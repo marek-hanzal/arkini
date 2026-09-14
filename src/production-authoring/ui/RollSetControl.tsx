@@ -270,8 +270,6 @@ const WeightedRollControl = ({
 							"quantity",
 							"max",
 						)}
-						minimumDescription={<Mx label="Weighted selections minimum help" />}
-						maximumDescription={<Mx label="Weighted selections maximum help" />}
 						value={roll.quantity}
 						onChangeFn={(quantity) =>
 							onChangeFn({

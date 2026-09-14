@@ -202,16 +202,11 @@ Clock:
   value: Clock
 Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.:
   value: Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.
-Clock enabled help:
-  value: |
-    Sets the Clock's authored starting state.
-
-    When disabled, interval and lifetime do not advance. When enabled, Clock rules may still pause it; every Enable rule must pass and any Disable rule wins.
 Clock expiry:
   value: Clock expiry
 Clock expiry output help:
   value: |
-    Resolves once when the finite lifetime reaches zero.
+    Available when **Lifetime** is configured and resolves once when that lifetime reaches zero. Clearing Lifetime keeps this output intact but pauses editing until a lifetime is set again.
 
     In **Loose-kill**, failed placement keeps the expired item alive until settlement can succeed. In **Kill switch**, returned reservations and buffers are placed first, then this output; anything that does not fit is lost and logged.
 Clock interval help:
@@ -244,6 +239,14 @@ Clock rules help:
     These rules pause or resume the complete Clock schedule.
 
     Every **Enable** rule must pass and any matching **Disable** rule vetoes it. Accepted production then uses the selected line's own rules independently.
+Clock status help:
+  value: |
+    ### Authored starting state
+
+    - **Enabled:** the lifetime and interval may advance while the item is on a Board.
+    - **Disabled:** both timers remain paused until runtime enables the Clock.
+
+    Clock rules are evaluated after this setting. Every **Enable** rule must pass, and any matching **Disable** rule pauses the Clock. Changing the status keeps the configured timers, rules, and expiry output.
 Close:
   value: Close
   dynamic: true
@@ -983,8 +986,6 @@ Open the inventory after all requirements and rules pass.:
   value: Open the inventory after all requirements and rules pass.
 Optional output resolved after the source action and target effect complete.:
   value: Optional output resolved after the source action and target effect complete.
-Output:
-  value: Output
 Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.:
   value: Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.
 Output set:
@@ -1380,6 +1381,8 @@ Starting layout controls help:
     - **Right-click** a stack to remove it.
     - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack. Anything at the destination is replaced.
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
+Status:
+  value: Status
 Storage:
   value: Storage
 Storage scope:
@@ -1401,7 +1404,7 @@ Target unit cost help:
 
     - **Selected item:** the item type that may pay. Only items with **Units** enabled are available.
     - **Board distance:** how far from the owner the engine may search for the payer.
-    - **Cost:** units removed from the matching item each time the action or job starts.
+    - **Cost:** units removed from the matching item each time the action or job starts. It stays disabled until an item is selected and cannot exceed that item's authored Units deposit.
 
     The payer stays in place. Spending its final unit resolves that item's normal depletion behavior.
 The authored line selected for automatic Clock impulses. Selecting Default does not change this selection.:
@@ -1526,14 +1529,6 @@ Weighted selections help:
     - **2–4:** randomly two, three, or four picks.
 
     Every pick uses the same candidate weights, and the same candidate may be selected more than once.
-Weighted selections maximum help:
-  value: |
-    Highest number of independent candidate picks this roll may perform.
-
-    The actual integer count is chosen from **Minimum** through **Maximum**, inclusive.
-Weighted selections minimum help:
-  value: |
-    Lowest number of independent candidate picks this roll performs when it resolves.
 With note:
   value: With note
 Write a note…:

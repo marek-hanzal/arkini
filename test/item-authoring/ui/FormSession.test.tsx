@@ -1255,7 +1255,9 @@ describe("item section form session", () => {
 		const { container, renderSection } = await render(<ProductionSection />);
 		const toggle = async (label: string) => {
 			const button = [
-				...container.querySelectorAll("button"),
+				...container.querySelectorAll<HTMLButtonElement>(
+					'[data-ui="EditorBooleanToggleGroupOption"]',
+				),
 			].find((candidate) => candidate.textContent === label);
 			if (button === undefined) throw new Error(`Missing ${label} toggle.`);
 			await act(async () => button.click());
@@ -1383,8 +1385,25 @@ describe("item section form session", () => {
 		if (duration === null) throw new Error("Missing clock lifetime field.");
 		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear lifetime"]');
 		if (clear === null) throw new Error("Missing lifetime clear action");
+		const expiryMode = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Loose-kill",
+		);
+		const addExpiryOutput = container.querySelector<HTMLButtonElement>(
+			'button[title="Add output set"]',
+		);
+		if (expiryMode === undefined || addExpiryOutput === null) {
+			throw new Error("Missing lifetime-dependent Clock controls.");
+		}
 		await act(async () => clear.click());
 		expect(duration.value).toBe("");
+		const disabledExpiryMode = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Loose-kill",
+		);
+		const disabledAddExpiryOutput = container.querySelector<HTMLButtonElement>(
+			'button[title="Add output set"]',
+		);
+		expect(disabledExpiryMode?.matches(":disabled")).toBe(true);
+		expect(disabledAddExpiryOutput?.matches(":disabled")).toBe(true);
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});

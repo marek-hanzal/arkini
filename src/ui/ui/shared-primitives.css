@@ -172,6 +172,10 @@
 		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
 }
 
+.ak-segmented-control[data-ui-invalid="true"] .ak-segmented-option {
+	border-color: var(--ak-danger);
+}
+
 .ak-segmented-option[data-ui-selected="true"] {
 	z-index: 1;
 	color: var(--ak-secondary-foreground);

@@ -232,6 +232,7 @@ const UnitsTargetUnitCostControl = ({
 	const translator = useTranslator();
 	const units = input.units ?? DraftDefaults.inputs.units.units;
 	const selectedItem = project.config.items[input.query.selector.itemId];
+	const selectedItemUnitAmount = selectedItem?.units?.amount;
 	const targetMissingUnits = selectedItem !== undefined && selectedItem.units === undefined;
 	const selectedItemError = readEditorFormValidationErrorFn(issues, "query", "selector");
 	return (
@@ -256,16 +257,23 @@ const UnitsTargetUnitCostControl = ({
 				includeItemFn={hasUnitsFn}
 				labelVisible={false}
 				value={input.query.selector}
-				onChangeFn={(selector) =>
+				onChangeFn={(selector) => {
+					const selectedUnitAmount = project.config.items[selector.itemId]?.units?.amount;
 					onChangeFn({
 						...input,
-						units,
+						units: {
+							...units,
+							cost:
+								selectedUnitAmount === undefined
+									? units.cost
+									: Math.min(units.cost, selectedUnitAmount),
+						},
 						query: {
 							...input.query,
 							selector,
 						},
-					})
-				}
+					});
+				}}
 			/>
 			<div className="grid items-end gap-3 sm:grid-cols-[auto_minmax(0,1fr)]">
 				<BoardDistanceControl
@@ -281,19 +289,22 @@ const UnitsTargetUnitCostControl = ({
 					}}
 				/>
 				<EditorNumberControl
+					disabled={selectedItemUnitAmount === undefined}
 					error={readEditorFormValidationErrorFn(issues, "units", "cost")}
 					label={translator.textFn("Cost")}
 					value={units.cost}
+					max={selectedItemUnitAmount}
 					min={1}
-					onChangeFn={(cost) =>
+					onChangeFn={(cost) => {
+						if (selectedItemUnitAmount === undefined) return;
 						onChangeFn({
 							...input,
 							units: {
 								...units,
-								cost,
+								cost: Math.min(cost, selectedItemUnitAmount),
 							},
-						})
-					}
+						});
+					}}
 				/>
 			</div>
 		</div>

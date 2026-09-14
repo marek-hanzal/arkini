@@ -79,6 +79,19 @@ const renderInput = async (
 	});
 };
 
+const changeInput = async (input: HTMLInputElement, value: string) => {
+	const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+	await act(async () => {
+		valueSetter.call(input, value);
+		input.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
+	});
+};
+
 const withoutUnitsUnitsInput = {
 	type: "units",
 	query: {
@@ -194,6 +207,92 @@ describe("InputControl", () => {
 		).toBe("true");
 		expect(unitCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).not.toBeNull();
 		expect(unitCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("1");
+	});
+
+	it("locks target unit Cost until an item is selected and caps it at that item's units", async () => {
+		const payer = {
+			...createSearchItem("battery-target", true),
+			units: {
+				amount: 7,
+			},
+		} satisfies ItemSchema.Type;
+		state.items = {
+			[payer.id]: payer,
+		};
+		const { container, root } = createContainer();
+		const onChangeFn = vi.fn();
+		await renderInput(
+			root,
+			{
+				...withoutUnitsUnitsInput,
+				units: {
+					cost: 99_999,
+					from: "target",
+				},
+				query: {
+					...withoutUnitsUnitsInput.query,
+					selector: {
+						type: "item",
+						itemId: "",
+					},
+				},
+			},
+			onChangeFn,
+		);
+
+		const cost = container.querySelector<HTMLInputElement>('input[type="number"]');
+		const search = container.querySelector<HTMLInputElement>(
+			'[data-ui="EditorSearchComboboxInput"]',
+		);
+		if (cost === null || search === null) throw new Error("Expected target unit controls.");
+		expect(cost.disabled).toBe(true);
+
+		await act(async () => search.click());
+		const option = document.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorSearchComboboxOption"]',
+		);
+		if (option === null) throw new Error("Expected selectable unit payer.");
+		await act(async () => option.click());
+		expect(onChangeFn).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				units: {
+					cost: 7,
+					from: "target",
+				},
+			}),
+		);
+
+		await renderInput(
+			root,
+			{
+				...withoutUnitsUnitsInput,
+				units: {
+					cost: 1,
+					from: "target",
+				},
+				query: {
+					...withoutUnitsUnitsInput.query,
+					selector: {
+						type: "item",
+						itemId: payer.id,
+					},
+				},
+			},
+			onChangeFn,
+		);
+		const enabledCost = container.querySelector<HTMLInputElement>('input[type="number"]');
+		if (enabledCost === null) throw new Error("Expected enabled target unit Cost.");
+		expect(enabledCost.disabled).toBe(false);
+		expect(enabledCost.max).toBe("7");
+		await changeInput(enabledCost, "99999");
+		expect(onChangeFn).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				units: {
+					cost: 7,
+					from: "target",
+				},
+			}),
+		);
 	});
 
 	it("renders only Cost for a self-paid Units", async () => {

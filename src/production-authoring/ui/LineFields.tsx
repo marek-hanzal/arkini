@@ -1,11 +1,8 @@
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
-import { CircleCheck, CircleX, Clock, Eye, EyeOff, Star, StarOff } from "lucide-react";
-
-import { EditorChoiceControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
+import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
-import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
@@ -15,6 +12,7 @@ import { Mx } from "~/translation/ui/Mx";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
+import { EditorBooleanToggleGroup } from "~/editor-control/ui/EditorBooleanToggleGroup";
 
 const defaultLine: LineSchema.Type = {
 	id: "",
@@ -90,85 +88,74 @@ export const LineFields = withFieldGroupFn({
 									/>
 								)}
 							</group.AppField>
-							<div className="flex min-w-0 flex-wrap items-center gap-4">
-								<group.AppField name="default">
-									{(field) => (
-										<EditorBooleanToggleBadge
-											checked={field.state.value}
-											checkedIcon={Star}
-											uncheckedIcon={StarOff}
-											label={translator.textFn("Default")}
-											description={
-												<Mx label="Production line default help" />
-											}
-											onChangeFn={(value) =>
-												onMarkerChangeFn("default", value)
-											}
+							<div className="flex min-w-0 flex-wrap items-end gap-3">
+								<group.Subscribe
+									selector={(state) => ({
+										ahead: state.values.ahead === true,
+										clock: state.values.clock === true,
+										default: state.values.default,
+										enable: state.values.enable,
+										show: state.values.show,
+									})}
+								>
+									{(markers) => (
+										<EditorBooleanToggleGroup
+											options={[
+												{
+													description: (
+														<Mx label="Production line default help" />
+													),
+													label: translator.textFn("Default"),
+													onChangeFn: (value) =>
+														onMarkerChangeFn("default", value),
+													selected: markers.default,
+													value: "default",
+												},
+												{
+													description: (
+														<Mx label="Production line Clock help" />
+													),
+													label: translator.textFn("Clock"),
+													onChangeFn: (value) =>
+														onMarkerChangeFn("clock", value),
+													selected: markers.clock,
+													value: "clock",
+												},
+												{
+													description: (
+														<Mx label="Production line visibility help" />
+													),
+													label: translator.textFn("Visible"),
+													onChangeFn: (value) =>
+														group.setFieldValue("show", value),
+													selected: markers.show,
+													value: "visible",
+												},
+												{
+													description: (
+														<Mx label="Production line enabled help" />
+													),
+													label: translator.textFn("Enabled"),
+													onChangeFn: (value) =>
+														group.setFieldValue("enable", value),
+													selected: markers.enable,
+													value: "enabled",
+												},
+												{
+													description: (
+														<Mx label="Production line check ahead help" />
+													),
+													label: translator.textFn("Check ahead"),
+													onChangeFn: (value) =>
+														group.setFieldValue("ahead", value),
+													selected: markers.ahead,
+													value: "ahead",
+												},
+											]}
 										/>
 									)}
-								</group.AppField>
-								<group.AppField name="clock">
-									{(field) => (
-										<EditorBooleanToggleBadge
-											checked={field.state.value === true}
-											checkedIcon={Clock}
-											uncheckedIcon={Clock}
-											label={translator.textFn("Clock")}
-											description={<Mx label="Production line Clock help" />}
-											onChangeFn={(value) => onMarkerChangeFn("clock", value)}
-										/>
-									)}
-								</group.AppField>
-								<group.AppField name="show">
-									{(field) => (
-										<field.BoolToggle
-											checkedIcon={Eye}
-											description={
-												<Mx label="Production line visibility help" />
-											}
-											label={translator.textFn("Visible")}
-											uncheckedIcon={EyeOff}
-										/>
-									)}
-								</group.AppField>
-								<group.AppField name="enable">
-									{(field) => (
-										<field.BoolToggle
-											checkedIcon={CircleCheck}
-											description={
-												<Mx label="Production line enabled help" />
-											}
-											label={translator.textFn("Enabled")}
-											uncheckedIcon={CircleX}
-										/>
-									)}
-								</group.AppField>
+								</group.Subscribe>
 							</div>
-							<group.AppField name="ahead">
-								{(field) => (
-									<EditorChoiceControl
-										required={false}
-										value={field.state.value === true ? "enable" : "disable"}
-										onChangeFn={(value) =>
-											field.handleChange(value === "enable")
-										}
-										options={[
-											{
-												label: translator.textFn("Enable"),
-												value: "enable",
-											},
-											{
-												label: translator.textFn("Disable"),
-												value: "disable",
-											},
-										]}
-										label={translator.textFn("Check ahead")}
-										description={
-											<Mx label="Production line check ahead help" />
-										}
-									/>
-								)}
-							</group.AppField>
 						</div>
 						<group.AppField name="description">
 							{(field) => (
@@ -236,7 +223,7 @@ export const LineFields = withFieldGroupFn({
 								<section className="grid min-w-0 content-start gap-3">
 									<EditorFormSectionDivider
 										description={<Mx label="Production output help" />}
-										title={translator.textFn("Output")}
+										title={translator.textFn("Outputs")}
 										variant="secondary"
 									/>
 									<OutputControl

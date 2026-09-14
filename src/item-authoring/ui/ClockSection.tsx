@@ -1,4 +1,4 @@
-import { CircleCheck, CircleX, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
@@ -48,39 +48,47 @@ const ClockFields = () => {
 							/>
 						)}
 					</form.AppField>
-					<div className="mt-6.5 flex h-[var(--ak-control-min-height)] w-fit items-center">
-						<form.AppField name="clock.enable">
-							{(field) => (
-								<field.BoolToggle
-									checkedIcon={CircleCheck}
-									uncheckedIcon={CircleX}
-									label={translator.textFn("Enabled")}
-									description={<Mx label="Clock enabled help" />}
-								/>
-							)}
-						</form.AppField>
-					</div>
-					{clock.durationMs === undefined ? null : (
-						<EditorChoiceControl
-							label={translator.textFn("Expiry mode")}
-							value={clock.expiryMode ?? "loose-kill"}
-							options={[
-								{
-									value: "loose-kill",
-									label: translator.textFn("Loose-kill"),
-									description: <Mx label="Clock loose-kill help" />,
-								},
-								{
-									value: "kill-switch",
-									label: translator.textFn("Kill switch"),
-									description: <Mx label="Clock kill-switch help" />,
-								},
-							]}
-							onChangeFn={(expiryMode) =>
-								form.setFieldValue("clock.expiryMode", expiryMode)
-							}
-						/>
-					)}
+					<form.AppField name="clock.enable">
+						{(field) => (
+							<EditorChoiceControl
+								description={<Mx label="Clock status help" />}
+								label={translator.textFn("Status")}
+								options={[
+									{
+										label: translator.textFn("Enabled"),
+										value: "enabled",
+									},
+									{
+										label: translator.textFn("Disabled"),
+										value: "disabled",
+									},
+								]}
+								required={false}
+								value={field.state.value ? "enabled" : "disabled"}
+								onChangeFn={(value) => field.handleChange(value === "enabled")}
+							/>
+						)}
+					</form.AppField>
+					<EditorChoiceControl
+						disabled={clock.durationMs === undefined}
+						label={translator.textFn("Expiry mode")}
+						value={clock.expiryMode ?? "loose-kill"}
+						options={[
+							{
+								value: "loose-kill",
+								label: translator.textFn("Loose-kill"),
+								description: <Mx label="Clock loose-kill help" />,
+							},
+							{
+								value: "kill-switch",
+								label: translator.textFn("Kill switch"),
+								description: <Mx label="Clock kill-switch help" />,
+							},
+						]}
+						onChangeFn={(expiryMode) =>
+							form.setFieldValue("clock.expiryMode", expiryMode)
+						}
+					/>
 				</div>
 			</EditorFormCard>
 			<EditorFormSection
@@ -113,27 +121,28 @@ const ClockFields = () => {
 					</form.Subscribe>
 				</EditorFormCard>
 			</EditorFormSection>
-			{clock.durationMs === undefined ? null : (
-				<>
-					<EditorFormSection
-						title={translator.textFn("Expiry output")}
-						description={<Mx label="Clock expiry output help" />}
+			<EditorFormSection
+				title={translator.textFn("Expiry output")}
+				description={<Mx label="Clock expiry output help" />}
+			>
+				<EditorFormCard>
+					<fieldset
+						className="m-0 min-w-0 border-0 p-0"
+						disabled={clock.durationMs === undefined}
 					>
-						<EditorFormCard>
-							<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
-								{(output) => (
-									<OutputControl
-										value={output}
-										onChangeFn={(next) =>
-											form.setFieldValue("clock.onExpire", next)
-										}
-									/>
-								)}
-							</form.Subscribe>
-						</EditorFormCard>
-					</EditorFormSection>
-				</>
-			)}
+						<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
+							{(output) => (
+								<OutputControl
+									value={output}
+									onChangeFn={(next) =>
+										form.setFieldValue("clock.onExpire", next)
+									}
+								/>
+							)}
+						</form.Subscribe>
+					</fieldset>
+				</EditorFormCard>
+			</EditorFormSection>
 		</div>
 	);
 };

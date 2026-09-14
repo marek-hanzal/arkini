@@ -218,8 +218,8 @@ export const EditorSecondsControl = ({
 );
 
 export const EditorChoiceControl = <Value extends string>({
-	compact = false,
 	description,
+	disabled = false,
 	error,
 	label,
 	onChangeFn,
@@ -227,7 +227,7 @@ export const EditorChoiceControl = <Value extends string>({
 	required = true,
 	value,
 }: {
-	readonly compact?: boolean;
+	readonly disabled?: boolean;
 	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<{
 		readonly description?: ReactNode;
@@ -247,11 +247,11 @@ export const EditorChoiceControl = <Value extends string>({
 	>
 		<SegmentedControl
 			dataUi="EditorChoiceControlOptions"
+			disabled={disabled}
 			invalid={error !== undefined}
 			onChangeFn={onChangeFn}
 			optionDataUi="EditorChoiceControlOption"
 			options={options}
-			size={compact ? "compact" : "default"}
 			value={value}
 		/>
 	</EditorValueField>

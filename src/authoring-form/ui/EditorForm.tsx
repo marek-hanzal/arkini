@@ -189,7 +189,6 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	return (
 		<EditorChoiceControl
-			compact
 			description={description}
 			error={error}
 			label={label}

@@ -34,21 +34,21 @@ const ProductionFields = withFieldGroupFn({
 		const { form, project } = useFormSession();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
-				<EditorFormCard>
-					<group.AppField name="maxQueueSize">
-						{(field) => (
-							<field.NumberField
-								label={translator.textFn("Queue capacity")}
-								description={<Mx label="Production queue capacity help" />}
-								min={1}
-							/>
-						)}
-					</group.AppField>
-				</EditorFormCard>
 				<EditorFormSection
 					description={<Mx label="Product lines help" />}
 					title={translator.textFn("Product lines")}
 				>
+					<EditorFormCard>
+						<group.AppField name="maxQueueSize">
+							{(field) => (
+								<field.NumberField
+									label={translator.textFn("Queue capacity")}
+									description={<Mx label="Production queue capacity help" />}
+									min={1}
+								/>
+							)}
+						</group.AppField>
+					</EditorFormCard>
 					<group.AppField
 						name="lines"
 						mode="array"

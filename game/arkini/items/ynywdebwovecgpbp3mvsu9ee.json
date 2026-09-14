@@ -1,0 +1,154 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ynywdebwovecgpbp3mvsu9ee",
+		"id": "wishing-well-with-coffee",
+		"title": "Wishing Well With Coffee",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"wishing-well-with-coffee"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"intervalMs": 5000,
+			"durationMs": 60000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-well",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"control": "automatic-only",
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "wish",
+				"title": "Wish",
+				"description": "A wish. A coffee",
+				"clock": true,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "weight",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"drop": [
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "clay-mug-with-coffee",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "roasted-coffee-bag",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "cauldron-with-coffee",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "roasted-coffee-beans",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "coffee-tankard",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

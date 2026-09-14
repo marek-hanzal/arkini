@@ -79,6 +79,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "recovering-beagle"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-goose"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-goose"
 			}
 		],
 		"maxQueueSize": 1,

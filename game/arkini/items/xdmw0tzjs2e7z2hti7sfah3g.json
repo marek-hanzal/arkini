@@ -22,6 +22,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "paper-boat-bath"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wine-bath"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "paper-boat-wine-bath"
 			}
 		],
 		"maxQueueSize": 1,

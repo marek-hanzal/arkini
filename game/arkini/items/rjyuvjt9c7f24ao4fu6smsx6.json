@@ -1,14 +1,14 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "fzkyszns4hv8l7fh68o62q00",
-		"id": "feast",
-		"title": "Feast",
-		"description": "Bigger yummi ever. Maybe The Last Dinner.",
+		"uid": "rjyuvjt9c7f24ao4fu6smsx6",
+		"id": "well-fed-beagle-puppy",
+		"title": "Well Fed Beagle Puppy",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"feast"
+				"well-fed-beagle-puppy"
 			]
 		},
 		"scope": "board",
@@ -26,10 +26,19 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "bio-waste",
+										"itemId": "beagle-puppy",
 										"quantity": {
 											"min": 1,
-											"max": 2
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 2,
+											"max": 3
 										},
 										"placement": "drop",
 										"rules": []

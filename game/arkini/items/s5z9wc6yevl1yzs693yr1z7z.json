@@ -40,6 +40,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "wishing-well"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "well-with-beer"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "wishing-well-with-beer"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "well-with-coffee"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "wishing-well-with-coffee"
 			}
 		],
 		"maxQueueSize": 1,

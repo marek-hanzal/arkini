@@ -1,0 +1,153 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "urdeb97ivb7urtbzj8k7oab1",
+		"id": "wishing-well-with-milk",
+		"title": "Wishing Well With Milk",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"wishing-well-with-milk"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"intervalMs": 5000,
+			"durationMs": 60000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-well",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "wish",
+				"title": "Make a Wish",
+				"description": "Milky way",
+				"clock": true,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "weight",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"drop": [
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "clay-bowl-with-milk",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "clay-jug-with-milk",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "clay-bowl-with-cream",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "cauldron-with-milk",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 1,
+											"drop": [
+												{
+													"itemId": "milk-mug",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

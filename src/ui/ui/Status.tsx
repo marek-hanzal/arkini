@@ -8,6 +8,7 @@ interface StatusProps {
 	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly iconSpin?: boolean;
+	readonly iconTone?: "default" | "muted" | "warning" | "primary";
 	readonly title: ReactNode;
 	readonly size?: "normal" | "large";
 	readonly variant?: "card" | "flat";
@@ -20,6 +21,7 @@ export const Status = ({
 	description,
 	icon,
 	iconSpin = false,
+	iconTone = "default",
 	title,
 	size = "normal",
 	variant = "card",
@@ -38,11 +40,12 @@ export const Status = ({
 		>
 			<div className="grid w-full min-w-0 max-w-md justify-items-center gap-3">
 				<Icon
-					className="size-7 text-subtle group-data-[ui-size=large]/status:size-16 group-data-[ui-size=large]/status:text-accent data-[ui-spin=true]:animate-spin"
+					className="size-7 text-subtle group-data-[ui-size=large]/status:size-16 data-[ui-tone=default]:group-data-[ui-size=large]/status:text-accent data-[ui-spin=true]:animate-spin data-[ui-tone=muted]:text-muted data-[ui-tone=warning]:text-warning data-[ui-tone=primary]:text-accent"
 					{...readDataUiFn({
 						dataUi: "StatusIcon",
 						state: {
 							spin: iconSpin,
+							tone: iconTone,
 						},
 					})}
 				/>

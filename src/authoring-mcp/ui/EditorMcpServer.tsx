@@ -14,6 +14,7 @@ interface EditorMcpServerProps {
 	readonly onStopRemoteFn: () => void;
 	readonly overview: EditorMcpOverviewSchema.Type;
 	readonly pending: boolean;
+	readonly startingLocal: boolean;
 }
 
 export const EditorMcpServer = ({
@@ -23,6 +24,7 @@ export const EditorMcpServer = ({
 	onStopRemoteFn,
 	overview,
 	pending,
+	startingLocal,
 }: EditorMcpServerProps) => {
 	const localUrl =
 		overview.local.type === "ready"
@@ -44,6 +46,13 @@ export const EditorMcpServer = ({
 					variant="flat"
 					size="large"
 					icon={Laptop}
+					iconTone={
+						overview.local.type === "ready"
+							? "primary"
+							: startingLocal
+								? "warning"
+								: "muted"
+					}
 					title="Local MCP"
 					action={
 						<div className="grid justify-items-center gap-4">
@@ -78,21 +87,21 @@ export const EditorMcpServer = ({
 					variant="flat"
 					size="large"
 					icon={Globe}
+					iconTone={
+						overview.remote.type === "ready"
+							? "primary"
+							: overview.remote.type === "starting"
+								? "warning"
+								: "muted"
+					}
 					title="Remote MCP"
 					action={
 						<div className="grid justify-items-center gap-4">
 							<EditorMcpCopyableUrl url={remoteUrl} />
-							{overview.remote.type === "unavailable" ||
-							overview.remote.type === "starting" ? (
+							{overview.remote.type === "unavailable" ? (
 								<EditorMcpStatus
-									message={
-										overview.remote.type === "unavailable"
-											? overview.remote.message
-											: "Starting tunnel and checking OAuth…"
-									}
-									tone={
-										overview.remote.type === "unavailable" ? "danger" : "muted"
-									}
+									message={overview.remote.message}
+									tone="danger"
 								/>
 							) : null}
 							{overview.remote.type === "ready" ? (

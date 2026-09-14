@@ -14,6 +14,7 @@ export namespace useEditorMcpOverviewController {
 		readonly configureFn: (configuration: EditorMcpConfigurationSchema.Type) => void;
 		readonly overview?: EditorMcpOverviewSchema.Type;
 		readonly pending: boolean;
+		readonly startingLocal: boolean;
 		readonly resetAuthFn: () => void;
 		readonly startLocalFn: () => void;
 		readonly startRemoteFn: () => void;
@@ -60,6 +61,7 @@ export const useEditorMcpOverviewController = (): useEditorMcpOverviewController
 			});
 		},
 		overview,
+		startingLocal: state.kind === "pending" && state.action === "start-local",
 		pending: state.kind === "loading" || state.kind === "pending",
 		resetAuthFn: () =>
 			executeFn({

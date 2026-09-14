@@ -127,6 +127,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 						match(section)
 							.with("server", () => (
 								<EditorMcpServer
+									startingLocal={overviewController.startingLocal}
 									onStartLocalFn={() =>
 										executeFn(overviewController.startLocalFn)
 									}
@@ -141,8 +142,9 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 									pending={overviewController.pending}
 								/>
 							))
-							.with("settings", () => (
+							.with("local", "ngrok", (settingsSection) => (
 								<EditorMcpSettings
+									section={settingsSection}
 									authtoken={settingsController.authtoken}
 									ngrokDomain={settingsController.ngrokDomain}
 									onSaveNgrokFn={settingsController.saveNgrokFn}

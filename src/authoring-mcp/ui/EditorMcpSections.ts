@@ -4,8 +4,12 @@ export const EditorMcpSections = [
 		label: "Server",
 	},
 	{
-		id: "settings",
-		label: "Settings",
+		id: "local",
+		label: "Local",
+	},
+	{
+		id: "ngrok",
+		label: "Ngrok",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly id: string;

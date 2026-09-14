@@ -13,7 +13,7 @@ export const EditorMcpCopyableUrl = ({
 			title={url}
 		>
 			{label === undefined ? null : `${label}: `}
-			{url ?? "Configure the remote domain in Settings."}
+			{url ?? "Configure the remote domain in the Ngrok tab."}
 		</span>
 		{url === undefined ? null : (
 			<CopyButton

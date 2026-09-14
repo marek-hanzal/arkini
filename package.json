@@ -33,8 +33,6 @@
 		"@tanstack/react-hotkeys": "^0.10.0",
 		"@tanstack/react-router": "1.170.35",
 		"@tanstack/react-virtual": "3.14.12",
-		"cytoscape": "3.34.3",
-		"cytoscape-fcose": "2.2.0",
 		"effect": "4.0.0-rc.115",
 		"express": "5.2.1",
 		"express-rate-limit": "8.7.0",

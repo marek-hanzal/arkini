@@ -2,7 +2,6 @@ import { useMatchRoute } from "@tanstack/react-router";
 import {
 	Boxes,
 	FolderCog,
-	GitFork,
 	Images,
 	LayoutGrid,
 	NotebookPen,
@@ -42,14 +41,6 @@ export const EditorWorkspaceRoutes = [
 		matchTo: "/editor/$projectId/board",
 		shortcut: "Mod+Shift+B",
 		to: "/editor/$projectId/board",
-	},
-	{
-		id: "flow",
-		icon: GitFork,
-		label: "Flow",
-		matchTo: "/editor/$projectId/flow",
-		shortcut: "Mod+Shift+F",
-		to: "/editor/$projectId/flow",
 	},
 
 	{

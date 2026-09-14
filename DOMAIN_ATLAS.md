@@ -20,7 +20,7 @@ The densest islands have local maps:
 | Production | Action, condition, input, line, job, delivery and output | [`src/production-line/README.md`](src/production-line/README.md) |
 | Retained scene | Game Scene, Tile Presentation, Rendering, Motion and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
-| Flow and Estimate | Acquisition graph, layout, Canvas and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
+| Acquisition and Estimate | Shared acquisition graph and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
 | Editor persistence | Project Authoring filesystem repository, transactions, renderer projection, MCP and Electron IPC | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 
 ## Change impact
@@ -142,8 +142,6 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `authoring-mcp` | MCP schemas, storage, HTTP/tools/tunnel lifecycle and Editor presentation | [`src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts`](src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts) |
 | `item-chain` | Root-owned merge and Clock consequence exploration in Item detail | [`src/item-chain/fn/readItemChainsFn.ts`](src/item-chain/fn/readItemChainsFn.ts), [`src/item-chain/ui/ItemChain.tsx`](src/item-chain/ui/ItemChain.tsx) |
 | `flow` | Authored acquisition graph and relation semantics | [`src/flow/fn/createAcquisitionGraphFn.ts`](src/flow/fn/createAcquisitionGraphFn.ts) |
-| `flow-layout` | Deterministic graph layout and worker lifecycle | [`src/flow-layout/fx/layoutInWorkerFx.ts`](src/flow-layout/fx/layoutInWorkerFx.ts) |
-| `flow-canvas` | Flow projections, Canvas painting and interaction | [`src/flow-canvas/ui/EditorGameFlow.tsx`](src/flow-canvas/ui/EditorGameFlow.tsx) |
 | `estimate` | Optimistic acquisition witnesses, index, cache and worker | [`src/estimate/README.md`](src/estimate/README.md) |
 
 The filesystem Project Repository and Electron IPC composition are mapped in [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).

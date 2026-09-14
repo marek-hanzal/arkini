@@ -30,7 +30,6 @@ import { Route as EditorProjectIdAssetsRouteImport } from "./@routes/editor/$pro
 import { Route as EditorProjectIdBoardRouteImport } from "./@routes/editor/$projectId/board"
 import { Route as EditorProjectIdBuildRouteImport } from "./@routes/editor/$projectId/build"
 import { Route as EditorProjectIdEditorRouteImport } from "./@routes/editor/$projectId/editor"
-import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
 import { Route as EditorProjectIdMcpRouteImport } from "./@routes/editor/$projectId/mcp"
 import { Route as EditorProjectIdNotesRouteImport } from "./@routes/editor/$projectId/notes"
 import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
@@ -175,11 +174,6 @@ const EditorProjectIdBuildRoute = EditorProjectIdBuildRouteImport.update({
 const EditorProjectIdEditorRoute = EditorProjectIdEditorRouteImport.update({
   id: "/editor",
   path: "/editor",
-  getParentRoute: () => EditorProjectIdRoute,
-} as any)
-const EditorProjectIdFlowRoute = EditorProjectIdFlowRouteImport.update({
-  id: "/flow",
-  path: "/flow",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
 const EditorProjectIdMcpRoute = EditorProjectIdMcpRouteImport.update({
@@ -440,7 +434,6 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
-  "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/mcp": typeof EditorProjectIdMcpRouteWithChildren
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
@@ -499,7 +492,6 @@ export interface FileRoutesByTo {
   "/settings/game": typeof LauncherSettingsGameRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/settings": typeof LauncherSettingsIndexRoute
@@ -558,7 +550,6 @@ export interface FileRoutesById {
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
-  "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/mcp": typeof EditorProjectIdMcpRouteWithChildren
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
@@ -624,7 +615,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board"
     | "/editor/$projectId/build"
     | "/editor/$projectId/editor"
-    | "/editor/$projectId/flow"
     | "/editor/$projectId/mcp"
     | "/editor/$projectId/notes"
     | "/editor/$projectId/project"
@@ -683,7 +673,6 @@ export interface FileRouteTypes {
     | "/settings/game"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/build"
-    | "/editor/$projectId/flow"
     | "/editor/$projectId/notes"
     | "/game/$packageId/cheats"
     | "/settings"
@@ -741,7 +730,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board"
     | "/editor/$projectId/build"
     | "/editor/$projectId/editor"
-    | "/editor/$projectId/flow"
     | "/editor/$projectId/mcp"
     | "/editor/$projectId/notes"
     | "/editor/$projectId/project"
@@ -943,13 +931,6 @@ declare module "@tanstack/react-router" {
       path: "/editor"
       fullPath: "/editor/$projectId/editor"
       preLoaderRoute: typeof EditorProjectIdEditorRouteImport
-      parentRoute: typeof EditorProjectIdRoute
-    }
-    "/editor/$projectId/flow": {
-      id: "/editor/$projectId/flow"
-      path: "/flow"
-      fullPath: "/editor/$projectId/flow"
-      preLoaderRoute: typeof EditorProjectIdFlowRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
     "/editor/$projectId/mcp": {
@@ -1511,7 +1492,6 @@ interface EditorProjectIdRouteChildren {
   EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRouteWithChildren
   EditorProjectIdBuildRoute: typeof EditorProjectIdBuildRoute
   EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
-  EditorProjectIdFlowRoute: typeof EditorProjectIdFlowRoute
   EditorProjectIdMcpRoute: typeof EditorProjectIdMcpRouteWithChildren
   EditorProjectIdNotesRoute: typeof EditorProjectIdNotesRoute
   EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRouteWithChildren
@@ -1522,7 +1502,6 @@ const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
   EditorProjectIdBoardRoute: EditorProjectIdBoardRouteWithChildren,
   EditorProjectIdBuildRoute: EditorProjectIdBuildRoute,
   EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
-  EditorProjectIdFlowRoute: EditorProjectIdFlowRoute,
   EditorProjectIdMcpRoute: EditorProjectIdMcpRouteWithChildren,
   EditorProjectIdNotesRoute: EditorProjectIdNotesRoute,
   EditorProjectIdProjectRoute: EditorProjectIdProjectRouteWithChildren,

@@ -10,7 +10,6 @@ import {
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
-import { readItemOriginFlowFx } from "~/flow/fx/readItemOriginFlowFx";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 
 it.each([
@@ -35,7 +34,7 @@ it.each([
 		],
 	],
 ] as const)(
-	"keeps distinct authored operations and their Flow edges when IDs contain separators: %j",
+	"keeps distinct authored operations and their acquisition routes when IDs contain separators: %j",
 	async (first, second) => {
 		const owners = [
 			first,
@@ -79,19 +78,5 @@ it.each([
 			new Set(sources.flatMap((source) => source.outputs.map((output) => output.routeId)))
 				.size,
 		).toBe(2);
-		const flow = await Effect.runPromise(
-			readItemOriginFlowFx({
-				config: compiled.config,
-			}),
-		);
-		for (const [ownerId] of owners) {
-			const owner = flow.nodes.find((node) => node.itemId === ownerId);
-			expect(owner?.operations).toHaveLength(1);
-			expect(
-				flow.edges.some(
-					(edge) => edge.source === owner?.id && edge.target === "item:product",
-				),
-			).toBe(true);
-		}
 	},
 );

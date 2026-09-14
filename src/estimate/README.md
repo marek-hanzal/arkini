@@ -1,14 +1,12 @@
-# Flow and Estimate map
+# Acquisition and Estimate map
 
-Flow and Estimate analyze authored acquisition relationships. They never simulate Runtime execution and never provide an engine-valid witness. This README separates graph meaning, layout, Canvas presentation and optimistic estimation.
+The shared `flow` domain and Estimate analyze authored acquisition relationships. They never simulate Runtime execution and never provide an engine-valid witness. The Editor has no Flow visualization; the acquisition graph remains the shared authority for Estimate, Connections, and MCP relation queries.
 
 ## Owners
 
 | Domain | Owns | Public entrypoints |
 | --- | --- | --- |
-| `flow` | Acquisition facts, routes, bounded output distributions and origin projection | [`../flow/fn/createAcquisitionGraphFn.ts`](../flow/fn/createAcquisitionGraphFn.ts), [`../flow/fx/readItemOriginFlowFx.ts`](../flow/fx/readItemOriginFlowFx.ts) |
-| `flow-layout` | Node metrics, deterministic layout/routing and worker boundary | [`../flow-layout/fx/layoutFx.ts`](../flow-layout/fx/layoutFx.ts), [`../flow-layout/fx/layoutInWorkerFx.ts`](../flow-layout/fx/layoutInWorkerFx.ts) |
-| `flow-canvas` | Highlight/navigation projections, Canvas painting and Flow product UI | [`../flow-canvas/ui/EditorGameFlow.tsx`](../flow-canvas/ui/EditorGameFlow.tsx), [`../flow-canvas/ui/OriginFlow.tsx`](../flow-canvas/ui/OriginFlow.tsx) |
+| `flow` | Acquisition facts, routes, bounded output distributions and origin projection | [`../flow/fn/createAcquisitionGraphFn.ts`](../flow/fn/createAcquisitionGraphFn.ts), [`../flow/fn/readItemOriginRelationsFn.ts`](../flow/fn/readItemOriginRelationsFn.ts) |
 | `estimate` | Requirement topology, expected runs, route policy, witnesses, index, cache and worker | [`fn/estimateRequestsFn.ts`](fn/estimateRequestsFn.ts), [`fn/estimateItemCatalogFn.ts`](fn/estimateItemCatalogFn.ts), [`atom/ItemEstimateCacheAtom.ts`](atom/ItemEstimateCacheAtom.ts) |
 
 ## Dependency shape
@@ -16,17 +14,15 @@ Flow and Estimate analyze authored acquisition relationships. They never simulat
 The stable core direction is:
 
 ```text
-flow-canvas → flow-layout → flow
 estimate/{fn,type} → flow/{fn,type}
 ```
 
 - Flow core reads authored config, Item and production contracts. Its only cross-domain behavior dependency in that set is the canonical authored-Line read from `production-line`.
-- Flow Layout consumes Flow values but owns no relation meaning. Flow Canvas consumes both and owns no graph or geometry truth.
 - Estimate core consumes Flow's acquisition graph. It imports no renderer, route, Electron or runtime gameplay owner.
 - The top-level `estimate ↔ item-authoring` pair is presentation/shared-search composition: Estimate reuses the Item search policy and the shared artwork catalog card, while Item detail embeds an Estimate section. It is not recursive analysis behavior.
 - Project Authoring warms or presents Estimate; Estimate worker contracts use the immutable Project type. Project persistence never depends on an Estimate result.
 
-Do not collapse the four roots into a `flow` superdomain. Their change reasons and platform boundaries are different.
+Keep graph facts in `flow` and optimistic acquisition policy in `estimate`; their contracts remain distinct.
 
 ## Analysis flow
 
@@ -40,15 +36,6 @@ immutable Project revision
 → shared finite-root/co-product accounting
 → normalized witness projection
 → immutable catalog/index cached for that revision
-```
-
-Flow display takes a separate branch:
-
-```text
-authored acquisition graph
-→ origin projection
-→ worker layout
-→ Canvas projection and painting
 ```
 
 Editor Connections uses [`readItemConnectionFactsFn`](../flow/fn/readItemConnectionFactsFn.ts) to project direct authored inputs and outputs in either direction. Each item retains its source paths (line, action, merge, Units, or Clock, plus exact input, rule/condition, and output set/roll/candidate/drop positions); this lookup does not evaluate runtime availability or Estimate reachability.
@@ -84,8 +71,6 @@ Likely affected:
 
 - `flow` regression proofs when acquisition facts, line inputs, units, outputs or co-products change.
 - Estimate topology, routes, demand sharing, diagnostics, witness projection and cache identity.
-- Flow Layout only when graph shape or layout inputs change.
-- Flow Canvas only when origin/highlight/navigation projection changes.
 - Editor Item detail and project warmup at their exact embedding boundaries.
 
 Usually not affected:

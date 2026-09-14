@@ -516,8 +516,6 @@ Item list help:
     **Partial** means analysis hit a safety limit. **Unreachable** means there is no complete authored route from the starting items. Unavailable results appear as a dash. This is a planning preview, not a playthrough or a balance verdict.
 
     **New item** opens an unsaved draft. Creating an item from an asset supplies its initial artwork and title. Save applies changes to the project.
-Item merge output empty title:
-  value: Create extra items when this merge completes.
 Item merges empty title:
   value: Define what happens when this item is dropped onto another.
 Item merges help:
@@ -767,8 +765,6 @@ Optional output resolved after the source action and target effect complete.:
   value: Optional output resolved after the source action and target effect complete.
 Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.:
   value: Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.
-Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.:
-  value: Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.
 Output:
   value: Output
 Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.:
@@ -825,8 +821,6 @@ Production is enabled when at least one line is configured. Each line keeps its 
   value: Production is enabled when at least one line is configured. Each line keeps its own availability rules.
 Production line:
   value: Production line
-Production line output empty title:
-  value: Create items when this production line completes.
 Production output help:
   value: |
     Output resolves after a completed production job.
@@ -1130,10 +1124,6 @@ Use:
   value: Use
 Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.:
   value: Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.
-View assets:
-  value: View assets
-View items:
-  value: View items
 Visible:
   value: Visible
 Visible lines are shown to the player before runtime rules alter their visibility.:

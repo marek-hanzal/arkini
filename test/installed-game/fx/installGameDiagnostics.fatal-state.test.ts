@@ -1,4 +1,4 @@
-import { Cause, Effect } from "effect";
+import { Cause, Effect, Exit } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
@@ -87,7 +87,7 @@ describe("Game fatal-state diagnostics", () => {
 				cheats: {
 					enabled: false,
 					everEnabled: false,
-					instantGameplay: false,
+					speedUpGameplay: false,
 				},
 				currentSpace: 0,
 				items: [
@@ -154,6 +154,7 @@ describe("Game fatal-state diagnostics", () => {
 				restored: true,
 				runRendererEffectFn: Effect.runSync,
 				session: {
+					readFn: () => Exit.die("No Tick in this fatal/transition fixture"),
 					getFatalErrorFn: () => fatal,
 					getTransitionSnapshotFn: () => transition,
 					subscribeFatalErrorFn: (listener) => {

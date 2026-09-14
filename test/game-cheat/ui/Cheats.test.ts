@@ -87,7 +87,7 @@ afterEach(async () => {
 });
 
 describe("Cheats", () => {
-	it("renders and mutates the authoritative save-scoped Instant gameplay option", async () => {
+	it("renders and mutates the authoritative save-scoped Speed up option", async () => {
 		const config = createJobTestConfig();
 		const session = await createTestGameSession({
 			config,
@@ -135,33 +135,33 @@ describe("Cheats", () => {
 		const enable = container.querySelector<HTMLInputElement>(
 			'[data-ui="CheatsEnabledForGame"] input',
 		);
-		const instant = container.querySelector<HTMLInputElement>(
-			'[data-ui="CheatsInstantGameplay"] input',
+		const speedUp = container.querySelector<HTMLInputElement>(
+			'[data-ui="CheatsSpeedUpGameplay"] input',
 		);
-		if (enable === null || instant === null) throw new Error("Expected Cheat toggles.");
+		if (enable === null || speedUp === null) throw new Error("Expected Cheat toggles.");
 		expect(enable.checked).toBe(false);
-		expect(instant.disabled).toBe(true);
+		expect(speedUp.disabled).toBe(true);
 
 		await act(async () => enable.click());
 		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.enabled).toBe(true));
 		expect(session.getSnapshotFn().cheats.everEnabled).toBe(true);
-		expect(instant.disabled).toBe(false);
+		expect(speedUp.disabled).toBe(false);
 		expect(container.textContent).toContain("Cheat mode saved.");
 
-		await act(async () => instant.click());
-		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.instantGameplay).toBe(true));
-		expect(instant.checked).toBe(true);
-		expect(container.textContent).toContain("Instant gameplay saved.");
+		await act(async () => speedUp.click());
+		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.speedUpGameplay).toBe(true));
+		expect(speedUp.checked).toBe(true);
+		expect(container.textContent).toContain("Speed up saved.");
 
 		await act(async () => enable.click());
 		await vi.waitFor(() => expect(session.getSnapshotFn().cheats.enabled).toBe(false));
 		expect(session.getSnapshotFn().cheats).toEqual({
 			enabled: false,
 			everEnabled: true,
-			instantGameplay: true,
+			speedUpGameplay: true,
 		});
-		expect(instant.checked).toBe(true);
-		expect(instant.disabled).toBe(true);
+		expect(speedUp.checked).toBe(true);
+		expect(speedUp.disabled).toBe(true);
 	});
 
 	it("blocks same-tick Back admission after a Cheat command claims the surface", async () => {

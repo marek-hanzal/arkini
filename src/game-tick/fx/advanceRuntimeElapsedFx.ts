@@ -50,7 +50,7 @@ export type AdvanceRuntimeElapsedError =
 	| JobNotFoundError
 	| JobNotReadyError;
 
-/** Replays one whole fixed-step elapsed budget inside one runtime transaction. */
+/** Replays one whole simulation-time budget inside one runtime transaction. */
 export const advanceRuntimeElapsedFx: (
 	props: AdvanceRuntimeElapsedProps,
 ) => Effect.Effect<

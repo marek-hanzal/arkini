@@ -91,7 +91,7 @@ vi.mock("~/game-cheat/ui/useCheatsModel", async () => {
 			return {
 				blocked,
 				enabled: true,
-				instantGameplay: false,
+				speedUpGameplay: false,
 				requestExitFn: (runFx: import("effect").Effect.Effect<void, unknown>) => {
 					if (state.blocked) return;
 					state.publishBlocked(true);
@@ -103,7 +103,7 @@ vi.mock("~/game-cheat/ui/useCheatsModel", async () => {
 					kind: "idle" as const,
 				},
 				setEnabledFn: vi.fn(),
-				setInstantGameplayFn: vi.fn(),
+				setSpeedUpGameplayFn: vi.fn(),
 			};
 		},
 	};

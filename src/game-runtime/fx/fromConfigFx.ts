@@ -11,7 +11,7 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace: config.start.currentSpace,
 		items: [],

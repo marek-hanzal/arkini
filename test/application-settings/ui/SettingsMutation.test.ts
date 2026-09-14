@@ -214,7 +214,7 @@ describe("Settings mutation authority", () => {
 		expect(game.getSnapshotFn().cheats).toEqual({
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		});
 	});
 });

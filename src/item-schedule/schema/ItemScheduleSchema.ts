@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ItemScheduleExpiryModeSchema } from "~/item-schedule/schema/ItemScheduleExpiryModeSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { RuleSchema } from "~/production-action/schema/RuleSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
@@ -13,11 +14,16 @@ export const ItemScheduleSchema = z
 			),
 		durationMs: TimeSchema.min(100)
 			.optional()
-			.describe("Optional active lifetime; accepted work can outlive the schedule."),
+			.describe(
+				"Optional active lifetime; expiryMode determines whether accepted work may outlive it.",
+			),
+		expiryMode: ItemScheduleExpiryModeSchema.optional().describe(
+			"Lifetime expiry policy; omission uses loose-kill. Has no effect without a finite duration.",
+		),
 		enable: z.boolean().default(true),
 		rules: z.array(RuleSchema).default([]),
 		onExpire: OutputSchema.optional().describe(
-			"Output emitted atomically when the expired owner finishes settling production.",
+			"Output resolved at owner expiry in both modes; kill-switch places what fits after returned materials and logs the excess as lost, within the same atomic removal.",
 		),
 	})
 	.strict()

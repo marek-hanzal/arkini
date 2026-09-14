@@ -13,18 +13,21 @@ export namespace GameLayerFx {
 	export interface Props {
 		config: GameConfigSchema.Type;
 		state?: StateSchema.Type;
+		speedUpMultiplier?: number;
 	}
 }
 
 /** Test-only composition of canonical Runtime and deterministic Tick without a live loop. */
-export const GameLayerFx = ({ config, state }: GameLayerFx.Props) => {
+export const GameLayerFx = ({ config, state, speedUpMultiplier }: GameLayerFx.Props) => {
 	const makeGameLayer = (initialRuntime?: RuntimeSchema.Type) => {
 		const runtime = GameRuntimeLayerFx({
 			config,
 			initialRuntime,
 		});
 		const clock = TickTestClockLayer;
-		const tick = TickLayerFx.pipe(Layer.provide(Layer.merge(runtime, clock)));
+		const tick = TickLayerFx({
+			speedUpMultiplier,
+		}).pipe(Layer.provide(Layer.merge(runtime, clock)));
 		return Layer.mergeAll(runtime, tick, clock);
 	};
 

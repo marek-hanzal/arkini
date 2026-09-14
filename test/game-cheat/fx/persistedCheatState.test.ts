@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
-import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 const config = createJobTestConfig();
@@ -28,10 +28,10 @@ describe("persisted cheat state", () => {
 			expect(session.getSnapshotFn().cheats).toEqual({
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			});
 			await session.runFn(
-				setInstantGameplayFx({
+				setSpeedUpGameplayFx({
 					enabled: true,
 				}),
 			);
@@ -49,7 +49,7 @@ describe("persisted cheat state", () => {
 		expect(saved.cheats).toEqual({
 			enabled: true,
 			everEnabled: true,
-			instantGameplay: true,
+			speedUpGameplay: true,
 		});
 		const restored = await createTestGameSession({
 			config,
@@ -66,7 +66,7 @@ describe("persisted cheat state", () => {
 			expect(restored.getSnapshotFn().cheats).toEqual({
 				enabled: false,
 				everEnabled: true,
-				instantGameplay: true,
+				speedUpGameplay: true,
 			});
 		} finally {
 			await Effect.runPromise(restored.disposeFx);

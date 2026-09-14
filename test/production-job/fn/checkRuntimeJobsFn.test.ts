@@ -48,7 +48,7 @@ describe("checkRuntimeJobsFn", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -125,7 +125,7 @@ describe("checkRuntimeJobsFn", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -170,7 +170,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace: 0,
 		items: [

@@ -59,14 +59,14 @@ const gameSnapshots = {
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 	},
 	enabled: {
 		cheats: {
 			enabled: true,
 			everEnabled: true,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 	},
 } as const;

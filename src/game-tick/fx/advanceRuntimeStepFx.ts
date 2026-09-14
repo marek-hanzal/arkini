@@ -1,10 +1,10 @@
+import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
 import { Effect } from "effect";
 
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import { advanceDeliveriesRuntimeFx } from "~/production-delivery/fx/advanceDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -83,6 +83,12 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 	const events: GameEventSchema.Type[] = [];
 	for (const request of queueSnapshot) {
 		if (handledOwnerItemIds.has(request.ownerItemId)) continue;
+		const owner = draft.items.find((item) => item.id === request.ownerItemId);
+		if (
+			owner?.schedule?.remainingDurationMs === 0 &&
+			readItemScheduleFn(owner.item)?.expiryMode === "kill-switch"
+		)
+			continue;
 
 		const dispatched = yield* dispatchQueueRequestFx(request.id, draft);
 		if (dispatched.type !== "started" && dispatched.type !== "delivery-scheduled") continue;
@@ -113,9 +119,6 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	// identities earn time only from the next boundary, regardless of that output path.
 	const boundaryStart = yield* dispatchIdleQueueRequestsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesRuntimeFx(boundaryStart.runtime);
-	const instantGameplay = isInstantGameplayEnabledFn({
-		runtime: deliveryStart.runtime,
-	});
 	const jobs = sortJobsFn(deliveryStart.runtime.jobs);
 	const readyMaterialJobIds = readReadyMaterialJobIdsFn(deliveryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
@@ -138,7 +141,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (liveJob === undefined) continue;
 		draft = replaceJobFn(draft, {
 			...liveJob,
-			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - SimulationStepMs),
+			remainingMs: Math.max(0, liveJob.remainingMs - SimulationStepMs),
 		});
 	}
 

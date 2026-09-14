@@ -81,13 +81,13 @@ clear pending owner queue
 
 A queued request owns no time, material, units or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
-Scheduled owners use the same selected-line reader and one-intent admission. `Common.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally. Player-control admission is separate from autonomous work and shared by production commands and their projections.
+Scheduled owners use the same selected-line reader and one-intent admission. `Common.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally in loose-kill mode, while kill-switch cancels it. Player-control admission is separate from autonomous work and shared by production commands and their projections.
 
 ## Important invariants
 
 - Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.
 - A skipped request keeps its identity, line and valid buffered inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
-- One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; active Jobs remain non-preemptive and stored owners stay blocked.
+- One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs and stored owners stay blocked. Explicit forced owner removal can abort active Jobs.
 - Clearing pending work returns its unused line-input material without cancelling active work.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.
 - Active Jobs reserve the worst possible output quantity; queued requests reserve nothing.
@@ -114,3 +114,5 @@ Usually not affected:
 - Pixi geometry, animation or pointer policy when committed event/projection shape is unchanged.
 
 Changes to persisted Job/Input/Delivery schemas, Game Events or Item placement cross those defaults and require following the exact consumers.
+
+Clock kill-switch uses [`forceRemoveRuntimeItemFx`](../game-runtime/fx/forceRemoveRuntimeItemFx.ts), the general atomic removal path. It cancels all owner intent and active work, discards consumed inputs without unit refunds or line output, and returns reservations before buffers and expiry Output. Ordinary completion retains all-or-nothing placement. Forced removal alone permits logged capacity overflow; parent-job reconciliation uses that same policy when the removed root was committed material. Successful completions at the expiry boundary still win.

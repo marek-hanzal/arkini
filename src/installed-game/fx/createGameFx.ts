@@ -1,3 +1,4 @@
+import { GameplaySpeedUpMultiplier } from "~/game-cheat/constant/GameplaySpeedUpMultiplier";
 import { Effect } from "effect";
 import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
@@ -78,6 +79,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		state = saved.state;
 	}
 	const session = yield* createGameSessionFx({
+		speedUpMultiplier: GameplaySpeedUpMultiplier,
 		config: loaded.payload.config,
 		...(state === undefined
 			? {}

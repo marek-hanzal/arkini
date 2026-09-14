@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { settleInstantGameplayFx } from "~/game-cheat/fx/settleInstantGameplayFx";
 
 export namespace setCheatEnabledFx {
 	export interface Props {
@@ -34,6 +33,5 @@ export const setCheatEnabledFx = Effect.fn("setCheatEnabledFx")(function* ({
 			} satisfies RuntimeSchema.Type,
 		] as const);
 	});
-	if (enabled && cheats.instantGameplay) yield* settleInstantGameplayFx();
 	return cheats;
 });

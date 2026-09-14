@@ -1,5 +1,4 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
@@ -27,15 +26,13 @@ const subtractQuantityFn = (
 };
 
 const readJobMaximumOutputQuantitiesFn = ({
-	job,
+	consumed,
 	line,
 	owner,
-	runtime,
 }: {
-	readonly job: JobSchema.Type;
+	readonly consumed: ReadonlyArray<RuntimeItemSchema.Type>;
 	readonly line: LineSchema.Type;
 	readonly owner: RuntimeItemSchema.Type;
-	readonly runtime: RuntimeSchema.Type;
 }) => {
 	const quantities = new Map<IdSchema.Type, number>();
 	if (line.output !== undefined) {
@@ -57,13 +54,8 @@ const readJobMaximumOutputQuantitiesFn = ({
 		);
 	}
 
-	for (const item of runtime.items) {
-		if (
-			item.location.scope === LocationScopeEnumSchema.enum.Job &&
-			item.location.jobId === job.id
-		) {
-			subtractQuantityFn(quantities, item.item.id, item.quantity);
-		}
+	for (const item of consumed) {
+		subtractQuantityFn(quantities, item.item.id, item.quantity);
 	}
 
 	if (depleted) {
@@ -89,9 +81,22 @@ export const readReservedJobOutputQuantitiesFn = ({
 	runtime,
 }: readReservedJobOutputQuantitiesFn.Props) => {
 	const reserved = new Map<IdSchema.Type, ReservedJobOutputQuantity>();
+	// Index this immutable snapshot once instead of rescanning every item for each job.
+	const itemsById = new Map<IdSchema.Type, RuntimeItemSchema.Type>();
+	const consumedByJob = new Map<IdSchema.Type, RuntimeItemSchema.Type[]>();
+	for (const item of runtime.items) {
+		itemsById.set(item.id, item);
+		if (item.location.scope !== LocationScopeEnumSchema.enum.Job) continue;
+		const consumed = consumedByJob.get(item.location.jobId);
+		if (consumed === undefined)
+			consumedByJob.set(item.location.jobId, [
+				item,
+			]);
+		else consumed.push(item);
+	}
 
 	for (const job of runtime.jobs) {
-		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
+		const owner = itemsById.get(job.ownerItemId);
 		if (owner === undefined) continue;
 		const line = readItemLineFn({
 			item: owner.item,
@@ -100,10 +105,9 @@ export const readReservedJobOutputQuantitiesFn = ({
 		if (line === undefined) continue;
 
 		const quantities = readJobMaximumOutputQuantitiesFn({
-			job,
+			consumed: consumedByJob.get(job.id) ?? [],
 			line,
 			owner,
-			runtime,
 		});
 		for (const [itemId, quantity] of quantities) {
 			if (quantity <= 0) continue;

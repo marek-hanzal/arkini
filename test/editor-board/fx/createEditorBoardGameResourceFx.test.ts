@@ -7,6 +7,8 @@ import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
 import { createEditorBoardGameFx } from "~/editor-board/fx/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/editor-board/fx/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
+import { spawnItemFx } from "~test/support/spawnItemFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import {
 	editorTestResources,
@@ -32,6 +34,66 @@ afterEach(() => {
 });
 
 describe("Board Scenario createEditorBoardGameResourceFx", () => {
+	it.effect("reset restores authored start and ignores requests from the discarded game", () =>
+		Effect.gen(function* () {
+			const owner = yield* createEditorBoardGameResourceFx();
+			const project = createProject(1);
+			yield* owner.syncFx(project);
+			const before = yield* SubscriptionRef.get(owner.state);
+			if (before.type !== "ready") throw new Error("Initial game is missing.");
+			const oldGame = before.resource.game;
+			const startItems = oldGame
+				.getSnapshotFn()
+				.items.map(({ item, location, quantity }) => ({
+					item,
+					location,
+					quantity,
+				}));
+			yield* oldGame.runFx(
+				spawnItemFx({
+					id: "runtime:reset-probe",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			yield* oldGame.runFx(
+				setSpeedUpGameplayFx({
+					enabled: true,
+				}),
+			);
+			expect(oldGame.getSnapshotFn().items).toHaveLength(startItems.length + 1);
+
+			yield* owner.resetFx(project, oldGame);
+			const after = yield* SubscriptionRef.get(owner.state);
+			if (after.type !== "ready") throw new Error("Reset game is missing.");
+			expect(after.resource.game).not.toBe(oldGame);
+			expect(
+				after.resource.game.getSnapshotFn().items.map(({ item, location, quantity }) => ({
+					item,
+					location,
+					quantity,
+				})),
+			).toEqual(startItems);
+			expect(after.resource.game.getSnapshotFn().cheats.speedUpGameplay).toBe(false);
+			expect(after.resource.game.getSnapshotFn().jobs).toEqual([]);
+			expect(after.resource.game.getSnapshotFn().jobQueue).toEqual([]);
+			yield* owner.resetFx(project, oldGame);
+			expect(yield* SubscriptionRef.get(owner.state)).toBe(after);
+			yield* owner.releaseCurrentFx;
+			yield* owner.resetFx(project, after.resource.game);
+			expect(yield* SubscriptionRef.get(owner.state)).toEqual({
+				type: "idle",
+			});
+		}),
+	);
+
 	it.effect("publishes a replacement only after the exact previous revision is discarded", () =>
 		Effect.gen(function* () {
 			const releaseGate = yield* Deferred.make<void>();

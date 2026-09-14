@@ -109,3 +109,26 @@ Usually not affected:
 - Pixi geometry and motion tuning unless the committed Runtime/Event projection changes.
 
 If a Runtime schema changes, the last two groups can become affected through State, Arkpack or renderer contracts. Follow the changed field rather than trusting this default.
+
+Game and Editor inject the fixed `GameplaySpeedUpMultiplier` from `game-cheat` into `createGameSessionFx`, then `GameSessionLayerFx` and `TickLayerFx`. `TickLayerFx` reads the saved switches and converts the injected multiplier into the wall cadence (5 ms at ×20). Each accelerated wake advances at most one ordinary 100 ms step and drops overdue accelerated wall-time debt. `GameLoopLayerFx` uses Tick's next-delay result, compensates computation time, and yields between wakes; overload slows playback instead of creating catch-up batches. Normal gameplay retains full elapsed-time replay. `advanceRuntimeElapsedFx` accepts simulation time only. Jobs, deliveries, Clock intervals and lifetimes keep their ordinary simulation-step logic; toggling speed-up never settles work. Generic sessions default to normal speed when no multiplier is supplied.
+
+Runtime item IDs, revisions, and job IDs use the injectable [`RuntimeIdentityFx`](../runtime-identity/context/RuntimeIdentityFx.ts) entropy source, backed by host UUIDs. Identity entropy stays separate from seeded gameplay Random so retries cannot reuse identities merely by replaying the same roll seed. Tokens remain opaque; saved identities are not rewritten.
+
+### Performance diagnostics
+
+Game and Editor Board keep `tick-performance` records in `~/.arkini/diagnostics/diagnostics.jsonl` (logger `arkini.game.performance`, correlated by `sessionId`). Tick aggregates numeric counters over wall-time windows of at least one second; there is no per-step IPC, full-runtime serialization, or extra sampling timer. Closing the diagnostic session detaches its listener. Diagnostic sink failures cannot stop gameplay.
+
+- `windowMs`, `wakes`, `advances`, `failedAdvances`: elapsed observation window, loop wakes, actual replay calls, and rejected advances. Stable no-op wakes need no replay call.
+- `advanceMs`, `maxAdvanceMs`: summed and peak Tick work in the window, measured with Effect Clock. This includes runtime acquisition/replay/commit, excludes the observer callback, and does not measure GPU rendering.
+- `maxWakeGapMs`: largest wall gap between wakes, including prior work and host scheduling delay. Large gaps with small advance cost point toward host/main-thread scheduling rather than replay cost.
+- `simulationBudgetMs / windowMs`: achieved simulation-time budget per wall time; `speedMultiplier` is the selected effective multiplier at the last wake. A window spanning a toggle may contain both modes.
+- `droppedWallMs`: overdue accelerated wall time discarded to prevent catch-up bursts; always zero for normal wakes.
+- `items`, `jobs`, `queuedJobs`: counts at the last wake's input snapshot, without copying that snapshot into the log.
+
+For a slow Board, compare normal and accelerated windows for the same session and item population. High `maxAdvanceMs` points to Tick/runtime work; high wake gaps alone are not proof of a renderer/GPU bottleneck. Production animation frame timing is not included in these counters.
+
+### Forced owner removal
+
+[`forceRemoveRuntimeItemFx`](fx/forceRemoveRuntimeItemFx.ts) plans general forced removal on an explicit Runtime: cancel owned jobs/queue, consume aborted inputs, remove the root, return reservations before buffers, and reconcile any parent material job. [`discardRuntimeItemTreeFx`](fx/discardRuntimeItemTreeFx.ts) destroys only an idle passive ownership tree and returns exact loss facts. [`placeRuntimeItemBestEffortFx`](../item-placement/fx/placeRuntimeItemBestEffortFx.ts) reuses canonical placement, retaining fitting quantities and reporting explicit capacity overflow. These operations never publish; the enclosing Runtime transaction commits state and all events together.
+
+Clock kill-switch is the first explicit caller through `item-expiry`; ordinary removal, merge, queued cancellation, job completion and loose-kill retain their strict placement semantics. Speed-up does not select removal policy. Expiry Output resolves from the original operation snapshot and follows returns in the same transaction.

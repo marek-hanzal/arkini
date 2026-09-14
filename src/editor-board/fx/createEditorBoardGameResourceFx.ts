@@ -54,11 +54,12 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 					error: Cause.squash(cause),
 				});
 
-			const syncOwnedProjectFx = (project: Project) =>
+			const syncOwnedProjectFx = (project: Project, restart = false) =>
 				Effect.gen(function* () {
 					const snapshot = yield* SubscriptionRef.get(state);
 					if (ownsNewerRevisionFn(snapshot, project)) return;
 					if (
+						!restart &&
 						current !== undefined &&
 						ownsRevisionFn(current, project) &&
 						snapshot.type === "ready"
@@ -95,6 +96,17 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 					Effect.gen(function* () {
 						routedProjectId = project.projectId;
 						yield* syncOwnedProjectFx(project);
+					}).pipe(Effect.uninterruptible),
+				),
+			);
+			const resetFx: EditorBoardGameResource["resetFx"] = Effect.fn(
+				"EditorBoardGameResourceFx.resetFx",
+			)((project, expectedGame) =>
+				lifecycle.withPermits(1)(
+					Effect.gen(function* () {
+						if (routedProjectId !== project.projectId || current?.game !== expectedGame)
+							return;
+						yield* syncOwnedProjectFx(project, true);
 					}).pipe(Effect.uninterruptible),
 				),
 			);
@@ -170,6 +182,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 			return {
 				state,
 				syncFx,
+				resetFx,
 				publishFx,
 				advanceNoopFx,
 				releaseCurrentFx,

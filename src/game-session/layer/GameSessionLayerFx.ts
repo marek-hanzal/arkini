@@ -13,6 +13,7 @@ interface GameSessionLayerProps {
 	config: GameConfigSchema.Type;
 	state?: StateSchema.Type;
 	intervalMs?: number;
+	speedUpMultiplier?: number;
 	onFatalErrorFn?: (cause: unknown) => void;
 }
 
@@ -21,6 +22,7 @@ export const GameSessionLayerFx = ({
 	config,
 	state,
 	intervalMs,
+	speedUpMultiplier,
 	onFatalErrorFn,
 }: GameSessionLayerProps) => {
 	const makeSessionLayer = (initialRuntime?: RuntimeSchema.Type) => {
@@ -28,7 +30,9 @@ export const GameSessionLayerFx = ({
 			config,
 			initialRuntime,
 		});
-		const tick = TickLayerFx.pipe(Layer.provide(runtime));
+		const tick = TickLayerFx({
+			speedUpMultiplier,
+		}).pipe(Layer.provide(runtime));
 		const core = Layer.merge(runtime, tick);
 		const loop = GameLoopLayerFx({
 			intervalMs,

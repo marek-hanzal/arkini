@@ -39,7 +39,7 @@ const runtime = (currentSpace: number, remainingUnits?: number) =>
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace,
 		items: [

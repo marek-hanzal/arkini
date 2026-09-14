@@ -28,7 +28,7 @@ export interface GameDiagnosticRuntime {
 	readonly cheats: {
 		readonly enabled: boolean;
 		readonly everEnabled: boolean;
-		readonly instantGameplay: boolean;
+		readonly speedUpGameplay: boolean;
 	};
 	readonly items: readonly GameDiagnosticRuntimeItem[];
 	readonly jobs: readonly GameDiagnosticRuntimeJob[];

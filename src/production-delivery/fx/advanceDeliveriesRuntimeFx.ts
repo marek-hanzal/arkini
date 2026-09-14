@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { settleItemDeliveryRuntimeFx } from "~/production-delivery/fx/settleItemDeliveryRuntimeFx";
@@ -16,9 +15,6 @@ interface AdvanceDeliveriesRuntimeResult {
 export const advanceDeliveriesRuntimeFx = Effect.fn("advanceDeliveriesFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
-	const instantGameplay = isInstantGameplayEnabledFn({
-		runtime,
-	});
 	const deliveryIds = runtime.items
 		.filter((item) => item.location.scope === LocationScopeEnumSchema.enum.Delivery)
 		.map((item) => item.id)
@@ -32,9 +28,10 @@ export const advanceDeliveriesRuntimeFx = Effect.fn("advanceDeliveriesFx")(funct
 			...liveItem,
 			location: {
 				...liveItem.location,
-				remainingDurationMs: instantGameplay
-					? 0
-					: Math.max(0, liveItem.location.remainingDurationMs - SimulationStepMs),
+				remainingDurationMs: Math.max(
+					0,
+					liveItem.location.remainingDurationMs - SimulationStepMs,
+				),
 			},
 		};
 		draft = {

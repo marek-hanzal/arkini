@@ -100,6 +100,7 @@ export const installEditorBoardGameOwner = (
 	);
 	const owner = {
 		state,
+		resetFx: () => Effect.void,
 		syncFx: () => Effect.void,
 		publishFx: () => Effect.void,
 		advanceNoopFx: () => Effect.void,

@@ -1205,9 +1205,17 @@
 					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
 				},
 				"durationMs": {
-					"description": "Optional active lifetime; accepted work can outlive the schedule.",
+					"description": "Optional active lifetime; expiryMode determines whether accepted work may outlive it.",
 					"minimum": 100,
 					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
+				},
+				"expiryMode": {
+					"description": "Lifetime expiry policy; omission uses loose-kill. Has no effect without a finite duration.",
+					"type": "string",
+					"enum": [
+						"loose-kill",
+						"kill-switch"
+					]
 				},
 				"enable": {
 					"default": true,
@@ -1221,7 +1229,7 @@
 					}
 				},
 				"onExpire": {
-					"description": "Output emitted atomically when the expired owner finishes settling production.",
+					"description": "Output resolved at owner expiry in both modes; kill-switch places what fits after returned materials and logs the excess as lost, within the same atomic removal.",
 					"$ref": "urn:arkini:schema:project#/$defs/OutputSchema"
 				}
 			},

@@ -189,6 +189,7 @@ module.exports = {
 				path: activeCodePattern,
 				pathNot: [
 					itemRevisionPattern,
+					"^src/runtime-identity/context/RuntimeIdentityFx[.]ts$",
 					"^src/game-value/schema/IdSchema[.]ts$",
 				],
 			},

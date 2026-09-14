@@ -165,7 +165,7 @@ export const createTileActorRuntime = ({
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace: 0,
 		items: [
@@ -217,7 +217,7 @@ export const createTemporaryTileActorRuntime = ({
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace: 0,
 		items: [

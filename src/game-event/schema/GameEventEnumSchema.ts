@@ -6,6 +6,8 @@ export const GameEventEnumSchema = z
 		CurrentSpaceChanged: "current-space:changed",
 		JobStarted: "job:started",
 		JobCompleted: "job:completed",
+		JobAborted: "job:aborted",
+		ItemDiscarded: "item:discarded",
 		ItemMerged: "item:merged",
 		ItemExpired: "item:expired",
 		ItemSpawned: "item:spawned",

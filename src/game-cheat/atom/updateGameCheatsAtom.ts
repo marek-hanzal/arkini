@@ -6,9 +6,9 @@ import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/game-presentation/fx/settleRendererCommandFailureFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
-import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 
-type UpdateGameCheatsAction = "cheat-mode" | "instant-gameplay" | "exit";
+type UpdateGameCheatsAction = "cheat-mode" | "speed-up-gameplay" | "exit";
 
 export namespace updateGameCheatsAtom {
 	export type Command =
@@ -17,7 +17,7 @@ export namespace updateGameCheatsAtom {
 				readonly enabled: boolean;
 		  }
 		| {
-				readonly action: "instant-gameplay";
+				readonly action: "speed-up-gameplay";
 				readonly enabled: boolean;
 		  }
 		| {
@@ -76,11 +76,11 @@ export const updateGameCheatsAtom = Effect.runSync(
 						)
 						.with(
 							{
-								action: "instant-gameplay",
+								action: "speed-up-gameplay",
 							},
 							({ enabled }) =>
 								game.runFx(
-									setInstantGameplayFx({
+									setSpeedUpGameplayFx({
 										enabled,
 									}),
 								),

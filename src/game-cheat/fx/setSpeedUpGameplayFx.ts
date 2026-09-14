@@ -2,20 +2,19 @@ import { Effect } from "effect";
 
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { settleInstantGameplayFx } from "~/game-cheat/fx/settleInstantGameplayFx";
 
-export namespace setInstantGameplayFx {
+export namespace setSpeedUpGameplayFx {
 	export interface Props {
 		readonly enabled: boolean;
 	}
 }
 
-/** Atomically changes the persisted Instant gameplay option. */
-export const setInstantGameplayFx = Effect.fn("setInstantGameplayFx")(function* ({
+/** Atomically changes the persisted Speed up option. */
+export const setSpeedUpGameplayFx = Effect.fn("setSpeedUpGameplayFx")(function* ({
 	enabled,
-}: setInstantGameplayFx.Props) {
+}: setSpeedUpGameplayFx.Props) {
 	const cheats = yield* modifyRuntimeFx((runtime) => {
-		if (runtime.cheats.instantGameplay === enabled) {
+		if (runtime.cheats.speedUpGameplay === enabled) {
 			return Effect.succeed([
 				runtime.cheats,
 				runtime,
@@ -23,7 +22,7 @@ export const setInstantGameplayFx = Effect.fn("setInstantGameplayFx")(function* 
 		}
 		const cheats = {
 			...runtime.cheats,
-			instantGameplay: enabled,
+			speedUpGameplay: enabled,
 		};
 		return Effect.succeed([
 			cheats,
@@ -33,6 +32,5 @@ export const setInstantGameplayFx = Effect.fn("setInstantGameplayFx")(function* 
 			} satisfies RuntimeSchema.Type,
 		] as const);
 	});
-	if (enabled && cheats.enabled) yield* settleInstantGameplayFx();
 	return cheats;
 });

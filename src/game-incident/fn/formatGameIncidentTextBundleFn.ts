@@ -26,7 +26,7 @@ const formatRuntimeFn = (report: GameIncidentReport) => {
 		`- Current space: ${runtime.currentSpace}`,
 		`- Cheats enabled: ${runtime.cheats.enabled ? "yes" : "no"}`,
 		`- Cheats ever enabled: ${runtime.cheats.everEnabled ? "yes" : "no"}`,
-		`- Instant gameplay: ${runtime.cheats.instantGameplay ? "yes" : "no"}`,
+		`- Speed up: ${runtime.cheats.speedUpGameplay ? "yes" : "no"}`,
 		`- Items: ${runtime.items.length}`,
 		`- Jobs: ${runtime.jobs.length}`,
 		`- Queued requests: ${runtime.queue.length}`,

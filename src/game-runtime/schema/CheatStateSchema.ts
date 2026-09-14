@@ -7,9 +7,11 @@ export const CheatStateSchema = z
 		everEnabled: z
 			.boolean()
 			.describe("Whether Cheat mode has ever been enabled for this exact save."),
-		instantGameplay: z
+		speedUpGameplay: z
 			.boolean()
-			.describe("Whether valid time-based gameplay completes without wall-clock waiting."),
+			.describe(
+				"Whether simulation runs at the fixed application speed-up multiplier while cheats are enabled.",
+			),
 	})
 	.strict()
 	.meta({

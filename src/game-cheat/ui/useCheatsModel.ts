@@ -10,11 +10,11 @@ export namespace useCheatsModel {
 	export interface Model {
 		readonly blocked: boolean;
 		readonly enabled: boolean;
-		readonly instantGameplay: boolean;
+		readonly speedUpGameplay: boolean;
 		readonly status: updateGameCheatsAtom.State;
 		readonly requestExitFn: (runFx: Effect.Effect<void, unknown, never>) => void;
 		readonly setEnabledFn: (enabled: boolean) => void;
-		readonly setInstantGameplayFn: (enabled: boolean) => void;
+		readonly setSpeedUpGameplayFn: (enabled: boolean) => void;
 	}
 }
 
@@ -45,10 +45,10 @@ export const useCheatsModel = (game: PlayableGame): useCheatsModel.Model => {
 			runCommandFn,
 		],
 	);
-	const setInstantGameplayFn = useCallback(
+	const setSpeedUpGameplayFn = useCallback(
 		(enabled: boolean) => {
 			runCommandFn({
-				action: "instant-gameplay",
+				action: "speed-up-gameplay",
 				enabled,
 			});
 		},
@@ -60,19 +60,19 @@ export const useCheatsModel = (game: PlayableGame): useCheatsModel.Model => {
 		() => ({
 			blocked: commandState.kind === "pending",
 			enabled: cheats.enabled,
-			instantGameplay: cheats.instantGameplay,
+			speedUpGameplay: cheats.speedUpGameplay,
 			status: commandState,
 			requestExitFn,
 			setEnabledFn,
-			setInstantGameplayFn,
+			setSpeedUpGameplayFn,
 		}),
 		[
 			cheats.enabled,
-			cheats.instantGameplay,
+			cheats.speedUpGameplay,
 			commandState,
 			requestExitFn,
 			setEnabledFn,
-			setInstantGameplayFn,
+			setSpeedUpGameplayFn,
 		],
 	);
 };

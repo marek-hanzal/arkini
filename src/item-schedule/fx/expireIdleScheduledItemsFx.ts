@@ -1,3 +1,4 @@
+import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { Effect } from "effect";
 import { attemptScheduledItemExpiryFx } from "~/item-schedule/fx/attemptScheduledItemExpiryFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -14,9 +15,11 @@ export const expireIdleScheduledItemsFx = Effect.fn("expireIdleScheduledItemsFx"
 		.map((item) => item.id)
 		.sort();
 	for (const itemId of ids) {
+		const item = draft.items.find((candidate) => candidate.id === itemId);
 		if (
-			!draft.items.some((item) => item.id === itemId) ||
-			draft.jobs.some((job) => job.ownerItemId === itemId)
+			item === undefined ||
+			(readItemScheduleFn(item.item)?.expiryMode !== "kill-switch" &&
+				draft.jobs.some((job) => job.ownerItemId === itemId))
 		)
 			continue;
 		const attempt = yield* attemptScheduledItemExpiryFx({

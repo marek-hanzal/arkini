@@ -30,7 +30,7 @@ vi.mock("~/game-cheat/ui/useGameCheats", () => ({
 	useGameCheats: () => ({
 		enabled: true,
 		everEnabled: true,
-		instantGameplay: false,
+		speedUpGameplay: false,
 	}),
 }));
 vi.mock("~/game-cheat/fx/spawnCheatItemFx", async () => {

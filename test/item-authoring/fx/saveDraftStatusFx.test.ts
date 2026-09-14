@@ -83,6 +83,7 @@ describe("saveDraftStatusFx", () => {
 					type: "idle",
 				}),
 			),
+			resetFx: () => Effect.void,
 			syncFx: () => Effect.void,
 			publishFx,
 			advanceNoopFx,

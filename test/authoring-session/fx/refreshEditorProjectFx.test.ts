@@ -50,6 +50,7 @@ const runRefresh = async (
 	);
 	const owner = {
 		state,
+		resetFx: () => Effect.void,
 		syncFx: (nextProject) =>
 			Effect.sync(() => events.push(`board-sync-${nextProject.revision}`)),
 		publishFx: (nextProject) =>

@@ -34,7 +34,7 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					<DetailFact
 						label={translator.textFn("Lifetime")}
 						description={translator.textFn(
-							"Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Accepted production finishes before the item disappears.",
+							"Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Expiry mode controls unfinished production.",
 						)}
 						value={
 							clock.durationMs === undefined
@@ -53,6 +53,19 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 								: formatDurationFn(clock.intervalMs)
 						}
 					/>
+					{clock.durationMs === undefined ? null : (
+						<DetailFact
+							label={translator.textFn("Expiry mode")}
+							value={translator.textFn(
+								clock.expiryMode === "kill-switch" ? "Kill switch" : "Loose-kill",
+							)}
+							description={translator.textFn(
+								clock.expiryMode === "kill-switch"
+									? "Cancel work and remove the item atomically. Place reserved items first, then unused buffers and expiry output. Anything that does not fit is lost and logged."
+									: "Wait for accepted production to settle. A job blocked on output space keeps this item alive.",
+							)}
+						/>
+					)}
 					<DetailFact
 						label={translator.textFn("Timer")}
 						description={translator.textFn(
@@ -74,7 +87,7 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 						emptyLabel={translator.textFn("No expiry output configured.")}
 						output={clock.onExpire}
 						description={translator.textFn(
-							"Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.",
+							"Resolved once when the item expires. Kill switch places what fits after returned materials; excess output is lost and logged.",
 						)}
 						title={translator.textFn("Expiry output")}
 					/>

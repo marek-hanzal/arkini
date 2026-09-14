@@ -1,3 +1,5 @@
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
@@ -37,51 +39,77 @@ const materialLine = createLine({
 });
 
 describe("Clock expiry settlement", () => {
-	it("admits the tied last pulse, drains accepted runnable work and expires only after its last completion", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnClockItemFx();
-				const expired = yield* tickClockFx(500);
-				const nextJob = yield* tickClockFx(200);
-				const settled = yield* tickClockFx(400);
-				return {
-					expired,
-					nextJob,
-					settled,
-				};
-			}).pipe(
-				useGameFx({
-					config: createClockConfig({
-						maxQueueSize: 2,
-						clock: {
-							durationMs: 500,
-							onExpire: expiryOutput,
-						},
+	it.each([
+		1,
+		5,
+	])(
+		"preserves the last pulse and drains accepted work before expiry at injected speed %s",
+		(speedUpMultiplier) => {
+			const result = Effect.runSync(
+				Effect.gen(function* () {
+					yield* spawnClockItemFx();
+					yield* setCheatEnabledFx({
+						enabled: true,
+					});
+					yield* setSpeedUpGameplayFx({
+						enabled: true,
+					});
+					for (let step = 0; step < 5; step++) {
+						yield* tickClockFx(100 / speedUpMultiplier);
+					}
+					const expired = yield* tickClockFx(0);
+					for (let step = 0; step < 5; step++) {
+						yield* tickClockFx(100 / speedUpMultiplier);
+					}
+					const nextJob = yield* tickClockFx(0);
+					for (let step = 0; step < 5; step++) {
+						yield* tickClockFx(100 / speedUpMultiplier);
+					}
+					const settled = yield* tickClockFx(0);
+					return {
+						expired,
+						nextJob,
+						settled,
+					};
+				}).pipe(
+					useGameFx({
+						speedUpMultiplier,
+						config: createClockConfig({
+							maxQueueSize: 2,
+							clock: {
+								durationMs: 500,
+								onExpire: expiryOutput,
+							},
+						}),
 					}),
-				}),
-			),
-		);
-		expect(
-			result.expired.items.find((item) => item.item.id === "clock")?.schedule
-				?.remainingDurationMs,
-		).toBe(0);
-		expect(result.expired.jobs).toHaveLength(1);
-		expect(result.expired.jobQueue).toMatchObject([
-			{
-				lineId: "a",
-			},
-		]);
-		expect(result.nextJob.jobs).toMatchObject([
-			{
-				lineId: "a",
-				remainingMs: 400,
-			},
-		]);
-		expect(result.nextJob.jobQueue).toHaveLength(0);
-		expect(result.settled.items.filter((item) => item.item.id === "clock")).toHaveLength(0);
-		expect(result.settled.items.filter((item) => item.item.id === "result")).toHaveLength(2);
-		expect(result.settled.items.filter((item) => item.item.id === "expired")).toHaveLength(1);
-	});
+				),
+			);
+			expect(
+				result.expired.items.find((item) => item.item.id === "clock")?.schedule
+					?.remainingDurationMs,
+			).toBe(0);
+			expect(result.expired.jobs).toHaveLength(1);
+			expect(result.expired.jobQueue).toMatchObject([
+				{
+					lineId: "a",
+				},
+			]);
+			expect(result.nextJob.jobs).toMatchObject([
+				{
+					lineId: "a",
+					remainingMs: 100,
+				},
+			]);
+			expect(result.nextJob.jobQueue).toHaveLength(0);
+			expect(result.settled.items.filter((item) => item.item.id === "clock")).toHaveLength(0);
+			expect(result.settled.items.filter((item) => item.item.id === "result")).toHaveLength(
+				2,
+			);
+			expect(result.settled.items.filter((item) => item.item.id === "expired")).toHaveLength(
+				1,
+			);
+		},
+	);
 
 	it("gives no extra capacity to the final pulse when an active job already fills the queue limit", () => {
 		const result = Effect.runSync(

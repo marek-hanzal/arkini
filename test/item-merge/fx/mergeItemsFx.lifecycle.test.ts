@@ -295,7 +295,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					cheats: {
 						enabled: false,
 						everEnabled: false,
-						instantGameplay: false,
+						speedUpGameplay: false,
 					},
 					currentSpace: 0,
 					items: [
@@ -361,7 +361,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				cheats: {
 					enabled: false,
 					everEnabled: false,
-					instantGameplay: false,
+					speedUpGameplay: false,
 				},
 				currentSpace: 0,
 				items: [
@@ -419,7 +419,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -532,7 +532,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				cheats: {
 					enabled: false,
 					everEnabled: false,
-					instantGameplay: false,
+					speedUpGameplay: false,
 				},
 				currentSpace: 0,
 				items: [
@@ -588,7 +588,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				cheats: {
 					enabled: false,
 					everEnabled: false,
-					instantGameplay: false,
+					speedUpGameplay: false,
 				},
 				currentSpace: 0,
 				items: [
@@ -643,7 +643,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -690,7 +690,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -735,7 +735,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -778,7 +778,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [
@@ -820,7 +820,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				cheats: {
 					enabled: false,
 					everEnabled: false,
-					instantGameplay: false,
+					speedUpGameplay: false,
 				},
 				currentSpace: 0,
 				items: [

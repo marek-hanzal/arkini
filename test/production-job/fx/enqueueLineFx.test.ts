@@ -10,7 +10,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
-import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 
 const props = {
@@ -94,7 +94,7 @@ const createStackedJobConfig = () => {
 	});
 };
 
-const createInstantQueueJobConfig = () => {
+const createTimedQueueJobConfig = () => {
 	const base = createJobTestConfig(3);
 	const forge = base.items.forge;
 	return GameConfigSchema.parse({
@@ -455,7 +455,7 @@ describe("enqueueLineFx", () => {
 		expect(result.runtime.jobQueue).toHaveLength(1);
 	});
 
-	it("keeps Instant queue playback bounded to the fixed-step lifecycle", () => {
+	it("keeps Speed-up queue playback bounded to the fixed-step lifecycle", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
@@ -471,7 +471,7 @@ describe("enqueueLineFx", () => {
 					},
 					quantity: 1,
 				});
-				yield* setInstantGameplayFx({
+				yield* setSpeedUpGameplayFx({
 					enabled: true,
 				});
 				yield* setCheatEnabledFx({
@@ -480,17 +480,23 @@ describe("enqueueLineFx", () => {
 				yield* enqueueLineFx(props);
 				yield* enqueueLineFx(props);
 				yield* enqueueLineFx(props);
-				yield* runTickRuntimeByFx({
-					elapsedMs: 100,
-				});
+				for (let step = 0; step < 10; step++) {
+					yield* runTickRuntimeByFx({
+						elapsedMs: 10,
+					});
+				}
 				const afterFirstStep = yield* readRuntimeFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: 100,
-				});
+				for (let step = 0; step < 10; step++) {
+					yield* runTickRuntimeByFx({
+						elapsedMs: 10,
+					});
+				}
 				const afterSecondStep = yield* readRuntimeFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: 100,
-				});
+				for (let step = 0; step < 10; step++) {
+					yield* runTickRuntimeByFx({
+						elapsedMs: 10,
+					});
+				}
 				return {
 					afterFirstStep,
 					afterSecondStep,
@@ -498,7 +504,8 @@ describe("enqueueLineFx", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config: createInstantQueueJobConfig(),
+					config: createTimedQueueJobConfig(),
+					speedUpMultiplier: 10,
 				}),
 			),
 		);

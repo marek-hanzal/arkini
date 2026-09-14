@@ -50,7 +50,9 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 		runtime,
 	});
 
+	const force = schedule.expiryMode === "kill-switch";
 	const expiry = yield* expireItemRuntimeFx({
+		removalMode: force ? "kill-switch" : undefined,
 		item,
 		origin: context.origin,
 		output: schedule.onExpire,
@@ -65,17 +67,22 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 			jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== item.id),
 		},
 	});
-	const release = yield* releaseOwnerInputsFx({
-		owner: item,
-		origin: context.origin,
-		runtime: expiry.runtime,
-	});
+	const release = force
+		? {
+				runtime: expiry.runtime,
+				events: [],
+			}
+		: yield* releaseOwnerInputsFx({
+				owner: item,
+				origin: context.origin,
+				runtime: expiry.runtime,
+			});
 	let draft = release.runtime;
 	const events = [
 		...expiry.events,
 		...release.events,
 	];
-	if (context.jobId !== undefined) {
+	if (!force && context.jobId !== undefined) {
 		const jobTransition = yield* reconcileJobAfterMaterialExpiryFx({
 			jobId: context.jobId,
 			runtime: draft,

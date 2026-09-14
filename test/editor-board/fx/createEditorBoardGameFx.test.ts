@@ -60,7 +60,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 		expect(game.getSnapshotFn().cheats).toEqual({
 			enabled: true,
 			everEnabled: true,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		});
 		expect(game.getSnapshotFn().items).toEqual([
 			expect.objectContaining({

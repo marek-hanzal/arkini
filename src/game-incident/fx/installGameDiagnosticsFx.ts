@@ -1,4 +1,5 @@
-import { Clock, Effect } from "effect";
+import { TickFx } from "~/game-tick/service/TickFx";
+import { Clock, Effect, Exit } from "effect";
 
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
@@ -26,6 +27,7 @@ import { writeLastGameIncidentFx } from "~/installed-game/fx/writeLastGameIncide
 
 type GameDiagnosticsSession = Pick<
 	GameSession,
+	| "readFn"
 	| "getFatalErrorFn"
 	| "getTransitionSnapshotFn"
 	| "subscribeFatalErrorFn"
@@ -94,6 +96,27 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 	} satisfies DiagnosticRecord;
 	yield* writeDiagnosticRecordFx(sessionStartedRecord);
 
+	const tick = session.readFn(TickFx);
+	const unsubscribePerformanceFn = Exit.isSuccess(tick)
+		? tick.value.subscribePerformanceFn((sample) => {
+				if (closed) return;
+				runRendererEffectFn(
+					writeDiagnosticRecordFx({
+						category: [
+							"game",
+							"performance",
+						],
+						event: "tick-performance",
+						level: "info",
+						sessionId,
+						data: {
+							...sample,
+						},
+					}),
+				);
+			})
+		: () => undefined;
+
 	const unsubscribeTransitionsFn = session.subscribeTransitionsFn((transition) => {
 		try {
 			latestSequence = transition.sequence;
@@ -136,6 +159,26 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 				);
 			}
 			runRendererEffectFn(writeDiagnosticRecordFx(record));
+			// Per-fact records survive the bounded semantic history's event cap.
+			for (const event of transition.events) {
+				if (event.type !== "job:aborted" && event.type !== "item:discarded") continue;
+				const { type, ...details } = event;
+				runRendererEffectFn(
+					writeDiagnosticRecordFx({
+						category: [
+							"game",
+							"removal",
+						],
+						event: type,
+						level: "info",
+						sessionId,
+						data: {
+							sequence: transition.sequence,
+							...details,
+						},
+					}),
+				);
+			}
 		} catch (cause) {
 			runRendererEffectFn(
 				writeDiagnosticRecordFx({
@@ -271,6 +314,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 		close: (reason: "discarded" | "saved") => {
 			if (closed) return;
 			closed = true;
+			unsubscribePerformanceFn();
 			unsubscribeFatalFn();
 			unsubscribeTransitionsFn();
 			runRendererEffectFn(

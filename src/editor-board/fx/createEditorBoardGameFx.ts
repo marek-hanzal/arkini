@@ -1,3 +1,4 @@
+import { GameplaySpeedUpMultiplier } from "~/game-cheat/constant/GameplaySpeedUpMultiplier";
 import { Effect } from "effect";
 
 import type { Project } from "~/project-authoring/type/Project";
@@ -20,6 +21,7 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 	project,
 }: createEditorBoardGameFx.Props) {
 	const session = yield* createGameSessionFx({
+		speedUpMultiplier: GameplaySpeedUpMultiplier,
 		config: project.config,
 	});
 	const resourcesById = new Map(

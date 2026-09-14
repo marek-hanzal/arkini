@@ -17,7 +17,7 @@ const runtime = ({
 	cheats = {
 		enabled: false,
 		everEnabled: false,
-		instantGameplay: false,
+		speedUpGameplay: false,
 	},
 	currentSpace,
 	defaultLineId,
@@ -124,7 +124,7 @@ describe("formatGameReplayTextFn", () => {
 					cheats: {
 						enabled: true,
 						everEnabled: true,
-						instantGameplay: true,
+						speedUpGameplay: true,
 					},
 					currentSpace: 0,
 				}),
@@ -134,7 +134,7 @@ describe("formatGameReplayTextFn", () => {
 		expect(text).toContain("### Cheats");
 		expect(text).toContain("- Enabled: no → yes");
 		expect(text).toContain("- Ever enabled: no → yes");
-		expect(text).toContain("- Instant gameplay: no → yes");
+		expect(text).toContain("- Speed up: no → yes");
 		expect(text).not.toContain("No runtime change was observed");
 	});
 

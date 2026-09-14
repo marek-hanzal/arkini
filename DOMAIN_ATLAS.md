@@ -57,6 +57,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `installed-game` | Arkpack/save bootstrap, leases, diagnostics and finalization | [`src/installed-game/fx/createGameEngineResourceServiceFx.ts`](src/installed-game/fx/createGameEngineResourceServiceFx.ts) |
 | `game-incident` | Session diagnostics, failed-session model and text rendering | [`src/game-incident/fx/installGameDiagnosticsFx.ts`](src/game-incident/fx/installGameDiagnosticsFx.ts) |
 | `game-start` | Initial placement plan and atomic empty-runtime start | [`src/game-start/fx/planStartFx.ts`](src/game-start/fx/planStartFx.ts) |
+| `runtime-identity` | Injectable opaque identity entropy, independent of seeded gameplay rolls | [`src/runtime-identity/context/RuntimeIdentityFx.ts`](src/runtime-identity/context/RuntimeIdentityFx.ts) |
 | `item-revision` | Opaque live Item revision and stale-write rejection | [`src/item-revision/fx/assertRevisionFx.ts`](src/item-revision/fx/assertRevisionFx.ts) |
 | `item-definition` | Immutable authored Item vocabulary and selectors | [`src/item-definition/schema/ItemSchema.ts`](src/item-definition/schema/ItemSchema.ts) |
 | `item-location` | Runtime locations, grid claims, distances and location rejection | [`src/item-location/schema/LocationSchema.ts`](src/item-location/schema/LocationSchema.ts) |

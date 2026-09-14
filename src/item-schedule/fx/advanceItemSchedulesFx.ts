@@ -1,4 +1,3 @@
-import { isInstantGameplayEnabledFn } from "~/game-runtime/fn/isInstantGameplayEnabledFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { Effect } from "effect";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -17,9 +16,6 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 	readonly stepStart: RuntimeSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
-	const instantGameplay = isInstantGameplayEnabledFn({
-		runtime,
-	});
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
 	let dispatched = false;
@@ -50,9 +46,12 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 					? state.remainingIntervalMs - elapsed
 					: state.remainingIntervalMs;
 		const expired =
-			state.remainingDurationMs !== undefined &&
-			(instantGameplay || state.remainingDurationMs <= elapsed);
-		if (phase !== undefined && phase <= 0) {
+			state.remainingDurationMs !== undefined && state.remainingDurationMs <= elapsed;
+		if (
+			phase !== undefined &&
+			phase <= 0 &&
+			!(expired && config.expiryMode === "kill-switch")
+		) {
 			// Only expected admission rejection consumes the pulse without state, randomness or delivery side effects.
 			const attempt = yield* Effect.gen(function* () {
 				const line = readEffectiveLineFn({
@@ -99,9 +98,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 								remainingDurationMs:
 									state.remainingDurationMs === undefined
 										? undefined
-										: instantGameplay
-											? 0
-											: Math.max(0, state.remainingDurationMs - elapsed),
+										: Math.max(0, state.remainingDurationMs - elapsed),
 							},
 						},
 			),

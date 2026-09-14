@@ -1,3 +1,6 @@
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -94,6 +97,72 @@ const spawnOwnerAndWaterFx = Effect.gen(function* () {
 });
 
 describe("settleItemDeliveryFx", () => {
+	it("accelerates outbound and return travel without skipping contact or settling on toggle", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerAndWaterFx;
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				const before = yield* readRuntimeFx();
+				yield* setCheatEnabledFx({
+					enabled: true,
+				});
+				yield* setSpeedUpGameplayFx({
+					enabled: true,
+				});
+				const enabled = yield* readRuntimeFx();
+				for (let step = 0; step < 2; step++) {
+					yield* runTickRuntimeByFx({
+						elapsedMs: 50,
+					});
+				}
+				const outbound = yield* readRuntimeFx();
+				for (let step = 0; step < 2; step++) {
+					yield* runTickRuntimeByFx({
+						elapsedMs: 50,
+					});
+				}
+				const returning = yield* readRuntimeFx();
+				for (let step = 0; step < 2; step++) {
+					yield* runTickRuntimeByFx({
+						elapsedMs: 50,
+					});
+				}
+				return {
+					before,
+					enabled,
+					outbound,
+					returning,
+					settled: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: inputRuntimeTestConfig,
+					speedUpMultiplier: 2,
+				}),
+			),
+		);
+		expect(result.enabled.items).toBe(result.before.items);
+		expect(
+			result.outbound.items.find((item) => item.id === "runtime:water")?.location,
+		).toMatchObject({
+			scope: "delivery",
+			remainingDurationMs: 100,
+		});
+		expect(
+			result.returning.items.find((item) => item.id === "runtime:water")?.location,
+		).toMatchObject({
+			scope: "delivery",
+			remainingDurationMs: 200,
+		});
+		expect(result.settled.items.find((item) => item.id === "runtime:water")).toMatchObject({
+			quantity: 4,
+			location: sourceLocation(1),
+		});
+	});
+
 	it("stores only on outbound contact and returns the whole stack remainder to its lease", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

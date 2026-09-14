@@ -1,8 +1,7 @@
-import { Cause, Duration, Effect, Fiber, Layer, Schedule } from "effect";
+import { Cause, Effect, Fiber, Layer } from "effect";
 
 import { GameLoopFx } from "~/game-tick/service/GameLoopFx";
 import { TickFx } from "~/game-tick/service/TickFx";
-import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 interface GameLoopLayerProps {
 	readonly intervalMs?: number;
@@ -17,7 +16,7 @@ interface GameLoopLayerProps {
  * listener runs would silently move job completion boundaries under renderer load.
  */
 export const GameLoopLayerFx = ({
-	intervalMs = SimulationStepMs,
+	intervalMs,
 	onFatalErrorFn = () => undefined,
 }: GameLoopLayerProps = {}) => {
 	const advance = TickFx.pipe(
@@ -30,7 +29,8 @@ export const GameLoopLayerFx = ({
 	return Layer.effect(
 		GameLoopFx,
 		advance.pipe(
-			Effect.repeat(Schedule.spaced(Duration.millis(Math.max(1, intervalMs)))),
+			Effect.flatMap((nextDelayMs) => Effect.sleep(Math.max(1, intervalMs ?? nextDelayMs))),
+			Effect.forever,
 			Effect.forkScoped({
 				startImmediately: true,
 			}),

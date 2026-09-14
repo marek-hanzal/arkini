@@ -8,7 +8,7 @@ const runtime = (currentSpace: number): GameTransition["runtime"] => ({
 	cheats: {
 		enabled: false,
 		everEnabled: false,
-		instantGameplay: false,
+		speedUpGameplay: false,
 	},
 	currentSpace,
 	items: [],

@@ -21,6 +21,29 @@ const inputLocation = {
 };
 
 describe("readGameAudioCuesFn", () => {
+	it("keeps cancellation audit facts silent instead of sounding completed work or spawned losses", () => {
+		expect(
+			readGameAudioCuesFn({
+				events: [
+					{
+						type: "job:aborted",
+						jobId: "job:1",
+						ownerItemId: "runtime:producer",
+						lineId: "line:1",
+						reason: "owner-removed",
+					},
+					{
+						type: "item:discarded",
+						ownerItemId: "runtime:producer",
+						canonicalItemId: "item:output",
+						quantity: 2,
+						source: "expiry-output",
+						reason: "board:full",
+					},
+				],
+			}),
+		).toEqual([]);
+	});
 	it("preserves semantic order while coalescing repeated event kinds", () => {
 		const batch = {
 			events: [

@@ -1,3 +1,4 @@
+import { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
 import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
@@ -10,6 +11,7 @@ import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
 
 interface ApplyOutputPlacementProps {
+	readonly overflow?: "discard";
 	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 	readonly origin: GridLocationSchema.Type;
 	readonly output: outputFx.Result;
@@ -23,12 +25,14 @@ interface ApplyOutputDropPlacement {
 
 export namespace applyOutputPlacementFx {
 	export interface Result {
+		readonly discarded?: readonly planBestEffortDropPlacementFx.Discarded[];
 		readonly drop: ReadonlyArray<ApplyOutputDropPlacement>;
 	}
 }
 
 const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(function* ({
 	drop,
+	overflow,
 	excludedLocations,
 	origin,
 	runtime,
@@ -61,21 +65,34 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
 		() => ({
 			draft: runtime,
 			results: [] as applyPlacementPlanFx.Result[],
+			discarded: [] as planBestEffortDropPlacementFx.Discarded[],
 		}),
 		(state, resolvedDrop) =>
 			Effect.gen(function* () {
-				const plan = yield* planDropPlacementFx({
+				const props = {
 					drop: resolvedDrop,
 					excludedLocations,
 					origin,
 					runtime: state.draft,
-				});
+				};
+				const planned =
+					overflow === "discard"
+						? yield* planBestEffortDropPlacementFx(props)
+						: {
+								plan: yield* planDropPlacementFx(props),
+								discarded: [],
+							};
+
 				const [result, draft] = yield* applyPlacementPlanFx({
-					plan,
+					plan: planned.plan,
 					runtime: state.draft,
 				});
 				return {
 					draft,
+					discarded: [
+						...state.discarded,
+						...planned.discarded,
+					],
 					results: [
 						...state.results,
 						result,
@@ -94,6 +111,7 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
 			},
 		} satisfies ApplyOutputDropPlacement,
 		placement.draft,
+		placement.discarded,
 	] as const;
 });
 
@@ -109,6 +127,7 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
  * commit of the complete output.
  */
 export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(function* ({
+	overflow,
 	excludedLocations,
 	origin,
 	output,
@@ -119,16 +138,22 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 		() => ({
 			draft: runtime,
 			results: [] as ApplyOutputDropPlacement[],
+			discarded: [] as planBestEffortDropPlacementFx.Discarded[],
 		}),
 		(state, drop) =>
 			Effect.map(
 				applyOutputDropPlacementFx({
 					drop,
+					overflow,
 					excludedLocations,
 					origin,
 					runtime: state.draft,
 				}),
-				([result, draft]) => ({
+				([result, draft, discarded]) => ({
+					discarded: [
+						...state.discarded,
+						...discarded,
+					],
 					draft,
 					results: [
 						...state.results,
@@ -141,6 +166,11 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 	return [
 		{
 			drop: placement.results,
+			...(overflow === "discard"
+				? {
+						discarded: placement.discarded,
+					}
+				: {}),
 		} satisfies applyOutputPlacementFx.Result,
 		placement.draft,
 	] as const;

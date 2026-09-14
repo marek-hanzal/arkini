@@ -46,6 +46,46 @@ const jobCompletedEventSchema = z
 	})
 	.strict();
 
+const jobAbortedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"JobAborted",
+		]),
+		jobId: IdSchema,
+		ownerItemId: IdSchema,
+		lineId: IdSchema,
+		reason: z.enum([
+			"owner-removed",
+			"material-expired",
+		]),
+	})
+	.strict();
+
+const itemDiscardedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"ItemDiscarded",
+		]),
+		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
+		itemId: IdSchema.optional(),
+		quantity: PositiveIntegerSchema,
+		source: z.enum([
+			"consumed-input",
+			"reservation",
+			"buffer",
+			"expiry-output",
+		]),
+		reason: z.enum([
+			"job-aborted",
+			"board:full",
+			"inventory:full",
+			"toolbar:full",
+			"item:max-count",
+		]),
+	})
+	.strict();
+
 const itemMergedEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
@@ -228,6 +268,8 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	currentSpaceChangedEventSchema,
 	jobStartedEventSchema,
 	jobCompletedEventSchema,
+	jobAbortedEventSchema,
+	itemDiscardedEventSchema,
 	itemMergedEventSchema,
 	itemExpiredEventSchema,
 	itemSpawnedEventSchema,

@@ -207,7 +207,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace: 0,
 		defaultLineByOwnerItemId: {},

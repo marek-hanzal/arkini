@@ -1,3 +1,5 @@
+import { TickFx } from "~/game-tick/service/TickFx";
+import type { TickPerformance } from "~/game-tick/type/TickPerformance";
 import { Cause, Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -7,7 +9,11 @@ import {
 	DiagnosticRecordSchema,
 } from "~electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
-import type { GameSession, GameTransition } from "~/game-session/type/GameSession";
+import type {
+	GameSession,
+	GameTransition,
+	GameSessionServices,
+} from "~/game-session/type/GameSession";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import { RuntimeInvalidError } from "~/game-runtime/error/RuntimeInvalidError";
@@ -44,7 +50,7 @@ const createTransition = (sequence: number): GameTransition =>
 			cheats: {
 				enabled: false,
 				everEnabled: false,
-				instantGameplay: false,
+				speedUpGameplay: false,
 			},
 			currentSpace: 0,
 			items: [],
@@ -76,6 +82,7 @@ describe("Game diagnostics", () => {
 			},
 		});
 		let transitionListener: ((transition: GameTransition) => void) | undefined;
+		let performanceListener: ((sample: TickPerformance) => void) | undefined;
 		let fatalListener: (() => void) | undefined;
 		let fatal: GameSessionFatalError | null = null;
 		const session = {
@@ -96,10 +103,27 @@ describe("Game diagnostics", () => {
 					fatalListener = undefined;
 				};
 			},
+			readFn: <Value, Error, Requirements extends GameSessionServices>(
+				effect: Effect.Effect<Value, Error, Requirements>,
+			) =>
+				Effect.runSyncExit(
+					effect.pipe(
+						Effect.provideService(TickFx, {
+							advanceRuntime: Effect.succeed(100),
+							subscribePerformanceFn: (listenerFn) => {
+								performanceListener = listenerFn;
+								return () => {
+									performanceListener = undefined;
+								};
+							},
+						}),
+					) as Effect.Effect<Value, Error>,
+				),
 			getFatalErrorFn: () => fatal,
 			getTransitionSnapshotFn: () => createTransition(5),
 		} satisfies Pick<
 			GameSession,
+			| "readFn"
 			| "getFatalErrorFn"
 			| "getTransitionSnapshotFn"
 			| "subscribeFatalErrorFn"
@@ -280,7 +304,33 @@ describe("Game diagnostics", () => {
 			},
 		});
 
+		const sample: TickPerformance = {
+			windowMs: 1200,
+			wakes: 20,
+			advances: 20,
+			failedAdvances: 0,
+			simulationBudgetMs: 2000,
+			advanceMs: 900,
+			maxAdvanceMs: 200,
+			maxWakeGapMs: 250,
+			droppedWallMs: 1100,
+			speedMultiplier: 20,
+			items: 187,
+			jobs: 180,
+			queuedJobs: 0,
+		};
+		const retainedPerformanceListener = performanceListener;
+		performanceListener?.(sample);
+		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+			event: "tick-performance",
+			sessionId: diagnostics.sessionId,
+			data: sample,
+		});
 		diagnostics.close("saved");
+		expect(performanceListener).toBeUndefined();
+		const recordsAfterClose = write.mock.calls.length;
+		retainedPerformanceListener?.(sample);
+		expect(write).toHaveBeenCalledTimes(recordsAfterClose);
 		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
 			event: "session-ended",
 			data: {

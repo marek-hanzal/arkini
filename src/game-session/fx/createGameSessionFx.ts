@@ -36,6 +36,7 @@ export namespace createGameSessionFx {
 		config: GameConfigSchema.Type;
 		state?: StateSchema.Type;
 		tickIntervalMs?: number;
+		speedUpMultiplier?: number;
 		save?: {
 			debounceMs?: number;
 			writeFx: (state: StateSchema.Type) => Effect.Effect<void, SaveError, never>;
@@ -150,7 +151,13 @@ const createGameSessionFatalSignalFx = Effect.fnUntraced(
  * against stable Effect while preserving exactly-once bootstrap and disposal cleanup.
  */
 export const createGameSessionFx = Effect.fn("createGameSessionFx")(
-	<SaveError>({ config, state, tickIntervalMs, save }: createGameSessionFx.Props<SaveError>) =>
+	<SaveError>({
+		config,
+		state,
+		tickIntervalMs,
+		speedUpMultiplier,
+		save,
+	}: createGameSessionFx.Props<SaveError>) =>
 		Effect.uninterruptibleMask((restoreFx) =>
 			Effect.gen(function* () {
 				const ownerScope = yield* Scope.make();
@@ -175,6 +182,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					config,
 					state,
 					intervalMs: tickIntervalMs,
+					speedUpMultiplier,
 					onFatalErrorFn: (cause) => failStopFn("tick", cause),
 				});
 				const saveLayer =

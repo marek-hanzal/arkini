@@ -1,3 +1,6 @@
+import { TickLayerFx } from "~/game-tick/layer/TickLayerFx";
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { Deferred, Effect } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
@@ -36,8 +39,10 @@ describe("GameLoopLayerFx", () => {
 					}),
 				),
 				Effect.provideService(TickFx, {
+					subscribePerformanceFn: () => () => undefined,
 					advanceRuntime: Deferred.succeed(advanceStarted, undefined).pipe(
 						Effect.andThen(Deferred.await(releaseAdvance)),
+						Effect.as(1),
 					),
 				}),
 				Effect.provide(
@@ -50,6 +55,56 @@ describe("GameLoopLayerFx", () => {
 			expect(fatalFailures).toBe(0);
 		});
 	});
+
+	it.effect("schedules individual accelerated steps at five-millisecond wall boundaries", () =>
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "runtime:loop-forge",
+				itemId: "forge",
+				quantity: 1,
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			});
+			yield* setCheatEnabledFx({
+				enabled: true,
+			});
+			yield* setSpeedUpGameplayFx({
+				enabled: true,
+			});
+			yield* startLineFx({
+				ownerItemId: "runtime:loop-forge",
+				lineId: "line:forge:run",
+			});
+			yield* Effect.gen(function* () {
+				yield* TestClock.adjust(9);
+				const before = yield* readRuntimeFx();
+				yield* TestClock.adjust(1);
+				const after = yield* readRuntimeFx();
+				expect(before.jobs[0]?.remainingMs).toBe(100);
+				expect(after.jobs).toEqual([]);
+				expect(after.items.some((item) => item.item.id === "inventoryOutput")).toBe(true);
+			}).pipe(
+				Effect.provide(GameLoopLayerFx()),
+				Effect.provide(
+					TickLayerFx({
+						speedUpMultiplier: 20,
+					}),
+				),
+			);
+		}).pipe(
+			Effect.provide(
+				GameRuntimeLayerFx({
+					config: createTickFailureTestConfig(),
+				}),
+			),
+		),
+	);
 
 	it.effect("commits one producer output on the exact fixed-step completion boundary", () =>
 		Effect.gen(function* () {

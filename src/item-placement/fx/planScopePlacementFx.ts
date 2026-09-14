@@ -112,12 +112,15 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		}
 		if (!excluded) eligibleLocations.push(location);
 	}
-	const availableStacks = readAvailableStackItemsFn({
-		itemId: item.id,
-		locations: eligibleLocations,
-		origin,
-		runtime,
-	});
+	const availableStacks =
+		item.maxStackSize === 1
+			? []
+			: readAvailableStackItemsFn({
+					itemId: item.id,
+					locations: eligibleLocations,
+					origin,
+					runtime,
+				});
 	const stack = planStackPlacementFn({
 		items: availableStacks,
 		quantity,

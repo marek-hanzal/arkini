@@ -3,6 +3,8 @@ import { match } from "ts-pattern";
 
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
+import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
@@ -254,6 +256,42 @@ const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function*
 						quantity,
 						reason: PlacementUnavailableError.Reason.BoardOriginUnavailable,
 					});
+				}
+				// Board-only single items cannot stack or fall back to passive storage.
+				// Count claimed cells before sorting locations or allocating spawn identities.
+				if (item.maxStackSize === 1) {
+					const config = yield* GameConfigFx;
+					const occupied = new Set<string>();
+					for (const location of [
+						...readGridLocationClaimsFn({
+							runtime,
+						}).map((claim) => claim.location),
+						...(excludedLocations ?? []),
+					]) {
+						if (
+							location.scope === "board" &&
+							location.space === origin.space &&
+							location.position.x >= 0 &&
+							location.position.x < config.meta.board.width &&
+							location.position.y >= 0 &&
+							location.position.y < config.meta.board.height
+						) {
+							occupied.add(readGridLocationKeyFn(location));
+						}
+					}
+					const available =
+						config.meta.board.width * config.meta.board.height - occupied.size;
+					if (available < quantity) {
+						return yield* Effect.fail(
+							new PlacementUnavailableError({
+								itemId: item.id,
+								placement: drop.placement,
+								quantity,
+								reason: PlacementUnavailableError.Reason.BoardFull,
+								remainingQuantity: quantity - available,
+							}),
+						);
+					}
 				}
 				const plan = yield* planBoardPlacementFx({
 					excludedLocations: excludedLocations?.filter(

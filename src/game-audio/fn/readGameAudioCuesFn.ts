@@ -57,7 +57,7 @@ const cueFn = (kind: readGameAudioCuesFn.Kind, strength: number): readGameAudioC
 	strength: clampStrengthFn(strength),
 });
 
-const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
+const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result | null =>
 	match(event)
 		.with(
 			{
@@ -145,6 +145,15 @@ const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
 			},
 			(event) => cueFn("remove", strengthForQuantityFn(event.quantity)),
 		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.JobAborted,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemDiscarded,
+			},
+			() => null,
+		)
 		.exhaustive();
 
 const coalesceCuesFn = (
@@ -155,6 +164,7 @@ const coalesceCuesFn = (
 
 	for (const event of events) {
 		const next = readGameAudioCueFn(event);
+		if (next === null) continue;
 		const existingIndex = indexByKind.get(next.kind);
 		if (existingIndex === undefined) {
 			indexByKind.set(next.kind, cues.length);

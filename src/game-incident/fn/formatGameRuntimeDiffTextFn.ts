@@ -79,10 +79,10 @@ export const formatGameRuntimeDiffTextFn = ({
 			: [
 					`- Ever enabled: ${formatBooleanFn(initial.cheats.everEnabled)} → ${formatBooleanFn(latest.cheats.everEnabled)}`,
 				]),
-		...(initial.cheats.instantGameplay === latest.cheats.instantGameplay
+		...(initial.cheats.speedUpGameplay === latest.cheats.speedUpGameplay
 			? []
 			: [
-					`- Instant gameplay: ${formatBooleanFn(initial.cheats.instantGameplay)} → ${formatBooleanFn(latest.cheats.instantGameplay)}`,
+					`- Speed up: ${formatBooleanFn(initial.cheats.speedUpGameplay)} → ${formatBooleanFn(latest.cheats.speedUpGameplay)}`,
 				]),
 	];
 	const itemLines = formatCollectionDiffFn({

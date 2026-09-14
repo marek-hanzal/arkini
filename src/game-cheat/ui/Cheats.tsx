@@ -7,7 +7,7 @@ import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const actionLabelFn = (action: updateGameCheatsAtom.Command["action"]) => {
-	if (action === "instant-gameplay") return "Instant gameplay";
+	if (action === "speed-up-gameplay") return "Speed up";
 	if (action === "cheat-mode") return "Cheat mode";
 	return "Navigation";
 };
@@ -72,7 +72,7 @@ export const Cheats = ({
 					<label
 						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-enabled=false]:cursor-default data-[ui-enabled=false]:opacity-60 data-[ui-pending=true]:cursor-progress"
 						{...readDataUiFn({
-							dataUi: "CheatsInstantGameplay",
+							dataUi: "CheatsSpeedUpGameplay",
 							state: {
 								enabled: model.enabled,
 								pending: model.blocked,
@@ -80,19 +80,19 @@ export const Cheats = ({
 						})}
 					>
 						<span className="grid gap-1">
-							<span className="text-sm font-semibold">Instant gameplay</span>
+							<span className="text-sm font-semibold">Speed up</span>
 							<span className="text-sm leading-5 text-muted">
-								Removes waiting time while preserving normal requirements,
-								placement, units and lifecycle rules.
+								Speeds up gameplay while preserving normal requirements, placement,
+								units and lifecycle rules.
 							</span>
 						</span>
 						<input
 							type="checkbox"
-							checked={model.instantGameplay}
+							checked={model.speedUpGameplay}
 							className="size-5 shrink-0 accent-accent"
 							disabled={model.blocked || !model.enabled}
 							onChange={(event) =>
-								model.setInstantGameplayFn(event.currentTarget.checked)
+								model.setSpeedUpGameplayFn(event.currentTarget.checked)
 							}
 						/>
 					</label>

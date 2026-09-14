@@ -63,6 +63,7 @@ describe("publishEditorProjectFx", () => {
 					type: "idle",
 				}),
 			),
+			resetFx: () => Effect.void,
 			syncFx: () => Effect.void,
 			publishFx,
 			advanceNoopFx,

@@ -1,4 +1,5 @@
 import { CircleCheck, CircleX, Clock, PackagePlus } from "lucide-react";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import { useStore } from "@tanstack/react-form";
@@ -31,7 +32,7 @@ const ClockFields = () => {
 								label={translator.textFn("Lifetime (seconds)")}
 								clearLabel={translator.textFn("Clear lifetime")}
 								description={translator.textFn(
-									"Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.",
+									"Leave empty to run indefinitely. Expiry mode controls what happens to unfinished production.",
 								)}
 								min={5}
 								step={5}
@@ -68,6 +69,31 @@ const ClockFields = () => {
 						</form.AppField>
 					</div>
 				</div>
+				{clock.durationMs === undefined ? null : (
+					<EditorChoiceControl
+						label={translator.textFn("Expiry mode")}
+						value={clock.expiryMode ?? "loose-kill"}
+						options={[
+							{
+								value: "loose-kill",
+								label: translator.textFn("Loose-kill"),
+								description: translator.textFn(
+									"Wait for accepted production to settle. A job blocked on output space keeps this item alive.",
+								),
+							},
+							{
+								value: "kill-switch",
+								label: translator.textFn("Kill switch"),
+								description: translator.textFn(
+									"Cancel work and remove the item atomically. Place reserved items first, then unused buffers and expiry output. Anything that does not fit is lost and logged.",
+								),
+							},
+						]}
+						onChangeFn={(expiryMode) =>
+							form.setFieldValue("clock.expiryMode", expiryMode)
+						}
+					/>
+				)}
 			</EditorFormCard>
 			<EditorFormSectionDivider
 				title={translator.textFn("Rules")}
@@ -99,7 +125,7 @@ const ClockFields = () => {
 					<EditorFormSectionDivider
 						title={translator.textFn("Expiry output")}
 						description={translator.textFn(
-							"Emitted once after the finite lifetime ends and accepted production has settled.",
+							"Resolved once when the item expires. Kill switch places what fits after returned materials; excess output is lost and logged.",
 						)}
 					/>
 					<EditorFormCard>
@@ -108,7 +134,7 @@ const ClockFields = () => {
 								<OptionalOutputControl
 									addLabel={translator.textFn("Enable")}
 									emptyDescription={translator.textFn(
-										"Without an output, the clock disappears after expiry and production settlement.",
+										"Without an output, the item disappears according to its expiry mode.",
 									)}
 									emptyIcon={PackagePlus}
 									emptyTitle={translator.textFn("Item expiry output empty title")}

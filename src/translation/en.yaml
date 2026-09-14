@@ -123,6 +123,8 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
+Cancel work and remove the item atomically. Place reserved items first, then unused buffers and expiry output. Anything that does not fit is lost and logged.:
+  value: Cancel work and remove the item atomically. Place reserved items first, then unused buffers and expiry output. Anything that does not fit is lost and logged.
 Candidate:
   value: Candidate
 Chain:
@@ -140,7 +142,7 @@ Chain help:
     - Details reveals each operation. Quantities belong to that operation, not the whole chain. Output sets are alternatives; rolls within a selected set run together; weighted candidates are alternatives per selection. Conditions and chance remain visible.
     - Exploration follows up to five steps. Each merge or Clock operation counts as one step. Depth limits and Clock loops are unfinished paths, not final items. Reaching the safety limit explicitly reports incomplete exploration.
     - Retained merge participants keep their existing runtime state; their Clock is not restarted. Spending a unit is marked separately, with conditional depletion output when configured.
-    - This is authored inspection, not runtime simulation. Disabled defaults, conditions, inputs, jobs and blocked placement may prevent or delay an outcome. Times are local configured durations, not guaranteed elapsed times.
+    - This is authored inspection, not runtime simulation. Disabled defaults, conditions, inputs, jobs and blocked placement may prevent or delay an outcome. Times are local configured durations, not guaranteed elapsed times. Kill switch may cancel unfinished production and discard outputs that cannot fit; Chain still shows the authored output possibilities.
 Chain pulse explanation:
   value: Shown once per admitted run. The owner remains until expiry. Inputs, availability, queueing and output placement can delay or prevent production.
 Chain safety limit:
@@ -286,9 +288,9 @@ Editor Board help:
   value: |
     Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, units, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
 
-    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Instant** removes waiting time while preserving normal requirements, placement, units, and lifecycle rules.
+    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Speed up** runs the simulation at a fixed ×20 speed while preserving normal requirements, placement, units, and lifecycle rules.
 
-    The live Board session is disposable. It has no saved scenarios and does not change authored project data.
+    **Reset** discards the live Board session and starts a fresh game from the current saved project, including its starting items and Default speed. It does not change authored project data or installed-game saves. The live Board has no saved scenarios.
 Editor MCP:
   value: Editor MCP
 Editor MCP help:
@@ -312,8 +314,6 @@ Editor MCP help:
     Open **Settings**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
 
     On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
-Emitted once after the finite lifetime ends and accepted production has settled.:
-  value: Emitted once after the finite lifetime ends and accepted production has settled.
 Enable:
   value: Enable
 Enable Units on this item before selecting Self to pay the unit cost.:
@@ -354,6 +354,8 @@ Exact count:
   value: Exact count
 Exists:
   value: Exists
+Expiry mode:
+  value: Expiry mode
 Expiry output:
   value: Expiry output
 Extra output:
@@ -463,7 +465,11 @@ Item clock help:
 
     - **Interval** attempts the line marked Clock periodically. Leave it empty for a one-shot lifetime without pulses.
     - **Lifetime** sets how long the timer may run. Leave it empty for an unlimited lifetime.
-    - At least one timer is required. **Expiry output** is available only with a lifetime and is emitted after accepted production settles.
+    - At least one timer is required. **Expiry output** and **Expiry mode** are available only with a lifetime.
+    - **Loose-kill** is the default: accepted production settles before the item disappears. A job whose output cannot fit keeps its owner alive.
+    - **Kill switch** cancels queued and active work, then removes the owner in one atomic change. Reserved items have placement priority, followed by unused buffered materials and the normal Clock expiry output. Anything that cannot fit is lost and recorded in gameplay logs. Consumed job inputs and spent units are not refunded; canceled jobs emit no line output. Incoming deliveries return normally.
+
+    Both modes resolve the configured expiry output. A job that already completed at the same Tick boundary keeps its result.
 
     **Enabled** and availability rules determine whether the timer runs. Every Enable rule must pass; any matching Disable rule pauses it. Accepted production keeps its own line rules.
 
@@ -504,7 +510,7 @@ Item estimate help:
 
     Arkini uses authored runtimes, output quantities and chances. Random outputs are converted into an expected number of attempts. Independent work can happen in parallel, so its time is not blindly added together.
 
-    Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
+    Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. Clock Kill switch can cancel unfinished production and discard outputs that cannot fit; Estimate does not simulate these losses. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
 Item expiry output empty title:
   value: Create items when this item's lifetime ends.
 Item global count help:
@@ -568,7 +574,7 @@ Item production help:
 
     **Interactive** allows manual production, material management, queue changes and line selection. **Automatic only** removes those player controls.
 
-    Clock can also give an item a finite lifetime without any lines. Accepted production may outlive that lifetime; expiry output waits for settlement. Adding a production line removes the configured Action when the draft is saved.
+    Clock can also give an item a finite lifetime without any lines. **Loose-kill** lets accepted production settle before expiry; **Kill switch** cancels unfinished work at expiry and may lose materials or expiry outputs that cannot be placed. Adding a production line removes the configured Action when the draft is saved.
 Item section copy help:
   value: |
     In the edit form, **Copy from** selects another saved item in this project. Confirm to replace the **entire active section**, including its unsaved changes. Collections are replaced in full, never merged; an absent optional section removes it from the destination. The source item stays unchanged.
@@ -615,10 +621,12 @@ Keep:
   value: Keep
 Keep leaves the receiving item unchanged, Remove takes one item from its stack, Spend removes one unit, and Replace swaps one item for the configured result.:
   value: Keep leaves the receiving item unchanged, Remove takes one item from its stack, Spend removes one unit, and Replace swaps one item for the configured result.
+Kill switch:
+  value: Kill switch
 Leave empty for a one-shot lifetime without periodic production.:
   value: Leave empty for a one-shot lifetime without periodic production.
-Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.:
-  value: Leave empty to run indefinitely. Expiry closes admission and waits for production to settle.
+Leave empty to run indefinitely. Expiry mode controls what happens to unfinished production.:
+  value: Leave empty to run indefinitely. Expiry mode controls what happens to unfinished production.
 "Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged.":
   value: "Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged."
 Lifetime:
@@ -641,6 +649,8 @@ Loading notes…:
   value: Loading notes…
 Location:
   value: Location
+Loose-kill:
+  value: Loose-kill
 MIME type:
   value: MIME type
 Matches any positive board distance and excludes only Self.:
@@ -719,8 +729,6 @@ No items emitted:
   value: No items emitted
 No items yet:
   value: No items yet
-No matches.:
-  value: No matches.
 No matching items:
   value: No matching items
 No other authored item outputs this item through production, expiry, units, or merges.:
@@ -927,8 +935,10 @@ Reserve:
   value: Reserve
 Reserved:
   value: Reserved
-Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.:
-  value: Resolved when the lifetime expires. The item disappears after expiry and accepted production have settled, even without an expiry output.
+Reset:
+  value: Reset
+Resolved once when the item expires. Kill switch places what fits after returned materials; excess output is lost and logged.:
+  value: Resolved once when the item expires. Kill switch places what fits after returned materials; excess output is lost and logged.
 Resource ID:
   value: Resource ID
 Retry loading notes:
@@ -943,8 +953,8 @@ Rules:
   value: Rules
 Running:
   value: Running
-Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Accepted production finishes before the item disappears.:
-  value: Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Accepted production finishes before the item disappears.
+Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Expiry mode controls unfinished production.:
+  value: Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Expiry mode controls unfinished production.
 Runtime:
   value: Runtime
 Runtime (seconds):
@@ -1159,6 +1169,8 @@ Visible:
   value: Visible
 Visible lines are shown to the player before runtime rules alter their visibility.:
   value: Visible lines are shown to the player before runtime rules alter their visibility.
+Wait for accepted production to settle. A job blocked on output space keeps this item alive.:
+  value: Wait for accepted production to settle. A job blocked on output space keeps this item alive.
 Weight:
   value: Weight
 Weighted:
@@ -1167,8 +1179,8 @@ Weighted selections:
   value: Weighted selections
 With note:
   value: With note
-Without an output, the clock disappears after expiry and production settlement.:
-  value: Without an output, the clock disappears after expiry and production settlement.
+Without an output, the item disappears according to its expiry mode.:
+  value: Without an output, the item disappears according to its expiry mode.
 Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.:
   value: Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.
 Write a note…:
@@ -1181,8 +1193,8 @@ consume:
   value: consume
 keep:
   value: keep
-manual:
-  value: manual
+kill-switch:
+  value: kill-switch
 negligible:
   value: negligible
 pulse:

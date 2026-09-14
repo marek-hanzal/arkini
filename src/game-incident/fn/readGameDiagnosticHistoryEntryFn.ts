@@ -284,7 +284,10 @@ export const readGameDiagnosticHistoryEntryFn = ({
 			value: event,
 		});
 		const details = toDiagnosticValueResultFn(
-			omitResolvedItemIdsFn(rawDetails, related.items.length > 0),
+			// Loss audits retain the explicit owner/item roles even when identities resolve.
+			type === "job:aborted" || type === "item:discarded"
+				? rawDetails
+				: omitResolvedItemIdsFn(rawDetails, related.items.length > 0),
 		);
 		return {
 			event: {

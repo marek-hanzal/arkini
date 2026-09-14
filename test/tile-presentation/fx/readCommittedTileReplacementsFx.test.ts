@@ -79,7 +79,7 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 		cheats: {
 			enabled: false,
 			everEnabled: false,
-			instantGameplay: false,
+			speedUpGameplay: false,
 		},
 		currentSpace: 0,
 		items: [

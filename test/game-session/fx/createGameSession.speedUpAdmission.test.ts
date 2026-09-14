@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
-import { setInstantGameplayFx } from "~/game-cheat/fx/setInstantGameplayFx";
+import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
@@ -79,7 +79,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 	return owner;
 });
 
-describe("GameSession Instant gameplay admission", () => {
+describe("GameSession Speed up admission", () => {
 	it("admits independent owner jobs before one shared Tick settles them", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
@@ -89,7 +89,7 @@ describe("GameSession Instant gameplay admission", () => {
 		try {
 			await session.runFn(
 				Effect.gen(function* () {
-					yield* setInstantGameplayFx({
+					yield* setSpeedUpGameplayFx({
 						enabled: true,
 					});
 					yield* setCheatEnabledFx({
@@ -139,7 +139,7 @@ describe("GameSession Instant gameplay admission", () => {
 
 			await session.runFn(
 				advanceRuntimeElapsedFx({
-					elapsedMs: SimulationStepMs,
+					elapsedMs: SimulationStepMs * 10,
 				}),
 			);
 			expect(session.getSnapshotFn().jobs).toEqual([]);
@@ -152,6 +152,7 @@ describe("GameSession Instant gameplay admission", () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(5),
 			tickIntervalMs: 1,
+			speedUpMultiplier: 20,
 		});
 		const ownerItemId = "runtime:forge:queue-race";
 		let unsubscribe: () => void = () => undefined;
@@ -159,7 +160,7 @@ describe("GameSession Instant gameplay admission", () => {
 		try {
 			await session.runFn(
 				Effect.gen(function* () {
-					yield* setInstantGameplayFx({
+					yield* setSpeedUpGameplayFx({
 						enabled: true,
 					});
 					yield* setCheatEnabledFx({
@@ -219,7 +220,10 @@ describe("GameSession Instant gameplay admission", () => {
 				},
 			);
 			unsubscribe = session.subscribeTransitionsFn((transition) => {
-				if (transition.runtime.jobQueue.length === 4) {
+				if (
+					transition.runtime.jobQueue.length === 4 &&
+					transition.runtime.jobs.length === 0
+				) {
 					publishWokenRuntime?.(transition.runtime);
 				}
 			});

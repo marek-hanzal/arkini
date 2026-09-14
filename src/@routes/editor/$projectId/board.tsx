@@ -77,7 +77,7 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 				header={
 					<EditorBoardToolbar
 						game={ready ? state.resource.game : undefined}
-						projectId={project.projectId}
+						project={project}
 					/>
 				}
 			>

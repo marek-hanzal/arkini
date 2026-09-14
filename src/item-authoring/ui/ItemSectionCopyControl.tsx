@@ -34,7 +34,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 			<fieldset
 				disabled={isSaving}
 				inert={isSaving}
-				className="w-84 min-w-0 py-0.5"
+				className="w-126 min-w-0 py-0.5"
 				data-ui="ItemSectionCopyControl"
 			>
 				<EditorSearchCombobox

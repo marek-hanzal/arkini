@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-form";
-import { Trash2 } from "lucide-react";
+import { PowerOff } from "lucide-react";
 
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -81,7 +81,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 					}
 				}}
 			>
-				<Trash2 className="size-4" />
+				<PowerOff className="size-4" />
 				{translator.textFn("Disable")}
 			</LinkButton>
 		</Tooltip>

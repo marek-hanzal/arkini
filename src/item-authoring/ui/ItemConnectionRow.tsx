@@ -19,11 +19,11 @@ export const ItemConnectionRow = ({
 	const project = useEditorProject();
 	return (
 		<article
-			className="ak-list-row ak-list-row-interactive relative flex min-h-16 min-w-0 items-center gap-4 rounded-xl p-3"
+			className="relative flex min-h-16 min-w-0 items-center gap-4 rounded-xl bg-secondary-subtle p-3 ring-1 ring-inset ring-control-border/60 transition-colors hover:bg-secondary-hover hover:ring-control-border"
 			data-ui="EditorItemConnectionsRow"
 		>
 			<EditorItemThumbnail
-				className="pointer-events-none rounded-lg border-0 bg-surface/45 ring-1 ring-line/50"
+				className="pointer-events-none rounded-lg border-0 bg-[var(--ak-editor-background)] ring-1 ring-control-border/60"
 				imageClassName="p-0.5"
 				resourceIds={item.asset.default}
 				size="sm"
@@ -37,7 +37,7 @@ export const ItemConnectionRow = ({
 						sectionId: "identity",
 					}}
 					search={{}}
-					className="min-h-0 min-w-0 justify-start border-0 bg-transparent p-0 text-left font-medium shadow-none before:absolute before:inset-0 before:content-[''] hover:bg-transparent hover:text-accent"
+					className="min-h-0 min-w-0 justify-start border-0 bg-transparent p-0 text-left font-medium shadow-none before:absolute before:inset-0 before:content-[''] hover:bg-transparent hover:text-accent active:bg-transparent"
 				>
 					{item.title}
 				</ButtonLink>
@@ -128,7 +128,7 @@ const ConnectionOrigin = ({
 				outputCandidate: roll?.candidateIndex,
 			}}
 			data-ui="EditorItemConnectionOriginLink"
-			className="relative z-10 inline min-h-0 border-0 bg-transparent p-0 text-left text-xs font-normal text-accent underline-offset-4 shadow-none hover:bg-transparent hover:underline"
+			className="relative z-10 inline min-h-0 border-0 bg-transparent p-0 text-left text-xs font-normal text-accent/65 underline-offset-4 shadow-none hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
 		>
 			{label}
 			{" · "}

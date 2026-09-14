@@ -19,7 +19,7 @@ export const EditorSectionBar = ({
 		<nav className="min-w-0 overflow-x-auto overscroll-x-contain">
 			<div className="flex min-w-max items-center gap-1">{children}</div>
 		</nav>
-		<div className="ml-auto flex shrink-0 items-center gap-3">
+		<div className="ml-auto flex shrink-0 items-center gap-3 [&_[data-ui=EditorPageHelpOpen]]:w-5">
 			{actions}
 			{help}
 		</div>

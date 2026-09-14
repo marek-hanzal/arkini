@@ -64,7 +64,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				}
 				action={
 					<LinkButtonLink
-						className="inline-flex items-center gap-1.5"
+						className="inline-flex items-center gap-1.5 opacity-75 hover:opacity-100"
 						data-overview-id="items"
 						data-ui="EditorProjectOverviewLink"
 						params={{
@@ -82,7 +82,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				body={`${project.resources.length} ${project.resources.length === 1 ? "asset" : "assets"}`}
 				action={
 					<LinkButtonLink
-						className="inline-flex items-center gap-1.5"
+						className="inline-flex items-center gap-1.5 opacity-75 hover:opacity-100"
 						data-overview-id="assets"
 						data-ui="EditorProjectOverviewLink"
 						params={{

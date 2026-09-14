@@ -1,16 +1,21 @@
 import { ImagePlus } from "lucide-react";
-import { Status } from "~/ui/ui/Status";
-import { PrimaryButtonLink } from "~/ui/ui/Button";
-import { useTranslator } from "~/translation/ui/useTranslator";
+
+import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 import { EditorAssetReference } from "~/asset-authoring/ui/EditorAssetReference";
+import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
+import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import type { Project } from "~/project-authoring/type/Project";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { PrimaryButtonLink } from "~/ui/ui/Button";
+import { Status } from "~/ui/ui/Status";
 
 /** Presents the project-wide launcher hero and About portraits. */
 export const ProjectArtworkDetail = ({ project }: { readonly project: Project }) => {
 	const translator = useTranslator();
+	const heroResourceId = project.config.resources.hero;
+	const heroUrl = useResourceUrl(heroResourceId);
 	const avatars = ProjectAvatarKeys.flatMap((slot) => {
 		const resourceId = project.config.resources[slot];
 		return resourceId === undefined
@@ -23,52 +28,69 @@ export const ProjectArtworkDetail = ({ project }: { readonly project: Project })
 				];
 	});
 	return (
-		<div className="grid gap-6">
-			<EditorRootCard dataUi="EditorProjectHeroDetailCard">
-				<DetailSection
-					title={translator.textFn("Hero image")}
-					description={translator.textFn("The project image shown by the launcher.")}
-				>
-					<EditorAssetReference resourceId={project.config.resources.hero} />
-				</DetailSection>
-			</EditorRootCard>
-			<EditorRootCard dataUi="EditorProjectAvatarsDetailCard">
-				<DetailSection
-					title={translator.textFn("About avatars")}
-					description={translator.textFn(
-						"Optional portraits used on the game About screen.",
-					)}
-				>
-					{avatars.length === 0 ? (
-						<Status
-							variant="flat"
-							icon={ImagePlus}
-							title={translator.textFn("No About avatars configured.")}
-							action={
-								<PrimaryButtonLink
-									to="/editor/$projectId/project/form/$sectionId"
-									params={{
-										projectId: project.projectId,
-										sectionId: "artwork",
-									}}
-								>
-									{translator.textFn("Add avatars")}
-								</PrimaryButtonLink>
-							}
+		<div
+			className="grid gap-6"
+			data-ui="EditorProjectArtworkDetail"
+		>
+			<EditorRootCard
+				className="justify-items-center"
+				dataUi="EditorProjectHeroDetailCard"
+			>
+				{heroUrl === undefined ? (
+					<EditorAssetReference resourceId={heroResourceId} />
+				) : (
+					<EditorAssetDetailLink
+						className="w-full max-w-3xl active:bg-transparent"
+						resourceId={heroResourceId}
+					>
+						<img
+							className="max-h-[45dvh] w-full object-contain"
+							src={heroUrl}
+							alt=""
+							draggable={false}
 						/>
-					) : (
-						<ul className="grid gap-3">
-							{avatars.map(({ resourceId, slot }) => (
-								<li key={slot}>
-									<EditorAssetReference
-										context={slot}
-										resourceId={resourceId}
-									/>
-								</li>
-							))}
-						</ul>
-					)}
-				</DetailSection>
+					</EditorAssetDetailLink>
+				)}
+			</EditorRootCard>
+			<hr className="border-line/70" />
+			<EditorRootCard dataUi="EditorProjectAvatarsDetailCard">
+				{avatars.length === 0 ? (
+					<Status
+						variant="flat"
+						icon={ImagePlus}
+						title={translator.textFn("No About avatars configured.")}
+						action={
+							<PrimaryButtonLink
+								to="/editor/$projectId/project/form/$sectionId"
+								params={{
+									projectId: project.projectId,
+									sectionId: "artwork",
+								}}
+							>
+								{translator.textFn("Add avatars")}
+							</PrimaryButtonLink>
+						}
+					/>
+				) : (
+					<ul className="grid grid-cols-2 gap-x-6 gap-y-3">
+						{avatars.map(({ resourceId, slot }) => (
+							<li
+								className="flex min-w-0 justify-center"
+								key={slot}
+							>
+								<EditorAssetDetailLink
+									className="min-w-0 gap-3 text-foreground active:bg-transparent"
+									resourceId={resourceId}
+								>
+									<EditorAssetThumbnail resourceId={resourceId} />
+									<span className="truncate font-mono text-sm font-semibold">
+										{slot}
+									</span>
+								</EditorAssetDetailLink>
+							</li>
+						))}
+					</ul>
+				)}
 			</EditorRootCard>
 		</div>
 	);

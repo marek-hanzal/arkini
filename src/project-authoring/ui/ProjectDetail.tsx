@@ -25,6 +25,7 @@ export const ProjectDetail = ({
 	const editActionRef = useEditorEditShortcut();
 	return (
 		<EditorSectionPage
+			contentClassName="mx-auto w-3/4"
 			header={
 				<EditorSectionNavigation
 					action={

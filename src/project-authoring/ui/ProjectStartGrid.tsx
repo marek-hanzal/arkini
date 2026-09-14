@@ -242,9 +242,10 @@ const ProjectStartGridSurface = ({
 	);
 	return (
 		<div
-			className="min-w-0 max-w-full overflow-x-auto rounded-xl border border-line bg-canvas/50 p-3 data-[mode=detail]:rounded-none data-[mode=detail]:border-0 data-[mode=detail]:bg-transparent data-[mode=detail]:p-0"
+			className="min-w-0 max-w-full overflow-x-auto rounded-xl bg-canvas/50 p-3 data-[mode=detail]:rounded-none data-[mode=detail]:bg-transparent data-[mode=detail]:p-0 data-[scope=board]:rounded-none data-[scope=board]:bg-transparent data-[scope=board]:p-0"
 			data-ui="EditorProjectStartGrid"
 			data-mode={edit === undefined ? "detail" : "edit"}
+			data-scope={scope}
 		>
 			<div
 				className="mx-auto grid gap-1.5"

@@ -75,28 +75,30 @@ export const ProjectBoardSection = () => {
 						/>
 					</div>
 					<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
-					<EditorValueField label="Space">
-						<input
-							type="number"
-							value={spaceInput}
-							className={`${editorInputClassName} w-56`}
-							max={MaxEditorSpaceIndex}
-							min={0}
-							step={1}
-							onChange={(event) => {
-								const value = event.currentTarget.value;
-								setSpaceInputFn(value);
-								const space = Number(value);
-								if (
-									value !== "" &&
-									Number.isInteger(space) &&
-									space >= 0 &&
-									space <= MaxEditorSpaceIndex
-								)
-									setSelectedSpaceFn(space);
-							}}
-						/>
-					</EditorValueField>
+					<div className="w-56 max-w-full shrink-0">
+						<EditorValueField label="Space">
+							<input
+								type="number"
+								value={spaceInput}
+								className={editorInputClassName}
+								max={MaxEditorSpaceIndex}
+								min={0}
+								step={1}
+								onChange={(event) => {
+									const value = event.currentTarget.value;
+									setSpaceInputFn(value);
+									const space = Number(value);
+									if (
+										value !== "" &&
+										Number.isInteger(space) &&
+										space >= 0 &&
+										space <= MaxEditorSpaceIndex
+									)
+										setSelectedSpaceFn(space);
+								}}
+							/>
+						</EditorValueField>
+					</div>
 				</div>
 			</EditorFormCard>
 			<ProjectStartGrid

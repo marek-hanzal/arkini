@@ -1,5 +1,3 @@
-About avatars:
-  value: About avatars
 Action:
   value: Action
 Action type:
@@ -400,8 +398,6 @@ Game limit:
   value: Game limit
 Guaranteed:
   value: Guaranteed
-Hero image:
-  value: Hero image
 Hide:
   value: Hide
 Highest demand first:
@@ -796,8 +792,6 @@ Optional items emitted when the final unit is spent.:
   value: Optional items emitted when the final unit is spent.
 Optional output resolved after the source action and target effect complete.:
   value: Optional output resolved after the source action and target effect complete.
-Optional portraits used on the game About screen.:
-  value: Optional portraits used on the game About screen.
 Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.:
   value: Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.
 Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.:
@@ -1079,8 +1073,6 @@ The item that owns this action pays the unit cost. It must define enough availab
   value: The item that owns this action pays the unit cost. It must define enough available units.
 The line selected by default for manual production. Selecting this line clears Default on sibling lines.:
   value: The line selected by default for manual production. Selecting this line clears Default on sibling lines.
-The project image shown by the launcher.:
-  value: The project image shown by the launcher.
 The receiving item must match this selector for the merge to apply.:
   value: The receiving item must match this selector for the merge to apply.
 These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected.:

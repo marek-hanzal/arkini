@@ -24,7 +24,6 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 					displaySelectedLabel
 					emptyLabel="No configured Space matches this search."
 					label="Space"
-					labelVisible={false}
 					options={spaces.map((space) => ({
 						id: String(space),
 						label: `Space · ${space}`,

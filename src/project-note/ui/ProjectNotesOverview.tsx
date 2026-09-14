@@ -47,7 +47,7 @@ export const ProjectNotesOverview = ({ projectId }: { readonly projectId: string
 			dataUi="EditorProjectNotesOverview"
 			action={
 				<LinkButtonLink
-					className="inline-flex items-center gap-1.5"
+					className="inline-flex items-center gap-1.5 opacity-75 hover:opacity-100"
 					data-overview-id="notes"
 					data-ui="EditorProjectOverviewLink"
 					params={{

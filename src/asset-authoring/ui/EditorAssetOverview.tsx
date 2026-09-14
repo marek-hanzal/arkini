@@ -23,42 +23,32 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 			className="mx-auto flex h-full min-h-0 w-3/4 min-w-0 flex-col gap-3 overflow-y-auto p-3"
 			data-ui="EditorAssetOverview"
 		>
-			<div className="grid shrink-0 gap-3 lg:grid-cols-2">
-				<EditorRootCard dataUi="EditorAssetIdentityCard">
-					<FactList>
-						<Fact
-							label={translator.textFn("Resource ID")}
-							mono
-							value={resource.id}
-						/>
-						<Fact
-							label={translator.textFn("Package status")}
-							value={translator.textFn("Included in current project")}
-						/>
-					</FactList>
-				</EditorRootCard>
-				<EditorRootCard dataUi="EditorAssetImageDetailsCard">
-					<FactList columns={3}>
-						<Fact
-							label={translator.textFn("Dimensions")}
-							value={
-								currentDimensions === undefined
-									? translator.textFn("Reading image…")
-									: `${currentDimensions.width} × ${currentDimensions.height} px`
-							}
-						/>
-						<Fact
-							label={translator.textFn("MIME type")}
-							mono
-							value={resource.mime}
-						/>
-						<Fact
-							label={translator.textFn("Byte size")}
-							value={formatByteSizeFn(resource.size)}
-						/>
-					</FactList>
-				</EditorRootCard>
-			</div>
+			<EditorRootCard dataUi="EditorAssetDetailsCard">
+				<FactList columns={4}>
+					<Fact
+						label={translator.textFn("Resource ID")}
+						mono
+						value={resource.id}
+					/>
+					<Fact
+						label={translator.textFn("Dimensions")}
+						value={
+							currentDimensions === undefined
+								? translator.textFn("Reading image…")
+								: `${currentDimensions.width} × ${currentDimensions.height} px`
+						}
+					/>
+					<Fact
+						label={translator.textFn("MIME type")}
+						mono
+						value={resource.mime}
+					/>
+					<Fact
+						label={translator.textFn("Byte size")}
+						value={formatByteSizeFn(resource.size)}
+					/>
+				</FactList>
+			</EditorRootCard>
 			<div
 				className="grid min-h-48 min-w-0 flex-1 place-items-center [container-type:size]"
 				data-ui="EditorAssetPreviewArea"

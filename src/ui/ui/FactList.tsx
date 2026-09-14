@@ -5,10 +5,10 @@ export const FactList = ({
 	columns = 2,
 }: {
 	readonly children: ReactNode;
-	readonly columns?: 1 | 2 | 3;
+	readonly columns?: 1 | 2 | 3 | 4;
 }) => (
 	<dl
-		className="ak-fact-list grid min-w-0 grid-cols-1 gap-x-8 gap-y-3 min-[48rem]:data-[columns=2]:grid-cols-2 min-[48rem]:data-[columns=3]:grid-cols-3"
+		className="ak-fact-list grid min-w-0 grid-cols-1 gap-x-8 gap-y-3 min-[48rem]:data-[columns=2]:grid-cols-2 min-[48rem]:data-[columns=3]:grid-cols-3 min-[48rem]:data-[columns=4]:grid-cols-4"
 		data-columns={columns}
 	>
 		{children}

@@ -1,9 +1,9 @@
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorResourceUsages } from "~/asset-authoring/ui/useEditorResourceUsages";
+import { Mx } from "~/translation/ui/Mx";
 import { Status } from "~/ui/ui/Status";
 import { EditorAssetUsageRow } from "~/asset-authoring/ui/EditorAssetUsageRow";
 
@@ -13,14 +13,14 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 	const usages = useEditorResourceUsages().filter((usage) => usage.resourceId === resourceId);
 	if (usages.length === 0) {
 		return (
-			<EditorRootCard dataUi="EditorAssetUnusedCard">
-				<Status
-					dataUi="EditorAssetUnused"
-					icon={Unlink}
-					title={translator.textFn("This asset is not used")}
-					variant="flat"
-				/>
-			</EditorRootCard>
+			<Status
+				dataUi="EditorAssetUnused"
+				description={<Mx label="Asset usage empty description" />}
+				icon={Unlink}
+				size="large"
+				title={translator.textFn("This asset is not used")}
+				variant="flat"
+			/>
 		);
 	}
 	return (

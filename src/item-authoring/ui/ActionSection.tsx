@@ -31,15 +31,15 @@ export const ActionSection = () => {
 			<form.Subscribe selector={(state) => state.values.action}>
 				{(action) =>
 					action === undefined ? (
-						<EditorFormCard>
-							<EditorCapabilityStatus
-								actionLabel={translator.textFn("Enable")}
-								dataUi="EditorActionDisabled"
-								icon={MapPinned}
-								onEnableFn={enableActionFn}
-								title={translator.textFn("Item action empty title")}
-							/>
-						</EditorFormCard>
+						<EditorCapabilityStatus
+							actionLabel={translator.textFn("Enable")}
+							dataUi="EditorActionDisabled"
+							icon={MapPinned}
+							onEnableFn={enableActionFn}
+							size="large"
+							summary={translator.textFn("Item action empty title")}
+							title={translator.textFn("No action configured")}
+						/>
 					) : (
 						<>
 							<EditorFormCard>

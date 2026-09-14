@@ -6,11 +6,10 @@ import { ShieldAlert, ShieldCheck } from "lucide-react";
 import type { Project } from "~/project-authoring/type/Project";
 import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { Button, DangerButton } from "~/ui/ui/Button";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorAssetUsageRow } from "~/asset-authoring/ui/EditorAssetUsageRow";
+import { Status } from "~/ui/ui/Status";
 
 const EditorAssetDeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (
@@ -122,42 +121,42 @@ export const EditorAssetDeleteSection = ({
 		resourceId,
 	});
 	const blocked = controller.blockers.length > 0;
-	const StateIcon = blocked ? ShieldAlert : ShieldCheck;
 	return (
 		<>
 			<section
 				className="grid gap-3"
 				data-ui="EditorAssetDeleteSection"
 			>
-				<EditorRootCard dataUi="EditorAssetDeleteStateCard">
-					<div className="flex items-start gap-3">
-						<StateIcon
-							className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
-							{...readDataUiFn({
-								dataUi: "EditorAssetDeleteStateIcon",
-								state: {
-									blocked,
-								},
-							})}
-						/>
-						<div>
-							<h2 className="text-lg font-semibold">
-								{blocked
-									? translator.textFn("This asset cannot be deleted yet")
-									: translator.textFn("This asset can be deleted")}
-							</h2>
-							<div className="mt-1 max-w-3xl text-sm leading-6 text-muted">
-								<Mx
-									label={
-										blocked
-											? "Asset delete blocked description"
-											: "Asset delete available description"
-									}
-								/>
-							</div>
-						</div>
-					</div>
-				</EditorRootCard>
+				<Status
+					action={
+						blocked ? undefined : (
+							<DangerButton
+								data-ui="EditorAssetDeleteOpen"
+								onClick={controller.openFn}
+							>
+								<Tx label="Delete asset" />
+							</DangerButton>
+						)
+					}
+					dataUi="EditorAssetDeleteState"
+					description={
+						blocked ? (
+							`${controller.blockers.length} ${translator.textFn(
+								controller.blockers.length === 1
+									? "reference must be removed first."
+									: "references must be removed first.",
+							)}`
+						) : (
+							<Mx label="Asset delete available description" />
+						)
+					}
+					icon={blocked ? ShieldAlert : ShieldCheck}
+					size="large"
+					title={translator.textFn(
+						blocked ? "This asset cannot be deleted yet" : "This asset can be deleted",
+					)}
+					variant="flat"
+				/>
 
 				{blocked ? (
 					<div
@@ -172,16 +171,7 @@ export const EditorAssetDeleteSection = ({
 							/>
 						))}
 					</div>
-				) : (
-					<EditorRootCard dataUi="EditorAssetDeleteActionCard">
-						<DangerButton
-							data-ui="EditorAssetDeleteOpen"
-							onClick={controller.openFn}
-						>
-							<Tx label="Delete asset" />
-						</DangerButton>
-					</EditorRootCard>
-				)}
+				) : null}
 			</section>
 			{controller.confirming ? (
 				<EditorAssetDeleteDialog

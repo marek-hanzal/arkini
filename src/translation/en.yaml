@@ -4,32 +4,32 @@ Action:
   value: Action
 Action disable rule help:
   value: |
-    A **Disable** rule vetoes the action while all of its conditions match.
+    **Disable** blocks the action whenever all its conditions match.
 
-    Disable wins over the authored state and every passing Enable rule. It affects activation only; it does not remove the action or change its inputs.
+    It wins over **Enabled** and every Enable rule. The action stays configured; players simply cannot use it.
 Action enable rule help:
   value: |
-    An **Enable** rule is a positive gate for the action. When Enable rules exist, **every** one must pass before activation is available.
+    **Enable** adds a required check. If you add several Enable rules, **all of them** must pass.
 
-    A matching Disable rule still wins.
+    Any matching Disable rule still blocks the action.
 Action input type help:
   value: |
-    Action inputs are settled when the player activates the item.
+    Choose what the action needs when used:
 
-    - **Simple** adds no external requirement.
-    - **Units** spends units from this item or a matching item on the current Board.
+    - **Simple:** nothing.
+    - **Units:** spends Units from this item or a matching Board item.
 Action inputs:
   value: Action inputs
 Action inputs help:
   value: |
-    These requirements are checked and settled **when the action activates**.
+    **Every requirement must be ready when the action is used.**
 
-    Every configured input must be satisfiable. **Simple** documents that no external item is needed; **Units** spends from the owner or a matching Board item. Actions do not accept delivered material inputs.
+    **Simple** needs nothing. **Units** spends Units from this item or a matching Board item. Actions cannot collect delivered Materials.
 Action rules help:
   value: |
-    These rules control whether the item action may activate.
+    Rules decide whether players can use this action.
 
-    Every **Enable** rule must pass. Any matching **Disable** rule vetoes activation. The action's inputs are settled only after the rules accept it.
+    Every **Enable** rule must pass. Any matching **Disable** rule blocks it. Costs are paid only after the rules pass.
 Action type:
   value: Action type
 Add at least one condition.:
@@ -66,46 +66,50 @@ Any local:
   value: Any local
   dynamic: true
 Approximate acquisition path:
-  value: Approximate acquisition path
+  value: Estimated route
 Artwork:
   value: Artwork
 Asset:
   value: Asset
 Asset Arkpack import summary:
-  value: Import all images. Matching resource IDs are replaced.
+  value: Import all images. Matching asset IDs are replaced.
 Asset ID:
   value: Asset ID
 Asset ID help:
   value: |
-    A unique resource name within this project. Renaming updates saved item, project and note references when you **Save**.
+    A unique name for this image inside the project.
+
+    Renaming it updates saved items, project artwork and note links when you **Save**.
 Asset PNG import summary:
-  value: Import selected PNG images. Filenames become resource IDs.
+  value: Import selected PNG images. Filenames become asset IDs.
 Asset catalog help:
   value: |
-    Assets contains reusable PNG images in the project. Search by asset ID and choose All, Unused, or With note to show assets linked to project notes. Open an asset to preview it, inspect its uses, replace it or create an item from it.
+    Assets are the reusable PNG images in this project.
 
-    **Import** adds PNG files or imports images from an Arkpack. **Optimize** losslessly re-encodes project PNGs at their original dimensions; it does not resize the artwork.
+    - Search by ID or filter by usage and linked notes.
+    - **Import** adds PNGs or images from another Arkpack.
+    - **Optimize** shrinks PNG files without resizing the artwork.
 
-    Replacing a saved image changes every use of that asset. Creating an item starts an unsaved draft with artwork and a title derived from the asset; Save publishes the item.
+    Replacing an image updates every place that uses it. **Create item** opens a new item draft with this artwork already selected.
 Asset delete available description:
-  value: No saved project or item references this asset. It is safe to remove from this project.
-Asset delete blocked description:
-  value: Remove the **references below** before deleting this asset.
+  value: Nothing in the saved project uses this asset. It is safe to delete.
 Asset delete confirmation warning:
   value: The image file will be **permanently removed** from this project. You cannot undo this in the Editor.
 Asset delete help:
   value: |
-    Delete an unused asset from the project. Saved item or project references block deletion; open **Usage** and remove or replace those references first.
+    Delete removes this PNG from the project.
 
-    Deleting an asset removes its note links while preserving the notes themselves. The confirmation applies to this saved resource.
+    Items and project artwork that use it must be changed first. Note links are removed, but the notes stay.
 Asset editing help:
   value: |
-    Rename this asset or replace its PNG image. **Save** validates and writes both changes together; **Discard** abandons this draft and returns to the saved asset.
+    Rename the asset, replace its PNG, or do both at once.
 
-    Renaming updates saved item, project and note references. Replacing the image changes every use of this asset. The source remains unchanged until Save succeeds.
+    **Save** updates every saved use. **Discard** keeps the current asset untouched.
 Asset image replacement help:
   value: |
-    Drop a **PNG** onto the preview or click it to choose a file. The replacement affects every use of this asset after **Save**. Leaving it unchanged preserves the current image.
+    Drop a **PNG** here or click to choose one.
+
+    After **Save**, every use of this asset shows the new image.
 Asset missing description:
   value: This asset is **not present in this project**. Return to Assets to choose an available image.
 Asset not found:
@@ -116,187 +120,191 @@ Asset notes empty title:
   value: No notes for this asset yet
 Asset overview help:
   value: |
-    Inspect the source image, dimensions, MIME type, file size and package status before using this project asset in artwork. **Create item** starts a new item draft using this asset. **Edit** lets you rename the asset or replace its PNG image.
+    Preview the image and check its size, format and file status.
 
-    The asset is shared: replacing its image changes every saved reference. **Usage** lists those references; **Notes** keeps linked authoring notes.
+    **Usage** shows where it is used. **Notes** keeps its art direction. **Create item** starts a new item with this artwork.
+Asset usage empty description:
+  value: No saved item or project artwork uses this asset.
 Asset usage help:
   value: |
-    Find saved item and project artwork that refers to this asset. Open a reference to inspect its owner.
+    Shows every saved item and project image that uses this asset.
 
-    The list reflects saved content, so unsaved edits are not included. Linked authoring notes appear under **Notes**, separately from game artwork usage.
+    Unsaved edits are not included. Notes have their own **Notes** tab.
 Assets:
   value: Assets
 Authored Clock expiry output summary help:
   value: |
-    Runs when the item's **Lifetime** expires.
+    Runs once when **Lifetime** reaches zero.
 
-    Its output uses the same independent output sets, rolls, weighted candidates, placement, and drop rules as production output.
+    It uses the same sets, rolls, drops and placement rules as any other output.
 Authored Clock interval summary help:
   value: |
-    The delay between automatic Clock attempts.
+    How often the Clock tries its selected production line.
 
-    **None** means the Clock has no repeating interval. A configured **Lifetime** can still expire.
+    **None** means no repeating production. Lifetime can still expire.
 Authored Clock kill-switch summary help:
   value: |
-    **Kill switch** removes the item as soon as its Lifetime expires, even when the expiry output cannot be placed.
+    **Stop immediately** removes the item at the end of its Lifetime, even if a job is unfinished or output has nowhere to go.
 Authored Clock lifetime summary help:
   value: |
-    How long the item may remain on a Board before expiring.
+    How long the item may stay on a Board before it expires.
 
-    **Unlimited** means the item has no authored lifetime.
+    **Unlimited** means it never expires on its own.
 Authored Clock loose-kill summary help:
   value: |
-    **Loose-kill** waits until the expiry output can resolve. The item remains present while that output is blocked.
+    **Wait for output** lets started jobs finish before the expired item disappears. If output has nowhere to go, the item waits too.
 Authored Clock rules summary help:
   value: |
-    These rules control whether the Clock may advance.
+    These rules pause or resume the Clock.
 
-    Every **Enable** rule must pass. Any matching **Disable** rule pauses the Clock.
+    Every **Enable** rule must pass. Any matching **Disable** rule pauses it.
 Authored Clock status summary help:
   value: |
-    The authored starting state of the timer.
+    The Clock's starting state.
 
-    Rules may still enable or disable the Clock while the game is running.
+    Rules can still enable or disable it during play.
 Authored Clock summary help:
   value: |
     Clock gives the item time-based behavior:
 
-    - **Interval** attempts the marked production line repeatedly.
-    - **Lifetime** expires the item and may resolve an expiry output.
+    - **Interval** repeatedly tries the selected production line.
+    - **Lifetime** expires the item and may create an output.
 
-    A Lifetime works even when the item has no production lines.
+    Lifetime also works without production.
 Authored Units amount summary help:
   value: |
-    Units are supply stored **inside each item**.
+    Units stored inside each new item.
 
-    This is the amount assigned when one item enters the game; it is independent of the number of items in the stack.
+    A stack may hold several items, and each item keeps this amount separately.
 Authored Units depletion output summary help:
   value: |
-    Resolves when the item's Units reach zero.
+    Runs when an item's Units reach zero.
 
-    Leaving this empty removes the depleted item without producing anything.
+    Leave it empty to remove the depleted item without creating anything.
 Authored Units summary help:
   value: |
-    Units are consumable supply stored inside each item.
+    Units are a spendable supply inside each item.
 
-    **Item count** and **Units** are separate: a stack can contain several items, and every item keeps its own Units.
+    A stack of several items has several separate Unit supplies.
 Authored action rules summary help:
   value: |
-    These rules gate the action before its requirements are settled.
+    These rules run before the action pays its costs.
 
-    Every **Enable** rule must pass. Any matching **Disable** rule vetoes activation.
+    Every **Enable** rule must pass. Any matching **Disable** rule blocks the action.
 Authored action summary help:
   value: |
-    An action runs when the player activates the item.
+    Runs when the player uses this item.
 
-    It first checks its **Rules**, then settles every **Requirement**, and finally opens Inventory or enters the configured space.
+    It checks **Rules**, pays every **Requirement**, then opens Inventory or enters the chosen Space.
 Authored artwork summary help:
   value: |
-    The base asset and optional overlay share one tile scale.
+    Combines a base image and optional overlay at one shared scale.
 
-    Artwork changes the rendered composition only. It does **not** change placement, occupied cells, or gameplay behavior.
+    Artwork changes only appearance, never placement or gameplay.
 Authored drop rules summary help:
   value: |
-    These rules decide whether this individual drop is available.
+    These rules apply only to this drop.
 
-    A rejected drop does not cancel its sibling drops in the same roll.
+    A blocked drop does not cancel the other drops in the same roll.
 Authored merge output summary help:
   value: |
-    Extra output resolves after the merge's source action and target effect succeed.
+    Extra output created after both sides of the merge are updated.
 
-    Leaving it empty means the merge changes only its source and target items.
+    Leave it empty when the merge should only change its two items.
 Authored merge source action summary help:
   value: |
-    Controls what happens to the item being dragged:
+    What happens to the item you drag:
 
-    - **Use** keeps it.
-    - **Consume** removes one item.
-    - **Spend** removes one Unit from it.
+    - **Use:** keep it.
+    - **Consume:** remove one item.
+    - **Spend:** remove one Unit.
 Authored merge target effect summary help:
   value: |
-    Controls what happens to the item receiving the drop:
+    What happens to the item receiving the drop:
 
-    - **Keep** leaves it unchanged.
-    - **Remove** deletes one item.
-    - **Replace** swaps it for the selected replacement.
-    - **Spend** removes one Unit from it.
+    - **Keep:** leave it.
+    - **Remove:** remove one item.
+    - **Replace:** swap one item.
+    - **Spend:** remove one Unit.
 Authored merge target summary help:
   value: |
-    The item that accepts this source item as a merge.
+    The item you drop this item **onto**.
 
-    Merge direction matters: this item is dragged **onto** the selected target.
+    Direction matters: A onto B is different from B onto A.
 Authored merges summary help:
   value: |
-    A merge starts when this item is dropped onto a matching target.
+    Starts when you drop this item onto its selected target.
 
-    The merge applies its **Source action**, then its **Target effect**, and finally resolves any extra output.
+    It updates the dragged item, updates the target, then creates any extra output.
 Authored output summary help:
   value: |
-    Output is resolved as a set of alternatives.
+    One output set is picked by weight, then every roll inside it runs.
 
-    Each output set has a relative weight and contains independent rolls. A roll may be **Guaranteed**, test one **Chance**, or make one or more **Weighted** selections.
+    A roll can be **Guaranteed**, use one **Chance**, or make **Weighted** picks.
 Authored player controls summary help:
   value: |
-    Controls which player-facing operations are available.
+    **Interactive** lets players run production and manage its inputs, queue and selected lines.
 
-    **Interactive** permits manual production, material management, queue changes, and line selection. **Automatic only** leaves those decisions to game systems.
+    **Automatic only** leaves production to the game.
 Authored production Check ahead marker help:
   value: |
-    Before this item is produced, checks one future run from each marked, shown, and enabled line against item count limits.
+    Before creating this item, checks whether one next run could stay within item limits.
 
-    The check reserves nothing and accepts the run when at least one eligible alternative fits.
+    Nothing is reserved. One fitting line is enough.
 Authored production Clock marker help:
-  value: Marks this line as the one attempted by the item's Clock interval.
+  value: |
+    The line attempted on every Clock interval.
 Authored production Default marker help:
-  value: Marks the line selected when no other authored or runtime selection overrides it.
+  value: |
+    The line initially selected for manual production.
 Authored production Enabled marker help:
   value: |
-    Sets whether the line starts enabled.
+    Whether this line starts enabled.
 
-    Runtime rules may still change availability after the game begins.
+    Enable and Disable rules may change that during play.
 Authored production Visible marker help:
   value: |
-    Sets whether the line starts visible to the player.
+    Whether players see this line at the start.
 
-    Visibility rules may still show or hide it at runtime.
+    Show and Hide rules may change that during play.
 Authored production inputs summary help:
   value: |
-    Every visible requirement must be satisfied before the line starts.
+    Every requirement must be ready before the line starts.
 
-    - **Consumed materials** are removed.
-    - **Reserved materials** return when work finishes.
-    - **Owner Units** are spent from this item.
-    - **Required Units** are spent from a matching Board item.
+    - **Consumed materials** disappear.
+    - **Reserved materials** return afterward.
+    - **Self Units** come from this item.
+    - **Target Units** come from a matching Board item.
 Authored production line output summary help:
   value: |
-    The line may complete without producing an item.
+    Optional items created when the line finishes.
 
-    When configured, output resolves through its alternative sets, independent rolls, weighted candidates, placement, and per-drop rules.
+    The output may choose between sets, run several rolls and apply rules to each drop.
 Authored production output summary help:
   value: |
-    Resolves after this production line completes.
+    Runs when this production line finishes.
 
-    Alternative sets compete by relative weight, while every roll inside the selected set resolves independently.
+    One set is picked by weight, then every roll inside that set runs independently.
 Authored production rules summary help:
   value: |
-    Rules control this line's visibility, availability, and runtime.
+    Rules control whether players see the line, whether it can start, and how long it takes.
 
-    Every positive gate must pass; matching veto rules win. Runtime adjustments apply only while their conditions match.
+    Every **Enable** must pass. **Hide** and **Disable** win when they match.
 Authored production runtime summary help:
   value: |
-    The base time required to finish one run.
+    How long one run normally takes.
 
-    Matching runtime rules may add or subtract time or multiply this value while the game is running.
+    Matching time rules may add, subtract or multiply this value.
 Authored production summary help:
   value: |
-    Production is enabled when the item has at least one product line.
+    Production is enabled when the item has at least one line.
 
-    Each line owns its requirements, runtime, output, and availability rules. Queue capacity is shared by all lines on the item.
+    Each line has its own time, requirements, rules and output. All lines share one queue.
 Authored queue capacity summary help:
   value: |
-    The maximum accepted work across all product lines on this item.
+    Maximum work accepted across all lines on this item.
 
-    The count includes **one active job** plus queued requests.
+    The active job counts too.
 Authtoken:
   value: Authtoken
 Automatic only:
@@ -312,9 +320,9 @@ Base tile scale:
   value: Base tile scale
 Base tile scale help:
   value: |
-    Scales the composed base and overlay artwork inside one Board tile.
+    Sizes the base image and overlay inside one Board tile.
 
-    **1** uses the full authored tile size; **0.5** renders it at half size. The allowed range is **0.25–1** and does not change collision or placement.
+    **1** uses the full image canvas; **0.5** uses half. It never changes occupied cells.
 Board:
   value: Board
   dynamic: true
@@ -322,23 +330,23 @@ Board distance:
   value: Board distance
 Board distance Close help:
   value: |
-    Matches items exactly **1 cell** from the origin, including diagonals.
+    Exactly **1 cell** from the starting item, including diagonals.
 Board distance Far help:
   value: |
-    Matches every item at a positive distance on the current Board and excludes only the origin itself.
+    Anywhere else on the current Board. Only the starting item is excluded.
 Board distance Near help:
   value: |
-    Matches items exactly **2 cells** from the origin, including diagonals.
+    Exactly **2 cells** from the starting item, including diagonals.
 Board distance Self help:
   value: |
-    Matches only the action or production owner itself at Board distance **0**.
+    Only the item running this action or production line.
 Board editing help:
   value: |
-    Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
+    Every Space has its own Board; all Boards share the same **Width** and **Height**.
 
-    Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
+    Use **Space** to switch between Spaces 0–31. Changes stay with the selected Space, even before you save.
 Board placement:
-  value: Board placement
+  value: Where to place
 Buffer:
   value: Buffer
 Buffer disabled:
@@ -353,11 +361,13 @@ Build failed:
   value: Build failed
 Build help:
   value: |
-    Build turns the project's current saved content into a portable Arkpack. Before producing the file, it runs the complete project and resource validation used by the game.
+    Build checks the saved project and creates a portable Arkpack.
 
-    Choose the output **Major**, **Minor** and optional **Suffix**. Build remembers valid settings even if compilation fails; these settings do not change the live Editor Board. You decide when a major change makes older saves incompatible. Blocking diagnostics link back to the exact Editor surface that needs fixing; non-blocking diagnostics remain attached to the finished artifact.
+    1. Choose **Major**, **Minor** and an optional **Suffix**.
+    2. Fix any errors that link back into the Editor.
+    3. Use **Install** or **Update** here, or **Save as…** to export the file.
 
-    After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
+    Increase **Major** only when older saves should stop working. Build settings do not change the live Editor Board.
 Build major update warning:
   value: Installing this update keeps the current save for now. **The next launch cannot load it** because the major versions differ. To continue playing, you will need to **permanently delete this package’s saved progress**.
 Build output:
@@ -367,9 +377,9 @@ Build ready description:
 Build stale description:
   value: Your project has changed since the last build. **Build again** to replace the previous Arkpack.
 Build validation blocked description:
-  value: Fix the **blocking findings below**, then try Build again.
+  value: Fix the **errors below**, then try Build again.
 Byte size:
-  value: Byte size
+  value: Size
 Calculating all item estimates:
   value: Calculating all item estimates
 Calculating estimate:
@@ -387,39 +397,38 @@ Capacity:
 Chain:
   value: Chain
 Chain empty description:
-  value: This item owns no merge or Clock. Incoming merges belong to their source item's Chain.
+  value: This item starts no Merge and has no Clock. A Merge started by another item appears on that item's Chain.
 Chain help:
   value: |
-    Chain is an overview of an authored interaction and its automatic consequences.
+    Chain previews what can follow from this item's merges and Clock.
 
-    - The starting item owns the merge direction. Dropping A onto B is separate from dropping B onto A; only the starting item's own merge rules are listed.
-    - The starting item's own Clock is also available. After the first operation, only Clock expiry and the output of its Clock-selected production line continue. Intermediate merge rules and production input chains are ignored.
-    - Each emitted item without a Clock ends its branch. Results include items emitted along the way. Click a result item to open its Chain tab and start a new investigation, including that item's own merges.
-    - Periodic output is shown once per admitted line run, with its interval, line duration and owner lifetime. It is not an accumulated yield or a promise of successful production.
-    - Details reveals each operation. Quantities belong to that operation, not the whole chain. Output sets are alternatives; rolls within a selected set run together; weighted candidates are alternatives per selection. Conditions and chance remain visible.
-    - Exploration follows up to five steps. Each merge or Clock operation counts as one step. Depth limits and Clock loops are unfinished paths, not final items. Reaching the safety limit explicitly reports incomplete exploration.
-    - Retained merge participants keep their existing runtime state; their Clock is not restarted. Spending a unit is marked separately, with conditional depletion output when configured.
-    - This is authored inspection, not runtime simulation. Disabled defaults, conditions, inputs, jobs and blocked placement may prevent or delay an outcome. Times are local configured durations, not guaranteed elapsed times. Kill switch may cancel unfinished production and discard outputs that cannot fit; Chain still shows the authored output possibilities.
+    - **Merge direction matters.** A onto B is different from B onto A.
+    - After the first step, Chain follows Clock production and expiry. It stops following new Merges and input items.
+    - Periodic production is shown once for one attempt, not as an endless pile of rewards.
+    - **Details** explains each step. Set weights, chances, conditions and quantities stay visible.
+    - Chain follows up to **five steps**. Reaching a loop or step five means more may follow.
+
+    This is a map of possible results, not a playthrough. Rules, missing inputs, full queues or blocked placement may still prevent them.
 Chain pulse explanation:
-  value: Shown once per admitted run. The owner remains until expiry. Inputs, availability, queueing and output placement can delay or prevent production.
+  value: Shows one possible production run. The item stays until Lifetime ends. Missing inputs, rules, a full queue or blocked output can still stop it.
 Chain safety limit:
-  value: This exploration reached its safety limit. Some branches are omitted.
+  value: Chain stopped after five steps. Later results may exist, but they are not shown here.
 Chance:
   value: Chance
 Chance (%):
   value: Chance (%)
 Chance percentage help:
   value: |
-    Probability that this roll emits all of its configured drops after its rules allow resolution.
+    Chance that this roll creates all its drops.
 
-    **0%** never emits and **100%** always emits. The Editor stores the entered percentage as the engine's normalized 0–1 value.
+    **0%** never does. **100%** always does. One percentage check covers the whole roll.
 Chance roll type help:
   value: |
-    Performs one probability check after the output set is selected.
+    Makes one probability check.
 
-    When it succeeds, every configured drop resolves. When it fails, this roll emits nothing while sibling rolls continue normally.
+    On success, every drop in this roll continues. On failure, this roll creates nothing; the other rolls still run.
 Check ahead:
-  value: Check ahead
+  value: Check next run
 Choose a different Project ID.:
   value: Choose a different Project ID.
 Choose a valid value.:
@@ -439,47 +448,47 @@ Clock expiry:
   value: Clock expiry
 Clock expiry output help:
   value: |
-    Available when **Lifetime** is configured and resolves once when that lifetime reaches zero. Clearing Lifetime keeps this output intact but pauses editing until a lifetime is set again.
+    Runs once when **Lifetime** reaches zero.
 
-    In **Loose-kill**, failed placement keeps the expired item alive until settlement can succeed. In **Kill switch**, returned reservations and buffers are placed first, then this output; anything that does not fit is lost and logged.
+    With **Wait for output**, the item stays until this output fits. With **Stop immediately**, anything that cannot fit is lost.
 Clock interval help:
   value: |
-    Time between automatic production pulses while this identity remains on a Board.
+    How often the Clock tries its selected production line while the item is on a Board.
 
-    Each pulse attempts the line marked **Clock**. A missing line, failed rules, or a full queue consumes that pulse without hidden debt. Leave empty for a lifetime-only Clock.
+    Failed rules or a full queue skip that attempt. Leave empty for Lifetime only.
 Clock kill-switch help:
   value: |
-    **Kill switch** removes the item when its lifetime ends, even if work is unfinished.
+    **Stop immediately** removes the item when Lifetime ends and cancels unfinished work.
 
-    Active and queued work is canceled. Reserved items return first, unused buffers follow, and expiry output is attempted last. Anything that cannot be placed is lost and recorded.
+    Reserved items return first, then unused materials, then expiry output. Anything that cannot fit is lost.
 Clock lifetime help:
   value: |
-    Total active lifetime of this exact runtime identity.
+    How long this item may spend on a Board before expiring.
 
-    Time advances only while the item remains on a Board. Inventory, Toolbar, delivery, input, and job ownership pause the saved value. Leave empty for unlimited lifetime.
+    Time pauses in Inventory, Toolbar, inputs and production. Leave empty for unlimited Lifetime.
 Clock line:
   value: Clock line
 Clock loop:
-  value: Clock loop
+  value: Clock repeats
   dynamic: true
 Clock loose-kill help:
   value: |
-    **Loose-kill** waits for already accepted production to settle before removing the expired item.
+    **Wait for output** lets started jobs finish before the expired item disappears.
 
-    If output cannot be placed, the zero-lifetime item and affected job remain blocked until settlement becomes possible.
+    If the output has nowhere to go, the item waits too.
 Clock rules help:
   value: |
-    These rules pause or resume the complete Clock schedule.
+    These rules pause or resume the Clock.
 
-    Every **Enable** rule must pass and any matching **Disable** rule vetoes it. Accepted production then uses the selected line's own rules independently.
+    Every **Enable** rule must pass. Any matching **Disable** rule pauses it. The selected production line still checks its own rules.
 Clock status help:
   value: |
-    ### Authored starting state
+    ### Starting state
 
-    - **Enabled:** the lifetime and interval may advance while the item is on a Board.
-    - **Disabled:** both timers remain paused until runtime enables the Clock.
+    - **Enabled:** the Clock may run while the item is on a Board.
+    - **Disabled:** it waits until an Enable rule turns it on.
 
-    Clock rules are evaluated after this setting. Every **Enable** rule must pass, and any matching **Disable** rule pauses the Clock. Changing the status keeps the configured timers, rules, and expiry output.
+    Rules are checked after this setting. Changing it keeps the timers and output.
 Close:
   value: Close
   dynamic: true
@@ -506,9 +515,9 @@ Consume:
   value: Consume
 Consume material mode help:
   value: |
-    **Consume** commits the delivered material to the job and removes it when production completes.
+    **Consume** removes the delivered items when production finishes.
 
-    Use this for ingredients and components that should not return.
+    Use it for ingredients and components.
 Consumed:
   value: Consumed
 Control:
@@ -516,29 +525,32 @@ Control:
 Copied:
   value: Copied
 Copy Clock section help:
-  value: Copying a configured Clock removes the destination action and fixes maximum stack size at **1**.
+  value: |
+    Copying a Clock removes the destination Action and sets maximum stack size to **1**.
 Copy URL:
   value: Copy URL
 Copy action section help:
-  value: Copying a configured action removes the destination item's production lines and Clock because those capabilities cannot coexist.
+  value: |
+    Copying an Action removes the destination Production and Clock because they cannot run together.
 Copy from:
   value: Copy from
 Copy from…:
   value: Copy from…
 Copy identity section help:
-  value: "**Item ID**, **UID**, and **Draft** status stay unchanged. If the destination already has a Clock, its maximum stack size remains **1**."
+  value: |
+    **Item ID**, **UID** and **Draft** stay unchanged. An existing Clock keeps maximum stack size at **1**.
 Copy password:
   value: Copy password
 Copy production section help:
-  value: Copying configured production removes the destination action. Every product line and the shared queue capacity are replaced.
+  value: |
+    Copies every line and the shared queue size. Nonempty Production removes the destination Action.
 Copy section replacement help:
   value: |
-    The entire current section is replaced, including unsaved edits.
+    Replaces this whole section, including unsaved changes.
 
-    - An empty source section clears the destination section.
-    - Values are copied; nothing is merged.
-    - **Save** persists the replacement.
-    - **Discard** restores the saved item.
+    - Empty source sections clear the destination.
+    - Lists are replaced, never combined.
+    - **Save** keeps the copy; **Discard** restores the saved item.
 Cost:
   value: Cost
 Could not load notes.:
@@ -547,9 +559,9 @@ Count range:
   value: Count range
 Count range condition help:
   value: |
-    Passes when the query's total matching quantity is between **Minimum** and **Maximum**, inclusive.
+    Passes when the total is between **Minimum** and **Maximum**, including both ends.
 
-    Example: `2–4` passes for 2, 3, or 4 matching items.
+    Example: `2–4` accepts 2, 3 or 4 items.
 Create item:
   value: Create item
 Create note:
@@ -557,10 +569,10 @@ Create note:
 Create project:
   value: Create project
 Create project help:
-  value: |-
-    Choose a **Project ID** for builds and gameplay saves.
+  value: |
+    Choose the **Project ID** used by builds and saved games.
 
-    For example: `my-fantasy-game`. Renaming the ID later makes the project a different game to existing saves.
+    Example: `my-fantasy-game`. Renaming it later creates a different game for existing saves.
 Create the first item to start authoring this game.:
   value: Create the first item to start authoring this game.
 Current stack:
@@ -568,7 +580,7 @@ Current stack:
 Custom:
   value: Custom
 "Cycle on route {routeId}: {factIds}.":
-  value: "Cycle on route {routeId}: {factIds}."
+  value: "{routeId} loops through these items: {factIds}."
   dynamic: true
 Default:
   value: Default
@@ -585,18 +597,19 @@ Delete item irreversible warning:
 Delete item?:
   value: Delete item?
 Deleted item assets help:
-  value: Project assets are preserved. Delete unused artwork separately from **Assets**.
+  value: |
+    Artwork files stay in the project. Remove unused images separately in **Assets**.
 Depends on conditions:
   value: Depends on conditions
 Depletion output:
   value: Depletion output
 Depletion output help:
   value: |
-    Optional output resolved after the final unit is spent.
+    Optional output created after the final Unit is spent.
 
-    The depleted item disappears after its accepted production settles. Each configured roll and drop still follows its own quantity, placement, and rules.
+    The empty item disappears after its current production finishes.
 Depth limit:
-  value: Depth limit
+  value: More steps follow
   dynamic: true
 Description:
   value: Description
@@ -610,29 +623,29 @@ Disable:
   value: Disable
 Disable Clock help:
   value: |
-    Removes the complete **Clock** configuration: interval, lifetime, state, rules, and expiry output.
+    Removes Interval, Lifetime, starting state, rules and expiry output.
 
-    This changes only the current draft. **Save** applies it; **Discard** restores the saved Clock.
+    **Save** keeps the removal. **Discard** restores the saved Clock.
 Disable Units help:
   value: |
-    Removes the item's unit supply and depletion output.
+    Removes this item's Units and depletion output.
 
-    Inputs or merges that spend this item's units may become invalid. This changes only the current draft until **Save**.
+    Inputs or merges that spend those Units may then become invalid. Nothing changes until **Save**.
 Disable action help:
   value: |
-    Removes the action together with its rules and input requirements.
+    Removes the Action, its rules and requirements.
 
-    Removed production lines or Clock settings are not restored automatically. **Discard** restores the saved item; **Save** applies the removal.
+    It does not restore old Production or Clock settings. **Discard** restores the saved item.
 Disable merges help:
   value: |
-    Removes every source-owned merge interaction from this item, including their optional outputs.
+    Removes every merge started by this item, including extra outputs.
 
-    This changes only the current draft. **Save** applies it; **Discard** restores the saved merges.
+    **Save** keeps the removal. **Discard** restores the saved merges.
 Disable production help:
   value: |
-    Removes every production line and its inputs, rules, and outputs from this item.
+    Removes every production line with its requirements, rules and output.
 
-    Queue capacity remains an authored default for future lines. **Save** applies the removal; **Discard** restores the saved lines.
+    The queue size stays ready for future lines. **Discard** restores the saved Production.
 Disable removes all merge interactions from this item.:
   value: Disable removes all merge interactions from this item.
   dynamic: true
@@ -662,30 +675,30 @@ Drop:
   value: Drop
 Drop disable rule help:
   value: |
-    Suppresses this selected drop while all conditions match.
+    Blocks only this drop while all conditions match.
 
-    It does not disable the production line, output set, roll, or sibling drops.
+    The line, set, roll and other drops keep going.
 Drop enable rule help:
   value: |
-    Allows this selected drop only while all conditions match.
+    Adds a required check for this drop.
 
-    When Enable rules exist, every one must pass. A matching Disable rule still vetoes only this drop.
+    Every Enable rule must pass. Any matching Disable rule blocks only this drop.
 Drop onto:
   value: Drop onto
 Drop rules help:
   value: |
-    These rules are evaluated only for the selected item drop when its roll resolves.
+    These rules apply only to this drop.
 
-    Every **Enable** rule must pass and any matching **Disable** rule vetoes this drop. Other drops and the owning line remain independent.
+    Every **Enable** must pass. Any matching **Disable** blocks it. Other drops and the production line continue.
 Dropped item:
   value: Dropped item
 Drops:
   value: Drops
 Drops help:
   value: |
-    Drops are the concrete items emitted when the selected roll succeeds.
+    The items created by this roll.
 
-    Every drop has its own item, quantity range, Board placement, and optional rules. Multiple drops in one roll are all evaluated.
+    Each drop chooses an item, quantity, placement and optional rules. One roll may create several drops.
 Edit:
   value: Edit
 Edit asset:
@@ -696,38 +709,37 @@ Editor Board:
   value: Editor Board
 Editor Board help:
   value: |
-    Editor Board runs the current saved project as a real, live game inside the Editor. Use it to verify how starting items, production, merges, units, placement, and item interactions behave together. Changes made while playing are temporary and do not modify the authored project data.
+    Editor Board runs the **saved project** as a real game. Use it to try production, merges, Units and placement together. Nothing you do here edits the project.
 
-    Press `Cmd+P` (`Ctrl+P` on Windows and Linux) to find and spawn any item that can exist on the Board. **Default** runs authored durations so time-based behavior remains visible. **Speed up** runs the simulation at a fixed ×20 speed while preserving normal requirements, placement, units, and lifecycle rules.
+    - `Cmd+P` (`Ctrl+P` on Windows and Linux) finds and spawns Board items.
+    - **Default** uses normal timing; **Speed up** runs at ×20.
+    - **Reset** throws away this play session and starts again from the saved layout.
 
-    **Reset** discards the live Board session and starts a fresh game from the current saved project, including its starting items and Default speed. It does not change authored project data or installed-game saves. The live Board has no saved scenarios.
+    The live Board is temporary and has no saved scenarios.
 Editor Board preparing description:
   value: Starting a fresh game from your **latest saved project**.
 Editor MCP:
   value: Editor MCP
 Editor MCP help:
   value: |
-    MCP lets AI tools work with the project currently open in Arkini. A connected client can inspect and edit project data and Notes, run validation, and explore item relationships.
+    MCP lets Codex and other AI tools read and edit the project currently open in Arkini.
 
-    > **Treat every connection as full project access.** Only connect clients you trust, and keep the intended project open in Arkini while they work.
+    > A connected client has full project access. Connect only tools you trust and keep the intended project open.
 
     ### Local MCP
 
-    Use **Local MCP** for Codex or another MCP client running on this Mac. Start the local server, then copy its loopback endpoint into the client. Local MCP stays on this computer and does not require ngrok.
+    Start **Local MCP** and copy its address into a client running on this computer. No ngrok needed.
 
     ### Remote MCP
 
-    Remote MCP exposes the open project through an OAuth-protected HTTPS endpoint. It requires:
+    Remote access needs an **ngrok Development Domain**, a dedicated **authtoken**, and an MCP client with OAuth support.
 
-    1. An **ngrok account** with a Development Domain.
-    2. A dedicated, revocable **ngrok authtoken**.
-    3. A remote MCP client that supports OAuth.
+    1. Save the domain without `https://` or a path, then paste the authtoken.
+    2. Return to **Server** and start Remote MCP.
+    3. Copy the published address into your client.
+    4. When Arkini asks, paste the password from **Copy password**.
 
-    The ngrok authtoken is stored unencrypted on this device. Use a dedicated, revocable token; on supported ngrok plans, restrict it to the Development Domain.
-
-    Open **Ngrok**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
-
-    On its first connection, the client opens Arkini's authorization page. Use **Copy password** in the section bar and paste the password there to approve it. **Reset password** in the section bar creates a new password, stops Remote MCP, and disconnects existing remote clients.
+    The token is stored unencrypted on this device, so use one you can revoke. **Reset password** stops Remote MCP and disconnects existing clients.
 Editor game could not synchronize:
   value: Editor game could not synchronize
 Editor game stopped:
@@ -768,9 +780,9 @@ Estimate:
 Estimate calculation failed:
   value: Estimate calculation failed
 Estimate incomplete description:
-  value: Estimate reached an **analysis limit** before it could calculate reliable totals. The diagnostics below identify the limit.
+  value: Estimate stopped before the totals were reliable. The details below explain where.
 Estimate loading description:
-  value: Analyzing the configured **acquisition paths** and their requirements.
+  value: Finding a route from the starting items and calculating what it needs.
 Estimate unreachable description:
   value: No complete path leads from the project’s **starting items** to this item with the current configuration.
 Every:
@@ -779,20 +791,20 @@ Exact count:
   value: Exact count
 Exact count condition help:
   value: |
-    Passes only when the query finds exactly the configured total quantity.
+    Passes when matching items add up to exactly this number.
 
-    Stacks contribute their full quantity; matching identities are summed before comparison.
+    Example: a stack of 3 counts as **3**.
 Exists:
   value: Exists
 Exists condition help:
   value: |
-    Passes when the query finds any positive matching item quantity.
+    Passes when at least one matching item exists.
 
-    Use this when the exact count does not matter.
+    Use it when the exact amount does not matter.
 Exit:
   value: Exit
 Expiry mode:
-  value: Expiry mode
+  value: When time runs out
 Expiry output:
   value: Expiry output
 Export:
@@ -808,17 +820,18 @@ Final item:
   value: Final item
   dynamic: true
 Finishing accepted work:
-  value: Finishing accepted work
+  value: Finishing started jobs
 Fix the highlighted fields before saving.:
   value: Fix the highlighted fields before saving.
 Force delete:
   value: Force delete
 Force delete item integrity warning:
-  value: Force delete rewrites every listed reference. Review the impact before continuing.
+  value: Force delete removes every use listed below. Check the damage before you continue.
 Force delete item?:
   value: Force delete item?
 Force delete reference removal help:
-  value: The item is still referenced by saved game data. Force delete removes those references before deleting the item.
+  value: |
+    Other saved data still uses this item. Force delete removes those links and then deletes the item.
 Force delete…:
   value: Force delete…
 From Arkpack:
@@ -831,9 +844,9 @@ Guaranteed:
   value: Guaranteed
 Guaranteed roll type help:
   value: |
-    Resolves every configured drop whenever the selected output set runs.
+    Always creates every configured drop when this set is selected.
 
-    No probability check is performed, but each drop still evaluates its own rules, quantity, and placement.
+    Each drop still checks its own rules, quantity and placement.
 Height:
   value: Height
 Hero asset:
@@ -854,8 +867,6 @@ Import assets:
   value: Import assets
 Imported assets:
   value: Imported assets
-Included in current project:
-  value: Included in current project
 Indeterminate:
   value: Indeterminate
 Initial board → item {index}:
@@ -884,9 +895,9 @@ Initial units:
   value: Initial units
 Initial units help:
   value: |
-    Finite supply stored by each newly created item identity, separate from stack quantity.
+    Units given to each new item, separate from stack quantity.
 
-    Unit inputs and **Spend** merges reduce this value. Spending the final unit depletes one item and resolves its depletion output.
+    Unit costs and **Spend** merges reduce them. At zero, the item depletes and may create its depletion output.
 Input:
   value: Input
   dynamic: true
@@ -916,150 +927,146 @@ Inventory action:
   value: Inventory action
 Inventory action help:
   value: |
-    Opens global Inventory after rules and input costs succeed.
+    Opens Inventory after rules pass and Unit costs are paid.
 
-    The action does not grant storage or move the activating item. Inventory placement and release continue to use the item's authored storage scope.
+    It does not move the item or grant extra storage space.
 Inventory action summary help:
   value: |
     Opens Inventory after every rule and requirement passes.
 
-    The action does not move the item or resolve a production line.
+    It does not move the item or run production.
 Inventory action type help:
   value: |
-    **Inventory** opens global Inventory after all rules and input costs succeed.
+    **Inventory** opens global Inventory after rules pass and Unit costs are paid.
 
-    It adds no target Space and grants no special storage permission.
+    It grants no extra storage space.
 Inventory editing help:
   value: |
-    Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
+    Inventory is shared storage available from every Space.
+
+    **Width** and **Height** set the same grid everywhere.
 Item:
   value: Item
 Item ID:
   value: Item ID
 Item ID help:
   value: |
-    Stable authored identifier used by production, merges, rules, Board data, and MCP.
+    The stable name used by production, merges, rules, Board layouts and MCP.
 
-    Changing it rewrites exact project references in the same save. Prefer a short semantic kebab-case ID; external text and unknown files cannot be rewritten.
+    Renaming it updates project links when you **Save**. Keep it short, for example `healing-kit`. Text outside Arkini cannot be updated.
 Item action empty title:
   value: Let a click open Inventory or move to another space.
 Item action help:
   value: |
-    Action is the item's immediate click handler. Choose **Space** to enter a target board space or **Inventory** to open Inventory.
+    Action runs when the player uses this item.
 
-    All input costs and rules must pass before activation. Every Enable rule must pass; any matching Disable rule prevents the action. Switching action kind keeps shared inputs and rules.
+    - **Space** enters a chosen Board Space.
+    - **Inventory** opens global Inventory.
+    - Every Enable rule must pass; any matching Disable rule blocks the action.
+    - Unit costs are paid only after the rules pass.
 
-    Enabling Action removes production lines and Clock from the draft. **Save** applies the change; **Discard** keeps the saved configuration.
+    Action cannot coexist with Production or Clock. Enabling it removes both from this draft.
 
-    Inside Inventory, clicking always releases the item to the first free compatible Board or Toolbar cell. It never runs that item's action. This also lets an inventory-opening item be stored and released normally.
+    Clicking an item inside Inventory releases it to Board or Toolbar; it does not run the item's Action.
 Item artwork help:
   value: |
-    Artwork combines a base asset with an optional overlay, drawn back to front.
+    Artwork combines a base image with an optional overlay.
 
-    **Base tile scale** changes the artwork size within its tile. A value of 1 fills the tile with the artwork canvas; transparent PNG padding remains visible. Scale does not change occupied cells, storage, interaction reach, or image resolution.
+    **Base tile scale** sizes both images together. `1` uses the whole image canvas; transparent PNG padding still counts. Scale changes appearance only, never occupied cells.
 
-    The preview below the form updates as you change the base asset, overlay, or scale. Its frame marks the complete tile. The same composition is shown in Item detail.
+    The preview updates immediately and matches Item detail.
 Item clock empty title:
   value: Automate production or give this item a limited lifetime.
 Item clock help:
   value: |
-    A Clock adds periodic production, a finite lifetime, or both.
+    Clock adds repeating production, a limited Lifetime, or both.
 
-    - **Interval** attempts the line marked Clock periodically. Leave it empty for a one-shot lifetime without pulses.
-    - **Lifetime** sets how long the timer may run. Leave it empty for an unlimited lifetime.
-    - At least one timer is required. **Expiry output** and **Expiry mode** are available only with a lifetime.
-    - **Loose-kill** is the default: accepted production settles before the item disappears. A job whose output cannot fit keeps its owner alive.
-    - **Kill switch** cancels queued and active work, then removes the owner in one atomic change. Reserved items have placement priority, followed by unused buffered materials and the normal Clock expiry output. Anything that cannot fit is lost and recorded in gameplay logs. Consumed job inputs and spent units are not refunded; canceled jobs emit no line output. Incoming deliveries return normally.
+    - **Interval** tries the line marked Clock. Leave empty for no repeating production.
+    - **Lifetime** expires the item. Leave empty for no time limit.
+    - **Wait for output** lets started jobs finish before removal.
+    - **Stop immediately** cancels unfinished work at expiry; anything that cannot fit is lost.
+    - Every Enable rule must pass; any matching Disable rule pauses the Clock.
 
-    Both modes resolve the configured expiry output. A job that already completed at the same Tick boundary keeps its result.
-
-    **Enabled** and availability rules determine whether the timer runs. Every Enable rule must pass; any matching Disable rule pauses it. Accepted production keeps its own line rules.
-
-    Enabling Clock removes the item's action and requires a stack size of one. Clock can use any storage scope, but its interval and lifetime advance only while its exact identity is on a Board. Moving it elsewhere pauses the saved timer state until it returns. New clocks start with a five-minute lifetime and no periodic interval.
+    Time advances only while the item is on a Board. Enabling Clock removes Action and sets maximum stack size to one.
 Item connections help:
   value: |
-    Connections explores one explicit authored relationship for any item.
+    Connections answers four quick questions:
 
-    - **Required by** lists authored owners that directly input this item or positively require it in a production condition.
-    - **Inputs** shows those same direct inputs and positive conditions from the selected owner's side.
-    - **Produces** lists the direct outputs of authored operations owned by the selected item.
-    - **Produced by** lists owners that emit this item through production lines, Clock expiry, unit depletion, or merges. These are authored possibilities, regardless of current availability.
+    - **Required by:** which items need this one?
+    - **Inputs:** what does this item need?
+    - **Produces:** what can this item create?
+    - **Produced by:** what can create this item?
 
-    Each connection shows its authored source instead of an item ID: the production line, action, merge, unit depletion, or Clock, including output set and roll when applicable. Multiple sources share one item row.
-
-    Use the search to find an item in the active relationship list. Open any result to inspect that item without losing the selected relationship.
+    Rows show the exact production line, action, merge, depletion or Clock behind the link. Search filters the current list; opening a result keeps the selected relationship.
 Item delete help:
   value: |
-    Delete checks the saved project for references to this item. Follow a blocker to inspect its owner before deleting.
+    Delete first shows every saved place that still uses this item.
 
-    Ordinary deletion requires those references to be removed. **Force delete** also removes the listed starting entries, operations and outputs that depend on this item; review the concrete impact in the confirmation dialog.
+    Remove those links normally, or use **Force delete** to remove the listed starting items, requirements and outputs too. The confirmation shows the exact damage before anything happens.
 
-    Asset files remain in the project. Linked Notes remain, with this item's link removed. Deletion is applied only after confirmation.
+    Artwork files and Notes stay; only this item's note links are removed.
 Item detail is unavailable.:
   value: Item detail is unavailable.
 Item details:
   value: Item details
 Item draft status help:
   value: |
-    **Draft** marks this item as work in progress for authors.
+    **Draft** marks work in progress for you and other authors.
 
-    It does not change export, validation, or gameplay behavior.
+    The item still validates, runs in the game and appears in builds.
 Item estimate help:
   value: |
-    Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.
+    Estimate answers: **roughly what does the game need to obtain this item?**
 
-    This is a planning preview, not a simulation or a promise.
+    ### Reading it
 
-    ### Reading the result
+    - **Quantity** is the approximate amount needed along one complete route.
+    - **Time** is that step's contribution to the optimistic total.
+    - Random rewards use their average number of attempts.
+    - Work that can happen together is counted in parallel.
 
-    - Each row is an item needed somewhere along the selected route.
-    - **Quantity** is the approximate amount the route consumes or requires.
-    - **Time** is how much that part contributes to the optimistic total.
-    - The Time and Quantity buttons only reorder the same result.
-
-    Arkini uses authored runtimes, output quantities and chances. Random outputs are converted into an expected number of attempts. Independent work can happen in parallel, so its time is not blindly added together.
-
-    Real play may take longer or choose another route because player decisions, placement, timing and actual random rolls are not simulated. Clock Kill switch can cancel unfinished production and discard outputs that cannot fit; Estimate does not simulate these losses. **Partial** or **unreachable** means the authored data did not provide one complete calculable path.
+    This is a planning shortcut, not a playthrough. Full queues, placement, player choices and unlucky rolls can make real play slower. **Incomplete** means the calculation hit a limit; **Unreachable** means no complete route starts from the project's starting items.
 Item global count help:
   value: |
-    Limits the total quantity of this item across the game. Stack quantities contribute to the same global limit. Leave empty for no global limit.
+    Maximum total quantity of this item across the whole game.
+
+    Stacks count every item. Leave empty for no limit.
 Item identity help:
   value: |
-    Item brings together identity, artwork, storage limits, units, actions, merges, Clock and a production summary. Use each section's **Edit** action to open its exact settings.
+    The Item page is the overview: artwork, storage, Production, Merges, Units, Clock and Action in one place.
 
-    **Storage scope** controls placement on Board, Toolbar and Inventory. **Stack capacity** counts separate items in one stack; **Units** are the supply inside each item. **Game limit** limits the item across the game.
+    - **Allowed storage** chooses Board, Toolbar, Inventory or any of them.
+    - **Maximum stack size** limits how many items share one cell.
+    - **Maximum global count** limits the item across the whole game.
+    - **Show all** opens the full detail page for a section; **Edit** opens its form.
 
-    **Action** opens a Space or Inventory after its inputs and rules pass. **Merges** apply a source action, target effect and optional output when this item is dropped onto a matching target. Action cannot coexist with production lines or Clock; Merges are independent.
+    Action cannot coexist with Production or Clock. Merges work independently.
 
-    **Production** previews the first two lines and their outputs. Open a line to edit it, or use **Show all** for the complete Production page.
-
-    **Clock** has its own section for periodic production, a finite lifetime and expiry output. A lifetime works without production lines.
-
-    The Item tab keeps the overview. **Show all** opens the corresponding detail tab: Artwork, Production, Merges, Units, Clock or Action. These tabs match the editing sections; **Edit** opens that section, and **Save** or **Discard** returns to its detail. Estimate, Chain, Connections, Notes and Delete remain available alongside them.
-
-    Item IDs can be renamed with their project references. The UID remains the item's stable identity. Artwork changes appearance without changing occupied cells.
-
-    **Draft** is saved immediately as an Editor organization flag. Draft items still participate in the game and the built Arkpack. Other edits are applied with **Save**; **Discard** leaves the saved item unchanged.
+    Renaming **Item ID** updates project links; UID never changes. **Draft** is saved immediately and marks work in progress, but the item still runs and builds normally.
 Item list help:
   value: |
-    Browse the project's saved items by title or ID. Each card shows its artwork, title, acquisition estimate and demand. Draft cards have a subtle tint; a note icon marks linked item notes. Open a card for the item detail; its **Estimate** tab explains the selected route.
+    Browse saved items by title or ID. Cards show artwork, Estimate, Demand, Draft status and linked Notes.
 
-    Use **Name**, **Fastest first**, **Slowest first** or **Highest demand first** to order the grid. **Unreachable** shows partial estimates and unreachable items. **With note** shows items with linked notes. **Draft** combines with search and the selected view; drafts still participate in the game and Arkpack builds.
+    ### Filters and sorting
 
-    **Estimate** is the optimistic time to obtain one item. Independent work can happen in parallel, and random outputs are averaged across the expected number of attempts. **Demand** adds up how much of this item is needed to obtain one of every reachable item through the selected routes. Its percentage compares with the highest-demand item in the project.
+    - Sort by **Name**, estimated time or highest Demand.
+    - **Unreachable** includes incomplete routes.
+    - **With note** and **Draft** combine with search and sorting.
 
-    **Partial** means analysis hit a safety limit. **Unreachable** means there is no complete authored route from the starting items. Unavailable results appear as a dash. This is a planning preview, not a playthrough or a balance verdict.
+    **Estimate** is the optimistic time to obtain one item. **Demand** approximates how much of it is needed across reachable item routes. Both are planning hints, not balance verdicts.
 
-    **New item** opens an unsaved draft. Creating an item from an asset supplies its initial artwork and title. Save applies changes to the project.
+    **New item** opens an unsaved draft. Creating from an asset fills its first title and artwork for you.
 Item merges empty title:
   value: Define what happens when this item is dropped onto another.
 Item merges help:
   value: |
-    Merges trigger when this item is dropped onto a matching target.
+    A merge starts when you drop this item onto the selected **Merge with** item.
 
-    The **Source action** decides whether the dropped item is consumed, retained, or spends a unit. The **Target effect** decides what happens to the target. A merge may also emit an extra output.
+    - **Dragged item** decides what happens to the item you moved.
+    - **Target item** decides what happens to the item receiving it.
+    - **Merge output** may create extra items afterward.
 
-    Enable merges to add the first interaction, then select a target and configure both sides. Changes take effect when you save.
+    Direction matters: A onto B is not B onto A. Changes start working after **Save**.
 Item not found:
   value: Item not found
 Item notes empty description:
@@ -1070,40 +1077,40 @@ Item picker keyboard hint:
   value: ↑↓ select · Enter choose · Esc close
 Item player controls help:
   value: |
-    **Interactive** allows players to start production, store or withdraw input materials, change the queue, and select the **Default** and **Clock** lines.
+    **Interactive** lets players start production, move Materials, change the queue and select Default or Clock lines.
 
-    **Automatic only** disables those production controls and leaves authored automation in charge. It does not change movement, merge or removal rules.
+    **Automatic only** hides those production controls. Movement, merges and removal still work normally.
 Item production empty title:
   value: Let this item produce other items.
 Item production help:
   value: |
-    Production shows the authored production lines. Queue capacity and player controls are shown on the Item page. Clock settings have their own Clock tab and remain visible in the Item overview. Each line has its own runtime, visibility, availability rules, inputs and optional output.
+    Production contains the jobs this item can perform.
 
-    **Default** selects the manual click line. **Clock** independently selects the line attempted at every timer pulse. Selecting either role clears only that role on the other lines. Without a Clock line, the timer continues without adding work.
+    - **Default** is the initial line for manual production.
+    - **Clock** is the line tried at every Clock interval.
+    - All lines share one queue; the active job counts toward its size.
+    - A failed Clock attempt is skipped, not saved for later.
+    - **Interactive** shows player controls; **Automatic only** leaves production to the game.
 
-    Manual and automatic requests use the same queue in admission order. Queue capacity includes the active job. A blocked or full queue skips a Clock pulse without storing missed work.
-
-    **Interactive** allows manual production, material management, queue changes and line selection. **Automatic only** removes those player controls.
-
-    Clock can also give an item a finite lifetime without any lines. **Loose-kill** lets accepted production settle before expiry; **Kill switch** cancels unfinished work at expiry and may lose materials or expiry outputs that cannot be placed. Adding a production line removes the configured Action when the draft is saved.
+    Adding Production removes Action when you save. Clock may also exist without any line when you only need a Lifetime.
 Item search shortcuts:
   value: ↑↓ Select · Enter Open · Esc Close
 Item section copy help:
   value: |
-    In the edit form, **Copy from** selects another saved item in this project. Confirm to replace the **entire active section**, including its unsaved changes. Collections are replaced in full, never merged; an absent optional section removes it from the destination. The source item stays unchanged.
+    **Copy from** replaces the whole open section with values from another saved item. Unsaved changes in this section are replaced too; the source item never changes.
 
-    **Save** persists the replacement together with the rest of your draft. **Discard** restores the saved destination item. Item references retain their authored targets; self-paid unit inputs bind to the destination when saved.
+    - **Item** keeps Item ID, UID and Draft.
+    - **Production** copies every line and queue size; nonempty Production removes Action.
+    - **Clock** removes Action and sets maximum stack size to one.
+    - **Action** removes Production and Clock.
+    - Artwork, Merges and Units replace their complete section.
 
-    - **Item:** copies title, description, player controls, storage, stack and global limits. Item ID, UID and draft status stay unchanged. An existing Clock keeps a stack size of one.
-    - **Artwork:** replaces base artwork, overlay and scale.
-    - **Production:** replaces all lines and queue capacity. Nonempty production removes the destination action.
-    - **Merges:** replaces all merge rules and their outputs.
-    - **Units:** replaces amount and depletion output.
-    - **Clock:** replaces timing, enabled state, rules and expiry output. A copied Clock removes the destination action and sets a stack size of one.
-    - **Action:** replaces the complete action, inputs and rules. A copied action removes destination production lines and Clock.
+    Lists are replaced, never combined. **Save** keeps the copy; **Discard** restores the destination item.
 Item stack size help:
   value: |
-    The maximum quantity that can share one cell as a stack. This is separate from **Units**, the finite supply inside one item. A configured **Clock** requires a stack size of one.
+    How many items may share one cell.
+
+    This is separate from **Units** inside each item. Clock requires a stack size of one.
 Item storage scope - any:
   value: Any
   dynamic: true
@@ -1118,18 +1125,18 @@ Item storage scope - toolbar:
   dynamic: true
 Item storage scope help:
   value: |
-    Controls where this item can be placed: **Board**, **Toolbar**, **Inventory**, or **Any** of these locations. Normal placement rules still need a compatible free cell or stack.
+    Where this item may be stored: **Board**, **Toolbar**, **Inventory**, or **Any**.
 
-    A configured **Clock** requires a stack size of one. Its interval and lifetime pause whenever the identity is outside a Board.
+    A compatible stack or empty cell is still required. Clock time pauses whenever the item is outside a Board.
 Item unavailable:
   value: Item unavailable
 Item units empty title:
-  value: Give this item health, resources, or another finite supply.
+  value: Give this item health, fuel, charges or another limited supply.
 Item units help:
   value: |
-    Units are a finite amount inside one item, such as health, resource stock, or uses. **Quantity** counts separate items in a stack.
+    Units are a spendable amount inside each item: health, fuel, charges, whatever fits your game.
 
-    **Initial units** sets the supply of each new instance. Spending the final unit depletes the item and may emit its configured **Depletion output**.
+    **Initial units** sets the amount for every new item. Spending the last Unit removes it and may create **Depletion output**.
 Items:
   value: Items
 Keep:
@@ -1141,7 +1148,7 @@ Keep at most {maximum} items.:
   value: Keep at most {maximum} items.
   dynamic: true
 Kill switch:
-  value: Kill switch
+  value: Stop immediately
 Lifetime:
   value: Lifetime
 Lifetime (seconds):
@@ -1176,17 +1183,15 @@ Local drop:
   value: Local drop
 Local drop placement help:
   value: |
-    Starts placement at the production origin, then fills compatible stacks and nearest free cells.
-
-    Use this when output should appear beside the item that produced it.
+    Places output beside the item that produced it, filling compatible stacks and nearby empty cells first.
 Local server:
   value: Local server
 Location:
   value: Location
 Loose-kill:
-  value: Loose-kill
+  value: Wait for output
 MIME type:
-  value: MIME type
+  value: Image format
 Main menu:
   value: Main menu
 Major:
@@ -1194,7 +1199,7 @@ Major:
 Managed:
   value: Managed
 Matches any positive board distance and excludes only Self.:
-  value: Matches any positive board distance and excludes only Self.
+  value: Matches anything else on the current Board. This item is excluded.
   dynamic: true
 Matches items exactly 1 cell away, including diagonals.:
   value: Matches items exactly 1 cell away, including diagonals.
@@ -1203,39 +1208,39 @@ Matches items exactly 2 cells away, including diagonals.:
   value: Matches items exactly 2 cells away, including diagonals.
   dynamic: true
 Matches only the origin itself at board distance 0.:
-  value: Matches only the origin itself at board distance 0.
+  value: Matches only the item running this action or production line.
   dynamic: true
 Material buffer help:
   value: |
-    Extra material quantity this input may hold above **Maximum**.
+    Extra delivered items this input may hold above **Maximum**.
 
-    Buffer improves delivery capacity only. It does not increase how much one run consumes or reserves.
+    It increases storage only, never the amount used by one run.
 Material input:
   value: Material input
 Material maximum quantity help:
   value: |
-    Upper bound consumed or reserved by one run.
+    Most items one run may consume or reserve.
 
-    A ready job takes the currently stored amount, capped at **Maximum**. It never waits for more once **Minimum** is satisfied.
+    Once **Minimum** is ready, the run starts with what is available up to this value.
 Material minimum quantity help:
   value: |
-    Smallest matching material quantity required before this line may start.
+    Fewest matching items needed before the line may start.
 
-    Reaching **Minimum** makes the input ready; the run may then take up to **Maximum**.
+    The run may then take up to **Maximum**.
 Material mode:
-  value: Material mode
+  value: Material use
 Material required item help:
   value: |
-    Selects the item identity that must be delivered into this production input.
+    The item delivered into this input.
 
-    Matching items accumulate here until **Minimum** is available. One run then takes up to **Maximum**; **Material mode** decides whether those items are consumed or reserved and returned afterward.
+    Production waits for **Minimum**, then takes up to **Maximum**. **Material use** decides whether those items disappear or return afterward.
 Materials:
   value: Materials
 Materials input type help:
   value: |
-    Requires matching items to be delivered into this production input.
+    Requires matching items to be delivered here.
 
-    Choose **Consume** for ingredients removed by the job or **Reserve** for tools and catalysts returned afterward.
+    Use **Consume** for ingredients or **Reserve** for tools that should return.
 Max count reached:
   value: Max count reached
 Maximum:
@@ -1252,51 +1257,51 @@ Merge output:
   value: Merge output
 Merge output help:
   value: |
-    Optional extra items emitted after the source action and target effect complete.
+    Optional extra items created after the merge changes both sides.
 
-    This output does not replace the target unless **Target effect** is Replace. Its sets, rolls, quantities, placement, and rules resolve normally.
+    This is separate from **Replace by**. It uses normal sets, rolls, quantities and placement.
 Merge source consume help:
   value: |
-    **Consume** permanently removes one source quantity. It consumes the item itself, not one unit.
+    **Consume** removes one dragged item, not one Unit.
 
-    Example: **Match + Unlit Candle → Candle** removes one Match. Removing the final quantity also disposes state owned by that source identity.
+    Example: **Match + Unlit Candle → Candle** consumes one Match.
 Merge source spend help:
   value: |
-    **Spend** removes one unit from the source item while keeping the item itself.
+    **Spend** removes one Unit from the dragged item and keeps it in place.
 
-    Spending the last unit depletes one source item and resolves its depletion output. The source must have **Units** configured before this option is valid.
+    At zero Units, that item depletes and may create its depletion output.
 Merge source use help:
   value: |
-    **Use** returns one source quantity near the target through normal placement and does not spend units.
+    **Use** keeps the dragged item and places it back near the target.
 
-    The source must be stateless enough to split safely: spent units, remaining lifetime, buffered inputs, or jobs block the merge. Example: a reusable tool returns unchanged.
+    Items with spent Units, active time, stored inputs or production work cannot be split safely. A plain reusable tool works well.
 Merge target keep help:
   value: |
-    **Keep** leaves the complete target stack and its runtime state unchanged.
+    **Keep** leaves the complete target stack unchanged.
 
-    The source action and optional merge output still resolve. Use this for keys, tools, or payments acting on a persistent target.
+    The dragged item and optional merge output still do their part. Useful for keys, tools or payments.
 Merge target remove help:
   value: |
-    **Remove** permanently removes one target quantity.
+    **Remove** deletes one target item.
 
-    A larger stack keeps its remaining quantities. The source follows its separately configured Source action.
+    If the target is a larger stack, the rest stays.
 Merge target replace help:
   value: |
-    **Replace** swaps one target quantity for the selected replacement in the same Board cell.
+    **Replace** swaps one target item for **Replace by** in the same cell.
 
-    A larger target stack is split nearby. Spent units carry over only to a compatible replacement with Units; other state that cannot transfer blocks the merge.
+    Extra items in the target stack move nearby. Units transfer only to a compatible replacement.
 Merge target spend help:
   value: |
-    **Spend** removes one unit from the target while leaving it in place.
+    **Spend** removes one Unit from the target and leaves it in place.
 
-    Spending the final unit depletes one target item and resolves that item's depletion output. The selected target must have **Units** configured.
+    At zero Units, that item depletes and may create its depletion output.
 Merge with:
   value: Merge with
 Merge with help:
   value: |
-    Select the target item that activates this directional merge when this item is dropped onto it.
+    Choose the item you will drop this item **onto**.
 
-    The item being edited is always the **source**. Its **Source action** and the selected **Target effect** resolve together.
+    This item is always the source. Direction matters.
 Merges:
   value: Merges
 Minimum:
@@ -1325,7 +1330,7 @@ New project:
 New version:
   value: New version
 Next pulse:
-  value: Next pulse
+  value: Next attempt
 No About avatars configured.:
   value: No About avatars configured.
 No Clock configured:
@@ -1341,13 +1346,13 @@ No asset selected:
 No assets match this search.:
   value: No assets match this search.
 No authored item directly inputs or positively requires this item.:
-  value: No authored item directly inputs or positively requires this item.
+  value: No saved item directly uses this item as an input or required condition.
   dynamic: true
 No authored operation owned by this item directly inputs or positively requires another item.:
-  value: No authored operation owned by this item directly inputs or positively requires another item.
+  value: This item has no direct item inputs or required conditions.
   dynamic: true
 No authored operation owned by this item outputs another item.:
-  value: No authored operation owned by this item outputs another item.
+  value: This item does not create another item.
   dynamic: true
 No chains for this item:
   value: No chains for this item
@@ -1360,7 +1365,7 @@ No expiry output configured.:
 No extra output configured.:
   value: No extra output configured.
 No finite lifetime:
-  value: No finite lifetime
+  value: No time limit
 No inputs:
   value: No inputs
 No item selected:
@@ -1370,7 +1375,7 @@ No item with Units enabled matches this search.:
 No items can be placed here.:
   value: No items can be placed here.
 No items emitted:
-  value: No items emitted
+  value: No items created
 No items match this search.:
   value: No items match this search.
 No items yet:
@@ -1384,7 +1389,7 @@ No material input required.:
 No merges for this item:
   value: No merges for this item
 No other authored item outputs this item through production, expiry, units, or merges.:
-  value: No other authored item outputs this item through production, expiry, units, or merges.
+  value: No saved item creates this one through Production, Clock, Units or Merges.
   dynamic: true
 No other item matches this search.:
   value: No other item matches this search.
@@ -1414,13 +1419,11 @@ Notes empty title:
   value: Your notes will live here
 Notes help:
   value: |
-    Keep project ideas, reminders and design decisions in **Markdown**.
+    Keep ideas, reminders and decisions in **Markdown**.
 
-    Notes are stored once and can link to several items or assets. An Item or Asset **Notes** page shows the notes linked to that entry; the global **Notes** page shows the whole collection. A note created from an Item or Asset starts linked to it.
+    A note may link to several items or assets. Their Notes tabs show the same shared note, already filtered for that entry.
 
-    Removing a link keeps the note and its other links. Deleting a note removes it from the whole project. Renaming an asset preserves its note links; deleting an item or asset removes only that entry's links.
-
-    Notes travel with the portable Editor project, but are excluded from **Build** and **Arkpack** output. Use Git to version the project and its notes.
+    Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Arkpack builds.
 Notes unavailable:
   value: Notes are unavailable.
 Nothing is currently scheduled to run.:
@@ -1455,16 +1458,9 @@ Output set:
   value: Output set
 Output set weight help:
   value: |
-    ### How output-set selection works
+    Exactly **one set** is picked each time this output runs.
 
-    Exactly **one output set** is selected whenever this output resolves. Its weight is compared with the weights of all sibling sets.
-
-    Weights are ratios, not percentages. For example:
-
-    - set A with weight **3** has a **75%** chance;
-    - set B with weight **1** has a **25%** chance.
-
-    After a set wins, the engine resolves every roll configured inside that set.
+    Weights are ratios. With weights **3** and **1**, the sets have **75%** and **25%** chances. After a set wins, every roll inside it runs.
 Output sets:
   value: Output sets
 Outputs:
@@ -1474,19 +1470,17 @@ Overlay asset:
 Owned:
   value: Owned
 Owner unit:
-  value: Owner unit
+  value: Unit from this item
 Owner units:
-  value: Owner units
+  value: Units from this item
 PNG files:
   value: PNG files
-Package status:
-  value: Package status
 Page help:
   value: Page help
 Paid by:
   value: Paid by
 Partial:
-  value: Partial
+  value: Incomplete
 Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
@@ -1516,118 +1510,118 @@ Produces:
 Product line:
   value: Product line
 Product lines:
-  value: Product lines
+  value: Production lines
 Product lines help:
   value: |
-    Product lines define the jobs this item can perform.
+    Each line is one job this item can perform, with its own time, requirements, rules and output.
 
-    Each line owns its runtime, inputs, rules, and output. Adding the first line enables production and removes an incompatible item action. Removing every line disables production.
+    The first line enables Production and removes Action. Removing every line disables Production.
 Production:
   value: Production
 Production disable rule help:
   value: |
-    A **Disable** rule makes this line unavailable while every condition matches.
+    **Disable** makes this line unavailable while all its conditions match.
 
-    Disable wins over the authored Enabled state and passing Enable rules. Visibility is evaluated separately.
+    It wins over **Enabled** and every Enable rule. Visibility is separate.
 Production enable rule help:
   value: |
-    An **Enable** rule is a positive availability gate for this line.
+    **Enable** adds a required check for this line.
 
-    When Enable rules exist, every one must pass. A matching Disable rule still wins.
+    If several Enable rules exist, **all of them** must pass. Any matching Disable rule still blocks the line.
 Production hide rule help:
   value: |
-    A **Hide** rule conceals this line while every condition matches.
+    **Hide** conceals this line while all its conditions match.
 
-    Hide wins over the authored Visible state and matching Show rules. It does not directly cancel already accepted work.
+    It wins over **Visible** and every Show rule. Work already in the queue continues.
 Production input type help:
   value: |
-    Select the contract this production line must satisfy before a job starts.
+    Choose what this line needs before it may start:
 
-    - **Simple:** explicitly requires no item.
-    - **Materials:** consumes or reserves delivered items.
-    - **Units:** spends finite units from the owner or a matching Board item.
+    - **Simple:** nothing.
+    - **Materials:** delivered items.
+    - **Units:** Units from this item or a matching Board item.
 Production inputs help:
   value: |
-    Inputs belong only to this production line. **Every configured input must be ready** before a job may start.
+    **Every input must be ready before the line starts.**
 
-    At least one explicit contract is required. A **Simple** input documents that the line intentionally needs no material; Materials and Units add real costs.
+    At least one input is required. Use **Simple** when the line intentionally needs nothing; Materials and Units add real costs.
 Production line:
   value: Production line
 Production line Clock help:
   value: |
-    Marks this line as the target for automatic Clock pulses.
+    The line tried on every Clock interval.
 
-    At most one sibling line may be Clock-selected. This selection is independent of **Default** and does not reset the Clock's phase or lifetime.
+    Only one line may hold this role. It is separate from **Default** and changing it does not restart the Clock.
 Production line check ahead help:
   value: |
-    Before this item is produced, checks whether one future run could fit under item-count limits.
+    Before creating this item, checks whether one next run could stay within item limits.
 
-    Only checked lines that are visible and enabled by default participate, and one fitting alternative is enough. This is a one-step admission check; it reserves no future output.
+    Only visible and enabled lines marked **Check next run** are tested. One fitting line is enough; nothing is reserved.
 Production line default help:
   value: |
-    Marks this line as the initial choice for manual production.
+    The initial line selected for manual production.
 
-    At most one sibling line may be Default-selected. Changing it does not alter the line selected for **Clock** pulses.
+    Only one line may hold this role. It is separate from the **Clock** line.
 Production line enabled help:
   value: |
-    Sets the line's authored base availability.
+    Whether this line starts enabled.
 
-    An enabled line may accept jobs after its runtime Enable and Disable rules are evaluated. This does not control whether the line is visible.
+    Enable and Disable rules may change it during play. Visibility is separate.
 Production line rules help:
   value: |
-    These rules belong only to the selected production line and are evaluated from the current game state.
+    These rules affect only this line.
 
-    - **Show/Hide** control presentation; Hide wins.
-    - **Enable/Disable** control admission; every Enable must pass and Disable wins.
-    - Runtime rules change job duration; multipliers apply before signed adjustments.
+    - **Show/Hide** controls whether players see it; Hide wins.
+    - **Enable/Disable** controls whether it may start; every Enable must pass and Disable wins.
+    - **Time** rules multiply the duration first, then add or subtract seconds.
 
-    Sibling lines and already accepted requests keep their own contracts.
+    Other lines and queued work keep their own settings.
 Production line runtime help:
   value: |
-    Base duration of one job before runtime rules.
+    How long one job normally takes.
 
-    Active multipliers apply first, then signed adjustments. A resulting duration of zero completes at the next normal settlement boundary.
+    Time multipliers apply first, then adjustments. A result of zero finishes on the next game update.
 Production line visibility help:
   value: |
-    Sets whether players see this line before runtime Show and Hide rules are applied.
+    Whether players see this line at the start.
 
-    Visibility does not itself make the line available for production.
+    Show and Hide rules may change it. Visibility does not decide whether the line may run.
 Production output help:
   value: |
-    Output resolves after a completed production job.
+    Items created when this production job finishes.
 
-    - **Output sets** are alternatives. Their relative weights decide which one is selected; equal weights make them equally likely.
-    - Every **roll** in the selected set runs. Guaranteed rolls always resolve, chance rolls test their probability, and weighted rolls select the configured number of candidates.
-    - Each selected **drop** applies its own quantity, placement, and rules before emitting items.
+    1. One **output set** is picked by weight.
+    2. Every **roll** in that set runs.
+    3. Each **drop** checks its rules, quantity and placement.
+
+    Equal set weights are equally likely.
 Production queue capacity help:
   value: |
-    Maximum accepted work across all lines owned by this item identity.
+    Maximum work accepted across all lines on this item.
 
-    Capacity counts **one active job plus queued requests**. New requests are rejected when the shared queue is full; it is not a separate limit per line.
+    The active job counts, so capacity **3** means one active job plus at most two waiting.
 Production runtime adjustment rule help:
   value: |
-    Adds a signed duration while every condition matches.
+    Adds or subtracts seconds while all conditions match.
 
-    All active runtime multipliers apply first; adjustments are applied afterward. Negative results clamp to immediate completion semantics.
+    Time multipliers run first. Negative results stop at zero.
 Production runtime multiplier rule help:
   value: |
-    Multiplies the line's base runtime while every condition matches.
+    Multiplies production time while all conditions match.
 
-    Multiple active multipliers combine before any signed runtime adjustments.
+    Several matching multipliers combine before any time adjustments.
 Production show rule help:
   value: |
-    A **Show** rule makes this line visible while every condition matches.
+    **Show** reveals this line while all its conditions match.
 
-    A matching Hide rule still wins. Availability is evaluated separately.
+    Any matching Hide rule still wins. Availability is separate.
 Project:
   value: Project
 Project About avatars help:
-  value: |-
-    Choose the portraits revealed on the **About** page as an easter egg.
+  value: |
+    Portraits revealed on the **About** page as a small easter egg.
 
-    - Each entry uses an asset from this project.
-    - The list order determines the portrait order.
-    - You can add up to **seven** portraits.
+    Choose up to **seven** project assets. Their order here is their order there.
 Project ID:
   value: Project ID
 Project ID example:
@@ -1636,28 +1630,31 @@ Project ID is required.:
   value: Project ID is required.
 Project artwork help:
   value: |
-    Choose the project-wide **Hero image** used by the launcher and game shell, and the ordered **About avatars** shown on the About page. These references use assets from this project.
+    Choose the project-wide **Hero image** and the ordered portraits shown on **About**.
 
-    Artwork changes apply after **Save** and do not change item artwork or placement.
+    These use project assets. They do not change item artwork or placement.
 Project asset count:
   value: "{count} asset"
 Project assets count:
   value: "{count} assets"
 Project avatars empty help:
-  value: Add portraits in **Artwork** to reveal them on the **About** page. You can choose up to **seven** assets and arrange their order.
+  value: |
+    Add up to **seven** portraits in Artwork and arrange the order used on the **About** page.
 Project general help:
   value: |
-    Inspect the project title, identity and storage dimensions. **Edit** changes the title. The **Project ID** identifies the game and its save namespace; changing it creates a different game identity.
+    Review the project's title, ID and storage sizes.
 
-    Board, Toolbar and Inventory links open their shared dimensions and authored starting layouts. Use **Export** to save the portable project sources.
+    **Project ID** is also the name used by saved games. Renaming it makes a new game to existing saves. Board, Toolbar and Inventory open their sizes and starting layouts. **Export** saves the portable Editor sources.
 Project hero image help:
-  value: The **Hero image** appears in the launcher and game shell. Choose an asset from this project.
+  value: |
+    The image shown by the launcher and game shell. Choose an asset from this project.
 Project item count:
   value: "{count} item"
 Project items count:
   value: "{count} items"
 Project toolbar disabled help:
-  value: The **Toolbar** is disabled. Set **Slots** above **0** to add toolbar storage and configure its starting items.
+  value: |
+    Toolbar is off. Set **Slots** above `0` to enable it and add starting items.
 Project unreachable item count:
   value: "{count} unreachable item"
 Project unreachable items count:
@@ -1665,32 +1662,28 @@ Project unreachable items count:
 Quantity:
   value: Quantity
 Query scope:
-  value: Query scope
+  value: Search in
 Query scope Any local help:
   value: |
-    Searches Inventory, Toolbar, and the current Board space.
+    Searches Inventory, Toolbar and the current Board Space.
 
-    Board matches ignore the distance selector in this scope. Other Board spaces are excluded.
+    Board distance is ignored; other Spaces are excluded.
 Query scope Board help:
   value: |
-    Searches only the current Board space relative to the action or production origin.
+    Searches the current Board Space around the item running this action or production line.
 
-    Use **Board distance** to choose Self, Close, Near, or Far.
+    Use **Board distance** to choose how far.
 Query scope Inventory help:
   value: |
-    Searches all matching items currently stored in global Inventory.
-
-    Board and Toolbar items are excluded.
+    Searches global Inventory only.
 Query scope Toolbar help:
   value: |
-    Searches all matching items currently stored in the Toolbar.
-
-    Board and Inventory items are excluded.
+    Searches Toolbar only.
 Query scope Universe help:
   value: |
-    Searches Inventory, Toolbar, and every Board space in the current game.
+    Searches Inventory, Toolbar and every Board Space in the game.
 
-    Use this for truly global state checks; it is broader than the player's current Space.
+    Use it when the current Space is too small a world.
 Queue capacity:
   value: Queue capacity
 Queue detail is unavailable.:
@@ -1709,9 +1702,9 @@ Random:
   value: Random
 Random drop placement help:
   value: |
-    Chooses a random cell on the current Board as the placement origin, then fills compatible stacks and nearby free cells.
+    Starts from a random cell on the current Board, then fills compatible stacks and nearby empty cells.
 
-    Use this when output should be distributed rather than anchored beside its producer.
+    Useful when output should spread around instead of appearing beside its producer.
 Reading image…:
   value: Reading image…
 Recent projects:
@@ -1727,7 +1720,7 @@ Refresh from disk:
 Refresh projects:
   value: Refresh projects
 Relative set weight:
-  value: Relative set weight
+  value: Set weight
 Remains:
   value: Remains
   dynamic: true
@@ -1740,17 +1733,17 @@ Remove action input:
 Remove action rule:
   value: Remove action rule
 Remove folder project help:
-  value: |-
-    Remove this project from the Editor’s recent list.
+  value: |
+    Removes the project from Recents.
 
-    **The folder and its files stay on disk.** You can open the folder again later.
+    **Its folder and files stay on disk.** You can open it again later.
 Remove from Recent:
   value: Remove from Recent
 Remove managed project help:
-  value: |-
-    This project and **all its files will be permanently deleted**.
+  value: |
+    Permanently deletes this project and **all of its files**.
 
-    Export a copy first if you want to keep the project.
+    Export a copy first if you may want it back.
 Remove merge rule:
   value: Remove merge rule
 Remove production line:
@@ -1770,10 +1763,10 @@ Rename project:
 Rename project ID:
   value: Rename project ID
 Rename project ID help:
-  value: |-
-    A new **Project ID** makes this a different game to existing saves.
+  value: |
+    Changes the name used by saved games.
 
-    Your project content and last output version settings stay unchanged.
+    Existing saves will see this as a different game. Project content and build settings stay unchanged.
 Repeated output:
   value: Repeated output
 Replace:
@@ -1782,9 +1775,9 @@ Replace by:
   value: Replace by
 Replace by help:
   value: |
-    Select the item that replaces one matched target quantity when **Target effect** is **Replace**.
+    Choose the item used when **Target item** is **Replace**.
 
-    The replacement appears in the target's Board cell and initializes its own authored state. It is separate from optional **Merge output**.
+    It appears in the target's cell with its normal starting values.
 Replace image:
   value: Replace image
 Replacement:
@@ -1809,9 +1802,9 @@ Reserve:
   value: Reserve
 Reserve material mode help:
   value: |
-    **Reserve** commits the delivered item to the job, then returns the same runtime identity when work completes.
+    **Reserve** holds the delivered item during production and returns that same item afterward.
 
-    Use this for tools or catalysts. If return placement is blocked, settlement waits rather than silently replacing the item.
+    Use it for tools or catalysts. If there is nowhere to return it, the job waits.
 Reserved:
   value: Reserved
 Reset:
@@ -1819,7 +1812,7 @@ Reset:
 Reset password:
   value: Reset password
 Resource ID:
-  value: Resource ID
+  value: Asset ID
 Retry loading notes:
   value: Retry loading notes
 Roll:
@@ -1830,32 +1823,15 @@ Rolls:
   value: Rolls
 Rolls help:
   value: |
-    ### How rolls work
+    Every roll in the chosen output set runs independently.
 
-    After one **output set** is selected, the engine evaluates every roll inside it in authored order. Rolls are additive: their accepted drops are combined into one output. A roll that produces nothing does not stop its sibling rolls.
+    - **Guaranteed:** always creates all its drops.
+    - **Chance:** makes one probability check for all its drops.
+    - **Weighted:** makes the number of picks under **Selections**; every pick chooses one candidate by weight.
 
-    Each accepted drop then evaluates its own **rules**, chooses a quantity within its **Minimum–Maximum** range, and uses its configured **Board placement**.
-
-    ### Roll types
-
-    - **Guaranteed** always offers every configured drop once. Example: a Guaranteed roll with **2 Wood** and **1 Stone** always adds both drops.
-    - **Chance** performs one probability check for the complete roll. At **25%**, either all configured drops continue to resolution or none do. Multiple drops do not receive separate 25% checks.
-    - **Weighted** performs the number of independent picks configured under **Selections**. Each pick chooses one candidate by relative weight, then offers every drop in that candidate. Candidates stay available, so the same candidate may win more than once.
-
-    ### Weighted example
-
-    A Weighted roll has **2–2 Selections** and two candidates:
-
-    - **3 Iron**, weight **3**;
-    - **1 Coal**, weight **1**.
-
-    Every pick has a **75%** chance to choose Iron and a **25%** chance to choose Coal. Because the two picks are independent, the result can be **6 Iron**, **3 Iron + 1 Coal**, or **2 Coal**.
-
-    ### Combined example
-
-    One set containing **Guaranteed 2 Wood**, **Chance 50%: 1 Gem**, and the Weighted roll above always attempts 2 Wood, may also attempt 1 Gem, and then adds exactly two weighted candidate results.
+    Example: two picks between **3 Iron, weight 3** and **1 Coal, weight 1** give each pick a 75% Iron / 25% Coal chance. The result can be **6 Iron**, **3 Iron + 1 Coal**, or **2 Coal**.
 Route {routeId} can never yield {factId}.:
-  value: Route {routeId} can never yield {factId}.
+  value: Route {routeId} cannot create {factId}.
   dynamic: true
 Rule:
   value: Rule
@@ -1866,17 +1842,18 @@ Rules:
 Running:
   value: Running
 Runtime:
-  value: Runtime
+  value: Production time
 Runtime (seconds):
-  value: Runtime (seconds)
+  value: Production time (seconds)
 Runtime adjustment:
-  value: Runtime adjustment
+  value: Time adjustment
 Runtime adjustment (seconds):
-  value: Runtime adjustment (seconds)
+  value: Time adjustment (seconds)
 Runtime multiplier:
-  value: Runtime multiplier
+  value: Time multiplier
 Safe item deletion help:
-  value: No saved game data references this item. It can be deleted without rewriting another item or project setting.
+  value: |
+    Nothing in the saved project uses this item. It can be deleted without changing anything else.
 Save:
   value: Save
 Save as…:
@@ -1896,7 +1873,7 @@ Search item title, ID or type…:
 Search lines…:
   value: Search lines…
 Searches matching items on the current board at the selected distance from the action owner.:
-  value: Searches matching items on the current board at the selected distance from the action owner.
+  value: Searches the current Board at the chosen distance from the item using this requirement.
   dynamic: true
 Searches matching items stored anywhere in the inventory.:
   value: Searches matching items stored anywhere in the inventory.
@@ -1928,9 +1905,9 @@ Self:
   dynamic: true
 Self unit cost help:
   value: |
-    Units spent from the item that owns this action or production line when it starts.
+    Units spent from this item when the action or production starts.
 
-    The owner stays in place. Spending its final unit schedules normal depletion and any configured depletion output.
+    The item stays in place. At zero Units, it depletes and may create its depletion output.
 Self-paid units input:
   value: Self-paid units input
 Set clock:
@@ -1949,9 +1926,9 @@ Simple input:
   value: Simple input
 Simple input type help:
   value: |
-    Adds no material or unit requirement.
+    Adds no Material or Unit cost.
 
-    Use **Simple** to state explicitly that this line or action may start without another item. Other configured inputs must still pass.
+    Other inputs on the same line or action must still be ready.
 Single item:
   value: Single item
 Slots:
@@ -1961,7 +1938,7 @@ Slowest first:
 Source:
   value: Source
 Source action:
-  value: Source action
+  value: Dragged item
 Source detail is unavailable.:
   value: Source detail is unavailable.
 Space:
@@ -1970,19 +1947,19 @@ Space action:
   value: Space action
 Space action help:
   value: |
-    After rules and input costs succeed, activation moves the player to the configured Space.
+    After rules pass and Unit costs are paid, using the item enters the chosen Space.
 
-    The item itself remains where it is. Dropping another item onto this Space action instead teleports that source stack to the target Board without activating the action.
+    The item stays where it is. Dropping another item onto this portal sends that stack to the target Board without moving the player.
 Space action summary help:
   value: |
-    Enters the configured space after every rule and requirement passes.
+    Enters the chosen Space after every rule and requirement passes.
 
-    The space ID is an authored destination; it does not identify another item.
+    The number names a Board Space, not another item.
 Space action type help:
   value: |
-    **Space** navigates to one configured Board after all rules and input costs succeed.
+    **Space** enters one chosen Board after rules pass and Unit costs are paid.
 
-    The same item also acts as a directional drop portal to that Board.
+    The item also acts as a portal for stacks dropped onto it.
 Speed up:
   value: Speed up
 Spend:
@@ -2000,12 +1977,12 @@ Start with an empty project:
   value: Start with an empty project
 Starting layout controls help:
   value: |
-    ### Starting layout controls
+    ### Editing the starting layout
 
-    - **Click** an empty slot to choose an item, or click a stack to add one.
-    - **Right-click** a stack to remove it.
-    - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack. Anything at the destination is replaced.
-    - Press **Minus** to remove one item or **Delete** to remove the whole stack.
+    - **Click** an empty cell to choose an item; click a stack to add one.
+    - **Right-click** removes one item.
+    - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack and replace the destination.
+    - **Minus** removes one item; **Delete** removes the whole stack.
 Status:
   value: Status
 Stop Local MCP:
@@ -2015,29 +1992,29 @@ Stop Remote MCP:
 Storage:
   value: Storage
 Storage scope:
-  value: Storage scope
+  value: Allowed storage
 Suffix:
   value: Suffix
 Target:
   value: Target
 Target effect:
-  value: Target effect
+  value: Target item
 Target space:
   value: Target space
 Target space help:
   value: |
-    Zero-based Board Space entered after successful activation.
+    The Board Space entered when the action succeeds.
 
-    Navigation may be one-way. A drop onto this item uses the same target Space but does not activate the action or change the player's current Space.
+    Dropping an item onto this portal sends the stack there without moving the player. Spaces start at `0`.
 Target unit cost help:
   value: |
-    Configures the Board item that pays when this action or production job starts.
+    Choose a Board item that pays the Unit cost.
 
-    - **Selected item:** the item type that may pay. Only items with **Units** enabled are available.
-    - **Board distance:** how far from the owner the engine may search for the payer.
-    - **Cost:** units removed from the matching item each time the action or job starts. It stays disabled until an item is selected and cannot exceed that item's authored Units deposit.
+    - **Selected item:** which kind may pay.
+    - **Board distance:** how far away Arkini may look.
+    - **Cost:** Units removed each time the action or job starts.
 
-    The payer stays in place. Spending its final unit resolves that item's normal depletion behavior.
+    The payer stays in place. At zero Units, it depletes normally.
 This Item ID is already in use.:
   value: This Item ID is already in use.
   dynamic: true
@@ -2072,7 +2049,9 @@ Toolbar:
   dynamic: true
 Toolbar editing help:
   value: |
-    Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
+    Toolbar is one row of shared storage visible during play.
+
+    Set **Slots** to `0` to remove it.
 Try a different search or change the active filters.:
   value: Try another search or change the **active filters**.
 Try again:
@@ -2092,19 +2071,19 @@ Units input:
   value: Units input
 Units input type help:
   value: |
-    Spends finite units when the line or action starts; the paying item remains in place.
+    Spends Units when the line or action starts; the paying item stays in place.
 
-    Choose **Self** to charge the owner or **Target** to query a matching item on the current Board.
+    Choose **Self** for this item or **Target** for a matching Board item.
 Units paid by self help:
   value: |
-    The item that owns this action or production line pays the unit cost.
+    This item pays the Unit cost.
 
-    The owner must have **Units** configured and enough remaining units. The query is fixed to Self.
+    It must have enough Units. The search is fixed to Self.
 Units paid by target help:
   value: |
-    A matching item on the current Board pays the unit cost in place.
+    A matching item on the current Board pays in place.
 
-    Configure the selected item and Board distance below. Only items with **Units** can be valid payers.
+    Choose its item type and Board distance below. Only items with Units are available.
 Units per item:
   value: Units per item
   dynamic: true
@@ -2150,39 +2129,39 @@ Waiting for inputs · one unit missing:
 Waiting for inputs · {quantity} units missing:
   value: Waiting for inputs · {quantity} units missing
 Waiting for runtime conditions:
-  value: Waiting for runtime conditions
+  value: Waiting for rules
 Weight:
   value: Weight
 Weighted:
   value: Weighted
 Weighted candidate weight help:
   value: |
-    Relative chance of selecting this candidate on each pick.
+    This candidate's chance on each pick.
 
-    Weights are ratios: candidates weighted **70** and **30** have 70% and 30% odds per pick. A candidate remains eligible for later picks.
+    Weights are ratios: **70** and **30** mean 70% and 30%. The same candidate may win again.
 Weighted candidates:
   value: Weighted candidates
 Weighted candidates help:
   value: |
-    Candidates are the alternatives considered by a Weighted roll.
+    The choices available to a Weighted roll.
 
-    Each pick selects exactly one candidate by relative weight and emits every drop inside it. At least two candidates are required for a valid weighted choice.
+    Each pick selects one candidate by weight and creates every drop inside it. Add at least two candidates.
 Weighted roll type help:
   value: |
-    Performs the configured number of independent weighted selections.
+    Makes the number of independent picks configured under **Selections**.
 
-    Each selection chooses one candidate by relative weight. Candidates are not removed after selection, so the same candidate may win repeatedly.
+    Each pick chooses one candidate by weight. Candidates stay available, so one may win several times.
 Weighted selections:
   value: Weighted selections
 Weighted selections help:
   value: |
-    Controls how many independent candidate picks this Weighted roll performs.
+    How many picks this Weighted roll makes.
 
-    - **1–1:** exactly one weighted reward.
-    - **3–3:** exactly three picks.
-    - **2–4:** randomly two, three, or four picks.
+    - **1–1:** exactly one.
+    - **3–3:** exactly three.
+    - **2–4:** randomly two, three or four.
 
-    Every pick uses the same candidate weights, and the same candidate may be selected more than once.
+    Every pick uses the same candidate weights.
 Width:
   value: Width
 With note:
@@ -2198,9 +2177,9 @@ automatic-only:
 available:
   value: available
 blocking error:
-  value: blocking error
+  value: error
 blocking errors:
-  value: blocking errors
+  value: errors
 chance:
   value: chance
 conditions:
@@ -2216,13 +2195,13 @@ entry:
 from:
   value: from
 from authored start:
-  value: from authored start
+  value: from starting items
 from the game.:
   value: from the game.
 keep:
   value: keep
 kill-switch:
-  value: kill-switch
+  value: stop immediately
 managed:
   value: managed
 negligible:
@@ -2240,9 +2219,9 @@ random:
 range:
   value: range
 reference must be removed first.:
-  value: reference must be removed first.
+  value: use must be removed first.
 references must be removed first.:
-  value: references must be removed first.
+  value: uses must be removed first.
 remove:
   value: remove
 rolls:
@@ -2262,13 +2241,13 @@ starting:
 unit available:
   value: unit available
 unit from owner:
-  value: unit from owner
+  value: unit from this item
 unit from target:
   value: unit from target
 units available:
   value: units available
 units from owner:
-  value: units from owner
+  value: units from this item
 units from target:
   value: units from target
 update:
@@ -2282,24 +2261,24 @@ warnings:
 weight:
   value: weight
 "{factId} × {quantity} exceeds the static estimate limit of {maximumQuantity} ({source}).":
-  value: "{factId} × {quantity} exceeds the static estimate limit of {maximumQuantity} ({source})."
+  value: "Estimate stopped: {factId} needs {quantity}, above the limit of {maximumQuantity} ({source})."
   dynamic: true
 "{factId} × {quantity} has no complete acquisition route through {routeId}.":
-  value: "{factId} × {quantity} has no complete acquisition route through {routeId}."
+  value: No complete route through {routeId} can create {quantity} × {factId}.
   dynamic: true
 "{factId} × {quantity} has no complete acquisition route.":
-  value: "{factId} × {quantity} has no complete acquisition route."
+  value: No complete route can create {quantity} × {factId}.
   dynamic: true
 "{quantity} available":
   value: "{quantity} available"
 "{routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.":
-  value: "{routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve."
+  value: "{routeId} depends on an expiring item with unfinished production, so Estimate cannot calculate it safely."
   dynamic: true
 "{routeId} exceeds the bounded complete-witness search of {maximumStates} states.":
-  value: "{routeId} exceeds the bounded complete-witness search of {maximumStates} states."
+  value: Estimate tried {maximumStates} route combinations for {routeId} and stopped before finding a complete one.
   dynamic: true
 "{routeId} exceeds the bounded joint-output accounting state space.":
-  value: "{routeId} exceeds the bounded joint-output accounting state space."
+  value: Estimate found too many combined output possibilities in {routeId} to calculate them safely.
   dynamic: true
 "{used} / {capacity} queue slots used":
   value: "{used} / {capacity} queue slots used"

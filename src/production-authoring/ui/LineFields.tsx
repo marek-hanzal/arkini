@@ -1,6 +1,6 @@
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
-import { CircleCheck, CircleX, Clock, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
+import { CircleCheck, CircleX, Clock, Eye, EyeOff, Star, StarOff } from "lucide-react";
 
 import { EditorChoiceControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
@@ -8,11 +8,10 @@ import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTit
 import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
-import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { Mx } from "~/translation/ui/Mx";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
@@ -219,6 +218,9 @@ export const LineFields = withFieldGroupFn({
 					className="min-w-0 grid-cols-2 gap-0"
 					dataUi="EditorFormCard"
 				>
+					<div className="col-span-2 pb-[var(--ak-panel-padding)]">
+						<EditorFormSectionDivider title={translator.textFn("Production")} />
+					</div>
 					<div className="min-w-0 pr-[var(--ak-panel-padding)]">
 						<group.Subscribe selector={(state) => state.values.input}>
 							{(input) => (
@@ -238,37 +240,15 @@ export const LineFields = withFieldGroupFn({
 						<group.Subscribe selector={(state) => state.values.output}>
 							{(output) => (
 								<section className="grid min-w-0 content-start gap-3">
-									{output === undefined ? (
-										<EditorCapabilityStatus
-											actionLabel={translator.textFn("Enable")}
-											icon={PackagePlus}
-											onEnableFn={() =>
-												group.setFieldValue(
-													"output",
-													structuredClone(DraftDefaults.output),
-												)
-											}
-											title={translator.textFn(
-												"Production line output empty title",
-											)}
-										/>
-									) : (
-										<>
-											<EditorFormSectionDivider
-												description={translator.textFn(
-													"Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops.",
-												)}
-												title={translator.textFn("Output")}
-												variant="secondary"
-											/>
-											<OutputControl
-												value={output}
-												onChangeFn={(next) =>
-													group.setFieldValue("output", next)
-												}
-											/>
-										</>
-									)}
+									<EditorFormSectionDivider
+										description={<Mx label="Production output help" />}
+										title={translator.textFn("Output")}
+										variant="secondary"
+									/>
+									<OutputControl
+										value={output}
+										onChangeFn={(next) => group.setFieldValue("output", next)}
+									/>
 								</section>
 							)}
 						</group.Subscribe>

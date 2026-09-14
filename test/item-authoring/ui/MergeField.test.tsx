@@ -18,8 +18,8 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 	EditorItemReferenceControl: () => createElement("span"),
 }));
 
-vi.mock("~/production-authoring/ui/OptionalOutputControl", () => ({
-	OptionalOutputControl: () => createElement("span"),
+vi.mock("~/production-authoring/ui/OutputControl", () => ({
+	OutputControl: () => createElement("span"),
 }));
 
 import { MergeField } from "~/item-authoring/ui/MergeField";

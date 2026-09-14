@@ -59,6 +59,46 @@ import { OutputControl } from "~/production-authoring/ui/OutputControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
+it("keeps empty output-set navigation visible and creates the first set through add", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	try {
+		await act(async () =>
+			root.render(
+				<OutputControl
+					value={undefined}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+		const add = container.querySelector<HTMLButtonElement>('button[title="Add output set"]');
+		const remove = container.querySelector<HTMLButtonElement>(
+			'button[title="Remove output set"]',
+		);
+		expect(add?.disabled).toBe(false);
+		expect(remove?.disabled).toBe(true);
+
+		await act(async () => add?.click());
+		expect(onChangeFn).toHaveBeenCalledWith({
+			set: [
+				expect.objectContaining({
+					weight: 1,
+					roll: [
+						expect.objectContaining({
+							type: "guaranteed",
+						}),
+					],
+				}),
+			],
+		});
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
+
 it.each([
 	"guaranteed",
 	"chance",

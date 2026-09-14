@@ -1,11 +1,10 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { PackagePlus } from "lucide-react";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
-import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
+import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
@@ -172,10 +171,7 @@ export const MergeField = ({
 				title={translator.textFn("Merge output")}
 			>
 				<EditorFormCard>
-					<OptionalOutputControl
-						addLabel={translator.textFn("Enable")}
-						emptyIcon={PackagePlus}
-						emptyTitle={translator.textFn("Item merge output empty title")}
+					<OutputControl
 						value={merge.output}
 						onChangeFn={(output) =>
 							onChangeFn({

@@ -976,10 +976,8 @@ describe("item section form session", () => {
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
 		const { container } = await render(<ProductionSection />);
-		const add = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable");
-		if (add === undefined) throw new Error("Missing enable production control.");
+		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		if (add === null) throw new Error("Missing add production line control.");
 		await act(async () => add.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -1114,10 +1112,8 @@ describe("item section form session", () => {
 
 	it("adds production to a passive Common through the ordinary line editor", async () => {
 		const { container } = await render(<ProductionSection />);
-		const addLine = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable");
-		if (addLine === undefined) throw new Error("Missing enable production control.");
+		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		if (addLine === null) throw new Error("Missing add production line control.");
 		await act(async () => addLine.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -1347,7 +1343,7 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
-			scope: "board",
+			scope: "inventory",
 			maxStackSize: 1,
 			action: undefined,
 			clock: {
@@ -1647,7 +1643,7 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 				uid: item.uid,
 				title: item.title,
 				clock: source.clock,
-				scope: "board",
+				scope: "any",
 				maxStackSize: 1,
 			}),
 		}),

@@ -288,7 +288,7 @@ export const useFormController = ({
 		if ((form.state.values.lines ?? []).length > 0) return;
 		form.setFieldValue("action", undefined);
 		form.setFieldValue("lines", [
-			createLineFn(form.state.values.id, [], newLineTitle, newLineDescription),
+			createLineFn([], newLineTitle, newLineDescription),
 		]);
 	}, [
 		form,

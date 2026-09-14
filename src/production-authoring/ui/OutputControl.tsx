@@ -2,7 +2,6 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
 import { OutputDropOption } from "~/production-authoring/ui/OutputDropOption";
@@ -15,7 +14,7 @@ const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
 
 interface OutputControlProps {
 	readonly onChangeFn: (output: OutputSchema.Type | undefined) => void;
-	readonly value: OutputSchema.Type;
+	readonly value: OutputSchema.Type | undefined;
 }
 
 /** Edits weighted output sets through their concrete RollSet domain. */
@@ -30,23 +29,19 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 	} = useFormSession();
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const validationIssues = useFormValidationIssues(value);
+	const sets = value?.set ?? [];
 	const invalidSetIndex = validationIssues.find(
 		(issue) => issue.path[0] === "set" && typeof issue.path[1] === "number",
 	)?.path[1] as number | undefined;
 	return (
 		<section className="grid gap-3">
-			<EditorFormSectionDivider
-				description="Weighted alternatives resolved when this output runs. A weight of one is the neutral default."
-				title="Output sets"
-				variant="secondary"
-			/>
 			<EditorCollectionSelector
 				addLabel="Add output set"
-				count={value.set.length}
+				count={sets.length}
 				initialSelectedIndex={outputSetIndex}
 				key={outputSetIndex}
 				itemLabelFn={(index) => {
-					const roll = value.set[index].roll[0];
+					const roll = sets[index]?.roll[0];
 					const itemId = roll === undefined ? undefined : readFirstRollItemIdFn(roll);
 					return `Output set ${index + 1} — ${readItemLabelFn(
 						itemId ?? "",
@@ -54,7 +49,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 					)}`;
 				}}
 				itemSearchTermsFn={(index) =>
-					value.set[index].roll.flatMap(readRollDropsFn).flatMap((drop) => [
+					(sets[index]?.roll ?? []).flatMap(readRollDropsFn).flatMap((drop) => [
 						drop.itemId,
 						readItemLabelFn(drop.itemId, ""),
 					])
@@ -62,63 +57,71 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 				renderItemContentFn={(index, label) => (
 					<OutputDropOption
 						label={label}
-						drops={value.set[index].roll.flatMap(readRollDropsFn)}
+						drops={(sets[index]?.roll ?? []).flatMap(readRollDropsFn)}
 					/>
 				)}
 				label="Output sets"
 				onAddFn={() =>
 					onChangeFn({
 						set: [
-							...value.set,
+							...sets,
 							{
 								weight: 1,
 								roll: [
 									structuredClone(DraftDefaults.rolls.guaranteed),
 								],
 							},
-						],
+						] as OutputSchema.Type["set"],
 					})
 				}
 				onRemoveFn={(index) =>
-					value.set.length === 1
+					sets.length === 1
 						? onChangeFn(undefined)
 						: onChangeFn({
-								set: value.set.filter(
+								set: sets.filter(
 									(_current, currentIndex) => currentIndex !== index,
-								) as typeof value.set,
+								) as OutputSchema.Type["set"],
 							})
 				}
 				removeLabel="Remove output set"
 				selectedIndex={invalidSetIndex}
 			>
-				{(index) => (
-					<RollSetControl
-						initialRuleIndex={index === outputSetIndex ? ruleIndex : undefined}
-						initialWhenIndex={index === outputSetIndex ? whenIndex : undefined}
-						index={index}
-						initialRollIndex={index === outputSetIndex ? outputRollIndex : undefined}
-						initialDropIndex={index === outputSetIndex ? outputDropIndex : undefined}
-						initialCandidateIndex={
-							index === outputSetIndex ? outputCandidateIndex : undefined
-						}
-						value={value.set[index]}
-						onChangeFn={(next) =>
-							next === undefined
-								? value.set.length === 1
-									? onChangeFn(undefined)
+				{(index) => {
+					const set = sets[index];
+					return set === undefined ? null : (
+						<RollSetControl
+							initialRuleIndex={index === outputSetIndex ? ruleIndex : undefined}
+							initialWhenIndex={index === outputSetIndex ? whenIndex : undefined}
+							index={index}
+							initialRollIndex={
+								index === outputSetIndex ? outputRollIndex : undefined
+							}
+							initialDropIndex={
+								index === outputSetIndex ? outputDropIndex : undefined
+							}
+							initialCandidateIndex={
+								index === outputSetIndex ? outputCandidateIndex : undefined
+							}
+							value={set}
+							onChangeFn={(next) =>
+								next === undefined
+									? sets.length === 1
+										? onChangeFn(undefined)
+										: onChangeFn({
+												set: sets.filter(
+													(_current, currentIndex) =>
+														currentIndex !== index,
+												) as OutputSchema.Type["set"],
+											})
 									: onChangeFn({
-											set: value.set.filter(
-												(_current, currentIndex) => currentIndex !== index,
-											) as typeof value.set,
+											set: sets.map((current, currentIndex) =>
+												currentIndex === index ? next : current,
+											) as OutputSchema.Type["set"],
 										})
-								: onChangeFn({
-										set: value.set.map((current, currentIndex) =>
-											currentIndex === index ? next : current,
-										) as typeof value.set,
-									})
-						}
-					/>
-				)}
+							}
+						/>
+					);
+				}}
 			</EditorCollectionSelector>
 		</section>
 	);

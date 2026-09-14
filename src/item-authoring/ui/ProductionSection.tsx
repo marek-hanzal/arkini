@@ -3,13 +3,11 @@ import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapability
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Factory } from "lucide-react";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { LineFields } from "~/production-authoring/ui/LineFields";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
-import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
@@ -65,7 +63,6 @@ const ProductionFields = withFieldGroupFn({
 								if (currentLines.length === 0)
 									form.setFieldValue("action", undefined);
 								const line = createLineFn(
-									form.state.values.id,
 									currentLines,
 									translator.textFn("New production line"),
 									translator.textFn(
@@ -77,18 +74,6 @@ const ProductionFields = withFieldGroupFn({
 									line,
 								]);
 							};
-
-							if (lines.length === 0)
-								return (
-									<EditorFormCard>
-										<EditorCapabilityStatus
-											actionLabel={translator.textFn("Enable")}
-											icon={Factory}
-											onEnableFn={addLineFn}
-											title={translator.textFn("Item production empty title")}
-										/>
-									</EditorFormCard>
-								);
 
 							return (
 								<>

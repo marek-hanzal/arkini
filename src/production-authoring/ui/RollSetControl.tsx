@@ -1,4 +1,3 @@
-import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
@@ -16,7 +15,6 @@ import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutoco
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { Tooltip } from "~/ui/ui/Tooltip";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 
@@ -291,27 +289,11 @@ const WeightedRollControl = ({
 	return (
 		<div className="grid gap-4">
 			<div className="grid gap-3">
-				<div className="text-sm">
-					<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
-						<span className="font-semibold text-foreground">Selections</span>
-						<Tooltip
-							content={<WeightedSelectionsHelp />}
-							contentClassName="max-w-lg p-4 text-sm leading-6"
-						>
-							<button
-								type="button"
-								data-ui="EditorInfoTooltip"
-								className="grid size-5 min-h-0 min-w-0 shrink-0 cursor-help place-items-center rounded-full border-0 bg-transparent p-0 text-muted hover:text-foreground"
-								onClick={(event) => {
-									event.preventDefault();
-									event.stopPropagation();
-								}}
-							>
-								<Info className="size-4" />
-							</button>
-						</Tooltip>
-					</span>
-				</div>
+				<EditorFormSectionDivider
+					description={<WeightedSelectionsHelp />}
+					title="Selections"
+					variant="secondary"
+				/>
 				<div className="grid gap-3 sm:grid-cols-2">
 					<QuantityFields
 						minimumError={readEditorFormValidationErrorFn(

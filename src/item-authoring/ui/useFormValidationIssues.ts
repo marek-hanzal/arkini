@@ -27,10 +27,11 @@ const readValuePathFn = (root: object, target: object): ReadonlyArray<PropertyKe
 };
 
 /** Reads submitted schema issues relative to one object already present in the item form. */
-export const useFormValidationIssues = (value: object) => {
+export const useFormValidationIssues = (value: object | undefined) => {
 	const { form, validationIssues } = useFormSession();
 	const values = useStore(form.store, (state) => state.values);
 	return useMemo(() => {
+		if (value === undefined) return [];
 		const path = readValuePathFn(values, value);
 		return path === undefined ? [] : readEditorFormValidationIssuesFn(validationIssues, path);
 	}, [

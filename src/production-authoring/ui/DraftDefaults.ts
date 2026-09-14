@@ -41,6 +41,8 @@ const rolls = {
 			min: 1,
 			max: 1,
 		},
+		// Authoring starts with one visible candidate; schema validation keeps Save
+		// blocked until the user deliberately adds the second weighted alternative.
 		drop: [
 			{
 				weight: 1,
@@ -50,15 +52,7 @@ const rolls = {
 					DropSchema.Type,
 				],
 			},
-			{
-				weight: 1,
-				drop: [
-					structuredClone(drop),
-				] as [
-					DropSchema.Type,
-				],
-			},
-		] as [
+		] as unknown as [
 			WeightedDropSchema.Type,
 			WeightedDropSchema.Type,
 			...WeightedDropSchema.Type[],

@@ -369,27 +369,6 @@ Finite units inside one item, separate from stack quantity. Spending the final u
   value: Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.
 Fix the highlighted fields before saving.:
   value: Fix the highlighted fields before saving.
-Flow:
-  value: Flow
-Flow help:
-  value: |
-    Flow is the project's **connection map**. It lets you follow an item in both directions without opening every production line and rule one by one.
-
-    Use it to answer two practical questions:
-
-    - Choose **Input** when you are asking, “Where can this item go?” Flow highlights operations that use the selected item and the items those operations can produce.
-    - Choose **Output** when you are asking, “Where can this item come from?” Flow highlights operations that produce the selected item and the items those operations need.
-
-    ### Using the graph
-
-    - Search for an item to focus its chain.
-    - Click an item card to select it and highlight its connections. Click the item name inside the card to open its full detail.
-    - Click a connection dot on the edge of a card to jump to the item at the other end.
-    - Drag the canvas to move around. The surrounding project stays visible as context.
-
-    Flow shows authored possibilities, not what will happen in one playthrough. It does not simulate placement, timing, rule truth or actual random rolls.
-
-    Press `?` to open the keyboard help inside the graph. It lists shortcuts for moving through items, showing more or less of a chain, returning to your selection and retracing recently visited items.
 Game limit:
   value: Game limit
 Guaranteed:
@@ -676,8 +655,6 @@ Merge output:
   value: Merge output
 Merges:
   value: Merges
-Missing item:
-  value: Missing item
 Name:
   value: Name
 Near:
@@ -850,6 +827,13 @@ Production line:
   value: Production line
 Production line output empty title:
   value: Create items when this production line completes.
+Production output help:
+  value: |
+    Output resolves after a completed production job.
+
+    - **Output sets** are alternatives. Their relative weights decide which one is selected; equal weights make them equally likely.
+    - Every **roll** in the selected set runs. Guaranteed rolls always resolve, chance rolls test their probability, and weighted rolls select the configured number of candidates.
+    - Each selected **drop** applies its own quantity, placement, and rules before emitting items.
 Project:
   value: Project
 Project ID:

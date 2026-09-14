@@ -1,19 +1,19 @@
 import type { LineSchema } from "~/production-line/schema/LineSchema";
+import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
 
 /** Creates a fresh production line with an unused owner-local identity. */
 export const createLineFn = (
-	ownerId: string,
 	lines: ReadonlyArray<LineSchema.Type>,
 	title: string,
 	description: string,
 ): LineSchema.Type => {
-	const prefix = `line:${ownerId.replace(/^item:/, "") || "new-item"}`;
+	const baseId = readEditorIdFromTitleFn(title) || "new-production-line";
 	const ids = new Set(lines.map((line) => line.id));
-	let id = `${prefix}:default`;
-	if (lines.length > 0 || ids.has(id)) {
+	let id = baseId;
+	if (ids.has(id)) {
 		let suffix = 2;
-		while (ids.has(`${prefix}:${suffix}`)) suffix += 1;
-		id = `${prefix}:${suffix}`;
+		while (ids.has(`${baseId}-${suffix}`)) suffix += 1;
+		id = `${baseId}-${suffix}`;
 	}
 	return {
 		id,

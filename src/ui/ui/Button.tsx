@@ -22,7 +22,7 @@ const ButtonBaseClassName =
 
 const ButtonVariantClassNames = {
 	default:
-		"border border-line bg-surface/75 text-foreground shadow-lg hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 data-[ui-disabled=true]:hover:border-line data-[ui-disabled=true]:hover:bg-surface/75 data-[ui-disabled=true]:active:bg-surface/75",
+		"border border-transparent bg-surface/75 text-foreground shadow-lg hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-transparent disabled:hover:bg-surface/75 disabled:active:bg-surface/75 data-[ui-disabled=true]:hover:border-transparent data-[ui-disabled=true]:hover:bg-surface/75 data-[ui-disabled=true]:active:bg-surface/75",
 	primary:
 		"bg-accent text-accent-contrast shadow-lg hover:bg-accent-hover active:bg-accent-hover disabled:hover:bg-accent disabled:active:bg-accent data-[ui-disabled=true]:hover:bg-accent data-[ui-disabled=true]:active:bg-accent",
 	danger: "bg-danger text-danger-contrast shadow-lg hover:opacity-90 active:opacity-80 disabled:hover:opacity-60 disabled:active:opacity-60 data-[ui-disabled=true]:hover:opacity-60 data-[ui-disabled=true]:active:opacity-60",

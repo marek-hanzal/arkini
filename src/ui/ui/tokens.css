@@ -43,6 +43,7 @@
 	--ak-canvas: light-dark(#fbf8ff, #090711);
 	--ak-surface: light-dark(#fffaff, #151020);
 	--ak-surface-raised: light-dark(#f3eafd, #231730);
+	--ak-editor-chrome-surface: light-dark(#ffffff, #151020);
 	--ak-foreground: light-dark(#2a1532, #fcf6ff);
 	--ak-muted: light-dark(#705d79, #bdaecc);
 	--ak-subtle: light-dark(#917f9a, #877792);

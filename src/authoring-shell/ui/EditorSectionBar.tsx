@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
 export const editorSectionLinkClassName =
-	"inline-flex shrink-0 items-center px-2 py-2 text-sm font-medium text-muted no-underline hover:bg-accent/10 hover:text-accent hover:no-underline data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent";
+	"inline-flex shrink-0 items-center px-4 py-2 text-sm font-medium text-muted no-underline hover:bg-accent/10 hover:text-accent hover:no-underline data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent";
 
 /** Keeps section links separate from primary actions, with optional help always last. */
 export const EditorSectionBar = ({

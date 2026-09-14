@@ -5,15 +5,22 @@
 	display: grid;
 	min-height: calc(3rem + 1.5rem + 1px);
 	align-items: center;
-	border-bottom: 1px solid color-mix(in srgb, var(--ak-line-strong) 64%, transparent);
+	border-bottom: 1px solid var(--ak-line);
+	background: var(--ak-editor-chrome-surface);
+}
+
+/* A full-width shadow strip keeps the lower edge straight, including both corners. */
+.ak-editor-page-header::after {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	left: 0;
+	height: 8px;
+	pointer-events: none;
+	content: "";
 	background: linear-gradient(
-		180deg,
-		color-mix(in srgb, var(--ak-surface) 94%, transparent),
-		color-mix(in srgb, var(--ak-surface-raised) 90%, transparent)
+		to bottom,
+		color-mix(in srgb, var(--ak-overlay) 10%, transparent),
+		transparent
 	);
-	box-shadow:
-		inset 0 1px 0 color-mix(in srgb, white 38%, transparent),
-		0 12px 24px -24px var(--ak-overlay);
-	backdrop-filter: blur(18px) saturate(115%);
-	-webkit-backdrop-filter: blur(18px) saturate(115%);
 }

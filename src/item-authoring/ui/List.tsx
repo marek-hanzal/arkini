@@ -221,7 +221,7 @@ export const List = ({
 						value={view}
 					/>
 					<Button
-						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm data-[ui-selected=true]:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:bg-accent/15 data-[ui-selected=true]:active:bg-accent/15"
+						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm data-[ui-selected=true]:hover:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:bg-accent/15 data-[ui-selected=true]:active:bg-accent/15"
 						onClick={() => onDraftChangeFn(!draft)}
 						{...readDataUiFn({
 							dataUi: "EditorItemDraftFilter",

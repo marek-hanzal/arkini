@@ -21,7 +21,7 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 	return (
 		<div className="grid justify-items-end gap-1">
 			<LinkButton
-				className="inline-flex h-9 items-center justify-center gap-1.5 text-sm data-[ui-active=true]:text-foreground"
+				className="inline-flex h-9 items-center justify-center gap-1.5 text-sm text-muted data-[ui-active=true]:text-accent"
 				cursorIntent={controller.pending ? "wait" : "pointer"}
 				disabled={controller.pending}
 				onClick={() => void controller.toggleFn()}

@@ -7,7 +7,7 @@ import type { OriginFlowDirection, Selection } from "~/flow-canvas/type/Highligh
 import { Canvas } from "~/flow-canvas/ui/Canvas";
 import type { LayoutNode, LayoutPoint } from "~/flow-layout/type/Layout";
 import { useOriginFlow } from "~/flow-canvas/ui/useOriginFlow";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Status } from "~/ui/ui/Status";
 
 const EmptyFlowBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>> = new Map();
 const EmptyFlowPositions: ReadonlyMap<string, LayoutNode> = new Map();
@@ -81,11 +81,10 @@ export const OriginFlow = ({
 			project.projectId,
 		],
 	);
-	const FlowStateIcon = flowState.status === "error" ? TriangleAlert : LoaderCircle;
 
 	return (
 		<section
-			className="h-full min-h-0 overflow-hidden rounded-lg border border-l-2 border-line bg-surface-raised"
+			className="flex h-full min-h-0 flex-col overflow-hidden"
 			data-ui="EditorOriginFlowSection"
 		>
 			{isReady ? (
@@ -104,38 +103,19 @@ export const OriginFlow = ({
 					/>
 				</div>
 			) : (
-				<div className="grid h-full place-items-center p-8">
-					<div className="flex max-w-md flex-col items-center gap-3 text-center">
-						<FlowStateIcon
-							className="size-9 data-[ui-status=error]:text-rose-600 data-[ui-status=loading]:animate-spin data-[ui-status=loading]:text-violet-700"
-							{...readDataUiFn({
-								dataUi: "EditorOriginFlowStatusIcon",
-								state: {
-									status: flowState.status,
-								},
-							})}
-						/>
-						<strong>
-							{flowState.status === "error" ? "Flow failed" : "Building flow"}
-						</strong>
-						<span className="text-sm text-muted">{flowState.progress.label}</span>
-						{flowState.status === "loading" ? (
-							<>
-								<div className="h-1.5 w-64 overflow-hidden rounded-full bg-violet-100">
-									<div
-										className="h-full rounded-full bg-violet-500"
-										style={{
-											width: `${flowState.progress.percent}%`,
-										}}
-									/>
-								</div>
-								<span className="font-mono text-xs text-muted">
-									{flowState.progress.percent}%
-								</span>
-							</>
-						) : null}
-					</div>
-				</div>
+				<Status
+					dataUi="EditorOriginFlowStatus"
+					variant="flat"
+					size="large"
+					icon={flowState.status === "error" ? TriangleAlert : LoaderCircle}
+					iconSpin={flowState.status === "loading"}
+					title={flowState.status === "error" ? "Flow failed" : "Building flow"}
+					description={
+						flowState.status === "loading"
+							? `${flowState.progress.label} · ${flowState.progress.percent}%`
+							: flowState.progress.label
+					}
+				/>
 			)}
 		</section>
 	);

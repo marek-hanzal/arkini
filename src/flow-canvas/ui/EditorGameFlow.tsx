@@ -127,7 +127,7 @@ export const EditorGameFlow = ({
 			}
 		>
 			<div
-				className="h-full min-h-0 p-3"
+				className="h-full min-h-0"
 				data-ui="EditorGameFlow"
 			>
 				<OriginFlow

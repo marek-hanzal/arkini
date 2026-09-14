@@ -87,6 +87,8 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 							>
 								<Status
 									dataUi="EditorNotesEmpty"
+									size="large"
+									variant="flat"
 									description={translator.textFn(
 										props.requiredCurrentResourceId !== undefined
 											? "Asset notes empty description"

@@ -1,19 +1,25 @@
 import { CopyButton } from "~/ui/ui/CopyButton";
 
 export const EditorMcpCopyableUrl = ({
-	label,
 	url,
+	label,
 }: {
-	readonly label: string;
-	readonly url: string;
+	readonly url?: string;
+	readonly label?: string;
 }) => (
-	<div className="flex min-w-0 items-center gap-1 text-sm text-success">
-		<span className="min-w-0 break-all">
-			{label}: {url}
+	<div className="flex w-full min-w-0 items-center justify-center gap-2 text-sm text-muted">
+		<span
+			className="min-w-0 truncate text-left"
+			title={url}
+		>
+			{label === undefined ? null : `${label}: `}
+			{url ?? "Configure the remote domain in Settings."}
 		</span>
-		<CopyButton
-			value={url}
-			title="Copy URL"
-		/>
+		{url === undefined ? null : (
+			<CopyButton
+				value={url}
+				title="Copy URL"
+			/>
+		)}
 	</div>
 );

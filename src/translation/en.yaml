@@ -308,9 +308,11 @@ Editor MCP help:
     2. A dedicated, revocable **ngrok authtoken**.
     3. A remote MCP client that supports OAuth.
 
+    The ngrok authtoken is stored unencrypted on this device. Use a dedicated, revocable token; on supported ngrok plans, restrict it to the Development Domain.
+
     Open **Settings**, enter the Development Domain as a hostname without `https://` or a path, paste the authtoken, and save the configuration. Return to **Server**, start Remote MCP, and copy the published endpoint into the client.
 
-    On its first connection, the client opens Arkini's authorization page. Enter the **Remote password** shown here to approve it. **Refresh** creates a new password, stops Remote MCP, and disconnects existing remote clients.
+    On its first connection, the client opens Arkini's authorization page. Use **Copy password** in the section bar and paste the password there to approve it. **Reset password** in the section bar creates a new password, stops Remote MCP, and disconnects existing remote clients.
 Enable:
   value: Enable
 Enable Units on this item before selecting Self to pay the unit cost.:

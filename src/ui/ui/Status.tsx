@@ -27,7 +27,7 @@ export const Status = ({
 	const Icon = icon;
 	return (
 		<section
-			className="group/status grid min-h-48 place-items-center data-[ui-size=large]:min-h-80 data-[ui-size=large]:flex-1 p-[var(--ak-panel-padding)] text-center data-[ui-variant=card]:rounded-2xl data-[ui-variant=card]:border data-[ui-variant=card]:border-line data-[ui-variant=card]:bg-surface/70"
+			className="group/status grid min-w-0 min-h-48 place-items-center data-[ui-size=large]:min-h-80 data-[ui-size=large]:flex-1 p-[var(--ak-panel-padding)] text-center data-[ui-variant=card]:rounded-2xl data-[ui-variant=card]:border data-[ui-variant=card]:border-line data-[ui-variant=card]:bg-surface/70"
 			{...readDataUiFn({
 				dataUi,
 				state: {
@@ -36,7 +36,7 @@ export const Status = ({
 				},
 			})}
 		>
-			<div className="grid max-w-md justify-items-center gap-3">
+			<div className="grid w-full min-w-0 max-w-md justify-items-center gap-3">
 				<Icon
 					className="size-7 text-subtle group-data-[ui-size=large]/status:size-16 group-data-[ui-size=large]/status:text-accent data-[ui-spin=true]:animate-spin"
 					{...readDataUiFn({
@@ -56,7 +56,7 @@ export const Status = ({
 						</p>
 					)}
 				</div>
-				{action === undefined ? null : <div className="pt-1">{action}</div>}
+				{action === undefined ? null : <div className="w-full min-w-0 pt-1">{action}</div>}
 			</div>
 		</section>
 	);

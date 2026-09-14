@@ -1,3 +1,4 @@
+import { Check, Copy, RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -5,13 +6,14 @@ import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
-	editorSectionTabClassName,
-	EditorSectionTabs,
-} from "~/authoring-shell/ui/EditorSectionTabs";
+	editorSectionLinkClassName,
+	EditorSectionBar,
+} from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { useCopyButtonController } from "~/ui/ui/useCopyButtonController";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
-import { ButtonLink } from "~/ui/ui/Button";
+import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServer } from "./EditorMcpServer";
 import { EditorMcpSettings } from "./EditorMcpSettings";
@@ -27,12 +29,15 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 		overview: overviewController.overview,
 	});
 	const overview = overviewController.overview;
+	const passwordCopy = useCopyButtonController({
+		value: overview?.remotePassword ?? "",
+	});
+	const PasswordCopyIcon = passwordCopy.copied ? Check : Copy;
 	const error = settingsController.error ?? overviewController.commandError;
 	const executeFn = (commandFn: () => void) => {
 		settingsController.clearErrorFn();
 		commandFn();
 	};
-	const title = section === "server" ? "MCP - Server" : "MCP - Settings";
 	return (
 		<section
 			className="h-full min-h-0"
@@ -41,12 +46,6 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 			<EditorSectionPage
 				header={
 					<EditorSectionNavigation
-						action={
-							<EditorPageHelp
-								content={<Mx label="Editor MCP help" />}
-								title={<Tx label="Editor MCP" />}
-							/>
-						}
 						leading={
 							<EditorHistoryBackButton
 								params={{
@@ -55,31 +54,64 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 								to="/editor/$projectId/editor/items/list"
 							/>
 						}
-						title={<h1 className="text-xl font-semibold">{title}</h1>}
-						tabs={
-							<EditorSectionTabs>
-								{EditorMcpSections.map((candidate) => (
-									<ButtonLink
-										key={candidate.id}
-										to="/editor/$projectId/mcp/$sectionId"
-										params={{
-											projectId: project.projectId,
-											sectionId: candidate.id,
-										}}
-										activeOptions={{
-											exact: true,
-										}}
-										activeProps={{
-											"data-ui-selected": true,
-										}}
-										className={editorSectionTabClassName}
-									>
-										{candidate.label}
-									</ButtonLink>
-								))}
-							</EditorSectionTabs>
-						}
+						title={<h1 className="text-xl font-semibold">MCP</h1>}
 					/>
+				}
+				secondaryNavigation={
+					<EditorSectionBar
+						actions={
+							section === "server" && overview !== undefined ? (
+								<>
+									<LinkButton
+										className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
+										title={
+											passwordCopy.error ??
+											(passwordCopy.copied ? "Copied" : "Copy password")
+										}
+										onClick={() => void passwordCopy.copyFn()}
+									>
+										<PasswordCopyIcon className="size-4" />
+										Copy password
+									</LinkButton>
+									<LinkButton
+										className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
+										data-ui="EditorMcpResetPassword"
+										disabled={overviewController.pending}
+										onClick={() => executeFn(overviewController.resetAuthFn)}
+									>
+										<RefreshCw className="size-4" />
+										Reset password
+									</LinkButton>
+								</>
+							) : null
+						}
+						help={
+							<EditorPageHelp
+								content={<Mx label="Editor MCP help" />}
+								title={<Tx label="Editor MCP" />}
+							/>
+						}
+					>
+						{EditorMcpSections.map((candidate) => (
+							<LinkButtonLink
+								key={candidate.id}
+								to="/editor/$projectId/mcp/$sectionId"
+								params={{
+									projectId: project.projectId,
+									sectionId: candidate.id,
+								}}
+								activeOptions={{
+									exact: true,
+								}}
+								activeProps={{
+									"data-ui-selected": true,
+								}}
+								className={editorSectionLinkClassName}
+							>
+								{candidate.label}
+							</LinkButtonLink>
+						))}
+					</EditorSectionBar>
 				}
 			>
 				<div className="mx-auto grid max-w-5xl gap-6">
@@ -95,7 +127,6 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 						match(section)
 							.with("server", () => (
 								<EditorMcpServer
-									onResetAuthFn={() => executeFn(overviewController.resetAuthFn)}
 									onStartLocalFn={() =>
 										executeFn(overviewController.startLocalFn)
 									}

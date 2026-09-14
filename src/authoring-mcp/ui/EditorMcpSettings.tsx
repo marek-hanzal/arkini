@@ -1,3 +1,4 @@
+import { ExternalLink, Save } from "lucide-react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
@@ -5,7 +6,6 @@ import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorMcpCopyableUrl } from "./EditorMcpCopyableUrl";
-import { EditorMcpStatus } from "./EditorMcpStatus";
 
 const editorMcpInputClassName =
 	"w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 py-2 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60";
@@ -42,18 +42,12 @@ export const EditorMcpSettings = ({
 	const ngrokDisabled = pending || remoteRunning;
 	const localUrl = `http://127.0.0.1:${port}/editor/mcp`;
 	return (
-		<div className="grid gap-4">
+		<div className="grid items-start gap-6 md:grid-cols-2">
 			<EditorRootCard
 				className="gap-3"
 				dataUi="EditorMcpLocalSettingsCard"
 			>
-				<div>
-					<h2 className="font-semibold">Local server</h2>
-					<p className="mt-1 text-sm text-muted">
-						The open local endpoint is intended for trusted tools running on this
-						computer.
-					</p>
-				</div>
+				<h2 className="font-semibold">Local server</h2>
 				<EditorValueField
 					as="div"
 					label="Port"
@@ -70,29 +64,32 @@ export const EditorMcpSettings = ({
 							onChange={(event) => onSetPortFn(event.currentTarget.value)}
 						/>
 						<LinkButton
+							className="inline-flex items-center gap-2"
 							disabled={pending}
 							onClick={onSavePortFn}
 						>
+							<Save className="size-4" />
 							Save
 						</LinkButton>
 					</div>
 				</EditorValueField>
-				<EditorMcpCopyableUrl
-					label="Local endpoint"
-					url={localUrl}
-				/>
+				<EditorMcpCopyableUrl url={localUrl} />
 			</EditorRootCard>
 			<EditorRootCard
 				className="gap-3"
 				dataUi="EditorMcpRemoteSettingsCard"
 			>
-				<div>
+				<div className="flex items-center justify-between gap-3">
 					<h2 className="font-semibold">ngrok</h2>
-					<p className="mt-1 text-sm text-muted">
-						The ngrok authtoken is stored unencrypted on this device. Use a dedicated,
-						revocable authtoken for Arkini. On supported ngrok plans, restrict it to
-						this Development Domain.
-					</p>
+					<a
+						href="https://ngrok.com/"
+						target="_blank"
+						rel="noreferrer"
+						className="inline-flex items-center gap-1 text-sm text-accent opacity-75 hover:opacity-100 hover:underline"
+					>
+						ngrok.com
+						<ExternalLink className="size-3" />
+					</a>
 				</div>
 				<EditorValueField
 					label="Development domain"
@@ -124,20 +121,13 @@ export const EditorMcpSettings = ({
 					/>
 				</EditorValueField>
 				<PrimaryButton
-					className="justify-self-start"
+					className="justify-self-start gap-2"
 					disabled={ngrokDisabled}
 					onClick={onSaveNgrokFn}
 				>
-					Save ngrok configuration
+					<Save className="size-4" />
+					Save
 				</PrimaryButton>
-				<EditorMcpStatus
-					message={
-						configuredDomain === undefined
-							? "ngrok is not configured."
-							: `Configured for ${configuredDomain}.`
-					}
-					tone={configuredDomain === undefined ? "muted" : "success"}
-				/>
 			</EditorRootCard>
 		</div>
 	);

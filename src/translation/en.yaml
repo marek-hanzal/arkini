@@ -268,6 +268,8 @@ Discard:
   value: Discard
 Draft:
   value: Draft
+Draft marks this item as work in progress for the author. It does not affect export or gameplay.:
+  value: Draft marks this item as work in progress for the author. It does not affect export or gameplay.
 Drop:
   value: Drop
 Drop onto:

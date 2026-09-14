@@ -5,6 +5,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { useItemDraftController } from "~/item-authoring/ui/useItemDraftController";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemDraftToggleProps extends useItemDraftController.Props {
@@ -20,22 +21,29 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 	const DraftIcon = draft ? SquareCheck : Square;
 	return (
 		<div className="grid justify-items-end gap-1">
-			<LinkButton
-				className="inline-flex h-9 items-center justify-center gap-1.5 text-sm text-muted data-[ui-active=true]:text-accent"
-				cursorIntent={controller.pending ? "wait" : "pointer"}
-				disabled={controller.pending}
-				onClick={() => void controller.toggleFn()}
-				{...readDataUiFn({
-					dataUi: "EditorItemDraftToggle",
-					state: {
-						active: draft,
-						pending: controller.pending,
-					},
-				})}
+			<Tooltip
+				placement="bottom-end"
+				content={
+					<Tx label="Draft marks this item as work in progress for the author. It does not affect export or gameplay." />
+				}
 			>
-				<Tx label="Draft" />
-				<DraftIcon className="size-4 shrink-0" />
-			</LinkButton>
+				<LinkButton
+					className="inline-flex h-9 items-center justify-center gap-1.5 text-sm text-muted data-[ui-active=true]:text-accent"
+					cursorIntent={controller.pending ? "wait" : "pointer"}
+					disabled={controller.pending}
+					onClick={() => void controller.toggleFn()}
+					{...readDataUiFn({
+						dataUi: "EditorItemDraftToggle",
+						state: {
+							active: draft,
+							pending: controller.pending,
+						},
+					})}
+				>
+					<Tx label="Draft" />
+					<DraftIcon className="size-4 shrink-0" />
+				</LinkButton>
+			</Tooltip>
 			{controller.error === undefined ? null : (
 				<p
 					className="max-w-80 text-right text-xs text-danger"

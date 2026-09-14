@@ -16,19 +16,19 @@ export const UnitsSection = () => {
 			<form.Subscribe selector={(state) => state.values.units}>
 				{(units) =>
 					units === undefined ? (
-						<EditorFormCard>
-							<EditorCapabilityStatus
-								actionLabel={translator.textFn("Enable")}
-								dataUi="EditorUnitsDisabled"
-								icon={BatteryCharging}
-								onEnableFn={() =>
-									form.setFieldValue("units", {
-										amount: 1,
-									})
-								}
-								title={translator.textFn("Item units empty title")}
-							/>
-						</EditorFormCard>
+						<EditorCapabilityStatus
+							actionLabel={translator.textFn("Enable")}
+							dataUi="EditorUnitsDisabled"
+							icon={BatteryCharging}
+							onEnableFn={() =>
+								form.setFieldValue("units", {
+									amount: 1,
+								})
+							}
+							title={translator.textFn("No Units configured")}
+							summary={translator.textFn("Item units empty title")}
+							size="large"
+						/>
 					) : (
 						<>
 							<EditorFormCard>

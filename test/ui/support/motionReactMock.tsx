@@ -282,6 +282,7 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 	});
 
 export const motion = {
+	create: createMotionComponent,
 	article: createMotionComponent("article"),
 	button: createMotionComponent("button"),
 	div: createMotionComponent("div"),

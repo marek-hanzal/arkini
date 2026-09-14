@@ -287,7 +287,7 @@ export const EditorSearchCombobox = ({
 								}
 								type="button"
 								disabled={searchPending}
-								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left data-[ui-selected=false]:enabled:hover:bg-surface-raised data-[ui-selected=false]:data-[ui-active=true]:enabled:bg-surface-raised data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:enabled:hover:bg-accent/20 data-[ui-selected=true]:data-[ui-active=true]:enabled:bg-accent/20 data-[ui-virtual=true]:absolute data-[ui-virtual=true]:top-0 data-[ui-virtual=true]:left-1.5 data-[ui-virtual=true]:w-[calc(100%-0.75rem)]"
+								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left data-[ui-selected=false]:enabled:hover:bg-surface-raised data-[ui-selected=false]:data-[ui-active=true]:enabled:bg-surface-raised data-[ui-selected=true]:bg-selection data-[ui-selected=true]:enabled:hover:bg-selection-hover data-[ui-selected=true]:data-[ui-active=true]:enabled:bg-selection-hover data-[ui-virtual=true]:absolute data-[ui-virtual=true]:top-0 data-[ui-virtual=true]:left-1.5 data-[ui-virtual=true]:w-[calc(100%-0.75rem)]"
 								onMouseDown={(event) => event.preventDefault()}
 								onMouseEnter={() => {
 									keyboardScrollPendingRef.current = false;

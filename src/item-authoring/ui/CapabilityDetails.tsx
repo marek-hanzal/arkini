@@ -8,7 +8,6 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ButtonLink } from "~/ui/ui/Button";
-import { ItemCollectionMoreCard } from "~/item-authoring/ui/ItemCollectionMoreCard";
 import { DetailFact, DetailFacts } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
@@ -158,7 +157,7 @@ export const MergeDetail = ({
 export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
-		<div className="grid grid-rows-[1fr_auto] gap-3">
+		<div className="grid">
 			{item.merge === undefined || item.merge.length === 0 ? (
 				<EditorRootCard dataUi="EditorItemMergesDisabledCard">
 					<DisabledCapabilityDetail
@@ -181,11 +180,6 @@ export const MergesDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					))}
 				</div>
 			)}
-			<ItemCollectionMoreCard
-				itemUid={item.uid}
-				sectionId="merges"
-				hasMore={(item.merge?.length ?? 0) > 1}
-			/>
 		</div>
 	);
 };

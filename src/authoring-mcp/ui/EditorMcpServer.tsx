@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
@@ -105,9 +106,9 @@ export const EditorMcpServer = ({
 	return (
 		<div className="grid gap-4">
 			{overview.remotePassword === undefined ? null : (
-				<div
-					className="grid gap-3 rounded-xl border border-accent bg-accent/10 p-5"
-					data-ui="EditorMcpRemotePassword"
+				<EditorRootCard
+					className="gap-3"
+					dataUi="EditorMcpRemotePassword"
 				>
 					<h2 className="font-semibold">Remote password</h2>
 					<p className="text-sm text-muted">
@@ -138,9 +139,9 @@ export const EditorMcpServer = ({
 							Refresh
 						</DangerButton>
 					</div>
-				</div>
+				</EditorRootCard>
 			)}
-			<div className="ak-list-row grid gap-5 rounded-xl border border-line p-5">
+			<EditorRootCard dataUi="EditorMcpTransportsCard">
 				<div className="grid gap-3">
 					<div>
 						<h2 className="font-semibold">Local MCP</h2>
@@ -209,7 +210,7 @@ export const EditorMcpServer = ({
 						/>
 					)}
 				</div>
-			</div>
+			</EditorRootCard>
 		</div>
 	);
 };

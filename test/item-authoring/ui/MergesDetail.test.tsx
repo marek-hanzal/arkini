@@ -85,7 +85,7 @@ afterEach(async () => {
 });
 
 describe("MergesDetail", () => {
-	it("links preview merges to their authored indices and keeps the complete list reachable", async () => {
+	it("links preview merges to their authored indices", async () => {
 		const item: ItemSchema.Type = {
 			...editorTestConfig.items.water,
 			merge: [
@@ -122,15 +122,6 @@ describe("MergesDetail", () => {
 			),
 		);
 		expect(links).toHaveLength(1);
-		const more = container.querySelector<HTMLAnchorElement>(
-			'[data-ui="EditorItemCollectionMoreCard"] a',
-		);
-		expect(more?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/detail/$sectionId");
-		expect(JSON.parse(more?.dataset.params ?? "null")).toEqual({
-			itemUid: item.uid,
-			projectId: project.projectId,
-			sectionId: "merges",
-		});
 		for (const [index, link] of links.entries()) {
 			expect(link.dataset.to).toBe(
 				"/editor/$projectId/editor/items/$itemUid/form/$sectionId",

@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { NoteForm } from "~/project-note/ui/NoteForm";
 import { NotebookPen, Pencil, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -13,6 +14,8 @@ import { Markdown } from "~/ui/ui/Markdown";
 import { NoteAssetLinks } from "~/project-note/ui/NoteAssetLinks";
 import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { NoteItemLinks } from "~/project-note/ui/NoteItemLinks";
+
+const MotionEditorRootCard = motion.create(EditorRootCard);
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -112,11 +115,11 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 							controller.notes.map((note) => {
 								const editing = controller.editingNoteId === note.noteId;
 								return (
-									<motion.article
+									<MotionEditorRootCard
 										key={note.noteId}
 										layout="position"
-										className="grid min-w-0 gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5"
-										data-ui="EditorNote"
+										className="min-w-0 gap-4"
+										dataUi="EditorNote"
 										{...noteMotion}
 									>
 										<header className="flex items-center gap-3">
@@ -212,7 +215,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 												/>
 											</>
 										)}
-									</motion.article>
+									</MotionEditorRootCard>
 								);
 							})
 						)}
@@ -230,7 +233,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 							: String(controller.error)}
 					</p>
 				)}
-				<div className="rounded-2xl border border-line bg-surface-raised/60 p-5">
+				<EditorRootCard dataUi="EditorNoteComposerCard">
 					<NoteForm
 						content={controller.newContent}
 						itemUids={controller.newItemUids}
@@ -247,7 +250,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 						onResourceIdsChangeFn={controller.setNewResourceIdsFn}
 						onSaveFn={controller.createFn}
 					/>
-				</div>
+				</EditorRootCard>
 			</div>
 		</div>
 	);

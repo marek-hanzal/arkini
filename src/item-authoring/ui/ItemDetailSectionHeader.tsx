@@ -1,3 +1,4 @@
+import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -11,11 +12,13 @@ export const ItemDetailSectionHeader = ({
 	sectionId,
 	title,
 	description,
+	filter,
 }: {
 	readonly itemUid: string;
 	readonly sectionId?: SectionId;
 	readonly title: string;
 	readonly description?: string;
+	readonly filter?: ItemConnectionFilter;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
@@ -37,6 +40,13 @@ export const ItemDetailSectionHeader = ({
 						sectionId === "identity"
 							? "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 							: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+					}
+					search={
+						filter === undefined
+							? undefined
+							: {
+									filter,
+								}
 					}
 					params={{
 						projectId: project.projectId,

@@ -39,7 +39,7 @@ export const EditorWorkspaceNavigation = ({
 	transitioningWorkspace,
 }: EditorWorkspaceNavigationProps) => (
 	<aside
-		className="relative z-20 flex min-h-0 w-16 flex-col items-center gap-2 border-r border-line bg-[var(--ak-editor-chrome-surface)] p-2"
+		className="relative z-20 flex min-h-0 w-16 flex-col items-center gap-2 border-r border-line bg-[var(--ak-editor-background)] p-2"
 		data-ui="EditorNavigation"
 		style={{
 			viewTransitionName: "arkini-editor-navigation",

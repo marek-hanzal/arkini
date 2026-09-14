@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { CircleCheck, CircleX, Clock, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
@@ -197,9 +198,9 @@ export const LineFields = withFieldGroupFn({
 						)}
 					</group.Subscribe>
 				</EditorFormCard>
-				<div
-					className="grid min-w-0 grid-cols-2 gap-0 rounded-2xl border border-l-2 border-line-strong bg-surface-raised/60 p-[var(--ak-panel-padding)]"
-					data-ui="EditorFormCard"
+				<EditorRootCard
+					className="min-w-0 grid-cols-2 gap-0"
+					dataUi="EditorFormCard"
 				>
 					<div className="min-w-0 pr-[var(--ak-panel-padding)]">
 						<group.Subscribe selector={(state) => state.values.input}>
@@ -255,7 +256,7 @@ export const LineFields = withFieldGroupFn({
 							)}
 						</group.Subscribe>
 					</div>
-				</div>
+				</EditorRootCard>
 			</div>
 		);
 	},

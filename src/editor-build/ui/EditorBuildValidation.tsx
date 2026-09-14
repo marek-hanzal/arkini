@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -36,9 +37,9 @@ export const EditorBuildValidation = ({
 	version,
 	onDismissFn,
 }: EditorBuildValidationProps) => (
-	<article
-		className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5"
-		data-ui="EditorBuildValidation"
+	<EditorRootCard
+		className="flex min-h-0 flex-1 flex-col gap-0 overflow-hidden"
+		dataUi="EditorBuildValidation"
 	>
 		<header className="flex shrink-0 items-start justify-between gap-4">
 			<div className="min-w-0">
@@ -66,5 +67,5 @@ export const EditorBuildValidation = ({
 				project={project}
 			/>
 		</Scrollable>
-	</article>
+	</EditorRootCard>
 );

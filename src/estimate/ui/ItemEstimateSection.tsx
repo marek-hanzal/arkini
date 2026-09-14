@@ -1,4 +1,4 @@
-import { ArrowRight, TriangleAlert, Unlink } from "lucide-react";
+import { TriangleAlert, Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -10,8 +10,6 @@ import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Status } from "~/ui/ui/Status";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
-import { LinkButtonLink } from "~/ui/ui/LinkButton";
-import { useTranslator } from "~/translation/ui/useTranslator";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
@@ -85,9 +83,9 @@ const ItemEstimateResult = ({
 			limit={limit}
 		/>
 	) : (
-		<article
-			className="rounded-xl border border-line bg-surface-raised p-4"
-			data-ui="EditorItemEstimateHeader"
+		<EditorRootCard
+			className="gap-0"
+			dataUi="EditorItemEstimateHeader"
 		>
 			<ItemEstimateSummary estimate={estimate} />
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
@@ -101,32 +99,8 @@ const ItemEstimateResult = ({
 					))}
 				</ul>
 			</div>
-		</article>
-	);
-
-const ItemEstimateMore = ({ itemUid }: { readonly itemUid: string }) => {
-	const project = useEditorProject();
-	const translator = useTranslator();
-	return (
-		<EditorRootCard dataUi="EditorItemEstimateMoreCard">
-			<div className="flex items-center justify-between gap-4 text-sm">
-				<p className="text-muted">{translator.textFn("More entries are available.")}</p>
-				<LinkButtonLink
-					className="inline-flex shrink-0 items-center gap-1.5"
-					to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-					params={{
-						projectId: project.projectId,
-						itemUid,
-						sectionId: "estimate",
-					}}
-				>
-					{translator.textFn("Show all")}
-					<ArrowRight className="size-4" />
-				</LinkButtonLink>
-			</div>
 		</EditorRootCard>
 	);
-};
 
 /** Shares the captured estimate between the full section and its two-entry overview. */
 export const ItemEstimateSection = ({
@@ -150,12 +124,9 @@ export const ItemEstimateSection = ({
 			})}
 		>
 			{state.status === "ready" ? null : (
-				<div
-					className="rounded-xl border border-line bg-surface-raised p-4"
-					data-ui="EditorItemEstimateHeader"
-				>
+				<EditorRootCard dataUi="EditorItemEstimateHeader">
 					<ItemEstimateHeading />
-				</div>
+				</EditorRootCard>
 			)}
 			{state.status === "loading" ? <ItemEstimateLoading /> : null}
 			{state.status === "error" ? (
@@ -172,14 +143,6 @@ export const ItemEstimateSection = ({
 					estimate={state.estimate}
 					limit={previewItemUid === undefined ? undefined : 2}
 				/>
-			) : null}
-			{previewItemUid !== undefined &&
-			state.status === "ready" &&
-			state.estimate.status !== "unreachable" &&
-			(state.estimate.obtainable
-				? state.estimate.routeSteps.length
-				: state.estimate.diagnostics.length) > 2 ? (
-				<ItemEstimateMore itemUid={previewItemUid} />
 			) : null}
 		</section>
 	);

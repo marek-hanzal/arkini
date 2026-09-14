@@ -35,7 +35,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 
 	return (
 		<div
-			className="grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] overflow-hidden bg-surface text-foreground"
+			className="grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] overflow-hidden bg-[var(--ak-editor-background)] text-foreground"
 			data-ui="EditorShell"
 			style={{
 				viewTransitionName: "arkini-editor-shell",
@@ -54,7 +54,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 				transitioningWorkspace={transition.workspace}
 			/>
 			<main
-				className="min-h-0 min-w-0 overflow-hidden bg-surface"
+				className="min-h-0 min-w-0 overflow-hidden bg-[var(--ak-editor-background)]"
 				data-ui="EditorContent"
 				style={{
 					viewTransitionName: "arkini-editor-content",

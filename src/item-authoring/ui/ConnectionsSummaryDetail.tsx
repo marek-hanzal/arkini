@@ -5,7 +5,6 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
 import { ItemConnectionRow } from "~/item-authoring/ui/ItemConnectionRow";
 import { ItemConnectionsEmpty } from "~/item-authoring/ui/ItemConnectionsEmpty";
-import { ItemCollectionMoreCard } from "~/item-authoring/ui/ItemCollectionMoreCard";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -53,9 +52,11 @@ export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.T
 				>
 					<ItemDetailSectionHeader
 						itemUid={item.uid}
+						sectionId="connections"
+						filter={filter}
 						title={translator.textFn(title)}
 					/>
-					<div className="grid grid-rows-[1fr_auto] gap-3">
+					<div className="grid">
 						{connections.length === 0 ? (
 							<EditorRootCard dataUi="EditorItemConnectionsEmptyCard">
 								<ItemConnectionsEmpty filter={filter} />
@@ -76,12 +77,6 @@ export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.T
 								))}
 							</div>
 						)}
-						<ItemCollectionMoreCard
-							itemUid={item.uid}
-							sectionId="connections"
-							filter={filter}
-							hasMore={connections.length > 2}
-						/>
 					</div>
 				</section>
 			))}

@@ -379,7 +379,7 @@ it("opens each overview preview's complete collection on the current item", asyn
 	await act(async () => root.render(<ConnectionsSummaryDetail item={item} />));
 	const links = [
 		...container.querySelectorAll<HTMLAnchorElement>(
-			'[data-ui="EditorItemCollectionMoreCard"] a',
+			'[data-ui="EditorItemDetailSectionHeader"] a',
 		),
 	];
 	expect(links.map((link) => JSON.parse(link.dataset.search ?? "null"))).toEqual([

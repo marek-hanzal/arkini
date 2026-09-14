@@ -7,13 +7,12 @@ import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
-import { ItemCollectionMoreCard } from "~/item-authoring/ui/ItemCollectionMoreCard";
 
 /** Keeps the item overview to two authored lines, with full output semantics. */
 export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
-		<div className="grid grid-rows-[1fr_auto] gap-3">
+		<div className="grid">
 			{item.lines.length === 0 ? (
 				<EditorRootCard dataUi="EditorItemProductionDisabledCard">
 					<DisabledCapabilityDetail
@@ -57,11 +56,6 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 					))}
 				</div>
 			)}
-			<ItemCollectionMoreCard
-				itemUid={item.uid}
-				sectionId="production"
-				hasMore={item.lines.length > 2}
-			/>
 		</div>
 	);
 };

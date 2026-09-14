@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
@@ -26,10 +27,10 @@ export const NotFound = ({ uid }: { readonly uid: string }) => {
 				className="grid min-h-full place-items-center"
 				data-ui="EditorItemNotFound"
 			>
-				<div className="max-w-lg rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-6 text-center">
+				<EditorRootCard className="max-w-lg gap-0 text-center">
 					<h1 className="text-xl font-semibold">Item not found</h1>
 					<p className="mt-2 text-sm text-muted">No saved item owns UID {uid}.</p>
-				</div>
+				</EditorRootCard>
 			</section>
 		</EditorSectionPage>
 	);

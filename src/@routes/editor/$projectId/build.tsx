@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { createFileRoute } from "@tanstack/react-router";
 import { Download, PackageCheck, PackagePlus } from "lucide-react";
 
@@ -74,7 +75,10 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						/>
 					</div>
 					{artifactSummary === undefined ? null : (
-						<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
+						<EditorRootCard
+							className="gap-0"
+							dataUi="EditorBuildOutput"
+						>
 							<h2 className="text-lg font-semibold">Build output</h2>
 							<p className="mt-2 break-all text-sm text-muted">{artifactSummary}</p>
 							<div className="mt-4 flex items-center gap-3">
@@ -117,7 +121,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 									{controller.installError}
 								</p>
 							)}
-						</article>
+						</EditorRootCard>
 					)}
 					{controller.validationVisible && controller.diagnostics.length > 0 ? (
 						<EditorBuildValidation

@@ -160,10 +160,7 @@ export const EditorAssetDeleteSection = ({
 						))}
 					</div>
 				) : (
-					<EditorRootCard
-						className="border-danger/35 bg-danger/10"
-						dataUi="EditorAssetDeleteActionCard"
-					>
+					<EditorRootCard dataUi="EditorAssetDeleteActionCard">
 						<DangerButton
 							data-ui="EditorAssetDeleteOpen"
 							onClick={controller.openFn}

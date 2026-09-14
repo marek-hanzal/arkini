@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
 import { PrimaryButton } from "~/ui/ui/Button";
@@ -42,7 +43,10 @@ export const EditorMcpSettings = ({
 	const localUrl = `http://127.0.0.1:${port}/editor/mcp`;
 	return (
 		<div className="grid gap-4">
-			<div className="ak-list-row grid gap-3 rounded-xl border border-line p-5">
+			<EditorRootCard
+				className="gap-3"
+				dataUi="EditorMcpLocalSettingsCard"
+			>
 				<div>
 					<h2 className="font-semibold">Local server</h2>
 					<p className="mt-1 text-sm text-muted">
@@ -79,8 +83,11 @@ export const EditorMcpSettings = ({
 					label="Local endpoint"
 					url={localUrl}
 				/>
-			</div>
-			<div className="ak-list-row grid gap-3 rounded-xl border border-line p-5">
+			</EditorRootCard>
+			<EditorRootCard
+				className="gap-3"
+				dataUi="EditorMcpRemoteSettingsCard"
+			>
 				<div>
 					<h2 className="font-semibold">ngrok</h2>
 					<p className="mt-1 text-sm text-muted">
@@ -139,7 +146,7 @@ export const EditorMcpSettings = ({
 					}
 					tone={configuredDomain === undefined ? "muted" : "success"}
 				/>
-			</div>
+			</EditorRootCard>
 		</div>
 	);
 };

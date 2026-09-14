@@ -1,3 +1,4 @@
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { Project } from "~/project-authoring/type/Project";
 import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
 import { type ReactNode, useState } from "react";
@@ -38,9 +39,9 @@ export const ItemEstimateRouteGraph = ({
 	});
 	return (
 		<div className="grid gap-3">
-			<article
-				className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-raised p-4"
-				data-ui="EditorItemEstimateHeader"
+			<EditorRootCard
+				className="flex flex-wrap items-center justify-between gap-3"
+				dataUi="EditorItemEstimateHeader"
 			>
 				{header}
 				<SegmentedControl
@@ -60,7 +61,7 @@ export const ItemEstimateRouteGraph = ({
 					size="compact"
 					value={sort}
 				/>
-			</article>
+			</EditorRootCard>
 			<div
 				className="ak-list grid min-h-0 gap-2 overflow-y-auto pr-1"
 				data-ui="EditorItemEstimateBreakdown"

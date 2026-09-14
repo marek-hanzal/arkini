@@ -1,7 +1,15 @@
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { Mx } from "~/translation/ui/Mx";
-import { FilePenLine, NotebookPen, PackageOpen, Plus, SearchX, TriangleAlert } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import {
+	FilePenLine,
+	NotebookPen,
+	PackageOpen,
+	Plus,
+	RefreshCw,
+	SearchX,
+	TriangleAlert,
+} from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
@@ -21,6 +29,7 @@ import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { Button } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -78,13 +87,15 @@ export const List = ({
 		},
 	] as const satisfies ReadonlyArray<EditorSelectOption<selectItemCollectionFn.View>>;
 
+	const [refreshVersion, setRefreshVersion] = useState(0);
 	const settledQuery = useDebouncedSearchQuery(query);
 	const estimates = useItemEstimateIndex(project, {
 		query: "",
+		refreshVersion,
 		view: view === "name" || view === "with-note" ? "fastest" : view,
 	});
 	const estimatesCurrent = estimates.snapshot.config === project.config;
-	// Item editing stays live; estimates belong to the captured entry config.
+	// Item editing stays live; estimates belong to the entry or manually refreshed config.
 	const currentEstimateRows = useMemo(
 		() => (estimatesCurrent ? estimates.rows : []),
 		[
@@ -220,6 +231,21 @@ export const List = ({
 						options={itemViewOptions}
 						value={view}
 					/>
+					<LinkButton
+						className="inline-flex shrink-0 items-center gap-2 px-2 text-sm opacity-60 data-[ui-stale=true]:opacity-100 hover:opacity-100"
+						disabled={estimatesCurrent && estimates.status === "loading"}
+						onClick={() => setRefreshVersion((version) => version + 1)}
+						{...readDataUiFn({
+							dataUi: "EditorItemsRefresh",
+							state: {
+								stale: !estimatesCurrent || estimates.status === "error",
+								loading: estimatesCurrent && estimates.status === "loading",
+							},
+						})}
+					>
+						<RefreshCw className="size-4 in-data-[ui-loading=true]:animate-spin" />
+						{translator.textFn("Refresh")}
+					</LinkButton>
 					<Button
 						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm data-[ui-selected=true]:hover:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:bg-accent/15 data-[ui-selected=true]:active:bg-accent/15"
 						onClick={() => onDraftChangeFn(!draft)}
@@ -261,18 +287,6 @@ export const List = ({
 				) : null}
 				{view === "with-note" && notes.loading ? (
 					<p className="text-sm text-muted">{translator.textFn("Loading notes…")}</p>
-				) : null}
-				{!empty && !estimatesCurrent ? (
-					<p className="text-sm text-muted">
-						{translator.textFn(
-							"Estimates are out of date. Reopen Items to refresh them.",
-						)}
-					</p>
-				) : null}
-				{!empty && estimatesCurrent && estimates.status === "loading" ? (
-					<p className="text-sm text-muted">
-						{translator.textFn("Calculating all item estimates")}
-					</p>
 				) : null}
 				{!empty && estimatesCurrent && estimates.status === "error" ? (
 					<Status

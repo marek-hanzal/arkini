@@ -111,8 +111,6 @@ Build help:
     After a successful build, use **Install** or **Update** to add the Arkpack to this Arkini installation. Use **Save as…** to export the same artifact as a file that can be stored or shared.
 Byte size:
   value: Byte size
-Calculating all item estimates:
-  value: Calculating all item estimates
 Cancel:
   value: Cancel
 Cancel edit:
@@ -335,8 +333,6 @@ Estimate:
   value: Estimate
 Estimate calculation failed:
   value: Estimate calculation failed
-Estimates are out of date. Reopen Items to refresh them.:
-  value: Estimates are out of date. Reopen Items to refresh them.
 Every:
   value: Every
 Every Enable rule must pass, and any matching Disable rule prevents activation.:
@@ -880,6 +876,8 @@ Ratio from 0.25 to 1. The default 1 fills the tile at 100%.:
   value: Ratio from 0.25 to 1. The default 1 fills the tile at 100%.
 Reading image…:
   value: Reading image…
+Refresh:
+  value: Refresh
 Remains:
   value: Remains
   dynamic: true

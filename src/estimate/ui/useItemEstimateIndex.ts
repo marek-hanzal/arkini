@@ -40,12 +40,14 @@ export const useItemEstimateIndex = (
 	{
 		query,
 		view,
+		refreshVersion,
 	}: {
+		readonly refreshVersion?: number;
 		readonly query: string;
 		readonly view: ItemEstimateViewSchema.Type;
 	},
 ): ItemEstimateIndexState => {
-	const snapshot = useItemEstimateEntrySnapshot(project);
+	const snapshot = useItemEstimateEntrySnapshot(project, refreshVersion);
 	const [state, requestIndexFn] = useAtom(ItemEstimateCacheAtom);
 
 	useEffect(() => {

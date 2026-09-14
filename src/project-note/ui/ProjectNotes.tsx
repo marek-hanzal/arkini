@@ -66,7 +66,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 			data-ui="EditorNotes"
 		>
 			<section
-				className="relative grid min-h-0 min-w-0 shrink-0 content-start gap-2 lg:overflow-y-auto lg:overscroll-contain"
+				className="relative grid min-h-0 min-w-0 shrink-0 content-start gap-8 lg:overflow-y-auto lg:overscroll-contain"
 				data-ui="EditorNotesList"
 			>
 				{controller.loading ? (
@@ -118,7 +118,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 									<MotionEditorRootCard
 										key={note.noteId}
 										layout="position"
-										className="min-w-0 gap-4 border-b border-line/70 pb-2 last:border-b-0 last:pb-0"
+										className="min-w-0 gap-4 border-b border-line/70 pb-8 last:border-b-0 last:pb-0"
 										dataUi="EditorNote"
 										{...noteMotion}
 									>

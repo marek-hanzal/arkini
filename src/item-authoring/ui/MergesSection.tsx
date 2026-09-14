@@ -8,7 +8,6 @@ import { useStore } from "@tanstack/react-form";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
-import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { MergeField } from "~/item-authoring/ui/MergeField";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -45,18 +44,18 @@ const MergeFields = ({
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			{merges.length === 0 ? (
-				<EditorFormCard>
-					<EditorCapabilityStatus
-						actionLabel={translator.textFn("Enable")}
-						icon={Combine}
-						onEnableFn={() =>
-							onChangeFn([
-								structuredClone(MergeDraftDefault),
-							])
-						}
-						title={translator.textFn("Item merges empty title")}
-					/>
-				</EditorFormCard>
+				<EditorCapabilityStatus
+					actionLabel={translator.textFn("Enable")}
+					icon={Combine}
+					onEnableFn={() =>
+						onChangeFn([
+							structuredClone(MergeDraftDefault),
+						])
+					}
+					title={translator.textFn("No merges for this item")}
+					summary={translator.textFn("Item merges empty title")}
+					size="large"
+				/>
 			) : (
 				<>
 					<EditorCollectionSelector

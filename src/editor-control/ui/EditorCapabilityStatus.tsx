@@ -10,6 +10,8 @@ interface EditorCapabilityStatusProps {
 	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly onEnableFn: () => void;
+	readonly size?: "normal" | "large";
+	readonly summary?: string;
 	readonly title: string;
 }
 
@@ -20,12 +22,16 @@ export const EditorCapabilityStatus = ({
 	description,
 	icon,
 	onEnableFn,
+	size = "normal",
+	summary,
 	title,
 }: EditorCapabilityStatusProps) => (
 	<Status
 		action={<PrimaryButton onClick={onEnableFn}>{actionLabel}</PrimaryButton>}
 		dataUi={dataUi}
 		icon={icon}
+		size={size}
+		description={summary}
 		title={
 			<span className="inline-flex items-center gap-1.5">
 				{title}

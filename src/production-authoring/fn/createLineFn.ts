@@ -7,10 +7,10 @@ export const createLineFn = (
 	title: string,
 	description: string,
 ): LineSchema.Type => {
-	const baseId = readEditorIdFromTitleFn(title) || "new-production-line";
+	const baseId = readEditorIdFromTitleFn(title);
 	const ids = new Set(lines.map((line) => line.id));
 	let id = baseId;
-	if (ids.has(id)) {
+	if (baseId !== "" && ids.has(id)) {
 		let suffix = 2;
 		while (ids.has(`${baseId}-${suffix}`)) suffix += 1;
 		id = `${baseId}-${suffix}`;

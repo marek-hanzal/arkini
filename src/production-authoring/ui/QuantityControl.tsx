@@ -5,8 +5,11 @@ import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 interface QuantityControlProps {
 	readonly maximumError?: string;
 	readonly maximumDescription?: ReactNode;
+	readonly maximumLabel?: string;
 	readonly minimumError?: string;
 	readonly minimumDescription?: ReactNode;
+	readonly minimumLabel?: string;
+	readonly minimumValue?: number;
 	readonly onChangeFn: (quantity: QuantitySchema.Type) => void;
 	readonly value: QuantitySchema.Type;
 }
@@ -15,8 +18,11 @@ interface QuantityControlProps {
 export const QuantityFields = ({
 	maximumError,
 	maximumDescription,
+	maximumLabel = "Maximum",
 	minimumError,
 	minimumDescription,
+	minimumLabel = "Minimum",
+	minimumValue = 1,
 	onChangeFn,
 	value,
 }: QuantityControlProps) => (
@@ -24,9 +30,9 @@ export const QuantityFields = ({
 		<EditorNumberControl
 			description={minimumDescription}
 			error={minimumError}
-			label="Minimum"
+			label={minimumLabel}
 			value={value.min}
-			min={1}
+			min={minimumValue}
 			onChangeFn={(min) =>
 				onChangeFn({
 					...value,
@@ -38,12 +44,13 @@ export const QuantityFields = ({
 		<EditorNumberControl
 			description={maximumDescription}
 			error={maximumError}
-			label="Maximum"
+			label={maximumLabel}
 			value={value.max}
-			min={value.min}
+			min={minimumValue}
 			onChangeFn={(max) =>
 				onChangeFn({
 					...value,
+					min: max < value.min ? max : value.min,
 					max,
 				})
 			}

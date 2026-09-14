@@ -1,6 +1,7 @@
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
+import { readDraftRollDropsFn } from "~/production-authoring/fn/readDraftRollDropsFn";
 
 /** Indexes authored references only; it never expands the related items' own capabilities. */
 export const readCapabilityRelatedTermsFn = (
@@ -29,8 +30,7 @@ export const readCapabilityRelatedTermsFn = (
 	}
 	for (const set of capability.output?.set ?? []) {
 		for (const roll of set.roll) {
-			const drops =
-				roll.type === "weight" ? roll.drop.flatMap((entry) => entry.drop) : roll.drop;
+			const drops = readDraftRollDropsFn(roll);
 			for (const drop of drops) {
 				ids.add(drop.itemId);
 				for (const rule of drop.rules)

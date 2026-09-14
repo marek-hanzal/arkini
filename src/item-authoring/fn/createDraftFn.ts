@@ -14,7 +14,7 @@ export const createDraftFn = ({
 	resourceId,
 	uid,
 }: CreateDraftFnProps): ItemSchema.Type => {
-	const itemId = requestedItemId ?? "item:new-item";
+	const itemId = requestedItemId ?? "";
 	return {
 		uid,
 		id: itemId,

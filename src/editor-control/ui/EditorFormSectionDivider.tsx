@@ -5,6 +5,7 @@ import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 interface EditorFormSectionDividerProps {
 	readonly action?: ReactNode;
 	readonly description?: ReactNode;
+	readonly required?: boolean;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";
 }
@@ -13,6 +14,7 @@ interface EditorFormSectionDividerProps {
 export const EditorFormSectionDivider = ({
 	action,
 	description,
+	required = false,
 	title,
 	variant = "primary",
 }: EditorFormSectionDividerProps) => (
@@ -27,6 +29,7 @@ export const EditorFormSectionDivider = ({
 			) : (
 				<h3 className="text-lg font-semibold">{title}</h3>
 			)}
+			{required ? <span className="size-1.5 shrink-0 rounded-full bg-accent" /> : null}
 			{description === undefined ? null : <EditorInfoTooltip content={description} />}
 		</div>
 		<span className="min-w-0 flex-1 border-t border-line/70" />

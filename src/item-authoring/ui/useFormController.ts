@@ -1,6 +1,5 @@
 import { copyItemSectionFn } from "~/item-authoring/fn/copyItemSectionFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
-import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
@@ -72,108 +71,6 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 				],
 });
 
-const FormPathLabelBySegment = {
-	action: "Source action",
-	adjustMs: "Runtime adjustment",
-	amount: "Amount",
-	asset: "Artwork",
-	capacity: "Buffer",
-	chance: "Chance",
-	units: "Units",
-	cost: "Cost",
-	default: "Default",
-	description: "Description",
-	distance: "Board distance",
-	durationMs: "Lifetime",
-	expiryMode: "Expiry mode",
-	intervalMs: "Interval",
-	control: "Player controls",
-	onExpire: "Expiry output",
-	effect: "Target effect",
-	enable: "Enabled",
-	from: "Paid by",
-	hint: "Hint",
-	id: "ID",
-	max: "Maximum",
-	maxCount: "Maximum global count",
-	maxQueueSize: "Queue capacity",
-	maxStackSize: "Maximum stack size",
-	min: "Minimum",
-	mode: "Material mode",
-	multiplier: "Runtime multiplier",
-	output: "Output",
-	placement: "Board placement",
-	quantity: "Quantity",
-	result: "Replacement item",
-	runtimeMs: "Runtime",
-	scale: "Base tile scale",
-	selector: "Selected item",
-	show: "Visible",
-	space: "Space",
-	target: "Target item",
-	title: "Title",
-	type: "Type",
-	weight: "Weight",
-} as const satisfies Partial<Record<string, string>>;
-
-const FormIndexedPathLabelBySegment = {
-	input: "Input",
-	lines: "Production line",
-	merge: "Merge",
-	roll: "Roll",
-	rules: "Rule",
-	set: "Output set",
-	when: "Condition",
-} as const satisfies Partial<Record<string, string>>;
-
-const readFormValidationLocationFn = (path: ReadonlyArray<PropertyKey>) => {
-	const labels: string[] = [];
-	const dropCollectionCount = path.filter(
-		(segment, index) => segment === "drop" && typeof path[index + 1] === "number",
-	).length;
-	let dropCollectionIndex = 0;
-	for (let index = 0; index < path.length; index += 1) {
-		const segment = path[index];
-		if (index === 0 && segment === "action") {
-			labels.push("Action");
-			continue;
-		}
-		const nestedIndex = path[index + 1];
-		const indexedLabel =
-			typeof segment === "string" && typeof nestedIndex === "number"
-				? FormIndexedPathLabelBySegment[
-						segment as keyof typeof FormIndexedPathLabelBySegment
-					]
-				: undefined;
-		if (indexedLabel !== undefined && typeof nestedIndex === "number") {
-			labels.push(`${indexedLabel} ${nestedIndex + 1}`);
-			index += 1;
-			continue;
-		}
-		if (segment === "drop" && typeof nestedIndex === "number") {
-			labels.push(
-				dropCollectionCount > 1 && dropCollectionIndex === 0
-					? `Weighted candidate ${nestedIndex + 1}`
-					: `Drop ${nestedIndex + 1}`,
-			);
-			dropCollectionIndex += 1;
-			index += 1;
-			continue;
-		}
-		if (segment === "query") continue;
-		if (segment === "itemId") {
-			if (path[index - 1] === "selector") continue;
-			if (path.includes("drop")) labels.push("Dropped item");
-			else if (labels.at(-1) !== "Target item") labels.push("Item");
-			continue;
-		}
-		if (typeof segment !== "string") continue;
-		const label = FormPathLabelBySegment[segment as keyof typeof FormPathLabelBySegment];
-		if (label !== undefined && labels.at(-1) !== label) labels.push(label);
-	}
-	return labels.length === 0 ? "Item" : labels.join(" → ");
-};
-
 const readFormValidationMessageFn = (issue: z.core.$ZodIssue) =>
 	issue.path.at(-1) === "itemId" && issue.code === "too_small"
 		? "Select an item."
@@ -188,7 +85,6 @@ export const useFormController = ({
 	onSavedFn,
 }: useFormController.Props) => {
 	const project = useEditorProject();
-	const translator = useTranslator();
 	const formValues = useMemo<FormValues>(
 		() => readFormValuesFn(initialItem),
 		[
@@ -282,18 +178,14 @@ export const useFormController = ({
 	}, [
 		form,
 	]);
-	const newLineTitle = translator.textFn("New production line");
-	const newLineDescription = translator.textFn("Describe what this line consumes and produces.");
 	const enableProductionFn = useCallback(() => {
 		if ((form.state.values.lines ?? []).length > 0) return;
 		form.setFieldValue("action", undefined);
 		form.setFieldValue("lines", [
-			createLineFn([], newLineTitle, newLineDescription),
+			createLineFn([], "", ""),
 		]);
 	}, [
 		form,
-		newLineTitle,
-		newLineDescription,
 	]);
 	const initializedCapability = useRef(false);
 	useLayoutEffect(() => {
@@ -415,12 +307,6 @@ export const useFormController = ({
 		saveFn: saveDraftFn,
 	});
 	const persistenceError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult));
-	const firstValidationIssue = validationIssues[0];
-	const error =
-		persistenceError ??
-		(firstValidationIssue === undefined
-			? undefined
-			: `${readFormValidationLocationFn(firstValidationIssue.path)}: ${firstValidationIssue.message}`);
 	return useMemo(
 		() => ({
 			canonicalItem: initialItem,
@@ -429,7 +315,7 @@ export const useFormController = ({
 			enableClockFn,
 			enableActionFn,
 			enableProductionFn,
-			error,
+			error: persistenceError,
 			isDirty: dirty,
 			isSaving: submitting,
 			form,
@@ -446,7 +332,7 @@ export const useFormController = ({
 			enableActionFn,
 			enableProductionFn,
 			dirty,
-			error,
+			persistenceError,
 			form,
 			initialItem,
 			itemId,

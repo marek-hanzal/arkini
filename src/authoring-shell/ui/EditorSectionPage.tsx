@@ -44,7 +44,7 @@ export const EditorSectionPage = ({
 		</div>
 		<div
 			className={twMerge(
-				"min-w-0 data-[ui-fill-content=true]:flex data-[ui-fill-content=true]:flex-1 data-[ui-fill-content=true]:flex-col data-[ui-content-mode=scroll]:p-3 data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:overflow-hidden",
+				"min-w-0 data-[ui-fill-content=true]:flex data-[ui-fill-content=true]:flex-1 data-[ui-fill-content=true]:flex-col data-[ui-content-mode=scroll]:p-3 data-[ui-content-mode=scroll]:pb-[50dvh] data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:overflow-hidden",
 				contentClassName,
 			)}
 			{...readDataUiFn({

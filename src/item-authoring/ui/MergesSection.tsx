@@ -12,6 +12,7 @@ import { MergeField } from "~/item-authoring/ui/MergeField";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { useFormValidationFocusIndex } from "~/item-authoring/ui/useFormValidationIssues";
 
 const MergeFields = ({
 	currentItemUid,
@@ -120,11 +121,10 @@ const MergeFields = ({
 };
 
 export const MergesSection = () => {
-	const { canonicalItem, form, mergeIndex, project, validationIssues } = useFormSession();
+	const { canonicalItem, form, mergeIndex, project } = useFormSession();
 	const sourceUnitsEnabled = useStore(form.store, (state) => state.values.units !== undefined);
-	const invalidMergeIndex = validationIssues.find(
-		(issue) => issue.path[0] === "merge" && typeof issue.path[1] === "number",
-	)?.path[1] as number | undefined;
+	const merges = useStore(form.store, (state) => state.values.merge);
+	const invalidMergeIndex = useFormValidationFocusIndex(merges);
 	return (
 		<form.Subscribe selector={(state) => state.values.merge}>
 			{(merge) => (

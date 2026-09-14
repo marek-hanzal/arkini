@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Required human-readable title for a configuration entity.
  */
-export const TitleSchema = z.string().trim().min(1).meta({
+export const TitleSchema = z.string().trim().min(1, "Title is required.").meta({
 	id: "TitleSchema",
 	description: "A required non-empty configuration title.",
 });

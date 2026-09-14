@@ -5,6 +5,7 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 interface EditorFormSectionProps extends PropsWithChildren {
 	readonly action?: ReactNode;
 	readonly description?: ReactNode;
+	readonly required?: boolean;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";
 }
@@ -14,6 +15,7 @@ export const EditorFormSection = ({
 	action,
 	children,
 	description,
+	required = false,
 	title,
 	variant,
 }: EditorFormSectionProps) => (
@@ -24,6 +26,7 @@ export const EditorFormSection = ({
 		<EditorFormSectionDivider
 			action={action}
 			description={description}
+			required={required}
 			title={title}
 			variant={variant}
 		/>

@@ -10,8 +10,12 @@ import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useStore } from "@tanstack/react-form";
-import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
+import {
+	useFormValidationFocusIndex,
+	useFormValidationIssues,
+} from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationIssuesFn } from "~/editor-control/fn/readEditorFormValidationIssuesFn";
+import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
 import { Mx } from "~/translation/ui/Mx";
 
 interface InputsControlProps {
@@ -39,7 +43,7 @@ export const InputsControl = ({
 			index,
 		]),
 	);
-	const invalidInputIndex = issuesByInput.findIndex((issues) => issues.length > 0);
+	const invalidInputIndex = useFormValidationFocusIndex(value as object);
 	const replaceAtFn = (index: number, input: LineInputSchema.Type) => {
 		const next = value.map((current, currentIndex) =>
 			currentIndex === index ? input : current,
@@ -64,6 +68,12 @@ export const InputsControl = ({
 				initialSelectedIndex={inputIndex}
 				key={inputIndex}
 				count={value.length}
+				error={readRequiredEditorCollectionErrorFn(
+					validationIssues,
+					value.length,
+					1,
+					"Add at least one input.",
+				)}
 				itemLabelFn={(index) => {
 					const input = value[index];
 					if (input.type === "materials")
@@ -130,18 +140,12 @@ export const InputsControl = ({
 						structuredClone(DraftDefaults.inputs.simple),
 					])
 				}
-				onRemoveFn={
-					!emptyAllowed && value.length === 1
-						? undefined
-						: (index) =>
-								onChangeFn(
-									value.filter(
-										(_current, currentIndex) => currentIndex !== index,
-									),
-								)
+				onRemoveFn={(index) =>
+					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}
+				removeDisabled={!emptyAllowed && value.length === 1}
 				removeLabel="Remove input"
-				selectedIndex={invalidInputIndex < 0 ? undefined : invalidInputIndex}
+				selectedIndex={invalidInputIndex}
 			>
 				{(index) => (
 					<InputControl

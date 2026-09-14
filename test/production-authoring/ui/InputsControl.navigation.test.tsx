@@ -23,6 +23,7 @@ vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
 	EditorItemThumbnail: () => null,
 }));
 vi.mock("~/item-authoring/ui/useFormValidationIssues", () => ({
+	useFormValidationFocusIndex: () => undefined,
 	useFormValidationIssues: () => [],
 }));
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -148,3 +149,44 @@ it.each([
 		}
 	},
 );
+
+it("keeps the required last-input remove control visible and disabled", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const value: InputSchema.Type[] = [
+		{
+			type: "simple",
+		},
+	];
+	try {
+		await act(async () =>
+			root.render(
+				<InputsControl
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+		const remove = container.querySelector<HTMLButtonElement>('button[title="Remove input"]');
+		expect(remove).not.toBeNull();
+		expect(remove?.disabled).toBe(true);
+
+		await act(async () =>
+			root.render(
+				<InputsControl
+					emptyAllowed
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+		expect(remove?.disabled).toBe(false);
+		await act(async () => remove?.click());
+		expect(onChangeFn).toHaveBeenCalledWith([]);
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});

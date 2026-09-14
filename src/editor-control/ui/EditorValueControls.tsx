@@ -24,6 +24,7 @@ interface EditorNumericControlProps extends EditorNamedValueControlProps {
 	readonly clearLabel?: string;
 	readonly children?: ReactNode;
 	readonly disabled?: boolean;
+	readonly labelVisible?: boolean;
 	readonly max?: number;
 	readonly min?: number;
 	readonly onChangeFn: (value: number) => void;
@@ -38,6 +39,7 @@ const EditorNumericControl = ({
 	disabled = false,
 	error,
 	label,
+	labelVisible = true,
 	max,
 	min,
 	name,
@@ -51,6 +53,7 @@ const EditorNumericControl = ({
 		description={description}
 		error={error}
 		label={label}
+		labelVisible={labelVisible}
 		required={required}
 	>
 		<div className="grid min-w-0 gap-1.5">
@@ -185,6 +188,7 @@ export const EditorNumberControl = ({
 	...props
 }: {
 	readonly disabled?: boolean;
+	readonly labelVisible?: boolean;
 	readonly max?: number;
 	readonly min?: number;
 	readonly onChangeFn: (value: number) => void;
@@ -235,7 +239,7 @@ export const EditorChoiceControl = <Value extends string>({
 		readonly label: string;
 		readonly value: Value;
 	}>;
-	readonly value: Value;
+	readonly value: Value | undefined;
 } & EditorValueControlProps) => (
 	<EditorValueField
 		as="fieldset"

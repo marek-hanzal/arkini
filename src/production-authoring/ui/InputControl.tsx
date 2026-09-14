@@ -176,48 +176,57 @@ const MaterialInputControl = ({
 	readonly input: MaterialInput;
 	readonly issues: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: MaterialInput) => void;
-}) => (
-	<div className="grid gap-4">
-		<SelectorControl
-			error={readEditorFormValidationErrorFn(issues, "selector")}
-			value={input.selector}
-			onChangeFn={(selector) =>
-				onChangeFn({
-					...input,
-					selector,
-				})
-			}
-		/>
-		<div className="grid gap-3 sm:grid-cols-3">
-			<QuantityFields
-				minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
-				maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
-				minimumDescription={<Mx label="Material minimum quantity help" />}
-				maximumDescription={<Mx label="Material maximum quantity help" />}
-				value={input.quantity}
-				onChangeFn={(quantity) =>
+}) => {
+	const translator = useTranslator();
+	return (
+		<div className="grid gap-3">
+			<EditorFormSectionDivider
+				description={<Mx label="Material required item help" />}
+				title={translator.textFn("Required item")}
+				variant="secondary"
+			/>
+			<SelectorControl
+				error={readEditorFormValidationErrorFn(issues, "selector")}
+				labelVisible={false}
+				value={input.selector}
+				onChangeFn={(selector) =>
 					onChangeFn({
 						...input,
-						quantity,
+						selector,
 					})
 				}
 			/>
-			<EditorNumberControl
-				error={readEditorFormValidationErrorFn(issues, "capacity")}
-				description={<Mx label="Material buffer help" />}
-				label="Buffer"
-				value={input.capacity}
-				min={0}
-				onChangeFn={(capacity) =>
-					onChangeFn({
-						...input,
-						capacity,
-					})
-				}
-			/>
+			<div className="grid gap-3 sm:grid-cols-3">
+				<QuantityFields
+					minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
+					maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
+					minimumDescription={<Mx label="Material minimum quantity help" />}
+					maximumDescription={<Mx label="Material maximum quantity help" />}
+					value={input.quantity}
+					onChangeFn={(quantity) =>
+						onChangeFn({
+							...input,
+							quantity,
+						})
+					}
+				/>
+				<EditorNumberControl
+					error={readEditorFormValidationErrorFn(issues, "capacity")}
+					description={<Mx label="Material buffer help" />}
+					label="Buffer"
+					value={input.capacity}
+					min={0}
+					onChangeFn={(capacity) =>
+						onChangeFn({
+							...input,
+							capacity,
+						})
+					}
+				/>
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 const UnitsTargetUnitCostControl = ({
 	input,

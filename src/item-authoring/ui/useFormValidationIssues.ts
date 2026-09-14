@@ -40,3 +40,30 @@ export const useFormValidationIssues = (value: object | undefined) => {
 		values,
 	]);
 };
+
+/** Selects a collection item only when it contains the form's current validation target. */
+export const useFormValidationFocusIndex = (
+	value: object | undefined,
+	...collectionPath: ReadonlyArray<PropertyKey>
+) => {
+	const { form, validationIssues } = useFormSession();
+	const values = useStore(form.store, (state) => state.values);
+	return useMemo(() => {
+		if (value === undefined) return undefined;
+		const valuePath = readValuePathFn(values, value);
+		const issue = validationIssues[0];
+		if (valuePath === undefined || issue === undefined) return undefined;
+		const prefix = [
+			...valuePath,
+			...collectionPath,
+		];
+		if (!prefix.every((segment, index) => issue.path[index] === segment)) return undefined;
+		const index = issue.path[prefix.length];
+		return typeof index === "number" ? index : undefined;
+	}, [
+		collectionPath,
+		validationIssues,
+		value,
+		values,
+	]);
+};

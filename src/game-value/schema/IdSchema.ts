@@ -7,7 +7,7 @@ import { z } from "zod";
  * uniqueness and lifecycle rules are enforced by the relevant compiler or
  * runtime boundary, not by parallel domain-specific ID scalar schemas.
  */
-export const IdSchema = z.string().min(1).meta({
+export const IdSchema = z.string().min(1, "ID is required.").meta({
 	id: "IdSchema",
 	description: "A non-empty exact identity used across Arkini.",
 });

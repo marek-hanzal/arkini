@@ -88,6 +88,7 @@ interface EditorNumberFieldProps {
 	readonly description?: ReactNode;
 	readonly disabled?: boolean;
 	readonly label: string;
+	readonly labelVisible?: boolean;
 	readonly max?: number;
 	readonly min?: number;
 	readonly optional?: boolean;
@@ -98,6 +99,7 @@ const EditorNumberField = ({
 	description,
 	disabled = false,
 	label,
+	labelVisible = true,
 	max,
 	min,
 	optional = false,
@@ -112,6 +114,7 @@ const EditorNumberField = ({
 			disabled={disabled}
 			error={error}
 			label={label}
+			labelVisible={labelVisible}
 			max={max}
 			min={min}
 			name={field.name}

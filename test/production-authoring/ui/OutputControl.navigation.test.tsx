@@ -19,6 +19,7 @@ vi.mock("~/authoring-form/ui/EditorItemThumbnail", () => ({
 	EditorItemSearchThumbnail: () => null,
 }));
 vi.mock("~/item-authoring/ui/useFormValidationIssues", () => ({
+	useFormValidationFocusIndex: () => undefined,
 	useFormValidationIssues: () => [],
 }));
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -85,12 +86,156 @@ it("keeps empty output-set navigation visible and creates the first set through 
 			set: [
 				expect.objectContaining({
 					weight: 1,
-					roll: [
-						expect.objectContaining({
-							type: "guaranteed",
-						}),
-					],
+					roll: [],
 				}),
+			],
+		});
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
+
+it("reveals roll type and drops only after each deliberate authoring step", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const renderOutputFn = async (value: OutputSchema.Type) =>
+		act(async () =>
+			root.render(
+				<OutputControl
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+	try {
+		let value = {
+			set: [
+				{
+					weight: 1,
+					roll: [],
+				},
+			],
+		} as unknown as OutputSchema.Type;
+		await renderOutputFn(value);
+		const addRoll = container.querySelector<HTMLButtonElement>('button[title="Add roll"]');
+		const removeRoll = container.querySelector<HTMLButtonElement>(
+			'button[title="Remove roll"]',
+		);
+		expect(addRoll?.disabled).toBe(false);
+		expect(removeRoll?.disabled).toBe(true);
+		expect(container.textContent).not.toContain("Roll type");
+
+		await act(async () => addRoll?.click());
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		await renderOutputFn(value);
+		expect(container.textContent).toContain("Roll type");
+		expect(
+			container.querySelector(
+				'[data-ui="EditorChoiceControlOption"][data-ui-selected="true"]',
+			),
+		).toBeNull();
+		expect(container.querySelector('button[title="Add drop"]')).toBeNull();
+
+		const guaranteed = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent?.includes("Guaranteed") === true,
+		);
+		await act(async () => guaranteed?.click());
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		await renderOutputFn(value);
+		const addDrop = container.querySelector<HTMLButtonElement>('button[title="Add drop"]');
+		const removeDrop = container.querySelector<HTMLButtonElement>(
+			'button[title="Remove drop"]',
+		);
+		expect(addDrop?.disabled).toBe(false);
+		expect(removeDrop?.disabled).toBe(true);
+		expect(container.querySelector('[data-label="Dropped item"]')).toBeNull();
+
+		await act(async () => addDrop?.click());
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		await renderOutputFn(value);
+		expect(container.querySelector('[data-label="Dropped item"]')).not.toBeNull();
+
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('button[title="Remove drop"]')?.click(),
+		);
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		expect(value.set[0]).toMatchObject({
+			weight: 1,
+			roll: [
+				{
+					type: "guaranteed",
+					drop: [],
+				},
+			],
+		});
+		await renderOutputFn(value);
+
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('button[title="Remove roll"]')?.click(),
+		);
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		expect(value).toMatchObject({
+			set: [
+				{
+					weight: 1,
+					roll: [],
+				},
+			],
+		});
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
+
+it("keeps a weighted roll when its last candidate is removed", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const renderOutputFn = async (value: OutputSchema.Type) =>
+		act(async () =>
+			root.render(
+				<OutputControl
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+	try {
+		let value = {
+			set: [
+				{
+					weight: 1,
+					roll: [
+						{},
+					],
+				},
+			],
+		} as unknown as OutputSchema.Type;
+		await renderOutputFn(value);
+		const weighted = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent?.includes("Weighted") === true,
+		);
+		await act(async () => weighted?.click());
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		await renderOutputFn(value);
+
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>('button[title="Remove weighted candidate"]')
+				?.click(),
+		);
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		expect(value.set[0]).toMatchObject({
+			roll: [
+				{
+					type: "weight",
+					drop: [],
+				},
 			],
 		});
 	} finally {

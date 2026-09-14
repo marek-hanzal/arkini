@@ -78,6 +78,7 @@ describe("Form", () => {
 			container.querySelector("output")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
+			id: "",
 			maxQueueSize: 1,
 			lines: [],
 

@@ -332,8 +332,6 @@ Depletion output help:
 Depth limit:
   value: Depth limit
   dynamic: true
-Describe what this line consumes and produces.:
-  value: Describe what this line consumes and produces.
 Description:
   value: Description
 Details:
@@ -821,6 +819,11 @@ Material minimum quantity help:
     Smallest matching material quantity required before this line may start.
 
     Reaching **Minimum** makes the input ready; the run may then take up to **Maximum**.
+Material required item help:
+  value: |
+    Selects the item identity that must be delivered into this production input.
+
+    Matching items accumulate here until **Minimum** is available. One run then takes up to **Maximum**; **Material mode** decides whether those items are consumed or reserved and returned afterward.
 Materials:
   value: Materials
 Materials input type help:
@@ -889,8 +892,6 @@ Near:
   dynamic: true
 New item:
   value: New item
-New production line:
-  value: New production line
 Next pulse:
   value: Next pulse
 No About avatars configured.:
@@ -1240,6 +1241,8 @@ Required:
 Required by:
   value: Required by
   dynamic: true
+Required item:
+  value: Required item
 Required units:
   value: Required units
 Requirements:

@@ -10,6 +10,7 @@ interface EditorCollectionSelectorProps {
 	readonly children: (activeIndex: number) => ReactNode;
 	readonly count: number;
 	readonly dataUi?: string;
+	readonly error?: string;
 	readonly itemLabelFn: (index: number) => string;
 	readonly itemMetaFn?: (index: number) => string | undefined;
 	readonly itemRelatedSearchTermsFn?: (index: number) => ReadonlyArray<string>;
@@ -20,6 +21,7 @@ interface EditorCollectionSelectorProps {
 	readonly navigationHeader?: ReactNode;
 	readonly onAddFn?: () => void;
 	readonly onRemoveFn?: (activeIndex: number) => void;
+	readonly removeDisabled?: boolean;
 	readonly removeLabel?: string;
 	readonly renderItemContentFn?: (index: number, label: string) => ReactNode;
 	readonly renderItemPreviewFn?: (index: number) => ReactNode;
@@ -33,6 +35,7 @@ export const EditorCollectionSelector = ({
 	children,
 	count,
 	dataUi = "EditorCollectionSelector",
+	error,
 	itemLabelFn,
 	itemMetaFn,
 	itemSearchTermsFn,
@@ -43,6 +46,7 @@ export const EditorCollectionSelector = ({
 	navigationHeader,
 	onAddFn,
 	onRemoveFn,
+	removeDisabled = false,
 	removeLabel = "Remove item",
 	renderItemContentFn,
 	renderItemPreviewFn,
@@ -61,6 +65,7 @@ export const EditorCollectionSelector = ({
 						disabled={activeIndex === undefined}
 						displaySelectedLabel
 						emptyLabel={`No ${label.toLocaleLowerCase()} match this search.`}
+						error={error}
 						label={label}
 						labelVisible={false}
 						optionContentLayout={itemMetaFn === undefined ? "stacked" : "inline"}
@@ -126,10 +131,10 @@ export const EditorCollectionSelector = ({
 					)}
 					{onRemoveFn === undefined ? null : (
 						<EditorIconButton
-							disabled={activeIndex === undefined}
+							disabled={removeDisabled || activeIndex === undefined}
 							title={removeLabel}
 							onClick={() => {
-								if (activeIndex === undefined) return;
+								if (removeDisabled || activeIndex === undefined) return;
 								onRemoveFn(activeIndex);
 								selectIndexFn(Math.max(0, activeIndex - 1));
 							}}

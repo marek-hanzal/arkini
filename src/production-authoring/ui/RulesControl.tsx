@@ -17,15 +17,38 @@ import {
 	EditorSecondsControl,
 	EditorTextControl,
 } from "~/editor-control/ui/EditorValueControls";
-import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
+import {
+	useFormValidationFocusIndex,
+	useFormValidationIssues,
+} from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
+import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
 import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ReactNode } from "react";
+import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 
 type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
 type RuleTarget = "action" | "drop" | "line";
+type DraftWhen =
+	| WhenSchema.Type
+	| {
+			readonly query: QuerySchema.Type;
+			readonly type?: undefined;
+	  };
+type RuleWithDraftConditions<Value> = Value extends RuleValue
+	? Omit<Value, "when"> & {
+			readonly when: DraftWhen[];
+		}
+	: never;
+type DraftRule =
+	| RuleWithDraftConditions<RuleValue>
+	| {
+			readonly hint?: string;
+			readonly type?: undefined;
+			readonly when: DraftWhen[];
+	  };
 
 const queryScopeOptions = [
 	{
@@ -124,11 +147,12 @@ const WhenControl = ({
 	onChangeFn,
 	value,
 }: {
-	readonly onChangeFn: (when: WhenSchema.Type) => void;
-	readonly value: WhenSchema.Type;
+	readonly onChangeFn: (when: DraftWhen) => void;
+	readonly value: DraftWhen;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
 	const translator = useTranslator();
+	const selectedValue = value.type === undefined ? undefined : value;
 	return (
 		<div className="grid min-w-0 gap-3">
 			<EditorChoiceControl
@@ -174,39 +198,38 @@ const WhenControl = ({
 					)
 				}
 			/>
-			<div className="flex min-w-0 flex-wrap items-end gap-3">
-				<div className="min-w-64 flex-1">
+			{selectedValue === undefined ? null : (
+				<>
 					<SelectorControl
 						error={readEditorFormValidationErrorFn(
 							validationIssues,
 							"query",
 							"selector",
 						)}
-						value={value.query.selector}
+						labelVisible={false}
+						value={selectedValue.query.selector}
 						onChangeFn={(selector) =>
 							onChangeFn({
-								...value,
+								...selectedValue,
 								query: {
-									...value.query,
+									...selectedValue.query,
 									selector,
 								},
 							})
 						}
 					/>
-				</div>
-				{match(value)
-					.with(
-						{
-							type: "exists",
-						},
-						() => null,
-					)
-					.with(
-						{
-							type: "count",
-						},
-						(when) => (
-							<div className="min-w-64">
+					{match(selectedValue)
+						.with(
+							{
+								type: "exists",
+							},
+							() => null,
+						)
+						.with(
+							{
+								type: "count",
+							},
+							(when) => (
 								<EditorNumberControl
 									error={readEditorFormValidationErrorFn(
 										validationIssues,
@@ -222,73 +245,70 @@ const WhenControl = ({
 										})
 									}
 								/>
-							</div>
-						),
-					)
-					.with(
-						{
-							type: "range",
-						},
-						(when) => (
-							<div className="grid min-w-96 grid-cols-2 gap-3">
-								<EditorNumberControl
-									error={readEditorFormValidationErrorFn(validationIssues, "min")}
-									label="Minimum count"
-									value={when.min}
-									min={0}
-									onChangeFn={(min) =>
+							),
+						)
+						.with(
+							{
+								type: "range",
+							},
+							(when) => (
+								<QuantityFields
+									minimumError={readEditorFormValidationErrorFn(
+										validationIssues,
+										"min",
+									)}
+									maximumError={readEditorFormValidationErrorFn(
+										validationIssues,
+										"max",
+									)}
+									minimumLabel="Minimum count"
+									maximumLabel="Maximum count"
+									minimumValue={0}
+									value={when}
+									onChangeFn={(range) =>
 										onChangeFn({
 											...when,
-											min,
-											max: min > when.max ? min : when.max,
+											...range,
 										})
 									}
 								/>
-								<EditorNumberControl
-									error={readEditorFormValidationErrorFn(validationIssues, "max")}
-									label="Maximum count"
-									value={when.max}
-									min={when.min}
-									onChangeFn={(max) =>
-										onChangeFn({
-											...when,
-											max,
-										})
-									}
-								/>
-							</div>
-						),
-					)
-					.exhaustive()}
-			</div>
-			<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-				<QueryScopeControl
-					error={readEditorFormValidationErrorFn(validationIssues, "query", "scope")}
-					value={value.query}
-					onChangeFn={(query) =>
-						onChangeFn({
-							...value,
-							query,
-						})
-					}
-				/>
-				{value.query.scope !== "board" ? null : (
-					<BoardDistanceControl
-						error={readEditorFormValidationErrorFn(
-							validationIssues,
-							"query",
-							"distance",
+							),
+						)
+						.exhaustive()}
+					<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+						<QueryScopeControl
+							error={readEditorFormValidationErrorFn(
+								validationIssues,
+								"query",
+								"scope",
+							)}
+							value={selectedValue.query}
+							onChangeFn={(query) =>
+								onChangeFn({
+									...selectedValue,
+									query,
+								})
+							}
+						/>
+						{selectedValue.query.scope !== "board" ? null : (
+							<BoardDistanceControl
+								error={readEditorFormValidationErrorFn(
+									validationIssues,
+									"query",
+									"distance",
+								)}
+								value={selectedValue.query}
+								onChangeFn={(query) =>
+									onChangeFn({
+										...selectedValue,
+										query,
+									})
+								}
+							/>
 						)}
-						value={value.query}
-						onChangeFn={(query) =>
-							onChangeFn({
-								...value,
-								query,
-							})
-						}
-					/>
-				)}
-			</div>
+					</div>
+				</>
+			)}
 		</div>
 	);
 };
@@ -304,39 +324,18 @@ const RuleControl = ({
 	ruleTypeDescription,
 }: {
 	readonly allowedTypes: ReadonlyArray<RuleType>;
-	readonly createRuleFn: (type: RuleType) => LineRuleSchema.Type;
-	readonly onChangeFn: (rule: RuleValue) => void;
+	readonly createRuleFn: (type: RuleType) => DraftRule;
+	readonly onChangeFn: (rule: DraftRule) => void;
 	readonly initialWhenIndex?: number;
-	readonly rule: RuleValue;
+	readonly rule: DraftRule;
 	readonly ruleIndex: number;
 	readonly ruleTarget: RuleTarget;
 	readonly ruleTypeDescription: ReactNode;
 }) => {
 	const validationIssues = useFormValidationIssues(rule);
-	const invalidWhenIndex = validationIssues.find(
-		(issue) => issue.path[0] === "when" && typeof issue.path[1] === "number",
-	)?.path[1] as number | undefined;
+	const invalidWhenIndex = useFormValidationFocusIndex(rule, "when");
 	return (
 		<article className="grid gap-3">
-			<EditorTextControl
-				error={readEditorFormValidationErrorFn(validationIssues, "hint")}
-				label="Hint"
-				placeholder="Optional explanation shown while this rule applies"
-				required={false}
-				value={rule.hint ?? ""}
-				onChangeFn={(hint) =>
-					onChangeFn({
-						...rule,
-						...(hint.trim() === ""
-							? {
-									hint: undefined,
-								}
-							: {
-									hint,
-								}),
-					})
-				}
-			/>
 			<div className="flex items-end gap-3">
 				<div className="min-w-0 flex-1">
 					<EditorChoiceControl
@@ -364,82 +363,110 @@ const RuleControl = ({
 					/>
 				</div>
 			</div>
-			{rule.type !== "runtime:multiplier" ? null : (
-				<EditorNumberControl
-					error={readEditorFormValidationErrorFn(validationIssues, "multiplier")}
-					label="Runtime multiplier"
-					value={rule.multiplier}
-					min={0.01}
-					step={0.01}
-					onChangeFn={(multiplier) =>
-						onChangeFn({
-							...rule,
-							multiplier,
-						})
-					}
-				/>
-			)}
-			{rule.type !== "runtime:adjust" ? null : (
-				<EditorSecondsControl
-					error={readEditorFormValidationErrorFn(validationIssues, "adjustMs")}
-					label="Runtime adjustment (seconds)"
-					step={5}
-					value={rule.adjustMs / 1_000}
-					onChangeFn={(adjustSeconds) =>
-						onChangeFn({
-							...rule,
-							adjustMs: Math.round(adjustSeconds * 1_000),
-						})
-					}
-				/>
-			)}
-			<EditorCollectionSelector
-				addLabel="Add condition"
-				initialSelectedIndex={initialWhenIndex}
-				key={initialWhenIndex}
-				count={rule.when.length}
-				itemLabelFn={(whenIndex) =>
-					`Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
-				}
-				label={`Rule ${ruleIndex + 1} conditions`}
-				onAddFn={() =>
-					onChangeFn({
-						...rule,
-						when: [
-							...rule.when,
-							structuredClone(DraftDefaults.when),
-						],
-					})
-				}
-				onRemoveFn={
-					rule.when.length === 1
-						? undefined
-						: (whenIndex) =>
-								onChangeFn({
-									...rule,
-									when: rule.when.filter(
-										(_candidate, candidateIndex) =>
-											candidateIndex !== whenIndex,
-									) as typeof rule.when,
-								})
-				}
-				removeLabel="Remove condition"
-				selectedIndex={invalidWhenIndex}
-			>
-				{(whenIndex) => (
-					<WhenControl
-						value={rule.when[whenIndex]}
-						onChangeFn={(next) =>
+			{rule.type === undefined ? null : (
+				<>
+					<EditorTextControl
+						error={readEditorFormValidationErrorFn(validationIssues, "hint")}
+						label="Hint"
+						placeholder="Optional explanation shown while this rule applies"
+						required={false}
+						value={rule.hint ?? ""}
+						onChangeFn={(hint) =>
 							onChangeFn({
 								...rule,
-								when: rule.when.map((candidate, candidateIndex) =>
-									candidateIndex === whenIndex ? next : candidate,
-								) as typeof rule.when,
+								...(hint.trim() === ""
+									? {
+											hint: undefined,
+										}
+									: {
+											hint,
+										}),
 							})
 						}
 					/>
-				)}
-			</EditorCollectionSelector>
+					{rule.type !== "runtime:multiplier" ? null : (
+						<EditorNumberControl
+							error={readEditorFormValidationErrorFn(validationIssues, "multiplier")}
+							label="Runtime multiplier"
+							value={rule.multiplier}
+							min={0.01}
+							step={0.01}
+							onChangeFn={(multiplier) =>
+								onChangeFn({
+									...rule,
+									multiplier,
+								})
+							}
+						/>
+					)}
+					{rule.type !== "runtime:adjust" ? null : (
+						<EditorSecondsControl
+							error={readEditorFormValidationErrorFn(validationIssues, "adjustMs")}
+							label="Runtime adjustment (seconds)"
+							step={5}
+							value={rule.adjustMs / 1_000}
+							onChangeFn={(adjustSeconds) =>
+								onChangeFn({
+									...rule,
+									adjustMs: Math.round(adjustSeconds * 1_000),
+								})
+							}
+						/>
+					)}
+					<EditorCollectionSelector
+						addLabel="Add condition"
+						initialSelectedIndex={initialWhenIndex}
+						key={initialWhenIndex}
+						count={rule.when.length}
+						error={readRequiredEditorCollectionErrorFn(
+							validationIssues,
+							rule.when.length,
+							1,
+							"Add at least one condition.",
+							"when",
+						)}
+						itemLabelFn={(whenIndex) =>
+							rule.when[whenIndex].type === undefined
+								? `Condition ${whenIndex + 1}`
+								: `Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
+						}
+						label={`Rule ${ruleIndex + 1} conditions`}
+						onAddFn={() =>
+							onChangeFn({
+								...rule,
+								when: [
+									...rule.when,
+									structuredClone(DraftDefaults.when),
+								],
+							})
+						}
+						onRemoveFn={(whenIndex) =>
+							onChangeFn({
+								...rule,
+								when: rule.when.filter(
+									(_candidate, candidateIndex) => candidateIndex !== whenIndex,
+								) as typeof rule.when,
+							})
+						}
+						removeLabel="Remove condition"
+						selectedIndex={invalidWhenIndex}
+					>
+						{(whenIndex) => (
+							<WhenControl
+								value={rule.when[whenIndex]}
+								onChangeFn={(next) =>
+									onChangeFn({
+										...rule,
+										when: rule.when.map((candidate, candidateIndex) =>
+											candidateIndex === whenIndex ? next : candidate,
+										) as typeof rule.when,
+									})
+								}
+							/>
+						)}
+					</EditorCollectionSelector>
+				</>
+			)}
 		</article>
 	);
 };
@@ -464,15 +491,12 @@ export const RulesControl = ({
 	readonly rules: ReadonlyArray<RuleValue>;
 	readonly target: RuleTarget;
 }) => {
-	const validationIssues = useFormValidationIssues(rules as object);
-	const invalidRuleIndex = validationIssues.find((issue) => typeof issue.path[0] === "number")
-		?.path[0] as number | undefined;
-	const createRuleFn = (type: RuleType): LineRuleSchema.Type =>
+	const draftRules = rules as ReadonlyArray<DraftRule>;
+	const invalidRuleIndex = useFormValidationFocusIndex(rules as object);
+	const createRuleFn = (type: RuleType): DraftRule =>
 		({
 			type,
-			when: [
-				structuredClone(DraftDefaults.when),
-			],
+			when: [],
 			...(type === "runtime:multiplier"
 				? {
 						multiplier: 1,
@@ -482,7 +506,8 @@ export const RulesControl = ({
 							adjustMs: 0,
 						}
 					: {}),
-		}) as LineRuleSchema.Type;
+		}) as DraftRule;
+	const emitChangeFn = (next: ReadonlyArray<DraftRule>) => onChangeFn(next as RuleValue[]);
 	return (
 		<section className="grid gap-3">
 			{headerVisible ? (
@@ -496,17 +521,23 @@ export const RulesControl = ({
 				addLabel="Add rule"
 				initialSelectedIndex={initialRuleIndex}
 				key={initialRuleIndex}
-				count={rules.length}
-				itemLabelFn={(ruleIndex) => `Rule ${ruleIndex + 1} — ${rules[ruleIndex].type}`}
+				count={draftRules.length}
+				itemLabelFn={(ruleIndex) =>
+					draftRules[ruleIndex].type === undefined
+						? `Rule ${ruleIndex + 1}`
+						: `Rule ${ruleIndex + 1} — ${draftRules[ruleIndex].type}`
+				}
 				label="Rules"
 				onAddFn={() =>
-					onChangeFn([
-						...rules,
-						createRuleFn(allowedTypes[0]),
+					emitChangeFn([
+						...draftRules,
+						{
+							when: [],
+						},
 					])
 				}
 				onRemoveFn={(ruleIndex) =>
-					onChangeFn(rules.filter((_current, index) => index !== ruleIndex))
+					emitChangeFn(draftRules.filter((_current, index) => index !== ruleIndex))
 				}
 				removeLabel="Remove rule"
 				selectedIndex={invalidRuleIndex}
@@ -518,13 +549,13 @@ export const RulesControl = ({
 						}
 						allowedTypes={allowedTypes}
 						createRuleFn={createRuleFn}
-						rule={rules[ruleIndex]}
+						rule={draftRules[ruleIndex]}
 						ruleIndex={ruleIndex}
 						ruleTarget={target}
 						ruleTypeDescription={description}
 						onChangeFn={(next) =>
-							onChangeFn(
-								rules.map((current, index) =>
+							emitChangeFn(
+								draftRules.map((current, index) =>
 									index === ruleIndex ? next : current,
 								),
 							)

@@ -268,6 +268,33 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 	});
 };
 
+const changeTextArea = async (input: HTMLTextAreaElement, value: string) => {
+	const valueSetter = Object.getOwnPropertyDescriptor(
+		HTMLTextAreaElement.prototype,
+		"value",
+	)?.set;
+	if (valueSetter === undefined) throw new Error("Expected native textarea value setter.");
+	await act(async () => {
+		valueSetter.call(input, value);
+		input.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
+	});
+};
+
+const completeFirstProductionLine = async (container: HTMLElement) => {
+	const title = container.querySelector<HTMLInputElement>('input[name="lines[0].title"]');
+	const description = container.querySelector<HTMLTextAreaElement>(
+		'textarea[name="lines[0].description"]',
+	);
+	if (title === null || description === null)
+		throw new Error("Missing new production line identity fields.");
+	await changeInput(title, "Test production line");
+	await changeTextArea(description, "Produces the test output.");
+};
+
 describe("item section form session", () => {
 	it("renders artwork on direct Clock entry and follows unsaved overlay changes", async () => {
 		state.project = {
@@ -421,8 +448,17 @@ describe("item section form session", () => {
 		});
 		state.persisted = configured;
 		(state.project as Project).config.items[item.id] = configured;
-		const { container } = await render(<IdentitySection />, false, undefined, capability);
+		const { container, renderSection } = await render(
+			<IdentitySection />,
+			false,
+			undefined,
+			capability,
+		);
 		expect(state.saveItem).not.toHaveBeenCalled();
+		if (capability === "production") {
+			await renderSection(<ProductionSection />, "production");
+			await completeFirstProductionLine(container);
+		}
 		await act(async () => {
 			[
 				...container.querySelectorAll("button"),
@@ -810,7 +846,7 @@ describe("item section form session", () => {
 	});
 
 	it("selects and focuses the exact invalid control inside a nested output", async () => {
-		const producer = createProducerItem({
+		const producerBase = createProducerItem({
 			id: "producer",
 			output: createOutput([
 				{
@@ -818,6 +854,44 @@ describe("item section form session", () => {
 				},
 			]),
 		});
+		const producer = {
+			...producerBase,
+			lines: producerBase.lines?.map((line) => ({
+				...line,
+				rules: [
+					{
+						type: "show" as const,
+						when: [
+							{
+								type: "exists" as const,
+								query: {
+									scope: "any" as const,
+									selector: {
+										type: "item" as const,
+										itemId: item.id,
+									},
+								},
+							},
+						],
+					},
+					{
+						type: "show" as const,
+						when: [
+							{
+								type: "exists" as const,
+								query: {
+									scope: "any" as const,
+									selector: {
+										type: "item" as const,
+										itemId: "",
+									},
+								},
+							},
+						],
+					},
+				],
+			})),
+		} as ItemSchema.Type;
 		state.persisted = producer;
 		const config = (
 			state.project as {
@@ -841,15 +915,41 @@ describe("item section form session", () => {
 			throw new Error("Missing nested output controls.");
 
 		await act(async () => addOutputSet.click());
+		const addRoll = container.querySelector<HTMLButtonElement>('button[title="Add roll"]');
+		if (addRoll === null) throw new Error("Missing add roll control.");
+		await act(async () => addRoll.click());
+		const guaranteed = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent?.includes("Guaranteed") === true,
+		);
+		if (guaranteed === undefined) throw new Error("Missing roll type control.");
+		await act(async () => guaranteed.click());
+		const addDrop = container.querySelector<HTMLButtonElement>('button[title="Add drop"]');
+		if (addDrop === null) throw new Error("Missing add drop control.");
+		await act(async () => {
+			saveButton.click();
+			await Promise.resolve();
+		});
+		const emptyDrops = container.querySelector<HTMLInputElement>(
+			'input[placeholder="Search drops…"]',
+		);
+		expect(emptyDrops?.disabled).toBe(true);
+		expect(emptyDrops?.dataset.uiInvalid).toBe("true");
+		expect(emptyDrops?.closest("label")?.textContent).toContain("Add at least one drop.");
+		const selectedCollectionLabels = Array.from(
+			container.querySelectorAll<HTMLInputElement>("input"),
+		).map((input) => input.value);
+		expect(selectedCollectionLabels).toContain("Rule 1 — show");
+		expect(selectedCollectionLabels).not.toContain("Rule 2 — show");
+		expect(container.textContent).not.toContain("Select an item.");
+
+		await act(async () => addDrop.click());
 		await act(async () => {
 			saveButton.click();
 			await Promise.resolve();
 		});
 
 		const invalid = container.querySelector<HTMLInputElement>('input[data-ui-invalid="true"]');
-		expect(container.textContent).toContain(
-			"Production line 1 → Output → Output set 2 → Roll 1 → Drop 1 → Dropped item: Select an item.",
-		);
+		expect(invalid?.closest("label")?.textContent).toContain("Select an item.");
 		await act(
 			() =>
 				new Promise<void>((resolve) => {
@@ -979,6 +1079,7 @@ describe("item section form session", () => {
 		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
 		if (add === null) throw new Error("Missing add production line control.");
 		await act(async () => add.click());
+		await completeFirstProductionLine(container);
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
@@ -1115,6 +1216,7 @@ describe("item section form session", () => {
 		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
 		if (addLine === null) throw new Error("Missing add production line control.");
 		await act(async () => addLine.click());
+		await completeFirstProductionLine(container);
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});

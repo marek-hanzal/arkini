@@ -11,8 +11,8 @@ describe("FormSchema", () => {
 		Number.POSITIVE_INFINITY,
 	])("rejects an invalid authored scale %s at its form field", (scale) => {
 		const item = createDraftFn({
+			itemId: "item:form-scale",
 			resourceId: "base",
-
 			uid: "item-form-scale",
 		});
 		const result = FormSchema.safeParse({
@@ -41,8 +41,8 @@ describe("FormSchema", () => {
 
 	it("omits a blank optional item description", () => {
 		const item = createDraftFn({
+			itemId: "item:form-description",
 			resourceId: "base",
-
 			uid: "item-form-description",
 		});
 
@@ -64,8 +64,8 @@ describe("FormSchema", () => {
 
 	it("preserves authored scale while omitting empty optional artwork slots", () => {
 		const item = createDraftFn({
+			itemId: "item:form-artwork",
 			resourceId: "base",
-
 			uid: "item-form-artwork",
 		});
 

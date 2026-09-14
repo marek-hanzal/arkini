@@ -5,6 +5,7 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { readDraftRollDropsFn } from "~/production-authoring/fn/readDraftRollDropsFn";
 
 /** Keeps authored order and deduplicates references independently on each side. */
 const readItemSidesFn = (line: LineSchema.Type) => {
@@ -26,8 +27,7 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 		for (const when of rule.when) inputs.add(when.query.selector.itemId);
 	for (const set of line.output?.set ?? []) {
 		for (const roll of set.roll) {
-			const drops =
-				roll.type === "weight" ? roll.drop.flatMap((entry) => entry.drop) : roll.drop;
+			const drops = readDraftRollDropsFn(roll);
 			for (const drop of drops) outputs.add(drop.itemId);
 			for (const drop of drops)
 				for (const rule of drop.rules)

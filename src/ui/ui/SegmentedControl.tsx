@@ -21,7 +21,7 @@ interface SegmentedControlProps<Value extends string> {
 	readonly options: ReadonlyArray<SegmentedControlOption<Value>>;
 	readonly pending?: boolean;
 	readonly size?: "compact" | "default" | "large";
-	readonly value: Value;
+	readonly value: Value | undefined;
 }
 
 const SegmentedControlSizeClassName = {

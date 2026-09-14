@@ -145,6 +145,50 @@ const createSearchItem = (id: string, spent: boolean) =>
 	}) satisfies ItemSchema.Type;
 
 describe("InputControl", () => {
+	it("keeps material quantity bounds ordered when either bound crosses the other", async () => {
+		const { container, root } = createContainer();
+		const onChangeFn = vi.fn();
+		await renderInput(
+			root,
+			{
+				type: "materials",
+				capacity: 0,
+				mode: "consume",
+				quantity: {
+					min: 5,
+					max: 10,
+				},
+				selector: {
+					type: "item",
+					itemId: "stone",
+				},
+			},
+			onChangeFn,
+		);
+		const bounds = container.querySelectorAll<HTMLInputElement>('input[type="number"]');
+		if (bounds.length < 2) throw new Error("Expected material quantity bounds.");
+
+		await changeInput(bounds[0], "12");
+		expect(onChangeFn).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				quantity: {
+					min: 12,
+					max: 12,
+				},
+			}),
+		);
+
+		await changeInput(bounds[1], "3");
+		expect(onChangeFn).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				quantity: {
+					min: 3,
+					max: 3,
+				},
+			}),
+		);
+	});
+
 	it("shows unit authoring only for Units inputs", async () => {
 		const { container, root } = createContainer();
 

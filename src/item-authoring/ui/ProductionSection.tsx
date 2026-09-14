@@ -12,6 +12,8 @@ import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { Mx } from "~/translation/ui/Mx";
+import { useStore } from "@tanstack/react-form";
+import { useFormValidationFocusIndex } from "~/item-authoring/ui/useFormValidationIssues";
 
 interface ProductionFieldValues {
 	readonly maxQueueSize?: number;
@@ -35,20 +37,26 @@ const ProductionFields = withFieldGroupFn({
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormSection
-					description={<Mx label="Product lines help" />}
-					title={translator.textFn("Product lines")}
+					description={<Mx label="Production queue capacity help" />}
+					required
+					title={translator.textFn("Queue capacity")}
 				>
 					<EditorFormCard>
 						<group.AppField name="maxQueueSize">
 							{(field) => (
 								<field.NumberField
 									label={translator.textFn("Queue capacity")}
-									description={<Mx label="Production queue capacity help" />}
+									labelVisible={false}
 									min={1}
 								/>
 							)}
 						</group.AppField>
 					</EditorFormCard>
+				</EditorFormSection>
+				<EditorFormSection
+					description={<Mx label="Product lines help" />}
+					title={translator.textFn("Product lines")}
+				>
 					<group.AppField
 						name="lines"
 						mode="array"
@@ -59,13 +67,7 @@ const ProductionFields = withFieldGroupFn({
 								const currentLines = form.state.values.lines ?? [];
 								if (currentLines.length === 0)
 									form.setFieldValue("action", undefined);
-								const line = createLineFn(
-									currentLines,
-									translator.textFn("New production line"),
-									translator.textFn(
-										"Describe what this line consumes and produces.",
-									),
-								);
+								const line = createLineFn(currentLines, "", "");
 								form.setFieldValue("lines", [
 									...currentLines,
 									line,
@@ -141,10 +143,9 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const { form, productionLineId, validationIssues } = useFormSession();
-	const invalidLineIndex = validationIssues.find(
-		(issue) => issue.path[0] === "lines" && typeof issue.path[1] === "number",
-	)?.path[1] as number | undefined;
+	const { form, productionLineId } = useFormSession();
+	const lines = useStore(form.store, (state) => state.values.lines);
+	const invalidLineIndex = useFormValidationFocusIndex(lines);
 	return (
 		<ProductionFields
 			form={form}

@@ -36,7 +36,7 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("EditorCollectionSelector", () => {
-	it("keeps empty collection controls visible while only add remains enabled", async () => {
+	it("keeps an invalid empty collection visible, marked, and ready to add", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -48,6 +48,7 @@ describe("EditorCollectionSelector", () => {
 				<EditorCollectionSelector
 					addLabel="Add line"
 					count={0}
+					error="Add at least one line."
 					itemLabelFn={() => "Line"}
 					label="Production lines"
 					onAddFn={addFn}
@@ -63,11 +64,43 @@ describe("EditorCollectionSelector", () => {
 		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
 		const remove = container.querySelector<HTMLButtonElement>('button[title="Remove line"]');
 		expect(input?.disabled).toBe(true);
+		expect(input?.dataset.uiInvalid).toBe("true");
+		expect(container.textContent).toContain("Add at least one line.");
 		expect(add?.disabled).toBe(false);
 		expect(remove?.disabled).toBe(true);
 
 		await act(async () => add?.click());
 		expect(addFn).toHaveBeenCalledOnce();
+		expect(removeFn).not.toHaveBeenCalled();
+	});
+
+	it("keeps an explicitly locked remove control visible and disabled", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const removeFn = vi.fn();
+		await act(async () => {
+			root.render(
+				<EditorCollectionSelector
+					count={1}
+					itemLabelFn={() => "Required item"}
+					label="Required items"
+					onRemoveFn={removeFn}
+					removeDisabled
+					removeLabel="Remove required item"
+				>
+					{() => null}
+				</EditorCollectionSelector>,
+			);
+		});
+
+		const remove = container.querySelector<HTMLButtonElement>(
+			'button[title="Remove required item"]',
+		);
+		expect(remove).not.toBeNull();
+		expect(remove?.disabled).toBe(true);
+		await act(async () => remove?.click());
 		expect(removeFn).not.toHaveBeenCalled();
 	});
 

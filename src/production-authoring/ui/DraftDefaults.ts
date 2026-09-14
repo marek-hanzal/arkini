@@ -17,23 +17,20 @@ const drop = {
 	rules: [],
 } satisfies DropSchema.Type;
 
+const drops = [] as unknown as [
+	DropSchema.Type,
+	...DropSchema.Type[],
+];
+
 const rolls = {
 	guaranteed: {
 		type: "guaranteed",
-		drop: [
-			drop,
-		] as [
-			DropSchema.Type,
-		],
+		drop: drops,
 	},
 	chance: {
 		type: "chance",
 		chance: 0.5,
-		drop: [
-			drop,
-		] as [
-			DropSchema.Type,
-		],
+		drop: drops,
 	},
 	weight: {
 		type: "weight",
@@ -46,11 +43,7 @@ const rolls = {
 		drop: [
 			{
 				weight: 1,
-				drop: [
-					structuredClone(drop),
-				] as [
-					DropSchema.Type,
-				],
+				drop: drops,
 			},
 		] as unknown as [
 			WeightedDropSchema.Type,
@@ -59,6 +52,10 @@ const rolls = {
 		],
 	},
 } satisfies Record<RollSchema.Type["type"], RollSchema.Type>;
+
+// Roll type is the first deliberate authoring choice; canonical validation
+// keeps this incomplete draft from being saved before that choice is made.
+const roll = {} as RollSchema.Type;
 
 const query = {
 	scope: "any",
@@ -104,23 +101,21 @@ export const DraftDefaults = {
 		},
 	} satisfies Record<LineInputSchema.Type["type"], LineInputSchema.Type>,
 	drop,
+	roll,
 	rolls,
 	output: {
 		set: [
 			{
 				weight: 1,
-				roll: [
-					rolls.guaranteed,
-				] as [
-					RollSchema.Type,
-				],
+				roll: [] as unknown as RollSetSchema.Type["roll"],
 			},
 		] as [
 			RollSetSchema.Type,
 		],
 	} satisfies OutputSchema.Type,
+	// Condition type is a deliberate authoring choice. Keeping the query in the
+	// incomplete draft lets type changes preserve the shared selector and scope.
 	when: {
-		type: "exists",
 		query,
-	} satisfies WhenSchema.Type,
+	} as unknown as WhenSchema.Type,
 } as const;

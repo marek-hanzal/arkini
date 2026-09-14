@@ -5,12 +5,16 @@ import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSe
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
 import { OutputDropOption } from "~/production-authoring/ui/OutputDropOption";
-import { readRollDropsFn } from "~/production-output/fn/readRollDropsFn";
+import { readDraftRollDropsFn } from "~/production-authoring/fn/readDraftRollDropsFn";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
-import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
+import {
+	useFormValidationFocusIndex,
+	useFormValidationIssues,
+} from "~/item-authoring/ui/useFormValidationIssues";
+import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
 
 const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
-	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
+	readDraftRollDropsFn(roll)[0]?.itemId;
 
 interface OutputControlProps {
 	readonly onChangeFn: (output: OutputSchema.Type | undefined) => void;
@@ -30,14 +34,19 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const validationIssues = useFormValidationIssues(value);
 	const sets = value?.set ?? [];
-	const invalidSetIndex = validationIssues.find(
-		(issue) => issue.path[0] === "set" && typeof issue.path[1] === "number",
-	)?.path[1] as number | undefined;
+	const invalidSetIndex = useFormValidationFocusIndex(value, "set");
 	return (
 		<section className="grid gap-3">
 			<EditorCollectionSelector
 				addLabel="Add output set"
 				count={sets.length}
+				error={readRequiredEditorCollectionErrorFn(
+					validationIssues,
+					sets.length,
+					1,
+					"Add at least one output set.",
+					"set",
+				)}
 				initialSelectedIndex={outputSetIndex}
 				key={outputSetIndex}
 				itemLabelFn={(index) => {
@@ -49,7 +58,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 					)}`;
 				}}
 				itemSearchTermsFn={(index) =>
-					(sets[index]?.roll ?? []).flatMap(readRollDropsFn).flatMap((drop) => [
+					(sets[index]?.roll ?? []).flatMap(readDraftRollDropsFn).flatMap((drop) => [
 						drop.itemId,
 						readItemLabelFn(drop.itemId, ""),
 					])
@@ -57,7 +66,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 				renderItemContentFn={(index, label) => (
 					<OutputDropOption
 						label={label}
-						drops={(sets[index]?.roll ?? []).flatMap(readRollDropsFn)}
+						drops={(sets[index]?.roll ?? []).flatMap(readDraftRollDropsFn)}
 					/>
 				)}
 				label="Output sets"
@@ -65,12 +74,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 					onChangeFn({
 						set: [
 							...sets,
-							{
-								weight: 1,
-								roll: [
-									structuredClone(DraftDefaults.rolls.guaranteed),
-								],
-							},
+							structuredClone(DraftDefaults.output.set[0]),
 						] as OutputSchema.Type["set"],
 					})
 				}
@@ -104,20 +108,11 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 							}
 							value={set}
 							onChangeFn={(next) =>
-								next === undefined
-									? sets.length === 1
-										? onChangeFn(undefined)
-										: onChangeFn({
-												set: sets.filter(
-													(_current, currentIndex) =>
-														currentIndex !== index,
-												) as OutputSchema.Type["set"],
-											})
-									: onChangeFn({
-											set: sets.map((current, currentIndex) =>
-												currentIndex === index ? next : current,
-											) as OutputSchema.Type["set"],
-										})
+								onChangeFn({
+									set: sets.map((current, currentIndex) =>
+										currentIndex === index ? next : current,
+									) as OutputSchema.Type["set"],
+								})
 							}
 						/>
 					);

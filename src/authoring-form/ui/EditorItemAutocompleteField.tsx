@@ -4,9 +4,10 @@ import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { ReactNode } from "react";
 
 interface EditorItemAutocompleteFieldProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
 }
 
@@ -42,11 +43,12 @@ export const EditorItemAutocompleteField = ({
 };
 
 interface EditorItemReferenceControlProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly emptyLabel?: string;
 	readonly error?: string;
 	readonly includeItemFn?: (item: ItemSchema.Type) => boolean;
 	readonly label: string;
+	readonly labelVisible?: boolean;
 	readonly onChangeFn: (itemId: string) => void;
 	readonly value: string;
 	readonly showSelectedPreview?: boolean;
@@ -59,6 +61,7 @@ export const EditorItemReferenceControl = ({
 	error,
 	includeItemFn,
 	label,
+	labelVisible = true,
 	onChangeFn,
 	showSelectedPreview = true,
 	value,
@@ -69,6 +72,7 @@ export const EditorItemReferenceControl = ({
 			displaySelectedLabel
 			description={description}
 			label={label}
+			labelVisible={labelVisible}
 			emptyLabel={emptyLabel}
 			error={error}
 			options={options}

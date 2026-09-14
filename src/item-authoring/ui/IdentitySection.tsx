@@ -53,9 +53,7 @@ export const IdentitySection = () => {
 						{(field) => (
 							<field.TextField
 								label={translator.textFn("Item ID")}
-								description={translator.textFn(
-									"Renaming updates exact project references.",
-								)}
+								description={<Mx label="Item ID help" />}
 								placeholder="item:example"
 							/>
 						)}
@@ -96,17 +94,16 @@ export const IdentitySection = () => {
 					</form.AppField>
 				</div>
 				<div className="grid grid-cols-2 gap-4">
-					{clock !== undefined ? null : (
-						<form.AppField name="maxStackSize">
-							{(field) => (
-								<field.NumberField
-									label={translator.textFn("Maximum stack size")}
-									description={<Mx label="Item stack size help" />}
-									min={1}
-								/>
-							)}
-						</form.AppField>
-					)}
+					<form.AppField name="maxStackSize">
+						{(field) => (
+							<field.NumberField
+								disabled={clock !== undefined}
+								label={translator.textFn("Maximum stack size")}
+								description={<Mx label="Item stack size help" />}
+								min={1}
+							/>
+						)}
+					</form.AppField>
 					<form.AppField name="maxCount">
 						{(field) => (
 							<field.NumberField

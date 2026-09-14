@@ -1,12 +1,14 @@
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { ReactNode } from "react";
 
 interface SelectorControlProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly emptyLabel?: string;
 	readonly error?: string;
 	readonly includeItemFn?: (item: ItemSchema.Type) => boolean;
+	readonly labelVisible?: boolean;
 	readonly onChangeFn: (selector: SelectorSchema.Type) => void;
 	readonly value: SelectorSchema.Type;
 }
@@ -17,6 +19,7 @@ export const SelectorControl = ({
 	emptyLabel,
 	error,
 	includeItemFn,
+	labelVisible = true,
 	onChangeFn,
 	value,
 }: SelectorControlProps) => (
@@ -26,6 +29,7 @@ export const SelectorControl = ({
 		error={error}
 		includeItemFn={includeItemFn}
 		label="Selected item"
+		labelVisible={labelVisible}
 		value={value.itemId}
 		onChangeFn={(itemId) =>
 			onChangeFn({

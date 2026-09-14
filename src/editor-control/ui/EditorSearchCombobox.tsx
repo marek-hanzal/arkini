@@ -43,7 +43,7 @@ interface EditorSearchComboboxProps {
 	readonly displaySelectedLabel?: boolean;
 	readonly label: string;
 	readonly labelVisible?: boolean;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly emptyLabel: string;
 	readonly error?: string;
 	readonly options: readonly EditorSearchOption[];

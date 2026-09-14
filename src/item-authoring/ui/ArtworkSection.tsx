@@ -1,7 +1,7 @@
 import { ArtworkTilePreview } from "~/item-authoring/ui/ArtworkTilePreview";
 import { Trash2 } from "lucide-react";
 
-import { LinkButton } from "~/ui/ui/LinkButton";
+import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
@@ -9,6 +9,7 @@ import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldError
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { FormValues } from "~/item-authoring/schema/FormSchema";
+import { Mx } from "~/translation/ui/Mx";
 
 const defaultArtwork: FormValues["asset"] = {
 	scale: 1,
@@ -32,9 +33,7 @@ const ArtworkFields = withFieldGroupFn({
 						{(field) => (
 							<EditorNumberControl
 								label={translator.textFn("Base tile scale")}
-								description={translator.textFn(
-									"Ratio from 0.25 to 1. The default 1 fills the tile at 100%.",
-								)}
+								description={<Mx label="Base tile scale help" />}
 								error={readEditorFieldErrorFn(field.state.meta.errors)}
 								min={0.25}
 								max={1}
@@ -56,13 +55,12 @@ const ArtworkFields = withFieldGroupFn({
 							/>
 						)}
 					</group.AppField>
-					<LinkButton
-						className="flex h-[var(--ak-control-min-height)] shrink-0 items-center"
+					<EditorIconButton
 						title={translator.textFn("Clear overlay asset")}
 						onClick={() => group.setFieldValue("default[1]", "")}
 					>
 						<Trash2 className="size-4" />
-					</LinkButton>
+					</EditorIconButton>
 				</div>
 			</>
 		);

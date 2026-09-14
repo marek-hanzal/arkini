@@ -12,6 +12,7 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useStore } from "@tanstack/react-form";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationIssuesFn } from "~/editor-control/fn/readEditorFormValidationIssuesFn";
+import { Mx } from "~/translation/ui/Mx";
 
 interface InputsControlProps {
 	readonly allowMaterials?: boolean;
@@ -49,11 +50,11 @@ export const InputsControl = ({
 		<section className="grid min-w-0 content-start gap-3">
 			<EditorFormSectionDivider
 				description={
-					allowMaterials
-						? "Inputs belong only to this production line. At least one explicit input contract is required, and every configured contract must be satisfiable before a job can start. A Simple input explicitly requires no material."
-						: translator.textFn(
-								"Optional requirements settled when this action activates. Simple adds no external item requirement, while Units spends units from the owner or a matching board item.",
-							)
+					allowMaterials ? (
+						<Mx label="Production inputs help" />
+					) : (
+						<Mx label="Action inputs help" />
+					)
 				}
 				title="Inputs"
 				variant="secondary"

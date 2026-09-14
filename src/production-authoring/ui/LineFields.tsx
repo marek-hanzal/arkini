@@ -86,9 +86,7 @@ export const LineFields = withFieldGroupFn({
 									<field.SecondsField
 										step={5}
 										label={translator.textFn("Runtime (seconds)")}
-										description={translator.textFn(
-											"Base duration of one job on this line before runtime multiplier and adjustment rules are applied.",
-										)}
+										description={<Mx label="Production line runtime help" />}
 									/>
 								)}
 							</group.AppField>
@@ -100,9 +98,9 @@ export const LineFields = withFieldGroupFn({
 											checkedIcon={Star}
 											uncheckedIcon={StarOff}
 											label={translator.textFn("Default")}
-											description={translator.textFn(
-												"The line selected by default for manual production. Selecting this line clears Default on sibling lines.",
-											)}
+											description={
+												<Mx label="Production line default help" />
+											}
 											onChangeFn={(value) =>
 												onMarkerChangeFn("default", value)
 											}
@@ -116,9 +114,7 @@ export const LineFields = withFieldGroupFn({
 											checkedIcon={Clock}
 											uncheckedIcon={Clock}
 											label={translator.textFn("Clock")}
-											description={translator.textFn(
-												"Each clock pulse attempts this line. Selecting this line clears Clock on sibling lines and leaves Default unchanged.",
-											)}
+											description={<Mx label="Production line Clock help" />}
 											onChangeFn={(value) => onMarkerChangeFn("clock", value)}
 										/>
 									)}
@@ -127,9 +123,9 @@ export const LineFields = withFieldGroupFn({
 									{(field) => (
 										<field.BoolToggle
 											checkedIcon={Eye}
-											description={translator.textFn(
-												"Visible lines are shown to the player before runtime rules alter their visibility.",
-											)}
+											description={
+												<Mx label="Production line visibility help" />
+											}
 											label={translator.textFn("Visible")}
 											uncheckedIcon={EyeOff}
 										/>
@@ -139,9 +135,9 @@ export const LineFields = withFieldGroupFn({
 									{(field) => (
 										<field.BoolToggle
 											checkedIcon={CircleCheck}
-											description={translator.textFn(
-												"Enabled lines can accept production jobs before runtime rules alter their availability.",
-											)}
+											description={
+												<Mx label="Production line enabled help" />
+											}
 											label={translator.textFn("Enabled")}
 											uncheckedIcon={CircleX}
 										/>
@@ -167,9 +163,9 @@ export const LineFields = withFieldGroupFn({
 											},
 										]}
 										label={translator.textFn("Check ahead")}
-										description={translator.textFn(
-											"Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output.",
-										)}
+										description={
+											<Mx label="Production line check ahead help" />
+										}
 									/>
 								)}
 							</group.AppField>
@@ -196,9 +192,7 @@ export const LineFields = withFieldGroupFn({
 								}
 								rules={rules}
 								target="line"
-								description={translator.textFn(
-									"These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected.",
-								)}
+								description={<Mx label="Production line rules help" />}
 								allowedTypes={[
 									"show",
 									"hide",

@@ -6,6 +6,7 @@ import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
+import { Mx } from "~/translation/ui/Mx";
 
 export const UnitsSection = () => {
 	const translator = useTranslator();
@@ -35,18 +36,14 @@ export const UnitsSection = () => {
 									{(field) => (
 										<field.NumberField
 											label={translator.textFn("Initial units")}
-											description={translator.textFn(
-												"The finite supply held by each new item, independently of its stack quantity.",
-											)}
+											description={<Mx label="Initial units help" />}
 											min={1}
 										/>
 									)}
 								</form.AppField>
 							</EditorFormCard>
 							<EditorFormSection
-								description={translator.textFn(
-									"Optional items emitted when the final unit is spent.",
-								)}
+								description={<Mx label="Depletion output help" />}
 								title={translator.textFn("Depletion output")}
 							>
 								<EditorFormCard>

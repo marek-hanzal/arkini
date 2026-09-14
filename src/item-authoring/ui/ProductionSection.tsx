@@ -11,6 +11,7 @@ import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSe
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
+import { Mx } from "~/translation/ui/Mx";
 
 interface ProductionFieldValues {
 	readonly maxQueueSize?: number;
@@ -38,18 +39,14 @@ const ProductionFields = withFieldGroupFn({
 						{(field) => (
 							<field.NumberField
 								label={translator.textFn("Queue capacity")}
-								description={translator.textFn(
-									"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
-								)}
+								description={<Mx label="Production queue capacity help" />}
 								min={1}
 							/>
 						)}
 					</group.AppField>
 				</EditorFormCard>
 				<EditorFormSection
-					description={translator.textFn(
-						"Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.",
-					)}
+					description={<Mx label="Product lines help" />}
 					title={translator.textFn("Product lines")}
 				>
 					<group.AppField

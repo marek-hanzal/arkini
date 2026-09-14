@@ -9,6 +9,7 @@ import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Edits the target, effects, replacement, and optional output of one merge definition. */
 export const MergeField = ({
@@ -44,27 +45,17 @@ export const MergeField = ({
 						value={merge.action}
 						options={[
 							{
-								description: translator.textFn(
-									"Returns one source quantity after the merge, placing the same item type near the target through normal placement. This does not spend units. A source instance with spent units, remaining lifetime, buffered inputs, or jobs blocks the merge. Example: Reusable Tool + Unlit Candle → Candle; the tool returns nearby with all units unchanged.",
-								),
+								description: <Mx label="Merge source use help" />,
 								label: translator.textFn("Use"),
 								value: "use",
 							},
 							{
-								description: translator.textFn(
-									"Permanently removes one source quantity instead of returning it. This consumes the item itself, not one unit. Removing the last quantity also disposes state owned by that source. Example: Match + Unlit Candle → Candle; one Match disappears.",
-								),
+								description: <Mx label="Merge source consume help" />,
 								label: translator.textFn("Consume"),
 								value: "consume",
 							},
 							{
-								description: sourceUnitsEnabled
-									? translator.textFn(
-											"Spends one unit from the source item. Spending the last unit depletes one source item and emits its configured depletion output. Example: Flint And Steel + Unlit Candle → Candle; Flint And Steel loses one use.",
-										)
-									: translator.textFn(
-											"Enable Units on this source item before selecting Spend. Spend removes one unit and emits its configured depletion output after the last use.",
-										),
+								description: <Mx label="Merge source spend help" />,
 								disabled: !sourceUnitsEnabled,
 								label: translator.textFn("Spend"),
 								value: "spend",
@@ -101,34 +92,22 @@ export const MergeField = ({
 						value={merge.effect}
 						options={[
 							{
-								description: translator.textFn(
-									"Leaves every target quantity and its state unchanged. The source action and optional merge output still resolve. Example: Key + Chest → reward; the Chest remains unchanged.",
-								),
+								description: <Mx label="Merge target keep help" />,
 								label: translator.textFn("Keep"),
 								value: "keep",
 							},
 							{
-								description: translator.textFn(
-									"Permanently removes one target quantity. A larger target stack keeps all remaining quantities. Example: Hammer + Rock → the Rock disappears; the Hammer follows its separate Source action.",
-								),
+								description: <Mx label="Merge target remove help" />,
 								label: translator.textFn("Remove"),
 								value: "remove",
 							},
 							{
-								description: translator.textFn(
-									"Replaces one target quantity with the selected item in the same board cell. A larger target stack is split and placed nearby. Previously spent units carry over only to a compatible replacement with units; other target state blocks the merge. Example: Flint + Unlit Candle → Candle; one Unlit Candle becomes one Candle.",
-								),
+								description: <Mx label="Merge target replace help" />,
 								label: translator.textFn("Replace"),
 								value: "replace",
 							},
 							{
-								description: targetUnitsEnabled
-									? translator.textFn(
-											"Spends one unit from the selected target. Spending its last unit depletes one target item and emits that item's configured depletion output. Example: Empty Wine + Wine Barrel → Wine; the Wine Barrel loses one fill.",
-										)
-									: translator.textFn(
-											"Select a target item with Units enabled before choosing Spend. Spend removes one unit from the target and emits that item's configured depletion output after the last use.",
-										),
+								description: <Mx label="Merge target spend help" />,
 								disabled: !targetUnitsEnabled,
 								label: translator.textFn("Spend"),
 								value: "spend",
@@ -167,7 +146,7 @@ export const MergeField = ({
 				</article>
 			</EditorFormCard>
 			<EditorFormSection
-				description={translator.textFn("Optional items emitted after this merge resolves.")}
+				description={<Mx label="Merge output help" />}
 				title={translator.textFn("Merge output")}
 			>
 				<EditorFormCard>

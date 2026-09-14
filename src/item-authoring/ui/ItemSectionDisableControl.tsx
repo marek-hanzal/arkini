@@ -6,13 +6,21 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Tooltip } from "~/ui/ui/Tooltip";
+import { Mx } from "~/translation/ui/Mx";
 
-const CapabilityDescription: Record<OptionalCapability, string> = {
-	production: "Disable removes all production lines from this item.",
-	merges: "Disable removes all merge interactions from this item.",
-	clock: "Disable removes timing, rules and expiry output from this item.",
-	units: "Disable removes the unit supply and depletion output from this item.",
-	action: "Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.",
+const CapabilityHelp = ({ capability }: { readonly capability: OptionalCapability }) => {
+	switch (capability) {
+		case "production":
+			return <Mx label="Disable production help" />;
+		case "merges":
+			return <Mx label="Disable merges help" />;
+		case "clock":
+			return <Mx label="Disable Clock help" />;
+		case "units":
+			return <Mx label="Disable Units help" />;
+		case "action":
+			return <Mx label="Disable action help" />;
+	}
 };
 
 /** Clears only the active capability in the local form; the form session owns persistence. */
@@ -45,18 +53,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 	)
 		return null;
 	return (
-		<Tooltip
-			content={
-				<div className="grid gap-2">
-					<p>{translator.textFn(CapabilityDescription[sectionId])}</p>
-					<p>
-						{translator.textFn(
-							"This changes only the current form. Save applies it; Discard restores the saved item.",
-						)}
-					</p>
-				</div>
-			}
-		>
+		<Tooltip content={<CapabilityHelp capability={sectionId} />}>
 			<LinkButton
 				className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
 				data-ui="ItemSectionDisableControl"

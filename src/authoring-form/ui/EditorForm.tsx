@@ -86,6 +86,7 @@ const EditorTextAreaField = ({
 
 interface EditorNumberFieldProps {
 	readonly description?: ReactNode;
+	readonly disabled?: boolean;
 	readonly label: string;
 	readonly max?: number;
 	readonly min?: number;
@@ -95,6 +96,7 @@ interface EditorNumberFieldProps {
 
 const EditorNumberField = ({
 	description,
+	disabled = false,
 	label,
 	max,
 	min,
@@ -107,6 +109,7 @@ const EditorNumberField = ({
 	return (
 		<EditorNumberControl
 			description={description}
+			disabled={disabled}
 			error={error}
 			label={label}
 			max={max}
@@ -199,7 +202,7 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 
 interface EditorBoolToggleProps {
 	readonly checkedIcon: LucideIcon;
-	readonly description: string;
+	readonly description: ReactNode;
 	readonly label: string;
 	readonly uncheckedIcon: LucideIcon;
 }

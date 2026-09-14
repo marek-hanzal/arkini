@@ -4,7 +4,7 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 
 interface EditorFormSectionProps extends PropsWithChildren {
 	readonly action?: ReactNode;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";
 }

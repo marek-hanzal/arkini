@@ -1,15 +1,12 @@
-import { EditorValueLabel } from "~/editor-control/ui/EditorValueField";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { ReactNode } from "react";
 import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 
 interface QuantityControlProps {
-	readonly description?: ReactNode;
-	readonly label?: string;
 	readonly maximumError?: string;
-	readonly maximumDescription?: string;
+	readonly maximumDescription?: ReactNode;
 	readonly minimumError?: string;
-	readonly minimumDescription?: string;
+	readonly minimumDescription?: ReactNode;
 	readonly onChangeFn: (quantity: QuantitySchema.Type) => void;
 	readonly value: QuantitySchema.Type;
 }
@@ -22,7 +19,7 @@ export const QuantityFields = ({
 	minimumDescription,
 	onChangeFn,
 	value,
-}: Omit<QuantityControlProps, "description" | "label">) => (
+}: QuantityControlProps) => (
 	<>
 		<EditorNumberControl
 			description={minimumDescription}
@@ -56,8 +53,6 @@ export const QuantityFields = ({
 
 /** Edits the required inclusive positive quantity bounds. */
 export const QuantityControl = ({
-	description,
-	label = "Quantity",
 	maximumDescription,
 	maximumError,
 	minimumDescription,
@@ -65,22 +60,14 @@ export const QuantityControl = ({
 	onChangeFn,
 	value,
 }: QuantityControlProps) => (
-	<div className="grid gap-3">
-		<div className="text-sm">
-			<EditorValueLabel
-				description={description}
-				label={label}
-			/>
-		</div>
-		<div className="grid gap-3 sm:grid-cols-2">
-			<QuantityFields
-				maximumError={maximumError}
-				maximumDescription={maximumDescription}
-				minimumError={minimumError}
-				minimumDescription={minimumDescription}
-				value={value}
-				onChangeFn={onChangeFn}
-			/>
-		</div>
+	<div className="grid gap-3 sm:grid-cols-2">
+		<QuantityFields
+			maximumError={maximumError}
+			maximumDescription={maximumDescription}
+			minimumError={minimumError}
+			minimumDescription={minimumDescription}
+			value={value}
+			onChangeFn={onChangeFn}
+		/>
 	</div>
 );

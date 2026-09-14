@@ -3,11 +3,12 @@ import { Info, type LucideIcon } from "lucide-react";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
+import type { ReactNode } from "react";
 
 interface EditorBooleanToggleBadgeProps {
 	readonly checked: boolean;
 	readonly checkedIcon: LucideIcon;
-	readonly description: string;
+	readonly description: ReactNode;
 	readonly label: string;
 	readonly onChangeFn: (checked: boolean) => void;
 	readonly uncheckedIcon: LucideIcon;

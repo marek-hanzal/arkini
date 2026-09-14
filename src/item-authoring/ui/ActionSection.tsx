@@ -12,6 +12,7 @@ import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { Mx } from "~/translation/ui/Mx";
 
 const RandomSpaceMinimum = 128;
 const RandomSpaceMaximum = 1_024;
@@ -48,16 +49,14 @@ export const ActionSection = () => {
 											{
 												value: "inventory",
 												label: translator.textFn("Inventory"),
-												description: translator.textFn(
-													"Open the inventory after all requirements and rules pass.",
+												description: (
+													<Mx label="Inventory action type help" />
 												),
 											},
 											{
 												value: "space",
 												label: translator.textFn("Space"),
-												description: translator.textFn(
-													"Enter the configured space after all requirements and rules pass.",
-												),
+												description: <Mx label="Space action type help" />,
 											},
 										]}
 										onChangeFn={(type) =>
@@ -87,13 +86,11 @@ export const ActionSection = () => {
 										: translator.textFn("Inventory")
 								}
 								description={
-									action.type === "space"
-										? translator.textFn(
-												"Activating this item settles its requirements and unit costs, then enters the target space.",
-											)
-										: translator.textFn(
-												"Open the inventory after all requirements and rules pass.",
-											)
+									action.type === "space" ? (
+										<Mx label="Space action help" />
+									) : (
+										<Mx label="Inventory action help" />
+									)
 								}
 							>
 								{match(action)
@@ -107,9 +104,9 @@ export const ActionSection = () => {
 													{(field) => (
 														<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
 															<field.NumberField
-																description={translator.textFn(
-																	"The board space entered after successful activation. One-way navigation is allowed.",
-																)}
+																description={
+																	<Mx label="Target space help" />
+																}
 																label={translator.textFn(
 																	"Target space",
 																)}
@@ -157,9 +154,7 @@ export const ActionSection = () => {
 											"enable",
 											"disable",
 										]}
-										description={translator.textFn(
-											"Every Enable rule must pass, and any matching Disable rule prevents activation.",
-										)}
+										description={<Mx label="Action rules help" />}
 										rules={action.rules}
 										target="action"
 										onChangeFn={(rules) =>

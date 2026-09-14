@@ -19,6 +19,9 @@ import {
 } from "~/editor-control/ui/EditorValueControls";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
+import { Mx } from "~/translation/ui/Mx";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import type { ReactNode } from "react";
 
 type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
@@ -55,49 +58,66 @@ const QueryScopeControl = ({
 	readonly error?: string;
 	readonly onChangeFn: (query: QuerySchema.Type) => void;
 	readonly value: QuerySchema.Type;
-}) => (
-	<EditorChoiceControl
-		error={error}
-		label="Query scope"
-		value={value.scope}
-		options={queryScopeOptions}
-		onChangeFn={(scope) =>
-			onChangeFn(
-				scope === "board"
-					? {
-							scope,
-							distance: "close",
-							selector: value.selector,
-						}
-					: {
-							scope,
-							selector: value.selector,
-						},
-			)
-		}
-	/>
-);
+}) => {
+	const translator = useTranslator();
+	return (
+		<EditorChoiceControl
+			error={error}
+			label={translator.textFn("Query scope")}
+			value={value.scope}
+			options={queryScopeOptions.map((option) => ({
+				...option,
+				label: translator.textFn(option.label),
+				description:
+					option.value === "board" ? (
+						<Mx label="Query scope Board help" />
+					) : option.value === "inventory" ? (
+						<Mx label="Query scope Inventory help" />
+					) : option.value === "toolbar" ? (
+						<Mx label="Query scope Toolbar help" />
+					) : option.value === "any" ? (
+						<Mx label="Query scope Any local help" />
+					) : (
+						<Mx label="Query scope Universe help" />
+					),
+			}))}
+			onChangeFn={(scope) =>
+				onChangeFn(
+					scope === "board"
+						? {
+								scope,
+								distance: "close",
+								selector: value.selector,
+							}
+						: {
+								scope,
+								selector: value.selector,
+							},
+				)
+			}
+		/>
+	);
+};
 
-const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget) => {
+const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget): ReactNode => {
 	if (target === "drop")
-		return type === "enable"
-			? "Allows this selected drop only while every condition passes. It does not enable or disable the production line itself."
-			: "Suppresses this selected drop while every condition passes. It does not disable the production line or other drops.";
+		return type === "enable" ? (
+			<Mx label="Drop enable rule help" />
+		) : (
+			<Mx label="Drop disable rule help" />
+		);
 	if (target === "action")
-		return type === "enable"
-			? "Acts as a positive gate for this item action. Every Enable rule must pass, while a matching Disable rule still vetoes activation."
-			: "Disables this item action while every condition passes, regardless of its authored Enabled state or passing Enable rules.";
-	if (type === "show")
-		return "Shows this production line while every condition passes. A matching Hide rule still has veto power.";
-	if (type === "hide")
-		return "Hides this production line while every condition passes, regardless of its authored visibility or matching Show rules.";
-	if (type === "enable")
-		return "Acts as a positive gate for this production line. When Enable rules exist, every one must pass; a matching Disable rule still vetoes availability.";
-	if (type === "disable")
-		return "Disables this production line while every condition passes, regardless of its authored Enabled state or passing Enable rules.";
-	if (type === "runtime:adjust")
-		return "Adds the configured signed duration to this production line while every condition passes.";
-	return "Multiplies this production line's runtime while every condition passes. Active multipliers are applied before runtime adjustments.";
+		return type === "enable" ? (
+			<Mx label="Action enable rule help" />
+		) : (
+			<Mx label="Action disable rule help" />
+		);
+	if (type === "show") return <Mx label="Production show rule help" />;
+	if (type === "hide") return <Mx label="Production hide rule help" />;
+	if (type === "enable") return <Mx label="Production enable rule help" />;
+	if (type === "disable") return <Mx label="Production disable rule help" />;
+	if (type === "runtime:adjust") return <Mx label="Production runtime adjustment rule help" />;
+	return <Mx label="Production runtime multiplier rule help" />;
 };
 
 const WhenControl = ({
@@ -108,28 +128,27 @@ const WhenControl = ({
 	readonly value: WhenSchema.Type;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
+	const translator = useTranslator();
 	return (
 		<div className="grid min-w-0 gap-3">
 			<EditorChoiceControl
 				error={readEditorFormValidationErrorFn(validationIssues, "type")}
-				label="Condition type"
+				label={translator.textFn("Condition type")}
 				value={value.type}
 				options={[
 					{
-						description: "Passes when the query finds any positive item quantity.",
-						label: "Exists",
+						description: <Mx label="Exists condition help" />,
+						label: translator.textFn("Exists"),
 						value: "exists",
 					},
 					{
-						description:
-							"Passes only when the query finds exactly the configured total item quantity.",
-						label: "Exact count",
+						description: <Mx label="Exact count condition help" />,
+						label: translator.textFn("Exact count"),
 						value: "count",
 					},
 					{
-						description:
-							"Passes when the query finds a total item quantity inside the configured inclusive range.",
-						label: "Count range",
+						description: <Mx label="Count range condition help" />,
+						label: translator.textFn("Count range"),
 						value: "range",
 					},
 				]}
@@ -291,7 +310,7 @@ const RuleControl = ({
 	readonly rule: RuleValue;
 	readonly ruleIndex: number;
 	readonly ruleTarget: RuleTarget;
-	readonly ruleTypeDescription: string;
+	readonly ruleTypeDescription: ReactNode;
 }) => {
 	const validationIssues = useFormValidationIssues(rule);
 	const invalidWhenIndex = validationIssues.find(
@@ -437,7 +456,7 @@ export const RulesControl = ({
 	target,
 }: {
 	readonly allowedTypes: ReadonlyArray<RuleType>;
-	readonly description: string;
+	readonly description: ReactNode;
 	readonly headerVisible?: boolean;
 	readonly onChangeFn: (rules: RuleValue[]) => void;
 	readonly initialRuleIndex?: number;

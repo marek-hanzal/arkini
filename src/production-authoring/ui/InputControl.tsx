@@ -11,6 +11,8 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { EditorFormValidationIssue } from "~/editor-control/type/EditorFormValidationIssue";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
+import { Mx } from "~/translation/ui/Mx";
+import type { ReactNode } from "react";
 
 type UnitsInput = Extract<
 	LineInputSchema.Type,
@@ -54,20 +56,12 @@ const UnitsPaidByControl = ({
 			value={units.from}
 			options={[
 				{
-					description: translator.textFn(
-						"The board item resolved by a Units input pays the unit cost in place. Units are spent without moving the target.",
-					),
+					description: <Mx label="Units paid by target help" />,
 					label: translator.textFn("Target"),
 					value: "target",
 				},
 				{
-					description: selfUnitsEnabled
-						? translator.textFn(
-								"The item that owns this action pays the unit cost. It must define enough available units.",
-							)
-						: translator.textFn(
-								"Enable Units on this item before selecting Self to pay the unit cost.",
-							),
+					description: <Mx label="Units paid by self help" />,
 					disabled: !selfUnitsEnabled,
 					label: translator.textFn("Self"),
 					value: "self",
@@ -117,9 +111,7 @@ const UnitsSelfUnitCostControl = ({
 			data-ui="EditorInputUnitCost"
 		>
 			<EditorFormSectionDivider
-				description={translator.textFn(
-					"Units spent by the item that owns this action when it starts.",
-				)}
+				description={<Mx label="Self unit cost help" />}
 				title={translator.textFn("Unit cost")}
 				variant="secondary"
 			/>
@@ -157,14 +149,12 @@ const MaterialModeControl = ({
 		value={input.mode}
 		options={[
 			{
-				description:
-					"Uses the delivered material for this run. The committed item is removed when production completes.",
+				description: <Mx label="Consume material mode help" />,
 				label: "Consume",
 				value: "consume",
 			},
 			{
-				description:
-					"Keeps the delivered material reserved during production and returns the same item when the run completes.",
+				description: <Mx label="Reserve material mode help" />,
 				label: "Reserve",
 				value: "reserve",
 			},
@@ -202,8 +192,8 @@ const MaterialInputControl = ({
 			<QuantityFields
 				minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
 				maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
-				minimumDescription="Minimum matching material quantity required before this line can start. If this amount is available, the run becomes ready."
-				maximumDescription="Maximum matching material quantity one run consumes or reserves. A ready run uses what is currently stored, capped at this amount."
+				minimumDescription={<Mx label="Material minimum quantity help" />}
+				maximumDescription={<Mx label="Material maximum quantity help" />}
 				value={input.quantity}
 				onChangeFn={(quantity) =>
 					onChangeFn({
@@ -214,7 +204,7 @@ const MaterialInputControl = ({
 			/>
 			<EditorNumberControl
 				error={readEditorFormValidationErrorFn(issues, "capacity")}
-				description="Additional quantity this input may hold above Maximum. The buffer does not increase how much one run consumes or reserves."
+				description={<Mx label="Material buffer help" />}
 				label="Buffer"
 				value={input.capacity}
 				min={0}
@@ -250,16 +240,11 @@ const UnitsTargetUnitCostControl = ({
 			data-ui="EditorInputUnitCost"
 		>
 			<EditorFormSectionDivider
-				description={translator.textFn(
-					"Units spent by the selected target when the action starts.",
-				)}
+				description={<Mx label="Target unit cost help" />}
 				title={translator.textFn("Unit cost")}
 				variant="secondary"
 			/>
 			<SelectorControl
-				description={translator.textFn(
-					"Only items with Units enabled are shown because the target pays the unit cost.",
-				)}
 				emptyLabel={translator.textFn("No item with Units enabled matches this search.")}
 				error={
 					targetMissingUnits
@@ -269,6 +254,7 @@ const UnitsTargetUnitCostControl = ({
 							: selectedItemError
 				}
 				includeItemFn={hasUnitsFn}
+				labelVisible={false}
 				value={input.query.selector}
 				onChangeFn={(selector) =>
 					onChangeFn({
@@ -332,28 +318,22 @@ export const InputControl = ({
 	const translator = useTranslator();
 	const inputTypeOptions = [
 		{
-			description: translator.textFn(
-				"Adds no item or units requirement. The action may start without delivering or targeting another item.",
-			),
+			description: <Mx label="Simple input type help" />,
 			label: translator.textFn("Simple"),
 			value: "simple",
 		},
 		{
-			description: translator.textFn(
-				"Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.",
-			),
+			description: <Mx label="Materials input type help" />,
 			label: translator.textFn("Materials"),
 			value: "materials",
 		},
 		{
-			description: translator.textFn(
-				"Spends units from this item or a matching board item when the action starts. The paying item stays in place.",
-			),
+			description: <Mx label="Units input type help" />,
 			label: translator.textFn("Units"),
 			value: "units",
 		},
 	] as const satisfies ReadonlyArray<{
-		readonly description: string;
+		readonly description: ReactNode;
 		readonly label: string;
 		readonly value: LineInputSchema.Type["type"];
 	}>;
@@ -365,13 +345,11 @@ export const InputControl = ({
 					error={readEditorFormValidationErrorFn(issues, "type")}
 					label={translator.textFn("Input type")}
 					description={
-						allowMaterials
-							? translator.textFn(
-									"Simple requires no consumable resource. Materials consume or reserve an item, while Units spends units from the owner or a matching board item.",
-								)
-							: translator.textFn(
-									"Simple adds no external item requirement. Units spends units from the owner or a matching item on the current board.",
-								)
+						allowMaterials ? (
+							<Mx label="Production input type help" />
+						) : (
+							<Mx label="Action input type help" />
+						)
 					}
 					value={input.type}
 					options={inputTypeOptions.filter(

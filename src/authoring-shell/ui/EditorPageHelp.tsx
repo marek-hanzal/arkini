@@ -56,7 +56,7 @@ const EditorPageHelpDialog = ({
 				animate={{
 					opacity: 1,
 				}}
-				className="grid max-h-[calc(100dvh-3rem)] w-full max-w-lg grid-rows-[auto_minmax(0,1fr)] rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+				className="grid max-h-[calc(100dvh-3rem)] w-full max-w-3xl grid-rows-[auto_minmax(0,1fr)] rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 				data-ui="EditorPageHelpDialog"
 				exit={{
 					opacity: 0,

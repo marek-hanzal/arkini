@@ -1,8 +1,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
-import { Button } from "~/ui/ui/Button";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 
 interface EditorCollectionSelectorProps {
@@ -114,8 +114,7 @@ export const EditorCollectionSelector = ({
 				</div>
 				<div className="flex shrink-0 items-center">
 					{onAddFn === undefined ? null : (
-						<Button
-							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
+						<EditorIconButton
 							title={addLabel}
 							onClick={() => {
 								onAddFn();
@@ -123,11 +122,10 @@ export const EditorCollectionSelector = ({
 							}}
 						>
 							<Plus className="size-5" />
-						</Button>
+						</EditorIconButton>
 					)}
 					{onRemoveFn === undefined ? null : (
-						<Button
-							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
+						<EditorIconButton
 							disabled={activeIndex === undefined}
 							title={removeLabel}
 							onClick={() => {
@@ -137,7 +135,7 @@ export const EditorCollectionSelector = ({
 							}}
 						>
 							<Trash2 className="size-4" />
-						</Button>
+						</EditorIconButton>
 					)}
 				</div>
 			</nav>

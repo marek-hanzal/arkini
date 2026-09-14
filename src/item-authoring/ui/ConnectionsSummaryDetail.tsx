@@ -46,7 +46,7 @@ export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.T
 		<>
 			{views.map(({ filter, title, connections }) => (
 				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+					className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 					data-ui="EditorItemConnectionsSummary"
 					key={filter}
 				>

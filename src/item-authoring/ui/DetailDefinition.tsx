@@ -14,7 +14,7 @@ export const DetailSection = ({
 	readonly description?: string;
 	readonly title: string;
 }) => (
-	<section className="grid gap-2 border-t border-line pt-5 first:border-t-0 first:pt-0">
+	<section className="grid gap-3">
 		<EditorFormSectionDivider
 			title={title}
 			description={description}

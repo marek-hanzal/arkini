@@ -12,7 +12,7 @@ export const EditorRootCard = ({
 }) => (
 	<div
 		{...props}
-		className={twMerge("grid gap-5", className)}
+		className={twMerge("grid gap-3", className)}
 		data-ui={dataUi}
 	>
 		{children}

@@ -19,7 +19,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)] min-[64rem]:grid-cols-2">
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemArtworkDetail"
 			>
 				<ItemDetailSectionHeader
@@ -38,7 +38,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				</EditorRootCard>
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemIdentityDetail"
 			>
 				<ItemDetailSectionHeader
@@ -126,7 +126,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				</EditorRootCard>
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemMergesDetail"
 			>
 				<ItemDetailSectionHeader
@@ -140,7 +140,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				<MergesDetail item={item} />
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemProductionSummary"
 			>
 				<ItemDetailSectionHeader
@@ -154,7 +154,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				<ProductionSummaryDetail item={item} />
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemUnitsDetail"
 			>
 				<ItemDetailSectionHeader
@@ -171,7 +171,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				/>
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemClockDetail"
 			>
 				<ItemDetailSectionHeader
@@ -188,7 +188,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				/>
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemActionDetail"
 			>
 				<ItemDetailSectionHeader
@@ -205,7 +205,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				/>
 			</section>
 			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 				data-ui="EditorItemEstimateDetail"
 			>
 				<ItemDetailSectionHeader

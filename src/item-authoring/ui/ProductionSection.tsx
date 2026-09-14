@@ -13,7 +13,7 @@ import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSe
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 
 interface ProductionFieldValues {
 	readonly maxQueueSize?: number;
@@ -49,114 +49,118 @@ const ProductionFields = withFieldGroupFn({
 						)}
 					</group.AppField>
 				</EditorFormCard>
-				<EditorFormSectionDivider
+				<EditorFormSection
 					description={translator.textFn(
 						"Add lines to enable production. Adding a line removes the configured action. Each line has its own inputs, output, runtime and rules.",
 					)}
 					title={translator.textFn("Product lines")}
-				/>
-				<group.AppField
-					name="lines"
-					mode="array"
 				>
-					{(linesField) => {
-						const lines = linesField.state.value ?? [];
-						const addLineFn = () => {
-							const currentLines = form.state.values.lines ?? [];
-							if (currentLines.length === 0) form.setFieldValue("action", undefined);
-							const line = createLineFn(
-								form.state.values.id,
-								currentLines,
-								translator.textFn("New production line"),
-								translator.textFn("Describe what this line consumes and produces."),
-							);
-							form.setFieldValue("lines", [
-								...currentLines,
-								line,
-							]);
-						};
+					<group.AppField
+						name="lines"
+						mode="array"
+					>
+						{(linesField) => {
+							const lines = linesField.state.value ?? [];
+							const addLineFn = () => {
+								const currentLines = form.state.values.lines ?? [];
+								if (currentLines.length === 0)
+									form.setFieldValue("action", undefined);
+								const line = createLineFn(
+									form.state.values.id,
+									currentLines,
+									translator.textFn("New production line"),
+									translator.textFn(
+										"Describe what this line consumes and produces.",
+									),
+								);
+								form.setFieldValue("lines", [
+									...currentLines,
+									line,
+								]);
+							};
 
-						if (lines.length === 0)
+							if (lines.length === 0)
+								return (
+									<EditorFormCard>
+										<EditorCapabilityStatus
+											actionLabel={translator.textFn("Enable")}
+											icon={Factory}
+											onEnableFn={addLineFn}
+											title={translator.textFn("Item production empty title")}
+										/>
+									</EditorFormCard>
+								);
+
 							return (
-								<EditorFormCard>
-									<EditorCapabilityStatus
-										actionLabel={translator.textFn("Enable")}
-										icon={Factory}
-										onEnableFn={addLineFn}
-										title={translator.textFn("Item production empty title")}
+								<>
+									<EditorCollectionSelector
+										addLabel={translator.textFn("Add line")}
+										count={lines.length}
+										itemLabelFn={(index) => {
+											const line = lines[index];
+											return line.title.length === 0
+												? `${translator.textFn("Production line")} ${index + 1}`
+												: line.title;
+										}}
+										renderItemContentFn={(index, label) => (
+											<ProductionLineOption
+												items={project.config.items}
+												line={lines[index]}
+												label={label}
+											/>
+										)}
+										itemSearchTermsFn={(index) => [
+											lines[index].id,
+											lines[index].description,
+										]}
+										itemRelatedSearchTermsFn={(index) =>
+											readCapabilityRelatedTermsFn(
+												lines[index],
+												project.config.items,
+											)
+										}
+										initialSelectedIndex={Math.max(
+											0,
+											lines.findIndex((line) => line.id === selectedLineId),
+										)}
+										selectedIndex={invalidLineIndex}
+										label={translator.textFn("Product lines")}
+										navigationCard
+										onAddFn={addLineFn}
+										onRemoveFn={(index) => linesField.removeValue(index)}
+										removeLabel={translator.textFn("Remove line")}
+									>
+										{(index) => (
+											<LineFields
+												form={group}
+												fields={`lines[${index}]`}
+												label={null}
+												onMarkerChangeFn={(marker, value) =>
+													form.setFieldValue(
+														"lines",
+														setLineMarkerFn(
+															form.state.values.lines ?? [],
+															index,
+															marker,
+															value,
+														),
+													)
+												}
+											/>
+										)}
+									</EditorCollectionSelector>
+									<EditorCapabilityDisable
+										title={translator.textFn("Production configured")}
+										description={translator.textFn(
+											"Disable removes all production lines from this item.",
+										)}
+										onDisableFn={() => form.setFieldValue("lines", [])}
 									/>
-								</EditorFormCard>
+								</>
 							);
-
-						return (
-							<>
-								<EditorCollectionSelector
-									addLabel={translator.textFn("Add line")}
-									count={lines.length}
-									itemLabelFn={(index) => {
-										const line = lines[index];
-										return line.title.length === 0
-											? `${translator.textFn("Production line")} ${index + 1}`
-											: line.title;
-									}}
-									renderItemContentFn={(index, label) => (
-										<ProductionLineOption
-											items={project.config.items}
-											line={lines[index]}
-											label={label}
-										/>
-									)}
-									itemSearchTermsFn={(index) => [
-										lines[index].id,
-										lines[index].description,
-									]}
-									itemRelatedSearchTermsFn={(index) =>
-										readCapabilityRelatedTermsFn(
-											lines[index],
-											project.config.items,
-										)
-									}
-									initialSelectedIndex={Math.max(
-										0,
-										lines.findIndex((line) => line.id === selectedLineId),
-									)}
-									selectedIndex={invalidLineIndex}
-									label={translator.textFn("Product lines")}
-									navigationCard
-									onAddFn={addLineFn}
-									onRemoveFn={(index) => linesField.removeValue(index)}
-									removeLabel={translator.textFn("Remove line")}
-								>
-									{(index) => (
-										<LineFields
-											form={group}
-											fields={`lines[${index}]`}
-											label={null}
-											onMarkerChangeFn={(marker, value) =>
-												form.setFieldValue(
-													"lines",
-													setLineMarkerFn(
-														form.state.values.lines ?? [],
-														index,
-														marker,
-														value,
-													),
-												)
-											}
-										/>
-									)}
-								</EditorCollectionSelector>
-								<EditorCapabilityDisable
-									title={translator.textFn("Production configured")}
-									description={translator.textFn(
-										"Disable removes all production lines from this item.",
-									)}
-									onDisableFn={() => form.setFieldValue("lines", [])}
-								/>
-							</>
-						);
-					}}
-				</group.AppField>
+						}}
+					</group.AppField>
+				</EditorFormSection>
 			</div>
 		);
 	},

@@ -27,7 +27,7 @@ export const ArtworkDetail = ({
 				resourceIds={item.asset.default}
 				scale={item.asset.scale}
 			/>
-			<dl className="grid min-w-0 gap-4 group-data-[ui-layout=detail]/artwork:order-first group-data-[ui-layout=detail]/artwork:text-center">
+			<dl className="grid min-w-0 gap-4 text-left group-data-[ui-layout=detail]/artwork:order-first">
 				{item.asset.default.map((resourceId, index) => (
 					<DetailFact
 						key={resourceId}

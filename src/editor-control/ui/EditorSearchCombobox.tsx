@@ -387,7 +387,7 @@ export const EditorSearchCombobox = ({
 					<SearchInput
 						value={query}
 						autoComplete="off"
-						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1"
+						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-[var(--ak-editor-background)] py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							handleOpenChangeFn(false);
@@ -436,7 +436,7 @@ export const EditorSearchCombobox = ({
 					<span
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
+						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-[var(--ak-editor-background)] p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
 						{...readDataUiFn({
 							dataUi: "EditorSearchComboboxMenu",
 							state: {

@@ -4,7 +4,7 @@ import { BatteryCharging, PackagePlus } from "lucide-react";
 import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 
@@ -44,25 +44,26 @@ export const UnitsSection = () => {
 									)}
 								</form.AppField>
 							</EditorFormCard>
-							<EditorFormSectionDivider
+							<EditorFormSection
 								description={translator.textFn(
 									"Optional items emitted when the final unit is spent.",
 								)}
 								title={translator.textFn("Depletion output")}
-							/>
-							<EditorFormCard>
-								<OptionalOutputControl
-									addLabel={translator.textFn("Enable")}
-									emptyIcon={PackagePlus}
-									emptyTitle={translator.textFn(
-										"Item depletion output empty title",
-									)}
-									value={units.output}
-									onChangeFn={(output) =>
-										form.setFieldValue("units.output", output)
-									}
-								/>
-							</EditorFormCard>
+							>
+								<EditorFormCard>
+									<OptionalOutputControl
+										addLabel={translator.textFn("Enable")}
+										emptyIcon={PackagePlus}
+										emptyTitle={translator.textFn(
+											"Item depletion output empty title",
+										)}
+										value={units.output}
+										onChangeFn={(output) =>
+											form.setFieldValue("units.output", output)
+										}
+									/>
+								</EditorFormCard>
+							</EditorFormSection>
 							<EditorCapabilityDisable
 								title={translator.textFn("Units configured")}
 								description={translator.textFn(

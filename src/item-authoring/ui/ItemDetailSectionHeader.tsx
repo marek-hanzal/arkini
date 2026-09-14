@@ -5,6 +5,7 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { SectionId } from "~/item-authoring/type/Section";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 /** Links overview capabilities to their own detail; identity keeps its direct edit action. */
 export const ItemDetailSectionHeader = ({
@@ -23,44 +24,47 @@ export const ItemDetailSectionHeader = ({
 	const project = useEditorProject();
 	const translator = useTranslator();
 	return (
-		<div
-			className="flex min-h-6 items-center gap-3"
-			data-ui="EditorItemDetailSectionHeader"
-		>
-			<div className="min-w-0 flex-1">
-				<EditorFormSectionDivider
-					title={title}
-					description={description}
-				/>
-			</div>
-			{sectionId === undefined ? null : (
-				<LinkButtonLink
-					className="inline-flex shrink-0 items-center gap-1.5"
-					to={
-						sectionId === "identity"
-							? "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-							: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-					}
-					search={
-						filter === undefined
-							? undefined
-							: {
-									filter,
-								}
-					}
-					params={{
-						projectId: project.projectId,
-						itemUid,
-						sectionId,
-					}}
-				>
-					{sectionId === "identity" ? <Pencil className="size-4" /> : null}
-					{sectionId === "identity"
-						? translator.textFn("Edit")
-						: translator.textFn("Show all")}
-					{sectionId === "identity" ? null : <ArrowRight className="size-4" />}
-				</LinkButtonLink>
-			)}
+		<div data-ui="EditorItemDetailSectionHeader">
+			<EditorFormSectionDivider
+				title={title}
+				description={description}
+				action={
+					sectionId === undefined ? undefined : (
+						<LinkButtonLink
+							className="inline-flex shrink-0 items-center gap-1.5 data-[ui-action=show-all]:opacity-75 data-[ui-action=show-all]:hover:opacity-100"
+							{...readDataUiFn({
+								dataUi: "EditorItemSectionAction",
+								state: {
+									action: sectionId === "identity" ? "edit" : "show-all",
+								},
+							})}
+							to={
+								sectionId === "identity"
+									? "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+									: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+							}
+							search={
+								filter === undefined
+									? undefined
+									: {
+											filter,
+										}
+							}
+							params={{
+								projectId: project.projectId,
+								itemUid,
+								sectionId,
+							}}
+						>
+							{sectionId === "identity" ? <Pencil className="size-4" /> : null}
+							{sectionId === "identity"
+								? translator.textFn("Edit")
+								: translator.textFn("Show all")}
+							{sectionId === "identity" ? null : <ArrowRight className="size-4" />}
+						</LinkButtonLink>
+					)
+				}
+			/>
 		</div>
 	);
 };

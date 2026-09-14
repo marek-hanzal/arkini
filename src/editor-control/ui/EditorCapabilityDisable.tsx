@@ -1,6 +1,6 @@
-import { Trash2 } from "lucide-react";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { Trash2 } from "lucide-react";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -16,14 +16,12 @@ export const EditorCapabilityDisable = ({
 }) => {
 	const translator = useTranslator();
 	return (
-		<>
-			<hr className="border-line-strong" />
+		<EditorFormSection
+			title={translator.textFn("Status")}
+			description={description}
+			variant="secondary"
+		>
 			<EditorFormCard>
-				<EditorFormSectionDivider
-					title={translator.textFn("Status")}
-					description={description}
-					variant="secondary"
-				/>
 				<div className="flex items-center justify-between gap-3">
 					<span className="text-sm font-medium">{title}</span>
 					<LinkButton
@@ -35,6 +33,6 @@ export const EditorCapabilityDisable = ({
 					</LinkButton>
 				</div>
 			</EditorFormCard>
-		</>
+		</EditorFormSection>
 	);
 };

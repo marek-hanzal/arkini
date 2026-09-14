@@ -16,15 +16,13 @@ export const EditorOverviewCard = ({
 	readonly title: string;
 }) => (
 	<section
-		className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
+		className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
 		data-ui={dataUi}
 	>
-		<div className="flex items-center gap-3">
-			<div className="min-w-0 flex-1">
-				<EditorFormSectionDivider title={title} />
-			</div>
-			<div className="shrink-0">{action}</div>
-		</div>
+		<EditorFormSectionDivider
+			title={title}
+			action={action}
+		/>
 		<EditorRootCard className="content-start">
 			<div className="text-sm font-medium leading-snug text-foreground">{body}</div>
 		</EditorRootCard>

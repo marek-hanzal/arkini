@@ -1117,6 +1117,37 @@ describe("item section form session", () => {
 		);
 	});
 
+	it("regenerates only the edited line ID from title while allowing independent ID edits", async () => {
+		const sibling = createLine({ id: "line:second" });
+		const common = {
+			...createProducerItem({
+				id: item.id,
+				lines: [{ ...createLine({ id: "custom-id" }), title: "Original Title" }, sibling],
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ProductionSection />);
+		const title = container.querySelector<HTMLInputElement>('input[name="lines[0].title"]');
+		const id = container.querySelector<HTMLInputElement>('input[name="lines[0].id"]');
+		if (title === null || id === null) throw new Error("Missing line identity fields.");
+		expect(id.value).toBe("custom-id");
+		await changeInput(title, "Foo   Bar");
+		expect(id.value).toBe("foo-bar");
+		await changeInput(id, "manual-id");
+		expect(title.value).toBe("Foo   Bar");
+		await changeInput(title, "Next Title");
+		expect(id.value).toBe("next-title");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.lines).toEqual([
+			{ ...common.lines[0], title: "Next Title", id: "next-title" },
+			sibling,
+		]);
+	});
+
 	it("selects Default and Clock exclusively across sibling lines through the saved form", async () => {
 		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
 			state.persisted = item;

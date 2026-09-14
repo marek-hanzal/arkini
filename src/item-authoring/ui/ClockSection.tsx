@@ -7,7 +7,7 @@ import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 /** Composes shared time, rule, and output controls for the authored schedule. */
@@ -95,54 +95,62 @@ const ClockFields = () => {
 					/>
 				)}
 			</EditorFormCard>
-			<EditorFormSectionDivider
+			<EditorFormSection
 				title={translator.textFn("Rules")}
 				description={rulesDescription}
-			/>
-			<EditorFormCard>
-				<form.Subscribe selector={(state) => state.values.clock?.rules ?? []}>
-					{(rules) => (
-						<RulesControl
-							initialRuleIndex={outputDropIndex === undefined ? ruleIndex : undefined}
-							initialWhenIndex={outputDropIndex === undefined ? whenIndex : undefined}
-							headerVisible={false}
-							rules={rules}
-							target="action"
-							allowedTypes={[
-								"enable",
-								"disable",
-							]}
-							description={rulesDescription}
-							onChangeFn={(next) =>
-								form.setFieldValue("clock.rules", next as RuleSchema.Type[])
-							}
-						/>
-					)}
-				</form.Subscribe>
-			</EditorFormCard>
+			>
+				<EditorFormCard>
+					<form.Subscribe selector={(state) => state.values.clock?.rules ?? []}>
+						{(rules) => (
+							<RulesControl
+								initialRuleIndex={
+									outputDropIndex === undefined ? ruleIndex : undefined
+								}
+								initialWhenIndex={
+									outputDropIndex === undefined ? whenIndex : undefined
+								}
+								headerVisible={false}
+								rules={rules}
+								target="action"
+								allowedTypes={[
+									"enable",
+									"disable",
+								]}
+								description={rulesDescription}
+								onChangeFn={(next) =>
+									form.setFieldValue("clock.rules", next as RuleSchema.Type[])
+								}
+							/>
+						)}
+					</form.Subscribe>
+				</EditorFormCard>
+			</EditorFormSection>
 			{clock.durationMs === undefined ? null : (
 				<>
-					<EditorFormSectionDivider
+					<EditorFormSection
 						title={translator.textFn("Expiry output")}
 						description={translator.textFn(
 							"Resolved once when the item expires. Kill switch places what fits after returned materials; excess output is lost and logged.",
 						)}
-					/>
-					<EditorFormCard>
-						<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
-							{(output) => (
-								<OptionalOutputControl
-									addLabel={translator.textFn("Enable")}
-									emptyIcon={PackagePlus}
-									emptyTitle={translator.textFn("Item expiry output empty title")}
-									value={output}
-									onChangeFn={(next) =>
-										form.setFieldValue("clock.onExpire", next)
-									}
-								/>
-							)}
-						</form.Subscribe>
-					</EditorFormCard>
+					>
+						<EditorFormCard>
+							<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
+								{(output) => (
+									<OptionalOutputControl
+										addLabel={translator.textFn("Enable")}
+										emptyIcon={PackagePlus}
+										emptyTitle={translator.textFn(
+											"Item expiry output empty title",
+										)}
+										value={output}
+										onChangeFn={(next) =>
+											form.setFieldValue("clock.onExpire", next)
+										}
+									/>
+								)}
+							</form.Subscribe>
+						</EditorFormCard>
+					</EditorFormSection>
 				</>
 			)}
 		</div>

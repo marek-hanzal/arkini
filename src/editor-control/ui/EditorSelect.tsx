@@ -69,7 +69,7 @@ export const EditorSelect = <Value extends string>({
 		<>
 			<Button
 				ref={refs.setReference}
-				className="h-[var(--ak-control-min-height)] min-h-[var(--ak-control-min-height)] min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none data-[ui-size=large]:h-12 data-[ui-size=large]:min-h-12"
+				className="h-[var(--ak-control-min-height)] min-h-[var(--ak-control-min-height)] min-w-56 justify-between gap-3 border-line-strong bg-[var(--ak-editor-background)] px-4 text-sm shadow-none data-[ui-size=large]:h-12 data-[ui-size=large]:min-h-12"
 				title={label}
 				{...getReferencePropsFn()}
 				{...readDataUiFn({
@@ -91,7 +91,7 @@ export const EditorSelect = <Value extends string>({
 				<FloatingPortal>
 					<div
 						ref={refs.setFloating}
-						className="z-50 grid gap-1 rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
+						className="z-50 grid gap-1 rounded-xl border border-line-strong bg-[var(--ak-editor-background)] p-1.5 shadow-2xl"
 						data-ui="EditorSelectMenu"
 						style={floatingStyles}
 						{...getFloatingPropsFn()}

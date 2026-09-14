@@ -3,7 +3,7 @@ import { PackagePlus } from "lucide-react";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
@@ -167,24 +167,25 @@ export const MergeField = ({
 					)}
 				</article>
 			</EditorFormCard>
-			<EditorFormSectionDivider
+			<EditorFormSection
 				description={translator.textFn("Optional items emitted after this merge resolves.")}
 				title={translator.textFn("Merge output")}
-			/>
-			<EditorFormCard>
-				<OptionalOutputControl
-					addLabel={translator.textFn("Enable")}
-					emptyIcon={PackagePlus}
-					emptyTitle={translator.textFn("Item merge output empty title")}
-					value={merge.output}
-					onChangeFn={(output) =>
-						onChangeFn({
-							...merge,
-							output,
-						})
-					}
-				/>
-			</EditorFormCard>
+			>
+				<EditorFormCard>
+					<OptionalOutputControl
+						addLabel={translator.textFn("Enable")}
+						emptyIcon={PackagePlus}
+						emptyTitle={translator.textFn("Item merge output empty title")}
+						value={merge.output}
+						onChangeFn={(output) =>
+							onChangeFn({
+								...merge,
+								output,
+							})
+						}
+					/>
+				</EditorFormCard>
+			</EditorFormSection>
 		</div>
 	);
 };

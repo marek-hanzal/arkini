@@ -6,7 +6,7 @@ import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/
 import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
@@ -81,7 +81,7 @@ export const ActionSection = () => {
 									/>
 								</div>
 							</EditorFormCard>
-							<EditorFormSectionDivider
+							<EditorFormSection
 								title={
 									action.type === "space"
 										? translator.textFn("Space")
@@ -96,95 +96,100 @@ export const ActionSection = () => {
 												"Open the inventory after all requirements and rules pass.",
 											)
 								}
-							/>
-							{match(action)
-								.with(
-									{
-										type: "space",
-									},
-									() => (
-										<EditorFormCard>
-											<form.AppField name="action.space">
-												{(field) => (
-													<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-														<field.NumberField
-															description={translator.textFn(
-																"The board space entered after successful activation. One-way navigation is allowed.",
-															)}
-															label={translator.textFn(
-																"Target space",
-															)}
-															min={0}
-														/>
-														<LinkButton
-															className="flex h-[var(--ak-control-min-height)] items-center whitespace-nowrap"
-															onClick={() =>
-																field.handleChange(
-																	Math.floor(
-																		Math.random() *
-																			(RandomSpaceMaximum -
-																				RandomSpaceMinimum +
-																				1),
-																	) + RandomSpaceMinimum,
-																)
-															}
-														>
-															{translator.textFn("Pick random space")}
-														</LinkButton>
-													</div>
-												)}
-											</form.AppField>
-										</EditorFormCard>
-									),
-								)
-								.with(
-									{
-										type: "inventory",
-									},
-									() => null,
-								)
-								.exhaustive()}
-							<EditorFormCard>
-								<RulesControl
-									initialRuleIndex={
-										outputDropIndex === undefined ? ruleIndex : undefined
-									}
-									initialWhenIndex={
-										outputDropIndex === undefined ? whenIndex : undefined
-									}
-									allowedTypes={[
-										"enable",
-										"disable",
-									]}
-									description={translator.textFn(
-										"Every Enable rule must pass, and any matching Disable rule prevents activation.",
-									)}
-									rules={action.rules}
-									target="action"
-									onChangeFn={(rules) =>
-										form.setFieldValue(
-											"action.rules",
-											rules as ActionRuleSchema.Type[],
-										)
-									}
-								/>
-							</EditorFormCard>
-							<EditorFormCard>
-								<InputsControl
-									allowMaterials={false}
-									emptyAllowed
-									value={action.input}
-									onChangeFn={(input) =>
-										form.setFieldValue(
-											"action.input",
-											input.filter(
-												(candidate): candidate is ActionInputSchema.Type =>
-													candidate.type !== "materials",
-											),
-										)
-									}
-								/>
-							</EditorFormCard>
+							>
+								{match(action)
+									.with(
+										{
+											type: "space",
+										},
+										() => (
+											<EditorFormCard>
+												<form.AppField name="action.space">
+													{(field) => (
+														<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+															<field.NumberField
+																description={translator.textFn(
+																	"The board space entered after successful activation. One-way navigation is allowed.",
+																)}
+																label={translator.textFn(
+																	"Target space",
+																)}
+																min={0}
+															/>
+															<LinkButton
+																className="flex h-[var(--ak-control-min-height)] items-center whitespace-nowrap"
+																onClick={() =>
+																	field.handleChange(
+																		Math.floor(
+																			Math.random() *
+																				(RandomSpaceMaximum -
+																					RandomSpaceMinimum +
+																					1),
+																		) + RandomSpaceMinimum,
+																	)
+																}
+															>
+																{translator.textFn(
+																	"Pick random space",
+																)}
+															</LinkButton>
+														</div>
+													)}
+												</form.AppField>
+											</EditorFormCard>
+										),
+									)
+									.with(
+										{
+											type: "inventory",
+										},
+										() => null,
+									)
+									.exhaustive()}
+								<EditorFormCard>
+									<RulesControl
+										initialRuleIndex={
+											outputDropIndex === undefined ? ruleIndex : undefined
+										}
+										initialWhenIndex={
+											outputDropIndex === undefined ? whenIndex : undefined
+										}
+										allowedTypes={[
+											"enable",
+											"disable",
+										]}
+										description={translator.textFn(
+											"Every Enable rule must pass, and any matching Disable rule prevents activation.",
+										)}
+										rules={action.rules}
+										target="action"
+										onChangeFn={(rules) =>
+											form.setFieldValue(
+												"action.rules",
+												rules as ActionRuleSchema.Type[],
+											)
+										}
+									/>
+								</EditorFormCard>
+								<EditorFormCard>
+									<InputsControl
+										allowMaterials={false}
+										emptyAllowed
+										value={action.input}
+										onChangeFn={(input) =>
+											form.setFieldValue(
+												"action.input",
+												input.filter(
+													(
+														candidate,
+													): candidate is ActionInputSchema.Type =>
+														candidate.type !== "materials",
+												),
+											)
+										}
+									/>
+								</EditorFormCard>
+							</EditorFormSection>
 							<EditorCapabilityDisable
 								title={translator.textFn("Action configured")}
 								description={translator.textFn(

@@ -1,3 +1,4 @@
+import { shell } from "electron";
 import type {
 	Event,
 	IpcMainEvent,
@@ -110,9 +111,28 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							};
 							const preventWebviewFn = (event: Event) => event.preventDefault();
 
-							webContents.setWindowOpenHandler(() => ({
-								action: "deny",
-							}));
+							webContents.setWindowOpenHandler(({ url }) => {
+								// Web links leave the app; no destination gets an Electron window.
+								const destination = URL.parse(url);
+								if (
+									isTrustedUrlFn(webContents.mainFrame.url) &&
+									destination !== null &&
+									(destination.protocol === "https:" ||
+										destination.protocol === "http:") &&
+									destination.username === "" &&
+									destination.password === "" &&
+									!isTrustedUrlFn(destination.href)
+								) {
+									void shell
+										.openExternal(destination.href)
+										.catch((cause: unknown) => {
+											console.error("Failed to open external browser", cause);
+										});
+								}
+								return {
+									action: "deny",
+								};
+							});
 							webContents.on("will-navigate", preventUntrustedMainFrameNavigationFn);
 							webContents.on("will-redirect", preventUntrustedMainFrameNavigationFn);
 							webContents.on(

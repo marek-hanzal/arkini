@@ -131,7 +131,7 @@ The router uses history routing in development and packaged Electron. `/` owns r
 
 Electron main owns native windows, protocols, privileged IPC and GUI-side filesystem composition. Node-compatible Project and MCP transport capabilities live under their semantic `src` owners, so the GUI and CLI may compose them without importing each other's process root. Renderer domains receive typed capabilities through `electron/contract`; physical paths and native objects never cross it.
 
-Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
+Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. HTTP(S) links requesting a new window from the trusted renderer open in the system browser; Electron popups remain denied, as do other URL schemes and URLs containing credentials. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
 ## Persistence and Editor
 

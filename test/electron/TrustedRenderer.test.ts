@@ -1,7 +1,14 @@
+import { shell } from "electron";
 import type { BrowserWindow, IpcMainEvent, Session, WebContents, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { createTrustedRendererFx } from "~electron/main/security/createTrustedRendererFx";
+
+vi.mock("electron", () => ({
+	shell: {
+		openExternal: vi.fn().mockResolvedValue(undefined),
+	},
+}));
 
 const createWindowHarness = (mainFrameUrl: string) => {
 	const listeners = new Map<string, Set<(event: never) => void>>();
@@ -9,7 +16,7 @@ const createWindowHarness = (mainFrameUrl: string) => {
 	const permissionCheckHandlers: Array<unknown> = [];
 	const permissionRequestHandlers: Array<unknown> = [];
 	let openHandler:
-		| (() => {
+		| ((details: { url: string }) => {
 				action: "deny";
 		  })
 		| undefined;
@@ -27,7 +34,7 @@ const createWindowHarness = (mainFrameUrl: string) => {
 		mainFrame,
 		session,
 		setWindowOpenHandler: (
-			handler: () => {
+			handler: (details: { url: string }) => {
 				action: "deny";
 			},
 		) => {
@@ -160,7 +167,11 @@ describe("trusted Electron renderer policy", () => {
 		expect(
 			harness.emitNavigation("will-attach-webview", "arkini://app/", false),
 		).toHaveBeenCalledOnce();
-		expect(harness.openHandler()?.()).toEqual({
+		expect(
+			harness.openHandler()?.({
+				url: "file:///tmp/index.html",
+			}),
+		).toEqual({
 			action: "deny",
 		});
 
@@ -174,6 +185,47 @@ describe("trusted Electron renderer policy", () => {
 		) => void;
 		permissionRequest(harness.webContents, "media", permissionCallback);
 		expect(permissionCallback).toHaveBeenCalledWith(false);
+	});
+
+	it("opens web links in the system browser without admitting Electron popups or unsafe URLs", async () => {
+		vi.mocked(shell.openExternal).mockClear();
+		const policy = await Effect.runPromise(
+			createTrustedRendererFx({
+				isPackaged: true,
+			}),
+		);
+		const harness = createWindowHarness("arkini://app/");
+		Effect.runSync(policy.registerWindowFx(harness.window));
+		const open = harness.openHandler()!;
+		expect(
+			open({
+				url: "https://ngrok.com/",
+			}),
+		).toEqual({
+			action: "deny",
+		});
+		expect(shell.openExternal).toHaveBeenCalledExactlyOnceWith("https://ngrok.com/");
+		for (const url of [
+			"file:///tmp/app",
+			"javascript:alert(1)",
+			"custom://app",
+			"https://user:pass@example.com",
+			"arkini://app/",
+			"invalid",
+		]) {
+			expect(
+				open({
+					url,
+				}),
+			).toEqual({
+				action: "deny",
+			});
+		}
+		harness.setMainFrameUrl("https://untrusted.example/");
+		open({
+			url: "https://ngrok.com/",
+		});
+		expect(shell.openExternal).toHaveBeenCalledTimes(1);
 	});
 
 	it("accepts only a registered trusted main frame as an IPC sender", async () => {

@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { LinkButton } from "~/ui/ui/LinkButton";
+import { IconButton } from "~/ui/ui/Button";
 import type { ReactNode } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -108,17 +108,16 @@ const EditorNumericControl = ({
 				})}
 			/>
 			{clearLabel === undefined ? null : (
-				<LinkButton
+				<IconButton
 					title={clearLabel}
 					disabled={Number.isNaN(value)}
-					className="inline-flex h-[var(--ak-control-min-height)] shrink-0 items-center"
 					onClick={(event) => {
 						event.preventDefault();
 						onChangeFn(Number.NaN);
 					}}
 				>
 					<Trash2 className="size-4" />
-				</LinkButton>
+				</IconButton>
 			)}
 		</div>
 		{children}

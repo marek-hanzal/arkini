@@ -5,7 +5,7 @@ import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { Button } from "~/ui/ui/Button";
+import { IconButton } from "~/ui/ui/Button";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface NoteAssetLinksProps {
@@ -75,8 +75,8 @@ export const NoteAssetLinks = ({
 								}
 								placement="top"
 							>
-								<Button
-									className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
+								<IconButton
+									className="hover:text-danger"
 									data-ui="EditorNoteUnlinkAsset"
 									disabled={disabled || requiredResourceId === resourceId}
 									onClick={() => {
@@ -91,7 +91,7 @@ export const NoteAssetLinks = ({
 									}}
 								>
 									<Trash2 className="size-4" />
-								</Button>
+								</IconButton>
 							</Tooltip>
 						</div>
 					);

@@ -58,14 +58,24 @@ const ItemEstimateResult = ({
 	readonly limit?: number;
 }) =>
 	estimate.status === "unreachable" ? (
-		<EditorRootCard dataUi="EditorItemEstimateUnreachableCard">
+		limit === undefined ? (
 			<Status
 				dataUi="EditorItemEstimateUnreachable"
 				icon={Unlink}
 				title="This item is unreachable."
+				size="large"
 				variant="flat"
 			/>
-		</EditorRootCard>
+		) : (
+			<EditorRootCard dataUi="EditorItemEstimateUnreachableCard">
+				<Status
+					dataUi="EditorItemEstimateUnreachable"
+					icon={Unlink}
+					title="This item is unreachable."
+					variant="flat"
+				/>
+			</EditorRootCard>
+		)
 	) : estimate.obtainable ? (
 		<ItemEstimateRouteGraph
 			config={config}

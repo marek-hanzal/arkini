@@ -2,6 +2,10 @@ import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCat
 import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import {
+	EditorSectionBar,
+	EditorSectionShortcutNavigation,
+} from "~/authoring-shell/ui/EditorSectionBar";
 import { Mx } from "~/translation/ui/Mx";
 import { FloatingPortal } from "@floating-ui/react";
 import {
@@ -9,8 +13,10 @@ import {
 	ChevronDown,
 	CircleAlert,
 	Image as ImageIcon,
+	ImageOff,
 	Images,
 	type LucideIcon,
+	NotebookPen,
 	PackageOpen,
 	SearchX,
 	Sparkles,
@@ -26,7 +32,6 @@ import type { Project } from "~/project-authoring/type/Project";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
-import { EditorSelect } from "~/editor-control/ui/EditorSelect";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
@@ -54,19 +59,23 @@ interface EditorAssetOptimizationAlertProps {
 
 const assetFilters = [
 	{
+		icon: Images,
 		label: "All",
 		value: "all",
 	},
 	{
+		icon: ImageOff,
 		label: "Unused",
 		value: "unused",
 	},
 	{
+		icon: NotebookPen,
 		label: "With note",
 		value: "with-note",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly label: string;
+	readonly icon: LucideIcon;
 	readonly value: useEditorAssetManagerController.Filter;
 }>;
 
@@ -120,11 +129,11 @@ const EditorAssetImportMenu = ({
 	return (
 		<>
 			<div
-				className="inline-flex h-12 min-h-0 shrink-0 overflow-hidden rounded-lg shadow-lg"
+				className="inline-flex h-10 min-h-0 shrink-0 overflow-hidden rounded-lg shadow-lg"
 				data-ui="EditorAssetImportControl"
 			>
 				<PrimaryButton
-					className="h-12 min-h-0 gap-2 rounded-r-none px-4 py-0 shadow-none"
+					className="h-10 min-h-0 gap-2 rounded-r-none px-3 py-0 text-sm shadow-none"
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetImport"
 					disabled={pending}
@@ -135,7 +144,7 @@ const EditorAssetImportMenu = ({
 				</PrimaryButton>
 				<PrimaryButton
 					ref={refs.setReference}
-					className="size-12 min-h-0 min-w-0 rounded-l-none border-l border-accent-contrast/25 p-0 shadow-none"
+					className="size-10 min-h-0 min-w-0 rounded-l-none border-l border-accent-contrast/25 p-0 shadow-none"
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorAssetImportMenuTrigger"
 					disabled={pending}
@@ -425,54 +434,49 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					<SearchInput
 						value={props.query}
 						containerClassName="min-w-64 flex-1"
-						className="h-12 min-h-12 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						className="h-10 min-h-10 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 text-sm text-foreground outline-none placeholder:text-muted"
 						data-ui="EditorAssetSearch"
 						placeholder={`${translator.textFn("Search assets…")} (${controller.resources.length})`}
 						onValueChangeFn={props.onQueryChangeFn}
 					/>
-					<EditorSelect
-						label={translator.textFn("View assets")}
-						onChangeFn={props.onFilterChangeFn}
-						options={assetFilters.map((option) => ({
-							...option,
-							label: translator.textFn(option.label),
-						}))}
-						size="large"
-						value={props.filter}
-					/>
-					{controller.catalogState === "empty" ? null : (
-						<Button
-							className="relative isolate h-12 min-h-0 min-w-36 shrink-0 gap-2 overflow-hidden px-4 py-0"
+					{controller.catalogState === "empty" ? null : importButton}
+				</header>
+			}
+			secondaryNavigation={
+				<EditorSectionBar
+					actions={
+						<LinkButton
+							className="inline-flex min-w-28 shrink-0 items-center justify-end gap-1.5 whitespace-nowrap"
 							cursorIntent={busy ? "progress" : undefined}
 							data-ui="EditorAssetsOptimize"
 							disabled={busy || controller.resources.length === 0}
 							onClick={controller.onOptimizeFn}
 						>
-							{controller.optimizePending ? (
-								<span
-									className="absolute inset-y-0 left-0 z-0 bg-accent/20 transition-[width] duration-200 ease-linear"
-									data-ui="EditorAssetsOptimizeProgress"
-									style={{
-										width: `${optimizationPercent}%`,
-									}}
-								/>
-							) : null}
-							<span className="relative z-10 inline-flex items-center gap-2">
-								<Sparkles className="size-4" />
-								{controller.optimizePending
-									? controller.optimizationProgress?.phase === "saving"
-										? "Saving…"
-										: `Optimizing ${optimizationPercent}%`
-									: "Optimize"}
-							</span>
-						</Button>
-					)}
-					{controller.catalogState === "empty" ? null : importButton}
-					<EditorPageHelp
-						title={translator.textFn("Assets")}
-						content={<Mx label="Asset catalog help" />}
+							<Sparkles className="size-4" />
+							{controller.optimizePending
+								? controller.optimizationProgress?.phase === "saving"
+									? "Saving…"
+									: `Optimizing ${optimizationPercent}%`
+								: "Optimize"}
+						</LinkButton>
+					}
+					help={
+						<EditorPageHelp
+							title={translator.textFn("Assets")}
+							content={<Mx label="Asset catalog help" />}
+						/>
+					}
+				>
+					<EditorSectionShortcutNavigation
+						dataUi="EditorAssetFilter"
+						onChangeFn={props.onFilterChangeFn}
+						options={assetFilters.map((option) => ({
+							...option,
+							label: translator.textFn(option.label),
+						}))}
+						value={props.filter}
 					/>
-				</header>
+				</EditorSectionBar>
 			}
 			scrollRestorationId="editor-asset-list"
 		>

@@ -36,6 +36,41 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("EditorCollectionSelector", () => {
+	it("keeps empty collection controls visible while only add remains enabled", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const addFn = vi.fn();
+		const removeFn = vi.fn();
+		await act(async () => {
+			root.render(
+				<EditorCollectionSelector
+					addLabel="Add line"
+					count={0}
+					itemLabelFn={() => "Line"}
+					label="Production lines"
+					onAddFn={addFn}
+					onRemoveFn={removeFn}
+					removeLabel="Remove line"
+				>
+					{() => null}
+				</EditorCollectionSelector>,
+			);
+		});
+
+		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
+		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		const remove = container.querySelector<HTMLButtonElement>('button[title="Remove line"]');
+		expect(input?.disabled).toBe(true);
+		expect(add?.disabled).toBe(false);
+		expect(remove?.disabled).toBe(true);
+
+		await act(async () => add?.click());
+		expect(addFn).toHaveBeenCalledOnce();
+		expect(removeFn).not.toHaveBeenCalled();
+	});
+
 	it("keeps technical identities searchable without displaying them", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

@@ -117,7 +117,7 @@ export const EditorFormSectionPage = ({
 			}
 		>
 			<div
-				className="mx-auto grid w-3/4 min-w-0 gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
+				className="min-w-0 data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:overflow-y-auto data-[ui-content-mode=viewport]:p-3"
 				{...readDataUiFn({
 					dataUi: "EditorFormViewport",
 					state: {
@@ -125,21 +125,31 @@ export const EditorFormSectionPage = ({
 					},
 				})}
 			>
-				{notice}
-				<EditorFormContent
-					error={error}
-					fill={contentMode === "viewport"}
-					rootCard={rootCard}
-					saveFn={saveFn}
+				<div
+					className="mx-auto grid w-3/4 min-w-0 gap-3 data-[ui-content-mode=viewport]:flex data-[ui-content-mode=viewport]:h-full data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:flex-col"
+					{...readDataUiFn({
+						dataUi: "EditorFormContentWidth",
+						state: {
+							contentMode,
+						},
+					})}
 				>
-					<fieldset
-						className="contents"
-						disabled={saving}
-						inert={saving}
+					{notice}
+					<EditorFormContent
+						error={error}
+						fill={contentMode === "viewport"}
+						rootCard={rootCard}
+						saveFn={saveFn}
 					>
-						{children}
-					</fieldset>
-				</EditorFormContent>
+						<fieldset
+							className="contents"
+							disabled={saving}
+							inert={saving}
+						>
+							{children}
+						</fieldset>
+					</EditorFormContent>
+				</div>
 			</div>
 		</EditorSectionPage>
 	);

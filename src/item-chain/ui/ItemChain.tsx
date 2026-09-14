@@ -53,6 +53,7 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 			{projection.chains.map((chain) => (
 				<EditorRootCard
 					key={chain.id}
+					className="border-b border-line pb-4 last:border-b-0 last:pb-0"
 					dataUi="EditorChainCard"
 				>
 					<div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
@@ -110,7 +111,7 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 						</div>
 					</div>
 					<details
-						className="mt-4 border-t border-line pt-3"
+						className="mt-4"
 						data-ui="EditorChainSteps"
 					>
 						<summary className="cursor-pointer text-sm font-semibold text-accent">

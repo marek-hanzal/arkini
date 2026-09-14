@@ -3,7 +3,6 @@
 	top: 0;
 	z-index: 20;
 	display: grid;
-	min-height: calc(3rem + 1.5rem + 1px);
 	align-items: center;
 	border-bottom: 1px solid var(--ak-line);
 	background: var(--ak-editor-background);

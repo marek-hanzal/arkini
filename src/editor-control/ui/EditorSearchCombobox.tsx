@@ -27,6 +27,7 @@ import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { SearchInput } from "~/ui/ui/SearchInput";
+import { editorDisabledInputClassName } from "~/editor-control/constant/EditorInputClassName";
 
 export interface EditorSearchOption {
 	readonly id: string;
@@ -38,6 +39,7 @@ export interface EditorSearchOption {
 
 interface EditorSearchComboboxProps {
 	readonly density?: "default" | "compact";
+	readonly disabled?: boolean;
 	readonly displaySelectedLabel?: boolean;
 	readonly label: string;
 	readonly labelVisible?: boolean;
@@ -61,6 +63,7 @@ interface EditorSearchComboboxProps {
 export const EditorSearchCombobox = ({
 	density = "default",
 	description,
+	disabled = false,
 	displaySelectedLabel = false,
 	emptyLabel,
 	error,
@@ -251,10 +254,12 @@ export const EditorSearchCombobox = ({
 		],
 	);
 	const beginSearchFn = () => {
+		if (disabled) return;
 		if (!open && query === selectedLabel) setQueryFn("");
 		setOpenFn(true);
 	};
 	const updateQueryFn = (nextQuery: string) => {
+		if (disabled) return;
 		keyboardScrollPendingRef.current = false;
 		setQueryFn(nextQuery);
 		onInputChangeFn?.(nextQuery);
@@ -386,7 +391,8 @@ export const EditorSearchCombobox = ({
 					<SearchInput
 						value={query}
 						autoComplete="off"
-						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1"
+						disabled={disabled}
+						className={`min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1 ${editorDisabledInputClassName}`}
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							handleOpenChangeFn(false);
@@ -427,7 +433,7 @@ export const EditorSearchCombobox = ({
 					/>
 				</span>
 			</span>
-			{open ? (
+			{open && !disabled ? (
 				<FloatingPortal>
 					<span
 						ref={refs.setFloating}

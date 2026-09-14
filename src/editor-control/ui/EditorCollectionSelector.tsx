@@ -58,6 +58,7 @@ export const EditorCollectionSelector = ({
 			<nav className="flex min-w-0 items-center gap-2">
 				<div className="min-w-0 flex-1">
 					<EditorSearchCombobox
+						disabled={activeIndex === undefined}
 						displaySelectedLabel
 						emptyLabel={`No ${label.toLocaleLowerCase()} match this search.`}
 						label={label}
@@ -124,11 +125,13 @@ export const EditorCollectionSelector = ({
 							<Plus className="size-5" />
 						</Button>
 					)}
-					{onRemoveFn === undefined || activeIndex === undefined ? null : (
+					{onRemoveFn === undefined ? null : (
 						<Button
 							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
+							disabled={activeIndex === undefined}
 							title={removeLabel}
 							onClick={() => {
+								if (activeIndex === undefined) return;
 								onRemoveFn(activeIndex);
 								selectIndexFn(Math.max(0, activeIndex - 1));
 							}}

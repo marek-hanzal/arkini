@@ -39,7 +39,7 @@ export const EditorSectionPage = ({
 				viewTransitionName: "arkini-editor-section-navigation",
 			}}
 		>
-			<div className="px-3 py-3">{header}</div>
+			<div className="grid h-16 items-center px-3">{header}</div>
 			{secondaryNavigation}
 		</div>
 		<div

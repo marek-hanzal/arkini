@@ -1,12 +1,22 @@
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import {
+	editorSectionLinkClassName,
+	EditorSectionBar,
+	EditorSectionShortcutNavigation,
+} from "~/authoring-shell/ui/EditorSectionBar";
 import { Mx } from "~/translation/ui/Mx";
 import {
+	ArrowDownAZ,
+	CircleOff,
 	FilePenLine,
+	Gauge,
+	Hourglass,
 	NotebookPen,
 	PackageOpen,
 	Plus,
 	RefreshCw,
 	SearchX,
+	TrendingUp,
 	TriangleAlert,
 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -16,7 +26,6 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { selectItemCollectionFn } from "~/item-authoring/fn/selectItemCollectionFn";
-import { EditorSelect, type EditorSelectOption } from "~/editor-control/ui/EditorSelect";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
@@ -30,7 +39,6 @@ import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
-import { Button } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
@@ -62,30 +70,40 @@ export const List = ({
 	);
 	const itemViewOptions = [
 		{
+			icon: ArrowDownAZ,
 			label: translator.textFn("Name"),
 			value: "name",
 		},
 		{
-			label: translator.textFn("Fastest first"),
-			value: "fastest",
-		},
-		{
-			label: translator.textFn("Slowest first"),
-			value: "slowest",
-		},
-		{
-			label: translator.textFn("Highest demand first"),
-			value: "demand",
-		},
-		{
+			icon: CircleOff,
 			label: translator.textFn("Unreachable"),
 			value: "incomplete",
 		},
 		{
+			icon: Gauge,
+			label: translator.textFn("Fastest first"),
+			value: "fastest",
+		},
+		{
+			icon: Hourglass,
+			label: translator.textFn("Slowest first"),
+			value: "slowest",
+		},
+		{
+			icon: TrendingUp,
+			label: translator.textFn("Highest demand first"),
+			value: "demand",
+		},
+		{
+			icon: NotebookPen,
 			label: translator.textFn("With note"),
 			value: "with-note",
 		},
-	] as const satisfies ReadonlyArray<EditorSelectOption<selectItemCollectionFn.View>>;
+	] as const satisfies ReadonlyArray<{
+		readonly icon: typeof ArrowDownAZ;
+		readonly label: string;
+		readonly value: selectItemCollectionFn.View;
+	}>;
 
 	const [refreshVersion, setRefreshVersion] = useState(0);
 	const settledQuery = useDebouncedSearchQuery(query);
@@ -205,7 +223,7 @@ export const List = ({
 			dataUi="EditorNewItemMenu"
 			defaultDraft={false}
 			projectId={project.projectId}
-			className={empty ? "gap-2" : "h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"}
+			className="h-10 min-h-10 shrink-0 gap-2 px-3 py-2 text-sm"
 			variant="primary"
 		>
 			<Plus className="size-4" />
@@ -221,33 +239,47 @@ export const List = ({
 					<SearchInput
 						value={query}
 						containerClassName="min-w-64 flex-1"
-						className="h-12 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						className="h-10 min-h-10 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder={`${translator.textFn("Search item title or ID…")} (${filteredItems.length})`}
 						onValueChangeFn={onQueryChangeFn}
 					/>
-					<EditorSelect
-						label={translator.textFn("View items")}
+					{empty ? null : newItemMenu}
+				</header>
+			}
+			secondaryNavigation={
+				<EditorSectionBar
+					actions={
+						<LinkButton
+							className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap opacity-60 data-[ui-stale=true]:opacity-100 hover:opacity-100"
+							disabled={estimatesCurrent && estimates.status === "loading"}
+							onClick={() => setRefreshVersion((version) => version + 1)}
+							{...readDataUiFn({
+								dataUi: "EditorItemsRefresh",
+								state: {
+									stale: !estimatesCurrent || estimates.status === "error",
+									loading: estimatesCurrent && estimates.status === "loading",
+								},
+							})}
+						>
+							<RefreshCw className="size-4 in-data-[ui-loading=true]:animate-spin" />
+							{translator.textFn("Refresh")}
+						</LinkButton>
+					}
+					help={
+						<EditorPageHelp
+							title={translator.textFn("Items")}
+							content={<Mx label="Item list help" />}
+						/>
+					}
+				>
+					<EditorSectionShortcutNavigation
+						dataUi="EditorItemView"
 						onChangeFn={onViewChangeFn}
 						options={itemViewOptions}
 						value={view}
 					/>
 					<LinkButton
-						className="inline-flex shrink-0 items-center gap-2 px-2 text-sm opacity-60 data-[ui-stale=true]:opacity-100 hover:opacity-100"
-						disabled={estimatesCurrent && estimates.status === "loading"}
-						onClick={() => setRefreshVersion((version) => version + 1)}
-						{...readDataUiFn({
-							dataUi: "EditorItemsRefresh",
-							state: {
-								stale: !estimatesCurrent || estimates.status === "error",
-								loading: estimatesCurrent && estimates.status === "loading",
-							},
-						})}
-					>
-						<RefreshCw className="size-4 in-data-[ui-loading=true]:animate-spin" />
-						{translator.textFn("Refresh")}
-					</LinkButton>
-					<Button
-						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm data-[ui-selected=true]:hover:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:bg-accent/15 data-[ui-selected=true]:active:bg-accent/15"
+						className={`${editorSectionLinkClassName} gap-1.5`}
 						onClick={() => onDraftChangeFn(!draft)}
 						{...readDataUiFn({
 							dataUi: "EditorItemDraftFilter",
@@ -256,15 +288,10 @@ export const List = ({
 							},
 						})}
 					>
-						<FilePenLine className="size-4" />
+						<FilePenLine className="size-4 shrink-0" />
 						{translator.textFn("Draft")}
-					</Button>
-					{empty ? null : newItemMenu}
-					<EditorPageHelp
-						title={translator.textFn("Items")}
-						content={<Mx label="Item list help" />}
-					/>
-				</header>
+					</LinkButton>
+				</EditorSectionBar>
 			}
 			scrollRestorationId="editor-item-list"
 		>

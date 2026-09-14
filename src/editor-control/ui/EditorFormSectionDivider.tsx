@@ -4,7 +4,7 @@ import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 
 interface EditorFormSectionDividerProps {
 	readonly action?: ReactNode;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";
 }

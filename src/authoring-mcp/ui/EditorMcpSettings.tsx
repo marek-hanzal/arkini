@@ -7,7 +7,7 @@ import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorMcpCopyableUrl } from "./EditorMcpCopyableUrl";
 
 const editorMcpInputClassName =
-	"w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 py-2 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60";
+	"w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 py-2 text-foreground outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-raised/60 disabled:text-muted disabled:placeholder:text-subtle";
 
 interface EditorMcpSettingsProps {
 	readonly section: "local" | "ngrok";

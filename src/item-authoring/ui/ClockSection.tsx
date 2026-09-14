@@ -157,14 +157,14 @@ export const ClockSection = () => {
 		<form.Subscribe selector={(state) => state.values.clock}>
 			{(clock) =>
 				clock === undefined ? (
-					<EditorFormCard>
-						<EditorCapabilityStatus
-							icon={Clock}
-							title={translator.textFn("Item clock empty title")}
-							actionLabel={translator.textFn("Enable")}
-							onEnableFn={enableClockFn}
-						/>
-					</EditorFormCard>
+					<EditorCapabilityStatus
+						icon={Clock}
+						title={translator.textFn("No Clock configured")}
+						summary={translator.textFn("Item clock empty title")}
+						size="large"
+						actionLabel={translator.textFn("Enable")}
+						onEnableFn={enableClockFn}
+					/>
 				) : (
 					<div
 						className="grid gap-[var(--ak-viewport-gap)]"

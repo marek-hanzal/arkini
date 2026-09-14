@@ -1,4 +1,3 @@
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Unlink } from "lucide-react";
@@ -18,16 +17,7 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 				<Status
 					dataUi="EditorAssetUnused"
 					icon={Unlink}
-					title={
-						<span className="inline-flex items-center gap-1.5">
-							{translator.textFn("This asset is not used")}
-							<EditorInfoTooltip
-								content={translator.textFn(
-									"No saved project or item currently references this asset.",
-								)}
-							/>
-						</span>
-					}
+					title={translator.textFn("This asset is not used")}
 					variant="flat"
 				/>
 			</EditorRootCard>

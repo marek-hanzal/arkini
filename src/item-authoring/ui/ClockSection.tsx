@@ -133,9 +133,6 @@ const ClockFields = () => {
 							{(output) => (
 								<OptionalOutputControl
 									addLabel={translator.textFn("Enable")}
-									emptyDescription={translator.textFn(
-										"Without an output, the item disappears according to its expiry mode.",
-									)}
 									emptyIcon={PackagePlus}
 									emptyTitle={translator.textFn("Item expiry output empty title")}
 									value={output}

@@ -53,9 +53,6 @@ export const UnitsSection = () => {
 							<EditorFormCard>
 								<OptionalOutputControl
 									addLabel={translator.textFn("Enable")}
-									emptyDescription={translator.textFn(
-										"Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.",
-									)}
 									emptyIcon={PackagePlus}
 									emptyTitle={translator.textFn(
 										"Item depletion output empty title",

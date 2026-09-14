@@ -223,9 +223,6 @@ export const LineFields = withFieldGroupFn({
 									{output === undefined ? (
 										<EditorCapabilityStatus
 											actionLabel={translator.textFn("Enable")}
-											description={translator.textFn(
-												"This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.",
-											)}
 											icon={PackagePlus}
 											onEnableFn={() =>
 												group.setFieldValue(

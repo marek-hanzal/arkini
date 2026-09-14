@@ -1,5 +1,4 @@
 import { Unlink } from "lucide-react";
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Status } from "~/ui/ui/Status";
@@ -45,16 +44,7 @@ export const ItemConnectionsEmpty = ({
 		<Status
 			dataUi="EditorItemConnectionsEmpty"
 			icon={Unlink}
-			title={
-				expanded ? (
-					translator.textFn(state.title)
-				) : (
-					<span className="inline-flex items-center gap-1.5">
-						{translator.textFn(state.title)}
-						<EditorInfoTooltip content={translator.textFn(state.description)} />
-					</span>
-				)
-			}
+			title={translator.textFn(state.title)}
 			description={expanded ? translator.textFn(state.description) : undefined}
 			size={expanded ? "large" : "normal"}
 			variant="flat"

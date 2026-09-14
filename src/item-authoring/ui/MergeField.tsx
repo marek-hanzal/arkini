@@ -174,9 +174,6 @@ export const MergeField = ({
 			<EditorFormCard>
 				<OptionalOutputControl
 					addLabel={translator.textFn("Enable")}
-					emptyDescription={translator.textFn(
-						"The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.",
-					)}
 					emptyIcon={PackagePlus}
 					emptyTitle={translator.textFn("Item merge output empty title")}
 					value={merge.output}

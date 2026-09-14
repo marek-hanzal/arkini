@@ -7,7 +7,6 @@ import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 
 interface OptionalOutputControlProps {
 	readonly addLabel: string;
-	readonly emptyDescription: string;
 	readonly emptyIcon: LucideIcon;
 	readonly emptyTitle: string;
 	readonly onChangeFn: (output: OutputSchema.Type | undefined) => void;
@@ -17,7 +16,6 @@ interface OptionalOutputControlProps {
 /** Adds, edits or removes one optional canonical output through the shared output editor. */
 export const OptionalOutputControl = ({
 	addLabel,
-	emptyDescription,
 	emptyIcon,
 	emptyTitle,
 	onChangeFn,
@@ -26,7 +24,6 @@ export const OptionalOutputControl = ({
 	value === undefined ? (
 		<EditorCapabilityStatus
 			actionLabel={addLabel}
-			description={emptyDescription}
 			icon={emptyIcon}
 			onEnableFn={() => onChangeFn(structuredClone(DraftDefaults.output))}
 			title={emptyTitle}

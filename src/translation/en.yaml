@@ -1,5 +1,3 @@
-A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.:
-  value: A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.
 About avatars:
   value: About avatars
 Action:
@@ -754,8 +752,6 @@ No outputs:
   value: No outputs
 No rules:
   value: No rules
-No saved project or item currently references this asset.:
-  value: No saved project or item currently references this asset.
 None:
   value: None
 None available:
@@ -1088,8 +1084,6 @@ The item that owns this action pays the unit cost. It must define enough availab
   value: The item that owns this action pays the unit cost. It must define enough available units.
 The line selected by default for manual production. Selecting this line clears Default on sibling lines.:
   value: The line selected by default for manual production. Selecting this line clears Default on sibling lines.
-The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.:
-  value: The merge currently changes only its source and target. Enable an output to emit additional items when it resolves.
 The project image shown by the launcher.:
   value: The project image shown by the launcher.
 The receiving item must match this selector for the merge to apply.:
@@ -1110,8 +1104,6 @@ This item produces nothing:
   dynamic: true
 This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.:
   value: This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.
-This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.:
-  value: This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes.
 Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.:
   value: Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.
 Time for one production cycle before runtime rules. Zero completes immediately.:
@@ -1189,10 +1181,6 @@ Weighted selections:
   value: Weighted selections
 With note:
   value: With note
-Without an output, the item disappears according to its expiry mode.:
-  value: Without an output, the item disappears according to its expiry mode.
-Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.:
-  value: Without an output, the item simply disappears when its last unit is spent. Enable one to emit configured items at depletion.
 Write a note…:
   value: Write a note…
 automatic-only:

@@ -30,9 +30,6 @@ export const ClockDetail = ({
 				)}
 				summary={preview ? undefined : translator.textFn("Item clock empty title")}
 				size={preview ? "normal" : "large"}
-				description={translator.textFn(
-					"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
-				)}
 			/>
 		);
 		return preview ? (

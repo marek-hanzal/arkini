@@ -355,13 +355,19 @@ build() {
 
 # @cmd Open the unpacked macOS arm64 application
 # @flag --build Force a rebuild before opening the application
+# @flag --skip-arkpack Skip bundled game Arkpack packing and verification
 preview-macos() {
 	local application
 	application=.out/desktop/release/mac-arm64/Arkini.app
 	if [[ "${argc_build:-0}" == 1 || ! -d "$application" ]]; then
 		clean_desktop
 		build_desktop
-		install_preview_game_arkpack
+		if [[ "${argc_skip_arkpack:-0}" == 1 ]]; then
+			echo "Skipping bundled game Arkpack packing and verification (--skip-arkpack)."
+			mkdir -p game/arkini/build
+		else
+			install_preview_game_arkpack
+		fi
 		electron-builder \
 			--config electron-builder.yml \
 			--mac \
@@ -470,11 +476,17 @@ platform-check() {
 }
 
 # @cmd Run the complete repository gate
+# @flag --skip-arkpack Skip bundled game Arkpack packing and verification
 check() {
 	format_check
 	translations:check
 	typecheck
-	build
+	build_desktop
+	if [[ "${argc_skip_arkpack:-0}" == 1 ]]; then
+		echo "Skipping bundled game Arkpack packing and verification (--skip-arkpack)."
+	else
+		install_game_arkpack
+	fi
 	dependency_check
 	copy_paste_check
 	test

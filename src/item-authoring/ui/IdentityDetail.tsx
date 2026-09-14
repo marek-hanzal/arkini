@@ -165,7 +165,10 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						"Units are the supply inside each item, independently of how many items are stacked.",
 					)}
 				/>
-				<UnitsDetail item={item} />
+				<UnitsDetail
+					item={item}
+					preview
+				/>
 			</section>
 			<section
 				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
@@ -179,7 +182,10 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
 					)}
 				/>
-				<ClockDetail item={item} />
+				<ClockDetail
+					item={item}
+					preview
+				/>
 			</section>
 			<section
 				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
@@ -193,7 +199,10 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						"Clicking this item can enter a space or open Inventory after its requirements pass.",
 					)}
 				/>
-				<ActionDetail item={item} />
+				<ActionDetail
+					item={item}
+					preview
+				/>
 			</section>
 			<section
 				className="grid min-w-0 grid-rows-[auto_1fr] gap-[var(--ak-viewport-gap)]"
@@ -201,6 +210,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 			>
 				<ItemDetailSectionHeader
 					itemUid={item.uid}
+					sectionId="estimate"
 					title={translator.textFn("Estimate")}
 				/>
 				<ItemEstimateSection

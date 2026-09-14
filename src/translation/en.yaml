@@ -528,6 +528,8 @@ Item identity help:
 
     **Clock** has its own section for periodic production, a finite lifetime and expiry output. A lifetime works without production lines.
 
+    The Item tab keeps the overview. **Show all** opens the corresponding detail tab: Artwork, Production, Merges, Units, Clock or Action. These tabs match the editing sections; **Edit** opens that section, and **Save** or **Discard** returns to its detail. Estimate, Chain, Connections, Notes and Delete remain available alongside them.
+
     Item IDs can be renamed with their project references. The UID remains the item's stable identity. Artwork changes appearance without changing occupied cells.
 
     **Draft** is saved immediately as an Editor organization flag. Draft items still participate in the game and the built Arkpack. Other edits are applied with **Save**; **Discard** leaves the saved item unchanged.
@@ -566,7 +568,7 @@ Item production empty title:
   value: Let this item produce other items.
 Item production help:
   value: |
-    Production shows the authored production lines. Queue capacity, player controls and Clock settings are shown on the Item page. Each line has its own runtime, visibility, availability rules, inputs and optional output.
+    Production shows the authored production lines. Queue capacity and player controls are shown on the Item page. Clock settings have their own Clock tab and remain visible in the Item overview. Each line has its own runtime, visibility, availability rules, inputs and optional output.
 
     **Default** selects the manual click line. **Clock** independently selects the line attempted at every timer pulse. Selecting either role clears only that role on the other lines. Without a Clock line, the timer continues without adding work.
 
@@ -700,6 +702,12 @@ Next pulse:
   value: Next pulse
 No About avatars configured.:
   value: No About avatars configured.
+No Clock configured:
+  value: No Clock configured
+No Units configured:
+  value: No Units configured
+No action configured:
+  value: No action configured
 No authored item directly inputs or positively requires this item.:
   value: No authored item directly inputs or positively requires this item.
   dynamic: true

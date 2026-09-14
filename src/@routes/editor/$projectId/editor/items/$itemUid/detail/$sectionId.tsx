@@ -1,3 +1,8 @@
+import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
+import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
+import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
+import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ItemChain } from "~/item-chain/ui/ItemChain";
 import { MergesCollectionDetail } from "~/item-authoring/ui/MergesCollectionDetail";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
@@ -9,7 +14,7 @@ import { IdentityDetail } from "~/item-authoring/ui/IdentityDetail";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 import { type ItemConnectionFilter, ItemConnectionFilters } from "~/flow/type/ItemConnectionFilter";
-import { type DetailSectionId } from "~/item-authoring/type/Section";
+import { type SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
@@ -60,10 +65,22 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		});
 		const item = useItemByUid(itemUid);
 		if (item === undefined) return <NotFound uid={itemUid} />;
-		const section = sectionId as DetailSectionId;
+		const section = sectionId as SectionId;
 		switch (section) {
 			case "identity":
 				return <IdentityDetail item={item} />;
+			case "artwork":
+				return (
+					<EditorRootCard dataUi="EditorItemArtworkDetailCard">
+						<ArtworkDetail item={item} />
+					</EditorRootCard>
+				);
+			case "units":
+				return <UnitsDetail item={item} />;
+			case "clock":
+				return <ClockDetail item={item} />;
+			case "action":
+				return <ActionDetail item={item} />;
 			case "production":
 				return <ProductionDetail item={item} />;
 			case "merges":

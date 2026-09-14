@@ -13,7 +13,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { SectionLink } from "~/item-authoring/ui/SectionLink";
-import type { DetailSectionId } from "~/item-authoring/type/Section";
+import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
@@ -25,7 +25,7 @@ export const Detail = ({
 	sectionId,
 	uid,
 }: PropsWithChildren<{
-	readonly sectionId: DetailSectionId;
+	readonly sectionId: SectionId;
 	readonly uid: string;
 }>) => {
 	const project = useEditorProject();
@@ -37,10 +37,9 @@ export const Detail = ({
 		projectId: project.projectId,
 		itemUid: item.uid,
 	};
-	const editableSectionId =
-		sectionId === "identity" || sectionId === "production" || sectionId === "merges"
-			? sectionId
-			: "identity";
+	const editableSectionId = readSectionsFn("form").some((section) => section.id === sectionId)
+		? sectionId
+		: "identity";
 	const help = ItemSectionHelp[sectionId];
 	const sections = readSectionsFn();
 	return (

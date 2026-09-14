@@ -1,11 +1,11 @@
-import { Pencil } from "lucide-react";
+import { ArrowRight, Pencil } from "lucide-react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { SectionId } from "~/item-authoring/type/Section";
 
-/** Keeps grouped detail sections linked to their exact authoring destination. */
+/** Links overview capabilities to their own detail; identity keeps its direct edit action. */
 export const ItemDetailSectionHeader = ({
 	itemUid,
 	sectionId,
@@ -33,15 +33,22 @@ export const ItemDetailSectionHeader = ({
 			{sectionId === undefined ? null : (
 				<LinkButtonLink
 					className="inline-flex shrink-0 items-center gap-1.5"
-					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+					to={
+						sectionId === "identity"
+							? "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+							: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+					}
 					params={{
 						projectId: project.projectId,
 						itemUid,
 						sectionId,
 					}}
 				>
-					<Pencil className="size-4" />
-					{translator.textFn("Edit")}
+					{sectionId === "identity" ? <Pencil className="size-4" /> : null}
+					{sectionId === "identity"
+						? translator.textFn("Edit")
+						: translator.textFn("Show all")}
+					{sectionId === "identity" ? null : <ArrowRight className="size-4" />}
 				</LinkButtonLink>
 			)}
 		</div>

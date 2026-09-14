@@ -9,24 +9,39 @@ import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapability
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 /** Presents the authored schedule independently of production lines. */
-export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+export const ClockDetail = ({
+	item,
+	preview = false,
+}: {
+	readonly item: ItemSchema.Type;
+	readonly preview?: boolean;
+}) => {
 	const translator = useTranslator();
 	const clock = item.clock;
-	if (clock === undefined)
-		return (
-			<EditorRootCard dataUi="EditorClockDisabledCard">
-				<DisabledCapabilityDetail
-					capability="clock"
-					itemUid={item.uid}
-					actionLabel={translator.textFn("Enable")}
-					icon={Clock}
-					title={translator.textFn("Item clock empty title")}
-					description={translator.textFn(
-						"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
-					)}
-				/>
-			</EditorRootCard>
+	if (clock === undefined) {
+		const empty = (
+			<DisabledCapabilityDetail
+				capability="clock"
+				itemUid={item.uid}
+				actionLabel={translator.textFn("Enable")}
+				icon={Clock}
+				title={translator.textFn(
+					preview ? "Item clock empty title" : "No Clock configured",
+				)}
+				summary={preview ? undefined : translator.textFn("Item clock empty title")}
+				size={preview ? "normal" : "large"}
+				description={translator.textFn(
+					"A clock can run at intervals or expire once. Enabling it removes the action and fixes this item to the board with a stack size of one.",
+				)}
+			/>
 		);
+		return preview ? (
+			<EditorRootCard dataUi="EditorClockDisabledCard">{empty}</EditorRootCard>
+		) : (
+			empty
+		);
+	}
+
 	return (
 		<div className="grid gap-3">
 			<EditorRootCard dataUi="EditorClockScheduleCard">

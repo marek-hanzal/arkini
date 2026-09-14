@@ -1,7 +1,6 @@
 import { ItemSectionCopyControl } from "~/item-authoring/ui/ItemSectionCopyControl";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
-import { readDetailSectionFn } from "~/item-authoring/fn/readDetailSectionFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useNavigate } from "@tanstack/react-router";
@@ -62,7 +61,6 @@ export const FormSession = ({
 }>) => {
 	const navigateFn = useNavigate();
 	const translator = useTranslator();
-	const detailSectionId = readDetailSectionFn(sectionId);
 	const project = useEditorProject();
 	const onInvalidSectionFn = useCallback(
 		(nextSectionId: SectionId, path: ReadonlyArray<PropertyKey>) =>
@@ -128,7 +126,7 @@ export const FormSession = ({
 				params: {
 					projectId: project.projectId,
 					itemUid: saved.uid,
-					sectionId: detailSectionId,
+					sectionId,
 				},
 				replace: true,
 			}).catch(() => undefined);
@@ -151,7 +149,7 @@ export const FormSession = ({
 			params: {
 				projectId: project.projectId,
 				itemUid: initialItem.uid,
-				sectionId: detailSectionId,
+				sectionId,
 			},
 			replace: true,
 		});
@@ -161,7 +159,7 @@ export const FormSession = ({
 		isNew,
 		navigateFn,
 		project.projectId,
-		detailSectionId,
+		sectionId,
 	]);
 	const context = useMemo(
 		() => ({
@@ -233,7 +231,7 @@ export const FormSession = ({
 								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 								params={{
 									...params,
-									sectionId: detailSectionId,
+									sectionId,
 								}}
 							/>
 						)

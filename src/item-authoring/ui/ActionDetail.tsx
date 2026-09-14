@@ -8,21 +8,36 @@ import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 /** Presents an optional immediate action and its requirements. */
-export const ActionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+export const ActionDetail = ({
+	item,
+	preview = false,
+}: {
+	readonly item: ItemSchema.Type;
+	readonly preview?: boolean;
+}) => {
 	const translator = useTranslator();
 	const action = item.action;
-	if (action === undefined)
-		return (
-			<EditorRootCard dataUi="EditorActionDisabledCard">
-				<DisabledCapabilityDetail
-					capability="action"
-					itemUid={item.uid}
-					icon={MousePointerClick}
-					title={translator.textFn("Item action empty title")}
-					actionLabel={translator.textFn("Enable")}
-				/>
-			</EditorRootCard>
+	if (action === undefined) {
+		const empty = (
+			<DisabledCapabilityDetail
+				capability="action"
+				itemUid={item.uid}
+				icon={MousePointerClick}
+				title={translator.textFn(
+					preview ? "Item action empty title" : "No action configured",
+				)}
+				summary={preview ? undefined : translator.textFn("Item action empty title")}
+				size={preview ? "normal" : "large"}
+				actionLabel={translator.textFn("Enable")}
+			/>
 		);
+		return preview ? (
+			<EditorRootCard dataUi="EditorActionDisabledCard">{empty}</EditorRootCard>
+		) : (
+			empty
+		);
+	}
+
 	return (
 		<EditorRootCard dataUi="EditorActionDetailCard">
 			<DetailSection

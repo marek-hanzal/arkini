@@ -24,8 +24,3 @@ export interface SectionDescriptor {
 	readonly id: SectionId;
 	readonly label: string;
 }
-
-export type DetailSectionId = Extract<
-	SectionId,
-	"identity" | "production" | "merges" | "estimate" | "connections" | "chain" | "notes" | "delete"
->;

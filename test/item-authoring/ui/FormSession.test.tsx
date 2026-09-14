@@ -330,21 +330,15 @@ describe("item section form session", () => {
 	});
 
 	it.each([
-		[
-			"units",
-			"identity",
-		],
-		[
-			"action",
-			"identity",
-		],
-		[
-			"clock",
-			"identity",
-		],
+		"artwork",
+		"production",
+		"merges",
+		"units",
+		"action",
+		"clock",
 	] as const)(
-		"returns %s edits to the %s detail after Save and Discard",
-		async (sectionId, destination) => {
+		"returns %s edits to the matching detail after Save and Discard",
+		async (sectionId) => {
 			const { container, renderSection } = await render(<IdentitySection />);
 			await renderSection(<IdentitySection />, sectionId);
 			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
@@ -372,7 +366,7 @@ describe("item section form session", () => {
 				expect.objectContaining({
 					to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 					params: expect.objectContaining({
-						sectionId: destination,
+						sectionId,
 					}),
 				}),
 			);
@@ -384,7 +378,7 @@ describe("item section form session", () => {
 			expect(state.navigate).toHaveBeenLastCalledWith(
 				expect.objectContaining({
 					params: expect.objectContaining({
-						sectionId: destination,
+						sectionId,
 					}),
 				}),
 			);

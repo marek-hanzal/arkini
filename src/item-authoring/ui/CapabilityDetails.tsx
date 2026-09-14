@@ -15,19 +15,35 @@ import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 
 /** Presents the optional unit capability or its explicit disabled state. */
-export const UnitsDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+export const UnitsDetail = ({
+	item,
+	preview = false,
+}: {
+	readonly item: ItemSchema.Type;
+	readonly preview?: boolean;
+}) => {
 	const translator = useTranslator();
-	return item.units === undefined ? (
-		<EditorRootCard dataUi="EditorItemUnitsDisabledCard">
+	if (item.units === undefined) {
+		const empty = (
 			<DisabledCapabilityDetail
 				actionLabel={translator.textFn("Enable")}
 				capability="units"
 				icon={BatteryCharging}
 				itemUid={item.uid}
-				title={translator.textFn("Item units empty title")}
+				title={translator.textFn(
+					preview ? "Item units empty title" : "No Units configured",
+				)}
+				summary={preview ? undefined : translator.textFn("Item units empty title")}
+				size={preview ? "normal" : "large"}
 			/>
-		</EditorRootCard>
-	) : (
+		);
+		return preview ? (
+			<EditorRootCard dataUi="EditorItemUnitsDisabledCard">{empty}</EditorRootCard>
+		) : (
+			empty
+		);
+	}
+	return (
 		<div className="grid gap-3">
 			<EditorRootCard dataUi="EditorItemUnitsCard">
 				<DetailFact

@@ -32,18 +32,7 @@ const FormSections = [
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
 const DetailSections = [
-	{
-		id: "identity",
-		label: "Item",
-	},
-	{
-		id: "production",
-		label: "Production",
-	},
-	{
-		id: "merges",
-		label: "Merges",
-	},
+	...FormSections,
 	{
 		id: "estimate",
 		label: "Estimate",
@@ -66,7 +55,7 @@ const DetailSections = [
 	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
-/** Detail groups related capabilities; authoring retains exact validation destinations. */
+/** Detail and authoring share capability order; analysis and project tools extend detail. */
 export const readSectionsFn = (
 	mode: "detail" | "form" = "detail",
 ): ReadonlyArray<SectionDescriptor> => (mode === "form" ? FormSections : DetailSections);

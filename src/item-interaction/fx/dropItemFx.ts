@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 
 import { commitMergeDropFx } from "~/item-interaction/fx/commitMergeDropFx";
 import { commitMoveDropFx } from "~/item-interaction/fx/commitMoveDropFx";
+import { commitPortalDropFx } from "~/item-interaction/fx/commitPortalDropFx";
 import { commitStackDropFx } from "~/item-interaction/fx/commitStackDropFx";
 import { commitStoreInputDropFx } from "~/item-interaction/fx/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/item-interaction/fx/commitSwapDropFx";
@@ -136,12 +137,15 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			{
 				kind: DropItemResultKind.Move,
 			},
-			(unexpected) =>
-				Effect.die(
-					new Error(
-						`Occupied drop preview unexpectedly resolved as "${unexpected.kind}".`,
-					),
-				),
+			() =>
+				commitPortalDropFx({
+					sourceItemId,
+					sourceRevision,
+					sourceLocation,
+					targetItemId,
+					targetRevision,
+					targetLocation,
+				}),
 		)
 		.exhaustive();
 });

@@ -2,11 +2,9 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { CircleCheck, CircleX, Clock, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
-import {
-	EditorChoiceControl,
-	EditorTextControl,
-} from "~/editor-control/ui/EditorValueControls";
+import { EditorChoiceControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
+import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
 import { EditorBooleanToggleBadge } from "~/editor-control/ui/EditorBooleanToggleBadge";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -72,7 +70,7 @@ export const LineFields = withFieldGroupFn({
 												field.handleChange(title);
 												group.setFieldValue(
 													"id",
-													title.trim().toLowerCase().split(/\s+/).join("-"),
+													readEditorIdFromTitleFn(title),
 												);
 											}}
 										/>

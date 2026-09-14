@@ -1128,12 +1128,47 @@ describe("item section form session", () => {
 		);
 	});
 
+	it("derives the item ID only from title edits and saves the same item UID", async () => {
+		const { container } = await render(<IdentitySection />);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
+		if (title === null || id === null) throw new Error("Missing item identity fields.");
+		expect(id.value).toBe(item.id);
+		await changeInput(title, "  Foo   Bar  ");
+		expect(id.value).toBe("foo-bar");
+		await changeInput(id, "manual-id");
+		expect(title.value).toBe("  Foo   Bar  ");
+		await changeInput(title, "");
+		expect(id.value).toBe("");
+		await changeInput(title, "Next Title");
+		expect(id.value).toBe("next-title");
+		expect(state.saveItem).not.toHaveBeenCalled();
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item).toEqual({
+			...item,
+			title: "Next Title",
+			id: "next-title",
+		});
+	});
+
 	it("regenerates only the edited line ID from title while allowing independent ID edits", async () => {
-		const sibling = createLine({ id: "line:second" });
+		const sibling = createLine({
+			id: "line:second",
+		});
 		const common = {
 			...createProducerItem({
 				id: item.id,
-				lines: [{ ...createLine({ id: "custom-id" }), title: "Original Title" }, sibling],
+				lines: [
+					{
+						...createLine({
+							id: "custom-id",
+						}),
+						title: "Original Title",
+					},
+					sibling,
+				],
 			}),
 			uid: item.uid,
 		};
@@ -1154,7 +1189,11 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item.lines).toEqual([
-			{ ...common.lines[0], title: "Next Title", id: "next-title" },
+			{
+				...common.lines[0],
+				title: "Next Title",
+				id: "next-title",
+			},
 			sibling,
 		]);
 	});

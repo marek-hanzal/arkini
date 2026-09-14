@@ -1,6 +1,8 @@
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { Mx } from "~/translation/ui/Mx";
-import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
+import { EditorChoiceControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
+import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
+import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
 import { useStore } from "@tanstack/react-form";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -31,20 +33,35 @@ export const IdentitySection = () => {
 	return (
 		<div className="grid grid-cols-2 items-stretch gap-4">
 			<div className="grid auto-rows-fr gap-4">
-				<form.AppField name="id">
-					{(field) => (
-						<field.TextField
-							label={translator.textFn("Item ID")}
-							description={translator.textFn(
-								"Renaming updates exact project references.",
-							)}
-							placeholder="item:example"
-						/>
-					)}
-				</form.AppField>
-				<form.AppField name="title">
-					{(field) => <field.TextField label={translator.textFn("Title")} />}
-				</form.AppField>
+				<div className="grid min-w-0 grid-cols-2 items-start gap-3">
+					<form.AppField name="title">
+						{(field) => (
+							<EditorTextControl
+								autoComplete="off"
+								label={translator.textFn("Title")}
+								name={field.name}
+								value={field.state.value}
+								error={readEditorFieldErrorFn(field.state.meta.errors)}
+								onBlurFn={field.handleBlur}
+								onChangeFn={(title) => {
+									field.handleChange(title);
+									form.setFieldValue("id", readEditorIdFromTitleFn(title));
+								}}
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="id">
+						{(field) => (
+							<field.TextField
+								label={translator.textFn("Item ID")}
+								description={translator.textFn(
+									"Renaming updates exact project references.",
+								)}
+								placeholder="item:example"
+							/>
+						)}
+					</form.AppField>
+				</div>
 				<div className="flex items-start justify-between gap-4">
 					{clock !== undefined ? (
 						<EditorValueField

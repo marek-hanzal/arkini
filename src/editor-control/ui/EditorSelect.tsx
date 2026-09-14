@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import {
 	autoUpdate,
@@ -98,7 +98,7 @@ export const EditorSelect = <Value extends string>({
 					>
 						{options.map((option) => (
 							<button
-								className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold enabled:hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent data-[ui-selected=false]:text-foreground data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent"
+								className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold data-[ui-selected=false]:enabled:hover:bg-surface-raised data-[ui-selected=true]:enabled:hover:bg-accent/20 disabled:cursor-not-allowed disabled:opacity-50 data-[ui-selected=false]:text-foreground data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent"
 								disabled={option.disabled}
 								key={option.value}
 								onClick={() => {
@@ -119,15 +119,6 @@ export const EditorSelect = <Value extends string>({
 										{option.trailingLabel}
 									</span>
 								)}
-								{option.trailingLabel !== undefined ? (
-									<span className="size-4 shrink-0">
-										{option.value === value ? (
-											<Check className="size-4" />
-										) : null}
-									</span>
-								) : option.value === value ? (
-									<Check className="size-4 shrink-0" />
-								) : null}
 							</button>
 						))}
 					</div>

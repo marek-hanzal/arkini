@@ -1,3 +1,4 @@
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { createId } from "@paralleldrive/cuid2";
 import { useState, type ReactNode } from "react";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
@@ -22,10 +23,14 @@ export const CreateItemLink = ({
 	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly resourceId?: string;
-	readonly variant?: "default" | "primary";
+	readonly variant?: "default" | "primary" | "link";
 }) => {
 	const [uid] = useState(createId);
-	const Component = variant === "primary" ? PrimaryButtonLink : ButtonLink;
+	const Component = {
+		default: ButtonLink,
+		primary: PrimaryButtonLink,
+		link: LinkButtonLink,
+	}[variant];
 	return (
 		<Component
 			to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"

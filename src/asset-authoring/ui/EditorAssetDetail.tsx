@@ -3,17 +3,15 @@ import { FileQuestion, PackagePlus, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
+import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import {
-	EditorSectionNavigation,
-	EditorSectionNavigationSeparator,
-} from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
-	editorSectionTabClassName,
-	EditorSectionTabs,
-} from "~/authoring-shell/ui/EditorSectionTabs";
+	editorSectionLinkClassName,
+	EditorSectionBar,
+} from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
@@ -44,7 +42,7 @@ const EditorAssetDetailTab = ({
 	readonly resourceId: string;
 	readonly to: EditorAssetDetailPath;
 }) => (
-	<ButtonLink
+	<LinkButtonLink
 		to={to}
 		params={{
 			projectId,
@@ -63,10 +61,10 @@ const EditorAssetDetailTab = ({
 		inactiveProps={{
 			"data-ui-selected": false,
 		}}
-		className={editorSectionTabClassName}
+		className={editorSectionLinkClassName}
 	>
 		<Tx label={label} />
-	</ButtonLink>
+	</LinkButtonLink>
 );
 
 export const EditorAssetDetail = ({
@@ -135,78 +133,78 @@ export const EditorAssetDetail = ({
 						/>
 					}
 					title={<h1 className="truncate text-xl font-semibold">{resource.id}</h1>}
-					tabs={
-						<EditorSectionTabs>
-							<EditorAssetDetailTab
-								filter={filter}
-								label="Overview"
-								projectId={project.projectId}
-								query={query}
-								resourceId={resourceId}
-								to="/editor/$projectId/assets/$resourceId/detail/overview"
-							/>
-							<EditorAssetDetailTab
-								filter={filter}
-								label="Usage"
-								projectId={project.projectId}
-								query={query}
-								resourceId={resourceId}
-								to="/editor/$projectId/assets/$resourceId/detail/usage"
-							/>
-
-							<EditorAssetDetailTab
-								filter={filter}
-								label="Notes"
-								projectId={project.projectId}
-								query={query}
-								resourceId={resourceId}
-								to="/editor/$projectId/assets/$resourceId/detail/notes"
-							/>
-							<EditorAssetDetailTab
-								filter={filter}
-								label="Delete"
-								projectId={project.projectId}
-								query={query}
-								resourceId={resourceId}
-								to="/editor/$projectId/assets/$resourceId/detail/delete"
-							/>
-						</EditorSectionTabs>
-					}
 					action={
-						<div className="flex items-center gap-2">
-							<EditorPageHelp {...help} />
-							<EditorSectionNavigationSeparator />
-							<CreateItemLink
-								dataUi="EditorAssetCreateItem"
-								defaultDraft
-								defaultItemId={resource.id}
-								defaultTitle={readAssetNameFn(resource.id)}
-								projectId={project.projectId}
-								resourceId={resource.id}
-								className="h-10 min-h-10 gap-2"
-							>
-								<PackagePlus className="size-4" /> <Tx label="Create item" />
-							</CreateItemLink>
-							<EditorSectionNavigationSeparator />
-							<PrimaryButtonLink
-								ref={editActionRef}
-								to="/editor/$projectId/assets/$resourceId/edit"
-								params={{
-									projectId: project.projectId,
-									resourceId,
-								}}
-								search={{
-									filter,
-									query,
-								}}
-								className="min-h-0 gap-2 px-4 py-2 text-sm"
-							>
-								<Pencil className="size-4" />
-								<Tx label="Edit" />
-							</PrimaryButtonLink>
-						</div>
+						<PrimaryButtonLink
+							ref={editActionRef}
+							to="/editor/$projectId/assets/$resourceId/edit"
+							params={{
+								projectId: project.projectId,
+								resourceId,
+							}}
+							search={{
+								filter,
+								query,
+							}}
+							className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+						>
+							<Pencil className="size-4" />
+							<Tx label="Edit" />
+						</PrimaryButtonLink>
 					}
 				/>
+			}
+			secondaryNavigation={
+				<EditorSectionBar
+					actions={
+						<CreateItemLink
+							dataUi="EditorAssetCreateItem"
+							defaultDraft
+							defaultItemId={resource.id}
+							defaultTitle={readAssetNameFn(resource.id)}
+							projectId={project.projectId}
+							resourceId={resource.id}
+							variant="link"
+							className="inline-flex items-center gap-1.5 text-sm"
+						>
+							<PackagePlus className="size-4" /> <Tx label="Create item" />
+						</CreateItemLink>
+					}
+					help={<EditorPageHelp {...help} />}
+				>
+					<EditorAssetDetailTab
+						filter={filter}
+						label="Overview"
+						projectId={project.projectId}
+						query={query}
+						resourceId={resourceId}
+						to="/editor/$projectId/assets/$resourceId/detail/overview"
+					/>
+					<EditorAssetDetailTab
+						filter={filter}
+						label="Usage"
+						projectId={project.projectId}
+						query={query}
+						resourceId={resourceId}
+						to="/editor/$projectId/assets/$resourceId/detail/usage"
+					/>
+
+					<EditorAssetDetailTab
+						filter={filter}
+						label="Notes"
+						projectId={project.projectId}
+						query={query}
+						resourceId={resourceId}
+						to="/editor/$projectId/assets/$resourceId/detail/notes"
+					/>
+					<EditorAssetDetailTab
+						filter={filter}
+						label="Delete"
+						projectId={project.projectId}
+						query={query}
+						resourceId={resourceId}
+						to="/editor/$projectId/assets/$resourceId/detail/delete"
+					/>
+				</EditorSectionBar>
 			}
 		>
 			{children}

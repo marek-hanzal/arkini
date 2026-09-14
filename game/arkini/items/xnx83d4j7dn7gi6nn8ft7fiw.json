@@ -22,6 +22,24 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "cauldron-with-vegetables-and-meat"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "hungry-beagle-puppy"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-puppy"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "hungry-beagle"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle"
 			}
 		],
 		"clock": {

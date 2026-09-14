@@ -1,38 +1,18 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "bttupkw06zzxn8xuvb4d27uu",
-		"id": "hay",
-		"title": "Hay",
+		"uid": "ms0pjnyoteo96bt25xr8lk7z",
+		"id": "hungry-beagle",
+		"title": "Hungry Beagle",
 		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"hay"
+				"hungry-beagle"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "cow"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "well-fed-cow"
-			},
-			{
-				"target": {
-					"type": "item",
-					"itemId": "hungry-cow"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "cow"
-			}
-		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,
@@ -46,7 +26,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-hay",
+										"itemId": "sick-beagle",
 										"quantity": {
 											"min": 1,
 											"max": 1

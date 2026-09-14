@@ -88,6 +88,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "recovering-goose"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-beagle-puppy"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-beagle-puppy"
 			}
 		],
 		"maxQueueSize": 1,

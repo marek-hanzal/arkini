@@ -11,7 +11,7 @@
 				"british-shorthair"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{
@@ -162,6 +162,43 @@
 				"result": "fighting-british-shorthairs"
 			}
 		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "hungry-british-shorthair",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

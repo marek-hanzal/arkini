@@ -1,0 +1,89 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "cdzjb2w5wnfeljcp1inxrgz9",
+		"id": "plague",
+		"title": "Plague",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"plague"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"intervalMs": 10000,
+			"durationMs": 15000,
+			"expiryMode": "kill-switch",
+			"enable": true,
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "plague",
+				"title": "Plague",
+				"description": "You want to stop this. Really",
+				"clock": true,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "weight",
+									"quantity": {
+										"min": 1,
+										"max": 1
+									},
+									"drop": [
+										{
+											"weight": 10,
+											"drop": [
+												{
+													"itemId": "disease",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										},
+										{
+											"weight": 15,
+											"drop": [
+												{
+													"itemId": "plague",
+													"quantity": {
+														"min": 1,
+														"max": 1
+													},
+													"placement": "drop",
+													"rules": []
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

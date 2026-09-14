@@ -1,0 +1,24 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "siugkd1lhwym2fqb49j4z0r5",
+		"id": "disease",
+		"title": "Disease",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"disease"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

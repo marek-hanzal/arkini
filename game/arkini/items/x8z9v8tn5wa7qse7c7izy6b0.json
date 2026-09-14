@@ -4,6 +4,7 @@
 		"uid": "x8z9v8tn5wa7qse7c7izy6b0",
 		"id": "base-camp",
 		"title": "Base Camp",
+		"draft": false,
 		"description": "This is the start of your journey. Here you can build more stuff as you progress!",
 		"asset": {
 			"scale": 1,

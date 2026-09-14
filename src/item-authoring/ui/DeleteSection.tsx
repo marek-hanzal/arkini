@@ -92,9 +92,7 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 					dataUi="EditorItemDeleteState"
 					size="large"
 					icon={blocked ? ShieldAlert : ShieldCheck}
-					title={
-						blocked ? "This item cannot be deleted yet" : "This item can be deleted"
-					}
+					title={blocked ? "This item cannot be deleted yet" : "This item can be deleted"}
 					description={
 						blocked
 							? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`

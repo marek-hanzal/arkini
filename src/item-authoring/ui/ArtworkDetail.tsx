@@ -19,7 +19,9 @@ export const ArtworkDetail = ({
 			className="group/artwork flex min-w-0 flex-wrap items-start gap-5 data-[ui-layout=detail]:flex-col data-[ui-layout=detail]:items-center"
 			{...readDataUiFn({
 				dataUi: "EditorArtworkDetail",
-				state: { layout },
+				state: {
+					layout,
+				},
 			})}
 		>
 			<ArtworkTilePreview

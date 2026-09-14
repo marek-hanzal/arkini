@@ -252,26 +252,28 @@ const WhenControl = ({
 								type: "range",
 							},
 							(when) => (
-								<QuantityFields
-									minimumError={readEditorFormValidationErrorFn(
-										validationIssues,
-										"min",
-									)}
-									maximumError={readEditorFormValidationErrorFn(
-										validationIssues,
-										"max",
-									)}
-									minimumLabel="Minimum count"
-									maximumLabel="Maximum count"
-									minimumValue={0}
-									value={when}
-									onChangeFn={(range) =>
-										onChangeFn({
-											...when,
-											...range,
-										})
-									}
-								/>
+								<div className="grid grid-cols-2 gap-3">
+									<QuantityFields
+										minimumError={readEditorFormValidationErrorFn(
+											validationIssues,
+											"min",
+										)}
+										maximumError={readEditorFormValidationErrorFn(
+											validationIssues,
+											"max",
+										)}
+										minimumLabel="Minimum count"
+										maximumLabel="Maximum count"
+										minimumValue={0}
+										value={when}
+										onChangeFn={(range) =>
+											onChangeFn({
+												...when,
+												...range,
+											})
+										}
+									/>
+								</div>
 							),
 						)
 						.exhaustive()}

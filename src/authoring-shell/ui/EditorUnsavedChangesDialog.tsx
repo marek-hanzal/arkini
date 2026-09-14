@@ -17,7 +17,7 @@ const EditorUnsavedChangesPrompt = ({
 	const translator = useTranslator();
 	const owner = useEditorUnsavedChangesOwner();
 	const focus = useOverlayFocus({
-		onCloseFn: () => void owner.decideFn("cancel"),
+		onCloseFn: () => void owner.decideFn("discard"),
 	});
 
 	useEditorSaveShortcut({

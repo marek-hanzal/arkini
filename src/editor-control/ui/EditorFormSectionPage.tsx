@@ -1,4 +1,5 @@
 import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
+import { useEditorDiscardShortcut } from "~/editor-control/ui/useEditorDiscardShortcut";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tx } from "~/translation/ui/Tx";
 import { Save, Trash2 } from "lucide-react";
@@ -79,6 +80,10 @@ export const EditorFormSectionPage = ({
 	readonly tabs?: ReactNode;
 	readonly title?: ReactNode;
 }>) => {
+	useEditorDiscardShortcut({
+		discardEnabled: !saving,
+		discardFn,
+	});
 	useEditorSaveShortcut({
 		saveEnabled: saveEnabled && !saving,
 		saveFn,

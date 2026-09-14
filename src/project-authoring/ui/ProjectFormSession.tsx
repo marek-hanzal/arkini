@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
@@ -21,6 +22,7 @@ export const ProjectFormSession = ({
 }>) => {
 	const navigateFn = useNavigate();
 	const project = useEditorProject();
+	const unsavedChanges = useEditorUnsavedChangesOwner();
 	const onInvalidDestinationFn = useCallback(
 		({ avatar, sectionId: nextSectionId }: ProjectFormDestination) =>
 			navigateFn({
@@ -55,7 +57,12 @@ export const ProjectFormSession = ({
 		},
 	});
 	const discardFn = useCallback(async () => {
-		controller.discardFn();
+		if (
+			!(await unsavedChanges.requestLeaveFn(
+				`/editor/${project.projectId}/project/detail/${sectionId}`,
+			))
+		)
+			return;
 		await navigateFn({
 			to: "/editor/$projectId/project/detail/$sectionId",
 			params: {
@@ -65,10 +72,10 @@ export const ProjectFormSession = ({
 			replace: true,
 		});
 	}, [
-		controller.discardFn,
 		navigateFn,
 		project.projectId,
 		sectionId,
+		unsavedChanges,
 	]);
 	return (
 		<ProjectFormProvider value={controller}>

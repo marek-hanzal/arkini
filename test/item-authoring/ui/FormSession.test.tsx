@@ -60,11 +60,13 @@ const state = vi.hoisted(() => ({
 	navigate: vi.fn().mockResolvedValue(undefined),
 	persisted: undefined as unknown,
 	project: undefined as unknown,
+	requestLeave: vi.fn().mockResolvedValue(true),
 	saveItem: vi.fn(),
 	unsavedSession: undefined as
 		| {
 				readonly saveFn: () => Promise<boolean>;
 				readonly discardFn: () => void;
+				readonly isDirtyFn: () => boolean;
 		  }
 		| undefined,
 }));
@@ -73,6 +75,13 @@ vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
 	useEditorUnsavedChangesRegistration: (session: typeof state.unsavedSession) => {
 		state.unsavedSession = session;
 	},
+	useEditorUnsavedChangesOwner: () => ({
+		requestLeaveFn: async (pathname: string) => {
+			const allowed = await state.requestLeave(pathname);
+			if (allowed && state.unsavedSession?.isDirtyFn()) state.unsavedSession.discardFn();
+			return allowed;
+		},
+	}),
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -197,6 +206,7 @@ beforeEach(() => {
 	};
 	state.persisted = item;
 	state.saveItem.mockResolvedValue(item);
+	state.requestLeave.mockReset().mockResolvedValue(true);
 	state.unsavedSession = undefined;
 });
 
@@ -688,6 +698,29 @@ describe("item section form session", () => {
 			},
 			replace: true,
 		});
+	});
+
+	it("keeps a dirty item form mounted when Discard is canceled", async () => {
+		const { container } = await render(<IdentitySection />);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing item title input.");
+		await changeInput(title, "Keep this title");
+		state.requestLeave.mockResolvedValueOnce(false);
+
+		await act(async () => {
+			[
+				...container.querySelectorAll("button"),
+			]
+				.find((button) => button.textContent === "Discard")
+				?.click();
+			await Promise.resolve();
+		});
+
+		expect(state.requestLeave).toHaveBeenCalledWith(
+			`/editor/editor-test/editor/items/${item.uid}/detail/identity`,
+		);
+		expect(title.value).toBe("Keep this title");
+		expect(state.navigate).not.toHaveBeenCalled();
 	});
 
 	it("retains the local draft across routed section replacement", async () => {

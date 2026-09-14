@@ -8,6 +8,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
@@ -63,6 +64,7 @@ export const FormSession = ({
 	const navigateFn = useNavigate();
 	const translator = useTranslator();
 	const project = useEditorProject();
+	const unsavedChanges = useEditorUnsavedChangesOwner();
 	const onInvalidSectionFn = useCallback(
 		(nextSectionId: SectionId, path: ReadonlyArray<PropertyKey>) =>
 			navigateFn({
@@ -134,7 +136,10 @@ export const FormSession = ({
 		},
 	});
 	const discardFn = useCallback(async () => {
-		controller.discardFn();
+		const targetPathname = isNew
+			? `/editor/${project.projectId}/editor/items/list`
+			: `/editor/${project.projectId}/editor/items/${initialItem.uid}/detail/${sectionId}`;
+		if (!(await unsavedChanges.requestLeaveFn(targetPathname))) return;
 		if (isNew) {
 			await navigateFn({
 				to: "/editor/$projectId/editor/items/list",
@@ -155,12 +160,12 @@ export const FormSession = ({
 			replace: true,
 		});
 	}, [
-		controller.discardFn,
 		initialItem.uid,
 		isNew,
 		navigateFn,
 		project.projectId,
 		sectionId,
+		unsavedChanges,
 	]);
 	const context = useMemo(
 		() => ({

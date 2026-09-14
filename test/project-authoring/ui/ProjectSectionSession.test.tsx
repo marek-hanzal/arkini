@@ -19,6 +19,13 @@ vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
 	useEditorUnsavedChangesRegistration: (session: typeof state.unsavedSession) => {
 		state.unsavedSession = session;
 	},
+	useEditorUnsavedChangesOwner: () => ({
+		requestLeaveFn: async (pathname: string) => {
+			const allowed = await state.requestLeave(pathname);
+			if (allowed && state.unsavedSession?.isDirtyFn()) state.unsavedSession.discardFn();
+			return allowed;
+		},
+	}),
 }));
 
 vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
@@ -77,6 +84,7 @@ vi.mock("~/ui/ui/Button", () => ({
 const state = vi.hoisted(() => ({
 	navigate: vi.fn().mockResolvedValue(undefined),
 	project: undefined as unknown,
+	requestLeave: vi.fn().mockResolvedValue(true),
 	saveConfig: vi.fn().mockResolvedValue(undefined),
 	section: undefined as ReactNode,
 	sectionId: "general",
@@ -84,6 +92,7 @@ const state = vi.hoisted(() => ({
 		| {
 				readonly saveFn: () => Promise<boolean>;
 				readonly discardFn: () => void;
+				readonly isDirtyFn: () => boolean;
 		  }
 		| undefined,
 }));
@@ -180,6 +189,7 @@ afterEach(async () => {
 	});
 	document.body.replaceChildren();
 	state.navigate.mockClear();
+	state.requestLeave.mockReset().mockResolvedValue(true);
 	state.saveConfig.mockReset().mockResolvedValue(undefined);
 	state.sectionId = "general";
 	state.unsavedSession = undefined;
@@ -550,6 +560,39 @@ describe("project section form session", () => {
 			},
 			replace: true,
 		});
+	});
+
+	it("keeps a dirty project form mounted when Discard is canceled", async () => {
+		state.project = boardSpaceProject;
+		state.section = <ProjectGeneralSection />;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () =>
+			root.render(
+				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
+			),
+		);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing project title input.");
+		await changeInput(title, "Keep this project title");
+		state.requestLeave.mockResolvedValueOnce(false);
+
+		await act(async () => {
+			[
+				...container.querySelectorAll("button"),
+			]
+				.find((button) => button.textContent === "Discard")
+				?.click();
+			await Promise.resolve();
+		});
+
+		expect(state.requestLeave).toHaveBeenCalledWith(
+			`/editor/${boardSpaceProject.projectId}/project/detail/general`,
+		);
+		expect(title.value).toBe("Keep this project title");
+		expect(state.navigate).not.toHaveBeenCalled();
 	});
 
 	it("edits initial Board cells in the zero-based space selected live", async () => {

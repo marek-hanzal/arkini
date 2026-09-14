@@ -2,7 +2,7 @@ import { NoteForm } from "~/project-note/ui/NoteForm";
 import { NotebookPen, Pencil, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { Button, IconButton } from "~/ui/ui/Button";
+import { Button } from "~/ui/ui/Button";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useNotesController } from "~/project-note/ui/useNotesController";
 import { Status } from "~/ui/ui/Status";
@@ -19,6 +19,8 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
 });
 
+const iconButtonClassName =
+	"size-8 min-h-0 border-0 bg-transparent p-0 text-muted shadow-none hover:border-transparent hover:bg-transparent hover:text-foreground active:bg-transparent disabled:hover:bg-transparent";
 const noteMotion = {
 	animate: {
 		opacity: 1,
@@ -122,12 +124,13 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 												{dateFormatter.format(note.updatedAtMs)}
 											</time>
 											{editing ? null : (
-												<div className="ml-auto flex items-center gap-1">
+												<div className="ml-auto flex items-center">
 													<Tooltip
 														content={<Tx label="Edit" />}
 														placement="top"
 													>
-														<IconButton
+														<Button
+															className={iconButtonClassName}
 															disabled={
 																controller.editingNoteId !==
 																	undefined || controller.pending
@@ -137,14 +140,14 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 															}
 														>
 															<Pencil className="size-4" />
-														</IconButton>
+														</Button>
 													</Tooltip>
 													<Tooltip
 														content={<Tx label="Delete" />}
 														placement="top"
 													>
-														<IconButton
-															className="hover:text-danger"
+														<Button
+															className={`${iconButtonClassName} hover:text-danger`}
 															disabled={
 																controller.editingNoteId !==
 																	undefined || controller.pending
@@ -154,7 +157,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 															}
 														>
 															<Trash2 className="size-4" />
-														</IconButton>
+														</Button>
 													</Tooltip>
 												</div>
 											)}

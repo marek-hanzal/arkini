@@ -21,7 +21,6 @@ const ButtonBaseClassName =
 	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors disabled:opacity-60 data-[ui-disabled=true]:opacity-60";
 
 const ButtonVariantClassNames = {
-	icon: "min-h-0 shrink-0 rounded-none border-0 bg-transparent p-0 text-foreground shadow-none hover:text-accent disabled:hover:text-foreground",
 	default:
 		"border border-line bg-surface/75 text-foreground shadow-lg hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 data-[ui-disabled=true]:hover:border-line data-[ui-disabled=true]:hover:bg-surface/75 data-[ui-disabled=true]:active:bg-surface/75",
 	primary:
@@ -123,9 +122,6 @@ const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
 
 /** Renders the canonical neutral game action on a native button. */
 export const Button = createButton("Button", "default");
-
-/** Renders an unpadded inline icon action; the surrounding row owns spacing. */
-export const IconButton = createButton("IconButton", "icon");
 
 /** Renders the canonical primary game action on a native button. */
 export const PrimaryButton = createButton("PrimaryButton", "primary");

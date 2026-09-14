@@ -1,7 +1,7 @@
 import { ArtworkTilePreview } from "~/item-authoring/ui/ArtworkTilePreview";
 import { Trash2 } from "lucide-react";
 
-import { IconButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
@@ -56,13 +56,13 @@ const ArtworkFields = withFieldGroupFn({
 							/>
 						)}
 					</group.AppField>
-					<IconButton
-						className="h-[var(--ak-control-min-height)]"
+					<LinkButton
+						className="flex h-[var(--ak-control-min-height)] shrink-0 items-center"
 						title={translator.textFn("Clear overlay asset")}
 						onClick={() => group.setFieldValue("default[1]", "")}
 					>
 						<Trash2 className="size-4" />
-					</IconButton>
+					</LinkButton>
 				</div>
 			</>
 		);

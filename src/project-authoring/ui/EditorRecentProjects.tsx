@@ -12,7 +12,7 @@ import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
-import { ButtonLink, IconButton } from "~/ui/ui/Button";
+import { ButtonLink } from "~/ui/ui/Button";
 
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -89,14 +89,14 @@ export const EditorRecentProjects = ({
 								<FolderOpen className="size-4" />
 								{translator.textFn("Open folder")}
 							</LinkButton>
-							<IconButton
+							<LinkButton
 								disabled={blocked}
 								className="shrink-0"
 								title={translator.textFn("Remove from Recent")}
 								onClick={() => onDismissInvalidProjectFn(candidate.root)}
 							>
 								<Trash2 className="size-4" />
-							</IconButton>
+							</LinkButton>
 						</div>
 					) : (
 						<div
@@ -137,10 +137,10 @@ export const EditorRecentProjects = ({
 									</span>
 								</span>
 							</ButtonLink>
-							<IconButton
+							<button
 								type="button"
 								disabled={blocked}
-								className="hover:text-danger"
+								className="grid size-8 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-subtle transition-colors hover:text-danger disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-subtle"
 								data-ui="EditorRecentProjectDelete"
 								title={`Delete ${candidate.project.title}`}
 								onClick={() =>
@@ -148,7 +148,7 @@ export const EditorRecentProjects = ({
 								}
 							>
 								<Trash2 className="size-4" />
-							</IconButton>
+							</button>
 							<ButtonLink
 								to="/editor/$projectId/editor/items/list"
 								params={{

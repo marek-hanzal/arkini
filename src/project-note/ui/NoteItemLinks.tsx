@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { IconButton } from "~/ui/ui/Button";
+import { Button } from "~/ui/ui/Button";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface NoteItemLinksProps {
@@ -75,8 +75,8 @@ export const NoteItemLinks = ({
 								}
 								placement="top"
 							>
-								<IconButton
-									className="hover:text-danger"
+								<Button
+									className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
 									data-ui="EditorNoteUnlinkItem"
 									disabled={disabled || requiredItemUid === itemUid}
 									onClick={() => {
@@ -87,7 +87,7 @@ export const NoteItemLinks = ({
 									}}
 								>
 									<Trash2 className="size-4" />
-								</IconButton>
+								</Button>
 							</Tooltip>
 						</div>
 					);

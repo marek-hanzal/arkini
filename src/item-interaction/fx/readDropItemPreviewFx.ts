@@ -28,6 +28,7 @@ export namespace readDropItemPreviewFx {
 					| typeof DropItemResultKind.Move
 					| typeof DropItemResultKind.Swap
 					| typeof DropItemResultKind.Merge
+					| typeof DropItemResultKind.StoreInventory
 					| typeof DropItemResultKind.Stack;
 		  }
 		| {
@@ -198,6 +199,19 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			: ({
 					kind: DropItemResultKind.Move,
 				} satisfies readDropItemPreviewFx.Result);
+	}
+	if (
+		source.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
+		targetItem.item.action?.type === "inventory"
+	) {
+		return isItemLocationScopeAllowedFn({
+			item: source.item,
+			locationScope: LocationScopeEnumSchema.enum.Inventory,
+		})
+			? ({
+					kind: DropItemResultKind.StoreInventory,
+				} satisfies readDropItemPreviewFx.Result)
+			: rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	if (target.inputStore !== undefined) {
 		const inputStore = resolveLineInputStoreFn({

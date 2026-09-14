@@ -38,14 +38,9 @@ const rolls = {
 			min: 1,
 			max: 1,
 		},
-		// Authoring starts with one visible candidate; schema validation keeps Save
-		// blocked until the user deliberately adds the second weighted alternative.
-		drop: [
-			{
-				weight: 1,
-				drop: drops,
-			},
-		] as unknown as [
+		// Candidate alternatives are deliberate authoring branches; canonical validation
+		// keeps Save blocked until the user adds the required pair.
+		drop: [] as unknown as [
 			WeightedDropSchema.Type,
 			WeightedDropSchema.Type,
 			...WeightedDropSchema.Type[],

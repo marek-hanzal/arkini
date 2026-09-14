@@ -17,6 +17,7 @@ import {
 import { readEditorFormValidationIssuesFn } from "~/editor-control/fn/readEditorFormValidationIssuesFn";
 import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
 import { Mx } from "~/translation/ui/Mx";
+import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 
 interface InputsControlProps {
 	readonly allowMaterials?: boolean;
@@ -96,43 +97,81 @@ export const InputsControl = ({
 						return [
 							input.selector.itemId,
 						];
-					if (input.type === "units")
+					if (input.type === "units") {
+						const itemId = input.query.selector.itemId;
+						if (itemId.length === 0) return [];
 						return [
-							input.query.selector.itemId,
+							itemId,
+							readItemLabelFn(itemId, ""),
 						];
+					}
 					return [];
 				}}
 				label={allowMaterials ? "Line inputs" : "Action inputs"}
 				renderItemContentFn={(index, label) => {
 					const input = value[index];
-					if (input.type !== "materials") return label;
-					const { min, max } = input.quantity;
-					return (
-						<EditorCollectionOption
-							label={label}
-							details={
-								<span className="text-xs text-subtle">
-									{min === max ? `×${min}` : `×${min}–${max}`}
-									{" · "}
-									{translator.textFn(
-										input.mode === "consume" ? "Consume" : "Reserve",
-									)}
-									{" · "}
-									{translator.textFn("Buffer")}: {input.capacity}
-								</span>
-							}
-						>
-							<EditorItemThumbnail
-								size="md"
-								className="rounded-md"
-								resourceIds={
-									project.config.items[input.selector.itemId]?.asset.default ?? [
-										"",
-									]
+					if (input.type === "materials") {
+						const { min, max } = input.quantity;
+						return (
+							<EditorCollectionOption
+								label={label}
+								details={
+									<span className="text-xs text-subtle">
+										{min === max ? `×${min}` : `×${min}–${max}`}
+										{" · "}
+										{translator.textFn(
+											input.mode === "consume" ? "Consume" : "Reserve",
+										)}
+										{" · "}
+										{translator.textFn("Buffer")}: {input.capacity}
+									</span>
 								}
-							/>
-						</EditorCollectionOption>
-					);
+							>
+								<EditorItemThumbnail
+									size="md"
+									className="rounded-md"
+									resourceIds={
+										project.config.items[input.selector.itemId]?.asset
+											.default ?? [
+											"",
+										]
+									}
+								/>
+							</EditorCollectionOption>
+						);
+					}
+					if (input.type === "units") {
+						const units = input.units ?? DraftDefaults.inputs.units.units;
+						const itemId = input.query.selector.itemId;
+						return (
+							<EditorCollectionOption
+								label={label}
+								details={
+									<span className="text-xs text-subtle">
+										{units.from === "self" ? "Self" : "Target"}
+										{units.from === "target"
+											? ` · ${BoardDistancePresentation[input.query.distance].label}`
+											: null}
+										{" · "}
+										{translator.textFn("Cost")}: {units.cost}
+									</span>
+								}
+							>
+								{itemId.length === 0 ? null : (
+									<EditorItemThumbnail
+										className="rounded-md"
+										resourceIds={
+											project.config.items[itemId]?.asset.default ?? [
+												"",
+											]
+										}
+										size="md"
+									/>
+								)}
+							</EditorCollectionOption>
+						);
+					}
+					return label;
 				}}
 				onAddFn={() =>
 					onChangeFn([

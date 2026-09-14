@@ -13,6 +13,7 @@ import {
 	type DraftRoll,
 } from "~/production-authoring/fn/readDraftRollDropsFn";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
@@ -119,6 +120,7 @@ const DropControl = ({
 					}
 				/>
 			</div>
+			<EditorFormBranchEnd />
 			<RulesControl
 				initialRuleIndex={initialRuleIndex}
 				initialWhenIndex={initialWhenIndex}
@@ -280,6 +282,7 @@ const WeightedRollControl = ({
 						}
 					/>
 				</div>
+				<EditorFormBranchEnd />
 			</div>
 			<EditorFormSectionDivider
 				description={<Mx label="Weighted candidates help" />}
@@ -384,6 +387,7 @@ const WeightedRollControl = ({
 									})
 								}
 							/>
+							<EditorFormBranchEnd />
 							<DropList
 								initialRuleIndex={
 									candidateIndex === initialCandidateIndex
@@ -472,18 +476,21 @@ const RollControl = ({
 								type: "guaranteed",
 							},
 							(roll) => (
-								<DropList
-									initialRuleIndex={initialRuleIndex}
-									initialWhenIndex={initialWhenIndex}
-									value={roll.drop}
-									initialDropIndex={initialDropIndex}
-									onChangeFn={(drop) =>
-										onChangeFn({
-											...roll,
-											drop: drop as typeof roll.drop,
-										})
-									}
-								/>
+								<div className="grid gap-3">
+									<EditorFormBranchEnd />
+									<DropList
+										initialRuleIndex={initialRuleIndex}
+										initialWhenIndex={initialWhenIndex}
+										value={roll.drop}
+										initialDropIndex={initialDropIndex}
+										onChangeFn={(drop) =>
+											onChangeFn({
+												...roll,
+												drop: drop as typeof roll.drop,
+											})
+										}
+									/>
+								</div>
 							),
 						)
 						.with(
@@ -510,6 +517,7 @@ const RollControl = ({
 											})
 										}
 									/>
+									<EditorFormBranchEnd />
 									<DropList
 										initialRuleIndex={initialRuleIndex}
 										initialWhenIndex={initialWhenIndex}
@@ -582,8 +590,10 @@ export const RollSetControl = ({
 					})
 				}
 			/>
+			<EditorFormBranchEnd />
 			<EditorFormSectionDivider
 				description={<Mx label="Rolls help" />}
+				required
 				title="Rolls"
 				variant="secondary"
 			/>

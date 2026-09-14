@@ -2,6 +2,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
@@ -69,7 +70,9 @@ export const MergeField = ({
 						}
 					/>
 					<SelectorControl
+						description={<Mx label="Merge with help" />}
 						error={readEditorFormValidationErrorFn(validationIssues, "target")}
+						label={translator.textFn("Merge with")}
 						value={merge.target}
 						onChangeFn={(target) =>
 							onChangeFn({
@@ -132,8 +135,9 @@ export const MergeField = ({
 					/>
 					{merge.effect !== "replace" ? null : (
 						<EditorItemReferenceControl
+							description={<Mx label="Replace by help" />}
 							error={readEditorFormValidationErrorFn(validationIssues, "result")}
-							label={translator.textFn("Replacement item")}
+							label={translator.textFn("Replace by")}
 							value={merge.result}
 							onChangeFn={(result) =>
 								onChangeFn({
@@ -144,6 +148,7 @@ export const MergeField = ({
 						/>
 					)}
 				</article>
+				<EditorFormBranchEnd />
 			</EditorFormCard>
 			<EditorFormSection
 				description={<Mx label="Merge output help" />}

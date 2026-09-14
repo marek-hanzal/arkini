@@ -1,11 +1,12 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { BatteryCharging, PackagePlus } from "lucide-react";
+import { BatteryCharging } from "lucide-react";
 
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
-import { OptionalOutputControl } from "~/production-authoring/ui/OptionalOutputControl";
+import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { Mx } from "~/translation/ui/Mx";
 
 export const UnitsSection = () => {
@@ -41,18 +42,14 @@ export const UnitsSection = () => {
 										/>
 									)}
 								</form.AppField>
+								<EditorFormBranchEnd />
 							</EditorFormCard>
 							<EditorFormSection
 								description={<Mx label="Depletion output help" />}
 								title={translator.textFn("Depletion output")}
 							>
 								<EditorFormCard>
-									<OptionalOutputControl
-										addLabel={translator.textFn("Enable")}
-										emptyIcon={PackagePlus}
-										emptyTitle={translator.textFn(
-											"Item depletion output empty title",
-										)}
+									<OutputControl
 										value={units.output}
 										onChangeFn={(output) =>
 											form.setFieldValue("units.output", output)

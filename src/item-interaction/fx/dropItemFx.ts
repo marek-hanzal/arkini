@@ -7,6 +7,7 @@ import { commitPortalDropFx } from "~/item-interaction/fx/commitPortalDropFx";
 import { commitStackDropFx } from "~/item-interaction/fx/commitStackDropFx";
 import { commitStoreInputDropFx } from "~/item-interaction/fx/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/item-interaction/fx/commitSwapDropFx";
+import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
@@ -145,6 +146,22 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					targetItemId,
 					targetRevision,
 					targetLocation,
+				}),
+		)
+		.with(
+			{
+				kind: DropItemResultKind.StoreInventory,
+			},
+			() =>
+				storeInventoryItemFx({
+					sourceItemId,
+					sourceRevision,
+					sourceLocation,
+					target: {
+						itemId: targetItemId,
+						revision: targetRevision,
+						location: targetLocation,
+					},
 				}),
 		)
 		.exhaustive();

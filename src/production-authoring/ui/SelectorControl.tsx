@@ -8,6 +8,7 @@ interface SelectorControlProps {
 	readonly emptyLabel?: string;
 	readonly error?: string;
 	readonly includeItemFn?: (item: ItemSchema.Type) => boolean;
+	readonly label?: string;
 	readonly labelVisible?: boolean;
 	readonly onChangeFn: (selector: SelectorSchema.Type) => void;
 	readonly value: SelectorSchema.Type;
@@ -19,6 +20,7 @@ export const SelectorControl = ({
 	emptyLabel,
 	error,
 	includeItemFn,
+	label = "Selected item",
 	labelVisible = true,
 	onChangeFn,
 	value,
@@ -28,7 +30,7 @@ export const SelectorControl = ({
 		emptyLabel={emptyLabel}
 		error={error}
 		includeItemFn={includeItemFn}
-		label="Selected item"
+		label={label}
 		labelVisible={labelVisible}
 		value={value.itemId}
 		onChangeFn={(itemId) =>

@@ -6,6 +6,7 @@ import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -360,7 +361,7 @@ export const InputControl = ({
 
 	return (
 		<article className="grid gap-4">
-			<div className="flex flex-wrap items-start justify-between gap-4">
+			<div className="flex flex-wrap items-start gap-4">
 				<EditorChoiceControl
 					error={readEditorFormValidationErrorFn(issues, "type")}
 					label={translator.textFn("Input type")}
@@ -434,6 +435,7 @@ export const InputControl = ({
 					},
 				)
 				.exhaustive()}
+			<EditorFormBranchEnd />
 		</article>
 	);
 };

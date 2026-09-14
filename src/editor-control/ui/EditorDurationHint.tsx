@@ -29,8 +29,8 @@ const formatEditorDurationFn = (seconds: number) => {
 	return `${sign}${parts.join(" ")}`;
 };
 
-export const EditorDurationHint = ({ seconds }: { readonly seconds: number }) => {
-	const duration = formatEditorDurationFn(seconds);
+export const EditorDurationHint = ({ seconds }: { readonly seconds?: number }) => {
+	const duration = seconds === undefined ? "(empty)" : formatEditorDurationFn(seconds);
 	if (duration === undefined) return null;
 	return (
 		<span

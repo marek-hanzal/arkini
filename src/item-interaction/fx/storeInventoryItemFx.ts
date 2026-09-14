@@ -31,6 +31,13 @@ class ItemInventoryStorageUnavailableError extends Data.TaggedError(
 	readonly itemId: IdSchema.Type;
 }> {}
 
+class InventoryActionDropRejectedError extends Data.TaggedError(
+	"InventoryActionDropRejectedError",
+)<{
+	readonly reason: DropItemRejectedReason;
+	readonly targetItemId: IdSchema.Type;
+}> {}
+
 interface StoreItemInInventoryResult {
 	readonly sourceBefore: GridRuntimeItemSchema.Type;
 	readonly sourceAfter?: GridRuntimeItemSchema.Type;
@@ -124,6 +131,51 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 					}),
 				);
 			}
+			const targetIntent = props.target;
+			if (targetIntent !== undefined) {
+				const runtimeTarget = runtime.items.find(
+					(candidate) => candidate.id === targetIntent.itemId,
+				);
+				if (
+					runtimeTarget === undefined ||
+					runtimeTarget.revision !== targetIntent.revision
+				) {
+					return yield* Effect.fail(
+						new InventoryActionDropRejectedError({
+							reason: DropItemRejectedReason.StaleTarget,
+							targetItemId: targetIntent.itemId,
+						}),
+					);
+				}
+				const target = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTarget));
+				if (
+					target === undefined ||
+					!isSameGridLocationFn({
+						left: target.location,
+						right: targetIntent.location,
+					})
+				) {
+					return yield* Effect.fail(
+						new InventoryActionDropRejectedError({
+							reason: DropItemRejectedReason.StaleTarget,
+							targetItemId: targetIntent.itemId,
+						}),
+					);
+				}
+				if (
+					target.id === source.id ||
+					target.item.action?.type !== "inventory" ||
+					(target.location.scope === LocationScopeEnumSchema.enum.Board &&
+						target.location.space !== runtime.currentSpace)
+				) {
+					return yield* Effect.fail(
+						new InventoryActionDropRejectedError({
+							reason: DropItemRejectedReason.InvalidTarget,
+							targetItemId: targetIntent.itemId,
+						}),
+					);
+				}
+			}
 			const plan = yield* planInventoryStorageFx({
 				item: source,
 				runtime,
@@ -153,10 +205,15 @@ export namespace storeInventoryItemFx {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
+		readonly target?: {
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+			readonly location: GridLocationSchema.Type;
+		};
 	}
 }
 
-/** Stores one exact whole tile through canonical Inventory placement, without a target item. */
+/** Stores one exact whole tile directly or through a validated Inventory action target. */
 export const storeInventoryItemFx = Effect.fn("storeInventoryItemFx")(function* (
 	props: storeInventoryItemFx.Props,
 ) {
@@ -172,6 +229,14 @@ export const storeInventoryItemFx = Effect.fn("storeInventoryItemFx")(function* 
 			};
 		}),
 		Effect.catchTags({
+			InventoryActionDropRejectedError: (error) =>
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: error.reason,
+						sourceItemId: props.sourceItemId,
+						targetItemId: error.targetItemId,
+					}),
+				),
 			ItemNotFoundError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

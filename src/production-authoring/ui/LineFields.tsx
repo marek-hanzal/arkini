@@ -8,6 +8,7 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { Mx } from "~/translation/ui/Mx";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
@@ -166,6 +167,7 @@ export const LineFields = withFieldGroupFn({
 							)}
 						</group.AppField>
 					</div>
+					<EditorFormBranchEnd />
 				</EditorFormCard>
 				<EditorFormCard>
 					<group.Subscribe selector={(state) => state.values.rules}>

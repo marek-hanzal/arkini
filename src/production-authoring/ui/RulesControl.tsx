@@ -10,7 +10,11 @@ import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { QueryScopePresentation } from "~/item-query/ui/QueryPresentation";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import {
+	BoardDistancePresentation,
+	QueryScopePresentation,
+} from "~/item-query/ui/QueryPresentation";
 import {
 	EditorChoiceControl,
 	EditorNumberControl,
@@ -27,6 +31,10 @@ import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ReactNode } from "react";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
+import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
@@ -49,6 +57,77 @@ type DraftRule =
 			readonly type?: undefined;
 			readonly when: DraftWhen[];
 	  };
+
+const readRuleItemIdsFn = (rule: DraftRule): ReadonlyArray<string> => [
+	...new Set(
+		rule.when.map((when) => when.query.selector.itemId).filter((itemId) => itemId.length > 0),
+	),
+];
+
+const readRuleSummaryFn = (rule: DraftRule): string => {
+	const conditionSummary = `${rule.when.length} ${rule.when.length === 1 ? "condition" : "conditions"}`;
+	if (rule.type === "runtime:multiplier") return `×${rule.multiplier} · ${conditionSummary}`;
+	if (rule.type === "runtime:adjust") return `${rule.adjustMs / 1_000}s · ${conditionSummary}`;
+	return conditionSummary;
+};
+
+const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: DraftRule }) => {
+	const project = useEditorProject();
+	const itemIds = readRuleItemIdsFn(rule);
+	return (
+		<EditorCollectionOption
+			label={label}
+			details={<span className="text-xs text-subtle">{readRuleSummaryFn(rule)}</span>}
+		>
+			{itemIds.map((itemId) => (
+				<EditorItemThumbnail
+					key={itemId}
+					className="rounded-md"
+					resourceIds={
+						project.config.items[itemId]?.asset.default ?? [
+							"",
+						]
+					}
+					size="md"
+				/>
+			))}
+		</EditorCollectionOption>
+	);
+};
+
+const readConditionSummaryFn = (when: DraftWhen): string => {
+	const scope = QueryScopePresentation[when.query.scope].label;
+	const querySummary =
+		when.query.scope === "board"
+			? `${scope} · ${BoardDistancePresentation[when.query.distance].label}`
+			: scope;
+	if (when.type === "count") return `${querySummary} · = ${when.count}`;
+	if (when.type === "range") return `${querySummary} · ${when.min}–${when.max}`;
+	return querySummary;
+};
+
+const ConditionOption = ({ label, when }: { readonly label: string; readonly when: DraftWhen }) => {
+	const project = useEditorProject();
+	const itemId = when.query.selector.itemId;
+	return (
+		<EditorCollectionOption
+			label={label}
+			details={<span className="text-xs text-subtle">{readConditionSummaryFn(when)}</span>}
+		>
+			{itemId.length === 0 ? null : (
+				<EditorItemThumbnail
+					className="rounded-md"
+					resourceIds={
+						project.config.items[itemId]?.asset.default ?? [
+							"",
+						]
+					}
+					size="md"
+				/>
+			)}
+		</EditorCollectionOption>
+	);
+};
 
 const queryScopeOptions = [
 	{
@@ -218,6 +297,38 @@ const WhenControl = ({
 							})
 						}
 					/>
+					<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+						<QueryScopeControl
+							error={readEditorFormValidationErrorFn(
+								validationIssues,
+								"query",
+								"scope",
+							)}
+							value={selectedValue.query}
+							onChangeFn={(query) =>
+								onChangeFn({
+									...selectedValue,
+									query,
+								})
+							}
+						/>
+						{selectedValue.query.scope !== "board" ? null : (
+							<BoardDistanceControl
+								error={readEditorFormValidationErrorFn(
+									validationIssues,
+									"query",
+									"distance",
+								)}
+								value={selectedValue.query}
+								onChangeFn={(query) =>
+									onChangeFn({
+										...selectedValue,
+										query,
+									})
+								}
+							/>
+						)}
+					</div>
 					{match(selectedValue)
 						.with(
 							{
@@ -277,38 +388,7 @@ const WhenControl = ({
 							),
 						)
 						.exhaustive()}
-					<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-						<QueryScopeControl
-							error={readEditorFormValidationErrorFn(
-								validationIssues,
-								"query",
-								"scope",
-							)}
-							value={selectedValue.query}
-							onChangeFn={(query) =>
-								onChangeFn({
-									...selectedValue,
-									query,
-								})
-							}
-						/>
-						{selectedValue.query.scope !== "board" ? null : (
-							<BoardDistanceControl
-								error={readEditorFormValidationErrorFn(
-									validationIssues,
-									"query",
-									"distance",
-								)}
-								value={selectedValue.query}
-								onChangeFn={(query) =>
-									onChangeFn({
-										...selectedValue,
-										query,
-									})
-								}
-							/>
-						)}
-					</div>
+					<EditorFormBranchEnd />
 				</>
 			)}
 		</div>
@@ -336,6 +416,7 @@ const RuleControl = ({
 }) => {
 	const validationIssues = useFormValidationIssues(rule);
 	const invalidWhenIndex = useFormValidationFocusIndex(rule, "when");
+	const readItemLabelFn = useEditorItemOptionLabel();
 	return (
 		<article className="grid gap-3">
 			<div className="flex items-end gap-3">
@@ -415,6 +496,7 @@ const RuleControl = ({
 							}
 						/>
 					)}
+					<EditorFormBranchEnd />
 					<EditorCollectionSelector
 						addLabel="Add condition"
 						initialSelectedIndex={initialWhenIndex}
@@ -432,6 +514,15 @@ const RuleControl = ({
 								? `Condition ${whenIndex + 1}`
 								: `Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
 						}
+						itemSearchTermsFn={(whenIndex) => {
+							const itemId = rule.when[whenIndex].query.selector.itemId;
+							return itemId.length === 0
+								? []
+								: [
+										itemId,
+										readItemLabelFn(itemId, ""),
+									];
+						}}
 						label={`Rule ${ruleIndex + 1} conditions`}
 						onAddFn={() =>
 							onChangeFn({
@@ -451,6 +542,12 @@ const RuleControl = ({
 							})
 						}
 						removeLabel="Remove condition"
+						renderItemContentFn={(whenIndex, label) => (
+							<ConditionOption
+								label={label}
+								when={rule.when[whenIndex]}
+							/>
+						)}
 						selectedIndex={invalidWhenIndex}
 					>
 						{(whenIndex) => (
@@ -495,6 +592,7 @@ export const RulesControl = ({
 }) => {
 	const draftRules = rules as ReadonlyArray<DraftRule>;
 	const invalidRuleIndex = useFormValidationFocusIndex(rules as object);
+	const readItemLabelFn = useEditorItemOptionLabel();
 	const createRuleFn = (type: RuleType): DraftRule =>
 		({
 			type,
@@ -529,6 +627,12 @@ export const RulesControl = ({
 						? `Rule ${ruleIndex + 1}`
 						: `Rule ${ruleIndex + 1} — ${draftRules[ruleIndex].type}`
 				}
+				itemSearchTermsFn={(ruleIndex) =>
+					readRuleItemIdsFn(draftRules[ruleIndex]).flatMap((itemId) => [
+						itemId,
+						readItemLabelFn(itemId, ""),
+					])
+				}
 				label="Rules"
 				onAddFn={() =>
 					emitChangeFn([
@@ -542,6 +646,12 @@ export const RulesControl = ({
 					emitChangeFn(draftRules.filter((_current, index) => index !== ruleIndex))
 				}
 				removeLabel="Remove rule"
+				renderItemContentFn={(ruleIndex, label) => (
+					<RuleOption
+						label={label}
+						rule={draftRules[ruleIndex]}
+					/>
+				)}
 				selectedIndex={invalidRuleIndex}
 			>
 				{(ruleIndex) => (

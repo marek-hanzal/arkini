@@ -80,6 +80,7 @@ const readAttractionActorIdFn = ({
 		.with(
 			DropItemResultKind.Merge,
 			DropItemResultKind.Stack,
+			DropItemResultKind.StoreInventory,
 			DropItemResultKind.StoreInput,
 			() => targetItem.id,
 		)

@@ -217,7 +217,7 @@ export const EditorSecondsControl = ({
 		{...props}
 		step={step}
 	>
-		<EditorDurationHint seconds={props.value} />
+		<EditorDurationHint seconds={Number.isNaN(props.value) ? undefined : props.value} />
 	</EditorNumericControl>
 );
 
@@ -226,12 +226,14 @@ export const EditorChoiceControl = <Value extends string>({
 	disabled = false,
 	error,
 	label,
+	labelVisible = true,
 	onChangeFn,
 	options,
 	required = true,
 	value,
 }: {
 	readonly disabled?: boolean;
+	readonly labelVisible?: boolean;
 	readonly onChangeFn: (value: Value) => void;
 	readonly options: ReadonlyArray<{
 		readonly description?: ReactNode;
@@ -247,6 +249,7 @@ export const EditorChoiceControl = <Value extends string>({
 		description={description}
 		error={error}
 		label={label}
+		labelVisible={labelVisible}
 		required={required}
 	>
 		<SegmentedControl

@@ -16,6 +16,9 @@ vi.mock("~/translation/ui/useTranslator", () => ({
 vi.mock("~/translation/ui/Mx", () => ({
 	Mx: ({ label }: { label: string }) => createElement("span", null, label),
 }));
+vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", () => ({
+	useEditorItemOptionLabel: () => (itemId: string, fallback: string) => itemId || fallback,
+}));
 vi.mock("~/production-authoring/ui/SelectorControl", () => ({
 	SelectorControl: ({
 		onChangeFn,

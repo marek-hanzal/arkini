@@ -1,6 +1,7 @@
 import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -61,9 +62,12 @@ export const ProjectArtworkSection = ({
 									)}
 								>
 									{(index) => (
-										<form.AppField name={`avatars[${index}]`}>
-											{(field) => <field.AssetField label="Asset" />}
-										</form.AppField>
+										<div className="grid gap-3">
+											<form.AppField name={`avatars[${index}]`}>
+												{(field) => <field.AssetField label="Asset" />}
+											</form.AppField>
+											<EditorFormBranchEnd />
+										</div>
 									)}
 								</EditorCollectionSelector>
 							);

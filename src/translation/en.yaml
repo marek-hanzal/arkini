@@ -635,8 +635,6 @@ Item delete help:
     Ordinary deletion requires those references to be removed. **Force delete** also removes the listed starting entries, operations and outputs that depend on this item; review the concrete impact in the confirmation dialog.
 
     Asset files remain in the project. Linked Notes remain, with this item's link removed. Deletion is applied only after confirmation.
-Item depletion output empty title:
-  value: Create items when the last unit is spent.
 Item estimate help:
   value: |
     Estimate answers a practical question: **what would the game roughly need to obtain this item?** It follows starting items and production rules until it finds one complete route.
@@ -883,6 +881,13 @@ Merge target spend help:
     **Spend** removes one unit from the target while leaving it in place.
 
     Spending the final unit depletes one target item and resolves that item's depletion output. The selected target must have **Units** configured.
+Merge with:
+  value: Merge with
+Merge with help:
+  value: |
+    Select the target item that activates this directional merge when this item is dropped onto it.
+
+    The item being edited is always the **source**. Its **Source action** and the selected **Target effect** resolve together.
 Merges:
   value: Merges
 Name:
@@ -1229,6 +1234,13 @@ Repeated output:
   value: Repeated output
 Replace:
   value: Replace
+Replace by:
+  value: Replace by
+Replace by help:
+  value: |
+    Select the item that replaces one matched target quantity when **Target effect** is **Replace**.
+
+    The replacement appears in the target's Board cell and initializes its own authored state. It is separate from optional **Merge output**.
 Replace image:
   value: Replace image
 Replacement:
@@ -1270,9 +1282,30 @@ Roll:
   value: Roll
 Rolls help:
   value: |
-    Every roll in the selected output set resolves independently.
+    ### How rolls work
 
-    Guaranteed rolls always run, Chance rolls test one probability, and Weighted rolls make one or more weighted candidate selections. A failed roll does not stop its siblings.
+    After one **output set** is selected, the engine evaluates every roll inside it in authored order. Rolls are additive: their accepted drops are combined into one output. A roll that produces nothing does not stop its sibling rolls.
+
+    Each accepted drop then evaluates its own **rules**, chooses a quantity within its **Minimum–Maximum** range, and uses its configured **Board placement**.
+
+    ### Roll types
+
+    - **Guaranteed** always offers every configured drop once. Example: a Guaranteed roll with **2 Wood** and **1 Stone** always adds both drops.
+    - **Chance** performs one probability check for the complete roll. At **25%**, either all configured drops continue to resolution or none do. Multiple drops do not receive separate 25% checks.
+    - **Weighted** performs the number of independent picks configured under **Selections**. Each pick chooses one candidate by relative weight, then offers every drop in that candidate. Candidates stay available, so the same candidate may win more than once.
+
+    ### Weighted example
+
+    A Weighted roll has **2–2 Selections** and two candidates:
+
+    - **3 Iron**, weight **3**;
+    - **1 Coal**, weight **1**.
+
+    Every pick has a **75%** chance to choose Iron and a **25%** chance to choose Coal. Because the two picks are independent, the result can be **6 Iron**, **3 Iron + 1 Coal**, or **2 Coal**.
+
+    ### Combined example
+
+    One set containing **Guaranteed 2 Wood**, **Chance 50%: 1 Gem**, and the Weighted roll above always attempts 2 Wood, may also attempt 1 Gem, and then adds exactly two weighted candidate results.
 Rule:
   value: Rule
 Rules:

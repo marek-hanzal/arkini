@@ -117,7 +117,7 @@ describe("readDropItemPreviewFx / preview", () => {
 			reason: DropItemRejectedReason.StaleSource,
 		});
 	});
-	it("uses ordinary swap semantics when the target has an Inventory click action", () => {
+	it("previews Inventory storage when the occupied target has an Inventory action", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -139,6 +139,53 @@ describe("readDropItemPreviewFx / preview", () => {
 					target: {
 						kind: "slot",
 						location: occupiedLocation,
+						occupant: {
+							itemId: inventory.id,
+							revision: inventory.revision,
+						},
+					},
+				});
+			}),
+		);
+
+		expect(result).toEqual({
+			kind: DropItemResultKind.StoreInventory,
+		});
+	});
+	it("keeps ordinary Inventory slot semantics around a stored Inventory action item", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const inventory = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				return yield* readDropItemPreviewFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: source.location,
+					target: {
+						kind: "slot",
+						location: inventory.location,
 						occupant: {
 							itemId: inventory.id,
 							revision: inventory.revision,

@@ -58,6 +58,14 @@ const portalConfig = GameConfigSchema.parse({
 					action: "consume",
 					effect: "keep",
 				},
+				{
+					target: {
+						type: "item",
+						itemId: "backpack",
+					},
+					action: "consume",
+					effect: "keep",
+				},
 			],
 		},
 		inventoryOnly: {
@@ -191,6 +199,58 @@ describe("dropItemFx / portal direction", () => {
 				},
 			},
 		});
+	});
+
+	it("stores a portal dropped onto an Inventory action before its own merge rules", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const portal = yield* spawnItemFx({
+					id: "runtime:portal",
+					itemId: "portal",
+					location: board(0, 0, 0),
+					quantity: 1,
+				});
+				const inventory = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: board(1, 0, 0),
+					quantity: 1,
+				});
+				const outcome = yield* dropOntoFx({
+					sourceId: portal.id,
+					targetId: inventory.id,
+				});
+				return {
+					inventory,
+					outcome,
+					portal,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+			portalConfig,
+		);
+
+		expect(result.outcome).toMatchObject({
+			kind: DropItemResultKind.StoreInventory,
+			source: {
+				itemId: result.portal.id,
+				previousLocation: result.portal.location,
+				current: null,
+			},
+		});
+		expect(result.runtime.items).toContainEqual(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					id: "portal",
+				}),
+				location: expect.objectContaining({
+					scope: "inventory",
+				}),
+			}),
+		);
+		expect(result.runtime.items.find((item) => item.id === result.inventory.id)).toEqual(
+			result.inventory,
+		);
 	});
 
 	it("rejects atomically when the destination Board has no free cell", () => {

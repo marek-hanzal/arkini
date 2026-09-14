@@ -7,6 +7,7 @@ import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
@@ -90,6 +91,7 @@ const ClockFields = () => {
 						}
 					/>
 				</div>
+				<EditorFormBranchEnd />
 			</EditorFormCard>
 			<EditorFormSection
 				title={translator.textFn("Rules")}

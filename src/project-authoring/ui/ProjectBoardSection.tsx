@@ -3,6 +3,7 @@ import { useStore } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -100,6 +101,7 @@ export const ProjectBoardSection = () => {
 						</EditorValueField>
 					</div>
 				</div>
+				<EditorFormBranchEnd />
 			</EditorFormCard>
 			<ProjectStartGrid
 				key={selectedSpace}

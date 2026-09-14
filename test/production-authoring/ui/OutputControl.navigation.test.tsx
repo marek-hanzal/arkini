@@ -191,7 +191,7 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 	}
 });
 
-it("keeps a weighted roll when its last candidate is removed", async () => {
+it("starts a weighted roll empty and keeps it when its last candidate is removed", async () => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -221,6 +221,29 @@ it("keeps a weighted roll when its last candidate is removed", async () => {
 			(button) => button.textContent?.includes("Weighted") === true,
 		);
 		await act(async () => weighted?.click());
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		expect(value.set[0]).toMatchObject({
+			roll: [
+				{
+					type: "weight",
+					drop: [],
+				},
+			],
+		});
+		await renderOutputFn(value);
+		expect(
+			container.querySelector<HTMLButtonElement>('button[title="Add weighted candidate"]'),
+		).not.toBeNull();
+		expect(
+			container.querySelector<HTMLButtonElement>('button[title="Remove weighted candidate"]')
+				?.disabled,
+		).toBe(true);
+
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>('button[title="Add weighted candidate"]')
+				?.click(),
+		);
 		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
 		await renderOutputFn(value);
 

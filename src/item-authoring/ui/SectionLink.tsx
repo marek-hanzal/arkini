@@ -1,6 +1,6 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ButtonLink } from "~/ui/ui/Button";
-import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
+import { editorSectionLinkClassName } from "~/authoring-shell/ui/EditorSectionBar";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
 
 const activeProps = {
@@ -33,7 +33,7 @@ export const SectionLink = ({
 }) => {
 	const translator = useTranslator();
 	return (
-		<ButtonLink
+		<LinkButtonLink
 			to={
 				destination === "detail"
 					? "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
@@ -73,9 +73,9 @@ export const SectionLink = ({
 			}}
 			activeProps={activeProps}
 			inactiveProps={inactiveProps}
-			className={editorSectionTabClassName}
+			className={editorSectionLinkClassName}
 		>
 			{translator.textFn(section.label)}
-		</ButtonLink>
+		</LinkButtonLink>
 	);
 };

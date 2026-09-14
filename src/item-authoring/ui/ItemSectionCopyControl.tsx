@@ -34,10 +34,11 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 			<fieldset
 				disabled={isSaving}
 				inert={isSaving}
-				className="w-84 min-w-0"
+				className="w-84 min-w-0 py-0.5"
 				data-ui="ItemSectionCopyControl"
 			>
 				<EditorSearchCombobox
+					density="compact"
 					label="Copy from"
 					emptyLabel={translator.textFn("No other item matches this search.")}
 					labelVisible={false}

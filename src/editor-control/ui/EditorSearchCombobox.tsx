@@ -37,6 +37,7 @@ export interface EditorSearchOption {
 }
 
 interface EditorSearchComboboxProps {
+	readonly density?: "default" | "compact";
 	readonly displaySelectedLabel?: boolean;
 	readonly label: string;
 	readonly labelVisible?: boolean;
@@ -58,6 +59,7 @@ interface EditorSearchComboboxProps {
 
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
 export const EditorSearchCombobox = ({
+	density = "default",
 	description,
 	displaySelectedLabel = false,
 	emptyLabel,
@@ -388,7 +390,7 @@ export const EditorSearchCombobox = ({
 					<SearchInput
 						value={query}
 						autoComplete="off"
-						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger"
+						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							handleOpenChangeFn(false);
@@ -422,6 +424,7 @@ export const EditorSearchCombobox = ({
 						{...readDataUiFn({
 							dataUi: "EditorSearchComboboxInput",
 							state: {
+								density,
 								invalid: error !== undefined,
 							},
 						})}

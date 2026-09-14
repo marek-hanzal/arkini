@@ -6,12 +6,9 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
-import {
-	EditorSectionNavigation,
-	EditorSectionNavigationSeparator,
-} from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { NotFound } from "~/item-authoring/ui/NotFound";
@@ -66,44 +63,37 @@ export const Detail = ({
 							title={item.title || item.id}
 						/>
 					}
-					tabs={
-						<EditorSectionTabs>
-							{sections.map((section) => (
-								<SectionLink
-									destination="detail"
-									itemUid={item.uid}
-									key={section.id}
-									projectId={project.projectId}
-									section={section}
-								/>
-							))}
-						</EditorSectionTabs>
-					}
 					action={
-						<div className="flex items-center gap-2">
-							{help === undefined ? null : (
-								<>
-									<EditorPageHelp {...help} />
-									<EditorSectionNavigationSeparator />
-								</>
-							)}
-							<ItemDraftToggle item={item} />
-							<EditorSectionNavigationSeparator />
-							<PrimaryButtonLink
-								ref={editActionRef}
-								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-								params={{
-									...params,
-									sectionId: editableSectionId,
-								}}
-								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
-							>
-								<Pencil className="size-4" />
-								{translator.textFn("Edit")}
-							</PrimaryButtonLink>
-						</div>
+						<PrimaryButtonLink
+							ref={editActionRef}
+							to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+							params={{
+								...params,
+								sectionId: editableSectionId,
+							}}
+							className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+						>
+							<Pencil className="size-4" />
+							{translator.textFn("Edit")}
+						</PrimaryButtonLink>
 					}
 				/>
+			}
+			secondaryNavigation={
+				<EditorSectionBar
+					actions={<ItemDraftToggle item={item} />}
+					help={help === undefined ? undefined : <EditorPageHelp {...help} />}
+				>
+					{sections.map((section) => (
+						<SectionLink
+							destination="detail"
+							itemUid={item.uid}
+							key={section.id}
+							projectId={project.projectId}
+							section={section}
+						/>
+					))}
+				</EditorSectionBar>
 			}
 		>
 			{children}

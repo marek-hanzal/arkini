@@ -25,10 +25,9 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	};
 });
 
-vi.mock("~/ui/ui/Button", () => ({
-	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
-		createElement("button", props, children),
-	ButtonLink: ({
+vi.mock("~/ui/ui/LinkButton", async (importOriginal) => ({
+	...(await importOriginal<typeof import("~/ui/ui/LinkButton")>()),
+	LinkButtonLink: ({
 		children,
 		search,
 	}: {
@@ -42,6 +41,11 @@ vi.mock("~/ui/ui/Button", () => ({
 			},
 			children,
 		),
+}));
+
+vi.mock("~/ui/ui/Button", () => ({
+	Button: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
+		createElement("button", props, children),
 	PrimaryButton: ({ children, cursorIntent: _cursorIntent, ...props }: MockButtonProps) =>
 		createElement("button", props, children),
 }));

@@ -8,7 +8,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
 import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 import { FormProvider } from "~/item-authoring/ui/FormContext";
@@ -193,6 +194,7 @@ export const FormSession = ({
 		],
 	);
 	const sections = readSectionsFn("form");
+	const help = ItemSectionHelp[sectionId];
 	const params = {
 		projectId: project.projectId,
 		itemUid: initialItem.uid,
@@ -204,14 +206,7 @@ export const FormSession = ({
 				data-ui="EditorItemForm"
 			>
 				<EditorFormSectionPage
-					headerActions={
-						<ItemSectionCopyControl
-							key={sectionId}
-							sectionId={sectionId}
-						/>
-					}
 					contentMode={sectionId === "artwork" ? "viewport" : "scroll"}
-					help={ItemSectionHelp[sectionId]}
 					discardFn={discardFn}
 					error={controller.error}
 					rootCard={
@@ -263,8 +258,16 @@ export const FormSession = ({
 							)}
 						</controller.form.Subscribe>
 					}
-					tabs={
-						<EditorSectionTabs>
+					secondaryNavigation={
+						<EditorSectionBar
+							actions={
+								<ItemSectionCopyControl
+									key={sectionId}
+									sectionId={sectionId}
+								/>
+							}
+							help={help === undefined ? undefined : <EditorPageHelp {...help} />}
+						>
 							{sections.map((candidate) => (
 								<SectionLink
 									defaultDraft={defaultDraft}
@@ -278,7 +281,7 @@ export const FormSession = ({
 									section={candidate}
 								/>
 							))}
-						</EditorSectionTabs>
+						</EditorSectionBar>
 					}
 				>
 					{children}

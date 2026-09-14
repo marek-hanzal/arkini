@@ -1,7 +1,6 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { BatteryCharging, PackagePlus } from "lucide-react";
 
-import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
@@ -64,13 +63,6 @@ export const UnitsSection = () => {
 									/>
 								</EditorFormCard>
 							</EditorFormSection>
-							<EditorCapabilityDisable
-								title={translator.textFn("Units configured")}
-								description={translator.textFn(
-									"Disable removes the unit supply and depletion output from this item.",
-								)}
-								onDisableFn={() => form.setFieldValue("units", undefined)}
-							/>
 						</>
 					)
 				}

@@ -114,6 +114,7 @@ import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { ClockSection } from "~/item-authoring/ui/ClockSection";
+import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import { ActionSection } from "~/item-authoring/ui/ActionSection";
@@ -976,7 +977,8 @@ describe("item section form session", () => {
 		};
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
-		const { container } = await render(<ActionSection />);
+		const { container, renderSection } = await render(<ActionSection />);
+		await renderSection(<ActionSection />, "action");
 		const disable = [
 			...container.querySelectorAll("button"),
 		].find((button) => button.textContent === "Disable");
@@ -999,6 +1001,8 @@ describe("item section form session", () => {
 	it.each([
 		"merges",
 		"production",
+		"clock",
+		"units",
 	] as const)(
 		"disables all %s only in the draft until Save and preserves the other capabilities",
 		async (capability) => {
@@ -1006,6 +1010,9 @@ describe("item section form session", () => {
 				...item,
 				scope: "board",
 				maxQueueSize: 4,
+				units: {
+					amount: 3,
+				},
 				clock: {
 					intervalMs: 1500,
 					durationMs: 2000,
@@ -1039,15 +1046,18 @@ describe("item section form session", () => {
 			});
 			state.persisted = configured;
 			(state.project as Project).config.items[item.id] = configured;
-			const { container } = await render(
-				capability === "merges" ? <MergesSection /> : <ProductionSection />,
+			const section = {
+				merges: <MergesSection />,
+				production: <ProductionSection />,
+				clock: <ClockSection />,
+				units: <UnitsSection />,
+			}[capability];
+			const { container, renderSection } = await render(section);
+			await renderSection(section, capability);
+			const disable = container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorSectionBar"] [data-ui="ItemSectionDisableControl"]',
 			);
-			const disable = [
-				...container.querySelectorAll("button"),
-			]
-				.reverse()
-				.find((button) => button.textContent === "Disable");
-			if (disable === undefined) throw new Error("Missing disable capability control.");
+			if (disable === null) throw new Error("Missing disable capability control.");
 			await act(async () => disable.click());
 			expect(state.saveItem).not.toHaveBeenCalled();
 			expect(state.persisted).toBe(configured);
@@ -1059,7 +1069,8 @@ describe("item section form session", () => {
 					item: expect.objectContaining({
 						id: configured.id,
 						maxQueueSize: configured.maxQueueSize,
-						clock: configured.clock,
+						clock: capability === "clock" ? undefined : configured.clock,
+						units: capability === "units" ? undefined : configured.units,
 						lines: capability === "production" ? [] : configured.lines,
 						merge: capability === "merges" ? undefined : configured.merge,
 					}),

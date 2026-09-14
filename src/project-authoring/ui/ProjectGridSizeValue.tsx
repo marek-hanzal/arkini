@@ -1,3 +1,5 @@
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
+
 export const ProjectGridSizeValue = ({
 	height,
 	width,
@@ -10,11 +12,13 @@ export const ProjectGridSizeValue = ({
 			? width * height
 			: "—";
 	return (
-		<div className="grid content-start gap-1.5 text-sm">
-			<span className="font-semibold text-foreground">Capacity</span>
-			<output className="flex min-h-[var(--ak-control-min-height)] items-center rounded-lg border border-line bg-canvas/50 px-3 py-2 font-mono text-muted">
+		<EditorValueField
+			as="div"
+			label="Capacity"
+		>
+			<output className="flex min-h-[var(--ak-control-min-height)] items-center rounded-lg border border-control-border bg-canvas/50 px-3 py-2 font-mono text-muted">
 				{size}
 			</output>
-		</div>
+		</EditorValueField>
 	);
 };

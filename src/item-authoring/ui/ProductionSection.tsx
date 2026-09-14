@@ -1,4 +1,3 @@
-import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
@@ -149,13 +148,6 @@ const ProductionFields = withFieldGroupFn({
 											/>
 										)}
 									</EditorCollectionSelector>
-									<EditorCapabilityDisable
-										title={translator.textFn("Production configured")}
-										description={translator.textFn(
-											"Disable removes all production lines from this item.",
-										)}
-										onDisableFn={() => form.setFieldValue("lines", [])}
-									/>
 								</>
 							);
 						}}

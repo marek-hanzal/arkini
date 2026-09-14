@@ -3,7 +3,7 @@ import { type DragEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
 import { EditorAssetSectionHelp } from "~/asset-authoring/ui/EditorAssetSectionHelp";
-import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -62,7 +62,7 @@ const EditorAssetImageDropZone = ({
 			/>
 			<button
 				type="button"
-				className="grid min-h-48 w-full cursor-pointer place-items-center rounded-xl border border-dashed border-line-strong bg-surface p-6 text-center data-[ui-dragging=true]:border-accent data-[ui-dragging=true]:bg-accent/10 data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
+				className="grid min-h-48 w-full cursor-pointer place-items-center rounded-xl border border-dashed border-control-border bg-[var(--ak-editor-background)] p-6 text-center data-[ui-dragging=true]:border-accent data-[ui-dragging=true]:bg-accent/10 data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
 				onClick={() => inputRef.current?.click()}
 				onDragEnter={(event) => {
 					event.preventDefault();
@@ -100,9 +100,6 @@ const EditorAssetImageDropZone = ({
 					</span>
 				</span>
 			</button>
-			{error === undefined ? null : (
-				<span className="text-xs leading-5 text-danger">{error}</span>
-			)}
 		</>
 	);
 };
@@ -186,18 +183,19 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 					onChangeFn={controller.setNextIdFn}
 					value={controller.nextId}
 				/>
-				<div className="grid gap-2">
-					<EditorValueLabel
-						label={translator.textFn("Image")}
-						description={<Mx label="Asset image replacement help" />}
-					/>
+				<EditorValueField
+					as="div"
+					label={translator.textFn("Image")}
+					description={<Mx label="Asset image replacement help" />}
+					error={controller.fileError}
+				>
 					<EditorAssetImageDropZone
 						currentUrl={controller.currentUrl}
 						error={controller.fileError}
 						file={controller.file}
 						onFileFn={controller.setFileFn}
 					/>
-				</div>
+				</EditorValueField>
 			</div>
 		</EditorFormSectionPage>
 	);

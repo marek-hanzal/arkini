@@ -50,11 +50,7 @@ export const DetailReference = ({
 				<span className="block truncate font-medium text-foreground transition-colors group-hover:text-accent">
 					{item.title}
 				</span>
-				{description === undefined ? (
-					<span className="mt-0.5 block truncate font-mono text-xs font-normal text-muted transition-colors group-hover:text-accent">
-						{item.id}
-					</span>
-				) : (
+				{description === undefined ? null : (
 					<span className="mt-0.5 block whitespace-normal text-xs font-normal text-muted transition-colors group-hover:text-accent">
 						{description}
 					</span>

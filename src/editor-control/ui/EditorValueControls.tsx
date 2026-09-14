@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorDurationHint } from "~/editor-control/ui/EditorDurationHint";
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
@@ -30,44 +30,6 @@ interface EditorNumericControlProps extends EditorNamedValueControlProps {
 	readonly value: number;
 }
 
-export const EditorValueLabel = ({
-	description,
-	label,
-	required = false,
-}: Pick<EditorValueControlProps, "description" | "label" | "required">) => (
-	<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
-		<span className="font-semibold text-foreground">{label}</span>
-		{required ? <span className="size-1.5 shrink-0 rounded-full bg-accent" /> : null}
-		{description === undefined ? null : <EditorInfoTooltip content={description} />}
-	</span>
-);
-
-const EditorValueField = ({
-	children,
-	description,
-	error,
-	fill = false,
-	label,
-	required = true,
-}: {
-	readonly children: ReactNode;
-	readonly fill?: boolean;
-} & EditorValueControlProps) => (
-	<label
-		className={`grid min-w-0 gap-1.5 text-sm ${fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : "content-start"}`}
-	>
-		<EditorValueLabel
-			description={description}
-			label={label}
-			required={required}
-		/>
-		{children}
-		{error === undefined ? null : (
-			<span className="text-xs leading-5 text-danger">{error}</span>
-		)}
-	</label>
-);
-
 const EditorNumericControl = ({
 	clearLabel,
 	children,
@@ -79,7 +41,7 @@ const EditorNumericControl = ({
 	name,
 	onBlurFn,
 	onChangeFn,
-	required,
+	required = true,
 	step,
 	value,
 }: EditorNumericControlProps) => (
@@ -89,39 +51,41 @@ const EditorNumericControl = ({
 		label={label}
 		required={required}
 	>
-		<div className="flex min-w-0 items-center gap-3">
-			<input
-				type="number"
-				name={name}
-				value={Number.isNaN(value) ? "" : value}
-				className={`${editorInputClassName} min-w-0 flex-1`}
-				max={max}
-				min={min}
-				step={step}
-				onBlur={onBlurFn}
-				onChange={(event) => onChangeFn(event.currentTarget.valueAsNumber)}
-				{...readDataUiFn({
-					dataUi: "EditorNumericControlInput",
-					state: {
-						invalid: error !== undefined,
-					},
-				})}
-			/>
-			{clearLabel === undefined ? null : (
-				<LinkButton
-					title={clearLabel}
-					disabled={Number.isNaN(value)}
-					className="inline-flex h-[var(--ak-control-min-height)] shrink-0 items-center"
-					onClick={(event) => {
-						event.preventDefault();
-						onChangeFn(Number.NaN);
-					}}
-				>
-					<Trash2 className="size-4" />
-				</LinkButton>
-			)}
+		<div className="grid min-w-0 gap-1.5">
+			<div className="flex min-w-0 items-center gap-3">
+				<input
+					type="number"
+					name={name}
+					value={Number.isNaN(value) ? "" : value}
+					className={`${editorInputClassName} min-w-0 flex-1`}
+					max={max}
+					min={min}
+					step={step}
+					onBlur={onBlurFn}
+					onChange={(event) => onChangeFn(event.currentTarget.valueAsNumber)}
+					{...readDataUiFn({
+						dataUi: "EditorNumericControlInput",
+						state: {
+							invalid: error !== undefined,
+						},
+					})}
+				/>
+				{clearLabel === undefined ? null : (
+					<LinkButton
+						title={clearLabel}
+						disabled={Number.isNaN(value)}
+						className="inline-flex h-[var(--ak-control-min-height)] shrink-0 items-center"
+						onClick={(event) => {
+							event.preventDefault();
+							onChangeFn(Number.NaN);
+						}}
+					>
+						<Trash2 className="size-4" />
+					</LinkButton>
+				)}
+			</div>
+			{children}
 		</div>
-		{children}
 	</EditorValueField>
 );
 
@@ -135,7 +99,7 @@ export const EditorTextControl = ({
 	onChangeFn,
 	placeholder,
 	readOnly,
-	required,
+	required = true,
 	value,
 }: {
 	readonly autoComplete?: string;
@@ -179,7 +143,7 @@ export const EditorTextAreaControl = ({
 	onBlurFn,
 	onChangeFn,
 	placeholder,
-	required,
+	required = true,
 	rows = 4,
 	value,
 }: {
@@ -269,22 +233,14 @@ export const EditorChoiceControl = <Value extends string>({
 	}>;
 	readonly value: Value;
 } & EditorValueControlProps) => (
-	<fieldset
-		className="grid min-w-0 content-start gap-1.5 text-sm"
-		{...readDataUiFn({
-			dataUi: "EditorChoiceControl",
-			state: {
-				invalid: error !== undefined,
-			},
-		})}
+	<EditorValueField
+		as="fieldset"
+		dataUi="EditorChoiceControl"
+		description={description}
+		error={error}
+		label={label}
+		required={required}
 	>
-		<legend>
-			<EditorValueLabel
-				description={description}
-				label={label}
-				required={required}
-			/>
-		</legend>
 		<SegmentedControl
 			dataUi="EditorChoiceControlOptions"
 			invalid={error !== undefined}
@@ -294,8 +250,5 @@ export const EditorChoiceControl = <Value extends string>({
 			size={compact ? "compact" : "default"}
 			value={value}
 		/>
-		{error === undefined ? null : (
-			<span className="text-xs leading-5 text-danger">{error}</span>
-		)}
-	</fieldset>
+	</EditorValueField>
 );

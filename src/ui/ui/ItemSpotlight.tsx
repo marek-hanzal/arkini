@@ -56,9 +56,11 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 							<span className="block truncate text-sm font-semibold">
 								{option.label}
 							</span>
-							<span className="ak-spotlight-option-secondary block truncate text-xs">
-								{option.secondary}
-							</span>
+							{option.secondary === undefined ? null : (
+								<span className="ak-spotlight-option-secondary block truncate text-xs">
+									{option.secondary}
+								</span>
+							)}
 							{option.disabledReason === undefined ? null : (
 								<span
 									className="block truncate text-xs font-semibold text-danger"

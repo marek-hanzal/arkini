@@ -24,7 +24,7 @@ const LineFlag = ({
 }) => {
 	return (
 		<span
-			className="inline-flex items-center gap-1 rounded-full border border-line bg-secondary-subtle px-2.5 py-1 text-xs font-semibold text-muted data-[ui-selected=true]:border-secondary-border data-[ui-selected=true]:bg-secondary-selected data-[ui-selected=true]:text-secondary-foreground"
+			className="inline-flex items-center gap-1 rounded-full border border-control-border bg-secondary-subtle px-2.5 py-1 text-xs font-semibold text-muted data-[ui-selected=true]:border-secondary-border data-[ui-selected=true]:bg-secondary-selected data-[ui-selected=true]:text-secondary-foreground"
 			{...readDataUiFn({
 				dataUi: "EditorProductionLineFlag",
 				state: {

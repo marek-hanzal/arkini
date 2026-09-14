@@ -1,3 +1,4 @@
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { useStore } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 
@@ -74,8 +75,7 @@ export const ProjectBoardSection = () => {
 						/>
 					</div>
 					<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
-					<label className="grid gap-1.5 text-sm">
-						<span className="font-semibold text-foreground">Space</span>
+					<EditorValueField label="Space">
 						<input
 							type="number"
 							value={spaceInput}
@@ -96,7 +96,7 @@ export const ProjectBoardSection = () => {
 									setSelectedSpaceFn(space);
 							}}
 						/>
-					</label>
+					</EditorValueField>
 				</div>
 			</EditorFormCard>
 			<ProjectStartGrid

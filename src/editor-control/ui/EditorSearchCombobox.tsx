@@ -22,7 +22,7 @@ import {
 	type ReactNode,
 } from "react";
 
-import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -356,14 +356,13 @@ export const EditorSearchCombobox = ({
 	);
 
 	return (
-		<label className="grid min-w-0 content-start gap-1.5 text-sm">
-			{labelVisible ? (
-				<EditorValueLabel
-					description={description}
-					label={label}
-					required={required}
-				/>
-			) : null}
+		<EditorValueField
+			description={description}
+			label={label}
+			labelVisible={labelVisible}
+			required={required}
+			error={error}
+		>
 			<span className="flex min-w-0 items-center gap-2">
 				{selectedPreview === undefined || selectedPreview === null ? null : (
 					<span
@@ -387,7 +386,7 @@ export const EditorSearchCombobox = ({
 					<SearchInput
 						value={query}
 						autoComplete="off"
-						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-[var(--ak-editor-background)] py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1"
+						className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1"
 						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							handleOpenChangeFn(false);
@@ -428,15 +427,12 @@ export const EditorSearchCombobox = ({
 					/>
 				</span>
 			</span>
-			{error === undefined ? null : (
-				<span className="text-xs leading-5 text-danger">{error}</span>
-			)}
 			{open ? (
 				<FloatingPortal>
 					<span
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-[var(--ak-editor-background)] p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
+						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-control-border bg-[var(--ak-editor-background)] p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
 						{...readDataUiFn({
 							dataUi: "EditorSearchComboboxMenu",
 							state: {
@@ -465,6 +461,6 @@ export const EditorSearchCombobox = ({
 					</span>
 				</FloatingPortal>
 			) : null}
-		</label>
+		</EditorValueField>
 	);
 };

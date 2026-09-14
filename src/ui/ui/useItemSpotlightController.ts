@@ -20,7 +20,7 @@ export namespace useItemSpotlightController {
 		readonly disabledReason?: ReactNode;
 		readonly itemId: string;
 		readonly label: string;
-		readonly secondary: string;
+		readonly secondary?: string;
 		readonly terms: ReadonlyArray<string>;
 	}
 

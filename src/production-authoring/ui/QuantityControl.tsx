@@ -1,6 +1,7 @@
+import { EditorValueLabel } from "~/editor-control/ui/EditorValueField";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { ReactNode } from "react";
-import { EditorNumberControl, EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 
 interface QuantityControlProps {
 	readonly description?: ReactNode;

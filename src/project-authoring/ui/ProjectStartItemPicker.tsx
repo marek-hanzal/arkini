@@ -32,7 +32,6 @@ export const ProjectStartItemPicker = (props: ProjectStartItemPickerProps) => {
 					),
 				itemId: option.id,
 				label: option.label,
-				secondary: option.meta ?? option.id,
 				terms: option.terms,
 			}))}
 			placement="viewport"

@@ -1,3 +1,4 @@
+import { ItemSectionDisableControl } from "~/item-authoring/ui/ItemSectionDisableControl";
 import { ItemSectionCopyControl } from "~/item-authoring/ui/ItemSectionCopyControl";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
@@ -259,10 +260,13 @@ export const FormSession = ({
 					secondaryNavigation={
 						<EditorSectionBar
 							actions={
-								<ItemSectionCopyControl
-									key={sectionId}
-									sectionId={sectionId}
-								/>
+								<>
+									<ItemSectionCopyControl
+										key={sectionId}
+										sectionId={sectionId}
+									/>
+									<ItemSectionDisableControl sectionId={sectionId} />
+								</>
 							}
 							help={help === undefined ? undefined : <EditorPageHelp {...help} />}
 						>

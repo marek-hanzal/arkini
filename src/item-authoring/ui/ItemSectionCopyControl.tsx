@@ -38,6 +38,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 				data-ui="ItemSectionCopyControl"
 			>
 				<EditorSearchCombobox
+					displaySelectedLabel
 					density="compact"
 					label="Copy from"
 					emptyLabel={translator.textFn("No other item matches this search.")}

@@ -22,7 +22,6 @@ export const useEditorItemSearchOptions = (
 						({
 							id: item.id,
 							label: item.title,
-							meta: item.id,
 							terms: [
 								item.id,
 								item.title,

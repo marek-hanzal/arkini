@@ -125,7 +125,6 @@ export const DeleteDialog = ({
 					</p>
 				) : null}
 			</div>
-			<p className="mt-2 text-xs text-subtle">Item ID: {item.id}</p>
 			<DeleteError error={error} />
 			<div className="mt-6 flex items-center justify-between gap-4">
 				<LinkButton

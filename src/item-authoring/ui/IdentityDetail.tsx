@@ -1,7 +1,6 @@
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { CopyButton } from "~/ui/ui/CopyButton";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
@@ -85,32 +84,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 									item.maxCount === undefined
 										? translator.textFn("Unlimited")
 										: item.maxCount
-								}
-							/>
-							<Fact
-								label={translator.textFn("Item ID")}
-								mono
-								value={
-									<span className="inline-flex max-w-full items-center gap-1">
-										<span className="min-w-0 break-all">{item.id}</span>
-										<CopyButton
-											value={item.id}
-											title="Copy Item ID"
-										/>
-									</span>
-								}
-							/>
-							<Fact
-								label={translator.textFn("UID")}
-								mono
-								value={
-									<span className="inline-flex max-w-full items-center gap-1">
-										<span className="min-w-0 break-all">{item.uid}</span>
-										<CopyButton
-											value={item.uid}
-											title="Copy UID"
-										/>
-									</span>
 								}
 							/>
 						</FactList>

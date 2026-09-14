@@ -50,7 +50,7 @@ export const SegmentedControl = <Value extends string>({
 	value,
 }: SegmentedControlProps<Value>) => (
 	<div
-		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex w-fit max-w-full self-start"} ${SegmentedControlFrameSizeClassName[size]} min-w-0 overflow-x-auto rounded-lg border border-line-strong bg-canvas/70 p-1 data-[ui-invalid=true]:border-danger`}
+		className={`ak-segmented-control ${fill ? "flex w-full" : "inline-flex w-fit max-w-full self-start"} ${SegmentedControlFrameSizeClassName[size]} min-w-0 overflow-x-auto rounded-lg border border-control-border bg-canvas/70 p-1 data-[ui-invalid=true]:border-danger`}
 		{...readDataUiFn({
 			dataUi,
 			state: {

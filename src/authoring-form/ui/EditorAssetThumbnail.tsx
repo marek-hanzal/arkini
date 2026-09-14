@@ -20,7 +20,7 @@ export const EditorAssetThumbnail = ({
 	return (
 		<span
 			data-ui="EditorAssetThumbnail"
-			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-canvas/70`}
+			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg border border-control-border bg-canvas/70`}
 		>
 			{url === undefined ? (
 				resourceId ? (

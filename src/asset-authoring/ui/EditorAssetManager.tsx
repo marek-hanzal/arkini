@@ -425,7 +425,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					<SearchInput
 						value={props.query}
 						containerClassName="min-w-64 flex-1"
-						className="h-12 min-h-12 w-full rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+						className="h-12 min-h-12 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-4 text-sm text-foreground outline-none placeholder:text-muted"
 						data-ui="EditorAssetSearch"
 						placeholder={`${translator.textFn("Search assets…")} (${controller.resources.length})`}
 						onValueChangeFn={props.onQueryChangeFn}

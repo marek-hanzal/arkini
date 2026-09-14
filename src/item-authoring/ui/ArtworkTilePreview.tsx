@@ -15,7 +15,7 @@ export const ArtworkTilePreview = ({
 }) => (
 	<div
 		className={twMerge(
-			"grid size-54 shrink-0 place-items-center overflow-hidden rounded-xl border border-line bg-canvas/70",
+			"grid size-54 shrink-0 place-items-center overflow-hidden rounded-xl border border-control-border bg-canvas/70",
 			className,
 		)}
 		data-ui="EditorArtworkTilePreview"

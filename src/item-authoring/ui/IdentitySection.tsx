@@ -1,5 +1,6 @@
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { Mx } from "~/translation/ui/Mx";
-import { EditorChoiceControl, EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { useStore } from "@tanstack/react-form";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -46,15 +47,15 @@ export const IdentitySection = () => {
 				</form.AppField>
 				<div className="flex items-start justify-between gap-4">
 					{clock !== undefined ? (
-						<div className="grid content-start gap-1.5 text-sm">
-							<EditorValueLabel
-								label={translator.textFn("Storage scope")}
-								description={<Mx label="Item storage scope help" />}
-							/>
-							<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
+						<EditorValueField
+							as="div"
+							label={translator.textFn("Storage scope")}
+							description={<Mx label="Item storage scope help" />}
+						>
+							<span className="rounded-lg border border-control-border bg-canvas/50 px-3 py-2 text-muted">
 								{translator.textFn("Board — required by Clock")}
 							</span>
-						</div>
+						</EditorValueField>
 					) : (
 						<form.AppField name="scope">
 							{(field) => (

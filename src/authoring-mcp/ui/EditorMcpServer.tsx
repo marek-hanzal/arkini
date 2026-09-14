@@ -121,7 +121,7 @@ export const EditorMcpServer = ({
 							<input
 								readOnly
 								value={overview.remotePassword}
-								className="h-full min-w-0 w-full rounded-lg border border-line bg-surface px-3 py-2 pr-10 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
+								className="h-full min-w-0 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 py-2 pr-10 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60"
 							/>
 							<div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted">
 								<CopyButton

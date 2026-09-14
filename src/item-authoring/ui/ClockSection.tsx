@@ -9,7 +9,6 @@ import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStat
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 /** Composes shared time, rule, and output controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
@@ -179,13 +178,6 @@ export const ClockSection = () => {
 						data-ui="EditorClockSection"
 					>
 						<ClockFields />
-						<EditorCapabilityDisable
-							title={translator.textFn("Clock configured")}
-							description={translator.textFn(
-								"Disable removes timing, rules and expiry output from this item.",
-							)}
-							onDisableFn={() => form.setFieldValue("clock", undefined)}
-						/>
 					</div>
 				)
 			}

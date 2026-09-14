@@ -2,8 +2,6 @@ About avatars:
   value: About avatars
 Action:
   value: Action
-Action configured:
-  value: Action configured
 Action type:
   value: Action type
 Activating this item settles its requirements and unit costs, then enters the target space.:
@@ -163,8 +161,6 @@ Clock:
   value: Clock
 Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.:
   value: Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.
-Clock configured:
-  value: Clock configured
 Clock expiry:
   value: Clock expiry
 Clock line:
@@ -252,14 +248,19 @@ Disable:
   value: Disable
 Disable removes all merge interactions from this item.:
   value: Disable removes all merge interactions from this item.
+  dynamic: true
 Disable removes all production lines from this item.:
   value: Disable removes all production lines from this item.
+  dynamic: true
 Disable removes the unit supply and depletion output from this item.:
   value: Disable removes the unit supply and depletion output from this item.
+  dynamic: true
 Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.:
   value: Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.
+  dynamic: true
 Disable removes timing, rules and expiry output from this item.:
   value: Disable removes timing, rules and expiry output from this item.
+  dynamic: true
 Disabled:
   value: Disabled
 Disabled by default:
@@ -683,8 +684,6 @@ Merge output:
   value: Merge output
 Merges:
   value: Merges
-Merges configured:
-  value: Merges configured
 Missing item:
   value: Missing item
 Name:
@@ -855,8 +854,6 @@ Product lines:
   value: Product lines
 Production:
   value: Production
-Production configured:
-  value: Production configured
 Production is enabled when at least one line is configured. Each line keeps its own availability rules.:
   value: Production is enabled when at least one line is configured. Each line keeps its own availability rules.
 Production line:
@@ -1056,8 +1053,6 @@ Starting layout controls help:
     - **Right-click** a stack to remove it.
     - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack. Anything at the destination is replaced.
     - Press **Minus** to remove one item or **Delete** to remove the whole stack.
-Status:
-  value: Status
 Storage:
   value: Storage
 Storage scope:
@@ -1096,6 +1091,8 @@ This asset is not present in this project.:
   value: This asset is not present in this project.
 This asset is not used:
   value: This asset is not used
+This changes only the current form. Save applies it; Discard restores the saved item.:
+  value: This changes only the current form. Save applies it; Discard restores the saved item.
 This item has no inputs:
   value: This item has no inputs
   dynamic: true
@@ -1120,8 +1117,6 @@ Toolbar editing help:
     Toolbar is passive one-row storage visible during play. Set **Slots** to zero if the game should not have one.
 Try a different search or change the active filters.:
   value: Try a different search or change the active filters.
-UID:
-  value: UID
 Unit cost:
   value: Unit cost
 Unit depletion:
@@ -1131,8 +1126,6 @@ Units:
   dynamic: true
 Units are the supply inside each item, independently of how many items are stacked.:
   value: Units are the supply inside each item, independently of how many items are stacked.
-Units configured:
-  value: Units configured
 Units input:
   value: Units input
 Units per item:

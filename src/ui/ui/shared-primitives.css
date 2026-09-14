@@ -164,7 +164,7 @@
 .ak-segmented-option {
 	color: var(--ak-muted);
 	background-color: var(--ak-secondary-subtle);
-	border-color: var(--ak-line);
+	border-color: var(--ak-control-border);
 	transition:
 		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),

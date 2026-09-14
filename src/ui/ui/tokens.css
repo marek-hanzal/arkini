@@ -9,6 +9,7 @@
 	--color-subtle: var(--ak-subtle);
 	--color-line: var(--ak-line);
 	--color-line-strong: var(--ak-line-strong);
+	--color-control-border: var(--ak-control-border);
 	--color-accent: var(--ak-accent);
 	--color-accent-hover: var(--ak-accent-hover);
 	--color-accent-contrast: var(--ak-accent-contrast);
@@ -53,6 +54,7 @@
 	--ak-subtle: light-dark(#917f9a, #877792);
 	--ak-line: light-dark(#e4d7eb, #382744);
 	--ak-line-strong: light-dark(#c9b4d5, #654c75);
+	--ak-control-border: light-dark(#e6e0eb, #483851);
 	--ak-accent: light-dark(#b9247d, #f05bb8);
 	--ak-accent-hover: light-dark(#9e1969, #ff7ccc);
 	--ak-accent-contrast: light-dark(#fff9fc, #2a0a1d);
@@ -60,10 +62,10 @@
 	--ak-info-contrast: light-dark(#fff, #0c1030);
 	--ak-success: light-dark(#75508c, #caa9df);
 	--ak-success-contrast: light-dark(#fffaff, #151020);
-	--ak-secondary-subtle: light-dark(#f6eef9, #241b2c);
-	--ak-secondary-hover: light-dark(#ead9f0, #392943);
-	--ak-secondary-selected: light-dark(#dcc0e6, #50365e);
-	--ak-secondary-border: light-dark(#ad82bd, #9d70b0);
+	--ak-secondary-subtle: light-dark(#faf8fc, #241b2c);
+	--ak-secondary-hover: light-dark(#f3edf8, #392943);
+	--ak-secondary-selected: light-dark(#ece3f3, #50365e);
+	--ak-secondary-border: light-dark(#d7c6e0, #9d70b0);
 	--ak-secondary-foreground: light-dark(#60336f, #f0d7fa);
 	--ak-warning: light-dark(#985a12, #f1b45e);
 	--ak-danger: light-dark(#b72b63, #ff6c9f);

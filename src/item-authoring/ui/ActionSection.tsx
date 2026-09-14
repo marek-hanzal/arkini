@@ -3,7 +3,6 @@ import { MapPinned } from "lucide-react";
 
 import type { InputSchema as ActionInputSchema } from "~/production-action/schema/InputSchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
-import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
@@ -190,13 +189,6 @@ export const ActionSection = () => {
 									/>
 								</EditorFormCard>
 							</EditorFormSection>
-							<EditorCapabilityDisable
-								title={translator.textFn("Action configured")}
-								description={translator.textFn(
-									"Disable removes this action, its rules and input requirements. It does not restore removed production lines or Clock.",
-								)}
-								onDisableFn={() => form.setFieldValue("action", undefined)}
-							/>
 						</>
 					)
 				}

@@ -3,12 +3,12 @@ import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOv
 
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
-import { EditorValueLabel } from "~/editor-control/ui/EditorValueControls";
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorMcpCopyableUrl } from "./EditorMcpCopyableUrl";
 import { EditorMcpStatus } from "./EditorMcpStatus";
 
 const editorMcpInputClassName =
-	"w-full rounded-lg border border-line bg-surface px-3 py-2 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60";
+	"w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 py-2 text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-60";
 
 interface EditorMcpSettingsProps {
 	readonly authtoken: string;
@@ -54,13 +54,11 @@ export const EditorMcpSettings = ({
 						computer.
 					</p>
 				</div>
-				<div className="grid gap-2">
-					<div className="text-sm">
-						<EditorValueLabel
-							label="Port"
-							required
-						/>
-					</div>
+				<EditorValueField
+					as="div"
+					label="Port"
+					required
+				>
 					<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
 						<input
 							type="number"
@@ -78,7 +76,7 @@ export const EditorMcpSettings = ({
 							Save
 						</LinkButton>
 					</div>
-				</div>
+				</EditorValueField>
 				<EditorMcpCopyableUrl
 					label="Local endpoint"
 					url={localUrl}
@@ -96,13 +94,10 @@ export const EditorMcpSettings = ({
 						this Development Domain.
 					</p>
 				</div>
-				<label className="grid gap-2">
-					<div className="text-sm">
-						<EditorValueLabel
-							label="Development domain"
-							required
-						/>
-					</div>
+				<EditorValueField
+					label="Development domain"
+					required
+				>
 					<input
 						value={ngrokDomain}
 						className={editorMcpInputClassName}
@@ -110,14 +105,11 @@ export const EditorMcpSettings = ({
 						placeholder="your-assigned-name.ngrok-free.app"
 						onChange={(event) => onSetNgrokDomainFn(event.currentTarget.value)}
 					/>
-				</label>
-				<label className="grid gap-2">
-					<div className="text-sm">
-						<EditorValueLabel
-							label="Authtoken"
-							required
-						/>
-					</div>
+				</EditorValueField>
+				<EditorValueField
+					label="Authtoken"
+					required
+				>
 					<input
 						type="password"
 						value={authtoken}
@@ -130,7 +122,7 @@ export const EditorMcpSettings = ({
 						}
 						onChange={(event) => onSetAuthtokenFn(event.currentTarget.value)}
 					/>
-				</label>
+				</EditorValueField>
 				<PrimaryButton
 					className="justify-self-start"
 					disabled={ngrokDisabled}

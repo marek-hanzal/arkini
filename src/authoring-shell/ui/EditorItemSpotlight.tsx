@@ -23,7 +23,6 @@ export const EditorItemSpotlight = ({
 			artwork: <EditorItemSearchThumbnail item={items[option.id]} />,
 			itemId: option.id,
 			label: option.label,
-			secondary: option.meta ?? option.id,
 			terms: option.terms,
 		}))}
 		placement="viewport"

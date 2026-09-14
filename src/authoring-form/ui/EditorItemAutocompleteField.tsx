@@ -20,6 +20,7 @@ export const EditorItemAutocompleteField = ({
 	const { items, options } = useEditorItemSearchOptions();
 	return (
 		<EditorSearchCombobox
+			displaySelectedLabel
 			label={label}
 			description={description}
 			emptyLabel="No known item matches this search."
@@ -65,6 +66,7 @@ export const EditorItemReferenceControl = ({
 	const { items, options } = useEditorItemSearchOptions(includeItemFn);
 	return (
 		<EditorSearchCombobox
+			displaySelectedLabel
 			description={description}
 			label={label}
 			emptyLabel={emptyLabel}

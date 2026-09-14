@@ -1,5 +1,4 @@
 import { MergeOption } from "~/item-authoring/ui/MergeOption";
-import { EditorCapabilityDisable } from "~/editor-control/ui/EditorCapabilityDisable";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Combine } from "lucide-react";
@@ -114,13 +113,6 @@ const MergeFields = ({
 							/>
 						)}
 					</EditorCollectionSelector>
-					<EditorCapabilityDisable
-						title={translator.textFn("Merges configured")}
-						description={translator.textFn(
-							"Disable removes all merge interactions from this item.",
-						)}
-						onDisableFn={() => onChangeFn(undefined)}
-					/>
 				</>
 			)}
 		</div>

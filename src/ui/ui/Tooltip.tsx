@@ -70,7 +70,7 @@ export const Tooltip = ({
 						ref={refs.setFloating}
 						style={floatingStyles}
 						className={twMerge(
-							"z-10 max-w-72 rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 text-foreground shadow-xl",
+							"z-10 max-w-[27rem] rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 text-foreground shadow-xl",
 							contentClassName,
 						)}
 						{...getFloatingPropsFn()}

@@ -572,6 +572,8 @@ Inventory editing help:
     Inventory is the shared passive storage available from every playable Space. **Width** and **Height** define the grid used everywhere.
 Item:
   value: Item
+Item details:
+  value: Item details
 Item ID:
   value: Item ID
 Item ID help:

@@ -5,6 +5,7 @@ import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStat
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { Mx } from "~/translation/ui/Mx";
@@ -33,6 +34,7 @@ export const UnitsSection = () => {
 					) : (
 						<>
 							<EditorFormCard>
+								<EditorFormSectionDivider title={translator.textFn("Units")} />
 								<form.AppField name="units.amount">
 									{(field) => (
 										<field.NumberField

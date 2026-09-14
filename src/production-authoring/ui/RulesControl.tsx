@@ -496,7 +496,6 @@ const RuleControl = ({
 							}
 						/>
 					)}
-					<EditorFormBranchEnd />
 					<EditorCollectionSelector
 						addLabel="Add condition"
 						initialSelectedIndex={initialWhenIndex}

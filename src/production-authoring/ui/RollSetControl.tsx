@@ -282,7 +282,6 @@ const WeightedRollControl = ({
 						}
 					/>
 				</div>
-				<EditorFormBranchEnd />
 			</div>
 			<EditorFormSectionDivider
 				description={<Mx label="Weighted candidates help" />}
@@ -387,7 +386,6 @@ const WeightedRollControl = ({
 									})
 								}
 							/>
-							<EditorFormBranchEnd />
 							<DropList
 								initialRuleIndex={
 									candidateIndex === initialCandidateIndex
@@ -517,7 +515,6 @@ const RollControl = ({
 											})
 										}
 									/>
-									<EditorFormBranchEnd />
 									<DropList
 										initialRuleIndex={initialRuleIndex}
 										initialWhenIndex={initialWhenIndex}
@@ -590,7 +587,6 @@ export const RollSetControl = ({
 					})
 				}
 			/>
-			<EditorFormBranchEnd />
 			<EditorFormSectionDivider
 				description={<Mx label="Rolls help" />}
 				required

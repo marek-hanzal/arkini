@@ -7,6 +7,6 @@ export const EditorFormBranchEnd = () => (
 		data-ui="EditorFormBranchEnd"
 	>
 		<Check className="size-3.5" />
-		<span>Done</span>
+		<span>End of section</span>
 	</div>
 );

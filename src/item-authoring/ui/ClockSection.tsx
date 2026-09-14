@@ -9,6 +9,7 @@ import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStat
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
 /** Composes shared time, rule, and output controls for the authored schedule. */
@@ -24,6 +25,7 @@ const ClockFields = () => {
 			data-ui="EditorClockFields"
 		>
 			<EditorFormCard>
+				<EditorFormSectionDivider title={translator.textFn("Clock")} />
 				<div className="grid grid-cols-2 items-start gap-4">
 					<form.AppField name="clock.durationMs">
 						{(field) => (

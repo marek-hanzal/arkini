@@ -1,12 +1,14 @@
 import { MergeOption } from "~/item-authoring/ui/MergeOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 import { Combine } from "lucide-react";
 import { useStore } from "@tanstack/react-form";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { MergeField } from "~/item-authoring/ui/MergeField";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -58,6 +60,10 @@ const MergeFields = ({
 				/>
 			) : (
 				<>
+					<EditorFormSectionDivider
+						description={<Mx label="Item merges help" />}
+						title={translator.textFn("Merges")}
+					/>
 					<EditorCollectionSelector
 						addLabel={translator.textFn("Add merge")}
 						count={merges.length}

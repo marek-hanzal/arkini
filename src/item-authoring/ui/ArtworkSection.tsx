@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
@@ -25,6 +26,7 @@ const ArtworkFields = withFieldGroupFn({
 		const translator = useTranslator();
 		return (
 			<>
+				<EditorFormSectionDivider title={translator.textFn("Artwork")} />
 				<div className="grid grid-cols-[minmax(0,1fr)_12rem] items-start gap-4">
 					<group.AppField name="default[0]">
 						{(field) => <field.AssetField label={translator.textFn("Base asset")} />}

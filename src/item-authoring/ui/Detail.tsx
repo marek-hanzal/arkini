@@ -44,6 +44,7 @@ export const Detail = ({
 	const sections = readSectionsFn();
 	return (
 		<EditorSectionPage
+			contentClassName="mx-auto w-3/4"
 			contentMode={sectionId === "notes" ? "viewport" : "scroll"}
 			fillContent={sectionId === "connections"}
 			header={

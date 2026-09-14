@@ -72,7 +72,10 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 			case "artwork":
 				return (
 					<EditorRootCard dataUi="EditorItemArtworkDetailCard">
-						<ArtworkDetail item={item} />
+						<ArtworkDetail
+							item={item}
+							layout="detail"
+						/>
 					</EditorRootCard>
 				);
 			case "units":

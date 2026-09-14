@@ -9,7 +9,6 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useDeleteController } from "~/item-authoring/ui/useDeleteController";
 import { ProjectSections } from "~/project-authoring/type/ProjectSections";
 import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 
 const DeleteBlockerLink = ({
 	blocker,
@@ -89,37 +88,37 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 				className="grid gap-3"
 				data-ui="EditorItemDeleteSection"
 			>
-				<EditorRootCard dataUi="EditorItemDeleteStateCard">
-					<Status
-						icon={blocked ? ShieldAlert : ShieldCheck}
-						title={
-							blocked ? "This item cannot be deleted yet" : "This item can be deleted"
-						}
-						description={
-							blocked
-								? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
-								: "No other game configuration references this item. Its asset files will remain available in the project."
-						}
-						action={
-							blocked ? (
-								<DangerButton
-									data-ui="EditorItemForceDeleteOpen"
-									onClick={() => controller.openFn(true)}
-								>
-									Force delete…
-								</DangerButton>
-							) : (
-								<DangerButton
-									data-ui="EditorItemDeleteOpen"
-									onClick={() => controller.openFn(false)}
-								>
-									Delete
-								</DangerButton>
-							)
-						}
-						variant="flat"
-					/>
-				</EditorRootCard>
+				<Status
+					dataUi="EditorItemDeleteState"
+					size="large"
+					icon={blocked ? ShieldAlert : ShieldCheck}
+					title={
+						blocked ? "This item cannot be deleted yet" : "This item can be deleted"
+					}
+					description={
+						blocked
+							? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
+							: "No other game configuration references this item. Its asset files will remain available in the project."
+					}
+					action={
+						blocked ? (
+							<DangerButton
+								data-ui="EditorItemForceDeleteOpen"
+								onClick={() => controller.openFn(true)}
+							>
+								Force delete…
+							</DangerButton>
+						) : (
+							<DangerButton
+								data-ui="EditorItemDeleteOpen"
+								onClick={() => controller.openFn(false)}
+							>
+								Delete
+							</DangerButton>
+						)
+					}
+					variant="flat"
+				/>
 				{blocked ? (
 					<div
 						className="ak-list grid gap-2"

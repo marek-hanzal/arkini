@@ -1,7 +1,7 @@
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { ReactNode } from "react";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { ArrowUpRight, ChevronRight, Square, SquareCheck } from "lucide-react";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
 
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { RulesDetail } from "~/item-authoring/ui/RulesDetail";
@@ -22,7 +22,6 @@ const LineFlag = ({
 	readonly label: ReactNode;
 	readonly description: ReactNode;
 }) => {
-	const Icon = checked ? SquareCheck : Square;
 	return (
 		<span
 			className="inline-flex items-center gap-1 rounded-full border border-line bg-secondary-subtle px-2.5 py-1 text-xs font-semibold text-muted data-[ui-selected=true]:border-secondary-border data-[ui-selected=true]:bg-secondary-selected data-[ui-selected=true]:text-secondary-foreground"
@@ -33,7 +32,6 @@ const LineFlag = ({
 				},
 			})}
 		>
-			<Icon className="size-3.5" />
 			{label}
 			<EditorInfoTooltip content={description} />
 		</span>

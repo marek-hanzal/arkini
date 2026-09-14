@@ -31,6 +31,8 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 			config === undefined ||
 			state === undefined ||
 			state.remainingDurationMs === 0 ||
+			item.location.scope !== LocationScopeEnumSchema.enum.Board ||
+			snapshot.location.scope !== LocationScopeEnumSchema.enum.Board ||
 			!(yield* resolveItemScheduleEnabledFx({
 				item: snapshot,
 				runtime: stepStart,
@@ -41,10 +43,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 		const phase =
 			state.remainingIntervalMs === undefined
 				? undefined
-				: item.location.scope === LocationScopeEnumSchema.enum.Board &&
-						snapshot.location.scope === LocationScopeEnumSchema.enum.Board
-					? state.remainingIntervalMs - elapsed
-					: state.remainingIntervalMs;
+				: state.remainingIntervalMs - elapsed;
 		const expired =
 			state.remainingDurationMs !== undefined && state.remainingDurationMs <= elapsed;
 		if (

@@ -260,7 +260,6 @@ export const useFormController = ({
 	const enableClockFn = useCallback(() => {
 		if (form.state.values.clock !== undefined) return;
 		form.setFieldValue("action", undefined);
-		form.setFieldValue("scope", "board");
 		form.setFieldValue("maxStackSize", 1);
 		form.setFieldValue("clock", {
 			durationMs: 300_000,

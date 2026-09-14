@@ -26,7 +26,7 @@ export const copyItemSectionFn = (
 				title: source.title,
 				description: source.description ?? "",
 				control: source.control,
-				scope: current.clock === undefined ? source.scope : "board",
+				scope: source.scope,
 				maxStackSize: current.clock === undefined ? source.maxStackSize : 1,
 				maxCount: source.maxCount,
 			};
@@ -66,7 +66,6 @@ export const copyItemSectionFn = (
 					? {}
 					: {
 							action: undefined,
-							scope: "board",
 							maxStackSize: 1,
 						}),
 			};

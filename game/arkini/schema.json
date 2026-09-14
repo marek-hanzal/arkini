@@ -1926,13 +1926,7 @@
 				]
 			},
 			"then": {
-				"required": [
-					"scope"
-				],
 				"properties": {
-					"scope": {
-						"const": "board"
-					},
 					"maxStackSize": {
 						"const": 1
 					}

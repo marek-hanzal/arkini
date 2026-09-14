@@ -94,8 +94,6 @@ Board editing help:
     Every playable Space gets its own Board, but they all use the same **Width** and **Height**.
 
     Use **Space** to jump between Spaces 0–31. Switching is instant, so you can inspect every layout without saving between visits. Your edits stay attached to the selected Space.
-Board — required by Clock:
-  value: Board — required by Clock
 Buffer:
   value: Buffer
 Buffer disabled:
@@ -192,8 +190,8 @@ Copy from:
   value: Copy from
 Copy from…:
   value: Copy from…
-Copying Clock also removes the destination action and sets Board storage with a stack size of one.:
-  value: Copying Clock also removes the destination action and sets Board storage with a stack size of one.
+Copying Clock also removes the destination action and sets a stack size of one.:
+  value: Copying Clock also removes the destination action and sets a stack size of one.
 Copying an action also removes destination production lines and Clock.:
   value: Copying an action also removes destination production lines and Clock.
 Copying production also removes the destination action. All lines and queue capacity are replaced.:
@@ -432,8 +430,8 @@ Item:
   value: Item
 Item ID:
   value: Item ID
-Item ID, UID and draft status stay unchanged. Clock keeps Board storage and a stack size of one.:
-  value: Item ID, UID and draft status stay unchanged. Clock keeps Board storage and a stack size of one.
+Item ID, UID and draft status stay unchanged. An existing Clock keeps a stack size of one.:
+  value: Item ID, UID and draft status stay unchanged. An existing Clock keeps a stack size of one.
 Item action empty title:
   value: Let a click open Inventory or move to another space.
 Item action help:
@@ -468,7 +466,7 @@ Item clock help:
 
     **Enabled** and availability rules determine whether the timer runs. Every Enable rule must pass; any matching Disable rule pauses it. Accepted production keeps its own line rules.
 
-    Enabling Clock removes the item's action and requires Board storage with a stack size of one. New clocks start with a five-minute lifetime and no periodic interval.
+    Enabling Clock removes the item's action and requires a stack size of one. Clock can use any storage scope, but its interval and lifetime advance only while its exact identity is on a Board. Moving it elsewhere pauses the saved timer state until it returns. New clocks start with a five-minute lifetime and no periodic interval.
 Item connections help:
   value: |
     Connections explores one explicit authored relationship for any item.
@@ -578,12 +576,12 @@ Item section copy help:
 
     **Save** persists the replacement together with the rest of your draft. **Discard** restores the saved destination item. Item references retain their authored targets; self-paid unit inputs bind to the destination when saved.
 
-    - **Item:** copies title, description, player controls, storage, stack and global limits. Item ID, UID and draft status stay unchanged. An existing Clock keeps Board storage and a stack size of one.
+    - **Item:** copies title, description, player controls, storage, stack and global limits. Item ID, UID and draft status stay unchanged. An existing Clock keeps a stack size of one.
     - **Artwork:** replaces base artwork, overlay and scale.
     - **Production:** replaces all lines and queue capacity. Nonempty production removes the destination action.
     - **Merges:** replaces all merge rules and their outputs.
     - **Units:** replaces amount and depletion output.
-    - **Clock:** replaces timing, enabled state, rules and expiry output. A copied Clock removes the destination action and sets Board storage with a stack size of one.
+    - **Clock:** replaces timing, enabled state, rules and expiry output. A copied Clock removes the destination action and sets a stack size of one.
     - **Action:** replaces the complete action, inputs and rules. A copied action removes destination production lines and Clock.
 Item stack size help:
   value: |
@@ -604,7 +602,7 @@ Item storage scope help:
   value: |
     Controls where this item can be placed: **Board**, **Toolbar**, **Inventory**, or **Any** of these locations. Normal placement rules still need a compatible free cell or stack.
 
-    A configured **Clock** requires Board scope and a stack size of one.
+    A configured **Clock** requires a stack size of one. Its interval and lifetime pause whenever the identity is outside a Board.
 Item units empty title:
   value: Give this item health, resources, or another finite supply.
 Item units help:

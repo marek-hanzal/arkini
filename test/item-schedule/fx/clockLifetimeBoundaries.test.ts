@@ -58,7 +58,7 @@ describe("Clock lifetime boundaries", () => {
 		expect(result.second.jobs[0].remainingMs).toBe(100);
 	});
 
-	it("ages stored lifetime without phase time and gives no retroactive pulse on return to Board", () => {
+	it("pauses phase and lifetime outside Board and gives no retroactive time on return", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const config = GameConfigSchema.parse({
 			...base,
@@ -133,12 +133,12 @@ describe("Clock lifetime boundaries", () => {
 				resultStep.runtime.items.find((item) => item.id === "material")?.schedule,
 			).toEqual({
 				remainingIntervalMs: 100,
-				remainingDurationMs: 500,
+				remainingDurationMs: 600,
 			});
 			expect(resultStep.dispatched).toBe(false);
 		}
 	});
-	it("expires a buffered line owner from its parent's origin and returns its own buffered roots", () => {
+	it("pauses a buffered Clock owner together with its own buffered roots", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const config = GameConfigSchema.parse({
 			...base,
@@ -219,19 +219,28 @@ describe("Clock lifetime boundaries", () => {
 				}),
 			),
 		);
-		expect(result.items.some((item) => item.id === "material")).toBe(false);
-		expect(result.items.filter((item) => item.item.id === "residue")).toMatchObject([
-			{
-				quantity: 1,
-				location: {
-					scope: "board",
-					space: 0,
-				},
+		expect(result.items.find((item) => item.id === "material")).toMatchObject({
+			location: {
+				inputIndex: 0,
+				lineId: "line:owner",
+				ownerItemId: "owner",
+				scope: "input",
 			},
-		]);
+			schedule: {
+				remainingDurationMs: 100,
+			},
+		});
+		expect(result.items.find((item) => item.id === "child")).toMatchObject({
+			location: {
+				inputIndex: 0,
+				lineId: "buffer",
+				ownerItemId: "material",
+				scope: "input",
+			},
+		});
 	});
 
-	it("ages expiring buffers before redispatch can spend units on the next accepted request", () => {
+	it("keeps a paused buffered Clock available to the next accepted request", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const owner = base.items.owner;
 		const config = GameConfigSchema.parse({
@@ -308,13 +317,13 @@ describe("Clock lifetime boundaries", () => {
 				}),
 			),
 		);
-		expect(result.items.find((item) => item.id === "owner")?.remainingUnits).toBeUndefined();
-		expect(result.jobs).toEqual([]);
-		expect(result.jobQueue).toMatchObject([
+		expect(result.items.find((item) => item.id === "owner")?.remainingUnits).toBe(4);
+		expect(result.jobs).toMatchObject([
 			{
 				ownerItemId: "owner",
 				lineId: "line:owner",
 			},
 		]);
+		expect(result.jobQueue).toEqual([]);
 	});
 });

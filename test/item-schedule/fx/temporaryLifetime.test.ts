@@ -524,7 +524,7 @@ describe("temporary item lifetime", () => {
 		expect(replaced?.revision).not.toBe(result.target.revision);
 	});
 
-	it("reports temporary items in passive storage", () => {
+	it("accepts paused Clock state in passive storage", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const temporary = yield* spawnTemporaryFx({});
@@ -555,15 +555,11 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(result.issues).toEqual(
-			expect.arrayContaining([
-				{
-					type: RuntimeCheckIssueEnumSchema.enum.ItemSchedule,
-					itemId: "runtime:temporary",
-					reason: "invalid-location",
-				},
-			]),
-		);
+		expect(
+			result.issues.filter(
+				(issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemSchedule,
+			),
+		).toEqual([]);
 	});
 
 	it("reports temporary duration state attached to a non-temporary item", () => {

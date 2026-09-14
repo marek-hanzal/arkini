@@ -305,10 +305,14 @@ describe("editor MCP authoring schema registry", () => {
 			],
 		};
 		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);
-		for (const replacement of [
-			{
+		expect(
+			validateCreate({
+				...scheduled,
 				scope: "inventory",
-			},
+			}),
+			JSON.stringify(validateCreate.errors),
+		).toBe(true);
+		for (const replacement of [
 			{
 				maxStackSize: 2,
 			},

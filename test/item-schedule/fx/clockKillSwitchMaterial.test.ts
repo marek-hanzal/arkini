@@ -61,119 +61,94 @@ const configFn = () => {
 };
 
 describe("kill-switch material expiry", () => {
-	it.each([
-		false,
-		true,
-	])(
-		"atomically aborts its parent job and prioritizes reservations over expiry output (full=%s)",
-		(full) => {
-			const result = Effect.runSync(
-				Effect.gen(function* () {
-					yield* spawnItemFx({
-						id: "owner",
-						itemId: "owner",
-						location: boardFn(0),
-						quantity: 1,
-					});
-					const material = yield* spawnItemFx({
-						id: "material",
-						itemId: "temporary",
-						location: boardFn(1),
-						quantity: 1,
-					});
-					const reserve = yield* spawnItemFx({
-						id: "reserve",
-						itemId: "blocker",
-						location: boardFn(2),
-						quantity: 1,
-					});
-					for (const [inputIndex, source] of [
-						[
-							0,
-							material,
-						],
-						[
-							1,
-							reserve,
-						],
-					] as const) {
-						yield* storeInputMaterialFx({
-							ownerItemId: "owner",
-							lineId: "line:owner",
-							inputIndex,
-							sourceItemId: source.id,
-							sourceItemRevision: source.revision,
-							quantity: 1,
-						});
-					}
-					yield* startLineFx({
+	it("pauses the kill switch while the material is committed to a job", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "owner",
+					itemId: "owner",
+					location: boardFn(0),
+					quantity: 1,
+				});
+				const material = yield* spawnItemFx({
+					id: "material",
+					itemId: "temporary",
+					location: boardFn(1),
+					quantity: 1,
+				});
+				const reserve = yield* spawnItemFx({
+					id: "reserve",
+					itemId: "blocker",
+					location: boardFn(2),
+					quantity: 1,
+				});
+				for (const [inputIndex, source] of [
+					[
+						0,
+						material,
+					],
+					[
+						1,
+						reserve,
+					],
+				] as const) {
+					yield* storeInputMaterialFx({
 						ownerItemId: "owner",
 						lineId: "line:owner",
-					});
-					yield* spawnItemFx({
-						id: "filler:2",
-						itemId: "product",
-						location: boardFn(2),
+						inputIndex,
+						sourceItemId: source.id,
+						sourceItemRevision: source.revision,
 						quantity: 1,
 					});
-					if (full)
-						yield* spawnItemFx({
-							id: "filler:1",
-							itemId: "product",
-							location: boardFn(1),
-							quantity: 1,
-						});
-					const before = yield* readRuntimeFx();
-					const committed = yield* modifyRuntimeWithTransitionFx((runtime) =>
-						Effect.gen(function* () {
-							const step = yield* advanceRuntimeStepFx(runtime);
-							return [
-								undefined,
-								step.runtime,
-								step.events,
-							] as const;
-						}),
-					);
-					return {
-						before,
-						committed,
-						after: yield* readRuntimeFx(),
-					};
-				}).pipe(
-					useGameFx({
-						config: configFn(),
-					}),
-				),
-			);
-			expect(result.after.jobs).toEqual([]);
-			expect(result.after.items.some((item) => item.id === "material")).toBe(false);
-			expect(result.after.items.some((item) => item.item.id === "residue")).toBe(false);
-			expect(result.after.items.filter((item) => item.item.id === "blocker")).toHaveLength(
-				full ? 0 : 1,
-			);
-			const transition = result.committed.transition!;
-			expect(transition.previousRuntime).toEqual(result.before);
-			expect(transition.runtime).toEqual(result.after);
-			expect(transition.events).toContainEqual(
-				expect.objectContaining({
-					type: "job:aborted",
-					reason: "material-expired",
+				}
+				yield* startLineFx({
 					ownerItemId: "owner",
+					lineId: "line:owner",
+				});
+				const before = yield* readRuntimeFx();
+				const committed = yield* modifyRuntimeWithTransitionFx((runtime) =>
+					Effect.gen(function* () {
+						const step = yield* advanceRuntimeStepFx(runtime);
+						return [
+							undefined,
+							step.runtime,
+							step.events,
+						] as const;
+					}),
+				);
+				return {
+					before,
+					committed,
+					after: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: configFn(),
 				}),
-			);
-			expect(transition.events).toContainEqual(
-				expect.objectContaining({
-					type: "item:discarded",
-					source: "expiry-output",
-					canonicalItemId: "residue",
-					quantity: 1,
-				}),
-			);
-			expect(
-				transition.events.filter(
-					(event) => event.type === "item:discarded" && event.source === "reservation",
-				),
-			).toHaveLength(full ? 1 : 0);
-		},
-	);
+			),
+		);
+		expect(result.after.jobs).toEqual([
+			expect.objectContaining({
+				ownerItemId: "owner",
+				remainingMs: 900,
+			}),
+		]);
+		expect(result.after.items.find((item) => item.id === "material")).toMatchObject({
+			location: {
+				scope: "job",
+			},
+			schedule: {
+				remainingDurationMs: 100,
+			},
+		});
+		expect(result.after.items.find((item) => item.id === "reserve")).toMatchObject({
+			location: {
+				scope: "reserved",
+			},
+		});
+		const transition = result.committed.transition!;
+		expect(transition.previousRuntime).toEqual(result.before);
+		expect(transition.runtime).toEqual(result.after);
+		expect(transition.events).toEqual([]);
+	});
 });

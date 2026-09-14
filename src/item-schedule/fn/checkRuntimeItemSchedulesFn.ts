@@ -2,7 +2,6 @@ import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import type { ItemScheduleIssueSchema } from "~/item-schedule/schema/ItemScheduleIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 /** Validates phase/lifetime against the immutable schedule, including exhausted saved owners. */
 export const checkRuntimeItemSchedulesFn = (
@@ -16,12 +15,7 @@ export const checkRuntimeItemSchedulesFn = (
 		if (config === undefined) {
 			if (state !== undefined) reason = "unexpected-state";
 		} else if (state === undefined) reason = "missing-state";
-		else if (
-			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			item.location.scope === LocationScopeEnumSchema.enum.Toolbar ||
-			item.quantity !== 1
-		)
-			reason = "invalid-location";
+		else if (item.quantity !== 1) reason = "invalid-location";
 		else if (
 			config.intervalMs === undefined
 				? state.remainingIntervalMs !== undefined

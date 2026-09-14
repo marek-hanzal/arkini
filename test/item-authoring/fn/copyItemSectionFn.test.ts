@@ -133,7 +133,7 @@ describe("section copy ownership", () => {
 			title: "New title",
 			draft: true,
 			description: "",
-			scope: "board",
+			scope: "inventory",
 			maxStackSize: 1,
 		});
 		expect(result.lines).toBe(destination.lines);
@@ -235,7 +235,7 @@ describe("section copy ownership", () => {
 			"clock",
 		);
 		expect(withClock).toMatchObject({
-			scope: "board",
+			scope: "inventory",
 			maxStackSize: 1,
 			clock: source.clock,
 		});

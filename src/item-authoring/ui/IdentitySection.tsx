@@ -1,4 +1,3 @@
-import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorChoiceControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
@@ -63,30 +62,18 @@ export const IdentitySection = () => {
 					</form.AppField>
 				</div>
 				<div className="flex items-start justify-between gap-4">
-					{clock !== undefined ? (
-						<EditorValueField
-							as="div"
-							label={translator.textFn("Storage scope")}
-							description={<Mx label="Item storage scope help" />}
-						>
-							<span className="rounded-lg border border-control-border bg-canvas/50 px-3 py-2 text-muted">
-								{translator.textFn("Board — required by Clock")}
-							</span>
-						</EditorValueField>
-					) : (
-						<form.AppField name="scope">
-							{(field) => (
-								<field.ChoiceField
-									label={translator.textFn("Storage scope")}
-									description={<Mx label="Item storage scope help" />}
-									options={scopeOptions.map((option) => ({
-										...option,
-										label: translator.textFn(option.label),
-									}))}
-								/>
-							)}
-						</form.AppField>
-					)}
+					<form.AppField name="scope">
+						{(field) => (
+							<field.ChoiceField
+								label={translator.textFn("Storage scope")}
+								description={<Mx label="Item storage scope help" />}
+								options={scopeOptions.map((option) => ({
+									...option,
+									label: translator.textFn(option.label),
+								}))}
+							/>
+						)}
+					</form.AppField>
 					<form.AppField name="control">
 						{(field) => (
 							<EditorChoiceControl

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
-/** Scheduling state must match its authored capability and stay on its Board identity. */
+/** Scheduling state must match its authored capability and exact runtime identity. */
 export const ItemScheduleIssueSchema = z
 	.object({
 		type: RuntimeCheckIssueEnumSchema.extract([

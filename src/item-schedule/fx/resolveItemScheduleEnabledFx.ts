@@ -6,8 +6,9 @@ import { readItemScheduleContextFx } from "~/item-schedule/fx/readItemScheduleCo
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
-/** Evaluates timer availability independently of the owner's admitted production. */
+/** Evaluates Board-bound timer availability independently of admitted production. */
 export const resolveItemScheduleEnabledFx = Effect.fn("resolveItemScheduleEnabledFx")(function* ({
 	item,
 	runtime,
@@ -16,7 +17,12 @@ export const resolveItemScheduleEnabledFx = Effect.fn("resolveItemScheduleEnable
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const schedule = readItemScheduleFn(item.item);
-	if (item.schedule?.remainingDurationMs === 0 || schedule === undefined) return false;
+	if (
+		item.location.scope !== LocationScopeEnumSchema.enum.Board ||
+		item.schedule?.remainingDurationMs === 0 ||
+		schedule === undefined
+	)
+		return false;
 	if (schedule.rules.length === 0) return schedule.enable;
 	const context = yield* readItemScheduleContextFx({
 		item,

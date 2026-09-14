@@ -80,7 +80,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 								{sectionId === "identity" ? (
 									<p className="text-sm text-muted">
 										{translator.textFn(
-											"Item ID, UID and draft status stay unchanged. Clock keeps Board storage and a stack size of one.",
+											"Item ID, UID and draft status stay unchanged. An existing Clock keeps a stack size of one.",
 										)}
 									</p>
 								) : null}
@@ -94,7 +94,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 								{sectionId === "clock" && source.clock !== undefined ? (
 									<p className="text-sm text-muted">
 										{translator.textFn(
-											"Copying Clock also removes the destination action and sets Board storage with a stack size of one.",
+											"Copying Clock also removes the destination action and sets a stack size of one.",
 										)}
 									</p>
 								) : null}

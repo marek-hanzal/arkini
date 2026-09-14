@@ -124,11 +124,6 @@ export const ItemSchema = z
 		if (item.clock !== undefined) {
 			for (const [field, valid, message] of [
 				[
-					"scope",
-					item.scope === "board",
-					"Clock requires Board storage.",
-				],
-				[
 					"maxStackSize",
 					item.maxStackSize === 1,
 					"Clock items cannot stack.",
@@ -161,20 +156,14 @@ export const ItemSchema = z
 	})
 	.meta({
 		id: "ItemSchema",
-		// JSON Schema clients must enforce the same capability conflict as canonical Item validation.
+		// JSON Schema clients must enforce the same Clock constraints as canonical Item validation.
 		if: {
 			required: [
 				"clock",
 			],
 		},
 		then: {
-			required: [
-				"scope",
-			],
 			properties: {
-				scope: {
-					const: "board",
-				},
 				maxStackSize: {
 					const: 1,
 				},

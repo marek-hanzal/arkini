@@ -30,7 +30,7 @@ export const MergeField = ({
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormCard>
-				<article className="grid grid-cols-2 items-start gap-[var(--ak-panel-padding)]">
+				<article className="grid auto-rows-fr grid-cols-2 items-start gap-[var(--ak-panel-padding)]">
 					<EditorChoiceControl
 						error={
 							sourceError !== undefined &&

@@ -63,6 +63,7 @@ const ItemEstimateResult = ({
 				dataUi="EditorItemEstimateUnreachable"
 				icon={Unlink}
 				title="This item is unreachable."
+				description="No complete acquisition path was found from the project's starting items using the current configuration."
 				size="large"
 				variant="flat"
 			/>

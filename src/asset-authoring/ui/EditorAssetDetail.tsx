@@ -16,6 +16,7 @@ import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcu
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { readAssetNameFn } from "~/asset-authoring/fn/readAssetNameFn";
 import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
+import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -132,7 +133,14 @@ export const EditorAssetDetail = ({
 							}}
 						/>
 					}
-					title={<h1 className="truncate text-xl font-semibold">{resource.id}</h1>}
+					title={
+						<ItemHeaderTitle
+							resourceIds={[
+								resource.id,
+							]}
+							title={resource.id}
+						/>
+					}
 					action={
 						<PrimaryButtonLink
 							ref={editActionRef}

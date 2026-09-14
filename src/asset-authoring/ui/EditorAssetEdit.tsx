@@ -14,6 +14,7 @@ import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";
 import { Status } from "~/ui/ui/Status";
+import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 
 interface EditorAssetEditProps extends useEditorAssetEditController.Props {}
 
@@ -156,9 +157,12 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 			saving={controller.saving}
 			tabs={undefined}
 			title={
-				<h1 className="truncate text-xl font-semibold">
-					<Tx label="Edit" /> {resourceId}
-				</h1>
+				<ItemHeaderTitle
+					resourceIds={[
+						resourceId,
+					]}
+					title={resourceId}
+				/>
 			}
 			leading={
 				<EditorHistoryBackButton

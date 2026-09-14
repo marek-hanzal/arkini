@@ -2,7 +2,6 @@ import { MergeOption } from "~/item-authoring/ui/MergeOption";
 import { Combine } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
@@ -21,15 +20,15 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 			data-ui="EditorItemMergesCollectionDetail"
 		>
 			{merges.length === 0 ? (
-				<EditorRootCard dataUi="EditorItemMergesDisabledCard">
-					<DisabledCapabilityDetail
-						capability="merges"
-						itemUid={item.uid}
-						title={translator.textFn("Item merges empty title")}
-						actionLabel={translator.textFn("Enable")}
-						icon={Combine}
-					/>
-				</EditorRootCard>
+				<DisabledCapabilityDetail
+					capability="merges"
+					itemUid={item.uid}
+					title={translator.textFn("No merges for this item")}
+					summary={translator.textFn("Item merges empty title")}
+					size="large"
+					actionLabel={translator.textFn("Enable")}
+					icon={Combine}
+				/>
 			) : (
 				<EditorCollectionSelector
 					key={item.uid}

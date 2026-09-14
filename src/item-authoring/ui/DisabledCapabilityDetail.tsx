@@ -12,6 +12,8 @@ export const DisabledCapabilityDetail = ({
 	description,
 	icon,
 	itemUid,
+	size = "normal",
+	summary,
 	title,
 }: {
 	readonly actionLabel: string;
@@ -19,6 +21,8 @@ export const DisabledCapabilityDetail = ({
 	readonly description?: string;
 	readonly icon: LucideIcon;
 	readonly itemUid: string;
+	readonly size?: "normal" | "large";
+	readonly summary?: string;
 	readonly title: string;
 }) => {
 	const project = useEditorProject();
@@ -40,6 +44,8 @@ export const DisabledCapabilityDetail = ({
 				</PrimaryButtonLink>
 			}
 			icon={icon}
+			size={size}
+			description={summary}
 			title={
 				<span className="inline-flex items-center gap-1.5">
 					{title}

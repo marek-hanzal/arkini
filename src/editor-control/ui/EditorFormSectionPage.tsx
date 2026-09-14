@@ -62,6 +62,7 @@ export const EditorFormSectionPage = ({
 	saveEnabled,
 	saveFn,
 	saving,
+	secondaryNavigation,
 	tabs,
 	title,
 }: PropsWithChildren<{
@@ -76,7 +77,8 @@ export const EditorFormSectionPage = ({
 	readonly saveEnabled: boolean;
 	readonly saveFn: () => Promise<boolean>;
 	readonly saving: boolean;
-	readonly tabs: ReactNode;
+	readonly secondaryNavigation?: ReactNode;
+	readonly tabs?: ReactNode;
 	readonly title?: ReactNode;
 }>) => {
 	useEditorSaveShortcut({
@@ -86,6 +88,7 @@ export const EditorFormSectionPage = ({
 	return (
 		<EditorSectionPage
 			contentMode={contentMode}
+			secondaryNavigation={secondaryNavigation}
 			header={
 				<EditorSectionNavigation
 					leading={leading}

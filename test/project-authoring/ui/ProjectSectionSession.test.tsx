@@ -37,6 +37,12 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	};
 });
 
+vi.mock("~/ui/ui/LinkButton", async (importOriginal) => ({
+	...(await importOriginal<typeof import("~/ui/ui/LinkButton")>()),
+	LinkButtonLink: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("a", null, children),
+}));
+
 vi.mock("~/ui/ui/Button", () => ({
 	Button: ({
 		children,
@@ -52,8 +58,6 @@ vi.mock("~/ui/ui/Button", () => ({
 			},
 			children,
 		),
-	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
-		createElement("a", null, children),
 	PrimaryButton: ({
 		children,
 		cursorIntent: _cursorIntent,

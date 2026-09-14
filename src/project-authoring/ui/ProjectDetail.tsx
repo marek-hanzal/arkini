@@ -6,12 +6,9 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { ProjectSectionHelp } from "~/project-authoring/ui/ProjectSectionHelp";
 import { Tx } from "~/translation/ui/Tx";
-import {
-	EditorSectionNavigation,
-	EditorSectionNavigationSeparator,
-} from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSourceExport } from "~/project-authoring/ui/ProjectSourceExport";
@@ -31,23 +28,18 @@ export const ProjectDetail = ({
 			header={
 				<EditorSectionNavigation
 					action={
-						<div className="flex items-center gap-4">
-							<EditorPageHelp {...ProjectSectionHelp[sectionId]} />
-							<EditorSectionNavigationSeparator />
-							<ProjectSourceExport projectId={project.projectId} />
-							<PrimaryButtonLink
-								ref={editActionRef}
-								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
-								to="/editor/$projectId/project/form/$sectionId"
-								params={{
-									projectId: project.projectId,
-									sectionId,
-								}}
-							>
-								<Pencil className="size-4" />
-								<Tx label="Edit" />
-							</PrimaryButtonLink>
-						</div>
+						<PrimaryButtonLink
+							ref={editActionRef}
+							className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+							to="/editor/$projectId/project/form/$sectionId"
+							params={{
+								projectId: project.projectId,
+								sectionId,
+							}}
+						>
+							<Pencil className="size-4" />
+							<Tx label="Edit" />
+						</PrimaryButtonLink>
 					}
 					leading={
 						<EditorHistoryBackButton
@@ -57,24 +49,27 @@ export const ProjectDetail = ({
 							to="/editor/$projectId/editor/items/list"
 						/>
 					}
-					tabs={
-						<EditorSectionTabs>
-							{ProjectSections.map((section) => (
-								<ProjectSectionLink
-									destination="detail"
-									key={section.id}
-									projectId={project.projectId}
-									section={section}
-								/>
-							))}
-						</EditorSectionTabs>
-					}
 					title={
 						<h1 className="truncate text-xl font-semibold">
 							{project.config.meta.title}
 						</h1>
 					}
 				/>
+			}
+			secondaryNavigation={
+				<EditorSectionBar
+					actions={<ProjectSourceExport projectId={project.projectId} />}
+					help={<EditorPageHelp {...ProjectSectionHelp[sectionId]} />}
+				>
+					{ProjectSections.map((section) => (
+						<ProjectSectionLink
+							destination="detail"
+							key={section.id}
+							projectId={project.projectId}
+							section={section}
+						/>
+					))}
+				</EditorSectionBar>
 			}
 		>
 			{children}

@@ -33,7 +33,7 @@ export const ProjectSourceExport = ({ projectId }: { readonly projectId: string 
 
 	return (
 		<LinkButton
-			className="inline-flex items-center gap-1.5"
+			className="inline-flex items-center gap-1.5 text-sm"
 			data-ui="EditorProjectExport"
 			disabled={exportResult.waiting}
 			cursorIntent={exportResult.waiting ? "progress" : undefined}

@@ -3,7 +3,8 @@ import { useCallback, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import { EditorSectionTabs } from "~/authoring-shell/ui/EditorSectionTabs";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
 import type { ProjectFormDestination } from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 import { ProjectFormProvider } from "~/project-authoring/ui/ProjectFormContext";
@@ -78,7 +79,6 @@ export const ProjectFormSession = ({
 				<EditorFormSectionPage
 					discardFn={discardFn}
 					error={controller.error}
-					help={ProjectSectionHelp[sectionId]}
 					leading={
 						<EditorHistoryBackButton
 							params={{
@@ -92,8 +92,10 @@ export const ProjectFormSession = ({
 					saveEnabled={controller.isDirty}
 					saveFn={controller.saveFn}
 					saving={controller.isSaving}
-					tabs={
-						<EditorSectionTabs>
+					secondaryNavigation={
+						<EditorSectionBar
+							help={<EditorPageHelp {...ProjectSectionHelp[sectionId]} />}
+						>
 							{ProjectSections.map((candidate) => (
 								<ProjectSectionLink
 									destination="form"
@@ -102,7 +104,7 @@ export const ProjectFormSession = ({
 									section={candidate}
 								/>
 							))}
-						</EditorSectionTabs>
+						</EditorSectionBar>
 					}
 					title={
 						<h1 className="truncate text-xl font-semibold">

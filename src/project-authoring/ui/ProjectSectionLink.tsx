@@ -1,6 +1,6 @@
 import { Tx } from "~/translation/ui/Tx";
-import { ButtonLink } from "~/ui/ui/Button";
-import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
+import { LinkButtonLink } from "~/ui/ui/LinkButton";
+import { editorSectionLinkClassName } from "~/authoring-shell/ui/EditorSectionBar";
 import type { ProjectSectionDescriptor } from "~/project-authoring/type/ProjectSections";
 
 export const ProjectSectionLink = ({
@@ -12,7 +12,7 @@ export const ProjectSectionLink = ({
 	readonly projectId: string;
 	readonly section: ProjectSectionDescriptor;
 }) => (
-	<ButtonLink
+	<LinkButtonLink
 		to={
 			destination === "detail"
 				? "/editor/$projectId/project/detail/$sectionId"
@@ -28,8 +28,8 @@ export const ProjectSectionLink = ({
 		activeProps={{
 			"data-ui-selected": true,
 		}}
-		className={editorSectionTabClassName}
+		className={editorSectionLinkClassName}
 	>
 		<Tx label={section.label} />
-	</ButtonLink>
+	</LinkButtonLink>
 );

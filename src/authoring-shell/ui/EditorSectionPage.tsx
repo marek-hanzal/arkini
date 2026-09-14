@@ -10,11 +10,13 @@ export const EditorSectionPage = ({
 	contentMode = "scroll",
 	fillContent = false,
 	header,
+	secondaryNavigation,
 	scrollRestorationId = "editor-section-page",
 }: PropsWithChildren<{
 	readonly contentMode?: EditorSectionPageContentMode;
 	readonly fillContent?: boolean;
 	readonly header: ReactNode;
+	readonly secondaryNavigation?: ReactNode;
 	readonly scrollRestorationId?: string;
 }>) => (
 	<div
@@ -29,12 +31,13 @@ export const EditorSectionPage = ({
 		})}
 	>
 		<div
-			className="ak-editor-page-header shrink-0 px-3 py-3"
+			className="ak-editor-page-header shrink-0"
 			style={{
 				viewTransitionName: "arkini-editor-section-navigation",
 			}}
 		>
-			{header}
+			<div className="px-3 py-3">{header}</div>
+			{secondaryNavigation}
 		</div>
 		<div
 			className="min-w-0 data-[ui-fill-content=true]:flex data-[ui-fill-content=true]:flex-1 data-[ui-fill-content=true]:flex-col data-[ui-content-mode=scroll]:p-3 data-[ui-content-mode=viewport]:min-h-0 data-[ui-content-mode=viewport]:overflow-hidden"

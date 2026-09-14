@@ -353,13 +353,29 @@ const WeightedRollControl = ({
 						"No item selected",
 					)}`;
 				}}
-				itemSearchTermsFn={(candidateIndex) => {
-					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
-					return itemId === undefined
-						? []
-						: [
-								itemId,
-							];
+				itemSearchTermsFn={(candidateIndex) =>
+					roll.drop[candidateIndex].drop.flatMap((drop) => [
+						drop.itemId,
+						readItemLabelFn(drop.itemId, ""),
+					])
+				}
+				renderItemContentFn={(candidateIndex, label) => {
+					const candidate = roll.drop[candidateIndex];
+					const summary = [
+						`Weight ${candidate.weight}`,
+						...candidate.drop.map((drop) =>
+							candidate.drop.length === 1
+								? readDropSummaryFn(drop)
+								: `${readItemLabelFn(drop.itemId, "No item selected")}: ${readDropSummaryFn(drop)}`,
+						),
+					].join(" · ");
+					return (
+						<OutputDropOption
+							label={label}
+							drops={candidate.drop}
+							summary={summary}
+						/>
+					);
 				}}
 				label="Weighted candidates"
 				onAddFn={() =>

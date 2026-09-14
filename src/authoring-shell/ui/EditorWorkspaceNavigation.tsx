@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { LogOut, RefreshCw } from "lucide-react";
 
@@ -37,71 +38,74 @@ export const EditorWorkspaceNavigation = ({
 	refreshPending,
 	refreshTooltip,
 	transitioningWorkspace,
-}: EditorWorkspaceNavigationProps) => (
-	<aside
-		className="relative z-20 flex min-h-0 w-16 flex-col items-center gap-2 border-r border-line bg-[var(--ak-editor-background)] p-2"
-		data-ui="EditorNavigation"
-		style={{
-			viewTransitionName: "arkini-editor-navigation",
-		}}
-	>
-		<nav className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1">
-			{EditorWorkspaceRoutes.map((workspace) => {
-				const { icon: Icon, id, label, shortcut, to } = workspace;
-				return (
-					<Tooltip
-						key={id}
-						content={`${label} · ${formatForDisplay(shortcut)}`}
-						placement="right"
-					>
-						<ButtonLink
-							to={to}
-							params={{
-								projectId,
-							}}
-							className={tabClassName}
-							data-workspace-id={id}
-							{...readDataUiFn({
-								dataUi: "EditorWorkspaceTab",
-								state: {
-									current: activeWorkspace === id,
-									transitioning: transitioningWorkspace === id,
-								},
-							})}
+}: EditorWorkspaceNavigationProps) => {
+	const translator = useTranslator();
+	return (
+		<aside
+			className="relative z-20 flex min-h-0 w-16 flex-col items-center gap-2 border-r border-line bg-[var(--ak-editor-background)] p-2"
+			data-ui="EditorNavigation"
+			style={{
+				viewTransitionName: "arkini-editor-navigation",
+			}}
+		>
+			<nav className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1">
+				{EditorWorkspaceRoutes.map((workspace) => {
+					const { icon: Icon, id, label, shortcut, to } = workspace;
+					return (
+						<Tooltip
+							key={id}
+							content={`${translator.textFn(label)} · ${formatForDisplay(shortcut)}`}
+							placement="right"
 						>
-							<Icon className="size-5" />
-						</ButtonLink>
-					</Tooltip>
-				);
-			})}
-		</nav>
-		<Tooltip
-			content={refreshTooltip}
-			placement="right"
-		>
-			<Button
-				className="mt-auto size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
-				data-ui="EditorProjectRefresh"
-				disabled={refreshDisabled}
-				cursorIntent={refreshPending ? "progress" : undefined}
-				onClick={onRefreshFn}
+							<ButtonLink
+								to={to}
+								params={{
+									projectId,
+								}}
+								className={tabClassName}
+								data-workspace-id={id}
+								{...readDataUiFn({
+									dataUi: "EditorWorkspaceTab",
+									state: {
+										current: activeWorkspace === id,
+										transitioning: transitioningWorkspace === id,
+									},
+								})}
+							>
+								<Icon className="size-5" />
+							</ButtonLink>
+						</Tooltip>
+					);
+				})}
+			</nav>
+			<Tooltip
+				content={refreshTooltip}
+				placement="right"
 			>
-				<RefreshCw className="size-5" />
-			</Button>
-		</Tooltip>
-		<Tooltip
-			content="Exit"
-			placement="right"
-		>
-			<Button
-				className="size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
-				data-ui="EditorExit"
-				disabled={exitDisabled}
-				cursorIntent={exitPending ? "progress" : undefined}
-				onClick={onExitFn}
+				<Button
+					className="mt-auto size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
+					data-ui="EditorProjectRefresh"
+					disabled={refreshDisabled}
+					cursorIntent={refreshPending ? "progress" : undefined}
+					onClick={onRefreshFn}
+				>
+					<RefreshCw className="size-5" />
+				</Button>
+			</Tooltip>
+			<Tooltip
+				content={translator.textFn("Exit")}
+				placement="right"
 			>
-				<LogOut className="size-5" />
-			</Button>
-		</Tooltip>
-	</aside>
-);
+				<Button
+					className="size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
+					data-ui="EditorExit"
+					disabled={exitDisabled}
+					cursorIntent={exitPending ? "progress" : undefined}
+					onClick={onExitFn}
+				>
+					<LogOut className="size-5" />
+				</Button>
+			</Tooltip>
+		</aside>
+	);
+};

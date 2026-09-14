@@ -1,4 +1,5 @@
 import { Tx } from "~/translation/ui/Tx";
+import { Mx } from "~/translation/ui/Mx";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
@@ -86,9 +87,7 @@ export const ProductionLineInputs = ({
 			<h4 className="flex items-center gap-1 border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
 				{title ?? translator.textFn("Inputs")}
 				<EditorInfoTooltip
-					content={translator.textFn(
-						"Consumed materials are spent; reserved materials return when work finishes. Owner units are spent from this item, while required units are spent from a matching Board item.",
-					)}
+					content={<Mx label="Authored production inputs summary help" />}
 				/>
 			</h4>
 			{visibleInput.length === 0 ? (

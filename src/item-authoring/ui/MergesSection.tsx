@@ -65,7 +65,6 @@ const MergeFields = ({
 						title={translator.textFn("Merges")}
 					/>
 					<EditorCollectionSelector
-						addLabel={translator.textFn("Add merge")}
 						count={merges.length}
 						initialSelectedIndex={initialSelectedIndex}
 						itemLabelFn={(index) => {
@@ -103,7 +102,6 @@ const MergeFields = ({
 							const next = merges.filter((_merge, candidate) => candidate !== index);
 							onChangeFn(next.length === 0 ? undefined : next);
 						}}
-						removeLabel={translator.textFn("Remove merge")}
 						selectedIndex={invalidMergeIndex}
 					>
 						{(index) => (

@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { Check } from "lucide-react";
 
 /** Marks the structural end of one expanded branch in a complex editor form. */
@@ -7,6 +8,8 @@ export const EditorFormBranchEnd = () => (
 		data-ui="EditorFormBranchEnd"
 	>
 		<Check className="size-3.5" />
-		<span>End of section</span>
+		<span>
+			<Tx label="End of section" />
+		</span>
 	</div>
 );

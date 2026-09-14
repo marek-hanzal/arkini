@@ -9,6 +9,7 @@ import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { NotFound } from "~/item-authoring/ui/NotFound";
@@ -42,6 +43,14 @@ export const Detail = ({
 		: "identity";
 	const help = ItemSectionHelp[sectionId];
 	const sections = readSectionsFn();
+	const section = sections.find((candidate) => candidate.id === sectionId);
+	const sectionTitle =
+		sectionId === "identity"
+			? translator.textFn("Item details")
+			: sectionId === "delete"
+				? translator.textFn("Delete item")
+				: translator.textFn(section?.label ?? "Item details");
+	const sectionHeading = <EditorFormSectionDivider title={sectionTitle} />;
 	return (
 		<EditorSectionPage
 			contentClassName="mx-auto w-3/4"
@@ -96,7 +105,31 @@ export const Detail = ({
 				</EditorSectionBar>
 			}
 		>
-			{children}
+			{sectionId === "notes" ? (
+				<div
+					className="grid h-full min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)]"
+					data-ui="EditorItemDetailPageContent"
+				>
+					<div className="px-3 pt-3">{sectionHeading}</div>
+					{children}
+				</div>
+			) : sectionId === "connections" ? (
+				<div
+					className="grid min-h-0 min-w-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemDetailPageContent"
+				>
+					{sectionHeading}
+					{children}
+				</div>
+			) : (
+				<div
+					className="grid min-w-0 content-start gap-[var(--ak-viewport-gap)]"
+					data-ui="EditorItemDetailPageContent"
+				>
+					{sectionHeading}
+					{children}
+				</div>
+			)}
 		</EditorSectionPage>
 	);
 };

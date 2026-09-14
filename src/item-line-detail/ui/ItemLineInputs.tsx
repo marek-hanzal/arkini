@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { AnimatePresence } from "motion/react";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
@@ -28,7 +29,9 @@ export const ItemLineInputs = ({
 	<section className="min-w-0">
 		<ItemLineInputsHeader withdraw={withdraw} />
 		{input.length === 0 ? (
-			<p className="py-3 text-sm text-muted">No material input required.</p>
+			<p className="py-3 text-sm text-muted">
+				<Tx label="No material input required." />
+			</p>
 		) : (
 			<div
 				className="space-y-1 pt-2"

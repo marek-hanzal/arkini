@@ -198,10 +198,7 @@ describe("EditorNotes", () => {
 			"missing-item",
 		);
 		expect(container.querySelector('[data-ui="EditorNoteItemLink"]')).toBeNull();
-		const editTooltip = [
-			...container.querySelectorAll("span[hidden]"),
-		].find((element) => element.textContent === "Edit");
-		await click(editTooltip?.parentElement?.querySelector("button") ?? null);
+		await click(container.querySelector('[data-ui="EditorNoteEdit"]'));
 		await click(
 			container.querySelector('[data-ui="EditorNote"] [data-ui="EditorNoteUnlinkItem"]'),
 		);
@@ -448,10 +445,7 @@ describe("EditorNotes", () => {
 		await act(async () =>
 			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
 		);
-		const editTooltip = [
-			...container.querySelectorAll("span[hidden]"),
-		].find((element) => element.textContent === "Edit");
-		await click(editTooltip?.parentElement?.querySelector("button") ?? null);
+		await click(container.querySelector('[data-ui="EditorNoteEdit"]'));
 		const editor = container.querySelector<HTMLTextAreaElement>(
 			'[data-ui="EditorNote"] textarea',
 		);

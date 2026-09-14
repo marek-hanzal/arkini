@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { Effect } from "effect";
@@ -42,26 +43,36 @@ const ProjectFormPathLabelBySegment = {
 const readProjectFormValidationLocationFn = (
 	path: ReadonlyArray<PropertyKey>,
 	values: ProjectFormSchema.Type,
+	textFn: (key: string) => string,
 ) => {
 	const [head, second, third] = path;
-	if (head === "avatars" && typeof second === "number") return `About avatar ${second + 1}`;
+	if (head === "avatars" && typeof second === "number")
+		return textFn("Avatar {index}").replace("{index}", String(second + 1));
 	if (head === "start" && second === "board" && typeof third === "number") {
 		const entry = values.start.board[third];
 		return entry === undefined
-			? `Initial board item ${third + 1}`
-			: `Initial board → space ${entry.space} → slot ${entry.x + 1}, ${entry.y + 1}`;
+			? textFn("Initial board → item {index}").replace("{index}", String(third + 1))
+			: textFn("Initial board → space {space} → slot {x}, {y}")
+					.replace("{space}", String(entry.space))
+					.replace("{x}", String(entry.x + 1))
+					.replace("{y}", String(entry.y + 1));
 	}
 	if (head === "start" && second === "inventory" && typeof third === "number") {
 		const entry = values.start.inventory[third];
 		return entry === undefined
-			? `Initial inventory item ${third + 1}`
-			: `Initial inventory → slot ${entry.position.x + 1}, ${entry.position.y + 1}`;
+			? textFn("Initial inventory → item {index}").replace("{index}", String(third + 1))
+			: textFn("Initial inventory → slot {x}, {y}")
+					.replace("{x}", String(entry.position.x + 1))
+					.replace("{y}", String(entry.position.y + 1));
 	}
 	if (head === "start" && second === "toolbar" && typeof third === "number") {
 		const entry = values.start.toolbar[third];
 		return entry === undefined
-			? `Initial toolbar item ${third + 1}`
-			: `Initial toolbar → slot ${entry.position.x + 1}`;
+			? textFn("Initial toolbar → item {index}").replace("{index}", String(third + 1))
+			: textFn("Initial toolbar → slot {index}").replace(
+					"{index}",
+					String(entry.position.x + 1),
+				);
 	}
 	const labels = path.flatMap((segment) => {
 		if (typeof segment !== "string") return [];
@@ -70,10 +81,10 @@ const readProjectFormValidationLocationFn = (
 		return label === undefined
 			? []
 			: [
-					label,
+					textFn(label),
 				];
 	});
-	return labels.length === 0 ? "Project" : labels.join(" → ");
+	return labels.length === 0 ? textFn("Project") : labels.join(" → ");
 };
 
 const createProjectConfigFn = (
@@ -180,6 +191,7 @@ export const useProjectFormController = ({
 	onInvalidDestinationFn,
 	onSavedFn,
 }: useProjectFormController.Props) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
 		() => readProjectFormValuesFn(project),
@@ -303,7 +315,7 @@ export const useProjectFormController = ({
 		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ??
 		(firstValidationIssue === undefined
 			? undefined
-			: `${readProjectFormValidationLocationFn(firstValidationIssue.path, currentValues)}: ${firstValidationIssue.message}`);
+			: `${readProjectFormValidationLocationFn(firstValidationIssue.path, currentValues, translator.textFn)}: ${firstValidationIssue.message}`);
 	return useMemo(
 		() => ({
 			canonicalValues,

@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -60,6 +61,7 @@ export const EditorAssetReferenceControl = ({
 	onChangeFn,
 	showSelectedPreview = true,
 }: EditorAssetReferenceControlProps) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const options = useMemo(
 		() =>
@@ -86,7 +88,7 @@ export const EditorAssetReferenceControl = ({
 		<EditorSearchCombobox
 			label={label}
 			description={description}
-			emptyLabel="No known asset matches this search."
+			emptyLabel={translator.textFn("No assets match this search.")}
 			error={error}
 			options={options}
 			required={!optional}

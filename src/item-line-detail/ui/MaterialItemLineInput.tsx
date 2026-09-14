@@ -17,6 +17,7 @@ import { QuantityValue } from "~/item-definition/ui/QuantityValue";
 import { UnitCostValue } from "~/production-input/ui/UnitCostValue";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 type MaterialInput = Extract<
 	ItemDetailLinesProjection.Input,
@@ -43,6 +44,7 @@ const MaterialInputAutofillAvailability = ({
 	readonly input: MaterialInput;
 	readonly label: string;
 }) => {
+	const translator = useTranslator();
 	const itemDetail = useItemDetailControl();
 	const producerItemId = input.producerItemId;
 	const availabilityKey =
@@ -64,9 +66,11 @@ const MaterialInputAutofillAvailability = ({
 				{...itemDetailFadeMotion}
 			>
 				{input.autofillAvailableQuantity > 0 ? (
-					`${input.autofillAvailableQuantity} available`
+					translator
+						.textFn("{quantity} available")
+						.replace("{quantity}", String(input.autofillAvailableQuantity))
 				) : producerItemId === undefined ? (
-					"None available"
+					translator.textFn("None available")
 				) : (
 					<>
 						<LinkButton
@@ -83,9 +87,9 @@ const MaterialInputAutofillAvailability = ({
 								)
 							}
 						>
-							None
+							{translator.textFn("None")}
 						</LinkButton>{" "}
-						available
+						{translator.textFn("available")}
 					</>
 				)}
 			</motion.p>

@@ -1,8 +1,11 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Tx } from "~/translation/ui/Tx";
 import { ExternalLink, Save } from "lucide-react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 
 import { PrimaryButton } from "~/ui/ui/Button";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorMcpCopyableUrl } from "./EditorMcpCopyableUrl";
 
@@ -36,6 +39,7 @@ export const EditorMcpSettings = ({
 	pending,
 	port,
 }: EditorMcpSettingsProps) => {
+	const translator = useTranslator();
 	const configuredDomain = overview.ngrokDomain;
 	const remoteRunning = overview.remote.type === "ready" || overview.remote.type === "starting";
 	const portDisabled =
@@ -49,10 +53,10 @@ export const EditorMcpSettings = ({
 					className="gap-3"
 					dataUi="EditorMcpLocalSettingsCard"
 				>
-					<h2 className="font-semibold">Local server</h2>
+					<EditorFormSectionDivider title={translator.textFn("Local server")} />
 					<EditorValueField
 						as="div"
-						label="Port"
+						label={translator.textFn("Port")}
 						required
 					>
 						<div className="min-w-0">
@@ -74,7 +78,7 @@ export const EditorMcpSettings = ({
 						onClick={onSavePortFn}
 					>
 						<Save className="size-4" />
-						Save
+						<Tx label="Save" />
 					</PrimaryButton>
 				</EditorRootCard>
 			) : (
@@ -82,20 +86,22 @@ export const EditorMcpSettings = ({
 					className="gap-3"
 					dataUi="EditorMcpRemoteSettingsCard"
 				>
-					<div className="flex items-center justify-between gap-3">
-						<h2 className="font-semibold">ngrok</h2>
-						<a
-							href="https://ngrok.com/"
-							target="_blank"
-							rel="noreferrer"
-							className="inline-flex items-center gap-1 text-sm text-accent opacity-75 hover:opacity-100 hover:underline"
-						>
-							ngrok.com
-							<ExternalLink className="size-3" />
-						</a>
-					</div>
+					<EditorFormSectionDivider
+						title={translator.textFn("ngrok tunnel")}
+						action={
+							<a
+								href="https://ngrok.com/"
+								target="_blank"
+								rel="noreferrer"
+								className="inline-flex items-center gap-1 text-sm text-accent opacity-75 hover:opacity-100 hover:underline"
+							>
+								ngrok.com
+								<ExternalLink className="size-3" />
+							</a>
+						}
+					/>
 					<EditorValueField
-						label="Development domain"
+						label={translator.textFn("Development domain")}
 						required
 					>
 						<input
@@ -107,7 +113,7 @@ export const EditorMcpSettings = ({
 						/>
 					</EditorValueField>
 					<EditorValueField
-						label="Authtoken"
+						label={translator.textFn("Authtoken")}
 						required
 					>
 						<input
@@ -117,8 +123,8 @@ export const EditorMcpSettings = ({
 							disabled={ngrokDisabled}
 							placeholder={
 								configuredDomain === undefined
-									? "Paste ngrok authtoken"
-									: "Configured — paste to replace"
+									? translator.textFn("Paste ngrok authtoken")
+									: translator.textFn("Configured \u2014 paste to replace")
 							}
 							onChange={(event) => onSetAuthtokenFn(event.currentTarget.value)}
 						/>
@@ -129,7 +135,7 @@ export const EditorMcpSettings = ({
 						onClick={onSaveNgrokFn}
 					>
 						<Save className="size-4" />
-						Save
+						<Tx label="Save" />
 					</PrimaryButton>
 				</EditorRootCard>
 			)}

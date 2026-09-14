@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { useStore } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSche
 const MaxEditorSpaceIndex = 31;
 
 export const ProjectBoardSection = () => {
+	const translator = useTranslator();
 	const { form, validationIssues } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.board.width);
 	const height = useStore(form.store, (state) => state.values.board.height);
@@ -55,7 +57,7 @@ export const ProjectBoardSection = () => {
 						<form.AppField name="board.width">
 							{(field) => (
 								<field.NumberField
-									label="Width"
+									label={translator.textFn("Width")}
 									max={EditorProjectSizeMax}
 									min={1}
 								/>
@@ -64,7 +66,7 @@ export const ProjectBoardSection = () => {
 						<form.AppField name="board.height">
 							{(field) => (
 								<field.NumberField
-									label="Height"
+									label={translator.textFn("Height")}
 									max={EditorProjectSizeMax}
 									min={1}
 								/>
@@ -77,7 +79,7 @@ export const ProjectBoardSection = () => {
 					</div>
 					<div className="hidden h-14 w-px shrink-0 bg-line-strong lg:block" />
 					<div className="w-56 max-w-full shrink-0">
-						<EditorValueField label="Space">
+						<EditorValueField label={translator.textFn("Space")}>
 							<input
 								type="number"
 								value={spaceInput}

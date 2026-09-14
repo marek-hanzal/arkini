@@ -1,3 +1,5 @@
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { LoaderCircle } from "lucide-react";
 
 import { Status } from "~/ui/ui/Status";
@@ -6,9 +8,9 @@ import { Status } from "~/ui/ui/Status";
 export const ItemEstimateLoading = ({ catalog = false }: { readonly catalog?: boolean }) => (
 	<Status
 		dataUi={catalog ? "EditorItemEstimatesLoading" : "EditorItemEstimateLoading"}
-		description="Analyzing authored routes and their requirements."
+		description={<Mx label="Estimate loading description" />}
 		icon={LoaderCircle}
 		iconSpin
-		title={catalog ? "Calculating all item estimates" : "Calculating estimate"}
+		title={<Tx label={catalog ? "Calculating all item estimates" : "Calculating estimate"} />}
 	/>
 );

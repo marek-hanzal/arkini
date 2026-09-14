@@ -57,7 +57,7 @@ export const EditorRecentProjects = ({
 		>
 			<header className="flex items-center justify-between gap-3">
 				<h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
-					Recent
+					{translator.textFn("Recent projects")}
 				</h2>
 				<span className="text-xs text-subtle">{projects.length}</span>
 			</header>
@@ -127,8 +127,8 @@ export const EditorRecentProjects = ({
 										</span>
 										<span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
 											{candidate.ownership === "managed"
-												? "Managed"
-												: "Custom"}
+												? translator.textFn("Managed")
+												: translator.textFn("Custom")}
 										</span>
 									</span>
 									<span className="mt-1 block truncate text-xs text-subtle">
@@ -142,7 +142,7 @@ export const EditorRecentProjects = ({
 								disabled={blocked}
 								className="grid size-8 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-subtle transition-colors hover:text-danger disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-subtle"
 								data-ui="EditorRecentProjectDelete"
-								title={`Delete ${candidate.project.title}`}
+								title={translator.textFn("Remove project")}
 								onClick={() =>
 									onDeleteProjectFn(candidate.project, candidate.ownership)
 								}

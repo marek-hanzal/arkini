@@ -11,6 +11,7 @@ import { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const BoardGameplayControls = ({
 	game,
@@ -21,6 +22,7 @@ const BoardGameplayControls = ({
 }) => {
 	const owner = useAtomValue(EditorBoardGameResourceOwnerAtom);
 	const cheats = useCheatsModel(game);
+	const translator = useTranslator();
 	return (
 		<>
 			<LinkButton
@@ -40,11 +42,11 @@ const BoardGameplayControls = ({
 				optionDataUi="EditorBoardGameplayModeOption"
 				options={[
 					{
-						label: "Default",
+						label: translator.textFn("Default"),
 						value: "default",
 					},
 					{
-						label: "Speed up",
+						label: translator.textFn("Speed up"),
 						value: "speed-up",
 					},
 				]}

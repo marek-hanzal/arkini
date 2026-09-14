@@ -7,6 +7,7 @@ import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Presents the authored schedule independently of production lines. */
 export const ClockDetail = ({
@@ -45,9 +46,7 @@ export const ClockDetail = ({
 				<DetailFacts>
 					<DetailFact
 						label={translator.textFn("Lifetime")}
-						description={translator.textFn(
-							"Running lifetime before expiry. Without a lifetime, the clock repeats indefinitely. Expiry mode controls unfinished production.",
-						)}
+						description={<Mx label="Authored Clock lifetime summary help" />}
 						value={
 							clock.durationMs === undefined
 								? translator.textFn("Unlimited")
@@ -56,9 +55,7 @@ export const ClockDetail = ({
 					/>
 					<DetailFact
 						label={translator.textFn("Interval")}
-						description={translator.textFn(
-							"Time between automatic impulses on the Clock-selected line. Without an interval, the item only waits for its lifetime to expire.",
-						)}
+						description={<Mx label="Authored Clock interval summary help" />}
 						value={
 							clock.intervalMs === undefined
 								? translator.textFn("None")
@@ -71,26 +68,26 @@ export const ClockDetail = ({
 							value={translator.textFn(
 								clock.expiryMode === "kill-switch" ? "Kill switch" : "Loose-kill",
 							)}
-							description={translator.textFn(
-								clock.expiryMode === "kill-switch"
-									? "Cancel work and remove the item atomically. Place reserved items first, then unused buffers and expiry output. Anything that does not fit is lost and logged."
-									: "Wait for accepted production to settle. A job blocked on output space keeps this item alive.",
-							)}
+							description={
+								<Mx
+									label={
+										clock.expiryMode === "kill-switch"
+											? "Authored Clock kill-switch summary help"
+											: "Authored Clock loose-kill summary help"
+									}
+								/>
+							}
 						/>
 					)}
 					<DetailFact
 						label={translator.textFn("Timer")}
-						description={translator.textFn(
-							"Allows the timer to run before availability rules are applied.",
-						)}
+						description={<Mx label="Authored Clock status summary help" />}
 						value={translator.textFn(clock.enable ? "Enabled" : "Disabled")}
 					/>
 				</DetailFacts>
 				<RulesDetail
 					rules={clock.rules}
-					description={translator.textFn(
-						"Every condition of a rule must pass. Every Enable rule gates the timer; a matching Disable rule pauses it. Accepted production can finish while the clock is paused.",
-					)}
+					description={<Mx label="Authored Clock rules summary help" />}
 				/>
 			</EditorRootCard>
 			{clock.durationMs === undefined ? null : (
@@ -98,9 +95,7 @@ export const ClockDetail = ({
 					<OutputDetail
 						emptyLabel={translator.textFn("No expiry output configured.")}
 						output={clock.onExpire}
-						description={translator.textFn(
-							"Resolved once when the item expires. Kill switch places what fits after returned materials; excess output is lost and logged.",
-						)}
+						description={<Mx label="Authored Clock expiry output summary help" />}
 						title={translator.textFn("Expiry output")}
 					/>
 				</EditorRootCard>

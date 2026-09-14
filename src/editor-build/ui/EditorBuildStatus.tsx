@@ -1,3 +1,7 @@
+import type { ReactNode } from "react";
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { LoaderCircle, PackageCheck, TriangleAlert } from "lucide-react";
 
 import type { EditorBuildFailure } from "~/editor-build/ui/useEditorBuildArtifactController";
@@ -34,21 +38,22 @@ export const EditorBuildStatus = ({
 	onMinorChangeFn,
 	onSuffixChangeFn,
 }: EditorBuildStatusProps) => {
+	const translator = useTranslator();
 	const requestedVersion = canBuild ? formatVersionFn(version) : "…";
-	let title = stale ? `Build current project v${requestedVersion}` : `Build v${requestedVersion}`;
-	let description = stale
-		? `The previous Build is out of date. Build v${requestedVersion} to replace it.`
-		: "Validate the saved project and create an Arkpack ready to install or save.";
+	let title = `${translator.textFn(stale ? "Build current project" : "Build")} v${requestedVersion}`;
+	let description: ReactNode = (
+		<Mx label={stale ? "Build stale description" : "Build ready description"} />
+	);
 	let icon = PackageCheck;
 	if (!pending && buildFailure?.type === "validation") {
-		title = "Build blocked by validation";
-		description = `Fix the blocking findings below, then build v${requestedVersion} again.`;
+		title = translator.textFn("Build blocked by validation");
+		description = <Mx label="Build validation blocked description" />;
 		icon = TriangleAlert;
 	} else if (!pending && buildFailure?.type === "operational") {
-		title = "Build failed";
+		title = translator.textFn("Build failed");
 		description =
 			buildFailure.detail ??
-			"The Editor project could not be built because of an unknown error.";
+			translator.textFn("An unexpected error prevented the build. Try again.");
 		icon = TriangleAlert;
 	}
 
@@ -63,7 +68,7 @@ export const EditorBuildStatus = ({
 							data-ui="EditorBuildVersion"
 						>
 							<EditorNumberControl
-								label="Major"
+								label={translator.textFn("Major")}
 								min={0}
 								max={Number.MAX_SAFE_INTEGER}
 								value={version.major}
@@ -71,7 +76,7 @@ export const EditorBuildStatus = ({
 							/>
 							<span className="pb-2">.</span>
 							<EditorNumberControl
-								label="Minor"
+								label={translator.textFn("Minor")}
 								min={0}
 								max={Number.MAX_SAFE_INTEGER}
 								value={version.minor}
@@ -79,9 +84,9 @@ export const EditorBuildStatus = ({
 							/>
 							<span className="pb-2">-</span>
 							<EditorTextControl
-								label="Suffix"
+								label={translator.textFn("Suffix")}
 								required={false}
-								placeholder="optional"
+								placeholder={translator.textFn("Optional")}
 								value={version.suffix ?? ""}
 								onChangeFn={onSuffixChangeFn}
 							/>
@@ -100,7 +105,7 @@ export const EditorBuildStatus = ({
 						) : (
 							<PackageCheck className="size-4" />
 						)}
-						{buildFailure === undefined || pending ? "Build" : "Try again"}
+						<Tx label={buildFailure === undefined || pending ? "Build" : "Try again"} />
 					</PrimaryButton>
 				</div>
 			}

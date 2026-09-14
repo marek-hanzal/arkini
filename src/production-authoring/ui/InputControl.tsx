@@ -143,31 +143,34 @@ const MaterialModeControl = ({
 	readonly error?: string;
 	readonly input: MaterialInput;
 	readonly onChangeFn: (input: MaterialInput) => void;
-}) => (
-	<EditorChoiceControl
-		error={error}
-		label="Material mode"
-		value={input.mode}
-		options={[
-			{
-				description: <Mx label="Consume material mode help" />,
-				label: "Consume",
-				value: "consume",
-			},
-			{
-				description: <Mx label="Reserve material mode help" />,
-				label: "Reserve",
-				value: "reserve",
-			},
-		]}
-		onChangeFn={(mode) =>
-			onChangeFn({
-				...input,
-				mode,
-			})
-		}
-	/>
-);
+}) => {
+	const translator = useTranslator();
+	return (
+		<EditorChoiceControl
+			error={error}
+			label={translator.textFn("Material mode")}
+			value={input.mode}
+			options={[
+				{
+					description: <Mx label="Consume material mode help" />,
+					label: translator.textFn("Consume"),
+					value: "consume",
+				},
+				{
+					description: <Mx label="Reserve material mode help" />,
+					label: translator.textFn("Reserve"),
+					value: "reserve",
+				},
+			]}
+			onChangeFn={(mode) =>
+				onChangeFn({
+					...input,
+					mode,
+				})
+			}
+		/>
+	);
+};
 
 const MaterialInputControl = ({
 	input,
@@ -214,7 +217,7 @@ const MaterialInputControl = ({
 				<EditorNumberControl
 					error={readEditorFormValidationErrorFn(issues, "capacity")}
 					description={<Mx label="Material buffer help" />}
-					label="Buffer"
+					label={translator.textFn("Buffer")}
 					value={input.capacity}
 					min={0}
 					onChangeFn={(capacity) =>

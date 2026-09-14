@@ -164,6 +164,7 @@ export const ItemLineStatus = ({
 	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale: boolean;
 }) => {
+	const translator = useTranslator();
 	const unavailable = line.availability.kind === "unavailable";
 	const unavailableDependency = unavailable
 		? readUnavailableDependencyFn(line.availability.reason)
@@ -198,7 +199,9 @@ export const ItemLineStatus = ({
 						{...itemDetailFadeMotion}
 					>
 						<Clock3 className="size-4 shrink-0" />
-						Queued for automatic start when the required inputs become available.
+						{translator.textFn(
+							"Queued for automatic start when the required inputs become available.",
+						)}
 					</motion.p>
 				) : null}
 			</AnimatePresence>

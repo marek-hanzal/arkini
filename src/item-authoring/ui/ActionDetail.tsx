@@ -6,6 +6,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Presents an optional immediate action and its requirements. */
 export const ActionDetail = ({
@@ -41,11 +42,15 @@ export const ActionDetail = ({
 	return (
 		<EditorRootCard dataUi="EditorActionDetailCard">
 			<DetailSection
-				description={translator.textFn(
-					action.type === "space"
-						? "Activation settles every requirement before entering the target."
-						: "Open the inventory after all requirements and rules pass.",
-				)}
+				description={
+					<Mx
+						label={
+							action.type === "space"
+								? "Space action summary help"
+								: "Inventory action summary help"
+						}
+					/>
+				}
 				title={translator.textFn(
 					action.type === "space" ? "Space action" : "Inventory action",
 				)}
@@ -66,9 +71,7 @@ export const ActionDetail = ({
 			/>
 			<RulesDetail
 				rules={action.rules}
-				description={translator.textFn(
-					"Every condition of a rule must pass. Every Enable rule gates activation; a matching Disable rule vetoes it. Requirements settle before the action opens its destination.",
-				)}
+				description={<Mx label="Authored action rules summary help" />}
 			/>
 		</EditorRootCard>
 	);

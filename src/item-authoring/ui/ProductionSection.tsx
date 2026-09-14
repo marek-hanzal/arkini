@@ -77,7 +77,7 @@ const ProductionFields = withFieldGroupFn({
 							return (
 								<>
 									<EditorCollectionSelector
-										addLabel={translator.textFn("Add line")}
+										dataUi="EditorProductionLinesCollection"
 										count={lines.length}
 										itemLabelFn={(index) => {
 											const line = lines[index];
@@ -111,7 +111,6 @@ const ProductionFields = withFieldGroupFn({
 										navigationCard
 										onAddFn={addLineFn}
 										onRemoveFn={(index) => linesField.removeValue(index)}
-										removeLabel={translator.textFn("Remove line")}
 									>
 										{(index) => (
 											<LineFields

@@ -169,7 +169,9 @@ it("keeps the required last-input remove control visible and disabled", async ()
 				/>,
 			),
 		);
-		const remove = container.querySelector<HTMLButtonElement>('button[title="Remove input"]');
+		const remove = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorInputsCollection"] [data-ui="EditorCollectionRemove"]',
+		);
 		expect(remove).not.toBeNull();
 		expect(remove?.disabled).toBe(true);
 

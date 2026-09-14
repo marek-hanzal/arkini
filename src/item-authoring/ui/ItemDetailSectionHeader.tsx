@@ -6,6 +6,7 @@ import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import type { ReactNode } from "react";
 
 /** Links overview capabilities to their own detail; identity keeps its direct edit action. */
 export const ItemDetailSectionHeader = ({
@@ -18,7 +19,7 @@ export const ItemDetailSectionHeader = ({
 	readonly itemUid: string;
 	readonly sectionId?: SectionId;
 	readonly title: string;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly filter?: ItemConnectionFilter;
 }) => {
 	const project = useEditorProject();

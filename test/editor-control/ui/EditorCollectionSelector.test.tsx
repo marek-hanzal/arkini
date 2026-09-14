@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -45,24 +46,26 @@ describe("EditorCollectionSelector", () => {
 		const removeFn = vi.fn();
 		await act(async () => {
 			root.render(
-				<EditorCollectionSelector
-					addLabel="Add line"
-					count={0}
-					error="Add at least one line."
-					itemLabelFn={() => "Line"}
-					label="Production lines"
-					onAddFn={addFn}
-					onRemoveFn={removeFn}
-					removeLabel="Remove line"
-				>
-					{() => null}
-				</EditorCollectionSelector>,
+				<TranslationTestProvider>
+					<EditorCollectionSelector
+						count={0}
+						error="Add at least one line."
+						itemLabelFn={() => "Line"}
+						label="Production lines"
+						onAddFn={addFn}
+						onRemoveFn={removeFn}
+					>
+						{() => null}
+					</EditorCollectionSelector>
+				</TranslationTestProvider>,
 			);
 		});
 
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
-		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
-		const remove = container.querySelector<HTMLButtonElement>('button[title="Remove line"]');
+		const add = container.querySelector<HTMLButtonElement>('[data-ui="EditorCollectionAdd"]');
+		const remove = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorCollectionRemove"]',
+		);
 		expect(input?.disabled).toBe(true);
 		expect(input?.dataset.uiInvalid).toBe("true");
 		expect(container.textContent).toContain("Add at least one line.");
@@ -82,21 +85,22 @@ describe("EditorCollectionSelector", () => {
 		const removeFn = vi.fn();
 		await act(async () => {
 			root.render(
-				<EditorCollectionSelector
-					count={1}
-					itemLabelFn={() => "Required item"}
-					label="Required items"
-					onRemoveFn={removeFn}
-					removeDisabled
-					removeLabel="Remove required item"
-				>
-					{() => null}
-				</EditorCollectionSelector>,
+				<TranslationTestProvider>
+					<EditorCollectionSelector
+						count={1}
+						itemLabelFn={() => "Required item"}
+						label="Required items"
+						onRemoveFn={removeFn}
+						removeDisabled
+					>
+						{() => null}
+					</EditorCollectionSelector>
+				</TranslationTestProvider>,
 			);
 		});
 
 		const remove = container.querySelector<HTMLButtonElement>(
-			'button[title="Remove required item"]',
+			'[data-ui="EditorCollectionRemove"]',
 		);
 		expect(remove).not.toBeNull();
 		expect(remove?.disabled).toBe(true);
@@ -111,16 +115,18 @@ describe("EditorCollectionSelector", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				<EditorCollectionSelector
-					count={1}
-					itemLabelFn={() => "Output set 1 — Spoiled Rum Barrel"}
-					itemSearchTermsFn={() => [
-						"spoiled-rum-barrel",
-					]}
-					label="Output sets"
-				>
-					{() => null}
-				</EditorCollectionSelector>,
+				<TranslationTestProvider>
+					<EditorCollectionSelector
+						count={1}
+						itemLabelFn={() => "Output set 1 — Spoiled Rum Barrel"}
+						itemSearchTermsFn={() => [
+							"spoiled-rum-barrel",
+						]}
+						label="Output sets"
+					>
+						{() => null}
+					</EditorCollectionSelector>
+				</TranslationTestProvider>,
 			);
 		});
 
@@ -141,25 +147,27 @@ describe("EditorCollectionSelector", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				<EditorCollectionSelector
-					count={2}
-					itemLabelFn={(index) =>
-						[
-							"Workshop",
-							"Foundry",
-						][index]
-					}
-					itemRelatedSearchTermsFn={(index) =>
-						index === 1
-							? [
-									"Copper",
-								]
-							: []
-					}
-					label="Production lines"
-				>
-					{(index) => <div data-ui="SelectedLine">{index}</div>}
-				</EditorCollectionSelector>,
+				<TranslationTestProvider>
+					<EditorCollectionSelector
+						count={2}
+						itemLabelFn={(index) =>
+							[
+								"Workshop",
+								"Foundry",
+							][index]
+						}
+						itemRelatedSearchTermsFn={(index) =>
+							index === 1
+								? [
+										"Copper",
+									]
+								: []
+						}
+						label="Production lines"
+					>
+						{(index) => <div data-ui="SelectedLine">{index}</div>}
+					</EditorCollectionSelector>
+				</TranslationTestProvider>,
 			);
 		});
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]');

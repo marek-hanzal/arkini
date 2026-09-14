@@ -7,6 +7,7 @@ import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Keeps the item overview to two authored lines, with full output semantics. */
 export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -48,9 +49,9 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 									</span>
 								}
 								emptyLabel={translator.textFn("No output")}
-								description={translator.textFn(
-									"This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.",
-								)}
+								description={
+									<Mx label="Authored production line output summary help" />
+								}
 							/>
 						</EditorRootCard>
 					))}

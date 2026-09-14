@@ -6,7 +6,6 @@ import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLin
 import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { Button } from "~/ui/ui/Button";
-import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface NoteAssetLinksProps {
 	readonly resourceIds: ReadonlyArray<string>;
@@ -64,35 +63,27 @@ export const NoteAssetLinks = ({
 									className="px-2 text-sm text-muted"
 									data-ui="EditorNoteMissingAsset"
 								>
-									Unavailable asset · {resourceId}
+									<Tx label="Unavailable asset" /> · {resourceId}
 								</span>
 							)}
-							<Tooltip
-								content={
-									requiredResourceId === resourceId
-										? "New notes stay linked to this asset"
-										: "Unlink asset from note"
-								}
-								placement="top"
+
+							<Button
+								className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
+								data-ui="EditorNoteUnlinkAsset"
+								disabled={disabled || requiredResourceId === resourceId}
+								onClick={() => {
+									if (disabled || requiredResourceId === resourceId) return;
+									if (onChangeFn !== undefined)
+										onChangeFn(
+											resourceIds.filter(
+												(linkedId) => linkedId !== resourceId,
+											),
+										);
+									else onUnlinkFn?.(resourceId);
+								}}
 							>
-								<Button
-									className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
-									data-ui="EditorNoteUnlinkAsset"
-									disabled={disabled || requiredResourceId === resourceId}
-									onClick={() => {
-										if (disabled || requiredResourceId === resourceId) return;
-										if (onChangeFn !== undefined)
-											onChangeFn(
-												resourceIds.filter(
-													(linkedId) => linkedId !== resourceId,
-												),
-											);
-										else onUnlinkFn?.(resourceId);
-									}}
-								>
-									<Trash2 className="size-4" />
-								</Button>
-							</Tooltip>
+								<Trash2 className="size-4" />
+							</Button>
 						</div>
 					);
 				})}

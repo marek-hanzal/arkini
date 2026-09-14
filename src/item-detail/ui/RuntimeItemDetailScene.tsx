@@ -7,6 +7,7 @@ import { ItemDetailContent } from "~/item-detail/ui/ItemDetailContent";
 import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
 import { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
+import { Tx } from "~/translation/ui/Tx";
 
 interface RuntimeItemDetailSceneProps extends useRuntimeItemDetailSceneController.Props {
 	readonly disabled: boolean;
@@ -40,7 +41,9 @@ export const RuntimeItemDetailScene = ({
 				/>
 			) : (
 				<header className="flex items-center justify-between border-b border-line pb-3">
-					<h2 className="text-lg font-semibold">Item unavailable</h2>
+					<h2 className="text-lg font-semibold">
+						<Tx label="Item unavailable" />
+					</h2>
 					<button
 						type="button"
 						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"

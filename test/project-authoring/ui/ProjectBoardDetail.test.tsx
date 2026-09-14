@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -89,7 +91,13 @@ describe("project Board detail", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => root.render(<ProjectBoardDetail project={project} />));
+		await act(async () => {
+			root.render(
+				<TranslationTestProvider>
+					<ProjectBoardDetail project={project} />
+				</TranslationTestProvider>,
+			);
+		});
 
 		const select = container.querySelector("select");
 		const preview = () =>

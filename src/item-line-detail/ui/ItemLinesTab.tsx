@@ -1,3 +1,5 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Tx } from "~/translation/ui/Tx";
 import { ListX, SearchX, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useLayoutEffect, useRef, type ReactNode } from "react";
@@ -167,6 +169,7 @@ export const ItemLinesTab = ({
 	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {
+	const translator = useTranslator();
 	const {
 		availabilityFilter,
 		availableLineCount,
@@ -197,7 +200,7 @@ export const ItemLinesTab = ({
 					<SearchInput
 						value={query}
 						className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
-						placeholder="Search lines…"
+						placeholder={translator.textFn("Search lines…")}
 						onValueChangeFn={setQueryFn}
 					/>
 				</motion.div>
@@ -215,6 +218,7 @@ export const ItemLinesTab = ({
 								optionDataUi="ItemLinesAvailabilityOption"
 								options={availabilityOptions.map((option) => ({
 									...option,
+									label: translator.textFn(option.label),
 									disabled:
 										option.value === "available" && availableLineCount === 0,
 								}))}
@@ -242,7 +246,9 @@ export const ItemLinesTab = ({
 								dataUi="ItemLinesVisibleEmpty"
 								icon={ListX}
 							>
-								<p>No product line is currently visible.</p>
+								<p>
+									<Tx label="No product line is currently visible." />
+								</p>
 							</ItemLinesEmptyState>
 						</motion.div>
 					) : filteredLines.length === 0 ? (
@@ -254,7 +260,11 @@ export const ItemLinesTab = ({
 								dataUi="ItemLinesSearchEmpty"
 								icon={SearchX}
 							>
-								<p>No visible lines match “{normalizedQuery}”.</p>
+								<p>
+									{translator
+										.textFn("No visible lines match {query}.")
+										.replace("{query}", `“${normalizedQuery}”`)}
+								</p>
 							</ItemLinesEmptyState>
 						</motion.div>
 					) : (

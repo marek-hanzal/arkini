@@ -11,6 +11,7 @@ import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 import { ConnectionsSummaryDetail } from "~/item-authoring/ui/ConnectionsSummaryDetail";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -25,9 +26,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					itemUid={item.uid}
 					sectionId="artwork"
 					title={translator.textFn("Artwork")}
-					description={translator.textFn(
-						"Base and overlay assets share one tile scale. Artwork does not change occupied cells.",
-					)}
+					description={<Mx label="Authored artwork summary help" />}
 				/>
 				<EditorRootCard
 					className="content-start"
@@ -50,9 +49,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 						<FactList>
 							<DetailFact
 								label={translator.textFn("Player controls")}
-								description={translator.textFn(
-									"Player controls govern manual production, material management, queue changes and line selection.",
-								)}
+								description={<Mx label="Authored player controls summary help" />}
 								value={translator.textFn(
 									item.control === "automatic-only"
 										? "Automatic only"
@@ -61,9 +58,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							/>
 							<DetailFact
 								label={translator.textFn("Queue capacity")}
-								description={translator.textFn(
-									"Maximum accepted work count across this item’s production lines: one active job plus queued requests.",
-								)}
+								description={<Mx label="Authored queue capacity summary help" />}
 								value={item.maxQueueSize}
 							/>
 							<Fact
@@ -106,9 +101,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					itemUid={item.uid}
 					sectionId="merges"
 					title={translator.textFn("Merges")}
-					description={translator.textFn(
-						"Dropping this item onto a matching target applies its source action, target effect and optional output.",
-					)}
+					description={<Mx label="Authored merges summary help" />}
 				/>
 				<MergesDetail item={item} />
 			</section>
@@ -120,9 +113,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					itemUid={item.uid}
 					sectionId="production"
 					title={translator.textFn("Production")}
-					description={translator.textFn(
-						"Production is enabled when at least one line is configured. Each line keeps its own availability rules.",
-					)}
+					description={<Mx label="Authored production summary help" />}
 				/>
 				<ProductionSummaryDetail item={item} />
 			</section>
@@ -134,9 +125,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					itemUid={item.uid}
 					sectionId="units"
 					title={translator.textFn("Units")}
-					description={translator.textFn(
-						"Units are the supply inside each item, independently of how many items are stacked.",
-					)}
+					description={<Mx label="Authored Units summary help" />}
 				/>
 				<UnitsDetail
 					item={item}
@@ -151,9 +140,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					itemUid={item.uid}
 					sectionId="clock"
 					title={translator.textFn("Clock")}
-					description={translator.textFn(
-						"Clock attempts the marked line at each interval and can also limit this item's lifetime. A lifetime works without production lines.",
-					)}
+					description={<Mx label="Authored Clock summary help" />}
 				/>
 				<ClockDetail
 					item={item}
@@ -168,9 +155,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					itemUid={item.uid}
 					sectionId="action"
 					title={translator.textFn("Action")}
-					description={translator.textFn(
-						"Clicking this item can enter a space or open Inventory after its requirements pass.",
-					)}
+					description={<Mx label="Authored action summary help" />}
 				/>
 				<ActionDetail
 					item={item}

@@ -79,7 +79,9 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							className="gap-0"
 							dataUi="EditorBuildOutput"
 						>
-							<h2 className="text-lg font-semibold">Build output</h2>
+							<h2 className="text-lg font-semibold">
+								<Tx label="Build output" />
+							</h2>
 							<p className="mt-2 break-all text-sm text-muted">{artifactSummary}</p>
 							<div className="mt-4 flex items-center gap-3">
 								<PrimaryButton
@@ -94,7 +96,13 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 									onClick={controller.installArtifactFn}
 								>
 									<InstallIcon className="mr-2 size-4" />
-									{controller.installAction === "update" ? "Update" : "Install"}
+									<Tx
+										label={
+											controller.installAction === "update"
+												? "Update"
+												: "Install"
+										}
+									/>
 								</PrimaryButton>
 								<Button
 									className="shrink-0 whitespace-nowrap border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
@@ -104,11 +112,11 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 									onClick={controller.saveArtifactFn}
 								>
 									<Download className="mr-2 size-4" />
-									Save as…
+									<Tx label="Save as…" />
 								</Button>
 								{controller.installedPackageId === undefined ? null : (
 									<p className="ml-auto min-w-0 truncate text-right text-sm text-success">
-										Installed as{" "}
+										<Tx label="Installed as" />{" "}
 										<strong>{controller.installedPackageId}</strong>.
 									</p>
 								)}

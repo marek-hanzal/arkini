@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFieldContext } from "~/editor-control/ui/EditorFormContexts";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
@@ -16,6 +17,7 @@ export const EditorItemAutocompleteField = ({
 	description,
 	label,
 }: EditorItemAutocompleteFieldProps) => {
+	const translator = useTranslator();
 	const field = useFieldContext<string>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const { items, options } = useEditorItemSearchOptions();
@@ -24,7 +26,7 @@ export const EditorItemAutocompleteField = ({
 			displaySelectedLabel
 			label={label}
 			description={description}
-			emptyLabel="No known item matches this search."
+			emptyLabel={translator.textFn("No items match this search.")}
 			error={error}
 			options={options}
 			required
@@ -57,7 +59,7 @@ interface EditorItemReferenceControlProps {
 /** Reuses the canonical item autocomplete outside direct TanStack field bindings. */
 export const EditorItemReferenceControl = ({
 	description,
-	emptyLabel = "No known item matches this search.",
+	emptyLabel,
 	error,
 	includeItemFn,
 	label,
@@ -66,6 +68,7 @@ export const EditorItemReferenceControl = ({
 	showSelectedPreview = true,
 	value,
 }: EditorItemReferenceControlProps) => {
+	const translator = useTranslator();
 	const { items, options } = useEditorItemSearchOptions(includeItemFn);
 	return (
 		<EditorSearchCombobox
@@ -73,7 +76,7 @@ export const EditorItemReferenceControl = ({
 			description={description}
 			label={label}
 			labelVisible={labelVisible}
-			emptyLabel={emptyLabel}
+			emptyLabel={emptyLabel ?? translator.textFn("No items match this search.")}
 			error={error}
 			options={options}
 			value={value}

@@ -74,9 +74,11 @@ it("keeps empty output-set navigation visible and creates the first set through 
 				/>,
 			),
 		);
-		const add = container.querySelector<HTMLButtonElement>('button[title="Add output set"]');
+		const add = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		const remove = container.querySelector<HTMLButtonElement>(
-			'button[title="Remove output set"]',
+			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionRemove"]',
 		);
 		expect(add?.disabled).toBe(false);
 		expect(remove?.disabled).toBe(true);
@@ -120,9 +122,11 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 			],
 		} as unknown as OutputSchema.Type;
 		await renderOutputFn(value);
-		const addRoll = container.querySelector<HTMLButtonElement>('button[title="Add roll"]');
+		const addRoll = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorRollsCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		const removeRoll = container.querySelector<HTMLButtonElement>(
-			'button[title="Remove roll"]',
+			'[data-ui="EditorRollsCollection"] [data-ui="EditorCollectionRemove"]',
 		);
 		expect(addRoll?.disabled).toBe(false);
 		expect(removeRoll?.disabled).toBe(true);
@@ -137,7 +141,7 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 				'[data-ui="EditorChoiceControlOption"][data-ui-selected="true"]',
 			),
 		).toBeNull();
-		expect(container.querySelector('button[title="Add drop"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorDropsCollection"]')).toBeNull();
 
 		const guaranteed = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent?.includes("Guaranteed") === true,
@@ -145,9 +149,11 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 		await act(async () => guaranteed?.click());
 		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
 		await renderOutputFn(value);
-		const addDrop = container.querySelector<HTMLButtonElement>('button[title="Add drop"]');
+		const addDrop = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorDropsCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		const removeDrop = container.querySelector<HTMLButtonElement>(
-			'button[title="Remove drop"]',
+			'[data-ui="EditorDropsCollection"] [data-ui="EditorCollectionRemove"]',
 		);
 		expect(addDrop?.disabled).toBe(false);
 		expect(removeDrop?.disabled).toBe(true);
@@ -159,7 +165,11 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 		expect(container.querySelector('[data-label="Dropped item"]')).not.toBeNull();
 
 		await act(async () =>
-			container.querySelector<HTMLButtonElement>('button[title="Remove drop"]')?.click(),
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorDropsCollection"] [data-ui="EditorCollectionRemove"]',
+				)
+				?.click(),
 		);
 		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
 		expect(value.set[0]).toMatchObject({
@@ -174,7 +184,11 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 		await renderOutputFn(value);
 
 		await act(async () =>
-			container.querySelector<HTMLButtonElement>('button[title="Remove roll"]')?.click(),
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorRollsCollection"] [data-ui="EditorCollectionRemove"]',
+				)
+				?.click(),
 		);
 		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
 		expect(value).toMatchObject({
@@ -232,16 +246,21 @@ it("starts a weighted roll empty and keeps it when its last candidate is removed
 		});
 		await renderOutputFn(value);
 		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Add weighted candidate"]'),
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorWeightedCandidatesCollection"] [data-ui="EditorCollectionAdd"]',
+			),
 		).not.toBeNull();
 		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Remove weighted candidate"]')
-				?.disabled,
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorWeightedCandidatesCollection"] [data-ui="EditorCollectionRemove"]',
+			)?.disabled,
 		).toBe(true);
 
 		await act(async () =>
 			container
-				.querySelector<HTMLButtonElement>('button[title="Add weighted candidate"]')
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorWeightedCandidatesCollection"] [data-ui="EditorCollectionAdd"]',
+				)
 				?.click(),
 		);
 		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
@@ -249,7 +268,9 @@ it("starts a weighted roll empty and keeps it when its last candidate is removed
 
 		await act(async () =>
 			container
-				.querySelector<HTMLButtonElement>('button[title="Remove weighted candidate"]')
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorWeightedCandidatesCollection"] [data-ui="EditorCollectionRemove"]',
+				)
 				?.click(),
 		);
 		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;

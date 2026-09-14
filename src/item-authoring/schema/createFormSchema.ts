@@ -36,7 +36,7 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 		if (existing !== undefined && existing.uid !== itemUid) {
 			context.addIssue({
 				code: "custom",
-				message: `Item ID ${item.id} is already used by another item.`,
+				message: "This Item ID is already in use.",
 				path: [
 					"id",
 				],
@@ -91,7 +91,7 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 				if (target === undefined || target.units !== undefined) continue;
 				context.addIssue({
 					code: "custom",
-					message: `Selected target ${target.id} must have Units enabled.`,
+					message: "Selected target must have Units enabled.",
 					path: [
 						...collection.path,
 						"input",

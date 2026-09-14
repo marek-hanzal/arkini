@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
 import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
@@ -134,7 +136,11 @@ describe("ItemDetailModal source ownership", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		const render = async () => {
-			await act(async () => root.render(createElement(ItemDetailModal)));
+			await act(async () =>
+				root.render(
+					createElement(TranslationTestProvider, null, createElement(ItemDetailModal)),
+				),
+			);
 		};
 
 		await render();

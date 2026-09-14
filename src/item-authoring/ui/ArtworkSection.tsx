@@ -57,10 +57,7 @@ const ArtworkFields = withFieldGroupFn({
 							/>
 						)}
 					</group.AppField>
-					<EditorIconButton
-						title={translator.textFn("Clear overlay asset")}
-						onClick={() => group.setFieldValue("default[1]", "")}
-					>
+					<EditorIconButton onClick={() => group.setFieldValue("default[1]", "")}>
 						<Trash2 className="size-4" />
 					</EditorIconButton>
 				</div>

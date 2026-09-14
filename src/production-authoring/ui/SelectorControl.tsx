@@ -2,6 +2,7 @@ import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ReactNode } from "react";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 interface SelectorControlProps {
 	readonly description?: ReactNode;
@@ -20,24 +21,27 @@ export const SelectorControl = ({
 	emptyLabel,
 	error,
 	includeItemFn,
-	label = "Selected item",
+	label,
 	labelVisible = true,
 	onChangeFn,
 	value,
-}: SelectorControlProps) => (
-	<EditorItemReferenceControl
-		description={description}
-		emptyLabel={emptyLabel}
-		error={error}
-		includeItemFn={includeItemFn}
-		label={label}
-		labelVisible={labelVisible}
-		value={value.itemId}
-		onChangeFn={(itemId) =>
-			onChangeFn({
-				...value,
-				itemId,
-			})
-		}
-	/>
-);
+}: SelectorControlProps) => {
+	const translator = useTranslator();
+	return (
+		<EditorItemReferenceControl
+			description={description}
+			emptyLabel={emptyLabel}
+			error={error}
+			includeItemFn={includeItemFn}
+			label={label ?? translator.textFn("Selected item")}
+			labelVisible={labelVisible}
+			value={value.itemId}
+			onChangeFn={(itemId) =>
+				onChangeFn({
+					...value,
+					itemId,
+				})
+			}
+		/>
+	);
+};

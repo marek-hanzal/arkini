@@ -1,3 +1,6 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Tx } from "~/translation/ui/Tx";
+import { Mx } from "~/translation/ui/Mx";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { Project } from "~/project-authoring/type/Project";
@@ -34,22 +37,26 @@ const EditorAssetDeleteDialog = ({
 			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 			data-ui="EditorAssetDeleteDialog"
 		>
-			<h2 className="text-lg font-semibold">Delete asset?</h2>
+			<h2 className="text-lg font-semibold">
+				<Tx label="Delete asset?" />
+			</h2>
 			<p className="mt-2 text-sm leading-6 text-muted">
-				Delete <strong className="text-foreground">{resourceId}</strong> from the project.
+				<Tx label="Delete asset" />:{" "}
+				<strong className="text-foreground">{resourceId}</strong>
 			</p>
 			<div className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
-				Its image bytes will be removed from the current project. This cannot be undone in
-				the Editor.
+				<Mx label="Asset delete confirmation warning" />
 			</div>
-			<p className="mt-2 text-xs text-subtle">Asset ID: {resourceId}</p>
+			<p className="mt-2 text-xs text-subtle">
+				<Tx label="Asset ID" />: {resourceId}
+			</p>
 			<EditorAssetDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
 				<Button
 					disabled={pending}
 					onClick={onCancelFn}
 				>
-					Cancel
+					<Tx label="Cancel" />
 				</Button>
 				<DangerButton
 					disabled={pending}
@@ -57,7 +64,7 @@ const EditorAssetDeleteDialog = ({
 					data-ui="EditorAssetDeleteConfirm"
 					onClick={onConfirmFn}
 				>
-					Delete asset
+					<Tx label="Delete asset" />
 				</DangerButton>
 			</div>
 		</div>
@@ -71,6 +78,7 @@ const EditorAssetDeleteBlockerLink = ({
 	readonly blocker: readGameResourceUsagesFn.Usage;
 	readonly project: Project;
 }) => {
+	const translator = useTranslator();
 	if (blocker.owner === "item") {
 		const owner = project.config.items[blocker.ownerId];
 		if (owner !== undefined)
@@ -84,7 +92,7 @@ const EditorAssetDeleteBlockerLink = ({
 						/>
 					}
 					project={project}
-					title={`${blocker.ownerLabel || blocker.ownerId} · Artwork`}
+					title={`${blocker.ownerLabel || blocker.ownerId} · ${translator.textFn("Artwork")}`}
 					usage={blocker}
 				/>
 			);
@@ -93,7 +101,7 @@ const EditorAssetDeleteBlockerLink = ({
 		<EditorAssetUsageRow
 			dataUi="EditorAssetDeleteBlocker"
 			project={project}
-			title="Project · Artwork"
+			title={`${translator.textFn("Project")} · ${translator.textFn("Artwork")}`}
 			usage={blocker}
 		/>
 	);
@@ -107,6 +115,7 @@ export const EditorAssetDeleteSection = ({
 	query,
 	resourceId,
 }: EditorAssetDeleteSectionProps) => {
+	const translator = useTranslator();
 	const controller = useEditorAssetDeleteController({
 		filter,
 		query,
@@ -134,14 +143,18 @@ export const EditorAssetDeleteSection = ({
 						<div>
 							<h2 className="text-lg font-semibold">
 								{blocked
-									? "This asset cannot be deleted yet"
-									: "This asset can be deleted"}
+									? translator.textFn("This asset cannot be deleted yet")
+									: translator.textFn("This asset can be deleted")}
 							</h2>
-							<p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
-								{blocked
-									? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
-									: "No saved project or item currently references this asset."}
-							</p>
+							<div className="mt-1 max-w-3xl text-sm leading-6 text-muted">
+								<Mx
+									label={
+										blocked
+											? "Asset delete blocked description"
+											: "Asset delete available description"
+									}
+								/>
+							</div>
 						</div>
 					</div>
 				</EditorRootCard>
@@ -165,7 +178,7 @@ export const EditorAssetDeleteSection = ({
 							data-ui="EditorAssetDeleteOpen"
 							onClick={controller.openFn}
 						>
-							Delete asset
+							<Tx label="Delete asset" />
 						</DangerButton>
 					</EditorRootCard>
 				)}

@@ -196,13 +196,13 @@ export const LineFields = withFieldGroupFn({
 					</group.Subscribe>
 				</EditorFormCard>
 				<EditorRootCard
-					className="min-w-0 grid-cols-2 gap-0"
+					className="min-w-0 gap-[var(--ak-viewport-gap)]"
 					dataUi="EditorFormCard"
 				>
-					<div className="col-span-2 pb-[var(--ak-panel-padding)]">
+					<div>
 						<EditorFormSectionDivider title={translator.textFn("Production")} />
 					</div>
-					<div className="min-w-0 pr-[var(--ak-panel-padding)]">
+					<div className="min-w-0">
 						<group.Subscribe selector={(state) => state.values.input}>
 							{(input) => (
 								<InputsControl
@@ -217,7 +217,7 @@ export const LineFields = withFieldGroupFn({
 							)}
 						</group.Subscribe>
 					</div>
-					<div className="min-w-0 border-l border-line pl-[var(--ak-panel-padding)]">
+					<div className="min-w-0">
 						<group.Subscribe selector={(state) => state.values.output}>
 							{(output) => (
 								<section className="grid min-w-0 content-start gap-3">

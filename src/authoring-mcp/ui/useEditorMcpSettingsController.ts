@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useState } from "react";
 import { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
@@ -27,6 +28,7 @@ export const useEditorMcpSettingsController = ({
 	onConfigureFn,
 	overview,
 }: useEditorMcpSettingsController.Props): useEditorMcpSettingsController.Output => {
+	const translator = useTranslator();
 	const [portDraft, setPortDraftFn] = useState<string>();
 	const [authtoken, setAuthtokenFn] = useState("");
 	const [ngrokDomainDraft, setNgrokDomainDraftFn] = useState<string>();
@@ -42,11 +44,11 @@ export const useEditorMcpSettingsController = ({
 		port,
 		saveNgrokFn: () => {
 			if (authtoken.trim() === "") {
-				setErrorFn("Paste an ngrok authtoken first.");
+				setErrorFn(translator.textFn("Paste an ngrok authtoken first."));
 				return;
 			}
 			if (ngrokDomain.trim() === "") {
-				setErrorFn("Enter the assigned ngrok domain first.");
+				setErrorFn(translator.textFn("Enter the assigned ngrok domain first."));
 				return;
 			}
 			const ngrok = EditorMcpConfigurationSchema.safeParse({
@@ -55,7 +57,9 @@ export const useEditorMcpSettingsController = ({
 				domain: ngrokDomain,
 			});
 			if (!ngrok.success) {
-				setErrorFn("Enter the ngrok hostname without https:// or a path.");
+				setErrorFn(
+					translator.textFn("Enter the ngrok hostname without https:// or a path."),
+				);
 				return;
 			}
 			onConfigureFn(ngrok.data);
@@ -65,7 +69,7 @@ export const useEditorMcpSettingsController = ({
 		savePortFn: () => {
 			const candidate = Number(port);
 			if (!Number.isInteger(candidate) || candidate < 1_024 || candidate > 65_535) {
-				setErrorFn("Use a port from 1024 to 65535.");
+				setErrorFn(translator.textFn("Use a port from 1024 to 65535."));
 				return;
 			}
 			onConfigureFn({

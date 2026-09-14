@@ -1,3 +1,5 @@
+import { Tx } from "~/translation/ui/Tx";
+import { Mx } from "~/translation/ui/Mx";
 import { Trash2, X } from "lucide-react";
 
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
@@ -29,14 +31,22 @@ export const ProjectDeleteDialog = ({
 			data-project-ownership={ownership}
 			data-ui="EditorProjectDeleteDialog"
 		>
-			<h2 className="text-lg font-semibold">Remove project?</h2>
-			<p className="mt-2 text-sm leading-6 text-muted">
-				Remove <strong className="text-foreground">{project.title}</strong> from the Editor?{" "}
-				{ownership === "managed"
-					? "This managed project and all its files will be permanently deleted."
-					: "This folder project will be removed from Editor. Files on disk remain untouched."}
+			<h2 className="text-lg font-semibold">
+				<Tx label="Remove project?" />
+			</h2>
+			<p className="mt-2 font-semibold text-foreground">{project.title}</p>
+			<div className="mt-2 text-sm leading-6 text-muted">
+				<Mx
+					label={
+						ownership === "managed"
+							? "Remove managed project help"
+							: "Remove folder project help"
+					}
+				/>
+			</div>
+			<p className="mt-2 text-xs text-subtle">
+				<Tx label="Project ID" />: {project.projectId}
 			</p>
-			<p className="mt-2 text-xs text-subtle">Project ID: {project.projectId}</p>
 			{error === undefined ? null : (
 				<p className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
 					{error instanceof Error ? error.message : String(error)}
@@ -49,7 +59,7 @@ export const ProjectDeleteDialog = ({
 					onClick={onCancelFn}
 				>
 					<X className="size-4" />
-					Cancel
+					<Tx label="Cancel" />
 				</LinkButton>
 				<DangerButton
 					className="gap-1.5"
@@ -59,7 +69,7 @@ export const ProjectDeleteDialog = ({
 					onClick={onConfirmFn}
 				>
 					<Trash2 className="size-4" />
-					Remove project
+					<Tx label="Remove project" />
 				</DangerButton>
 			</div>
 		</div>

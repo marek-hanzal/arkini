@@ -9,9 +9,9 @@ import { RulesDetail } from "~/item-authoring/ui/RulesDetail";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { Mx } from "~/translation/ui/Mx";
 
 const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.AuthoredItem }) => {
-	const translator = useTranslator();
 	return (
 		<div className="grid gap-2 text-xs text-muted">
 			<p>
@@ -23,9 +23,7 @@ const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.Au
 			{item.rules.length === 0 ? null : (
 				<RulesDetail
 					rules={item.rules}
-					description={translator.textFn(
-						"Every condition of a rule must pass. Enable rules gate this selected drop; a matching Disable rule suppresses it without disabling the line or other drops.",
-					)}
+					description={<Mx label="Authored drop rules summary help" />}
 				/>
 			)}
 		</div>
@@ -42,7 +40,7 @@ export const OutputDetail = ({
 	readonly emptyLabel?: string;
 	readonly output?: OutputSchema.Type;
 	readonly title?: ReactNode;
-	readonly description?: string;
+	readonly description?: ReactNode;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
@@ -57,12 +55,7 @@ export const OutputDetail = ({
 				<span className="flex items-center gap-1">
 					{title ?? translator.textFn("Outputs")}
 					<EditorInfoTooltip
-						content={
-							description ??
-							translator.textFn(
-								"One weighted alternative is selected, then its guaranteed, chance, and weighted rolls determine the output. Placement and rules apply to each selected drop.",
-							)
-						}
+						content={description ?? <Mx label="Authored output summary help" />}
 					/>
 				</span>
 			}

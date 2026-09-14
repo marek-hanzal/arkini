@@ -1,3 +1,5 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Tx } from "~/translation/ui/Tx";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { useEditorItemSpotlightController } from "~/authoring-shell/ui/useEditorItemSpotlightController";
 import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
@@ -10,22 +12,27 @@ export const EditorItemSpotlight = ({
 	items,
 	options,
 	selectItemFn,
-}: EditorItemSpotlightProps) => (
-	<ItemSpotlight
-		dataUi="EditorItemSpotlight"
-		emptyMessage="No items match this search."
-		footer={
-			<p className="text-center text-xs text-muted">↑↓ select · Enter open · Esc close</p>
-		}
-		onCloseFn={closeFn}
-		onSelectItemFn={selectItemFn}
-		options={options.map((option) => ({
-			artwork: <EditorItemSearchThumbnail item={items[option.id]} />,
-			itemId: option.id,
-			label: option.label,
-			terms: option.terms,
-		}))}
-		placement="viewport"
-		placeholder="Search item title, ID or type…"
-	/>
-);
+}: EditorItemSpotlightProps) => {
+	const translator = useTranslator();
+	return (
+		<ItemSpotlight
+			dataUi="EditorItemSpotlight"
+			emptyMessage={translator.textFn("No items match this search.")}
+			footer={
+				<p className="text-center text-xs text-muted">
+					<Tx label="Item search shortcuts" />
+				</p>
+			}
+			onCloseFn={closeFn}
+			onSelectItemFn={selectItemFn}
+			options={options.map((option) => ({
+				artwork: <EditorItemSearchThumbnail item={items[option.id]} />,
+				itemId: option.id,
+				label: option.label,
+				terms: option.terms,
+			}))}
+			placement="viewport"
+			placeholder={translator.textFn("Search item title, ID or type\u2026")}
+		/>
+	);
+};

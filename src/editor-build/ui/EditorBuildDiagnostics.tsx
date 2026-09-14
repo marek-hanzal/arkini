@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import type { Project } from "~/project-authoring/type/Project";
 import { readGameDiagnosticPresentationFn } from "~/game-config-diagnostic/fn/readGameDiagnosticPresentationFn";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
@@ -23,7 +24,6 @@ type EditorDiagnosticTarget =
 	| {
 			readonly kind: "project";
 			readonly sectionId: ProjectSectionId;
-			readonly label: string;
 	  };
 
 interface EditorGameDiagnosticPresentation {
@@ -127,7 +127,6 @@ const readEditorGameDiagnosticTargetsFn = (
 		{
 			kind: "project",
 			sectionId: readProjectSectionForPathFn(diagnostic.path),
-			label: "project settings",
 		} satisfies EditorDiagnosticTarget,
 	];
 };
@@ -173,7 +172,7 @@ const EditorDiagnosticLink = ({
 						sectionId: target.sectionId,
 					}}
 				>
-					Open {target.label}
+					<Tx label="Open" /> {target.label}
 				</ButtonLink>
 			);
 		case "asset":
@@ -186,7 +185,7 @@ const EditorDiagnosticLink = ({
 						resourceId: target.resourceId,
 					}}
 				>
-					Open asset {target.label}
+					<Tx label="Open asset" /> {target.label}
 				</ButtonLink>
 			);
 		case "project":
@@ -199,7 +198,7 @@ const EditorDiagnosticLink = ({
 						sectionId: target.sectionId,
 					}}
 				>
-					Open {target.label}
+					<Tx label="Open project settings" />
 				</ButtonLink>
 			);
 	}
@@ -250,7 +249,11 @@ export const EditorBuildDiagnostics = ({
 						<div className="flex flex-wrap gap-2">
 							{printed.targets.map((target) => (
 								<EditorDiagnosticLink
-									key={`${target.kind}-${target.label}`}
+									key={
+										target.kind === "project"
+											? `project-${target.sectionId}`
+											: `${target.kind}-${target.label}`
+									}
 									projectId={project.projectId}
 									target={target}
 								/>

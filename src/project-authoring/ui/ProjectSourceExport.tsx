@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { FolderOutput } from "lucide-react";
@@ -40,7 +41,7 @@ export const ProjectSourceExport = ({ projectId }: { readonly projectId: string 
 			onClick={exportSourceFn}
 		>
 			<FolderOutput className="size-4" />
-			Export
+			<Tx label="Export" />
 		</LinkButton>
 	);
 };

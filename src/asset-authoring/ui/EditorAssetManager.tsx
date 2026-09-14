@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
@@ -140,7 +141,7 @@ const EditorAssetImportMenu = ({
 					onClick={onImportArkpackFn}
 				>
 					<PackageOpen className="size-4" />
-					Import assets
+					<Tx label="Import assets" />
 				</PrimaryButton>
 				<PrimaryButton
 					ref={refs.setReference}
@@ -169,9 +170,11 @@ const EditorAssetImportMenu = ({
 						>
 							<PackageOpen className="size-5 shrink-0 text-accent" />
 							<span>
-								<span className="block font-semibold">From arkpack</span>
+								<span className="block font-semibold">
+									<Tx label="From Arkpack" />
+								</span>
 								<span className="mt-0.5 block text-xs font-normal leading-4 text-muted">
-									Imports all assets and overrides matching resource IDs.
+									<Tx label="Asset Arkpack import summary" />
 								</span>
 							</span>
 						</Button>
@@ -182,10 +185,11 @@ const EditorAssetImportMenu = ({
 						>
 							<Images className="size-5 shrink-0 text-accent" />
 							<span>
-								<span className="block font-semibold">PNG files</span>
+								<span className="block font-semibold">
+									<Tx label="PNG files" />
+								</span>
 								<span className="mt-0.5 block text-xs font-normal leading-4 text-muted">
-									Imports selected PNG files using their filenames as resource
-									IDs.
+									<Tx label="Asset PNG import summary" />
 								</span>
 							</span>
 						</Button>
@@ -221,7 +225,7 @@ const EditorAssetOptimizationAlert = ({
 			data-ui="EditorAssetsOptimizeAlertDismiss"
 			onClick={onDismissFn}
 		>
-			Dismiss
+			<Tx label="Dismiss" />
 		</LinkButton>
 	</div>
 );
@@ -353,7 +357,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 	const importSuccess =
 		controller.importedCount === undefined
 			? undefined
-			: `Imported ${controller.importedCount} asset${controller.importedCount === 1 ? "" : "s"}.`;
+			: `${translator.textFn("Imported assets")}: ${controller.importedCount}`;
 	const optimizeError =
 		controller.optimizeError === undefined
 			? undefined
@@ -364,8 +368,8 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 		controller.optimization === undefined
 			? undefined
 			: controller.optimization.optimizedResourceCount === 0
-				? `All ${controller.optimization.processedResourceCount} selected PNGs are already optimized.`
-				: `Optimized ${controller.optimization.optimizedResourceCount} of ${controller.optimization.processedResourceCount} selected PNGs · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup"}.`;
+				? `${translator.textFn("Already optimized")}: ${controller.optimization.processedResourceCount} PNG`
+				: `${translator.textFn("Optimized")}: ${controller.optimization.optimizedResourceCount}/${controller.optimization.processedResourceCount} PNG · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${translator.textFn(controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup")}`;
 	const optimizationAlert =
 		optimizeError === undefined
 			? optimizationSuccess === undefined
@@ -455,9 +459,9 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 							<Sparkles className="size-4" />
 							{controller.optimizePending
 								? controller.optimizationProgress?.phase === "saving"
-									? "Saving…"
-									: `Optimizing ${optimizationPercent}%`
-								: "Optimize"}
+									? translator.textFn("Saving…")
+									: `${translator.textFn("Optimizing")} ${optimizationPercent}%`
+								: translator.textFn("Optimize")}
 						</LinkButton>
 					}
 					help={
@@ -518,7 +522,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 				{catalogStatus === undefined ? null : (
 					<Status
 						dataUi={catalogStatus.dataUi}
-						description={translator.textFn(catalogStatus.description)}
+						description={<Mx label={catalogStatus.description} />}
 						size="large"
 						variant="flat"
 						icon={catalogStatus.icon}

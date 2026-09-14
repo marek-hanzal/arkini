@@ -1,3 +1,5 @@
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { PackageCheck, X } from "lucide-react";
 
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
@@ -23,15 +25,16 @@ export const EditorBuildMajorUpdateDialog = ({
 			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 			data-ui="EditorBuildMajorUpdateDialog"
 		>
-			<h2 className="text-lg font-semibold">Update across major versions?</h2>
+			<h2 className="text-lg font-semibold">
+				<Tx label="Update across major versions?" />
+			</h2>
 			<p className="mt-2 text-sm leading-6 text-muted">
-				The installed package uses gameplay version {confirmation.installedVersion}; this
-				build uses {confirmation.targetVersion}.
+				<Tx label="Installed version" />: <strong>{confirmation.installedVersion}</strong>
+				<br />
+				<Tx label="New version" />: <strong>{confirmation.targetVersion}</strong>
 			</p>
 			<div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm leading-6 text-warning">
-				Installing the update does not delete saved progress now. The next launch will
-				reject the incompatible save; continuing requires permanently deleting this
-				package&apos;s existing saved progress.
+				<Mx label="Build major update warning" />
 			</div>
 			{error === undefined ? null : (
 				<p
@@ -48,7 +51,7 @@ export const EditorBuildMajorUpdateDialog = ({
 					onClick={onCancelFn}
 				>
 					<X className="size-4" />
-					Cancel
+					<Tx label="Cancel" />
 				</LinkButton>
 				<DangerButton
 					className="gap-1.5"
@@ -58,7 +61,7 @@ export const EditorBuildMajorUpdateDialog = ({
 					onClick={onConfirmFn}
 				>
 					<PackageCheck className="size-4" />
-					Update package
+					<Tx label="Update package" />
 				</DangerButton>
 			</div>
 		</div>

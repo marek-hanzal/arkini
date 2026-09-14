@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { FileJson2, FilePlus2, RefreshCw } from "lucide-react";
 
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
@@ -51,7 +52,9 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 				data-ui="EditorWelcome"
 			>
 				<header className="flex items-center justify-between gap-3">
-					<h1 className="text-2xl font-semibold">Editor</h1>
+					<h1 className="text-2xl font-semibold">
+						<Tx label="Editor" />
+					</h1>
 					<LinkButton
 						disabled={actions.blocked}
 						cursorIntent={actions.refreshingProjects ? "progress" : undefined}
@@ -59,7 +62,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 						onClick={() => void actions.refreshProjectsFn()}
 					>
 						<RefreshCw className="size-4" />
-						Refresh
+						<Tx label="Refresh" />
 					</LinkButton>
 				</header>
 
@@ -76,9 +79,11 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 						onClick={actions.importJsonDirectoryFn}
 					>
 						<FileJson2 className="size-9 text-accent" />
-						<span className="text-lg">Open folder</span>
+						<span className="text-lg">
+							<Tx label="Open folder" />
+						</span>
 						<span className="text-xs font-medium opacity-75">
-							Use an existing Editor project in place
+							<Tx label="Use an existing Editor project in place" />
 						</span>
 					</Button>
 					<Button
@@ -89,9 +94,11 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 						onClick={() => setCreateOpenFn(true)}
 					>
 						<FilePlus2 className="size-9" />
-						<span className="text-lg">New project</span>
+						<span className="text-lg">
+							<Tx label="New project" />
+						</span>
 						<span className="text-xs font-medium opacity-75">
-							Start with an empty project
+							<Tx label="Start with an empty project" />
 						</span>
 					</Button>
 				</section>
@@ -105,7 +112,9 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 				)}
 				{actions.projectRefreshError === undefined ? null : (
 					<div className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
-						<p>Recent projects could not be refreshed.</p>
+						<p>
+							<Tx label="Recent projects could not be refreshed." />
+						</p>
 						<p className="mt-1 text-xs opacity-80">
 							{actions.projectRefreshError instanceof Error
 								? actions.projectRefreshError.message
@@ -117,7 +126,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 							className="mt-3"
 							onClick={() => void actions.refreshProjectsFn()}
 						>
-							Refresh projects
+							<Tx label="Refresh projects" />
 						</Button>
 					</div>
 				)}

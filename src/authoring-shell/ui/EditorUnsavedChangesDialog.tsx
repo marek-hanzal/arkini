@@ -1,3 +1,4 @@
+import { Mx } from "~/translation/ui/Mx";
 import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Save, Trash2, X } from "lucide-react";
@@ -34,11 +35,9 @@ const EditorUnsavedChangesPrompt = ({
 				onKeyDown={focus.onKeyDownFn}
 			>
 				<h2 className="text-lg font-semibold">{translator.textFn("Unsaved changes")}</h2>
-				<p className="mt-2 text-sm leading-6 text-muted">
-					{translator.textFn(
-						"Save or discard this draft before leaving the editor surface.",
-					)}
-				</p>
+				<div className="mt-2 text-sm leading-6 text-muted">
+					<Mx label="Editor unsaved changes description" />
+				</div>
 				{state.error === undefined ? null : (
 					<p className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
 						{state.error instanceof Error ? state.error.message : String(state.error)}

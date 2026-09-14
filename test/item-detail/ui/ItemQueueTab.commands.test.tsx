@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -61,23 +63,27 @@ describe("ItemQueueTab command boundary", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(ItemQueueTab, {
-					queue: {
-						active: [],
-						capacity: 2,
-						canClearQueue: true,
-						itemId: "runtime:owner",
-						kind: "available",
-						request: [
-							{
-								lineId: "line:first",
-								requestId: "request:first",
-								status: "inputs-ready",
-								title: "First line",
-							},
-						],
-					},
-				}),
+				createElement(
+					TranslationTestProvider,
+					null,
+					createElement(ItemQueueTab, {
+						queue: {
+							active: [],
+							capacity: 2,
+							canClearQueue: true,
+							itemId: "runtime:owner",
+							kind: "available",
+							request: [
+								{
+									lineId: "line:first",
+									requestId: "request:first",
+									status: "inputs-ready",
+									title: "First line",
+								},
+							],
+						},
+					}),
+				),
 			);
 		});
 

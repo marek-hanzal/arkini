@@ -1,5 +1,6 @@
 import { Square, SquareCheck } from "lucide-react";
 import { Tx } from "~/translation/ui/Tx";
+import { Mx } from "~/translation/ui/Mx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
@@ -23,9 +24,7 @@ export const ItemDraftToggle = ({ item }: ItemDraftToggleProps) => {
 		<div className="grid justify-items-end gap-1">
 			<Tooltip
 				placement="bottom-end"
-				content={
-					<Tx label="Draft marks this item as work in progress for the author. It does not affect export or gameplay." />
-				}
+				content={<Mx label="Item draft status help" />}
 			>
 				<LinkButton
 					className="inline-flex h-9 items-center justify-center gap-1.5 text-sm text-muted data-[ui-active=true]:text-accent"

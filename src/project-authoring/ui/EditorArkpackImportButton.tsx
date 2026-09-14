@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { PackageOpen } from "lucide-react";
 import { useRef } from "react";
 
@@ -38,9 +39,11 @@ export const EditorArkpackImportButton = ({
 				data-ui="EditorArkpackImportButton"
 			>
 				<PackageOpen className="size-9 text-accent" />
-				<span className="text-lg">Import arkpack</span>
+				<span className="text-lg">
+					<Tx label="Import arkpack" />
+				</span>
 				<span className="text-xs font-medium opacity-75">
-					Choose an existing .arkpack file
+					<Tx label="Choose an existing .arkpack file" />
 				</span>
 			</Button>
 		</>

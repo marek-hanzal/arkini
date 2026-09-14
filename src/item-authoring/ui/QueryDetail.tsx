@@ -1,4 +1,5 @@
 import { Tx } from "~/translation/ui/Tx";
+import { Mx } from "~/translation/ui/Mx";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import {
@@ -14,7 +15,7 @@ export const QueryDetail = ({ query }: { readonly query: QuerySchema.Type }) => 
 		<div className="flex flex-wrap items-center gap-1 text-xs text-muted">
 			<Tx label={QueryScopePresentation[query.scope].label} />
 			<EditorInfoTooltip
-				content={<Tx label={QueryScopePresentation[query.scope].description} />}
+				content={<Mx label={QueryScopePresentation[query.scope].description} />}
 			/>
 			{query.scope === "board" ? (
 				<>
@@ -22,7 +23,7 @@ export const QueryDetail = ({ query }: { readonly query: QuerySchema.Type }) => 
 					· <Tx label={BoardDistancePresentation[query.distance].label} />
 					<EditorInfoTooltip
 						content={
-							<Tx label={BoardDistancePresentation[query.distance].description} />
+							<Mx label={BoardDistancePresentation[query.distance].description} />
 						}
 					/>
 				</>

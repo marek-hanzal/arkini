@@ -138,7 +138,7 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEditPr
 			>
 				<Status
 					dataUi="EditorAssetNotFound"
-					description={translator.textFn("This asset is not present in this project.")}
+					description={<Mx label="Asset missing description" />}
 					icon={FileQuestion}
 					title={translator.textFn("Asset not found")}
 				/>

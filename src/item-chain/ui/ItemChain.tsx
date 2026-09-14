@@ -1,3 +1,4 @@
+import { Mx } from "~/translation/ui/Mx";
 import { useMemo } from "react";
 import { ArrowRight, Clock, GitBranch } from "lucide-react";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -38,14 +39,12 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 			data-ui="EditorItemChain"
 			className="flex flex-col gap-4"
 		>
-			{projection.truncated ? (
-				<p className="text-sm text-muted">{translator.textFn("Chain safety limit")}</p>
-			) : null}
+			{projection.truncated ? <Mx label="Chain safety limit" /> : null}
 			{projection.chains.length === 0 ? (
 				<Status
 					icon={GitBranch}
 					title={translator.textFn("No chains for this item")}
-					description={translator.textFn("Chain empty description")}
+					description={<Mx label="Chain empty description" />}
 					size="large"
 					variant="flat"
 				/>
@@ -235,9 +234,9 @@ const ChainStep = ({ step }: { readonly step: readItemChainsFn.Step }) => {
 				</p>
 			)}
 			{step.kind !== "pulse" ? null : (
-				<p className="mt-1 text-xs text-muted">
-					{translator.textFn("Chain pulse explanation")}
-				</p>
+				<div className="mt-1">
+					<Mx label="Chain pulse explanation" />
+				</div>
 			)}
 			<div className="mt-3 flex flex-col gap-3">
 				{step.branches.length === 0 && !step.incomplete ? (

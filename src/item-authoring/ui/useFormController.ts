@@ -23,6 +23,7 @@ import { MergeDraftDefault } from "~/item-authoring/ui/MergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readEditorFormValidationMessageFn as readSharedValidationMessageFn } from "~/editor-control/fn/readEditorFormValidationMessageFn";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const saveCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
@@ -71,10 +72,24 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 				],
 });
 
-const readFormValidationMessageFn = (issue: z.core.$ZodIssue) =>
-	issue.path.at(-1) === "itemId" && issue.code === "too_small"
-		? "Select an item."
-		: readSharedValidationMessageFn(issue);
+const readFormValidationMessageFn = (issue: z.core.$ZodIssue, textFn: (key: string) => string) => {
+	if (issue.path.at(-1) === "itemId" && issue.code === "too_small")
+		return textFn("Select an item.");
+	switch (issue.message) {
+		case "This Item ID is already in use.":
+			return textFn("This Item ID is already in use.");
+		case "Enable Units on this item before selecting Spend.":
+			return textFn("Enable Units on this item before selecting Spend.");
+		case "Selected target must have Units enabled before choosing Spend.":
+			return textFn("Selected target must have Units enabled before choosing Spend.");
+		case "Enable Units on this item before selecting Self.":
+			return textFn("Enable Units on this item before selecting Self.");
+		case "Selected target must have Units enabled.":
+			return textFn("Selected target must have Units enabled.");
+		default:
+			return readSharedValidationMessageFn(issue, textFn);
+	}
+};
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
 export const useFormController = ({
@@ -85,6 +100,7 @@ export const useFormController = ({
 	onSavedFn,
 }: useFormController.Props) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const formValues = useMemo<FormValues>(
 		() => readFormValuesFn(initialItem),
 		[
@@ -230,8 +246,14 @@ export const useFormController = ({
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);
+	const readValidationMessageFn = useCallback(
+		(issue: z.core.$ZodIssue) => readFormValidationMessageFn(issue, translator.textFn),
+		[
+			translator.textFn,
+		],
+	);
 	const validationIssues = useAuthoringFormValidation({
-		readMessageFn: readFormValidationMessageFn,
+		readMessageFn: readValidationMessageFn,
 		schema,
 		submissionAttempts,
 		values: currentValues,

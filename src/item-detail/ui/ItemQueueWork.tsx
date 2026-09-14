@@ -11,6 +11,8 @@ import { ProductionJobProgress } from "~/production-job/ui/ProductionJobProgress
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 type QueueProjection = Extract<
 	ItemDetailQueueProjection,
@@ -56,6 +58,7 @@ export const ItemQueueActiveSlot = ({
 	readonly job: QueueProjection["active"][number] | undefined;
 	readonly queuedRequestCount: number;
 }) => {
+	const translator = useTranslator();
 	return (
 		<div
 			className="relative min-h-28"
@@ -86,7 +89,7 @@ export const ItemQueueActiveSlot = ({
 					>
 						<h3 className="flex items-center gap-2 text-lg font-semibold leading-tight text-foreground">
 							<CircleOff className="size-5 shrink-0 text-muted" />
-							No active job
+							<Tx label="No active job" />
 						</h3>
 						<AnimatePresence
 							initial={false}
@@ -98,8 +101,10 @@ export const ItemQueueActiveSlot = ({
 								{...itemDetailFadeMotion}
 							>
 								{queuedRequestCount === 0
-									? "Nothing is currently scheduled to run."
-									: "Queued work will start as soon as its requirements are met."}
+									? translator.textFn("Nothing is currently scheduled to run.")
+									: translator.textFn(
+											"Queued work will start as soon as its requirements are met.",
+										)}
 							</motion.p>
 						</AnimatePresence>
 					</motion.article>
@@ -147,7 +152,7 @@ export const ItemQueueActiveSlot = ({
 												className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground"
 												{...itemDetailBadgeMotion}
 											>
-												{statusLabel[job.status]}
+												{translator.textFn(statusLabel[job.status])}
 											</motion.span>
 										)}
 									</AnimatePresence>
@@ -171,50 +176,64 @@ const QueueRequestRow = ({
 }: {
 	readonly index: number;
 	readonly request: QueueProjection["request"][number];
-}) => (
-	<article
-		className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
-		{...readDataUiFn({
-			dataUi: "ItemQueueRow",
-			state: {
-				queueStatus: request.status,
-				state: "queued",
-			},
-		})}
-	>
-		<div className="min-w-0">
-			<div className="flex flex-wrap items-center gap-2">
-				<QueueWorkIdentity
-					identity={request.identity}
-					title={request.title}
-				/>
-				<span className="rounded-full border border-line-strong bg-surface-raised/65 px-2.5 py-1 text-xs font-semibold text-muted">
-					Queued #{index + 1}
-				</span>
-			</div>
-			<AnimatePresence
-				initial={false}
-				mode="popLayout"
-			>
-				<motion.p
-					key={`${request.status}:${request.missingQuantity ?? "unknown"}`}
-					className="mt-2 text-sm text-muted"
-					{...itemDetailFadeMotion}
+}) => {
+	const translator = useTranslator();
+	return (
+		<article
+			className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
+			{...readDataUiFn({
+				dataUi: "ItemQueueRow",
+				state: {
+					queueStatus: request.status,
+					state: "queued",
+				},
+			})}
+		>
+			<div className="min-w-0">
+				<div className="flex flex-wrap items-center gap-2">
+					<QueueWorkIdentity
+						identity={request.identity}
+						title={request.title}
+					/>
+					<span className="rounded-full border border-line-strong bg-surface-raised/65 px-2.5 py-1 text-xs font-semibold text-muted">
+						{translator
+							.textFn("Queued #{position}")
+							.replace("{position}", String(index + 1))}
+					</span>
+				</div>
+				<AnimatePresence
+					initial={false}
+					mode="popLayout"
 				>
-					{request.status === "inputs-ready"
-						? "Inputs available"
-						: request.status === "waiting-inputs"
-							? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
-									request.missingQuantity === 1 ? "unit" : "units"
-								} missing`
-							: request.status === "blocked-active"
-								? "Waiting for active job"
-								: "Waiting for runtime conditions"}
-				</motion.p>
-			</AnimatePresence>
-		</div>
-	</article>
-);
+					<motion.p
+						key={`${request.status}:${request.missingQuantity ?? "unknown"}`}
+						className="mt-2 text-sm text-muted"
+						{...itemDetailFadeMotion}
+					>
+						{request.status === "inputs-ready"
+							? translator.textFn("Inputs available")
+							: request.status === "waiting-inputs"
+								? translator
+										.textFn(
+											request.missingQuantity === 1
+												? "Waiting for inputs · one unit missing"
+												: "Waiting for inputs · {quantity} units missing",
+										)
+										.replace(
+											"{quantity}",
+											request.missingQuantity === undefined
+												? translator.textFn("some")
+												: String(request.missingQuantity),
+										)
+								: request.status === "blocked-active"
+									? translator.textFn("Waiting for active job")
+									: translator.textFn("Waiting for runtime conditions")}
+					</motion.p>
+				</AnimatePresence>
+			</div>
+		</article>
+	);
+};
 
 /** Renders queued requests or the canonical empty queue presentation. */
 export const ItemQueueRequestList = ({
@@ -235,7 +254,9 @@ export const ItemQueueRequestList = ({
 			>
 				<div className="grid justify-items-center gap-2">
 					<ListX className="size-6 text-subtle" />
-					<p>Queue is empty</p>
+					<p>
+						<Tx label="Queue is empty" />
+					</p>
 				</div>
 			</motion.div>
 		) : (

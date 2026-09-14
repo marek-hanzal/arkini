@@ -12,6 +12,7 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
+import { Mx } from "~/translation/ui/Mx";
 
 const LineFlag = ({
 	checked,
@@ -42,11 +43,7 @@ const LineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 	<div className="grid min-w-32 gap-1 text-right">
 		<p className="flex items-center justify-end gap-1 text-xs font-medium uppercase tracking-[0.08em] text-muted">
 			<Tx label="Runtime" />
-			<EditorInfoTooltip
-				content={
-					<Tx label="Time for one production cycle before runtime rules. Zero completes immediately." />
-				}
-			/>
+			<EditorInfoTooltip content={<Mx label="Authored production runtime summary help" />} />
 		</p>
 		<div className="grid">
 			<p className="self-center font-semibold tabular-nums text-foreground">
@@ -86,37 +83,27 @@ export const ProductionLineDetail = ({
 						<LineFlag
 							checked={line.default}
 							label={<Tx label="Default" />}
-							description={
-								<Tx label="The authored line selected for ordinary item activation. The player can change Default independently of Clock." />
-							}
+							description={<Mx label="Authored production Default marker help" />}
 						/>
 						<LineFlag
 							checked={line.clock === true}
 							label={<Tx label="Clock" />}
-							description={
-								<Tx label="The authored line selected for automatic Clock impulses. Selecting Default does not change this selection." />
-							}
+							description={<Mx label="Authored production Clock marker help" />}
 						/>
 						<LineFlag
 							checked={line.show}
 							label={<Tx label="Visible" />}
-							description={
-								<Tx label="Visible lines are shown to the player before runtime rules alter their visibility." />
-							}
+							description={<Mx label="Authored production Visible marker help" />}
 						/>
 						<LineFlag
 							checked={line.enable}
 							label={<Tx label="Enabled" />}
-							description={
-								<Tx label="Enabled lines can accept production jobs before runtime rules alter their availability." />
-							}
+							description={<Mx label="Authored production Enabled marker help" />}
 						/>
 						<LineFlag
 							checked={line.ahead === true}
 							label={<Tx label="Check ahead" />}
-							description={
-								<Tx label="Before this item is produced, check one future run against item count limits. Only checked lines that are shown and enabled by default participate; one fitting alternative is enough. This looks one step ahead and reserves no future output." />
-							}
+							description={<Mx label="Authored production Check ahead marker help" />}
 						/>
 					</div>
 					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
@@ -135,17 +122,13 @@ export const ProductionLineDetail = ({
 				</div>
 				<OutputDetail
 					emptyLabel={translator.textFn("No output")}
-					description={translator.textFn(
-						"This line can complete without producing an item. Configured output is resolved through its alternatives, rolls, and drop rules.",
-					)}
+					description={<Mx label="Authored production output summary help" />}
 					output={line.output}
 				/>
 			</div>
 			<RulesDetail
 				rules={line.rules}
-				description={translator.textFn(
-					"Every condition of a rule must pass. Show and Hide control visibility; Enable rules must all pass and Disable vetoes availability. Runtime multipliers apply before signed runtime adjustments.",
-				)}
+				description={<Mx label="Authored production rules summary help" />}
 			/>
 		</EditorRootCard>
 	);

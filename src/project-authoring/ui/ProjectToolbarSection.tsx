@@ -1,3 +1,5 @@
+import { Mx } from "~/translation/ui/Mx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useStore } from "@tanstack/react-form";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -8,6 +10,7 @@ import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext
 import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 export const ProjectToolbarSection = () => {
+	const translator = useTranslator();
 	const { form, validationIssues } = useProjectFormSession();
 	const size = useStore(form.store, (state) => state.values.toolbarSize);
 	const start = useStore(form.store, (state) => state.values.start);
@@ -34,7 +37,7 @@ export const ProjectToolbarSection = () => {
 				<form.AppField name="toolbarSize">
 					{(field) => (
 						<field.NumberField
-							label="Slots"
+							label={translator.textFn("Slots")}
 							min={0}
 							max={EditorProjectSizeMax}
 						/>
@@ -42,9 +45,11 @@ export const ProjectToolbarSection = () => {
 				</form.AppField>
 				<EditorFormBranchEnd />
 			</EditorFormCard>
-			<EditorFormSection title="Initial toolbar">
+			<EditorFormSection title={translator.textFn("Initial toolbar")}>
 				{size === 0 ? (
-					<p className="text-sm text-muted">Toolbar is disabled.</p>
+					<div className="text-sm text-muted">
+						<Mx label="Project toolbar disabled help" />
+					</div>
 				) : (
 					<ProjectStartGrid
 						cells={cells}

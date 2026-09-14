@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
@@ -113,11 +115,13 @@ const render = async (resourceId: string) => {
 	roots.push(root);
 	await act(async () => {
 		root.render(
-			<EditorAssetDeleteSection
-				filter="unused"
-				query="spare"
-				resourceId={resourceId}
-			/>,
+			<TranslationTestProvider>
+				<EditorAssetDeleteSection
+					filter="unused"
+					query="spare"
+					resourceId={resourceId}
+				/>
+			</TranslationTestProvider>,
 		);
 	});
 	return container;

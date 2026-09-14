@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useCallback } from "react";
 
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
@@ -20,6 +21,7 @@ export const NoteLinkPickers = ({
 	readonly onItemUidsChangeFn: (itemUids: ReadonlyArray<string>) => void;
 	readonly onResourceIdsChangeFn: (resourceIds: ReadonlyArray<string>) => void;
 }) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const includeItemFn = useCallback(
 		(item: ItemSchema.Type) => !itemUids.includes(item.uid),
@@ -43,7 +45,7 @@ export const NoteLinkPickers = ({
 			<EditorItemReferenceControl
 				showSelectedPreview={false}
 				key={`items:${itemUids.length}`}
-				label="Link item"
+				label={translator.textFn("Link item")}
 				value=""
 				includeItemFn={includeItemFn}
 				onChangeFn={(itemId) => {
@@ -58,7 +60,7 @@ export const NoteLinkPickers = ({
 			<EditorAssetReferenceControl
 				showSelectedPreview={false}
 				key={`assets:${resourceIds.length}`}
-				label="Link asset"
+				label={translator.textFn("Link asset")}
 				value=""
 				includeResourceFn={includeResourceFn}
 				onChangeFn={(resourceId) => {

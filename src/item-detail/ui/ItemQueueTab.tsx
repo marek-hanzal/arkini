@@ -9,6 +9,8 @@ import { ItemQueueActiveSlot, ItemQueueRequestList } from "~/item-detail/ui/Item
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Scrollable } from "~/ui/ui/Scrollable";
+import { Tx } from "~/translation/ui/Tx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 type QueueProjection = Extract<
 	ItemDetailQueueProjection,
@@ -24,6 +26,7 @@ interface ItemQueueTabProps extends useItemQueueClearController.Props {
 
 /** Composes queue commands, the active slot, and queued request presentation. */
 export const ItemQueueTab = ({ disabled = false, queue }: ItemQueueTabProps) => {
+	const translator = useTranslator();
 	const controller = useItemQueueClearController({
 		queue,
 	});
@@ -36,7 +39,10 @@ export const ItemQueueTab = ({ disabled = false, queue }: ItemQueueTabProps) => 
 		>
 			<div className="flex items-center justify-between gap-4 border-b border-line pb-3 text-sm">
 				<p className="text-muted">
-					{used} / {queue.capacity} queue slots used
+					{translator
+						.textFn("{used} / {capacity} queue slots used")
+						.replace("{used}", String(used))
+						.replace("{capacity}", String(queue.capacity))}
 				</p>
 				<div className="flex min-h-10 items-center justify-end">
 					<AnimatePresence initial={false}>
@@ -66,7 +72,7 @@ export const ItemQueueTab = ({ disabled = false, queue }: ItemQueueTabProps) => 
 									cursorIntent={controller.pending ? "progress" : undefined}
 									onClick={controller.clearQueueFn}
 								>
-									Clear queue
+									<Tx label="Clear queue" />
 								</LinkButton>
 							</motion.div>
 						)}

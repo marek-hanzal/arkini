@@ -1,6 +1,8 @@
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 
 import type { EditorBoardGame } from "~/editor-board/type/EditorBoardGame";
 import { EditorBoardGameAtom } from "~/editor-board/atom/EditorBoardGameAtom";
@@ -20,8 +22,8 @@ const EditorBoardStatus = ({
 	detail,
 	title,
 }: {
-	readonly detail: string;
-	readonly title: string;
+	readonly detail: ReactNode;
+	readonly title: ReactNode;
 }) => (
 	<section
 		className="grid size-full place-items-center overflow-y-auto p-3"
@@ -29,7 +31,7 @@ const EditorBoardStatus = ({
 	>
 		<div className="w-full max-w-xl rounded-2xl border border-line bg-surface-raised p-6 text-center shadow-xl">
 			<h1 className="text-xl font-semibold">{title}</h1>
-			<p className="mt-3 break-words text-sm leading-6 text-muted">{detail}</p>
+			<div className="mt-3 break-words text-sm leading-6 text-muted">{detail}</div>
 		</div>
 	</section>
 );
@@ -44,7 +46,7 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 		return (
 			<EditorBoardStatus
 				detail={failure.message}
-				title="Editor game stopped"
+				title={<Tx label="Editor game stopped" />}
 			/>
 		);
 	}
@@ -92,12 +94,12 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 						state.projectRevision === project.revision ? (
 						<EditorBoardStatus
 							detail={String(state.error)}
-							title="Editor game could not synchronize"
+							title={<Tx label="Editor game could not synchronize" />}
 						/>
 					) : (
 						<EditorBoardStatus
-							detail="Starting a fresh game from the latest project revision."
-							title="Preparing editor game…"
+							detail={<Mx label="Editor Board preparing description" />}
+							title={<Tx label="Preparing editor game…" />}
 						/>
 					)}
 				</section>

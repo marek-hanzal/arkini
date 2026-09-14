@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { Project } from "~/project-authoring/type/Project";
 import type { EstimateRouteStep } from "~/estimate/type/EstimateProjection";
@@ -6,6 +7,7 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
@@ -26,6 +28,7 @@ export const ItemEstimateRouteGraph = ({
 	readonly limit?: number;
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }) => {
+	const translator = useTranslator();
 	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
 	const sortedRouteSteps = [
 		...routeSteps,
@@ -50,11 +53,11 @@ export const ItemEstimateRouteGraph = ({
 					optionDataUi="EditorItemEstimateRouteSort"
 					options={[
 						{
-							label: "Time",
+							label: translator.textFn("Time"),
 							value: "time",
 						},
 						{
-							label: "Quantity",
+							label: translator.textFn("Quantity"),
 							value: "quantity",
 						},
 					]}
@@ -85,7 +88,7 @@ export const ItemEstimateRouteGraph = ({
 										className="block truncate font-medium text-muted"
 										title={route.factId}
 									>
-										{route.factId} [missing]
+										{route.factId} {translator.textFn("Missing item marker")}
 									</span>
 								) : (
 									<DetailReference
@@ -96,19 +99,24 @@ export const ItemEstimateRouteGraph = ({
 								)}
 								{route.rootQuantity > 0 ? (
 									<p className="mt-1 truncate text-xs text-muted">
-										{formatQuantityFn(route.rootQuantity)} from authored start
+										{formatQuantityFn(route.rootQuantity)}{" "}
+										{translator.textFn("from authored start")}
 									</p>
 								) : null}
 							</div>
 							<dl className="pointer-events-none relative z-10 grid shrink-0 gap-1 text-right tabular-nums">
 								<div className="flex items-baseline justify-end gap-1.5">
-									<dt className="text-xs text-muted">Quantity:</dt>
+									<dt className="text-xs text-muted">
+										<Tx label="Quantity" />:
+									</dt>
 									<dd className="font-semibold text-foreground">
 										×{formatQuantityFn(route.quantity)}
 									</dd>
 								</div>
 								<div className="flex items-baseline justify-end gap-1.5">
-									<dt className="text-xs text-muted">Time:</dt>
+									<dt className="text-xs text-muted">
+										<Tx label="Time" />:
+									</dt>
 									<dd className="font-semibold text-foreground">
 										{formatRuntimeFn(route.durationMs)}
 									</dd>

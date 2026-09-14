@@ -14,6 +14,7 @@ import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRu
 import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Tx } from "~/translation/ui/Tx";
 
 interface RuntimeItemDetailContentProps {
 	readonly kind: "runtime";
@@ -70,7 +71,7 @@ const ItemInfoContent = ({
 	if (identity?.kind !== "available" || info?.kind !== "available") {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
-				Item detail is unavailable.
+				<Tx label="Item detail is unavailable." />
 			</div>
 		);
 	}
@@ -141,7 +142,7 @@ const ItemLinesContent = ({
 	if (lines?.kind !== "available") {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
-				Line detail is unavailable.
+				<Tx label="Line detail is unavailable." />
 			</div>
 		);
 	}
@@ -172,14 +173,14 @@ const ItemQueueContent = ({
 				className="grid flex-1 place-items-center px-4 text-center text-sm text-muted"
 				data-ui="ItemQueueStale"
 			>
-				Queue is unavailable because this item no longer exists.
+				<Tx label="Queue is unavailable because this item no longer exists." />
 			</div>
 		);
 	}
 	if (queue?.kind !== "available") {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
-				Queue detail is unavailable.
+				<Tx label="Queue detail is unavailable." />
 			</div>
 		);
 	}
@@ -203,7 +204,7 @@ const ItemSourcesContent = ({
 	if (sources?.kind !== "available" || sources.source.length === 0) {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
-				Source detail is unavailable.
+				<Tx label="Source detail is unavailable." />
 			</div>
 		);
 	}

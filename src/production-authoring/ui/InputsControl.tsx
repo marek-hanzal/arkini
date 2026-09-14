@@ -61,11 +61,11 @@ export const InputsControl = ({
 						<Mx label="Action inputs help" />
 					)
 				}
-				title="Inputs"
+				title={translator.textFn("Inputs")}
 				variant="secondary"
 			/>
 			<EditorCollectionSelector
-				addLabel="Add input"
+				dataUi="EditorInputsCollection"
 				initialSelectedIndex={inputIndex}
 				key={inputIndex}
 				count={value.length}
@@ -73,23 +73,23 @@ export const InputsControl = ({
 					validationIssues,
 					value.length,
 					1,
-					"Add at least one input.",
+					translator.textFn("Add at least one input."),
 				)}
 				itemLabelFn={(index) => {
 					const input = value[index];
 					if (input.type === "materials")
-						return `Material input ${index + 1} — ${readItemLabelFn(
+						return `${translator.textFn("Material input")} ${index + 1} — ${readItemLabelFn(
 							input.selector.itemId,
-							"No item selected",
+							translator.textFn("No item selected"),
 						)}`;
 					if (input.type === "units" && input.units?.from === "self")
 						return `${translator.textFn("Self-paid units input")} ${index + 1}`;
 					if (input.type === "units")
 						return `${translator.textFn("Units input")} ${index + 1} — ${readItemLabelFn(
 							input.query.selector.itemId,
-							"No item selected",
+							translator.textFn("No item selected"),
 						)}`;
-					return `Simple input ${index + 1}`;
+					return `${translator.textFn("Simple input")} ${index + 1}`;
 				}}
 				itemSearchTermsFn={(index) => {
 					const input = value[index];
@@ -107,7 +107,7 @@ export const InputsControl = ({
 					}
 					return [];
 				}}
-				label={allowMaterials ? "Line inputs" : "Action inputs"}
+				label={translator.textFn(allowMaterials ? "Line inputs" : "Action inputs")}
 				renderItemContentFn={(index, label) => {
 					const input = value[index];
 					if (input.type === "materials") {
@@ -148,9 +148,11 @@ export const InputsControl = ({
 								label={label}
 								details={
 									<span className="text-xs text-subtle">
-										{units.from === "self" ? "Self" : "Target"}
+										{translator.textFn(
+											units.from === "self" ? "Self" : "Target",
+										)}
 										{units.from === "target"
-											? ` · ${BoardDistancePresentation[input.query.distance].label}`
+											? ` · ${translator.textFn(BoardDistancePresentation[input.query.distance].label)}`
 											: null}
 										{" · "}
 										{translator.textFn("Cost")}: {units.cost}
@@ -183,7 +185,6 @@ export const InputsControl = ({
 					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}
 				removeDisabled={!emptyAllowed && value.length === 1}
-				removeLabel="Remove input"
 				selectedIndex={invalidInputIndex}
 			>
 				{(index) => (

@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
 import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -83,7 +85,13 @@ describe("ProjectGeneralDetail", () => {
 			resources: editorTestResources,
 		} satisfies Project;
 
-		await act(async () => root.render(<ProjectGeneralDetail project={project} />));
+		await act(async () => {
+			root.render(
+				<TranslationTestProvider>
+					<ProjectGeneralDetail project={project} />
+				</TranslationTestProvider>,
+			);
+		});
 
 		const links = Array.from(container.querySelectorAll<HTMLAnchorElement>("a"));
 		expect(links).toHaveLength(3);

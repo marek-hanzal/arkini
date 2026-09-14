@@ -5,7 +5,6 @@ import { Trash2 } from "lucide-react";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { Button } from "~/ui/ui/Button";
-import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface NoteItemLinksProps {
 	readonly itemUids: ReadonlyArray<string>;
@@ -47,7 +46,7 @@ export const NoteItemLinks = ({
 									className="px-2 text-sm text-muted"
 									data-ui="EditorNoteMissingItem"
 								>
-									Unavailable item · {itemUid}
+									<Tx label="Unavailable item" /> · {itemUid}
 								</span>
 							) : (
 								<Link
@@ -67,28 +66,20 @@ export const NoteItemLinks = ({
 									<span className="truncate">{item.title || item.id}</span>
 								</Link>
 							)}
-							<Tooltip
-								content={
-									requiredItemUid === itemUid
-										? "New notes stay linked to this item"
-										: "Unlink item from note"
-								}
-								placement="top"
+
+							<Button
+								className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
+								data-ui="EditorNoteUnlinkItem"
+								disabled={disabled || requiredItemUid === itemUid}
+								onClick={() => {
+									if (disabled || requiredItemUid === itemUid) return;
+									if (onChangeFn !== undefined)
+										onChangeFn(itemUids.filter((uid) => uid !== itemUid));
+									else onUnlinkFn?.(itemUid);
+								}}
 							>
-								<Button
-									className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
-									data-ui="EditorNoteUnlinkItem"
-									disabled={disabled || requiredItemUid === itemUid}
-									onClick={() => {
-										if (disabled || requiredItemUid === itemUid) return;
-										if (onChangeFn !== undefined)
-											onChangeFn(itemUids.filter((uid) => uid !== itemUid));
-										else onUnlinkFn?.(itemUid);
-									}}
-								>
-									<Trash2 className="size-4" />
-								</Button>
-							</Tooltip>
+								<Trash2 className="size-4" />
+							</Button>
 						</div>
 					);
 				})}

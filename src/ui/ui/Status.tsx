@@ -5,7 +5,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 interface StatusProps {
 	readonly action?: ReactNode;
 	readonly dataUi?: string;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly icon: LucideIcon;
 	readonly iconSpin?: boolean;
 	readonly iconTone?: "default" | "muted" | "warning" | "primary";
@@ -54,9 +54,9 @@ export const Status = ({
 						{title}
 					</h2>
 					{description === undefined ? null : (
-						<p className="text-sm text-muted group-data-[ui-size=large]/status:text-base">
+						<div className="text-sm text-muted group-data-[ui-size=large]/status:text-base">
 							{description}
-						</p>
+						</div>
 					)}
 				</div>
 				{action === undefined ? null : <div className="w-full min-w-0 pt-1">{action}</div>}

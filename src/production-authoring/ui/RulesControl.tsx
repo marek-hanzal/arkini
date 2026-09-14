@@ -58,14 +58,23 @@ type DraftRule =
 			readonly when: DraftWhen[];
 	  };
 
+const RuleTypeTranslationKey = {
+	disable: "Disable",
+	enable: "Enable",
+	hide: "Hide",
+	"runtime:adjust": "Runtime adjustment",
+	"runtime:multiplier": "Runtime multiplier",
+	show: "Show",
+} as const satisfies Record<RuleType, string>;
+
 const readRuleItemIdsFn = (rule: DraftRule): ReadonlyArray<string> => [
 	...new Set(
 		rule.when.map((when) => when.query.selector.itemId).filter((itemId) => itemId.length > 0),
 	),
 ];
 
-const readRuleSummaryFn = (rule: DraftRule): string => {
-	const conditionSummary = `${rule.when.length} ${rule.when.length === 1 ? "condition" : "conditions"}`;
+const readRuleSummaryFn = (rule: DraftRule, textFn: (key: string) => string): string => {
+	const conditionSummary = `${rule.when.length} ${textFn(rule.when.length === 1 ? "condition" : "conditions")}`;
 	if (rule.type === "runtime:multiplier") return `×${rule.multiplier} · ${conditionSummary}`;
 	if (rule.type === "runtime:adjust") return `${rule.adjustMs / 1_000}s · ${conditionSummary}`;
 	return conditionSummary;
@@ -73,11 +82,16 @@ const readRuleSummaryFn = (rule: DraftRule): string => {
 
 const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: DraftRule }) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const itemIds = readRuleItemIdsFn(rule);
 	return (
 		<EditorCollectionOption
 			label={label}
-			details={<span className="text-xs text-subtle">{readRuleSummaryFn(rule)}</span>}
+			details={
+				<span className="text-xs text-subtle">
+					{readRuleSummaryFn(rule, translator.textFn)}
+				</span>
+			}
 		>
 			{itemIds.map((itemId) => (
 				<EditorItemThumbnail
@@ -95,11 +109,11 @@ const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: Dr
 	);
 };
 
-const readConditionSummaryFn = (when: DraftWhen): string => {
-	const scope = QueryScopePresentation[when.query.scope].label;
+const readConditionSummaryFn = (when: DraftWhen, textFn: (key: string) => string): string => {
+	const scope = textFn(QueryScopePresentation[when.query.scope].label);
 	const querySummary =
 		when.query.scope === "board"
-			? `${scope} · ${BoardDistancePresentation[when.query.distance].label}`
+			? `${scope} · ${textFn(BoardDistancePresentation[when.query.distance].label)}`
 			: scope;
 	if (when.type === "count") return `${querySummary} · = ${when.count}`;
 	if (when.type === "range") return `${querySummary} · ${when.min}–${when.max}`;
@@ -108,11 +122,16 @@ const readConditionSummaryFn = (when: DraftWhen): string => {
 
 const ConditionOption = ({ label, when }: { readonly label: string; readonly when: DraftWhen }) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const itemId = when.query.selector.itemId;
 	return (
 		<EditorCollectionOption
 			label={label}
-			details={<span className="text-xs text-subtle">{readConditionSummaryFn(when)}</span>}
+			details={
+				<span className="text-xs text-subtle">
+					{readConditionSummaryFn(when, translator.textFn)}
+				</span>
+			}
 		>
 			{itemId.length === 0 ? null : (
 				<EditorItemThumbnail
@@ -346,7 +365,7 @@ const WhenControl = ({
 										validationIssues,
 										"count",
 									)}
-									label="Exact count"
+									label={translator.textFn("Exact count")}
 									value={when.count}
 									min={0}
 									onChangeFn={(count) =>
@@ -373,8 +392,8 @@ const WhenControl = ({
 											validationIssues,
 											"max",
 										)}
-										minimumLabel="Minimum count"
-										maximumLabel="Maximum count"
+										minimumLabel={translator.textFn("Minimum count")}
+										maximumLabel={translator.textFn("Maximum count")}
 										minimumValue={0}
 										value={when}
 										onChangeFn={(range) =>
@@ -417,18 +436,19 @@ const RuleControl = ({
 	const validationIssues = useFormValidationIssues(rule);
 	const invalidWhenIndex = useFormValidationFocusIndex(rule, "when");
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const translator = useTranslator();
 	return (
 		<article className="grid gap-3">
 			<div className="flex items-end gap-3">
 				<div className="min-w-0 flex-1">
 					<EditorChoiceControl
 						error={readEditorFormValidationErrorFn(validationIssues, "type")}
-						label="Rule type"
+						label={translator.textFn("Rule type")}
 						description={ruleTypeDescription}
 						value={rule.type}
 						options={allowedTypes.map((type) => ({
 							description: readRuleTypeDescriptionFn(type, ruleTarget),
-							label: type,
+							label: translator.textFn(RuleTypeTranslationKey[type]),
 							value: type,
 						}))}
 						onChangeFn={(type) => {
@@ -450,8 +470,10 @@ const RuleControl = ({
 				<>
 					<EditorTextControl
 						error={readEditorFormValidationErrorFn(validationIssues, "hint")}
-						label="Hint"
-						placeholder="Optional explanation shown while this rule applies"
+						label={translator.textFn("Hint")}
+						placeholder={translator.textFn(
+							"Optional explanation shown while this rule applies",
+						)}
 						required={false}
 						value={rule.hint ?? ""}
 						onChangeFn={(hint) =>
@@ -470,7 +492,7 @@ const RuleControl = ({
 					{rule.type !== "runtime:multiplier" ? null : (
 						<EditorNumberControl
 							error={readEditorFormValidationErrorFn(validationIssues, "multiplier")}
-							label="Runtime multiplier"
+							label={translator.textFn("Runtime multiplier")}
 							value={rule.multiplier}
 							min={0.01}
 							step={0.01}
@@ -485,7 +507,7 @@ const RuleControl = ({
 					{rule.type !== "runtime:adjust" ? null : (
 						<EditorSecondsControl
 							error={readEditorFormValidationErrorFn(validationIssues, "adjustMs")}
-							label="Runtime adjustment (seconds)"
+							label={translator.textFn("Runtime adjustment (seconds)")}
 							step={5}
 							value={rule.adjustMs / 1_000}
 							onChangeFn={(adjustSeconds) =>
@@ -497,7 +519,7 @@ const RuleControl = ({
 						/>
 					)}
 					<EditorCollectionSelector
-						addLabel="Add condition"
+						dataUi="EditorConditionsCollection"
 						initialSelectedIndex={initialWhenIndex}
 						key={initialWhenIndex}
 						count={rule.when.length}
@@ -505,13 +527,19 @@ const RuleControl = ({
 							validationIssues,
 							rule.when.length,
 							1,
-							"Add at least one condition.",
+							translator.textFn("Add at least one condition."),
 							"when",
 						)}
 						itemLabelFn={(whenIndex) =>
 							rule.when[whenIndex].type === undefined
-								? `Condition ${whenIndex + 1}`
-								: `Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
+								? `${translator.textFn("Condition")} ${whenIndex + 1}`
+								: `${translator.textFn("Condition")} ${whenIndex + 1} — ${translator.textFn(
+										rule.when[whenIndex].type === "count"
+											? "Exact count"
+											: rule.when[whenIndex].type === "range"
+												? "Count range"
+												: "Exists",
+									)}`
 						}
 						itemSearchTermsFn={(whenIndex) => {
 							const itemId = rule.when[whenIndex].query.selector.itemId;
@@ -522,7 +550,7 @@ const RuleControl = ({
 										readItemLabelFn(itemId, ""),
 									];
 						}}
-						label={`Rule ${ruleIndex + 1} conditions`}
+						label={`${translator.textFn("Rule")} ${ruleIndex + 1} ${translator.textFn("conditions")}`}
 						onAddFn={() =>
 							onChangeFn({
 								...rule,
@@ -540,7 +568,6 @@ const RuleControl = ({
 								) as typeof rule.when,
 							})
 						}
-						removeLabel="Remove condition"
 						renderItemContentFn={(whenIndex, label) => (
 							<ConditionOption
 								label={label}
@@ -592,6 +619,7 @@ export const RulesControl = ({
 	const draftRules = rules as ReadonlyArray<DraftRule>;
 	const invalidRuleIndex = useFormValidationFocusIndex(rules as object);
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const translator = useTranslator();
 	const createRuleFn = (type: RuleType): DraftRule =>
 		({
 			type,
@@ -612,19 +640,21 @@ export const RulesControl = ({
 			{headerVisible ? (
 				<EditorFormSectionDivider
 					description={description}
-					title="Rules"
+					title={translator.textFn("Rules")}
 					variant="secondary"
 				/>
 			) : null}
 			<EditorCollectionSelector
-				addLabel="Add rule"
+				dataUi="EditorRulesCollection"
 				initialSelectedIndex={initialRuleIndex}
 				key={initialRuleIndex}
 				count={draftRules.length}
 				itemLabelFn={(ruleIndex) =>
 					draftRules[ruleIndex].type === undefined
-						? `Rule ${ruleIndex + 1}`
-						: `Rule ${ruleIndex + 1} — ${draftRules[ruleIndex].type}`
+						? `${translator.textFn("Rule")} ${ruleIndex + 1}`
+						: `${translator.textFn("Rule")} ${ruleIndex + 1} — ${translator.textFn(
+								RuleTypeTranslationKey[draftRules[ruleIndex].type as RuleType],
+							)}`
 				}
 				itemSearchTermsFn={(ruleIndex) =>
 					readRuleItemIdsFn(draftRules[ruleIndex]).flatMap((itemId) => [
@@ -632,7 +662,7 @@ export const RulesControl = ({
 						readItemLabelFn(itemId, ""),
 					])
 				}
-				label="Rules"
+				label={translator.textFn("Rules")}
 				onAddFn={() =>
 					emitChangeFn([
 						...draftRules,
@@ -644,7 +674,6 @@ export const RulesControl = ({
 				onRemoveFn={(ruleIndex) =>
 					emitChangeFn(draftRules.filter((_current, index) => index !== ruleIndex))
 				}
-				removeLabel="Remove rule"
 				renderItemContentFn={(ruleIndex, label) => (
 					<RuleOption
 						label={label}

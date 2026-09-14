@@ -2,6 +2,7 @@ import { Unlink } from "lucide-react";
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Status } from "~/ui/ui/Status";
+import { Mx } from "~/translation/ui/Mx";
 
 const EmptyStateByFilter = {
 	"required-by": {
@@ -45,7 +46,7 @@ export const ItemConnectionsEmpty = ({
 			dataUi="EditorItemConnectionsEmpty"
 			icon={Unlink}
 			title={translator.textFn(state.title)}
-			description={expanded ? translator.textFn(state.description) : undefined}
+			description={expanded ? <Mx label={state.description} /> : undefined}
 			size={expanded ? "large" : "normal"}
 			variant="flat"
 		/>

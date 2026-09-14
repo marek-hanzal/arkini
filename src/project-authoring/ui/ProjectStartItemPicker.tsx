@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useProjectStartItemPickerController } from "~/project-authoring/ui/useProjectStartItemPickerController";
 import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
@@ -7,14 +8,15 @@ interface ProjectStartItemPickerProps extends useProjectStartItemPickerControlle
 
 /** Selects one canonical item allowed in the requested initial grid scope. */
 export const ProjectStartItemPicker = (props: ProjectStartItemPickerProps) => {
+	const translator = useTranslator();
 	const controller = useProjectStartItemPickerController(props);
 	return (
 		<ItemSpotlight
 			dataUi="EditorProjectStartItemPicker"
-			emptyMessage="No items can be placed here."
+			emptyMessage={translator.textFn("No items can be placed here.")}
 			footer={
 				<p className="text-center text-xs text-muted">
-					↑↓ select · Enter choose · Esc close
+					<Tx label="Item picker keyboard hint" />
 				</p>
 			}
 			onCloseFn={props.onCloseFn}

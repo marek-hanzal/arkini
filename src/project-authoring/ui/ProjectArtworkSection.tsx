@@ -1,3 +1,5 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 import { EditorAssetThumbnail } from "~/authoring-form/ui/EditorAssetThumbnail";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -12,22 +14,23 @@ export const ProjectArtworkSection = ({
 }: {
 	readonly initialAvatarIndex?: number;
 }) => {
+	const translator = useTranslator();
 	const { form } = useProjectFormSession();
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
-				title="Hero image"
-				description="The package-owned image shown by the launcher and game shell."
+				title={translator.textFn("Hero image")}
+				description={<Mx label="Project hero image help" />}
 			>
 				<EditorFormCard>
 					<form.AppField name="hero">
-						{(field) => <field.AssetField label="Hero asset" />}
+						{(field) => <field.AssetField label={translator.textFn("Hero asset")} />}
 					</form.AppField>
 				</EditorFormCard>
 			</EditorFormSection>
 			<EditorFormSection
-				title="About avatars"
-				description="Ordered package-owned images revealed on the /about screen as an easter egg."
+				title={translator.textFn("About avatars")}
+				description={<Mx label="Project About avatars help" />}
 			>
 				<EditorFormCard>
 					<form.AppField
@@ -38,22 +41,23 @@ export const ProjectArtworkSection = ({
 							const avatars = avatarsField.state.value;
 							return (
 								<EditorCollectionSelector
-									addLabel="Add avatar"
 									count={avatars.length}
 									initialSelectedIndex={initialAvatarIndex}
 									itemLabelFn={(index) =>
-										ProjectAvatarKeys[index] ?? `Avatar ${index + 1}`
+										ProjectAvatarKeys[index] ??
+										`${translator.textFn("Avatar")} ${index + 1}`
 									}
-									itemMetaFn={(index) => avatars[index] || "No asset selected"}
+									itemMetaFn={(index) =>
+										avatars[index] || translator.textFn("No asset selected")
+									}
 									key={initialAvatarIndex}
-									label="About avatars"
+									label={translator.textFn("About avatars")}
 									onAddFn={
 										avatars.length >= ProjectAvatarKeys.length
 											? undefined
 											: () => avatarsField.pushValue("")
 									}
 									onRemoveFn={(index) => avatarsField.removeValue(index)}
-									removeLabel="Remove avatar"
 									renderItemPreviewFn={(index) => (
 										<EditorAssetThumbnail
 											resourceId={avatars[index]}
@@ -64,7 +68,11 @@ export const ProjectArtworkSection = ({
 									{(index) => (
 										<div className="grid gap-3">
 											<form.AppField name={`avatars[${index}]`}>
-												{(field) => <field.AssetField label="Asset" />}
+												{(field) => (
+													<field.AssetField
+														label={translator.textFn("Asset")}
+													/>
+												)}
 											</form.AppField>
 											<EditorFormBranchEnd />
 										</div>

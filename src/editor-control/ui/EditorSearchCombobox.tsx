@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Search } from "lucide-react";
 
@@ -86,6 +87,7 @@ export const EditorSearchCombobox = ({
 	const selectedLabel = displaySelectedLabel
 		? (options.find((option) => option.id === value)?.label ?? value)
 		: value;
+	const translator = useTranslator();
 	const [query, setQueryFn] = useState(selectedLabel);
 	const [open, setOpenFn] = useState(false);
 	const [activeIndex, setActiveIndexFn] = useState(0);
@@ -393,7 +395,10 @@ export const EditorSearchCombobox = ({
 						autoComplete="off"
 						disabled={disabled}
 						className={`min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] py-2 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle data-[ui-invalid=true]:border-danger data-[ui-density=compact]:h-8 data-[ui-density=compact]:min-h-8 data-[ui-density=compact]:py-1 ${editorDisabledInputClassName}`}
-						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
+						placeholder={
+							placeholder ??
+							`${translator.textFn("Search")} ${label.toLocaleLowerCase()}…`
+						}
 						onBlur={() => {
 							handleOpenChangeFn(false);
 							onBlurFn?.();

@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 
 export const ProjectGridSizeValue = ({
@@ -7,6 +8,7 @@ export const ProjectGridSizeValue = ({
 	readonly height: number;
 	readonly width: number;
 }) => {
+	const translator = useTranslator();
 	const size =
 		Number.isInteger(width) && width > 0 && Number.isInteger(height) && height > 0
 			? width * height
@@ -14,7 +16,7 @@ export const ProjectGridSizeValue = ({
 	return (
 		<EditorValueField
 			as="div"
-			label="Capacity"
+			label={translator.textFn("Capacity")}
 		>
 			<output className="flex min-h-[var(--ak-control-min-height)] items-center rounded-lg border border-control-border bg-canvas/50 px-3 py-2 font-mono text-muted">
 				{size}

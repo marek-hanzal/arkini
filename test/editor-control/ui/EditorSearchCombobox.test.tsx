@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 
-import { act } from "react";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
+import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -44,29 +46,33 @@ describe("EditorSearchCombobox", () => {
 		const onChangeFn = vi.fn();
 		await act(async () => {
 			root.render(
-				<EditorSearchCombobox
-					emptyLabel="No assets"
-					label="Asset"
-					onChangeFn={onChangeFn}
-					options={[
-						{
-							id: "avatar-01",
-							label: "Avatar 01",
-							terms: [
-								"Avatar 01",
-							],
-						},
-						{
-							id: "avatar-02",
-							label: "Avatar 02",
-							terms: [
-								"Avatar 02",
-							],
-						},
-					]}
-					renderPreviewFn={() => null}
-					value="avatar-01"
-				/>,
+				createElement(
+					TranslationTestProvider,
+					null,
+					<EditorSearchCombobox
+						emptyLabel="No assets"
+						label="Asset"
+						onChangeFn={onChangeFn}
+						options={[
+							{
+								id: "avatar-01",
+								label: "Avatar 01",
+								terms: [
+									"Avatar 01",
+								],
+							},
+							{
+								id: "avatar-02",
+								label: "Avatar 02",
+								terms: [
+									"Avatar 02",
+								],
+							},
+						]}
+						renderPreviewFn={() => null}
+						value="avatar-01"
+					/>,
+				),
 			);
 		});
 
@@ -113,30 +119,34 @@ it("coalesces typed searches, blocks stale selection, and cancels dismissed quer
 	const renderPreviewFn = vi.fn(() => null);
 	await act(async () =>
 		root.render(
-			<EditorSearchCombobox
-				label="Item"
-				emptyLabel="No items"
-				value="alpha"
-				onChangeFn={onChangeFn}
-				onInputChangeFn={onInputChangeFn}
-				renderPreviewFn={renderPreviewFn}
-				options={[
-					{
-						id: "alpha",
-						label: "Alpha",
-						terms: [
-							"alpha",
-						],
-					},
-					{
-						id: "beta",
-						label: "Beta",
-						terms: [
-							"beta",
-						],
-					},
-				]}
-			/>,
+			createElement(
+				TranslationTestProvider,
+				null,
+				<EditorSearchCombobox
+					label="Item"
+					emptyLabel="No items"
+					value="alpha"
+					onChangeFn={onChangeFn}
+					onInputChangeFn={onInputChangeFn}
+					renderPreviewFn={renderPreviewFn}
+					options={[
+						{
+							id: "alpha",
+							label: "Alpha",
+							terms: [
+								"alpha",
+							],
+						},
+						{
+							id: "beta",
+							label: "Beta",
+							terms: [
+								"beta",
+							],
+						},
+					]}
+				/>,
+			),
 		),
 	);
 	const input = container.querySelector<HTMLInputElement>('input[type="search"]');
@@ -205,25 +215,29 @@ it("keeps arrow navigation visible in the menu without stealing input focus or s
 	roots.push(root);
 	await act(async () =>
 		root.render(
-			<EditorSearchCombobox
-				label="Item"
-				emptyLabel="No items"
-				value=""
-				onChangeFn={() => undefined}
-				renderPreviewFn={() => null}
-				options={Array.from(
-					{
-						length: 5,
-					},
-					(_, index) => ({
-						id: String(index),
-						label: String(index),
-						terms: [
-							String(index),
-						],
-					}),
-				)}
-			/>,
+			createElement(
+				TranslationTestProvider,
+				null,
+				<EditorSearchCombobox
+					label="Item"
+					emptyLabel="No items"
+					value=""
+					onChangeFn={() => undefined}
+					renderPreviewFn={() => null}
+					options={Array.from(
+						{
+							length: 5,
+						},
+						(_, index) => ({
+							id: String(index),
+							label: String(index),
+							terms: [
+								String(index),
+							],
+						}),
+					)}
+				/>,
+			),
 		),
 	);
 	const input = container.querySelector<HTMLInputElement>('input[type="search"]');
@@ -316,25 +330,29 @@ it("virtualizes a large picker and scrolls keyboard selection to an unmounted la
 		const onChangeFn = vi.fn();
 		await act(async () =>
 			root.render(
-				<EditorSearchCombobox
-					label="Item"
-					emptyLabel="No items"
-					value=""
-					onChangeFn={onChangeFn}
-					renderPreviewFn={() => null}
-					options={Array.from(
-						{
-							length: 1000,
-						},
-						(_, index) => ({
-							id: `item-${index}`,
-							label: `Item ${index}`,
-							terms: [
-								`item-${index}`,
-							],
-						}),
-					)}
-				/>,
+				createElement(
+					TranslationTestProvider,
+					null,
+					<EditorSearchCombobox
+						label="Item"
+						emptyLabel="No items"
+						value=""
+						onChangeFn={onChangeFn}
+						renderPreviewFn={() => null}
+						options={Array.from(
+							{
+								length: 1000,
+							},
+							(_, index) => ({
+								id: `item-${index}`,
+								label: `Item ${index}`,
+								terms: [
+									`item-${index}`,
+								],
+							}),
+						)}
+					/>,
+				),
 			),
 		);
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]')!;

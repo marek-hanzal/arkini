@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
@@ -58,6 +59,7 @@ export const useEditorProjectRefreshController = ({
 	blocked,
 	projectId,
 }: useEditorProjectRefreshController.Props): useEditorProjectRefreshController.Output => {
+	const translator = useTranslator();
 	const router = useRouter();
 	const commandAtom = refreshEditorProjectCommandAtom(projectId);
 	const result = useAtomValue(commandAtom);
@@ -93,7 +95,7 @@ export const useEditorProjectRefreshController = ({
 		refreshFn,
 		tooltip:
 			error === undefined
-				? "Refresh from disk"
-				: `Refresh failed: ${readErrorMessageFn(error)}`,
+				? translator.textFn("Refresh from disk")
+				: `${translator.textFn("Refresh failed")}: ${readErrorMessageFn(error)}`,
 	};
 };

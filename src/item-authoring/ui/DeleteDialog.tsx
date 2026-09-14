@@ -5,6 +5,8 @@ import type { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import type { Project } from "~/project-authoring/type/Project";
 import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 
 const DeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (
@@ -29,39 +31,42 @@ const ForceDeleteImpactList = ({
 	readonly impact: forceDeleteFx.Impact;
 	readonly project: Project;
 }) => {
+	const translator = useTranslator();
 	const entries: string[] = [];
 	for (const [surface, count] of Object.entries(impact.removedStartEntries)) {
 		if (count > 0)
 			entries.push(
-				`Remove ${count} starting ${startSurfaceTitles[surface as keyof typeof startSurfaceTitles]} ${count === 1 ? "entry" : "entries"}`,
+				`${translator.textFn("Remove")} ${count} ${translator.textFn("starting")} ${translator.textFn(startSurfaceTitles[surface as keyof typeof startSurfaceTitles])} ${translator.textFn(count === 1 ? "entry" : "entries")}`,
 			);
 	}
 	for (const { ownerItemId, ruleNumber } of impact.removedMergeRules)
 		entries.push(
-			`Remove merge rule ${ruleNumber} from ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove merge rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const { ownerItemId, inputNumber } of impact.removedActionInputs)
 		entries.push(
-			`Remove action input ${inputNumber} from ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove action input")} ${inputNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const { ownerItemId, ruleNumber } of impact.removedActionRules)
 		entries.push(
-			`Remove action rule ${ruleNumber} from ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove action rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const { ownerItemId, title } of impact.removedLines)
 		entries.push(
-			`Remove production line “${title}” from ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove production line")} “${title}” ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const ownerItemId of impact.removedUnitOutputOwnerIds)
 		entries.push(
-			`Remove the unit depletion output from ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove the unit depletion output from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const ownerItemId of impact.removedExpiryOutputOwnerIds)
-		entries.push(`Remove the expiry output from ${readItemTitleFn(project, ownerItemId)}`);
+		entries.push(
+			`${translator.textFn("Remove the expiry output from")} ${readItemTitleFn(project, ownerItemId)}`,
+		);
 
 	return (
 		<div className="mt-4 rounded-xl border border-line bg-surface/70 p-4">
-			<p className="text-sm font-semibold">This will also:</p>
+			<p className="text-sm font-semibold">{translator.textFn("This will also:")}</p>
 			<ul className="mt-2 grid max-h-52 list-disc gap-1.5 overflow-y-auto pl-5 text-sm leading-5 text-muted">
 				{entries.map((entry, index) => (
 					<li key={`${entry}:${index}`}>{entry}</li>
@@ -89,65 +94,60 @@ export const DeleteDialog = ({
 	readonly project: Project;
 	readonly onCancelFn: () => void;
 	readonly onConfirmFn: () => void;
-}) => (
-	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
-		<div
-			className="w-full max-w-2xl rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
-			data-ui="EditorItemDeleteDialog"
-		>
-			<h2 className="text-lg font-semibold">
-				{force ? "Force delete item?" : "Delete item?"}
-			</h2>
-			<p className="mt-2 text-sm leading-6 text-muted">
-				Delete <strong className="text-foreground">{item.title || item.id}</strong> from the
-				game
-				{force ? " and remove every authored structure that directly references it." : "."}
-			</p>
-			{force ? (
-				<ForceDeleteImpactList
-					impact={impact}
-					project={project}
-				/>
-			) : null}
-			<p className="mt-2 text-sm text-muted">
-				Its asset files remain available in the project.
-			</p>
-			<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
-				<p>
-					This removes the item from the saved project. This cannot be undone in the
-					Editor.
+}) => {
+	const translator = useTranslator();
+	return (
+		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
+			<div
+				className="w-full max-w-2xl rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+				data-ui="EditorItemDeleteDialog"
+			>
+				<h2 className="text-lg font-semibold">
+					{translator.textFn(force ? "Force delete item?" : "Delete item?")}
+				</h2>
+				<p className="mt-2 text-sm leading-6 text-muted">
+					{translator.textFn("Delete")}{" "}
+					<strong className="text-foreground">{item.title || item.id}</strong>{" "}
+					{translator.textFn("from the game.")}
 				</p>
+				{force ? <Mx label="Force delete reference removal help" /> : null}
 				{force ? (
-					<p>
-						The resulting config will remain structurally valid, but the game can be
-						logically broken. No additional references or gameplay relationships will be
-						repaired.
-					</p>
+					<ForceDeleteImpactList
+						impact={impact}
+						project={project}
+					/>
 				) : null}
-			</div>
-			<DeleteError error={error} />
-			<div className="mt-6 flex items-center justify-between gap-4">
-				<LinkButton
-					className="inline-flex items-center gap-1.5"
-					disabled={pending}
-					onClick={onCancelFn}
-				>
-					<X className="size-4" />
-					Cancel
-				</LinkButton>
-				<div className="flex shrink-0 items-center gap-2">
-					<Button
-						className="gap-1.5"
+				<div className="mt-2 text-sm text-muted">
+					<Mx label="Deleted item assets help" />
+				</div>
+				<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
+					<Mx label="Delete item irreversible warning" />
+					{force ? <Mx label="Force delete item integrity warning" /> : null}
+				</div>
+				<DeleteError error={error} />
+				<div className="mt-6 flex items-center justify-between gap-4">
+					<LinkButton
+						className="inline-flex items-center gap-1.5"
 						disabled={pending}
-						cursorIntent={pending ? "progress" : undefined}
-						data-ui="EditorItemDeleteConfirm"
-						onClick={onConfirmFn}
+						onClick={onCancelFn}
 					>
-						<Trash2 className="size-4" />
-						{force ? "Force delete" : "Delete"}
-					</Button>
+						<X className="size-4" />
+						{translator.textFn("Cancel")}
+					</LinkButton>
+					<div className="flex shrink-0 items-center gap-2">
+						<Button
+							className="gap-1.5"
+							disabled={pending}
+							cursorIntent={pending ? "progress" : undefined}
+							data-ui="EditorItemDeleteConfirm"
+							onClick={onConfirmFn}
+						>
+							<Trash2 className="size-4" />
+							{translator.textFn(force ? "Force delete" : "Delete")}
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-);
+	);
+};

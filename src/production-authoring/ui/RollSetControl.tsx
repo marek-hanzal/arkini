@@ -26,6 +26,7 @@ import {
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
 import { Mx } from "~/translation/ui/Mx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 type DropListValue = DropSchema.Type[];
 type WeightedRoll = Extract<
@@ -36,12 +37,12 @@ type WeightedRoll = Extract<
 >;
 
 const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
-const readDropSummaryFn = (drop: DropSchema.Type) => {
+const readDropSummaryFn = (drop: DropSchema.Type, textFn: (key: string) => string) => {
 	const { min, max } = drop.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
-	const placement = drop.placement === "drop" ? "Local drop" : "Random";
+	const placement = textFn(drop.placement === "drop" ? "Local drop" : "Random");
 	const rules = drop.rules.length;
-	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${rules === 1 ? "rule" : "rules"}`}`;
+	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`}`;
 };
 const RollTypeLabelByType = {
 	chance: "Chance",
@@ -61,11 +62,12 @@ const DropControl = ({
 	readonly value: DropSchema.Type;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
+	const translator = useTranslator();
 	return (
 		<div className="grid gap-3">
 			<EditorItemReferenceControl
 				error={readEditorFormValidationErrorFn(validationIssues, "itemId")}
-				label="Dropped item"
+				label={translator.textFn("Dropped item")}
 				value={value.itemId}
 				onChangeFn={(itemId) =>
 					onChangeFn({
@@ -98,17 +100,17 @@ const DropControl = ({
 				</div>
 				<EditorChoiceControl
 					error={readEditorFormValidationErrorFn(validationIssues, "placement")}
-					label="Board placement"
+					label={translator.textFn("Board placement")}
 					value={value.placement}
 					options={[
 						{
 							description: <Mx label="Local drop placement help" />,
-							label: "Local drop",
+							label: translator.textFn("Local drop"),
 							value: "drop",
 						},
 						{
 							description: <Mx label="Random drop placement help" />,
-							label: "Random",
+							label: translator.textFn("Random"),
 							value: "random",
 						},
 					]}
@@ -158,44 +160,45 @@ const DropList = ({
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};
+	const translator = useTranslator();
 	const validationIssues = useFormValidationIssues(value);
 	const invalidDropIndex = useFormValidationFocusIndex(value as object);
 	return (
 		<section className="grid gap-3">
 			<EditorFormSectionDivider
 				description={<Mx label="Drops help" />}
-				title="Drops"
+				title={translator.textFn("Drops")}
 				variant="secondary"
 			/>
 			<EditorCollectionSelector
-				addLabel="Add drop"
+				dataUi="EditorDropsCollection"
 				count={value.length}
 				error={readRequiredEditorCollectionErrorFn(
 					validationIssues,
 					value.length,
 					1,
-					"Add at least one drop.",
+					translator.textFn("Add at least one drop."),
 				)}
 				initialSelectedIndex={initialDropIndex}
 				key={initialDropIndex}
 				itemLabelFn={(index) =>
-					`Drop ${index + 1} — ${readItemLabelFn(
+					`${translator.textFn("Drop")} ${index + 1} — ${readItemLabelFn(
 						value[index].itemId,
-						"No item selected",
+						translator.textFn("No item selected"),
 					)}`
 				}
 				itemSearchTermsFn={(index) => [
 					value[index].itemId,
 				]}
-				label="Drops"
-				itemMetaFn={(index) => readDropSummaryFn(value[index])}
+				label={translator.textFn("Drops")}
+				itemMetaFn={(index) => readDropSummaryFn(value[index], translator.textFn)}
 				renderItemContentFn={(index, label) => (
 					<OutputDropOption
 						label={label}
 						drops={[
 							value[index],
 						]}
-						summary={readDropSummaryFn(value[index])}
+						summary={readDropSummaryFn(value[index], translator.textFn)}
 					/>
 				)}
 				renderSelectedItemPreviewFn={(index) => (
@@ -213,7 +216,6 @@ const DropList = ({
 				onRemoveFn={(index) =>
 					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}
-				removeLabel="Remove drop"
 				selectedIndex={invalidDropIndex}
 			>
 				{(index) => (
@@ -251,6 +253,7 @@ const WeightedRollControl = ({
 	readonly roll: WeightedRoll;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const translator = useTranslator();
 	const validationIssues = useFormValidationIssues(roll);
 	const invalidCandidateIndex = useFormValidationFocusIndex(roll, "drop");
 	return (
@@ -258,7 +261,7 @@ const WeightedRollControl = ({
 			<div className="grid gap-3">
 				<EditorFormSectionDivider
 					description={<Mx label="Weighted selections help" />}
-					title="Selections"
+					title={translator.textFn("Selections")}
 					variant="secondary"
 				/>
 				<div className="grid gap-3 sm:grid-cols-2">
@@ -285,26 +288,26 @@ const WeightedRollControl = ({
 			</div>
 			<EditorFormSectionDivider
 				description={<Mx label="Weighted candidates help" />}
-				title="Weighted candidates"
+				title={translator.textFn("Weighted candidates")}
 				variant="secondary"
 			/>
 			<EditorCollectionSelector
-				addLabel="Add weighted candidate"
+				dataUi="EditorWeightedCandidatesCollection"
 				count={roll.drop.length}
 				error={readRequiredEditorCollectionErrorFn(
 					validationIssues,
 					roll.drop.length,
 					2,
-					"Add at least two weighted candidates.",
+					translator.textFn("Add at least two weighted candidates."),
 					"drop",
 				)}
 				initialSelectedIndex={initialCandidateIndex}
 				key={initialCandidateIndex}
 				itemLabelFn={(candidateIndex) => {
 					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
-					return `Candidate ${candidateIndex + 1} — ${readItemLabelFn(
+					return `${translator.textFn("Candidate")} ${candidateIndex + 1} — ${readItemLabelFn(
 						itemId ?? "",
-						"No item selected",
+						translator.textFn("No item selected"),
 					)}`;
 				}}
 				itemSearchTermsFn={(candidateIndex) =>
@@ -316,11 +319,11 @@ const WeightedRollControl = ({
 				renderItemContentFn={(candidateIndex, label) => {
 					const candidate = roll.drop[candidateIndex];
 					const summary = [
-						`Weight ${candidate.weight}`,
+						`${translator.textFn("Weight")} ${candidate.weight}`,
 						...candidate.drop.map((drop) =>
 							candidate.drop.length === 1
-								? readDropSummaryFn(drop)
-								: `${readItemLabelFn(drop.itemId, "No item selected")}: ${readDropSummaryFn(drop)}`,
+								? readDropSummaryFn(drop, translator.textFn)
+								: `${readItemLabelFn(drop.itemId, translator.textFn("No item selected"))}: ${readDropSummaryFn(drop, translator.textFn)}`,
 						),
 					].join(" · ");
 					return (
@@ -331,7 +334,7 @@ const WeightedRollControl = ({
 						/>
 					);
 				}}
-				label="Weighted candidates"
+				label={translator.textFn("Weighted candidates")}
 				onAddFn={() =>
 					onChangeFn({
 						...roll,
@@ -354,7 +357,6 @@ const WeightedRollControl = ({
 						) as typeof roll.drop,
 					})
 				}
-				removeLabel="Remove weighted candidate"
 				selectedIndex={invalidCandidateIndex}
 			>
 				{(candidateIndex) => {
@@ -369,7 +371,7 @@ const WeightedRollControl = ({
 									candidateIndex,
 									"weight",
 								)}
-								label={`Candidate ${candidateIndex + 1} weight`}
+								label={`${translator.textFn("Candidate")} ${candidateIndex + 1} ${translator.textFn("weight")}`}
 								value={candidate.weight}
 								min={1}
 								onChangeFn={(weight) =>
@@ -441,26 +443,27 @@ const RollControl = ({
 	readonly value: DraftRoll;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
+	const translator = useTranslator();
 	return (
 		<div className="grid gap-4">
 			<EditorChoiceControl
 				error={readEditorFormValidationErrorFn(validationIssues, "type")}
-				label="Roll type"
+				label={translator.textFn("Roll type")}
 				value={value.type}
 				options={[
 					{
 						description: <Mx label="Guaranteed roll type help" />,
-						label: "Guaranteed",
+						label: translator.textFn("Guaranteed"),
 						value: "guaranteed",
 					},
 					{
 						description: <Mx label="Chance roll type help" />,
-						label: "Chance",
+						label: translator.textFn("Chance"),
 						value: "chance",
 					},
 					{
 						description: <Mx label="Weighted roll type help" />,
-						label: "Weighted",
+						label: translator.textFn("Weighted"),
 						value: "weight",
 					},
 				]}
@@ -503,7 +506,7 @@ const RollControl = ({
 											"chance",
 										)}
 										description={<Mx label="Chance percentage help" />}
-										label="Chance (%)"
+										label={translator.textFn("Chance (%)")}
 										value={readChancePercentFn(roll.chance)}
 										min={0}
 										max={100}
@@ -570,6 +573,7 @@ export const RollSetControl = ({
 	readonly value: RollSetSchema.Type;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const translator = useTranslator();
 	const validationIssues = useFormValidationIssues(value);
 	const invalidRollIndex = useFormValidationFocusIndex(value, "roll");
 	return (
@@ -577,7 +581,7 @@ export const RollSetControl = ({
 			<EditorNumberControl
 				description={<Mx label="Output set weight help" />}
 				error={readEditorFormValidationErrorFn(validationIssues, "weight")}
-				label="Relative set weight"
+				label={translator.textFn("Relative set weight")}
 				value={value.weight}
 				min={1}
 				onChangeFn={(weight) =>
@@ -590,26 +594,26 @@ export const RollSetControl = ({
 			<EditorFormSectionDivider
 				description={<Mx label="Rolls help" />}
 				required
-				title="Rolls"
+				title={translator.textFn("Rolls")}
 				variant="secondary"
 			/>
 			<EditorCollectionSelector
-				addLabel="Add roll"
+				dataUi="EditorRollsCollection"
 				count={value.roll.length}
 				error={readRequiredEditorCollectionErrorFn(
 					validationIssues,
 					value.roll.length,
 					1,
-					"Add at least one roll.",
+					translator.textFn("Add at least one roll."),
 					"roll",
 				)}
 				initialSelectedIndex={initialRollIndex}
 				key={initialRollIndex}
 				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
-					return `${roll.type === undefined ? "Roll" : RollTypeLabelByType[roll.type]} ${rollIndex + 1} — ${readItemLabelFn(
+					return `${translator.textFn(roll.type === undefined ? "Roll" : RollTypeLabelByType[roll.type])} ${rollIndex + 1} — ${readItemLabelFn(
 						readDraftRollDropsFn(roll)[0]?.itemId ?? "",
-						"No item selected",
+						translator.textFn("No item selected"),
 					)}`;
 				}}
 				itemSearchTermsFn={(rollIndex) =>
@@ -624,7 +628,7 @@ export const RollSetControl = ({
 						drops={readDraftRollDropsFn(value.roll[rollIndex])}
 					/>
 				)}
-				label={`Output set ${index + 1} rolls`}
+				label={`${translator.textFn("Output set")} ${index + 1} ${translator.textFn("rolls")}`}
 				onAddFn={() =>
 					onChangeFn({
 						...value,
@@ -642,7 +646,6 @@ export const RollSetControl = ({
 						) as typeof value.roll,
 					})
 				}
-				removeLabel="Remove roll"
 				selectedIndex={invalidRollIndex}
 			>
 				{(rollIndex) => (

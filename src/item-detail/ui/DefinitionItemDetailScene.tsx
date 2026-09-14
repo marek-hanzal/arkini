@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import {
 	ItemDetailHeader,
 	type ItemDetailHeaderIdentityRenderer,
@@ -25,7 +26,9 @@ export const DefinitionItemDetailScene = ({
 	if (controller.definition.kind === "unavailable") {
 		return (
 			<header className="flex items-center justify-between border-b border-line pb-3">
-				<h2 className="text-lg font-semibold">Item unavailable</h2>
+				<h2 className="text-lg font-semibold">
+					<Tx label="Item unavailable" />
+				</h2>
 				<button
 					type="button"
 					className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"

@@ -12,6 +12,7 @@ import {
 	useFormValidationIssues,
 } from "~/item-authoring/ui/useFormValidationIssues";
 import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const readFirstRollItemIdFn = (roll: RollSchema.Type): string | undefined =>
 	readDraftRollDropsFn(roll)[0]?.itemId;
@@ -23,6 +24,7 @@ interface OutputControlProps {
 
 /** Edits weighted output sets through their concrete RollSet domain. */
 export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
+	const translator = useTranslator();
 	const {
 		outputSetIndex,
 		outputRollIndex,
@@ -38,13 +40,13 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 	return (
 		<section className="grid gap-3">
 			<EditorCollectionSelector
-				addLabel="Add output set"
+				dataUi="EditorOutputSetsCollection"
 				count={sets.length}
 				error={readRequiredEditorCollectionErrorFn(
 					validationIssues,
 					sets.length,
 					1,
-					"Add at least one output set.",
+					translator.textFn("Add at least one output set."),
 					"set",
 				)}
 				initialSelectedIndex={outputSetIndex}
@@ -52,9 +54,9 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 				itemLabelFn={(index) => {
 					const roll = sets[index]?.roll[0];
 					const itemId = roll === undefined ? undefined : readFirstRollItemIdFn(roll);
-					return `Output set ${index + 1} — ${readItemLabelFn(
+					return `${translator.textFn("Output set")} ${index + 1} — ${readItemLabelFn(
 						itemId ?? "",
-						"No item selected",
+						translator.textFn("No item selected"),
 					)}`;
 				}}
 				itemSearchTermsFn={(index) =>
@@ -69,7 +71,7 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 						drops={(sets[index]?.roll ?? []).flatMap(readDraftRollDropsFn)}
 					/>
 				)}
-				label="Output sets"
+				label={translator.textFn("Output sets")}
 				onAddFn={() =>
 					onChangeFn({
 						set: [
@@ -87,7 +89,6 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 								) as OutputSchema.Type["set"],
 							})
 				}
-				removeLabel="Remove output set"
 				selectedIndex={invalidSetIndex}
 			>
 				{(index) => {

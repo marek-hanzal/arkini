@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
 
@@ -22,6 +23,7 @@ import { useEditorMcpOverviewController } from "./useEditorMcpOverviewController
 import { useEditorMcpSettingsController } from "./useEditorMcpSettingsController";
 
 export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId }) => {
+	const translator = useTranslator();
 	const project = useEditorProject();
 	const overviewController = useEditorMcpOverviewController();
 	const settingsController = useEditorMcpSettingsController({
@@ -66,12 +68,14 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 										className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
 										title={
 											passwordCopy.error ??
-											(passwordCopy.copied ? "Copied" : "Copy password")
+											translator.textFn(
+												passwordCopy.copied ? "Copied" : "Copy password",
+											)
 										}
 										onClick={() => void passwordCopy.copyFn()}
 									>
 										<PasswordCopyIcon className="size-4" />
-										Copy password
+										<Tx label="Copy password" />
 									</LinkButton>
 									<LinkButton
 										className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
@@ -80,7 +84,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 										onClick={() => executeFn(overviewController.resetAuthFn)}
 									>
 										<RefreshCw className="size-4" />
-										Reset password
+										<Tx label="Reset password" />
 									</LinkButton>
 								</>
 							) : null
@@ -108,7 +112,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 								}}
 								className={editorSectionLinkClassName}
 							>
-								{candidate.label}
+								{translator.textFn(candidate.label)}
 							</LinkButtonLink>
 						))}
 					</EditorSectionBar>
@@ -122,7 +126,9 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 						/>
 					)}
 					{overview === undefined ? (
-						<EditorMcpStatus message="Loading MCP settings…" />
+						<EditorMcpStatus
+							message={translator.textFn("Loading MCP settings\u2026")}
+						/>
 					) : (
 						match(section)
 							.with("server", () => (

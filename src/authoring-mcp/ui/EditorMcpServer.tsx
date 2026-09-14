@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { Globe, Laptop } from "lucide-react";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
@@ -53,7 +54,7 @@ export const EditorMcpServer = ({
 								? "warning"
 								: "muted"
 					}
-					title="Local MCP"
+					title={<Tx label="Local MCP" />}
 					action={
 						<div className="grid justify-items-center gap-4">
 							<EditorMcpCopyableUrl url={localUrl} />
@@ -68,14 +69,14 @@ export const EditorMcpServer = ({
 									disabled={pending}
 									onClick={onStopLocalFn}
 								>
-									Stop Local MCP
+									<Tx label="Stop Local MCP" />
 								</PrimaryButton>
 							) : (
 								<PrimaryButton
 									disabled={pending}
 									onClick={onStartLocalFn}
 								>
-									Start Local MCP
+									<Tx label="Start Local MCP" />
 								</PrimaryButton>
 							)}
 						</div>
@@ -94,7 +95,7 @@ export const EditorMcpServer = ({
 								? "warning"
 								: "muted"
 					}
-					title="Remote MCP"
+					title={<Tx label="Remote MCP" />}
 					action={
 						<div className="grid justify-items-center gap-4">
 							<EditorMcpCopyableUrl url={remoteUrl} />
@@ -109,14 +110,14 @@ export const EditorMcpServer = ({
 									disabled={pending}
 									onClick={onStopRemoteFn}
 								>
-									Stop Remote MCP
+									<Tx label="Stop Remote MCP" />
 								</PrimaryButton>
 							) : (
 								<PrimaryButton
 									disabled={pending || overview.ngrokDomain === undefined}
 									onClick={onStartRemoteFn}
 								>
-									Start Remote MCP
+									<Tx label="Start Remote MCP" />
 								</PrimaryButton>
 							)}
 						</div>

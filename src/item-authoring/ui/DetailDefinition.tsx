@@ -11,7 +11,7 @@ export const DetailSection = ({
 	title,
 }: {
 	readonly children: ReactNode;
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly title: string;
 }) => (
 	<section className="grid gap-3">
@@ -37,7 +37,7 @@ export const DetailFact = ({
 	mono = false,
 	value,
 }: {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
 	readonly mono?: boolean;
 	readonly value: ReactNode;

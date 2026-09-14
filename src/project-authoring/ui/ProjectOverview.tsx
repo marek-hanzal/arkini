@@ -26,7 +26,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				data-ui="EditorProjectOverviewUnreachableLoading"
 			>
 				<LoaderCircle className="size-4 animate-spin" />
-				Calculating…
+				{translator.textFn("Calculating…")}
 			</span>
 		) : estimateState.status === "ready" && unreachableCount > 0 ? (
 			<LinkButtonLink
@@ -42,7 +42,13 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				to="/editor/$projectId/editor/items/list"
 			>
 				<TriangleAlert className="size-4" />
-				{unreachableCount} unreachable {unreachableCount === 1 ? "item" : "items"}
+				{translator
+					.textFn(
+						unreachableCount === 1
+							? "Project unreachable item count"
+							: "Project unreachable items count",
+					)
+					.replace("{count}", String(unreachableCount))}
 			</LinkButtonLink>
 		) : null;
 
@@ -56,7 +62,11 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				body={
 					<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
 						<span>
-							{itemCount} {itemCount === 1 ? "item" : "items"}
+							{translator
+								.textFn(
+									itemCount === 1 ? "Project item count" : "Project items count",
+								)
+								.replace("{count}", String(itemCount))}
 						</span>
 						{unreachableSummary === null ? null : <span className="h-5 w-px bg-line" />}
 						{unreachableSummary}
@@ -79,7 +89,13 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 				title={translator.textFn("Items")}
 			/>
 			<EditorOverviewCard
-				body={`${project.resources.length} ${project.resources.length === 1 ? "asset" : "assets"}`}
+				body={translator
+					.textFn(
+						project.resources.length === 1
+							? "Project asset count"
+							: "Project assets count",
+					)
+					.replace("{count}", String(project.resources.length))}
 				action={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5 opacity-75 hover:opacity-100"

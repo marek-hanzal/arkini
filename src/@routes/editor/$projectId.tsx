@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
@@ -83,13 +84,19 @@ export const Route = createFileRoute("/editor/$projectId")({
 			data-ui="EditorProjectErrorPage"
 		>
 			<section className="w-full max-w-xl rounded-2xl border border-danger/40 bg-surface p-6 shadow-2xl">
-				<h1 className="text-2xl font-semibold">Editor project could not be opened</h1>
+				<h1 className="text-2xl font-semibold">
+					<Tx label="Editor project could not be opened" />
+				</h1>
 				<p className="mt-3 break-words text-sm leading-6 text-danger">
 					{error instanceof Error ? error.message : String(error)}
 				</p>
 				<div className="mt-6 flex flex-wrap gap-3">
-					<ButtonLink to="/editor/welcome">Editor welcome</ButtonLink>
-					<ButtonLink to="/main-menu">Main menu</ButtonLink>
+					<ButtonLink to="/editor/welcome">
+						<Tx label="Editor welcome" />
+					</ButtonLink>
+					<ButtonLink to="/main-menu">
+						<Tx label="Main menu" />
+					</ButtonLink>
 				</div>
 			</section>
 		</main>

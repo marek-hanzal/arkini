@@ -420,9 +420,7 @@ describe("EditorBuild", () => {
 	it("does not expose an unknown Build failure cause", async () => {
 		state.buildResult = AsyncResult.fail(new Error("private filesystem detail"));
 		const { container } = await renderBuild();
-		expect(container.textContent).toContain(
-			"The Editor project could not be built because of an unknown error.",
-		);
+		expect(container.querySelector('[data-ui="EditorBuildActionStatus"]')).not.toBeNull();
 		expect(container.textContent).not.toContain("private filesystem detail");
 	});
 

@@ -12,6 +12,7 @@ import { DetailFact, DetailFacts } from "~/item-authoring/ui/DetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Presents the optional unit capability or its explicit disabled state. */
 export const UnitsDetail = ({
@@ -47,9 +48,7 @@ export const UnitsDetail = ({
 			<EditorRootCard dataUi="EditorItemUnitsCard">
 				<DetailFact
 					label={translator.textFn("Initial units")}
-					description={translator.textFn(
-						"Finite units inside one item, separate from stack quantity. Spending the final unit depletes the item.",
-					)}
+					description={<Mx label="Authored Units amount summary help" />}
 					value={item.units.amount}
 				/>
 			</EditorRootCard>
@@ -57,9 +56,7 @@ export const UnitsDetail = ({
 				<OutputDetail
 					emptyLabel={translator.textFn("No depletion output configured.")}
 					output={item.units.output}
-					description={translator.textFn(
-						"Output resolved when the final unit is spent. Without output, the depleted item disappears after its accepted production settles.",
-					)}
+					description={<Mx label="Authored Units depletion output summary help" />}
 					title={translator.textFn("Depletion output")}
 				/>
 			</EditorRootCard>
@@ -101,16 +98,12 @@ export const MergeDetail = ({
 			<DetailFacts>
 				<DetailFact
 					label={translator.textFn("Target")}
-					description={translator.textFn(
-						"The receiving item must match this selector for the merge to apply.",
-					)}
+					description={<Mx label="Authored merge target summary help" />}
 					value={<SelectorDetail selector={merge.target} />}
 				/>
 				<DetailFact
 					label={translator.textFn("Source action")}
-					description={translator.textFn(
-						"Use returns one source item after the merge, Consume removes one source item, and Spend removes one of its units.",
-					)}
+					description={<Mx label="Authored merge source action summary help" />}
 					value={translator.textFn(
 						merge.action === "spend"
 							? "Spend"
@@ -127,9 +120,7 @@ export const MergeDetail = ({
 				) : null}
 				<DetailFact
 					label={translator.textFn("Target effect")}
-					description={translator.textFn(
-						"Keep leaves the receiving item unchanged, Remove takes one item from its stack, Spend removes one unit, and Replace swaps one item for the configured result.",
-					)}
+					description={<Mx label="Authored merge target effect summary help" />}
 					value={translator.textFn(
 						merge.effect === "spend"
 							? "Spend"
@@ -145,9 +136,7 @@ export const MergeDetail = ({
 				emptyLabel={translator.textFn("No extra output configured.")}
 				output={merge.output}
 				title={translator.textFn("Extra output")}
-				description={translator.textFn(
-					"Optional output resolved after the source action and target effect complete.",
-				)}
+				description={<Mx label="Authored merge output summary help" />}
 			/>
 		</EditorRootCard>
 	);

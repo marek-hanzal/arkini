@@ -81,14 +81,22 @@ it("reveals and removes each rule and condition level independently", async () =
 		let rules = [] as RuleSchema.Type[];
 		await renderRulesFn(rules);
 		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Add rule"]')?.disabled,
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorRulesCollection"] [data-ui="EditorCollectionAdd"]',
+			)?.disabled,
 		).toBe(false);
 		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Remove rule"]')?.disabled,
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorRulesCollection"] [data-ui="EditorCollectionRemove"]',
+			)?.disabled,
 		).toBe(true);
 
 		await act(async () =>
-			container.querySelector<HTMLButtonElement>('button[title="Add rule"]')?.click(),
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorRulesCollection"] [data-ui="EditorCollectionAdd"]',
+				)
+				?.click(),
 		);
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
 		expect(rules).toEqual([
@@ -99,14 +107,14 @@ it("reveals and removes each rule and condition level independently", async () =
 		await renderRulesFn(rules);
 		expect(container.textContent).toContain("Rule type");
 		expect(container.textContent).not.toContain("Hint");
-		expect(container.querySelector('button[title="Add condition"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorConditionsCollection"]')).toBeNull();
 		expect(
 			container.querySelector(
 				'[data-ui="EditorChoiceControlOption"][data-ui-selected="true"]',
 			),
 		).toBeNull();
 
-		await act(async () => choiceButtonFn("enable")?.click());
+		await act(async () => choiceButtonFn("Enable")?.click());
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
 		expect(rules[0]).toMatchObject({
 			type: "enable",
@@ -115,15 +123,22 @@ it("reveals and removes each rule and condition level independently", async () =
 		await renderRulesFn(rules);
 		expect(container.textContent).toContain("Hint");
 		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Add condition"]')?.disabled,
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorConditionsCollection"] [data-ui="EditorCollectionAdd"]',
+			)?.disabled,
 		).toBe(false);
 		expect(
-			container.querySelector<HTMLButtonElement>('button[title="Remove condition"]')
-				?.disabled,
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorConditionsCollection"] [data-ui="EditorCollectionRemove"]',
+			)?.disabled,
 		).toBe(true);
 
 		await act(async () =>
-			container.querySelector<HTMLButtonElement>('button[title="Add condition"]')?.click(),
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorConditionsCollection"] [data-ui="EditorCollectionAdd"]',
+				)
+				?.click(),
 		);
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
 		expect(rules[0].when).toEqual([
@@ -169,7 +184,11 @@ it("reveals and removes each rule and condition level independently", async () =
 		await renderRulesFn(rules);
 
 		await act(async () =>
-			container.querySelector<HTMLButtonElement>('button[title="Remove condition"]')?.click(),
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorConditionsCollection"] [data-ui="EditorCollectionRemove"]',
+				)
+				?.click(),
 		);
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
 		expect(rules[0]).toMatchObject({
@@ -178,15 +197,19 @@ it("reveals and removes each rule and condition level independently", async () =
 		});
 		await renderRulesFn(rules);
 		expect(container.textContent).toContain("Rule type");
-		expect(container.querySelector('button[title="Add condition"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="EditorConditionsCollection"]')).not.toBeNull();
 
 		await act(async () =>
-			container.querySelector<HTMLButtonElement>('button[title="Remove rule"]')?.click(),
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorRulesCollection"] [data-ui="EditorCollectionRemove"]',
+				)
+				?.click(),
 		);
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
 		expect(rules).toEqual([]);
 		await renderRulesFn(rules);
-		expect(container.querySelector('button[title="Add rule"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="EditorRulesCollection"]')).not.toBeNull();
 	} finally {
 		await act(async () => root.unmount());
 		container.remove();

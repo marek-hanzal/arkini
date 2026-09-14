@@ -703,9 +703,7 @@ describe("item section form session", () => {
 
 		expect(state.saveItem).not.toHaveBeenCalled();
 		expect(id.dataset.uiInvalid).toBe("true");
-		expect(container.textContent).toContain(
-			"Item ID item:duplicate is already used by another item.",
-		);
+		expect(container.textContent).toContain("This Item ID is already in use.");
 	});
 
 	it("discards the local draft and returns an existing item to detail without saving", async () => {
@@ -906,7 +904,7 @@ describe("item section form session", () => {
 		};
 		const { container } = await render(<ProductionSection />);
 		const addOutputSet = container.querySelector<HTMLButtonElement>(
-			'button[title="Add output set"]',
+			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		const saveButton = [
 			...container.querySelectorAll("button"),
@@ -915,7 +913,9 @@ describe("item section form session", () => {
 			throw new Error("Missing nested output controls.");
 
 		await act(async () => addOutputSet.click());
-		const addRoll = container.querySelector<HTMLButtonElement>('button[title="Add roll"]');
+		const addRoll = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorRollsCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		if (addRoll === null) throw new Error("Missing add roll control.");
 		await act(async () => addRoll.click());
 		const guaranteed = Array.from(container.querySelectorAll("button")).find(
@@ -923,7 +923,9 @@ describe("item section form session", () => {
 		);
 		if (guaranteed === undefined) throw new Error("Missing roll type control.");
 		await act(async () => guaranteed.click());
-		const addDrop = container.querySelector<HTMLButtonElement>('button[title="Add drop"]');
+		const addDrop = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorDropsCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		if (addDrop === null) throw new Error("Missing add drop control.");
 		await act(async () => {
 			saveButton.click();
@@ -938,8 +940,8 @@ describe("item section form session", () => {
 		const selectedCollectionLabels = Array.from(
 			container.querySelectorAll<HTMLInputElement>("input"),
 		).map((input) => input.value);
-		expect(selectedCollectionLabels).toContain("Rule 1 — show");
-		expect(selectedCollectionLabels).not.toContain("Rule 2 — show");
+		expect(selectedCollectionLabels).toContain("Rule 1 — Show");
+		expect(selectedCollectionLabels).not.toContain("Rule 2 — Show");
 		expect(container.textContent).not.toContain("Select an item.");
 
 		await act(async () => addDrop.click());
@@ -1076,7 +1078,9 @@ describe("item section form session", () => {
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
 		const { container } = await render(<ProductionSection />);
-		const add = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		const add = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		if (add === null) throw new Error("Missing add production line control.");
 		await act(async () => add.click());
 		await completeFirstProductionLine(container);
@@ -1213,7 +1217,9 @@ describe("item section form session", () => {
 
 	it("adds production to a passive Common through the ordinary line editor", async () => {
 		const { container } = await render(<ProductionSection />);
-		const addLine = container.querySelector<HTMLButtonElement>('button[title="Add line"]');
+		const addLine = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionAdd"]',
+		);
 		if (addLine === null) throw new Error("Missing add production line control.");
 		await act(async () => addLine.click());
 		await completeFirstProductionLine(container);
@@ -1243,7 +1249,7 @@ describe("item section form session", () => {
 		(state.project as Project).config.items[item.id] = common;
 		const { container } = await render(<ProductionSection />);
 		const removeLine = container.querySelector<HTMLButtonElement>(
-			'button[title="Remove line"]',
+			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionRemove"]',
 		);
 		if (removeLine === null) throw new Error("Missing remove line control.");
 		await act(async () => removeLine.click());
@@ -1491,7 +1497,7 @@ describe("item section form session", () => {
 			(button) => button.textContent === "Loose-kill",
 		);
 		const addExpiryOutput = container.querySelector<HTMLButtonElement>(
-			'button[title="Add output set"]',
+			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		if (expiryMode === undefined || addExpiryOutput === null) {
 			throw new Error("Missing lifetime-dependent Clock controls.");
@@ -1502,7 +1508,7 @@ describe("item section form session", () => {
 			(button) => button.textContent === "Loose-kill",
 		);
 		const disabledAddExpiryOutput = container.querySelector<HTMLButtonElement>(
-			'button[title="Add output set"]',
+			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		expect(disabledExpiryMode?.matches(":disabled")).toBe(true);
 		expect(disabledAddExpiryOutput?.matches(":disabled")).toBe(true);
@@ -1715,11 +1721,14 @@ describe("item section form session", () => {
 	);
 });
 
-vi.mock("~/translation/ui/useTranslator", () => ({
-	useTranslator: () => ({
+vi.mock("~/translation/ui/useTranslator", () => {
+	const translator = {
 		textFn: (key: string) => key,
-	}),
-}));
+	};
+	return {
+		useTranslator: () => translator,
+	};
+});
 
 it("keeps copied sections in the draft until Save and lets Discard restore the destination", async () => {
 	let session: ReturnType<typeof useFormSession> | undefined;

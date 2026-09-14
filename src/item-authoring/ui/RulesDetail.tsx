@@ -7,6 +7,7 @@ import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
+import type { ReactNode } from "react";
 
 const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
 	<li className="grid gap-1">
@@ -50,7 +51,7 @@ export const RulesDetail = ({
 	description,
 }: {
 	readonly rules: readonly RuleSchema.Type[];
-	readonly description: string;
+	readonly description: ReactNode;
 }) => {
 	const translator = useTranslator();
 	return (

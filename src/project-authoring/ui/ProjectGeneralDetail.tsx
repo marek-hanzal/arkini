@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ReactNode } from "react";
 
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
@@ -30,6 +31,7 @@ const ProjectSectionValueLink = ({
 );
 
 export const ProjectGeneralDetail = ({ project }: { readonly project: Project }) => {
+	const translator = useTranslator();
 	const { board, inventory, toolbarSize = 0 } = project.config.meta;
 	const identityRename = useProjectIdentityRenameController({
 		project,
@@ -38,26 +40,26 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 		<>
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorRootCard dataUi="EditorProjectGeneralDetailCard">
-					<DetailSection title="General">
+					<DetailSection title={translator.textFn("General")}>
 						<DetailFacts columns={3}>
 							<DetailFact
-								label="Title"
+								label={translator.textFn("Title")}
 								value={project.config.meta.title}
 							/>
 							<DetailFact
-								label="Project ID"
+								label={translator.textFn("Project ID")}
 								value={
 									<span className="flex min-w-0 flex-wrap items-center gap-2">
 										<code className="break-all">{project.projectId}</code>
 										<LinkButton onClick={identityRename.openFn}>
-											Rename
+											{translator.textFn("Rename")}
 										</LinkButton>
 									</span>
 								}
 							/>
 							<div className="hidden min-[48rem]:block" />
 							<DetailFact
-								label="Board"
+								label={translator.textFn("Board")}
 								value={
 									<ProjectSectionValueLink
 										projectId={project.projectId}
@@ -69,7 +71,7 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 								}
 							/>
 							<DetailFact
-								label="Inventory"
+								label={translator.textFn("Inventory")}
 								value={
 									<ProjectSectionValueLink
 										projectId={project.projectId}
@@ -81,7 +83,7 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 								}
 							/>
 							<DetailFact
-								label="Toolbar"
+								label={translator.textFn("Toolbar")}
 								value={
 									<ProjectSectionValueLink
 										projectId={project.projectId}

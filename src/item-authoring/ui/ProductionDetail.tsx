@@ -55,6 +55,7 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 						title={translator.textFn("Item production empty title")}
 						actionLabel={translator.textFn("Enable")}
 						icon={Factory}
+						size="large"
 					/>
 				</EditorRootCard>
 			)}

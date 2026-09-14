@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
@@ -17,7 +18,9 @@ export const ItemLineInputsHeader = ({
 	readonly withdraw?: ItemLineInputsWithdrawAction;
 }) => (
 	<div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
-		<h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">Inputs</h4>
+		<h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+			<Tx label="Inputs" />
+		</h4>
 		<AnimatePresence initial={false}>
 			{withdraw === undefined ? null : (
 				<motion.div
@@ -31,7 +34,7 @@ export const ItemLineInputsHeader = ({
 						disabled={withdraw.disabled || withdraw.pending}
 						onClick={withdraw.onClickFn}
 					>
-						Withdraw
+						<Tx label="Withdraw" />
 					</LinkButton>
 				</motion.div>
 			)}
@@ -73,7 +76,7 @@ export const MaterialInputWithdraw = ({
 				disabled={disabled || controller.pending || !input.canWithdraw}
 				onClick={controller.withdrawFn}
 			>
-				Withdraw
+				<Tx label="Withdraw" />
 			</LinkButton>
 			{controller.error === null ? null : (
 				<p className="mt-1 text-xs text-danger">{controller.error}</p>

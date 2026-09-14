@@ -8,6 +8,7 @@ import {
 	itemDetailFadeMotion,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Tx } from "~/translation/ui/Tx";
 
 interface ItemLineSummaryIdentityRenderProps {
 	readonly children: ReactNode;
@@ -70,7 +71,7 @@ export const ItemLineSummary = ({
 								},
 							})}
 						>
-							{status === "paused" ? "Paused" : "Disabled"}
+							<Tx label={status === "paused" ? "Paused" : "Disabled"} />
 						</motion.span>
 					)}
 				</AnimatePresence>
@@ -83,7 +84,7 @@ export const ItemLineSummary = ({
 							data-ui="TileLineDefaultBadge"
 							{...itemDetailBadgeMotion}
 						>
-							Default
+							<Tx label="Default" />
 						</motion.span>
 					)}
 				</AnimatePresence>

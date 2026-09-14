@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
+
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -108,9 +110,13 @@ describe("ItemEstimateSection", () => {
 		};
 		await act(async () => {
 			root.render(
-				createElement(ItemEstimateSection, {
-					itemId: "tool",
-				}),
+				createElement(
+					TranslationTestProvider,
+					null,
+					createElement(ItemEstimateSection, {
+						itemId: "tool",
+					}),
+				),
 			);
 		});
 		expect(container.querySelector('[data-ui="CompletedEstimateRouteGraph"]')).not.toBeNull();
@@ -121,9 +127,13 @@ describe("ItemEstimateSection", () => {
 		};
 		await act(async () => {
 			root.render(
-				createElement(ItemEstimateSection, {
-					itemId: "tool",
-				}),
+				createElement(
+					TranslationTestProvider,
+					null,
+					createElement(ItemEstimateSection, {
+						itemId: "tool",
+					}),
+				),
 			);
 		});
 		expect(container.querySelector('[data-ui="EditorItemEstimateHeader"]')).not.toBeNull();

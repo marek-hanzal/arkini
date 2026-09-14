@@ -1,10 +1,10 @@
+import { Mx } from "~/translation/ui/Mx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { NoteForm } from "~/project-note/ui/NoteForm";
 import { NotebookPen, Pencil, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { Button } from "~/ui/ui/Button";
-import { Tooltip } from "~/ui/ui/Tooltip";
 import { useNotesController } from "~/project-note/ui/useNotesController";
 import { Status } from "~/ui/ui/Status";
 import { Tx } from "~/translation/ui/Tx";
@@ -94,13 +94,17 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 									dataUi="EditorNotesEmpty"
 									size="large"
 									variant="flat"
-									description={translator.textFn(
-										props.requiredCurrentResourceId !== undefined
-											? "Asset notes empty description"
-											: props.requiredCurrentItemUid === undefined
-												? "Notes empty description"
-												: "Item notes empty description",
-									)}
+									description={
+										<Mx
+											label={
+												props.requiredCurrentResourceId !== undefined
+													? "Asset notes empty description"
+													: props.requiredCurrentItemUid === undefined
+														? "Notes empty description"
+														: "Item notes empty description"
+											}
+										/>
+									}
 									icon={NotebookPen}
 									title={translator.textFn(
 										props.requiredCurrentResourceId !== undefined
@@ -128,40 +132,29 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 											</time>
 											{editing ? null : (
 												<div className="ml-auto flex items-center">
-													<Tooltip
-														content={<Tx label="Edit" />}
-														placement="top"
+													<Button
+														className={iconButtonClassName}
+														disabled={
+															controller.editingNoteId !==
+																undefined || controller.pending
+														}
+														data-ui="EditorNoteEdit"
+														onClick={() => controller.startEditFn(note)}
 													>
-														<Button
-															className={iconButtonClassName}
-															disabled={
-																controller.editingNoteId !==
-																	undefined || controller.pending
-															}
-															onClick={() =>
-																controller.startEditFn(note)
-															}
-														>
-															<Pencil className="size-4" />
-														</Button>
-													</Tooltip>
-													<Tooltip
-														content={<Tx label="Delete" />}
-														placement="top"
+														<Pencil className="size-4" />
+													</Button>
+
+													<Button
+														className={`${iconButtonClassName} hover:text-danger`}
+														disabled={
+															controller.editingNoteId !==
+																undefined || controller.pending
+														}
+														data-ui="EditorNoteDelete"
+														onClick={() => controller.removeFn(note)}
 													>
-														<Button
-															className={`${iconButtonClassName} hover:text-danger`}
-															disabled={
-																controller.editingNoteId !==
-																	undefined || controller.pending
-															}
-															onClick={() =>
-																controller.removeFn(note)
-															}
-														>
-															<Trash2 className="size-4" />
-														</Button>
-													</Tooltip>
+														<Trash2 className="size-4" />
+													</Button>
 												</div>
 											)}
 										</header>

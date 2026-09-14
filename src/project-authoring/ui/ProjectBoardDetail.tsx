@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useState } from "react";
 
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
@@ -6,6 +7,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 
 export const ProjectBoardDetail = ({ project }: { readonly project: Project }) => {
+	const translator = useTranslator();
 	const { board } = project.config.meta;
 	const spaces = [
 		...new Set([
@@ -22,13 +24,13 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 			<EditorRootCard dataUi="EditorProjectSpaceDetailCard">
 				<EditorSearchCombobox
 					displaySelectedLabel
-					emptyLabel="No configured Space matches this search."
-					label="Space"
+					emptyLabel={translator.textFn("No configured Space matches this search.")}
+					label={translator.textFn("Space")}
 					options={spaces.map((space) => ({
 						id: String(space),
-						label: `Space · ${space}`,
+						label: `${translator.textFn("Space")} · ${space}`,
 						terms: [
-							"Space",
+							translator.textFn("Space"),
 							String(space),
 						],
 					}))}

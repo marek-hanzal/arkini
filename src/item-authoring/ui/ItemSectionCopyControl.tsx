@@ -12,6 +12,7 @@ import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 
 /** Holds an explicit source snapshot until the user confirms replacement of the active form section. */
 export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: SectionId }) => {
@@ -40,7 +41,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 				<EditorSearchCombobox
 					displaySelectedLabel
 					density="compact"
-					label="Copy from"
+					label={translator.textFn("Copy from")}
 					emptyLabel={translator.textFn("No other item matches this search.")}
 					labelVisible={false}
 					placeholder={translator.textFn("Copy from…")}
@@ -72,38 +73,20 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 								</h2>
 								<p className="text-sm text-muted">
 									{translator.textFn("Copy from")}{" "}
-									<strong className="text-foreground">{source.title}</strong>.{" "}
-									{translator.textFn(
-										"The entire current section will be replaced, including unsaved edits. An empty source section clears it. Nothing is merged. Save applies the change; Discard restores the saved item.",
-									)}
+									<strong className="text-foreground">{source.title}</strong>.
 								</p>
+								<Mx label="Copy section replacement help" />
 								{sectionId === "identity" ? (
-									<p className="text-sm text-muted">
-										{translator.textFn(
-											"Item ID, UID and draft status stay unchanged. An existing Clock keeps a stack size of one.",
-										)}
-									</p>
+									<Mx label="Copy identity section help" />
 								) : null}
 								{sectionId === "production" && source.lines.length > 0 ? (
-									<p className="text-sm text-muted">
-										{translator.textFn(
-											"Copying production also removes the destination action. All lines and queue capacity are replaced.",
-										)}
-									</p>
+									<Mx label="Copy production section help" />
 								) : null}
 								{sectionId === "clock" && source.clock !== undefined ? (
-									<p className="text-sm text-muted">
-										{translator.textFn(
-											"Copying Clock also removes the destination action and sets a stack size of one.",
-										)}
-									</p>
+									<Mx label="Copy Clock section help" />
 								) : null}
 								{sectionId === "action" && source.action !== undefined ? (
-									<p className="text-sm text-muted">
-										{translator.textFn(
-											"Copying an action also removes destination production lines and Clock.",
-										)}
-									</p>
+									<Mx label="Copy action section help" />
 								) : null}
 								<div className="flex items-center justify-between gap-4">
 									<LinkButton

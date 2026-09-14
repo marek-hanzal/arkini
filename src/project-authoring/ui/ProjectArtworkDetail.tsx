@@ -1,3 +1,4 @@
+import { Mx } from "~/translation/ui/Mx";
 import { ImagePlus } from "lucide-react";
 
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
@@ -57,6 +58,7 @@ export const ProjectArtworkDetail = ({ project }: { readonly project: Project })
 				{avatars.length === 0 ? (
 					<Status
 						variant="flat"
+						description={<Mx label="Project avatars empty help" />}
 						icon={ImagePlus}
 						title={translator.textFn("No About avatars configured.")}
 						action={

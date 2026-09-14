@@ -9,6 +9,8 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useDeleteController } from "~/item-authoring/ui/useDeleteController";
 import { ProjectSections } from "~/project-authoring/type/ProjectSections";
 import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
+import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
 
 const DeleteBlockerLink = ({
 	blocker,
@@ -17,6 +19,7 @@ const DeleteBlockerLink = ({
 	readonly blocker: readDeleteBlockersFn.Blocker;
 	readonly project: Project;
 }) => {
+	const translator = useTranslator();
 	if (
 		blocker.path[0] === "items" &&
 		typeof blocker.path[1] === "string" &&
@@ -39,7 +42,7 @@ const DeleteBlockerLink = ({
 				/>
 				<span className="min-w-0">
 					<span className="block truncate text-sm font-semibold">
-						{owner.title || owner.id} · Delete
+						{owner.title || owner.id} · {translator.textFn("Delete")}
 					</span>
 					<span className="mt-1 block text-xs font-normal leading-5 text-muted">
 						{blocker.message}
@@ -63,7 +66,8 @@ const DeleteBlockerLink = ({
 		>
 			<span className="min-w-0">
 				<span className="block truncate text-sm font-semibold">
-					Project · {section?.label ?? "Settings"}
+					{translator.textFn("Project")} ·{" "}
+					{translator.textFn(section?.label ?? "Settings")}
 				</span>
 				<span className="mt-1 block text-xs font-normal leading-5 text-muted">
 					{blocker.message}
@@ -78,6 +82,7 @@ interface DeleteSectionProps extends useDeleteController.Props {}
 
 /** Explains item-delete eligibility and exposes the guarded destructive action. */
 export const DeleteSection = ({ item }: DeleteSectionProps) => {
+	const translator = useTranslator();
 	const controller = useDeleteController({
 		item,
 	});
@@ -92,11 +97,19 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 					dataUi="EditorItemDeleteState"
 					size="large"
 					icon={blocked ? ShieldAlert : ShieldCheck}
-					title={blocked ? "This item cannot be deleted yet" : "This item can be deleted"}
+					title={translator.textFn(
+						blocked ? "This item cannot be deleted yet" : "This item can be deleted",
+					)}
 					description={
-						blocked
-							? `${controller.blockers.length} ${controller.blockers.length === 1 ? "reference must" : "references must"} be removed first.`
-							: "No other game configuration references this item. Its asset files will remain available in the project."
+						blocked ? (
+							`${controller.blockers.length} ${translator.textFn(
+								controller.blockers.length === 1
+									? "reference must be removed first."
+									: "references must be removed first.",
+							)}`
+						) : (
+							<Mx label="Safe item deletion help" />
+						)
 					}
 					action={
 						blocked ? (
@@ -104,14 +117,14 @@ export const DeleteSection = ({ item }: DeleteSectionProps) => {
 								data-ui="EditorItemForceDeleteOpen"
 								onClick={() => controller.openFn(true)}
 							>
-								Force delete…
+								{translator.textFn("Force delete…")}
 							</DangerButton>
 						) : (
 							<DangerButton
 								data-ui="EditorItemDeleteOpen"
 								onClick={() => controller.openFn(false)}
 							>
-								Delete
+								{translator.textFn("Delete")}
 							</DangerButton>
 						)
 					}

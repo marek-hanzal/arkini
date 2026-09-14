@@ -1,6 +1,7 @@
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { ReactNode } from "react";
 import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 interface QuantityControlProps {
 	readonly maximumError?: string;
@@ -18,45 +19,48 @@ interface QuantityControlProps {
 export const QuantityFields = ({
 	maximumError,
 	maximumDescription,
-	maximumLabel = "Maximum",
+	maximumLabel,
 	minimumError,
 	minimumDescription,
-	minimumLabel = "Minimum",
+	minimumLabel,
 	minimumValue = 1,
 	onChangeFn,
 	value,
-}: QuantityControlProps) => (
-	<>
-		<EditorNumberControl
-			description={minimumDescription}
-			error={minimumError}
-			label={minimumLabel}
-			value={value.min}
-			min={minimumValue}
-			onChangeFn={(min) =>
-				onChangeFn({
-					...value,
-					min,
-					max: min > value.max ? min : value.max,
-				})
-			}
-		/>
-		<EditorNumberControl
-			description={maximumDescription}
-			error={maximumError}
-			label={maximumLabel}
-			value={value.max}
-			min={minimumValue}
-			onChangeFn={(max) =>
-				onChangeFn({
-					...value,
-					min: max < value.min ? max : value.min,
-					max,
-				})
-			}
-		/>
-	</>
-);
+}: QuantityControlProps) => {
+	const translator = useTranslator();
+	return (
+		<>
+			<EditorNumberControl
+				description={minimumDescription}
+				error={minimumError}
+				label={minimumLabel ?? translator.textFn("Minimum")}
+				value={value.min}
+				min={minimumValue}
+				onChangeFn={(min) =>
+					onChangeFn({
+						...value,
+						min,
+						max: min > value.max ? min : value.max,
+					})
+				}
+			/>
+			<EditorNumberControl
+				description={maximumDescription}
+				error={maximumError}
+				label={maximumLabel ?? translator.textFn("Maximum")}
+				value={value.max}
+				min={minimumValue}
+				onChangeFn={(max) =>
+					onChangeFn({
+						...value,
+						min: max < value.min ? max : value.min,
+						max,
+					})
+				}
+			/>
+		</>
+	);
+};
 
 /** Edits the required inclusive positive quantity bounds. */
 export const QuantityControl = ({

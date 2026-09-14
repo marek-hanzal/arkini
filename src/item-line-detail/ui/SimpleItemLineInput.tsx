@@ -1,3 +1,4 @@
+import { Tx } from "~/translation/ui/Tx";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineInputFrame } from "~/item-line-detail/ui/ItemLineInputFrame";
 import { UnitCostValue } from "~/production-input/ui/UnitCostValue";
@@ -22,7 +23,9 @@ export const SimpleItemLineInput = ({
 		state="empty"
 		suppressSurface={suppressSurface}
 	>
-		<p className="font-medium text-foreground">Owner unit</p>
+		<p className="font-medium text-foreground">
+			<Tx label="Owner unit" />
+		</p>
 		<p className="text-right text-sm text-muted">
 			<UnitCostValue unit={input.units} />
 		</p>

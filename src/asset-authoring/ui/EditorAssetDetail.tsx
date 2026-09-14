@@ -1,3 +1,4 @@
+import { Mx } from "~/translation/ui/Mx";
 import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { FileQuestion, PackagePlus, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
@@ -109,7 +110,7 @@ export const EditorAssetDetail = ({
 			>
 				<Status
 					dataUi="EditorAssetNotFound"
-					description={translator.textFn("This asset is not present in this project.")}
+					description={<Mx label="Asset missing description" />}
 					icon={FileQuestion}
 					title={translator.textFn("Asset not found")}
 				/>

@@ -4,6 +4,7 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
+import { Tx } from "~/translation/ui/Tx";
 
 /** Links one known item reference to the requested detail section. */
 export const DetailReference = ({
@@ -26,7 +27,7 @@ export const DetailReference = ({
 	if (item === undefined)
 		return (
 			<span className="min-w-0 break-all font-mono text-sm font-medium text-muted">
-				{itemId} [missing]
+				{itemId} <Tx label="Missing item marker" />
 			</span>
 		);
 	return (

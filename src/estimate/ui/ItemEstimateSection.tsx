@@ -1,3 +1,5 @@
+import { Mx } from "~/translation/ui/Mx";
+import { Tx } from "~/translation/ui/Tx";
 import { TriangleAlert, Unlink } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -10,38 +12,71 @@ import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Status } from "~/ui/ui/Status";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const formatQuantityFn = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
+const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic, textFn: (key: string) => string) => {
 	switch (diagnostic.kind) {
 		case "finite-owner-lifetime-unsupported":
-			return `${diagnostic.routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.`;
+			return textFn(
+				"{routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.",
+			).replace("{routeId}", diagnostic.routeId);
 		case "joint-output-accounting-unsupported":
-			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space.`;
+			return textFn(
+				"{routeId} exceeds the bounded joint-output accounting state space.",
+			).replace("{routeId}", diagnostic.routeId);
 		case "witness-search-exhausted":
-			return `${diagnostic.routeId} exceeds the bounded complete-witness search of ${diagnostic.maximumStates} states.`;
+			return textFn(
+				"{routeId} exceeds the bounded complete-witness search of {maximumStates} states.",
+			)
+				.replace("{routeId}", diagnostic.routeId)
+				.replace("{maximumStates}", String(diagnostic.maximumStates));
 		case "quantity-limit-exceeded":
-			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
+			return textFn(
+				"{factId} × {quantity} exceeds the static estimate limit of {maximumQuantity} ({source}).",
+			)
+				.replace("{factId}", diagnostic.factId)
+				.replace("{quantity}", formatQuantityFn(diagnostic.quantity))
+				.replace("{maximumQuantity}", String(diagnostic.maximumQuantity))
+				.replace("{source}", diagnostic.source);
 		case "cycle":
-			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
+			return textFn("Cycle on route {routeId}: {factIds}.")
+				.replace("{routeId}", diagnostic.routeId)
+				.replace("{factIds}", diagnostic.factIds.join(" → "));
 		case "unreachable":
-			return `${diagnostic.factId} × ${formatQuantityFn(diagnostic.quantity)} has no complete acquisition route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}.`;
+			return (
+				diagnostic.routeId === undefined
+					? textFn("{factId} × {quantity} has no complete acquisition route.")
+					: textFn(
+							"{factId} × {quantity} has no complete acquisition route through {routeId}.",
+						).replace("{routeId}", diagnostic.routeId)
+			)
+				.replace("{factId}", diagnostic.factId)
+				.replace("{quantity}", formatQuantityFn(diagnostic.quantity));
 		case "zero-yield":
-			return `Route ${diagnostic.routeId} can never yield ${diagnostic.factId}.`;
+			return textFn("Route {routeId} can never yield {factId}.")
+				.replace("{routeId}", diagnostic.routeId)
+				.replace("{factId}", diagnostic.factId);
 	}
 };
 
 const ItemEstimateHeading = () => (
-	<h2 className="text-lg font-semibold text-foreground">Approximate acquisition path</h2>
+	<h2 className="text-lg font-semibold text-foreground">
+		<Tx label="Approximate acquisition path" />
+	</h2>
 );
 
 const ItemEstimateSummary = ({ estimate }: { readonly estimate: ItemEstimate }) => (
 	<div className="flex min-w-0 flex-1 items-center justify-between gap-4">
 		<ItemEstimateHeading />
 		<p className="shrink-0 font-semibold tabular-nums text-foreground">
-			{formatItemEstimateResultFn(estimate)}
+			{estimate.obtainable ? (
+				formatItemEstimateResultFn(estimate)
+			) : (
+				<Tx label={estimate.status === "partial" ? "Indeterminate" : "Unreachable"} />
+			)}
 		</p>
 	</div>
 );
@@ -54,14 +89,15 @@ const ItemEstimateResult = ({
 	readonly config: GameConfigSchema.Type;
 	readonly estimate: ItemEstimate;
 	readonly limit?: number;
-}) =>
-	estimate.status === "unreachable" ? (
+}) => {
+	const translator = useTranslator();
+	return estimate.status === "unreachable" ? (
 		limit === undefined ? (
 			<Status
 				dataUi="EditorItemEstimateUnreachable"
 				icon={Unlink}
-				title="This item is unreachable."
-				description="No complete acquisition path was found from the project's starting items using the current configuration."
+				title={<Tx label="This item is unreachable." />}
+				description={<Mx label="Estimate unreachable description" />}
 				size="large"
 				variant="flat"
 			/>
@@ -70,7 +106,7 @@ const ItemEstimateResult = ({
 				<Status
 					dataUi="EditorItemEstimateUnreachable"
 					icon={Unlink}
-					title="This item is unreachable."
+					title={<Tx label="This item is unreachable." />}
 					variant="flat"
 				/>
 			</EditorRootCard>
@@ -89,18 +125,18 @@ const ItemEstimateResult = ({
 		>
 			<ItemEstimateSummary estimate={estimate} />
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
-				<p className="font-medium text-foreground">
-					The bounded static analysis could not produce stable totals; see the diagnostic
-					for the exact limit.
-				</p>
+				<Mx label="Estimate incomplete description" />
 				<ul className="grid gap-2">
 					{estimate.diagnostics.slice(0, limit).map((diagnostic, index) => (
-						<li key={`${diagnostic.kind}:${index}`}>{diagnosticTextFn(diagnostic)}</li>
+						<li key={`${diagnostic.kind}:${index}`}>
+							{diagnosticTextFn(diagnostic, translator.textFn)}
+						</li>
 					))}
 				</ul>
 			</div>
 		</EditorRootCard>
 	);
+};
 
 /** Shares the captured estimate between the full section and its two-entry overview. */
 export const ItemEstimateSection = ({
@@ -134,7 +170,7 @@ export const ItemEstimateSection = ({
 					dataUi="EditorItemEstimateError"
 					description={state.message}
 					icon={TriangleAlert}
-					title="Estimate calculation failed"
+					title={<Tx label="Estimate calculation failed" />}
 				/>
 			) : null}
 			{state.status === "ready" ? (

@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { useStore } from "@tanstack/react-form";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -9,6 +10,7 @@ import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValu
 import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
 
 export const ProjectInventorySection = () => {
+	const translator = useTranslator();
 	const { form, validationIssues } = useProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.inventory.width);
 	const height = useStore(form.store, (state) => state.values.inventory.height);
@@ -37,7 +39,7 @@ export const ProjectInventorySection = () => {
 					<form.AppField name="inventory.width">
 						{(field) => (
 							<field.NumberField
-								label="Width"
+								label={translator.textFn("Width")}
 								max={EditorProjectSizeMax}
 								min={1}
 							/>
@@ -46,7 +48,7 @@ export const ProjectInventorySection = () => {
 					<form.AppField name="inventory.height">
 						{(field) => (
 							<field.NumberField
-								label="Height"
+								label={translator.textFn("Height")}
 								max={EditorProjectSizeMax}
 								min={1}
 							/>
@@ -59,7 +61,7 @@ export const ProjectInventorySection = () => {
 				</div>
 				<EditorFormBranchEnd />
 			</EditorFormCard>
-			<EditorFormSection title="Initial inventory">
+			<EditorFormSection title={translator.textFn("Initial inventory")}>
 				<ProjectStartGrid
 					cells={cells}
 					height={height}

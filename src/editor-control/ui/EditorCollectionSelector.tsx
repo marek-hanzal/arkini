@@ -1,3 +1,4 @@
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Plus, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
@@ -6,7 +7,6 @@ import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 
 interface EditorCollectionSelectorProps {
-	readonly addLabel?: string;
 	readonly children: (activeIndex: number) => ReactNode;
 	readonly count: number;
 	readonly dataUi?: string;
@@ -22,7 +22,6 @@ interface EditorCollectionSelectorProps {
 	readonly onAddFn?: () => void;
 	readonly onRemoveFn?: (activeIndex: number) => void;
 	readonly removeDisabled?: boolean;
-	readonly removeLabel?: string;
 	readonly renderItemContentFn?: (index: number, label: string) => ReactNode;
 	readonly renderItemPreviewFn?: (index: number) => ReactNode;
 	readonly renderSelectedItemPreviewFn?: (index: number | undefined) => ReactNode;
@@ -31,7 +30,6 @@ interface EditorCollectionSelectorProps {
 
 /** Shows exactly one selected collection item when the collection is nonempty. */
 export const EditorCollectionSelector = ({
-	addLabel = "Add item",
 	children,
 	count,
 	dataUi = "EditorCollectionSelector",
@@ -47,12 +45,12 @@ export const EditorCollectionSelector = ({
 	onAddFn,
 	onRemoveFn,
 	removeDisabled = false,
-	removeLabel = "Remove item",
 	renderItemContentFn,
 	renderItemPreviewFn,
 	renderSelectedItemPreviewFn,
 	selectedIndex,
 }: EditorCollectionSelectorProps) => {
+	const translator = useTranslator();
 	const [internalSelectedIndex, selectIndexFn] = useState(initialSelectedIndex);
 	const requestedIndex = selectedIndex === undefined ? internalSelectedIndex : selectedIndex;
 	const activeIndex = count === 0 ? undefined : Math.min(requestedIndex, count - 1);
@@ -64,7 +62,7 @@ export const EditorCollectionSelector = ({
 					<EditorSearchCombobox
 						disabled={activeIndex === undefined}
 						displaySelectedLabel
-						emptyLabel={`No ${label.toLocaleLowerCase()} match this search.`}
+						emptyLabel={translator.textFn("No matches found.")}
 						error={error}
 						label={label}
 						labelVisible={false}
@@ -120,7 +118,7 @@ export const EditorCollectionSelector = ({
 				<div className="flex shrink-0 items-center">
 					{onAddFn === undefined ? null : (
 						<EditorIconButton
-							title={addLabel}
+							data-ui="EditorCollectionAdd"
 							onClick={() => {
 								onAddFn();
 								selectIndexFn(count);
@@ -131,8 +129,8 @@ export const EditorCollectionSelector = ({
 					)}
 					{onRemoveFn === undefined ? null : (
 						<EditorIconButton
+							data-ui="EditorCollectionRemove"
 							disabled={removeDisabled || activeIndex === undefined}
-							title={removeLabel}
 							onClick={() => {
 								if (removeDisabled || activeIndex === undefined) return;
 								onRemoveFn(activeIndex);

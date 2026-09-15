@@ -91,7 +91,7 @@ describe("game pack CLI", () => {
 
 	it("can suppress warning diagnostics without hiding validation success", async () => {
 		const root = await harness.createExternalProject("cli-silent-warning");
-		await writeFile(join(root, "assets", "unused.png"), createTestPngBytes());
+		await writeFile(join(root, "artwork", "unused.png"), createTestPngBytes());
 
 		const visible = await runValidate(root);
 		expect(visible.stderr).toContain("WARNING resource:unused");

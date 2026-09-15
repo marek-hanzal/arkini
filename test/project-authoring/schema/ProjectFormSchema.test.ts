@@ -44,7 +44,7 @@ const createInventoryProject = () =>
 					},
 					title: "Backpack",
 					description: "Backpack",
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [
 							"item-water",
@@ -212,8 +212,8 @@ describe("ProjectFormSchema", () => {
 			...createValidFormValue(project),
 			hero: "missing",
 			avatars: [
-				"item-water",
-				"item-water",
+				"hero",
+				"hero",
 			],
 		});
 

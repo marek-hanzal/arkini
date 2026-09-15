@@ -5,7 +5,7 @@
 		"id": "fawn",
 		"title": "Fawn",
 		"description": "It's cute, isn't it?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fawn"

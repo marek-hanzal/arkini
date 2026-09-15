@@ -43,7 +43,7 @@ export const MergeOption = ({
 				size="md"
 				className="rounded-md"
 				resourceIds={
-					target?.asset.default ?? [
+					target?.artwork.default ?? [
 						"",
 					]
 				}

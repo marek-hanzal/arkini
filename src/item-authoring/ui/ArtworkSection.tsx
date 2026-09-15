@@ -12,7 +12,7 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { FormValues } from "~/item-authoring/schema/FormSchema";
 import { Mx } from "~/translation/ui/Mx";
 
-const defaultArtwork: FormValues["asset"] = {
+const defaultArtwork: FormValues["artwork"] = {
 	scale: 1,
 	default: [
 		"",
@@ -29,7 +29,13 @@ const ArtworkFields = withFieldGroupFn({
 				<EditorFormSectionDivider title={translator.textFn("Artwork")} />
 				<div className="grid grid-cols-[minmax(0,1fr)_12rem] items-start gap-4">
 					<group.AppField name="default[0]">
-						{(field) => <field.AssetField label={translator.textFn("Base asset")} />}
+						{(field) => (
+							<field.ResourceField
+								emptyLabel={translator.textFn("No artwork matches this search.")}
+								label={translator.textFn("Base artwork")}
+								resourceType="artwork"
+							/>
+						)}
 					</group.AppField>
 					<group.AppField name="scale">
 						{(field) => (
@@ -51,9 +57,11 @@ const ArtworkFields = withFieldGroupFn({
 				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
 					<group.AppField name="default[1]">
 						{(field) => (
-							<field.AssetField
-								label={translator.textFn("Overlay asset")}
+							<field.ResourceField
+								emptyLabel={translator.textFn("No artwork matches this search.")}
+								label={translator.textFn("Overlay artwork")}
 								optional
+								resourceType="artwork"
 							/>
 						)}
 					</group.AppField>
@@ -76,29 +84,29 @@ export const ArtworkSection = () => {
 			<EditorFormCard>
 				<ArtworkFields
 					form={form}
-					fields="asset"
+					fields="artwork"
 				/>
 			</EditorFormCard>
 			<div
 				className="grid min-h-0 min-w-0 place-items-center [container-type:size]"
 				data-ui="EditorArtworkPreviewArea"
 			>
-				<form.Subscribe selector={(state) => state.values.asset}>
-					{(asset) =>
-						asset.default[0] ? (
+				<form.Subscribe selector={(state) => state.values.artwork}>
+					{(artwork) =>
+						artwork.default[0] ? (
 							<ArtworkTilePreview
 								className="size-[min(80cqh,100cqw)] rounded-2xl border-2 border-accent"
 								resourceIds={
-									asset.default[1]
+									artwork.default[1]
 										? [
-												asset.default[0],
-												asset.default[1],
+												artwork.default[0],
+												artwork.default[1],
 											]
 										: [
-												asset.default[0],
+												artwork.default[0],
 											]
 								}
-								scale={asset.scale}
+								scale={artwork.scale}
 							/>
 						) : null
 					}

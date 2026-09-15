@@ -5,7 +5,7 @@
 		"id": "grain-field",
 		"title": "Grain Field",
 		"description": "A field. Of grain.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"grain-field"

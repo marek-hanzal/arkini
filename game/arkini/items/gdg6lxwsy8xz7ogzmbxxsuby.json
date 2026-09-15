@@ -5,7 +5,7 @@
 		"id": "ground-meadow-01",
 		"title": "Ground Meadow 01",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"ground-meadow-01"

@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
+import type { ArtworkSchema } from "~/item-definition/schema/ArtworkSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 interface CheatItemCatalogEntry {
 	readonly itemId: IdSchema.Type;
-	readonly sourceResourceIds: AssetSchema.Type["default"];
+	readonly sourceResourceIds: ArtworkSchema.Type["default"];
 	readonly title: string;
 }
 
@@ -22,7 +22,7 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 		.map(
 			(item): CheatItemCatalogEntry => ({
 				itemId: item.id,
-				sourceResourceIds: item.asset.default,
+				sourceResourceIds: item.artwork.default,
 				title: item.title,
 			}),
 		)

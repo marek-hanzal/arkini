@@ -5,7 +5,7 @@
 		"id": "treasure-chest-t5",
 		"title": "Treasure Chest - Tier 5",
 		"description": "Quite luxury stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"treasure-chest-t5"

@@ -5,7 +5,7 @@
 		"id": "spoiled-copper-pan",
 		"title": "Spoiled Copper Pan",
 		"description": "Pan. Offline",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-copper-pan"

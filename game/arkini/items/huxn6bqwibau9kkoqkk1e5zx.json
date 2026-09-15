@@ -5,7 +5,7 @@
 		"id": "dairy",
 		"title": "Dairy",
 		"description": "What is the smell here...? Ah, tasty cheese!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dairy"

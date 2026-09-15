@@ -28,9 +28,10 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 		...validateGameResourcesFn({
 			config: project.config,
 			provenance,
-			resources: project.resources.map(({ id }) => ({
+			resources: project.resources.map(({ id, type }) => ({
 				id,
-				path: `${source}/resources/${id}.png`,
+				path: `${source}/${type}/${id}.png`,
+				type,
 			})),
 		}),
 	];

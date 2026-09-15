@@ -5,7 +5,7 @@
 		"id": "clay-jug",
 		"title": "Clay Jug",
 		"description": "A lot of stuff you can put stuff into",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-jug"

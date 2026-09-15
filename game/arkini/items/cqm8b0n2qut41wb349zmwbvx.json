@@ -5,7 +5,7 @@
 		"id": "clay-vase-with-flowers",
 		"title": "Clay Vase With Flowers",
 		"description": "It's nice. For a while",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-vase-with-flowers"

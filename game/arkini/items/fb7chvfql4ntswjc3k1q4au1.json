@@ -5,7 +5,7 @@
 		"id": "hot-chocolate-cauldron",
 		"title": "Hot Chocolate Cauldron",
 		"description": "Wanna bath yourself?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hot-chocolate-cauldron"

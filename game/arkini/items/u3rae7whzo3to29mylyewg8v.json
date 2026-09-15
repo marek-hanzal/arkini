@@ -5,7 +5,7 @@
 		"id": "farmland-portal",
 		"title": "Farmland Portal",
 		"description": "Farmland",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"farmland-portal"

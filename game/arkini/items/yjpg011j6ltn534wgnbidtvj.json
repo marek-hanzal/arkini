@@ -5,7 +5,7 @@
 		"id": "knowledge-t2",
 		"title": "Knowledge - Tier 2",
 		"description": "A bit better knowledge of something... interesting",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"knowledge-t2"

@@ -5,7 +5,7 @@
 		"id": "meal",
 		"title": "Meal",
 		"description": "Gimme!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"meal"

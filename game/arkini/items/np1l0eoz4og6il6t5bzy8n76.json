@@ -5,7 +5,7 @@
 		"id": "spoiled-rum-barrel",
 		"title": "Spoiled Rum Barrel",
 		"description": "Ages ago, it was a nice barrel",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-rum-barrel"

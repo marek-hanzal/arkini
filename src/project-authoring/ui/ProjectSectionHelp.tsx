@@ -8,9 +8,9 @@ export const ProjectSectionHelp: Record<ProjectSectionId, EditorPageHelpContent>
 		title: <Tx label="Project" />,
 		content: <Mx label="Project general help" />,
 	},
-	artwork: {
-		title: <Tx label="Artwork" />,
-		content: <Mx label="Project artwork help" />,
+	images: {
+		title: <Tx label="Images" />,
+		content: <Mx label="Project images help" />,
 	},
 	board: {
 		title: <Tx label="Board" />,

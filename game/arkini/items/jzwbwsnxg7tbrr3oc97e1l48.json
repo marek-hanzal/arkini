@@ -5,7 +5,7 @@
 		"id": "shorn-wild-boar",
 		"title": "Shorn Wild Boar",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"shorn-wild-boar"

@@ -5,7 +5,7 @@
 		"id": "spoiled-dye-plants",
 		"title": "Spoiled Dye Plants",
 		"description": "Colors not found",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-dye-plants"

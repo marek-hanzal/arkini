@@ -5,7 +5,7 @@
 		"id": "cauldron-with-beer",
 		"title": "Cauldron With Beer",
 		"description": "Beer. In cauldron. A lot of beer",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-beer"

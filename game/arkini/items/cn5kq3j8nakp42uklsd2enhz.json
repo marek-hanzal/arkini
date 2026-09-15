@@ -5,7 +5,7 @@
 		"id": "battle-axe",
 		"title": "Battle Axe",
 		"description": "Slice through things",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"battle-axe"

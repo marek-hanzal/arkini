@@ -5,7 +5,7 @@
 		"id": "dirty-clay-bowl",
 		"title": "Dirty Clay Bowl",
 		"description": "Don't reuse it like this",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dirty-clay-bowl"

@@ -5,7 +5,7 @@
 		"id": "steam-dairy-farm",
 		"title": "Steam Dairy Farm",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"steam-dairy-farm"

@@ -5,7 +5,7 @@
 		"id": "gear-t1",
 		"title": "Gear - Tier 1",
 		"description": "Simple gear for simple machines",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gear-t1"

@@ -5,7 +5,7 @@
 		"id": "spoiled-flax",
 		"title": "Spoiled Flax",
 		"description": "Offline threads",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-flax"

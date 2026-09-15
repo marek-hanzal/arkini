@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
-import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
+import type { ArtworkSchema } from "~/item-definition/schema/ArtworkSchema";
 
 /** Compares the authored artwork canvas with its unchanged full tile bounds. */
 export const ArtworkTilePreview = ({
@@ -10,7 +10,7 @@ export const ArtworkTilePreview = ({
 	scale,
 }: {
 	readonly className?: string;
-	readonly resourceIds: AssetSchema.Type["default"];
+	readonly resourceIds: ArtworkSchema.Type["default"];
 	readonly scale: number;
 }) => (
 	<div

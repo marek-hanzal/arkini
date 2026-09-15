@@ -20,6 +20,7 @@ import { SchemaReferenceConflictDiagnosticSchema } from "./SchemaReferenceConfli
 import { StartInvalidDiagnosticSchema } from "./StartInvalidDiagnosticSchema";
 import { SourceJsonDiagnosticSchema } from "./SourceJsonDiagnosticSchema";
 import { SourceSchemaDiagnosticSchema } from "./SourceSchemaDiagnosticSchema";
+import { ResourceTypeMismatchDiagnosticSchema } from "./ResourceTypeMismatchDiagnosticSchema";
 
 export const GameDiagnosticSchema = z
 	.discriminatedUnion("code", [
@@ -27,6 +28,7 @@ export const GameDiagnosticSchema = z
 		DuplicateProviderDiagnosticSchema,
 		DuplicateResourceDiagnosticSchema,
 		MissingResourceDiagnosticSchema,
+		ResourceTypeMismatchDiagnosticSchema,
 		UnusedResourceDiagnosticSchema,
 		SchemaReferenceConflictDiagnosticSchema,
 		ConfigSchemaDiagnosticSchema,

@@ -5,7 +5,7 @@
 		"id": "empty-bed-t1",
 		"title": "Empty Bed T1",
 		"description": "You can sleep, not so comfortably",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-bed-t1"

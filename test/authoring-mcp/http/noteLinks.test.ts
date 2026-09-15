@@ -158,7 +158,7 @@ describe("editor MCP note item links", () => {
 		);
 		expect(detail).toEqual({
 			...note,
-			linkedAssets: [],
+			linkedResources: [],
 			linkedItems: [
 				{
 					uid: "water",
@@ -259,7 +259,7 @@ describe("editor MCP note item links", () => {
 			...note,
 			resourceIds: [],
 			itemUids: [],
-			linkedAssets: [],
+			linkedResources: [],
 			linkedItems: [],
 			updatedAtMs: expect.any(Number),
 		});

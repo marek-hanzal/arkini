@@ -5,7 +5,7 @@
 		"id": "empty-bottle",
 		"title": "Empty Bottle",
 		"description": "A bottle",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-bottle"

@@ -5,7 +5,7 @@
 		"id": "cow",
 		"title": "Cow",
 		"description": "Booo!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cow"

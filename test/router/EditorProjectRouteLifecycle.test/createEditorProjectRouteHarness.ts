@@ -71,7 +71,6 @@ const createRepository = (projects: ReadonlyMap<string, Project>): ProjectReposi
 	replaceResourceFx: () => Effect.die("Unexpected replaceResourceFx call."),
 	deleteItemFx: () => Effect.die("Unexpected deleteItemFx call."),
 	upsertItemFx: () => Effect.die("Unexpected upsertItemFx call."),
-	upsertResourcesFx: () => Effect.die("Unexpected upsertResourcesFx call."),
 });
 
 export const createEditorProjectRouteHarness = async () => {

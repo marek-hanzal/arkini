@@ -5,7 +5,7 @@
 		"id": "pig-pen",
 		"title": "Pig Pen",
 		"description": "Arn't they cute?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pig-pen"

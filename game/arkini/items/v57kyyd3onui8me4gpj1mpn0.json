@@ -5,7 +5,7 @@
 		"id": "earth-deposit-deplated",
 		"title": "Deplated Earth Deposit",
 		"description": "You can find a new one to mine!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"earth-source-depleted"

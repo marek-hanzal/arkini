@@ -29,10 +29,10 @@ const simpleItem = ({
 	title: id,
 	description: id,
 	units,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			`asset:${id}`,
+			`artwork:${id}`,
 		],
 	},
 	scope,

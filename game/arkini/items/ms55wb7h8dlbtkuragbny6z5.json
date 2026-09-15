@@ -5,7 +5,7 @@
 		"id": "scriptorium",
 		"title": "Scriptorium",
 		"description": "Book maker",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"scriptorium"

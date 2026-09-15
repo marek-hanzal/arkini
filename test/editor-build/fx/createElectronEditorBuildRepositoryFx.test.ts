@@ -56,7 +56,7 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 				path: [
 					"items",
 					"water",
-					"asset",
+					"artwork",
 					"default",
 					0,
 				],

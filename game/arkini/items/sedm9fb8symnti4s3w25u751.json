@@ -5,7 +5,7 @@
 		"id": "candle",
 		"title": "Candle",
 		"description": "Warm, nice light source; be careful, it will fade over time.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"candle"

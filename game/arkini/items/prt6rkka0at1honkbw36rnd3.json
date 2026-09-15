@@ -5,7 +5,7 @@
 		"id": "foundry-extinguished",
 		"title": "Foundry Extinguished",
 		"description": "We're offline",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"foundry-extinguished"

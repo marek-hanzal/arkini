@@ -5,7 +5,7 @@
 		"id": "cotton-seed",
 		"title": "Cotton Seed",
 		"description": "Cotton. Want. To. Grow",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"seed",

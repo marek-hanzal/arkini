@@ -15,8 +15,9 @@ import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionS
 import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { Magic } from "~/arkpack-artifact/constant/Magic";
 import { ManifestSchema } from "~/arkpack-artifact/schema/ManifestSchema";
-import { resizePngAssetFileFx } from "~/game-config-resource/fx/resizePngAssetFileFx";
+import { normalizeArtworkPngFileFx } from "~/game-config-resource/fx/normalizeArtworkPngFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export namespace packDirectoryFx {
 	export interface Props {
@@ -77,7 +78,7 @@ const writeJsonFileFx = Effect.fn("packDirectoryFx.writeJsonFileFx")(
 
 interface PackedResourceFile {
 	readonly id: string;
-	readonly mime: "image/png";
+	readonly type: ResourceTypeSchema.Type;
 	readonly path: string;
 	readonly length: number;
 }
@@ -161,18 +162,18 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		yield* fileSystem.makeDirectory(temporary);
 		const resourcesRoot = path.join(temporary, "resources");
 		yield* fileSystem.makeDirectory(resourcesRoot);
-		const pngResources: PackedResourceFile[] = [];
+		const resources: PackedResourceFile[] = [];
 		for (let index = 0; index < compilation.resources.length; index += 1) {
 			const resource = compilation.resources[index];
 			const target = path.join(resourcesRoot, String(index).padStart(6, "0"));
 			const length =
-				resource.kind === "asset"
-					? yield* resizePngAssetFileFx(resource.path, target, resource.id)
+				resource.type === "artwork"
+					? yield* normalizeArtworkPngFileFx(resource.path, target, resource.id)
 					: yield* validatePngResourceFileFx(resource.path, resource.id);
-			pngResources.push({
+			resources.push({
 				id: resource.id,
-				mime: resource.mime,
-				path: resource.kind === "asset" ? target : resource.path,
+				type: resource.type,
+				path: resource.type === "artwork" ? target : resource.path,
 				length,
 			});
 		}
@@ -187,9 +188,9 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 			version: identity.version,
 			arkini: ArkiniVersionSchema.parse(ArkiniAppVersion),
 			length: configLength,
-			resources: pngResources.map(({ id, mime, length }) => ({
+			resources: resources.map(({ id, type, length }) => ({
 				id,
-				mime,
+				type,
 				length,
 			})),
 		});
@@ -201,12 +202,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 				),
 			);
 		const stagedArkpack = path.join(temporary, filename);
-		const artifact = yield* writeArkpackFx(
-			stagedArkpack,
-			manifestPath,
-			configPath,
-			pngResources,
-		);
+		const artifact = yield* writeArkpackFx(stagedArkpack, manifestPath, configPath, resources);
 		yield* fileSystem.remove(build, {
 			force: true,
 			recursive: true,
@@ -232,7 +228,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		packageId: identity.packageId,
 		version: identity.version,
 		json: compilation.json,
-		png: compilation.resources.length,
+		resources: compilation.resources.length,
 		bytes: artifact.bytes,
 		contentHash: artifact.contentHash,
 		diagnostics: compilation.diagnostics,

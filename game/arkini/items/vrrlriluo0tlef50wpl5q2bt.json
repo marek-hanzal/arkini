@@ -5,7 +5,7 @@
 		"id": "beehive",
 		"title": "Beehive",
 		"description": "Honey producers",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"beehive"

@@ -5,7 +5,7 @@
 		"id": "empty-grass-field",
 		"title": "Empty Grass Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-grass-field"

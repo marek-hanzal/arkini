@@ -5,7 +5,7 @@
 		"id": "dye-workshop-beer",
 		"title": "Dye Workshop Beer",
 		"description": "Why you did this?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye-workshop-beer"

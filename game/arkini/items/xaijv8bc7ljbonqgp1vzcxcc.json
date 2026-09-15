@@ -5,7 +5,7 @@
 		"id": "hunted-game",
 		"title": "Hunted Game",
 		"description": "Some raw hunted stuff you shall process",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hunted-game"

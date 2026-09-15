@@ -5,7 +5,7 @@
 		"id": "hungry-beagle",
 		"title": "Hungry Beagle",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hungry-beagle"

@@ -5,7 +5,7 @@
 		"id": "pig-farm",
 		"title": "Pig Farm",
 		"description": "Pig generator",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pig-farm"

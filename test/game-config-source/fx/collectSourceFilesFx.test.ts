@@ -26,8 +26,11 @@ describe("collectSourceFilesFx", () => {
 				"game.json",
 				"items/kept.json",
 				"items/nested/ignored.json",
-				"assets/kept.png",
-				"resources/nested/ignored.png",
+				"artwork/kept.png",
+				"image/hero.png",
+				"image/nested/ignored.png",
+				"assets/obsolete.png",
+				"resources/obsolete.png",
 				"notes/ignored.json",
 				"scenarios/ignored.json",
 				"versions/version-1/ignored.json",
@@ -40,13 +43,14 @@ describe("collectSourceFilesFx", () => {
 				collectSourceFilesFx({
 					input: directory,
 				}).pipe(
-					Effect.map(({ json, png }) => ({
+					Effect.map(({ json, resources }) => ({
 						json: json.map((file) =>
 							path.relative(directory, file).split(path.sep).join("/"),
 						),
-						png: png.map((file) =>
-							path.relative(directory, file).split(path.sep).join("/"),
-						),
+						resources: resources.map((resource) => ({
+							path: path.relative(directory, resource.path).split(path.sep).join("/"),
+							type: resource.type,
+						})),
 					})),
 				);
 
@@ -57,8 +61,15 @@ describe("collectSourceFilesFx", () => {
 					"game.json",
 					"items/kept.json",
 				],
-				png: [
-					"assets/kept.png",
+				resources: [
+					{
+						path: "artwork/kept.png",
+						type: "artwork",
+					},
+					{
+						path: "image/hero.png",
+						type: "image",
+					},
 				],
 			});
 		}).pipe(Effect.provide(NodeServices.layer)),

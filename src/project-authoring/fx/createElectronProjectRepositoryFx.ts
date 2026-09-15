@@ -72,7 +72,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"create-project",
 				callFx(
 					"create-project",
-					() => window.arkini.editor.createProjectFn(request),
+					() => window.arkini.editor.createProjectFn(request.config.meta.id),
 					parseProjectFn,
 				),
 			),
@@ -207,15 +207,6 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					"upsert-item",
 					() => window.arkini.editor.upsertItemFn(request),
 					parseCommitFn,
-				),
-			),
-		upsertResourcesFx: (request) =>
-			writeFx(
-				"upsert-resource",
-				callFx(
-					"upsert-resource",
-					() => window.arkini.editor.upsertResourcesFn(request),
-					parseProjectFn,
 				),
 			),
 		updateNoteFx: (request) =>

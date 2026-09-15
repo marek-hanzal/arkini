@@ -10,6 +10,7 @@ import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLa
 import { createArkpackSourceProvenanceFn } from "~/arkpack-admission/fn/createArkpackSourceProvenanceFn";
 import type { ExtractedArkpack } from "~/arkpack-admission/type/ExtractedArkpack";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
+import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
 import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";
 import { validateGameResourcesFn } from "~/game-config-validation/fn/validateGameResourcesFn";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
@@ -73,10 +74,12 @@ export const extractArkpackFileFx = Effect.fn("extractArkpackFileFx")(function* 
 		const resource = layout.resources[index];
 		const path = join(resourcesRoot, String(index).padStart(6, "0"));
 		yield* copyRangeFx(arkpackPath, resource.offset, resource.length, path);
-		if (resource.mime === "image/png") yield* validatePngResourceFileFx(path, resource.id);
+		yield* resource.type === "artwork"
+			? validateArtworkPngFileFx(path, resource.id)
+			: validatePngResourceFileFx(path, resource.id);
 		resources.push({
 			id: resource.id,
-			mime: resource.mime,
+			type: resource.type,
 			path,
 			size: resource.length,
 		});

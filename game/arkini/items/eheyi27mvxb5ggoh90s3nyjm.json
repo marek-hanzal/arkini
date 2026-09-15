@@ -5,7 +5,7 @@
 		"id": "townhall-t1-blueprint",
 		"title": "Townhall I blueprint",
 		"description": "So it's time for upgrade?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

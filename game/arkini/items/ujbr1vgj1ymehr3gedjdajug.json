@@ -5,7 +5,7 @@
 		"id": "burning-paper",
 		"title": "Burning Paper",
 		"draft": false,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"paper",

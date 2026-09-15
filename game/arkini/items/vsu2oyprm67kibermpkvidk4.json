@@ -5,7 +5,7 @@
 		"id": "roasted-coffee-beans",
 		"title": "Roasted Coffee Beans",
 		"description": "Time for a good cup of coffee",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"roasted-coffee-beans"

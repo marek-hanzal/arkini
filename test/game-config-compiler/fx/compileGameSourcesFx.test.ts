@@ -34,11 +34,11 @@ describe("compileGameSourcesFx", () => {
 	it("preserves authored scale and layered default composition", async () => {
 		const item = {
 			...createSimpleItem("item:layered"),
-			asset: {
+			artwork: {
 				scale: 0.65,
 				default: [
-					"asset:base",
-					"asset:overlay",
+					"artwork:base",
+					"artwork:overlay",
 				],
 			},
 		};
@@ -50,7 +50,7 @@ describe("compileGameSourcesFx", () => {
 			}),
 		);
 
-		expect(result.config?.items[item.id]?.asset).toEqual(item.asset);
+		expect(result.config?.items[item.id]?.artwork).toEqual(item.artwork);
 		expect(result.diagnostics).toEqual([]);
 	});
 

@@ -4,7 +4,7 @@
 		"uid": "rw4gsk55m78q58bresm6fcas",
 		"id": "pot-with-coins",
 		"title": "Pot With Coins",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pot-with-coins"

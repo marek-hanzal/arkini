@@ -32,7 +32,7 @@ export const OutputDropOption = ({
 					size="md"
 					className="rounded-md"
 					resourceIds={
-						project.config.items[id]?.asset.default ?? [
+						project.config.items[id]?.artwork.default ?? [
 							"",
 						]
 					}

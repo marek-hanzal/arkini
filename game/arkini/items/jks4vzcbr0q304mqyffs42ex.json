@@ -5,7 +5,7 @@
 		"id": "wire-processing",
 		"title": "Wire Processing",
 		"description": "It's time for some electricity",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wire-processing"

@@ -6,7 +6,7 @@
 		"title": "Base Camp",
 		"draft": false,
 		"description": "This is the start of your journey. Here you can build more stuff as you progress!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"base-camp"

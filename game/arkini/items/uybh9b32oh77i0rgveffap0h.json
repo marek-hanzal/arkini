@@ -5,7 +5,7 @@
 		"id": "spoiled-flowers",
 		"title": "Spoiled Flowers",
 		"description": "Not nice anymore",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-flowers"

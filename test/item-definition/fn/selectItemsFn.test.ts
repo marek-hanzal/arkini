@@ -11,10 +11,10 @@ const item = {
 	id: "tree",
 	title: "Tree",
 	description: "A living tree.",
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			"asset:tree",
+			"artwork:tree",
 		],
 	},
 	scope: "board",

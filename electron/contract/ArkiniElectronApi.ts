@@ -59,7 +59,7 @@ export namespace ArkiniElectronApi {
 		editorProjectImportJsonDirectory: "arkini:editor:project:import-json-directory",
 		editorProjectImportArkpack: "arkini:editor:project:import-arkpack",
 		editorProjectImportInstalledArkpack: "arkini:editor:project:import-installed-arkpack",
-		editorProjectImportAssets: "arkini:editor:project:import-assets",
+		editorProjectImportResources: "arkini:editor:project:import-resources",
 		editorProjectList: "arkini:editor:project:list",
 		editorProjectOpenDirectory: "arkini:editor:project:open-directory",
 		editorProjectOptimizeResources: "arkini:editor:project:optimize-resources",
@@ -70,7 +70,6 @@ export namespace ArkiniElectronApi {
 		editorProjectReplaceConfig: "arkini:editor:project:replace-config",
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
-		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
 		editorNoteList: "arkini:editor:note:list",
 		editorNoteCreate: "arkini:editor:note:create",
 		editorNoteUpdate: "arkini:editor:note:update",
@@ -119,7 +118,7 @@ export namespace ArkiniElectronApi {
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<{
 			readonly id: string;
-			readonly mime: string;
+			readonly type: "artwork" | "image";
 			readonly url: string;
 		}>;
 	}
@@ -193,7 +192,7 @@ export namespace ArkiniElectronApi {
 				request: EditorProjectTransport.ReadBuildRequest,
 			) => Promise<EditorProjectTransport.Result<boolean>>;
 			readonly createProjectFn: (
-				request: EditorProjectTransport.CreateProjectRequest,
+				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly deleteProjectFn: (
 				projectId: string,
@@ -213,9 +212,11 @@ export namespace ArkiniElectronApi {
 			readonly importInstalledArkpackFn: (
 				packageId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Descriptor>>;
-			readonly importAssetsFn: (
-				request: EditorProjectTransport.ImportAssetsRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.ImportAssetsResult>>;
+			readonly importResourcesFn: (
+				request: EditorProjectTransport.ImportResourcesRequest,
+			) => Promise<
+				EditorProjectTransport.Result<EditorProjectTransport.ImportResourcesResult>
+			>;
 			readonly exportJsonDirectoryFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorSourceExportSchema.Type | null>>;
@@ -254,9 +255,6 @@ export namespace ArkiniElectronApi {
 			readonly upsertItemFn: (
 				request: EditorProjectTransport.UpsertItemRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
-			readonly upsertResourcesFn: (
-				request: EditorProjectTransport.UpsertResourcesRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly listNotesFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.Note>>>;

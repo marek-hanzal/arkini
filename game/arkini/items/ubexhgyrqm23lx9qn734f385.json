@@ -5,7 +5,7 @@
 		"id": "clay-plate",
 		"title": "Clay Plate",
 		"description": "So sad",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-plate"

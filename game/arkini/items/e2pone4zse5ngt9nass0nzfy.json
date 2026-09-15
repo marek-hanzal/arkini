@@ -5,7 +5,7 @@
 		"id": "animal-feed",
 		"title": "Animal Feed",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"animal-feed"

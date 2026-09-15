@@ -5,7 +5,7 @@
 		"id": "green-coffee-beans",
 		"title": "Green Coffee Beans",
 		"description": "Still needs some care before it will be a coffee you know",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"green-coffee-beans"

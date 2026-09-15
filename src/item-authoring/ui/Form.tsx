@@ -19,7 +19,10 @@ const useDraft = (
 		const draft = createDraftFn({
 			draft: defaultDraft,
 			itemId: defaultItemId,
-			resourceId: resourceId ?? project.resources[0]?.id ?? "missing-asset",
+			resourceId:
+				resourceId ??
+				project.resources.find(({ type }) => type === "artwork")?.id ??
+				"missing-artwork",
 			uid,
 		});
 		const namedDraft =

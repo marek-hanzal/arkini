@@ -5,7 +5,7 @@
 		"id": "cocoa-powder",
 		"title": "Cocoa Powder",
 		"description": "Can you smell it?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cocoa-powder"

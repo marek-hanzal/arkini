@@ -5,7 +5,7 @@
 		"id": "gem-mine",
 		"title": "Gem Mine",
 		"description": "If you wanna be rich, go into the depths",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gem-mine"

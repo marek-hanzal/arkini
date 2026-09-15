@@ -5,7 +5,7 @@
 		"id": "butter",
 		"title": "Butter",
 		"description": "Fresh nice butter",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"butter"

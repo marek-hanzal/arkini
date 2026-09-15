@@ -5,7 +5,7 @@
 		"id": "furniture",
 		"title": "Furniture",
 		"description": "Some furniture to the house",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"furniture"

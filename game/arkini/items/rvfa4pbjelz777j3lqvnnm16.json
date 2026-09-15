@@ -5,7 +5,7 @@
 		"id": "confectionery",
 		"title": "Confectionery",
 		"description": "Yummies are available here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"confectionery"

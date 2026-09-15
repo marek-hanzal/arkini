@@ -5,7 +5,7 @@
 		"id": "spoiled-raw-chicken",
 		"title": "Spoiled Raw Chicken",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-raw-chicken"

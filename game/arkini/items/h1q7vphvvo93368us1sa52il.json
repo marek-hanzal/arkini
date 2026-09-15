@@ -5,7 +5,7 @@
 		"id": "recovering-chicken",
 		"title": "Recovering Chicken",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"recovering-chicken"

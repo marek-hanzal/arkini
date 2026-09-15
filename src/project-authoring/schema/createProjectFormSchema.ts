@@ -5,7 +5,12 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */
 export const createProjectFormSchema = (project: Pick<Project, "config" | "resources">) => {
-	const resourceIds = new Set(project.resources.map(({ id }) => id));
+	const resourceTypes = new Map(
+		project.resources.map(({ id, type }) => [
+			id,
+			type,
+		]),
+	);
 	const allowedStartItemIds = new Map([
 		[
 			LocationScopeEnumSchema.enum.Board,
@@ -31,10 +36,10 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 	] as const);
 
 	return ProjectFormBaseSchema.superRefine((value, context) => {
-		if (!resourceIds.has(value.hero)) {
+		if (resourceTypes.get(value.hero) !== "image") {
 			context.addIssue({
 				code: "custom",
-				message: `Hero asset ${value.hero} does not exist in this project.`,
+				message: `Hero image ${value.hero} does not exist in this project.`,
 				path: [
 					"hero",
 				],
@@ -42,10 +47,10 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 		}
 		const seenAvatars = new Set<string>();
 		value.avatars.forEach((avatar, index) => {
-			if (!resourceIds.has(avatar)) {
+			if (resourceTypes.get(avatar) !== "image") {
 				context.addIssue({
 					code: "custom",
-					message: `Avatar asset ${avatar} does not exist in this project.`,
+					message: `Avatar image ${avatar} does not exist in this project.`,
 					path: [
 						"avatars",
 						index,
@@ -55,7 +60,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			if (seenAvatars.has(avatar)) {
 				context.addIssue({
 					code: "custom",
-					message: `Avatar asset ${avatar} is already selected.`,
+					message: `Avatar image ${avatar} is already selected.`,
 					path: [
 						"avatars",
 						index,

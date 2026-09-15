@@ -5,7 +5,7 @@
 		"id": "clay-jug-with-milk",
 		"title": "Clay Jug With Milk",
 		"description": "More milk",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-jug-with-milk"

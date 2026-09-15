@@ -5,7 +5,7 @@
 		"id": "dynamite",
 		"title": "Dynamite",
 		"description": "Kaboom. You should be extremely careful as this may literally destroy your progress.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dynamite"

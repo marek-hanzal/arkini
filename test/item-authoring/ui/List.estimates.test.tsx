@@ -101,7 +101,7 @@ it("keeps live item identity while rejecting a completed estimate from an older 
 		id: "ore",
 		uid: "ore-uid",
 		title: "Old ore",
-		asset: {
+		artwork: {
 			scale: 1,
 			default: [
 				"ore",

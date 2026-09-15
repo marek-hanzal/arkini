@@ -5,7 +5,7 @@
 		"id": "grain-seed",
 		"title": "Grain Seed",
 		"description": "Bio",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"seed",

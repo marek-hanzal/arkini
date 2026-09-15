@@ -5,7 +5,7 @@
 		"id": "arrowheads",
 		"title": "Arrowheads",
 		"description": "Arrow. Oh, just a tip",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"arrowheads"

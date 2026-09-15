@@ -5,7 +5,7 @@
 		"id": "glass",
 		"title": "Glass",
 		"description": "A bit more complex buildings needs windows. They're quite useful, really.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass"

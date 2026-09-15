@@ -5,7 +5,7 @@
 		"id": "clay-mug-with-lye",
 		"title": "Clay Mug With Lye",
 		"description": "A present for your enemy",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug-with-lye"

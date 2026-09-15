@@ -5,7 +5,7 @@
 		"id": "well-with-milk",
 		"title": "Well With Milk",
 		"description": "Cows are on vacation",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-with-milk"

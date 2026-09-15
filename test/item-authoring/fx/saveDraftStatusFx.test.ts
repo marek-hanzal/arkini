@@ -71,7 +71,6 @@ describe("saveDraftStatusFx", () => {
 			replaceConfigFx: () => Effect.die("Unexpected config replacement."),
 			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 			upsertItemFx,
-			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
 		const advanceNoopFx = vi.fn<EditorBoardGameResource["advanceNoopFx"]>(() => Effect.void);
 		const publishFx = vi.fn<EditorBoardGameResource["publishFx"]>(() =>

@@ -5,7 +5,7 @@
 		"id": "order",
 		"title": "Order",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"order"

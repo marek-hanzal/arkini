@@ -5,7 +5,7 @@
 		"id": "amethyst-cow",
 		"title": "Amethyst Cow",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"amethyst-cow"

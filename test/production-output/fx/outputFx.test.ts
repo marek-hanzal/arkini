@@ -38,10 +38,10 @@ const config = GameConfigSchema.parse({
 			id: "source",
 			title: "Source",
 			description: "An output origin.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:source",
+					"artwork:source",
 				],
 			},
 			scope: "board",

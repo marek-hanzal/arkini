@@ -5,7 +5,7 @@
 		"id": "spoiled-bread-basket",
 		"title": "Spoiled Bread Basket",
 		"description": "Poor ugly thing",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-bread-basket"

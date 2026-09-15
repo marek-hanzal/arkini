@@ -5,7 +5,7 @@
 		"id": "rapeseed-seeds",
 		"title": "Rapeseed Seeds",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"rapeseed-seeds"

@@ -5,7 +5,7 @@
 		"id": "tree-seed",
 		"title": "Tree Seed",
 		"description": "More trees, tree lovers!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"seed",

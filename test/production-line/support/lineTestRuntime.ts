@@ -29,10 +29,10 @@ export const lineTestConfig = GameConfigSchema.parse({
 			id: "source",
 			title: "Source",
 			description: "A line origin.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:source",
+					"artwork:source",
 				],
 			},
 			scope: "board",
@@ -46,10 +46,10 @@ export const lineTestConfig = GameConfigSchema.parse({
 			id: "permit",
 			title: "Permit",
 			description: "Allows a product line.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:permit",
+					"artwork:permit",
 				],
 			},
 			scope: "any",
@@ -63,10 +63,10 @@ export const lineTestConfig = GameConfigSchema.parse({
 			id: "booster",
 			title: "Booster",
 			description: "Changes a product-line runtime.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:booster",
+					"artwork:booster",
 				],
 			},
 			scope: "any",
@@ -80,10 +80,10 @@ export const lineTestConfig = GameConfigSchema.parse({
 			id: "blocker",
 			title: "Blocker",
 			description: "Disables and hides a product line.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:blocker",
+					"artwork:blocker",
 				],
 			},
 			scope: "any",

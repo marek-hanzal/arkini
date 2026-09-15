@@ -17,7 +17,9 @@ import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { join } from "node:path";
 import { access } from "node:fs/promises";
-import { importEditorAssetFilesFx } from "../importEditorAssetFilesFx";
+import { importEditorResourceFilesFx } from "../importEditorResourceFilesFx";
+import { createFreshProjectFx } from "~/project-authoring/fx/createFreshProjectFx";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 
 const readEditorWindowFx = (
 	event: IpcMainInvokeEvent,
@@ -189,7 +191,19 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						ownership,
 						diagnostics,
 						requestParser.parseCreateProjectFx(candidate),
-						(repository, request) => repository.createProjectFx(request),
+						(repository, projectId) =>
+							createFreshProjectFx(projectId).pipe(
+								Effect.provideService(ProjectRepository, repository),
+								Effect.mapError((cause) =>
+									cause instanceof ProjectRepositoryError
+										? cause
+										: new ProjectRepositoryError({
+												operation: "create-project",
+												message: "The Editor project could not be created.",
+												cause,
+											}),
+								),
+							),
 					),
 				);
 				handleFn(
@@ -429,29 +443,18 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectImportAssets,
+					ArkiniElectronApi.channels.editorProjectImportResources,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"upsert-resource",
 							ownership,
 							diagnostics,
-							requestParser.parseImportAssetsFx(candidate),
+							requestParser.parseImportResourcesFx(candidate),
 							(repository, request) =>
-								importEditorAssetFilesFx({
+								importEditorResourceFilesFx({
 									repository,
 									request,
 								}),
-						),
-				);
-				handleFn(
-					ArkiniElectronApi.channels.editorProjectUpsertResources,
-					(_event, candidate) =>
-						executeEditorProjectRepositoryFx(
-							"upsert-resource",
-							ownership,
-							diagnostics,
-							requestParser.parseUpsertResourcesFx(candidate),
-							(repository, request) => repository.upsertResourcesFx(request),
 						),
 				);
 				handleFn(
@@ -480,7 +483,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectImportArkpack,
 					ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
-					ArkiniElectronApi.channels.editorProjectImportAssets,
+					ArkiniElectronApi.channels.editorProjectImportResources,
 					ArkiniElectronApi.channels.editorProjectList,
 					ArkiniElectronApi.channels.editorProjectOpenDirectory,
 					ArkiniElectronApi.channels.editorProjectOptimizeResources,
@@ -489,7 +492,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,
 					ArkiniElectronApi.channels.editorProjectReplaceResource,
 					ArkiniElectronApi.channels.editorProjectUpsertItem,
-					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					...noteChannels,
 				];
 				app.once("will-quit", () => {

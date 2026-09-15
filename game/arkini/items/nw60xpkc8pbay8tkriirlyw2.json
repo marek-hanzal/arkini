@@ -5,7 +5,7 @@
 		"id": "empty-mug",
 		"title": "Empty Mug",
 		"description": "You can put something in there",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-mug"

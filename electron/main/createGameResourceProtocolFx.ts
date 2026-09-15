@@ -6,6 +6,8 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
+import { readResourceContentTypeFn } from "~/game-config-resource/fn/readResourceContentTypeFn";
+import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 const InstallationResourceSchema = z
 	.object({
@@ -15,7 +17,7 @@ const InstallationResourceSchema = z
 			z
 				.object({
 					id: z.string(),
-					mime: z.string(),
+					type: ResourceTypeSchema,
 					path: z.string(),
 					size: z.number().int().nonnegative(),
 				})
@@ -115,7 +117,7 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 									}),
 						});
 						const headers = new Headers(response.headers);
-						headers.set("Content-Type", resource.mime);
+						headers.set("Content-Type", readResourceContentTypeFn(resource.type));
 						if (range === null && !headers.has("Content-Length"))
 							headers.set("Content-Length", String(info.size));
 						if (origin !== null) {

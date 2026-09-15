@@ -5,7 +5,7 @@
 		"id": "sack-with-milk",
 		"title": "Sack With Milk",
 		"description": "It cannot hold it. Oops",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-milk"

@@ -5,7 +5,7 @@
 		"id": "empty-honeycomb",
 		"title": "Empty Honeycomb",
 		"description": "So you want to make some candles?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-honeycomb"

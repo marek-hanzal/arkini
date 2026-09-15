@@ -5,7 +5,7 @@
 		"id": "glass-goblet-with-wine",
 		"title": "Glass Goblet with Wine",
 		"description": "Get drunk. Don't tell mom.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass-goblet-with-wine"

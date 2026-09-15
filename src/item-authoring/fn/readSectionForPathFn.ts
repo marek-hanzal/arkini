@@ -5,7 +5,7 @@ export const readSectionForPathFn = (path: ReadonlyArray<PropertyKey>): SectionI
 	switch (path[0]) {
 		case "action":
 			return "action";
-		case "asset":
+		case "artwork":
 			return "artwork";
 		case "maxCount":
 		case "maxStackSize":

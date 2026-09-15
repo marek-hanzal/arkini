@@ -5,7 +5,7 @@
 		"id": "fertilized-sunflower-field",
 		"title": "Fertilized Sunflower Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fertilized-sunflower-field"

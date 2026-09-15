@@ -12,10 +12,10 @@ export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function
 	readonly game: Pick<GameEngine, "getResourceUrlFn">;
 	readonly item: ItemSchema.Type;
 }) {
-	const sourceIds = item.asset.default;
+	const sourceIds = item.artwork.default;
 	return {
 		itemId: item.id,
-		artworkScale: item.asset.scale,
+		artworkScale: item.artwork.scale,
 		sourceUrl: game.getResourceUrlFn(sourceIds[0]),
 		...(sourceIds[1] === undefined
 			? {}

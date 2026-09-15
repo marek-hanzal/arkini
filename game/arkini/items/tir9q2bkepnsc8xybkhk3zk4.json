@@ -5,7 +5,7 @@
 		"id": "spoiled-vegetable-crate",
 		"title": "Spoiled Vegetable Crate",
 		"description": "Not so healthy anymore",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-vegetable-crate"

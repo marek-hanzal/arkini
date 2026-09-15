@@ -5,7 +5,7 @@
 		"id": "ruby",
 		"title": "Ruby",
 		"description": "This one is quite nice and shiny",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"ruby"

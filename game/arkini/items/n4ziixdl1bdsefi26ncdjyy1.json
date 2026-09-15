@@ -5,7 +5,7 @@
 		"id": "bed-biowaste",
 		"title": "Bed Biowaste",
 		"description": "You monster!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bed-biowaste"

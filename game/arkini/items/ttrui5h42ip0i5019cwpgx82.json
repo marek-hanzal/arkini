@@ -5,7 +5,7 @@
 		"id": "duvet",
 		"title": "Duvet",
 		"description": "Wanna something warm over you?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"duvet"

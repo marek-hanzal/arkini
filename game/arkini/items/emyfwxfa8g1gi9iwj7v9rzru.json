@@ -5,7 +5,7 @@
 		"id": "forester",
 		"title": "Forester",
 		"description": "Finds forests. Or trees. Or both",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"forester"

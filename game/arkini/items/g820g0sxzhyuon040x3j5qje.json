@@ -5,7 +5,7 @@
 		"id": "grain",
 		"title": "Grain",
 		"description": "All you can eat!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"grain"

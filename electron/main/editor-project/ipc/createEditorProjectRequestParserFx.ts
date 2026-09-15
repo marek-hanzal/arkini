@@ -7,19 +7,11 @@ import type { EditorProjectTransport } from "~electron/contract/editor/EditorPro
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 
-const createProjectSchema = z
-	.object({
-		version: VersionPartsSchema,
-		config: GameConfigSchema,
-		resources: ResourceSchema.array(),
-	})
-	.strict();
 const saveBuildVersionSchema = z
 	.object({
 		version: VersionPartsSchema,
@@ -90,13 +82,7 @@ const replaceResourceSchema = z
 		resource: ProjectResourceReplacementSchema,
 	})
 	.strict();
-const upsertResourcesSchema = z
-	.object({
-		projectId: IdSchema,
-		resources: ResourceSchema.array().min(1),
-	})
-	.strict();
-const importAssetsSchema = z
+const importResourcesSchema = z
 	.object({
 		files: z
 			.object({
@@ -111,19 +97,24 @@ const importAssetsSchema = z
 			"arkpack",
 			"files",
 		]),
+		type: z.enum([
+			"artwork",
+			"image",
+		]),
 	})
 	.strict();
 /** Creates the feature-owned validator capability used by the Electron IPC adapter. */
 export const createEditorProjectRequestParserFx = Effect.fn("createEditorProjectRequestParserFx")(
 	() =>
 		Effect.succeed({
-			parseImportAssetsFx: (
+			parseImportResourcesFx: (
 				candidate: unknown,
 			): Effect.Effect<
-				EditorProjectTransport.ImportAssetsRequest,
+				EditorProjectTransport.ImportResourcesRequest,
 				ProjectRepositoryError,
 				never
-			> => parseEditorProjectIpcRequestFx("upsert-resource", importAssetsSchema, candidate),
+			> =>
+				parseEditorProjectIpcRequestFx("upsert-resource", importResourcesSchema, candidate),
 			parseSaveBuildVersionFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx(
 					"save-build-version",
@@ -138,10 +129,8 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 					readProjectBuildSchema,
 					candidate,
 				),
-			parseCreateProjectFx: (
-				candidate: unknown,
-			): Effect.Effect<ProjectRepository.CreateProjectProps, ProjectRepositoryError, never> =>
-				parseEditorProjectIpcRequestFx("create-project", createProjectSchema, candidate),
+			parseCreateProjectFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx("create-project", IdSchema, candidate),
 			parseProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
 			parseDeleteProjectIdFx: (candidate: unknown) =>
@@ -201,13 +190,5 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				candidate: unknown,
 			): Effect.Effect<ProjectRepository.UpsertItemProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("upsert-item", upsertItemSchema, candidate),
-			parseUpsertResourcesFx: (
-				candidate: unknown,
-			): Effect.Effect<
-				ProjectRepository.UpsertResourcesProps,
-				ProjectRepositoryError,
-				never
-			> =>
-				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
 		} as const),
 );

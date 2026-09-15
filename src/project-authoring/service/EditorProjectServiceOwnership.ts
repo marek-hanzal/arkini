@@ -8,6 +8,7 @@ import type {
 import type { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import type { ReadEditorBuildProps } from "~/editor-build/service/EditorBuildRepository";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface OwnedEditorProjectRepository
 	extends ProjectRepositoryService,
@@ -22,7 +23,7 @@ export interface OwnedEditorProjectRepository
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<{
 			readonly id: string;
-			readonly mime: "image/png";
+			readonly type: ResourceTypeSchema.Type;
 			readonly path: string;
 			readonly size: number;
 		}>;
@@ -34,6 +35,7 @@ export interface OwnedEditorProjectRepository
 		{
 			readonly root: string;
 			readonly path: string;
+			readonly type: ResourceTypeSchema.Type;
 			readonly version: string;
 			readonly size: number;
 		} | null,

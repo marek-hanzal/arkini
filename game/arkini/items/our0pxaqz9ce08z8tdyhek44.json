@@ -5,7 +5,7 @@
 		"id": "campfire",
 		"title": "Campfire",
 		"description": "Do you like marshmallows?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"campfire"

@@ -5,7 +5,7 @@
 		"id": "spoiled-clay-vase-with-flowers",
 		"title": "Spoiled Clay Vase With Flowers",
 		"description": "Once nice flowers",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-clay-vase-with-flowers"

@@ -38,8 +38,8 @@ describe("editor MCP authoring schema registry", () => {
 		expect(producer).toMatchObject({
 			$id: "urn:arkini:schema:mcp:create-item-input",
 			properties: {
-				asset: {
-					$ref: "AssetSchema",
+				artwork: {
+					$ref: "ArtworkSchema",
 				},
 				lines: {
 					items: {
@@ -121,7 +121,7 @@ describe("editor MCP authoring schema registry", () => {
 		]) {
 			expect(await readSchemaDetail(id), id).toHaveProperty("oneOf");
 		}
-		expect(await readSchemaDetail("AssetSchema")).toMatchObject({
+		expect(await readSchemaDetail("ArtworkSchema")).toMatchObject({
 			properties: {
 				default: {
 					$ref: "item.CompositionSchema",
@@ -197,7 +197,7 @@ describe("editor MCP authoring schema registry", () => {
 				"line.RuleSchema",
 				"action.RuleSchema",
 				"MergeSchema",
-				"AssetSchema",
+				"ArtworkSchema",
 				"item.CompositionSchema",
 				"StartSchema",
 				"start.BoardItemSchema",

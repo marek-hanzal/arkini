@@ -32,12 +32,12 @@ const createStorages = async (version = "1.0") => {
 		resources: [
 			{
 				id: "hero",
-				mime: "image/png",
+				type: "image",
 				url: "arkini://test/hero",
 			},
 			{
-				id: "asset:water",
-				mime: "image/png",
+				id: "artwork:water",
+				type: "artwork",
 				url: "arkini://test/asset-water",
 			},
 		],
@@ -127,7 +127,7 @@ describe("createGameFx", () => {
 				},
 			}),
 		]);
-		expect(first.getResourceUrlFn("asset:water")).toBe("arkini://test/asset-water");
+		expect(first.getResourceUrlFn("artwork:water")).toBe("arkini://test/asset-water");
 		await Effect.runPromise(first.disposeFx);
 		expect(storages.readSaved()).not.toBeNull();
 
@@ -257,7 +257,7 @@ describe("createGameFx", () => {
 				saveStorage,
 			}),
 		);
-		const resourceUrl = game.getResourceUrlFn("asset:water");
+		const resourceUrl = game.getResourceUrlFn("artwork:water");
 		await game.runFn(
 			spawnItemFx({
 				id: "runtime:public-disposal-retry",
@@ -276,7 +276,7 @@ describe("createGameFx", () => {
 		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk full");
 		expect(writes).toBe(1);
 		expect(diagnosticWrites.some(({ event }) => event === "session-ended")).toBe(false);
-		expect(game.getResourceUrlFn("asset:water")).toBe(resourceUrl);
+		expect(game.getResourceUrlFn("artwork:water")).toBe(resourceUrl);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		await expect(
 			game.runFn(
@@ -305,8 +305,8 @@ describe("createGameFx", () => {
 			}),
 		]);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
-		expect(() => game.getResourceUrlFn("asset:water")).toThrow(
-			"Game resource asset:water is unavailable.",
+		expect(() => game.getResourceUrlFn("artwork:water")).toThrow(
+			"Game resource artwork:water is unavailable.",
 		);
 		const saved = storages.readSaved();
 		expect(saved).not.toBeNull();
@@ -343,8 +343,8 @@ describe("createGameFx", () => {
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		await expect(Effect.runPromise(game.disposeWithoutSaveFx)).resolves.toBeUndefined();
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
-		expect(() => game.getResourceUrlFn("asset:water")).toThrow(
-			"Game resource asset:water is unavailable.",
+		expect(() => game.getResourceUrlFn("artwork:water")).toThrow(
+			"Game resource artwork:water is unavailable.",
 		);
 	});
 

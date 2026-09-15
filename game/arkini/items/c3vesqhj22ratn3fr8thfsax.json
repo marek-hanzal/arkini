@@ -5,7 +5,7 @@
 		"id": "spoiled-clay-bowl",
 		"title": "Spoiled Clay Bowl",
 		"description": "Do you remember previous content?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-clay-bowl"

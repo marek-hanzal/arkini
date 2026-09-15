@@ -60,7 +60,7 @@ interface EditorSearchComboboxProps {
 	readonly renderSelectedPreviewFn?: (option: EditorSearchOption | undefined) => ReactNode;
 }
 
-/** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
+/** One Fuse-backed picker shared by Item and Resource form fields. */
 export const EditorSearchCombobox = ({
 	density = "default",
 	description,

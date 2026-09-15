@@ -5,7 +5,7 @@
 		"id": "glass-goblet-with-milk",
 		"title": "Glass Goblet with Milk",
 		"description": "Somebody may tell you a wine belongs there",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass-goblet-with-milk"

@@ -55,7 +55,7 @@ describe("tile identity and Info projections", () => {
 			itemId: owner.id,
 			title: "workshop",
 			sourceResourceIds: [
-				"asset:workshop",
+				"artwork:workshop",
 			],
 		});
 		expect(

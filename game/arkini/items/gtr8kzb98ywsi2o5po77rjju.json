@@ -5,7 +5,7 @@
 		"id": "spoiled-chopped-fruit",
 		"title": "Spoiled Chopped Fruit",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-chopped-fruit"

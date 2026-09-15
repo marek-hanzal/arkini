@@ -5,7 +5,7 @@
 		"id": "dairy-blueprint",
 		"title": "Dairy Blueprint",
 		"description": "Cheese!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

@@ -5,7 +5,7 @@
 		"id": "fertilized-cotton-field",
 		"title": "Fertilized Cotton Field",
 		"description": "Ready for cotton seed.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fertilized-cotton-field"

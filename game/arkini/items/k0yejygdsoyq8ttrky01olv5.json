@@ -5,7 +5,7 @@
 		"id": "treasure-chest-t1",
 		"title": "Treasure Chest - Tier 1",
 		"description": "It may give you some basic loot",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"treasure-chest-t1"

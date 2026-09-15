@@ -14,7 +14,7 @@ const base = (id: string) => ({
 	description: id,
 	scope: "any",
 	maxStackSize: 1,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
 			"hero",

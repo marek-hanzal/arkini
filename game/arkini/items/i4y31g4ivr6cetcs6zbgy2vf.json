@@ -5,7 +5,7 @@
 		"id": "bubble-reservoir",
 		"title": "Bubble Reservoir",
 		"description": "Bubble world",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bubble-reservoir"

@@ -5,7 +5,7 @@
 		"id": "oven-with-ash",
 		"title": "Oven With Ash",
 		"description": "It's done",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"oven-with-ash"

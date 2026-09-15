@@ -5,7 +5,7 @@
 		"id": "empty-cacao-grove",
 		"title": "Empty Cacao Grove",
 		"description": "No more cocoa stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-cacao-grove"

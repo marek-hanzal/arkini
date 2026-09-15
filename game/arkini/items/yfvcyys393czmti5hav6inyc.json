@@ -5,7 +5,7 @@
 		"id": "iron-mine",
 		"title": "Iron Mine",
 		"description": "We need raw ore, dudes",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"iron-mine"

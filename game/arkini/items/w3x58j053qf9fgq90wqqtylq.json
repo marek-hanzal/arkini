@@ -5,7 +5,7 @@
 		"id": "empty-jar",
 		"title": "Empty Jar",
 		"description": "Ready to be filled",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-jar"

@@ -5,7 +5,7 @@
 		"id": "sawmill",
 		"title": "Sawmill",
 		"description": "You want to advance in your journey? Sawmill is your friend!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sawmill"

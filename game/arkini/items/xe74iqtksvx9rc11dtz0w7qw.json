@@ -5,7 +5,7 @@
 		"id": "trade-portal",
 		"title": "Trade Portal",
 		"description": "Trader's land",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"trade-portal"

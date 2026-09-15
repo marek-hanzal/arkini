@@ -5,7 +5,7 @@
 		"id": "compost",
 		"title": "Compost",
 		"description": "Nice thing, flowers would like it.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"compost"

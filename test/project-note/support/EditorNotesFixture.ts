@@ -15,13 +15,13 @@ export const editorNotesTestProject: Project = {
 	resources: [
 		{
 			id: "asset-water",
-			mime: "image/png",
+			type: "artwork",
 			size: 0,
 			version: "1",
 		},
 		{
 			id: "asset-wood",
-			mime: "image/png",
+			type: "artwork",
 			size: 0,
 			version: "1",
 		},

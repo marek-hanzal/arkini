@@ -5,7 +5,7 @@
 		"id": "blasting-machine",
 		"title": "Blasting Machine",
 		"description": "This will make kaboom if connected properly",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blasting-machine"

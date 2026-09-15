@@ -5,7 +5,7 @@
 		"id": "cut-grass",
 		"title": "Cut Grass",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cut-grass"

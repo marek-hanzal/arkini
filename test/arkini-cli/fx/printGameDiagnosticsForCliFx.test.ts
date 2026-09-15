@@ -52,7 +52,7 @@ describe("printGameDiagnosticsForCliFx", () => {
 							"assets",
 							"unused.png",
 						],
-						source: "assets/unused.png",
+						source: "artwork/unused.png",
 						message: "This asset is not referenced.",
 						resourceId: "unused",
 					},

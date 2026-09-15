@@ -5,7 +5,7 @@
 		"id": "explosive-egg",
 		"title": "Explosive Egg",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"explosive-egg"

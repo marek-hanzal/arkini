@@ -343,11 +343,11 @@ describe("createArkiniRouterFx", () => {
 		);
 	});
 
-	it("skips native transitions between sections of the same asset detail", () => {
+	it("skips native transitions between sections of the same artwork detail", () => {
 		const sections = [
 			"overview",
 			"usage",
-			"technical",
+			"notes",
 			"delete",
 		] as const;
 		for (const from of sections) {
@@ -355,16 +355,16 @@ describe("createArkiniRouterFx", () => {
 				if (from === to) continue;
 				expect(
 					resolveTypes(
-						`/editor/arkini/assets/producer-townhall-t3/detail/${from}`,
-						`/editor/arkini/assets/producer-townhall-t3/detail/${to}`,
+						`/editor/arkini/artwork/producer-townhall-t3/detail/${from}`,
+						`/editor/arkini/artwork/producer-townhall-t3/detail/${to}`,
 					),
 				).toBe(false);
 			}
 		}
 		expect(
 			resolveTypes(
-				"/editor/arkini/assets/producer-townhall-t3/detail/overview",
-				"/editor/arkini/assets/producer-academy/detail/overview",
+				"/editor/arkini/artwork/producer-townhall-t3/detail/overview",
+				"/editor/arkini/artwork/producer-academy/detail/overview",
 			),
 		).toEqual([
 			"arkini-route",

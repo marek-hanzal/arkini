@@ -5,7 +5,7 @@
 		"id": "steel-armor",
 		"title": "Steel Armor",
 		"description": "You may be a bit better protected",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"steel-armor"

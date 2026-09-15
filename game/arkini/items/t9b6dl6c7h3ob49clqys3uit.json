@@ -5,7 +5,7 @@
 		"id": "corrupted-mouse",
 		"title": "Corrupted Mouse",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"corrupted-mouse"

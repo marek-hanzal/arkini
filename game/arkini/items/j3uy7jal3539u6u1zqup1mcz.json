@@ -5,7 +5,7 @@
 		"id": "arrows",
 		"title": "Arrows",
 		"description": "Quill",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"arrows"

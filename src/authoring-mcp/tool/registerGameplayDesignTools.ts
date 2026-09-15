@@ -327,7 +327,7 @@ export const registerGameplayDesignToolsFn = ({
 		"rename_item",
 		{
 			description:
-				"Rename one canonical item ID and every exact item reference in one revision-guarded project write. The item UID, line IDs, asset IDs, type, and all other fields remain unchanged. An optional revision copied from item_config rejects stale edits.",
+				"Rename one canonical item ID and every exact item reference in one revision-guarded project write. The item UID, line IDs, resource IDs, type, and all other fields remain unchanged. An optional revision copied from item_config rejects stale edits.",
 			inputSchema: RenameItemInputSchema,
 		},
 		async ({ itemId, newItemId, revision }) =>

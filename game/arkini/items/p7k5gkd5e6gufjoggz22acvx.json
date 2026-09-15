@@ -5,7 +5,7 @@
 		"id": "toxic-waste-purifier",
 		"title": "Toxic Waste Purifier",
 		"description": "Throw those ugly chemicals into the river... oh, filter it out in pure nature way",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"toxic-waste-purifier"

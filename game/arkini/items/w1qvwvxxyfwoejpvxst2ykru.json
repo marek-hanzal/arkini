@@ -5,10 +5,10 @@
 		"id": "tomasek",
 		"title": "Tomášek",
 		"description": "The older son",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
-				"avatar-04"
+				"tomasek"
 			]
 		},
 		"scope": "any",

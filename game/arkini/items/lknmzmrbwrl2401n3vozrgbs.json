@@ -5,7 +5,7 @@
 		"id": "shield",
 		"title": "Shield",
 		"description": "It may protect you",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"shield"

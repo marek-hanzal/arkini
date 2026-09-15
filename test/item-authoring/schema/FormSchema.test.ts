@@ -19,7 +19,7 @@ describe("FormSchema", () => {
 			...item,
 			description: "",
 			title: "Item title",
-			asset: {
+			artwork: {
 				scale,
 				default: [
 					"base",
@@ -32,7 +32,7 @@ describe("FormSchema", () => {
 		expect(result.error.issues).toEqual([
 			expect.objectContaining({
 				path: [
-					"asset",
+					"artwork",
 					"scale",
 				],
 			}),
@@ -51,7 +51,7 @@ describe("FormSchema", () => {
 				...item,
 				description: "   ",
 				title: "Item title",
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [
 						"base",
@@ -74,14 +74,14 @@ describe("FormSchema", () => {
 				...item,
 				description: "Item description",
 				title: "Item title",
-				asset: {
+				artwork: {
 					scale: 0.65,
 					default: [
 						"base",
 						"",
 					],
 				},
-			}).asset,
+			}).artwork,
 		).toEqual({
 			scale: 0.65,
 			default: [

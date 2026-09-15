@@ -5,7 +5,7 @@
 		"id": "clay-bowl-with-lye",
 		"title": "Clay Bowl With Lye",
 		"description": "Don't drink it.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-bowl-with-lye"

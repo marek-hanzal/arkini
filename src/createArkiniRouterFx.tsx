@@ -38,7 +38,7 @@ export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: 
 				: false,
 			scrollRestoration: true,
 			scrollToTopSelectors: [
-				'[data-scroll-restoration-id="editor-asset-list"]',
+				'[data-scroll-restoration-id="editor-artwork-list"]',
 				'[data-scroll-restoration-id="editor-estimate-list"]',
 				'[data-scroll-restoration-id="editor-item-list"]',
 				'[data-scroll-restoration-id="editor-item-type-picker"]',

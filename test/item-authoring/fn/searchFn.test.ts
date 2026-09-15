@@ -4,9 +4,9 @@ import { searchFn } from "~/item-authoring/fn/searchFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const item = (id: string, title: string): ItemSchema.Type => ({
-	asset: {
+	artwork: {
 		default: [
-			"asset:item",
+			"artwork:item",
 		],
 		scale: 1,
 	},

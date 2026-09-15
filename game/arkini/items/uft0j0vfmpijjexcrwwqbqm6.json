@@ -5,7 +5,7 @@
 		"id": "well-fed-goose",
 		"title": "Well Fed Goose",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-fed-goose"

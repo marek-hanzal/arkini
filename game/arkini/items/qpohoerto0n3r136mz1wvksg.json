@@ -5,7 +5,7 @@
 		"id": "spoiled-cheese",
 		"title": "Spoiled Cheese",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-cheese"

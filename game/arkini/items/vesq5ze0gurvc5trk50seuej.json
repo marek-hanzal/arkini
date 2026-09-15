@@ -5,7 +5,7 @@
 		"id": "cotton-fiber",
 		"title": "Cotton Fiber",
 		"description": "Fiber. Cotton",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton-fiber"

@@ -5,7 +5,7 @@
 		"id": "hunter",
 		"title": "Hunter",
 		"description": "Hunt",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hunter"

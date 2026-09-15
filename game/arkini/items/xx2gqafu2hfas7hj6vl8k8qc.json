@@ -5,7 +5,7 @@
 		"id": "well-blueprint",
 		"title": "Well Blueprint",
 		"description": "Wanna some well?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

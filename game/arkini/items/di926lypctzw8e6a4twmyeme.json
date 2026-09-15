@@ -5,7 +5,7 @@
 		"id": "cotton-fabric",
 		"title": "Cotton Fabric",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton-fabric"

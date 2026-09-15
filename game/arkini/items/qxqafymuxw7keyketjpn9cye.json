@@ -5,7 +5,7 @@
 		"id": "feather",
 		"title": "Feather",
 		"description": "Piece of arrow. Or piece of writing tool",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"feather"

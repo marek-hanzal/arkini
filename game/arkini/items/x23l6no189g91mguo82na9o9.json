@@ -5,7 +5,7 @@
 		"id": "paper-boat-bath",
 		"title": "Paper Boat Bath",
 		"description": "It floats",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"paper-boat-bath"

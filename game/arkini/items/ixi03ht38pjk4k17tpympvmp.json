@@ -5,7 +5,7 @@
 		"id": "raw-ruby",
 		"title": "Raw Ruby",
 		"description": "Baby ruby",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"raw-ruby"

@@ -5,7 +5,7 @@
 		"id": "cutting-board",
 		"title": "Cutting Board",
 		"description": "Not a skate. Just a board",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cutting-board"

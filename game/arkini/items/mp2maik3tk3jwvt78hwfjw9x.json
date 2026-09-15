@@ -5,7 +5,7 @@
 		"id": "flax-field",
 		"title": "Flax Field",
 		"description": "Flax field",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"flax-field"

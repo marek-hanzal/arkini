@@ -5,7 +5,7 @@
 		"id": "clay-vase",
 		"title": "Clay Vase",
 		"description": "Something could be put inside.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-vase"

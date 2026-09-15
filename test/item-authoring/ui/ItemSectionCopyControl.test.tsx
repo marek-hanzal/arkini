@@ -73,7 +73,7 @@ it("excludes the destination by UID and copies only the confirmed source snapsho
 		uid: "source-uid",
 		id: "source",
 		title: "Source",
-		asset: {
+		artwork: {
 			scale: 1,
 			default: [
 				"art",

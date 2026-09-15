@@ -1,6 +1,6 @@
 export const ProjectSectionIds = [
 	"general",
-	"artwork",
+	"images",
 	"board",
 	"toolbar",
 	"inventory",
@@ -21,8 +21,8 @@ export const ProjectSections = [
 		shortcut: "g",
 	},
 	{
-		id: "artwork",
-		label: "Artwork",
+		id: "images",
+		label: "Images",
 		shortcut: "a",
 	},
 	{

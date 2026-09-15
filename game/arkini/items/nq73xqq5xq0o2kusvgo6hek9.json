@@ -5,7 +5,7 @@
 		"id": "campfire-burning",
 		"title": "Campfire Burning",
 		"description": "Warm place",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"campfire-burning"

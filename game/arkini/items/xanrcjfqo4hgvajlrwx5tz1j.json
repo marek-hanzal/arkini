@@ -5,7 +5,7 @@
 		"id": "book-t4",
 		"title": "Book - Tier 4",
 		"description": "You wan to read this one. Or write. Or both.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"book-t4"

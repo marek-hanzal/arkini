@@ -15,13 +15,16 @@ const provenance = {
 	),
 };
 
+const projectImageIds = new Set(Object.values(startTestConfig.resources));
+const readResourceTypeFn = (id: string) => (projectImageIds.has(id) ? "image" : "artwork");
+
 describe("validateGameResourcesFn", () => {
 	it("accepts exact filename resource IDs", () => {
 		const ids = new Set<string>([
 			startTestConfig.resources.hero,
 		]);
 		for (const item of Object.values(startTestConfig.items)) {
-			item.asset.default.forEach((id) => ids.add(id));
+			item.artwork.default.forEach((id) => ids.add(id));
 		}
 		const diagnostics = validateGameResourcesFn({
 			config: startTestConfig,
@@ -31,6 +34,7 @@ describe("validateGameResourcesFn", () => {
 			].map((id) => ({
 				id,
 				path: `${id}.png`,
+				type: readResourceTypeFn(id),
 			})),
 		});
 
@@ -52,6 +56,7 @@ describe("validateGameResourcesFn", () => {
 				{
 					id: "hero",
 					path: "hero.png",
+					type: "image",
 				},
 			],
 		});
@@ -90,10 +95,12 @@ describe("validateGameResourcesFn", () => {
 				{
 					id: "hero",
 					path: "a/hero.png",
+					type: "image",
 				},
 				{
 					id: "hero",
 					path: "b/hero.png",
+					type: "image",
 				},
 			],
 		});
@@ -120,7 +127,7 @@ describe("validateGameResourcesFn", () => {
 				...startTestConfig.items,
 				[itemId]: {
 					...item,
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [
 							"missing:base",
@@ -143,7 +150,7 @@ describe("validateGameResourcesFn", () => {
 					path: [
 						"items",
 						itemId,
-						"asset",
+						"artwork",
 						"default",
 						0,
 					],
@@ -153,7 +160,7 @@ describe("validateGameResourcesFn", () => {
 					path: [
 						"items",
 						itemId,
-						"asset",
+						"artwork",
 						"default",
 						1,
 					],
@@ -181,7 +188,7 @@ describe("validateGameResourcesFn", () => {
 			},
 			title: id,
 			description: id,
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
 					"blueprint",
@@ -235,12 +242,12 @@ describe("validateGameResourcesFn", () => {
 				"blueprint:tree": blueprintItem({
 					id: "blueprint:tree",
 					targetId: "tree",
-					targetAsset: "asset:tree",
+					targetAsset: "artwork:tree",
 				}),
 				"blueprint:log": blueprintItem({
 					id: "blueprint:log",
 					targetId: "log",
-					targetAsset: "asset:log",
+					targetAsset: "artwork:log",
 				}),
 			},
 		});
@@ -257,14 +264,15 @@ describe("validateGameResourcesFn", () => {
 			},
 			resources: [
 				"hero",
-				"asset:tree",
-				"asset:log",
-				"asset:lens",
-				"asset:backpack",
+				"artwork:tree",
+				"artwork:log",
+				"artwork:lens",
+				"artwork:backpack",
 				"blueprint",
 			].map((id) => ({
 				id,
 				path: `${id}.png`,
+				type: readResourceTypeFn(id),
 			})),
 		});
 

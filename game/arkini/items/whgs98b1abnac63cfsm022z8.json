@@ -5,7 +5,7 @@
 		"id": "corrupted-beagle",
 		"title": "Corrupted Beagle",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"corrupted-beagle"

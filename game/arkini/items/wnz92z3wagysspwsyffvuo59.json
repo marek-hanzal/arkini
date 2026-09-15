@@ -5,7 +5,7 @@
 		"id": "dirty-jar",
 		"title": "Dirty Jar",
 		"description": "Bleh",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dirty-jar"

@@ -5,7 +5,7 @@
 		"id": "bed-wine",
 		"title": "Bed Wine",
 		"description": "Don't lick it",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bed-wine"

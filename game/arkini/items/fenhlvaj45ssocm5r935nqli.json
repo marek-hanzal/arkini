@@ -5,7 +5,7 @@
 		"id": "campfire-extinguished",
 		"title": "Campfire Extinguished",
 		"description": "No more light here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"campfire-extinguished"

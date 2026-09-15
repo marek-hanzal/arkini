@@ -5,7 +5,7 @@
 		"id": "flowers",
 		"title": "Flowers",
 		"description": "Flowers",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"flowers"

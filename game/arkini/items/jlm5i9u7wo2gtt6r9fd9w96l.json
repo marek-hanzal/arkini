@@ -5,7 +5,7 @@
 		"id": "spoiled-bread-slices",
 		"title": "Spoiled Bread Slices",
 		"description": "Bread. Eaten by mould",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-bread-slices"

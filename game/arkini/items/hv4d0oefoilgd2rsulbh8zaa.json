@@ -5,7 +5,7 @@
 		"id": "medicine-satchel",
 		"title": "Medicine Satchel",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"medicine-satchel"

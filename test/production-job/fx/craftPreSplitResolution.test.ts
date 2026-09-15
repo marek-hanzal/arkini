@@ -35,10 +35,10 @@ const config = GameConfigSchema.parse({
 			id: "craft",
 			title: "Craft",
 			description: "A stackable craft.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:craft",
+					"artwork:craft",
 				],
 			},
 			scope: "any",

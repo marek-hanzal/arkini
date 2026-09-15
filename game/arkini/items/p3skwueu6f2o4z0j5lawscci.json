@@ -5,7 +5,7 @@
 		"id": "rope",
 		"title": "Rope",
 		"description": "Just a rope if you want hang something",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"rope"

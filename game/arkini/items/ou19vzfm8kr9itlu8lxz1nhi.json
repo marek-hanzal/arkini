@@ -5,7 +5,7 @@
 		"id": "spoiled-steak",
 		"title": "Spoiled Steak",
 		"description": "Piece of cow, maybe?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-steak"

@@ -33,11 +33,11 @@ export const copyItemSectionFn = (
 		case "artwork":
 			return {
 				...current,
-				asset: {
-					scale: source.asset.scale,
+				artwork: {
+					scale: source.artwork.scale,
 					default: [
-						source.asset.default[0],
-						source.asset.default[1] ?? "",
+						source.artwork.default[0],
+						source.artwork.default[1] ?? "",
 					],
 				},
 			};

@@ -5,7 +5,7 @@
 		"id": "sweet-pastry",
 		"title": "Sweet Pastry",
 		"description": "You should brush your teeth after this",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sweet-pastry"

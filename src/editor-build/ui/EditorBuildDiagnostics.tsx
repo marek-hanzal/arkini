@@ -17,8 +17,9 @@ type EditorDiagnosticTarget =
 			readonly label: string;
 	  }
 	| {
-			readonly kind: "asset";
+			readonly kind: "resource";
 			readonly resourceId: string;
+			readonly resourceType: Project.Resource["type"];
 			readonly label: string;
 	  }
 	| {
@@ -111,14 +112,15 @@ const readEditorGameDiagnosticTargetsFn = (
 				];
 	});
 	if (itemTargets.length > 0) return itemTargets;
-	if (
+	const resource =
 		(diagnostic.code === "resource:duplicate" || diagnostic.code === "resource:unused") &&
-		project.resources.some((resource) => resource.id === diagnostic.resourceId)
-	)
+		project.resources.find((candidate) => candidate.id === diagnostic.resourceId);
+	if (resource)
 		return [
 			{
-				kind: "asset",
+				kind: "resource",
 				resourceId: diagnostic.resourceId,
+				resourceType: resource.type,
 				label: diagnostic.resourceId,
 			} satisfies EditorDiagnosticTarget,
 		];
@@ -175,17 +177,28 @@ const EditorDiagnosticLink = ({
 					<Tx label="Open" /> {target.label}
 				</ButtonLink>
 			);
-		case "asset":
-			return (
+		case "resource":
+			return target.resourceType === "artwork" ? (
 				<ButtonLink
 					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/assets/$resourceId/detail/overview"
+					to="/editor/$projectId/artwork/$resourceId/detail/overview"
 					params={{
 						projectId,
 						resourceId: target.resourceId,
 					}}
 				>
-					<Tx label="Open asset" /> {target.label}
+					<Tx label="Open artwork" /> {target.label}
+				</ButtonLink>
+			) : (
+				<ButtonLink
+					className="mt-3 w-fit shadow-none"
+					to="/editor/$projectId/project/detail/$sectionId"
+					params={{
+						projectId,
+						sectionId: "images",
+					}}
+				>
+					<Tx label="Open project images" />
 				</ButtonLink>
 			);
 		case "project":

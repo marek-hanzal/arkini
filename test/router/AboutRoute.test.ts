@@ -25,13 +25,13 @@ const portraitState = vi.hoisted(() => ({
 	urls: [] as string[],
 }));
 
-vi.mock("~/launcher/atom/AboutPortraitAssetsAtom", async () => {
+vi.mock("~/launcher/atom/AboutPortraitImagesAtom", async () => {
 	const [Atom, AsyncResult] = await Promise.all([
 		import("effect/unstable/reactivity/Atom"),
 		import("effect/unstable/reactivity/AsyncResult"),
 	]);
 	return {
-		AboutPortraitAssetsAtom: Atom.make(() => AsyncResult.success(portraitState.urls)),
+		AboutPortraitImagesAtom: Atom.make(() => AsyncResult.success(portraitState.urls)),
 	};
 });
 

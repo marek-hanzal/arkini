@@ -5,7 +5,7 @@
 		"id": "bedding",
 		"title": "Bedding",
 		"description": "Sleep well",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bedding"

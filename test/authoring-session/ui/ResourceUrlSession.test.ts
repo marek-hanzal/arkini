@@ -66,7 +66,7 @@ const UrlMapProbe = ({ resourceIds }: { readonly resourceIds: ReadonlyArray<stri
 const resourceFn = (id: string, version = "1"): Project.Resource => ({
 	id,
 	version,
-	mime: "image/png",
+	type: "artwork",
 	size: 1024,
 });
 const urlFn = (resourceId: string, version = "1", projectId = "project-one") =>

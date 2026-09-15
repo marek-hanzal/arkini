@@ -5,7 +5,7 @@
 		"id": "grapes",
 		"title": "Grapes",
 		"description": "Yummy",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"grapes"

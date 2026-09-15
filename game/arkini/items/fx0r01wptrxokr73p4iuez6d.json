@@ -5,7 +5,7 @@
 		"id": "well-fed-pig",
 		"title": "Well Fed Pig",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-fed-pig"

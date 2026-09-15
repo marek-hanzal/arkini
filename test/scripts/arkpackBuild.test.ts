@@ -49,8 +49,8 @@ beforeEach(async () => {
 		"scripts",
 		"bin",
 		"game/arkini/items",
-		"game/arkini/assets",
-		"game/arkini/resources",
+		"game/arkini/artwork",
+		"game/arkini/image",
 		"game/arkini/notes",
 		".out/desktop/build/main/cli",
 	]) {
@@ -72,7 +72,7 @@ beforeEach(async () => {
 	await writeFile(join(root, "mise.toml"), "");
 	await writeFile(join(root, "electron.vite.config.ts"), "export default {};");
 	await writeFile(join(root, "src/builder.ts"), "export const builder = 1;");
-	await writeFile(join(root, "game/arkini/assets/a space.png"), "image bytes");
+	await writeFile(join(root, "game/arkini/artwork/a space.png"), "image bytes");
 	await writeFile(join(root, "bin/electron-vite"), "#!/usr/bin/env bash\nexit 0\n", {
 		mode: 0o755,
 	});
@@ -113,7 +113,7 @@ describe("repository Arkpack build cache", () => {
 			"src/builder.ts",
 			"game/arkini/game.json",
 			"package-lock.json",
-			"game/arkini/assets/a space.png",
+			"game/arkini/artwork/a space.png",
 		]) {
 			const before = await fingerprintFn();
 			await appendFile(join(root, file), "changed");
@@ -121,11 +121,11 @@ describe("repository Arkpack build cache", () => {
 		}
 		const beforeRename = await fingerprintFn();
 		await rename(
-			join(root, "game/arkini/assets/a space.png"),
-			join(root, "game/arkini/assets/renamed.png"),
+			join(root, "game/arkini/artwork/a space.png"),
+			join(root, "game/arkini/artwork/renamed.png"),
 		);
 		expect(await fingerprintFn()).not.toBe(beforeRename);
-		await rm(join(root, "game/arkini/assets/renamed.png"));
+		await rm(join(root, "game/arkini/artwork/renamed.png"));
 		expect(await fingerprintFn()).not.toBe(beforeRename);
 	});
 

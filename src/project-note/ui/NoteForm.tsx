@@ -1,13 +1,13 @@
 import { useRef } from "react";
 import { Save, Undo2 } from "lucide-react";
 
-import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
+import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
 import { EditorTextarea } from "~/editor-control/ui/EditorTextarea";
 import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { NoteContentMaxLength } from "~/project-note/schema/NoteSchema";
 import { NoteLinkPickers } from "~/project-note/ui/NoteLinkPickers";
 import { NoteItemLinks } from "~/project-note/ui/NoteItemLinks";
-import { NoteAssetLinks } from "~/project-note/ui/NoteAssetLinks";
+import { NoteResourceLinks } from "~/project-note/ui/NoteResourceLinks";
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -19,8 +19,8 @@ export const NoteForm = ({
 	resourceIds,
 	requiredItemUid,
 	requiredResourceId,
-	assetFilter,
-	assetQuery,
+	artworkFilter,
+	artworkQuery,
 	pending,
 	canSave,
 	saveLabel,
@@ -35,8 +35,8 @@ export const NoteForm = ({
 	readonly resourceIds: ReadonlyArray<string>;
 	readonly requiredItemUid?: string;
 	readonly requiredResourceId?: string;
-	readonly assetFilter?: AssetCatalogFilterSchema.Type;
-	readonly assetQuery?: string;
+	readonly artworkFilter?: ArtworkCatalogFilterSchema.Type;
+	readonly artworkQuery?: string;
 	readonly pending: boolean;
 	readonly canSave: boolean;
 	readonly saveLabel: "Create note" | "Save";
@@ -81,13 +81,13 @@ export const NoteForm = ({
 				disabled={pending}
 				onChangeFn={onItemUidsChangeFn}
 			/>
-			<NoteAssetLinks
+			<NoteResourceLinks
 				resourceIds={resourceIds}
 				requiredResourceId={requiredResourceId}
 				disabled={pending}
 				onChangeFn={onResourceIdsChangeFn}
-				filter={assetFilter}
-				query={assetQuery}
+				filter={artworkFilter}
+				query={artworkQuery}
 			/>
 			<div className="flex flex-wrap items-center justify-end gap-2">
 				{onCancelFn === undefined ? null : (

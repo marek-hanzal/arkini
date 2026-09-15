@@ -5,7 +5,7 @@
 		"id": "well",
 		"title": "Well",
 		"description": "Source of water. This one is full.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well"

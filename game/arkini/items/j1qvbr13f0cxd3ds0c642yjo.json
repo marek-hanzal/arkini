@@ -5,7 +5,7 @@
 		"id": "sunflower-field",
 		"title": "Sunflower Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sunflower-field"

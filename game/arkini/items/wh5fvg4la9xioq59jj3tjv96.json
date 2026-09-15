@@ -5,7 +5,7 @@
 		"id": "sheep",
 		"title": "Sheep",
 		"description": "Shaun the Sheep!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sheep"

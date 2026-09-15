@@ -5,7 +5,7 @@
 		"id": "wild-boar",
 		"title": "Wild Boar",
 		"description": "An animal",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wild-boar"

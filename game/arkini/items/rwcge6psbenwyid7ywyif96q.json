@@ -5,7 +5,7 @@
 		"id": "roof-tiles",
 		"title": "Roof Tiles",
 		"description": "This thing should be put on top of buildings.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"roof-tiles"

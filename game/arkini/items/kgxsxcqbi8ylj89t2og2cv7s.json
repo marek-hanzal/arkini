@@ -5,7 +5,7 @@
 		"id": "copper-pan-with-raw-steak",
 		"title": "Copper Pan With Raw Steak",
 		"description": "Wanna eat this",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"copper-pan-with-raw-steak"

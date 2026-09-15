@@ -5,7 +5,7 @@
 		"id": "key-t1",
 		"title": "Key - Tier 1",
 		"description": "May unlock something",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"key-t1"

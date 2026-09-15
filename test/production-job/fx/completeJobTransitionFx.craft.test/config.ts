@@ -59,10 +59,10 @@ const craftItem = ({
 	({
 		maxQueueSize: 1,
 
-		asset: {
+		artwork: {
 			scale: 0.8,
 			default: [
-				`asset:${id}`,
+				`artwork:${id}`,
 			],
 		},
 		units: {
@@ -121,10 +121,10 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 		maxQueueSize: 1,
 		lines: [],
 
-		asset: {
+		artwork: {
 			scale: 0.8,
 			default: [
-				`asset:${id}`,
+				`artwork:${id}`,
 			],
 		},
 		description: id,

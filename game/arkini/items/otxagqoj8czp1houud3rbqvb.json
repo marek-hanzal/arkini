@@ -5,7 +5,7 @@
 		"id": "raw-chicken",
 		"title": "Raw Chicken",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"raw-chicken"

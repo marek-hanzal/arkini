@@ -5,7 +5,7 @@
 		"id": "key-t3",
 		"title": "Key - Tier 3",
 		"description": "Quite a good key, but not good enough",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"key-t3"

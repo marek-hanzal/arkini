@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { About } from "~/launcher/ui/About";
 import { AboutEasterEgg } from "~/launcher/ui/AboutEasterEgg";
 import { AboutJumpscare } from "~/launcher/ui/AboutJumpscare";
-import { AboutPortraitAssetsAtom } from "~/launcher/atom/AboutPortraitAssetsAtom";
+import { AboutPortraitImagesAtom } from "~/launcher/atom/AboutPortraitImagesAtom";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 const aboutEasterEggDelayMs = 2_000;
@@ -23,14 +23,14 @@ const useAboutEasterEggDelay = () => {
 	return active;
 };
 
-const useAboutPortraitAssets = (): readonly string[] => {
-	const result = useAtomValue(AboutPortraitAssetsAtom);
+const useAboutPortraitImages = (): readonly string[] => {
+	const result = useAtomValue(AboutPortraitImagesAtom);
 	return AsyncResult.isSuccess(result) ? result.value : [];
 };
 
 export const Route = createFileRoute("/_launcher/about")({
 	component: () => {
-		const portraitUrls = useAboutPortraitAssets();
+		const portraitUrls = useAboutPortraitImages();
 		const easterEggActive = useAboutEasterEggDelay() && portraitUrls.length > 0;
 
 		return (

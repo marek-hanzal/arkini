@@ -5,7 +5,7 @@
 		"id": "sack-with-sunflower-seeds",
 		"title": "Sack With Sunflower Seeds",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-sunflower-seeds"

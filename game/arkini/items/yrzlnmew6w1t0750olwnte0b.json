@@ -5,7 +5,7 @@
 		"id": "fruit-crate",
 		"title": "Fruit Crate",
 		"description": "Yammy",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fruit-crate"

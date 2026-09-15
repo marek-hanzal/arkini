@@ -5,7 +5,7 @@
 		"id": "ground-boulders-01",
 		"title": "Ground Boulders 01",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"ground-boulders-01"

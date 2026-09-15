@@ -5,7 +5,7 @@
 		"id": "paper-boat",
 		"title": "Paper Boat",
 		"description": "Just a boat",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"paper-boat"

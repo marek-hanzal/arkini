@@ -55,7 +55,7 @@ vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 					resources: [
 						{
 							id: "hero",
-							mime: "image/png",
+							type: "image",
 							url: "arkini://test/hero",
 						},
 					],

@@ -61,10 +61,10 @@ describe("editor MCP item creation", () => {
 		});
 		const item = project.config.items["item:mcp-simple"];
 		expect(item).toMatchObject({
-			asset: {
+			artwork: {
 				scale: 1,
 				default: [
-					editorTestPayload.resources[0]?.id,
+					editorTestPayload.resources.find(({ type }) => type === "artwork")?.id,
 				],
 			},
 			description: "Created through the editor MCP.",

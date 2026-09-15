@@ -5,7 +5,7 @@
 		"id": "dirty-cauldron",
 		"title": "Dirty Cauldron",
 		"description": "You should clean it up",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dirty-cauldron"

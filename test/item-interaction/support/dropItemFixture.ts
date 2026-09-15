@@ -37,10 +37,10 @@ export const configInput = {
 
 			title: "Water",
 			description: "Water",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:water",
+					"artwork:water",
 				],
 			},
 			scope: "any",
@@ -55,10 +55,10 @@ export const configInput = {
 
 			title: "Stone",
 			description: "Stone",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:stone",
+					"artwork:stone",
 				],
 			},
 			scope: "any",
@@ -74,10 +74,10 @@ export const configInput = {
 			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:backpack",
+					"artwork:backpack",
 				],
 			},
 		},
@@ -162,10 +162,10 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 			id: "mud",
 			title: "Mud",
 			description: "Mud",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:mud",
+					"artwork:mud",
 				],
 			},
 		},

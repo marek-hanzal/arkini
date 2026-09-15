@@ -5,7 +5,7 @@
 		"id": "bow",
 		"title": "Bow",
 		"description": "Bow. Hunt something",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bow"

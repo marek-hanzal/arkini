@@ -5,7 +5,7 @@
 		"id": "coal",
 		"title": "Coal",
 		"description": "Coal",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coal"

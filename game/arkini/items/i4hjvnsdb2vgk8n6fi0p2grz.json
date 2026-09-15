@@ -6,7 +6,7 @@
 		"title": "Lumber Camp Blueprint",
 		"draft": false,
 		"description": "If you need a new one, here we go.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

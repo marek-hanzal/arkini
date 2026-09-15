@@ -112,8 +112,8 @@ vi.mock("~/ui/fx/readSettledAsyncResultErrorFx", () => ({
 	readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),
 }));
 
-vi.mock("~/authoring-form/ui/AssetAutocompleteField", () => ({
-	AssetAutocompleteField: ({ label }: { readonly label: string }) =>
+vi.mock("~/authoring-form/ui/ResourceAutocompleteField", () => ({
+	ResourceAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));
 
@@ -367,6 +367,15 @@ describe("project section form session", () => {
 	it("submits one complete config without losing unrelated facts or exact start stacks", async () => {
 		const project = {
 			...boardSpaceProject,
+			resources: [
+				...boardSpaceProject.resources,
+				{
+					id: "avatar-three",
+					type: "image",
+					size: 1,
+					version: "1",
+				},
+			],
 			config: {
 				...boardSpaceProject.config,
 				meta: {
@@ -375,7 +384,7 @@ describe("project section form session", () => {
 				},
 				resources: {
 					hero: "hero",
-					"avatar-03": "item-water",
+					"avatar-03": "avatar-three",
 				},
 				start: {
 					...boardSpaceProject.config.start,
@@ -438,7 +447,7 @@ describe("project section form session", () => {
 		expect(config.items).toEqual(project.config.items);
 		expect(config.resources).toEqual({
 			hero: "hero",
-			"avatar-01": "item-water",
+			"avatar-01": "avatar-three",
 		});
 		expect(config.start).toEqual(project.config.start);
 		expect(state.navigate).toHaveBeenCalledWith({
@@ -451,15 +460,15 @@ describe("project section form session", () => {
 		});
 	});
 
-	it("opens the exact invalid avatar in Artwork after cross-section validation", async () => {
+	it("opens the exact invalid avatar in Images after cross-section validation", async () => {
 		const project = {
 			...boardSpaceProject,
 			config: {
 				...boardSpaceProject.config,
 				resources: {
 					hero: "hero",
-					"avatar-01": "item-water",
-					"avatar-02": "item-water",
+					"avatar-01": "hero",
+					"avatar-02": "hero",
 				},
 			},
 		} satisfies Project;
@@ -492,7 +501,7 @@ describe("project section form session", () => {
 			to: "/editor/$projectId/project/form/$sectionId",
 			params: {
 				projectId: project.projectId,
-				sectionId: "artwork",
+				sectionId: "images",
 			},
 			search: {
 				avatar: 1,

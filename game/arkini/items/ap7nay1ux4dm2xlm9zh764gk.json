@@ -5,7 +5,7 @@
 		"id": "colored-window",
 		"title": "Colored Window",
 		"description": "Colors, hehehe",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"colored-window"

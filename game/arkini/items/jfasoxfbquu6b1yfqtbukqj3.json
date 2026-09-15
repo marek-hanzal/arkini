@@ -5,7 +5,7 @@
 		"id": "pottery",
 		"title": "Pottery",
 		"description": "Tavern may need this",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pottery"

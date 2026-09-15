@@ -5,7 +5,7 @@
 		"id": "raw-diamond",
 		"title": "Raw Diamond",
 		"description": "It's raw",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"raw-diamond"

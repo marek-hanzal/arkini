@@ -5,7 +5,7 @@
 		"id": "coffee-field",
 		"title": "Coffee Field",
 		"description": "Coffee",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coffee-field"

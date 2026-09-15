@@ -5,7 +5,7 @@
 		"id": "scissors",
 		"title": "Scissors",
 		"description": "Sharp. Keep children away",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"scissors"

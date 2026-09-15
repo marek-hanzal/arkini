@@ -1,12 +1,13 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
-/** A disk-backed Editor asset reference; PNG bodies are not part of project state. */
+/** A disk-backed typed Resource reference; binary bodies are not part of project state. */
 export const ProjectResourceSchema = z
 	.object({
 		id: IdSchema,
-		mime: z.literal("image/png"),
+		type: ResourceTypeSchema,
 		size: z.number().int().nonnegative(),
 		version: z.string().min(1),
 	})

@@ -5,7 +5,7 @@
 		"id": "grape-field",
 		"title": "Grape Field",
 		"description": "Grape field",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"grape-field"

@@ -5,7 +5,7 @@
 		"id": "toilet-biowaste",
 		"title": "Toilet Biowaste",
 		"description": "Disgusting",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"toilet-biowaste"

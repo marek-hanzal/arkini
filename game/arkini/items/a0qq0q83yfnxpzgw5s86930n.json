@@ -5,7 +5,7 @@
 		"id": "paper-boat-beer-bath",
 		"title": "Paper Boat Beer Bath",
 		"description": "It floats in beer too",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"paper-boat-beer-bath"

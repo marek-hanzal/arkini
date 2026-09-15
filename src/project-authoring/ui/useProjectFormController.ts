@@ -30,7 +30,7 @@ const ProjectFormPathLabelBySegment = {
 	avatars: "About avatars",
 	board: "Board",
 	height: "Height",
-	hero: "Hero asset",
+	hero: "Hero image",
 	inventory: "Inventory",
 	quantity: "Quantity",
 	start: "Initial layout",

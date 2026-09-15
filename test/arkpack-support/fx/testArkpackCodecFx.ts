@@ -35,7 +35,7 @@ export const encodeTestArkpackPayloadFx = Effect.fn("encodeTestArkpackPayloadFx"
 					length: configBytes.byteLength,
 					resources: resources.map((resource) => ({
 						id: resource.id,
-						mime: resource.mime,
+						type: resource.type,
 						length: resource.bytes.byteLength,
 					})),
 				}),
@@ -90,7 +90,7 @@ export const decodeTestArkpackPayloadFx = Effect.fn("decodeTestArkpackPayloadFx"
 				offset = end;
 				return {
 					id: resource.id,
-					mime: resource.mime,
+					type: resource.type,
 					bytes: resourceBytes,
 				};
 			});

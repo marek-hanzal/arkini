@@ -25,10 +25,10 @@ const simpleItem = ({
 
 		title: id,
 		description: id,
-		asset: {
+		artwork: {
 			scale: 0.8,
 			default: [
-				`asset:${id}`,
+				`artwork:${id}`,
 			],
 		},
 		scope,
@@ -56,10 +56,10 @@ const blueprintItem = ({
 		},
 		title: id,
 		description: id,
-		asset: {
+		artwork: {
 			scale: 0.8,
 			default: [
-				`asset:${id}`,
+				`artwork:${id}`,
 			],
 		},
 		scope: "board" as const,
@@ -377,10 +377,10 @@ export const blueprintConfig = GameConfigSchema.parse({
 
 			title: "Limited producer",
 			description: "Produces one singleton output.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer:limited",
+					"artwork:producer:limited",
 				],
 			},
 			scope: "board",
@@ -416,10 +416,10 @@ export const blueprintConfig = GameConfigSchema.parse({
 
 			title: "Blueprint source",
 			description: "Produces one purpose-bound blueprint.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer:blueprint-source",
+					"artwork:producer:blueprint-source",
 				],
 			},
 			scope: "board",
@@ -626,10 +626,10 @@ export const blueprintConfig = GameConfigSchema.parse({
 
 			title: "Shared source",
 			description: "Produces the shared capped item.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer:shared-source",
+					"artwork:producer:shared-source",
 				],
 			},
 			scope: "board",
@@ -657,10 +657,10 @@ export const blueprintConfig = GameConfigSchema.parse({
 
 			title: "Shared consumer",
 			description: "Consumes the shared capped item without producing it.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer:shared-consumer",
+					"artwork:producer:shared-consumer",
 				],
 			},
 			scope: "board",
@@ -695,10 +695,10 @@ export const blueprintConfig = GameConfigSchema.parse({
 
 			title: "Recycler",
 			description: "Replaces one capped item with one capped item.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer:recycler",
+					"artwork:producer:recycler",
 				],
 			},
 			scope: "board",
@@ -734,10 +734,10 @@ export const blueprintConfig = GameConfigSchema.parse({
 
 			title: "Finite stack",
 			description: "Replaces exactly one depleted stacked owner.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer:spent-stack",
+					"artwork:producer:spent-stack",
 				],
 			},
 			scope: "board",

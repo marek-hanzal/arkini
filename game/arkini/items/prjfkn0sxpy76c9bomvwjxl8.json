@@ -5,7 +5,7 @@
 		"id": "coin-stack",
 		"title": "Coin Stack",
 		"description": "Quite valuable thing, keep an eye on them!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coin-stack"

@@ -5,7 +5,7 @@
 		"id": "golden-goose",
 		"title": "Golden Goose",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"golden-goose"

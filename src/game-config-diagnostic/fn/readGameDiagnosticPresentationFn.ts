@@ -3,11 +3,12 @@ import type { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/D
 
 const diagnosticTitles = {
 	"source:json-invalid": "Invalid JSON source",
-	"resource:duplicate": "Duplicate asset",
-	"resource:missing": "Missing asset",
+	"resource:duplicate": "Duplicate resource",
+	"resource:missing": "Missing resource",
+	"resource:type-mismatch": "Wrong resource type",
 	"source:duplicate-record": "Duplicate source record",
 	"start:invalid": "Invalid game start",
-	"resource:unused": "Unused asset",
+	"resource:unused": "Unused resource",
 	"source:duplicate-provider": "Duplicate source provider",
 	"config:missing-reference": "Missing item reference",
 	"source:schema-invalid": "Invalid source value",
@@ -41,6 +42,7 @@ const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string 
 			return diagnostic.itemId;
 		case "resource:duplicate":
 		case "resource:missing":
+		case "resource:type-mismatch":
 		case "resource:unused":
 			return diagnostic.resourceId;
 		case "config:missing-reference":

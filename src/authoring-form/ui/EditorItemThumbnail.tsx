@@ -14,7 +14,7 @@ const thumbnailSizeClassName = {
 interface EditorItemThumbnailProps {
 	readonly className?: string;
 	readonly imageClassName?: string;
-	readonly resourceIds: ItemSchema.Type["asset"]["default"];
+	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
 	readonly size?: keyof typeof thumbnailSizeClassName;
 }
 
@@ -44,7 +44,7 @@ export const EditorItemSearchThumbnail = ({
 		<EditorItemSelectedThumbnail
 			className={className}
 			resourceIds={
-				item?.asset.default ?? [
+				item?.artwork.default ?? [
 					"",
 				]
 			}
@@ -52,7 +52,7 @@ export const EditorItemSearchThumbnail = ({
 	) : item === undefined ? null : (
 		<EditorItemThumbnail
 			className={className}
-			resourceIds={item.asset.default}
+			resourceIds={item.artwork.default}
 			size="lg"
 		/>
 	);

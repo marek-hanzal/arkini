@@ -5,7 +5,7 @@
 		"id": "scrubbing-brush",
 		"title": "Scrubbing Brush",
 		"description": "Dirty things? It's my job!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"scrubbing-brush"

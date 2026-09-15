@@ -2,10 +2,11 @@ import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackP
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface ExtractedArkpackResource {
 	readonly id: string;
-	readonly mime: string;
+	readonly type: ResourceTypeSchema.Type;
 	readonly path: string;
 	readonly size: number;
 }

@@ -5,7 +5,7 @@
 		"id": "wine-bath",
 		"title": "Wine Bath",
 		"description": "Why not?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wine-bath"

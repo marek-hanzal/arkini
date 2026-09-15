@@ -5,7 +5,7 @@
 		"id": "dye-workshop-washed",
 		"title": "Dye Workshop Washed",
 		"description": "You washed it out",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye-workshop-washed"

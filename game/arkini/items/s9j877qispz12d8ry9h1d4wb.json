@@ -5,7 +5,7 @@
 		"id": "water",
 		"title": "Water",
 		"description": "Everybody needs to drink.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"water-bucket"

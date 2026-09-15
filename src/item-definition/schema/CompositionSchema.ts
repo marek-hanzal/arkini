@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 
-/** One or two visual asset layers in authoritative back-to-front order. */
+/** One or two Artwork layers in authoritative back-to-front order. */
 export const CompositionSchema = z
 	.union([
 		z.tuple([
@@ -15,7 +15,7 @@ export const CompositionSchema = z
 	])
 	.meta({
 		id: "item.CompositionSchema",
-		description: "A one- or two-layer visual asset composition in back-to-front order.",
+		description: "A one- or two-layer Artwork composition in back-to-front order.",
 	});
 
 export type CompositionSchema = typeof CompositionSchema;

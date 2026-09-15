@@ -5,7 +5,7 @@
 		"id": "hops",
 		"title": "Hops",
 		"description": "Core ingredient for a beer.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hops"

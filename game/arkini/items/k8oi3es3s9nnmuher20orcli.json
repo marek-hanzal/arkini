@@ -5,7 +5,7 @@
 		"id": "spoiled-chocolate",
 		"title": "Spoiled Chocolate",
 		"description": "...",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-chocolate"

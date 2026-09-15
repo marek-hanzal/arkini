@@ -22,7 +22,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						},
 					],
 
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [],
 					},
@@ -40,7 +40,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						},
 					],
 
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [],
 					},
@@ -58,7 +58,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						},
 					],
 
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [],
 					},
@@ -91,7 +91,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 					},
 				],
 
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [],
 				},
@@ -109,7 +109,7 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 					},
 				],
 
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [],
 				},
@@ -364,7 +364,7 @@ it("opens each overview preview's complete collection on the current item", asyn
 		title: "Overview",
 		scope: "any",
 		maxStackSize: 1,
-		asset: {
+		artwork: {
 			scale: 0.8,
 			default: [
 				"overview",

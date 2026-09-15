@@ -6,7 +6,7 @@ import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/Game
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 
-/** Validates exact config-to-PNG resource identity without naming conventions. */
+/** Validates exact config-to-resource identity and semantic type. */
 export const validateGameResourcesFn = ({
 	config,
 	provenance,
@@ -14,10 +14,13 @@ export const validateGameResourcesFn = ({
 }: {
 	config: GameConfigSchema.Type;
 	provenance: GameSourceProvenanceSchema.Type;
-	resources: ReadonlyArray<Pick<ResourceDescriptorSchema.Type, "id" | "path">>;
+	resources: ReadonlyArray<Pick<ResourceDescriptorSchema.Type, "id" | "path" | "type">>;
 }) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
-	const firstById = new Map<string, Pick<ResourceDescriptorSchema.Type, "id" | "path">>();
+	const firstById = new Map<
+		string,
+		Pick<ResourceDescriptorSchema.Type, "id" | "path" | "type">
+	>();
 	for (const resource of resources) {
 		const first = firstById.get(resource.id);
 		if (first === undefined) {
@@ -32,7 +35,7 @@ export const validateGameResourcesFn = ({
 				resource.id,
 			],
 			source: resource.path,
-			message: `Resource ${resource.id} is provided by more than one PNG file.`,
+			message: `Resource ${resource.id} is provided by more than one source file.`,
 			resourceId: resource.id,
 			sources: [
 				first.path,
@@ -44,14 +47,31 @@ export const validateGameResourcesFn = ({
 	const usages = readGameResourceUsagesFn(config);
 	const referenced = new Set(usages.map(({ resourceId }) => resourceId));
 	for (const usage of usages) {
-		if (firstById.has(usage.resourceId)) continue;
+		const resource = firstById.get(usage.resourceId);
+		if (resource !== undefined) {
+			if (resource.type !== usage.resourceType)
+				diagnostics.push({
+					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
+					path: usage.path,
+					source:
+						usage.owner === "project"
+							? provenance.resources
+							: provenance.items[usage.ownerId],
+					message: `Referenced resource ${usage.resourceId} must be ${usage.resourceType}, but its source type is ${resource.type}.`,
+					resourceId: usage.resourceId,
+					expectedType: usage.resourceType,
+					actualType: resource.type,
+				});
+			continue;
+		}
 		diagnostics.push({
 			code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: usage.path,
 			source:
 				usage.owner === "project" ? provenance.resources : provenance.items[usage.ownerId],
-			message: `Referenced resource ${usage.resourceId} has no matching PNG file.`,
+			message: `Referenced resource ${usage.resourceId} has no matching source file.`,
 			resourceId: usage.resourceId,
 		});
 	}
@@ -65,7 +85,7 @@ export const validateGameResourcesFn = ({
 				resource.id,
 			],
 			source: resource.path,
-			message: `PNG resource ${resource.id} is not referenced by the completed game config.`,
+			message: `Resource ${resource.id} is not referenced by the completed game config.`,
 			resourceId: resource.id,
 		});
 	}

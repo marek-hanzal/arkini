@@ -11,18 +11,18 @@ project.json
 schema.json
 game.json
 items/<uid>.json
-assets/<id>.png
-resources/<id>.png
+artwork/<id>.png
+image/<id>.png
 notes/<noteId>.json
 ```
 
-Only `game.json`, `items/<uid>.json`, `assets/*.png`, and `resources/*.png` are game sources. Project metadata, Notes, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` validate and build the current saved sources directly.
+Only `game.json`, `items/<uid>.json`, `artwork/*.png`, and `image/*.png` are game sources. Project metadata, Notes, locks, temporary files, and ignored `build/` artifacts are never compiled. Editor Build and `arkini-cli game pack` validate and build the current saved sources directly.
 
 - `project.json` is the root marker and contains Arkini writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
 - `game.json` is the strict complete non-item root and owns `$schema`, package metadata/ID, structured output version, resources, and start state.
 - Each item file is a strict `{ $schema, item }` document. Its path owns canonical type and immutable encoded UID; its item owns the human-authored ID.
-- `resources/` contains package-shell resources and `assets/` item artwork. The current source contract accepts PNG bytes; schema support does not imply another runtime resource type. The explicit Editor Assets **Optimize** action losslessly re-encodes every 8-bit PNG in both directories at its original dimensions, normalizes it to RGBA, and clears RGB below fully transparent pixels. This source-maintenance write is separate from Build and Arkpack artwork baking.
+- `artwork/` contains square Item Artwork. `image/` contains unrestricted-aspect launcher and shell images such as Hero and About avatars. Both accept PNG and share one global resource-ID namespace; the typed root owns semantic type and the filename owns ID. Artwork **Optimize** is an explicit source edit that losslessly re-encodes selected Artwork at its original dimensions; imports never rewrite source bodies automatically. Build bounds only Artwork to square RGBA no larger than 256 × 256; Image bytes and dimensions are preserved.
 
 There is no free-form recursive JSON-fragment grammar. JSON outside the exact root and item paths is ignored as game source, and a missing/invalid marker, schema, root, path identity, or reference is a diagnostic.
 
@@ -37,7 +37,7 @@ read marker + schema + exact source paths
 → completed GameConfig parse
 → semantic and PNG-resource validation
 → assert no errors
-→ bounded RGBA normalization for `assets/`; byte-preserving `resources/`
+→ bounded square RGBA normalization for `artwork/`; byte-preserving `image/`
 → JSON manifest + JSON GameConfig + ordered raw resource bodies
 → ARKPACK envelope with optional distribution proof
 ```
@@ -57,7 +57,7 @@ arkini-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-sessi
 
 Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files. Its bounded text report distinguishes a reproduced fatal failure from a timeout, includes semantic history, and compares the initial and final runtime without dumping duplicate complete states. The common rotating diagnostic directory contains human-readable application runtime and fatal history in `application.md` beside the private gameplay session stream in `diagnostics.jsonl`. Every application record carries severity, the `package.json` application version, packaged/development mode, platform, and architecture; any bounded normalization or final text truncation is visible in the record. Diagnostic slicing defaults to the latest failed gameplay session, accepts the fixed text incident or that rotating JSONL stream, reports malformed input without physical paths, and renders only stable human/LLM-readable text. `--session-id` selects only JSONL sessions; `--section runtime` reads only the fixed incident's complete runtime projection. The fixed incident directory links `incident.md`, `failure.md`, `history.md`, and `runtime-state.md`; Item references include runtime ID, authored ID, and immutable configured UID whenever resolution is possible.
 
-The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again, streams `<project>/build/<encoded projectId>.arkpack`, and replaces the prior build; ordinary local and Editor builds are Community. Item artwork from `assets/` is compiled to an aspect-preserving RGBA PNG no larger than 256 × 256 pixels without enlarging smaller artwork. Package-shell PNGs from `resources/` retain their exact source bytes and dimensions.
+The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again, streams `<project>/build/<encoded projectId>.arkpack`, and replaces the prior build; ordinary local and Editor builds are Community. Item Artwork from `artwork/` is compiled to square RGBA no larger than 256 × 256 pixels without enlarging smaller artwork. General PNGs from `image/` retain their exact source bytes and dimensions.
 
 `game validate` and `game pack` accept `--silent` to hide warning diagnostics while preserving errors and normal command results. `argc check --silent` forwards that policy to the bundled game pack; every other repository check remains unchanged.
 
@@ -85,7 +85,7 @@ Exact Item capabilities, line/input/rule/output shapes, conditions, rolls, and f
 
 The canonical immutable Item vocabulary lives in [`src/item-definition`](src/item-definition): Item schema identities, storage permission, bounded quantities, selectors, and total selection policy over explicit definitions. Authored query scope/reach schemas and canonical Runtime Item query execution live together in `src/item-query`; canonical aggregate reads remain in `src/game-runtime`, while drop/write plus ordinary click reads live in `src/item-interaction`. `SpaceActionSchema` remains with the Space action that interprets it, while `item-action` owns the discriminated action contract, game metadata remains in `src/game-config`, and toolbar size is owned beside location contracts in `src/item-location`.
 
-- every item requires finite `asset.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including both default layers, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
+- every item requires finite `artwork.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including both default layers, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
@@ -119,7 +119,7 @@ The compiler must reject an invalid project without producing a usable artifact.
 
 ## Editor sidecars
 
-Notes are stored once in `notes/<noteId>.json` with Markdown content, ordering/freshness timestamps, and optional unique `itemUids` and `resourceIds` arrays. Missing link arrays normalize to `[]`; a note is globally unlinked only when both arrays are empty. Item links use immutable UIDs, while asset links use the current canonical resource IDs. The global Notes route and every Item or Asset detail Notes tab share one composer/list; authoring forms do not expose Notes. Create/edit validates both relationship sets against the open project and guards updates by `expectedUpdatedAtMs`. Item deletion strips absent UIDs, and resource rename/delete rewrites affected resource IDs in the same ordered best-effort file plan while preserving the note and advancing its freshness.
+Notes are stored once in `notes/<noteId>.json` with Markdown content, ordering/freshness timestamps, and optional unique `itemUids` and `resourceIds` arrays. Missing link arrays normalize to `[]`; a note is globally unlinked only when both arrays are empty. Item links use immutable UIDs, while Resource links use the current canonical resource IDs. The global Notes route and every Item or Artwork detail Notes tab share one composer/list; authoring forms do not expose Notes. Create/edit validates both relationship sets against the open project and guards updates by `expectedUpdatedAtMs`. Item deletion strips absent UIDs, and resource rename/delete rewrites affected resource IDs in the same ordered best-effort file plan while preserving the note and advancing its freshness.
 
 Notes are portable but do not change authoring revision and do not enter Build or Arkpack output. The live Editor Board is ephemeral: named scenarios and internal project history are not supported. Use Git to version the portable project.
 
@@ -127,7 +127,7 @@ The project stores `game.json.version` as `{ major, minor, suffix? }`, the last 
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
 
-`src/asset-authoring` owns the Assets product catalog, browser-file admission, import/edit/delete sessions, and presentation. `src/authoring-session` owns the mounted-project object-URL lifecycle shared by authoring products, while `src/authoring-form` owns the canonical Asset-reference form control. `src/game-config-resource` is the flat upstream authored-config contract for embedded PNG and source-descriptor schemas, bounded PNG byte/decode admission, references, source discovery, usage, and rename semantics; Asset Authoring consumes that contract instead of creating a second Resource domain. Explicit non-item resource roles belong to the completed `src/game-config` value they populate.
+`src/artwork-authoring` owns the Artwork catalog, square-PNG admission, import/edit/delete sessions, Optimize, and presentation. Project Images owns general-PNG import and launcher/shell mappings. `src/resource-authoring` owns shared typed import orchestration; `src/authoring-session` owns mounted-project resource URLs; `src/authoring-form` owns the typed Resource-reference control. `src/game-config-resource` owns the generic Resource schema, type, source discovery, PNG admission, references, usage, and rename semantics. Explicit non-item Image roles belong to the completed `src/game-config` value they populate.
 
 ## Content workflow
 

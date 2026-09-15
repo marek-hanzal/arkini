@@ -5,7 +5,7 @@
 		"id": "clay-bowl-with-beer",
 		"title": "Clay Bowl With Beer",
 		"description": "Beer inside (tm)",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-bowl-with-beer"

@@ -5,7 +5,7 @@
 		"id": "empty-sack",
 		"title": "Empty Sack",
 		"description": "You can put things inside",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-sack"

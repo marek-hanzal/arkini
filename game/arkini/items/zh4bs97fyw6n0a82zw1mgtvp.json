@@ -5,7 +5,7 @@
 		"id": "golden-egg",
 		"title": "Golden Egg",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"golden-egg"

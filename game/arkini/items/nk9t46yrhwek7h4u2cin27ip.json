@@ -5,7 +5,7 @@
 		"id": "hungry-chicken",
 		"title": "Hungry Chicken",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hungry-chicken"

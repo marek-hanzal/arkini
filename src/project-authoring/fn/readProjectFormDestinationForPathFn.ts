@@ -12,7 +12,7 @@ export const readProjectFormDestinationForPathFn = (
 ): ProjectFormDestination => {
 	const sectionId = readProjectSectionForPathFn(path);
 	const [head, second] = path;
-	return sectionId === "artwork" &&
+	return sectionId === "images" &&
 		head === "avatars" &&
 		typeof second === "number" &&
 		Number.isInteger(second) &&

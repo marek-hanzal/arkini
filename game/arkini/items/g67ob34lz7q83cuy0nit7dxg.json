@@ -5,7 +5,7 @@
 		"id": "spoiled-corn-kernels",
 		"title": "Spoiled Corn Kernels",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-corn-kernels"

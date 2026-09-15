@@ -6,7 +6,7 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 export const CreateItemInputSchema = z
 	.object(ItemSchema.shape)
 	.omit({
-		asset: true,
+		artwork: true,
 		lines: true,
 		maxQueueSize: true,
 		maxStackSize: true,
@@ -14,9 +14,11 @@ export const CreateItemInputSchema = z
 		uid: true,
 	})
 	.extend({
-		asset: ItemSchema.shape.asset
+		artwork: ItemSchema.shape.artwork
 			.optional()
-			.describe("Optional visual asset; defaults to the first asset in the open project."),
+			.describe(
+				"Optional Item artwork; defaults to the first Artwork resource in the open project.",
+			),
 		scope: ItemSchema.shape.scope
 			.optional()
 			.describe("Optional storage scope; defaults to any."),

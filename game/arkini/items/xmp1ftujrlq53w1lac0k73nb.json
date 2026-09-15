@@ -5,7 +5,7 @@
 		"id": "rapeseed-oil",
 		"title": "Rapeseed Oil",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"rapeseed-oil"

@@ -5,7 +5,7 @@
 		"id": "sick-goose",
 		"title": "Sick Goose",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sick-goose"

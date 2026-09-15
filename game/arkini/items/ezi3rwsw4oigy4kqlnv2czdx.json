@@ -5,7 +5,7 @@
 		"id": "gold-ore",
 		"title": "Gold Ore",
 		"description": "Wanna be goldish?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gold-ore"

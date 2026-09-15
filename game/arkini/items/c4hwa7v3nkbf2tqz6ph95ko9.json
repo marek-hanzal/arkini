@@ -5,7 +5,7 @@
 		"id": "fertilized-grape-field",
 		"title": "Fertilized Grape Field",
 		"description": "Ready for grape seed.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fertilized-grape-field"

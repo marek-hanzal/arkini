@@ -464,7 +464,6 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			populatePendingFx: (pendingRoot) =>
 				providePlatformFx(
 					copyExtractedProjectResourcesFx({
-						config: arkpack.config,
 						resources: arkpack.resources,
 						root: pendingRoot,
 					}),

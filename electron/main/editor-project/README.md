@@ -1,6 +1,6 @@
 # Editor persistence map
 
-One GUI Electron main or Node CLI process owns the physical Editor project repository. The portable current tree is canonical; renderer Atoms, form drafts, versioned asset URLs, Build descriptors and the Editor Board are projections.
+One GUI Electron main or Node CLI process owns the physical Editor project repository. The portable current tree is canonical; renderer Atoms, form drafts, versioned Resource URLs, Build descriptors and the Editor Board are projections.
 
 [`CONFIG.md`](../../../CONFIG.md) owns portable layout and authoring semantics. [`VERSION.md`](../../../VERSION.md) owns external payload compatibility. This README maps ownership, I/O and replacement lifecycle.
 
@@ -21,7 +21,7 @@ One GUI Electron main or Node CLI process owns the physical Editor project repos
 | CLI MCP lifecycle | `src/arkini-cli` | [`../../../src/arkini-cli/command/EditorMcpCommand.ts`](../../../src/arkini-cli/command/EditorMcpCommand.ts) |
 | Mounted renderer projection and replacement guard | `src/authoring-session` | [`../../../src/authoring-session/fx/refreshEditorProjectFx.ts`](../../../src/authoring-session/fx/refreshEditorProjectFx.ts) |
 
-The filesystem repository implements product capabilities; it does not own their schemas or renderer presentation. Renderer code sees no managed project path, file handle, native object or mutable repository state. A browser-selected asset contributes only its native source path so Electron main can stream or copy it without an IPC byte payload.
+The filesystem repository implements product capabilities; it does not own their schemas or renderer presentation. Renderer code sees no managed project path, file handle, native object or mutable repository state. A browser-selected Resource contributes only its native source path so Electron main can stream or copy it without an IPC byte payload.
 
 ## Dependency shape
 
@@ -67,13 +67,13 @@ validate the authored result
 
 Path containment and owned-file validation remain immediate write contracts. There is no aggregate journal, rollback or crash recovery: a failed multi-file write may leave a partial tree, and reopening or repeating the operation is the repair path. Item/config commits reconcile Note links against the final item UIDs; resource rename/delete rewrites Note resource IDs in the same ordered plan. Single-file mechanics belong to `src/filesystem-write`.
 
-## Asset bodies and incremental saves
+## Resource bodies and incremental saves
 
-Project projections carry resource ID, MIME type, byte size and a filesystem version token, never PNG bodies. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged PNGs. Asset import/replacement and explicit Optimize supply only their changed bodies or source paths. Renames and shell-resource moves read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
+Project projections carry resource ID, semantic type, byte size and a filesystem version token, never binary bodies or MIME. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged PNGs. Resource import/replacement and Artwork Optimize supply only changed bodies or native source paths. Renames read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
 
 [`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
-[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned asset URLs to image consumers, including Editor Board. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Unrequested images are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build reads source files while streaming the Arkpack.
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image consumers, including Editor Board. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Unrequested images are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build reads source files while streaming the Arkpack.
 
 ## Renderer replacement flow
 
@@ -88,7 +88,7 @@ capture expected revision
 → publish it to the still-mounted project Atom
 ```
 
-Assets **Optimize** follows this same write path. The renderer passes the exact resource IDs selected by the current Assets search and usage filter. Main holds the repository semaphore while it losslessly normalizes one selected `assets/` or `resources/` PNG at a time through temporary files, then copies changed files through one ordered write plan and publishes one fresh Project projection. Selected PNG bodies are not accumulated in JavaScript memory. The same repository operation can optimize one resource by receiving one ID. It does not invoke Arkpack Build or its 256 px Item-artwork bake.
+Artwork **Optimize** follows this same write path. The renderer passes exact Artwork IDs selected by the current search and usage filter. Main holds the repository semaphore while it losslessly normalizes one selected `artwork/` PNG at a time through temporary files, then copies changed files through one ordered write plan and publishes one fresh Project projection. Selected PNG bodies are not accumulated in JavaScript memory. The same repository operation can optimize one Artwork by receiving one ID. It does not invoke Arkpack Build or its 256 px Artwork bake; general `image/` resources are not optimized.
 The filesystem operation reports completed PNGs over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
 
 Hard Refresh and project replacement use a stronger boundary:
@@ -121,8 +121,8 @@ Build and CLI pack verify the current source set and bytes before publishing the
 - Renderer validates every result again through the pure transport contract.
 - Repository failure is serialized as the exact project operation plus bounded message, not leaked native state.
 - Editor persistence may fail independently without preventing gameplay boot; Editor channels report unavailable state.
-- MCP uses the same schema, expected revision, reference checks and repository mutation operations. Note edits, relationship removal and deletes use the exact `updatedAtMs` returned by the last read as their freshness token. Notes MCP collection composes item UID, asset resource ID and content filters before pagination; collection/detail resolve current item and asset presentation.
-- Successful MCP mutation emits invalidation; the renderer rereads canonical repository state. Notes also refresh after a local project revision changes. They preserve a local draft across refresh, reject a stale save and leave edit mode when its note disappears from the active global/item/asset collection.
+- MCP uses the same schema, expected revision, reference checks and repository mutation operations. Note edits, relationship removal and deletes use the exact `updatedAtMs` returned by the last read as their freshness token. Notes MCP collection composes Item UID, Resource ID and content filters before pagination; collection/detail resolve current Item and Resource presentation.
+- Successful MCP mutation emits invalidation; the renderer rereads canonical repository state. Notes also refresh after a local project revision changes. They preserve a local draft across refresh, reject a stale save and leave edit mode when its note disappears from the active global, Item, or Artwork collection.
 - GUI Editor and CLI MCP access are mutually unsupported by contract. No process lock or runtime detection enforces that restriction.
 
 ## Changing this island?

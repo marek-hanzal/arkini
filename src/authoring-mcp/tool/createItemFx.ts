@@ -21,7 +21,8 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 	readonly repository: ProjectRepositoryService;
 }) {
 	const draft = createDraftFn({
-		resourceId: project.resources[0]?.id ?? "missing-asset",
+		resourceId:
+			project.resources.find(({ type }) => type === "artwork")?.id ?? "missing-artwork",
 		uid: createId(),
 	});
 	const { commit, item } = yield* saveWithRepositoryFx({

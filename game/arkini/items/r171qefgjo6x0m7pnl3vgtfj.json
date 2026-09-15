@@ -5,7 +5,7 @@
 		"id": "empty-well",
 		"title": "Empty Well",
 		"description": "No more water. Yay.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-well"

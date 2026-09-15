@@ -5,7 +5,7 @@
 		"id": "spoiled-corn",
 		"title": "Spoiled Corn",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-corn"

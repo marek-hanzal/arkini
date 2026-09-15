@@ -11,6 +11,7 @@ import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLa
 import { verifyArkpackFileProvenanceFx } from "~/arkpack-artifact/fx/verifyArkpackFileProvenanceFx";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 const InstallationSchema = z
 	.object({
@@ -22,7 +23,7 @@ const InstallationSchema = z
 			z
 				.object({
 					id: z.string().min(1),
-					mime: z.string().min(1),
+					type: ResourceTypeSchema,
 					path: z.string().min(1),
 					size: z.number().int().nonnegative(),
 				})
@@ -126,7 +127,7 @@ export const installArkpackFileFx = Effect.fn("installArkpackFileFx")(function* 
 			packageId: extracted.packageId,
 			resources: extracted.resources.map((resource) => ({
 				id: resource.id,
-				mime: resource.mime,
+				type: resource.type,
 				path: relative(pending, resource.path),
 				size: resource.size,
 			})),

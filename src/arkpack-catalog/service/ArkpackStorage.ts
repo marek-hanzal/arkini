@@ -1,5 +1,6 @@
 import type { Effect } from "effect";
 import type { ArkpackProvenanceSchema } from "~/arkpack-artifact/schema/ArkpackProvenanceSchema";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export namespace ArkpackStorage {
 	interface Identity {
@@ -21,7 +22,7 @@ export namespace ArkpackStorage {
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<{
 			readonly id: string;
-			readonly mime: string;
+			readonly type: ResourceTypeSchema.Type;
 			readonly url: string;
 		}>;
 	}

@@ -5,7 +5,7 @@
 		"id": "wine-toilet",
 		"title": "Wine Toilet",
 		"description": "Sommelier's dream",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wine-toilet"

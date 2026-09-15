@@ -5,7 +5,7 @@
 		"id": "treasure-chest-t4",
 		"title": "Treasure Chest T4",
 		"description": "Deep secrets hidden inside. You may hope they're not dark ones",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"treasure-chest-t4"

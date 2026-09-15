@@ -5,7 +5,7 @@
 		"id": "cauldron-with-soap",
 		"title": "Cauldron With Soap",
 		"description": "I can smell a fresh soap",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-soap"

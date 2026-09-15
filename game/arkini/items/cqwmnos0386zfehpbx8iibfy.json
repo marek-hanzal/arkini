@@ -5,7 +5,7 @@
 		"id": "house-t1-blueprint",
 		"title": "House - Tier 1 Blueprint",
 		"description": "People should live somewhere",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

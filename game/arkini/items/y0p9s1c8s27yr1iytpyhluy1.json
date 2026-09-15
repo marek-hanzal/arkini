@@ -5,7 +5,7 @@
 		"id": "spoiled-copper-bathtub",
 		"title": "Spoiled Copper Bathtub",
 		"description": "You're welcome to bath. Not really",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-copper-bathtub"

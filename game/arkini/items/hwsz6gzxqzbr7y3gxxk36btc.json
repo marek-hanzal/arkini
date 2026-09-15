@@ -5,7 +5,7 @@
 		"id": "sand-deposit",
 		"title": "Sand Deposit",
 		"description": "Sandman.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sand-source"

@@ -5,7 +5,7 @@
 		"id": "spoiled-rapeseed",
 		"title": "Spoiled Rapeseed",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-rapeseed"

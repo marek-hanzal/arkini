@@ -5,7 +5,7 @@
 		"id": "bio-waste-bucket",
 		"title": "Bio Waste Bucket",
 		"description": "Grose",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bio-waste-bucket"

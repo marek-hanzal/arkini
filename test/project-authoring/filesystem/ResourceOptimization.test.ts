@@ -35,7 +35,7 @@ const createDirtyPng = () =>
 		.toBuffer();
 
 describe("filesystem Editor PNG optimization", () => {
-	it("rewrites both item assets and shell resources without resizing", async () => {
+	it("rewrites selected Artwork without touching general Images", async () => {
 		const dirtyPng = await createDirtyPng();
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(
@@ -62,46 +62,39 @@ describe("filesystem Editor PNG optimization", () => {
 				onProgressFn: (value) => progress.push(value),
 				projectId: created.projectId,
 				resourceIds: [
-					"hero",
 					"item-water",
 				],
 			}),
 		);
 
-		expect(result.optimizedResourceCount).toBe(2);
-		expect(result.processedResourceCount).toBe(2);
+		expect(result.optimizedResourceCount).toBe(1);
+		expect(result.processedResourceCount).toBe(1);
 		expect(progress).toEqual([
 			{
 				completedResourceCount: 0,
 				phase: "optimizing",
-				totalResourceCount: 2,
+				totalResourceCount: 1,
 			},
 			{
 				completedResourceCount: 1,
 				phase: "optimizing",
-				totalResourceCount: 2,
+				totalResourceCount: 1,
 			},
 			{
-				completedResourceCount: 2,
-				phase: "optimizing",
-				totalResourceCount: 2,
-			},
-			{
-				completedResourceCount: 2,
+				completedResourceCount: 1,
 				phase: "saving",
-				totalResourceCount: 2,
+				totalResourceCount: 1,
 			},
 		]);
 		expect(result.optimizedBytes).toBeLessThan(result.originalBytes);
 		expect(result.project.revision).toBeGreaterThan(created.revision);
+		expect(new Uint8Array(await readFile(join(root, "image/hero.png")))).toEqual(
+			new Uint8Array(dirtyPng),
+		);
 		for (const [resourceId, source] of [
 			[
-				"hero",
-				"resources/hero.png",
-			],
-			[
 				"item-water",
-				"assets/item-water.png",
+				"artwork/item-water.png",
 			],
 		] as const) {
 			const bytes = await readFile(join(root, source));
@@ -115,7 +108,7 @@ describe("filesystem Editor PNG optimization", () => {
 			expect(decoded).toEqual(Buffer.from(Uint8Array.of(0, 0, 0, 0, 20, 40, 60, 255)));
 			expect(result.project.resources.find(({ id }) => id === resourceId)).toEqual({
 				id: resourceId,
-				mime: "image/png",
+				type: "artwork",
 				size: bytes.byteLength,
 				version: expect.any(String),
 			});
@@ -170,11 +163,11 @@ describe("filesystem Editor PNG optimization", () => {
 			optimizedResourceCount: 1,
 			processedResourceCount: 1,
 		});
-		expect(new Uint8Array(await readFile(join(root, "resources/hero.png")))).toEqual(
+		expect(new Uint8Array(await readFile(join(root, "image/hero.png")))).toEqual(
 			new Uint8Array(dirtyPng),
 		);
 		expect(
-			await sharp(await readFile(join(root, "assets/item-water.png")))
+			await sharp(await readFile(join(root, "artwork/item-water.png")))
 				.ensureAlpha()
 				.raw()
 				.toBuffer(),

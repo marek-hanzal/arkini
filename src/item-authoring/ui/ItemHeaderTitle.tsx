@@ -6,7 +6,7 @@ export const ItemHeaderTitle = ({
 	resourceIds,
 	title,
 }: {
-	readonly resourceIds: ItemSchema.Type["asset"]["default"];
+	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
 	readonly title: string;
 }) => (
 	<h1

@@ -5,7 +5,7 @@
 		"id": "explorer",
 		"title": "Explorer",
 		"description": "He will find something. Eventually",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"explorer"

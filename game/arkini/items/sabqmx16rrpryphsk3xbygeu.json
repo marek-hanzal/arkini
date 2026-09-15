@@ -5,7 +5,7 @@
 		"id": "hungry-sheep",
 		"title": "Hungry Sheep",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hungry-sheep"

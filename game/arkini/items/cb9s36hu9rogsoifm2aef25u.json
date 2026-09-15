@@ -5,7 +5,7 @@
 		"id": "well-with-coffee",
 		"title": "Well With Coffee",
 		"description": "Source of coffee. Try it out",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-with-coffee"

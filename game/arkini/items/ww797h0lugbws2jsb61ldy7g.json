@@ -5,7 +5,7 @@
 		"id": "empty-bucket",
 		"title": "Empty Bucket",
 		"description": "I suppose you would be creative with this one",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-bucket"

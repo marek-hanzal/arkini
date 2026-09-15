@@ -5,7 +5,7 @@
 		"id": "steel",
 		"title": "Steel",
 		"description": "Steel stuff.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"steel"

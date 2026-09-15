@@ -5,7 +5,7 @@
 		"id": "brickworks",
 		"title": "Brickworks",
 		"description": "Do bricks",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"brickworks"

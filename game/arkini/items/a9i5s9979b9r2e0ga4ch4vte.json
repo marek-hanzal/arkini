@@ -5,7 +5,7 @@
 		"id": "roasted-coffee-bag",
 		"title": "Roasted Coffee Bag",
 		"description": "Now you can open your coffee shop!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"roasted-coffee-bag"

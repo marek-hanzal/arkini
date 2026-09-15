@@ -32,15 +32,15 @@ export const projectItemDetailReferenceFx = Effect.fn("projectItemDetailReferenc
 	const live = preferredRuntimeItemIds
 		.map((runtimeItemId) => runtime.items.find((candidate) => candidate.id === runtimeItemId))
 		.find((candidate) => candidate?.item.id === itemId);
-	const sourceAssetIds = configured.asset.default;
+	const sourceArtworkIds = configured.artwork.default;
 	return {
 		itemId,
 		title: configured.title,
-		sourceUrl: game.getResourceUrlFn(sourceAssetIds[0]),
-		...(sourceAssetIds[1] === undefined
+		sourceUrl: game.getResourceUrlFn(sourceArtworkIds[0]),
+		...(sourceArtworkIds[1] === undefined
 			? {}
 			: {
-					compositeUrl: game.getResourceUrlFn(sourceAssetIds[1]),
+					compositeUrl: game.getResourceUrlFn(sourceArtworkIds[1]),
 				}),
 		...(live === undefined
 			? {}

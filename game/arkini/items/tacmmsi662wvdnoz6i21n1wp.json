@@ -5,7 +5,7 @@
 		"id": "waste-incinerator",
 		"title": "Waste Incinerator",
 		"description": "De-waste-izator",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"waste-incinerator"

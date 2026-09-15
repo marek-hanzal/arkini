@@ -5,7 +5,7 @@
 		"id": "magic-sawmill-blueprint",
 		"title": "Magic Sawmill Blueprint",
 		"description": "Can you smell fresh wood... and magic?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

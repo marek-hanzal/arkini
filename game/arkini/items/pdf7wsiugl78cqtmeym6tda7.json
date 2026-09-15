@@ -5,7 +5,7 @@
 		"id": "silenced-bow",
 		"title": "Silenced Bow",
 		"description": "It makes less noise",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"silenced-bow"

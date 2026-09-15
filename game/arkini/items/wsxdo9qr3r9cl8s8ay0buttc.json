@@ -5,7 +5,7 @@
 		"id": "beer-mug",
 		"title": "Beer Bug",
 		"description": "Good cold beer, ach!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"beer-mug"

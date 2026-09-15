@@ -5,7 +5,7 @@
 		"id": "animal-feed-workshop",
 		"title": "Animal Feed Workshop",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"animal-feed-workshop"

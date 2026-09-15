@@ -5,7 +5,7 @@
 		"id": "cafe",
 		"title": "Cafe",
 		"description": "Coffee",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cafe"

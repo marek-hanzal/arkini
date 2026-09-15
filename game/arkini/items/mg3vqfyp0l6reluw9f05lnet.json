@@ -5,7 +5,7 @@
 		"id": "bed-beer",
 		"title": "Bed Beer",
 		"description": "Bleh",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bed-beer"

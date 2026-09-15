@@ -5,7 +5,7 @@
 		"id": "chopped-vegetables",
 		"title": "Chopped Vegetables",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"chopped-vegetables"

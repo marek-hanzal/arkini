@@ -5,7 +5,7 @@
 		"id": "cauldron-with-molasses",
 		"title": "Cauldron With Molasses",
 		"description": "Useful.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-molasses"

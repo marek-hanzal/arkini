@@ -5,7 +5,7 @@
 		"id": "cotton-thread",
 		"title": "Cotton Thread",
 		"description": "Cotton thread",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton-thread"

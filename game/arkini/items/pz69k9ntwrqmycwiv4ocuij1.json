@@ -5,7 +5,7 @@
 		"id": "laboratory-glassware",
 		"title": "Laboratory Glassware",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"laboratory-glassware"

@@ -118,7 +118,7 @@ export const DeleteDialog = ({
 					/>
 				) : null}
 				<div className="mt-2 text-sm text-muted">
-					<Mx label="Deleted item assets help" />
+					<Mx label="Deleted item artwork help" />
 				</div>
 				<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 					<Mx label="Delete item irreversible warning" />

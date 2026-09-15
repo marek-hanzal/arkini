@@ -76,7 +76,6 @@ describe("saveProjectConfigFx", () => {
 			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 			deleteItemFx: () => Effect.die("Unexpected item delete."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
-			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
 
 		await expect(
@@ -127,7 +126,6 @@ describe("saveProjectConfigFx", () => {
 			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 			deleteItemFx: () => Effect.die("Unexpected item delete."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
-			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
 
 		await expect(

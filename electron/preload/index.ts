@@ -126,8 +126,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildSave, request),
 		statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
 		awaitIdleFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
-		createProjectFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, request),
+		createProjectFn: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, projectId),
 		deleteProjectFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDelete, projectId),
 		deleteItemFn: (request) =>
@@ -148,8 +148,8 @@ const api: ArkiniElectronApi.Api = {
 				ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
 				packageId,
 			),
-		importAssetsFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportAssets, request),
+		importResourcesFn: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportResources, request),
 		listProjectsFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
 		dismissInvalidProjectFn: (root) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, root),
@@ -175,8 +175,6 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceResource, request),
 		upsertItemFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
-		upsertResourcesFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertResources, request),
 		listNotesFn: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteList, projectId),
 		createNoteFn: (request) =>

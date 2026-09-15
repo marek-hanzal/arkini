@@ -5,7 +5,7 @@
 		"id": "spoiled-animal-fat",
 		"title": "Spoiled Animal Fat",
 		"description": "I don't like it",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-animal-fat"

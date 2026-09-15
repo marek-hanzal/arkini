@@ -49,8 +49,8 @@ Use the smallest non-derivable payload:
 | `project.json` | `{ arkini, revision }`: writer provenance and current project revision. |
 | `schema.json` | Current project JSON Schema with stable `$id` and explicit definitions. |
 | `game.json` | `$schema`, structured output `version`, and complete non-item config; `meta.id` is package identity. |
-| `items/<type>/<uid>.json` | `$schema` plus direct `item`; path owns type/UID, item owns gameplay ID. |
-| `assets/<id>.png`, `resources/<id>.png` | Path owns ID/kind; extension owns current MIME. |
+| `items/<uid>.json` | `$schema` plus direct `item`; path owns UID, item owns gameplay ID. |
+| `artwork/<id>.png`, `image/<id>.png` | Typed root owns semantic Resource type, filename owns ID, and extension owns encoding. |
 | `notes/<noteId>.json` | Markdown content, optional unique immutable `itemUids` and canonical `resourceIds`, and ordering/freshness timestamps; path owns note ID. |
 
 The Editor installation catalog stores discovery roots, managed/external ownership, and timestamps only. It never copies canonical project identity or mutable project fields.
@@ -59,7 +59,7 @@ The Editor installation catalog stores discovery roots, managed/external ownersh
 
 | Artifact | Contract |
 | --- | --- |
-| `.arkpack` | Self-contained `ARKPACK` magic/length envelope around one streamable payload and optional Sigstore proof through EOF. The payload is a length-prefixed JSON manifest, JSON GameConfig, and ordered raw resource bodies. The proof signs only the exact payload. Manifest owns the formatted output `version` string, Arkini writer, config byte length, and resource IDs/MIME types/lengths needed to copy resource ranges without materializing the package. Package ID comes only from `config.meta.id`. |
+| `.arkpack` | Self-contained `ARKPACK` magic/length envelope around one streamable payload and optional Sigstore proof through EOF. The payload is a length-prefixed JSON manifest, JSON GameConfig, and ordered raw resource bodies. The proof signs only the exact payload. Manifest owns the formatted output `version` string, Arkini writer, config byte length, and resource IDs/semantic types/lengths needed to copy resource ranges without materializing the package. Package ID comes only from `config.meta.id`. |
 | Editor build descriptor | `{ projectId, revision, version, contentHash, size, diagnostics }`; disposable proof of one Community build with the exact output version, invalidated by later authored-content changes. `contentHash` covers only the inner gameplay payload. |
 | `.arksave` | UTF-8 JSON `{ version, arkini, state }` below the collision-safe encoded package directory. Path owns package identity; payload owns gameplay compatibility, writer provenance, and complete State. |
 | Latest incident environment | Disposable fixed directory `game/incidents/latest/` containing exact `game.arkpack` and `save.arksave` replay inputs plus linked `incident.md`, `failure.md`, `history.md`, and `runtime-state.md` text reports. A later fatal failure hard-overwrites these files; modification time identifies freshness. The report is a debugging projection, not a versioned interchange format; each Arkpack/save retains its own normal compatibility contract. |

@@ -144,13 +144,13 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 					isDeepStrictEqual(files.arkpack, state.project.version) &&
 					isDeepStrictEqual(files.config, state.project.config) &&
 					isDeepStrictEqual(
-						files.resources.map(({ id, mime }) => ({
+						files.resources.map(({ id, type }) => ({
 							id,
-							mime,
+							type,
 						})),
-						state.project.resources.map(({ id, mime }) => ({
+						state.project.resources.map(({ id, type }) => ({
 							id,
-							mime,
+							type,
 						})),
 					),
 				projectChangedBeforeBuildFn,

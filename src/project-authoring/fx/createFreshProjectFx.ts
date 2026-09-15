@@ -58,7 +58,7 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 		resources: [
 			{
 				id: "hero",
-				mime: "image/png",
+				type: "image",
 				bytes: placeholderHeroBytes.slice(),
 			},
 		],

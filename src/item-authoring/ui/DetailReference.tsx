@@ -44,7 +44,7 @@ export const DetailReference = ({
 			<EditorItemThumbnail
 				className="rounded-lg border-0 bg-surface/45 ring-1 ring-line/50"
 				imageClassName="p-0.5"
-				resourceIds={item.asset.default}
+				resourceIds={item.artwork.default}
 				size="sm"
 			/>
 			<span className="min-w-0">

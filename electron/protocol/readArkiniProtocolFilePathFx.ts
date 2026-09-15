@@ -59,7 +59,7 @@ export const readArkiniProtocolFilePathFx = Effect.fn("readArkiniProtocolFilePat
 				return yield* Effect.fail(
 					new ArkiniProtocolError({
 						status: 404,
-						message: "Arkini renderer asset was not found.",
+						message: "Arkini renderer resource was not found.",
 					}),
 				);
 			}

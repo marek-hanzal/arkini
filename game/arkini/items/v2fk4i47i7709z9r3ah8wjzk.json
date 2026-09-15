@@ -5,7 +5,7 @@
 		"id": "honeyed-fruit",
 		"title": "Honeyed Fruit",
 		"description": "Radiation of sweetness",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"honeyed-fruit"

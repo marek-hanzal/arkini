@@ -5,7 +5,7 @@
 		"id": "fertilized-grain-field",
 		"title": "Fertilized Grain Field",
 		"description": "Ready for grain seed.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fertilized-grain-field"

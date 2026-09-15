@@ -86,14 +86,13 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 							(resource) => resource.id === resourceId,
 						);
 						if (state === undefined || resource === undefined) return null;
-						const target = yield* new Set(
-							Object.values(state.project.config.resources),
-						).has(resourceId)
-							? state.paths.resourceFileFx(resourceId)
-							: state.paths.assetFileFx(resourceId);
+						const target = yield* resource.type === "image"
+							? state.paths.imageFileFx(resourceId)
+							: state.paths.artworkFileFx(resourceId);
 						return {
 							root: state.paths.root,
 							path: target,
+							type: resource.type,
 							version: resource.version,
 							size: resource.size,
 						};
@@ -104,7 +103,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 						(cause) =>
 							new ProjectRepositoryError({
 								operation: "read-project",
-								message: "Editor asset location could not be resolved.",
+								message: "Editor resource location could not be resolved.",
 								cause,
 							}),
 					),
@@ -174,7 +173,6 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		replaceConfigFx: (props) => provideFx(repository.replaceConfigFx(props)),
 		replaceResourceFx: (props) => provideFx(repository.replaceResourceFx(props)),
 		upsertItemFx: (props) => provideFx(repository.upsertItemFx(props)),
-		upsertResourcesFx: (props) => provideFx(repository.upsertResourcesFx(props)),
 		upsertResourceFilesFx: (props) => provideFx(repository.upsertResourceFilesFx(props)),
 		listNotesFx: (projectId) => provideFx(repository.listNotesFx(projectId)),
 		createNoteFx: (props) => provideFx(repository.createNoteFx(props)),

@@ -5,7 +5,7 @@
 		"id": "cheese",
 		"title": "Cheese",
 		"description": "Cheese you want to chew in!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cheese"

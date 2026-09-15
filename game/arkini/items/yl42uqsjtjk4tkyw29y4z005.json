@@ -5,7 +5,7 @@
 		"id": "corrupted-british-shorthair",
 		"title": "Corrupted British Shorthair",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"corrupted-british-shorthair"

@@ -5,7 +5,7 @@
 		"id": "disease",
 		"title": "Disease",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"disease"

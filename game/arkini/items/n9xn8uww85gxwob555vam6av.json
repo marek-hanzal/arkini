@@ -5,7 +5,7 @@
 		"id": "coffee-tankard",
 		"title": "Coffee Tankard",
 		"description": "Americano",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coffee-tankard"

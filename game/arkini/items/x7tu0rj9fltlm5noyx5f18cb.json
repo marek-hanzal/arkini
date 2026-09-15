@@ -5,7 +5,7 @@
 		"id": "dye-workshop-milk",
 		"title": "Dye Workshop Milk",
 		"description": "Milky-way",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye-workshop-milk"

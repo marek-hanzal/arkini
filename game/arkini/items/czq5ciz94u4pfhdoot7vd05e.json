@@ -4,7 +4,7 @@
 		"uid": "czq5ciz94u4pfhdoot7vd05e",
 		"id": "faith-chest",
 		"title": "Faith Chest",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"faith-chest"

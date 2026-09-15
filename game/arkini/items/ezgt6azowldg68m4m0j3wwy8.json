@@ -5,7 +5,7 @@
 		"id": "filter-bank",
 		"title": "Filter Bank",
 		"description": "Air filter used by air-purifier to make... air clean",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"filter-bank"

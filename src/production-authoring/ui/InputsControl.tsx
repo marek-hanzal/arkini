@@ -129,7 +129,7 @@ export const InputsControl = ({
 									size="md"
 									className="rounded-md"
 									resourceIds={
-										project.config.items[input.selector.itemId]?.asset
+										project.config.items[input.selector.itemId]?.artwork
 											.default ?? [
 											"",
 										]
@@ -161,7 +161,7 @@ export const InputsControl = ({
 									<EditorItemThumbnail
 										className="rounded-md"
 										resourceIds={
-											project.config.items[itemId]?.asset.default ?? [
+											project.config.items[itemId]?.artwork.default ?? [
 												"",
 											]
 										}

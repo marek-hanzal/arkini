@@ -5,7 +5,7 @@
 		"id": "chocolate",
 		"title": "Chocolate",
 		"description": "Good chocolate",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"chocolate"

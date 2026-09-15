@@ -5,7 +5,7 @@
 		"id": "flower-field",
 		"title": "Flower Field",
 		"description": "Floweers",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"flower-field"

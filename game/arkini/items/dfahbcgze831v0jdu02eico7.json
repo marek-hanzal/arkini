@@ -5,7 +5,7 @@
 		"id": "spoiled-coffee-plant",
 		"title": "Spoiled Coffee Plant",
 		"description": "Bleh-Coffee",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-coffee-plant"

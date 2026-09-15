@@ -5,7 +5,7 @@
 		"id": "spoiled-clay-jug",
 		"title": "Spoiled Clay Jug",
 		"description": "Next time a bit more care",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-clay-jug"

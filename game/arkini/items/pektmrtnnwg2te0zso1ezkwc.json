@@ -5,7 +5,7 @@
 		"id": "empty-oven",
 		"title": "Empty Oven",
 		"description": "Heat source",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-oven"

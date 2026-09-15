@@ -25,7 +25,7 @@ export const ItemConnectionRow = ({
 			<EditorItemThumbnail
 				className="pointer-events-none rounded-lg border-0 bg-[var(--ak-editor-background)] ring-1 ring-control-border/60"
 				imageClassName="p-0.5"
-				resourceIds={item.asset.default}
+				resourceIds={item.artwork.default}
 				size="sm"
 			/>
 			<div className="min-w-0 flex-1">

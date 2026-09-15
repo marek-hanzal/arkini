@@ -5,7 +5,7 @@
 		"id": "healing-kit",
 		"title": "Healing Kit",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"healing-kit"

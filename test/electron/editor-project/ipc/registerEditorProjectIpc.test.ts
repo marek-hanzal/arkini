@@ -148,7 +148,6 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectReplaceConfig,
 	ArkiniElectronApi.channels.editorProjectReplaceResource,
 	ArkiniElectronApi.channels.editorProjectUpsertItem,
-	ArkiniElectronApi.channels.editorProjectUpsertResources,
 ];
 
 beforeEach(async () => {
@@ -188,11 +187,6 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "ready",
 			repository,
 		});
-		const createRequest = {
-			version: parseVersionFn(editorTestPayload.version),
-			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
-		};
 		const replaceConfigRequest = {
 			projectId: "project-one",
 			expectedRevision: 0,
@@ -201,7 +195,10 @@ describe("registerEditorProjectIpcFx", () => {
 		const replaceResourceRequest = {
 			...replaceConfigRequest,
 			currentId: "hero",
-			resource: editorTestPayload.resources[0],
+			resource: {
+				id: "hero",
+				type: "image",
+			},
 		};
 		const upsertItemRequest = {
 			expectedRevision: 0,
@@ -218,12 +215,6 @@ describe("registerEditorProjectIpcFx", () => {
 			expectedRevision: 0,
 			projectId: "project-one",
 			resourceId: "unused",
-		};
-		const upsertResourcesRequest = {
-			projectId: "project-one",
-			resources: [
-				editorTestPayload.resources[0],
-			],
 		};
 		const optimizeResourcesRequest = {
 			expectedRevision: 0,
@@ -316,7 +307,7 @@ describe("registerEditorProjectIpcFx", () => {
 			value: editorProjectIpcProject,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectCreate, createRequest),
+			invoke(ArkiniElectronApi.channels.editorProjectCreate, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: editorProjectIpcProject,
@@ -347,14 +338,27 @@ describe("registerEditorProjectIpcFx", () => {
 		await invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, deleteItemRequest);
 		await invoke(ArkiniElectronApi.channels.editorProjectDeleteResource, deleteResourceRequest);
 		await invoke(
-			ArkiniElectronApi.channels.editorProjectUpsertResources,
-			upsertResourcesRequest,
-		);
-		await invoke(
 			ArkiniElectronApi.channels.editorProjectOptimizeResources,
 			optimizeResourcesRequest,
 		);
-		expect(repository.createProjectFx).toHaveBeenCalledWith(createRequest);
+		expect(repository.createProjectFx).toHaveBeenCalledWith({
+			version: {
+				major: 1,
+				minor: 0,
+			},
+			config: expect.objectContaining({
+				meta: expect.objectContaining({
+					id: "project-one",
+				}),
+			}),
+			resources: [
+				expect.objectContaining({
+					id: "hero",
+					type: "image",
+					bytes: expect.any(Uint8Array),
+				}),
+			],
+		});
 		expect(repository.deleteProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.readProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.replaceConfigFx).toHaveBeenCalledWith(replaceConfigRequest);
@@ -362,7 +366,6 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.upsertItemFx).toHaveBeenCalledWith(upsertItemRequest);
 		expect(repository.deleteItemFx).toHaveBeenCalledWith(deleteItemRequest);
 		expect(repository.deleteResourceFx).toHaveBeenCalledWith(deleteResourceRequest);
-		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
 		expect(repository.optimizeResourcesFx).toHaveBeenCalledWith({
 			...optimizeResourcesRequest,
 			onProgressFn: expect.any(Function),
@@ -378,10 +381,7 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		);
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectCreate, {
-				...createRequest,
-				projectId: "",
-			}),
+			invoke(ArkiniElectronApi.channels.editorProjectCreate, ""),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {

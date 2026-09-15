@@ -5,7 +5,7 @@
 		"id": "sack-with-water",
 		"title": "Sack With Water",
 		"description": "It's wet",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-water"

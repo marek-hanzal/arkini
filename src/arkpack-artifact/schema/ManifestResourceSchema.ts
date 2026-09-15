@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 export const ManifestResourceSchema = z
 	.object({
 		id: IdSchema.describe("The stable resource identifier."),
-		mime: ResourceSchema.shape.mime.describe("The resource media type."),
+		type: ResourceTypeSchema.describe("The semantic resource kind."),
 		length: NonNegativeIntegerSchema.describe("The resource payload size in bytes."),
 	})
 	.strict()

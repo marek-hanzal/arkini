@@ -5,7 +5,7 @@
 		"id": "rum-barrel",
 		"title": "Rum Barrel",
 		"description": "A lot of fun inside",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"rum-barrel"

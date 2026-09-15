@@ -5,7 +5,7 @@
 		"id": "glass-goblet-with-coffee",
 		"title": "Glass Goblet with Coffee",
 		"description": "Espresso Maximo",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass-goblet-with-coffee"

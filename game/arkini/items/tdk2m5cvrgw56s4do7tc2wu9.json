@@ -5,7 +5,7 @@
 		"id": "dye-workshop",
 		"title": "Dye Workshop",
 		"description": "Produces colors",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye-workshop"

@@ -5,7 +5,7 @@
 		"id": "gold-ingot",
 		"title": "Gold Ingot",
 		"description": "Shiny shiny",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gold-ingot"

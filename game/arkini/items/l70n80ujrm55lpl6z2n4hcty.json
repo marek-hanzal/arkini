@@ -5,7 +5,7 @@
 		"id": "bio-waste",
 		"title": "Bio-Waste",
 		"description": "Stuff produced by life. From the other side.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bio-waste"

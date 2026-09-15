@@ -5,7 +5,7 @@
 		"id": "vegetable-garden-blueprint",
 		"title": "Vegetable Garden Blueprint",
 		"description": "Good stuff to eat",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

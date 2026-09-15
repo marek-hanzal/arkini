@@ -3,7 +3,7 @@ import { DescriptionSchema } from "~/game-value/schema/DescriptionSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { MergeSchema } from "~/item-merge/schema/MergeSchema";
-import { AssetSchema } from "./AssetSchema";
+import { ArtworkSchema } from "./ArtworkSchema";
 import { UnitsSchema } from "./UnitsSchema";
 
 import { z } from "zod";
@@ -52,9 +52,9 @@ export const ItemSchema = z
 			"The optional human-readable explanation of this item's purpose.",
 		),
 		/**
-		 * Visual asset definition used to render this item.
+		 * Visual artwork definition used to render this item.
 		 */
-		asset: AssetSchema.describe("The visual asset definition used to render this item."),
+		artwork: ArtworkSchema.describe("The visual artwork definition used to render this item."),
 		/**
 		 * Part of game state in which this item may be stored.
 		 */

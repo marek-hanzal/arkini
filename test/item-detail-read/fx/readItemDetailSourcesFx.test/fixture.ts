@@ -19,10 +19,10 @@ const item = (id: string, title = id) => ({
 
 	title,
 	description: id,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			`asset:${id}`,
+			`artwork:${id}`,
 		],
 	},
 	scope: "any" as const,

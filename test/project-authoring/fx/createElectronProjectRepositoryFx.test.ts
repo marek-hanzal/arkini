@@ -83,7 +83,7 @@ const installEditorApi = () => {
 		importJsonDirectoryFn: vi.fn(async () => success(descriptor)),
 		importArkpackFn: vi.fn(async () => success(descriptor)),
 		importInstalledArkpackFn: vi.fn(async () => success(descriptor)),
-		importAssetsFn: vi.fn(async () =>
+		importResourcesFn: vi.fn(async () =>
 			success({
 				project,
 				resourceIds: [],
@@ -108,7 +108,6 @@ const installEditorApi = () => {
 		replaceConfigFn: vi.fn(async () => success(commit)),
 		replaceResourceFn: vi.fn(async () => success(project)),
 		upsertItemFn: vi.fn(async () => success(commit)),
-		upsertResourcesFn: vi.fn(async () => success(project)),
 		updateNoteFn: vi.fn(async ({ projectId, noteId, content, itemUids, resourceIds }) =>
 			success({
 				noteId,
@@ -159,6 +158,23 @@ afterEach(() => {
 });
 
 describe("createElectronProjectRepositoryFx", () => {
+	it("creates a fresh project over IPC using only its ID", async () => {
+		const editor = installEditorApi();
+		const { repository } = createRepository();
+
+		await Effect.runPromise(
+			repository.createProjectFx({
+				version: parseVersionFn(editorTestPayload.version),
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+
+		expect(editor.createProjectFn).toHaveBeenCalledExactlyOnceWith(
+			editorTestPayload.config.meta.id,
+		);
+	});
+
 	it("preserves a stable server failure envelope as one typed repository failure", async () => {
 		const editor = installEditorApi();
 		vi.mocked(editor.listProjectsFn).mockResolvedValueOnce({
@@ -278,56 +294,6 @@ describe("createElectronProjectRepositoryFx", () => {
 		});
 	});
 
-	it("sends uploaded bytes but receives only asset metadata", async () => {
-		const editor = installEditorApi();
-		const { repository } = createRepository();
-		const requestBytes = new Uint8Array([
-			9,
-			8,
-			7,
-		]);
-
-		const saved = await Effect.runPromise(
-			repository.upsertResourcesFx({
-				projectId: "project-one",
-				resources: [
-					{
-						id: "fresh-resource",
-						mime: "image/png",
-						bytes: requestBytes,
-					},
-				],
-			}),
-		);
-		const optimized = await Effect.runPromise(
-			repository.optimizeResourcesFx({
-				expectedRevision: project.revision,
-				projectId: project.projectId,
-				resourceIds: [
-					"hero",
-				],
-			}),
-		);
-
-		const request = vi.mocked(editor.upsertResourcesFn).mock.calls[0]?.[0];
-		expect(request?.resources[0]).toMatchObject({
-			id: "fresh-resource",
-			mime: "image/png",
-			bytes: expect.any(Uint8Array),
-		});
-		expect(saved.resources).toEqual(editorTestResources);
-		expect(saved.resources[0]).not.toHaveProperty("bytes");
-		expect(editor.optimizeResourcesFn).toHaveBeenCalledWith({
-			expectedRevision: project.revision,
-			projectId: project.projectId,
-			resourceIds: [
-				"hero",
-			],
-		});
-		expect(optimized.project.resources).toEqual(editorTestResources);
-		expect(optimized.project.resources[0]).not.toHaveProperty("bytes");
-	});
-
 	it("forwards matching resource optimization progress and releases the listener", async () => {
 		const editor = installEditorApi();
 		const { repository } = createRepository();
@@ -382,27 +348,5 @@ describe("createElectronProjectRepositoryFx", () => {
 			totalResourceCount: 2,
 		});
 		expect(unsubscribeFn).toHaveBeenCalledOnce();
-	});
-
-	it("blocks resource import IPC while a hard project replacement owns writes", async () => {
-		const editor = installEditorApi();
-		const { admission, repository } = createRepository();
-		const releaseFx = Effect.runSync(
-			admission.acquireReplacementFx("refresh-project", () => false),
-		);
-		try {
-			const failure = await readTypedFailure(
-				repository.upsertResourcesFx({
-					projectId: "project-one",
-					resources: [
-						editorTestPayload.resources[0]!,
-					],
-				}),
-			);
-			expect(failure.operation).toBe("upsert-resource");
-			expect(editor.upsertResourcesFn).not.toHaveBeenCalled();
-		} finally {
-			Effect.runSync(releaseFx);
-		}
 	});
 });

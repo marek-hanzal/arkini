@@ -5,7 +5,7 @@
 		"id": "cow-farm",
 		"title": "Cow Farm",
 		"description": "Something related to milk? Come here!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cow-farm"

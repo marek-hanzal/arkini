@@ -5,7 +5,7 @@
 		"id": "spoiled-clay-plate",
 		"title": "Spoiled Clay Plate",
 		"description": "A dinner for your enemy",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-clay-plate"

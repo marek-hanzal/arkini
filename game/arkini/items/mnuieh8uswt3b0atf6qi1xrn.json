@@ -5,7 +5,7 @@
 		"id": "nails",
 		"title": "Nails",
 		"description": "Put some things together",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"nails"

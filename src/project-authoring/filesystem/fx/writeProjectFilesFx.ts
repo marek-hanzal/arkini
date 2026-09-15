@@ -139,14 +139,13 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 		if (collision !== undefined) return yield* Effect.fail(collision);
 	}
 
-	const shellResources = new Set(Object.values(config.resources));
 	const resourceWrites = new Map<string, Write>();
 	for (const resource of [
 		...resources,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const target = yield* shellResources.has(resource.id)
-			? paths.resourceFileFx(resource.id)
-			: paths.assetFileFx(resource.id);
+		const target = yield* resource.type === "image"
+			? paths.imageFileFx(resource.id)
+			: paths.artworkFileFx(resource.id);
 		const collision = addUniqueTargetFn(resourceWrites, {
 			target,
 			bytes: resource.bytes,

@@ -5,7 +5,7 @@
 		"id": "coin",
 		"title": "Coin",
 		"description": "Everybody wanna be rich.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coin"

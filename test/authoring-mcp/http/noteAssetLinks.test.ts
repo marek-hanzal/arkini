@@ -104,7 +104,7 @@ describe("editor MCP note asset links", () => {
 			);
 			expect(collection).toContain("Matched notes: 1");
 			expect(collection).toContain(`- ${note.noteId}`);
-			expect(collection).toContain('"id":"hero","type":"image","mime":"image/png"');
+			expect(collection).toContain('"id":"hero","type":"image"');
 		}
 		const unmatched = readTextFn(
 			await client.callTool({
@@ -143,16 +143,14 @@ describe("editor MCP note asset links", () => {
 					title: "Water",
 				},
 			],
-			linkedAssets: [
+			linkedResources: [
 				{
 					id: "hero",
 					type: "image",
-					mime: "image/png",
 				},
 				{
 					id: "item-water",
-					type: "image",
-					mime: "image/png",
+					type: "artwork",
 				},
 			],
 		});

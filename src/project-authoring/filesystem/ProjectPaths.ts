@@ -10,11 +10,11 @@ export interface ProjectPaths {
 	readonly schemaFile: string;
 	readonly gameFile: string;
 	readonly items: string;
-	readonly assets: string;
-	readonly resources: string;
+	readonly artwork: string;
+	readonly image: string;
 	readonly notes: string;
 	readonly itemFileFx: (props: { readonly uid: string }) => Effect.Effect<string, never, never>;
-	readonly assetFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
-	readonly resourceFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
+	readonly artworkFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
+	readonly imageFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
 	readonly noteFileFx: (noteId: string) => Effect.Effect<string, never, never>;
 }

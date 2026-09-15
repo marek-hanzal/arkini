@@ -5,7 +5,7 @@
 		"id": "mining-portal",
 		"title": "Mining Portal",
 		"description": "Transfer you to the mining-land",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"mining-portal"

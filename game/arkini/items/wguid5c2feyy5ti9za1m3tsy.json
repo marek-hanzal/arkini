@@ -5,7 +5,7 @@
 		"id": "knife",
 		"title": "Knife",
 		"description": "Sharp.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"knife"

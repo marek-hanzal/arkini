@@ -5,7 +5,7 @@
 		"id": "clay-bowl-with-cream",
 		"title": "Clay Bowl With Cream",
 		"description": "Creammy thing",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-bowl-with-cream"

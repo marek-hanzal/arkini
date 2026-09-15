@@ -5,7 +5,7 @@
 		"id": "forest",
 		"title": "Forest",
 		"description": "Just forest. Cute and nice",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"forest"

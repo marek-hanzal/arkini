@@ -92,8 +92,8 @@ vi.mock("~/item-authoring/ui/useItemByUid", () => ({
 	useItemByUid: () => state.persisted,
 }));
 
-vi.mock("~/authoring-form/ui/AssetAutocompleteField", () => ({
-	AssetAutocompleteField: ({ label }: { readonly label: string }) =>
+vi.mock("~/authoring-form/ui/ResourceAutocompleteField", () => ({
+	ResourceAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));
 
@@ -150,10 +150,10 @@ const item: ItemSchema.Type = {
 
 	title: "Water",
 	description: "Fresh water.",
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			"asset:water",
+			"artwork:water",
 		],
 	},
 	scope: "any",
@@ -300,11 +300,11 @@ describe("item section form session", () => {
 		state.project = {
 			...(state.project as Project),
 			resources: [
-				"asset:water",
-				"asset:overlay",
+				"artwork:water",
+				"artwork:overlay",
 			].map((id) => ({
 				id,
-				mime: "image/png" as const,
+				type: "artwork" as const,
 				size: 1,
 				version: "1",
 			})),
@@ -316,8 +316,8 @@ describe("item section form session", () => {
 					type="button"
 					onClick={() =>
 						form.setFieldValue(
-							"asset.default[1]",
-							form.state.values.asset.default[1] === "" ? "asset:overlay" : "",
+							"artwork.default[1]",
+							form.state.values.artwork.default[1] === "" ? "artwork:overlay" : "",
 						)
 					}
 				>
@@ -349,7 +349,7 @@ describe("item section form session", () => {
 				(image) => new URL(image.src).searchParams.get("resourceId"),
 			);
 		expect(headerResourcesFn()).toEqual([
-			"asset:water",
+			"artwork:water",
 		]);
 		const toggle = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Toggle overlay",
@@ -357,12 +357,12 @@ describe("item section form session", () => {
 		if (toggle === undefined) throw new Error("Missing artwork edit probe.");
 		await act(async () => toggle.click());
 		expect(headerResourcesFn()).toEqual([
-			"asset:water",
-			"asset:overlay",
+			"artwork:water",
+			"artwork:overlay",
 		]);
 		await act(async () => toggle.click());
 		expect(headerResourcesFn()).toEqual([
-			"asset:water",
+			"artwork:water",
 		]);
 		expect(state.saveItem).not.toHaveBeenCalled();
 	});
@@ -564,14 +564,14 @@ describe("item section form session", () => {
 	it("keeps the persisted artwork scale in the form and saves the edited ratio", async () => {
 		const scaledItem = {
 			...item,
-			asset: {
-				...item.asset,
+			artwork: {
+				...item.artwork,
 				scale: 0.65,
 			},
 		};
 		state.persisted = scaledItem;
 		const { container } = await render(<ArtworkSection />);
-		const scale = container.querySelector<HTMLInputElement>('input[name="asset.scale"]');
+		const scale = container.querySelector<HTMLInputElement>('input[name="artwork.scale"]');
 		if (scale === null) throw new Error("Missing artwork scale control.");
 		expect(scale.value).toBe("0.65");
 		await changeInput(scale, "0.9");
@@ -579,11 +579,11 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem).toHaveBeenCalledOnce();
-		expect(state.saveItem.mock.calls[0]?.[0].item.asset).toEqual({
-			...item.asset,
+		expect(state.saveItem.mock.calls[0]?.[0].item.artwork).toEqual({
+			...item.artwork,
 			scale: 0.9,
 		});
-		expect(scaledItem.asset.scale).toBe(0.65);
+		expect(scaledItem.artwork.scale).toBe(0.65);
 	});
 
 	it("picks both bounds of the reserved random space range into the local draft", async () => {

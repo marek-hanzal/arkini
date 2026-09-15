@@ -5,7 +5,7 @@
 		"id": "spoiled-eggs",
 		"title": "Spoiled Eggs",
 		"description": "No more Easter",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-eggs"

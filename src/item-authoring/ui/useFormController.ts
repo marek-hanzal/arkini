@@ -57,11 +57,11 @@ export namespace useFormController {
 const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	description: item.description ?? "",
-	asset: {
-		scale: item.asset.scale,
+	artwork: {
+		scale: item.artwork.scale,
 		default: [
-			item.asset.default[0],
-			item.asset.default[1] ?? "",
+			item.artwork.default[0],
+			item.artwork.default[1] ?? "",
 		],
 	},
 	merge:
@@ -155,7 +155,7 @@ export const useFormController = ({
 			if (current.maxStackSize !== next.maxStackSize)
 				form.setFieldValue("maxStackSize", next.maxStackSize);
 			if (current.maxCount !== next.maxCount) form.setFieldValue("maxCount", next.maxCount);
-			if (current.asset !== next.asset) form.setFieldValue("asset", next.asset);
+			if (current.artwork !== next.artwork) form.setFieldValue("artwork", next.artwork);
 			if (current.lines !== next.lines) form.setFieldValue("lines", next.lines);
 			if (current.maxQueueSize !== next.maxQueueSize)
 				form.setFieldValue("maxQueueSize", next.maxQueueSize);

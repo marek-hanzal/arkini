@@ -5,7 +5,7 @@
 		"id": "spoiled-raw-game-meat",
 		"title": "Spoiled Raw Game Meat",
 		"description": "Not good anymore",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-raw-game-meat"

@@ -5,7 +5,7 @@
 		"id": "sunflower-oil",
 		"title": "Sunflower Oil",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sunflower-oil"

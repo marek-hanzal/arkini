@@ -5,7 +5,7 @@
 		"id": "spoiled-sunflower",
 		"title": "Spoiled Sunflower",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-sunflower"

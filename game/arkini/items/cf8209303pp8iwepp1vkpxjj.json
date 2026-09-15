@@ -5,7 +5,7 @@
 		"id": "clay-mug-with-milk",
 		"title": "Clay Mug With Milk",
 		"description": "A mini-milk",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug-with-milk"

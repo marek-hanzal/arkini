@@ -73,9 +73,17 @@ describe("filesystem Editor project build", () => {
 		});
 	});
 
-	it("builds after replacing an early-sorting resource and adding an earlier asset without Refresh", async () => {
+	it("builds after replacing an early-sorting resource and adding earlier Artwork without Refresh", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
+		const alternateHero = createAlternateTestPngBytes();
+		const alternateHeroPath = join(harness.temporaryDirectory, "alternate-hero.png");
+		const artwork = createTestPngBytes();
+		const artworkPath = join(harness.temporaryDirectory, "aa.png");
+		await Promise.all([
+			writeFile(alternateHeroPath, alternateHero),
+			writeFile(artworkPath, artwork),
+		]);
 		await Effect.runPromise(
 			repository.replaceResourceFx({
 				projectId: project.projectId,
@@ -84,19 +92,21 @@ describe("filesystem Editor project build", () => {
 				config: project.config,
 				resource: {
 					id: "hero",
-					mime: "image/png",
-					bytes: createAlternateTestPngBytes(),
+					type: "image",
+					path: alternateHeroPath,
+					size: alternateHero.byteLength,
 				},
 			}),
 		);
 		const updated = await Effect.runPromise(
-			repository.upsertResourcesFx({
+			repository.upsertResourceFilesFx({
 				projectId: project.projectId,
 				resources: [
 					{
 						id: "aa",
-						mime: "image/png",
-						bytes: createTestPngBytes(),
+						type: "artwork",
+						path: artworkPath,
+						size: artwork.byteLength,
 					},
 				],
 			}),
@@ -235,7 +245,7 @@ describe("filesystem Editor project build", () => {
 
 	it("preserves blocking diagnostics with project-relative provenance", async () => {
 		const root = await harness.createExternalProject("project-invalid-resource");
-		await unlink(join(root, "assets", "item-water.png"));
+		await unlink(join(root, "artwork", "item-water.png"));
 		const repository = await harness.openRepository();
 		const project = await Effect.runPromise(
 			repository.openProjectFx({
@@ -264,7 +274,7 @@ describe("filesystem Editor project build", () => {
 
 	it("keeps successful Build warnings project-relative", async () => {
 		const root = await harness.createExternalProject("project-warning");
-		await writeFile(join(root, "assets", "unused.png"), createTestPngBytes());
+		await writeFile(join(root, "artwork", "unused.png"), createTestPngBytes());
 		const repository = await harness.openRepository();
 		const project = await Effect.runPromise(
 			repository.openProjectFx({
@@ -283,7 +293,7 @@ describe("filesystem Editor project build", () => {
 		expect(artifact.diagnostics).toContainEqual(
 			expect.objectContaining({
 				code: DiagnosticCodeEnumSchema.enum.ResourceUnused,
-				source: "assets/unused.png",
+				source: "artwork/unused.png",
 			}),
 		);
 	});

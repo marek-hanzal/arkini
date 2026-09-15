@@ -5,7 +5,7 @@
 		"id": "spoiled-cacao-pod",
 		"title": "Spoiled Cacao Pod",
 		"description": "Bleh",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-cacao-pod"

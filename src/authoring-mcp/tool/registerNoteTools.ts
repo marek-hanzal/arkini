@@ -31,7 +31,7 @@ const NoteCollectionInputSchema = z
 			.describe("Maximum notes per page; defaults to 25 and is capped at 100."),
 		itemUid: IdSchema.optional().describe("Only notes linked to this immutable item UID."),
 		resourceId: IdSchema.optional().describe(
-			"Only notes linked to this asset resource ID; all supplied filters must match.",
+			"Only notes linked to this resource ID; all supplied filters must match.",
 		),
 		query: z
 			.string()
@@ -43,7 +43,7 @@ const NoteCollectionInputSchema = z
 		$id: "urn:arkini:schema:mcp:note-collection-input",
 		title: "Note collection tool input",
 		description:
-			"Item and asset filtering, pagination and full-content search for the project note collection.",
+			"Item and resource filtering, pagination and full-content search for the project note collection.",
 	});
 
 const NoteDetailInputSchema = z
@@ -64,14 +64,14 @@ const CreateNoteInputSchema = z
 			"Complete unique list of existing immutable item UIDs; use [] for no item links.",
 		),
 		resourceIds: NoteSchema.shape.resourceIds.describe(
-			"Complete unique list of existing asset resource IDs; use [] for no asset links.",
+			"Complete unique list of existing resource IDs; use [] for no resource links.",
 		),
 	})
 	.strict()
 	.meta({
 		$id: "urn:arkini:schema:mcp:create-note-input",
 		title: "Create note tool input",
-		description: "The complete content, item and asset relationships of a new project note.",
+		description: "The complete content, item and resource relationships of a new project note.",
 	});
 
 const noteMutationSchema = z
@@ -90,7 +90,7 @@ const EditNoteInputSchema = noteMutationSchema
 			"Complete replacement list of immutable item UIDs; omitting a previous UID unlinks it.",
 		),
 		resourceIds: NoteSchema.shape.resourceIds.describe(
-			"Complete replacement list of asset resource IDs; omitting a previous ID unlinks it.",
+			"Complete replacement list of resource IDs; omitting a previous ID unlinks it.",
 		),
 	})
 	.strict()
@@ -126,13 +126,12 @@ const readLinkedItemsFn = (note: NoteSchema.Type, project: Project) =>
 		};
 	});
 
-const readLinkedAssetsFn = (note: NoteSchema.Type, project: Project) =>
+const readLinkedResourcesFn = (note: NoteSchema.Type, project: Project) =>
 	note.resourceIds.map((id) => {
 		const resource = project.resources.find((candidate) => candidate.id === id);
 		return {
 			id,
-			type: resource === undefined ? null : "image",
-			mime: resource?.mime ?? null,
+			type: resource?.type ?? null,
 		};
 	});
 
@@ -184,7 +183,7 @@ const readNoteCollectionTextFn = (
 							`- ${note.noteId}`,
 							`  Linked items: ${JSON.stringify(readLinkedItemsFn(note, project))}`,
 							`  Resource IDs: ${JSON.stringify(note.resourceIds)}`,
-							`  Linked assets: ${JSON.stringify(readLinkedAssetsFn(note, project))}`,
+							`  Linked resources: ${JSON.stringify(readLinkedResourcesFn(note, project))}`,
 							`  Created: ${new Date(note.createdAtMs).toISOString()}`,
 							`  Updated: ${new Date(note.updatedAtMs).toISOString()}`,
 							`  Updated at ms: ${note.updatedAtMs}`,
@@ -242,7 +241,7 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and asset links. Linked items include their current authored IDs and human titles; linked assets include resource IDs, image type and MIME. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Arkpacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and resource links. Linked items include their current authored IDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Arkpacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
@@ -264,7 +263,7 @@ export const registerNoteToolsFn = ({
 		"note_detail",
 		{
 			description:
-				"Read one complete project note as JSON, including item UIDs, current authored IDs and human titles, resource IDs and resolved asset type and MIME. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
+				"Read one complete project note as JSON, including item UIDs, current authored IDs and human titles, resource IDs and resolved semantic resource types. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
 			inputSchema: NoteDetailInputSchema,
 		},
 		async ({ noteId }) =>
@@ -277,7 +276,7 @@ export const registerNoteToolsFn = ({
 									{
 										...note,
 										linkedItems: readLinkedItemsFn(note, project),
-										linkedAssets: readLinkedAssetsFn(note, project),
+										linkedResources: readLinkedResourcesFn(note, project),
 									},
 									null,
 									2,
@@ -323,7 +322,7 @@ export const registerNoteToolsFn = ({
 		"edit_note",
 		{
 			description:
-				"Replace complete Markdown content, item and asset links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
+				"Replace complete Markdown content, item and resource links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
 			inputSchema: EditNoteInputSchema,
 		},
 		async ({ content, expectedUpdatedAtMs, itemUids, resourceIds, noteId }) =>

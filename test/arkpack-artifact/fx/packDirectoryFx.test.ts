@@ -29,7 +29,7 @@ describe("packDirectoryFx game-project contract", () => {
 				packageId: "project-game",
 				version: "2.3",
 				json: 3,
-				png: 2,
+				resources: 2,
 			});
 			expect(payload).toMatchObject({
 				version: "2.3",
@@ -44,12 +44,12 @@ describe("packDirectoryFx game-project contract", () => {
 			if (itemWater === undefined) throw new Error("Missing packed item-water asset.");
 			expect(hero).toEqual({
 				id: "hero",
-				mime: "image/png",
+				type: "image",
 				bytes: png,
 			});
 			expect(itemWater).toMatchObject({
 				id: "item-water",
-				mime: "image/png",
+				type: "artwork",
 			});
 			expect(itemWater.bytes).not.toEqual(assetPng);
 			const normalized = yield* Effect.promise(() =>
@@ -59,14 +59,14 @@ describe("packDirectoryFx game-project contract", () => {
 			);
 			expect(normalized.info).toMatchObject({
 				width: 256,
-				height: 64,
+				height: 256,
 				channels: 4,
 				hasAlpha: true,
 			});
 			expect(normalized.data[3]).toBe(128);
 			expect(payload.config).not.toHaveProperty("arkpack");
-			expect(payload.config.items.water?.asset.scale).toBe(0.65);
-			expect(payload.config.items.portal?.asset.scale).toBe(1);
+			expect(payload.config.items.water?.artwork.scale).toBe(0.65);
+			expect(payload.config.items.portal?.artwork.scale).toBe(1);
 			expect(payload.config.items.portal).toMatchObject({
 				action: {
 					type: "space" as const,

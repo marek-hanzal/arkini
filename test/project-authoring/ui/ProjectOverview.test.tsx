@@ -102,11 +102,11 @@ describe("ProjectOverview", () => {
 		);
 		expect(links.map((link) => link.dataset.overviewId)).toEqual([
 			"items",
-			"assets",
+			"artwork",
 		]);
 		expect(links.map((link) => link.dataset.to)).toEqual([
 			"/editor/$projectId/editor/items/list",
-			"/editor/$projectId/assets",
+			"/editor/$projectId/artwork",
 		]);
 		for (const link of links)
 			expect(JSON.parse(link.dataset.params ?? "null")).toEqual({

@@ -5,7 +5,7 @@
 		"id": "linen",
 		"title": "Linen",
 		"description": "Some linen over here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"linen"

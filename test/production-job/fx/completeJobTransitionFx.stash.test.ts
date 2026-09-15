@@ -66,10 +66,10 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
 
 	title: id,
 	description: id,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			`asset:${id}`,
+			`artwork:${id}`,
 		],
 	},
 	scope,
@@ -95,10 +95,10 @@ const stashItem = ({
 	},
 	title: id,
 	description: id,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			`asset:${id}`,
+			`artwork:${id}`,
 		],
 	},
 	scope: "board" as const,

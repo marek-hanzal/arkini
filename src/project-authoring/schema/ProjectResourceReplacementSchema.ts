@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 const identitySchema = z
 	.object({
 		id: IdSchema,
-		mime: ResourceSchema.shape.mime,
+		type: ResourceTypeSchema,
 	})
 	.strict();
 
@@ -16,16 +16,15 @@ export const ProjectResourceFileReplacementSchema = identitySchema.extend({
 	size: NonNegativeIntegerSchema,
 });
 
-/** A rename, byte-backed replacement, or native file-backed replacement. */
+/** A rename or native file-backed replacement. */
 export const ProjectResourceReplacementSchema = z
 	.union([
-		ResourceSchema,
 		ProjectResourceFileReplacementSchema,
 		identitySchema,
 	])
 	.meta({
 		id: "ProjectResourceReplacementSchema",
-		description: "An asset rename with optional replacement PNG content.",
+		description: "A resource rename with optional replacement content.",
 	});
 export type ProjectResourceReplacementSchema = typeof ProjectResourceReplacementSchema;
 export namespace ProjectResourceReplacementSchema {

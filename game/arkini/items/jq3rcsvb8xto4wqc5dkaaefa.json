@@ -5,7 +5,7 @@
 		"id": "spoiled-hay",
 		"title": "Spoiled Hay",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-hay"

@@ -5,7 +5,7 @@
 		"id": "oven-with-wood",
 		"title": "Oven With Wood",
 		"description": "Ready to be fired!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"oven-with-wood"

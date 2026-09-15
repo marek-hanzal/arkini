@@ -5,7 +5,7 @@
 		"id": "raw-amethyst",
 		"title": "Raw Amethyst",
 		"description": "Purple",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"raw-amethyst"

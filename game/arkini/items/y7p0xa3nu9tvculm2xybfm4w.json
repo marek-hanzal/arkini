@@ -5,7 +5,7 @@
 		"id": "explosive-compound",
 		"title": "Explosive Compound",
 		"description": "Kaboom in the bottle",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"explosive-compound"

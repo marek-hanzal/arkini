@@ -88,7 +88,7 @@ export namespace EditorProjectTransport {
 
 	export interface Resource {
 		readonly id: string;
-		readonly mime: string;
+		readonly type: "artwork" | "image";
 		readonly size: number;
 		readonly version: string;
 	}
@@ -126,18 +126,19 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 	}
 
-	export interface ImportAssetFile {
+	export interface ImportResourcesFile {
 		readonly name: string;
 		readonly path: string;
 	}
 
-	export interface ImportAssetsRequest {
-		readonly files: ReadonlyArray<ImportAssetFile>;
+	export interface ImportResourcesRequest {
+		readonly files: ReadonlyArray<ImportResourcesFile>;
 		readonly projectId: string;
 		readonly source: "arkpack" | "files";
+		readonly type: Resource["type"];
 	}
 
-	export interface ImportAssetsResult {
+	export interface ImportResourcesResult {
 		readonly project: Project;
 		readonly resourceIds: ReadonlyArray<string>;
 	}
@@ -174,12 +175,6 @@ export namespace EditorProjectTransport {
 		readonly resourceIds: ReadonlyArray<string>;
 	}
 
-	export interface CreateProjectRequest {
-		readonly version: BuildVersion;
-		readonly config: unknown;
-		readonly resources: ReadonlyArray<unknown>;
-	}
-
 	export interface UpsertItemRequest {
 		readonly expectedRevision?: number;
 		readonly projectId: string;
@@ -211,11 +206,6 @@ export namespace EditorProjectTransport {
 		readonly expectedRevision: number;
 		readonly projectId: string;
 		readonly resource: unknown;
-	}
-
-	export interface UpsertResourcesRequest {
-		readonly projectId: string;
-		readonly resources: ReadonlyArray<unknown>;
 	}
 
 	export interface OptimizeResourcesRequest {

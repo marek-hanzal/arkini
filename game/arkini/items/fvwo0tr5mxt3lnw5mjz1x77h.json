@@ -5,7 +5,7 @@
 		"id": "glass-goblet",
 		"title": "Glass Goblet",
 		"description": "Prepared for drink",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass-goblet"

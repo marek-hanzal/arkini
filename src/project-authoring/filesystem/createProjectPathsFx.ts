@@ -14,8 +14,8 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 	const path = yield* Path.Path;
 	const root = path.resolve(projectRoot);
 	const items = path.join(root, "items");
-	const assets = path.join(root, "assets");
-	const resources = path.join(root, "resources");
+	const artwork = path.join(root, "artwork");
+	const image = path.join(root, "image");
 	const notes = path.join(root, "notes");
 
 	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
@@ -47,13 +47,13 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		schemaFile: path.join(root, GameProjectSchemaFileName),
 		gameFile: path.join(root, "game.json"),
 		items,
-		assets,
-		resources,
+		artwork,
+		image,
 		notes,
 		itemFileFx: ({ uid }) =>
 			Effect.succeed(path.join(items, `${encodeGameProjectFileStemFn(uid)}.json`)),
-		assetFileFx: (resourceId) => readResourceFileFx(assets, resourceId),
-		resourceFileFx: (resourceId) => readResourceFileFx(resources, resourceId),
+		artworkFileFx: (resourceId) => readResourceFileFx(artwork, resourceId),
+		imageFileFx: (resourceId) => readResourceFileFx(image, resourceId),
 		noteFileFx: (noteId) =>
 			Effect.succeed(path.join(notes, `${encodeGameProjectFileStemFn(noteId)}.json`)),
 	} satisfies ProjectPaths;

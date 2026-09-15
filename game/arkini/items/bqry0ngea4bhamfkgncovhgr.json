@@ -5,7 +5,7 @@
 		"id": "clay-bowl",
 		"title": "Clay Bowl",
 		"description": "Just a bowl",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-bowl"

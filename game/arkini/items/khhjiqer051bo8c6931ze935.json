@@ -5,7 +5,7 @@
 		"id": "glass-goblet-spoiled",
 		"title": "Spoiled Glass Goblet",
 		"description": "You've forgot it in the corner month ago?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass-goblet-spoiled"

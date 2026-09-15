@@ -5,7 +5,7 @@
 		"id": "key-t2",
 		"title": "Key - Tier 2",
 		"description": "Thing unlocker",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"key-t2"

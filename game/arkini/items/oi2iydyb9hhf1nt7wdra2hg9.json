@@ -5,7 +5,7 @@
 		"id": "empty-crate",
 		"title": "Empty Crate",
 		"description": "Just a crate",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-crate"

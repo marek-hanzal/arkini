@@ -5,7 +5,7 @@
 		"id": "bubble-maker",
 		"title": "Bubble Maker",
 		"description": "Make some bubbles",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bubble-maker"

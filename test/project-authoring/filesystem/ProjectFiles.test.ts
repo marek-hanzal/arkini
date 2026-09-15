@@ -36,17 +36,15 @@ describe("filesystem Editor project current tree", () => {
 		const expectCurrentTreeFn = async (expected: ProjectFiles) => {
 			expect(await harness.read()).toEqual({
 				...expected,
-				resources: expected.resources.map(({ id, mime, bytes }) => ({
+				resources: expected.resources.map(({ id, type, bytes }) => ({
 					id,
-					mime,
+					type,
 					size: bytes.byteLength,
 					version: expect.any(String),
 				})),
 			});
 			for (const resource of expected.resources) {
-				const directory = Object.values(expected.config.resources).includes(resource.id)
-					? "resources"
-					: "assets";
+				const directory = resource.type;
 				expect(
 					new Uint8Array(
 						await readFile(join(harness.root, directory, `${resource.id}.png`)),
@@ -105,7 +103,7 @@ describe("filesystem Editor project current tree", () => {
 		expect(JSON.parse(await readFile(waterPath, "utf8")).$schema).toBe(
 			GameProjectItemSchemaReference,
 		);
-		const waterResourcePath = join(harness.root, "assets", "item-water.png");
+		const waterResourcePath = join(harness.root, "artwork", "item-water.png");
 		await mkdir(join(harness.root, ".git"));
 		await Promise.all([
 			writeFile(join(harness.root, ".git", "config"), "keep-git"),

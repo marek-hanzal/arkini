@@ -5,7 +5,7 @@
 		"id": "diamond",
 		"title": "Diamond",
 		"description": "You're incredibly rich!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"diamond"

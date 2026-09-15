@@ -5,7 +5,7 @@
 		"id": "cauldron-with-wine",
 		"title": "Cauldron With Wine",
 		"description": "A lot of wine",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-wine"

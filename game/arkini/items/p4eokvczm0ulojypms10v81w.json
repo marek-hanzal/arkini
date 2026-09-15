@@ -5,7 +5,7 @@
 		"id": "empty-beer-barrel",
 		"title": "Empty Beer Barrel",
 		"description": "Nothing inside.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-beer-barrel"

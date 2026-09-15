@@ -2,7 +2,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { useCallback } from "react";
 
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
-import { EditorAssetReferenceControl } from "~/authoring-form/ui/AssetAutocompleteField";
+import { ResourceReferenceControl } from "~/authoring-form/ui/ResourceAutocompleteField";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { Project } from "~/project-authoring/type/Project";
@@ -57,10 +57,11 @@ export const NoteLinkPickers = ({
 					]);
 				}}
 			/>
-			<EditorAssetReferenceControl
+			<ResourceReferenceControl
 				showSelectedPreview={false}
-				key={`assets:${resourceIds.length}`}
-				label={translator.textFn("Link asset")}
+				emptyLabel={translator.textFn("No resources match this search.")}
+				key={`resources:${resourceIds.length}`}
+				label={translator.textFn("Link resource")}
 				value=""
 				includeResourceFn={includeResourceFn}
 				onChangeFn={(resourceId) => {

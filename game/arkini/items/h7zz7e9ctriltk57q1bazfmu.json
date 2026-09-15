@@ -5,7 +5,7 @@
 		"id": "recovering-cow",
 		"title": "Recovering Cow",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"recovering-cow"

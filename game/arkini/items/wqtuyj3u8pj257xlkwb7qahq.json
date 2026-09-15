@@ -5,7 +5,7 @@
 		"id": "sugar-beet",
 		"title": "Sugar Beet",
 		"description": "If you want sugar, start here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sugar-beet"

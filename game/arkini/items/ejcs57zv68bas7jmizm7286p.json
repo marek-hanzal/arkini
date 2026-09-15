@@ -5,7 +5,7 @@
 		"id": "labor-t1",
 		"title": "Labor - Tier 1",
 		"description": "Work needs labor tokens, here you go",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"labor-t1"

@@ -5,7 +5,7 @@
 		"id": "well-with-wine",
 		"title": "Well With Wine",
 		"description": "Wine for free",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-with-wine"

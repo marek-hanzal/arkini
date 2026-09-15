@@ -105,7 +105,6 @@ const runRefresh = async (
 		replaceResourceFx: () => Effect.die("Unexpected resource write."),
 		deleteItemFx: () => Effect.die("Unexpected item delete."),
 		upsertItemFx: () => Effect.die("Unexpected item write."),
-		upsertResourcesFx: () => Effect.die("Unexpected resources write."),
 	};
 	const unsaved = {
 		decideFn: async () => undefined,

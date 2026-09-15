@@ -11,14 +11,14 @@ describe("readProjectFormDestinationForPathFn", () => {
 			]),
 		).toEqual({
 			avatar: 3,
-			sectionId: "artwork",
+			sectionId: "images",
 		});
 		expect(
 			readProjectFormDestinationForPathFn([
 				"hero",
 			]),
 		).toEqual({
-			sectionId: "artwork",
+			sectionId: "images",
 		});
 	});
 });

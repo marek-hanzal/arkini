@@ -31,7 +31,7 @@ afterEach(async () => {
 
 describe("Game resource protocol", () => {
 	it("serves one installed file lazily and forwards media byte ranges", async () => {
-		const packageId = "package:audio";
+		const packageId = "package:image";
 		const contentHash = "a".repeat(64);
 		const installationRoot = join(
 			root,
@@ -49,8 +49,8 @@ describe("Game resource protocol", () => {
 				contentHash,
 				resources: [
 					{
-						id: "music:theme",
-						mime: "audio/ogg",
+						id: "image:hero",
+						type: "image",
 						path: "resources/000000",
 						size: 6,
 					},
@@ -72,7 +72,7 @@ describe("Game resource protocol", () => {
 				isTrustedUrlFn: () => true,
 			}),
 		);
-		const url = `arkini://app/game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${contentHash}&resourceId=${encodeURIComponent("music:theme")}`;
+		const url = `arkini://app/game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${contentHash}&resourceId=${encodeURIComponent("image:hero")}`;
 
 		const response = await Effect.runPromise(
 			protocol.handleRequestFx(
@@ -88,7 +88,7 @@ describe("Game resource protocol", () => {
 		expect(response.status).toBe(206);
 		expect(response.headers.get("Content-Range")).toBe("bytes 1-2/6");
 		expect(response.headers.get("Content-Length")).toBe("2");
-		expect(response.headers.get("Content-Type")).toBe("audio/ogg");
+		expect(response.headers.get("Content-Type")).toBe("image/png");
 		expect(response.headers.get("Access-Control-Allow-Origin")).toBe("arkini://app");
 		expect(response.headers.get("Vary")).toBe("Origin");
 		expect(await response.text()).toBe("bc");

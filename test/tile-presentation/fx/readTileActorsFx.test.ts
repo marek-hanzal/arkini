@@ -30,8 +30,8 @@ describe("readTileActorsFx", () => {
 
 		expect(empty).toMatchObject({
 			artworkScale: 0.625,
-			sourceUrl: "resource:asset:blueprint-base",
-			compositeUrl: "resource:asset:blueprint-overlay",
+			sourceUrl: "resource:artwork:blueprint-base",
+			compositeUrl: "resource:artwork:blueprint-overlay",
 		});
 	});
 

@@ -5,7 +5,7 @@
 		"id": "wine-mug",
 		"title": "Wine Mug",
 		"description": "You're a barbar!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wine-mug"

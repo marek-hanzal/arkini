@@ -5,7 +5,7 @@
 		"id": "clay-jug-with-beer",
 		"title": "Clay Jug With Beer",
 		"description": "Fresh beer",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-jug-with-beer"

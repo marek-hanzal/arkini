@@ -5,7 +5,7 @@
 		"id": "stone-deposit-deplated",
 		"title": "Once upon a time, here was stone",
 		"description": "Stone is no longer here, but you can use some tools to find a new deposit!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"stone-source-depleted"

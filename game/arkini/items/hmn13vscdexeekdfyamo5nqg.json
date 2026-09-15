@@ -5,7 +5,7 @@
 		"id": "bread-slices",
 		"title": "Bread Slices",
 		"description": "Yammi slices",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bread-slices"

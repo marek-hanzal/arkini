@@ -130,11 +130,11 @@ const ActiveWorkspaceProbe = () =>
 	);
 
 const createTestRouter = ({
-	assetsLoader,
+	artworkLoader,
 	dirty = false,
 	projectLoader,
 }: {
-	readonly assetsLoader?: () => Promise<void>;
+	readonly artworkLoader?: () => Promise<void>;
 	readonly dirty?: boolean;
 	readonly projectLoader?: () => Promise<void>;
 }) => {
@@ -154,7 +154,7 @@ const createTestRouter = ({
 				),
 			),
 	});
-	const route = (path: "assets" | "build" | "project", loader?: () => Promise<void>) =>
+	const route = (path: "artwork" | "build" | "project", loader?: () => Promise<void>) =>
 		createRoute({
 			getParentRoute: () => editorRoute,
 			path,
@@ -183,7 +183,7 @@ const createTestRouter = ({
 				component: () => createElement("p", null, "Main menu"),
 			}),
 			editorRoute.addChildren([
-				route("assets", assetsLoader),
+				route("artwork", artworkLoader),
 				route("build"),
 				route("project", projectLoader),
 				itemRoute,
@@ -290,9 +290,9 @@ describe("EditorShell", () => {
 
 	it("projects only the latest accepted destination during rapid navigation", async () => {
 		const project = gate();
-		const assets = gate();
+		const artwork = gate();
 		const router = createTestRouter({
-			assetsLoader: () => assets.promise,
+			artworkLoader: () => artwork.promise,
 			projectLoader: () => project.promise,
 		});
 		const { container } = await renderRouter(router);
@@ -306,25 +306,25 @@ describe("EditorShell", () => {
 				},
 			});
 		});
-		let assetsNavigation!: Promise<void>;
+		let artworkNavigation!: Promise<void>;
 		await act(async () => {
-			assetsNavigation = router.navigate({
-				to: "/editor/$projectId/assets",
+			artworkNavigation = router.navigate({
+				to: "/editor/$projectId/artwork",
 				params: {
 					projectId: "editor-test",
 				},
 			});
 		});
 
-		expect(readActiveWorkspace(container)).toBe("assets");
+		expect(readActiveWorkspace(container)).toBe("artwork");
 		await act(async () => {
-			assets.resolve();
-			await assetsNavigation;
+			artwork.resolve();
+			await artworkNavigation;
 			project.resolve();
 			await projectNavigation;
 		});
-		expect(router.state.location.pathname).toBe("/editor/editor-test/assets");
-		expect(readActiveWorkspace(container)).toBe("assets");
+		expect(router.state.location.pathname).toBe("/editor/editor-test/artwork");
+		expect(readActiveWorkspace(container)).toBe("artwork");
 	});
 
 	it("keeps Close usable after refresh rejects while exit is waiting for writes", async () => {

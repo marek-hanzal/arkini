@@ -5,7 +5,7 @@
 		"id": "water-mug",
 		"title": "Water Mug",
 		"description": "A mug. With a water. Really?!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"water-mug"

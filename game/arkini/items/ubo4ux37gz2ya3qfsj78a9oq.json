@@ -5,7 +5,7 @@
 		"id": "clutter",
 		"title": "Clutter",
 		"description": "Just broken stuff. You should take care of you clutter.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clutter"

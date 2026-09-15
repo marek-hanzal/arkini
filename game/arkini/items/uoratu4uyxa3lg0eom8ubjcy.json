@@ -5,7 +5,7 @@
 		"id": "sawmill-blueprint",
 		"title": "Sawmill Blueprint",
 		"description": "What about some stuff sawing other stuff?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

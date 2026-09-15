@@ -5,7 +5,7 @@
 		"id": "brewery-blueprint",
 		"title": "Brewery Blueprint",
 		"description": "We want beer! We want beer!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

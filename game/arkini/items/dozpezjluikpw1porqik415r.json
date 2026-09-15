@@ -5,7 +5,7 @@
 		"id": "forest-portal",
 		"title": "Forest Portal",
 		"description": "Gives you an access to the Forest Land",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"forest-portal"

@@ -5,7 +5,7 @@
 		"id": "wool",
 		"title": "Wool",
 		"description": "Winter is comming",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wool"

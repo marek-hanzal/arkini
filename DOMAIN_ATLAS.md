@@ -134,7 +134,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `authoring-shell` | Cross-product Editor shell and navigation | [`src/authoring-shell/ui/EditorShell.tsx`](src/authoring-shell/ui/EditorShell.tsx) |
 | `authoring-form` | Shared form registry and reference controls | [`src/authoring-form/ui/EditorForm.tsx`](src/authoring-form/ui/EditorForm.tsx) |
 | `editor-control` | Reusable Editor fields, sections, selection and search | [`src/editor-control/ui/EditorFormSection.tsx`](src/editor-control/ui/EditorFormSection.tsx) |
-| `asset-authoring` | Asset catalog, validation, edit/import/delete and UI | [`src/asset-authoring/ui/EditorAssetManager.tsx`](src/asset-authoring/ui/EditorAssetManager.tsx) |
+| `artwork-authoring` | Artwork catalog, square-PNG validation, edit/import/delete, Optimize and UI | [`src/artwork-authoring/ui/EditorArtworkManager.tsx`](src/artwork-authoring/ui/EditorArtworkManager.tsx) |
+| `resource-authoring` | Shared typed Resource import orchestration | [`src/resource-authoring/fx/importEditorResourcesFx.ts`](src/resource-authoring/fx/importEditorResourcesFx.ts) |
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |

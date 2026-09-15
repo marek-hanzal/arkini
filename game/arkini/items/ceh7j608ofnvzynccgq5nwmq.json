@@ -5,7 +5,7 @@
 		"id": "dye-field",
 		"title": "Dye Field",
 		"description": "Dye field. Da colors",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye-field"

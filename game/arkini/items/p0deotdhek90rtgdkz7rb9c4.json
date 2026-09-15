@@ -5,7 +5,7 @@
 		"id": "bread-basket",
 		"title": "Bread Basket",
 		"description": "Some fresh bread and stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bread-basket"

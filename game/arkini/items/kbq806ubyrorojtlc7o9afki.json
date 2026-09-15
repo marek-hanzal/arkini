@@ -5,7 +5,7 @@
 		"id": "flour",
 		"title": "Flour",
 		"description": "Bread?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"flour"

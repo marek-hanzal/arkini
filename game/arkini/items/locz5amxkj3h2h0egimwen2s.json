@@ -5,7 +5,7 @@
 		"id": "work-clothes",
 		"title": "Work Clothes",
 		"description": "You should go the the work",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"work-clothes"

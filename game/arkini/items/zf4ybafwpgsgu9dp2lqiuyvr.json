@@ -5,7 +5,7 @@
 		"id": "cutting-board-with-bread",
 		"title": "Cutting Board With Bread",
 		"description": "Bread",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cutting-board-with-bread"

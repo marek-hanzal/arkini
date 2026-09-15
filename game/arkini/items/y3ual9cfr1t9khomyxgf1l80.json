@@ -5,7 +5,7 @@
 		"id": "cauldron-with-coffee",
 		"title": "Cauldron With Coffee",
 		"description": "A lot of coffee",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-coffee"

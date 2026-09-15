@@ -6,7 +6,7 @@
 		"title": "Grain Farm Blueprint",
 		"draft": false,
 		"description": "Blueprint for Grain Farm. Usual boring stuff.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

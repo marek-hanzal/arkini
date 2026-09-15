@@ -69,7 +69,6 @@ const createFixture = () => {
 		replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 		deleteItemFx: () => Effect.die("Unexpected item delete."),
 		upsertItemFx,
-		upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 	};
 	return {
 		registry,

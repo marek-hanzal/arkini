@@ -5,7 +5,7 @@
 		"id": "cauldron-with-boiling-water",
 		"title": "Cauldron With Boiling Water",
 		"description": "Keep it hot",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-boiling-water"

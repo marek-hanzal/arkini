@@ -5,7 +5,7 @@
 		"id": "copper-ore",
 		"title": "Copper Ore",
 		"description": "It wanna became a Copper Ingot!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"copper-ore"

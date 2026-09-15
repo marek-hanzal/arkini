@@ -5,7 +5,7 @@
 		"id": "labor-t4",
 		"title": "Labor - Tier 4",
 		"description": "Masters of the Masters",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"labor-t4"

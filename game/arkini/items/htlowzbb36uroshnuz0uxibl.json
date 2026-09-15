@@ -5,7 +5,7 @@
 		"id": "glassworks",
 		"title": "Glassworks",
 		"description": "Be careful, it's a bit britle",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glassworks"

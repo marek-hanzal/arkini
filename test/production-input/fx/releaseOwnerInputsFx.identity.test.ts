@@ -14,10 +14,10 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 	id,
 	title: id,
 	description: id,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			`asset:${id}`,
+			`artwork:${id}`,
 		],
 	},
 	scope: "any" as const,

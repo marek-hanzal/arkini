@@ -5,7 +5,7 @@
 		"id": "spoiled-wine-barrel",
 		"title": "Spoiled Wine Barrel",
 		"description": "Too much archived vine",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-wine-barrel"

@@ -5,7 +5,7 @@
 		"id": "empty-grape-field",
 		"title": "Empty Grape Field",
 		"description": "Ready for another grape cycle.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-grape-field"

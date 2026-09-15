@@ -5,7 +5,7 @@
 		"id": "broken-toilet",
 		"title": "Broken Toilet",
 		"description": "It does not work anymore",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"broken-toilet"

@@ -5,7 +5,7 @@
 		"id": "steam-dye-workshop",
 		"title": "Steam Dye Workshop",
 		"description": "Dye",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"steam-dye-workshop"

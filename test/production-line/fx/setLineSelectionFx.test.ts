@@ -66,10 +66,10 @@ const config = GameConfigSchema.parse({
 
 			title: "Producer",
 			description: "Owns two lines.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer",
+					"artwork:producer",
 				],
 			},
 			scope: "board",
@@ -109,10 +109,10 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 
 				title: "Producer",
 				description: "Owns one line.",
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [
-						"asset:producer",
+						"artwork:producer",
 					],
 				},
 				scope: "any",
@@ -131,10 +131,10 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 
 				title: "Blocker",
 				description: "Blocks placement.",
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [
-						"asset:blocker",
+						"artwork:blocker",
 					],
 				},
 				scope: "any",

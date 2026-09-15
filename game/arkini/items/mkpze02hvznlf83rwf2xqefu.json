@@ -5,7 +5,7 @@
 		"id": "honeycomb",
 		"title": "Honeycomb",
 		"description": "Sweet stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"honeycomb"

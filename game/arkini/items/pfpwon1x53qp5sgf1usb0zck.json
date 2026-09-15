@@ -5,7 +5,7 @@
 		"id": "fertilized-rapeseed-field",
 		"title": "Fertilized Rapeseed Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fertilized-rapeseed-field"

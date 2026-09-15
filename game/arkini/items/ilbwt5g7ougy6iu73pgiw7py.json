@@ -5,7 +5,7 @@
 		"id": "homeland-portal",
 		"title": "Homeland Portal",
 		"description": "Somebody calls home!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"homeland-portal"

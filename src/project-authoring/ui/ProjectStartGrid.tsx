@@ -66,7 +66,7 @@ const ProjectStartGridCellContent = ({
 }: {
 	readonly empty?: ReactNode;
 	readonly quantity?: number;
-	readonly resourceIds: ItemSchema.Type["asset"]["default"] | undefined;
+	readonly resourceIds: ItemSchema.Type["artwork"]["default"] | undefined;
 }) => (
 	<>
 		{resourceIds === undefined ? (
@@ -190,7 +190,7 @@ const ProjectStartGridSlot = ({
 		<ProjectStartGridCellContent
 			empty={<Plus className="size-[15%] opacity-35" />}
 			quantity={cell?.quantity}
-			resourceIds={item?.asset.default}
+			resourceIds={item?.artwork.default}
 		/>
 	</button>
 );
@@ -270,7 +270,7 @@ const ProjectStartGridSurface = ({
 						const content = (
 							<ProjectStartGridCellContent
 								quantity={cell?.quantity}
-								resourceIds={item?.asset.default}
+								resourceIds={item?.artwork.default}
 							/>
 						);
 						return cell !== undefined &&
@@ -350,7 +350,7 @@ const ProjectStartGridDragPreview = ({
 	readonly cellSize: number;
 	readonly previewRef: RefObject<HTMLDivElement | null>;
 	readonly quantity: number;
-	readonly resourceIds: ItemSchema.Type["asset"]["default"];
+	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
 }) => (
 	<div
 		className="pointer-events-none fixed top-0 left-0 z-[90] grid [container-type:inline-size] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"
@@ -478,7 +478,7 @@ const ProjectStartGridEdit = ({
 					cellSize={dragVisual.cellSize}
 					previewRef={dragPreviewRef}
 					quantity={dragVisual.source.quantity}
-					resourceIds={items[dragVisual.source.itemId]?.asset.default ?? []}
+					resourceIds={items[dragVisual.source.itemId]?.artwork.default ?? []}
 				/>
 			)}
 		</>

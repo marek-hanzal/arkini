@@ -5,7 +5,7 @@
 		"id": "medicine-jar",
 		"title": "Medicine Jar",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"medicine-jar"

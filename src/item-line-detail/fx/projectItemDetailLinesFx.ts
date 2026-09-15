@@ -39,17 +39,17 @@ const projectOutputItemFx = Effect.fn("projectOutputItemFx")(function* ({
 				activeRuleHints: item.activeRuleHints,
 			} satisfies ItemDetailLinesProjection.OutputItem;
 		}
-		const sourceAssetIds = configured.asset.default;
+		const sourceArtworkIds = configured.artwork.default;
 		return {
 			itemId: item.itemId,
 			title: configured.title,
 			quantity: item.quantity,
 			activeRuleHints: item.activeRuleHints,
-			sourceUrl: game.getResourceUrlFn(sourceAssetIds[0]),
-			...(sourceAssetIds[1] === undefined
+			sourceUrl: game.getResourceUrlFn(sourceArtworkIds[0]),
+			...(sourceArtworkIds[1] === undefined
 				? {}
 				: {
-						compositeUrl: game.getResourceUrlFn(sourceAssetIds[1]),
+						compositeUrl: game.getResourceUrlFn(sourceArtworkIds[1]),
 					}),
 			definitionItemId: configured.id,
 		} satisfies ItemDetailLinesProjection.OutputItem;

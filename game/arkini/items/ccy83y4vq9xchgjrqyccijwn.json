@@ -5,7 +5,7 @@
 		"id": "linen-thread",
 		"title": "Linen Thread",
 		"description": "Something to make other things tangled.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"linen-thread"

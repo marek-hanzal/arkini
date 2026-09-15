@@ -5,7 +5,7 @@
 		"id": "magic-sawmill",
 		"title": "Magic Sawmill",
 		"description": "Magical wood",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"magic-sawmill"

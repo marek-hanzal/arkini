@@ -5,7 +5,7 @@
 		"id": "key-t5",
 		"title": "Key - Tier 5",
 		"description": "Cool key",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"key-t5"

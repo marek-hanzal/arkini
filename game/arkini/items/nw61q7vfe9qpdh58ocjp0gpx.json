@@ -5,7 +5,7 @@
 		"id": "foundation-chest",
 		"title": "Foundation Chest",
 		"description": "Initial stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"foundation-chest"

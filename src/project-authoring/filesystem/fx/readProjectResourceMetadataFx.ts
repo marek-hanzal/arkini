@@ -1,21 +1,23 @@
 import { Effect, FileSystem, Option } from "effect";
 
 import type { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 import { readProjectResourceVersionFn } from "../fn/readProjectResourceVersionFn";
 
 /** Reads a resource's cache identity without opening or decoding its PNG body. */
 export const readProjectResourceMetadataFx = Effect.fn("readProjectResourceMetadataFx")(function* (
 	resourceId: string,
+	type: ResourceTypeSchema.Type,
 	target: string,
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const stat = yield* fileSystem.stat(target);
 	if (stat.type !== "File")
-		return yield* Effect.fail(new Error(`Editor asset ${target} is not a file.`));
+		return yield* Effect.fail(new Error(`Editor resource ${target} is not a file.`));
 	const size = Number(stat.size);
 	return {
 		id: resourceId,
-		mime: "image/png",
+		type,
 		size,
 		version: readProjectResourceVersionFn({
 			size,

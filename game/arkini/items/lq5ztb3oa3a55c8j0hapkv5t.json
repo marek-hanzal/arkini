@@ -5,7 +5,7 @@
 		"id": "clay-mug-with-wine",
 		"title": "Clay Mug With Wine",
 		"description": "Another way to drink it",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug-with-wine"

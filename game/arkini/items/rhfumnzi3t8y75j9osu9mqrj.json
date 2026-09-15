@@ -5,7 +5,7 @@
 		"id": "spoiled-beer-barrel",
 		"title": "Spoiled Beer Barrel",
 		"description": "Beer Deluxe Edition",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-beer-barrel"

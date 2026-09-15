@@ -5,7 +5,7 @@
 		"id": "dirty-scrubbing-brush",
 		"title": "Dirty Scrubbing Brush",
 		"description": "No longer is able to clean up things",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dirty-scrubbing-brush"

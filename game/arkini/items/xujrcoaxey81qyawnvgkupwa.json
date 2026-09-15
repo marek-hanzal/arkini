@@ -5,7 +5,7 @@
 		"id": "spoiled-clay-mug",
 		"title": "Spoiled Clay Mug",
 		"description": "It's spoiled",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-clay-mug"

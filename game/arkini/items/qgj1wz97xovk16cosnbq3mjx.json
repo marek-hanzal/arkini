@@ -5,7 +5,7 @@
 		"id": "sack-with-popcorn",
 		"title": "Sack With Popcorn",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-popcorn"

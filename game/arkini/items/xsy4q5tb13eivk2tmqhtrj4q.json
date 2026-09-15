@@ -5,7 +5,7 @@
 		"id": "spoiled-animal-bones",
 		"title": "Spoiled Animal Bones",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-animal-bones"

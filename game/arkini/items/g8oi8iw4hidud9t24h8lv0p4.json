@@ -5,7 +5,7 @@
 		"id": "animal-fat",
 		"title": "Animal Fat",
 		"description": "Fat",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"animal-fat"

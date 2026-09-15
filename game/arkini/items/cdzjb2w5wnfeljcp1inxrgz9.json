@@ -5,7 +5,7 @@
 		"id": "plague",
 		"title": "Plague",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"plague"

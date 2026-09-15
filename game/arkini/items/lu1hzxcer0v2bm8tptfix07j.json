@@ -5,7 +5,7 @@
 		"id": "bathhouse",
 		"title": "Bathhouse",
 		"description": "Luxury bathing.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bathhouse"

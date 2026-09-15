@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { Effect, FileSystem, Path } from "effect";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { ArkiniProtocolError } from "../protocol/ArkiniProtocolError";
+import { readResourceContentTypeFn } from "~/game-config-resource/fn/readResourceContentTypeFn";
 
 export namespace createEditorResourceProtocolFx {
 	export interface Props {
@@ -94,7 +95,7 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 						catch: unavailableFn,
 					});
 					const headers = new Headers(response.headers);
-					headers.set("Content-Type", "image/png");
+					headers.set("Content-Type", readResourceContentTypeFn(location.type));
 					if (!headers.has("Content-Length"))
 						headers.set("Content-Length", String(Number(stat.size)));
 					headers.set("Cache-Control", "no-store");

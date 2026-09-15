@@ -38,7 +38,6 @@ const createRepository = (
 	replaceConfigFx: () => Effect.die("Unexpected config replacement."),
 	replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 	upsertItemFx: () => Effect.die("Unexpected item upsert."),
-	upsertResourcesFx: () => Effect.die("Unexpected resource upsert."),
 });
 
 describe("openEditorArkpackFx", () => {

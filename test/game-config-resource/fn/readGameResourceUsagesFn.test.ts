@@ -8,6 +8,7 @@ describe("readGameResourceUsagesFn", () => {
 		expect(readGameResourceUsagesFn(editorTestConfig)).toEqual([
 			{
 				resourceId: "hero",
+				resourceType: "image",
 				owner: "project",
 				ownerLabel: "Project",
 				roleLabel: "Hero",
@@ -18,6 +19,7 @@ describe("readGameResourceUsagesFn", () => {
 			},
 			{
 				resourceId: "item-water",
+				resourceType: "artwork",
 				owner: "item",
 				ownerId: "water",
 				ownerUid: "water",
@@ -26,7 +28,7 @@ describe("readGameResourceUsagesFn", () => {
 				path: [
 					"items",
 					"water",
-					"asset",
+					"artwork",
 					"default",
 					0,
 				],

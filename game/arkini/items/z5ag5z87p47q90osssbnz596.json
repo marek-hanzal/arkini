@@ -5,7 +5,7 @@
 		"id": "linen-sewing-kit",
 		"title": "Linen Sewing Kit",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"linen-sewing-kit"

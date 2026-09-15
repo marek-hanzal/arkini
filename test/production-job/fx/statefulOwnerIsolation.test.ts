@@ -35,10 +35,10 @@ const config = GameConfigSchema.parse({
 			id: "producer",
 			title: "Producer",
 			description: "Producer",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer",
+					"artwork:producer",
 				],
 			},
 			scope: "any",
@@ -101,10 +101,10 @@ const config = GameConfigSchema.parse({
 			id: "limited",
 			title: "Limited",
 			description: "Limited",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:limited",
+					"artwork:limited",
 				],
 			},
 			scope: "board",
@@ -119,10 +119,10 @@ const config = GameConfigSchema.parse({
 			id: "blocker",
 			title: "Blocker",
 			description: "Blocker",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:blocker",
+					"artwork:blocker",
 				],
 			},
 			scope: "any",

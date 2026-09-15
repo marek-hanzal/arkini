@@ -5,7 +5,7 @@
 		"id": "spoiled-herbs",
 		"title": "Spoiled Herbs",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-herbs"

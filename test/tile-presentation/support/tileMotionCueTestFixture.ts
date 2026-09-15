@@ -58,10 +58,10 @@ const config = GameConfigSchema.parse({
 
 			title: "Water",
 			description: "Water",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:water",
+					"artwork:water",
 				],
 			},
 			scope: "any",
@@ -77,10 +77,10 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 1,
 			title: "Inventory",
 			description: "Inventory",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:inventory",
+					"artwork:inventory",
 				],
 			},
 		},

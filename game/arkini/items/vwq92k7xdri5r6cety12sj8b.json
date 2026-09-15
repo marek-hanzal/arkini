@@ -5,7 +5,7 @@
 		"id": "glass-goblet-with-beer",
 		"title": "Glass Goblet with Beer",
 		"description": "Disgusting",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"glass-goblet-with-beer"

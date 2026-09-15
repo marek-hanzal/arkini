@@ -5,7 +5,7 @@
 		"id": "apiary",
 		"title": "Apiary",
 		"description": "Bees",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"apiary"

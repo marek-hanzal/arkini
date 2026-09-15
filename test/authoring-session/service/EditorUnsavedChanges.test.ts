@@ -17,7 +17,7 @@ describe("EditorUnsavedChanges", () => {
 		owner.registerFn("item", createSession());
 
 		await expect(owner.requestLeaveFn("/editor/project/item/form/artwork")).resolves.toBe(true);
-		const leaving = owner.requestLeaveFn("/editor/project/assets");
+		const leaving = owner.requestLeaveFn("/editor/project/artwork");
 		await vi.waitFor(() => expect(owner.getSnapshotFn().promptOpen).toBe(true));
 		expect(owner.getSnapshotFn().promptOpen).toBe(true);
 		await owner.decideFn("cancel");
@@ -69,7 +69,7 @@ describe("EditorUnsavedChanges", () => {
 		);
 		owner.registerFn("item", session);
 
-		const firstLeave = owner.requestLeaveFn("/editor/project/assets");
+		const firstLeave = owner.requestLeaveFn("/editor/project/artwork");
 		await vi.waitFor(() => expect(owner.getSnapshotFn().promptOpen).toBe(true));
 		const saving = owner.decideFn("save");
 		await Promise.resolve();
@@ -95,7 +95,7 @@ describe("EditorUnsavedChanges", () => {
 		const owner = Effect.runSync(createEditorUnsavedChangesOwnerFx());
 		const validated = Effect.runSync(Deferred.make<boolean>());
 		const session = createSession();
-		const unregister = owner.registerFn("asset", {
+		const unregister = owner.registerFn("artwork", {
 			...session,
 			isValidFn: () => Effect.runPromise(Deferred.await(validated)),
 		});

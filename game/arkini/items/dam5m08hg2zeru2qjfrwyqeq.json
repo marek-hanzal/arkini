@@ -5,7 +5,7 @@
 		"id": "sick-pig",
 		"title": "Sick Pig",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sick-pig"

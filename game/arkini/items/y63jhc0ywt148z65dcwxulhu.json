@@ -5,7 +5,7 @@
 		"id": "toilet-golem",
 		"title": "Toilet Golem",
 		"description": "This is real danger",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"toilet-golem"

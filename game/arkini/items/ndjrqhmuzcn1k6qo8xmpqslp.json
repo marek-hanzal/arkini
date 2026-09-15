@@ -5,7 +5,7 @@
 		"id": "beeswax",
 		"title": "Beeswax",
 		"description": "Candles are created using this",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"beeswax"

@@ -5,7 +5,7 @@
 		"id": "axe",
 		"title": "Axe",
 		"description": "Chop something down?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"axe"

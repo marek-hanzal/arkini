@@ -5,7 +5,7 @@
 		"id": "wooden-hot-chocolate",
 		"title": "Wooden Hot Chocolate",
 		"description": "Wooden chocolate",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wooden-hot-chocolate"

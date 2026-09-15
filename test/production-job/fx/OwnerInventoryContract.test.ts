@@ -35,10 +35,10 @@ const createInventoryOpenerJobConfig = () => {
 				maxStackSize: 1,
 				title: "Backpack",
 				description: "Stores items.",
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [
-						"asset:backpack",
+						"artwork:backpack",
 					],
 				},
 			},

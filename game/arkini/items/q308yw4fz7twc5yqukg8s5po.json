@@ -5,7 +5,7 @@
 		"id": "clay-jug-with-water",
 		"title": "Clay Jug With Water",
 		"description": "Another day, another water",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-jug-with-water"

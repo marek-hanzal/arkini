@@ -5,7 +5,7 @@
 		"id": "water-jar",
 		"title": "Water Jar",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"water-jar"

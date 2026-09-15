@@ -5,7 +5,7 @@
 		"id": "lantern",
 		"title": "Lantern",
 		"description": "Better light source",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"lantern"

@@ -5,7 +5,7 @@
 		"id": "cauldron-with-milk",
 		"title": "Cauldron With Milk",
 		"description": "A lot of milk",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-milk"

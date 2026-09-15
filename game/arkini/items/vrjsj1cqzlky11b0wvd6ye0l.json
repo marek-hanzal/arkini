@@ -5,7 +5,7 @@
 		"id": "lumer-camp",
 		"title": "Lumber camp",
 		"description": "That place you get wood from. You need this one.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"lumber-camp"

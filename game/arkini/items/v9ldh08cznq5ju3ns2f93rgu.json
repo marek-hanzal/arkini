@@ -5,7 +5,7 @@
 		"id": "spoiled-butter",
 		"title": "Spoiled Butter",
 		"description": "You don't want this on your bread",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-butter"

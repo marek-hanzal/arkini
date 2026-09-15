@@ -5,7 +5,7 @@
 		"id": "sack-with-coffee",
 		"title": "Sack With Coffee",
 		"description": "You'd better drink it yourself",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-coffee"

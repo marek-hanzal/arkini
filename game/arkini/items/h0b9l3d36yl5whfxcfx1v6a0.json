@@ -5,7 +5,7 @@
 		"id": "piggy-bank",
 		"title": "Piggy Bank",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"piggy-bank"

@@ -5,7 +5,7 @@
 		"id": "cotton-field",
 		"title": "Cotton Field",
 		"description": "Grows cotton",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton-field"

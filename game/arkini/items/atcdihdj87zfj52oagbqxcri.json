@@ -5,7 +5,7 @@
 		"id": "empty-herb-garden",
 		"title": "Empty Herb Garden",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-herb-garden"

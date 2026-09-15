@@ -5,7 +5,7 @@
 		"id": "house-of-engineers",
 		"title": "House Of Engineers",
 		"description": "Your mechanical journey starts here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"house-of-engineers"

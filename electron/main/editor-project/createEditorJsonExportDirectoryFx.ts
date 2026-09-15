@@ -20,8 +20,8 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 		"game.json",
 	];
 	for (const directory of [
-		"assets",
-		"resources",
+		"artwork",
+		"image",
 		"notes",
 		"items",
 	]) {

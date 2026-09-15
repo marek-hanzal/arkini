@@ -5,7 +5,7 @@
 		"id": "pralines",
 		"title": "Pralines",
 		"description": "So tasty",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pralines"

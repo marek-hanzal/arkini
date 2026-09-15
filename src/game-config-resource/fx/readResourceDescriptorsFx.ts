@@ -10,7 +10,7 @@ export namespace readResourceDescriptorsFx {
 	}
 }
 
-/** Reads exact PNG resource identities from filename basenames without mapping magic. */
+/** Reads exact typed resource identities from their canonical source directories. */
 export const readResourceDescriptorsFx = Effect.fn("readResourceDescriptorsFx")(function* ({
 	input,
 }: readResourceDescriptorsFx.Props) {
@@ -19,13 +19,12 @@ export const readResourceDescriptorsFx = Effect.fn("readResourceDescriptorsFx")(
 		input,
 	});
 
-	return files.png.map((resourcePath) => {
-		const relative = path.relative(files.root, resourcePath).replaceAll("\\", "/");
+	return files.resources.map((resource) => {
+		const resourcePath = resource.path;
 		return {
 			id: path.basename(resourcePath, path.extname(resourcePath)),
-			kind: relative.startsWith("assets/") ? "asset" : "resource",
+			type: resource.type,
 			path: resourcePath,
-			mime: "image/png",
 		} satisfies ResourceDescriptorSchema.Type;
 	});
 });

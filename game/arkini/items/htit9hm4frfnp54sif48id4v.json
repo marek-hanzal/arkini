@@ -5,7 +5,7 @@
 		"id": "key-t6",
 		"title": "Key - Tier 6",
 		"description": "Master key of Life and Death. Just kidding, it's a key, just nicer.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"key-t6"

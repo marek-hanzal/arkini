@@ -5,7 +5,7 @@
 		"id": "air-pollution",
 		"title": "Air Pollution",
 		"description": "Ugly thing, it will disappear by itself, but you can also clear it by yourself.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"air-pollution"

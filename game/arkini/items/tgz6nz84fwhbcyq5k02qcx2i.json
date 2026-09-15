@@ -5,7 +5,7 @@
 		"id": "goose",
 		"title": "Goose",
 		"description": "Beloved lifestock",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"goose"

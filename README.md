@@ -1,10 +1,10 @@
 # Arkini
 
 <p align="center">
-  <img src="game/arkini/resources/hero.png" alt="Arkini logo with winged unicorns and magical machinery" width="100%" />
+  <img src="game/arkini/image/hero.png" alt="Arkini logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Assets. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results and complete step details as readable text through `item_chain({ itemId })`.
+Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Artwork. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results and complete step details as readable text through `item_chain({ itemId })`.
 
 ## Start here
 

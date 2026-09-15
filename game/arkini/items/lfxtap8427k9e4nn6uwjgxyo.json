@@ -5,7 +5,7 @@
 		"id": "wolf",
 		"title": "Wolf",
 		"description": "He is dangerous. But he may walk away",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wolf"

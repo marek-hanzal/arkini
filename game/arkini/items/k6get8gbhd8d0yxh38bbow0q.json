@@ -5,7 +5,7 @@
 		"id": "clay-bowl-with-milk",
 		"title": "Clay Bowl With Milk",
 		"description": "Milk",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-bowl-with-milk"

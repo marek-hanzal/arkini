@@ -5,7 +5,7 @@
 		"id": "cacao-pod",
 		"title": "Cacao Pod",
 		"description": "You shall Cocoa!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cacao-pod"

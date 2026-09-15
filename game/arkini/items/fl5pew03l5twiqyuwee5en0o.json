@@ -5,7 +5,7 @@
 		"id": "wool-cloth",
 		"title": "Wool Cloth",
 		"description": "It's warm",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wool-cloth"

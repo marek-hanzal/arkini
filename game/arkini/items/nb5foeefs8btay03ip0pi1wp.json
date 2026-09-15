@@ -5,7 +5,7 @@
 		"id": "sack-with-wine",
 		"title": "Sack With Wine",
 		"description": "True blood, oh, true wine",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-wine"

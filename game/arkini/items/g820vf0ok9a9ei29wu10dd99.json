@@ -5,7 +5,7 @@
 		"id": "knowledge-t4",
 		"title": "Knowledge - Tier 4",
 		"description": "Master knowledge of the topic",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"knowledge-t4"

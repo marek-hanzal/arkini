@@ -36,10 +36,10 @@ const config = GameConfigSchema.parse({
 			id: "source",
 			title: "Source",
 			description: "Reusable source.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:source",
+					"artwork:source",
 				],
 			},
 			scope: "any",
@@ -64,10 +64,10 @@ const config = GameConfigSchema.parse({
 			id: "target",
 			title: "Target",
 			description: "Remote explicit target.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:target",
+					"artwork:target",
 				],
 			},
 			scope: "board",

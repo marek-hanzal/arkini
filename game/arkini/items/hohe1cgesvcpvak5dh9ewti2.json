@@ -5,7 +5,7 @@
 		"id": "hide",
 		"title": "Hide",
 		"description": "Raw stuff to make a nice leather",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hide"

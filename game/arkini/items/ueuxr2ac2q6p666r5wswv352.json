@@ -5,7 +5,7 @@
 		"id": "well-fed-sarka",
 		"title": "Well Fed Sarka",
 		"description": "Fully belly",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-fed-sarka"

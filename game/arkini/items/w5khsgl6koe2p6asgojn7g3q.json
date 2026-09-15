@@ -5,7 +5,7 @@
 		"id": "pot",
 		"title": "Pot",
 		"description": "You can put something in there",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pot"

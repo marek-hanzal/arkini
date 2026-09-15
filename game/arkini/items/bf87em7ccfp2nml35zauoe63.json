@@ -5,10 +5,10 @@
 		"id": "toy-sheep",
 		"title": "Toy Sheep",
 		"description": "It get lost, a lot of times",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
-				"avatar-07"
+				"toy-sheep"
 			]
 		},
 		"scope": "board",

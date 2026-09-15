@@ -5,7 +5,7 @@
 		"id": "sick-bear",
 		"title": "Sick Bear",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sick-bear"

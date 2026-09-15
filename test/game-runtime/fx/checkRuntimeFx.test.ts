@@ -37,10 +37,10 @@ const config = GameConfigSchema.parse({
 			id: "any",
 			title: "Any item",
 			description: "May occupy any grid.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:any",
+					"artwork:any",
 				],
 			},
 			scope: "any",
@@ -54,10 +54,10 @@ const config = GameConfigSchema.parse({
 			id: "limited",
 			title: "Limited item",
 			description: "Has count and stack limits.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:limited",
+					"artwork:limited",
 				],
 			},
 			scope: "any",
@@ -72,10 +72,10 @@ const config = GameConfigSchema.parse({
 			id: "board",
 			title: "Board item",
 			description: "May occupy only the board.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:board",
+					"artwork:board",
 				],
 			},
 			scope: "board",

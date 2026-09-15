@@ -5,7 +5,7 @@
 		"id": "dynamite-sticks",
 		"title": "Dynamite Sticks",
 		"description": "Boom",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dynamite-sticks"

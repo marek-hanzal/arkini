@@ -5,7 +5,7 @@
 		"id": "sapphire",
 		"title": "Sapphire",
 		"description": "You're rich now!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sapphire"

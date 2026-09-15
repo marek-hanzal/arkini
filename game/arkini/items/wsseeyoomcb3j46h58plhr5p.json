@@ -5,7 +5,7 @@
 		"id": "vegetables",
 		"title": "Vegetables",
 		"description": "Fresh vegetables you want to eat",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"vegetable-crate"

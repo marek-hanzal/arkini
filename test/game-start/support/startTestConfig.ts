@@ -17,10 +17,10 @@ const simpleItem = ({
 		id,
 		title: id,
 		description: id,
-		asset: {
+		artwork: {
 			scale: 0.8,
 			default: [
-				`asset:${id}`,
+				`artwork:${id}`,
 			],
 		},
 		scope,
@@ -101,10 +101,10 @@ export const startTestConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:backpack",
+					"artwork:backpack",
 				],
 			},
 		},

@@ -5,7 +5,7 @@
 		"id": "marble-block",
 		"title": "Marble Block",
 		"description": "Nicer marble stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"marble-block"

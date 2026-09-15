@@ -22,7 +22,6 @@ const createRepository = (
 	replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 	deleteItemFx: () => Effect.die("Unexpected item delete."),
 	upsertItemFx: () => Effect.die("Unexpected item save."),
-	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 });
 
 beforeEach(() => {
@@ -48,9 +47,9 @@ describe("createFreshProjectFx", () => {
 					updatedAtMs: 100,
 					revision: 0,
 					config,
-					resources: resources.map(({ id, mime, bytes }) => ({
+					resources: resources.map(({ id, type, bytes }) => ({
 						id,
-						mime,
+						type,
 						size: bytes.byteLength,
 						version: "1",
 					})),
@@ -107,7 +106,7 @@ describe("createFreshProjectFx", () => {
 		);
 		expect(project.resources[0]).toMatchObject({
 			id: "hero",
-			mime: "image/png",
+			type: "image",
 		});
 		expect(createProjectFx.mock.calls[0]?.[0].resources[0]?.bytes.slice(0, 8)).toEqual(
 			Uint8Array.from([

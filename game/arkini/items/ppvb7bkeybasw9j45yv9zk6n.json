@@ -5,7 +5,7 @@
 		"id": "bed-t1",
 		"title": "Bed - Tier 1",
 		"description": "Simple, but comfortable bed",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bed-t1"

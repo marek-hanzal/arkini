@@ -55,11 +55,6 @@ export namespace ProjectRepository {
 		readonly resource: ProjectResourceReplacementSchema.Type;
 	}
 
-	export interface UpsertResourcesProps {
-		readonly projectId: string;
-		readonly resources: ReadonlyArray<ResourceSchema.Type>;
-	}
-
 	export interface OptimizeResourcesProps {
 		readonly expectedRevision: number;
 		readonly onProgressFn?: (progress: OptimizeResourcesProgress) => void;
@@ -149,9 +144,6 @@ export interface ProjectRepositoryService {
 	readonly upsertItemFx: (
 		props: ProjectRepository.UpsertItemProps,
 	) => Effect.Effect<ProjectCommit, ProjectRepositoryError, never>;
-	readonly upsertResourcesFx: (
-		props: ProjectRepository.UpsertResourcesProps,
-	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly updateNoteFx: (
 		props: ProjectRepository.UpdateNoteProps,
 	) => Effect.Effect<NoteSchema.Type, ProjectRepositoryError, never>;

@@ -5,7 +5,7 @@
 		"id": "beer-barrel",
 		"title": "Beer Barrel",
 		"description": "Beer source",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"beer-barrel"

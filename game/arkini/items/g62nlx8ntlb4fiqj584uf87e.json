@@ -5,7 +5,7 @@
 		"id": "cotton-sewing-kit",
 		"title": "Cotton Sewing Kit",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton-sewing-kit"

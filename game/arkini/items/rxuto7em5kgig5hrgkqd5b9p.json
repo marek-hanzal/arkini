@@ -5,7 +5,7 @@
 		"id": "empty-basket",
 		"title": "Empty Basket",
 		"description": "Just basket",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-basket"

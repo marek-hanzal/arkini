@@ -5,7 +5,7 @@
 		"id": "herb-garden",
 		"title": "Herb Garden",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"herb-garden"

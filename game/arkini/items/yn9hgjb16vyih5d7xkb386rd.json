@@ -5,7 +5,7 @@
 		"id": "beer-bath",
 		"title": "Beer Bath",
 		"description": "Beer bath",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"beer-bath"

@@ -54,10 +54,10 @@ const config = GameConfigSchema.parse({
 
 			title: "Producer",
 			description: "Produces resources.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:producer",
+					"artwork:producer",
 				],
 			},
 			scope: "board",
@@ -88,10 +88,10 @@ const config = GameConfigSchema.parse({
 
 			title: "Resource",
 			description: "One resource.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:resource",
+					"artwork:resource",
 				],
 			},
 			scope: "any",
@@ -107,10 +107,10 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 1,
 			title: "Satchel",
 			description: "Opens the shared inventory.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:satchel",
+					"artwork:satchel",
 				],
 			},
 		},

@@ -5,7 +5,7 @@
 		"id": "mouse-full-belly",
 		"title": "Mouse Full Belly",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"mouse-full-belly"

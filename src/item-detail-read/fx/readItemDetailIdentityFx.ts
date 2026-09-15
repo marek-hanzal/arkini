@@ -41,6 +41,6 @@ export const readItemDetailIdentityFx = Effect.fn("readItemDetailIdentityFx")(fu
 		definitionId: item.item.id,
 		itemId: item.id,
 		title: item.item.title,
-		sourceResourceIds: item.item.asset.default,
+		sourceResourceIds: item.item.artwork.default,
 	} satisfies readItemDetailIdentityFx.Result;
 });

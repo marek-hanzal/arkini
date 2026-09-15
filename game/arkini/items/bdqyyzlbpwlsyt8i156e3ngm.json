@@ -5,7 +5,7 @@
 		"id": "well-with-beer",
 		"title": "Well With Beer",
 		"description": "Source of beer, if you want",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-with-beer"

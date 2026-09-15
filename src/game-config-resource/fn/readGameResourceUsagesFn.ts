@@ -7,6 +7,7 @@ export namespace readGameResourceUsagesFn {
 	export type Usage =
 		| {
 				readonly resourceId: string;
+				readonly resourceType: "image";
 				readonly owner: "project";
 				readonly ownerLabel: "Project";
 				readonly roleLabel: string;
@@ -14,6 +15,7 @@ export namespace readGameResourceUsagesFn {
 		  }
 		| {
 				readonly resourceId: string;
+				readonly resourceType: "artwork";
 				readonly owner: "item";
 				readonly ownerId: string;
 				readonly ownerUid: string;
@@ -68,6 +70,7 @@ export const readGameResourceUsagesFn = (
 		if (resourceId === undefined) continue;
 		usages.push({
 			resourceId,
+			resourceType: "image",
 			owner: "project",
 			ownerLabel: "Project",
 			roleLabel: role.label,
@@ -80,9 +83,10 @@ export const readGameResourceUsagesFn = (
 	for (const [itemId, item] of Object.entries(config.items).sort(([left], [right]) =>
 		Order.String(left, right),
 	)) {
-		item.asset.default.forEach((resourceId, index) => {
+		item.artwork.default.forEach((resourceId, index) => {
 			usages.push({
 				resourceId,
+				resourceType: "artwork",
 				owner: "item",
 				ownerId: itemId,
 				ownerUid: item.uid,
@@ -91,7 +95,7 @@ export const readGameResourceUsagesFn = (
 				path: [
 					"items",
 					itemId,
-					"asset",
+					"artwork",
 					"default",
 					index,
 				],

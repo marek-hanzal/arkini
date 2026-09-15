@@ -5,7 +5,7 @@
 		"id": "clay-camp",
 		"title": "Clay Camp",
 		"description": "Gives you a clay",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-camp"

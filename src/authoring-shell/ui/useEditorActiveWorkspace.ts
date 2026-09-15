@@ -27,12 +27,12 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/editor/items/list",
 	},
 	{
-		id: "assets",
+		id: "artwork",
 		icon: Images,
-		label: "Assets",
-		matchTo: "/editor/$projectId/assets",
+		label: "Artwork",
+		matchTo: "/editor/$projectId/artwork",
 		shortcut: "Mod+Shift+A",
-		to: "/editor/$projectId/assets",
+		to: "/editor/$projectId/artwork",
 	},
 	{
 		id: "board",

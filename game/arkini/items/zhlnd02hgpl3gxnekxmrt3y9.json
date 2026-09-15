@@ -5,7 +5,7 @@
 		"id": "sack-with-beer",
 		"title": "Sack With Beer",
 		"description": "Oh god...",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-beer"

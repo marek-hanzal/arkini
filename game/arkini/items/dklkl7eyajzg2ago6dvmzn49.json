@@ -5,7 +5,7 @@
 		"id": "spoiled-cauldron",
 		"title": "Spoiled Cauldron",
 		"description": "Bada-fuj",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-cauldron"

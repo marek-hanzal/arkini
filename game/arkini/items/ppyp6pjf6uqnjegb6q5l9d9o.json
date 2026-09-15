@@ -5,7 +5,7 @@
 		"id": "cotton",
 		"title": "Cotton",
 		"description": "Fluffy",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton"

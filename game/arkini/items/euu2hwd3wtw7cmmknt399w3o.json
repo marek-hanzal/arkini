@@ -5,10 +5,10 @@
 		"id": "toy-sloth",
 		"title": "Toy Sloth",
 		"description": "This one gets lost too",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
-				"avatar-06"
+				"toy-sloth"
 			]
 		},
 		"scope": "board",

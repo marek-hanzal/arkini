@@ -5,7 +5,7 @@
 		"id": "brewery",
 		"title": "Brewery",
 		"description": "Wanna some cold beer?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"brewery"

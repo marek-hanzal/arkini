@@ -5,7 +5,7 @@
 		"id": "animal-bones",
 		"title": "Animal Bones",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"animal-bones"

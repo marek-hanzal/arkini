@@ -382,9 +382,9 @@
 					"maxItems": 2
 				}
 			],
-			"description": "A one- or two-layer visual asset composition in back-to-front order."
+			"description": "A one- or two-layer Artwork composition in back-to-front order."
 		},
-		"AssetSchema": {
+		"ArtworkSchema": {
 			"type": "object",
 			"properties": {
 				"scale": {
@@ -403,7 +403,7 @@
 				"default"
 			],
 			"additionalProperties": false,
-			"description": "The visual asset definition for a game item."
+			"description": "The visual artwork definition for a game item."
 		},
 		"scope.StorageSchema": {
 			"type": "string",
@@ -1841,9 +1841,9 @@
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
 				},
-				"asset": {
-					"description": "The visual asset definition used to render this item.",
-					"$ref": "urn:arkini:schema:project#/$defs/AssetSchema"
+				"artwork": {
+					"description": "The visual artwork definition used to render this item.",
+					"$ref": "urn:arkini:schema:project#/$defs/ArtworkSchema"
 				},
 				"scope": {
 					"description": "The part of game state in which this item may be stored.",
@@ -1907,7 +1907,7 @@
 				"uid",
 				"id",
 				"title",
-				"asset",
+				"artwork",
 				"scope",
 				"maxStackSize",
 				"maxQueueSize",

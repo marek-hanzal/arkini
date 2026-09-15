@@ -47,10 +47,10 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 
 					title: "Workshop",
 					description: "Produces grouped output.",
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [
-							"asset:workshop",
+							"artwork:workshop",
 						],
 					},
 					scope: "board",
@@ -142,10 +142,10 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 
 					title: "Wood",
 					description: "Wood.",
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [
-							"asset:wood",
+							"artwork:wood",
 						],
 					},
 					scope: "any",
@@ -160,10 +160,10 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 
 					title: "Gem",
 					description: "Gem.",
-					asset: {
+					artwork: {
 						scale: 0.8,
 						default: [
-							"asset:gem",
+							"artwork:gem",
 						],
 					},
 					scope: "any",

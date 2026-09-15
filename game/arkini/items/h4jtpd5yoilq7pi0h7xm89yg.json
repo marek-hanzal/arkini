@@ -5,7 +5,7 @@
 		"id": "goose-quill",
 		"title": "Goose Quill",
 		"description": "Time for school",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"goose-quill"

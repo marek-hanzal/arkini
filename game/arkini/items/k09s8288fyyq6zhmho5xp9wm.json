@@ -5,7 +5,7 @@
 		"id": "townhall-t1",
 		"title": "Townhall I",
 		"description": "Better village management, really.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"townhall-t1"

@@ -1,11 +1,12 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { ResourceTypeSchema } from "./ResourceTypeSchema";
 
 export const ResourceSchema = z
 	.object({
 		id: IdSchema.describe("The stable resource identifier."),
-		mime: z.literal("image/png").describe("The fixed MIME type of Arkini resources."),
+		type: ResourceTypeSchema.describe("The semantic resource kind."),
 		bytes: z
 			.custom<Uint8Array>((value) => value instanceof Uint8Array)
 			.describe("The raw resource bytes."),
@@ -13,7 +14,7 @@ export const ResourceSchema = z
 	.strict()
 	.meta({
 		id: "ResourceSchema",
-		description: "One binary resource embedded in a game pack.",
+		description: "One typed binary resource embedded in a game pack.",
 	});
 
 export type ResourceSchema = typeof ResourceSchema;

@@ -42,7 +42,7 @@ const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 	});
 
 	yield* Console.log(`Building Arkpack v${result.version}.`);
-	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
+	yield* Console.log(`Packed ${result.json} JSON sources and ${result.resources} resources.`);
 	yield* Console.log(`Wrote ${result.arkpack} (${result.bytes} bytes).`);
 	if (process.env.ARKINI_RELEASE_SIGN === "1") {
 		const signedBytes = yield* signArkpackFileFx({

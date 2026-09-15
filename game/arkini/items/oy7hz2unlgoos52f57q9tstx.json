@@ -5,7 +5,7 @@
 		"id": "milk-mug",
 		"title": "Milk Mug",
 		"description": "Innocent mug of milk. Or foam on top of beer you can mask",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"milk-mug"

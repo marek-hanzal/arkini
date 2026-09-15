@@ -6,6 +6,7 @@ export const DiagnosticCodeEnumSchema = z
 		SourceJsonInvalid: "source:json-invalid",
 		ResourceDuplicate: "resource:duplicate",
 		ResourceMissing: "resource:missing",
+		ResourceTypeMismatch: "resource:type-mismatch",
 		SourceDuplicateRecord: "source:duplicate-record",
 		StartInvalid: "start:invalid",
 		ResourceUnused: "resource:unused",

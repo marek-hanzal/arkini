@@ -5,7 +5,7 @@
 		"id": "composting-workshop",
 		"title": "Composting Workshop",
 		"description": "Clean things up",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"composting-workshop"

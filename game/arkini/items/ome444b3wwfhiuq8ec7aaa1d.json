@@ -5,7 +5,7 @@
 		"id": "arkini-banknote",
 		"title": "Arkini Banknote",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"arkini-banknote"

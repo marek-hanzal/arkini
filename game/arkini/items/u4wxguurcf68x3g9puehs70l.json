@@ -5,7 +5,7 @@
 		"id": "clay-mug-with-water",
 		"title": "Clay Mug With Water",
 		"description": "Drinkable",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug-with-water"

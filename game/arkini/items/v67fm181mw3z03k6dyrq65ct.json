@@ -5,7 +5,7 @@
 		"id": "yarn",
 		"title": "Yarn",
 		"description": "Tangled.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"yarn"

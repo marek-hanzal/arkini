@@ -77,12 +77,12 @@ export const useItemDetailNavigationController = ({
 							ownerItemId: source.ownerItemId,
 							ownerDefinitionItemId: source.ownerDefinitionItemId,
 							title: configured.title,
-							sourceUrl: game.getResourceUrlFn(owner.item.asset.default[0]),
-							...(configured.asset.default[1] === undefined
+							sourceUrl: game.getResourceUrlFn(owner.item.artwork.default[0]),
+							...(configured.artwork.default[1] === undefined
 								? {}
 								: {
 										compositeUrl: game.getResourceUrlFn(
-											configured.asset.default[1],
+											configured.artwork.default[1],
 										),
 									}),
 							space: source.space,

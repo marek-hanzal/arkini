@@ -5,7 +5,7 @@
 		"id": "cauldron-with-beeswax",
 		"title": "Cauldron With Beeswax",
 		"description": "Try to make it warm",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-beeswax"

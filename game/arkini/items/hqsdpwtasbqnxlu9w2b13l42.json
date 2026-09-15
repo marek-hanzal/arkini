@@ -5,7 +5,7 @@
 		"id": "molasses-jar",
 		"title": "Molasses Jar",
 		"description": "Rum time",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"molasses-jar"

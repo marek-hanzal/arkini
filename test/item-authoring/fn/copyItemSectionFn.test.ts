@@ -7,7 +7,7 @@ const source = ItemSchema.parse({
 	uid: "source",
 	id: "source",
 	title: "Source",
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
 			"base",
@@ -72,7 +72,7 @@ const destination: FormValues = {
 	title: "Destination",
 	draft: true,
 	description: "Keep this unsaved description",
-	asset: {
+	artwork: {
 		scale: 1,
 		default: [
 			"other",
@@ -99,7 +99,7 @@ describe("section copy ownership", () => {
 		expect(result.lines).toHaveLength(1);
 		expect(result.lines).not.toBe(source.lines);
 		expect(result.lines?.[0].input).not.toBe(source.lines[0].input);
-		expect(result.asset).toBe(destination.asset);
+		expect(result.artwork).toBe(destination.artwork);
 		expect(result.title).toBe(destination.title);
 		expect(result.description).toBe(destination.description);
 		expect(result.id).toBe(destination.id);
@@ -143,7 +143,7 @@ describe("section copy ownership", () => {
 			destination,
 			{
 				...source,
-				asset: {
+				artwork: {
 					scale: 0.5,
 					default: [
 						"new",
@@ -152,7 +152,7 @@ describe("section copy ownership", () => {
 			},
 			"artwork",
 		);
-		expect(result.asset).toEqual({
+		expect(result.artwork).toEqual({
 			scale: 0.5,
 			default: [
 				"new",
@@ -193,7 +193,7 @@ describe("section copy ownership", () => {
 			section,
 		);
 		expect(result[section === "merges" ? "merge" : section]).toBeUndefined();
-		expect(result.asset).toBe(current.asset);
+		expect(result.artwork).toBe(current.artwork);
 	});
 	it("applies capability exclusions only when the copied capability is present", () => {
 		const action = {

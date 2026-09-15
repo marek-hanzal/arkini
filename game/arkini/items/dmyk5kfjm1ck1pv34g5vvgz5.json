@@ -5,7 +5,7 @@
 		"id": "clay-mug-with-beer",
 		"title": "Clay Mug With Beer",
 		"description": "Beer in quite a strange form",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug-with-beer"

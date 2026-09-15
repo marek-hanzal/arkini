@@ -5,7 +5,7 @@
 		"id": "bakery",
 		"title": "Bakery",
 		"description": "Bake a thing. Yummi thing",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bakery"

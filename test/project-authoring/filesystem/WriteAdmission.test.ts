@@ -1,7 +1,8 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -64,17 +65,25 @@ describe("incremental write admission", () => {
 		},
 	);
 
-	it("rejects a new asset colliding with an unchanged filename on case-insensitive filesystems", async () => {
+	it("rejects new Artwork colliding with an unchanged filename on case-insensitive filesystems", async () => {
 		const repository = await harness.openRepository();
 		const initial = await harness.createProject(repository);
+		const bytes = createTestPngBytes();
+		const firstPath = join(harness.temporaryDirectory, "first.png");
+		const secondPath = join(harness.temporaryDirectory, "second.png");
+		await Promise.all([
+			writeFile(firstPath, bytes),
+			writeFile(secondPath, bytes),
+		]);
 		const project = await Effect.runPromise(
-			repository.upsertResourcesFx({
+			repository.upsertResourceFilesFx({
 				projectId: initial.projectId,
 				resources: [
 					{
 						id: "Ore",
-						mime: "image/png",
-						bytes: Uint8Array.of(1, 2, 3),
+						type: "artwork",
+						path: firstPath,
+						size: bytes.byteLength,
 					},
 				],
 			}),
@@ -84,21 +93,20 @@ describe("incremental write admission", () => {
 		const marker = await readFile(join(root, "project.json"));
 		await expect(
 			Effect.runPromise(
-				repository.upsertResourcesFx({
+				repository.upsertResourceFilesFx({
 					projectId: project.projectId,
 					resources: [
 						{
 							id: "ore",
-							mime: "image/png",
-							bytes: Uint8Array.of(4, 5, 6),
+							type: "artwork",
+							path: secondPath,
+							size: bytes.byteLength,
 						},
 					],
 				}),
 			),
 		).rejects.toBeDefined();
-		expect(new Uint8Array(await readFile(join(root, "assets", "Ore.png")))).toEqual(
-			Uint8Array.of(1, 2, 3),
-		);
+		expect(new Uint8Array(await readFile(join(root, "artwork", "Ore.png")))).toEqual(bytes);
 		expect(await readFile(join(root, "project.json"))).toEqual(marker);
 		expect(await Effect.runPromise(repository.readProjectFx(project.projectId))).toEqual(
 			project,

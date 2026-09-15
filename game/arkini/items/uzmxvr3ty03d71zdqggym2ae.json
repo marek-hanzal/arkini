@@ -5,7 +5,7 @@
 		"id": "clay-jug-with-lye",
 		"title": "Clay Jug With Lye",
 		"description": "Some chemical experiments awaits",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-jug-with-lye"

@@ -5,7 +5,7 @@
 		"id": "steam-corn-processing",
 		"title": "Steam Corn Processing",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"steam-corn-processing"

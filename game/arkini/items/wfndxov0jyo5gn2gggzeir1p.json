@@ -5,7 +5,7 @@
 		"id": "empty-mine",
 		"title": "Empty Mine",
 		"description": "You need some new resources?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"mine-depleted"

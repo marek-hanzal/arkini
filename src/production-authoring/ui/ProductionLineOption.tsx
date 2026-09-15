@@ -63,7 +63,7 @@ const ItemImages = ({
 					className="rounded-md"
 					size="md"
 					resourceIds={
-						items[id]?.asset.default ?? [
+						items[id]?.artwork.default ?? [
 							"",
 						]
 					}

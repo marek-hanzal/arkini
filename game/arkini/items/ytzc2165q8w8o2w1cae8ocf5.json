@@ -5,7 +5,7 @@
 		"id": "cacao-grove",
 		"title": "Cacao Grove",
 		"description": "You can harvest some good stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cacao-grove"

@@ -5,7 +5,7 @@
 		"id": "empty-cauldron",
 		"title": "Empty Cauldron",
 		"description": "This is a good friend used for brew stuff.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-cauldron"

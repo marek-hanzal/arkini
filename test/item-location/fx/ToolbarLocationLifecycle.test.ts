@@ -52,10 +52,10 @@ const configInput = {
 
 			title: "Water",
 			description: "Water",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:water",
+					"artwork:water",
 				],
 			},
 			scope: "any",
@@ -70,10 +70,10 @@ const configInput = {
 
 			title: "Stone",
 			description: "Stone",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:stone",
+					"artwork:stone",
 				],
 			},
 			scope: "any",
@@ -88,10 +88,10 @@ const configInput = {
 
 			title: "Board only",
 			description: "Board only",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:board-only",
+					"artwork:board-only",
 				],
 			},
 			scope: "board",
@@ -106,10 +106,10 @@ const configInput = {
 
 			title: "Inventory only",
 			description: "Inventory only",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:inventory-only",
+					"artwork:inventory-only",
 				],
 			},
 			scope: "inventory",
@@ -125,10 +125,10 @@ const configInput = {
 			maxStackSize: 1,
 			title: "Backpack",
 			description: "Backpack",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:backpack",
+					"artwork:backpack",
 				],
 			},
 		},

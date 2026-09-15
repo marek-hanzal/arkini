@@ -5,7 +5,7 @@
 		"id": "british-shorthair-shorn",
 		"title": "British Shorthair Shorn",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"british-shorthair-shorn"

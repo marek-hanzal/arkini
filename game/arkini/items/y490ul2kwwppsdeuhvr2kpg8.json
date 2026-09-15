@@ -5,7 +5,7 @@
 		"id": "luxury-clothes",
 		"title": "Luxury Clothes",
 		"description": "Nice",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"luxury-clothes"

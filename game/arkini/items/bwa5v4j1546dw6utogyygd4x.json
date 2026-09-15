@@ -5,7 +5,7 @@
 		"id": "sugar-cane-field",
 		"title": "Sugar Cane Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sugar-cane-field"

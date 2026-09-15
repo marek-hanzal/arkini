@@ -5,7 +5,7 @@
 		"id": "adventurers-guild",
 		"title": "Adventurers Guild",
 		"draft": false,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"adventurers-guild"

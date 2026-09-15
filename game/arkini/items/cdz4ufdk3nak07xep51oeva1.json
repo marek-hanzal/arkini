@@ -5,7 +5,7 @@
 		"id": "dirty-scissors",
 		"title": "Dirty Scissors",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dirty-scissors"

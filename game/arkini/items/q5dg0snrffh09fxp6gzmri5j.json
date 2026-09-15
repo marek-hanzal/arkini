@@ -5,7 +5,7 @@
 		"id": "clay-mug-with-coffee",
 		"title": "Clay Mug With Coffee",
 		"description": "Fresh coffee",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug-with-coffee"

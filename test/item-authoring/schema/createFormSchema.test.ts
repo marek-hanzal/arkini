@@ -28,10 +28,10 @@ const createTargetPaidInput = (itemId: string) => ({
 const readFormValues = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	description: item.description ?? "",
-	asset: {
-		scale: item.asset.scale,
+	artwork: {
+		scale: item.artwork.scale,
 		default: [
-			item.asset.default[0],
+			item.artwork.default[0],
 			"",
 		],
 	},

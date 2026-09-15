@@ -6,10 +6,11 @@ import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface LoadedArkpackResource {
 	readonly id: string;
-	readonly mime: string;
+	readonly type: ResourceTypeSchema.Type;
 	readonly url: string;
 }
 

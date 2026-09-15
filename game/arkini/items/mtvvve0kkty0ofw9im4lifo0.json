@@ -5,7 +5,7 @@
 		"id": "sausage",
 		"title": "Sausage",
 		"description": "Suasage",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sausage"

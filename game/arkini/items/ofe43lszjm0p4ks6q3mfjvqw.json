@@ -5,7 +5,7 @@
 		"id": "treasure-chest-t3",
 		"title": "Treasure Chest - Tier 3",
 		"description": "Quite interesting things inside",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"treasure-chest-t3"

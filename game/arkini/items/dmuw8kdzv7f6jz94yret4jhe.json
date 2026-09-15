@@ -5,7 +5,7 @@
 		"id": "stonemason-camp-blueprint",
 		"title": "Stonemason Camp Blueprint",
 		"description": "Stone Access: Granted!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",

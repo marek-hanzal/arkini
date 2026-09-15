@@ -5,7 +5,7 @@
 		"id": "marek-smelly",
 		"title": "Marek Smelly",
 		"description": "I should take some wash",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"marek-smelly"

@@ -5,7 +5,7 @@
 		"id": "bandage-satchel",
 		"title": "Bandage Satchel",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bandage-satchel"

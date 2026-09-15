@@ -5,7 +5,7 @@
 		"id": "jam",
 		"title": "Jam",
 		"description": "Yummi",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"jam"

@@ -5,7 +5,7 @@
 		"id": "construction-set-t1",
 		"title": "Construction Set - Tier 1",
 		"description": "Just some basic stuff over here.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"construction-material-box-t1"

@@ -5,7 +5,7 @@
 		"id": "empty-grain-field",
 		"title": "Empty Grain Field",
 		"description": "Ready for another grain cycle.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-grain-field"

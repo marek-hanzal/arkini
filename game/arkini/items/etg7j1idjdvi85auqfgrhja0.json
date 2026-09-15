@@ -5,7 +5,7 @@
 		"id": "pillow",
 		"title": "Pillow",
 		"description": "Your neck may thank you",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pillow"

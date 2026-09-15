@@ -5,7 +5,7 @@
 		"id": "needle",
 		"title": "Needle",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"needle"

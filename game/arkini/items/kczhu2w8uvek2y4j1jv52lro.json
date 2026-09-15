@@ -5,7 +5,7 @@
 		"id": "bricks",
 		"title": "Bricks",
 		"description": "Just building material",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bricks"

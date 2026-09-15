@@ -7,7 +7,7 @@ import { ProjectNotesOverview } from "~/project-note/ui/ProjectNotesOverview";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 
-/** Presents project-wide repository, content, Estimate, and asset summaries. */
+/** Presents project-wide repository, content, Estimate, and artwork summaries. */
 export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 	const translator = useTranslator();
 	const estimateState = useItemEstimateIndex(project, {
@@ -19,6 +19,7 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 	).length;
 	const items = Object.values(project.config.items);
 	const itemCount = items.length;
+	const artworkCount = project.resources.filter(({ type }) => type === "artwork").length;
 	const unreachableSummary =
 		estimateState.status === "loading" ? (
 			<span
@@ -90,27 +91,23 @@ export const ProjectOverview = ({ project }: { readonly project: Project }) => {
 			/>
 			<EditorOverviewCard
 				body={translator
-					.textFn(
-						project.resources.length === 1
-							? "Project asset count"
-							: "Project assets count",
-					)
-					.replace("{count}", String(project.resources.length))}
+					.textFn("Project artwork count")
+					.replace("{count}", String(artworkCount))}
 				action={
 					<LinkButtonLink
 						className="inline-flex items-center gap-1.5 opacity-75 hover:opacity-100"
-						data-overview-id="assets"
+						data-overview-id="artwork"
 						data-ui="EditorProjectOverviewLink"
 						params={{
 							projectId: project.projectId,
 						}}
-						to="/editor/$projectId/assets"
+						to="/editor/$projectId/artwork"
 					>
 						{translator.textFn("Open")}
 						<ArrowRight className="size-4" />
 					</LinkButtonLink>
 				}
-				title={translator.textFn("Assets")}
+				title={translator.textFn("Artwork")}
 			/>
 		</section>
 	);

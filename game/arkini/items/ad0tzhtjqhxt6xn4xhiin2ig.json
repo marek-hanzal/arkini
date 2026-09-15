@@ -5,7 +5,7 @@
 		"id": "planks",
 		"title": "Planks",
 		"description": "Really complex piece of wood. Just planks, I'm kidding.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"planks"

@@ -5,7 +5,7 @@
 		"id": "bed-milk",
 		"title": "Bed Milk",
 		"description": "Milk everywhere.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bed-milk"

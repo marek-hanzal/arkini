@@ -5,7 +5,7 @@
 		"id": "colored-glass",
 		"title": "Colored Glass",
 		"description": "Rainbooow!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"colored-glass"

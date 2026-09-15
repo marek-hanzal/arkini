@@ -5,7 +5,7 @@
 		"id": "empty-rum-barrel",
 		"title": "Empty Rum Barrel",
 		"description": "Waiting for an another round",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-rum-barrel"

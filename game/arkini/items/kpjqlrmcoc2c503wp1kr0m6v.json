@@ -5,7 +5,7 @@
 		"id": "foundry",
 		"title": "Foundry",
 		"description": "Industrial",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"foundry"

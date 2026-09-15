@@ -5,7 +5,7 @@
 		"id": "labor-t3",
 		"title": "Labor T3",
 		"description": "Expensive ones",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"labor-t3"

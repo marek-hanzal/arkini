@@ -35,10 +35,10 @@ const config = GameConfigSchema.parse({
 			id: "source",
 			title: "Source",
 			description: "A query origin.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:source",
+					"artwork:source",
 				],
 			},
 			scope: "board",
@@ -52,10 +52,10 @@ const config = GameConfigSchema.parse({
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:tree",
+					"artwork:tree",
 				],
 			},
 			scope: "any",

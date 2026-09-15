@@ -5,7 +5,7 @@
 		"id": "chicken",
 		"title": "Chicken",
 		"description": "Kwooo... kwo, kwo!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"chicken"

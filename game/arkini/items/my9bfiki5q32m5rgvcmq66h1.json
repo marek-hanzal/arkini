@@ -5,7 +5,7 @@
 		"id": "soapy-scrubbing-brush",
 		"title": "Soapy Scrubbing Brush",
 		"description": "Make things clean again",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"soapy-scrubbing-brush"

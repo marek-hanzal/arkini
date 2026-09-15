@@ -5,7 +5,7 @@
 		"id": "copper-bathtub-with-bio-waste",
 		"title": "Copper Bathtub With Bio Waste",
 		"description": "You cannot help yourself?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"copper-bathtub-with-bio-waste"

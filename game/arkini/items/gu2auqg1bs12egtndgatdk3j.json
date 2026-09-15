@@ -5,7 +5,7 @@
 		"id": "faith-paper-scriptorium",
 		"title": "Faith Paper Scriptorium",
 		"description": "Somebody bless papers and books!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"faith-paper-scriptorium"

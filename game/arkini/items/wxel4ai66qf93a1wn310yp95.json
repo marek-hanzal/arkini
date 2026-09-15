@@ -5,7 +5,7 @@
 		"id": "fruit-garden",
 		"title": "Fruit Garden",
 		"description": "I see an apple there, Adam",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fruit-garden"

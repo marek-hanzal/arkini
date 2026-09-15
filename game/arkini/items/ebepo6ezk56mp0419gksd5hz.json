@@ -5,7 +5,7 @@
 		"id": "spoiled-sack",
 		"title": "Spoiled Sack",
 		"description": "Things have life-times. This one is over",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-sack"

@@ -5,7 +5,7 @@
 		"id": "luxury-furniture",
 		"title": "Luxury Furniture",
 		"description": "Quite an expensive stuff",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"luxury-furniture"

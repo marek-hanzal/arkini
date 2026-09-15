@@ -5,7 +5,7 @@
 		"id": "spoiled-mug",
 		"title": "Spoiled Mug",
 		"description": "Bleh",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-mug"

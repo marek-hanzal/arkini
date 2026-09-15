@@ -32,7 +32,7 @@ const productionLine = (id: string, input: ReadonlyArray<ReturnType<typeof mater
 
 export const tileActorTestConfig = GameConfigSchema.parse({
 	resources: {
-		hero: "asset:hero",
+		hero: "artwork:hero",
 	},
 	meta: {
 		id: "game:tile-actors",
@@ -56,10 +56,10 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 
 			...itemBase("material"),
 
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:material-primary",
+					"artwork:material-primary",
 				],
 			},
 			maxStackSize: 10,
@@ -69,10 +69,10 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 
 			...itemBase("craft"),
 
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:craft",
+					"artwork:craft",
 				],
 			},
 			maxStackSize: 1,
@@ -88,11 +88,11 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		blueprint: {
 			...itemBase("blueprint"),
 
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:blueprint-base",
-					"asset:blueprint-overlay",
+					"artwork:blueprint-base",
+					"artwork:blueprint-overlay",
 				],
 			},
 			maxStackSize: 1,
@@ -115,10 +115,10 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 
 			lines: [],
 			maxQueueSize: 1,
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
-					"asset:temporary",
+					"artwork:temporary",
 				],
 			},
 			clock: {
@@ -169,8 +169,8 @@ export const createTileActorRuntime = ({
 				revision: "revision:owner",
 				item: {
 					...ownerItem,
-					asset: {
-						...ownerItem.asset,
+					artwork: {
+						...ownerItem.artwork,
 						scale: artworkScale,
 					},
 				},

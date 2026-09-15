@@ -5,7 +5,7 @@
 		"id": "leather",
 		"title": "Leather",
 		"description": "Hide is hidden. This is nice quality leather.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"leather"

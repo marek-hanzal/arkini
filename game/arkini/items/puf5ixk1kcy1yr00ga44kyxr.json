@@ -5,7 +5,7 @@
 		"id": "fertilized-grass-field",
 		"title": "Fertilized Grass Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"fertilized-grass-field"

@@ -5,7 +5,7 @@
 		"id": "spoiled-fruit-crate",
 		"title": "Spoiled Fruit Crate",
 		"description": "Ugly thing",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-fruit-crate"

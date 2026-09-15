@@ -43,7 +43,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 
 			title: "Water",
 			description: "Water",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
 					"item-water",
@@ -62,21 +62,21 @@ export const editorTestPayload: TestArkpackPayload = {
 	resources: [
 		{
 			id: "hero",
-			mime: "image/png",
+			type: "image",
 			bytes: createTestPngBytes(),
 		},
 		{
 			id: "item-water",
-			mime: "image/png",
+			type: "artwork",
 			bytes: createAlternateTestPngBytes(),
 		},
 	],
 };
 
 /** Renderer/repository projection of the same fixture's disk-backed PNG files. */
-export const editorTestResources = editorTestPayload.resources.map(({ id, mime, bytes }) => ({
+export const editorTestResources = editorTestPayload.resources.map(({ id, type, bytes }) => ({
 	id,
-	mime,
+	type,
 	size: bytes.byteLength,
 	version: "1",
 }));

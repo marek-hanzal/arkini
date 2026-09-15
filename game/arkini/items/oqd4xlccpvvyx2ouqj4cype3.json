@@ -5,7 +5,7 @@
 		"id": "grape-seed",
 		"title": "Grape Seed",
 		"description": "Wine Time!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"seed",

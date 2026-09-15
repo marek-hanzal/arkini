@@ -5,7 +5,7 @@
 		"id": "clay-mug",
 		"title": "Clay Mug",
 		"description": "Wanna some coffee?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-mug"

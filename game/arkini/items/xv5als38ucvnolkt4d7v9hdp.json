@@ -5,7 +5,7 @@
 		"id": "clay-jug-with-wine",
 		"title": "Clay Jug With Wine",
 		"description": "Fresh wine",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay-jug-with-wine"

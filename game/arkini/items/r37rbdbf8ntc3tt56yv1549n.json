@@ -5,7 +5,7 @@
 		"id": "house-t1",
 		"title": "House - Tier 1",
 		"description": "Simple good old house.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"house-t1"

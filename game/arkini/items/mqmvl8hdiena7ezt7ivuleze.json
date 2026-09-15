@@ -5,7 +5,7 @@
 		"id": "flying-pig",
 		"title": "Flying Pig",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"flying-pig"

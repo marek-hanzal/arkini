@@ -5,7 +5,7 @@
 		"id": "spoiled-bucket",
 		"title": "Spoiled Bucket",
 		"description": "Ugly",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-bucket"

@@ -5,7 +5,7 @@
 		"id": "leather-satchel",
 		"title": "Leather Satchel",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"leather-satchel"

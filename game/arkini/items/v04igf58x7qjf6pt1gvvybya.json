@@ -5,7 +5,7 @@
 		"id": "book-t3",
 		"title": "Book - Tier 3",
 		"description": "Quite a good book",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"book-t3"

@@ -5,7 +5,7 @@
 		"id": "grain-farm",
 		"title": "Grain Farm",
 		"description": "Some food? Basic stuff here!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"grain-farm"

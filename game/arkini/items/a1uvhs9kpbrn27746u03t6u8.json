@@ -5,7 +5,7 @@
 		"id": "workshop-portal",
 		"title": "Workshop Portal",
 		"description": "Workshops",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"workshop-portal"

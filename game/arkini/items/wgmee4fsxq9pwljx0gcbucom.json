@@ -5,7 +5,7 @@
 		"id": "sick-cow",
 		"title": "Sick Cow",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sick-cow"

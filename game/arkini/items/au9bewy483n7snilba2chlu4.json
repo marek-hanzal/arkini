@@ -5,7 +5,7 @@
 		"id": "well-fed-cow",
 		"title": "Well Fed Cow",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"well-fed-cow"

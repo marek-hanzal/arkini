@@ -5,7 +5,7 @@
 		"id": "cooked-steak",
 		"title": "Cooked Steak",
 		"description": "Yammy",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cooked-steak"

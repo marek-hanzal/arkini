@@ -5,7 +5,7 @@
 		"id": "coffee-plant",
 		"title": "Coffee Plant",
 		"description": "You need caffeine",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coffee-plant"

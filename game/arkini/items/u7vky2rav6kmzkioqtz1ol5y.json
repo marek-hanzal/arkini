@@ -5,7 +5,7 @@
 		"id": "harmless-air-pollution",
 		"title": "Harmless Air Pollution",
 		"description": "It does nothing. It's innocent",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"harmless-air-pollution"

@@ -5,7 +5,7 @@
 		"id": "wine-barrel",
 		"title": "Wine Barrel",
 		"description": "Over age of 18",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wine-barrel"

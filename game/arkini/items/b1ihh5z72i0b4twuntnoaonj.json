@@ -5,7 +5,7 @@
 		"id": "dirty-pig",
 		"title": "Dirty Pig",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dirty-pig"

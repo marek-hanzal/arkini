@@ -5,7 +5,7 @@
 		"id": "hungry-cow",
 		"title": "Hungry Cow",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hungry-cow"

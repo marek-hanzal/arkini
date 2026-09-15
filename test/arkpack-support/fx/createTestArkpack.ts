@@ -45,7 +45,7 @@ export const testArkpackConfig = GameConfigSchema.parse({
 
 			title: "Water",
 			description: "Water",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
 					"asset-water",
@@ -78,12 +78,12 @@ export const createTestArkpack = (
 			resources: [
 				{
 					id: "hero",
-					mime: "image/png",
+					type: "image",
 					bytes: createTestPngBytes(),
 				},
 				{
 					id: "asset-water",
-					mime: "image/png",
+					type: "artwork",
 					bytes: createTestPngBytes(),
 				},
 			],

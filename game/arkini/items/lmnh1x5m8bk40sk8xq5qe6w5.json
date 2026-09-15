@@ -5,7 +5,7 @@
 		"id": "rapeseed-field",
 		"title": "Rapeseed Field",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"rapeseed-field"

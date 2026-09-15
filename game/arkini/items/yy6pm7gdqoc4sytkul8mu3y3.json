@@ -5,7 +5,7 @@
 		"id": "windmill",
 		"title": "Windmill",
 		"description": "Mill some flour",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"windmill"

@@ -45,7 +45,7 @@ describe("editor MCP server", () => {
 			"item_meta",
 			"estimate",
 			"item_collection",
-			"asset_collection",
+			"artwork_collection",
 			"note_collection",
 			"note_detail",
 			"create_note",
@@ -58,30 +58,21 @@ describe("editor MCP server", () => {
 			"item_estimate",
 			"item_chain",
 		]);
-		const assetCollectionSchema = tools.tools.find(
-			({ name }) => name === "asset_collection",
+		const artworkCollectionSchema = tools.tools.find(
+			({ name }) => name === "artwork_collection",
 		)?.inputSchema;
-		expect(assetCollectionSchema?.properties).toMatchObject({
+		expect(artworkCollectionSchema?.properties).toMatchObject({
 			filter: {
-				$ref: "#/$defs/AssetCollectionFilterSchema",
+				$ref: "#/$defs/ArtworkCollectionFilterSchema",
 			},
 			page: expect.any(Object),
 			limit: expect.any(Object),
 			query: expect.any(Object),
-			type: {
-				$ref: "#/$defs/AssetTypeSchema",
-			},
 		});
-		const assetCollectionDefinitions = isJsonSchemaRecord(assetCollectionSchema?.$defs)
-			? assetCollectionSchema.$defs
+		const artworkCollectionDefinitions = isJsonSchemaRecord(artworkCollectionSchema?.$defs)
+			? artworkCollectionSchema.$defs
 			: {};
-		expect(assetCollectionDefinitions.AssetTypeSchema).toMatchObject({
-			enum: [
-				"image",
-			],
-			type: "string",
-		});
-		expect(assetCollectionDefinitions.AssetCollectionFilterSchema).toMatchObject({
+		expect(artworkCollectionDefinitions.ArtworkCollectionFilterSchema).toMatchObject({
 			enum: [
 				"all",
 				"unused",
@@ -195,11 +186,11 @@ describe("editor MCP server", () => {
 				resources: [
 					...editorTestPayload.resources,
 					{
-						...editorTestPayload.resources[0],
+						...editorTestPayload.resources.find(({ type }) => type === "artwork")!,
 						id: "cow",
 					},
 					{
-						...editorTestPayload.resources[0],
+						...editorTestPayload.resources.find(({ type }) => type === "artwork")!,
 						id: "cow-farm",
 					},
 				],
@@ -213,18 +204,16 @@ describe("editor MCP server", () => {
 			name: "project",
 			arguments: {},
 		});
-		const assets = await client.callTool({
-			name: "asset_collection",
+		const artwork = await client.callTool({
+			name: "artwork_collection",
 			arguments: {
 				query: "cow",
-				type: "image",
 			},
 		});
 		const rejectedLegacyPagination = await client.callTool({
-			name: "asset_collection",
+			name: "artwork_collection",
 			arguments: {
 				pageSize: 1,
-				type: "image",
 			},
 		});
 		expect(project.content).toMatchObject([
@@ -232,10 +221,10 @@ describe("editor MCP server", () => {
 				text: expect.stringContaining("Project ID: project-context"),
 			},
 		]);
-		expect(assets.content).toMatchObject([
+		expect(artwork.content).toMatchObject([
 			{
 				text: expect.stringMatching(
-					/- Type: image\n  ID: cow\n\n- Type: image\n  ID: cow-farm/,
+					/- Type: artwork\n  ID: cow\n\n- Type: artwork\n  ID: cow-farm/,
 				),
 			},
 		]);

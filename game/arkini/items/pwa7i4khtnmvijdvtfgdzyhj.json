@@ -5,7 +5,7 @@
 		"id": "dye",
 		"title": "Dye",
 		"description": "Wanna color something?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye"

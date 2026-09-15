@@ -218,7 +218,6 @@ describe("bootstrapRendererControlledCloseFx", () => {
 			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 			deleteItemFx: () => Effect.die("Unexpected item delete."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
-			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
 		const { rendererRuntime } = createTestRendererRuntime({
 			createResourceFx: () => Effect.succeed(resource),

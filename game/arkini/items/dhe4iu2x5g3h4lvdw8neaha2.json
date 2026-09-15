@@ -5,7 +5,7 @@
 		"id": "wick",
 		"title": "Wick",
 		"description": "I heard - a candle?",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wick"

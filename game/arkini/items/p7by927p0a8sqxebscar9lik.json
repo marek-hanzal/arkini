@@ -5,7 +5,7 @@
 		"id": "hammer",
 		"title": "Hammer",
 		"description": "Can break something",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"hammer"

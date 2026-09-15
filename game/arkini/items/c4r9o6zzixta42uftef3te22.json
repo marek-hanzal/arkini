@@ -5,7 +5,7 @@
 		"id": "spoiled-sunflower-seeds",
 		"title": "Spoiled Sunflower Seeds",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-sunflower-seeds"

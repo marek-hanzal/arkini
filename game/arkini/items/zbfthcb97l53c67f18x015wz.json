@@ -5,7 +5,7 @@
 		"id": "cauldron-with-lye",
 		"title": "Cauldron With Lye",
 		"description": "First class of chemistry",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-lye"

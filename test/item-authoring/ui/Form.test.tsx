@@ -82,10 +82,10 @@ describe("Form", () => {
 			maxQueueSize: 1,
 			lines: [],
 
-			asset: {
+			artwork: {
 				scale: 1,
 				default: [
-					project.resources[0]?.id,
+					project.resources.find(({ type }) => type === "artwork")?.id,
 				],
 			},
 			draft: false,
@@ -116,7 +116,7 @@ describe("Form", () => {
 			container.querySelector("output")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
-			asset: {
+			artwork: {
 				scale: 1,
 				default: [
 					"selected_asset-name",

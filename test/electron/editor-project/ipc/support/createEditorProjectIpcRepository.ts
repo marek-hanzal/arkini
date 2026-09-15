@@ -115,7 +115,6 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	replaceConfigFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
-	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertResourceFilesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids, resourceIds }) =>
 		Effect.succeed({

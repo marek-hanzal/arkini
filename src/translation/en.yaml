@@ -69,69 +69,40 @@ Approximate acquisition path:
   value: Estimated route
 Artwork:
   value: Artwork
-Asset:
-  value: Asset
-Asset Arkpack import summary:
-  value: Import all images. Matching asset IDs are replaced.
-Asset ID:
-  value: Asset ID
-Asset ID help:
-  value: |
-    A unique name for this image inside the project.
-
-    Renaming it updates saved items, project artwork and note links when you **Save**.
-Asset PNG import summary:
-  value: Import selected PNG images. Filenames become asset IDs.
-Asset catalog help:
-  value: |
-    Assets are the reusable PNG images in this project.
-
-    - Search by ID or filter by usage and linked notes.
-    - **Import** adds PNGs or images from another Arkpack.
-    - **Optimize** shrinks PNG files without resizing the artwork.
-
-    Replacing an image updates every place that uses it. **Create item** opens a new item draft with this artwork already selected.
-Asset delete available description:
-  value: Nothing in the saved project uses this asset. It is safe to delete.
-Asset delete confirmation warning:
-  value: The image file will be **permanently removed** from this project. You cannot undo this in the Editor.
-Asset delete help:
-  value: |
-    Delete removes this PNG from the project.
-
-    Items and project artwork that use it must be changed first. Note links are removed, but the notes stay.
-Asset editing help:
-  value: |
-    Rename the asset, replace its PNG, or do both at once.
-
-    **Save** updates every saved use. **Discard** keeps the current asset untouched.
-Asset image replacement help:
-  value: |
-    Drop a **PNG** here or click to choose one.
-
-    After **Save**, every use of this asset shows the new image.
-Asset missing description:
-  value: This asset is **not present in this project**. Return to Assets to choose an available image.
-Asset not found:
-  value: Asset not found
-Asset notes empty description:
-  value: Create a note here to keep art direction and decisions linked to this asset.
-Asset notes empty title:
-  value: No notes for this asset yet
-Asset overview help:
-  value: |
-    Preview the image and check its size, format and file status.
-
-    **Usage** shows where it is used. **Notes** keeps its art direction. **Create item** starts a new item with this artwork.
-Asset usage empty description:
-  value: No saved item or project artwork uses this asset.
-Asset usage help:
-  value: |
-    Shows every saved item and project image that uses this asset.
-
-    Unsaved edits are not included. Notes have their own **Notes** tab.
-Assets:
-  value: Assets
+Artwork Arkpack import summary:
+  value: Import all Artwork. Matching resource IDs are replaced.
+Artwork ID:
+  value: Artwork ID
+Artwork ID help:
+  value: The stable Resource ID used by Item artwork references.
+Artwork PNG import summary:
+  value: Import selected square PNGs. Filenames become Artwork IDs.
+Artwork catalog help:
+  value: Browse square PNG Artwork used by Items. Import, inspect, rename, replace, optimize, or remove it here.
+Artwork delete available description:
+  value: Nothing in the saved project uses this Artwork. It can be deleted.
+Artwork delete confirmation warning:
+  value: The PNG is removed from the project.
+Artwork delete help:
+  value: Artwork can be deleted only after every saved reference is removed.
+Artwork editing help:
+  value: Rename the Artwork, replace its square PNG, or do both in one save.
+Artwork image replacement help:
+  value: Choose a square PNG to replace the current Artwork bytes.
+Artwork missing description:
+  value: This Artwork is not present in the project. Return to Artwork and choose an available entry.
+Artwork not found:
+  value: Artwork not found
+Artwork notes empty description:
+  value: Create a note here to keep art direction and decisions linked to this Artwork.
+Artwork notes empty title:
+  value: No notes for this Artwork yet
+Artwork overview help:
+  value: Review the Artwork preview, ID, size, and current project references.
+Artwork usage empty description:
+  value: No saved Item uses this Artwork.
+Artwork usage help:
+  value: Shows every saved Item that references this Artwork.
 Authored Clock expiry output summary help:
   value: |
     Runs once when **Lifetime** reaches zero.
@@ -314,8 +285,8 @@ Avatar:
 Avatar {index}:
   value: Avatar {index}
   dynamic: true
-Base asset:
-  value: Base asset
+Base artwork:
+  value: Base artwork
 Base tile scale:
   value: Base tile scale
 Base tile scale help:
@@ -582,19 +553,18 @@ Default:
   value: Default
 Delete:
   value: Delete
-Delete asset:
-  value: Delete asset
-Delete asset?:
-  value: Delete asset?
+Delete artwork:
+  value: Delete artwork
+Delete artwork?:
+  value: Delete artwork?
 Delete item:
   value: Delete item
 Delete item irreversible warning:
   value: "**This cannot be undone.**"
 Delete item?:
   value: Delete item?
-Deleted item assets help:
-  value: |
-    Artwork files stay in the project. Remove unused images separately in **Assets**.
+Deleted item artwork help:
+  value: Artwork files stay in the project. Remove unused entries separately in **Artwork**.
 Depends on conditions:
   value: Depends on conditions
 Depletion output:
@@ -695,8 +665,8 @@ Drops help:
     Each drop chooses an item, quantity, placement and optional rules. One roll may create several drops.
 Edit:
   value: Edit
-Edit asset:
-  value: Edit asset
+Edit artwork:
+  value: Edit artwork
 Editor:
   value: Editor
 Editor Board:
@@ -834,6 +804,8 @@ Game limit:
   value: Game limit
 General:
   value: General
+General PNG images keep their original dimensions.:
+  value: General PNG images keep their original dimensions.
 Guaranteed:
   value: Guaranteed
 Guaranteed roll type help:
@@ -843,8 +815,6 @@ Guaranteed roll type help:
     Each drop still checks its own rules, quantity and placement.
 Height:
   value: Height
-Hero asset:
-  value: Hero asset
 Hero image:
   value: Hero image
 Hide:
@@ -855,12 +825,18 @@ Hint:
   value: Hint
 Image:
   value: Image
+Images:
+  value: Images
 Import arkpack:
   value: Import arkpack
-Import assets:
-  value: Import assets
-Imported assets:
-  value: Imported assets
+Import artwork:
+  value: Import artwork
+Import images:
+  value: Import images
+Imported artwork:
+  value: Imported artwork
+Imported image count:
+  value: Imported {count} image resources.
 Indeterminate:
   value: Indeterminate
 Initial board → item {index}:
@@ -1049,7 +1025,7 @@ Item list help:
 
     **Estimate** is the optimistic time to obtain one item. **Demand** approximates how much of it is needed across reachable item routes. Both are planning hints, not balance verdicts.
 
-    **New item** opens an unsaved draft. Creating from an asset fills its first title and artwork for you.
+    **New item** opens an unsaved draft. Creating from Artwork fills its first title and artwork for you.
 Item merges empty title:
   value: Define what happens when this item is dropped onto another.
 Item merges help:
@@ -1163,10 +1139,10 @@ Line selection could not be changed.:
   value: Line selection could not be changed.
 Line title:
   value: Line title
-Link asset:
-  value: Link asset
 Link item:
   value: Link item
+Link resource:
+  value: Link resource
 Loading MCP settings…:
   value: Loading MCP settings…
 Loading notes…:
@@ -1184,8 +1160,6 @@ Location:
   value: Location
 Loose-kill:
   value: Wait for output
-MIME type:
-  value: Image format
 Main menu:
   value: Main menu
 Major:
@@ -1330,10 +1304,8 @@ No action configured:
   value: No action configured
 No active job:
   value: No active job
-No asset selected:
-  value: No asset selected
-No assets match this search.:
-  value: No assets match this search.
+No artwork matches this search.:
+  value: No artwork matches this search.
 No authored item directly inputs or positively requires this item.:
   value: No saved item directly uses this item as an input or required condition.
   dynamic: true
@@ -1355,6 +1327,10 @@ No extra output configured.:
   value: No extra output configured.
 No finite lifetime:
   value: No time limit
+No image selected:
+  value: No image selected
+No images match this search.:
+  value: No images match this search.
 No inputs:
   value: No inputs
 No item selected:
@@ -1390,6 +1366,8 @@ No outputs:
   value: No outputs
 No product line is currently visible.:
   value: No product line is currently visible.
+No resources match this search.:
+  value: No resources match this search.
 No rules:
   value: No rules
 No saved item has this UID.:
@@ -1410,7 +1388,7 @@ Notes help:
   value: |
     Keep ideas, reminders and decisions in **Markdown**.
 
-    A note may link to several items or assets. Their Notes tabs show the same shared note, already filtered for that entry.
+    A note may link to several Items or Resources. Their Notes tabs show the same shared note, already filtered for that entry.
 
     Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Arkpack builds.
 Notes unavailable:
@@ -1427,10 +1405,12 @@ Once:
   value: Once
 Open:
   value: Open
-Open asset:
-  value: Open asset
+Open artwork:
+  value: Open artwork
 Open folder:
   value: Open folder
+Open project images:
+  value: Open project images
 Open project settings:
   value: Open project settings
 Optimize:
@@ -1454,8 +1434,8 @@ Output sets:
   value: Output sets
 Outputs:
   value: Outputs
-Overlay asset:
-  value: Overlay asset
+Overlay artwork:
+  value: Overlay artwork
 Owned:
   value: Owned
 Owner unit:
@@ -1486,8 +1466,8 @@ Player hint:
   value: Player hint
 Port:
   value: Port
-Preparing asset preview…:
-  value: Preparing asset preview…
+Preparing artwork preview…:
+  value: Preparing artwork preview…
 Preparing editor game…:
   value: Preparing editor game…
 Produced by:
@@ -1610,25 +1590,18 @@ Project About avatars help:
   value: |
     Portraits revealed on the **About** page as a small easter egg.
 
-    Choose up to **seven** project assets. Their order here is their order there.
+    Choose up to **seven** project Images. Their order here is their order there.
 Project ID:
   value: Project ID
 Project ID example:
   value: project:example
 Project ID is required.:
   value: Project ID is required.
-Project artwork help:
-  value: |
-    Choose the project-wide **Hero image** and the ordered portraits shown on **About**.
-
-    These use project assets. They do not change item artwork or placement.
-Project asset count:
-  value: "{count} asset"
-Project assets count:
-  value: "{count} assets"
+Project artwork count:
+  value: "{count} artwork"
 Project avatars empty help:
   value: |
-    Add up to **seven** portraits in Artwork and arrange the order used on the **About** page.
+    Add up to **seven** portrait Images and arrange the order used on the **About** page.
 Project general help:
   value: |
     Review the project's title, ID and storage sizes.
@@ -1636,7 +1609,12 @@ Project general help:
     **Project ID** is also the name used by saved games. Renaming it makes a new game to existing saves. Board, Toolbar and Inventory open their sizes and starting layouts. **Export** saves the portable Editor sources.
 Project hero image help:
   value: |
-    The image shown by the launcher and game shell. Choose an asset from this project.
+    The Image shown by the launcher and game shell. Choose one from this project.
+Project images help:
+  value: |
+    Configure general PNG images used by the launcher and game shell.
+
+    Unlike square Item Artwork, Images preserve their original dimensions and are loaded only when their surface requests them.
 Project item count:
   value: "{count} item"
 Project items count:
@@ -1801,7 +1779,11 @@ Reset:
 Reset password:
   value: Reset password
 Resource ID:
-  value: Asset ID
+  value: Resource ID
+Resource type:
+  value: Resource type
+Resources:
+  value: Resources
 Retry loading notes:
   value: Retry loading notes
 Roll:
@@ -1853,8 +1835,8 @@ Schedule:
   value: Schedule
 Search:
   value: Search
-Search assets…:
-  value: Search assets…
+Search artwork…:
+  value: Search artwork…
 Search item title or ID…:
   value: Search item title or ID…
 Search item title, ID or type…:
@@ -2007,12 +1989,12 @@ Target unit cost help:
 This Item ID is already in use.:
   value: This Item ID is already in use.
   dynamic: true
-This asset can be deleted:
-  value: This asset can be deleted
-This asset cannot be deleted yet:
-  value: This asset cannot be deleted yet
-This asset is not used:
-  value: This asset is not used
+This artwork can be deleted:
+  value: This artwork can be deleted
+This artwork cannot be deleted yet:
+  value: This artwork cannot be deleted yet
+This artwork is not used:
+  value: This artwork is not used
 This item can be deleted:
   value: This item can be deleted
 This item cannot be deleted yet:
@@ -2045,10 +2027,10 @@ Try a different search or change the active filters.:
   value: Try another search or change the **active filters**.
 Try again:
   value: Try again
-Unavailable asset:
-  value: Unavailable asset
 Unavailable item:
   value: Unavailable item
+Unavailable resource:
+  value: Unavailable resource
 Unit cost:
   value: Unit cost
 Unit depletion:

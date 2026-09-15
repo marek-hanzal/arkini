@@ -5,7 +5,7 @@
 		"id": "mage-lodge",
 		"title": "Mage Lodge",
 		"description": "Your way of magic starts here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"mage-lodge"

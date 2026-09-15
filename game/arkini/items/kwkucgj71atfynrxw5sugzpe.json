@@ -5,7 +5,7 @@
 		"id": "wood",
 		"title": "Wood",
 		"description": "Raw wood, so you can be creative with it to make new nice things.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"wood"

@@ -5,7 +5,7 @@
 		"id": "cotton-cloth",
 		"title": "Cotton Cloth",
 		"description": "Cotton cloth",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cotton-cloth"

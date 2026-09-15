@@ -5,7 +5,7 @@
 		"id": "gardener",
 		"title": "Gardener",
 		"description": "Source of various seeds.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gardener"

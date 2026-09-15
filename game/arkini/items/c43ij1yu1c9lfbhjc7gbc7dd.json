@@ -5,7 +5,7 @@
 		"id": "soap",
 		"title": "Soap",
 		"description": "You can clean yourself",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"soap"

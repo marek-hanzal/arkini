@@ -5,7 +5,7 @@
 		"id": "coal-deposit",
 		"title": "Coal Deposit",
 		"description": "Industrial times starts here",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"coal-source"

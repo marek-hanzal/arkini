@@ -5,7 +5,7 @@
 		"id": "dye-plants",
 		"title": "Dye Plants",
 		"description": "Colors everywhere",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"dye-plants"

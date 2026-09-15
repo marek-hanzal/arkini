@@ -5,7 +5,7 @@
 		"id": "roasted-chicken",
 		"title": "Roasted Chicken",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"roasted-chicken"

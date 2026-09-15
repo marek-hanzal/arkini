@@ -5,7 +5,7 @@
 		"id": "boar-bristles",
 		"title": "Boar Bristles",
 		"description": "Core item for making other things clean",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"boar-bristles"

@@ -5,7 +5,7 @@
 		"id": "spoiled-sausage",
 		"title": "Spoiled Sausage",
 		"description": "I almost threw",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-sausage"

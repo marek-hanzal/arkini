@@ -5,7 +5,7 @@
 		"id": "building-ruins",
 		"title": "Building Ruins",
 		"description": "If you destroy a building - here you go",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"building-ruins"

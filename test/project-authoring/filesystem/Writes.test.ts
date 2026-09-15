@@ -2,10 +2,12 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { readFile, writeFile } from "node:fs/promises";
 import { join, sep } from "node:path";
 import { Cause, Effect, Exit, FileSystem } from "effect";
+import sharp from "sharp";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -145,8 +147,8 @@ describe("filesystem Editor project writes", () => {
 					...water,
 					title: "Fresh Water",
 					draft: true,
-					asset: {
-						...water.asset,
+					artwork: {
+						...water.artwork,
 						scale: 0.65,
 					},
 				},
@@ -174,7 +176,7 @@ describe("filesystem Editor project writes", () => {
 				nodeFileSystem.readFileString(join(root, "items", `${water.uid}.json`)),
 			),
 		);
-		expect(savedItem.item.asset.scale).toBe(0.65);
+		expect(savedItem.item.artwork.scale).toBe(0.65);
 		expect(savedItem.item.draft).toBe(true);
 		publishedTargets.clear();
 		pngOperations.length = 0;
@@ -211,7 +213,7 @@ describe("filesystem Editor project writes", () => {
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
 		const project = await Effect.runPromise(reopened.readProjectFx(created.projectId));
-		expect(project?.config.items.water?.asset.scale).toBe(0.65);
+		expect(project?.config.items.water?.artwork.scale).toBe(0.65);
 	});
 
 	it("pins config, item, and resource writes while preserving the selected build version", async () => {
@@ -265,13 +267,17 @@ describe("filesystem Editor project writes", () => {
 			),
 		).rejects.toThrow(`changed from revision ${compatible.revision} to ${itemCommit.revision}`);
 
+		const resourceBytes = createTestPngBytes();
+		const resourcePath = join(harness.temporaryDirectory, "new-artwork.png");
+		await writeFile(resourcePath, resourceBytes);
 		const resource = {
 			id: "new-asset",
-			mime: "image/png" as const,
-			bytes: Uint8Array.of(7, 8, 9),
+			type: "artwork" as const,
+			path: resourcePath,
+			size: resourceBytes.byteLength,
 		};
 		const resourceCommit = await Effect.runPromise(
-			repository.upsertResourcesFx({
+			repository.upsertResourceFilesFx({
 				projectId: created.projectId,
 				resources: [
 					resource,
@@ -280,8 +286,8 @@ describe("filesystem Editor project writes", () => {
 		);
 		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual({
 			id: resource.id,
-			mime: resource.mime,
-			size: resource.bytes.byteLength,
+			type: resource.type,
+			size: resourceBytes.byteLength,
 			version: expect.any(String),
 		});
 		expect(resourceCommit.version).toEqual({
@@ -296,8 +302,8 @@ describe("filesystem Editor project writes", () => {
 					currentId: resource.id,
 					config: resourceCommit.config,
 					resource: {
-						...resource,
-						bytes: Uint8Array.of(1),
+						id: resource.id,
+						type: resource.type,
 					},
 				}),
 			),
@@ -313,8 +319,8 @@ describe("filesystem Editor project writes", () => {
 					currentId: resource.id,
 					config: resourceCommit.config,
 					resource: {
-						...resource,
 						id: "hero",
+						type: resource.type,
 					},
 				}),
 			),
@@ -324,8 +330,8 @@ describe("filesystem Editor project writes", () => {
 		expect(canonical?.config.items.water?.title).toBe("Fresh Water");
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		if (root === null) throw new Error("Managed project root missing.");
-		expect(new Uint8Array(await readFile(join(root, "assets", `${resource.id}.png`)))).toEqual(
-			resource.bytes,
+		expect(new Uint8Array(await readFile(join(root, "artwork", `${resource.id}.png`)))).toEqual(
+			resourceBytes,
 		);
 		expect(canonical?.resources).toEqual(resourceCommit.resources);
 	});
@@ -335,7 +341,7 @@ describe("filesystem Editor project writes", () => {
 		const project = await harness.createProject(repository);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Managed project root missing.");
-		const original = await readFile(join(root, "resources", "hero.png"));
+		const original = await readFile(join(root, "image", "hero.png"));
 		const source = join(harness.temporaryDirectory, "renamed-jpeg.png");
 		await writeFile(source, "not a PNG");
 
@@ -348,7 +354,7 @@ describe("filesystem Editor project writes", () => {
 					config: project.config,
 					resource: {
 						id: "hero",
-						mime: "image/png",
+						type: "image",
 						path: source,
 						size: 9,
 					},
@@ -357,7 +363,55 @@ describe("filesystem Editor project writes", () => {
 		).rejects.toMatchObject({
 			operation: "replace-resource",
 		});
-		expect(await readFile(join(root, "resources", "hero.png"))).toEqual(original);
+		expect(await readFile(join(root, "image", "hero.png"))).toEqual(original);
+	});
+
+	it("rejects non-square Artwork replacement without changing the source", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		const target = join(root, "artwork", "item-water.png");
+		const original = await readFile(target);
+		const source = join(harness.temporaryDirectory, "rectangular-artwork.png");
+		await sharp({
+			create: {
+				width: 3,
+				height: 2,
+				channels: 4,
+				background: {
+					r: 255,
+					g: 0,
+					b: 255,
+					alpha: 1,
+				},
+			},
+		})
+			.png()
+			.toFile(source);
+
+		await expect(
+			Effect.runPromise(
+				repository.replaceResourceFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+					currentId: "item-water",
+					config: project.config,
+					resource: {
+						id: "item-water",
+						type: "artwork",
+						path: source,
+						size: 1,
+					},
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "replace-resource",
+		});
+		expect(await readFile(target)).toEqual(original);
+		expect(await Effect.runPromise(repository.readProjectFx(project.projectId))).toEqual(
+			project,
+		);
 	});
 
 	it("returns a typed repository failure when a write targets an unknown project", async () => {

@@ -5,7 +5,7 @@
 		"id": "vegetable-garden",
 		"title": "Vegetable Garden",
 		"description": "Grows some vegetables",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"vegetable-garden"

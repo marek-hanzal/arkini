@@ -95,7 +95,7 @@ describe("editor MCP project notes", () => {
 		);
 		expect(detail).toEqual({
 			...first,
-			linkedAssets: [],
+			linkedResources: [],
 			linkedItems: [],
 		});
 	});

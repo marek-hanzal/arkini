@@ -8,7 +8,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { AssetCollectionInputSchema } from "./AssetCollectionInputSchema";
+import { ArtworkCollectionInputSchema } from "./ArtworkCollectionInputSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchema } from "./CreateItemInputSchema";
 import { EditItemInputSchema } from "./EditItemInputSchema";
@@ -16,7 +16,7 @@ import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
-import { readAssetCollectionTextFn } from "./fn/readAssetCollectionTextFn";
+import { readArtworkCollectionTextFn } from "./fn/readArtworkCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
@@ -136,7 +136,7 @@ const readProjectTextFn = (project: Project) => {
 		`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
 		`Toolbar: ${project.config.meta.toolbarSize === undefined || project.config.meta.toolbarSize === 0 ? "disabled" : `${project.config.meta.toolbarSize} slots`}`,
 		`Inventory: ${project.config.meta.inventory.width} × ${project.config.meta.inventory.height}`,
-		`Hero asset: ${project.config.resources.hero}`,
+		`Hero artwork: ${project.config.resources.hero}`,
 		...(avatarResourceIds.length === 0
 			? []
 			: [
@@ -302,7 +302,7 @@ const createServerFn = (
 		server.registerTool(
 			"edit_item",
 			{
-				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, units, merge, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
+				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as artwork, units, merge, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
@@ -375,16 +375,16 @@ const createServerFn = (
 			),
 	);
 	server.registerTool(
-		"asset_collection",
+		"artwork_collection",
 		{
 			description:
-				"List one page of assets with the Editor Asset library's usage filter and fuzzy search. Each result contains only its public type and exact ID.",
-			inputSchema: AssetCollectionInputSchema,
+				"List one page of Artwork with the Editor Artwork library's usage filter and fuzzy search. Each result contains its semantic type and exact ID.",
+			inputSchema: ArtworkCollectionInputSchema,
 		},
 		async (input) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.map((project) => readAssetCollectionTextFn(project, input)),
+					Effect.map((project) => readArtworkCollectionTextFn(project, input)),
 				),
 			),
 	);

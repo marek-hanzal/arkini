@@ -7,7 +7,6 @@ import {
 } from "~/game-config-source/constant/GameProjectReference";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { Project } from "~/project-authoring/type/Project";
-import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import type { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
@@ -22,7 +21,6 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 	root,
 	previous,
 	next,
-	resourceWrites = [],
 	resourceFileWrites = [],
 	resourceRename,
 	noteUpdates,
@@ -30,7 +28,6 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 	readonly root: string;
 	readonly previous: Project;
 	readonly next: Project;
-	readonly resourceWrites?: ReadonlyArray<ResourceSchema.Type>;
 	readonly resourceFileWrites?: ReadonlyArray<{
 		readonly id: string;
 		readonly path: string;
@@ -124,18 +121,10 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 						uid,
 					}),
 				);
-			const previousShell = new Set(Object.values(previous.config.resources));
-			const nextShell = new Set(Object.values(next.config.resources));
 			const previousResources = new Map(
 				previous.resources.map((resource) => [
 					resource.id,
 					resource,
-				]),
-			);
-			const resourceBodies = new Map(
-				resourceWrites.map((resource) => [
-					resource.id,
-					resource.bytes,
 				]),
 			);
 			const resourceFiles = new Map(
@@ -148,29 +137,22 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				const oldId =
 					resourceRename?.to === resource.id ? resourceRename.from : resource.id;
 				const old = previousResources.get(oldId);
-				const target = yield* nextShell.has(resource.id)
-					? paths.resourceFileFx(resource.id)
-					: paths.assetFileFx(resource.id);
+				const target = yield* resource.type === "image"
+					? paths.imageFileFx(resource.id)
+					: paths.artworkFileFx(resource.id);
 				yield* admitTargetFx(target);
 				const oldTarget =
 					old === undefined
 						? undefined
-						: yield* previousShell.has(old.id)
-								? paths.resourceFileFx(old.id)
-								: paths.assetFileFx(old.id);
-				let bytes = resourceBodies.get(resource.id);
+						: yield* old.type === "image"
+								? paths.imageFileFx(old.id)
+								: paths.artworkFileFx(old.id);
 				let source = resourceFiles.get(resource.id);
 				if (oldTarget !== undefined && oldTarget !== target) {
 					deletes.add(oldTarget);
-					source ??= bytes === undefined ? oldTarget : undefined;
+					source ??= oldTarget;
 				}
-				if (bytes !== undefined) {
-					writes.push({
-						target,
-						bytes,
-					});
-					changedResources.add(resource.id);
-				} else if (source !== undefined) {
+				if (source !== undefined) {
 					writes.push({
 						target,
 						source,
@@ -178,16 +160,16 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 					changedResources.add(resource.id);
 				} else if (old === undefined) {
 					return yield* Effect.fail(
-						new Error(`New Editor asset ${resource.id} has no content.`),
+						new Error(`New Editor resource ${resource.id} has no content.`),
 					);
 				}
 				previousResources.delete(oldId);
 			}
 			for (const resource of previousResources.values()) {
 				deletes.add(
-					yield* previousShell.has(resource.id)
-						? paths.resourceFileFx(resource.id)
-						: paths.assetFileFx(resource.id),
+					yield* resource.type === "image"
+						? paths.imageFileFx(resource.id)
+						: paths.artworkFileFx(resource.id),
 				);
 			}
 			for (const note of noteUpdates) {
@@ -214,10 +196,14 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				verifyFx: Effect.forEach(next.resources, (resource) =>
 					changedResources.has(resource.id)
 						? Effect.gen(function* () {
-								const target = yield* nextShell.has(resource.id)
-									? paths.resourceFileFx(resource.id)
-									: paths.assetFileFx(resource.id);
-								return yield* readProjectResourceMetadataFx(resource.id, target);
+								const target = yield* resource.type === "image"
+									? paths.imageFileFx(resource.id)
+									: paths.artworkFileFx(resource.id);
+								return yield* readProjectResourceMetadataFx(
+									resource.id,
+									resource.type,
+									target,
+								);
 							})
 						: Effect.succeed(resource),
 				).pipe(

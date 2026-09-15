@@ -13,7 +13,7 @@ import {
 } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { EditorItemAutocompleteField } from "~/authoring-form/ui/EditorItemAutocompleteField";
-import { AssetAutocompleteField } from "~/authoring-form/ui/AssetAutocompleteField";
+import { ResourceAutocompleteField } from "~/authoring-form/ui/ResourceAutocompleteField";
 
 interface EditorTextFieldProps {
 	readonly autoComplete?: string;
@@ -232,7 +232,7 @@ const EditorBoolToggle = ({
 // later, use the library's withForm helper instead of mirroring its generic API by hand.
 export const { useAppForm, withFieldGroup: withFieldGroupFn } = createFormHook({
 	fieldComponents: {
-		AssetField: AssetAutocompleteField,
+		ResourceField: ResourceAutocompleteField,
 		BoolToggle: EditorBoolToggle,
 		ChoiceField: EditorChoiceField,
 		ItemField: EditorItemAutocompleteField,

@@ -124,7 +124,6 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	const descriptors = yield* readResourceDescriptorsFx({
 		input: paths.root,
 	});
-	const shellResources = new Set(Object.values(config.resources));
 	const resourceIds = new Set<string>();
 	for (const descriptor of descriptors) {
 		if (resourceIds.has(descriptor.id)) {
@@ -133,9 +132,9 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 			);
 		}
 		resourceIds.add(descriptor.id);
-		const expectedPath = yield* shellResources.has(descriptor.id)
-			? paths.resourceFileFx(descriptor.id)
-			: paths.assetFileFx(descriptor.id);
+		const expectedPath = yield* descriptor.type === "image"
+			? paths.imageFileFx(descriptor.id)
+			: paths.artworkFileFx(descriptor.id);
 		if (path.resolve(descriptor.path) !== expectedPath) {
 			return yield* Effect.fail(
 				new Error(
@@ -152,7 +151,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 				? left.path.localeCompare(right.path)
 				: left.id.localeCompare(right.id),
 		),
-		({ id, path: resourcePath }) => readProjectResourceMetadataFx(id, resourcePath),
+		({ id, type, path: resourcePath }) => readProjectResourceMetadataFx(id, type, resourcePath),
 	);
 	yield* admitArkiniVersionFx("Editor project", marker.arkini);
 

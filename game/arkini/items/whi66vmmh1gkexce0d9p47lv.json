@@ -5,7 +5,7 @@
 		"id": "gear-t4",
 		"title": "Gear - Tier 4",
 		"description": "Only masters can build this",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gear-t4"

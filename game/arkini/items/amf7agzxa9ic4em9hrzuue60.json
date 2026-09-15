@@ -5,7 +5,7 @@
 		"id": "empty-wine-barrel",
 		"title": "Empty Wine Barrel",
 		"description": "Wanna more",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"empty-wine-barrel"

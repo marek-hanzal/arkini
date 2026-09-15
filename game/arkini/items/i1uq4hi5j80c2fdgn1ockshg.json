@@ -5,7 +5,7 @@
 		"id": "sword",
 		"title": "Sword",
 		"description": "Just a sword. You can cut a bread using it",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sword"

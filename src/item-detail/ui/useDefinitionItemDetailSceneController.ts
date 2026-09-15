@@ -68,11 +68,11 @@ const useItemDefinitionDetail = (
 				kind: "available",
 				itemId: item.id,
 				title: item.title,
-				sourceUrl: game.getResourceUrlFn(item.asset.default[0]),
-				...(item.asset.default[1] === undefined
+				sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),
+				...(item.artwork.default[1] === undefined
 					? {}
 					: {
-							compositeUrl: game.getResourceUrlFn(item.asset.default[1]),
+							compositeUrl: game.getResourceUrlFn(item.artwork.default[1]),
 						}),
 				description: item.description,
 				schedule:

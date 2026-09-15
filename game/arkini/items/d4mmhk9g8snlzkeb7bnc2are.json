@@ -5,7 +5,7 @@
 		"id": "gear-t2",
 		"title": "Gear - Tier 2",
 		"description": "Better gears",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"gear-t2"

@@ -5,7 +5,7 @@
 		"id": "inventory",
 		"title": "Inventory",
 		"description": "Here you have all the clutter you don't want on the board. Yaay!",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"inventory"

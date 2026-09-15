@@ -5,7 +5,7 @@
 		"id": "copper-mine",
 		"title": "Copper Mine",
 		"description": "Source of the raw copper",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"copper-mine"

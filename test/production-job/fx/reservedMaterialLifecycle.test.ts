@@ -16,10 +16,10 @@ const base = (id: string, scope: "any" | "board" = "board") => ({
 	id,
 	title: id,
 	description: id,
-	asset: {
+	artwork: {
 		scale: 0.8,
 		default: [
-			`asset:${id}`,
+			`artwork:${id}`,
 		],
 	},
 	scope,

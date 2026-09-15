@@ -5,7 +5,7 @@
 		"id": "book-t1",
 		"title": "Book - Tier 1",
 		"description": "Just a book. It could be empty. Or has some poem. Or whatever.",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"book-t1"

@@ -5,7 +5,7 @@
 		"id": "poison-jar",
 		"title": "Poison Jar",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"poison-jar"

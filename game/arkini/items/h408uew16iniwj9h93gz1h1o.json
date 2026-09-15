@@ -5,7 +5,7 @@
 		"id": "injured-fawn",
 		"title": "Injured Fawn",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"injured-fawn"

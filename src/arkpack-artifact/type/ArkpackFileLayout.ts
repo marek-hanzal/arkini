@@ -1,8 +1,9 @@
 import type { ManifestSchema } from "~/arkpack-artifact/schema/ManifestSchema";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface ArkpackFileResourceLayout {
 	readonly id: string;
-	readonly mime: string;
+	readonly type: ResourceTypeSchema.Type;
 	readonly length: number;
 	readonly offset: number;
 }

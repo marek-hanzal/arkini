@@ -5,7 +5,7 @@
 		"id": "spoiled-pancake",
 		"title": "Spoiled Pancake",
 		"description": "No-yummi",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"spoiled-pancake"

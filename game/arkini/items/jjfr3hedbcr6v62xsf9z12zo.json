@@ -5,7 +5,7 @@
 		"id": "cauldron-with-water",
 		"title": "Cauldron With Water",
 		"description": "Water is good",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-water"

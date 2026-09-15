@@ -247,13 +247,13 @@ export const FormSession = ({
 							selector={(state) =>
 								[
 									state.values.title,
-									state.values.asset,
+									state.values.artwork,
 								] as const
 							}
 						>
-							{([title, asset]) => (
+							{([title, artwork]) => (
 								<ItemHeaderTitle
-									resourceIds={readCanonicalItemArtworkFn(asset).default}
+									resourceIds={readCanonicalItemArtworkFn(artwork).default}
 									title={
 										title.trim() ||
 										(isNew ? translator.textFn("New item") : initialItem.id)

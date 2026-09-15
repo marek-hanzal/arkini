@@ -5,7 +5,7 @@
 		"id": "inkwell",
 		"title": "Inkwell",
 		"description": "Write something nice",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"inkwell"

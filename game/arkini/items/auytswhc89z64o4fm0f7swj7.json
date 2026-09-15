@@ -5,7 +5,7 @@
 		"id": "iron-ore",
 		"title": "Iron Ore",
 		"description": "Metal, let's rock",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"iron-ore"

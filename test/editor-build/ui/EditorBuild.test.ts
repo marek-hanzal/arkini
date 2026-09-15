@@ -379,6 +379,7 @@ describe("EditorBuild", () => {
 			resources: [
 				{
 					id: "unused-asset",
+					type: "artwork",
 				},
 			],
 		};
@@ -402,7 +403,7 @@ describe("EditorBuild", () => {
 		).not.toBeNull();
 		expect(
 			container.querySelector(
-				'a[href="/editor/editor-test/assets/unused-asset/detail/overview"]',
+				'a[href="/editor/editor-test/artwork/unused-asset/detail/overview"]',
 			),
 		).not.toBeNull();
 		expect(

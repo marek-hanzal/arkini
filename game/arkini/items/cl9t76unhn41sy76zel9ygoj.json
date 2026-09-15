@@ -5,7 +5,7 @@
 		"id": "cocoa-beans",
 		"title": "Cocoa Beans",
 		"description": "Fresh cocoa beans",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cocoa-beans"

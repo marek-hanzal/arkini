@@ -5,7 +5,7 @@
 		"id": "sugar",
 		"title": "Sugar",
 		"description": "Pure sweetness",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"sugar"

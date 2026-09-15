@@ -5,7 +5,7 @@
 		"id": "air-purifier",
 		"title": "Air Purifier",
 		"description": "Fresh air",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"air-purifier"

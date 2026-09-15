@@ -10,9 +10,9 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 /** Local presentation values owned only by one mounted item form. */
 export type FormValues = Omit<
 	ItemSchema.Type,
-	"asset" | "description" | "merge" | "lines" | "maxQueueSize"
+	"artwork" | "description" | "merge" | "lines" | "maxQueueSize"
 > & {
-	readonly asset: {
+	readonly artwork: {
 		readonly scale: number;
 		readonly default: [
 			string,
@@ -30,18 +30,18 @@ export type FormValues = Omit<
 
 /** Removes empty optional artwork slots from the local form representation. */
 export const readCanonicalItemArtworkFn = (
-	asset: FormValues["asset"],
-): ItemSchema.Type["asset"] => {
-	const overlay = asset.default[1];
+	artwork: FormValues["artwork"],
+): ItemSchema.Type["artwork"] => {
+	const overlay = artwork.default[1];
 	return {
-		scale: asset.scale,
+		scale: artwork.scale,
 		default:
 			overlay === ""
 				? [
-						asset.default[0],
+						artwork.default[0],
 					]
 				: [
-						asset.default[0],
+						artwork.default[0],
 						overlay,
 					],
 	};
@@ -104,7 +104,7 @@ export const FormSchema = z.custom<FormValues>().transform((candidate, context) 
 			: {
 					description,
 				}),
-		asset: readCanonicalItemArtworkFn(normalized.asset),
+		artwork: readCanonicalItemArtworkFn(normalized.artwork),
 	});
 	if (result.success) return result.data;
 	for (const issue of result.error.issues) {

@@ -6,7 +6,10 @@ import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes"
 
 export const writeSigningGame = async (root: string) => {
 	const gameDirectory = join(root, "game");
-	await mkdir(join(gameDirectory, "assets"), {
+	await mkdir(join(gameDirectory, "artwork"), {
+		recursive: true,
+	});
+	await mkdir(join(gameDirectory, "image"), {
 		recursive: true,
 	});
 	await mkdir(join(gameDirectory, "items"), {
@@ -44,7 +47,7 @@ export const writeSigningGame = async (root: string) => {
 				},
 			},
 			resources: {
-				hero: "item",
+				hero: "hero",
 			},
 			start: {
 				currentSpace: 0,
@@ -64,7 +67,7 @@ export const writeSigningGame = async (root: string) => {
 
 				title: "Item",
 				description: "Signing fixture item.",
-				asset: {
+				artwork: {
 					scale: 0.8,
 					default: [
 						"item",
@@ -75,6 +78,7 @@ export const writeSigningGame = async (root: string) => {
 			},
 		})}\n`,
 	);
-	await writeFile(join(gameDirectory, "assets", "item.png"), createTestPngBytes());
+	await writeFile(join(gameDirectory, "artwork", "item.png"), createTestPngBytes());
+	await writeFile(join(gameDirectory, "image", "hero.png"), createTestPngBytes());
 	return gameDirectory;
 };

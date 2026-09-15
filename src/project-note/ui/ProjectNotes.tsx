@@ -11,8 +11,8 @@ import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Markdown } from "~/ui/ui/Markdown";
 
-import { NoteAssetLinks } from "~/project-note/ui/NoteAssetLinks";
-import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
+import { NoteResourceLinks } from "~/project-note/ui/NoteResourceLinks";
+import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
 import { NoteItemLinks } from "~/project-note/ui/NoteItemLinks";
 
 const MotionEditorRootCard = motion.create(EditorRootCard);
@@ -52,8 +52,8 @@ const noteMotion = {
 } as const;
 
 interface ProjectNotesProps extends useNotesController.Props {
-	readonly assetFilter?: AssetCatalogFilterSchema.Type;
-	readonly assetQuery?: string;
+	readonly artworkFilter?: ArtworkCatalogFilterSchema.Type;
+	readonly artworkQuery?: string;
 }
 
 /** Shared two-column Notes workspace; the list and composer own independent scroll areas. */
@@ -98,7 +98,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 										<Mx
 											label={
 												props.requiredCurrentResourceId !== undefined
-													? "Asset notes empty description"
+													? "Artwork notes empty description"
 													: props.requiredCurrentItemUid === undefined
 														? "Notes empty description"
 														: "Item notes empty description"
@@ -108,7 +108,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 									icon={NotebookPen}
 									title={translator.textFn(
 										props.requiredCurrentResourceId !== undefined
-											? "Asset notes empty title"
+											? "Artwork notes empty title"
 											: props.requiredCurrentItemUid === undefined
 												? "Notes empty title"
 												: "Item notes empty title",
@@ -163,8 +163,8 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 												content={controller.editContent}
 												itemUids={controller.editItemUids}
 												resourceIds={controller.editResourceIds}
-												assetFilter={props.assetFilter}
-												assetQuery={props.assetQuery}
+												artworkFilter={props.artworkFilter}
+												artworkQuery={props.artworkQuery}
 												pending={controller.pending}
 												canSave={controller.canSaveEdit}
 												saveLabel="Save"
@@ -191,7 +191,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 														controller.unlinkFn(note, itemUid)
 													}
 												/>
-												<NoteAssetLinks
+												<NoteResourceLinks
 													resourceIds={note.resourceIds}
 													disabled={
 														controller.pending ||
@@ -203,8 +203,8 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 															resourceId,
 														)
 													}
-													filter={props.assetFilter}
-													query={props.assetQuery}
+													filter={props.artworkFilter}
+													query={props.artworkQuery}
 												/>
 											</>
 										)}
@@ -233,8 +233,8 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 						resourceIds={controller.newResourceIds}
 						requiredItemUid={props.requiredCurrentItemUid}
 						requiredResourceId={props.requiredCurrentResourceId}
-						assetFilter={props.assetFilter}
-						assetQuery={props.assetQuery}
+						artworkFilter={props.artworkFilter}
+						artworkQuery={props.artworkQuery}
 						pending={controller.pending}
 						canSave={controller.canCreate}
 						saveLabel="Create note"

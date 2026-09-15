@@ -28,7 +28,7 @@ export const itemFn = (id: string, fields: Record<string, unknown> = {}) =>
 		uid: id,
 		id,
 		title: id,
-		asset: {
+		artwork: {
 			default: [
 				id,
 			],

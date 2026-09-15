@@ -5,7 +5,7 @@
 		"id": "scythe",
 		"title": "Scythe",
 		"draft": true,
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"scythe"

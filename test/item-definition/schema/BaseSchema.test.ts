@@ -12,7 +12,7 @@ describe("BaseSchema draft status", () => {
 			uid: "legacy-item",
 			id: "legacy-item",
 			title: "Legacy item",
-			asset: {
+			artwork: {
 				scale: 0.8,
 				default: [
 					"legacy-item",

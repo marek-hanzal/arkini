@@ -5,7 +5,7 @@
 		"id": "clay",
 		"title": "Clay",
 		"description": "Clay",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"clay"

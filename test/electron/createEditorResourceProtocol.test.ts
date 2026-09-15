@@ -24,6 +24,7 @@ const locations = new Map<
 	{
 		root: string;
 		path: string;
+		type: "artwork";
 		version: string;
 		size: number;
 	}
@@ -32,7 +33,7 @@ let protocol: createEditorResourceProtocolFx.Output;
 let nativeBodies: Array<ReadableStream<Uint8Array> | null> = [];
 
 const registerFn = async (id: string, content: string) => {
-	const path = join(root, "assets", `${id}.png`);
+	const path = join(root, "artwork", `${id}.png`);
 	await writeFile(path, content);
 	const info = await stat(path);
 	const version = readProjectResourceVersionFn({
@@ -45,6 +46,7 @@ const registerFn = async (id: string, content: string) => {
 	locations.set(id, {
 		root,
 		path,
+		type: "artwork",
 		version,
 		size: info.size,
 	});
@@ -60,7 +62,7 @@ const requestFn = (url: string, init?: RequestInit) =>
 
 beforeEach(async () => {
 	root = await realpath(await mkdtemp(join(tmpdir(), "arkini-resource-protocol-")));
-	await mkdir(join(root, "assets"));
+	await mkdir(join(root, "artwork"));
 	netFetch.mockReset();
 	nativeBodies = [];
 	netFetch.mockImplementation(async (url: string, init?: RequestInit) => {
@@ -133,7 +135,7 @@ describe("Editor resource protocol", () => {
 		const newUrl = await registerFn("asset", "new");
 		expect((await requestFn(oldUrl)).status).toBe(409);
 		expect(await (await requestFn(newUrl)).text()).toBe("new");
-		await writeFile(join(root, "assets", "asset.png"), "external change");
+		await writeFile(join(root, "artwork", "asset.png"), "external change");
 		const external = await requestFn(newUrl);
 		expect(await external.text()).toBe("external change");
 		expect(external.headers.get("Content-Length")).toBe("15");

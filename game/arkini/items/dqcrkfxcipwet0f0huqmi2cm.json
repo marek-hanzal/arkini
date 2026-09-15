@@ -5,7 +5,7 @@
 		"id": "bubble",
 		"title": "Bubble",
 		"description": "Bubble. No use for it",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"bubble"

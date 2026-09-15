@@ -5,7 +5,7 @@
 		"id": "pancake",
 		"title": "Pancake",
 		"description": "You can make it better",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"pancake"

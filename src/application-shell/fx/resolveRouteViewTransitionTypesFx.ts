@@ -22,17 +22,17 @@ const editorWelcomePattern = /^\/editor(?:\/welcome)?\/?$/;
 const editorProjectPattern = /^\/editor\/(?!welcome(?:\/|$))[^/]+(?:\/.*)?$/;
 const editorBoardPattern = /^\/editor\/[^/]+\/board\/?$/;
 const editorBoardInventoryPattern = /^\/editor\/[^/]+\/board\/inventory\/?$/;
-const editorAssetDetailLeafPattern =
-	/^\/editor\/([^/]+)\/assets\/([^/]+)\/detail\/(?:overview|usage|technical|delete)\/?$/;
+const editorArtworkDetailLeafPattern =
+	/^\/editor\/([^/]+)\/artwork\/([^/]+)\/detail\/(?:overview|usage|notes|delete)\/?$/;
 const settingsPattern = /^\/settings(?:\/(?:common|game|dev))?\/?$/;
 
 const isEditorBoardLeafTransitionFn = (from: string, to: string) =>
 	(editorBoardPattern.test(from) && editorBoardInventoryPattern.test(to)) ||
 	(editorBoardInventoryPattern.test(from) && editorBoardPattern.test(to));
 
-const isSameEditorAssetDetailTransitionFn = (from: string, to: string) => {
-	const fromDetail = editorAssetDetailLeafPattern.exec(from);
-	const toDetail = editorAssetDetailLeafPattern.exec(to);
+const isSameEditorArtworkDetailTransitionFn = (from: string, to: string) => {
+	const fromDetail = editorArtworkDetailLeafPattern.exec(from);
+	const toDetail = editorArtworkDetailLeafPattern.exec(to);
 	return (
 		fromDetail !== null &&
 		toDetail !== null &&
@@ -75,7 +75,7 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 		Effect.sync(() => {
 			if (fromLocation === undefined || fromLocation.pathname === toLocation.pathname)
 				return false;
-			if (isSameEditorAssetDetailTransitionFn(fromLocation.pathname, toLocation.pathname))
+			if (isSameEditorArtworkDetailTransitionFn(fromLocation.pathname, toLocation.pathname))
 				return false;
 			const from = resolveVisualRouteIdFn(fromLocation.pathname);
 			const to = resolveVisualRouteIdFn(toLocation.pathname);

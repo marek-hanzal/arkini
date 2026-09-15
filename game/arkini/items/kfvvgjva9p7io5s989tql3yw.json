@@ -5,10 +5,10 @@
 		"id": "sarka",
 		"title": "Šárka",
 		"description": "The Author's Wife",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
-				"avatar-03"
+				"sarka"
 			]
 		},
 		"scope": "any",

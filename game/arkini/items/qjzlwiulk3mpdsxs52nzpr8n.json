@@ -5,7 +5,7 @@
 		"id": "honey",
 		"title": "Honey",
 		"description": "So sweet",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"honey"

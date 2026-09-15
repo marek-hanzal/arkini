@@ -5,7 +5,7 @@
 		"id": "labor-t2",
 		"title": "Labor T2",
 		"description": "Those better paid",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"labor-t2"

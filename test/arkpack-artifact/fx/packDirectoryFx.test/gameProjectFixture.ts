@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import sharp from "sharp";
 
 export const png = Uint8Array.from(
 	Buffer.from(
@@ -53,7 +54,7 @@ const config = GameConfigSchema.parse({
 
 			title: "Portal",
 			description: "Portal",
-			asset: {
+			artwork: {
 				scale: 1,
 				default: [
 					"item-water",
@@ -71,7 +72,7 @@ const config = GameConfigSchema.parse({
 
 			title: "Water",
 			description: "Water",
-			asset: {
+			artwork: {
 				scale: 0.65,
 				default: [
 					"item-water",
@@ -88,17 +89,17 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	const path = yield* Path.Path;
 	const input = yield* fileSystem.makeTempDirectoryScoped();
 	const itemDirectory = path.join(input, "items");
-	const assets = path.join(input, "assets");
-	const resources = path.join(input, "resources");
+	const artwork = path.join(input, "artwork");
+	const image = path.join(input, "image");
 	const { items: authoredItems, ...root } = config;
 
 	yield* fileSystem.makeDirectory(itemDirectory, {
 		recursive: true,
 	});
-	yield* fileSystem.makeDirectory(assets, {
+	yield* fileSystem.makeDirectory(artwork, {
 		recursive: true,
 	});
-	yield* fileSystem.makeDirectory(resources, {
+	yield* fileSystem.makeDirectory(image, {
 		recursive: true,
 	});
 	yield* fileSystem.writeFileString(
@@ -137,8 +138,16 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 			item: authoredItems.portal,
 		}),
 	);
-	yield* fileSystem.writeFile(path.join(resources, "hero.png"), png);
-	yield* fileSystem.writeFile(path.join(assets, "item-water.png"), assetPng);
+	yield* fileSystem.writeFile(path.join(image, "hero.png"), png);
+	const squareArtworkPng = yield* Effect.promise(() =>
+		sharp(assetPng)
+			.resize(512, 512, {
+				fit: "fill",
+			})
+			.png()
+			.toBuffer(),
+	);
+	yield* fileSystem.writeFile(path.join(artwork, "item-water.png"), squareArtworkPng);
 
 	return input;
 });

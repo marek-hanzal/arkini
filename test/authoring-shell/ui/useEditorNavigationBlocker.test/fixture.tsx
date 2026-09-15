@@ -81,7 +81,6 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 			replaceConfigFx: () => Effect.die("Unexpected config write."),
 			replaceResourceFx: () => Effect.die("Unexpected resource write."),
 			upsertItemFx: () => Effect.die("Unexpected item write."),
-			upsertResourcesFx: () => Effect.die("Unexpected resource write."),
 			readProjectFx: () => Effect.succeed(project),
 		},
 	});

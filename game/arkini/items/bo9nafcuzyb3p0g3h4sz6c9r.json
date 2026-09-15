@@ -5,7 +5,7 @@
 		"id": "cauldron-with-boiling-beeswax",
 		"title": "Cauldron With Boiling Beeswax",
 		"description": "Boiling beeswax. It could be useful, but keep it warm",
-		"asset": {
+		"artwork": {
 			"scale": 1,
 			"default": [
 				"cauldron-with-boiling-beeswax"

@@ -1,17 +1,17 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "s2nit67s0y8655wk3pvom2qo",
-		"id": "wild-boar",
-		"title": "Wild Boar",
-		"description": "An animal",
+		"uid": "rsuelogiw40sc1p2sxa2ptik",
+		"id": "beagle-with-sword",
+		"title": "Beagle With Sword",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"wild-boar"
+				"beagle-with-sword"
 			]
 		},
-		"scope": "board",
+		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

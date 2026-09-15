@@ -41,7 +41,56 @@
 				"result": "poison-jar"
 			}
 		],
+		"clock": {
+			"intervalMs": 180000,
+			"durationMs": 900000,
+			"expiryMode": "kill-switch",
+			"enable": true,
+			"rules": []
+		},
+		"control": "automatic-only",
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "corruption",
+				"title": "Corruption",
+				"description": "You deserve it",
+				"clock": true,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "chance",
+									"chance": 0.5,
+									"drop": [
+										{
+											"itemId": "corruption",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

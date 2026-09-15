@@ -63,6 +63,56 @@
 					]
 				},
 				"effect": "spend"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "beagle-with-sword"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle-puppy"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "spoiled-raw-game-meat",
+											"quantity": {
+												"min": 4,
+												"max": 6
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "corruption",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "corrupted-beagle-puppy"
 			}
 		],
 		"maxQueueSize": 1,

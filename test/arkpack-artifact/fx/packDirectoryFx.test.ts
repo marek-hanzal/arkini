@@ -1,11 +1,10 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { Deferred, Effect, Fiber, FileSystem, Path, Ref } from "effect";
-import { TestClock } from "effect/testing";
+import { Effect, FileSystem, Path } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import sharp from "sharp";
 
-import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
-import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
+import { decodeTestArkpackPayloadFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { decodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
 import {
 	assetPng,
@@ -22,8 +21,8 @@ describe("packDirectoryFx game-project contract", () => {
 				input,
 			});
 			const arkpack = yield* fileSystem.readFile(result.arkpack);
-			const envelope = yield* decodeArkpackEnvelopeFx(arkpack);
-			const payload = yield* decodeFx(envelope.payload);
+			const envelope = yield* decodeTestArkpackEnvelopeFx(arkpack);
+			const payload = yield* decodeTestArkpackPayloadFx(envelope.payload);
 
 			expect(result).toMatchObject({
 				filename: "project-game.arkpack",
@@ -161,29 +160,6 @@ describe("packDirectoryFx game-project contract", () => {
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
-	it.effect("refuses to pack an interrupted portable Editor tree", () =>
-		Effect.gen(function* () {
-			const fileSystem = yield* FileSystem.FileSystem;
-			const path = yield* Path.Path;
-			const input = yield* writeGameProjectFixtureFx();
-			const recovery = path.join(input, "editor.lock.write");
-			yield* fileSystem.makeDirectory(recovery);
-			const result = yield* Effect.result(
-				packDirectoryFx({
-					input,
-				}),
-			);
-
-			expect(result).toMatchObject({
-				_tag: "Failure",
-				failure: {
-					message: expect.stringContaining("reopen it in the Editor before packing"),
-				},
-			});
-			expect(yield* fileSystem.exists(path.join(input, "build"))).toBe(false);
-		}).pipe(Effect.provide(NodeServices.layer)),
-	);
-
 	it.effect("rejects an item file whose filename does not match its UID", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
@@ -212,81 +188,6 @@ describe("packDirectoryFx game-project contract", () => {
 					]),
 				},
 			});
-		}).pipe(Effect.provide(NodeServices.layer)),
-	);
-
-	for (const change of [
-		"JSON bytes",
-		"PNG bytes",
-		"source membership",
-	] as const) {
-		it.effect(`preserves the previous artifact when ${change} changes during packing`, () =>
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				const path = yield* Path.Path;
-				const input = yield* writeGameProjectFixtureFx();
-				const previous = yield* packDirectoryFx({
-					input,
-				});
-				const previousBytes = yield* fileSystem.readFile(previous.arkpack);
-				const mutation =
-					change === "JSON bytes"
-						? fileSystem.writeFileString(path.join(input, "game.json"), "{}")
-						: change === "PNG bytes"
-							? fileSystem.writeFile(
-									path.join(input, "assets", "item-water.png"),
-									png,
-								)
-							: fileSystem.writeFile(path.join(input, "assets", "extra.png"), png);
-				const result = yield* Effect.result(
-					packDirectoryFx({
-						input,
-						assertCurrentFx: mutation,
-					}),
-				);
-				expect(result).toMatchObject({
-					_tag: "Failure",
-					failure: {
-						message: "The saved project sources changed while the build was prepared.",
-					},
-				});
-				expect(yield* fileSystem.readFile(previous.arkpack)).toEqual(previousBytes);
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-	}
-
-	it.effect("serializes concurrent project builds before the freshness assertion", () =>
-		Effect.gen(function* () {
-			const input = yield* writeGameProjectFixtureFx();
-			const firstEntered = yield* Deferred.make<void>();
-			const releaseFirst = yield* Deferred.make<void>();
-			const secondEntered = yield* Ref.make(false);
-			const first = yield* packDirectoryFx({
-				input,
-				assertCurrentFx: Deferred.succeed(firstEntered, undefined).pipe(
-					Effect.andThen(Deferred.await(releaseFirst)),
-				),
-			}).pipe(Effect.forkChild);
-			yield* Deferred.await(firstEntered);
-			const second = yield* packDirectoryFx({
-				input,
-				assertCurrentFx: Ref.set(secondEntered, true),
-			}).pipe(Effect.forkChild);
-			yield* TestClock.adjust("100 millis");
-			const enteredWhileLocked = yield* Ref.get(secondEntered);
-			yield* Deferred.succeed(releaseFirst, undefined);
-			const firstResult = yield* Fiber.join(first);
-			yield* TestClock.adjust("100 millis");
-			const secondResult = yield* Fiber.join(second);
-
-			expect(enteredWhileLocked).toBe(false);
-			expect([
-				firstResult.filename,
-				secondResult.filename,
-			]).toEqual([
-				"project-game.arkpack",
-				"project-game.arkpack",
-			]);
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 });

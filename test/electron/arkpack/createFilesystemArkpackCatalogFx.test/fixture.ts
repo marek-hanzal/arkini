@@ -6,7 +6,7 @@ import { join } from "node:path";
 
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "~electron/main/arkpack/createFilesystemArkpackCatalogFx";
-import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
+import { decodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
@@ -55,7 +55,7 @@ export const readFileRecord = ({
 	readonly source: ArkiniElectronApi.ArkpackFile["source"];
 }): ArkiniElectronApi.ArkpackFile => {
 	const bytes = source === "bundled" ? createBundledBytes(packageId) : createUserBytes(packageId);
-	const { payload } = Effect.runSync(decodeArkpackEnvelopeFx(bytes));
+	const { payload } = Effect.runSync(decodeTestArkpackEnvelopeFx(bytes));
 	return {
 		packageId,
 		filename: readPackageFilename(packageId),

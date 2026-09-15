@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
-import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
+import { decodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { encodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
 import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { writeSigningGame } from "./arkpackSigningWorkflow.test/writeSigningGame";
 
@@ -35,12 +35,12 @@ describe("local Arkpack build", () => {
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 		const firstEnvelope = Effect.runSync(
-			decodeArkpackEnvelopeFx(new Uint8Array(await readFile(first.arkpack))),
+			decodeTestArkpackEnvelopeFx(new Uint8Array(await readFile(first.arkpack))),
 		);
 		await writeFile(
 			first.arkpack,
 			Effect.runSync(
-				encodeArkpackEnvelopeFx({
+				encodeTestArkpackEnvelopeFx({
 					payload: firstEnvelope.payload,
 					proof: new TextEncoder().encode("{}"),
 				}),
@@ -55,6 +55,6 @@ describe("local Arkpack build", () => {
 
 		const rebuiltBytes = new Uint8Array(await readFile(rebuilt.arkpack));
 		expect(rebuiltBytes.byteLength).toBe(rebuilt.bytes);
-		expect(Effect.runSync(decodeArkpackEnvelopeFx(rebuiltBytes)).proof).toBeUndefined();
+		expect(Effect.runSync(decodeTestArkpackEnvelopeFx(rebuiltBytes)).proof).toBeUndefined();
 	});
 });

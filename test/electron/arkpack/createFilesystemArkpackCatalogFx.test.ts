@@ -5,7 +5,6 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkpackLimits } from "~shared/ArkpackLimits";
-import { writeArkpackFileFx } from "~electron/main/arkpack/writeArkpackFileFx";
 import {
 	createBundledBytes,
 	createCatalog,
@@ -69,13 +68,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		];
 		const catalog = await createCatalog(root);
 
-		for (const packageId of packageIds)
-			await Effect.runPromise(
-				catalog.installFx({
-					packageId,
-					bytes: createUserBytes(packageId),
-				}),
-			);
+		for (let index = 0; index < packageIds.length; index += 1) {
+			const packageId = packageIds[index];
+			const source = join(root, `source-${index}.arkpack`);
+			await writeFile(source, createUserBytes(packageId));
+			await Effect.runPromise(catalog.importFx(source));
+		}
 
 		const files = await Effect.runPromise(catalog.listFx);
 		expect(new Set(files.map(({ packageId }) => packageId))).toEqual(new Set(packageIds));
@@ -260,13 +258,9 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
 
-		const installing = Effect.runPromise(
-			writeArkpackFileFx({
-				arkpackPath: output,
-				bytes: createUserBytes(packageId),
-				fileSystem,
-			}),
-		);
+		const source = join(root, "serialized-source.arkpack");
+		await writeFile(source, createUserBytes(packageId));
+		const installing = Effect.runPromise(catalog.importFx(source));
 		await renameEntered.promise;
 		const removing = Effect.runPromise(catalog.removeFx(packageId));
 		await new Promise<void>((resolve) => setImmediate(resolve));
@@ -309,13 +303,9 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			},
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
-		const writing = Effect.runPromise(
-			writeArkpackFileFx({
-				arkpackPath: output,
-				bytes: createUserBytes(packageId),
-				fileSystem,
-			}),
-		);
+		const source = join(root, "locked-reader-source.arkpack");
+		await writeFile(source, createUserBytes(packageId));
+		const writing = Effect.runPromise(catalog.importFx(source));
 		await publicationEntered.promise;
 		const listing = Effect.runPromise(catalog.listFx);
 		await new Promise<void>((resolve) => setImmediate(resolve));

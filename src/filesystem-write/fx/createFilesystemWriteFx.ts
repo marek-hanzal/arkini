@@ -1,5 +1,6 @@
 import { Context, Effect, FileSystem, Path } from "effect";
 import { lock as acquireLock } from "proper-lockfile";
+import { copyFile } from "node:fs/promises";
 
 import { FilesystemWriteError } from "../error/FilesystemWriteError";
 import type { FilesystemWrite } from "../service/FilesystemWrite";
@@ -159,16 +160,36 @@ const replaceFileFx = Effect.fn("replaceFileFx")(function* ({
 	}
 	let ownsPending = false;
 	return yield* Effect.uninterruptibleMask((restoreFx) =>
-		Effect.scoped(
-			Effect.gen(function* () {
-				const file = yield* fileSystem.open(pending, {
-					flag: "wx",
-				});
+		Effect.gen(function* () {
+			if (props.source === undefined) {
+				yield* Effect.scoped(
+					Effect.gen(function* () {
+						const file = yield* fileSystem.open(pending, {
+							flag: "wx",
+						});
+						ownsPending = true;
+						yield* restoreFx(file.writeAll(props.bytes));
+						yield* restoreFx(file.sync);
+					}),
+				);
+			} else {
+				yield* restoreFx(
+					Effect.tryPromise({
+						try: () => copyFile(props.source, pending),
+						catch: (cause) => cause,
+					}),
+				);
 				ownsPending = true;
-				yield* restoreFx(file.writeAll(props.bytes));
-				yield* restoreFx(file.sync);
-			}),
-		).pipe(
+				yield* Effect.scoped(
+					Effect.gen(function* () {
+						const file = yield* fileSystem.open(pending, {
+							flag: "r",
+						});
+						yield* restoreFx(file.sync);
+					}),
+				);
+			}
+		}).pipe(
 			Effect.andThen(
 				Effect.uninterruptible(
 					fileSystem.rename(pending, prepared.target).pipe(

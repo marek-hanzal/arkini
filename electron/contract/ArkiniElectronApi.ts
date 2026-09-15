@@ -21,7 +21,7 @@ export namespace ArkiniElectronApi {
 		arkpackList: "arkini:arkpack:list",
 		arkpackRead: "arkini:arkpack:read",
 		arkpackImport: "arkini:arkpack:import",
-		arkpackInstall: "arkini:arkpack:install",
+		arkpackInstallEditorBuild: "arkini:arkpack:install-editor-build",
 		arkpackRemove: "arkini:arkpack:remove",
 		arkpackOpenUserDirectory: "arkini:arkpack:open-user-directory",
 		saveRead: "arkini:save:read",
@@ -49,7 +49,6 @@ export namespace ArkiniElectronApi {
 		editorAwaitIdle: "arkini:editor:await-idle",
 		editorProjectBuildVersionSave: "arkini:editor:build:version:save",
 		editorProjectBuild: "arkini:editor:project:build",
-		editorProjectBuildRead: "arkini:editor:project:build:read",
 		editorProjectBuildSave: "arkini:editor:project:build:save",
 		editorProjectCreate: "arkini:editor:project:create",
 		editorProjectDismissInvalid: "arkini:editor:project:dismiss-invalid",
@@ -60,6 +59,7 @@ export namespace ArkiniElectronApi {
 		editorProjectImportJsonDirectory: "arkini:editor:project:import-json-directory",
 		editorProjectImportArkpack: "arkini:editor:project:import-arkpack",
 		editorProjectImportInstalledArkpack: "arkini:editor:project:import-installed-arkpack",
+		editorProjectImportAssets: "arkini:editor:project:import-assets",
 		editorProjectList: "arkini:editor:project:list",
 		editorProjectOpenDirectory: "arkini:editor:project:open-directory",
 		editorProjectOptimizeResources: "arkini:editor:project:optimize-resources",
@@ -124,9 +124,10 @@ export namespace ArkiniElectronApi {
 		}>;
 	}
 
-	export interface ArkpackInstall {
+	export interface ArkpackEditorBuildInstall {
 		readonly packageId: string;
-		readonly bytes: Uint8Array;
+		readonly expectedRevision: number;
+		readonly contentHash: string;
 	}
 
 	export interface SaveKey {
@@ -134,11 +135,16 @@ export namespace ArkiniElectronApi {
 	}
 
 	export interface Api {
+		readonly file: {
+			readonly readPathFn: (file: File) => string;
+		};
 		readonly arkpack: {
 			readonly listFn: () => Promise<ReadonlyArray<ArkpackFile>>;
 			readonly readFn: (packageId: string) => Promise<ReadonlyArray<ArkpackLoadedFile>>;
 			readonly importFn: () => Promise<ArkpackFile | null>;
-			readonly installFn: (record: ArkpackInstall) => Promise<void>;
+			readonly installEditorBuildFn: (
+				record: ArkpackEditorBuildInstall,
+			) => Promise<ArkpackFile>;
 			readonly removeFn: (packageId: string) => Promise<void>;
 			readonly openUserDirectoryFn: () => Promise<void>;
 		};
@@ -183,9 +189,6 @@ export namespace ArkiniElectronApi {
 			readonly buildProjectFn: (
 				request: EditorProjectTransport.BuildRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Build>>;
-			readonly readProjectBuildFn: (
-				request: EditorProjectTransport.ReadBuildRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BuildContent>>;
 			readonly saveProjectBuildFn: (
 				request: EditorProjectTransport.ReadBuildRequest,
 			) => Promise<EditorProjectTransport.Result<boolean>>;
@@ -210,6 +213,9 @@ export namespace ArkiniElectronApi {
 			readonly importInstalledArkpackFn: (
 				packageId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Descriptor>>;
+			readonly importAssetsFn: (
+				request: EditorProjectTransport.ImportAssetsRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.ImportAssetsResult>>;
 			readonly exportJsonDirectoryFn: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorSourceExportSchema.Type | null>>;

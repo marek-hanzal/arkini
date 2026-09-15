@@ -50,7 +50,10 @@ export const editEditorAssetFx = Effect.fn("editEditorAssetFx")(function* ({
 							mime: existing.mime,
 							id: resourceId,
 						}
-					: yield* validateEditorAssetFileFx(file, resourceId);
+					: {
+							...(yield* validateEditorAssetFileFx(file, resourceId)),
+							path: window.arkini.file.readPathFn(file),
+						};
 			const config = yield* renameGameResourceFx({
 				config: project.config,
 				from: currentId,

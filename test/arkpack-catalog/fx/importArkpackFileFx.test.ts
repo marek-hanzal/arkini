@@ -23,7 +23,6 @@ describe("importArkpackFileFx", () => {
 			listFx: Effect.succeed([]),
 			readFx: () => Effect.succeed([]),
 			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
 			importFx: Effect.succeed(imported),
 			openUserDirectoryFx: Effect.void,
 		} satisfies ArkpackStorage;

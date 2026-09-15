@@ -48,13 +48,9 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 						cause,
 					}),
 			}),
-			writeFx: Effect.fn("ArkpackStorage.writeFx")((packageId: string, bytes: ArrayBuffer) =>
+			installEditorBuildFx: Effect.fn("ArkpackStorage.installEditorBuildFx")((record) =>
 				Effect.tryPromise({
-					try: () =>
-						api.installFn({
-							packageId,
-							bytes: new Uint8Array(bytes.slice(0)),
-						}),
+					try: () => api.installEditorBuildFn(record),
 					catch: (cause) =>
 						new ArkpackStorageError({
 							operation: "install",

@@ -3,8 +3,8 @@ import {
 	createTestPngBytes,
 } from "~/../test/arkpack-support/fn/createTestPngBytes";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import type { TestArkpackPayload } from "~test/arkpack-support/fx/testArkpackCodecFx";
 
 export const editorTestConfig = GameConfigSchema.parse({
 	resources: {
@@ -55,7 +55,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 	},
 });
 
-export const editorTestPayload: PayloadSchema.Type = {
+export const editorTestPayload: TestArkpackPayload = {
 	version: "1.0",
 	arkini: ArkiniAppVersion,
 	config: editorTestConfig,

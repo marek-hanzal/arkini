@@ -1,4 +1,4 @@
-import { Effect, Exit } from "effect";
+import { Effect } from "effect";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { readLastPackageIdFx } from "~/installed-game/fx/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/launcher/fx/preloadLauncherHeroFx";
@@ -9,7 +9,6 @@ interface PrepareLauncherHeroProps {
 }
 
 interface PreparedLauncherHero {
-	readonly owned: boolean;
 	readonly url: string;
 }
 
@@ -34,7 +33,6 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 			const packageId = yield* readLastPackageIdFx();
 			if (packageId === null) {
 				return {
-					owned: false,
 					url: fallbackUrl,
 				} satisfies PreparedLauncherHero;
 			}
@@ -42,47 +40,20 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 				packageId,
 			});
 			const resource = yield* readHeroResourceFx(loaded.payload);
-			return "url" in resource
-				? ({
-						owned: false,
-						url: resource.url,
-					} satisfies PreparedLauncherHero)
-				: yield* Effect.try({
-						try: () =>
-							({
-								owned: true,
-								url: URL.createObjectURL(
-									new Blob(
-										[
-											resource.bytes.slice().buffer,
-										],
-										{
-											type: resource.mime,
-										},
-									),
-								),
-							}) satisfies PreparedLauncherHero,
-						catch: (cause) => cause,
-					});
+			return {
+				url: resource.url,
+			} satisfies PreparedLauncherHero;
 		}).pipe(
 			Effect.flatMap((candidate) =>
 				preloadLauncherHeroFx({
 					url: candidate.url,
-				}).pipe(
-					Effect.as(candidate),
-					Effect.onExit((exit) =>
-						Exit.isFailure(exit) && candidate.owned
-							? Effect.sync(() => URL.revokeObjectURL(candidate.url))
-							: Effect.void,
-					),
-				),
+				}).pipe(Effect.as(candidate)),
 			),
 			Effect.catch(() =>
 				preloadLauncherHeroFx({
 					url: fallbackUrl,
 				}).pipe(
 					Effect.as({
-						owned: false,
 						url: fallbackUrl,
 					} satisfies PreparedLauncherHero),
 				),

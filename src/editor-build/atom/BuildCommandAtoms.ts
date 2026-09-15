@@ -71,7 +71,6 @@ export const BuildCommandAtoms = RendererRuntime.runSync(
 					return installBuiltEditorArkpackFx({
 						...request,
 						catalog,
-						repository,
 					});
 				},
 			).pipe(Atom.setIdleTTL(0)),

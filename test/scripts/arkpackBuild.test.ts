@@ -87,7 +87,6 @@ if (process.argv.includes("pack")) {
 	if (process.env.FAIL_PACK) process.exit(1);
 	fs.mkdirSync("game/arkini/build", { recursive: true });
 	fs.writeFileSync("${artifact}", "packed game " + count);
-	if (process.env.CHANGE_DURING_PACK) fs.appendFileSync("src/builder.ts", " changed");
 } else if (process.argv.includes("verify")) {
 	if (process.env.FAIL_VERIFY) process.exit(1);
 	console.log(JSON.stringify({ type: process.env.ARKINI_EXPECTED_PROVENANCE }));
@@ -130,27 +129,6 @@ describe("repository Arkpack build cache", () => {
 		expect(await fingerprintFn()).not.toBe(beforeRename);
 	});
 
-	it("rejects a failed final hash even if its output digest still matches", async () => {
-		const xargsPath = (
-			await execFileFn("bash", [
-				"-c",
-				"command -v xargs",
-			])
-		).stdout.trim();
-		await writeFile(
-			join(root, "bin/xargs"),
-			`#!/usr/bin/env bash
-"${xargsPath}" "$@"
-if [[ -f pack-count ]]; then exit 1; fi
-`,
-			{
-				mode: 0o755,
-			},
-		);
-		await expect(runFn("build")).rejects.toThrow();
-		await expect(readFile(join(root, `${artifact}.cache`))).rejects.toThrow();
-	});
-
 	it("skips only intact builds and rebuilds after source changes or damaged cache", async () => {
 		await runFn("build");
 		expect((await runFn("build")).stdout).toContain("Arkpack unchanged");
@@ -169,16 +147,10 @@ if [[ -f pack-count ]]; then exit 1; fi
 		expect(await countFn()).toBe(5);
 	});
 
-	it("does not publish a reuse record after a failed or stale build", async () => {
+	it("does not publish a reuse record after a failed build or verification", async () => {
 		await expect(
 			runFn("build", {
 				FAIL_PACK: "1",
-			}),
-		).rejects.toThrow();
-		await expect(readFile(join(root, `${artifact}.cache`))).rejects.toThrow();
-		await expect(
-			runFn("build", {
-				CHANGE_DURING_PACK: "1",
 			}),
 		).rejects.toThrow();
 		await expect(readFile(join(root, `${artifact}.cache`))).rejects.toThrow();
@@ -190,7 +162,7 @@ if [[ -f pack-count ]]; then exit 1; fi
 		await expect(readFile(join(root, `${artifact}.cache`))).rejects.toThrow();
 	});
 
-	it("keeps verification on hits and bypasses reuse for transactions and release signing", async () => {
+	it("keeps verification on hits and bypasses reuse for an active writer and release signing", async () => {
 		await runFn("build");
 		await expect(
 			runFn("build", {
@@ -200,7 +172,6 @@ if [[ -f pack-count ]]; then exit 1; fi
 		expect(await countFn()).toBe(1);
 		for (const marker of [
 			"editor.lock",
-			"editor.lock.write",
 		]) {
 			await mkdir(join(root, "game/arkini", marker));
 			await runFn("build");
@@ -208,7 +179,7 @@ if [[ -f pack-count ]]; then exit 1; fi
 				recursive: true,
 			});
 		}
-		expect(await countFn()).toBe(3);
+		expect(await countFn()).toBe(2);
 		await runFn("build", {
 			ARKINI_RELEASE_SIGN: "1",
 			ARKINI_EXPECTED_PROVENANCE: "official",
@@ -217,6 +188,6 @@ if [[ -f pack-count ]]; then exit 1; fi
 			ARKINI_RELEASE_SIGN: "1",
 			ARKINI_EXPECTED_PROVENANCE: "official",
 		});
-		expect(await countFn()).toBe(5);
+		expect(await countFn()).toBe(4);
 	});
 });

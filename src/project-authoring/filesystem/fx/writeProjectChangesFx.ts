@@ -12,7 +12,7 @@ import type { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import { readProjectResourceMetadataFx } from "./readProjectResourceMetadataFx";
-import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
+import { type ProjectFileSetPlan, writeProjectFileSetFx } from "./writeProjectFileSetFx";
 
 const encodeJsonFn = (value: unknown) =>
 	new TextEncoder().encode(`${JSON.stringify(value, undefined, "\t")}\n`);
@@ -23,6 +23,7 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 	previous,
 	next,
 	resourceWrites = [],
+	resourceFileWrites = [],
 	resourceRename,
 	noteUpdates,
 }: {
@@ -30,6 +31,10 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 	readonly previous: Project;
 	readonly next: Project;
 	readonly resourceWrites?: ReadonlyArray<ResourceSchema.Type>;
+	readonly resourceFileWrites?: ReadonlyArray<{
+		readonly id: string;
+		readonly path: string;
+	}>;
 	readonly resourceRename?: {
 		readonly from: string;
 		readonly to: string;
@@ -45,10 +50,7 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 		root,
 		filesystemWrite,
 		planFx: Effect.gen(function* () {
-			const writes: Array<{
-				target: string;
-				bytes: Uint8Array;
-			}> = [];
+			const writes: Array<ProjectFileSetPlan["writes"][number]> = [];
 			const deletes = new Set<string>();
 			const finalTargets = new Map<string, string>();
 			const admitTargetFx = (target: string) =>
@@ -136,6 +138,12 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 					resource.bytes,
 				]),
 			);
+			const resourceFiles = new Map(
+				resourceFileWrites.map((resource) => [
+					resource.id,
+					resource.path,
+				]),
+			);
 			for (const resource of next.resources) {
 				const oldId =
 					resourceRename?.to === resource.id ? resourceRename.from : resource.id;
@@ -151,14 +159,21 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 								? paths.resourceFileFx(old.id)
 								: paths.assetFileFx(old.id);
 				let bytes = resourceBodies.get(resource.id);
+				let source = resourceFiles.get(resource.id);
 				if (oldTarget !== undefined && oldTarget !== target) {
 					deletes.add(oldTarget);
-					bytes ??= yield* fileSystem.readFile(oldTarget);
+					source ??= bytes === undefined ? oldTarget : undefined;
 				}
 				if (bytes !== undefined) {
 					writes.push({
 						target,
 						bytes,
+					});
+					changedResources.add(resource.id);
+				} else if (source !== undefined) {
+					writes.push({
+						target,
+						source,
 					});
 					changedResources.add(resource.id);
 				} else if (old === undefined) {

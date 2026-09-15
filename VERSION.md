@@ -74,12 +74,12 @@ Preferences are individual strictly validated scalar JSON files and need no enve
 
 Provenance is soft and independent from schema, semantic validation, integrity admission, compatibility, package identity, location, and user overrides:
 
-- `Official`: the embedded Sigstore proof offline-validates the exact inner gameplay payload for the configured distribution channel: its issuer and exact repository workflow identity. Any release produced by that channel remains Official across older and newer application versions.
+- `Official`: the embedded Sigstore proof offline-validates the current Arkpack content hash for the configured distribution channel: its issuer and exact repository workflow identity.
 - `Community`: that proof is absent or fails—for local/Editor/manual builds, changed payload bytes, malformed proof, or another issuer/repository/workflow channel.
 
 Both states are playable. Provenance is a label, not an anti-tampering or content-admission system. A structurally invalid payload still fails normal loading; proof failure alone never does.
 
-The one `.arkpack` is the complete distributable artifact. Its proof is optional and signs only the immutable inner payload, avoiding circular self-signing. Proof nondeterminism therefore cannot change gameplay identity or save association.
+The one `.arkpack` is the complete distributable artifact. Its proof is optional and signs the SHA-256 identity of the immutable payload, avoiding circular self-signing. Proof nondeterminism therefore cannot change gameplay identity or save association. Arkpack readers follow the same forward-only major-version policy as the rest of the application; obsolete proof encodings are not retained.
 
 Electron main hashes and validates the portable Arkpack incrementally. First use copies its raw resource ranges into `game/installed/<encoded packageId>/<contentHash>/`; later loads trust and reuse a matching installation record without re-reading or tamper-checking the extracted bodies. Gameplay receives only validated config metadata and lazy `arkini://game/resource` URLs, never Arkpack bytes. Native file responses preserve range requests for media seeking. Editor Arkpack import uses the same extractor and copies those files into a new portable project; the renderer never receives the archive bytes.
 

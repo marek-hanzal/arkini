@@ -163,7 +163,8 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		deleteProjectFx: (projectId) => provideFx(repository.deleteProjectFx(projectId)),
 		openProjectFx: (props) => provideFx(repository.openProjectFx(props)),
 		readProjectFx: (projectId) => provideFx(repository.readProjectFx(projectId)),
-		readProjectBuildFx: (props) => provideFx(repository.readProjectBuildFx(props)),
+		withProjectBuildPathFx: (props, useFx) =>
+			provideFx(repository.withProjectBuildPathFx(props, useFx)),
 		readProjectRootFx: (projectId) => provideFx(repository.readProjectRootFx(projectId)),
 		refreshProjectFx: (projectId) => provideFx(repository.refreshProjectFx(projectId)),
 		listProjectsFx: provideFx(repository.listProjectsFx),
@@ -174,6 +175,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		replaceResourceFx: (props) => provideFx(repository.replaceResourceFx(props)),
 		upsertItemFx: (props) => provideFx(repository.upsertItemFx(props)),
 		upsertResourcesFx: (props) => provideFx(repository.upsertResourcesFx(props)),
+		upsertResourceFilesFx: (props) => provideFx(repository.upsertResourceFilesFx(props)),
 		listNotesFx: (projectId) => provideFx(repository.listNotesFx(projectId)),
 		createNoteFx: (props) => provideFx(repository.createNoteFx(props)),
 		updateNoteFx: (props) => provideFx(repository.updateNoteFx(props)),

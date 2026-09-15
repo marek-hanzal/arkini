@@ -47,9 +47,6 @@ const installEditorApi = () => {
 		buildProjectFn: vi.fn(async () => {
 			throw new Error("Unexpected build.");
 		}),
-		readProjectBuildFn: vi.fn(async () => {
-			throw new Error("Unexpected build read.");
-		}),
 		saveProjectBuildFn: vi.fn(async () => {
 			throw new Error("Unexpected build save.");
 		}),
@@ -86,6 +83,12 @@ const installEditorApi = () => {
 		importJsonDirectoryFn: vi.fn(async () => success(descriptor)),
 		importArkpackFn: vi.fn(async () => success(descriptor)),
 		importInstalledArkpackFn: vi.fn(async () => success(descriptor)),
+		importAssetsFn: vi.fn(async () =>
+			success({
+				project,
+				resourceIds: [],
+			}),
+		),
 		listProjectsFn: vi.fn(async () =>
 			success([
 				{

@@ -190,53 +190,6 @@ describe("Editor resource protocol", () => {
 			).status,
 		).toBe(405);
 	});
-	it("keeps the admitted URL usable when rollback restores bytes with new filesystem timestamps", async () => {
-		const url = await registerFn("asset", "original");
-		const location = locations.get("asset")!;
-		await requestFn(url);
-		await writeFile(location.path, "failed replacement");
-		await writeFile(location.path, "original");
-		await utimes(location.path, 1, 1);
-		const response = await requestFn(url);
-		expect(response.status).toBe(200);
-		expect(await response.text()).toBe("original");
-		expect(reads).toHaveBeenCalledTimes(2);
-	});
-
-	it("does not publish a PNG response when its registered identity changed during the read", async () => {
-		const url = await registerFn("asset", "original");
-		reads.mockImplementationOnce(() => locations.delete("asset"));
-		expect((await requestFn(url)).status).toBe(409);
-	});
-	it("rejects temporary replacement bytes when the second lookup waits for a rollback retaining logical identity", async () => {
-		const url = await registerFn("asset", "original");
-		const location = locations.get("asset")!;
-		await writeFile(location.path, "temporary replacement");
-		let lookups = 0;
-		const owner = await Effect.runPromise(
-			createEditorResourceProtocolFx({
-				isTrustedUrlFn: () => true,
-				readResourceLocationFx: () =>
-					Effect.gen(function* () {
-						lookups += 1;
-						if (lookups === 2) {
-							yield* Effect.promise(async () => {
-								await writeFile(location.path, "original");
-								await utimes(location.path, 1, 1);
-							});
-						}
-						return location;
-					}),
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-		const response = await Effect.runPromise(owner.handleRequestFx(new Request(url)));
-		expect(response.status).toBe(409);
-		expect(lookups).toBe(2);
-		expect(await response.text()).not.toBe("temporary replacement");
-		expect(
-			await (await Effect.runPromise(owner.handleRequestFx(new Request(url)))).text(),
-		).toBe("original");
-	});
 	it("invalidates same-size atomic replacements even when both timestamps coincide", async () => {
 		const url = await registerFn("asset", "1111");
 		const location = locations.get("asset")!;

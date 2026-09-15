@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { validateArkpackPayloadFx } from "~/arkpack-admission/fx/validateArkpackPayloadFx";
 import { createFreshProjectFx } from "~/project-authoring/fx/createFreshProjectFx";
 import type { Project } from "~/project-authoring/type/Project";
 import {
@@ -122,16 +121,6 @@ describe("createFreshProjectFx", () => {
 				10,
 			]),
 		);
-		expect(
-			await Effect.runPromise(
-				validateArkpackPayloadFx({
-					config: project.config,
-					resources: [
-						...createProjectFx.mock.calls[0]![0].resources,
-					],
-				}),
-			),
-		).toEqual([]);
 		expect(createProjectFx).toHaveBeenCalledOnce();
 	});
 });

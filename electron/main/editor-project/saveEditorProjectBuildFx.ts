@@ -1,13 +1,20 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
+import { copyFile } from "node:fs/promises";
 import { dialog, type BrowserWindow } from "electron";
-import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
-import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+
+const copyFileFx = Effect.fn("saveEditorProjectBuildFx.copyFileFx")(
+	(source: string, target: string) =>
+		Effect.tryPromise({
+			try: () => copyFile(source, target),
+			catch: (cause) => cause,
+		}),
+);
 
 /** Saves the exact current local Editor build through one native file choice. */
 export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
@@ -40,16 +47,12 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 			});
 			if (selection.canceled || selection.filePath === undefined) return false;
 
-			const content = yield* repository.readProjectBuildFx(request);
 			const arkpackPath = selection.filePath.endsWith(".arkpack")
 				? selection.filePath
 				: `${selection.filePath}.arkpack`;
-			const fileSystem = yield* FileSystem.FileSystem;
-			yield* writeArkpackFileFx({
-				arkpackPath,
-				bytes: content.bytes,
-				fileSystem,
-			});
+			yield* repository.withProjectBuildPathFx(request, (sourcePath) =>
+				sourcePath === arkpackPath ? Effect.void : copyFileFx(sourcePath, arkpackPath),
+			);
 			return true;
 		}).pipe(
 			Effect.provide(NodeServices.layer),

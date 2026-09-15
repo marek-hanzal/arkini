@@ -302,35 +302,6 @@ describe("filesystem Editor project lifecycle", () => {
 		});
 	});
 
-	it("preserves a managed root when its write recovery cannot complete", async () => {
-		const repository = await harness.openRepository();
-		const created = await harness.createProject(repository);
-		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
-		if (root === null) throw new Error("Managed project root missing.");
-		await harness.closeRepository(repository);
-		const recovery = join(root, "editor.lock.write");
-		await mkdir(recovery);
-		await writeFile(join(recovery, "preserved"), "backup");
-
-		const reopened = await harness.openRepository();
-		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([
-			expect.objectContaining({
-				type: "invalid",
-				root,
-				validationError: expect.stringContaining(recovery),
-			}),
-		]);
-		await expect(readFile(join(recovery, "preserved"), "utf8")).resolves.toBe("backup");
-		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
-			projects: [
-				{
-					root,
-					ownership: "managed",
-				},
-			],
-		});
-	});
-
 	it("opens an external folder in place and unregisters it without deleting its files", async () => {
 		const root = await harness.createExternalProject();
 		await rm(join(root, ".gitignore"));

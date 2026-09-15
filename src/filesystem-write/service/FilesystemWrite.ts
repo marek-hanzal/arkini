@@ -11,11 +11,21 @@ export interface FilesystemWrite {
 		Failure | FilesystemWriteError,
 		Exclude<Exclude<Requirements, FileSystem.FileSystem>, Path.Path>
 	>;
-	readonly replaceFileFx: (props: {
-		readonly lock: string;
-		readonly target: string;
-		readonly bytes: Uint8Array;
-	}) => Effect.Effect<void, FilesystemWriteError, never>;
+	readonly replaceFileFx: (
+		props: {
+			readonly lock: string;
+			readonly target: string;
+		} & (
+			| {
+					readonly bytes: Uint8Array;
+					readonly source?: never;
+			  }
+			| {
+					readonly bytes?: never;
+					readonly source: string;
+			  }
+		),
+	) => Effect.Effect<void, FilesystemWriteError, never>;
 	/** Replaces independently publishable files under one lock without aggregate rollback. */
 	readonly replaceIndependentFilesFx: (props: {
 		readonly lock: string;

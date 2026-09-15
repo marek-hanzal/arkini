@@ -51,7 +51,7 @@ arkpack-fingerprint() {
 }
 
 install_game_arkpack() {
-	local source source_dir target verdict fingerprint current_fingerprint cache record
+	local source source_dir target verdict fingerprint cache record
 	local -a pack_arguments
 	target=game/arkini/build/arkini.arkpack
 	cache=$target.cache
@@ -66,16 +66,11 @@ install_game_arkpack() {
 			record=$(printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target") || return $?
 		fi
 		if [[ "${ARKINI_RELEASE_SIGN:-}" != 1 && -f "$cache" && -n "$record" &&
-			! -e game/arkini/editor.lock && ! -e game/arkini/editor.lock.write &&
+			! -e game/arkini/editor.lock &&
 			"$record" == "$(cat "$cache")" ]]; then
 			echo "Arkpack unchanged; reusing $target."
 		else
 			node .out/desktop/build/main/cli/arkini.js "${pack_arguments[@]}" || return $?
-		fi
-		current_fingerprint=$(arkpack-fingerprint) || return $?
-		if [[ "$fingerprint" != "$current_fingerprint" ]]; then
-			echo "Build sources changed; Arkpack cache was not updated." >&2
-			return 1
 		fi
 	else
 		source_dir=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd) || return $?
@@ -87,14 +82,12 @@ install_game_arkpack() {
 		rm -rf game/arkini/build || return $?
 		mkdir -p game/arkini/build || return $?
 		cp "$source" "$target" || return $?
-		cmp "$source" "$target" || return $?
 	fi
 	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
 	node .out/desktop/build/main/cli/arkini.js arkpack verify "$target" |
 		grep -Fx "{\"type\":\"$verdict\"}" || return $?
 	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" && "${ARKINI_RELEASE_SIGN:-}" != 1 ]]; then
-		{ printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target"; } > "$cache.pending" || return $?
-		mv "$cache.pending" "$cache" || return $?
+		{ printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target"; } > "$cache" || return $?
 	fi
 }
 

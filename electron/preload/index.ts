@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 
 const beforeCloseListeners = new Set<() => Promise<void>>();
@@ -75,6 +75,9 @@ ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 });
 
 const api: ArkiniElectronApi.Api = {
+	file: {
+		readPathFn: (file) => webUtils.getPathForFile(file),
+	},
 	appearance: {
 		readFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceRead),
 		writeFn: (theme) => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceWrite, theme),
@@ -119,8 +122,6 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, request),
 		buildProjectFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuild, request),
-		readProjectBuildFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildRead, request),
 		saveProjectBuildFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildSave, request),
 		statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
@@ -147,6 +148,8 @@ const api: ArkiniElectronApi.Api = {
 				ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
 				packageId,
 			),
+		importAssetsFn: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportAssets, request),
 		listProjectsFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
 		dismissInvalidProjectFn: (root) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, root),
@@ -203,8 +206,8 @@ const api: ArkiniElectronApi.Api = {
 		readFn: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),
 		importFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackImport),
-		installFn: (record) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstall, record),
+		installEditorBuildFn: (record) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstallEditorBuild, record),
 		removeFn: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRemove, packageId),
 		openUserDirectoryFn: () =>

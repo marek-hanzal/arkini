@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import type { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -95,10 +96,34 @@ const upsertResourcesSchema = z
 		resources: ResourceSchema.array().min(1),
 	})
 	.strict();
+const importAssetsSchema = z
+	.object({
+		files: z
+			.object({
+				name: z.string().min(1),
+				path: z.string().min(1),
+			})
+			.strict()
+			.array()
+			.min(1),
+		projectId: IdSchema,
+		source: z.enum([
+			"arkpack",
+			"files",
+		]),
+	})
+	.strict();
 /** Creates the feature-owned validator capability used by the Electron IPC adapter. */
 export const createEditorProjectRequestParserFx = Effect.fn("createEditorProjectRequestParserFx")(
 	() =>
 		Effect.succeed({
+			parseImportAssetsFx: (
+				candidate: unknown,
+			): Effect.Effect<
+				EditorProjectTransport.ImportAssetsRequest,
+				ProjectRepositoryError,
+				never
+			> => parseEditorProjectIpcRequestFx("upsert-resource", importAssetsSchema, candidate),
 			parseSaveBuildVersionFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx(
 					"save-build-version",

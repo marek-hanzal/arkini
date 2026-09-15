@@ -4,12 +4,7 @@ import { RendererAtomRuntime } from "~/application-runtime/atom/RendererAtomRegi
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { prepareLauncherHeroFx } from "~/launcher/fx/prepareLauncherHeroFx";
 
-/**
- * Owns the decoded Hero resource for one attempt.
- *
- * Refresh closes the previous attempt scope and revokes an owned object URL
- * exactly once before preparing the replacement.
- */
+/** Resolves and preloads the selected installed Hero URL for one attempt. */
 export const LauncherHeroAtom = RendererAtomRuntime.atom((get) => {
 	const config = get(LauncherStartupConfigAtom);
 	if (config === undefined) {
@@ -17,18 +12,10 @@ export const LauncherHeroAtom = RendererAtomRuntime.atom((get) => {
 	}
 	if (config.bootstrapFx !== undefined) {
 		return Effect.succeed({
-			owned: false,
 			url: config.heroUrl,
 		});
 	}
-	return Effect.acquireRelease(
-		prepareLauncherHeroFx({
-			fallbackUrl: config.heroUrl,
-		}),
-		(candidate) =>
-			candidate.owned ? Effect.sync(() => URL.revokeObjectURL(candidate.url)) : Effect.void,
-		{
-			interruptible: true,
-		},
-	);
+	return prepareLauncherHeroFx({
+		fallbackUrl: config.heroUrl,
+	});
 }).pipe(Atom.keepAlive);

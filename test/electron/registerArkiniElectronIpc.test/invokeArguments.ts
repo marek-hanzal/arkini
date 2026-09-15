@@ -81,11 +81,12 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		[],
 	],
 	[
-		ArkiniElectronApi.channels.arkpackInstall,
+		ArkiniElectronApi.channels.arkpackInstallEditorBuild,
 		[
 			{
 				packageId: placeholderPackageId,
-				bytes: new Uint8Array(),
+				expectedRevision: 1,
+				contentHash: "a".repeat(64),
 			},
 		],
 	],

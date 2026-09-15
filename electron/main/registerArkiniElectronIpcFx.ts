@@ -27,6 +27,9 @@ import { writeLatestGameIncidentFx } from "./incident/writeLatestGameIncidentFx"
 import { WindowModeSchema } from "../contract/window/WindowModeSchema";
 import type { WindowPreferences } from "./window/createFilesystemWindowPreferencesFx";
 import type { WindowModeControllerOwnership } from "./window/createWindowModeControllerOwnershipFx";
+import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { z } from "zod";
 
 let registered = false;
 const maxClipboardTextLength = 65_536;
@@ -42,6 +45,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly windowPreferences: WindowPreferences;
 		readonly diagnostics: DiagnosticLog;
 		readonly userDataPaths: ArkiniUserDataPaths;
+		readonly editorProjectServiceOwnership: EditorProjectServiceOwnership;
 	}
 }
 
@@ -57,6 +61,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		windowPreferences,
 		diagnostics,
 		userDataPaths,
+		editorProjectServiceOwnership,
 	}: registerArkiniElectronIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
@@ -263,9 +268,33 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					),
 				);
 				ipcMain.handle(
-					ArkiniElectronApi.channels.arkpackInstall,
-					(event, record: ArkiniElectronApi.ArkpackInstall) =>
-						runAuthorizedFn(event, arkpacks.installFx(record)),
+					ArkiniElectronApi.channels.arkpackInstallEditorBuild,
+					(event, candidate) =>
+						runAuthorizedFn(
+							event,
+							Effect.gen(function* () {
+								if (editorProjectServiceOwnership.type !== "ready")
+									return yield* Effect.fail(
+										new Error(editorProjectServiceOwnership.message),
+									);
+								const request = z
+									.object({
+										packageId: IdSchema,
+										expectedRevision: z.number().int().nonnegative(),
+										contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+									})
+									.strict()
+									.parse(candidate);
+								return yield* editorProjectServiceOwnership.repository.withProjectBuildPathFx(
+									{
+										projectId: request.packageId,
+										expectedRevision: request.expectedRevision,
+										contentHash: request.contentHash,
+									},
+									arkpacks.importFx,
+								);
+							}),
+						),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackRemove,
@@ -319,7 +348,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.arkpackList,
 						ArkiniElectronApi.channels.arkpackRead,
 						ArkiniElectronApi.channels.arkpackImport,
-						ArkiniElectronApi.channels.arkpackInstall,
+						ArkiniElectronApi.channels.arkpackInstallEditorBuild,
 						ArkiniElectronApi.channels.arkpackRemove,
 						ArkiniElectronApi.channels.arkpackOpenUserDirectory,
 						ArkiniElectronApi.channels.saveRead,

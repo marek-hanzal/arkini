@@ -1,5 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join, sep } from "node:path";
 import { Cause, Effect, Exit, FileSystem } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -110,11 +110,7 @@ describe("filesystem Editor project writes", () => {
 		const jsonReads = new Set<string>();
 		const recordReadFn = (target: string) => {
 			if (target.endsWith(".png")) pngOperations.push(target);
-			if (
-				target.startsWith(`${root}${sep}`) &&
-				target.endsWith(".json") &&
-				!target.includes(`editor.lock.write${sep}`)
-			)
+			if (target.startsWith(`${root}${sep}`) && target.endsWith(".json"))
 				jsonReads.add(target);
 		};
 		const fileSystem: FileSystem.FileSystem = {
@@ -173,11 +169,7 @@ describe("filesystem Editor project writes", () => {
 			[
 				...jsonReads,
 			].sort(),
-		).toEqual(
-			[
-				...publishedTargets,
-			].sort(),
-		);
+		).toEqual([]);
 		const savedItem = JSON.parse(
 			await Effect.runPromise(
 				nodeFileSystem.readFileString(join(root, "items", `${water.uid}.json`)),
@@ -216,11 +208,7 @@ describe("filesystem Editor project writes", () => {
 			[
 				...jsonReads,
 			].sort(),
-		).toEqual(
-			[
-				...publishedTargets,
-			].sort(),
-		);
+		).toEqual([]);
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
 		const project = await Effect.runPromise(reopened.readProjectFx(created.projectId));
@@ -341,6 +329,36 @@ describe("filesystem Editor project writes", () => {
 			resource.bytes,
 		);
 		expect(canonical?.resources).toEqual(resourceCommit.resources);
+	});
+
+	it("validates a native replacement path as PNG before copying it", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		const original = await readFile(join(root, "resources", "hero.png"));
+		const source = join(harness.temporaryDirectory, "renamed-jpeg.png");
+		await writeFile(source, "not a PNG");
+
+		await expect(
+			Effect.runPromise(
+				repository.replaceResourceFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+					currentId: "hero",
+					config: project.config,
+					resource: {
+						id: "hero",
+						mime: "image/png",
+						path: source,
+						size: 9,
+					},
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "replace-resource",
+		});
+		expect(await readFile(join(root, "resources", "hero.png"))).toEqual(original);
 	});
 
 	it("returns a typed repository failure when a write targets an unknown project", async () => {

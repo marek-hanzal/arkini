@@ -24,6 +24,7 @@ export const validatePngResourceFileFx = Effect.fn("validatePngResourceFileFx")(
 					width * height > PngResourceLimits.maxPixels
 				)
 					throw new Error(`Resource ${resourceId} exceeds the supported PNG dimensions.`);
+				return Number(file.size);
 			},
 			catch: (cause) =>
 				cause instanceof Error && cause.message.startsWith(`Resource ${resourceId}`)

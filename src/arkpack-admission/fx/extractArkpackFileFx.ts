@@ -81,9 +81,6 @@ export const extractArkpackFileFx = Effect.fn("extractArkpackFileFx")(function* 
 			size: resource.length,
 		});
 	}
-	const currentLayout = yield* readArkpackFileLayoutFx(arkpackPath);
-	if (currentLayout.contentHash !== layout.contentHash || currentLayout.size !== layout.size)
-		return yield* Effect.fail(new Error("The Arkpack changed while it was being extracted."));
 	const sourceProvenance = createArkpackSourceProvenanceFn(packageId, config.items);
 	const diagnostics = [
 		...(yield* validateGameConfigFx({
@@ -110,7 +107,7 @@ export const extractArkpackFileFx = Effect.fn("extractArkpackFileFx")(function* 
 		config,
 		contentHash: layout.contentHash,
 		packageId,
-		provenance: yield* verifyArkpackFileProvenanceFx(currentLayout),
+		provenance: yield* verifyArkpackFileProvenanceFx(layout),
 		resources,
 		version: layout.manifest.version,
 	} satisfies ExtractedArkpack;

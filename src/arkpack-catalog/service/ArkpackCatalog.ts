@@ -19,9 +19,9 @@ export namespace ArkpackCatalog {
 		readonly listFx?: Effect.Effect<ReadonlyArray<ArkpackDescriptor>, unknown, never>;
 		readonly importFileFx?: () => Effect.Effect<ArkpackDescriptor | null, unknown, never>;
 		readonly installFx?: (props: {
-			readonly bytes: Uint8Array;
-			readonly filename: string;
 			readonly packageId: string;
+			readonly expectedRevision: number;
+			readonly contentHash: string;
 		}) => Effect.Effect<ArkpackDescriptor, unknown, never>;
 		readonly removeFx?: (packageId: string) => Effect.Effect<void, unknown, never>;
 	}
@@ -30,10 +30,6 @@ export namespace ArkpackCatalog {
 		readonly packageId: string;
 		readonly contentHash: string;
 		readonly version: ArkpackDescriptor["version"];
-	}
-
-	export interface InstallContent {
-		readonly bytes: Uint8Array;
 	}
 }
 
@@ -45,9 +41,9 @@ export interface ArkpackCatalog {
 	readonly refreshFx: Effect.Effect<void, unknown, never>;
 	readonly importFileFx: () => Effect.Effect<ArkpackDescriptor | null, unknown, never>;
 	readonly installFx: (props: {
-		readonly contentFx: Effect.Effect<ArkpackCatalog.InstallContent, unknown, never>;
+		readonly expectedRevision: number;
+		readonly contentHash: string;
 		readonly expectedCurrent: ArkpackCatalog.PackageSnapshot | null;
-		readonly filename: string;
 		readonly packageId: string;
 	}) => Effect.Effect<ArkpackDescriptor, unknown, never>;
 	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown, never>;

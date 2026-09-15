@@ -37,51 +37,12 @@ const readAboutPortraitResourcesFn = (payload: {
 	});
 };
 
-const revokeUrlsFx = Effect.fn("createAboutPortraitAssetsFx.revokeUrlsFx")(function* (
-	urls: ReadonlyArray<string>,
-) {
-	for (const url of urls)
-		yield* Effect.sync(() => URL.revokeObjectURL(url)).pipe(
-			Effect.catchCause(() => Effect.void),
-		);
-});
-
 /** Resolves canonical Arkini About portraits to lazy installed-resource URLs. */
 export const createAboutPortraitAssetsFx = Effect.fn("createAboutPortraitAssetsFx")(() =>
 	Effect.gen(function* () {
 		const loaded = yield* loadArkpackFx({
 			packageId: ArkiniDefaultPackageId,
 		});
-		const resources = readAboutPortraitResourcesFn(loaded.payload);
-		if (resources.every((resource) => "url" in resource))
-			return resources.map(({ url }) => url);
-		if (!resources.every((resource) => "bytes" in resource))
-			return yield* Effect.fail(new Error("Arkpack resources use a mixed storage mode."));
-		const urls: string[] = [];
-		return yield* Effect.acquireRelease(
-			Effect.try({
-				try: () => {
-					for (const resource of resources)
-						urls.push(
-							URL.createObjectURL(
-								new Blob(
-									[
-										resource.bytes.slice().buffer,
-									],
-									{
-										type: resource.mime,
-									},
-								),
-							),
-						);
-					return urls;
-				},
-				catch: (cause) => cause,
-			}).pipe(Effect.tapError(() => revokeUrlsFx(urls))),
-			revokeUrlsFx,
-			{
-				interruptible: true,
-			},
-		);
+		return readAboutPortraitResourcesFn(loaded.payload).map(({ url }) => url);
 	}).pipe(Effect.catch(() => Effect.succeed([]))),
 );

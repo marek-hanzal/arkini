@@ -285,6 +285,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		windowPreferences,
 		diagnostics,
 		userDataPaths,
+		editorProjectServiceOwnership,
 	});
 	yield* registerEditorProjectIpcFx({
 		bundledArkpacksRoot: app.isPackaged

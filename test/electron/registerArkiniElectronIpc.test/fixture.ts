@@ -105,6 +105,10 @@ export const createRegisteredIpcHarness = async () => {
 			);
 			yield* registerArkiniElectronIpcFx({
 				bundledArkpacksRoot: join(userDataPath, "bundled-arkpacks"),
+				editorProjectServiceOwnership: {
+					type: "unavailable",
+					message: "Editor storage is unavailable in this IPC harness.",
+				},
 				trustedRenderer,
 				appearancePreferences,
 				cheatPreferences,

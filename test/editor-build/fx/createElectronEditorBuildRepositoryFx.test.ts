@@ -11,19 +11,16 @@ import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/Diagno
 
 const installBuildApi = () => {
 	const buildProject = vi.fn<Window["arkini"]["editor"]["buildProjectFn"]>();
-	const readProjectBuild = vi.fn<Window["arkini"]["editor"]["readProjectBuildFn"]>();
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
 			editor: {
 				buildProjectFn: buildProject,
-				readProjectBuildFn: readProjectBuild,
 			},
 		},
 	});
 	return {
 		buildProject,
-		readProjectBuild,
 	};
 };
 

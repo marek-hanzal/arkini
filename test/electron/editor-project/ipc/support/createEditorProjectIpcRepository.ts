@@ -107,14 +107,8 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	),
 	openProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	readProjectBuildFx: vi.fn(() =>
-		Effect.succeed({
-			bytes: new Uint8Array([
-				1,
-				2,
-				3,
-			]),
-		}),
+	withProjectBuildPathFx: vi.fn((_request, useFx) =>
+		useFx("/editor/project-one/build/project-one.arkpack"),
 	),
 	readProjectRootFx: vi.fn(() => Effect.succeed("/editor/project-one")),
 	refreshProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
@@ -122,6 +116,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	upsertResourceFilesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids, resourceIds }) =>
 		Effect.succeed({
 			...editorProjectIpcNote,

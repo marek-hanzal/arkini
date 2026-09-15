@@ -1,4 +1,6 @@
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
 	cleanupRegisteredIpcHarnesses,
@@ -9,19 +11,18 @@ import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 afterEach(cleanupRegisteredIpcHarnesses);
 
 describe("registerArkiniElectronIpcFx Arkpack storage", () => {
-	it("preserves install, list, candidate read, and user removal", async () => {
+	it("preserves list, candidate read, and user removal", async () => {
 		const harness = await createRegisteredIpcHarness();
 		const event = harness.trustedEvent;
 		const packageId = "arkini-test";
 		const arkpackBytes = createTestArkpack(undefined, packageId);
-		const record: ArkiniElectronApi.ArkpackInstall = {
-			packageId,
-			bytes: arkpackBytes,
-		};
-
-		await expect(
-			harness.invoke(ArkiniElectronApi.channels.arkpackInstall, event, record),
-		).resolves.toBeUndefined();
+		await mkdir(harness.userDataPaths.game.arkpacks, {
+			recursive: true,
+		});
+		await writeFile(
+			join(harness.userDataPaths.game.arkpacks, `${packageId}.arkpack`),
+			arkpackBytes,
+		);
 		await expect(
 			harness.invoke(ArkiniElectronApi.channels.arkpackList, event),
 		).resolves.toEqual(

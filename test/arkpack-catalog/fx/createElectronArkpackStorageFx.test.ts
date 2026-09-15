@@ -10,7 +10,7 @@ describe("createElectronArkpackStorageFx", () => {
 			createElectronArkpackStorageFx({
 				api: {
 					importFn: vi.fn(),
-					installFn: vi.fn(),
+					installEditorBuildFn: vi.fn(),
 					listFn: vi.fn().mockRejectedValue(cause),
 					openUserDirectoryFn: vi.fn(),
 					readFn: vi.fn(),

@@ -9,7 +9,6 @@ import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 import { removeUserArkpackFx } from "./removeUserArkpackFx";
-import { writeUserArkpackFx } from "./writeUserArkpackFx";
 import { installArkpackFileFx } from "./installArkpackFileFx";
 import { importUserArkpackFx } from "./importUserArkpackFx";
 
@@ -26,9 +25,6 @@ interface ArkpackCatalog {
 		ElectronMainError,
 		never
 	>;
-	readonly installFx: (
-		record: ArkiniElectronApi.ArkpackInstall,
-	) => Effect.Effect<void, ElectronMainError, never>;
 	readonly importFx: (
 		sourcePath: string,
 	) => Effect.Effect<ArkiniElectronApi.ArkpackFile, ElectronMainError, never>;
@@ -225,15 +221,6 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 						),
 						Effect.tap(() => Effect.sync(() => (eligibility = undefined))),
 					),
-				),
-			),
-			installFx: Effect.fn("FilesystemArkpackCatalog.installFx")((record) =>
-				operations.withPermits(1)(
-					writeUserArkpackFx({
-						root: userRoot,
-						fileSystem,
-						record,
-					}).pipe(Effect.tap(() => Effect.sync(() => (eligibility = undefined)))),
 				),
 			),
 			removeFx: Effect.fn("FilesystemArkpackCatalog.removeFx")((packageId) =>

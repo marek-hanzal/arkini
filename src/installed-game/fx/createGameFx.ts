@@ -5,10 +5,6 @@ import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { Game } from "~/installed-game/type/Game";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
-import {
-	createGameResourceUrlsFx,
-	type GameResourceUrls,
-} from "~/playable-game/fx/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
@@ -18,15 +14,11 @@ import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
-import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
-import type { LoadedArkpackResource } from "~/arkpack-catalog/fx/readArkpackCandidatesFx";
 
-const isMemoryResourceFn = (resource: LoadedArkpackResource): resource is ResourceSchema.Type =>
-	"bytes" in resource;
-
-const isInstalledResourceFn = (
-	resource: LoadedArkpackResource,
-): resource is Exclude<LoadedArkpackResource, ResourceSchema.Type> => "url" in resource;
+interface GameResourceUrls {
+	readonly getFn: (resourceId: string) => string;
+	readonly releaseFx: Effect.Effect<void, never, never>;
+}
 
 export namespace createGameFx {
 	export interface Props {
@@ -122,28 +114,21 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	);
 
 	return yield* Effect.gen(function* () {
-		if (loaded.payload.resources.every(isMemoryResourceFn))
-			resourceUrls = yield* createGameResourceUrlsFx({
-				owner: "Game",
-				resources: loaded.payload.resources,
-			});
-		else if (loaded.payload.resources.every(isInstalledResourceFn)) {
-			const urls = new Map(
-				loaded.payload.resources.map((resource) => [
-					resource.id,
-					resource.url,
-				]),
-			);
-			resourceUrls = {
-				getFn: (resourceId) => {
-					const url = urls.get(resourceId);
-					if (url === undefined)
-						throw new Error(`Game resource ${resourceId} is unavailable.`);
-					return url;
-				},
-				releaseFx: Effect.sync(() => urls.clear()),
-			};
-		} else return yield* Effect.fail(new Error("Arkpack resources use a mixed storage mode."));
+		const urls = new Map(
+			loaded.payload.resources.map((resource) => [
+				resource.id,
+				resource.url,
+			]),
+		);
+		resourceUrls = {
+			getFn: (resourceId) => {
+				const url = urls.get(resourceId);
+				if (url === undefined)
+					throw new Error(`Game resource ${resourceId} is unavailable.`);
+				return url;
+			},
+			releaseFx: Effect.sync(() => urls.clear()),
+		};
 		const liveResourceUrls = resourceUrls;
 		if (state === undefined) {
 			// A restored save is already started; only a new state receives the initial command.

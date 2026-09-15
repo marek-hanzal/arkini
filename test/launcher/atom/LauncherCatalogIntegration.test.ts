@@ -30,7 +30,6 @@ vi.mock("~/window-mode/fx/readWindowModeFx", () => ({
 vi.mock("~/launcher/atom/LauncherHeroAtom", () => ({
 	LauncherHeroAtom: Atom.make(
 		Effect.succeed({
-			owned: false,
 			url: "/hero.png",
 		}),
 	),

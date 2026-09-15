@@ -1,148 +1,229 @@
 import { createHash, randomUUID } from "node:crypto";
-import { isDeepStrictEqual } from "node:util";
+import { createReadStream, createWriteStream } from "node:fs";
+import { open, stat } from "node:fs/promises";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { FileSystem, Path } from "effect";
-import { Effect, Exit } from "effect";
+import { Effect } from "effect";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
 import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { assertGameConfigValidFx } from "~/game-config-compiler/fx/assertGameConfigValidFx";
 import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
-import { encodeFx } from "./encodeFx";
-import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
-import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
-import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
-import { resizePngAssetFx } from "~/game-config-resource/fx/resizePngAssetFx";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
+import { ManifestSchema } from "~/arkpack-artifact/schema/ManifestSchema";
+import { resizePngAssetFileFx } from "~/game-config-resource/fx/resizePngAssetFileFx";
+import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 
 export namespace packDirectoryFx {
 	export interface Props {
 		readonly input: string;
-		readonly assertCurrentFx?: Effect.Effect<void, unknown, FileSystem.FileSystem | Path.Path>;
 	}
 }
 
-const writeSyncedFileFx = Effect.fn("packDirectoryFx.writeSyncedFileFx")(function* (
-	filePath: string,
-	bytes: Uint8Array,
-) {
-	const fileSystem = yield* FileSystem.FileSystem;
-	yield* Effect.scoped(
-		Effect.gen(function* () {
-			const file = yield* fileSystem.open(filePath, {
-				flag: "w",
-			});
-			yield* file.writeAll(bytes);
-			yield* file.sync;
+function* encodeJsonChunksFn(value: unknown): Generator<string> {
+	if (value === null) {
+		yield "null";
+		return;
+	}
+	if (Array.isArray(value)) {
+		yield "[";
+		for (let index = 0; index < value.length; index += 1) {
+			if (index > 0) yield ",";
+			yield* encodeJsonChunksFn(value[index] ?? null);
+		}
+		yield "]";
+		return;
+	}
+	if (typeof value === "object") {
+		yield "{";
+		let emitted = false;
+		for (const [key, entry] of Object.entries(value)) {
+			if (entry === undefined || typeof entry === "function" || typeof entry === "symbol")
+				continue;
+			if (emitted) yield ",";
+			emitted = true;
+			yield JSON.stringify(key);
+			yield ":";
+			yield* encodeJsonChunksFn(entry);
+		}
+		yield "}";
+		return;
+	}
+	const encoded = JSON.stringify(value);
+	yield encoded === undefined ? "null" : encoded;
+}
+
+const writeJsonFileFx = Effect.fn("packDirectoryFx.writeJsonFileFx")(
+	(target: string, value: unknown) =>
+		Effect.tryPromise({
+			try: async () => {
+				await pipeline(
+					Readable.from(encodeJsonChunksFn(value), {
+						encoding: "utf8",
+					}),
+					createWriteStream(target, {
+						flags: "wx",
+					}),
+				);
+				return Number((await stat(target)).size);
+			},
+			catch: (cause) => cause,
 		}),
-	);
-});
+);
 
-const readSourceSnapshotFx = Effect.fn("packDirectoryFx.readSourceSnapshotFx")(function* (
-	input: string,
-) {
-	const fileSystem = yield* FileSystem.FileSystem;
-	const files = yield* collectSourceFilesFx({
-		input,
-	});
-	return yield* Effect.forEach(
-		[
-			...files.json,
-			...files.png,
-		],
-		(source) =>
-			fileSystem.readFile(source).pipe(
-				Effect.map((bytes) => ({
-					source,
-					hash: createHash("sha256").update(bytes).digest("hex"),
-				})),
-			),
-	);
-});
+interface PackedResourceFile {
+	readonly id: string;
+	readonly mime: "image/png";
+	readonly path: string;
+	readonly length: number;
+}
 
-/** Compiles, validates, and atomically publishes one canonical project build directory. */
+const writeArkpackFx = Effect.fn("packDirectoryFx.writeArkpackFx")(
+	(target: string, manifestPath: string, configPath: string, resources: PackedResourceFile[]) =>
+		Effect.tryPromise({
+			try: async () => {
+				const manifestLength = Number((await stat(manifestPath)).size);
+				const configLength = Number((await stat(configPath)).size);
+				const payloadLength =
+					4 +
+					manifestLength +
+					configLength +
+					resources.reduce((total, resource) => total + resource.length, 0);
+				if (payloadLength < 1 || payloadLength > ArkpackLimits.maxPayloadBytes)
+					throw new Error(`Invalid Arkpack payload length ${payloadLength}.`);
+				const file = await open(target, "wx");
+				const contentHash = createHash("sha256");
+				const writeFx = async (bytes: Uint8Array, payload: boolean) => {
+					let offset = 0;
+					while (offset < bytes.byteLength) {
+						const { bytesWritten } = await file.write(
+							bytes,
+							offset,
+							bytes.byteLength - offset,
+							null,
+						);
+						if (bytesWritten === 0) throw new Error("Arkpack write made no progress.");
+						offset += bytesWritten;
+					}
+					if (payload) contentHash.update(bytes);
+				};
+				const copyPayloadFileFx = async (source: string) => {
+					for await (const chunk of createReadStream(source))
+						await writeFx(chunk as Buffer, true);
+				};
+				try {
+					const envelopeHeader = new Uint8Array(Magic.byteLength + 4);
+					envelopeHeader.set(Magic);
+					new DataView(envelopeHeader.buffer).setUint32(
+						Magic.byteLength,
+						payloadLength,
+						true,
+					);
+					await writeFx(envelopeHeader, false);
+					const payloadHeader = new Uint8Array(4);
+					new DataView(payloadHeader.buffer).setUint32(0, manifestLength, true);
+					await writeFx(payloadHeader, true);
+					await copyPayloadFileFx(manifestPath);
+					await copyPayloadFileFx(configPath);
+					for (const resource of resources) await copyPayloadFileFx(resource.path);
+				} finally {
+					await file.close();
+				}
+				return {
+					bytes: Magic.byteLength + 4 + payloadLength,
+					contentHash: contentHash.digest("hex"),
+				};
+			},
+			catch: (cause) => cause,
+		}),
+);
+
+/** Compiles, validates, and publishes one canonical project build directory. */
 const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* ({
-	assertCurrentFx,
 	input,
 }: packDirectoryFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const sourceSnapshot = yield* readSourceSnapshotFx(input);
 	const compilation = yield* compileGameDirectoryFx({
 		input,
 	});
 	const config = yield* assertGameConfigValidFx(compilation);
 	const identity = compilation.projectIdentity!;
-	const pngResources = yield* Effect.forEach(
-		compilation.resources,
-		({ kind, path: resourcePath }) =>
-			readPngResourceFx({
-				path: resourcePath,
-			}).pipe(
-				Effect.flatMap((resource) =>
-					kind === "asset" ? resizePngAssetFx(resource) : Effect.succeed(resource),
-				),
-			),
-	);
-	const bytes = yield* encodeFx({
-		version: identity.version,
-		arkini: ArkiniVersionSchema.parse(ArkiniAppVersion),
-		config,
-		resources: pngResources,
-	});
-	const arkpack = yield* encodeArkpackEnvelopeFx({
-		payload: bytes,
-	});
-	const contentHash = yield* readArkpackContentHashFx(arkpack);
-
 	const root = yield* fileSystem.realPath(path.resolve(input));
 	const build = path.join(root, "build");
-	const pending = path.join(root, `.build.${randomUUID()}.pending`);
-	const previous = path.join(root, `.build.${randomUUID()}.previous`);
+	const temporary = path.join(root, `.arkpack-build.${randomUUID()}`);
 	const filename = readArkpackArtifactNameFn(identity.packageId);
-
-	yield* Effect.gen(function* () {
-		if (assertCurrentFx !== undefined) yield* assertCurrentFx;
-		const currentSources = yield* readSourceSnapshotFx(input);
-		if (!isDeepStrictEqual(sourceSnapshot, currentSources))
+	const artifact = yield* Effect.gen(function* () {
+		yield* fileSystem.makeDirectory(temporary);
+		const resourcesRoot = path.join(temporary, "resources");
+		yield* fileSystem.makeDirectory(resourcesRoot);
+		const pngResources: PackedResourceFile[] = [];
+		for (let index = 0; index < compilation.resources.length; index += 1) {
+			const resource = compilation.resources[index];
+			const target = path.join(resourcesRoot, String(index).padStart(6, "0"));
+			const length =
+				resource.kind === "asset"
+					? yield* resizePngAssetFileFx(resource.path, target, resource.id)
+					: yield* validatePngResourceFileFx(resource.path, resource.id);
+			pngResources.push({
+				id: resource.id,
+				mime: resource.mime,
+				path: resource.kind === "asset" ? target : resource.path,
+				length,
+			});
+		}
+		const configPath = path.join(temporary, "config.json");
+		const configLength = yield* writeJsonFileFx(configPath, config);
+		if (configLength > ArkpackLimits.maxConfigBytes)
 			return yield* Effect.fail(
-				new Error("The saved project sources changed while the build was prepared."),
+				new Error(`Arkpack config exceeds the ${ArkpackLimits.maxConfigBytes} byte limit.`),
 			);
-		yield* fileSystem.makeDirectory(pending);
-		const stagedArkpack = path.join(pending, filename);
-		yield* writeSyncedFileFx(stagedArkpack, arkpack);
-
-		yield* Effect.uninterruptible(
-			Effect.gen(function* () {
-				const hadPrevious = yield* fileSystem.exists(build);
-				if (hadPrevious) yield* fileSystem.rename(build, previous);
-				const swap = yield* Effect.exit(fileSystem.rename(pending, build));
-				if (Exit.isFailure(swap)) {
-					if (hadPrevious) yield* fileSystem.rename(previous, build);
-					return yield* Effect.failCause(swap.cause);
-				}
-				if (hadPrevious) {
-					yield* fileSystem
-						.remove(previous, {
-							force: true,
-							recursive: true,
-						})
-						.pipe(Effect.ignore);
-				}
-			}),
+		const manifestPath = path.join(temporary, "manifest.json");
+		const manifest = ManifestSchema.parse({
+			version: identity.version,
+			arkini: ArkiniVersionSchema.parse(ArkiniAppVersion),
+			length: configLength,
+			resources: pngResources.map(({ id, mime, length }) => ({
+				id,
+				mime,
+				length,
+			})),
+		});
+		const manifestLength = yield* writeJsonFileFx(manifestPath, manifest);
+		if (manifestLength > ArkpackLimits.maxManifestBytes)
+			return yield* Effect.fail(
+				new Error(
+					`Arkpack manifest exceeds the ${ArkpackLimits.maxManifestBytes} byte limit.`,
+				),
+			);
+		const stagedArkpack = path.join(temporary, filename);
+		const artifact = yield* writeArkpackFx(
+			stagedArkpack,
+			manifestPath,
+			configPath,
+			pngResources,
 		);
+		yield* fileSystem.remove(build, {
+			force: true,
+			recursive: true,
+		});
+		yield* fileSystem.makeDirectory(build);
+		yield* fileSystem.rename(stagedArkpack, path.join(build, filename));
+		return artifact;
 	}).pipe(
 		Effect.ensuring(
 			fileSystem
-				.remove(pending, {
+				.remove(temporary, {
 					force: true,
 					recursive: true,
 				})
 				.pipe(Effect.ignore),
 		),
 	);
-
 	return {
 		input: root,
 		build,
@@ -151,10 +232,9 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		packageId: identity.packageId,
 		version: identity.version,
 		json: compilation.json,
-		png: pngResources.length,
-		bytes: arkpack.byteLength,
-		content: arkpack,
-		contentHash,
+		png: compilation.resources.length,
+		bytes: artifact.bytes,
+		contentHash: artifact.contentHash,
 		diagnostics: compilation.diagnostics,
 	} as const;
 });
@@ -168,18 +248,9 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* (
 	const root = yield* fileSystem.realPath(path.resolve(props.input));
 	return yield* filesystemWrite.withLockFx(
 		path.join(root, "editor.lock"),
-		Effect.gen(function* () {
-			const recovery = path.join(root, "editor.lock.write");
-			if (yield* fileSystem.exists(recovery))
-				return yield* Effect.fail(
-					new Error(
-						`Project ${root} has an interrupted Editor transaction at ${recovery}; reopen it in the Editor before packing.`,
-					),
-				);
-			return yield* packDirectoryUnlockedFx({
-				...props,
-				input: root,
-			});
+		packDirectoryUnlockedFx({
+			...props,
+			input: root,
 		}),
 	);
 });

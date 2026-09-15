@@ -55,7 +55,7 @@ export const renderArkpackSelector = async ({
 		value: {
 			arkpack: {
 				importFn: vi.fn(),
-				installFn: vi.fn(),
+				installEditorBuildFn: vi.fn(),
 				listFn: vi.fn(),
 				openUserDirectoryFn: openUserDirectory,
 				readFn: vi.fn(),

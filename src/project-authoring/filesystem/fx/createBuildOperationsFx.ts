@@ -3,16 +3,13 @@ import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Data, Effect, type Semaphore } from "effect";
 
-import { ArkpackLimits } from "~shared/ArkpackLimits";
 import type { ProjectState } from "../ProjectState";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
-import {
-	EditorProjectBuildContentSchema,
-	EditorProjectBuildSchema,
-} from "~/editor-build/schema/EditorProjectBuildSchema";
+import type { ReadEditorBuildProps } from "~/editor-build/service/EditorBuildRepository";
+import { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
-import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
+import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
@@ -34,7 +31,7 @@ class EditorProjectBuildOperationError extends Data.TaggedError(
 const projectChangedBeforeBuildFn = () =>
 	new EditorProjectBuildOperationError({
 		message:
-			"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
+			"The saved project differs from the open Editor state. Refresh the project and build again.",
 	});
 
 const relativeDiagnosticSourceFn = (projectRoot: string, source: string) => {
@@ -137,7 +134,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
-	// Authored identity is pinned here; packDirectoryFx snapshots and verifies live PNG bytes.
+	// Authored identity is pinned before compilation while the project write lock is held.
 	const assertCurrentFx = (state: ProjectState) =>
 		readProjectFilesFx(state.paths.root).pipe(
 			Effect.mapError(projectChangedBeforeBuildFn),
@@ -256,7 +253,6 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 							yield* assertCurrentFx(state);
 							return yield* packDirectoryFx({
 								input: state.paths.root,
-								assertCurrentFx: assertCurrentFx(state),
 							}).pipe(
 								Effect.mapError((cause) =>
 									cause instanceof GameValidationError
@@ -305,11 +301,10 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			),
 		);
 
-	const readProjectBuildFx: EditorBuildRepositoryService["readProjectBuildFx"] = ({
-		contentHash,
-		expectedRevision,
-		projectId,
-	}) =>
+	const withProjectBuildPathFx = <Value, Failure>(
+		{ contentHash, expectedRevision, projectId }: ReadEditorBuildProps,
+		useFx: (path: string) => Effect.Effect<Value, Failure, never>,
+	) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const state = yield* readStateFx(projectId);
@@ -322,23 +317,16 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 						if (!(yield* fileSystem.exists(build)))
 							return yield* Effect.fail(new Error("No Editor project build exists."));
 						const arkpackPath = path.join(build, readArkpackArtifactNameFn(projectId));
-						const info = yield* fileSystem.stat(arkpackPath);
-						if (info.size > ArkpackLimits.maxArkpackBytes)
-							return yield* Effect.fail(
-								new Error(
-									`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`,
-								),
-							);
-						const bytes = Uint8Array.from(yield* fileSystem.readFile(arkpackPath));
-						if ((yield* readArkpackContentHashFx(bytes)) !== contentHash)
+						if (
+							(yield* readArkpackFileLayoutFx(arkpackPath)).contentHash !==
+							contentHash
+						)
 							return yield* Effect.fail(
 								new Error(
 									"The current Editor build does not match the requested artifact.",
 								),
 							);
-						return EditorProjectBuildContentSchema.parse({
-							bytes,
-						});
+						return yield* useFx(arkpackPath);
 					}),
 				);
 			}).pipe(
@@ -355,6 +343,6 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 	return {
 		saveBuildVersionFx,
 		buildProjectFx,
-		readProjectBuildFx,
+		withProjectBuildPathFx,
 	};
 });

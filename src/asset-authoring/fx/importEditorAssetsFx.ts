@@ -1,93 +1,57 @@
 import { Effect } from "effect";
+import { z } from "zod";
 
-import {
-	type EditorArkpackFileInput,
-	readSelectedArkpackFileFx,
-} from "~/arkpack-admission/fx/readSelectedArkpackFileFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
-import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
-import type { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
-import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
-import {
-	type EditorAssetFileInput,
-	validateEditorAssetFileFx,
-} from "~/asset-authoring/fx/validateEditorAssetFileFx";
+import { IdSchema } from "~/game-value/schema/IdSchema";
+import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
+import { ProjectPayloadSchema } from "~/project-authoring/schema/ProjectPayloadSchema";
 
 type ImportEditorAssetsProps =
 	| {
-			readonly file: EditorArkpackFileInput;
+			readonly file: File;
 			readonly projectId: string;
 			readonly source: "arkpack";
 	  }
 	| {
-			readonly files: ReadonlyArray<EditorAssetFileInput>;
+			readonly files: ReadonlyArray<File>;
 			readonly projectId: string;
 			readonly source: "files";
 	  };
 
-const readEditorAssetImportResourcesFx = Effect.fn("readEditorAssetImportResourcesFx")(function* (
-	props: ImportEditorAssetsProps,
-) {
-	if (props.source === "arkpack") {
-		const loaded = yield* readSelectedArkpackFileFx(props.file);
-		if (loaded.payload.resources.length > 0) return loaded.payload.resources;
-		return yield* Effect.fail(
-			new ProjectOperationError({
-				reason: "invalid-asset",
-				message: "The selected arkpack does not contain any assets.",
-			}),
-		);
-	}
-	if (props.files.length === 0) {
-		return yield* Effect.fail(
-			new ProjectOperationError({
-				reason: "invalid-asset",
-				message: "Select at least one PNG asset to import.",
-			}),
-		);
-	}
-	const resources: ReadonlyArray<ResourceSchema.Type> = yield* Effect.forEach(
-		props.files,
-		(file) => validateEditorAssetFileFx(file),
-		{
-			concurrency: 4,
-		},
-	);
-	const resourceIds = new Set<string>();
-	for (const resource of resources) {
-		if (resourceIds.has(resource.id)) {
-			return yield* Effect.fail(
-				new ProjectOperationError({
-					reason: "invalid-resource-id",
-					message: `Asset ID ${resource.id} occurs more than once in the selected batch.`,
-				}),
-			);
-		}
-		resourceIds.add(resource.id);
-	}
-	return resources;
-});
+const resultSchema = z
+	.object({
+		project: ProjectPayloadSchema,
+		resourceIds: IdSchema.array(),
+	})
+	.strict();
 
-/** Validates one PNG or Arkpack source and atomically publishes its assets. */
+/** Imports selected assets by native path and publishes the resulting project. */
 export const importEditorAssetsFx = Effect.fn("importEditorAssetsFx")(function* (
 	props: ImportEditorAssetsProps,
 ) {
-	const resources = yield* readEditorAssetImportResourcesFx(props);
-	const repository = yield* ProjectRepository;
-	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const project = yield* repository.upsertResourcesFx({
+	const files =
+		props.source === "arkpack"
+			? [
+					props.file,
+				]
+			: props.files;
+	const result = yield* invokeProjectTransportFx({
+		callFn: () =>
+			window.arkini.editor.importAssetsFn({
+				files: files.map((file) => ({
+					name: file.name,
+					path: window.arkini.file.readPathFn(file),
+				})),
 				projectId: props.projectId,
-				resources,
-			});
-			yield* publishEditorProjectFx(props.projectId, {
-				project,
-			});
-			return {
-				project,
-				resourceIds: resources.map(({ id }) => id),
-			};
-		}),
-	);
+				source: props.source,
+			}),
+		operation: "upsert-resource",
+		parseFn: (value) => resultSchema.parse(value),
+		requestMessage: "The selected assets could not be imported.",
+		responseMessage: "The imported asset response is invalid.",
+	});
+	yield* publishEditorProjectFx(props.projectId, {
+		project: result.project,
+	});
+	return result;
 });

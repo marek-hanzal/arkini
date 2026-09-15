@@ -17,6 +17,7 @@ import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { join } from "node:path";
 import { access } from "node:fs/promises";
+import { importEditorAssetFilesFx } from "../importEditorAssetFilesFx";
 
 const readEditorWindowFx = (
 	event: IpcMainInvokeEvent,
@@ -136,15 +137,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						diagnostics,
 						requestParser.parseBuildProjectFx(candidate),
 						(repository, request) => repository.buildProjectFx(request),
-					),
-				);
-				handleFn(ArkiniElectronApi.channels.editorProjectBuildRead, (_event, candidate) =>
-					executeEditorProjectRepositoryFx(
-						"read-project-build",
-						ownership,
-						diagnostics,
-						requestParser.parseReadProjectBuildFx(candidate),
-						(repository, request) => repository.readProjectBuildFx(request),
 					),
 				);
 				handleFn(ArkiniElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
@@ -437,6 +429,21 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
+					ArkiniElectronApi.channels.editorProjectImportAssets,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"upsert-resource",
+							ownership,
+							diagnostics,
+							requestParser.parseImportAssetsFx(candidate),
+							(repository, request) =>
+								importEditorAssetFilesFx({
+									repository,
+									request,
+								}),
+						),
+				);
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -463,7 +470,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorAwaitIdle,
 					ArkiniElectronApi.channels.editorProjectBuild,
 					ArkiniElectronApi.channels.editorProjectBuildVersionSave,
-					ArkiniElectronApi.channels.editorProjectBuildRead,
 					ArkiniElectronApi.channels.editorProjectBuildSave,
 					ArkiniElectronApi.channels.editorProjectCreate,
 					ArkiniElectronApi.channels.editorProjectDismissInvalid,
@@ -474,6 +480,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectImportArkpack,
 					ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
+					ArkiniElectronApi.channels.editorProjectImportAssets,
 					ArkiniElectronApi.channels.editorProjectList,
 					ArkiniElectronApi.channels.editorProjectOpenDirectory,
 					ArkiniElectronApi.channels.editorProjectOptimizeResources,

@@ -5,9 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { ArkpackDistributionChannel } from "~/arkpack-artifact/constant/ArkpackDistributionChannel";
-import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
-import { verifyArkpackProvenanceWithFx } from "~/arkpack-artifact/fx/verifyArkpackProvenanceFx";
-import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
+import { encodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { verifyArkpackProofFx } from "~/arkpack-artifact/fx/verifyArkpackProofFx";
+import { readTestArkpackContentHashFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
 import { verifyArkpackFileProvenanceWithFx } from "~/arkpack-artifact/fx/verifyArkpackFileProvenanceFx";
 import { Magic } from "~/arkpack-artifact/constant/Magic";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
@@ -17,9 +17,10 @@ import fixture from "./verifyArkpackProvenanceFx.test/official.fixture.json";
 // payload/channel. Production trust remains src/arkpack-artifact/constant/trusted-root.json.
 const payload = Uint8Array.from(Buffer.from(fixture.payloadBase64, "base64"));
 const proof = new TextEncoder().encode(JSON.stringify(fixture.proof));
-const verifyFixtureFx = (bytes: Uint8Array) =>
-	verifyArkpackProvenanceWithFx({
-		bytes,
+const verifyFixtureFx = (artifact: Uint8Array, candidateProof: Uint8Array | null = proof) =>
+	verifyArkpackProofFx({
+		artifact,
+		proof: candidateProof ?? undefined,
 		channel: ArkpackDistributionChannel,
 		trustedRoot: fixture.trustedRoot,
 	});
@@ -44,24 +45,17 @@ describe("Arkpack release provenance", () => {
 	});
 
 	it("offline-verifies the checked-in payload proof as Official", async () => {
-		const release = await Effect.runPromise(
-			encodeArkpackEnvelopeFx({
-				payload,
-				proof,
-			}),
-		);
-
-		await expect(Effect.runPromise(verifyFixtureFx(release))).resolves.toEqual({
+		await expect(Effect.runPromise(verifyFixtureFx(payload))).resolves.toEqual({
 			type: "official",
 		});
 	});
 
-	it("offline-verifies the checked-in proof while streaming its payload from disk", async () => {
+	it("does not accept a legacy payload proof as a file content-hash proof", async () => {
 		const root = await mkdtemp(join(tmpdir(), "arkini-stream-proof-"));
 		try {
 			const arkpackPath = join(root, "fixture.arkpack");
 			const release = await Effect.runPromise(
-				encodeArkpackEnvelopeFx({
+				encodeTestArkpackEnvelopeFx({
 					payload,
 					proof,
 				}),
@@ -92,7 +86,7 @@ describe("Arkpack release provenance", () => {
 					}),
 				),
 			).resolves.toEqual({
-				type: "official",
+				type: "community",
 			});
 		} finally {
 			await rm(root, {
@@ -108,25 +102,14 @@ describe("Arkpack release provenance", () => {
 			subjectAlternativeName:
 				/^https:\/\/github[.]com\/pepa\/arkini\/[.]github\/workflows\/release[.]yml@.+$/,
 		};
-		const release = await Effect.runPromise(
-			encodeArkpackEnvelopeFx({
-				payload,
-				proof,
-			}),
-		);
 		const changedPayload = payload.slice();
 		changedPayload[0] ^= 1;
-		const changed = await Effect.runPromise(
-			encodeArkpackEnvelopeFx({
-				payload: changedPayload,
-				proof,
-			}),
-		);
 
 		await expect(
 			Effect.runPromise(
-				verifyArkpackProvenanceWithFx({
-					bytes: release,
+				verifyArkpackProofFx({
+					artifact: payload,
+					proof,
 					channel: foreignChannel,
 					trustedRoot: fixture.trustedRoot,
 				}),
@@ -134,32 +117,34 @@ describe("Arkpack release provenance", () => {
 		).resolves.toEqual({
 			type: "community",
 		});
-		await expect(Effect.runPromise(verifyFixtureFx(changed))).resolves.toEqual({
+		await expect(Effect.runPromise(verifyFixtureFx(changedPayload))).resolves.toEqual({
 			type: "community",
 		});
 	});
 
 	it("keeps missing or malformed proof Community without changing gameplay identity", async () => {
 		const unsigned = await Effect.runPromise(
-			encodeArkpackEnvelopeFx({
+			encodeTestArkpackEnvelopeFx({
 				payload,
 			}),
 		);
 		const malformed = await Effect.runPromise(
-			encodeArkpackEnvelopeFx({
+			encodeTestArkpackEnvelopeFx({
 				payload,
 				proof: new TextEncoder().encode("not-json"),
 			}),
 		);
 
-		await expect(Effect.runPromise(verifyFixtureFx(unsigned))).resolves.toEqual({
+		await expect(Effect.runPromise(verifyFixtureFx(payload, null))).resolves.toEqual({
 			type: "community",
 		});
-		await expect(Effect.runPromise(verifyFixtureFx(malformed))).resolves.toEqual({
+		await expect(
+			Effect.runPromise(verifyFixtureFx(payload, new TextEncoder().encode("not-json"))),
+		).resolves.toEqual({
 			type: "community",
 		});
-		await expect(Effect.runPromise(readArkpackContentHashFx(unsigned))).resolves.toBe(
-			await Effect.runPromise(readArkpackContentHashFx(malformed)),
+		await expect(Effect.runPromise(readTestArkpackContentHashFx(unsigned))).resolves.toBe(
+			await Effect.runPromise(readTestArkpackContentHashFx(malformed)),
 		);
 	});
 });

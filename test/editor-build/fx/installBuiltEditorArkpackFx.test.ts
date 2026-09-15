@@ -107,14 +107,6 @@ describe("Editor Build install admission", () => {
 			}),
 		);
 		await Effect.runPromise(catalog.refreshFx);
-		const readProjectBuildFx = vi.fn(() =>
-			Effect.succeed({
-				bytes: new Uint8Array([
-					1,
-				]),
-			}),
-		);
-
 		await expect(
 			Effect.runPromise(
 				installBuiltEditorArkpackFx({
@@ -123,13 +115,9 @@ describe("Editor Build install admission", () => {
 						version: "2.0",
 					},
 					catalog,
-					repository: {
-						readProjectBuildFx,
-					},
 				}),
 			),
 		).rejects.toThrow("requires confirmation");
-		expect(readProjectBuildFx).not.toHaveBeenCalled();
 		expect(install).not.toHaveBeenCalled();
 
 		const plan = readEditorBuildInstallPlanFn({
@@ -150,16 +138,12 @@ describe("Editor Build install admission", () => {
 					},
 					catalog,
 					confirmation: plan.confirmation,
-					repository: {
-						readProjectBuildFx,
-					},
 				}),
 			),
 		).resolves.toMatchObject({
 			packageId: artifact.projectId,
 			version: "2.0",
 		});
-		expect(readProjectBuildFx).toHaveBeenCalledOnce();
 		expect(install).toHaveBeenCalledOnce();
 	});
 
@@ -191,14 +175,6 @@ describe("Editor Build install admission", () => {
 					version: "1.9",
 				},
 				catalog,
-				repository: {
-					readProjectBuildFx: () =>
-						Effect.succeed({
-							bytes: new Uint8Array([
-								1,
-							]),
-						}),
-				},
 			}),
 		);
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({

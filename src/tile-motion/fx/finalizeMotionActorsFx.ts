@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
@@ -16,6 +17,7 @@ export namespace finalizeMotionActorsFx {
 		readonly actorStore: MainActorStore;
 		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
+		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly readPaletteFn: () => PixiScenePalette;
 		readonly stillClaimedActorIds: ReadonlySet<string>;
 		readonly surface: MainSurface;
@@ -29,6 +31,7 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 	actorStore,
 	animator,
 	application,
+	onActorSettledFn,
 	readPaletteFn,
 	stillClaimedActorIds,
 	surface,
@@ -40,12 +43,14 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 		if (actor === undefined) continue;
 		if (actor.container.destroyed) {
 			yield* actorStore.deleteActorFx(actorId);
+			onActorSettledFn(actor);
 			continue;
 		}
 		const canonical = actorStore.canonicalItems.get(actorId);
 		const pose = canonical === undefined ? null : yield* surface.readActorPoseFx(canonical);
 		if (canonical === undefined || pose === null) {
 			yield* actorStore.releaseActorFx(actorId);
+			onActorSettledFn(actor);
 			yield* startActorExitFx({
 				actor,
 				animator,
@@ -74,5 +79,6 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 			x: actor.container.x,
 			y: actor.container.y,
 		});
+		onActorSettledFn(actor);
 	}
 });

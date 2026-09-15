@@ -29,6 +29,7 @@ import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
 import type { MainRuntime } from "~/game-scene/service/MainRuntime";
+import { createDragOriginGhostsFx } from "~/tile-interaction/fx/createDragOriginGhostsFx";
 
 interface CreateMainRuntimeProps {
 	readonly dragThreshold: number;
@@ -109,6 +110,12 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		// Retained actors must die before their parent surface destroys its layers.
 		registerRollbackFn(actorStore.closeFx);
 		registerRollbackFn(animator.closeFx);
+		const dragOriginGhosts = yield* createDragOriginGhostsFx({
+			animationDriver,
+			application,
+			surface,
+		});
+		registerRollbackFn(dragOriginGhosts.closeFx);
 		const magneticField = yield* createMagneticFieldFx({
 			actorStore,
 			animationDriver,
@@ -121,6 +128,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			animator,
 			application,
 			magneticField,
+			onActorSettledFn: (actor) => RendererRuntime.runSync(dragOriginGhosts.settleFx(actor)),
 			readPaletteFn: () => paletteState.current,
 			surface,
 			textures,
@@ -153,6 +161,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			application,
 			cursorGrab,
 			dragThreshold,
+			dragOriginGhosts,
 			dropSubmission,
 			game,
 			magneticField,

@@ -22,11 +22,13 @@ import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
+import type { DragOriginGhosts } from "~/tile-interaction/type/DragOriginGhosts";
 
 export interface MainDragController {
 	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
 	readonly detachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
+	readonly settleOriginGhostFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	/** Coalesces canonical/layout invalidation onto the current drag frame slot. */
 	readonly requestRefreshFx: Effect.Effect<void, never, never>;
 	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void, never, never>;
@@ -39,6 +41,7 @@ interface Props {
 	readonly application: PixiApplicationOwner;
 	readonly cursorGrab: CursorGrabMotion;
 	readonly dragThreshold: number;
+	readonly dragOriginGhosts: DragOriginGhosts;
 	readonly dropSubmission: DropSubmission;
 	readonly game: GameEngine;
 	readonly magneticField: MagneticField;
@@ -146,6 +149,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	application,
 	cursorGrab,
 	dragThreshold,
+	dragOriginGhosts,
 	dropSubmission,
 	game,
 	magneticField,
@@ -174,6 +178,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			settleDraggedActorFx({
 				actor,
 				animator,
+				onCompleteFn: () => RendererRuntime.runSync(dragOriginGhosts.settleFx(actor)),
 				surface,
 			}),
 		);
@@ -208,7 +213,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			actor.container.off("pointerdown", actor.onPointerDownFn);
 			actor.onPointerDownFn = null;
 		}
-		if (activeDrag?.actor !== actor) return;
+		if (activeDrag?.actor !== actor) {
+			RendererRuntime.runSync(dragOriginGhosts.settleFx(actor));
+			return;
+		}
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		const drag = activeDrag;
 		activeDrag = null;
@@ -222,6 +230,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		RendererRuntime.runSync(cursorGrab.finishFx(actor));
 		actor.dragging = false;
 		actor.container.cursor = "default";
+		RendererRuntime.runSync(dragOriginGhosts.settleFx(actor));
 	};
 
 	const applyPointerMoveFn = (sample: createPointerFrameSamplerFx.Sample) => {
@@ -298,6 +307,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				return;
 			}
 			drag.actor.dragging = true;
+			RendererRuntime.runSync(dragOriginGhosts.beginFx(drag.actor));
 			drag.actor.container.cursor = "grabbing";
 			surface.transientActorLayer.addChild(drag.actor.container);
 			drag.actor.container.zIndex = 10_000;
@@ -508,6 +518,8 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				dropSubmission.submitFx({
 					actor: drag.actor,
 					commandTarget: targetFacts.commandTarget,
+					onReturnSettledFn: () =>
+						RendererRuntime.runSync(dragOriginGhosts.settleFx(drag.actor)),
 					previewKind: drag.previewKind,
 					sourceItem,
 					targetItem: drag.targetItem,
@@ -548,6 +560,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (sourceItem === null) return;
 		const submission = {
 			actor: drag.actor,
+			onReturnSettledFn: () => RendererRuntime.runSync(dragOriginGhosts.settleFx(drag.actor)),
 			sourceItem,
 			commandTarget: {
 				kind: "inventory" as const,
@@ -708,6 +721,9 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		cancelInteractionFx: Effect.sync(() => cancelInteractionFn()),
 		detachActorFx: Effect.fn("MainDragController.detachActorFx")((actor) =>
 			Effect.sync(() => detachActorFn(actor)),
+		),
+		settleOriginGhostFx: Effect.fn("MainDragController.settleOriginGhostFx")((actor) =>
+			dragOriginGhosts.settleFx(actor),
 		),
 		requestRefreshFx: Effect.gen(function* () {
 			const drag = activeDrag;

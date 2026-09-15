@@ -647,6 +647,7 @@ export const createMotionHarness = ({
 		readonly sourceKind: "drag" | "motion";
 	}> = [];
 	const magneticUpdates: MagneticSample[] = [];
+	const settledActors: PixiTileActor[] = [];
 	const resolvePose =
 		readPose ??
 		((location: TileActorItem["location"]) => ({
@@ -679,6 +680,9 @@ export const createMotionHarness = ({
 			animator,
 			application,
 			magneticField,
+			onActorSettledFn: (actor) => {
+				settledActors.push(actor);
+			},
 			readPaletteFn: () => palette,
 			surface,
 			textures: {} as never,
@@ -697,6 +701,7 @@ export const createMotionHarness = ({
 		magneticReleases,
 		magneticUpdates,
 		runtime,
+		settledActors,
 		surface,
 		transientActorLayer,
 	};

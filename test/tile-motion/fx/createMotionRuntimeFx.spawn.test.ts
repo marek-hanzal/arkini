@@ -99,6 +99,7 @@ describe("spawn lifecycle", () => {
 					animations,
 				}),
 				application: createApplication(),
+				onActorSettledFn: () => {},
 				readPaletteFn: () => palette,
 				stillClaimedActorIds: new Set(),
 				surface: createSurface(),

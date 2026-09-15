@@ -33,6 +33,7 @@ export interface DropSubmission {
 					readonly kind: "inventory";
 			  };
 		readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
+		readonly onReturnSettledFn: () => void;
 		readonly sourceItem: TileActorItem;
 		readonly targetItem: TileActorItem | null;
 	}) => Effect.Effect<void, never, never>;
@@ -203,11 +204,12 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 }: Props) {
 	let closed = false;
 
-	const settleActorFn = (actor: PixiTileActor) => {
+	const settleActorFn = (actor: PixiTileActor, onCompleteFn: () => void) => {
 		RendererRuntime.runSync(
 			settleDraggedActorFx({
 				actor,
 				animator,
+				onCompleteFn,
 				surface,
 			}),
 		);
@@ -245,7 +247,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 			),
 		),
 		submitFx: Effect.fn("DropSubmission.submitFx")(
-			({ actor, commandTarget, previewKind, sourceItem, targetItem }) =>
+			({ actor, commandTarget, onReturnSettledFn, previewKind, sourceItem, targetItem }) =>
 				Effect.sync(() => {
 					if (closed) return;
 					RendererRuntime.runSync(cursorGrab.finishFx(actor));
@@ -345,7 +347,11 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							if (optimisticRemoval !== null && removalStarted) {
 								restoreOptimisticRemovalFn(optimisticRemoval);
 							}
-							if (retainedSource !== null) settleActorFn(retainedSource);
+							if (retainedSource !== null) {
+								settleActorFn(retainedSource, onReturnSettledFn);
+							} else {
+								onReturnSettledFn();
+							}
 						} catch (cause) {
 							game.reportCriticalFailureFn("game-presentation", cause);
 						}
@@ -362,7 +368,9 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							if (optimisticRemoval !== null && removalStarted) {
 								restoreOptimisticRemovalFn(optimisticRemoval);
 							}
-							settleActorFn(retainedSource);
+							settleActorFn(retainedSource, onReturnSettledFn);
+						} else {
+							onReturnSettledFn();
 						}
 						game.reportCriticalFailureFn("game-presentation", cause);
 					};

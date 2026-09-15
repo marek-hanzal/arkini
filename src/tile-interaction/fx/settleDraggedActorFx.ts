@@ -11,6 +11,7 @@ import type { MainInteractionSurface } from "~/tile-interaction/type/MainInterac
 interface Props {
 	readonly actor: PixiTileActor;
 	readonly animator: ActorAnimator;
+	readonly onCompleteFn?: () => void;
 	readonly surface: MainInteractionSurface;
 }
 
@@ -18,11 +19,15 @@ interface Props {
 export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* ({
 	actor,
 	animator,
+	onCompleteFn,
 	surface,
 }: Props) {
 	actor.dragging = false;
 	const pose = yield* surface.readActorPoseFx(actor.item);
-	if (pose === null || actor.container.destroyed) return;
+	if (pose === null || actor.container.destroyed) {
+		onCompleteFn?.();
+		return;
+	}
 	surface.transientActorLayer.addChild(actor.container);
 	actor.container.zIndex = 0;
 	actor.container.cursor = readActorCursorFn({
@@ -61,9 +66,11 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 		},
 		durationMs,
 		onCompleteFn: () => {
-			if (actor.container.destroyed) return;
-			const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
-			latest.layer.addChild(actor.container);
+			if (!actor.container.destroyed) {
+				const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+				latest.layer.addChild(actor.container);
+			}
+			onCompleteFn?.();
 		},
 		readPoseFn,
 	});

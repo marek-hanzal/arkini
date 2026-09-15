@@ -513,10 +513,12 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			if (updatePlan.pose.kind === "travel") {
 				surface.transientActorLayer.addChild(actor.container);
 				const finishTravelFn = () => {
-					if (actor.container.destroyed) return;
-					const latest =
-						RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
-					latest.layer.addChild(actor.container);
+					if (!actor.container.destroyed) {
+						const latest =
+							RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+						latest.layer.addChild(actor.container);
+					}
+					RendererRuntime.runSync(drag.settleOriginGhostFx(actor));
 				};
 				yield* animateRetargetablePoseFx({
 					actor,
@@ -546,6 +548,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				});
 			} else {
 				pose.layer.addChild(actor.container);
+				yield* drag.settleOriginGhostFx(actor);
 			}
 		}
 

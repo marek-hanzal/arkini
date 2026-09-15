@@ -103,8 +103,16 @@ describe("motion stack contact", () => {
 	});
 
 	it("stacks a consumed source with its one retained physical actor", () => {
-		const { actors, animations, animator, canonicalItems, cue, runtime, target } =
-			createStackHarness();
+		const {
+			actors,
+			animations,
+			animator,
+			canonicalItems,
+			cue,
+			runtime,
+			settledActors,
+			target,
+		} = createStackHarness();
 		const source = createActor(cue.originActorId);
 		source.item = {
 			...source.item,
@@ -159,11 +167,13 @@ describe("motion stack contact", () => {
 			y: target.container.y - target.container.pivot.y * target.container.scale.y,
 		});
 		travel.onCompleteFn?.();
+		expect(settledActors).toEqual([]);
 		advanceStackMergeVanish({
 			actor: source,
 			animations,
 		});
 
+		expect(settledActors).toContain(source);
 		expect(source.container.destroyed).toBe(true);
 		expect(actors.has(source.item.id)).toBe(false);
 		expect(target.item.quantity).toBe(2);

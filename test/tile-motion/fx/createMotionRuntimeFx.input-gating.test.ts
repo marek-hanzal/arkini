@@ -49,7 +49,7 @@ describe("input-gated owner output", () => {
 				output.item,
 			],
 		]);
-		const { animations, runtime } = createMotionHarness({
+		const { animations, runtime, settledActors } = createMotionHarness({
 			actors,
 			canonicalItems,
 		});
@@ -131,6 +131,7 @@ describe("input-gated owner output", () => {
 		).toBe(false);
 		removal.onCompleteFn?.();
 
+		expect(settledActors).toContain(source);
 		expect(actors.has(source.item.id)).toBe(false);
 		expect(source.container.destroyed).toBe(true);
 		expect(transient.container.destroyed).toBe(true);

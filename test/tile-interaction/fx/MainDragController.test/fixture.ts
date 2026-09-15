@@ -19,6 +19,7 @@ import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
+import type { DragOriginGhosts } from "~/tile-interaction/type/DragOriginGhosts";
 import {
 	createDragActor,
 	createItem as createTestItem,
@@ -192,6 +193,8 @@ export const mountController = ({
 	const cancelAnimation = vi.fn();
 	const cancelChannel = vi.fn();
 	const finishCursorGrab = vi.fn();
+	const beginOriginGhost = vi.fn();
+	const settleOriginGhost = vi.fn();
 	const flushMagneticField = vi.fn();
 	const startCursorGrab = vi.fn();
 	let scheduledFrameWork: (() => void) | null = null;
@@ -345,6 +348,11 @@ export const mountController = ({
 		finishFx: () => Effect.sync(finishCursorGrab),
 		startFx: (actor, pointer) => Effect.sync(() => startCursorGrab(actor, pointer)),
 	} satisfies CursorGrabMotion;
+	const dragOriginGhosts = {
+		beginFx: (ghostActor) => Effect.sync(() => beginOriginGhost(ghostActor)),
+		closeFx: Effect.void,
+		settleFx: (ghostActor) => Effect.sync(() => settleOriginGhost(ghostActor)),
+	} satisfies DragOriginGhosts;
 	const game = {
 		getSnapshotFn: () => ({
 			cheats: {
@@ -485,6 +493,7 @@ export const mountController = ({
 				} satisfies PixiApplicationOwner,
 				cursorGrab,
 				dragThreshold: 6,
+				dragOriginGhosts,
 				dropSubmission,
 				game,
 				magneticField,
@@ -512,6 +521,7 @@ export const mountController = ({
 		animations,
 		animateActor,
 		beginInteractionHandoff,
+		beginOriginGhost,
 		canonicalItems,
 		cancelAnimation,
 		cancelChannel,
@@ -567,6 +577,7 @@ export const mountController = ({
 			targetFactsFailure = cause;
 		},
 		startCursorGrab,
+		settleOriginGhost,
 		stage,
 		targetRedirects,
 		transientActorLayer,

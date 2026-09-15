@@ -59,6 +59,25 @@ describe("main drag controller: pointer", () => {
 		expect(mounted.magneticUpdates).toHaveLength(1);
 	});
 
+	it("keeps an origin ghost from the drag threshold through a cancelled return", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(14, 20));
+		mounted.flushFrame();
+		expect(mounted.beginOriginGhost).not.toHaveBeenCalled();
+
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		expect(mounted.beginOriginGhost).toHaveBeenCalledExactlyOnceWith(mounted.actor);
+
+		mounted.stage.emit("pointercancel", pointer(30, 20));
+		expect(mounted.settleOriginGhost).not.toHaveBeenCalled();
+		const returnAnimation = mounted.animations.at(-1);
+		if (returnAnimation === undefined) throw new Error("Expected a return animation.");
+		returnAnimation.onCompleteFn?.();
+		expect(mounted.settleOriginGhost).toHaveBeenCalledExactlyOnceWith(mounted.actor);
+	});
+
 	it("latches a raw threshold crossing through an exact release below the threshold", () => {
 		const mounted = mountController();
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));

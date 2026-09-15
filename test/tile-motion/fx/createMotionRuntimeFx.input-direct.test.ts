@@ -111,6 +111,7 @@ describe("direct input remainder", () => {
 				cue,
 				cueKey: "42:0",
 				magneticField: createRecordingMagneticField(),
+				onActorSettledFn: () => {},
 				onCompleteFn: completed,
 				onSpawnRevealFn: () => {},
 				onInputRemainderRevealedFn: () => {

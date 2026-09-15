@@ -119,6 +119,11 @@ describe("main reconciliation / layout and landing", () => {
 			},
 		});
 		expect(landing?.durationMs).toBeLessThan(280);
+		expect(harness.settledOriginGhosts).toEqual([]);
+		landing?.onCompleteFn?.();
+		expect(harness.settledOriginGhosts).toEqual([
+			actor,
+		]);
 		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).landingActorIds).toEqual(
 			new Set(),
 		);

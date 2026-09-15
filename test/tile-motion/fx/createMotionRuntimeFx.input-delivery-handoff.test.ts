@@ -103,6 +103,7 @@ for (const phase of [
 				animator,
 				application,
 				magneticField,
+				onActorSettledFn: () => {},
 				surface,
 				readPaletteFn: () => palette,
 				textures: {} as never,

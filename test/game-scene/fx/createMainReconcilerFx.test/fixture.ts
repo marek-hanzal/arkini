@@ -430,9 +430,11 @@ export const createAnimator = () => {
 export const createDrag = () => {
 	const detached: PixiTileActor[] = [];
 	const requestRefresh = vi.fn();
+	const settledOriginGhosts: PixiTileActor[] = [];
 	return {
 		detached,
 		requestRefresh,
+		settledOriginGhosts,
 		drag: {
 			attachActorFx: () => Effect.void,
 			cancelInteractionFx: Effect.void,
@@ -442,6 +444,10 @@ export const createDrag = () => {
 					detached.push(actor);
 				}),
 			requestRefreshFx: Effect.sync(requestRefresh),
+			settleOriginGhostFx: (actor: PixiTileActor) =>
+				Effect.sync(() => {
+					settledOriginGhosts.push(actor);
+				}),
 			setInteractionBlockedFx: () => Effect.void,
 		} satisfies MainDragController,
 	};

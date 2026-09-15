@@ -37,6 +37,7 @@ export namespace createMotionRuntimeFx {
 		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly magneticField: MagneticField;
+		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
@@ -294,6 +295,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	animator,
 	application,
 	magneticField,
+	onActorSettledFn,
 	readPaletteFn,
 	surface,
 	textures,
@@ -452,6 +454,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				actorStore,
 				animator,
 				application,
+				onActorSettledFn,
 				readPaletteFn,
 				stillClaimedActorIds,
 				surface,
@@ -499,6 +502,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				actorStore,
 				animator,
 				application,
+				onActorSettledFn,
 				readPaletteFn,
 				stillClaimedActorIds: readRetainedActorIdsFn(),
 				surface,
@@ -530,6 +534,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				cueKey,
 				magneticField,
 				isCueActiveFn: () => !closed && cueLifecycleByKey.get(cueKey)?.started === true,
+				onActorSettledFn,
 				onCompleteFn: () => completeCue(cue),
 				onSpawnRevealFn: () => {
 					if (
@@ -545,6 +550,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 								actorStore,
 								animator,
 								application,
+								onActorSettledFn,
 								readPaletteFn,
 								stillClaimedActorIds: new Set(),
 								surface,
@@ -734,6 +740,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				actorStore,
 				animator,
 				application,
+				onActorSettledFn,
 				readPaletteFn,
 				stillClaimedActorIds: readRetainedActorIdsFn(),
 				surface,
@@ -883,6 +890,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 						actorStore,
 						animator,
 						application,
+						onActorSettledFn,
 						readPaletteFn,
 						stillClaimedActorIds,
 						surface,

@@ -58,6 +58,7 @@ for (const phase of [
 				animator,
 				application: harness.application,
 				magneticField: harness.magneticField,
+				onActorSettledFn: () => {},
 				surface: harness.surface,
 				readPaletteFn: () => palette,
 				textures: {} as never,

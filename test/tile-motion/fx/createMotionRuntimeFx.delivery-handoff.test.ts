@@ -53,6 +53,7 @@ describe("spawn ownership transfer to delivery", () => {
 					animator,
 					application,
 					magneticField,
+					onActorSettledFn: () => {},
 					surface,
 					readPaletteFn: () => palette,
 					textures: {} as never,

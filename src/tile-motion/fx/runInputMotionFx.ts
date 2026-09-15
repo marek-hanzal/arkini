@@ -31,6 +31,7 @@ export namespace runInputMotionFx {
 		readonly delayMs: number;
 		readonly magneticField: MagneticField;
 		readonly isCueActiveFn: () => boolean;
+		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
 		readonly onRemainderRevealedFn: () => void;
 		readonly readSourceSurvivesFn: () => boolean;
@@ -53,11 +54,13 @@ const inputReturnCurve = {
 const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	actorStore,
 	animator,
+	onActorSettledFn,
 	onCompleteFn,
 	source,
 }: {
 	readonly actorStore: MainActorStore;
 	readonly animator: ActorAnimator;
+	readonly onActorSettledFn: (actor: PixiTileActor) => void;
 	readonly onCompleteFn: () => void;
 	readonly source: PixiTileActor;
 }) {
@@ -73,6 +76,7 @@ const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	) {
 		yield* actorStore.releaseActorFx(source.item.id);
 	}
+	onActorSettledFn(source);
 	onCompleteFn();
 });
 
@@ -188,6 +192,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	delayMs,
 	magneticField,
 	isCueActiveFn,
+	onActorSettledFn,
 	onCompleteFn,
 	onRemainderRevealedFn,
 	readPaletteFn,
@@ -307,6 +312,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 							finishConsumedStackFx({
 								actorStore,
 								animator,
+								onActorSettledFn,
 								onCompleteFn,
 								source,
 							}),

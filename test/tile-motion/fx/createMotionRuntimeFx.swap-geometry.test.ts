@@ -11,7 +11,8 @@ import {
 
 describe("swap geometry retargeting", () => {
 	it("retargets both swap legs continuously when live surface geometry changes", () => {
-		const { animations, cue, runtime, setGeometry, source, target } = createSwapHarness();
+		const { animations, cue, runtime, setGeometry, settledActors, source, target } =
+			createSwapHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -91,6 +92,7 @@ describe("swap geometry retargeting", () => {
 		});
 		targetTravel.onCompleteFn?.();
 		sourceTravel.onCompleteFn?.();
+		expect(settledActors).toEqual([]);
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
 
 		const targetSettle = animations
@@ -152,6 +154,12 @@ describe("swap geometry retargeting", () => {
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
 		finalSourceSettle.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+		expect(new Set(settledActors)).toEqual(
+			new Set([
+				source,
+				target,
+			]),
+		);
 		expect(target.container).toMatchObject({
 			x: latestTargetDestination.x,
 			y: latestTargetDestination.y,

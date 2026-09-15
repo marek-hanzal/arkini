@@ -2,6 +2,7 @@ import {
 	app,
 	BrowserWindow,
 	clipboard,
+	dialog,
 	ipcMain,
 	nativeTheme,
 	shell,
@@ -62,6 +63,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 			registered = true;
 			const arkpacks = yield* createFilesystemArkpackCatalogFx({
 				bundledRoot: bundledArkpacksRoot,
+				installationsRoot: userDataPaths.game.installations,
 				userRoot: userDataPaths.game.arkpacks,
 			});
 			const saves = yield* createFilesystemGameSaveFilesFx({
@@ -173,8 +175,10 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						Effect.sync(() => GameIncidentWriteSchema.parse(candidate)).pipe(
 							Effect.flatMap((incident) =>
 								writeLatestGameIncidentFx({
+									bundledArkpacksRoot,
 									incidentsRoot: userDataPaths.game.incidents,
 									incident,
+									userArkpacksRoot: userDataPaths.game.arkpacks,
 								}),
 							),
 						),
@@ -226,6 +230,37 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackRead, (event, packageId: string) =>
 					runAuthorizedFn(event, arkpacks.readFx(packageId)),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.arkpackImport, (event) =>
+					runAuthorizedFn(
+						event,
+						Effect.gen(function* () {
+							const window = BrowserWindow.fromWebContents(event.sender);
+							if (window === null)
+								return yield* Effect.fail(
+									new Error("The Arkpack picker window is unavailable."),
+								);
+							const selection = yield* Effect.promise(() =>
+								dialog.showOpenDialog(window, {
+									properties: [
+										"openFile",
+									],
+									filters: [
+										{
+											name: "Arkpack",
+											extensions: [
+												"arkpack",
+											],
+										},
+									],
+								}),
+							);
+							const sourcePath = selection.filePaths[0];
+							return selection.canceled || sourcePath === undefined
+								? null
+								: yield* arkpacks.importFx(sourcePath);
+						}),
+					),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackInstall,
@@ -283,6 +318,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.localizationPreferredLanguagesRead,
 						ArkiniElectronApi.channels.arkpackList,
 						ArkiniElectronApi.channels.arkpackRead,
+						ArkiniElectronApi.channels.arkpackImport,
 						ArkiniElectronApi.channels.arkpackInstall,
 						ArkiniElectronApi.channels.arkpackRemove,
 						ArkiniElectronApi.channels.arkpackOpenUserDirectory,

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import {
+	buttonByText,
 	cleanupArkpackSelectorTests,
 	renderArkpackSelector,
 } from "~test/arkpack-selector/ui/ArkpackSelector.test/fixture";
@@ -112,32 +113,14 @@ describe("ArkpackSelector action recovery", () => {
 		const navigate = vi
 			.spyOn(router, "navigate")
 			.mockRejectedValueOnce(new Error("load navigation rejected"));
-		const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]');
-		if (fileInput === null) throw new Error("Missing Arkpack file input.");
-		const file = new File(
-			[
-				"package",
-			],
-			"imported.arkpack",
+		const importButton = buttonByText(
+			container,
+			"Import ArkpackChoose an existing .arkpack file",
 		);
-		Object.defineProperty(fileInput, "files", {
-			configurable: true,
-			value: [
-				file,
-			],
-		});
 
 		await act(async () => {
-			fileInput.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
-			fileInput.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
+			importButton.click();
+			importButton.click();
 			await Promise.resolve();
 			await Promise.resolve();
 		});
@@ -145,15 +128,11 @@ describe("ArkpackSelector action recovery", () => {
 		expect(importFileFx).toHaveBeenCalledTimes(1);
 		await vi.waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
 		await vi.waitFor(() => expect(container.textContent).toContain("load navigation rejected"));
-		expect(fileInput.disabled).toBe(false);
+		expect(importButton.disabled).toBe(false);
 		expect(router.state.location.pathname).toBe("/arkpacks");
 
 		await act(async () => {
-			fileInput.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
+			importButton.click();
 			await Promise.resolve();
 			await Promise.resolve();
 		});

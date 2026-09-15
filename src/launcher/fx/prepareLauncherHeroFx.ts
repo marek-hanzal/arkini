@@ -1,8 +1,8 @@
 import { Effect, Exit } from "effect";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
-import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { readLastPackageIdFx } from "~/installed-game/fx/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/launcher/fx/preloadLauncherHeroFx";
+import type { LoadedArkpackResource } from "~/arkpack-catalog/fx/readArkpackCandidatesFx";
 
 interface PrepareLauncherHeroProps {
 	readonly fallbackUrl: string;
@@ -13,9 +13,12 @@ interface PreparedLauncherHero {
 	readonly url: string;
 }
 
-const readHeroResourceFx = Effect.fn("prepareLauncherHeroFx.readResourceFx")(function* (
-	payload: PayloadSchema.Type,
-) {
+const readHeroResourceFx = Effect.fn("prepareLauncherHeroFx.readResourceFx")(function* (payload: {
+	readonly config: {
+		readonly resources: Readonly<Record<string, string>>;
+	};
+	readonly resources: ReadonlyArray<LoadedArkpackResource>;
+}) {
 	const resourceId = payload.config.resources.hero;
 	const resource = payload.resources.find((candidate) => candidate.id === resourceId);
 	if (resource === undefined) {
@@ -39,23 +42,28 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 				packageId,
 			});
 			const resource = yield* readHeroResourceFx(loaded.payload);
-			return yield* Effect.try({
-				try: () =>
-					({
-						owned: true,
-						url: URL.createObjectURL(
-							new Blob(
-								[
-									resource.bytes.slice().buffer,
-								],
-								{
-									type: resource.mime,
-								},
-							),
-						),
-					}) satisfies PreparedLauncherHero,
-				catch: (cause) => cause,
-			});
+			return "url" in resource
+				? ({
+						owned: false,
+						url: resource.url,
+					} satisfies PreparedLauncherHero)
+				: yield* Effect.try({
+						try: () =>
+							({
+								owned: true,
+								url: URL.createObjectURL(
+									new Blob(
+										[
+											resource.bytes.slice().buffer,
+										],
+										{
+											type: resource.mime,
+										},
+									),
+								),
+							}) satisfies PreparedLauncherHero,
+						catch: (cause) => cause,
+					});
 		}).pipe(
 			Effect.flatMap((candidate) =>
 				preloadLauncherHeroFx({

@@ -69,7 +69,7 @@ describe("createArkpackCatalogFx lifecycle", () => {
 					}),
 			});
 
-			const first = yield* Effect.exit(catalog.importFileFx({} as File));
+			const first = yield* Effect.exit(catalog.importFileFx());
 			expect(Exit.isFailure(first)).toBe(true);
 			if (Exit.isFailure(first)) {
 				expect(Cause.hasDies(first.cause)).toBe(true);
@@ -82,7 +82,7 @@ describe("createArkpackCatalogFx lifecycle", () => {
 				],
 			});
 
-			expect(yield* catalog.importFileFx({} as File)).toBe(imported);
+			expect(yield* catalog.importFileFx()).toBe(imported);
 			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
 				type: "ready",
 				arkpacks: [
@@ -131,7 +131,7 @@ describe("createArkpackCatalogFx lifecycle", () => {
 			});
 			yield* catalog.refreshFx;
 
-			const importing = yield* catalog.importFileFx({} as File).pipe(Effect.forkChild);
+			const importing = yield* catalog.importFileFx().pipe(Effect.forkChild);
 			yield* Deferred.await(importStarted);
 			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
 				type: "loading",

@@ -1,25 +1,16 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import { openEditorArkpackFx } from "~/project-authoring/fx/openEditorArkpackFx";
-import type { Project } from "~/project-authoring/type/Project";
-import {
-	ProjectRepository,
-	type ProjectRepositoryService,
-} from "~/project-authoring/service/ProjectRepository";
-import {
-	editorTestResources,
-	editorTestPayload,
-} from "~test/project-authoring/support/editorTestPayload";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import {
+	editorTestPayload,
+	editorTestResources,
+} from "~test/project-authoring/support/editorTestPayload";
 
-vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
-	loadArkpackFx: vi.fn(),
-}));
-
-const project: Project = {
+const project = {
 	projectId: editorTestPayload.config.meta.id,
 	title: editorTestPayload.config.meta.title,
 	version: {
@@ -33,83 +24,63 @@ const project: Project = {
 	resources: editorTestResources,
 };
 
+afterEach(() => vi.unstubAllGlobals());
+
 const createRepository = (
 	readProjectFx: ProjectRepositoryService["readProjectFx"],
-	createProjectFx: ProjectRepositoryService["createProjectFx"],
 ): ProjectRepositoryService => ({
 	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
-	readProjectFx,
-	createProjectFx,
-	listProjectsFx: Effect.die("Unexpected project list."),
-	replaceConfigFx: () => Effect.die("Unexpected config save."),
-	replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+	createProjectFx: () => Effect.die("Unexpected project create."),
 	deleteItemFx: () => Effect.die("Unexpected item delete."),
-	upsertItemFx: () => Effect.die("Unexpected item save."),
-	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
-});
-
-const runOpen = (repository: ProjectRepositoryService) =>
-	Effect.runPromise(
-		openEditorArkpackFx(project.projectId).pipe(
-			Effect.provideService(ProjectRepository, repository),
-		),
-	);
-
-afterEach(() => {
-	vi.clearAllMocks();
+	listProjectsFx: Effect.die("Unexpected project list."),
+	readProjectFx,
+	replaceConfigFx: () => Effect.die("Unexpected config replacement."),
+	replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+	upsertItemFx: () => Effect.die("Unexpected item upsert."),
+	upsertResourcesFx: () => Effect.die("Unexpected resource upsert."),
 });
 
 describe("openEditorArkpackFx", () => {
-	it("returns the existing matching Editor project without loading the Arkpack", async () => {
-		const result = await runOpen(
-			createRepository(
-				() => Effect.succeed(project),
-				() => Effect.die("Unexpected project creation."),
+	it("returns an existing matching Editor project", async () => {
+		const repository = createRepository(() => Effect.succeed(project));
+		await expect(
+			Effect.runPromise(
+				openEditorArkpackFx(project.projectId).pipe(
+					Effect.provideService(ProjectRepository, repository),
+				),
 			),
-		);
-
-		expect(result).toBe(project);
-		expect(loadArkpackFx).not.toHaveBeenCalled();
+		).resolves.toMatchObject({
+			projectId: project.projectId,
+		});
 	});
 
-	it("creates a missing Editor project from the validated installed payload", async () => {
-		vi.mocked(loadArkpackFx).mockReturnValue(
-			Effect.succeed({
-				bytes: new Uint8Array(),
-				descriptor: {
-					packageId: project.projectId,
-					contentHash: "a".repeat(64),
-					title: project.title,
-					version: "4.2",
-					arkini: ArkiniAppVersion,
-					provenance: {
-						type: "community",
-					},
-					source: "user",
-					overridesBundled: false,
+	it("asks main to stream-import a missing installed Arkpack", async () => {
+		vi.stubGlobal("window", {
+			arkini: {
+				editor: {
+					importInstalledArkpackFn: async () => ({
+						type: "success",
+						value: {
+							projectId: project.projectId,
+							title: project.title,
+							version: project.version,
+							createdAtMs: project.createdAtMs,
+							updatedAtMs: project.updatedAtMs,
+						},
+					}),
 				},
-				payload: {
-					version: "4.2",
-					arkini: ArkiniAppVersion,
-					config: project.config,
-					resources: [
-						...editorTestPayload.resources,
-					],
-				},
-			}),
-		);
-		const createProjectFx = vi.fn(() => Effect.succeed(project));
-		const result = await runOpen(createRepository(() => Effect.succeed(null), createProjectFx));
-
-		expect(result).toBe(project);
-		expect(loadArkpackFx).toHaveBeenCalledWith({
-			packageId: project.projectId,
+			},
 		});
-		expect(createProjectFx).toHaveBeenCalledWith({
-			version: project.version,
-			config: project.config,
-			resources: editorTestPayload.resources,
+		const repository = createRepository(() => Effect.succeed(null));
+		await expect(
+			Effect.runPromise(
+				openEditorArkpackFx(project.projectId).pipe(
+					Effect.provideService(ProjectRepository, repository),
+				),
+			),
+		).resolves.toMatchObject({
+			projectId: project.projectId,
 		});
 	});
 });

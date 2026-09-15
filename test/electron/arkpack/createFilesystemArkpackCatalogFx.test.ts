@@ -1,5 +1,5 @@
 import { Effect, FileSystem } from "effect";
-import { access, mkdtemp, realpath, rm, truncate, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readFile, realpath, rm, truncate, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -7,14 +7,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { writeArkpackFileFx } from "~electron/main/arkpack/writeArkpackFileFx";
 import {
-	bundledBytes,
+	createBundledBytes,
 	createCatalog,
 	createNodeFileSystem,
 	createPromiseGate,
+	createUserBytes,
 	readFileRecord,
 	readPackagePath,
 	readRoots,
-	userBytes,
 	writePackage,
 } from "./createFilesystemArkpackCatalogFx.test/fixture";
 
@@ -37,12 +37,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await writePackage({
 			root: roots.bundled,
 			packageId: "arkini",
-			bytes: bundledBytes,
+			bytes: createBundledBytes("arkini"),
 		});
 		await writePackage({
 			root: roots.user,
 			packageId: "package.manual",
-			bytes: userBytes,
+			bytes: createUserBytes("package.manual"),
 		});
 		await writeFile(join(roots.user, "descriptor.json"), "not catalog authority");
 
@@ -51,12 +51,10 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			readFileRecord({
 				packageId: "arkini",
-				bytes: bundledBytes,
 				source: "bundled",
 			}),
 			readFileRecord({
 				packageId: "package.manual",
-				bytes: userBytes,
 				source: "user",
 			}),
 		]);
@@ -75,7 +73,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			await Effect.runPromise(
 				catalog.installFx({
 					packageId,
-					bytes: userBytes,
+					bytes: createUserBytes(packageId),
 				}),
 			);
 
@@ -90,22 +88,20 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const bundledPath = await writePackage({
 			root: roots.bundled,
 			packageId,
-			bytes: bundledBytes,
+			bytes: createBundledBytes(packageId),
 		});
 		const userPath = await writePackage({
 			root: roots.user,
 			packageId,
-			bytes: userBytes,
+			bytes: createUserBytes(packageId),
 		});
 		const catalog = await createCatalog(root);
 		const bundled = readFileRecord({
 			packageId,
-			bytes: bundledBytes,
 			source: "bundled",
 		});
 		const userOverride = readFileRecord({
 			packageId,
-			bytes: userBytes,
 			source: "user",
 			overridesBundled: true,
 		});
@@ -115,8 +111,8 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			userOverride,
 		]);
 		expect(await Effect.runPromise(catalog.readFx(packageId))).toEqual([
-			bundled,
-			userOverride,
+			expect.objectContaining(bundled),
+			expect.objectContaining(userOverride),
 		]);
 
 		await Effect.runPromise(catalog.removeFx(packageId));
@@ -126,10 +122,39 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			readFileRecord({
 				packageId,
-				bytes: bundledBytes,
 				source: "bundled",
 			}),
 		]);
+	});
+
+	it("publishes a replacement import directly over the current user Arkpack", async () => {
+		const roots = readRoots(root);
+		const packageId = "replace-import";
+		const target = await writePackage({
+			root: roots.user,
+			packageId,
+			bytes: createBundledBytes(packageId),
+		});
+		const replacement = createUserBytes(packageId);
+		const source = join(root, "replacement.arkpack");
+		await writeFile(source, replacement);
+		const nodeFileSystem = await createNodeFileSystem();
+		let movedCurrentAside = false;
+		const fileSystem = {
+			...nodeFileSystem,
+			rename: (oldPath, newPath) => {
+				if (oldPath === target) movedCurrentAside = true;
+				return nodeFileSystem.rename(oldPath, newPath);
+			},
+		} satisfies FileSystem.FileSystem;
+		const catalog = await createCatalog(root, fileSystem);
+
+		await expect(Effect.runPromise(catalog.importFx(source))).resolves.toMatchObject({
+			packageId,
+			version: "1.1",
+		});
+		expect(movedCurrentAside).toBe(false);
+		expect(new Uint8Array(await readFile(target))).toEqual(replacement);
 	});
 
 	it("isolates an oversized manually copied package before reading its payload", async () => {
@@ -138,7 +163,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await writePackage({
 			root: roots.bundled,
 			packageId,
-			bytes: bundledBytes,
+			bytes: createBundledBytes(packageId),
 		});
 		const path = await writePackage({
 			root: roots.user,
@@ -159,14 +184,13 @@ describe("createFilesystemArkpackCatalogFx", () => {
 
 		const bundled = readFileRecord({
 			packageId,
-			bytes: bundledBytes,
 			source: "bundled",
 		});
 		await expect(Effect.runPromise(catalog.listFx)).resolves.toEqual([
 			bundled,
 		]);
 		await expect(Effect.runPromise(catalog.readFx(packageId))).resolves.toEqual([
-			bundled,
+			expect.objectContaining(bundled),
 		]);
 		expect(payloadRead).toBe(false);
 	});
@@ -174,6 +198,9 @@ describe("createFilesystemArkpackCatalogFx", () => {
 	it("uses the same aggregate-budget eligibility for listing and exact reads", async () => {
 		const roots = readRoots(root);
 		const packageId = "target";
+		const bundledBytes = createBundledBytes(packageId);
+		const firstUserBytes = createUserBytes("aaa");
+		const targetUserBytes = createUserBytes(packageId);
 		await Promise.all([
 			writePackage({
 				root: roots.bundled,
@@ -183,18 +210,18 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			writePackage({
 				root: roots.user,
 				packageId: "aaa",
-				bytes: userBytes,
+				bytes: firstUserBytes,
 			}),
 			writePackage({
 				root: roots.user,
 				packageId,
-				bytes: userBytes,
+				bytes: targetUserBytes,
 			}),
 		]);
-		const catalog = await createCatalog(root, undefined, 6);
+		const rootBudget = Math.max(bundledBytes.byteLength, firstUserBytes.byteLength) + 1;
+		const catalog = await createCatalog(root, undefined, rootBudget * 2);
 		const bundled = readFileRecord({
 			packageId,
-			bytes: bundledBytes,
 			source: "bundled",
 		});
 
@@ -202,12 +229,11 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			bundled,
 			readFileRecord({
 				packageId: "aaa",
-				bytes: userBytes,
 				source: "user",
 			}),
 		]);
 		await expect(Effect.runPromise(catalog.readFx(packageId))).resolves.toEqual([
-			bundled,
+			expect.objectContaining(bundled),
 		]);
 	});
 
@@ -237,7 +263,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const installing = Effect.runPromise(
 			writeArkpackFileFx({
 				arkpackPath: output,
-				bytes: userBytes,
+				bytes: createUserBytes(packageId),
 				fileSystem,
 			}),
 		);
@@ -261,7 +287,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const output = await writePackage({
 			root: roots.user,
 			packageId,
-			bytes: bundledBytes,
+			bytes: createBundledBytes(packageId),
 		});
 		const nodeFileSystem = await createNodeFileSystem();
 		const publicationEntered = createPromiseGate();
@@ -286,7 +312,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const writing = Effect.runPromise(
 			writeArkpackFileFx({
 				arkpackPath: output,
-				bytes: userBytes,
+				bytes: createUserBytes(packageId),
 				fileSystem,
 			}),
 		);
@@ -300,7 +326,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await expect(listing).resolves.toEqual([
 			readFileRecord({
 				packageId,
-				bytes: userBytes,
 				source: "user",
 			}),
 		]);

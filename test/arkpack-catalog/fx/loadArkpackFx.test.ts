@@ -1,4 +1,3 @@
-import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -14,7 +13,7 @@ beforeEach(installTestPngDecoder);
 
 const malformedArkpackBytes = Effect.runSync(
 	encodeArkpackEnvelopeFx({
-		payload: new Uint8Array(gzipSync(new Uint8Array())),
+		payload: Uint8Array.of(1),
 	}),
 );
 

@@ -75,7 +75,7 @@ afterEach(async () => {
 describe("Arkpack provenance CLI", () => {
 	it("offline-classifies a local artifact without a proof as Community", async () => {
 		const arkpackPath = join(root, "fixture.arkpack");
-		await writeFile(arkpackPath, "local bytes");
+		await writeFile(arkpackPath, createTestArkpack());
 
 		const result = await execFileAsync(
 			process.execPath,

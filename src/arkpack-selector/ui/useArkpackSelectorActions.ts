@@ -36,7 +36,6 @@ export const useArkpackSelectorActions = () => {
 		mode: "promise",
 	});
 	const navigateFn = useNavigate();
-	const inputRef = useRef<HTMLInputElement>(null);
 	const mountedRef = useRef(false);
 	const [actionError, setActionErrorFn] = useState<unknown>();
 	const { active, claimFn, releaseFn } = useExclusiveAction<ActiveAction>();
@@ -81,37 +80,32 @@ export const useArkpackSelectorActions = () => {
 		requestMainMenuFn,
 	]);
 
-	const uploadFn = useCallback(
-		async (file: File | undefined) => {
-			if (file === undefined || state.type === "loading" || !claimFn("import")) {
-				return;
-			}
-			setActionErrorFn(undefined);
-			try {
-				const arkpack = await importFileFn(file);
-				await navigateFn({
-					to: "/action/load-game/$packageId",
-					params: {
-						packageId: arkpack.packageId,
-					},
-				});
-			} catch (error) {
-				if (mountedRef.current) setActionErrorFn(error);
-			} finally {
-				releaseFn("import");
-				if (mountedRef.current) {
-					if (inputRef.current !== null) inputRef.current.value = "";
-				}
-			}
-		},
-		[
-			claimFn,
-			importFileFn,
-			navigateFn,
-			releaseFn,
-			state.type,
-		],
-	);
+	const uploadFn = useCallback(async () => {
+		if (state.type === "loading" || !claimFn("import")) {
+			return;
+		}
+		setActionErrorFn(undefined);
+		try {
+			const arkpack = await importFileFn(undefined);
+			if (arkpack === null) return;
+			await navigateFn({
+				to: "/action/load-game/$packageId",
+				params: {
+					packageId: arkpack.packageId,
+				},
+			});
+		} catch (error) {
+			if (mountedRef.current) setActionErrorFn(error);
+		} finally {
+			releaseFn("import");
+		}
+	}, [
+		claimFn,
+		importFileFn,
+		navigateFn,
+		releaseFn,
+		state.type,
+	]);
 
 	const runBusyActionFn = useCallback(
 		(action: Exclude<BusyAction, "import">, operationFn: () => Promise<unknown>) => {
@@ -174,7 +168,6 @@ export const useArkpackSelectorActions = () => {
 
 	return {
 		state,
-		inputRef,
 		blocked: active !== null || state.type === "loading",
 		actionError,
 		uploadFn,

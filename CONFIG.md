@@ -38,8 +38,8 @@ read marker + schema + exact source paths
 → semantic and PNG-resource validation
 → assert no errors
 → bounded RGBA normalization for `assets/`; byte-preserving `resources/`
-→ MessagePack encode
-→ gzip Arkpack
+→ JSON manifest + JSON GameConfig + ordered raw resource bodies
+→ ARKPACK envelope with optional distribution proof
 ```
 
 Validation, Editor Build, tests, and packing must not assemble their own variation. Conflicts never silently overwrite another provider; diagnostics retain the owning source path.

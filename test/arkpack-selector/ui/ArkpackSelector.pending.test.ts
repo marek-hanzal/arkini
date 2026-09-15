@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import {
+	buttonByText,
 	cleanupArkpackSelectorTests,
 	renderArkpackSelector,
 } from "~test/arkpack-selector/ui/ArkpackSelector.test/fixture";
@@ -60,8 +61,11 @@ describe("ArkpackSelector pending actions", () => {
 		const playLink = container.querySelector<HTMLAnchorElement>(
 			'a[href="/action/load-game/package%3Alocal"]',
 		);
-		const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]');
-		if (removeButton === null || playLink === null || fileInput === null) {
+		const importButton = buttonByText(
+			container,
+			"Import ArkpackChoose an existing .arkpack file",
+		);
+		if (removeButton === null || playLink === null) {
 			throw new Error("Missing Arkpack selector controls.");
 		}
 
@@ -73,27 +77,12 @@ describe("ArkpackSelector pending actions", () => {
 		expect(removeFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
 		expect(playLink.getAttribute("data-ui-disabled")).toBe("true");
-		expect(fileInput.disabled).toBe(true);
+		expect(importButton.disabled).toBe(true);
 
 		await act(async () => {
 			removeButton.click();
 			playLink.click();
-			Object.defineProperty(fileInput, "files", {
-				configurable: true,
-				value: [
-					new File(
-						[
-							"package",
-						],
-						"other.arkpack",
-					),
-				],
-			});
-			fileInput.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
+			importButton.click();
 			await Promise.resolve();
 		});
 		expect(removeFx).toHaveBeenCalledTimes(1);
@@ -108,7 +97,7 @@ describe("ArkpackSelector pending actions", () => {
 		});
 		expect(removeButton.disabled).toBe(false);
 		expect(playLink.getAttribute("data-ui-disabled")).toBe("false");
-		expect(fileInput.disabled).toBe(false);
+		expect(importButton.disabled).toBe(false);
 	});
 
 	it("blocks catalog actions and repeated file changes while import is pending", async () => {
@@ -155,42 +144,25 @@ describe("ArkpackSelector pending actions", () => {
 		const playLink = container.querySelector<HTMLAnchorElement>(
 			'a[href="/action/load-game/package%3Aimported"]',
 		);
-		const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]');
-		if (removeButton === null || playLink === null || fileInput === null) {
+		const importButton = buttonByText(
+			container,
+			"Import ArkpackChoose an existing .arkpack file",
+		);
+		if (removeButton === null || playLink === null) {
 			throw new Error("Missing Arkpack selector controls.");
 		}
-		const file = new File(
-			[
-				"package",
-			],
-			"imported.arkpack",
-		);
-		Object.defineProperty(fileInput, "files", {
-			configurable: true,
-			value: [
-				file,
-			],
-		});
 
 		await act(async () => {
-			fileInput.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
+			importButton.click();
 			await Promise.resolve();
 		});
 		expect(importFileFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
 		expect(playLink.getAttribute("data-ui-disabled")).toBe("true");
-		expect(fileInput.disabled).toBe(true);
+		expect(importButton.disabled).toBe(true);
 
 		await act(async () => {
-			fileInput.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
+			importButton.click();
 			removeButton.click();
 			playLink.click();
 			await Promise.resolve();

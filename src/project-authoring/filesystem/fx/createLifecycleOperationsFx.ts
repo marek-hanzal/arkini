@@ -23,6 +23,9 @@ import { readProjectFilesFx } from "./readProjectFilesFx";
 import { readProjectNotesFx } from "./readProjectNotesFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
+import { copyExtractedProjectResourcesFx } from "./copyExtractedProjectResourcesFx";
+import type { ExtractedArkpack } from "~/arkpack-admission/type/ExtractedArkpack";
+import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 
 interface LifecycleOperations {
 	readonly dismissInvalidProjectFx: (
@@ -31,6 +34,9 @@ interface LifecycleOperations {
 
 	readonly createProjectFx: (
 		props: ProjectRepository.CreateProjectProps,
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
+	readonly createExtractedProjectFx: (
+		arkpack: ExtractedArkpack,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly deleteProjectFx: (
 		projectId: string,
@@ -319,6 +325,109 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 
 	yield* readCandidatesFx;
 
+	const createManagedProjectFx = Effect.fn("createLifecycleOperationsFx.createManagedProjectFx")(
+		function* ({
+			projectId,
+			version,
+			config,
+			resources,
+			populatePendingFx,
+		}: {
+			readonly projectId: string;
+			readonly version: VersionPartsSchema.Type;
+			readonly config: GameConfigSchema.Type;
+			readonly resources: ReadonlyArray<ResourceSchema.Type>;
+			readonly populatePendingFx?: (
+				pendingRoot: string,
+			) => Effect.Effect<void, unknown, never>;
+		}) {
+			const nowMs = yield* Clock.currentTimeMillis;
+			return yield* operations
+				.withPermits(1)(
+					Effect.gen(function* () {
+						if (states.has(projectId))
+							return yield* Effect.fail(
+								errorFn(
+									"create-project",
+									`Editor project ${projectId} already exists.`,
+								),
+							);
+						return yield* filesystemWrite.withLockFx(
+							lifecycleLock,
+							Effect.uninterruptible(
+								Effect.gen(function* () {
+									const directoryName = `${encodeManagedProjectDirectoryStemFn(projectId)}-${createId()}`;
+									const pendingRoot = path.join(
+										managedProjectStagingRoot,
+										directoryName,
+									);
+									const root = path.join(managedProjectsRoot, directoryName);
+									return yield* Effect.gen(function* () {
+										yield* fileSystem.makeDirectory(pendingRoot, {
+											recursive: true,
+										});
+										const marker = GameProjectManifestSchema.parse({
+											arkini: ArkiniAppVersion,
+											revision: nowMs,
+										});
+										yield* writeProjectFx({
+											root: pendingRoot,
+											next: {
+												arkpack: version,
+												marker,
+												config,
+												resources,
+											},
+										});
+										if (populatePendingFx !== undefined)
+											yield* populatePendingFx(pendingRoot);
+										yield* fileSystem.rename(pendingRoot, root);
+										const entry = ProjectCatalogEntrySchema.parse({
+											root: yield* fileSystem.realPath(root),
+											ownership: "managed",
+											createdAtMs: nowMs,
+										});
+										const state = yield* materializeFx(entry);
+										yield* catalog.addFx(entry);
+										states.set(projectId, state);
+										return cloneProjectFn(state.project);
+									}).pipe(
+										Effect.onError(() =>
+											Effect.all(
+												[
+													pendingRoot,
+													root,
+												].map((target) =>
+													fileSystem
+														.remove(target, {
+															force: true,
+															recursive: true,
+														})
+														.pipe(Effect.ignore),
+												),
+												{
+													discard: true,
+												},
+											),
+										),
+									);
+								}),
+							),
+						);
+					}),
+				)
+				.pipe(
+					Effect.mapError((cause) =>
+						errorFn(
+							"create-project",
+							"The Editor project could not be created.",
+							cause,
+						),
+					),
+				);
+		},
+	);
+
 	const createProjectFx: LifecycleOperations["createProjectFx"] = ({
 		version: candidateVersion,
 		config: candidateConfig,
@@ -338,83 +447,29 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				catch: (cause) =>
 					errorFn("create-project", "The Editor project is invalid.", cause),
 			});
-			const nowMs = yield* Clock.currentTimeMillis;
-			return yield* operations.withPermits(1)(
-				Effect.gen(function* () {
-					if (states.has(projectId))
-						return yield* Effect.fail(
-							errorFn(
-								"create-project",
-								`Editor project ${projectId} already exists.`,
-							),
-						);
-					return yield* filesystemWrite.withLockFx(
-						lifecycleLock,
-						Effect.uninterruptible(
-							Effect.gen(function* () {
-								const directoryName = `${encodeManagedProjectDirectoryStemFn(projectId)}-${createId()}`;
-								const pendingRoot = path.join(
-									managedProjectStagingRoot,
-									directoryName,
-								);
-								const root = path.join(managedProjectsRoot, directoryName);
-								return yield* Effect.gen(function* () {
-									yield* fileSystem.makeDirectory(pendingRoot, {
-										recursive: true,
-									});
-									const marker = GameProjectManifestSchema.parse({
-										arkini: ArkiniAppVersion,
-										revision: nowMs,
-									});
-									yield* writeProjectFx({
-										root: pendingRoot,
-										next: {
-											arkpack: version,
-											marker,
-											config,
-											resources,
-										},
-									});
-									yield* fileSystem.rename(pendingRoot, root);
-									const entry = ProjectCatalogEntrySchema.parse({
-										root: yield* fileSystem.realPath(root),
-										ownership: "managed",
-										createdAtMs: nowMs,
-									});
-									const state = yield* materializeFx(entry);
-									yield* catalog.addFx(entry);
-									states.set(projectId, state);
-									return cloneProjectFn(state.project);
-								}).pipe(
-									Effect.onError(() =>
-										Effect.all(
-											[
-												pendingRoot,
-												root,
-											].map((target) =>
-												fileSystem
-													.remove(target, {
-														force: true,
-														recursive: true,
-													})
-													.pipe(Effect.ignore),
-											),
-											{
-												discard: true,
-											},
-										),
-									),
-								);
-							}),
-						),
-					);
-				}),
-			);
-		}).pipe(
-			Effect.mapError((cause) =>
-				errorFn("create-project", "The Editor project could not be created.", cause),
-			),
-		);
+			return yield* createManagedProjectFx({
+				projectId,
+				version,
+				config,
+				resources,
+			});
+		});
+
+	const createExtractedProjectFx: LifecycleOperations["createExtractedProjectFx"] = (arkpack) =>
+		createManagedProjectFx({
+			projectId: arkpack.config.meta.id,
+			version: parseVersionFn(arkpack.version),
+			config: arkpack.config,
+			resources: [],
+			populatePendingFx: (pendingRoot) =>
+				providePlatformFx(
+					copyExtractedProjectResourcesFx({
+						config: arkpack.config,
+						resources: arkpack.resources,
+						root: pendingRoot,
+					}),
+				),
+		});
 
 	const openProjectFx: LifecycleOperations["openProjectFx"] = ({ root: candidateRoot }) =>
 		operations.withPermits(1)(
@@ -579,6 +634,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 		);
 
 	return {
+		createExtractedProjectFx,
 		createProjectFx,
 		dismissInvalidProjectFx,
 		deleteProjectFx,

@@ -3,13 +3,15 @@ import { Effect, Semaphore } from "effect";
 import { dirname, join } from "node:path";
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { ArkpackLimits } from "~shared/ArkpackLimits";
-import type { ElectronMainError } from "../ElectronMainError";
+import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
 import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 import { removeUserArkpackFx } from "./removeUserArkpackFx";
 import { writeUserArkpackFx } from "./writeUserArkpackFx";
+import { installArkpackFileFx } from "./installArkpackFileFx";
+import { importUserArkpackFx } from "./importUserArkpackFx";
 
 interface ArkpackCatalog {
 	readonly listFx: Effect.Effect<
@@ -19,16 +21,24 @@ interface ArkpackCatalog {
 	>;
 	readonly readFx: (
 		packageId: string,
-	) => Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError, never>;
+	) => Effect.Effect<
+		ReadonlyArray<ArkiniElectronApi.ArkpackLoadedFile>,
+		ElectronMainError,
+		never
+	>;
 	readonly installFx: (
 		record: ArkiniElectronApi.ArkpackInstall,
 	) => Effect.Effect<void, ElectronMainError, never>;
+	readonly importFx: (
+		sourcePath: string,
+	) => Effect.Effect<ArkiniElectronApi.ArkpackFile, ElectronMainError, never>;
 	readonly removeFx: (packageId: string) => Effect.Effect<void, ElectronMainError, never>;
 }
 
 export namespace createFilesystemArkpackCatalogFx {
 	export interface Props {
 		readonly bundledRoot: string;
+		readonly installationsRoot?: string;
 		readonly maxCatalogBytes?: number;
 		readonly maxCatalogCandidates?: number;
 		readonly userRoot: string;
@@ -41,12 +51,15 @@ export namespace createFilesystemArkpackCatalogFx {
 export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpackCatalogFx")(
 	function* ({
 		bundledRoot,
+		installationsRoot: requestedInstallationsRoot,
 		maxCatalogBytes = ArkpackLimits.maxCatalogBytes,
 		maxCatalogCandidates = ArkpackLimits.maxCatalogCandidates,
 		userRoot,
 		fileSystem: providedFileSystem,
 		verifyProvenanceFx,
 	}: createFilesystemArkpackCatalogFx.Props) {
+		const installationsRoot =
+			requestedInstallationsRoot ?? join(dirname(userRoot), "installed");
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const operations = yield* Semaphore.make(1);
 		const rootBudget = maxCatalogBytes / 2;
@@ -112,12 +125,30 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 		);
 		const readCandidateFx = (root: string, packageId: string, source: "bundled" | "user") => {
 			const readFx = (candidateRoot: string) =>
-				readArkpackFileFx({
-					root: candidateRoot,
-					fileSystem,
-					packageId,
-					source,
-					verifyProvenanceFx,
+				Effect.gen(function* () {
+					const file = yield* readArkpackFileFx({
+						root: candidateRoot,
+						fileSystem,
+						packageId,
+						source,
+						verifyProvenanceFx,
+					});
+					if (file === null) return null;
+					const installed = yield* installArkpackFileFx({
+						arkpackPath: join(candidateRoot, file.filename),
+						expectedPackageId: packageId,
+						installationsRoot,
+					});
+					return {
+						...file,
+						provenance: installed.provenance,
+						config: installed.config,
+						resources: installed.resources.map((resource) => ({
+							id: resource.id,
+							mime: resource.mime,
+							url: `arkini://game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${installed.contentHash}&resourceId=${encodeURIComponent(resource.id)}`,
+						})),
+					} satisfies ArkiniElectronApi.ArkpackLoadedFile;
 				});
 			const candidate =
 				source === "user"
@@ -177,6 +208,25 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 		return {
 			listFx,
 			readFx,
+			importFx: Effect.fn("FilesystemArkpackCatalog.importFx")((sourcePath) =>
+				operations.withPermits(1)(
+					importUserArkpackFx({
+						fileSystem,
+						sourcePath,
+						stagingRoot: installationsRoot,
+						userRoot,
+					}).pipe(
+						Effect.mapError(
+							(cause) =>
+								new ElectronMainError({
+									operation: "import user Arkpack",
+									cause,
+								}),
+						),
+						Effect.tap(() => Effect.sync(() => (eligibility = undefined))),
+					),
+				),
+			),
 			installFx: Effect.fn("FilesystemArkpackCatalog.installFx")((record) =>
 				operations.withPermits(1)(
 					writeUserArkpackFx({

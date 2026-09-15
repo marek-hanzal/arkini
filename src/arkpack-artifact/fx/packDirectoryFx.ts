@@ -1,6 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { isDeepStrictEqual, promisify } from "node:util";
-import { gzip } from "node:zlib";
+import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Effect, Exit } from "effect";
 
@@ -16,8 +15,6 @@ import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
 import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 import { resizePngAssetFx } from "~/game-config-resource/fx/resizePngAssetFx";
-
-const gzipAsyncFn = promisify(gzip);
 
 export namespace packDirectoryFx {
 	export interface Props {
@@ -94,9 +91,8 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		config,
 		resources: pngResources,
 	});
-	const compressed = yield* Effect.promise(async () => new Uint8Array(await gzipAsyncFn(bytes)));
 	const arkpack = yield* encodeArkpackEnvelopeFx({
-		payload: compressed,
+		payload: bytes,
 	});
 	const contentHash = yield* readArkpackContentHashFx(arkpack);
 

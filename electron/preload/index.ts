@@ -140,6 +140,13 @@ const api: ArkiniElectronApi.Api = {
 			),
 		importJsonDirectoryFn: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportJsonDirectory),
+		importArkpackFn: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportArkpack),
+		importInstalledArkpackFn: (packageId) =>
+			ipcRenderer.invoke(
+				ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
+				packageId,
+			),
 		listProjectsFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
 		dismissInvalidProjectFn: (root) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, root),
@@ -195,6 +202,7 @@ const api: ArkiniElectronApi.Api = {
 		listFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
 		readFn: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),
+		importFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackImport),
 		installFn: (record) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstall, record),
 		removeFn: (packageId) =>

@@ -84,6 +84,8 @@ const installEditorApi = () => {
 		),
 		exportJsonDirectoryFn: vi.fn(async () => success(null)),
 		importJsonDirectoryFn: vi.fn(async () => success(descriptor)),
+		importArkpackFn: vi.fn(async () => success(descriptor)),
+		importInstalledArkpackFn: vi.fn(async () => success(descriptor)),
 		listProjectsFn: vi.fn(async () =>
 			success([
 				{

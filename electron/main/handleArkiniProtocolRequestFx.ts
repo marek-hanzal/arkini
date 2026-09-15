@@ -12,6 +12,9 @@ export namespace handleArkiniProtocolRequestFx {
 		readonly handleEditorResourceRequestFx?: (
 			request: Request,
 		) => Effect.Effect<Response, never, never>;
+		readonly handleGameResourceRequestFx?: (
+			request: Request,
+		) => Effect.Effect<Response, never, never>;
 	}
 }
 
@@ -30,14 +33,23 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 		request,
 		rendererRoot,
 		handleEditorResourceRequestFx,
+		handleGameResourceRequestFx,
 	}: handleArkiniProtocolRequestFx.Props) =>
 		Effect.gen(function* () {
-			if (new URL(request.url).host === "editor") {
+			const host = new URL(request.url).host;
+			if (host === "editor") {
 				return handleEditorResourceRequestFx === undefined
 					? new Response("Editor storage is unavailable.", {
 							status: 503,
 						})
 					: yield* handleEditorResourceRequestFx(request);
+			}
+			if (host === "game") {
+				return handleGameResourceRequestFx === undefined
+					? new Response("Game storage is unavailable.", {
+							status: 503,
+						})
+					: yield* handleGameResourceRequestFx(request);
 			}
 			if (request.method !== "GET" && request.method !== "HEAD") {
 				return withProductionContentSecurityPolicyFn(

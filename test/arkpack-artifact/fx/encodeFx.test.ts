@@ -47,7 +47,7 @@ const payload = {
 } satisfies PayloadSchema.Type;
 
 describe("encodeFx", () => {
-	it("round-trips MessagePack config and raw resource bytes", async () => {
+	it("round-trips JSON config and raw resource bytes", async () => {
 		const decoded = await Effect.runPromise(encodeFx(payload).pipe(Effect.flatMap(decodeFx)));
 
 		expect(decoded).toEqual({

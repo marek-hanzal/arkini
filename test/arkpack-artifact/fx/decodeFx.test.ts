@@ -1,16 +1,14 @@
-import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { ArkpackDecodeError } from "~/arkpack-artifact/error/ArkpackDecodeError";
-import { Magic } from "~/arkpack-artifact/constant/Magic";
 import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 const createManifestOnlyPackFn = (manifest: Uint8Array) => {
-	const headerLength = Magic.byteLength + 4;
+	const headerLength = 4;
 	const bytes = new Uint8Array(headerLength + manifest.byteLength);
-	bytes.set(Magic);
-	new DataView(bytes.buffer).setUint32(Magic.byteLength, manifest.byteLength, true);
+	new DataView(bytes.buffer).setUint32(0, manifest.byteLength, true);
 	bytes.set(manifest, headerLength);
 	return bytes;
 };
@@ -22,7 +20,7 @@ describe("decodeFx", () => {
 			new Uint8Array(),
 		],
 		[
-			"invalid MessagePack manifest",
+			"invalid JSON manifest",
 			createManifestOnlyPackFn(
 				new Uint8Array([
 					0xc1,
@@ -31,7 +29,26 @@ describe("decodeFx", () => {
 		],
 		[
 			"schema-invalid manifest",
-			createManifestOnlyPackFn(encode({})),
+			createManifestOnlyPackFn(new TextEncoder().encode(JSON.stringify({}))),
+		],
+		[
+			"manifest resource outside the canonical MIME contract",
+			createManifestOnlyPackFn(
+				new TextEncoder().encode(
+					JSON.stringify({
+						version: "1.0",
+						arkini: ArkiniAppVersion,
+						length: 0,
+						resources: [
+							{
+								id: "hostile-resource",
+								mime: "text/html",
+								length: 0,
+							},
+						],
+					}),
+				),
+			),
 		],
 	])("rejects a %s through the typed decode channel", (_, bytes) => {
 		const result = Effect.runSync(Effect.result(decodeFx(bytes)));

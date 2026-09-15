@@ -1,4 +1,3 @@
-import { encode } from "@msgpack/msgpack";
 import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -13,6 +12,8 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+
+const encodeJsonFn = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
 
 const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffectFn">) =>
 	createGameFromPackageFx({
@@ -156,7 +157,7 @@ describe("createGameFx", () => {
 		if (bytes === null) throw new Error("Expected a save.");
 		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
 		storages.setSaved(
-			encode({
+			encodeJsonFn({
 				...saved,
 				version: "1.0",
 			}),
@@ -202,7 +203,7 @@ describe("createGameFx", () => {
 		const bytes = storages.readSaved();
 		if (bytes === null) throw new Error("Expected a save.");
 		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
-		const incompatibleBytes = encode({
+		const incompatibleBytes = encodeJsonFn({
 			...saved,
 			version: "2.0",
 		});
@@ -346,7 +347,7 @@ describe("createGameFx", () => {
 	it("rejects an invalid save before constructing or starting a partial game session", async () => {
 		const storages = await createStorages();
 		storages.setSaved(
-			encode({
+			encodeJsonFn({
 				version: "not-a-version",
 				arkini: ArkiniAppVersion,
 				state: {},

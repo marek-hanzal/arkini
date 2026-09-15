@@ -1,4 +1,3 @@
-import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -218,7 +217,7 @@ describe("readArkpackFx", () => {
 				readArkpackFx({
 					bytes: Effect.runSync(
 						encodeArkpackEnvelopeFx({
-							payload: new Uint8Array(gzipSync(encoded)),
+							payload: encoded,
 						}),
 					),
 					provenance: {
@@ -266,7 +265,7 @@ describe("readArkpackFx", () => {
 				readArkpackFx({
 					bytes: Effect.runSync(
 						encodeArkpackEnvelopeFx({
-							payload: new Uint8Array(gzipSync(encoded)),
+							payload: encoded,
 						}),
 					),
 					provenance: {

@@ -19,6 +19,9 @@ const navigation = vi.hoisted(() => ({
 	invalidate: vi.fn(async () => undefined),
 	navigate: vi.fn(),
 }));
+const arkpackImport = vi.hoisted(() => ({
+	fails: false,
+}));
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@tanstack/react-router")>()),
@@ -64,8 +67,8 @@ vi.mock("~/project-authoring/fx/createFreshProjectFx", async () => {
 vi.mock("~/project-authoring/fx/importEditorArkpackFileFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		importEditorArkpackFileFx: ({ file }: { readonly file: File }) =>
-			file.name === "broken.arkpack"
+		importEditorArkpackFileFx: () =>
+			arkpackImport.fails
 				? Effect.fail(new Error("Broken import"))
 				: Effect.succeed({
 						projectId: "project-imported",
@@ -106,6 +109,7 @@ afterEach(async () => {
 	for (const registry of registries.splice(0)) registry.dispose();
 	navigation.invalidate.mockClear();
 	navigation.navigate.mockReset();
+	arkpackImport.fails = false;
 	document.body.replaceChildren();
 });
 
@@ -115,7 +119,6 @@ describe("EditorWelcomeCommandAtom", () => {
 
 		registry.set(EditorWelcomeCommandAtom, {
 			action: "import-arkpack",
-			file: new File([], "game.arkpack"),
 		});
 		const ready = await waitForState(registry, (state) => state.kind === "ready");
 		expect(ready).toMatchObject({
@@ -236,9 +239,9 @@ describe("EditorWelcomeCommandAtom", () => {
 
 	it("publishes domain failures without entering navigation", async () => {
 		const registry = makeRegistry();
+		arkpackImport.fails = true;
 		registry.set(EditorWelcomeCommandAtom, {
 			action: "import-arkpack",
-			file: new File([], "broken.arkpack"),
 		});
 
 		const state = await waitForState(registry, (current) => current.kind === "error");

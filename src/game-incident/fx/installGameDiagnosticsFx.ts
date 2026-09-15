@@ -43,7 +43,6 @@ export namespace installGameDiagnosticsFx {
 	} & (
 		| {
 				readonly arkpack: ArkpackDescriptor;
-				readonly arkpackBytes: Uint8Array;
 		  }
 		| {
 				readonly projectId: string;
@@ -251,7 +250,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			runRendererEffectFn(writeDiagnosticRecordFx(fatalRecord));
 			// Board sessions have project identity and logs, but no installed package to archive.
 			if (!("arkpack" in props)) return;
-			const { arkpack, arkpackBytes } = props;
+			const { arkpack } = props;
 			const report = {
 				capturedAt: observedAt,
 				diagnostics: {
@@ -281,7 +280,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			} satisfies GameIncidentReport;
 			runRendererEffectFn(
 				writeLastGameIncidentFx({
-					arkpackBytes: new Uint8Array(arkpackBytes),
+					arkpack,
 					saveBytes: encodeArkiniSaveFn({
 						version: arkpack.version,
 						state: fromRuntimeFn({

@@ -1,4 +1,3 @@
-import { gunzipSync } from "node:zlib";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Path, Ref } from "effect";
 import { TestClock } from "effect/testing";
@@ -24,7 +23,7 @@ describe("packDirectoryFx game-project contract", () => {
 			});
 			const arkpack = yield* fileSystem.readFile(result.arkpack);
 			const envelope = yield* decodeArkpackEnvelopeFx(arkpack);
-			const payload = yield* decodeFx(new Uint8Array(gunzipSync(envelope.payload)));
+			const payload = yield* decodeFx(envelope.payload);
 
 			expect(result).toMatchObject({
 				filename: "project-game.arkpack",

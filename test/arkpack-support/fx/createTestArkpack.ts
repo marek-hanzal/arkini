@@ -1,4 +1,3 @@
-import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 
 import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
@@ -92,7 +91,7 @@ export const createTestArkpack = (
 	);
 	return Effect.runSync(
 		encodeArkpackEnvelopeFx({
-			payload: new Uint8Array(gzipSync(encoded)),
+			payload: encoded,
 		}),
 	);
 };

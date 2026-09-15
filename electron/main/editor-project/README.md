@@ -13,6 +13,7 @@ One GUI Electron main or Node CLI process owns the physical Editor project repos
 | Renderer repository proxy and response validation | `src/project-authoring` | [`../../../src/project-authoring/fx/createElectronProjectRepositoryFx.ts`](../../../src/project-authoring/fx/createElectronProjectRepositoryFx.ts) |
 | Filesystem repository composition | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Discovery, create/open/refresh/delete | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts) |
+| Streamed Arkpack import | `src/arkpack-admission` + `src/project-authoring/filesystem` | [`../../../src/arkpack-admission/fx/extractArkpackFileFx.ts`](../../../src/arkpack-admission/fx/extractArkpackFileFx.ts), [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Config, Item and Resource commits | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts) |
 | Notes and Build | Their `src/*` contracts plus Project Authoring filesystem operations | `src/project-authoring/filesystem/fx/create*OperationsFx.ts` |
 | Current-tree lock, journal and recovery | `src/project-authoring/filesystem` + mechanical `filesystem-write` | [`../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts), [`../../../src/project-authoring/filesystem/fx/recoverProjectFileTransactionFx.ts`](../../../src/project-authoring/filesystem/fx/recoverProjectFileTransactionFx.ts) |
@@ -33,6 +34,7 @@ This island has deliberate cross-process and lifecycle coupling:
 - `project-authoring ↔ project-note` and authoring products cross at exact repository or presentation contracts. No root is a generic Editor superdomain.
 - `filesystem-write` stays mechanical and imports none of its product consumers. The Editor repository supplies path ownership, file sets, serialization and error meaning.
 - MCP calls the same Project Repository capabilities and revision checks. It never owns a second project store or bypass mutation path.
+- Arkpack import is selected in Electron main, stream-extracted through the shared admission owner, and published as one managed portable project. Archive and resource bytes never cross renderer IPC.
 - `arkini-cli editor mcp <projectId>` selects one catalog project and composes the same Node-compatible filesystem MCP storage, HTTP server, tools and optional ngrok tunnel as the GUI Editor without starting Electron.
 
 The top-level domain graph is cyclic; the process authority is not. Physical mutation terminates in this filesystem repository.

@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { gzipSync } from "node:zlib";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { importArkpackFx } from "~/arkpack-catalog/fx/importArkpackFx";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
@@ -97,7 +96,7 @@ describe("importArkpackFx", () => {
 				importArkpackFx({
 					bytes: Effect.runSync(
 						encodeArkpackEnvelopeFx({
-							payload: new Uint8Array(gzipSync(encoded)),
+							payload: encoded,
 						}),
 					),
 					filename: "invalid.arkpack",

@@ -26,16 +26,27 @@ export namespace verifyArkpackProvenanceWithFx {
 	}
 }
 
+export namespace verifyArkpackProofWithFx {
+	export interface Props {
+		readonly artifact?: Uint8Array;
+		readonly artifactSignatureVerified?: boolean;
+		readonly proof?: Uint8Array;
+		readonly channel: verifyArkpackProvenanceWithFx.Props["channel"];
+		readonly trustedRoot: unknown;
+	}
+}
+
 const sigstoreVerification = Semaphore.makeUnsafe(1);
 
-/** Soft-classifies an Arkpack against one explicit offline Sigstore trust policy. */
-export const verifyArkpackProvenanceWithFx = Effect.fn("verifyArkpackProvenanceWithFx")(function* ({
-	bytes,
+/** Verifies one parsed proof after either in-memory or streaming artifact admission. */
+export const verifyArkpackProofWithFx = Effect.fn("verifyArkpackProofWithFx")(function* ({
+	artifact,
+	artifactSignatureVerified,
+	proof,
 	channel,
 	trustedRoot,
-}: verifyArkpackProvenanceWithFx.Props) {
-	const decoded = yield* Effect.option(decodeArkpackEnvelopeFx(bytes));
-	if (decoded._tag === "None" || decoded.value.proof === undefined)
+}: verifyArkpackProofWithFx.Props) {
+	if (proof === undefined)
 		return {
 			type: "community",
 		} satisfies ArkpackProvenanceSchema.Type;
@@ -50,15 +61,25 @@ export const verifyArkpackProvenanceWithFx = Effect.fn("verifyArkpackProvenanceW
 				const serialized = JSON.parse(
 					new TextDecoder("utf-8", {
 						fatal: true,
-					}).decode(decoded.value.proof),
+					}).decode(proof),
 				);
-				const entity = toSignedEntity(
-					bundleFromJSON(serialized),
-					Buffer.from(decoded.value.payload),
-				);
+				const bundle = bundleFromJSON(serialized);
+				if (artifact === undefined && bundle.content?.$case !== "messageSignature")
+					throw new Error("Streaming Arkpack proof is not a message signature.");
+				const artifactSignature =
+					bundle.content?.$case === "messageSignature"
+						? Buffer.from(bundle.content.messageSignature.signature)
+						: undefined;
+				const entity = toSignedEntity(bundle, Buffer.from(artifact ?? new Uint8Array()));
 				const originalVerifyFn = sigstoreCrypto.verify;
 				// Electron 43 requires the ECDSA digest explicitly, while Sigstore's Rekor checks omit it.
 				sigstoreCrypto.verify = (data, key, signature, algorithm) => {
+					if (
+						artifactSignatureVerified !== undefined &&
+						artifactSignature !== undefined &&
+						Buffer.from(signature).equals(artifactSignature)
+					)
+						return artifactSignatureVerified;
 					const keyType = key instanceof KeyObject ? key.asymmetricKeyType : undefined;
 					const digest =
 						algorithm ??
@@ -89,6 +110,26 @@ export const verifyArkpackProvenanceWithFx = Effect.fn("verifyArkpackProvenanceW
 			}
 		}),
 	);
+});
+
+/** Soft-classifies an Arkpack against one explicit offline Sigstore trust policy. */
+export const verifyArkpackProvenanceWithFx = Effect.fn("verifyArkpackProvenanceWithFx")(function* ({
+	bytes,
+	channel,
+	trustedRoot,
+}: verifyArkpackProvenanceWithFx.Props) {
+	const decoded = yield* Effect.option(decodeArkpackEnvelopeFx(bytes));
+	if (decoded._tag === "None" || decoded.value.proof === undefined)
+		return {
+			type: "community",
+		} satisfies ArkpackProvenanceSchema.Type;
+
+	return yield* verifyArkpackProofWithFx({
+		artifact: decoded.value.payload,
+		proof: decoded.value.proof,
+		channel,
+		trustedRoot,
+	});
 });
 
 /** Offline soft classification of the proof embedded in one self-contained Arkpack. */

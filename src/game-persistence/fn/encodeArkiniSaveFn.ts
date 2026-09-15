@@ -1,4 +1,3 @@
-import { encode } from "@msgpack/msgpack";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import type { ArkiniSaveSchema } from "~/game-persistence/schema/ArkiniSaveSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
@@ -11,13 +10,10 @@ interface Props {
 
 /** Encodes one complete canonical gameplay state with its compatibility provenance. */
 export const encodeArkiniSaveFn = ({ version, state }: Props) =>
-	encode(
-		{
+	new TextEncoder().encode(
+		JSON.stringify({
 			version,
 			arkini: ArkiniAppVersion,
 			state,
-		} satisfies ArkiniSaveSchema.Type,
-		{
-			ignoreUndefined: true,
-		},
+		} satisfies ArkiniSaveSchema.Type),
 	);

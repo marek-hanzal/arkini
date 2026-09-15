@@ -9,6 +9,7 @@ describe("createElectronArkpackStorageFx", () => {
 		const storage = Effect.runSync(
 			createElectronArkpackStorageFx({
 				api: {
+					importFn: vi.fn(),
 					installFn: vi.fn(),
 					listFn: vi.fn().mockRejectedValue(cause),
 					openUserDirectoryFn: vi.fn(),

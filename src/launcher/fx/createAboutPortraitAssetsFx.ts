@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
-import type { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
+import type { LoadedArkpackResource } from "~/arkpack-catalog/fx/readArkpackCandidatesFx";
 
 const avatarRoles = [
 	"avatar-01",
@@ -13,7 +13,12 @@ const avatarRoles = [
 	"avatar-07",
 ] as const;
 
-const readAboutPortraitResourcesFn = (payload: PayloadSchema.Type) => {
+const readAboutPortraitResourcesFn = (payload: {
+	readonly config: {
+		readonly resources: Readonly<Record<string, string>>;
+	};
+	readonly resources: ReadonlyArray<LoadedArkpackResource>;
+}) => {
 	const resourceById = new Map(
 		payload.resources.map((resource) => [
 			resource.id,
@@ -33,45 +38,45 @@ const readAboutPortraitResourcesFn = (payload: PayloadSchema.Type) => {
 };
 
 const revokeUrlsFx = Effect.fn("createAboutPortraitAssetsFx.revokeUrlsFx")(function* (
-	urls: readonly string[],
+	urls: ReadonlyArray<string>,
 ) {
-	for (const url of urls) {
-		yield* Effect.try({
-			try: () => URL.revokeObjectURL(url),
-			catch: (cause) => cause,
-		}).pipe(Effect.catch(() => Effect.void));
-	}
+	for (const url of urls)
+		yield* Effect.sync(() => URL.revokeObjectURL(url)).pipe(
+			Effect.catchCause(() => Effect.void),
+		);
 });
 
-/** Loads and scope-owns the canonical Arkini About portrait object URLs. */
+/** Resolves canonical Arkini About portraits to lazy installed-resource URLs. */
 export const createAboutPortraitAssetsFx = Effect.fn("createAboutPortraitAssetsFx")(() =>
 	Effect.gen(function* () {
 		const loaded = yield* loadArkpackFx({
 			packageId: ArkiniDefaultPackageId,
 		});
 		const resources = readAboutPortraitResourcesFn(loaded.payload);
+		if (resources.every((resource) => "url" in resource))
+			return resources.map(({ url }) => url);
+		if (!resources.every((resource) => "bytes" in resource))
+			return yield* Effect.fail(new Error("Arkpack resources use a mixed storage mode."));
 		const urls: string[] = [];
 		return yield* Effect.acquireRelease(
-			Effect.gen(function* () {
-				for (const resource of resources) {
-					urls.push(
-						yield* Effect.try({
-							try: () =>
-								URL.createObjectURL(
-									new Blob(
-										[
-											resource.bytes.slice().buffer,
-										],
-										{
-											type: resource.mime,
-										},
-									),
+			Effect.try({
+				try: () => {
+					for (const resource of resources)
+						urls.push(
+							URL.createObjectURL(
+								new Blob(
+									[
+										resource.bytes.slice().buffer,
+									],
+									{
+										type: resource.mime,
+									},
 								),
-							catch: (cause) => cause,
-						}),
-					);
-				}
-				return urls;
+							),
+						);
+					return urls;
+				},
+				catch: (cause) => cause,
 			}).pipe(Effect.tapError(() => revokeUrlsFx(urls))),
 			revokeUrlsFx,
 			{

@@ -1,22 +1,21 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem } from "effect";
 import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "~electron/main/arkpack/createFilesystemArkpackCatalogFx";
+import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 
-export const bundledBytes = new Uint8Array([
-	1,
-	2,
-	3,
-]);
-export const userBytes = new Uint8Array([
-	4,
-	5,
-	6,
-]);
+export const createBundledBytes = (packageId: string) =>
+	createTestArkpack(undefined, packageId, "1.0");
+
+export const createUserBytes = (packageId: string) =>
+	createTestArkpack(undefined, packageId, "1.1");
 
 export const readRoots = (root: string) => ({
 	bundled: join(root, "bundled"),
@@ -47,25 +46,30 @@ export const writePackage = async ({
 };
 
 export const readFileRecord = ({
-	bytes,
 	overridesBundled = false,
 	packageId,
 	source,
 }: {
-	readonly bytes: Uint8Array;
 	readonly overridesBundled?: boolean;
 	readonly packageId: string;
 	readonly source: ArkiniElectronApi.ArkpackFile["source"];
-}): ArkiniElectronApi.ArkpackFile => ({
-	packageId,
-	filename: readPackageFilename(packageId),
-	bytes,
-	provenance: {
-		type: "community",
-	},
-	source,
-	overridesBundled,
-});
+}): ArkiniElectronApi.ArkpackFile => {
+	const bytes = source === "bundled" ? createBundledBytes(packageId) : createUserBytes(packageId);
+	const { payload } = Effect.runSync(decodeArkpackEnvelopeFx(bytes));
+	return {
+		packageId,
+		filename: readPackageFilename(packageId),
+		contentHash: createHash("sha256").update(payload).digest("hex"),
+		title: "Test game",
+		version: source === "bundled" ? "1.0" : "1.1",
+		arkini: ArkiniAppVersion,
+		provenance: {
+			type: "community",
+		},
+		source,
+		overridesBundled,
+	};
+};
 
 export const createCatalog = (
 	root: string,

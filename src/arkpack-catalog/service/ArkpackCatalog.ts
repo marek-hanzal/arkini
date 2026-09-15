@@ -17,7 +17,7 @@ export namespace ArkpackCatalog {
 
 	export interface Props {
 		readonly listFx?: Effect.Effect<ReadonlyArray<ArkpackDescriptor>, unknown, never>;
-		readonly importFileFx?: (file: File) => Effect.Effect<ArkpackDescriptor, unknown, never>;
+		readonly importFileFx?: () => Effect.Effect<ArkpackDescriptor | null, unknown, never>;
 		readonly installFx?: (props: {
 			readonly bytes: Uint8Array;
 			readonly filename: string;
@@ -43,7 +43,7 @@ export interface ArkpackCatalog {
 	readonly awaitIdleFx: Effect.Effect<void, never, never>;
 	readonly state: SubscriptionRef.SubscriptionRef<ArkpackCatalog.State>;
 	readonly refreshFx: Effect.Effect<void, unknown, never>;
-	readonly importFileFx: (file: File) => Effect.Effect<ArkpackDescriptor, unknown, never>;
+	readonly importFileFx: () => Effect.Effect<ArkpackDescriptor | null, unknown, never>;
 	readonly installFx: (props: {
 		readonly contentFx: Effect.Effect<ArkpackCatalog.InstallContent, unknown, never>;
 		readonly expectedCurrent: ArkpackCatalog.PackageSnapshot | null;

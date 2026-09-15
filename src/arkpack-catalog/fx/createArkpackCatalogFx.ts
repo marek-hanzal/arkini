@@ -16,11 +16,7 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 
 			const listFx = props.listFx ?? listArkpacksFx();
 			const importFileDependencyFx = Effect.fn("ArkpackCatalog.importFileDependencyFx")(
-				props.importFileFx ??
-					((file: File) =>
-						importArkpackFileFx({
-							file,
-						})),
+				props.importFileFx ?? (() => importArkpackFileFx()),
 			);
 			const installDependencyFx = Effect.fn("ArkpackCatalog.installDependencyFx")(
 				props.installFx ??
@@ -138,8 +134,8 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 				awaitIdleFx: lock.withPermits(1)(Effect.void),
 				state,
 				refreshFx: runCatalogOperationFx(Effect.void, Effect.void, false),
-				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")((file: File) =>
-					runCatalogOperationFx(importFileDependencyFx(file)),
+				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")(() =>
+					runCatalogOperationFx(importFileDependencyFx()),
 				),
 				installFx: Effect.fn("ArkpackCatalog.installFx")((install) =>
 					runCatalogOperationFx(

@@ -1,36 +1,40 @@
-import { decode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 
 import { ArkpackDecodeError } from "~/arkpack-artifact/error/ArkpackDecodeError";
-import { Magic } from "~/arkpack-artifact/constant/Magic";
 import { ManifestSchema } from "~/arkpack-artifact/schema/ManifestSchema";
 import { PayloadSchema } from "~/arkpack-artifact/schema/PayloadSchema";
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
+import { ArkpackLimits } from "~shared/ArkpackLimits";
 
 export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 	const payload = yield* Effect.try({
 		try: () => {
-			const headerLength = Magic.byteLength + 4;
+			const decoder = new TextDecoder("utf-8", {
+				fatal: true,
+			});
+			const headerLength = 4;
 			if (bytes.byteLength < headerLength) {
 				throw new Error("Invalid pack: truncated header.");
 			}
-			if (!Magic.every((byte, index) => bytes[index] === byte)) {
-				throw new Error("Invalid pack: magic header mismatch.");
-			}
-
 			const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-			const manifestLength = view.getUint32(Magic.byteLength, true);
+			const manifestLength = view.getUint32(0, true);
+			if (manifestLength === 0 || manifestLength > ArkpackLimits.maxManifestBytes)
+				throw new Error(`Invalid pack manifest length ${manifestLength}.`);
 			const manifestEnd = headerLength + manifestLength;
 			if (bytes.byteLength < manifestEnd) {
 				throw new Error("Invalid pack: truncated manifest.");
 			}
 
-			const manifest = ManifestSchema.parse(decode(bytes.slice(headerLength, manifestEnd)));
+			const manifest = ManifestSchema.parse(
+				JSON.parse(decoder.decode(bytes.slice(headerLength, manifestEnd))),
+			);
+			if (manifest.length > ArkpackLimits.maxConfigBytes)
+				throw new Error(`Invalid pack config length ${manifest.length}.`);
 			const configEnd = manifestEnd + manifest.length;
 			if (bytes.byteLength < configEnd) {
 				throw new Error("Invalid pack: truncated config.");
 			}
-			const config = decode(bytes.slice(manifestEnd, configEnd));
+			const config = JSON.parse(decoder.decode(bytes.slice(manifestEnd, configEnd)));
 
 			let offset = configEnd;
 			const resources = manifest.resources.map((resource) => {
@@ -43,7 +47,7 @@ export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 
 				return {
 					id: resource.id,
-					mime: "image/png",
+					mime: resource.mime,
 					bytes: resourceBytes,
 				};
 			});

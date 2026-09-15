@@ -1,4 +1,3 @@
-import { decode } from "@msgpack/msgpack";
 import { Data, Effect } from "effect";
 import { ArkiniSaveSchema } from "~/game-persistence/schema/ArkiniSaveSchema";
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
@@ -10,7 +9,14 @@ class ArkiniSaveDecodeError extends Data.TaggedError("ArkiniSaveDecodeError")<{
 /** Decodes and validates one complete Arkini save without constructing a live session. */
 export const decodeArkiniSaveFx = Effect.fn("decodeArkiniSaveFx")((bytes: Uint8Array) =>
 	Effect.try({
-		try: () => ArkiniSaveSchema.parse(decode(bytes)),
+		try: () =>
+			ArkiniSaveSchema.parse(
+				JSON.parse(
+					new TextDecoder("utf-8", {
+						fatal: true,
+					}).decode(bytes),
+				),
+			),
 		catch: (cause) =>
 			new ArkiniSaveDecodeError({
 				cause,

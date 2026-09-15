@@ -19,14 +19,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 						operation: "list",
 						cause,
 					}),
-			}).pipe(
-				Effect.map((files) =>
-					files.map((file) => ({
-						...file,
-						bytes: file.bytes.slice().buffer,
-					})),
-				),
-			),
+			}),
 			readFx: Effect.fn("ArkpackStorage.readFx")((packageId: string) =>
 				Effect.tryPromise({
 					try: () => api.readFn(packageId),
@@ -35,14 +28,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 							operation: "read",
 							cause,
 						}),
-				}).pipe(
-					Effect.map((records) =>
-						records.map((record) => ({
-							...record,
-							bytes: record.bytes.slice().buffer,
-						})),
-					),
-				),
+				}),
 			),
 			removeFx: Effect.fn("ArkpackStorage.removeFx")((packageId: string) =>
 				Effect.tryPromise({
@@ -54,6 +40,14 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 						}),
 				}),
 			),
+			importFx: Effect.tryPromise({
+				try: () => api.importFn(),
+				catch: (cause) =>
+					new ArkpackStorageError({
+						operation: "install",
+						cause,
+					}),
+			}),
 			writeFx: Effect.fn("ArkpackStorage.writeFx")((packageId: string, bytes: ArrayBuffer) =>
 				Effect.tryPromise({
 					try: () =>

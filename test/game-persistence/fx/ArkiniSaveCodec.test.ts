@@ -1,4 +1,3 @@
-import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
@@ -18,6 +17,7 @@ const state: StateSchema.Type = {
 	jobQueue: [],
 };
 const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+const encodeJsonFn = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
 
 describe("Arkini save codec", () => {
 	it("round-trips arkpack and writer compatibility with canonical state", async () => {
@@ -39,7 +39,7 @@ describe("Arkini save codec", () => {
 		await expect(
 			Effect.runPromise(
 				decodeArkiniSaveFx(
-					encode({
+					encodeJsonFn({
 						version: "1.2",
 						arkini,
 						state,
@@ -57,7 +57,7 @@ describe("Arkini save codec", () => {
 		await expect(
 			Effect.runPromise(
 				decodeArkiniSaveFx(
-					encode({
+					encodeJsonFn({
 						version: "1.2",
 						arkini,
 						state,
@@ -126,13 +126,7 @@ describe("Arkini save codec", () => {
 		},
 	])("rejects unsupported or malformed envelopes", async (value) => {
 		const result = await Effect.runPromise(
-			Effect.result(
-				decodeArkiniSaveFx(
-					encode(value, {
-						ignoreUndefined: true,
-					}),
-				),
-			),
+			Effect.result(decodeArkiniSaveFx(encodeJsonFn(value))),
 		);
 		expect(result).toMatchObject({
 			_tag: "Failure",

@@ -101,6 +101,8 @@ The complete mutation, Tick and session navigation is in [`src/game-runtime/READ
 
 Game Session composes Runtime, Tick, save, command/listener scopes and first-failure publication. Playable Game adds resource URLs and presentation fail-stop without package identity. Game Incident records session transitions and failures for both Installed Game and Editor Board; only installed packages produce Arkpack-backed incident archives. Installed Game adds Arkpack/save bootstrap, resource leases and serialized package lifecycle.
 
+Electron main inspects and hashes portable Arkpacks as streams. First use extracts raw resource ranges into a content-hash installation; matching installations are reused optimistically without checking their extracted bodies. Renderer bootstrap receives config plus lazy `arkini://game/resource` URLs, never the archive or resource bytes. The protocol serves contained native files on demand and preserves byte ranges for media. Editor project import reuses the same extraction boundary before publishing a portable source tree.
+
 React mount state is never desired-Game state. Same-package acquisition shares one provisional lease; explicit load adopts it. A different package finalizes the current resource before acquisition.
 
 Ordinary shutdown stops Tick, stops command producers, flushes or discards the latest stable Runtime as requested, then releases the owner scope with its subscriptions and runtime. Fatal quiesce closes transition subscriptions earlier. Concurrent cleanup joins the same attempt. A failed final save leaves the underlying Game Session frozen and capable of retry or explicit discard. Installed Game finalization treats that failure as terminal: its renderer authority retains one critical error and rejects successor acquisition rather than retrying. Reset and Editor replacement use discard-only disposal.
@@ -139,7 +141,7 @@ Arkini-owned data is resolved independently from Electron below the effective sy
 
 ```text
 ~/.arkini/diagnostics/  application logs
-~/.arkini/game/         Arkpacks, saves, preferences, latest incident
+~/.arkini/game/         Arkpacks, content-hash installations, saves, preferences, latest incident
 ~/.arkini/editor/       project catalog, managed projects, MCP state
 ```
 

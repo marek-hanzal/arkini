@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { formatGameIncidentTextBundleFn } from "~/game-incident/fn/formatGameIncidentTextBundleFn";
 import type { GameIncidentReport } from "~/game-incident/type/GameIncidentReport";
+import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 
 const reportIncidentWriteFailureFn = (cause: unknown) => {
 	console.warn("Arkini could not write the latest game incident.", cause);
@@ -9,7 +10,7 @@ const reportIncidentWriteFailureFn = (cause: unknown) => {
 
 export namespace writeLastGameIncidentFx {
 	export interface Props {
-		readonly arkpackBytes: Uint8Array;
+		readonly arkpack: ArkpackDescriptor;
 		readonly report: GameIncidentReport;
 		readonly saveBytes: Uint8Array;
 	}
@@ -17,7 +18,7 @@ export namespace writeLastGameIncidentFx {
 
 /** Starts the best-effort renderer-to-main write of one disposable failed-session environment. */
 export const writeLastGameIncidentFx = Effect.fnUntraced(function* ({
-	arkpackBytes,
+	arkpack,
 	report,
 	saveBytes,
 }: writeLastGameIncidentFx.Props) {
@@ -26,7 +27,11 @@ export const writeLastGameIncidentFx = Effect.fnUntraced(function* ({
 		if (writer === undefined) return;
 		void writer
 			.writeFn({
-				arkpackBytes: new Uint8Array(arkpackBytes),
+				arkpack: {
+					packageId: arkpack.packageId,
+					contentHash: arkpack.contentHash,
+					source: arkpack.source,
+				},
 				saveBytes: new Uint8Array(saveBytes),
 				text: formatGameIncidentTextBundleFn(report),
 			})

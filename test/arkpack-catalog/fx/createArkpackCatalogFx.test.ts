@@ -93,7 +93,7 @@ describe("createArkpackCatalogFx state", () => {
 			],
 		});
 
-		const descriptor = await Effect.runPromise(catalog.importFileFx({} as File));
+		const descriptor = await Effect.runPromise(catalog.importFileFx());
 		expect(descriptor).toBe(imported);
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",

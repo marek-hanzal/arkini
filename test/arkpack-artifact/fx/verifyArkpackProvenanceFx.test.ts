@@ -1,10 +1,16 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { ArkpackDistributionChannel } from "~/arkpack-artifact/constant/ArkpackDistributionChannel";
 import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
 import { verifyArkpackProvenanceWithFx } from "~/arkpack-artifact/fx/verifyArkpackProvenanceFx";
 import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
+import { verifyArkpackFileProvenanceWithFx } from "~/arkpack-artifact/fx/verifyArkpackFileProvenanceFx";
+import { Magic } from "~/arkpack-artifact/constant/Magic";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import fixture from "./verifyArkpackProvenanceFx.test/official.fixture.json";
 
 // This suite owns the isolated test-only Sigstore root and its one proof over this exact
@@ -48,6 +54,52 @@ describe("Arkpack release provenance", () => {
 		await expect(Effect.runPromise(verifyFixtureFx(release))).resolves.toEqual({
 			type: "official",
 		});
+	});
+
+	it("offline-verifies the checked-in proof while streaming its payload from disk", async () => {
+		const root = await mkdtemp(join(tmpdir(), "arkini-stream-proof-"));
+		try {
+			const arkpackPath = join(root, "fixture.arkpack");
+			const release = await Effect.runPromise(
+				encodeArkpackEnvelopeFx({
+					payload,
+					proof,
+				}),
+			);
+			await writeFile(arkpackPath, release);
+			await expect(
+				Effect.runPromise(
+					verifyArkpackFileProvenanceWithFx({
+						layout: {
+							arkpackPath,
+							contentHash: "0".repeat(64),
+							configLength: 0,
+							configOffset: Magic.byteLength + 4,
+							manifest: {
+								version: "1.0",
+								arkini: ArkiniAppVersion,
+								length: 0,
+								resources: [],
+							},
+							payloadLength: payload.byteLength,
+							payloadOffset: Magic.byteLength + 4,
+							proof,
+							resources: [],
+							size: release.byteLength,
+						},
+						channel: ArkpackDistributionChannel,
+						trustedRoot: fixture.trustedRoot,
+					}),
+				),
+			).resolves.toEqual({
+				type: "official",
+			});
+		} finally {
+			await rm(root, {
+				force: true,
+				recursive: true,
+			});
+		}
 	});
 
 	it("keeps the same proof Community for another channel or payload", async () => {

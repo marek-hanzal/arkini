@@ -5,7 +5,7 @@ import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 /** Creates an explicit in-memory Arkpack capability for tests only. */
 export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackStorageFx")(() =>
 	Effect.sync(() => {
-		const files = new Map<string, ArkpackStorage.File>();
+		const files = new Map<string, ArkpackStorage.MemoryFile>();
 		return {
 			listFx: Effect.sync(() =>
 				Array.from(files.values(), (file) => ({
@@ -29,6 +29,7 @@ export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackSt
 				Effect.sync(() => {
 					files.delete(packageId);
 				}),
+			importFx: Effect.succeed(null),
 			writeFx: (packageId, bytes) =>
 				Effect.sync(() => {
 					files.set(packageId, {

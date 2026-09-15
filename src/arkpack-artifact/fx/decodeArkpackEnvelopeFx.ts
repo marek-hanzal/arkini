@@ -29,11 +29,11 @@ export const decodeArkpackEnvelopeFx = Effect.fn("decodeArkpackEnvelopeFx")((byt
 				throw new Error("Invalid Arkpack: truncated payload.");
 			const proofLength = bytes.byteLength - payloadEnd;
 			return {
-				payload: bytes.slice(headerLength, payloadEnd),
+				payload: new Uint8Array(bytes.slice(headerLength, payloadEnd)),
 				...(proofLength === 0 || proofLength > ArkpackLimits.maxProofBytes
 					? {}
 					: {
-							proof: bytes.slice(payloadEnd),
+							proof: new Uint8Array(bytes.slice(payloadEnd)),
 						}),
 			} as const;
 		},

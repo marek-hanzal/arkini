@@ -11,6 +11,7 @@ import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 
 let harness: ProjectTestHarness;
 
@@ -29,6 +30,47 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project lifecycle", () => {
+	it("imports an Arkpack through the shared filesystem extraction pipeline", async () => {
+		const repository = await harness.openRepository();
+		const arkpackPath = join(harness.temporaryDirectory, "import.arkpack");
+		await writeFile(arkpackPath, createTestArkpack());
+
+		const imported = await Effect.runPromise(repository.importArkpackFileFx(arkpackPath));
+
+		expect(imported).toMatchObject({
+			projectId: "game:test",
+			config: {
+				meta: {
+					id: "game:test",
+				},
+			},
+		});
+		expect(imported.resources.map(({ id }) => id).sort()).toEqual([
+			"asset:water",
+			"hero",
+		]);
+		const hero = await Effect.runPromise(
+			repository.readResourceLocationFx({
+				projectId: imported.projectId,
+				resourceId: "hero",
+			}),
+		);
+		expect(hero).not.toBeNull();
+		if (hero === null) throw new Error("Imported Hero is unavailable.");
+		expect((await readFile(hero.path)).subarray(0, 8)).toEqual(
+			Buffer.from([
+				137,
+				80,
+				78,
+				71,
+				13,
+				10,
+				26,
+				10,
+			]),
+		);
+	});
+
 	it("creates and reopens a project with no authored items", async () => {
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(

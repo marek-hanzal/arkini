@@ -10,7 +10,7 @@ export namespace encodeArkpackEnvelopeFx {
 	}
 }
 
-/** Wraps deterministic compressed gameplay bytes and an optional proof in one Arkpack file. */
+/** Wraps one deterministic Arkpack payload and its optional distribution proof. */
 export const encodeArkpackEnvelopeFx = Effect.fn("encodeArkpackEnvelopeFx")(
 	({ payload, proof = new Uint8Array() }: encodeArkpackEnvelopeFx.Props) =>
 		Effect.sync(() => {

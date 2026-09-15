@@ -106,19 +106,15 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		],
 	);
 
-	const importArkpackFileFn = useCallback(
-		(file: File | undefined) => {
-			if (file === undefined || blocked) return;
-			runCommandFn({
-				action: "import-arkpack",
-				file,
-			});
-		},
-		[
-			blocked,
-			runCommandFn,
-		],
-	);
+	const importArkpackFileFn = useCallback(() => {
+		if (blocked) return;
+		runCommandFn({
+			action: "import-arkpack",
+		});
+	}, [
+		blocked,
+		runCommandFn,
+	]);
 
 	const importJsonDirectoryFn = useCallback(() => {
 		if (blocked) return;

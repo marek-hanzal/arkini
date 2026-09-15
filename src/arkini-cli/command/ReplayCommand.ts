@@ -1,14 +1,11 @@
 import { CliError, Command, Flag } from "effect/unstable/cli";
 import { Clock, Console, Effect, FileSystem, Option } from "effect";
 import { join } from "node:path";
-import { promisify } from "node:util";
-import { gunzip } from "node:zlib";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { GameIncidentFiles } from "~shared/GameIncidentMetadata";
-import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
-import { decodeFx } from "~/arkpack-artifact/fx/decodeFx";
-import { readArkpackContentHashFx } from "~/arkpack-artifact/fx/readArkpackContentHashFx";
+import { readArkpackFileConfigFx } from "~/arkpack-artifact/fx/readArkpackFileConfigFx";
+import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
 import { toDiagnosticValueResultFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import { GAME_DIAGNOSTIC_HISTORY_LIMIT } from "~/game-incident/constant/GameDiagnosticHistoryLimit";
@@ -30,8 +27,6 @@ interface ReplayPaths {
 	readonly arkpack: string;
 	readonly save: string;
 }
-
-const gunzipAsyncFn = promisify(gunzip);
 
 const toReplayUserErrorFn = (cause: unknown) =>
 	new CliError.UserError({
@@ -114,40 +109,33 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 	if (paths instanceof Error) return yield* Effect.fail(paths);
 	const fileSystem = yield* FileSystem.FileSystem;
 	const clock = yield* Clock.Clock;
-	const arkpackBytes = new Uint8Array(
-		yield* fileSystem
-			.readFile(paths.arkpack)
-			.pipe(Effect.mapError(() => new Error("Could not read the replay Arkpack."))),
+	const layout = yield* readArkpackFileLayoutFx(paths.arkpack).pipe(
+		Effect.mapError(() => new Error("Could not read the replay Arkpack.")),
 	);
-	const envelope = yield* decodeArkpackEnvelopeFx(arkpackBytes);
-	const payload = yield* decodeFx(
-		yield* Effect.tryPromise({
-			try: async () => new Uint8Array(await gunzipAsyncFn(envelope.payload)),
-			catch: (cause) => cause,
-		}),
-	);
-	const contentHash = yield* readArkpackContentHashFx(arkpackBytes);
+	const config = yield* readArkpackFileConfigFx(layout);
+	const version = layout.manifest.version;
+	const contentHash = layout.contentHash;
 	const saveBytes = yield* fileSystem
 		.readFile(paths.save)
 		.pipe(Effect.mapError(() => new Error("Could not read the replay save.")));
 	const saved = yield* decodeArkiniSaveFx(saveBytes);
-	const arkpackVersion = readGameVersionMajorFn(payload.version);
+	const arkpackVersion = readGameVersionMajorFn(version);
 	const saveVersion = readGameVersionMajorFn(saved.version);
 	if (saveVersion.major !== arkpackVersion.major) {
 		return yield* Effect.fail(
 			new Error(
-				`Save version ${saved.version} is incompatible with arkpack version ${payload.version}.`,
+				`Save version ${saved.version} is incompatible with arkpack version ${version}.`,
 			),
 		);
 	}
 	const session = yield* createGameSessionFx({
-		config: payload.config,
+		config,
 		state: saved.state,
 	});
 	return yield* Effect.gen(function* () {
 		const initialTransition = session.getTransitionSnapshotFn();
 		const initialRuntime = readGameDiagnosticRuntimeFn({
-			config: payload.config,
+			config,
 			runtime: initialTransition.runtime,
 		});
 		const startedAtMs = clock.currentTimeMillisUnsafe();
@@ -164,7 +152,7 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 			const observedAtMs = clock.currentTimeMillisUnsafe();
 			history.push(
 				readGameDiagnosticHistoryEntryFn({
-					config: payload.config,
+					config,
 					elapsedSincePreviousMs:
 						previousObservedAtMs === undefined
 							? null
@@ -189,7 +177,7 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 		const failure = (() => {
 			if (fatal === null) return null;
 			const relatedItems = readGameDiagnosticRelatedItemsResultFn({
-				config: payload.config,
+				config,
 				transition: finalTransition,
 				value: fatal,
 			});
@@ -205,9 +193,9 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 		})();
 		const report = {
 			applicationVersion: ArkiniAppVersion,
-			packageId: payload.config.meta.id,
+			packageId: config.meta.id,
 			contentHash,
-			gameVersion: payload.version,
+			gameVersion: version,
 			elapsedMs: Math.max(0, capturedAtMs - startedAtMs),
 			result,
 			initialSequence: initialTransition.sequence,
@@ -222,7 +210,7 @@ const runReplayFx = Effect.fn("runReplayFx")(function* ({
 			failure,
 			initialRuntime,
 			finalRuntime: readGameDiagnosticRuntimeFn({
-				config: payload.config,
+				config,
 				runtime: finalTransition.runtime,
 			}),
 		} satisfies GameReplayReport;

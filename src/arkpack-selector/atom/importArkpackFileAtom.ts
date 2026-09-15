@@ -7,12 +7,12 @@ import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOw
  * The catalog Semaphore owns ordering; concurrent mode prevents Atom from cancelling an earlier import.
  */
 export const importArkpackFileAtom = Atom.fn(
-	(file: File, get) => {
+	(_, get) => {
 		const catalog = get(ArkpackCatalogOwnerAtom);
 		const importFx =
 			catalog === undefined
 				? Effect.fail(new Error("Arkpack catalog is not configured."))
-				: catalog.importFileFx(file);
+				: catalog.importFileFx();
 		// TODO(#397): Remove only after stable Atom guarantees observable pending
 		// settlement for a synchronous concurrent command.
 		return Effect.yieldNow.pipe(Effect.andThen(importFx));

@@ -11,8 +11,8 @@ import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
-import { decodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/decodeArkpackEnvelopeFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
+import { decodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { encodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 let harness: ProjectTestHarness;
@@ -147,13 +147,16 @@ describe("filesystem Editor project build", () => {
 		]);
 		expect(await readFile(join(root, ".gitignore"), "utf8")).toContain("/build/\n");
 		const content = await Effect.runPromise(
-			repository.readProjectBuildFx({
-				projectId: project.projectId,
-				expectedRevision: artifact.revision,
-				contentHash: artifact.contentHash,
-			}),
+			repository.withProjectBuildPathFx(
+				{
+					projectId: project.projectId,
+					expectedRevision: artifact.revision,
+					contentHash: artifact.contentHash,
+				},
+				(path) => Effect.promise(() => readFile(path)),
+			),
 		);
-		expect(content.bytes.byteLength).toBe(artifact.size);
+		expect(content.byteLength).toBe(artifact.size);
 		await Effect.runPromise(
 			repository.createNoteFx({
 				projectId: project.projectId,
@@ -172,9 +175,7 @@ describe("filesystem Editor project build", () => {
 			}),
 		);
 		expect(rebuilt.contentHash).toBe(artifact.contentHash);
-		expect(await readFile(join(root, "build", "project%2Ebuild.arkpack"))).toEqual(
-			Buffer.from(content.bytes),
-		);
+		expect(await readFile(join(root, "build", "project%2Ebuild.arkpack"))).toEqual(content);
 	});
 
 	it("rejects changed bytes and preserves a user's existing gitignore content", async () => {
@@ -195,14 +196,15 @@ describe("filesystem Editor project build", () => {
 		);
 		const arkpackPath = join(root, "build", "project-tamper.arkpack");
 		const envelope = Effect.runSync(
-			decodeArkpackEnvelopeFx(new Uint8Array(await readFile(arkpackPath))),
+			decodeTestArkpackEnvelopeFx(new Uint8Array(await readFile(arkpackPath))),
 		);
 		const changedPayload = envelope.payload.slice();
-		changedPayload[0] = (changedPayload[0] ?? 0) ^ 1;
+		changedPayload[changedPayload.byteLength - 1] =
+			(changedPayload[changedPayload.byteLength - 1] ?? 0) ^ 1;
 		await writeFile(
 			arkpackPath,
 			Effect.runSync(
-				encodeArkpackEnvelopeFx({
+				encodeTestArkpackEnvelopeFx({
 					payload: changedPayload,
 					proof: envelope.proof,
 				}),
@@ -211,11 +213,14 @@ describe("filesystem Editor project build", () => {
 
 		await expect(
 			Effect.runPromise(
-				repository.readProjectBuildFx({
-					projectId: project.projectId,
-					expectedRevision: artifact.revision,
-					contentHash: artifact.contentHash,
-				}),
+				repository.withProjectBuildPathFx(
+					{
+						projectId: project.projectId,
+						expectedRevision: artifact.revision,
+						contentHash: artifact.contentHash,
+					},
+					() => Effect.void,
+				),
 			),
 		).rejects.toMatchObject({
 			operation: "read-project-build",
@@ -304,7 +309,7 @@ describe("filesystem Editor project build", () => {
 		).rejects.toMatchObject({
 			operation: "build-project",
 			message:
-				"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
+				"The saved project differs from the open Editor state. Refresh the project and build again.",
 		});
 		await expect(readdir(join(root, "build"))).rejects.toBeDefined();
 	});
@@ -327,7 +332,7 @@ describe("filesystem Editor project build", () => {
 		).rejects.toMatchObject({
 			operation: "build-project",
 			message:
-				"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
+				"The saved project differs from the open Editor state. Refresh the project and build again.",
 		});
 		await expect(readdir(join(root, "build"))).rejects.toBeDefined();
 	});

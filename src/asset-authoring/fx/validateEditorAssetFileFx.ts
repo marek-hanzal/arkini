@@ -1,16 +1,11 @@
 import { Effect } from "effect";
 
 import { PngResourceLimits } from "~/game-config-resource/constant/PngResourceLimits";
-import { validatePngResourceFx } from "~/game-config-resource/fx/validatePngResourceFx";
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 
-export interface EditorAssetFileInput {
-	readonly name: string;
-	readonly size: number;
-	readonly arrayBuffer: () => Promise<ArrayBuffer>;
-}
+export type EditorAssetFileInput = File;
 
 /** Admits one browser file as a bounded Editor PNG resource. */
 export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
@@ -38,8 +33,8 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 				cause,
 			}),
 	});
-	const bytes = yield* Effect.tryPromise({
-		try: async () => new Uint8Array(await inputFile.arrayBuffer()),
+	const bitmap = yield* Effect.tryPromise({
+		try: () => createImageBitmap(inputFile),
 		catch: (cause) =>
 			new ProjectOperationError({
 				reason: "invalid-asset",
@@ -47,19 +42,26 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 				cause,
 			}),
 	});
-	yield* validatePngResourceFx(bytes, resourceId).pipe(
-		Effect.mapError(
-			(cause) =>
+	try {
+		if (
+			bitmap.width < 1 ||
+			bitmap.height < 1 ||
+			bitmap.width > PngResourceLimits.maxDimension ||
+			bitmap.height > PngResourceLimits.maxDimension ||
+			bitmap.width * bitmap.height > PngResourceLimits.maxPixels
+		)
+			return yield* Effect.fail(
 				new ProjectOperationError({
 					reason: "invalid-asset",
-					message: cause.message.replace(/^Resource /, "Asset "),
-					cause,
+					message: `Asset ${resourceId} exceeds the supported PNG dimensions.`,
 				}),
-		),
-	);
+			);
+	} finally {
+		bitmap.close();
+	}
 	return {
 		id: resourceId,
 		mime: "image/png",
-		bytes,
+		size: inputFile.size,
 	} as const;
 });

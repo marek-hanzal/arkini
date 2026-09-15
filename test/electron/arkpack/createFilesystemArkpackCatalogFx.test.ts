@@ -1,20 +1,19 @@
 import { Effect, FileSystem } from "effect";
-import { access, mkdtemp, realpath, rm, truncate, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readFile, realpath, rm, truncate, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkpackLimits } from "~shared/ArkpackLimits";
-import { writeArkpackFileFx } from "~electron/main/arkpack/writeArkpackFileFx";
 import {
-	bundledBytes,
+	createBundledBytes,
 	createCatalog,
 	createNodeFileSystem,
 	createPromiseGate,
+	createUserBytes,
 	readFileRecord,
 	readPackagePath,
 	readRoots,
-	userBytes,
 	writePackage,
 } from "./createFilesystemArkpackCatalogFx.test/fixture";
 
@@ -37,12 +36,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await writePackage({
 			root: roots.bundled,
 			packageId: "arkini",
-			bytes: bundledBytes,
+			bytes: createBundledBytes("arkini"),
 		});
 		await writePackage({
 			root: roots.user,
 			packageId: "package.manual",
-			bytes: userBytes,
+			bytes: createUserBytes("package.manual"),
 		});
 		await writeFile(join(roots.user, "descriptor.json"), "not catalog authority");
 
@@ -51,12 +50,10 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			readFileRecord({
 				packageId: "arkini",
-				bytes: bundledBytes,
 				source: "bundled",
 			}),
 			readFileRecord({
 				packageId: "package.manual",
-				bytes: userBytes,
 				source: "user",
 			}),
 		]);
@@ -71,13 +68,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		];
 		const catalog = await createCatalog(root);
 
-		for (const packageId of packageIds)
-			await Effect.runPromise(
-				catalog.installFx({
-					packageId,
-					bytes: userBytes,
-				}),
-			);
+		for (let index = 0; index < packageIds.length; index += 1) {
+			const packageId = packageIds[index];
+			const source = join(root, `source-${index}.arkpack`);
+			await writeFile(source, createUserBytes(packageId));
+			await Effect.runPromise(catalog.importFx(source));
+		}
 
 		const files = await Effect.runPromise(catalog.listFx);
 		expect(new Set(files.map(({ packageId }) => packageId))).toEqual(new Set(packageIds));
@@ -90,22 +86,20 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const bundledPath = await writePackage({
 			root: roots.bundled,
 			packageId,
-			bytes: bundledBytes,
+			bytes: createBundledBytes(packageId),
 		});
 		const userPath = await writePackage({
 			root: roots.user,
 			packageId,
-			bytes: userBytes,
+			bytes: createUserBytes(packageId),
 		});
 		const catalog = await createCatalog(root);
 		const bundled = readFileRecord({
 			packageId,
-			bytes: bundledBytes,
 			source: "bundled",
 		});
 		const userOverride = readFileRecord({
 			packageId,
-			bytes: userBytes,
 			source: "user",
 			overridesBundled: true,
 		});
@@ -115,8 +109,8 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			userOverride,
 		]);
 		expect(await Effect.runPromise(catalog.readFx(packageId))).toEqual([
-			bundled,
-			userOverride,
+			expect.objectContaining(bundled),
+			expect.objectContaining(userOverride),
 		]);
 
 		await Effect.runPromise(catalog.removeFx(packageId));
@@ -126,10 +120,29 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			readFileRecord({
 				packageId,
-				bytes: bundledBytes,
 				source: "bundled",
 			}),
 		]);
+	});
+
+	it("publishes a replacement import directly over the current user Arkpack", async () => {
+		const roots = readRoots(root);
+		const packageId = "replace-import";
+		const target = await writePackage({
+			root: roots.user,
+			packageId,
+			bytes: createBundledBytes(packageId),
+		});
+		const replacement = createUserBytes(packageId);
+		const source = join(root, "replacement.arkpack");
+		await writeFile(source, replacement);
+		const catalog = await createCatalog(root);
+
+		await expect(Effect.runPromise(catalog.importFx(source))).resolves.toMatchObject({
+			packageId,
+			version: "1.1",
+		});
+		expect(new Uint8Array(await readFile(target))).toEqual(replacement);
 	});
 
 	it("isolates an oversized manually copied package before reading its payload", async () => {
@@ -138,7 +151,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await writePackage({
 			root: roots.bundled,
 			packageId,
-			bytes: bundledBytes,
+			bytes: createBundledBytes(packageId),
 		});
 		const path = await writePackage({
 			root: roots.user,
@@ -159,14 +172,13 @@ describe("createFilesystemArkpackCatalogFx", () => {
 
 		const bundled = readFileRecord({
 			packageId,
-			bytes: bundledBytes,
 			source: "bundled",
 		});
 		await expect(Effect.runPromise(catalog.listFx)).resolves.toEqual([
 			bundled,
 		]);
 		await expect(Effect.runPromise(catalog.readFx(packageId))).resolves.toEqual([
-			bundled,
+			expect.objectContaining(bundled),
 		]);
 		expect(payloadRead).toBe(false);
 	});
@@ -174,6 +186,9 @@ describe("createFilesystemArkpackCatalogFx", () => {
 	it("uses the same aggregate-budget eligibility for listing and exact reads", async () => {
 		const roots = readRoots(root);
 		const packageId = "target";
+		const bundledBytes = createBundledBytes(packageId);
+		const firstUserBytes = createUserBytes("aaa");
+		const targetUserBytes = createUserBytes(packageId);
 		await Promise.all([
 			writePackage({
 				root: roots.bundled,
@@ -183,18 +198,18 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			writePackage({
 				root: roots.user,
 				packageId: "aaa",
-				bytes: userBytes,
+				bytes: firstUserBytes,
 			}),
 			writePackage({
 				root: roots.user,
 				packageId,
-				bytes: userBytes,
+				bytes: targetUserBytes,
 			}),
 		]);
-		const catalog = await createCatalog(root, undefined, 6);
+		const rootBudget = Math.max(bundledBytes.byteLength, firstUserBytes.byteLength) + 1;
+		const catalog = await createCatalog(root, undefined, rootBudget * 2);
 		const bundled = readFileRecord({
 			packageId,
-			bytes: bundledBytes,
 			source: "bundled",
 		});
 
@@ -202,12 +217,11 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			bundled,
 			readFileRecord({
 				packageId: "aaa",
-				bytes: userBytes,
 				source: "user",
 			}),
 		]);
 		await expect(Effect.runPromise(catalog.readFx(packageId))).resolves.toEqual([
-			bundled,
+			expect.objectContaining(bundled),
 		]);
 	});
 
@@ -216,8 +230,8 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const packageId = "serialized";
 		const output = readPackagePath(roots.user, packageId);
 		const nodeFileSystem = await createNodeFileSystem();
-		const renameEntered = createPromiseGate();
-		const releaseRename = createPromiseGate();
+		const copyEntered = createPromiseGate();
+		const releaseCopy = createPromiseGate();
 		let removeStarted = false;
 		const fileSystem = {
 			...nodeFileSystem,
@@ -225,28 +239,24 @@ describe("createFilesystemArkpackCatalogFx", () => {
 				if (path === output) removeStarted = true;
 				return nodeFileSystem.remove(path, options);
 			},
-			rename: (oldPath, newPath) => {
-				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (newPath !== output) return renameFx;
-				renameEntered.resolve();
-				return Effect.promise(() => releaseRename.promise).pipe(Effect.andThen(renameFx));
+			copyFile: (oldPath, newPath) => {
+				const copyFx = nodeFileSystem.copyFile(oldPath, newPath);
+				if (newPath !== output) return copyFx;
+				copyEntered.resolve();
+				return Effect.promise(() => releaseCopy.promise).pipe(Effect.andThen(copyFx));
 			},
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
 
-		const installing = Effect.runPromise(
-			writeArkpackFileFx({
-				arkpackPath: output,
-				bytes: userBytes,
-				fileSystem,
-			}),
-		);
-		await renameEntered.promise;
+		const source = join(root, "serialized-source.arkpack");
+		await writeFile(source, createUserBytes(packageId));
+		const installing = Effect.runPromise(catalog.importFx(source));
+		await copyEntered.promise;
 		const removing = Effect.runPromise(catalog.removeFx(packageId));
 		await new Promise<void>((resolve) => setImmediate(resolve));
 
 		expect(removeStarted).toBe(false);
-		releaseRename.resolve();
+		releaseCopy.resolve();
 		await Promise.all([
 			installing,
 			removing,
@@ -261,11 +271,11 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const output = await writePackage({
 			root: roots.user,
 			packageId,
-			bytes: bundledBytes,
+			bytes: createBundledBytes(packageId),
 		});
 		const nodeFileSystem = await createNodeFileSystem();
-		const publicationEntered = createPromiseGate();
-		const releasePublication = createPromiseGate();
+		const copyEntered = createPromiseGate();
+		const releaseCopy = createPromiseGate();
 		let canonicalReadStarted = false;
 		const fileSystem = {
 			...nodeFileSystem,
@@ -273,34 +283,27 @@ describe("createFilesystemArkpackCatalogFx", () => {
 				if (path === output) canonicalReadStarted = true;
 				return nodeFileSystem.readFile(path);
 			},
-			rename: (oldPath, newPath) => {
-				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (newPath !== output) return renameFx;
-				publicationEntered.resolve();
-				return Effect.promise(() => releasePublication.promise).pipe(
-					Effect.andThen(renameFx),
-				);
+			copyFile: (oldPath, newPath) => {
+				const copyFx = nodeFileSystem.copyFile(oldPath, newPath);
+				if (newPath !== output) return copyFx;
+				copyEntered.resolve();
+				return Effect.promise(() => releaseCopy.promise).pipe(Effect.andThen(copyFx));
 			},
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
-		const writing = Effect.runPromise(
-			writeArkpackFileFx({
-				arkpackPath: output,
-				bytes: userBytes,
-				fileSystem,
-			}),
-		);
-		await publicationEntered.promise;
+		const source = join(root, "locked-reader-source.arkpack");
+		await writeFile(source, createUserBytes(packageId));
+		const writing = Effect.runPromise(catalog.importFx(source));
+		await copyEntered.promise;
 		const listing = Effect.runPromise(catalog.listFx);
 		await new Promise<void>((resolve) => setImmediate(resolve));
 		expect(canonicalReadStarted).toBe(false);
 
-		releasePublication.resolve();
+		releaseCopy.resolve();
 		await writing;
 		await expect(listing).resolves.toEqual([
 			readFileRecord({
 				packageId,
-				bytes: userBytes,
 				source: "user",
 			}),
 		]);

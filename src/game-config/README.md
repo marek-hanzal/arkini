@@ -9,7 +9,7 @@ This map separates authored values, portable source, diagnostics, semantic valid
 | `game-value` | Foundational immutable identity, required text, quantity and whole-millisecond time schemas | [`../game-value/schema/IdSchema.ts`](../game-value/schema/IdSchema.ts), [`../game-value/schema/TimeSchema.ts`](../game-value/schema/TimeSchema.ts) |
 | `game-config` | Completed authored aggregate and loaded-config capability | [`schema/GameConfigSchema.ts`](schema/GameConfigSchema.ts), [`context/GameConfigFx.ts`](context/GameConfigFx.ts) |
 | `game-config-source` | Portable filenames, source schemas, discovery, parsing and generated JSON Schema | [`../game-config-source/schema/ProjectSchema.ts`](../game-config-source/schema/ProjectSchema.ts), [`../game-config-source/fx/collectSourceFilesFx.ts`](../game-config-source/fx/collectSourceFilesFx.ts) |
-| `game-config-resource` | Embedded PNG/source descriptors, usage, rename, discovery, byte admission, source optimization and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/readPngResourceFx.ts`](../game-config-resource/fx/readPngResourceFx.ts), [`../game-config-resource/fx/optimizePngResourceFx.ts`](../game-config-resource/fx/optimizePngResourceFx.ts), [`../game-config-resource/fx/resizePngAssetFx.ts`](../game-config-resource/fx/resizePngAssetFx.ts) |
+| `game-config-resource` | Embedded PNG/source descriptors, usage, rename, discovery, byte admission, streamed source optimization and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/optimizePngResourceFileFx.ts`](../game-config-resource/fx/optimizePngResourceFileFx.ts), [`../game-config-resource/fx/resizePngAssetFileFx.ts`](../game-config-resource/fx/resizePngAssetFileFx.ts) |
 | `game-config-diagnostic` | Provenance-aware diagnostic vocabulary and presentation | [`../game-config-diagnostic/schema/GameDiagnosticsSchema.ts`](../game-config-diagnostic/schema/GameDiagnosticsSchema.ts), [`../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts`](../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts) |
 | `game-config-validation` | Completed-config semantic validation and blocking diagnostics | [`../game-config-validation/fx/validateGameConfigFx.ts`](../game-config-validation/fx/validateGameConfigFx.ts) |
 | `game-config-compiler` | Deterministic source assembly, validation orchestration and compilation result | [`../game-config-compiler/fx/compileGameDirectoryFx.ts`](../game-config-compiler/fx/compileGameDirectoryFx.ts) |
@@ -77,7 +77,7 @@ Changing a `game-value` scalar has a wider blast radius than changing the comple
 Usually not affected:
 
 - Game Session disposal, Tick timing or installed-package lease ownership for a source-only change.
-- Electron Editor transaction mechanics when the portable path set is unchanged.
+- Electron Editor current-tree write mechanics when the portable path set is unchanged.
 - Pixi lifecycle and interaction when completed runtime facts are unchanged.
 
 A portable filename, persisted schema, compatibility or provenance change crosses into [`VERSION.md`](../../VERSION.md) and the Editor persistence map at [`../../electron/main/editor-project/README.md`](../../electron/main/editor-project/README.md).

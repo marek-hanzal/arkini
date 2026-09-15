@@ -2,7 +2,16 @@ import { z } from "zod";
 
 export const GameIncidentWriteSchema = z
 	.object({
-		arkpackBytes: z.instanceof(Uint8Array),
+		arkpack: z
+			.object({
+				packageId: z.string().min(1),
+				contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+				source: z.enum([
+					"bundled",
+					"user",
+				]),
+			})
+			.strict(),
 		saveBytes: z.instanceof(Uint8Array),
 		text: z
 			.object({

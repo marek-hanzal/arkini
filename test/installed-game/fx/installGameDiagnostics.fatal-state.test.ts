@@ -140,7 +140,7 @@ describe("Game fatal-state diagnostics", () => {
 			installGameDiagnosticsFx({
 				arkpack: {
 					packageId: "package:test",
-					contentHash: "content:test",
+					contentHash: "0".repeat(64),
 					title: "Test",
 					version: "1.0",
 					arkini: "1",
@@ -149,7 +149,6 @@ describe("Game fatal-state diagnostics", () => {
 						type: "official",
 					},
 				} satisfies ArkpackDescriptor,
-				arkpackBytes: Uint8Array.of(1, 2, 3),
 				config,
 				restored: true,
 				runRendererEffectFn: Effect.runSync,
@@ -228,7 +227,9 @@ describe("Game fatal-state diagnostics", () => {
 		});
 		expect(writeIncident).toHaveBeenCalledWith(
 			expect.objectContaining({
-				arkpackBytes: Uint8Array.of(1, 2, 3),
+				arkpack: expect.objectContaining({
+					packageId: "package:test",
+				}),
 				text: expect.objectContaining({
 					incident: expect.stringContaining("# Arkini game incident"),
 					failure: expect.stringContaining("config-uid uid:producer:finite"),

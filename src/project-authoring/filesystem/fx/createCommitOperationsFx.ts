@@ -1,4 +1,7 @@
-import { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
+import {
+	ProjectResourceFileReplacementSchema,
+	ProjectResourceReplacementSchema,
+} from "~/project-authoring/schema/ProjectResourceReplacementSchema";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
@@ -15,13 +18,14 @@ import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
-import { optimizePngResourceFx } from "~/game-config-resource/fx/optimizePngResourceFx";
+import { optimizePngResourceFileFx } from "~/game-config-resource/fx/optimizePngResourceFileFx";
+import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
 import { writeProjectChangesFx } from "./writeProjectChangesFx";
-import { readPngResourceFx } from "~/game-config-resource/fx/readPngResourceFx";
 import type { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
+import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 
 type Operations = Pick<
 	ProjectRepositoryService,
@@ -32,7 +36,8 @@ type Operations = Pick<
 	| "replaceResourceFx"
 	| "upsertItemFx"
 	| "upsertResourcesFx"
->;
+> &
+	Pick<OwnedEditorProjectRepository, "upsertResourceFilesFx">;
 
 const errorFn = (operation: ProjectRepositoryOperation, message: string, cause?: unknown) =>
 	cause instanceof ProjectRepositoryError && cause.operation === operation
@@ -100,6 +105,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		config,
 		resources,
 		resourceWrites,
+		resourceFileWrites,
 		resourceDelete,
 		resourceRename,
 		nowMs,
@@ -109,6 +115,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ProjectResourceSchema.Type>;
 		readonly resourceWrites?: ReadonlyArray<ResourceSchema.Type>;
+		readonly resourceFileWrites?: ReadonlyArray<{
+			readonly id: string;
+			readonly path: string;
+		}>;
 		readonly resourceDelete?: string;
 		readonly resourceRename?: {
 			readonly from: string;
@@ -146,7 +156,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			].sort((left, right) => left.id.localeCompare(right.id)),
 		};
 		// Reconcile against the completed config: force cleanup may remove additional owners.
-		// Notes and the item tree share the journal and become visible only after it commits.
+		// Notes and the item tree are published from the same completed project projection.
 		const remainingItemUids = new Set(
 			Object.values(canonicalConfig.items).map((item) => item.uid),
 		);
@@ -185,6 +195,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			previous: state.project,
 			next: nextProject,
 			resourceWrites,
+			resourceFileWrites,
 			resourceRename,
 			noteUpdates,
 		});
@@ -391,6 +402,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ProjectResourceSchema.Type>;
 				readonly resourceWrites?: ReadonlyArray<ResourceSchema.Type>;
+				readonly resourceFileWrites?: ReadonlyArray<{
+					readonly id: string;
+					readonly path: string;
+				}>;
 				readonly resourceDelete?: string;
 				readonly resourceRename?: {
 					readonly from: string;
@@ -415,6 +430,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							config: next.config,
 							resources: next.resources,
 							resourceWrites: next.resourceWrites,
+							resourceFileWrites: next.resourceFileWrites,
 							...(next.resourceDelete === undefined
 								? {}
 								: {
@@ -431,6 +447,23 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				}),
 			);
 		});
+	const assertDistinctResourceIdsFx = Effect.fn("assertDistinctResourceIdsFx")(function* <
+		Resource extends {
+			readonly id: string;
+		},
+	>(resources: ReadonlyArray<Resource>) {
+		if (resources.length === 0)
+			return yield* Effect.fail(
+				errorFn("upsert-resource", "Select at least one PNG asset to import."),
+			);
+		if (new Set(resources.map(({ id }) => id)).size !== resources.length)
+			return yield* Effect.fail(
+				errorFn(
+					"upsert-resource",
+					"A resource occurs more than once in the same Editor write.",
+				),
+			);
+	});
 
 	const upsertResourcesFx: Operations["upsertResourcesFx"] = ({
 		projectId,
@@ -438,17 +471,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	}) =>
 		Effect.gen(function* () {
 			const resources = yield* Effect.try({
-				try: () => ResourceSchema.array().min(1).parse(candidates),
+				try: () => ResourceSchema.array().parse(candidates),
 				catch: (cause) =>
 					errorFn("upsert-resource", "The Editor resources are invalid.", cause),
 			});
-			if (new Set(resources.map(({ id }) => id)).size !== resources.length)
-				return yield* Effect.fail(
-					errorFn(
-						"upsert-resource",
-						"A resource occurs more than once in the same Editor write.",
-					),
-				);
+			yield* assertDistinctResourceIdsFx(resources);
 			return yield* commitResourcesFx("upsert-resource", projectId, undefined, (state) => {
 				const ids = new Set(resources.map(({ id }) => id));
 				return Effect.succeed({
@@ -475,6 +502,46 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			),
 		);
 
+	const upsertResourceFilesFx = ({
+		projectId,
+		resources,
+	}: {
+		readonly projectId: string;
+		readonly resources: ReadonlyArray<{
+			readonly id: string;
+			readonly mime: "image/png";
+			readonly path: string;
+			readonly size: number;
+		}>;
+	}) =>
+		Effect.gen(function* () {
+			yield* assertDistinctResourceIdsFx(resources);
+			return yield* commitResourcesFx("upsert-resource", projectId, undefined, (state) => {
+				const ids = new Set(resources.map(({ id }) => id));
+				return Effect.succeed({
+					config: state.project.config,
+					resources: [
+						...state.project.resources.filter(({ id }) => !ids.has(id)),
+						...resources.map(({ id, mime, size }) => ({
+							id,
+							mime,
+							size,
+							version: "pending",
+						})),
+					],
+					resourceFileWrites: resources,
+				});
+			});
+		}).pipe(
+			Effect.mapError((cause) =>
+				errorFn(
+					"upsert-resource",
+					`Resources could not be saved in project ${projectId}.`,
+					cause,
+				),
+			),
+		);
+
 	const optimizeResourcesFx: Operations["optimizeResourcesFx"] = ({
 		expectedRevision,
 		onProgressFn,
@@ -483,132 +550,148 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	}) =>
 		operations
 			.withPermits(1)(
-				Effect.gen(function* () {
-					const state = yield* readStateFx(projectId);
-					yield* assertExpectedRevisionFx(state, expectedRevision, "optimize-resources");
-					if (resourceIds.length === 0)
-						return yield* Effect.fail(
-							errorFn(
-								"optimize-resources",
-								"At least one resource must be selected for optimization.",
-							),
+				Effect.scoped(
+					Effect.gen(function* () {
+						const state = yield* readStateFx(projectId);
+						yield* assertExpectedRevisionFx(
+							state,
+							expectedRevision,
+							"optimize-resources",
 						);
-					const selectedResourceIds = new Set(resourceIds);
-					if (selectedResourceIds.size !== resourceIds.length)
-						return yield* Effect.fail(
-							errorFn(
-								"optimize-resources",
-								"Each selected resource may appear only once.",
-							),
-						);
-					const resources = state.project.resources.filter(({ id }) =>
-						selectedResourceIds.has(id),
-					);
-					if (resources.length !== resourceIds.length) {
-						const currentResourceIds = new Set(
-							state.project.resources.map(({ id }) => id),
-						);
-						const missingResourceIds = resourceIds.filter(
-							(resourceId) => !currentResourceIds.has(resourceId),
-						);
-						return yield* Effect.fail(
-							errorFn(
-								"optimize-resources",
-								`Selected resources do not exist in project ${projectId}: ${missingResourceIds.join(", ")}.`,
-							),
-						);
-					}
-					let completedResourceCount = 0;
-					const totalResourceCount = resources.length;
-					yield* Effect.sync(() =>
-						onProgressFn?.({
-							completedResourceCount,
-							phase: "optimizing",
-							totalResourceCount,
-						}),
-					);
-					const results = yield* Effect.forEach(
-						resources,
-						(resource) =>
-							Effect.gen(function* () {
-								const target = yield* new Set(
-									Object.values(state.project.config.resources),
-								).has(resource.id)
-									? state.paths.resourceFileFx(resource.id)
-									: state.paths.assetFileFx(resource.id);
-								const body = yield* readPngResourceFx({
-									path: target,
-								});
-								return yield* optimizePngResourceFx(body);
-							}).pipe(
-								Effect.tap(() =>
-									Effect.sync(() => {
-										completedResourceCount += 1;
-										onProgressFn?.({
-											completedResourceCount,
-											phase: "optimizing",
-											totalResourceCount,
-										});
-									}),
+						if (resourceIds.length === 0)
+							return yield* Effect.fail(
+								errorFn(
+									"optimize-resources",
+									"At least one resource must be selected for optimization.",
 								),
-							),
-						{
-							concurrency: 2,
-						},
-					);
-					const optimizedResourceCount = results.reduce(
-						(count, result) => count + (result.changed ? 1 : 0),
-						0,
-					);
-					const originalBytes = results.reduce(
-						(total, result) => total + result.originalBytes,
-						0,
-					);
-					const optimizedBytes = results.reduce(
-						(total, result) => total + result.optimizedBytes,
-						0,
-					);
-					const optimizedResources = new Map(
-						results.map(({ resource }) => [
-							resource.id,
-							resource,
-						]),
-					);
-					yield* Effect.sync(() =>
-						onProgressFn?.({
-							completedResourceCount,
-							phase: "saving",
-							totalResourceCount,
-						}),
-					);
-					const project =
-						optimizedResourceCount === 0
-							? cloneProjectFn(state.project)
-							: yield* commitFx({
-									state,
-									config: state.project.config,
-									resources: state.project.resources.map((resource) =>
-										optimizedResources.has(resource.id)
-											? {
-													...resource,
-													size: optimizedResources.get(resource.id)!.bytes
-														.byteLength,
-												}
-											: resource,
+							);
+						const selectedResourceIds = new Set(resourceIds);
+						if (selectedResourceIds.size !== resourceIds.length)
+							return yield* Effect.fail(
+								errorFn(
+									"optimize-resources",
+									"Each selected resource may appear only once.",
+								),
+							);
+						const resources = state.project.resources.filter(({ id }) =>
+							selectedResourceIds.has(id),
+						);
+						if (resources.length !== resourceIds.length) {
+							const currentResourceIds = new Set(
+								state.project.resources.map(({ id }) => id),
+							);
+							const missingResourceIds = resourceIds.filter(
+								(resourceId) => !currentResourceIds.has(resourceId),
+							);
+							return yield* Effect.fail(
+								errorFn(
+									"optimize-resources",
+									`Selected resources do not exist in project ${projectId}: ${missingResourceIds.join(", ")}.`,
+								),
+							);
+						}
+						let completedResourceCount = 0;
+						const totalResourceCount = resources.length;
+						const temporary = yield* fileSystem.makeTempDirectoryScoped();
+						const shellResourceIds = new Set(
+							Object.values(state.project.config.resources),
+						);
+						yield* Effect.sync(() =>
+							onProgressFn?.({
+								completedResourceCount,
+								phase: "optimizing",
+								totalResourceCount,
+							}),
+						);
+						const results = yield* Effect.forEach(
+							resources,
+							(resource) =>
+								Effect.gen(function* () {
+									const source = yield* shellResourceIds.has(resource.id)
+										? state.paths.resourceFileFx(resource.id)
+										: state.paths.assetFileFx(resource.id);
+									const result = yield* optimizePngResourceFileFx(
+										source,
+										path.join(temporary, String(completedResourceCount)),
+										resource.id,
+									);
+									return {
+										...result,
+										id: resource.id,
+									};
+								}).pipe(
+									Effect.tap(() =>
+										Effect.sync(() => {
+											completedResourceCount += 1;
+											onProgressFn?.({
+												completedResourceCount,
+												phase: "optimizing",
+												totalResourceCount,
+											});
+										}),
 									),
-									resourceWrites: results
-										.filter((result) => result.changed)
-										.map((result) => result.resource),
-									nowMs: yield* Clock.currentTimeMillis,
-								});
-					return {
-						optimizedResourceCount,
-						originalBytes,
-						optimizedBytes,
-						processedResourceCount: results.length,
-						project: cloneProjectFn(project),
-					};
-				}),
+								),
+							{
+								concurrency: 1,
+							},
+						);
+						const optimizedResourceCount = results.reduce(
+							(count, result) => count + (result.changed ? 1 : 0),
+							0,
+						);
+						const originalBytes = results.reduce(
+							(total, result) => total + result.originalBytes,
+							0,
+						);
+						const optimizedBytes = results.reduce(
+							(total, result) => total + result.optimizedBytes,
+							0,
+						);
+						const optimizedResources = new Map(
+							results.map((result) => [
+								result.id,
+								result,
+							]),
+						);
+						yield* Effect.sync(() =>
+							onProgressFn?.({
+								completedResourceCount,
+								phase: "saving",
+								totalResourceCount,
+							}),
+						);
+						const project =
+							optimizedResourceCount === 0
+								? cloneProjectFn(state.project)
+								: yield* commitFx({
+										state,
+										config: state.project.config,
+										resources: state.project.resources.map((resource) =>
+											optimizedResources.has(resource.id)
+												? {
+														...resource,
+														size: optimizedResources.get(resource.id)!
+															.optimizedBytes,
+													}
+												: resource,
+										),
+										resourceFileWrites: results
+											.filter((result) => result.changed)
+											.map((result) => ({
+												id: result.id,
+												path: result.path,
+											})),
+										nowMs: yield* Clock.currentTimeMillis,
+									});
+						return {
+							optimizedResourceCount,
+							originalBytes,
+							optimizedBytes,
+							processedResourceCount: results.length,
+							project: cloneProjectFn(project),
+						};
+					}),
+				),
 			)
 			.pipe(
 				Effect.provideService(FileSystem.FileSystem, fileSystem),
@@ -673,11 +756,24 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				catch: (cause) =>
 					errorFn("replace-resource", "The resource references are invalid.", cause),
 			});
-			const resource = yield* Effect.try({
+			const parsedResource = yield* Effect.try({
 				try: () => ProjectResourceReplacementSchema.parse(candidateResource),
 				catch: (cause) =>
 					errorFn("replace-resource", "The replacement resource is invalid.", cause),
 			});
+			const parsedFileResource =
+				ProjectResourceFileReplacementSchema.safeParse(parsedResource);
+			const resource = parsedFileResource.success
+				? ProjectResourceReplacementSchema.parse({
+						...parsedFileResource.data,
+						size: yield* validatePngResourceFileFx(
+							parsedFileResource.data.path,
+							parsedFileResource.data.id,
+						),
+					})
+				: parsedResource;
+			const byteResource = ResourceSchema.safeParse(resource);
+			const fileResource = ProjectResourceFileReplacementSchema.safeParse(resource);
 			return yield* commitResourcesFx(
 				"replace-resource",
 				projectId,
@@ -707,20 +803,27 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							{
 								id: resource.id,
 								mime: resource.mime,
-								size: resource.bytes?.byteLength ?? previousResource.size,
+								size: byteResource.success
+									? byteResource.data.bytes.byteLength
+									: fileResource.success
+										? fileResource.data.size
+										: previousResource.size,
 								version: previousResource.version,
 							},
 						],
-						resourceWrites:
-							resource.bytes === undefined
-								? []
-								: [
-										{
-											id: resource.id,
-											mime: resource.mime,
-											bytes: resource.bytes,
-										},
-									],
+						resourceWrites: !byteResource.success
+							? []
+							: [
+									byteResource.data,
+								],
+						resourceFileWrites: !fileResource.success
+							? []
+							: [
+									{
+										id: resource.id,
+										path: fileResource.data.path,
+									},
+								],
 						...(resource.id === currentId
 							? {}
 							: {
@@ -746,5 +849,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		replaceResourceFx,
 		upsertItemFx,
 		upsertResourcesFx,
+		upsertResourceFilesFx,
 	} satisfies Operations;
 });

@@ -19,6 +19,9 @@ const electron = vi.hoisted(() => {
 			}),
 			send: vi.fn(),
 		},
+		webUtils: {
+			getPathForFile: vi.fn(() => "/selected/file"),
+		},
 		readExposed: () => {
 			if (exposed === undefined) throw new Error("Expected preload API exposure.");
 			return exposed;
@@ -33,6 +36,7 @@ const electron = vi.hoisted(() => {
 vi.mock("electron", () => ({
 	contextBridge: electron.contextBridge,
 	ipcRenderer: electron.ipcRenderer,
+	webUtils: electron.webUtils,
 }));
 
 const loadPreload = async () => {

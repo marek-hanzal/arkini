@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { listArkpackFilesFx } from "~electron/main/arkpack/listArkpackFilesFx";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 
 let root = "";
 
@@ -25,23 +26,11 @@ afterEach(async () => {
 
 describe("listArkpackFilesFx", () => {
 	it("bounds the total package bytes retained by one root scan", async () => {
+		const first = createTestArkpack(undefined, "first");
+		const second = createTestArkpack(undefined, "second");
 		await Promise.all([
-			writeFile(
-				join(root, "first.arkpack"),
-				new Uint8Array([
-					1,
-					2,
-					3,
-				]),
-			),
-			writeFile(
-				join(root, "second.arkpack"),
-				new Uint8Array([
-					4,
-					5,
-					6,
-				]),
-			),
+			writeFile(join(root, "first.arkpack"), first),
+			writeFile(join(root, "second.arkpack"), second),
 		]);
 		const fileSystem = await Effect.runPromise(
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
@@ -51,7 +40,7 @@ describe("listArkpackFilesFx", () => {
 			listArkpackFilesFx({
 				root,
 				fileSystem,
-				maxTotalBytes: 3,
+				maxTotalBytes: first.byteLength,
 				source: "user",
 			}),
 		);
@@ -61,10 +50,10 @@ describe("listArkpackFilesFx", () => {
 		]);
 	});
 
-	it("bounds zero-byte candidates independently from the byte budget", async () => {
+	it("bounds candidates independently from the byte budget", async () => {
 		await Promise.all([
-			writeFile(join(root, "first.arkpack"), new Uint8Array()),
-			writeFile(join(root, "second.arkpack"), new Uint8Array()),
+			writeFile(join(root, "first.arkpack"), createTestArkpack(undefined, "first")),
+			writeFile(join(root, "second.arkpack"), createTestArkpack(undefined, "second")),
 		]);
 		const fileSystem = await Effect.runPromise(
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),

@@ -19,17 +19,13 @@ describe("createArkpackCatalogFx state", () => {
 		await expect(
 			Effect.runPromise(
 				catalog.installFx({
-					contentFx: Effect.succeed({
-						bytes: new Uint8Array([
-							1,
-						]),
-					}),
+					contentHash: builtIn.contentHash,
 					expectedCurrent: {
 						packageId: builtIn.packageId,
 						contentHash: "f".repeat(64),
 						version: builtIn.version,
 					},
-					filename: "built.arkpack",
+					expectedRevision: 1,
 					packageId: builtIn.packageId,
 				}),
 			),
@@ -48,13 +44,9 @@ describe("createArkpackCatalogFx state", () => {
 			builtIn,
 		];
 		const list = vi.fn(() => descriptors);
-		const install = vi.fn(({ bytes }: { readonly bytes: Uint8Array }) =>
+		const install = vi.fn(({ contentHash }: { readonly contentHash: string }) =>
 			Effect.sync(() => {
-				expect(bytes).toEqual(
-					new Uint8Array([
-						1,
-					]),
-				);
+				expect(contentHash).toBe(imported.contentHash);
 				descriptors = [
 					builtIn,
 					imported,
@@ -93,7 +85,7 @@ describe("createArkpackCatalogFx state", () => {
 			],
 		});
 
-		const descriptor = await Effect.runPromise(catalog.importFileFx({} as File));
+		const descriptor = await Effect.runPromise(catalog.importFileFx());
 		expect(descriptor).toBe(imported);
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
@@ -114,22 +106,16 @@ describe("createArkpackCatalogFx state", () => {
 		await expect(
 			Effect.runPromise(
 				catalog.installFx({
-					contentFx: Effect.succeed({
-						bytes: new Uint8Array([
-							1,
-						]),
-					}),
+					contentHash: imported.contentHash,
 					expectedCurrent: null,
-					filename: "built.arkpack",
+					expectedRevision: 1,
 					packageId: imported.packageId,
 				}),
 			),
 		).resolves.toBe(imported);
 		expect(install).toHaveBeenCalledWith({
-			bytes: new Uint8Array([
-				1,
-			]),
-			filename: "built.arkpack",
+			contentHash: imported.contentHash,
+			expectedRevision: 1,
 			packageId: imported.packageId,
 		});
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({

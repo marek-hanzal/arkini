@@ -29,7 +29,7 @@ describe("createArkpackCatalogFx concurrency", () => {
 					),
 			});
 
-			const importing = yield* catalog.importFileFx({} as File).pipe(Effect.forkChild);
+			const importing = yield* catalog.importFileFx().pipe(Effect.forkChild);
 			yield* Deferred.await(importStarted);
 			const interrupted = yield* Fiber.interrupt(importing).pipe(Effect.forkChild);
 			yield* Effect.yieldNow;
@@ -97,7 +97,7 @@ describe("createArkpackCatalogFx concurrency", () => {
 
 				const refreshing = yield* catalog.refreshFx.pipe(Effect.forkChild);
 				yield* Deferred.await(firstListStarted);
-				const importing = yield* catalog.importFileFx({} as File).pipe(Effect.forkChild);
+				const importing = yield* catalog.importFileFx().pipe(Effect.forkChild);
 				const removing = yield* catalog.removeFx(imported.packageId).pipe(Effect.forkChild);
 				yield* Effect.yieldNow;
 				expect(order).toEqual([

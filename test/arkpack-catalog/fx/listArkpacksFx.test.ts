@@ -1,34 +1,34 @@
 import { Effect } from "effect";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { listArkpacksFx } from "~/arkpack-catalog/fx/listArkpacksFx";
-import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
-beforeEach(installTestPngDecoder);
+const createStorageFn = (files: ReadonlyArray<ArkpackStorage.Candidate>): ArkpackStorage => ({
+	listFx: Effect.succeed(files),
+	readFx: () => Effect.die("Unexpected exact read."),
+	removeFx: () => Effect.void,
+	openUserDirectoryFx: Effect.void,
+});
 
 describe("listArkpacksFx", () => {
-	it("derives descriptors from the effective raw files", async () => {
-		const bytes = createTestArkpack(undefined, "package:catalog");
-		const storage: ArkpackStorage = {
-			listFx: Effect.succeed([
-				{
-					packageId: "package:catalog",
-					filename: "package%3Acatalog.arkpack",
-					bytes: bytes.buffer,
-					provenance: {
-						type: "community",
-					},
-					source: "user",
-					overridesBundled: true,
+	it("projects installed metadata without reading package bodies", async () => {
+		const storage = createStorageFn([
+			{
+				packageId: "package:catalog",
+				filename: "package%3Acatalog.arkpack",
+				contentHash: "a".repeat(64),
+				title: "Catalog",
+				version: "1.0",
+				arkini: ArkiniAppVersion,
+				provenance: {
+					type: "community",
 				},
-			]),
-			readFx: () => Effect.die("Unexpected exact read."),
-			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
-			openUserDirectoryFx: Effect.void,
-		};
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
 
 		await expect(
 			Effect.runPromise(
@@ -45,37 +45,35 @@ describe("listArkpacksFx", () => {
 		]);
 	});
 
-	it("falls back to bundled when a user candidate fails payload validation", async () => {
-		const bundledBytes = createTestArkpack(undefined, "package:filename");
-		const userBytes = createTestArkpack(undefined, "package:payload");
-		const storage: ArkpackStorage = {
-			listFx: Effect.succeed([
-				{
-					packageId: "package:filename",
-					filename: "package%3Afilename.arkpack",
-					bytes: bundledBytes.buffer,
-					provenance: {
-						type: "official",
-					},
-					source: "bundled",
-					overridesBundled: false,
+	it("falls back to bundled metadata when the user record is invalid", async () => {
+		const storage = createStorageFn([
+			{
+				packageId: "package:fallback",
+				filename: "package%3Afallback.arkpack",
+				contentHash: "a".repeat(64),
+				title: "Bundled",
+				version: "1.0",
+				arkini: ArkiniAppVersion,
+				provenance: {
+					type: "official",
 				},
-				{
-					packageId: "package:filename",
-					filename: "package%3Afilename.arkpack",
-					bytes: userBytes.buffer,
-					provenance: {
-						type: "community",
-					},
-					source: "user",
-					overridesBundled: true,
+				source: "bundled",
+				overridesBundled: false,
+			},
+			{
+				packageId: "package:fallback",
+				filename: "package%3Afallback.arkpack",
+				contentHash: "b".repeat(64),
+				title: "Invalid",
+				version: "invalid",
+				arkini: ArkiniAppVersion,
+				provenance: {
+					type: "community",
 				},
-			]),
-			readFx: () => Effect.die("Unexpected exact read."),
-			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
-			openUserDirectoryFx: Effect.void,
-		};
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
 
 		await expect(
 			Effect.runPromise(
@@ -85,7 +83,7 @@ describe("listArkpacksFx", () => {
 			),
 		).resolves.toEqual([
 			expect.objectContaining({
-				packageId: "package:filename",
+				packageId: "package:fallback",
 				source: "bundled",
 			}),
 		]);

@@ -153,18 +153,22 @@ it.each([
 	async (boundary) => {
 		const editor = await mountEditor();
 		const bytes = createTestPngBytes();
-		let release!: (bytes: ArrayBuffer) => void;
-		const arrayBuffer = vi.fn(
+		let release!: (bitmap: ImageBitmap) => void;
+		const decode = vi.mocked(createImageBitmap).mockImplementation(
 			() =>
-				new Promise<ArrayBuffer>((resolve) => {
+				new Promise<ImageBitmap>((resolve) => {
 					release = resolve;
 				}),
 		);
-		const file = {
-			name: "replacement.png",
-			size: bytes.byteLength,
-			arrayBuffer,
-		} as unknown as File;
+		const file = new File(
+			[
+				bytes,
+			],
+			"replacement.png",
+			{
+				type: "image/png",
+			},
+		);
 		await act(async () => editor.read().setFileFn(file));
 		let saving!: Promise<boolean>;
 		await act(async () => {
@@ -173,7 +177,7 @@ it.each([
 		});
 		expect(editor.read().saving).toBe(true);
 		expect(await editor.read().saveFn()).toBe(false);
-		expect(arrayBuffer).toHaveBeenCalledOnce();
+		expect(decode).toHaveBeenCalledOnce();
 		await act(async () => {
 			if (boundary === "discard") state.session.discardFn();
 			else editor.unmount();
@@ -182,8 +186,11 @@ it.each([
 				revision: 4,
 			};
 		});
-		arrayBuffer.mockImplementation(async () => new Uint8Array(bytes).buffer);
-		release(new Uint8Array(bytes).buffer);
+		release({
+			width: 1,
+			height: 1,
+			close: vi.fn(),
+		} as unknown as ImageBitmap);
 		await act(async () => expect(await saving).toBe(false));
 		expect(state.replaceResource).not.toHaveBeenCalled();
 		expect(state.navigate).not.toHaveBeenCalled();

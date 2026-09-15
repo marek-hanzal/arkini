@@ -1,29 +1,16 @@
+// @vitest-environment jsdom
+
 import { scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Project } from "~/project-authoring/type/Project";
-import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import {
-	ProjectRepository,
-	type ProjectRepositoryService,
-} from "~/project-authoring/service/ProjectRepository";
+import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { importEditorAssetsFx } from "~/asset-authoring/fx/importEditorAssetsFx";
-import {
-	editorTestResources,
-	editorTestPayload,
-} from "~test/project-authoring/support/editorTestPayload";
-import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
-const createPng = () =>
-	Uint8Array.from(
-		Buffer.from(
-			"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-			"base64",
-		),
-	);
-const createProject = (revision = 0): Project => ({
+const project = {
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
 	version: {
@@ -31,275 +18,77 @@ const createProject = (revision = 0): Project => ({
 		minor: 0,
 	},
 	createdAtMs: 1,
-	updatedAtMs: revision + 1,
-	revision,
+	updatedAtMs: 2,
+	revision: 2,
 	config: editorTestPayload.config,
-	resources: editorTestResources,
-});
-const bitmapClose = vi.fn();
-const registries: AtomRegistry.AtomRegistry[] = [];
-
-const createFixture = () => {
-	const registry = AtomRegistry.make({
-		scheduleTask,
-	});
-	registries.push(registry);
-	const upsertResourcesFx = vi.fn<ProjectRepositoryService["upsertResourcesFx"]>(
-		({ resources }) =>
-			Effect.succeed({
-				...createProject(1),
-				resources: [
-					...editorTestResources,
-					...resources.map(({ id, mime, bytes }) => ({
-						id,
-						mime,
-						size: bytes.byteLength,
-						version: "1",
-					})),
-				],
-			}),
-	);
-	const repository: ProjectRepositoryService = {
-		...UnusedEditorProjectRepository,
-		awaitIdleFx: Effect.void,
-		createProjectFx: () => Effect.die("Unexpected create."),
-		listProjectsFx: Effect.die("Unexpected list."),
-		readProjectFx: () => Effect.die("Unexpected read."),
-		replaceConfigFx: () => Effect.die("Unexpected config save."),
-		replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
-		deleteItemFx: () => Effect.die("Unexpected item delete."),
-		upsertItemFx: () => Effect.die("Unexpected item save."),
-		upsertResourcesFx,
-	};
-	return {
-		registry,
-		repository,
-		upsertResourcesFx,
-	};
+	resources: [],
 };
 
-beforeEach(() => {
-	bitmapClose.mockReset();
-	vi.stubGlobal(
-		"createImageBitmap",
-		vi.fn(async () => ({
-			width: 1,
-			height: 1,
-			close: bitmapClose,
-		})),
-	);
-});
-
 afterEach(() => {
-	for (const registry of registries.splice(0)) registry.dispose();
 	vi.unstubAllGlobals();
 });
 
 describe("Asset Authoring importEditorAssetsFx from PNG files", () => {
-	it("validates, atomically commits and publishes one PNG batch", async () => {
-		const fixture = createFixture();
-		const png = createPng();
-		const saved = await Effect.runPromise(
-			importEditorAssetsFx({
-				projectId: "project",
-				source: "files",
-				files: [
-					{
-						name: "New Asset.png",
-						size: png.byteLength,
-						arrayBuffer: async () => png.buffer,
-					},
-					{
-						name: "Other Asset.png",
-						size: png.byteLength,
-						arrayBuffer: async () => png.buffer,
-					},
-				],
-			}).pipe(
-				Effect.provideService(ProjectRepository, fixture.repository),
-				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
-			),
-		);
-
-		expect(saved.resourceIds).toEqual([
-			"new-asset",
-			"other-asset",
-		]);
-		expect(fixture.upsertResourcesFx).toHaveBeenCalledWith({
-			projectId: "project",
-			resources: [
-				{
-					id: "new-asset",
-					mime: "image/png",
-					bytes: png,
+	it("passes only native paths over IPC and publishes the imported project", async () => {
+		const importAssetsFn = vi.fn<ArkiniElectronApi.Api["editor"]["importAssetsFn"]>(
+			async () => ({
+				type: "success",
+				value: {
+					project,
+					resourceIds: [
+						"new-asset",
+						"other-asset",
+					],
 				},
-				{
-					id: "other-asset",
-					mime: "image/png",
-					bytes: png,
-				},
-			],
-		});
-		expect(fixture.registry.get(EditorProjectAtom("project"))?.revision).toBe(1);
-		expect(bitmapClose).toHaveBeenCalledTimes(2);
-	});
-
-	it("bounds concurrent PNG decodes while preserving the selected file order", async () => {
-		const fixture = createFixture();
-		const png = createPng();
-		let active = 0;
-		let maxActive = 0;
-		let started = 0;
-		const pending: Array<() => void> = [];
-		vi.mocked(createImageBitmap).mockImplementation(
-			() =>
-				new Promise<ImageBitmap>((resolve) => {
-					active += 1;
-					started += 1;
-					maxActive = Math.max(maxActive, active);
-					pending.push(() => {
-						active -= 1;
-						resolve({
-							width: 1,
-							height: 1,
-							close: bitmapClose,
-						} as unknown as ImageBitmap);
-					});
-				}),
-		);
-		const files = Array.from(
-			{
-				length: 9,
-			},
-			(_, index) => ({
-				name: `Asset ${index}.png`,
-				size: png.byteLength,
-				arrayBuffer: async () => png.buffer,
 			}),
 		);
-		const saving = Effect.runPromise(
+		vi.stubGlobal("arkini", undefined);
+		Object.defineProperty(window, "arkini", {
+			configurable: true,
+			value: {
+				file: {
+					readPathFn: (file: File) => `/selected/${file.name}`,
+				},
+				editor: {
+					importAssetsFn,
+				},
+			} as unknown as ArkiniElectronApi.Api,
+		});
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		const files = [
+			new File([], "New Asset.png"),
+			new File([], "Other Asset.png"),
+		];
+
+		const imported = await Effect.runPromise(
 			importEditorAssetsFx({
 				projectId: "project",
 				source: "files",
 				files,
-			}).pipe(
-				Effect.provideService(ProjectRepository, fixture.repository),
-				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
-			),
+			}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
 		);
 
-		await vi.waitFor(() => expect(started).toBe(4));
-		expect(maxActive).toBe(4);
-		while (started < files.length) {
-			await vi.waitFor(() => expect(pending.length).toBeGreaterThan(0));
-			const previousStarted = started;
-			for (const release of pending.splice(0)) release();
-			await vi.waitFor(() => expect(started).toBeGreaterThan(previousStarted));
-		}
-		await vi.waitFor(() => expect(pending.length).toBeGreaterThan(0));
-		for (const release of pending.splice(0)) release();
-		const saved = await saving;
-
-		expect(maxActive).toBe(4);
-		expect(saved.resourceIds).toEqual(files.map((_, index) => `asset-${index}`));
-		expect(bitmapClose).toHaveBeenCalledTimes(files.length);
-	});
-
-	it("rejects bytes that only claim a PNG filename before repository admission", async () => {
-		const fixture = createFixture();
-		vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error("decode failed"));
-		const fakePng = new Uint8Array(24);
-		fakePng.set([
-			137,
-			80,
-			78,
-			71,
-			13,
-			10,
-			26,
-			10,
+		expect(importAssetsFn).toHaveBeenCalledWith({
+			files: [
+				{
+					name: "New Asset.png",
+					path: "/selected/New Asset.png",
+				},
+				{
+					name: "Other Asset.png",
+					path: "/selected/Other Asset.png",
+				},
+			],
+			projectId: "project",
+			source: "files",
+		});
+		expect(imported.resourceIds).toEqual([
+			"new-asset",
+			"other-asset",
 		]);
-
-		await expect(
-			Effect.runPromise(
-				importEditorAssetsFx({
-					projectId: "project",
-					source: "files",
-					files: [
-						{
-							name: "fake.png",
-							size: fakePng.byteLength,
-							arrayBuffer: async () => fakePng.buffer,
-						},
-					],
-				}).pipe(
-					Effect.provideService(ProjectRepository, fixture.repository),
-					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
-				),
-			),
-		).rejects.toThrow("must decode as a valid PNG image");
-		expect(fixture.upsertResourcesFx).not.toHaveBeenCalled();
-	});
-
-	it("rejects colliding generated IDs before the atomic repository transaction", async () => {
-		const fixture = createFixture();
-		const png = createPng();
-
-		await expect(
-			Effect.runPromise(
-				importEditorAssetsFx({
-					projectId: "project",
-					source: "files",
-					files: [
-						{
-							name: "Same Asset.png",
-							size: png.byteLength,
-							arrayBuffer: async () => png.buffer,
-						},
-						{
-							name: "same asset.PNG",
-							size: png.byteLength,
-							arrayBuffer: async () => png.buffer,
-						},
-					],
-				}).pipe(
-					Effect.provideService(ProjectRepository, fixture.repository),
-					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
-				),
-			),
-		).rejects.toThrow("occurs more than once in the selected batch");
-		expect(fixture.upsertResourcesFx).not.toHaveBeenCalled();
-		expect(bitmapClose).toHaveBeenCalledTimes(2);
-	});
-
-	it("releases the decoded bitmap when dimension validation fails", async () => {
-		const fixture = createFixture();
-		vi.mocked(createImageBitmap).mockResolvedValueOnce({
-			width: 9000,
-			height: 1,
-			close: bitmapClose,
-		} as unknown as ImageBitmap);
-		const png = createPng();
-
-		await expect(
-			Effect.runPromise(
-				importEditorAssetsFx({
-					projectId: "project",
-					source: "files",
-					files: [
-						{
-							name: "oversized.png",
-							size: png.byteLength,
-							arrayBuffer: async () => png.buffer,
-						},
-					],
-				}).pipe(
-					Effect.provideService(ProjectRepository, fixture.repository),
-					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
-				),
-			),
-		).rejects.toThrow("exceeds the supported PNG dimensions");
-		expect(bitmapClose).toHaveBeenCalledOnce();
-		expect(fixture.upsertResourcesFx).not.toHaveBeenCalled();
+		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(2);
+		registry.dispose();
 	});
 });

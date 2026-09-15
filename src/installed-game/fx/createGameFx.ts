@@ -5,10 +5,6 @@ import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { Game } from "~/installed-game/type/Game";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
-import {
-	createGameResourceUrlsFx,
-	type GameResourceUrls,
-} from "~/playable-game/fx/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
@@ -18,6 +14,11 @@ import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
+
+interface GameResourceUrls {
+	readonly getFn: (resourceId: string) => string;
+	readonly releaseFx: Effect.Effect<void, never, never>;
+}
 
 export namespace createGameFx {
 	export interface Props {
@@ -29,7 +30,7 @@ export namespace createGameFx {
 }
 
 /**
- * Loads one package into a jointly owned session/resource-URL aggregate.
+ * Loads one package into a jointly owned session/resource aggregate.
  *
  * No partially bootstrapped Game escapes: every failure discards the session
  * without writing a save and revokes all object URLs allocated so far.
@@ -113,19 +114,29 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	);
 
 	return yield* Effect.gen(function* () {
-		resourceUrls = yield* createGameResourceUrlsFx({
-			owner: "Game",
-			resources: loaded.payload.resources,
-		});
+		const urls = new Map(
+			loaded.payload.resources.map((resource) => [
+				resource.id,
+				resource.url,
+			]),
+		);
+		resourceUrls = {
+			getFn: (resourceId) => {
+				const url = urls.get(resourceId);
+				if (url === undefined)
+					throw new Error(`Game resource ${resourceId} is unavailable.`);
+				return url;
+			},
+			releaseFx: Effect.sync(() => urls.clear()),
+		};
+		const liveResourceUrls = resourceUrls;
 		if (state === undefined) {
 			// A restored save is already started; only a new state receives the initial command.
 			yield* session.runFx(startFx());
 		}
 
-		const liveResourceUrls = resourceUrls;
 		const diagnostics = yield* installGameDiagnosticsFx({
 			arkpack: loaded.descriptor,
-			arkpackBytes: loaded.bytes,
 			config: loaded.payload.config,
 			restored: state !== undefined,
 			runRendererEffectFn,

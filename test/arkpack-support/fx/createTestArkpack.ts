@@ -1,8 +1,7 @@
-import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 
-import { encodeFx } from "~/arkpack-artifact/fx/encodeFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
+import { encodeTestArkpackPayloadFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { encodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
 import type { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
@@ -49,7 +48,7 @@ export const testArkpackConfig = GameConfigSchema.parse({
 			asset: {
 				scale: 0.8,
 				default: [
-					"asset:water",
+					"asset-water",
 				],
 			},
 			scope: "any",
@@ -72,7 +71,7 @@ export const createTestArkpack = (
 		},
 	};
 	const encoded = Effect.runSync(
-		encodeFx({
+		encodeTestArkpackPayloadFx({
 			version,
 			arkini,
 			config: identifiedConfig,
@@ -83,7 +82,7 @@ export const createTestArkpack = (
 					bytes: createTestPngBytes(),
 				},
 				{
-					id: "asset:water",
+					id: "asset-water",
 					mime: "image/png",
 					bytes: createTestPngBytes(),
 				},
@@ -91,8 +90,8 @@ export const createTestArkpack = (
 		}),
 	);
 	return Effect.runSync(
-		encodeArkpackEnvelopeFx({
-			payload: new Uint8Array(gzipSync(encoded)),
+		encodeTestArkpackEnvelopeFx({
+			payload: encoded,
 		}),
 	);
 };

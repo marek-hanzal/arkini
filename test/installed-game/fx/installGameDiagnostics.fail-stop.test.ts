@@ -12,7 +12,7 @@ const originalWindow = globalThis.window;
 const runRendererEffectFn = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
 const testArkpack = {
 	packageId: "package:test",
-	contentHash: "content:test",
+	contentHash: "0".repeat(64),
 	title: "Test",
 	version: "1.0",
 	arkini: "1",
@@ -55,7 +55,6 @@ describe("Game diagnostics fail-stop", () => {
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
 				arkpack: testArkpack,
-				arkpackBytes: new Uint8Array(),
 				config,
 				restored: false,
 				runRendererEffectFn,

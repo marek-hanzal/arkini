@@ -1,18 +1,18 @@
-import { encode } from "@msgpack/msgpack";
 import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
-import { readArkpackFx } from "~/arkpack-admission/fx/readArkpackFx";
 import { createGameFx as createGameFromPackageFx } from "~/installed-game/fx/createGameFx";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+
+const encodeJsonFn = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
 
 const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffectFn">) =>
 	createGameFromPackageFx({
@@ -21,21 +21,26 @@ const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEff
 	});
 
 const createStorages = async (version = "1.0") => {
-	const bytes = createTestArkpack(testArkpackConfig, testArkpackConfig.meta.id, version);
-	const loaded = await Effect.runPromise(
-		readArkpackFx({
-			bytes,
-			filename: "test.arkpack",
-			provenance: {
-				type: "community",
-			},
-			source: "user",
-		}),
-	);
-	const file: ArkpackStorage.File = {
-		packageId: loaded.descriptor.packageId,
+	const file: ArkpackStorage.LoadedFile = {
+		packageId: testArkpackConfig.meta.id,
 		filename: "test.arkpack",
-		bytes: bytes.slice().buffer,
+		contentHash: "a".repeat(64),
+		title: testArkpackConfig.meta.title,
+		version,
+		arkini: ArkiniAppVersion,
+		config: testArkpackConfig,
+		resources: [
+			{
+				id: "hero",
+				mime: "image/png",
+				url: "arkini://test/hero",
+			},
+			{
+				id: "asset:water",
+				mime: "image/png",
+				url: "arkini://test/asset-water",
+			},
+		],
 		provenance: {
 			type: "community",
 		},
@@ -55,7 +60,6 @@ const createStorages = async (version = "1.0") => {
 					: [],
 			),
 		removeFx: () => Effect.void,
-		writeFx: () => Effect.void,
 		openUserDirectoryFx: Effect.void,
 	};
 	let saved: Uint8Array | null = null;
@@ -74,10 +78,10 @@ const createStorages = async (version = "1.0") => {
 	};
 	return {
 		arkpackStorage,
-		descriptor: loaded.descriptor,
-		packageId: loaded.descriptor.packageId,
+		descriptor: file,
+		packageId: file.packageId,
 		saveKey: {
-			packageId: loaded.descriptor.packageId,
+			packageId: file.packageId,
 		} satisfies GameSaveStorage.Key,
 		readSaved: () => saved,
 		readClearCount: () => clears,
@@ -123,7 +127,7 @@ describe("createGameFx", () => {
 				},
 			}),
 		]);
-		expect(first.getResourceUrlFn("asset:water")).toMatch(/^blob:/);
+		expect(first.getResourceUrlFn("asset:water")).toBe("arkini://test/asset-water");
 		await Effect.runPromise(first.disposeFx);
 		expect(storages.readSaved()).not.toBeNull();
 
@@ -156,7 +160,7 @@ describe("createGameFx", () => {
 		if (bytes === null) throw new Error("Expected a save.");
 		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
 		storages.setSaved(
-			encode({
+			encodeJsonFn({
 				...saved,
 				version: "1.0",
 			}),
@@ -202,7 +206,7 @@ describe("createGameFx", () => {
 		const bytes = storages.readSaved();
 		if (bytes === null) throw new Error("Expected a save.");
 		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
-		const incompatibleBytes = encode({
+		const incompatibleBytes = encodeJsonFn({
 			...saved,
 			version: "2.0",
 		});
@@ -300,7 +304,7 @@ describe("createGameFx", () => {
 				}),
 			}),
 		]);
-		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
+		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		expect(() => game.getResourceUrlFn("asset:water")).toThrow(
 			"Game resource asset:water is unavailable.",
 		);
@@ -335,18 +339,19 @@ describe("createGameFx", () => {
 				saveStorage,
 			}),
 		);
-		const resourceUrl = game.getResourceUrlFn("asset:water");
-
 		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk still full");
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		await expect(Effect.runPromise(game.disposeWithoutSaveFx)).resolves.toBeUndefined();
-		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
+		expect(revokeObjectUrl).not.toHaveBeenCalled();
+		expect(() => game.getResourceUrlFn("asset:water")).toThrow(
+			"Game resource asset:water is unavailable.",
+		);
 	});
 
 	it("rejects an invalid save before constructing or starting a partial game session", async () => {
 		const storages = await createStorages();
 		storages.setSaved(
-			encode({
+			encodeJsonFn({
 				version: "not-a-version",
 				arkini: ArkiniAppVersion,
 				state: {},
@@ -382,14 +387,15 @@ describe("createGameFx", () => {
 			readFx: () =>
 				Effect.succeed([
 					{
-						packageId: storages.packageId,
-						filename: "test.arkpack",
-						bytes: Uint8Array.of(1, 2, 3).buffer,
-						provenance: {
-							type: "community",
+						...storages.descriptor,
+						config: {
+							...testArkpackConfig,
+							meta: {
+								...testArkpackConfig.meta,
+								id: "wrong-package",
+							},
 						},
-						source: "user",
-						overridesBundled: false,
+						resources: [],
 					},
 				]),
 		};
@@ -406,29 +412,5 @@ describe("createGameFx", () => {
 		expect(Option.isSome(failure)).toBe(true);
 		if (Option.isNone(failure)) throw new Error("Expected package failure.");
 		expect(failure.value).not.toBeInstanceOf(GameSaveBootstrapError);
-	});
-
-	it("disposes a partial game bootstrap and revokes created resources when resource setup fails", async () => {
-		const storages = await createStorages();
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:created")
-			.mockImplementationOnce(() => {
-				throw new Error("resource setup failed");
-			});
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
-
-		await expect(
-			Effect.runPromise(
-				createGameFx({
-					packageId: storages.packageId,
-					arkpackStorage: storages.arkpackStorage,
-					saveStorage: storages.saveStorage,
-				}),
-			),
-		).rejects.toThrow("resource setup failed");
-
-		expect(createObjectUrl).toHaveBeenCalledTimes(2);
-		expect(revokeObjectUrl).toHaveBeenCalledWith("blob:created");
 	});
 });

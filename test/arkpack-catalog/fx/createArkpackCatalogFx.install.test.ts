@@ -28,13 +28,9 @@ describe("createArkpackCatalogFx install lifecycle", () => {
 			});
 			yield* catalog.refreshFx;
 			const request = {
-				contentFx: Effect.succeed({
-					bytes: new Uint8Array([
-						1,
-					]),
-				}),
+				contentHash: imported.contentHash,
 				expectedCurrent: null,
-				filename: "imported.arkpack",
+				expectedRevision: 1,
 				packageId: imported.packageId,
 			} as const;
 
@@ -87,13 +83,9 @@ describe("createArkpackCatalogFx install lifecycle", () => {
 
 			expect(
 				yield* catalog.installFx({
-					contentFx: Effect.succeed({
-						bytes: new Uint8Array([
-							1,
-						]),
-					}),
+					contentHash: imported.contentHash,
 					expectedCurrent: null,
-					filename: "imported.arkpack",
+					expectedRevision: 1,
 					packageId: imported.packageId,
 				}),
 			).toBe(imported);
@@ -108,7 +100,7 @@ describe("createArkpackCatalogFx install lifecycle", () => {
 		}),
 	);
 
-	it.effect("joins install content acquisition before reporting catalog idle", () =>
+	it.effect("joins installation before reporting catalog idle", () =>
 		Effect.gen(function* () {
 			const contentStarted = yield* Deferred.make<void>();
 			const releaseContent = yield* Deferred.make<void>();
@@ -116,22 +108,19 @@ describe("createArkpackCatalogFx install lifecycle", () => {
 				listFx: Effect.succeed([
 					builtIn,
 				]),
-				installFx: () => Effect.succeed(imported),
+				installFx: () =>
+					Deferred.succeed(contentStarted, undefined).pipe(
+						Effect.andThen(Deferred.await(releaseContent)),
+						Effect.as(imported),
+					),
 			});
 			yield* catalog.refreshFx;
 
 			const installing = yield* catalog
 				.installFx({
-					contentFx: Deferred.succeed(contentStarted, undefined).pipe(
-						Effect.andThen(Deferred.await(releaseContent)),
-						Effect.as({
-							bytes: new Uint8Array([
-								1,
-							]),
-						}),
-					),
+					contentHash: imported.contentHash,
 					expectedCurrent: null,
-					filename: "imported.arkpack",
+					expectedRevision: 1,
 					packageId: imported.packageId,
 				})
 				.pipe(Effect.forkChild);

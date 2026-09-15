@@ -20,6 +20,7 @@ describe("Arkini user data", () => {
 			game: {
 				root: join(root, "game"),
 				arkpacks: join(root, "game", "arkpacks"),
+				installations: join(root, "game", "installed"),
 				incidents: join(root, "game", "incidents"),
 				preferences: join(root, "game", "preferences"),
 				saves: join(root, "game", "saves"),

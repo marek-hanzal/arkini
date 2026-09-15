@@ -48,9 +48,7 @@ const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 		const signedBytes = yield* signArkpackFileFx({
 			arkpackPath: result.arkpack,
 		});
-		yield* Console.log(
-			`Embedded release proof in ${result.arkpack} (${signedBytes.byteLength} bytes).`,
-		);
+		yield* Console.log(`Embedded release proof in ${result.arkpack} (${signedBytes} bytes).`);
 	}
 });
 
@@ -74,8 +72,4 @@ export const PackCommand = ({ input, name = "pack" }: PackCommand.Props) =>
 				input,
 				silent,
 			}),
-	).pipe(
-		Command.withDescription(
-			"Pack one portable game project into a compressed `.arkpack` file.",
-		),
-	);
+	).pipe(Command.withDescription("Pack one portable game project into an `.arkpack` file."));

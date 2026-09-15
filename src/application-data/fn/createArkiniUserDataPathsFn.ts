@@ -7,6 +7,7 @@ export interface ArkiniUserDataPaths {
 	readonly game: {
 		readonly root: string;
 		readonly arkpacks: string;
+		readonly installations: string;
 		readonly incidents: string;
 		readonly preferences: string;
 		readonly saves: string;
@@ -29,6 +30,7 @@ export const createArkiniUserDataPathsFn = (homePath: string): ArkiniUserDataPat
 		game: {
 			root: gameRoot,
 			arkpacks: join(gameRoot, "arkpacks"),
+			installations: join(gameRoot, "installed"),
 			incidents: join(gameRoot, "incidents"),
 			preferences: join(gameRoot, "preferences"),
 			saves: join(gameRoot, "saves"),

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect, Semaphore } from "effect";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
@@ -14,12 +14,17 @@ import { saveEditorProjectBuildFx } from "../saveEditorProjectBuildFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { join } from "node:path";
+import { access } from "node:fs/promises";
+import { importEditorAssetFilesFx } from "../importEditorAssetFilesFx";
 
 const readEditorWindowFx = (
 	event: IpcMainInvokeEvent,
 	operation:
 		| "export-json-directory"
 		| "import-json-directory"
+		| "import-arkpack"
 		| "optimize-resources"
 		| "save-project-build",
 ) =>
@@ -40,15 +45,23 @@ let registered = false;
 
 export namespace registerEditorProjectIpcFx {
 	export interface Props {
+		readonly bundledArkpacksRoot?: string;
 		readonly diagnostics: DiagnosticLog;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly ownership: EditorProjectServiceOwnership;
+		readonly userArkpacksRoot?: string;
 	}
 }
 
 /** Registers editor-only IPC even when Editor persistence is unavailable. */
 export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx")(
-	({ diagnostics, trustedRenderer, ownership }: registerEditorProjectIpcFx.Props) =>
+	({
+		bundledArkpacksRoot = "",
+		diagnostics,
+		trustedRenderer,
+		ownership,
+		userArkpacksRoot = "",
+	}: registerEditorProjectIpcFx.Props) =>
 		Effect.gen(function* () {
 			const shouldRegister = yield* Effect.sync(() => {
 				if (registered) return false;
@@ -124,15 +137,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						diagnostics,
 						requestParser.parseBuildProjectFx(candidate),
 						(repository, request) => repository.buildProjectFx(request),
-					),
-				);
-				handleFn(ArkiniElectronApi.channels.editorProjectBuildRead, (_event, candidate) =>
-					executeEditorProjectRepositoryFx(
-						"read-project-build",
-						ownership,
-						diagnostics,
-						requestParser.parseReadProjectBuildFx(candidate),
-						(repository, request) => repository.readProjectBuildFx(request),
 					),
 				);
 				handleFn(ArkiniElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
@@ -242,6 +246,93 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}),
 					),
 				);
+				handleFn(ArkiniElectronApi.channels.editorProjectImportArkpack, (event) =>
+					executeEditorProjectRepositoryFx(
+						"import-arkpack",
+						ownership,
+						diagnostics,
+						readEditorWindowFx(event, "import-arkpack"),
+						(repository, window) =>
+							Effect.tryPromise({
+								try: () =>
+									dialog.showOpenDialog(window, {
+										properties: [
+											"openFile",
+										],
+										filters: [
+											{
+												name: "Arkpack",
+												extensions: [
+													"arkpack",
+												],
+											},
+										],
+									}),
+								catch: (cause) =>
+									new ProjectRepositoryError({
+										operation: "import-arkpack",
+										message: "The Arkpack picker could not be opened.",
+										cause,
+									}),
+							}).pipe(
+								Effect.flatMap((selection) => {
+									const arkpackPath = selection.filePaths[0];
+									if (selection.canceled || arkpackPath === undefined)
+										return Effect.succeed(null);
+									return repository.importArkpackFileFx(arkpackPath).pipe(
+										Effect.map((project) => ({
+											projectId: project.projectId,
+											title: project.title,
+											version: project.version,
+											createdAtMs: project.createdAtMs,
+											updatedAtMs: project.updatedAtMs,
+										})),
+									);
+								}),
+							),
+					),
+				);
+				handleFn(
+					ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"import-arkpack",
+							ownership,
+							diagnostics,
+							requestParser.parseProjectIdFx(candidate),
+							(repository, packageId) => {
+								const filename = readArkpackArtifactNameFn(packageId);
+								const userPath = join(userArkpacksRoot, filename);
+								const bundledPath = join(bundledArkpacksRoot, filename);
+								return Effect.tryPromise({
+									try: async () => {
+										try {
+											await access(userPath);
+											return userPath;
+										} catch {
+											await access(bundledPath);
+											return bundledPath;
+										}
+									},
+									catch: (cause) =>
+										new ProjectRepositoryError({
+											operation: "import-arkpack",
+											message: `Arkpack ${packageId} is not installed.`,
+											cause,
+										}),
+								}).pipe(
+									Effect.flatMap(repository.importArkpackFileFx),
+									Effect.map((project) => ({
+										projectId: project.projectId,
+										title: project.title,
+										version: project.version,
+										createdAtMs: project.createdAtMs,
+										updatedAtMs: project.updatedAtMs,
+									})),
+								);
+							},
+						),
+				);
 				handleFn(
 					ArkiniElectronApi.channels.editorProjectOpenDirectory,
 					(_event, candidate) =>
@@ -338,6 +429,21 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
+					ArkiniElectronApi.channels.editorProjectImportAssets,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"upsert-resource",
+							ownership,
+							diagnostics,
+							requestParser.parseImportAssetsFx(candidate),
+							(repository, request) =>
+								importEditorAssetFilesFx({
+									repository,
+									request,
+								}),
+						),
+				);
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -364,7 +470,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorAwaitIdle,
 					ArkiniElectronApi.channels.editorProjectBuild,
 					ArkiniElectronApi.channels.editorProjectBuildVersionSave,
-					ArkiniElectronApi.channels.editorProjectBuildRead,
 					ArkiniElectronApi.channels.editorProjectBuildSave,
 					ArkiniElectronApi.channels.editorProjectCreate,
 					ArkiniElectronApi.channels.editorProjectDismissInvalid,
@@ -373,6 +478,9 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectDeleteResource,
 					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
+					ArkiniElectronApi.channels.editorProjectImportArkpack,
+					ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
+					ArkiniElectronApi.channels.editorProjectImportAssets,
 					ArkiniElectronApi.channels.editorProjectList,
 					ArkiniElectronApi.channels.editorProjectOpenDirectory,
 					ArkiniElectronApi.channels.editorProjectOptimizeResources,

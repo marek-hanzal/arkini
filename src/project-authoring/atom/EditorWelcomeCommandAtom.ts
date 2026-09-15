@@ -36,7 +36,6 @@ export namespace EditorWelcomeCommandAtom {
 		  }
 		| {
 				readonly action: "import-arkpack";
-				readonly file: File;
 		  }
 		| {
 				readonly action: "import-json";
@@ -177,11 +176,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 							Effect.provideService(ProjectRepository, editorProjectRepository),
 						)
 					: command.action === "import-arkpack"
-						? importEditorArkpackFileFx({
-								file: command.file,
-							}).pipe(
-								Effect.provideService(ProjectRepository, editorProjectRepository),
-							)
+						? importEditorArkpackFileFx()
 						: invokeProjectTransportFx({
 								callFn: () => window.arkini.editor.importJsonDirectoryFn(),
 								operation: "import-json-directory",

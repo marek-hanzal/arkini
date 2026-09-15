@@ -1,13 +1,12 @@
 import { Argument, Command } from "effect/unstable/cli";
-import { Console, Effect, FileSystem } from "effect";
+import { Console, Effect } from "effect";
 
-import { verifyArkpackProvenanceFx } from "~/arkpack-artifact/fx/verifyArkpackProvenanceFx";
+import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
+import { verifyArkpackFileProvenanceFx } from "~/arkpack-artifact/fx/verifyArkpackFileProvenanceFx";
 
 const runArkpackVerifyFx = Effect.fn("runArkpackVerifyFx")(function* (arkpackPath: string) {
-	const fileSystem = yield* FileSystem.FileSystem;
-	const provenance = yield* verifyArkpackProvenanceFx({
-		bytes: yield* fileSystem.readFile(arkpackPath),
-	});
+	const layout = yield* readArkpackFileLayoutFx(arkpackPath);
+	const provenance = yield* verifyArkpackFileProvenanceFx(layout);
 	yield* Console.log(JSON.stringify(provenance));
 });
 

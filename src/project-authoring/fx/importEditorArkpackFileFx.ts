@@ -1,29 +1,15 @@
 import { Effect } from "effect";
 
-import {
-	type EditorArkpackFileInput,
-	readSelectedArkpackFileFx,
-} from "~/arkpack-admission/fx/readSelectedArkpackFileFx";
-import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
-import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
-import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
+import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
+import { ProjectDescriptorSchema } from "~/project-authoring/schema/ProjectDescriptorSchema";
 
-export namespace importEditorArkpackFileFx {
-	export interface Props {
-		readonly file: EditorArkpackFileInput;
-	}
-}
-
-/** Validates one Arkpack and creates one managed filesystem Editor project. */
-export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(function* ({
-	file,
-}: importEditorArkpackFileFx.Props) {
-	const loaded = yield* readSelectedArkpackFileFx(file);
-	const repository = yield* ProjectRepository;
-	const project = yield* repository.createProjectFx({
-		version: parseVersionFn(loaded.payload.version),
-		config: loaded.payload.config,
-		resources: loaded.payload.resources,
-	});
-	return project satisfies ProjectDescriptor;
-});
+/** Lets main select and stream-import one Arkpack into a managed Editor project. */
+export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(() =>
+	invokeProjectTransportFx({
+		callFn: () => window.arkini.editor.importArkpackFn(),
+		operation: "import-arkpack",
+		parseFn: (value) => (value === null ? null : ProjectDescriptorSchema.parse(value)),
+		requestMessage: "The editor Arkpack import request failed.",
+		responseMessage: "The editor Arkpack import response is invalid.",
+	}),
+);

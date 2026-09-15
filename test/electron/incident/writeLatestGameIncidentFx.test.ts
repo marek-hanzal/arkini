@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -6,6 +6,9 @@ import { Effect } from "effect";
 
 import { GameIncidentFiles } from "~shared/GameIncidentMetadata";
 import { writeLatestGameIncidentFx } from "~electron/main/incident/writeLatestGameIncidentFx";
+import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 
 let root = "";
 
@@ -22,15 +25,31 @@ afterEach(async () => {
 
 describe("latest game incident files", () => {
 	it("hard-overwrites the fixed Arkpack, save, and themed diagnostic environment", async () => {
+		const bundledArkpacksRoot = join(root, "bundled");
+		const userArkpacksRoot = join(root, "user");
+		const packageId = "game:test";
+		const arkpackPath = join(userArkpacksRoot, readArkpackArtifactNameFn(packageId));
+		await mkdir(userArkpacksRoot, {
+			recursive: true,
+		});
+		let latestArkpack = new Uint8Array();
 		for (const marker of [
 			1,
 			2,
 		]) {
+			latestArkpack = createTestArkpack(undefined, packageId, marker === 1 ? "1.0" : "1.1");
+			await writeFile(arkpackPath, latestArkpack);
+			const layout = await Effect.runPromise(readArkpackFileLayoutFx(arkpackPath));
 			await Effect.runPromise(
 				writeLatestGameIncidentFx({
+					bundledArkpacksRoot,
 					incidentsRoot: root,
 					incident: {
-						arkpackBytes: Uint8Array.of(marker),
+						arkpack: {
+							packageId,
+							contentHash: layout.contentHash,
+							source: "user",
+						},
 						saveBytes: Uint8Array.of(marker + 10),
 						text: {
 							incident: `# Incident ${marker}`,
@@ -39,6 +58,7 @@ describe("latest game incident files", () => {
 							runtimeState: `# Runtime ${marker}`,
 						},
 					},
+					userArkpacksRoot,
 				}),
 			);
 			if (marker === 1) {
@@ -51,9 +71,7 @@ describe("latest game incident files", () => {
 
 		const directory = join(root, GameIncidentFiles.directory);
 		expect(await readFile(join(directory, GameIncidentFiles.arkpack))).toEqual(
-			Buffer.from([
-				2,
-			]),
+			Buffer.from(latestArkpack),
 		);
 		expect(await readFile(join(directory, GameIncidentFiles.save))).toEqual(
 			Buffer.from([

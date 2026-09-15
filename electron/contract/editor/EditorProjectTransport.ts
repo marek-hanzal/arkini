@@ -19,6 +19,7 @@ export namespace EditorProjectTransport {
 		| "delete-note"
 		| "export-json-directory"
 		| "import-json-directory"
+		| "import-arkpack"
 		| "list-notes"
 		| "list-projects"
 		| "open-project-directory"
@@ -107,10 +108,6 @@ export namespace EditorProjectTransport {
 		readonly diagnostics: ReadonlyArray<unknown>;
 	}
 
-	export interface BuildContent {
-		readonly bytes: Uint8Array;
-	}
-
 	export interface BuildRequest {
 		readonly expectedVersion: BuildVersion;
 		readonly expectedRevision: number;
@@ -127,6 +124,22 @@ export namespace EditorProjectTransport {
 		readonly contentHash: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
+	}
+
+	export interface ImportAssetFile {
+		readonly name: string;
+		readonly path: string;
+	}
+
+	export interface ImportAssetsRequest {
+		readonly files: ReadonlyArray<ImportAssetFile>;
+		readonly projectId: string;
+		readonly source: "arkpack" | "files";
+	}
+
+	export interface ImportAssetsResult {
+		readonly project: Project;
+		readonly resourceIds: ReadonlyArray<string>;
 	}
 
 	export interface Note {

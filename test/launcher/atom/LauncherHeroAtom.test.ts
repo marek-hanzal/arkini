@@ -56,7 +56,7 @@ vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 						{
 							id: "hero",
 							mime: "image/png",
-							bytes: Uint8Array.of(1, 2, 3),
+							url: "arkini://test/hero",
 						},
 					],
 				},
@@ -152,15 +152,11 @@ describe("LauncherHeroAtom", () => {
 		registry.dispose();
 	});
 
-	it("reselects the Hero on retry and revokes the prior owned URL once", async () => {
+	it("reselects the installed Hero URL on retry", async () => {
 		const registry = AtomRegistry.make({
 			defaultIdleTTL: 400,
 			scheduleTask,
 		});
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValue("blob:package-hero");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
@@ -175,12 +171,10 @@ describe("LauncherHeroAtom", () => {
 		expect(harness.loadedPackageIds).toEqual([
 			"package:last",
 		]);
-		expect(createObjectUrl).toHaveBeenCalledOnce();
-		expect(createObjectUrl.mock.calls[0]?.[0]).toBeInstanceOf(Blob);
 		expect(harness.preloadedUrls).toEqual([
-			"blob:package-hero",
+			"arkini://test/hero",
 		]);
-		expect(registry.get(LauncherHeroUrlAtom)).toBe("blob:package-hero");
+		expect(registry.get(LauncherHeroUrlAtom)).toBe("arkini://test/hero");
 
 		harness.loadFailure = new Error("package removed");
 		registry.set(retryLauncherStartupAtom, undefined);
@@ -190,14 +184,11 @@ describe("LauncherHeroAtom", () => {
 			expect(registry.get(LauncherHeroUrlAtom)).toBe("/hero.png");
 		});
 		expect(harness.preloadedUrls).toEqual([
-			"blob:package-hero",
+			"arkini://test/hero",
 			"/hero.png",
 		]);
-		expect(revokeObjectUrl).toHaveBeenCalledOnce();
-		expect(revokeObjectUrl).toHaveBeenCalledWith("blob:package-hero");
 
 		registry.dispose();
-		expect(revokeObjectUrl).toHaveBeenCalledOnce();
 	});
 
 	it("uses the public fallback when the last package is unavailable", async () => {
@@ -227,7 +218,7 @@ describe("LauncherHeroAtom", () => {
 		registry.dispose();
 	});
 
-	it("revokes an in-flight owned URL when the registry is disposed", async () => {
+	it("interrupts an in-flight installed Hero preload when the registry is disposed", async () => {
 		const registry = AtomRegistry.make({
 			defaultIdleTTL: 400,
 			scheduleTask,
@@ -236,8 +227,6 @@ describe("LauncherHeroAtom", () => {
 		harness.preloadPromise = new Promise<void>((resolve) => {
 			resolvePreload = resolve;
 		});
-		vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:pending-package-hero");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
@@ -246,18 +235,15 @@ describe("LauncherHeroAtom", () => {
 		registry.mount(LauncherStartupAtom);
 		await vi.waitFor(() =>
 			expect(harness.preloadedUrls).toEqual([
-				"blob:pending-package-hero",
+				"arkini://test/hero",
 			]),
 		);
 
 		registry.dispose();
 		await vi.waitFor(() => {
 			expect(harness.preloadInterruptions).toBe(1);
-			expect(revokeObjectUrl).toHaveBeenCalledOnce();
-			expect(revokeObjectUrl).toHaveBeenCalledWith("blob:pending-package-hero");
 		});
 		resolvePreload();
 		await Promise.resolve();
-		expect(revokeObjectUrl).toHaveBeenCalledOnce();
 	});
 });

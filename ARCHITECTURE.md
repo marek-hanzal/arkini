@@ -101,6 +101,8 @@ The complete mutation, Tick and session navigation is in [`src/game-runtime/READ
 
 Game Session composes Runtime, Tick, save, command/listener scopes and first-failure publication. Playable Game adds resource URLs and presentation fail-stop without package identity. Game Incident records session transitions and failures for both Installed Game and Editor Board; only installed packages produce Arkpack-backed incident archives. Installed Game adds Arkpack/save bootstrap, resource leases and serialized package lifecycle.
 
+Electron main inspects and hashes portable Arkpacks as streams. First use extracts raw resource ranges into a content-hash installation; matching installations are reused optimistically without checking their extracted bodies. Renderer bootstrap receives config plus lazy `arkini://game/resource` URLs, never the archive or resource bytes. The protocol serves contained native files on demand and preserves byte ranges for media. Editor project import reuses the same extraction boundary before publishing a portable source tree.
+
 React mount state is never desired-Game state. Same-package acquisition shares one provisional lease; explicit load adopts it. A different package finalizes the current resource before acquisition.
 
 Ordinary shutdown stops Tick, stops command producers, flushes or discards the latest stable Runtime as requested, then releases the owner scope with its subscriptions and runtime. Fatal quiesce closes transition subscriptions earlier. Concurrent cleanup joins the same attempt. A failed final save leaves the underlying Game Session frozen and capable of retry or explicit discard. Installed Game finalization treats that failure as terminal: its renderer authority retains one critical error and rejects successor acquisition rather than retrying. Reset and Editor replacement use discard-only disposal.
@@ -129,7 +131,7 @@ The router uses history routing in development and packaged Electron. `/` owns r
 
 ## Electron and security
 
-Electron main owns native windows, protocols, privileged IPC and GUI-side filesystem composition. Node-compatible Project and MCP transport capabilities live under their semantic `src` owners, so the GUI and CLI may compose them without importing each other's process root. Renderer domains receive typed capabilities through `electron/contract`; physical paths and native objects never cross it.
+Electron main owns native windows, protocols, privileged IPC and GUI-side filesystem composition. Node-compatible Project and MCP transport capabilities live under their semantic `src` owners, so the GUI and CLI may compose them without importing each other's process root. Renderer domains receive typed capabilities through `electron/contract`; native objects and managed project-internal paths never cross it. A user-selected asset source crosses only as Electron's native path identity so main can copy it without transporting its bytes.
 
 Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. HTTP(S) links requesting a new window from the trusted renderer open in the system browser; Electron popups remain denied, as do other URL schemes and URLs containing credentials. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
@@ -139,7 +141,7 @@ Arkini-owned data is resolved independently from Electron below the effective sy
 
 ```text
 ~/.arkini/diagnostics/  application logs
-~/.arkini/game/         Arkpacks, saves, preferences, latest incident
+~/.arkini/game/         Arkpacks, content-hash installations, saves, preferences, latest incident
 ~/.arkini/editor/       project catalog, managed projects, MCP state
 ```
 
@@ -147,7 +149,7 @@ Arkini-owned data is resolved independently from Electron below the effective sy
 
 Game Persistence observes changed Runtime root identity, debounces and always flushes the latest canonical snapshot. Event-only transitions do not wake it. Persistence is an observer, not gameplay truth.
 
-The Editor's portable current tree is canonical. The GUI Electron main and Node CLI alternatively compose the same filesystem Project Repository; renderer project state, forms, versioned asset URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and use one recoverable current-tree transaction while preserving `.git` and unrelated files.
+The Editor's portable current tree is canonical. The GUI Electron main and Node CLI alternatively compose the same filesystem Project Repository; renderer project state, forms, versioned asset URLs, Build descriptors and Editor Board are projections. Project writes validate expected revision and apply one ordered best-effort file plan while preserving `.git` and unrelated files; there is no journal or aggregate rollback.
 
 External authored JSON and asset-catalog changes are ignored while mounted. Project projections hold resource metadata, never PNG bodies; item/config saves write only changed JSON and the revision marker. Requested previews read current PNG bodies through a bounded cache keyed by disk metadata. Already mounted images and Editor Board are not watched. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the directory metadata and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
 
@@ -155,7 +157,7 @@ The GUI Editor and `arkini-cli editor mcp` are alternative owners of that reposi
 
 Gameplay version is output metadata stored as `{ major, minor, suffix? }` in `game.json`. Build remembers valid settings before compilation without advancing authoring revision or publishing a Board change; failed compilation retains those settings. The produced artifact owns the formatted version used by install compatibility. Ordinary content writes preserve output metadata and retain their normal revision boundary.
 
-Editor Build and CLI pack compile the current saved source tree and verify actual source-file identity and bytes before publication. PNG bodies belong to that build snapshot, not the mounted authoring projection. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Arkpack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
+Editor Build and CLI pack compile the current saved source tree under the project write lock and stream PNG sources into the artifact. PNG bodies never enter the mounted authoring projection. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Arkpack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 
 ## Hosted validation and delivery
 

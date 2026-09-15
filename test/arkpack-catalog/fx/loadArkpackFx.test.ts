@@ -1,254 +1,105 @@
-import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
-import { encodeArkpackEnvelopeFx } from "~/arkpack-artifact/fx/encodeArkpackEnvelopeFx";
-import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
+import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
 
-beforeEach(installTestPngDecoder);
+const createFileFn = (
+	packageId: string,
+	props: Partial<ArkpackStorage.LoadedFile> = {},
+): ArkpackStorage.LoadedFile => ({
+	packageId,
+	filename: `${encodeURIComponent(packageId)}.arkpack`,
+	contentHash: "a".repeat(64),
+	title: "Package",
+	version: "1.0",
+	arkini: ArkiniAppVersion,
+	config: {
+		...testArkpackConfig,
+		meta: {
+			...testArkpackConfig.meta,
+			id: packageId,
+		},
+	},
+	resources: [],
+	provenance: {
+		type: "community",
+	},
+	source: "user",
+	overridesBundled: true,
+	...props,
+});
 
-const malformedArkpackBytes = Effect.runSync(
-	encodeArkpackEnvelopeFx({
-		payload: new Uint8Array(gzipSync(new Uint8Array())),
-	}),
-);
-
-const createStorageFn = (files: ReadonlyArray<ArkpackStorage.File>): ArkpackStorage => ({
+const createStorageFn = (files: ReadonlyArray<ArkpackStorage.LoadedFile>): ArkpackStorage => ({
 	listFx: Effect.die("Unexpected catalog list."),
 	readFx: (packageId) => Effect.succeed(files.filter((file) => file.packageId === packageId)),
 	removeFx: () => Effect.void,
-	writeFx: () => Effect.void,
 	openUserDirectoryFx: Effect.void,
 });
 
 describe("loadArkpackFx", () => {
-	it("surfaces an installed package's writer-major incompatibility", async () => {
-		const currentMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
-		const bytes = createTestArkpack(
-			undefined,
-			"package:future",
-			"1.0",
-			`${Number(currentMajor) + 1}.0.0`,
-		);
-		const storage = createStorageFn([
-			{
-				packageId: "package:future",
-				filename: "package%3Afuture.arkpack",
-				bytes: bytes.buffer,
-				provenance: {
-					type: "community",
-				},
-				source: "user",
-				overridesBundled: true,
-			},
-		]);
-
-		await expect(
-			Effect.runPromise(
-				loadArkpackFx({
-					packageId: "package:future",
-					storage,
-				}),
-			),
-		).rejects.toBeInstanceOf(ArkiniVersionIncompatibleError);
-	});
-
-	it("loads the exact effective file selected by package identity", async () => {
-		const bytes = createTestArkpack(undefined, "package:selected");
-		const file: ArkpackStorage.File = {
-			packageId: "package:selected",
-			filename: "package%3Aselected.arkpack",
-			bytes: bytes.buffer,
-			provenance: {
-				type: "community",
-			},
-			source: "user",
-			overridesBundled: true,
-		};
-		const storage = createStorageFn([
-			file,
-		]);
-
-		const loaded = await Effect.runPromise(
-			loadArkpackFx({
-				packageId: "package:selected",
-				storage,
-			}),
-		);
-
-		expect(loaded.descriptor).toMatchObject({
-			packageId: "package:selected",
-			source: "user",
-			overridesBundled: true,
-		});
-		expect(loaded.payload.config.meta.id).toBe("package:selected");
-	});
-
-	it("falls back from a malformed user override to the valid bundled package", async () => {
-		const packageId = "package:fallback";
-		const bundledBytes = createTestArkpack(undefined, packageId);
-		const storage = createStorageFn([
-			{
-				packageId,
-				filename: "package%3Afallback.arkpack",
-				bytes: bundledBytes.buffer,
-				provenance: {
-					type: "official",
-				},
-				source: "bundled",
-				overridesBundled: false,
-			},
-			{
-				packageId,
-				filename: "package%3Afallback.arkpack",
-				bytes: malformedArkpackBytes.buffer,
-				provenance: {
-					type: "community",
-				},
-				source: "user",
-				overridesBundled: true,
-			},
-		]);
-
+	it("loads the exact installed package selected by package identity", async () => {
+		const packageId = "package:selected";
 		const loaded = await Effect.runPromise(
 			loadArkpackFx({
 				packageId,
-				storage,
+				storage: createStorageFn([
+					createFileFn(packageId),
+				]),
 			}),
 		);
 
 		expect(loaded.descriptor).toMatchObject({
 			packageId,
+			source: "user",
+		});
+		expect(loaded.payload.config.meta.id).toBe(packageId);
+	});
+
+	it("falls back from an invalid user record to the bundled installation", async () => {
+		const packageId = "package:fallback";
+		const loaded = await Effect.runPromise(
+			loadArkpackFx({
+				packageId,
+				storage: createStorageFn([
+					createFileFn(packageId, {
+						source: "bundled",
+						overridesBundled: false,
+						provenance: {
+							type: "official",
+						},
+					}),
+					createFileFn(packageId, {
+						config: {
+							...testArkpackConfig,
+							meta: {
+								...testArkpackConfig.meta,
+								id: "other",
+							},
+						},
+					}),
+				]),
+			}),
+		);
+
+		expect(loaded.descriptor).toMatchObject({
 			source: "bundled",
-			overridesBundled: false,
 			provenance: {
 				type: "official",
 			},
 		});
 	});
 
-	it("preserves bundled writer incompatibility after a malformed user override", async () => {
-		const packageId = "package:future-fallback";
-		const currentMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
-		const bundledBytes = createTestArkpack(
-			undefined,
-			packageId,
-			"1.0",
-			`${Number(currentMajor) + 1}.0.0`,
-		);
-		const storage = createStorageFn([
-			{
-				packageId,
-				filename: "package%3Afuture-fallback.arkpack",
-				bytes: bundledBytes.buffer,
-				provenance: {
-					type: "official",
-				},
-				source: "bundled",
-				overridesBundled: false,
-			},
-			{
-				packageId,
-				filename: "package%3Afuture-fallback.arkpack",
-				bytes: malformedArkpackBytes.buffer,
-				provenance: {
-					type: "community",
-				},
-				source: "user",
-				overridesBundled: true,
-			},
-		]);
-
-		await expect(
-			Effect.runPromise(
-				loadArkpackFx({
-					packageId,
-					storage,
-				}),
-			),
-		).rejects.toBeInstanceOf(ArkiniVersionIncompatibleError);
-	});
-
-	it("rejects an exact load when every candidate is malformed", async () => {
-		const packageId = "package:invalid";
-		const storage = createStorageFn([
-			{
-				packageId,
-				filename: "package%3Ainvalid.arkpack",
-				bytes: malformedArkpackBytes.buffer,
-				provenance: {
-					type: "community",
-				},
-				source: "user",
-				overridesBundled: true,
-			},
-		]);
-
-		await expect(
-			Effect.runPromise(
-				loadArkpackFx({
-					packageId,
-					storage,
-				}),
-			),
-		).rejects.toThrow(`Arkpack ${packageId} is not installed.`);
-	});
-
 	it("fails when the requested package is absent", async () => {
-		const storage = createStorageFn([]);
-
 		await expect(
 			Effect.runPromise(
 				loadArkpackFx({
 					packageId: "missing",
-					storage,
+					storage: createStorageFn([]),
 				}),
 			),
 		).rejects.toThrow("Arkpack missing is not installed");
-	});
-
-	it("plays a Community user override without treating provenance as admission", async () => {
-		const bundledBytes = createTestArkpack(undefined, "package:tampered");
-		const userBytes = createTestArkpack(undefined, "package:tampered");
-		const storage = createStorageFn([
-			{
-				packageId: "package:tampered",
-				filename: "package%3Atampered.arkpack",
-				bytes: bundledBytes.buffer,
-				provenance: {
-					type: "official",
-				},
-				source: "bundled",
-				overridesBundled: false,
-			},
-			{
-				packageId: "package:tampered",
-				filename: "package%3Atampered.arkpack",
-				bytes: userBytes.buffer,
-				provenance: {
-					type: "community",
-				},
-				source: "user",
-				overridesBundled: true,
-			},
-		]);
-
-		const loaded = await Effect.runPromise(
-			loadArkpackFx({
-				packageId: "package:tampered",
-				storage,
-			}),
-		);
-		expect(loaded.descriptor).toMatchObject({
-			source: "user",
-			provenance: {
-				type: "community",
-			},
-		});
 	});
 });

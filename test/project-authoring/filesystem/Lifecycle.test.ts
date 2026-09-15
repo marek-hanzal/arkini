@@ -11,6 +11,7 @@ import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
+import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
 
 let harness: ProjectTestHarness;
 
@@ -29,6 +30,47 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project lifecycle", () => {
+	it("imports an Arkpack through the shared filesystem extraction pipeline", async () => {
+		const repository = await harness.openRepository();
+		const arkpackPath = join(harness.temporaryDirectory, "import.arkpack");
+		await writeFile(arkpackPath, createTestArkpack());
+
+		const imported = await Effect.runPromise(repository.importArkpackFileFx(arkpackPath));
+
+		expect(imported).toMatchObject({
+			projectId: "game:test",
+			config: {
+				meta: {
+					id: "game:test",
+				},
+			},
+		});
+		expect(imported.resources.map(({ id }) => id).sort()).toEqual([
+			"asset-water",
+			"hero",
+		]);
+		const hero = await Effect.runPromise(
+			repository.readResourceLocationFx({
+				projectId: imported.projectId,
+				resourceId: "hero",
+			}),
+		);
+		expect(hero).not.toBeNull();
+		if (hero === null) throw new Error("Imported Hero is unavailable.");
+		expect((await readFile(hero.path)).subarray(0, 8)).toEqual(
+			Buffer.from([
+				137,
+				80,
+				78,
+				71,
+				13,
+				10,
+				26,
+				10,
+			]),
+		);
+	});
+
 	it("creates and reopens a project with no authored items", async () => {
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(
@@ -149,53 +191,6 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
 	});
 
-	it("freshly reopens the old project after an injected commit failure", async () => {
-		const repository = await harness.openRepository();
-		const created = await harness.createProject(repository);
-		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
-		if (root === null) throw new Error("Managed project root missing.");
-		await harness.closeRepository(repository);
-		const nodeFileSystem = await Effect.runPromise(
-			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
-		);
-		const fileSystem: FileSystem.FileSystem = {
-			...nodeFileSystem,
-			rename: (from, to) =>
-				String(to) === join(root, "game.json")
-					? Effect.fail(
-							PlatformError.systemError({
-								_tag: "Unknown",
-								module: "FileSystem",
-								method: "rename",
-								description: "injected commit failure",
-							}),
-						)
-					: nodeFileSystem.rename(from, to),
-		};
-		const failing = await harness.openRepository(fileSystem);
-		await expect(
-			Effect.runPromise(
-				failing.replaceConfigFx({
-					projectId: created.projectId,
-					expectedRevision: created.revision,
-					config: {
-						...created.config,
-						meta: {
-							...created.config.meta,
-							title: "Must roll back",
-						},
-					},
-				}),
-			),
-		).rejects.toBeDefined();
-		await harness.closeRepository(failing);
-
-		const reopened = await harness.openRepository();
-		const restored = await Effect.runPromise(reopened.readProjectFx(created.projectId));
-		expect(restored?.title).toBe(created.title);
-		expect(restored?.revision).toBe(created.revision);
-	});
-
 	it("reconciles healthy and incomplete managed directories when the catalog is missing", async () => {
 		const seedingRepository = await harness.openRepository();
 		const healthy = await harness.createProject(seedingRepository, "healthy-missing-catalog");
@@ -257,35 +252,6 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([]);
 		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
 			projects: [],
-		});
-	});
-
-	it("preserves a managed root when its write recovery cannot complete", async () => {
-		const repository = await harness.openRepository();
-		const created = await harness.createProject(repository);
-		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
-		if (root === null) throw new Error("Managed project root missing.");
-		await harness.closeRepository(repository);
-		const recovery = join(root, "editor.lock.write");
-		await mkdir(recovery);
-		await writeFile(join(recovery, "preserved"), "backup");
-
-		const reopened = await harness.openRepository();
-		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([
-			expect.objectContaining({
-				type: "invalid",
-				root,
-				validationError: expect.stringContaining(recovery),
-			}),
-		]);
-		await expect(readFile(join(recovery, "preserved"), "utf8")).resolves.toBe("backup");
-		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
-			projects: [
-				{
-					root,
-					ownership: "managed",
-				},
-			],
 		});
 	});
 

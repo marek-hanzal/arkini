@@ -19,14 +19,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 						operation: "list",
 						cause,
 					}),
-			}).pipe(
-				Effect.map((files) =>
-					files.map((file) => ({
-						...file,
-						bytes: file.bytes.slice().buffer,
-					})),
-				),
-			),
+			}),
 			readFx: Effect.fn("ArkpackStorage.readFx")((packageId: string) =>
 				Effect.tryPromise({
 					try: () => api.readFn(packageId),
@@ -35,14 +28,7 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 							operation: "read",
 							cause,
 						}),
-				}).pipe(
-					Effect.map((records) =>
-						records.map((record) => ({
-							...record,
-							bytes: record.bytes.slice().buffer,
-						})),
-					),
-				),
+				}),
 			),
 			removeFx: Effect.fn("ArkpackStorage.removeFx")((packageId: string) =>
 				Effect.tryPromise({
@@ -54,13 +40,17 @@ export const createElectronArkpackStorageFx = Effect.fn("createElectronArkpackSt
 						}),
 				}),
 			),
-			writeFx: Effect.fn("ArkpackStorage.writeFx")((packageId: string, bytes: ArrayBuffer) =>
+			importFx: Effect.tryPromise({
+				try: () => api.importFn(),
+				catch: (cause) =>
+					new ArkpackStorageError({
+						operation: "install",
+						cause,
+					}),
+			}),
+			installEditorBuildFx: Effect.fn("ArkpackStorage.installEditorBuildFx")((record) =>
 				Effect.tryPromise({
-					try: () =>
-						api.installFn({
-							packageId,
-							bytes: new Uint8Array(bytes.slice(0)),
-						}),
+					try: () => api.installEditorBuildFn(record),
 					catch: (cause) =>
 						new ArkpackStorageError({
 							operation: "install",

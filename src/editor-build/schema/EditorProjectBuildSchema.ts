@@ -24,19 +24,3 @@ export type EditorProjectBuildSchema = typeof EditorProjectBuildSchema;
 export namespace EditorProjectBuildSchema {
 	export type Type = z.infer<EditorProjectBuildSchema>;
 }
-
-export const EditorProjectBuildContentSchema = z
-	.object({
-		bytes: z.instanceof(Uint8Array),
-	})
-	.strict()
-	.meta({
-		id: "EditorProjectBuildContentSchema",
-		description: "Bounded bytes read from one exact current Editor build artifact.",
-	});
-
-export type EditorProjectBuildContentSchema = typeof EditorProjectBuildContentSchema;
-
-export namespace EditorProjectBuildContentSchema {
-	export type Type = z.infer<EditorProjectBuildContentSchema>;
-}

@@ -23,9 +23,9 @@ describe("filesystem build version metadata", () => {
 		const published: Array<string> = [];
 		const repository = await harness.openRepository({
 			...nodeFileSystem,
-			rename: (from, to) => {
-				if (String(from) === `${String(to)}.arkini-replace`) published.push(String(to));
-				return nodeFileSystem.rename(from, to);
+			writeFile: (target, bytes, options) => {
+				published.push(String(target));
+				return nodeFileSystem.writeFile(target, bytes, options);
 			},
 		});
 		const project = await harness.createProject(repository);
@@ -174,30 +174,26 @@ describe("filesystem build version metadata", () => {
 		).toEqual(project.version);
 	});
 
-	it("rolls back a failed version write before publishing repository state", async () => {
+	it("does not publish repository state when the version write fails", async () => {
 		const nodeFileSystem = await Effect.runPromise(
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
 		);
 		let fail = false;
 		const repository = await harness.openRepository({
 			...nodeFileSystem,
-			rename: (from, to) => {
-				if (
-					fail &&
-					String(from) === `${String(to)}.arkini-replace` &&
-					basename(String(to)) === "game.json"
-				) {
+			writeFile: (target, bytes, options) => {
+				if (fail && basename(String(target)) === "game.json") {
 					fail = false;
 					return Effect.fail(
 						PlatformError.systemError({
 							_tag: "Unknown",
 							module: "FileSystem",
-							method: "rename",
+							method: "writeFile",
 							description: "Injected version publication failure",
 						}),
 					);
 				}
-				return nodeFileSystem.rename(from, to);
+				return nodeFileSystem.writeFile(target, bytes, options);
 			},
 		});
 		const project = await harness.createProject(repository);

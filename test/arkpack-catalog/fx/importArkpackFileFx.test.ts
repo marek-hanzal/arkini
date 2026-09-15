@@ -1,24 +1,41 @@
 import { Effect } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { importArkpackFileFx } from "~/arkpack-catalog/fx/importArkpackFileFx";
+import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 
 describe("importArkpackFileFx", () => {
-	it("rejects oversized files before arrayBuffer allocates their contents", async () => {
-		const arrayBuffer = vi.fn<() => Promise<ArrayBuffer>>();
+	it("delegates native selection and streamed import to storage", async () => {
+		const imported: ArkpackStorage.FilesystemFile = {
+			packageId: "package:test",
+			filename: "package%3Atest.arkpack",
+			contentHash: "a".repeat(64),
+			title: "Test",
+			version: "1.0",
+			arkini: "0.5.0",
+			provenance: {
+				type: "community",
+			},
+			source: "user",
+			overridesBundled: false,
+		};
+		const storage = {
+			listFx: Effect.succeed([]),
+			readFx: () => Effect.succeed([]),
+			removeFx: () => Effect.void,
+			importFx: Effect.succeed(imported),
+			openUserDirectoryFx: Effect.void,
+		} satisfies ArkpackStorage;
 
 		await expect(
 			Effect.runPromise(
 				importArkpackFileFx({
-					file: {
-						name: "oversized.arkpack",
-						size: ArkpackLimits.maxArkpackBytes + 1,
-						arrayBuffer,
-					},
+					storage,
 				}),
 			),
-		).rejects.toThrow("byte limit");
-		expect(arrayBuffer).not.toHaveBeenCalled();
+		).resolves.toMatchObject({
+			packageId: "package:test",
+			contentHash: "a".repeat(64),
+		});
 	});
 });

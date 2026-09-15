@@ -3,12 +3,12 @@
 import { RegistryContext, scheduleTask, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { StrictMode, act, createElement } from "react";
+import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AboutPortraitAssetsAtom } from "~/launcher/atom/AboutPortraitAssetsAtom";
 import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { AboutPortraitAssetsAtom } from "~/launcher/atom/AboutPortraitAssetsAtom";
 
 (
 	globalThis as {
@@ -50,17 +50,17 @@ const payload = {
 		{
 			id: "hero",
 			mime: "image/png",
-			bytes: Uint8Array.of(0),
+			url: "arkini://game/resource/hero",
 		},
 		{
 			id: "avatar:one",
 			mime: "image/png",
-			bytes: Uint8Array.of(1),
+			url: "arkini://game/resource/avatar-one",
 		},
 		{
 			id: "avatar:two",
 			mime: "image/webp",
-			bytes: Uint8Array.of(2),
+			url: "arkini://game/resource/avatar-two",
 		},
 	],
 };
@@ -89,10 +89,28 @@ const PortraitProbe = () => {
 	return createElement("output", null, JSON.stringify(urls));
 };
 
+const mountProbe = async (registry: AtomRegistry.AtomRegistry) => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(
+				RegistryContext.Provider,
+				{
+					value: registry,
+				},
+				createElement(PortraitProbe),
+			),
+		);
+	});
+	return container;
+};
+
 beforeEach(() => {
 	harness.loadFailure = undefined;
 	harness.loadedPackageIds.length = 0;
-	vi.restoreAllMocks();
 });
 
 afterEach(async () => {
@@ -104,253 +122,43 @@ afterEach(async () => {
 });
 
 describe("AboutPortraitAssetsAtom", () => {
-	it("loads resolvable portraits in stable role order and attempts every revocation when one fails", async () => {
+	it("loads installed portrait URLs in stable role order", async () => {
 		const registry = AtomRegistry.make({
 			defaultIdleTTL: 400,
 			scheduleTask,
 		});
 		registries.push(registry);
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:avatar-01")
-			.mockReturnValueOnce("blob:avatar-05");
-		const revokeObjectUrl = vi
-			.spyOn(URL, "revokeObjectURL")
-			.mockImplementationOnce(() => {
-				throw new Error("first portrait revocation failed");
-			})
-			.mockImplementationOnce(() => undefined);
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
+		const container = await mountProbe(registry);
 
-		await act(async () => {
-			root.render(
-				createElement(
-					RegistryContext.Provider,
-					{
-						value: registry,
-					},
-					createElement(PortraitProbe),
-				),
-			);
-		});
 		await vi.waitFor(() =>
 			expect(container.textContent).toBe(
 				JSON.stringify([
-					"blob:avatar-01",
-					"blob:avatar-05",
+					"arkini://game/resource/avatar-two",
+					"arkini://game/resource/avatar-one",
 				]),
 			),
 		);
-
 		expect(harness.loadedPackageIds).toEqual([
 			ArkiniDefaultPackageId,
 		]);
-		expect(createObjectUrl).toHaveBeenCalledTimes(2);
-		const blobs = createObjectUrl.mock.calls.map(([source]) => {
-			expect(source).toBeInstanceOf(Blob);
-			if (!(source instanceof Blob)) throw new Error("Expected one portrait Blob.");
-			return source;
-		});
-		expect(blobs.map(({ type }) => type)).toEqual([
-			"image/webp",
-			"image/png",
-		]);
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-
-		registry.dispose();
-		await vi.waitFor(() => expect(revokeObjectUrl).toHaveBeenCalledTimes(2));
-		expect(revokeObjectUrl.mock.calls).toEqual([
-			[
-				"blob:avatar-01",
-			],
-			[
-				"blob:avatar-05",
-			],
-		]);
 	});
 
-	it("maps an ordinary load failure to the empty presentation without creating URLs", async () => {
+	it("maps an ordinary load failure to the empty presentation", async () => {
 		harness.loadFailure = new Error("portrait package unavailable");
 		const registry = AtomRegistry.make({
 			defaultIdleTTL: 400,
 			scheduleTask,
 		});
 		registries.push(registry);
-		const createObjectUrl = vi.spyOn(URL, "createObjectURL");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
+		const container = await mountProbe(registry);
 
-		await act(async () => {
-			root.render(
-				createElement(
-					RegistryContext.Provider,
-					{
-						value: registry,
-					},
-					createElement(PortraitProbe),
-				),
-			);
-		});
 		await vi.waitFor(() => {
 			const result = registry.get(AboutPortraitAssetsAtom);
 			expect(AsyncResult.isSuccess(result) && !result.waiting).toBe(true);
 		});
-
 		expect(container.textContent).toBe("[]");
 		expect(harness.loadedPackageIds).toEqual([
 			ArkiniDefaultPackageId,
-		]);
-		expect(createObjectUrl).not.toHaveBeenCalled();
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-	});
-
-	it("cleans a partially created URL batch before publishing the empty fallback", async () => {
-		const registry = AtomRegistry.make({
-			defaultIdleTTL: 400,
-			scheduleTask,
-		});
-		registries.push(registry);
-		vi.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:partial-portrait")
-			.mockImplementationOnce(() => {
-				throw new Error("object URL allocation failed");
-			});
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () => {
-			root.render(
-				createElement(
-					RegistryContext.Provider,
-					{
-						value: registry,
-					},
-					createElement(PortraitProbe),
-				),
-			);
-		});
-		await vi.waitFor(() => {
-			const result = registry.get(AboutPortraitAssetsAtom);
-			expect(AsyncResult.isSuccess(result) && !result.waiting).toBe(true);
-		});
-
-		expect(container.textContent).toBe("[]");
-		expect(revokeObjectUrl).toHaveBeenCalledOnce();
-		expect(revokeObjectUrl).toHaveBeenCalledWith("blob:partial-portrait");
-		registry.dispose();
-		expect(revokeObjectUrl).toHaveBeenCalledOnce();
-	});
-
-	it("keeps one owner across a quick unmount/remount and eventually revokes after unmount", async () => {
-		const registry = AtomRegistry.make({
-			defaultIdleTTL: 400,
-			scheduleTask,
-		});
-		registries.push(registry);
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:remount-one")
-			.mockReturnValueOnce("blob:remount-two");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () => {
-			root.render(
-				createElement(
-					RegistryContext.Provider,
-					{
-						value: registry,
-					},
-					createElement(PortraitProbe),
-				),
-			);
-		});
-		await vi.waitFor(() => expect(createObjectUrl).toHaveBeenCalledTimes(2));
-
-		await act(async () => root.render(null));
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-		await act(async () => {
-			root.render(
-				createElement(
-					RegistryContext.Provider,
-					{
-						value: registry,
-					},
-					createElement(PortraitProbe),
-				),
-			);
-		});
-		expect(createObjectUrl).toHaveBeenCalledTimes(2);
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-
-		await act(async () => root.render(null));
-		await vi.waitFor(() => expect(revokeObjectUrl).toHaveBeenCalledTimes(2));
-		expect(harness.loadedPackageIds).toEqual([
-			ArkiniDefaultPackageId,
-		]);
-	});
-
-	it("does not duplicate or prematurely revoke portrait ownership under StrictMode", async () => {
-		const registry = AtomRegistry.make({
-			defaultIdleTTL: 400,
-			scheduleTask,
-		});
-		registries.push(registry);
-		const createObjectUrl = vi
-			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:strict-one")
-			.mockReturnValueOnce("blob:strict-two");
-		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () => {
-			root.render(
-				createElement(
-					StrictMode,
-					null,
-					createElement(
-						RegistryContext.Provider,
-						{
-							value: registry,
-						},
-						createElement(PortraitProbe),
-					),
-				),
-			);
-		});
-		await vi.waitFor(() => expect(createObjectUrl).toHaveBeenCalledTimes(2));
-
-		expect(harness.loadedPackageIds).toEqual([
-			ArkiniDefaultPackageId,
-		]);
-		expect(revokeObjectUrl).not.toHaveBeenCalled();
-
-		await act(async () => root.unmount());
-		roots.splice(roots.indexOf(root), 1);
-		registry.dispose();
-		await vi.waitFor(() => expect(revokeObjectUrl).toHaveBeenCalledTimes(2));
-		expect(revokeObjectUrl.mock.calls).toEqual([
-			[
-				"blob:strict-one",
-			],
-			[
-				"blob:strict-two",
-			],
 		]);
 	});
 });

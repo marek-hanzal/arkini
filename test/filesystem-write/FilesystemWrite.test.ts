@@ -60,17 +60,17 @@ describe("FilesystemWrite", () => {
 		const canonicalSame = join(canonicalRoot, "same");
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
-			rename: (oldPath, newPath) => {
-				if (String(newPath) === canonicalFirst)
+			writeFile: (target, bytes, options) => {
+				if (String(target) === canonicalFirst)
 					return Deferred.succeed(firstEntered, undefined).pipe(
 						Effect.andThen(Deferred.await(releaseFirst)),
-						Effect.andThen(nodeFileSystem.rename(oldPath, newPath)),
+						Effect.andThen(nodeFileSystem.writeFile(target, bytes, options)),
 					);
-				if (String(newPath) === canonicalSame)
+				if (String(target) === canonicalSame)
 					return Deferred.succeed(sameEntered, undefined).pipe(
-						Effect.andThen(nodeFileSystem.rename(oldPath, newPath)),
+						Effect.andThen(nodeFileSystem.writeFile(target, bytes, options)),
 					);
-				return nodeFileSystem.rename(oldPath, newPath);
+				return nodeFileSystem.writeFile(target, bytes, options);
 			},
 		};
 		const [one, two, three] = await Promise.all([
@@ -111,41 +111,19 @@ describe("FilesystemWrite", () => {
 		]);
 	});
 
-	it("keeps the old file until one synced rename publishes the new file", async () => {
+	it("reports a failed direct replacement and allows a retry", async () => {
 		const target = join(root, "target.json");
 		await writeFile(target, "old");
 		const nodeFileSystem = await readNodeFileSystem();
 		const canonicalRoot = await Effect.runPromise(nodeFileSystem.realPath(root));
 		const canonicalTarget = join(canonicalRoot, "target.json");
-		const pending = `${canonicalTarget}.arkini-replace`;
-		let rejectRename = true;
-		let synced = false;
+		let rejectWrite = true;
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
-			open: (candidate, options) =>
-				nodeFileSystem.open(candidate, options).pipe(
-					Effect.map((file) =>
-						String(candidate) === pending
-							? new Proxy(file, {
-									get(target, property, receiver) {
-										if (property !== "sync")
-											return Reflect.get(target, property, receiver);
-										return file.sync.pipe(
-											Effect.tap(() =>
-												Effect.sync(() => {
-													synced = true;
-												}),
-											),
-										);
-									},
-								})
-							: file,
-					),
-				),
-			rename: (from, to) =>
-				String(to) === canonicalTarget && rejectRename
-					? Effect.fail(systemError("rename"))
-					: nodeFileSystem.rename(from, to),
+			writeFile: (target, bytes, options) =>
+				String(target) === canonicalTarget && rejectWrite
+					? Effect.fail(systemError("writeFile"))
+					: nodeFileSystem.writeFile(target, bytes, options),
 		};
 		const filesystemWrite = await createWrite(fileSystem);
 		const replace = () =>
@@ -158,23 +136,11 @@ describe("FilesystemWrite", () => {
 			);
 
 		await expect(replace()).rejects.toThrow("replacement failed");
-		expect(synced).toBe(true);
 		await expect(readFile(target, "utf8")).resolves.toBe("old");
-		await expect(lstat(pending)).rejects.toMatchObject({
-			code: "ENOENT",
-		});
 
-		rejectRename = false;
-		synced = false;
+		rejectWrite = false;
 		await expect(replace()).resolves.toBeUndefined();
-		expect(synced).toBe(true);
 		await expect(readFile(target, "utf8")).resolves.toBe("new");
-		await expect(lstat(pending)).rejects.toMatchObject({
-			code: "ENOENT",
-		});
-		await expect(lstat(join(canonicalRoot, ".target.lock.write"))).rejects.toMatchObject({
-			code: "ENOENT",
-		});
 	});
 
 	it("bounds independent replacements under one held lock", async () => {
@@ -186,15 +152,15 @@ describe("FilesystemWrite", () => {
 		let maximumActive = 0;
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
-			rename: (from, to) =>
-				String(to).endsWith(".json")
+			writeFile: (target, bytes, options) =>
+				String(target).endsWith(".json")
 					? Effect.gen(function* () {
 							active += 1;
 							entered += 1;
 							maximumActive = Math.max(maximumActive, active);
 							if (entered === 4) yield* Deferred.succeed(fourEntered, undefined);
 							yield* Deferred.await(releaseWrites);
-							yield* nodeFileSystem.rename(from, to);
+							yield* nodeFileSystem.writeFile(target, bytes, options);
 						}).pipe(
 							Effect.ensuring(
 								Effect.sync(() => {
@@ -202,7 +168,7 @@ describe("FilesystemWrite", () => {
 								}),
 							),
 						)
-					: nodeFileSystem.rename(from, to),
+					: nodeFileSystem.writeFile(target, bytes, options),
 		};
 		const filesystemWrite = await createWrite(fileSystem);
 		const files = Array.from(

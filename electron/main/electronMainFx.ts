@@ -9,6 +9,7 @@ import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { createEditorResourceProtocolFx } from "./createEditorResourceProtocolFx";
 import { handleArkiniProtocolRequestFx } from "./handleArkiniProtocolRequestFx";
+import { createGameResourceProtocolFx } from "./createGameResourceProtocolFx";
 import { registerArkiniElectronIpcFx } from "./registerArkiniElectronIpcFx";
 import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
 import { createFilesystemCheatPreferencesFx } from "./cheat/createFilesystemCheatPreferencesFx";
@@ -256,6 +257,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 					isTrustedUrlFn: trustedRenderer.isTrustedUrlFn,
 				})
 			: undefined;
+	const gameResourceProtocol = yield* createGameResourceProtocolFx({
+		installationsRoot: userDataPaths.game.installations,
+		isTrustedUrlFn: trustedRenderer.isTrustedUrlFn,
+	});
 	yield* Effect.sync(() => {
 		protocol.handle("arkini", (request) =>
 			ElectronMainRuntime.runPromise(
@@ -263,6 +268,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 					request,
 					rendererRoot,
 					handleEditorResourceRequestFx: editorResourceProtocol?.handleRequestFx,
+					handleGameResourceRequestFx: gameResourceProtocol.handleRequestFx,
 				}),
 			),
 		);
@@ -279,11 +285,16 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		windowPreferences,
 		diagnostics,
 		userDataPaths,
+		editorProjectServiceOwnership,
 	});
 	yield* registerEditorProjectIpcFx({
+		bundledArkpacksRoot: app.isPackaged
+			? join(process.resourcesPath, "game")
+			: resolve("game/arkini/build"),
 		diagnostics,
 		trustedRenderer,
 		ownership: editorProjectServiceOwnership,
+		userArkpacksRoot: userDataPaths.game.arkpacks,
 	});
 	yield* registerEditorMcpPreferencesIpcFx({
 		trustedRenderer,

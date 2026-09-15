@@ -1,7 +1,6 @@
 import { Cause, Effect, Exit, Option, Semaphore, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import { importArkpackFileFx } from "~/arkpack-catalog/fx/importArkpackFileFx";
-import { importArkpackFx } from "~/arkpack-catalog/fx/importArkpackFx";
 import { listArkpacksFx } from "~/arkpack-catalog/fx/listArkpacksFx";
 import { createElectronArkpackStorageFx } from "~/arkpack-catalog/fx/createElectronArkpackStorageFx";
 
@@ -16,20 +15,26 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 
 			const listFx = props.listFx ?? listArkpacksFx();
 			const importFileDependencyFx = Effect.fn("ArkpackCatalog.importFileDependencyFx")(
-				props.importFileFx ??
-					((file: File) =>
-						importArkpackFileFx({
-							file,
-						})),
+				props.importFileFx ?? (() => importArkpackFileFx()),
 			);
-			const installDependencyFx = Effect.fn("ArkpackCatalog.installDependencyFx")(
+			const installEditorBuildDependencyFx = Effect.fn(
+				"ArkpackCatalog.installEditorBuildDependencyFx",
+			)(
 				props.installFx ??
-					(({ bytes, filename, packageId }) =>
-						importArkpackFx({
-							bytes,
-							filename,
-							packageId,
-						})),
+					((request: {
+						readonly packageId: string;
+						readonly expectedRevision: number;
+						readonly contentHash: string;
+					}) =>
+						createElectronArkpackStorageFx().pipe(
+							Effect.flatMap((storage) =>
+								storage.installEditorBuildFx === undefined
+									? Effect.fail(
+											new Error("Editor Build installation is unavailable."),
+										)
+									: storage.installEditorBuildFx(request),
+							),
+						)),
 			);
 			const removeDependencyFx = Effect.fn("ArkpackCatalog.removeDependencyFx")(
 				props.removeFx ??
@@ -138,20 +143,16 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 				awaitIdleFx: lock.withPermits(1)(Effect.void),
 				state,
 				refreshFx: runCatalogOperationFx(Effect.void, Effect.void, false),
-				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")((file: File) =>
-					runCatalogOperationFx(importFileDependencyFx(file)),
+				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")(() =>
+					runCatalogOperationFx(importFileDependencyFx()),
 				),
 				installFx: Effect.fn("ArkpackCatalog.installFx")((install) =>
 					runCatalogOperationFx(
-						install.contentFx.pipe(
-							Effect.flatMap((content) =>
-								installDependencyFx({
-									bytes: content.bytes,
-									filename: install.filename,
-									packageId: install.packageId,
-								}),
-							),
-						),
+						installEditorBuildDependencyFx({
+							packageId: install.packageId,
+							expectedRevision: install.expectedRevision,
+							contentHash: install.contentHash,
+						}),
 						admitInstallFx({
 							expectedCurrent: install.expectedCurrent,
 							packageId: install.packageId,

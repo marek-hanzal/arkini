@@ -13,14 +13,15 @@ One GUI Electron main or Node CLI process owns the physical Editor project repos
 | Renderer repository proxy and response validation | `src/project-authoring` | [`../../../src/project-authoring/fx/createElectronProjectRepositoryFx.ts`](../../../src/project-authoring/fx/createElectronProjectRepositoryFx.ts) |
 | Filesystem repository composition | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Discovery, create/open/refresh/delete | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts) |
+| Streamed Arkpack import | `src/arkpack-admission` + `src/project-authoring/filesystem` | [`../../../src/arkpack-admission/fx/extractArkpackFileFx.ts`](../../../src/arkpack-admission/fx/extractArkpackFileFx.ts), [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Config, Item and Resource commits | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts) |
 | Notes and Build | Their `src/*` contracts plus Project Authoring filesystem operations | `src/project-authoring/filesystem/fx/create*OperationsFx.ts` |
-| Current-tree lock, journal and recovery | `src/project-authoring/filesystem` + mechanical `filesystem-write` | [`../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts), [`../../../src/project-authoring/filesystem/fx/recoverProjectFileTransactionFx.ts`](../../../src/project-authoring/filesystem/fx/recoverProjectFileTransactionFx.ts) |
+| Ordered current-tree writes | `src/project-authoring/filesystem` + mechanical `filesystem-write` | [`../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts) |
 | IPC authorization and dispatch | `electron/main/editor-project` | [`ipc/registerEditorProjectIpcFx.ts`](ipc/registerEditorProjectIpcFx.ts) |
 | CLI MCP lifecycle | `src/arkini-cli` | [`../../../src/arkini-cli/command/EditorMcpCommand.ts`](../../../src/arkini-cli/command/EditorMcpCommand.ts) |
 | Mounted renderer projection and replacement guard | `src/authoring-session` | [`../../../src/authoring-session/fx/refreshEditorProjectFx.ts`](../../../src/authoring-session/fx/refreshEditorProjectFx.ts) |
 
-The filesystem repository implements product capabilities; it does not own their schemas or renderer presentation. Renderer code sees no physical path, file handle, native object or mutable repository state.
+The filesystem repository implements product capabilities; it does not own their schemas or renderer presentation. Renderer code sees no managed project path, file handle, native object or mutable repository state. A browser-selected asset contributes only its native source path so Electron main can stream or copy it without an IPC byte payload.
 
 ## Dependency shape
 
@@ -33,6 +34,7 @@ This island has deliberate cross-process and lifecycle coupling:
 - `project-authoring ↔ project-note` and authoring products cross at exact repository or presentation contracts. No root is a generic Editor superdomain.
 - `filesystem-write` stays mechanical and imports none of its product consumers. The Editor repository supplies path ownership, file sets, serialization and error meaning.
 - MCP calls the same Project Repository capabilities and revision checks. It never owns a second project store or bypass mutation path.
+- Arkpack import is selected in Electron main, stream-extracted through the shared admission owner, and published as one managed portable project. Archive and resource bytes never cross renderer IPC.
 - `arkini-cli editor mcp <projectId>` selects one catalog project and composes the same Node-compatible filesystem MCP storage, HTTP server, tools and optional ngrok tunnel as the GUI Editor without starting Electron.
 
 The top-level domain graph is cyclic; the process authority is not. Physical mutation terminates in this filesystem repository.
@@ -50,32 +52,28 @@ The catalog never copies canonical project identity or mutable project fields. `
 
 Managed roots may be deleted only by explicit managed-project deletion. External roots are edited in place; deletion only unregisters them. Arkini writes only allowlisted owned paths and preserves `.git` plus unrelated files.
 
-## Current-tree transaction
+## Current-tree writes
 
-All readers, writers and recovery share `editor.lock`.
+Writers share `editor.lock` and apply their already validated file plan in order.
 
 ```text
-recover any prior journal
-→ validate root, containment and target types
+validate the authored result
 → compute exact changed writes and removals
-→ write and sync transaction record
-→ preserve replaced/removed bytes in the journal
-→ mark writing
-→ atomically replace each owned file
+→ replace each owned file
 → apply exact removals
-→ mark committed
-→ recover/clean the exact journal
+→ verify the resulting metadata
+→ publish the fresh Project projection
 ```
 
-Unowned, ambiguous, escaped or missing durable artifacts fail closed. Recovery restores an old-or-new complete portable tree; it never guesses a partial state. Item/config commits reconcile Note links against the final item UIDs; resource rename/delete rewrites Note resource IDs. Each operation includes affected Note files in the same transaction, and a failed Note rewrite rolls back the project tree plus every earlier Note rewrite before repository state is published. Single-file mechanics belong to `src/filesystem-write`; the multi-file journal belongs here.
+Path containment and owned-file validation remain immediate write contracts. There is no aggregate journal, rollback or crash recovery: a failed multi-file write may leave a partial tree, and reopening or repeating the operation is the repair path. Item/config commits reconcile Note links against the final item UIDs; resource rename/delete rewrites Note resource IDs in the same ordered plan. Single-file mechanics belong to `src/filesystem-write`.
 
 ## Asset bodies and incremental saves
 
-Project projections carry resource ID, MIME type, byte size and a filesystem version token, never PNG bodies. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged PNGs. Asset import/replacement and explicit Optimize supply only their changed bodies. Renames and shell-resource moves read only the affected disk file. New resource metadata is verified inside the journal before its committed marker and repository publication.
+Project projections carry resource ID, MIME type, byte size and a filesystem version token, never PNG bodies. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged PNGs. Asset import/replacement and explicit Optimize supply only their changed bodies or source paths. Renames and shell-resource moves read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
 
-[`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same current-tree journal and Note reconciliation.
+[`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
-[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned asset URLs to image consumers, including Editor Board. It admits the URL against the registered resource and checks the contained path. The actual disk stat token keys the body cache independently of the admitted URL; a rollback can restore identical bytes with new filesystem timestamps. A process-local 64 MiB LRU shares concurrent requests and admits at most four cold disk reads at once. Unrequested images never enter the cache; ordinary saves do not touch it. Replacement changes only that resource's URL. Build continues to read and verify actual source bytes when compiling the Arkpack.
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned asset URLs to image consumers, including Editor Board. It admits the URL against the registered resource and checks the contained path. The actual disk stat token keys the body cache independently of the admitted URL. A process-local 64 MiB LRU shares concurrent requests and admits at most four cold disk reads at once. Unrequested images never enter the cache; ordinary saves do not touch it. Replacement changes only that resource's URL. Build reads source files while streaming the Arkpack.
 
 ## Renderer replacement flow
 
@@ -90,7 +88,7 @@ capture expected revision
 → publish it to the still-mounted project Atom
 ```
 
-Assets **Optimize** follows this same write path. The renderer passes the exact resource IDs selected by the current Assets search and usage filter. Main holds the repository semaphore while it losslessly normalizes only those current `assets/` and `resources/` PNGs, then publishes all changed bytes through one current-tree transaction and one fresh Project projection. The same repository operation can optimize one resource by receiving one ID. It does not invoke Arkpack Build or its 256 px Item-artwork bake.
+Assets **Optimize** follows this same write path. The renderer passes the exact resource IDs selected by the current Assets search and usage filter. Main holds the repository semaphore while it losslessly normalizes one selected `assets/` or `resources/` PNG at a time through temporary files, then copies changed files through one ordered write plan and publishes one fresh Project projection. Selected PNG bodies are not accumulated in JavaScript memory. The same repository operation can optimize one resource by receiving one ID. It does not invoke Arkpack Build or its 256 px Item-artwork bake.
 The filesystem operation reports completed PNGs over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
 
 Hard Refresh and project replacement use a stronger boundary:
@@ -133,7 +131,7 @@ Likely affected:
 
 - Project Repository contract, Electron transport schemas and IPC tests.
 - Catalog/open/refresh/delete lifecycle and managed-versus-external ownership.
-- Current-tree transaction, recovery and native filesystem portability tests.
+- Ordered current-tree writes and native filesystem portability tests.
 - Authoring Session replacement, unsaved changes and Editor Board teardown/recreation.
 - MCP mutation and invalidation when a repository command changes.
 - Notes or Build when their repository operation or portable file set changes.

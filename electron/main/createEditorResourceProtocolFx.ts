@@ -66,16 +66,6 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 			const readFx = yield* Effect.cached(
 				Effect.gen(function* () {
 					const bytes = new Uint8Array(yield* fs.readFile(filePath));
-					const stat = yield* fs.stat(filePath);
-					const currentVersion = readFileVersionFn(stat);
-					if (currentVersion !== version) {
-						return yield* Effect.fail(
-							new ArkiniProtocolError({
-								status: 409,
-								message: "Editor resource changed while it was being read.",
-							}),
-						);
-					}
 					if (bytes.byteLength <= maxCacheBytes) {
 						while (cacheBytes + bytes.byteLength > maxCacheBytes) {
 							const oldest = cache.entries().next().value;
@@ -159,8 +149,6 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					const stat = yield* fs.stat(filePath);
 					if (stat.type !== "File") return yield* Effect.fail(unavailableFn());
 					const currentVersion = readFileVersionFn(stat);
-					// Rollback may restore identical contents with fresh filesystem timestamps.
-					// URL admission follows repository identity; cache freshness follows the live file.
 					const headers = new Headers({
 						"Content-Type": "image/png",
 						"Content-Length": String(Number(stat.size)),
@@ -175,27 +163,6 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 						request.method === "HEAD"
 							? null
 							: yield* readBytesFx(filePath, currentVersion);
-					const retainedLocation = yield* readResourceLocationFx({
-						projectId,
-						resourceId,
-					});
-					if (
-						retainedLocation === null ||
-						retainedLocation.version !== location.version ||
-						retainedLocation.path !== location.path ||
-						retainedLocation.root !== location.root
-					) {
-						return new Response("Editor resource changed while it was being read.", {
-							status: 409,
-						});
-					}
-					// The second repository lookup waits for an overlapping commit or rollback.
-					// A failed commit can retain logical identity while replacing the physical file.
-					if (readFileVersionFn(yield* fs.stat(filePath)) !== currentVersion) {
-						return new Response("Editor resource changed while it was being read.", {
-							status: 409,
-						});
-					}
 					return new Response(body, {
 						headers,
 					});

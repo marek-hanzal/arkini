@@ -3,8 +3,6 @@ import { Effect, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
-import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 
 const matchesConfirmationFn = (
@@ -22,12 +20,10 @@ export const installBuiltEditorArkpackFx = Effect.fn("installBuiltEditorArkpackF
 	artifact,
 	catalog,
 	confirmation,
-	repository,
 }: {
 	readonly artifact: EditorProjectBuildSchema.Type;
 	readonly catalog: ArkpackCatalog;
 	readonly confirmation?: EditorBuildMajorUpdateConfirmation;
-	readonly repository: Pick<EditorBuildRepositoryService, "readProjectBuildFx">;
 }) {
 	const catalogState = yield* SubscriptionRef.get(catalog.state);
 	if (catalogState.type !== "ready") {
@@ -46,13 +42,9 @@ export const installBuiltEditorArkpackFx = Effect.fn("installBuiltEditorArkpackF
 		);
 	}
 	return yield* catalog.installFx({
-		contentFx: repository.readProjectBuildFx({
-			projectId: artifact.projectId,
-			expectedRevision: artifact.revision,
-			contentHash: artifact.contentHash,
-		}),
-		expectedCurrent: plan.expectedCurrent,
-		filename: readArkpackArtifactNameFn(artifact.projectId),
 		packageId: artifact.projectId,
+		expectedRevision: artifact.revision,
+		contentHash: artifact.contentHash,
+		expectedCurrent: plan.expectedCurrent,
 	});
 });

@@ -10,6 +10,8 @@ import { createProjectCatalogFx } from "./createProjectCatalogFx";
 import { createBuildOperationsFx } from "./createBuildOperationsFx";
 import { createCommitOperationsFx } from "./createCommitOperationsFx";
 import { createLifecycleOperationsFx } from "./createLifecycleOperationsFx";
+import { extractArkpackFileFx } from "~/arkpack-admission/fx/extractArkpackFileFx";
+import { randomUUID } from "node:crypto";
 
 export namespace createFilesystemEditorProjectRepositoryFx {
 	export interface Props {
@@ -111,6 +113,36 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		...builds,
 		...commits,
 		...notes,
+		importArkpackFileFx: (arkpackPath: string) =>
+			Effect.gen(function* () {
+				const pending = path.join(
+					path.dirname(projectsRoot),
+					`.arkpack-import-${randomUUID()}`,
+				);
+				return yield* extractArkpackFileFx({
+					arkpackPath,
+					outputRoot: pending,
+				}).pipe(
+					Effect.flatMap(projects.createExtractedProjectFx),
+					Effect.ensuring(
+						fileSystem
+							.remove(pending, {
+								force: true,
+								recursive: true,
+							})
+							.pipe(Effect.ignore),
+					),
+					Effect.mapError((cause) =>
+						cause instanceof ProjectRepositoryError
+							? cause
+							: new ProjectRepositoryError({
+									operation: "import-arkpack",
+									message: "The Arkpack could not be imported into the Editor.",
+									cause,
+								}),
+					),
+				);
+			}),
 		closeFx: operations.withPermits(1)(Effect.void),
 	} satisfies OwnedEditorProjectRepository;
 	const provideFx = <Value, Failure>(effect: Effect.Effect<Value, Failure, never>) =>
@@ -125,11 +157,14 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		saveBuildVersionFx: (props) => provideFx(repository.saveBuildVersionFx(props)),
 		buildProjectFx: (props) => provideFx(repository.buildProjectFx(props)),
 		createProjectFx: (props) => provideFx(repository.createProjectFx(props)),
+		importArkpackFileFx: (arkpackPath) =>
+			provideFx(repository.importArkpackFileFx(arkpackPath)),
 		dismissInvalidProjectFx: (root) => provideFx(repository.dismissInvalidProjectFx(root)),
 		deleteProjectFx: (projectId) => provideFx(repository.deleteProjectFx(projectId)),
 		openProjectFx: (props) => provideFx(repository.openProjectFx(props)),
 		readProjectFx: (projectId) => provideFx(repository.readProjectFx(projectId)),
-		readProjectBuildFx: (props) => provideFx(repository.readProjectBuildFx(props)),
+		withProjectBuildPathFx: (props, useFx) =>
+			provideFx(repository.withProjectBuildPathFx(props, useFx)),
 		readProjectRootFx: (projectId) => provideFx(repository.readProjectRootFx(projectId)),
 		refreshProjectFx: (projectId) => provideFx(repository.refreshProjectFx(projectId)),
 		listProjectsFx: provideFx(repository.listProjectsFx),
@@ -140,6 +175,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		replaceResourceFx: (props) => provideFx(repository.replaceResourceFx(props)),
 		upsertItemFx: (props) => provideFx(repository.upsertItemFx(props)),
 		upsertResourcesFx: (props) => provideFx(repository.upsertResourcesFx(props)),
+		upsertResourceFilesFx: (props) => provideFx(repository.upsertResourceFilesFx(props)),
 		listNotesFx: (projectId) => provideFx(repository.listNotesFx(projectId)),
 		createNoteFx: (props) => provideFx(repository.createNoteFx(props)),
 		updateNoteFx: (props) => provideFx(repository.updateNoteFx(props)),

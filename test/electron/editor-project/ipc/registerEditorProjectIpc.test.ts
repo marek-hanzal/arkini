@@ -132,7 +132,6 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorAwaitIdle,
 	ArkiniElectronApi.channels.editorProjectBuild,
 	ArkiniElectronApi.channels.editorProjectBuildVersionSave,
-	ArkiniElectronApi.channels.editorProjectBuildRead,
 	ArkiniElectronApi.channels.editorProjectBuildSave,
 	ArkiniElectronApi.channels.editorProjectCreate,
 	ArkiniElectronApi.channels.editorProjectDismissInvalid,
@@ -283,22 +282,6 @@ describe("registerEditorProjectIpcFx", () => {
 			expectedVersion: parseVersionFn(editorTestPayload.version),
 			projectId: "project-one",
 			expectedRevision: 1,
-		});
-		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectBuildRead, {
-				projectId: "project-one",
-				expectedRevision: 1,
-				contentHash: "a".repeat(64),
-			}),
-		).resolves.toEqual({
-			type: "success",
-			value: {
-				bytes: new Uint8Array([
-					1,
-					2,
-					3,
-				]),
-			},
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectBuildSave, {

@@ -77,11 +77,16 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
-		ArkiniElectronApi.channels.arkpackInstall,
+		ArkiniElectronApi.channels.arkpackImport,
+		[],
+	],
+	[
+		ArkiniElectronApi.channels.arkpackInstallEditorBuild,
 		[
 			{
 				packageId: placeholderPackageId,
-				bytes: new Uint8Array(),
+				expectedRevision: 1,
+				contentHash: "a".repeat(64),
 			},
 		],
 	],
@@ -144,7 +149,11 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		ArkiniElectronApi.channels.incidentWrite,
 		[
 			{
-				arkpackBytes: new Uint8Array(),
+				arkpack: {
+					packageId: "game:test",
+					contentHash: "0".repeat(64),
+					source: "user",
+				},
 				saveBytes: new Uint8Array(),
 				text: {
 					incident: "# Incident",

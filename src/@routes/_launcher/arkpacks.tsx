@@ -60,21 +60,11 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 					</header>
 
 					<section className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain">
-						<input
-							ref={actions.inputRef}
-							type="file"
-							accept=".arkpack,application/octet-stream"
-							className="hidden"
-							disabled={blocked}
-							onChange={(event) =>
-								void actions.uploadFn(event.currentTarget.files?.[0])
-							}
-						/>
 						<Button
 							className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-4 rounded-xl p-4 text-left shadow-none"
 							cursorIntent={blocked ? "progress" : undefined}
 							disabled={blocked}
-							onClick={() => actions.inputRef.current?.click()}
+							onClick={() => void actions.uploadFn()}
 						>
 							<PackageOpen className="size-8 shrink-0 text-accent" />
 							<span className="min-w-0">

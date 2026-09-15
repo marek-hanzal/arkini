@@ -1619,19 +1619,13 @@
 				"quantity": {
 					"description": "The exact or bounded total amount accepted across all matching materials.",
 					"$ref": "urn:arkini:schema:project#/$defs/QuantitySchema"
-				},
-				"capacity": {
-					"default": 0,
-					"description": "The extra total quantity this input may buffer above its required quantity; defaults to zero, which allows no extra materials.",
-					"$ref": "urn:arkini:schema:project#/$defs/NonNegativeIntegerSchema"
 				}
 			},
 			"required": [
 				"type",
 				"selector",
 				"mode",
-				"quantity",
-				"capacity"
+				"quantity"
 			],
 			"additionalProperties": false,
 			"description": "A directly delivered material item required by a product line."

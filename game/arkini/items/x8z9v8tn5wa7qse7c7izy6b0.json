@@ -36,8 +36,7 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"type": "materials",
@@ -49,8 +48,7 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {
@@ -128,8 +126,7 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"type": "materials",
@@ -141,8 +138,7 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {
@@ -220,8 +216,7 @@
 						"quantity": {
 							"min": 6,
 							"max": 6
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"type": "materials",
@@ -233,8 +228,7 @@
 						"quantity": {
 							"min": 6,
 							"max": 6
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"type": "materials",
@@ -246,8 +240,7 @@
 						"quantity": {
 							"min": 2,
 							"max": 2
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {
@@ -342,8 +335,7 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {
@@ -421,8 +413,7 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {
@@ -469,8 +460,7 @@
 						"quantity": {
 							"min": 2,
 							"max": 2
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"type": "materials",
@@ -482,8 +472,7 @@
 						"quantity": {
 							"min": 3,
 							"max": 3
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {

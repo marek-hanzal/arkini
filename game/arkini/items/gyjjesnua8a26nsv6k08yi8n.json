@@ -1,39 +1,51 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "kpjqlrmcoc2c503wp1kr0m6v",
-		"id": "foundry",
-		"title": "Foundry",
-		"description": "Industrial",
+		"uid": "gyjjesnua8a26nsv6k08yi8n",
+		"id": "butcher",
+		"title": "Butcher",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"foundry"
+				"butcher"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"maxQueueSize": 1,
+		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "iron-ingot",
-				"title": "Iron Ingot",
-				"description": "Make an iron ingot",
+				"id": "pig",
+				"title": "Pig",
+				"description": "Some yummi stuff from a pig",
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 26000,
+				"runtimeMs": 30000,
 				"input": [
 					{
 						"type": "materials",
 						"selector": {
 							"type": "item",
-							"itemId": "iron-ore"
+							"itemId": "pig"
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 4,
-							"max": 4
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "cutting-board"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -46,10 +58,19 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "iron-ingot",
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-fat",
 											"quantity": {
 												"min": 1,
-												"max": 2
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []
@@ -63,24 +84,24 @@
 				"rules": []
 			},
 			{
-				"id": "copper-ingot",
-				"title": "Copper Ingot",
-				"description": "Copper stuff",
+				"id": "sausage",
+				"title": "Sausage",
+				"description": "Yummi sausage",
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 28000,
+				"runtimeMs": 30000,
 				"input": [
 					{
 						"type": "materials",
 						"selector": {
 							"type": "item",
-							"itemId": "copper-ore"
+							"itemId": "raw-game-meat"
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 4,
-							"max": 4
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -93,10 +114,10 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "copper-ingot",
+											"itemId": "sausage",
 											"quantity": {
-												"min": 1,
-												"max": 2
+												"min": 4,
+												"max": 4
 											},
 											"placement": "drop",
 											"rules": []

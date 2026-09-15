@@ -97,6 +97,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "recovering-beagle-puppy"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sick-chicken"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "recovering-chicken"
 			}
 		],
 		"maxQueueSize": 1,

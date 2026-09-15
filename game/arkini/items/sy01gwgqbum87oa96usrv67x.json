@@ -60,8 +60,7 @@
 						"quantity": {
 							"min": 2,
 							"max": 2
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"units": {

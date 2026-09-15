@@ -1,29 +1,18 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "i767otw53htcjcc2y9zrw6it",
-		"id": "chicken",
-		"title": "Chicken",
-		"description": "Kwooo... kwo, kwo!",
+		"uid": "qs41k4md44ei5bybbuq74dec",
+		"id": "hungry-goose",
+		"title": "Hungry Goose",
+		"draft": true,
 		"asset": {
 			"scale": 1,
 			"default": [
-				"chicken"
+				"hungry-goose"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "dynamite"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "well-fed-chicken-dynamite"
-			}
-		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,
@@ -37,7 +26,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "hungry-chicken",
+										"itemId": "sick-goose",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -52,7 +41,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": []
 	}

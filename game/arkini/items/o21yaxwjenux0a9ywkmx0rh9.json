@@ -13,6 +13,44 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "goose"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "well-fed-goose"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "hungry-goose"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "goose"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "sheep"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "well-fed-sheep"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "hungry-sheep"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sheep"
+			}
+		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,

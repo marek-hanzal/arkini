@@ -38,8 +38,7 @@
 						"quantity": {
 							"min": 4,
 							"max": 4
-						},
-						"capacity": 0
+						}
 					},
 					{
 						"units": {

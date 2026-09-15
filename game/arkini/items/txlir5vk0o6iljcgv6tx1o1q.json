@@ -34,8 +34,7 @@
 						"quantity": {
 							"min": 3,
 							"max": 3
-						},
-						"capacity": 0
+						}
 					}
 				],
 				"output": {

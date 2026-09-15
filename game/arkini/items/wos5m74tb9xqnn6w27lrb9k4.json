@@ -1,0 +1,74 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "wos5m74tb9xqnn6w27lrb9k4",
+		"id": "british-shorthair-stabbed-with-sword",
+		"title": "British Shorthair Stabbed With Sword",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"british-shorthair-stabbed-with-sword"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-raw-game-meat",
+										"quantity": {
+											"min": 2,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "spoiled-animal-bones",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "corruption",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "sword",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

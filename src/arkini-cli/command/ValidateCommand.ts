@@ -1,4 +1,4 @@
-import { Argument, Command } from "effect/unstable/cli";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/game-config-compiler/fx/compileGameDirectoryFx";
@@ -13,11 +13,17 @@ export namespace ValidateCommand {
 
 const runValidateCommandFx = Effect.fn("runValidateCommandFx")(function* ({
 	input,
-}: ValidateCommand.Props) {
+	silent,
+}: ValidateCommand.Props & {
+	readonly silent: boolean;
+}) {
 	const result = yield* compileGameDirectoryFx({
 		input,
 	});
-	yield* printGameDiagnosticsForCliFx(result.diagnostics);
+	yield* printGameDiagnosticsForCliFx({
+		diagnostics: result.diagnostics,
+		silent,
+	});
 	yield* assertGameConfigValidFx(result);
 	yield* Console.log(`Validated ${input}.`);
 });
@@ -28,10 +34,17 @@ export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 		"validate",
 		{
 			input: Argument.Directory("input").pipe(Argument.withDefault(input)),
+			silent: Flag.Boolean("silent").pipe(
+				Flag.withDefault(false),
+				Flag.withDescription(
+					"Suppress warning diagnostics; errors and command results are still printed.",
+				),
+			),
 		},
-		({ input }) =>
+		({ input, silent }) =>
 			runValidateCommandFx({
 				input,
+				silent,
 			}),
 	).pipe(
 		Command.withDescription(

@@ -1,5 +1,4 @@
 import { Effect, Option } from "effect";
-import { match } from "ts-pattern";
 
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -19,12 +18,12 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
+import { readPlacementRouteFn } from "~/item-placement/fn/readPlacementRouteFn";
 import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocationsFn";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
@@ -128,26 +127,22 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 				})
 			: emptyToolbar;
 
-	const location = match(item.item.scope)
-		.with(StorageSchema.enum.Board, () => orderedBoard[0])
-		.with(StorageSchema.enum.Inventory, () => orderedInventory[0])
-		.with(StorageSchema.enum.Toolbar, () => orderedToolbar[0])
-		.with(StorageSchema.enum.Any, () =>
-			origin.scope === LocationScopeEnumSchema.enum.Board
-				? (orderedBoard[0] ?? orderedInventory[0] ?? orderedToolbar[0])
-				: origin.scope === LocationScopeEnumSchema.enum.Inventory
-					? (orderedInventory[0] ?? orderedToolbar[0] ?? orderedBoard[0])
-					: (orderedToolbar[0] ?? orderedInventory[0] ?? orderedBoard[0]),
-		)
-		.exhaustive() satisfies GridLocationSchema.Type | undefined;
-	if (location !== undefined) return location;
+	const locationsByScope = {
+		board: orderedBoard,
+		inventory: orderedInventory,
+		toolbar: orderedToolbar,
+	} satisfies Record<readPlacementRouteFn.Scope, ReadonlyArray<GridLocationSchema.Type>>;
+	const route = readPlacementRouteFn({
+		itemScope: item.item.scope,
+		originScope: origin.scope,
+		toolbarEnabled: (config.meta.toolbarSize ?? 0) > 0,
+	});
+	for (const step of route) {
+		const location = locationsByScope[step.scope][0];
+		if (location !== undefined) return location;
+	}
 
-	const reason =
-		item.item.scope === StorageSchema.enum.Board
-			? PlacementUnavailableError.Reason.BoardFull
-			: item.item.scope === StorageSchema.enum.Toolbar
-				? PlacementUnavailableError.Reason.ToolbarFull
-				: PlacementUnavailableError.Reason.InventoryFull;
+	const reason = route[route.length - 1].unavailableReason;
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
 			itemId: item.item.id,

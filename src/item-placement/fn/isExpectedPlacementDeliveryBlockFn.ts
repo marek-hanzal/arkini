@@ -5,7 +5,6 @@ import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnava
 /** Keeps only the placement failures that may legitimately defer output delivery. */
 export const isExpectedPlacementDeliveryBlockFn = (reason: PlacementUnavailableError.Reason) => {
 	return match(reason)
-		.with(PlacementUnavailableError.Reason.BoardOriginUnavailable, () => false)
 		.with(
 			P.union(
 				PlacementUnavailableError.Reason.BoardFull,

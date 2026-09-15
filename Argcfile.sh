@@ -52,8 +52,13 @@ arkpack-fingerprint() {
 
 install_game_arkpack() {
 	local source source_dir target verdict fingerprint current_fingerprint cache record
+	local -a pack_arguments
 	target=game/arkini/build/arkini.arkpack
 	cache=$target.cache
+	pack_arguments=(game pack ./game/arkini)
+	if [[ "${1:-}" == "--silent" ]]; then
+		pack_arguments+=(--silent)
+	fi
 	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" ]]; then
 		fingerprint=$(arkpack-fingerprint) || return $?
 		record=
@@ -65,7 +70,7 @@ install_game_arkpack() {
 			"$record" == "$(cat "$cache")" ]]; then
 			echo "Arkpack unchanged; reusing $target."
 		else
-			node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini || return $?
+			node .out/desktop/build/main/cli/arkini.js "${pack_arguments[@]}" || return $?
 		fi
 		current_fingerprint=$(arkpack-fingerprint) || return $?
 		if [[ "$fingerprint" != "$current_fingerprint" ]]; then
@@ -483,6 +488,7 @@ platform-check() {
 
 # @cmd Run the complete repository gate
 # @flag --skip-arkpack Skip bundled game Arkpack packing and verification
+# @flag --silent Suppress bundled game warning diagnostics during Arkpack packing
 check() {
 	format_check
 	translations:check
@@ -490,6 +496,8 @@ check() {
 	build_desktop
 	if [[ "${argc_skip_arkpack:-0}" == 1 ]]; then
 		echo "Skipping bundled game Arkpack packing and verification (--skip-arkpack)."
+	elif [[ "${argc_silent:-0}" == 1 ]]; then
+		install_game_arkpack --silent
 	else
 		install_game_arkpack
 	fi

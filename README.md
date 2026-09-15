@@ -66,6 +66,8 @@ argc mcp-inspect
 
 `argc check --skip-arkpack` skips bundled game Arkpack packing and verification entirely, including the cache lookup. The Electron build and all other checks still run; use plain `argc check` for the complete gate. `argc preview-macos --build --skip-arkpack` also skips this step while rebuilding the app, bundling the existing Arkpack if available or starting without one.
 
+`argc check --silent` still packs and verifies the bundled game, but suppresses its warning diagnostics. Validation errors and the normal pack summary remain visible.
+
 `argc platform-check` is the narrower hosted macOS/Windows portability gate. It runs the production build plus real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; this does not replace the complete closing gate.
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.

@@ -1,4 +1,6 @@
 import { execFile } from "node:child_process";
+import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { promisify } from "node:util";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -7,6 +9,7 @@ import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
 } from "~test/project-authoring/filesystem/support/createProjectTestHarness";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 
 const execFileAsync = promisify(execFile);
 let harness: ProjectTestHarness;
@@ -17,7 +20,7 @@ beforeEach(async () => {
 
 afterEach(async () => harness.close());
 
-const runPack = (root: string) =>
+const runPack = (root: string, silent = false) =>
 	execFileAsync(
 		process.execPath,
 		[
@@ -26,13 +29,18 @@ const runPack = (root: string) =>
 			"game",
 			"pack",
 			root,
+			...(silent
+				? [
+						"--silent",
+					]
+				: []),
 		],
 		{
 			env: process.env,
 		},
 	);
 
-const runValidate = (root: string) =>
+const runValidate = (root: string, silent = false) =>
 	execFileAsync(
 		process.execPath,
 		[
@@ -41,6 +49,11 @@ const runValidate = (root: string) =>
 			"game",
 			"validate",
 			root,
+			...(silent
+				? [
+						"--silent",
+					]
+				: []),
 		],
 		{
 			env: process.env,
@@ -74,5 +87,22 @@ describe("game pack CLI", () => {
 			}),
 		);
 		expect((await runPack(root)).stdout).toContain("Building Arkpack v1.0.");
+	}, 30_000);
+
+	it("can suppress warning diagnostics without hiding validation success", async () => {
+		const root = await harness.createExternalProject("cli-silent-warning");
+		await writeFile(join(root, "assets", "unused.png"), createTestPngBytes());
+
+		const visible = await runValidate(root);
+		expect(visible.stderr).toContain("WARNING resource:unused");
+		expect(visible.stdout).toContain("Validated");
+
+		const silent = await runValidate(root, true);
+		expect(silent.stderr).not.toContain("WARNING resource:unused");
+		expect(silent.stdout).toContain("Validated");
+
+		const packed = await runPack(root, true);
+		expect(packed.stderr).not.toContain("WARNING resource:unused");
+		expect(packed.stdout).toContain("Building Arkpack");
 	}, 30_000);
 });

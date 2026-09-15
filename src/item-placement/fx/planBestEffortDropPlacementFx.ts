@@ -11,7 +11,7 @@ export namespace planBestEffortDropPlacementFx {
 	export interface Discarded {
 		readonly itemId: string;
 		readonly quantity: number;
-		readonly reason: Exclude<PlacementUnavailableError.Reason, "board:origin-unavailable">;
+		readonly reason: PlacementUnavailableError.Reason;
 	}
 	export interface Result {
 		readonly plan: PlacementPlan;
@@ -49,12 +49,10 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 				plan,
 			})),
 			Effect.catchTag("PlacementUnavailableError", (error) =>
-				error.reason === PlacementUnavailableError.Reason.BoardOriginUnavailable
-					? Effect.fail(error)
-					: Effect.succeed({
-							type: "blocked" as const,
-							error,
-						}),
+				Effect.succeed({
+					type: "blocked" as const,
+					error,
+				}),
 			),
 		);
 		if (attempt.type === "placed")
@@ -62,8 +60,6 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 				plan: attempt.plan,
 				discarded,
 			} satisfies planBestEffortDropPlacementFx.Result;
-		if (attempt.error.reason === PlacementUnavailableError.Reason.BoardOriginUnavailable)
-			return yield* Effect.fail(attempt.error);
 		const lost = Math.min(quantity, attempt.error.remainingQuantity);
 		discarded.push({
 			itemId: drop.itemId,

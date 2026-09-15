@@ -1,4 +1,4 @@
-import { Argument, Command } from "effect/unstable/cli";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
@@ -16,24 +16,30 @@ export namespace PackCommand {
 namespace runPackCommandFx {
 	export interface Props {
 		readonly input: string;
+		readonly silent: boolean;
 	}
 }
 
 const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 	input,
+	silent,
 }: runPackCommandFx.Props) {
 	const result = yield* packDirectoryFx({
 		input,
 	}).pipe(
 		Effect.catch((error) =>
 			error instanceof GameValidationError
-				? printGameDiagnosticsForCliFx(error.diagnostics).pipe(
-						Effect.andThen(Effect.fail(error)),
-					)
+				? printGameDiagnosticsForCliFx({
+						diagnostics: error.diagnostics,
+						silent,
+					}).pipe(Effect.andThen(Effect.fail(error)))
 				: Effect.fail(error),
 		),
 	);
-	yield* printGameDiagnosticsForCliFx(result.diagnostics);
+	yield* printGameDiagnosticsForCliFx({
+		diagnostics: result.diagnostics,
+		silent,
+	});
 
 	yield* Console.log(`Building Arkpack v${result.version}.`);
 	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
@@ -56,10 +62,17 @@ export const PackCommand = ({ input, name = "pack" }: PackCommand.Props) =>
 		name,
 		{
 			input: Argument.Directory("input").pipe(Argument.withDefault(input)),
+			silent: Flag.Boolean("silent").pipe(
+				Flag.withDefault(false),
+				Flag.withDescription(
+					"Suppress warning diagnostics; errors and command results are still printed.",
+				),
+			),
 		},
-		({ input }) =>
+		({ input, silent }) =>
 			runPackCommandFx({
 				input,
+				silent,
 			}),
 	).pipe(
 		Command.withDescription(

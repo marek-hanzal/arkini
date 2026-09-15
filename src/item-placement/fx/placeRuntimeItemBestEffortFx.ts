@@ -9,7 +9,6 @@ import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 
 export namespace placeRuntimeItemBestEffortFx {
@@ -67,12 +66,10 @@ export const placeRuntimeItemBestEffortFx = Effect.fn("placeRuntimeItemBestEffor
 				placement,
 			})),
 			Effect.catchTag("PlacementUnavailableError", (error) =>
-				error.reason === PlacementUnavailableError.Reason.BoardOriginUnavailable
-					? Effect.fail(error)
-					: Effect.succeed({
-							type: "blocked" as const,
-							error,
-						}),
+				Effect.succeed({
+					type: "blocked" as const,
+					error,
+				}),
 			),
 		);
 		if (attempt.type === "placed")
@@ -84,8 +81,6 @@ export const placeRuntimeItemBestEffortFx = Effect.fn("placeRuntimeItemBestEffor
 				],
 			} satisfies placeRuntimeItemBestEffortFx.Result;
 		const reason = attempt.error.reason;
-		if (reason === PlacementUnavailableError.Reason.BoardOriginUnavailable)
-			return yield* Effect.fail(attempt.error);
 		const lostQuantity = Math.min(item.quantity, attempt.error.remainingQuantity);
 		if (lostQuantity === item.quantity) {
 			const discarded = yield* discardRuntimeItemTreeFx({

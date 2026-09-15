@@ -6,7 +6,6 @@ import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 const PlacementFailureReason = {
 	ItemMaxCount: "item:max-count",
-	BoardOriginUnavailable: "board:origin-unavailable",
 	BoardFull: "board:full",
 	InventoryFull: "inventory:full",
 	ToolbarFull: "toolbar:full",

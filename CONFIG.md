@@ -48,8 +48,8 @@ Product commands are:
 
 ```bash
 arkini-cli game schema [--output path]
-arkini-cli game validate [project]
-arkini-cli game pack [project]
+arkini-cli game validate [project] [--silent]
+arkini-cli game pack [project] [--silent]
 arkini-cli game replay --incident <latest-directory> --until-fatal [--timeout-ms 10000]
 arkini-cli game replay --arkpack <file> --save <file> --until-fatal [--timeout-ms 10000]
 arkini-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-session-id>] [--section all|summary|failure|history|runtime]
@@ -58,6 +58,8 @@ arkini-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-sessi
 Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files. Its bounded text report distinguishes a reproduced fatal failure from a timeout, includes semantic history, and compares the initial and final runtime without dumping duplicate complete states. The common rotating diagnostic directory contains human-readable application runtime and fatal history in `application.md` beside the private gameplay session stream in `diagnostics.jsonl`. Every application record carries severity, the `package.json` application version, packaged/development mode, platform, and architecture; any bounded normalization or final text truncation is visible in the record. Diagnostic slicing defaults to the latest failed gameplay session, accepts the fixed text incident or that rotating JSONL stream, reports malformed input without physical paths, and renders only stable human/LLM-readable text. `--session-id` selects only JSONL sessions; `--section runtime` reads only the fixed incident's complete runtime projection. The fixed incident directory links `incident.md`, `failure.md`, `history.md`, and `runtime-state.md`; Item references include runtime ID, authored ID, and immutable configured UID whenever resolution is possible.
 
 The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary local and Editor builds are Community. Item artwork from `assets/` is compiled to an aspect-preserving RGBA PNG no larger than 256 × 256 pixels without enlarging smaller artwork. Package-shell PNGs from `resources/` retain their exact source bytes and dimensions.
+
+`game validate` and `game pack` accept `--silent` to hide warning diagnostics while preserving errors and normal command results. `argc check --silent` forwards that policy to the bundled game pack; every other repository check remains unchanged.
 
 Repository builds and previews skip packing an unchanged official game through `Argcfile.sh`. `argc arkpack-fingerprint` uses the mise-pinned Coreutils SHA-256 implementation to hash sorted relative paths and raw file bytes: game JSON and PNG sources, project/schema markers, the conservative `src`, `shared`, `electron` and `scripts` source trees, dependency manifests, TypeScript/build configuration and toolchain pins. The generated route tree, Notes and build output are excluded; platform and architecture are included. The project manifest is parsed with the existing Node runtime and hashed with its valid Editor revision normalized to zero; its format version and any other fields remain inputs. Revision-only saves therefore preserve the cache. The conservative source trees still allow harmless rebuilds after unrelated code changes instead of maintaining an import graph. Images are read for hashing but are not decoded or normalized on a cache hit.
 

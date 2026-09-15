@@ -20,15 +20,18 @@ const printGameDiagnosticForCliFn = (diagnostic: GameDiagnosticSchema.Type) => {
 };
 
 /** Prints canonical diagnostics for CLI consumers without changing their data contract. */
-export const printGameDiagnosticsForCliFx = Effect.fn("printGameDiagnosticsForCliFx")(function* (
-	diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>,
-) {
+export const printGameDiagnosticsForCliFx = Effect.fn("printGameDiagnosticsForCliFx")(function* ({
+	diagnostics,
+	silent,
+}: {
+	readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
+	readonly silent: boolean;
+}) {
 	for (const diagnostic of diagnostics) {
-		const message = printGameDiagnosticForCliFn(diagnostic);
 		if (diagnostic.severity === DiagnosticSeverityEnumSchema.enum.Warning) {
-			yield* Console.warn(message);
+			if (!silent) yield* Console.warn(printGameDiagnosticForCliFn(diagnostic));
 		} else {
-			yield* Console.error(message);
+			yield* Console.error(printGameDiagnosticForCliFn(diagnostic));
 		}
 	}
 });

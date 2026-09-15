@@ -1,13 +1,13 @@
-import { Effect, FileSystem, Option, Path, Semaphore } from "effect";
+import { net } from "electron";
+import { pathToFileURL } from "node:url";
+import { Effect, FileSystem, Path } from "effect";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
-import { readProjectResourceVersionFn } from "~/project-authoring/filesystem/fn/readProjectResourceVersionFn";
 import { ArkiniProtocolError } from "../protocol/ArkiniProtocolError";
 
 export namespace createEditorResourceProtocolFx {
 	export interface Props {
 		readonly readResourceLocationFx: OwnedEditorProjectRepository["readResourceLocationFx"];
 		readonly isTrustedUrlFn: (url: string) => boolean;
-		readonly maxCacheBytes?: number;
 	}
 
 	export interface Output {
@@ -21,73 +21,11 @@ const unavailableFn = () =>
 		message: "Editor resource was not found.",
 	});
 
-const readFileVersionFn = (stat: FileSystem.File.Info) =>
-	readProjectResourceVersionFn({
-		size: Number(stat.size),
-		mtimeMs: Option.getOrUndefined(stat.mtime)?.getTime() ?? 0,
-		birthtimeMs: Option.getOrUndefined(stat.birthtime)?.getTime() ?? 0,
-		dev: stat.dev,
-		ino: Option.getOrUndefined(stat.ino) ?? 0,
-	});
-
-/** Only requested PNGs enter this process-local cache; project saves never traverse it. */
+/** Streams requested Editor resources directly from their registered filesystem paths. */
 export const createEditorResourceProtocolFx = Effect.fn("createEditorResourceProtocolFx")(
-	function* ({
-		readResourceLocationFx,
-		isTrustedUrlFn,
-		maxCacheBytes = 64 * 1024 * 1024,
-	}: createEditorResourceProtocolFx.Props) {
+	function* ({ readResourceLocationFx, isTrustedUrlFn }: createEditorResourceProtocolFx.Props) {
 		const fs = yield* FileSystem.FileSystem;
 		const path = yield* Path.Path;
-		const reads = yield* Semaphore.make(4);
-		const cache = new Map<string, Uint8Array<ArrayBuffer>>();
-		const pending = new Map<
-			string,
-			Effect.Effect<Uint8Array<ArrayBuffer>, ArkiniProtocolError>
-		>();
-		let cacheBytes = 0;
-
-		const readBytesFx = Effect.fn("EditorResourceProtocol.readBytesFx")(function* (
-			filePath: string,
-			version: string,
-		) {
-			const key = JSON.stringify([
-				filePath,
-				version,
-			]);
-			const cached = cache.get(key);
-			if (cached !== undefined) {
-				cache.delete(key);
-				cache.set(key, cached);
-				return cached;
-			}
-			const running = pending.get(key);
-			if (running !== undefined) return yield* running;
-			const readFx = yield* Effect.cached(
-				Effect.gen(function* () {
-					const bytes = new Uint8Array(yield* fs.readFile(filePath));
-					if (bytes.byteLength <= maxCacheBytes) {
-						while (cacheBytes + bytes.byteLength > maxCacheBytes) {
-							const oldest = cache.entries().next().value;
-							if (oldest === undefined) break;
-							cache.delete(oldest[0]);
-							cacheBytes -= oldest[1].byteLength;
-						}
-						cache.set(key, bytes);
-						cacheBytes += bytes.byteLength;
-					}
-					return bytes;
-				}).pipe(
-					reads.withPermits(1),
-					Effect.mapError((error) =>
-						error instanceof ArkiniProtocolError ? error : unavailableFn(),
-					),
-					Effect.ensuring(Effect.sync(() => pending.delete(key))),
-				),
-			);
-			pending.set(key, readFx);
-			return yield* readFx;
-		});
 
 		const handleRequestFx = Effect.fn("EditorResourceProtocol.handleRequestFx")(
 			(request: Request) =>
@@ -148,22 +86,25 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					}
 					const stat = yield* fs.stat(filePath);
 					if (stat.type !== "File") return yield* Effect.fail(unavailableFn());
-					const currentVersion = readFileVersionFn(stat);
-					const headers = new Headers({
-						"Content-Type": "image/png",
-						"Content-Length": String(Number(stat.size)),
-						"Cache-Control": "no-store",
-						"X-Content-Type-Options": "nosniff",
+					const response = yield* Effect.tryPromise({
+						try: () =>
+							net.fetch(pathToFileURL(filePath).toString(), {
+								method: request.method,
+							}),
+						catch: unavailableFn,
 					});
+					const headers = new Headers(response.headers);
+					headers.set("Content-Type", "image/png");
+					if (!headers.has("Content-Length"))
+						headers.set("Content-Length", String(Number(stat.size)));
+					headers.set("Cache-Control", "no-store");
 					if (origin !== null) {
 						headers.set("Access-Control-Allow-Origin", origin);
 						headers.set("Vary", "Origin");
 					}
-					const body =
-						request.method === "HEAD"
-							? null
-							: yield* readBytesFx(filePath, currentVersion);
-					return new Response(body, {
+					headers.set("X-Content-Type-Options", "nosniff");
+					return new Response(response.body, {
+						status: response.status,
 						headers,
 					});
 				}).pipe(

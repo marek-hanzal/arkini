@@ -1,9 +1,19 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { mkdir, mkdtemp, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Effect, FileSystem } from "effect";
+import { fileURLToPath } from "node:url";
+import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const netFetch = vi.hoisted(() => vi.fn());
+
+vi.mock("electron", () => ({
+	net: {
+		fetch: netFetch,
+	},
+}));
+
 import { createEditorResourceProtocolFx } from "~electron/main/createEditorResourceProtocolFx";
 import { readProjectResourceUrlFn } from "~/project-authoring/fn/readProjectResourceUrlFn";
 import { readProjectResourceVersionFn } from "~/project-authoring/filesystem/fn/readProjectResourceVersionFn";
@@ -18,8 +28,8 @@ const locations = new Map<
 		size: number;
 	}
 >();
-const reads = vi.fn();
 let protocol: createEditorResourceProtocolFx.Output;
+let nativeBodies: Array<ReadableStream<Uint8Array> | null> = [];
 
 const registerFn = async (id: string, content: string) => {
 	const path = join(root, "assets", `${id}.png`);
@@ -51,24 +61,35 @@ const requestFn = (url: string, init?: RequestInit) =>
 beforeEach(async () => {
 	root = await realpath(await mkdtemp(join(tmpdir(), "arkini-resource-protocol-")));
 	await mkdir(join(root, "assets"));
-	reads.mockClear();
+	netFetch.mockReset();
+	nativeBodies = [];
+	netFetch.mockImplementation(async (url: string, init?: RequestInit) => {
+		const bytes = Uint8Array.from(await readFile(fileURLToPath(url)));
+		const body =
+			init?.method === "HEAD"
+				? null
+				: new ReadableStream<Uint8Array>({
+						start(controller) {
+							controller.enqueue(bytes);
+							controller.close();
+						},
+					});
+		nativeBodies.push(body);
+		return {
+			body,
+			headers: new Headers({
+				"Content-Length": String(bytes.byteLength),
+			}),
+			status: 200,
+		} as unknown as Response;
+	});
 	protocol = await Effect.runPromise(
-		Effect.gen(function* () {
-			const fs = yield* FileSystem.FileSystem;
-			return yield* createEditorResourceProtocolFx({
-				readResourceLocationFx: ({ projectId, resourceId }) =>
-					Effect.succeed(
-						projectId === "project" ? (locations.get(resourceId) ?? null) : null,
-					),
-				isTrustedUrlFn: (url) => url === "arkini://app" || url === "http://127.0.0.1:4040",
-				maxCacheBytes: 8,
-			}).pipe(
-				Effect.provideService(FileSystem.FileSystem, {
-					...fs,
-					readFile: (path) =>
-						fs.readFile(path).pipe(Effect.tap(() => Effect.sync(() => reads(path)))),
-				}),
-			);
+		createEditorResourceProtocolFx({
+			readResourceLocationFx: ({ projectId, resourceId }) =>
+				Effect.succeed(
+					projectId === "project" ? (locations.get(resourceId) ?? null) : null,
+				),
+			isTrustedUrlFn: (url) => url === "arkini://app" || url === "http://127.0.0.1:4040",
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 });
@@ -82,10 +103,10 @@ afterEach(async () => {
 });
 
 describe("Editor resource protocol", () => {
-	it("loads only requested bytes, deduplicates concurrent requests and serves repeat hits from cache", async () => {
+	it("streams only requested files without retaining their response bodies", async () => {
 		const url = await registerFn("asset", "abcd");
 		await registerFn("unused", "unused");
-		expect(reads).not.toHaveBeenCalled();
+		expect(netFetch).not.toHaveBeenCalled();
 		expect(
 			(
 				await requestFn(url, {
@@ -93,20 +114,17 @@ describe("Editor resource protocol", () => {
 				})
 			).status,
 		).toBe(200);
-		expect(reads).not.toHaveBeenCalled();
-		const responses = await Promise.all([
-			requestFn(url),
-			requestFn(url),
-			requestFn(url),
-		]);
-		expect(await Promise.all(responses.map((response) => response.text()))).toEqual([
-			"abcd",
-			"abcd",
-			"abcd",
-		]);
-		expect(reads).toHaveBeenCalledTimes(1);
+		expect(netFetch).toHaveBeenCalledTimes(1);
+		const response = await requestFn(url);
+		expect(response.body).toBe(nativeBodies[1]);
+		expect(nativeBodies[1]?.locked).toBe(false);
+		expect(await response.text()).toBe("abcd");
+		expect(netFetch).toHaveBeenCalledTimes(2);
 		expect(await (await requestFn(url)).text()).toBe("abcd");
-		expect(reads).toHaveBeenCalledTimes(1);
+		expect(netFetch).toHaveBeenCalledTimes(3);
+		expect(netFetch.mock.calls.every(([fileUrl]) => !String(fileUrl).includes("unused"))).toBe(
+			true,
+		);
 	});
 
 	it("invalidates replaced and removed identities while reading external file changes on demand", async () => {
@@ -121,21 +139,7 @@ describe("Editor resource protocol", () => {
 		expect(external.headers.get("Content-Length")).toBe("15");
 		locations.delete("asset");
 		expect((await requestFn(newUrl)).status).toBe(404);
-		expect(reads).toHaveBeenCalledTimes(3);
-	});
-
-	it("evicts the least recently requested bytes to honor its byte budget", async () => {
-		const first = await registerFn("first", "1111");
-		const second = await registerFn("second", "2222");
-		const third = await registerFn("third", "3333");
-		await requestFn(first);
-		await requestFn(second);
-		await requestFn(first);
-		await requestFn(third);
-		await requestFn(first);
-		expect(reads).toHaveBeenCalledTimes(3);
-		await requestFn(second);
-		expect(reads).toHaveBeenCalledTimes(4);
+		expect(netFetch).toHaveBeenCalledTimes(3);
 	});
 
 	it("rejects unknown identities and resource paths that become symlinks", async () => {
@@ -151,7 +155,7 @@ describe("Editor resource protocol", () => {
 		await writeFile(join(root, "private.png"), "private");
 		await symlink(join(root, "private.png"), location.path);
 		expect((await requestFn(url)).status).toBe(404);
-		expect(reads).not.toHaveBeenCalled();
+		expect(netFetch).not.toHaveBeenCalled();
 	});
 
 	it("permits trusted renderer image fetches but rejects foreign origins and mutations", async () => {

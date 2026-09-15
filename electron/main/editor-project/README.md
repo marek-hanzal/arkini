@@ -73,7 +73,7 @@ Project projections carry resource ID, MIME type, byte size and a filesystem ver
 
 [`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
-[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned asset URLs to image consumers, including Editor Board. It admits the URL against the registered resource and checks the contained path. The actual disk stat token keys the body cache independently of the admitted URL. A process-local 64 MiB LRU shares concurrent requests and admits at most four cold disk reads at once. Unrequested images never enter the cache; ordinary saves do not touch it. Replacement changes only that resource's URL. Build reads source files while streaming the Arkpack.
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned asset URLs to image consumers, including Editor Board. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Unrequested images are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build reads source files while streaming the Arkpack.
 
 ## Renderer replacement flow
 

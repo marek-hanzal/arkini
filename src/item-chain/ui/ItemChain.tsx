@@ -1,6 +1,6 @@
 import { Mx } from "~/translation/ui/Mx";
 import { type ReactNode, useMemo } from "react";
-import { ArrowRight, Clock, GitBranch } from "lucide-react";
+import { ArrowRight, Clock, GitBranch, Plus } from "lucide-react";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
@@ -55,24 +55,27 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 					className="border-b border-line pb-4 last:border-b-0 last:pb-0"
 					dataUi="EditorChainCard"
 				>
-					<div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4">
+					<div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-4">
 						<div className="flex min-w-0 flex-col gap-2">
-							<ItemReference itemId={chain.ownerId} />
 							{chain.targetId === undefined ? (
-								<span className="inline-flex items-center gap-2 text-sm text-muted">
-									<Clock className="size-4" />
-									{translator.textFn("Clock")}
-								</span>
+								<ItemReference
+									description={
+										<span className="inline-flex items-center gap-2 text-sm text-muted">
+											<Clock className="size-4" />
+											{translator.textFn("Clock")}
+										</span>
+									}
+									itemId={chain.ownerId}
+								/>
 							) : (
-								<>
-									<span className="text-sm text-muted">
-										{translator.textFn("Merge with")}
-									</span>
+								<div className="flex min-w-0 flex-wrap items-center gap-3">
+									<ItemReference itemId={chain.ownerId} />
+									<Plus className="size-4 shrink-0 text-muted" />
 									<ItemReference itemId={chain.targetId} />
-								</>
+								</div>
 							)}
 						</div>
-						<ArrowRight className="size-5 text-muted" />
+						<ArrowRight className="size-5 self-center text-muted" />
 						<div className="min-w-0 max-w-full justify-self-end">
 							<div className="flex flex-wrap justify-end gap-3">
 								{chain.outcomes.length > 0 &&
@@ -301,8 +304,8 @@ const ChainStep = ({ step }: { readonly step: readItemChainsFn.Step }) => {
 			</div>
 			{step.kind !== "merge" ? null : (
 				<p className="mt-1 text-xs text-muted">
-					{translator.textFn("Source")}: {step.sourceAction} ·{" "}
-					{translator.textFn("Target")}: {step.targetEffect}
+					{translator.textFn("Source")}: <strong>{step.sourceAction}</strong> ·{" "}
+					{translator.textFn("Target")}: <strong>{step.targetEffect}</strong>
 				</p>
 			)}
 			{step.kind !== "pulse" ? null : (

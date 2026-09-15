@@ -39,13 +39,13 @@
 				]
 			}
 		},
-		"maxQueueSize": 1,
+		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "copper-ore",
-				"title": "Copper Ore",
+				"id": "copper-ore---candle",
+				"title": "Copper Ore - Candle",
 				"description": "Copper ore",
-				"default": true,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 28000,
@@ -64,6 +64,18 @@
 							"scope": "board",
 							"distance": "self"
 						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "candle"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
 					}
 				],
 				"output": {
@@ -76,6 +88,78 @@
 									"drop": [
 										{
 											"itemId": "copper-ore",
+											"quantity": {
+												"min": 3,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "copper-ore---lantern",
+				"title": "Copper Ore - Lantern",
+				"description": "Copper ore",
+				"clock": false,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 20000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "copper-mine"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "lantern"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "copper-ore",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-lantern",
 											"quantity": {
 												"min": 1,
 												"max": 1

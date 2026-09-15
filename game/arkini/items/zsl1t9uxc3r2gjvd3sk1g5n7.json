@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zsl1t9uxc3r2gjvd3sk1g5n7",
+		"id": "laboratory-glassware-with-milk",
+		"title": "Laboratory Glassware With Milk",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware-with-milk"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

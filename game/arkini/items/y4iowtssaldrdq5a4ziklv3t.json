@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "y4iowtssaldrdq5a4ziklv3t",
+		"id": "laboratory-glassware-with-cream",
+		"title": "Laboratory Glassware With Cream",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware-with-cream"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

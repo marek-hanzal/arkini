@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "c7iplno6v2eepclkna7b30m9",
+		"id": "laboratory-glassware-with-honey",
+		"title": "Laboratory Glassware With Honey",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware-with-honey"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "sogbloy6favyawf7m7ww5cai",
+		"id": "laboratory-glassware-with-coffee",
+		"title": "Laboratory Glassware With Coffee",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"laboratory-glassware-with-coffee"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

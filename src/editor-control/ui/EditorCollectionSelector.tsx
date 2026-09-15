@@ -1,5 +1,5 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { Plus, Trash2 } from "lucide-react";
+import { CopyPlus, Plus, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -20,6 +20,7 @@ interface EditorCollectionSelectorProps {
 	readonly navigationCard?: boolean;
 	readonly navigationHeader?: ReactNode;
 	readonly onAddFn?: () => void;
+	readonly onDuplicateFn?: (activeIndex: number) => void;
 	readonly onRemoveFn?: (activeIndex: number) => void;
 	readonly removeDisabled?: boolean;
 	readonly renderItemContentFn?: (index: number, label: string) => ReactNode;
@@ -43,6 +44,7 @@ export const EditorCollectionSelector = ({
 	navigationCard = false,
 	navigationHeader,
 	onAddFn,
+	onDuplicateFn,
 	onRemoveFn,
 	removeDisabled = false,
 	renderItemContentFn,
@@ -125,6 +127,19 @@ export const EditorCollectionSelector = ({
 							}}
 						>
 							<Plus className="size-5" />
+						</EditorIconButton>
+					)}
+					{onDuplicateFn === undefined ? null : (
+						<EditorIconButton
+							data-ui="EditorCollectionDuplicate"
+							disabled={activeIndex === undefined}
+							onClick={() => {
+								if (activeIndex === undefined) return;
+								onDuplicateFn(activeIndex);
+								selectIndexFn(activeIndex + 1);
+							}}
+						>
+							<CopyPlus className="size-4" />
 						</EditorIconButton>
 					)}
 					{onRemoveFn === undefined ? null : (

@@ -98,6 +98,136 @@ it("keeps empty output-set navigation visible and creates the first set through 
 	}
 });
 
+it("duplicates the selected root output set with its complete roll tree", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const value = OutputSchema.parse({
+		set: [
+			{
+				weight: 3,
+				roll: [
+					{
+						type: "guaranteed",
+						drop: [
+							{
+								itemId: "ore",
+								placement: "drop",
+								quantity: {
+									min: 2,
+									max: 2,
+								},
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	});
+	try {
+		await act(async () =>
+			root.render(
+				<OutputControl
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionDuplicate"]',
+				)
+				?.click(),
+		);
+		const next = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		expect(next.set).toEqual([
+			value.set[0],
+			value.set[0],
+		]);
+		expect(next.set[1]).not.toBe(value.set[0]);
+		expect(next.set[1].roll).not.toBe(value.set[0].roll);
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
+
+it("duplicates complete rolls and drops immediately after their source", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const renderOutputFn = async (value: OutputSchema.Type) =>
+		act(async () =>
+			root.render(
+				<OutputControl
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+	let value = OutputSchema.parse({
+		set: [
+			{
+				weight: 1,
+				roll: [
+					{
+						type: "guaranteed",
+						drop: [
+							{
+								itemId: "ore",
+								placement: "drop",
+								quantity: {
+									min: 2,
+									max: 3,
+								},
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	});
+	try {
+		await renderOutputFn(value);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorRollsCollection"] [data-ui="EditorCollectionDuplicate"]',
+				)
+				?.click(),
+		);
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		expect(value.set[0].roll).toHaveLength(2);
+		expect(value.set[0].roll[1]).toEqual(value.set[0].roll[0]);
+		expect(value.set[0].roll[1]).not.toBe(value.set[0].roll[0]);
+		await renderOutputFn(value);
+
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorDropsCollection"] [data-ui="EditorCollectionDuplicate"]',
+				)
+				?.click(),
+		);
+		value = onChangeFn.mock.lastCall?.[0] as OutputSchema.Type;
+		const duplicatedRoll = value.set[0].roll[1];
+		if (duplicatedRoll.type !== "guaranteed")
+			throw new Error("Expected duplicated guaranteed roll.");
+		expect(duplicatedRoll.drop).toHaveLength(2);
+		expect(duplicatedRoll.drop[1]).toEqual(duplicatedRoll.drop[0]);
+		expect(duplicatedRoll.drop[1]).not.toBe(duplicatedRoll.drop[0]);
+		expect(duplicatedRoll.drop[1].quantity).not.toBe(duplicatedRoll.drop[0].quantity);
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
+
 it("reveals roll type and drops only after each deliberate authoring step", async () => {
 	const container = document.createElement("div");
 	document.body.append(container);

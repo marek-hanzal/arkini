@@ -1265,6 +1265,47 @@ describe("item section form session", () => {
 		);
 	});
 
+	it("duplicates a complete production line with a fresh non-selected identity", async () => {
+		const source = {
+			...createLine({
+				id: "copper-ore",
+				default: true,
+				clock: true,
+			}),
+			title: "Copper Ore",
+			description: "Mines copper ore.",
+		};
+		const common = {
+			...createProducerItem({
+				id: item.id,
+				lines: [
+					source,
+				],
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container } = await render(<ProductionSection />);
+		const duplicate = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionDuplicate"]',
+		);
+		if (duplicate === null) throw new Error("Missing duplicate line control.");
+		await act(async () => duplicate.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.lines).toEqual([
+			source,
+			{
+				...source,
+				id: "copper-ore-2",
+				clock: false,
+				default: false,
+			},
+		]);
+	});
+
 	it("derives the item ID only from title edits and saves the same item UID", async () => {
 		const { container } = await render(<IdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');

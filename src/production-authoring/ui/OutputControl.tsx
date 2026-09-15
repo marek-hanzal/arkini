@@ -80,6 +80,15 @@ export const OutputControl = ({ onChangeFn, value }: OutputControlProps) => {
 						] as OutputSchema.Type["set"],
 					})
 				}
+				onDuplicateFn={(index) =>
+					onChangeFn({
+						set: [
+							...sets.slice(0, index + 1),
+							structuredClone(sets[index]),
+							...sets.slice(index + 1),
+						] as OutputSchema.Type["set"],
+					})
+				}
 				onRemoveFn={(index) =>
 					sets.length === 1
 						? onChangeFn(undefined)

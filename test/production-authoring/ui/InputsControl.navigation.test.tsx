@@ -191,3 +191,53 @@ it("keeps the required last-input remove control visible and disabled", async ()
 		container.remove();
 	}
 });
+
+it("duplicates the selected root input with its complete nested configuration", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const value: InputSchema.Type[] = [
+		{
+			type: "materials",
+			mode: "reserve",
+			quantity: {
+				min: 2,
+				max: 4,
+			},
+			selector: {
+				type: "item",
+				itemId: "ore",
+			},
+		},
+	];
+	try {
+		await act(async () =>
+			root.render(
+				<InputsControl
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorInputsCollection"] [data-ui="EditorCollectionDuplicate"]',
+				)
+				?.click(),
+		);
+		const next = onChangeFn.mock.lastCall?.[0] as InputSchema.Type[];
+		expect(next).toEqual([
+			value[0],
+			value[0],
+		]);
+		expect(next[1]).not.toBe(value[0]);
+		if (next[1].type !== "materials" || value[0].type !== "materials")
+			throw new Error("Expected material inputs.");
+		expect(next[1].quantity).not.toBe(value[0].quantity);
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});

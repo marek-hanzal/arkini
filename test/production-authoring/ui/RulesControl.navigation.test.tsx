@@ -215,3 +215,62 @@ it("reveals and removes each rule and condition level independently", async () =
 		container.remove();
 	}
 });
+
+it("duplicates the selected root rule with all of its conditions", async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const rules: RuleSchema.Type[] = [
+		{
+			type: "enable",
+			hint: "Needs ore",
+			when: [
+				{
+					type: "count",
+					count: 2,
+					query: {
+						scope: "inventory",
+						selector: {
+							type: "item",
+							itemId: "ore",
+						},
+					},
+				},
+			],
+		},
+	];
+	try {
+		await act(async () =>
+			root.render(
+				<RulesControl
+					allowedTypes={[
+						"enable",
+						"disable",
+					]}
+					description={null}
+					onChangeFn={onChangeFn}
+					rules={rules}
+					target="line"
+				/>,
+			),
+		);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorRulesCollection"] [data-ui="EditorCollectionDuplicate"]',
+				)
+				?.click(),
+		);
+		const next = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
+		expect(next).toEqual([
+			rules[0],
+			rules[0],
+		]);
+		expect(next[1]).not.toBe(rules[0]);
+		expect(next[1].when).not.toBe(rules[0].when);
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});

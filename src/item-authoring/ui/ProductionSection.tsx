@@ -14,6 +14,7 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { Mx } from "~/translation/ui/Mx";
 import { useStore } from "@tanstack/react-form";
 import { useFormValidationFocusIndex } from "~/item-authoring/ui/useFormValidationIssues";
+import { duplicateLineFn } from "~/production-authoring/fn/duplicateLineFn";
 
 interface ProductionFieldValues {
 	readonly maxQueueSize?: number;
@@ -110,6 +111,18 @@ const ProductionFields = withFieldGroupFn({
 										label={translator.textFn("Product lines")}
 										navigationCard
 										onAddFn={addLineFn}
+										onDuplicateFn={(index) => {
+											const currentLines = form.state.values.lines ?? [];
+											const duplicate = duplicateLineFn(
+												currentLines,
+												currentLines[index],
+											);
+											form.setFieldValue("lines", [
+												...currentLines.slice(0, index + 1),
+												duplicate,
+												...currentLines.slice(index + 1),
+											]);
+										}}
 										onRemoveFn={(index) => linesField.removeValue(index)}
 									>
 										{(index) => (

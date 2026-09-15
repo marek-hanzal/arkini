@@ -179,6 +179,13 @@ export const InputsControl = ({
 						structuredClone(DraftDefaults.inputs.simple),
 					])
 				}
+				onDuplicateFn={(index) =>
+					onChangeFn([
+						...value.slice(0, index + 1),
+						structuredClone(value[index]),
+						...value.slice(index + 1),
+					])
+				}
 				onRemoveFn={(index) =>
 					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}

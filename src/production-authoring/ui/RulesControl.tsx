@@ -671,6 +671,13 @@ export const RulesControl = ({
 						},
 					])
 				}
+				onDuplicateFn={(ruleIndex) =>
+					emitChangeFn([
+						...draftRules.slice(0, ruleIndex + 1),
+						structuredClone(draftRules[ruleIndex]),
+						...draftRules.slice(ruleIndex + 1),
+					])
+				}
 				onRemoveFn={(ruleIndex) =>
 					emitChangeFn(draftRules.filter((_current, index) => index !== ruleIndex))
 				}

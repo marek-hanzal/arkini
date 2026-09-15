@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act } from "react";
+import { act, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -37,6 +37,51 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("EditorCollectionSelector", () => {
+	it("duplicates the selected entry and moves selection to the inserted copy", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const Harness = () => {
+			const [items, setItems] = useState([
+				"First",
+				"Second",
+			]);
+			return (
+				<EditorCollectionSelector
+					count={items.length}
+					itemLabelFn={(index) => items[index]}
+					label="Entries"
+					onDuplicateFn={(index) =>
+						setItems([
+							...items.slice(0, index + 1),
+							`${items[index]} copy`,
+							...items.slice(index + 1),
+						])
+					}
+				>
+					{(index) => <output data-ui="SelectedEntry">{items[index]}</output>}
+				</EditorCollectionSelector>
+			);
+		};
+		await act(async () =>
+			root.render(
+				<TranslationTestProvider>
+					<Harness />
+				</TranslationTestProvider>,
+			),
+		);
+
+		const duplicate = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorCollectionDuplicate"]',
+		);
+		expect(duplicate?.disabled).toBe(false);
+		await act(async () => duplicate?.click());
+		expect(container.querySelector('[data-ui="SelectedEntry"]')?.textContent).toBe(
+			"First copy",
+		);
+	});
+
 	it("keeps an invalid empty collection visible, marked, and ready to add", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

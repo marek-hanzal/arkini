@@ -213,6 +213,13 @@ const DropList = ({
 						structuredClone(DraftDefaults.drop),
 					])
 				}
+				onDuplicateFn={(index) =>
+					onChangeFn([
+						...value.slice(0, index + 1),
+						structuredClone(value[index]),
+						...value.slice(index + 1),
+					])
+				}
 				onRemoveFn={(index) =>
 					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}
@@ -636,6 +643,16 @@ export const RollSetControl = ({
 							...value.roll,
 							structuredClone(DraftDefaults.roll),
 						],
+					})
+				}
+				onDuplicateFn={(rollIndex) =>
+					onChangeFn({
+						...value,
+						roll: [
+							...value.roll.slice(0, rollIndex + 1),
+							structuredClone(value.roll[rollIndex]),
+							...value.roll.slice(rollIndex + 1),
+						] as typeof value.roll,
 					})
 				}
 				onRemoveFn={(rollIndex) =>

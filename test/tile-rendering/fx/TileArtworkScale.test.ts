@@ -53,6 +53,7 @@ const createItemFn = (artworkScale: number): TileActorItem => ({
 const createHarnessFn = (item: TileActorItem) => {
 	const animations: ActorAnimation[] = [];
 	const frames = {
+		addBeforeRenderListenerFx: () => Effect.succeed(() => {}),
 		closeFx: Effect.void,
 		invalidateFx: Effect.void,
 		reportCriticalFailureFn: vi.fn(),

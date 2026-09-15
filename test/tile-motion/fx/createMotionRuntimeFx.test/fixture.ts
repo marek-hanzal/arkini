@@ -354,6 +354,7 @@ export const createApplication = (
 	} as PixiApplicationOwner["app"],
 	closeFx: Effect.void,
 	frames: {
+		addBeforeRenderListenerFx: () => Effect.succeed(() => {}),
 		closeFx: Effect.void,
 		invalidateFx: Effect.void,
 		reportCriticalFailureFn: () => {},

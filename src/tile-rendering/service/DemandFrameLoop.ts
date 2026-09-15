@@ -5,6 +5,10 @@ export interface DemandFrameLoop {
 	readonly invalidateFx: Effect.Effect<void, never, never>;
 	/** Schedules scene-local work for the next owned demand frame and returns its cancellation. */
 	readonly scheduleFx: (workFn: () => void) => Effect.Effect<() => void, never, never>;
+	/** Registers persistent preparation that runs before each requested scene render. */
+	readonly addBeforeRenderListenerFx: (
+		listenerFn: () => void,
+	) => Effect.Effect<() => void, never, never>;
 	/** Schedules scene-local work only after the next owned render has completed. */
 	readonly scheduleAfterRenderFx: (workFn: () => void) => Effect.Effect<() => void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;

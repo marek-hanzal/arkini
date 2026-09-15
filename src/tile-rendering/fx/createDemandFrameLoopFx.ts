@@ -26,6 +26,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 			let poisoned = false;
 			let queuedFrame: number | null = null;
 			const afterRenderWork = new Map<number, () => void>();
+			const beforeRenderListeners = new Map<number, () => void>();
 			const scheduledWork = new Map<number, () => void>();
 
 			const scheduleFn = () => {
@@ -59,12 +60,27 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 				const renderRequested = dirty;
 				dirty = false;
 				if (renderRequested) {
+					for (const listenerFn of beforeRenderListeners.values()) {
+						if (closed || poisoned) return;
+						try {
+							listenerFn();
+						} catch (cause) {
+							poisoned = true;
+							dirty = false;
+							afterRenderWork.clear();
+							beforeRenderListeners.clear();
+							scheduledWork.clear();
+							reportCriticalFailureFn(cause);
+							return;
+						}
+					}
 					try {
 						renderFn();
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
 						afterRenderWork.clear();
+						beforeRenderListeners.clear();
 						scheduledWork.clear();
 						reportCriticalFailureFn(cause);
 						return;
@@ -120,6 +136,17 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 							scheduledWork.delete(workId);
 						};
 					}),
+				addBeforeRenderListenerFx: (listenerFn) =>
+					Effect.sync(() => {
+						if (closed || poisoned) return () => {};
+						const listenerId = ++nextWorkId;
+						beforeRenderListeners.set(listenerId, listenerFn);
+						dirty = true;
+						scheduleFn();
+						return () => {
+							beforeRenderListeners.delete(listenerId);
+						};
+					}),
 				scheduleAfterRenderFx: (workFn) =>
 					Effect.sync(() => {
 						if (closed || poisoned) return () => {};
@@ -136,6 +163,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 					closed = true;
 					dirty = false;
 					afterRenderWork.clear();
+					beforeRenderListeners.clear();
 					scheduledWork.clear();
 					document.removeEventListener("visibilitychange", onVisibilityChangeFn);
 					if (queuedFrame !== null) {

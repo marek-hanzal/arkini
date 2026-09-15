@@ -120,6 +120,42 @@ describe("DemandFrameLoop", () => {
 		expect(canceled).not.toHaveBeenCalled();
 	});
 
+	it("runs persistent preparation only before requested renders until canceled", () => {
+		const fake = createFakeFrames();
+		const order: string[] = [];
+		const loop = Effect.runSync(
+			createDemandFrameLoopFx({
+				cancelFrameFn: fake.cancelFrameFn,
+				reportCriticalFailureFn: vi.fn(),
+				renderFn: () => order.push("render"),
+				requestFrameFn: fake.requestFrameFn,
+			}),
+		);
+
+		const cancel = Effect.runSync(loop.addBeforeRenderListenerFx(() => order.push("prepare")));
+		fake.runNext(10);
+		expect(order).toEqual([
+			"prepare",
+			"render",
+		]);
+		expect(fake.callbacks).toHaveLength(0);
+
+		Effect.runSync(loop.invalidateFx);
+		fake.runNext(20);
+		expect(order).toEqual([
+			"prepare",
+			"render",
+			"prepare",
+			"render",
+		]);
+
+		cancel();
+		Effect.runSync(loop.invalidateFx);
+		fake.runNext(30);
+		expect(order.at(-1)).toBe("render");
+		expect(order.filter((entry) => entry === "prepare")).toHaveLength(2);
+	});
+
 	it("stops later callbacks from the same frame when an earlier callback closes it", () => {
 		const fake = createFakeFrames();
 		const laterWork = vi.fn();

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, RenderTexture, type Texture } from "pixi.js";
+import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import { createDragOriginGhostsFx } from "~/tile-interaction/fx/createDragOriginGhostsFx";
@@ -9,16 +9,12 @@ import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicat
 import { createDragActor, item } from "~test/tile-interaction/fx/MainDragController.test/actors";
 
 describe("drag origin ghosts", () => {
-	it("keeps a non-interactive snapshot below actors until settlement completes", () => {
+	it("keeps a live non-interactive mirror below actors until settlement completes", () => {
 		const actor = createDragActor(item);
 		const layer = new Container();
 		layer.addChild(actor.container);
-		const texture = RenderTexture.create({
-			height: actor.size,
-			width: actor.size,
-		});
-		const destroyTexture = vi.spyOn(texture, "destroy");
-		const generateTexture = vi.fn(() => texture as Texture);
+		const render = vi.fn();
+		const beforeRenderListeners = new Set<() => void>();
 		const tweens: Array<Parameters<AnimationDriver["startTweenFx"]>[0]> = [];
 		const animationDriver = {
 			closeFx: Effect.void,
@@ -50,9 +46,16 @@ describe("drag origin ghosts", () => {
 				application: {
 					app: {
 						renderer: {
-							generateTexture,
+							render,
 							resolution: 1,
 						},
+					},
+					frames: {
+						addBeforeRenderListenerFx: (listenerFn: () => void) =>
+							Effect.sync(() => {
+								beforeRenderListeners.add(listenerFn);
+								return () => beforeRenderListeners.delete(listenerFn);
+							}),
 					},
 				} as unknown as PixiApplicationOwner,
 				surface,
@@ -61,18 +64,23 @@ describe("drag origin ghosts", () => {
 
 		Effect.runSync(ghosts.beginFx(actor));
 		const ghost = layer.children[0];
-		expect(generateTexture).toHaveBeenCalledOnce();
 		expect(ghost?.label).toBe(`DragOriginGhost:${actor.item.id}:${actor.instanceId}`);
 		expect(ghost?.eventMode).toBe("none");
 		expect(ghost?.interactiveChildren).toBe(false);
 		expect(layer.children[1]).toBe(actor.container);
+		expect(beforeRenderListeners).toHaveLength(1);
+		for (const listenerFn of beforeRenderListeners) listenerFn();
+		expect(render).toHaveBeenCalledOnce();
+		expect(render.mock.calls[0]?.[0]).toMatchObject({
+			container: actor.container,
+		});
 
 		Effect.runSync(ghosts.settleFx(actor));
 		expect(ghost?.destroyed).toBe(false);
 		expect(tweens).toHaveLength(2);
 		tweens[1]?.onCompleteFn?.();
 		expect(ghost?.destroyed).toBe(true);
-		expect(destroyTexture).toHaveBeenCalledExactlyOnceWith(true);
+		expect(beforeRenderListeners).toHaveLength(0);
 		expect(layer.children).toEqual([
 			actor.container,
 		]);

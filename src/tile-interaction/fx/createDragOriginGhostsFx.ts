@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Rectangle, Sprite, type Texture } from "pixi.js";
+import { Container, Matrix, RenderTexture, Sprite } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { AnimationControl, AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
@@ -16,7 +16,8 @@ interface Props {
 
 interface Ghost {
 	readonly container: Container;
-	readonly texture: Texture;
+	readonly stopRefreshingFn: () => void;
+	readonly texture: RenderTexture;
 	entrance: AnimationControl | null;
 	exit: AnimationControl | null;
 }
@@ -26,11 +27,12 @@ const exitDurationMs = 150;
 const restingAlpha = 0.24;
 
 /**
- * Snapshots a dragged actor at its committed origin without creating another gameplay actor.
+ * Mirrors a dragged actor at its committed origin without creating another gameplay actor.
  *
- * Ghosts live in the origin actor layer, below its interactive children. They never enter actor
- * stores, hit testing, drop preview, or magnetic queries, and disappear only when presentation has
- * settled the real actor or retired it from the main scene.
+ * Ghosts live in the origin actor layer, below its interactive children. Their retained texture is
+ * refreshed before every requested scene render so current Clock, job, quantity, and artwork state
+ * remains visible. They never enter actor stores, hit testing, drop preview, or magnetic queries,
+ * and disappear only when presentation has settled the real actor or retired it from the main scene.
  */
 export const createDragOriginGhostsFx = Effect.fn("createDragOriginGhostsFx")(function* ({
 	animationDriver,
@@ -43,6 +45,7 @@ export const createDragOriginGhostsFx = Effect.fn("createDragOriginGhostsFx")(fu
 	const destroyGhostFx = Effect.fn("DragOriginGhosts.destroyGhostFx")(function* (ghost: Ghost) {
 		yield* ghost.entrance?.stopFx ?? Effect.void;
 		yield* ghost.exit?.stopFx ?? Effect.void;
+		ghost.stopRefreshingFn();
 		ghost.container.destroy({
 			children: true,
 		});
@@ -61,11 +64,27 @@ export const createDragOriginGhostsFx = Effect.fn("createDragOriginGhostsFx")(fu
 					yield* destroyGhostFx(stale);
 				}
 
-				const texture = application.app.renderer.generateTexture({
+				const texture = RenderTexture.create({
 					antialias: true,
-					frame: new Rectangle(0, 0, actor.size, actor.size),
+					height: actor.size,
 					resolution: application.app.renderer.resolution,
-					target: actor.container,
+					width: actor.size,
+				});
+				const captureTransform = new Matrix();
+				const stopRefreshingFn = yield* application.frames.addBeforeRenderListenerFx(() => {
+					if (actor.container.destroyed || texture.destroyed) return;
+					application.app.renderer.render({
+						clearColor: [
+							0,
+							0,
+							0,
+							0,
+						],
+						container: actor.container,
+						target: texture,
+						transform: captureTransform,
+					});
+					texture.source.updateMipmaps();
 				});
 				const sprite = new Sprite({
 					anchor: 0.5,
@@ -89,6 +108,7 @@ export const createDragOriginGhostsFx = Effect.fn("createDragOriginGhostsFx")(fu
 					container,
 					entrance: null,
 					exit: null,
+					stopRefreshingFn,
 					texture,
 				};
 				ghosts.set(actor, ghost);

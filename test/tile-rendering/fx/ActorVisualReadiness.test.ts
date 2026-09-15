@@ -111,6 +111,7 @@ const createFrames = () => {
 	const reportCriticalFailureFn = vi.fn();
 	return {
 		frames: {
+			addBeforeRenderListenerFx: () => Effect.succeed(() => {}),
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
 			reportCriticalFailureFn,

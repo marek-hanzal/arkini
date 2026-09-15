@@ -57,6 +57,7 @@ const createFrames = () => {
 	const invalidate = vi.fn();
 	return {
 		frames: {
+			addBeforeRenderListenerFx: () => Effect.succeed(() => {}),
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
 			scheduleAfterRenderFx: (work) =>

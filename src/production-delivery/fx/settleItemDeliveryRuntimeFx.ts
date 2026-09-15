@@ -139,7 +139,6 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 					input === undefined ||
 					input.type !== TypeSchema.enum.Materials ||
 					isLineInputClosedFn({
-						input,
 						ownerItemId: owner.id,
 						lineId: line.id,
 						runtime: inputRuntime,

@@ -17,7 +17,7 @@ describe("startLineRuntimeFx", () => {
 					(item) => item.item.id === "water" && item.location.scope === "input",
 				);
 				if (consumedSource === undefined) {
-					return yield* Effect.die(new Error("Expected buffered water input."));
+					return yield* Effect.die(new Error("Expected stored water input."));
 				}
 
 				const [job, runtime, events] = yield* startLineRuntimeFx({
@@ -42,12 +42,6 @@ describe("startLineRuntimeFx", () => {
 		expect(result.runtime.jobs).toEqual([
 			result.job,
 		]);
-		expect(
-			result.runtime.items.find((item) => item.id === result.consumedSource.id),
-		).toMatchObject({
-			location: result.consumedSource.location,
-			quantity: 3,
-		});
 		expect(
 			result.runtime.items.find(
 				(item) => item.item.id === "water" && item.location.scope === "job",
@@ -75,9 +69,9 @@ describe("startLineRuntimeFx", () => {
 			sourceItemId: result.consumedSource.id,
 			canonicalItemId: "water",
 			sourceLocation: result.consumedSource.location,
-			previousQuantity: 6,
+			previousQuantity: 3,
 			consumedQuantity: 3,
-			resultingQuantity: 3,
+			resultingQuantity: 0,
 		});
 	});
 });

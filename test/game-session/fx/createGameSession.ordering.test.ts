@@ -192,7 +192,7 @@ describe("createGameSessionFx / callback ordering", () => {
 			);
 			if (jobEvents.length > 0) {
 				batches.push(jobEvents);
-				if (batches.length === 2)
+				if (batches.length === 3)
 					publishBatches?.(
 						batches.map((events) => [
 							...events,
@@ -220,6 +220,11 @@ describe("createGameSessionFx / callback ordering", () => {
 					elapsedMs: 2_000,
 				}),
 			);
+			await session.runFn(
+				advanceRuntimeElapsedFx({
+					elapsedMs: 1_000,
+				}),
+			);
 			expect(session.getSnapshotFn().jobs).toHaveLength(0);
 
 			expect(await batchesDelivered).toEqual([
@@ -229,6 +234,8 @@ describe("createGameSessionFx / callback ordering", () => {
 				[
 					"job:completed",
 					"job:started",
+				],
+				[
 					"job:completed",
 				],
 			]);

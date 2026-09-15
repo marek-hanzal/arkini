@@ -169,7 +169,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 								min: 1,
 								max: 1,
 							},
-							capacity: 1,
 							mode: "consume",
 						},
 					],

@@ -34,7 +34,6 @@ const materialInput = (itemId: string) => ({
 		min: 1,
 		max: 1,
 	},
-	capacity: 1,
 	mode: "reserve" as const,
 });
 
@@ -75,7 +74,6 @@ const config = GameConfigSchema.parse({
 						materialInput("worker"),
 						{
 							...materialInput("material"),
-							capacity: 3,
 							quantity: {
 								min: 3,
 								max: 3,

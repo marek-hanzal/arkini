@@ -80,7 +80,6 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 						selector: input.selector,
 					}) ||
 					isLineInputClosedFn({
-						input,
 						ownerItemId: owner.id,
 						lineId: line.id,
 						runtime: nextRuntime,

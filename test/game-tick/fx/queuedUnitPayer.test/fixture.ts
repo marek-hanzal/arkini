@@ -53,7 +53,6 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 								min: 1,
 								max: 1,
 							},
-							capacity: 0,
 						},
 					]),
 					line("free", [

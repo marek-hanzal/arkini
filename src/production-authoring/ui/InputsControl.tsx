@@ -122,8 +122,6 @@ export const InputsControl = ({
 										{translator.textFn(
 											input.mode === "consume" ? "Consume" : "Reserve",
 										)}
-										{" · "}
-										{translator.textFn("Buffer")}: {input.capacity}
 									</span>
 								}
 							>

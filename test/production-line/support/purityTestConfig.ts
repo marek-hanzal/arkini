@@ -71,27 +71,6 @@ export const purityTestConfig = GameConfigSchema.parse({
 					],
 					rules: [],
 				},
-				{
-					id: "line:producer:buffer",
-					title: "Buffered",
-					description: "A line with storage capacity.",
-					runtimeMs: 1_000,
-					input: [
-						{
-							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "material",
-							},
-							quantity: {
-								min: 1,
-								max: 1,
-							},
-							capacity: 2,
-						},
-					],
-					rules: [],
-				},
 			],
 		},
 		craft: {

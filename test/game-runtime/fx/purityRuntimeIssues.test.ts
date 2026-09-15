@@ -106,7 +106,7 @@ describe("runtime purity invariants", () => {
 					location: {
 						scope: "input" as const,
 						ownerItemId: "runtime:producer",
-						lineId: "line:producer:buffer",
+						lineId: "line:producer:zero",
 						inputIndex: 0,
 					},
 					quantity: 1,
@@ -131,7 +131,7 @@ describe("runtime purity invariants", () => {
 				{
 					id: "job:producer",
 					ownerItemId: "runtime:producer",
-					lineId: "line:producer:buffer",
+					lineId: "line:producer:zero",
 					durationMs: 1_000,
 					remainingMs: 1_000,
 				},
@@ -154,7 +154,7 @@ describe("runtime purity invariants", () => {
 				{
 					id: "request:producer",
 					ownerItemId: "runtime:producer",
-					lineId: "line:producer:buffer",
+					lineId: "line:producer:zero",
 				},
 			],
 
@@ -221,62 +221,6 @@ describe("runtime purity invariants", () => {
 				},
 			],
 			jobs: [],
-
-			jobQueue: [],
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-
-		const result = Effect.runSync(
-			checkRuntimeFx({
-				runtime,
-			}).pipe(
-				useGameFx({
-					config: purityTestConfig,
-				}),
-			),
-		);
-
-		expect(result.issues).toEqual([]);
-	});
-
-	it("allows buffered input on a running positive-capacity line", () => {
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				{
-					id: "runtime:producer",
-					item: purityTestConfig.items.producer,
-					location: board(0),
-					quantity: 1,
-					revision: "revision:producer",
-				},
-				{
-					id: "runtime:material",
-					item: purityTestConfig.items.material,
-					location: {
-						scope: "input" as const,
-						ownerItemId: "runtime:producer",
-						lineId: "line:producer:buffer",
-						inputIndex: 0,
-					},
-					quantity: 1,
-					revision: "revision:material",
-				},
-			],
-			jobs: [
-				{
-					id: "job:producer",
-					ownerItemId: "runtime:producer",
-					lineId: "line:producer:buffer",
-					durationMs: 1_000,
-					remainingMs: 1_000,
-				},
-			],
 
 			jobQueue: [],
 			defaultLineByOwnerItemId: {},

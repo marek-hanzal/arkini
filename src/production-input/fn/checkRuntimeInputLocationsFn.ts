@@ -132,7 +132,6 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 			return quantity + candidate.item.quantity;
 		}, 0);
 		const closed = isLineInputClosedFn({
-			input: current.input,
 			ownerItemId: current.location.ownerItemId,
 			lineId: current.location.lineId,
 			runtime,

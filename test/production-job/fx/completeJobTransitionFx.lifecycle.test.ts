@@ -100,10 +100,29 @@ const lifecycleConfig = GameConfigSchema.parse({
 								min: 1,
 								max: 1,
 							},
-							capacity: 1,
 						},
 					],
 					output,
+					rules: [],
+				},
+				{
+					id: "line:trader:stored",
+					title: "Stored material",
+					description: "Hold material for another trade.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "materials",
+							selector: {
+								type: "item",
+								itemId: "item:material",
+							},
+							quantity: {
+								min: 1,
+								max: 1,
+							},
+						},
+					],
 					rules: [],
 				},
 			],
@@ -320,7 +339,7 @@ describe("job completion unit lifecycle", () => {
 		]);
 	});
 
-	it("removes a depleted producer and releases buffered input after placing output", () => {
+	it("removes a depleted producer after placing output", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -394,7 +413,7 @@ describe("job completion unit lifecycle", () => {
 		);
 	});
 
-	it("preserves one impure buffered input after depleted-owner outputs claim priority", () => {
+	it("preserves one impure stored input after depleted-owner outputs claim priority", () => {
 		const state = {
 			cheats: {
 				enabled: false,
@@ -433,7 +452,7 @@ describe("job completion unit lifecycle", () => {
 					location: {
 						scope: "input",
 						ownerItemId: "runtime:trader",
-						lineId: "line:trader:trade",
+						lineId: "line:trader:stored",
 						inputIndex: 0,
 					},
 					remainingUnits: 1,

@@ -84,8 +84,7 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
  *
  * Sources prefer the owner's board space by distance, then Toolbar and Inventory slot order.
  * Required minima are allocated across every slot before compatible range inputs receive optional
- * top-ups toward their maximum. The planner never consumes authored buffer capacity or mutates
- * runtime truth itself.
+ * top-ups toward their maximum. The planner does not mutate runtime truth itself.
  */
 export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(function* ({
 	includeIncomingDeliveries = true,
@@ -165,7 +164,6 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			storedQuantity: plannedQuantity,
 		});
 		const closed = isLineInputClosedFn({
-			input,
 			ownerItemId,
 			lineId,
 			runtime,

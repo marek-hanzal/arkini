@@ -110,8 +110,8 @@ describe("forceRemoveRuntimeItemFx", () => {
 			items: [
 				owner,
 				itemFn("existing", "water", boardFn(1), 2),
-				itemFn("buffer-a", "water", inputFn(owner.id, 0), 3),
-				itemFn("buffer-b", "water", inputFn(owner.id, 0), 2),
+				itemFn("buffer-a", "water", inputFn(owner.id, 0, "line:forge:stored-water"), 3),
+				itemFn("buffer-b", "water", inputFn(owner.id, 0, "line:forge:stored-water"), 2),
 			],
 		};
 		Effect.runSync(
@@ -157,7 +157,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 			target: {
 				kind: "line-input",
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineId: "line:forge:stored-water",
 				input: [
 					{
 						inputIndex: 0,

@@ -271,7 +271,6 @@ describe("validateInputUnitsFn", () => {
 						max: 1,
 					},
 					mode: "consume",
-					capacity: 0,
 					units: {
 						from: "target",
 						cost: 1,

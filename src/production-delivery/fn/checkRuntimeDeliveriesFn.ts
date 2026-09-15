@@ -96,7 +96,6 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 			}
 			if (
 				isLineInputClosedFn({
-					input,
 					ownerItemId: owner.id,
 					lineId: line.id,
 					runtime,

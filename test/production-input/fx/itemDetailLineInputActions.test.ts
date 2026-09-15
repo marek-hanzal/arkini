@@ -43,7 +43,6 @@ const twoInputTestConfig = GameConfigSchema.parse({
 							min: 2,
 							max: 2,
 						},
-						capacity: 0,
 					},
 					...line.input.slice(1),
 				],
@@ -85,7 +84,6 @@ const rangeInputTestConfig = GameConfigSchema.parse({
 							min: 1,
 							max: 4,
 						},
-						capacity: 2,
 					},
 					...line.input.slice(1),
 				],
@@ -164,7 +162,7 @@ const spawnWaterFx = ({
 	});
 
 describe("Item Detail line input actions", () => {
-	it("autofills a range input toward the available maximum without filling its buffer", () => {
+	it("autofills a range input toward its maximum", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -481,7 +479,7 @@ describe("Item Detail line input actions", () => {
 		});
 	});
 
-	it("withdraws required input and excess buffer through canonical placement", () => {
+	it("withdraws stored input through canonical placement", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -489,11 +487,6 @@ describe("Item Detail line input actions", () => {
 					id: "runtime:required-water",
 					location: sourceLocation(1),
 					quantity: 3,
-				});
-				yield* spawnWaterFx({
-					id: "runtime:buffered-water",
-					location: sourceLocation(2),
-					quantity: 2,
 				});
 				const requiredWater = yield* getItemFx({
 					itemId: "runtime:required-water",
@@ -505,17 +498,6 @@ describe("Item Detail line input actions", () => {
 					sourceItemId: requiredWater.id,
 					sourceItemRevision: requiredWater.revision,
 					quantity: 3,
-				});
-				const bufferedWater = yield* getItemFx({
-					itemId: "runtime:buffered-water",
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 0,
-					sourceItemId: bufferedWater.id,
-					sourceItemRevision: bufferedWater.revision,
-					quantity: 2,
 				});
 				const withdrawn = yield* withdrawLineInputsFx({
 					ownerItemId,
@@ -539,8 +521,8 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.withdrawn).toEqual({
-			withdrawnItemCount: 2,
-			withdrawnQuantity: 5,
+			withdrawnItemCount: 1,
+			withdrawnQuantity: 3,
 		});
 		expect(result.runtime.items).not.toContainEqual(
 			expect.objectContaining({
@@ -556,7 +538,7 @@ describe("Item Detail line input actions", () => {
 				item: expect.objectContaining({
 					id: "water",
 				}),
-				quantity: 5,
+				quantity: 3,
 				location: expect.objectContaining({
 					scope: "board",
 					space: 0,

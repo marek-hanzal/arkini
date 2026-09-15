@@ -9,7 +9,7 @@ const itemBase = (id: string, scope: "any" | "board" = "any") => ({
 	scope,
 });
 
-const materialInput = (quantity: number, capacity?: number) => ({
+const materialInput = (quantity: number) => ({
 	type: "materials",
 	selector: {
 		type: "item",
@@ -19,11 +19,6 @@ const materialInput = (quantity: number, capacity?: number) => ({
 		min: quantity,
 		max: quantity,
 	},
-	...(capacity === undefined
-		? {}
-		: {
-				capacity,
-			}),
 });
 
 const productionLine = (id: string, input: ReadonlyArray<ReturnType<typeof materialInput>>) => ({
@@ -86,7 +81,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			},
 			lines: [
 				productionLine("craft", [
-					materialInput(6, 3),
+					materialInput(6),
 				]),
 			],
 		},

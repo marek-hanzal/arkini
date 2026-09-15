@@ -250,7 +250,7 @@ describe("storeInputMaterialFx", () => {
 					x: 2,
 				});
 				yield* storeFx({
-					quantity: 4,
+					quantity: 2,
 				});
 				const second = yield* storeFx({
 					quantity: 3,
@@ -271,7 +271,7 @@ describe("storeInputMaterialFx", () => {
 
 		expect(result.second.storedItem.quantity).toBe(1);
 		expect(result.second.sourceItem?.quantity).toBe(2);
-		expect(result.buffered.reduce((quantity, item) => quantity + item.quantity, 0)).toBe(5);
+		expect(result.buffered.reduce((quantity, item) => quantity + item.quantity, 0)).toBe(3);
 	});
 
 	it("rejects unavailable material without partially changing runtime", () => {

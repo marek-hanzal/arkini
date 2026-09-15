@@ -122,7 +122,7 @@ describe("readItemDetailLinesFx / queue order and visibility", () => {
 						max: 3,
 					},
 					missingQuantity: 1,
-					availableCapacity: 3,
+					availableCapacity: 1,
 					ready: false,
 				},
 			],

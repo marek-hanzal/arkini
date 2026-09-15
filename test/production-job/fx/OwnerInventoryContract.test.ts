@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -10,7 +11,6 @@ import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRun
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
-import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
@@ -73,19 +73,7 @@ const moveOwnerFx = Effect.fn("moveOwnerFx")(function* (scope: "board" | "invent
 	});
 });
 
-const removeBufferedWaterFx = Effect.fn("removeBufferedWaterFx")(function* () {
-	const runtime = yield* readRuntimeFx();
-	const water = runtime.items.find(
-		(item) => item.item.id === "water" && item.location.scope === "input",
-	);
-	if (water === undefined) throw new Error("Expected buffered water.");
-	yield* removeRuntimeItemForTestFx({
-		itemId: water.id,
-		revision: water.revision,
-	});
-});
-
-const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
+const refillInputsFx = Effect.fn("refillInputsFx")(function* () {
 	const water = yield* spawnItemFx({
 		id: "runtime:water:inventory-contract",
 		itemId: "water",
@@ -106,6 +94,19 @@ const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
 		sourceItemId: water.id,
 		sourceItemRevision: water.revision,
 		quantity: 3,
+	});
+	const runtime = yield* readRuntimeFx();
+	const tool = runtime.items.find(
+		(item) => item.item.id === "tool" && item.location.scope === "board",
+	);
+	if (tool === undefined) throw new Error("Expected available tool.");
+	yield* storeInputMaterialFx({
+		ownerItemId,
+		lineId,
+		inputIndex: 1,
+		sourceItemId: tool.id,
+		sourceItemRevision: tool.revision,
+		quantity: 1,
 	});
 });
 
@@ -319,25 +320,21 @@ describe("job owner inventory contract", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
-				yield* startLineFx({
-					ownerItemId,
-					lineId,
-				});
 				yield* enqueueLineFx({
 					ownerItemId,
 					lineId,
 				});
-				yield* removeBufferedWaterFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: 1_000,
+				yield* withdrawLineInputsFx({
+					ownerItemId,
+					lineId,
 				});
-				yield* refillBufferedWaterFx();
 				yield* moveOwnerFx("inventory");
 				yield* runTickRuntimeByFx({
 					elapsedMs: 400,
 				});
 				const paused = yield* readRuntimeFx();
 				yield* moveOwnerFx("board");
+				yield* refillInputsFx();
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});

@@ -80,7 +80,6 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 									min: 1,
 									max: 2,
 								},
-								capacity: 0,
 								mode: "consume",
 							},
 						],

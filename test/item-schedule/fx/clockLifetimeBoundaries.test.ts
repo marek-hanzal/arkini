@@ -163,7 +163,6 @@ describe("Clock lifetime boundaries", () => {
 										min: 1,
 										max: 1,
 									},
-									capacity: 0,
 									mode: "consume",
 								},
 							],

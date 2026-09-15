@@ -390,7 +390,7 @@ describe("dropItemFx default-line input storage", () => {
 
 		expect(result.outcome).toMatchObject({
 			kind: DropItemResultKind.StoreInput,
-			storedQuantity: 5,
+			storedQuantity: 3,
 			source: {
 				itemId: "runtime:water",
 				previousQuantity: 7,
@@ -398,18 +398,18 @@ describe("dropItemFx default-line input storage", () => {
 					itemId: "runtime:water",
 					canonicalItemId: "water",
 					location: sourceLocation(1),
-					quantity: 2,
+					quantity: 4,
 				},
 			},
 		});
 		const visibleSource = result.runtime.items.find((item) => item.id === "runtime:water");
-		expect(visibleSource?.quantity).toBe(2);
+		expect(visibleSource?.quantity).toBe(4);
 		expect(visibleSource?.location).toEqual(sourceLocation(1));
 		expect(
 			result.runtime.items
 				.filter((item) => item.location.scope === "input")
 				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(5);
+		).toBe(3);
 	});
 
 	it("admits only a valid exact input request before a compatible authored merge", () => {
@@ -548,7 +548,7 @@ describe("dropItemFx default-line input storage", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const { owner, source } = yield* setupFx({
-					quantity: 5,
+					quantity: 3,
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
@@ -556,7 +556,7 @@ describe("dropItemFx default-line input storage", () => {
 					inputIndex: 0,
 					sourceItemId: "runtime:water",
 					sourceItemRevision: source.revision,
-					quantity: 5,
+					quantity: 3,
 				});
 				const extra = yield* spawnItemFx({
 					id: "runtime:water-extra",

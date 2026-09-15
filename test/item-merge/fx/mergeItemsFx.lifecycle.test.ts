@@ -61,7 +61,6 @@ const producerItem = ({
 						min: 1,
 						max: 1,
 					},
-					capacity: 3,
 					mode: "reserve" as const,
 				},
 			],

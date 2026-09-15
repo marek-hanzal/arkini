@@ -84,48 +84,6 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 			Effect.gen(function* () {
 				const owner = yield* prepareJobLineFx();
 				const started = yield* startLineFx(startProps);
-				const water = yield* spawnItemFx({
-					id: "runtime:water:queued",
-					itemId: "water",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 3,
-							y: 0,
-						},
-					},
-					quantity: 3,
-				});
-				const tool = yield* spawnItemFx({
-					id: "runtime:tool:queued",
-					itemId: "tool",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 4,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId: owner.id,
-					lineId: startProps.lineId,
-					inputIndex: 0,
-					sourceItemId: water.id,
-					sourceItemRevision: water.revision,
-					quantity: 3,
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId: owner.id,
-					lineId: startProps.lineId,
-					inputIndex: 1,
-					sourceItemId: tool.id,
-					sourceItemRevision: tool.revision,
-					quantity: 1,
-				});
 				const queued = yield* enqueueLineFx(startProps);
 				yield* setCheatEnabledFx({
 					enabled: true,

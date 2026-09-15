@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
@@ -13,8 +12,8 @@ import { ModeSchema } from "./ModeSchema";
  *
  * The matching items are committed to the active job. `consume` destroys passive
  * owned state at start and discards the committed root at completion; `reserve`
- * retains the same live instance and relocates it after completion. Quantity and
- * capacity aggregate every item matched by the selector.
+ * retains the same live instance and relocates it after completion. Quantity
+ * aggregates every item matched by the selector.
  */
 export const MaterialSchema = z
 	.object({
@@ -49,15 +48,6 @@ export const MaterialSchema = z
 		 */
 		quantity: QuantitySchema.describe(
 			"The exact or bounded total amount accepted across all matching materials.",
-		),
-		/**
-		 * Extra total quantity this input may buffer above its required `quantity`.
-		 *
-		 * Zero accepts exactly the quantity required by the line and no additional
-		 * items. A positive value allows that many extra items to wait in the input.
-		 */
-		capacity: NonNegativeIntegerSchema.default(0).describe(
-			"The extra total quantity this input may buffer above its required quantity; defaults to zero, which allows no extra materials.",
 		),
 	})
 	.strict()

@@ -200,7 +200,7 @@ const MaterialInputControl = ({
 					})
 				}
 			/>
-			<div className="grid gap-3 sm:grid-cols-3">
+			<div className="grid gap-3 sm:grid-cols-2">
 				<QuantityFields
 					minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
 					maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
@@ -211,19 +211,6 @@ const MaterialInputControl = ({
 						onChangeFn({
 							...input,
 							quantity,
-						})
-					}
-				/>
-				<EditorNumberControl
-					error={readEditorFormValidationErrorFn(issues, "capacity")}
-					description={<Mx label="Material buffer help" />}
-					label={translator.textFn("Buffer")}
-					value={input.capacity}
-					min={0}
-					onChangeFn={(capacity) =>
-						onChangeFn({
-							...input,
-							capacity,
 						})
 					}
 				/>

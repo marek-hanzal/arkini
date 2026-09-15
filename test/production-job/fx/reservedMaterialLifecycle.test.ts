@@ -36,7 +36,6 @@ const reserveInput = (itemId: string) => ({
 		min: 1,
 		max: 1,
 	},
-	capacity: 0,
 	mode: "reserve" as const,
 });
 
@@ -119,15 +118,12 @@ const config = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:worker:buffer",
-					title: "Buffer",
-					description: "Keep one payload buffered.",
+					id: "line:worker:reserve",
+					title: "Reserve",
+					description: "Reserve one payload.",
 					runtimeMs: 200,
 					input: [
-						{
-							...reserveInput("item:payload"),
-							capacity: 1,
-						},
+						reserveInput("item:payload"),
 					],
 					rules: [],
 				},
@@ -300,7 +296,7 @@ describe("reserved material lifecycle", () => {
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: worker.id,
-					lineId: "line:worker:buffer",
+					lineId: "line:worker:reserve",
 					inputIndex: 0,
 					sourceItemId: payload.id,
 					sourceItemRevision: payload.revision,
@@ -440,7 +436,7 @@ describe("reserved material lifecycle", () => {
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: worker.id,
-					lineId: "line:worker:buffer",
+					lineId: "line:worker:reserve",
 					inputIndex: 0,
 					sourceItemId: payload.id,
 					sourceItemRevision: payload.revision,

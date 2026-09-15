@@ -25,12 +25,12 @@ const props = {
 	lineId: "line:forge:run",
 };
 
-const removeBufferedWaterFx = Effect.fn("removeBufferedWaterFx")(function* () {
+const removeAvailableWaterFx = Effect.fn("removeAvailableWaterFx")(function* () {
 	const runtime = yield* readRuntimeFx();
 	const water = runtime.items.find(
-		(item) => item.item.id === "water" && item.location.scope === "input",
+		(item) => item.item.id === "water" && item.location.scope === "board",
 	);
-	if (water === undefined) throw new Error("Expected buffered water.");
+	if (water === undefined) throw new Error("Expected available water.");
 	yield* removeRuntimeItemForTestFx({
 		itemId: water.id,
 		revision: water.revision,
@@ -268,7 +268,7 @@ describe("runTickRuntimeByFx", () => {
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
 				yield* enqueueLineFx(props);
-				yield* removeBufferedWaterFx();
+				yield* removeAvailableWaterFx();
 
 				yield* runTickRuntimeByFx({
 					elapsedMs: 1_000,
@@ -277,7 +277,7 @@ describe("runTickRuntimeByFx", () => {
 
 				yield* refillBufferedWaterFx();
 				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
+					elapsedMs: 500,
 				});
 				return {
 					blocked,

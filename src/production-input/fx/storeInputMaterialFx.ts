@@ -186,7 +186,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				ownerItemId,
 			});
 			const closed = isLineInputClosedFn({
-				input,
 				ownerItemId,
 				lineId,
 				runtime,

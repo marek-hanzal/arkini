@@ -13,11 +13,10 @@ const fixedInput = MaterialSchema.parse({
 		min: 3,
 		max: 3,
 	},
-	capacity: 2,
 });
 
 describe("resolveInputMaterialFn", () => {
-	it("reports a missing fixed input and its remaining buffer capacity", () => {
+	it("reports a missing fixed input and its remaining capacity", () => {
 		expect(
 			resolveInputMaterialFn({
 				input: fixedInput,
@@ -31,25 +30,25 @@ describe("resolveInputMaterialFn", () => {
 				max: 3,
 			},
 			storedQuantity: 1,
-			maxStoredQuantity: 5,
+			maxStoredQuantity: 3,
 			runQuantity: 0,
 			missingQuantity: 2,
-			availableCapacity: 4,
+			availableCapacity: 2,
 			ready: false,
 		});
 	});
 
-	it("caps one ready run at the required maximum and leaves buffered excess", () => {
+	it("caps one ready run at the required maximum", () => {
 		expect(
 			resolveInputMaterialFn({
 				input: fixedInput,
-				storedQuantity: 4,
+				storedQuantity: 3,
 			}),
 		).toMatchObject({
-			storedQuantity: 4,
+			storedQuantity: 3,
 			runQuantity: 3,
 			missingQuantity: 0,
-			availableCapacity: 1,
+			availableCapacity: 0,
 			ready: true,
 		});
 	});

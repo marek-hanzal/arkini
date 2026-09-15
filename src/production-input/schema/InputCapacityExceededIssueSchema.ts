@@ -7,15 +7,15 @@ import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeInteger
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /**
- * One material input buffer stores more quantity than its configured capacity.
+ * One material input stores more quantity than its configured maximum.
  */
 export const InputCapacityExceededIssueSchema = z
 	.object({
 		ownerItemId: IdSchema.describe("The runtime item that owns the overfilled input."),
 		lineId: IdSchema.describe("The stable ID of the owner product line."),
 		inputIndex: NonNegativeIntegerSchema.describe("The zero-based input position."),
-		itemIds: z.array(IdSchema).min(1).describe("The buffered runtime items in this input."),
-		storedQuantity: PositiveIntegerSchema.describe("The total buffered material quantity."),
+		itemIds: z.array(IdSchema).min(1).describe("The runtime items stored in this input."),
+		storedQuantity: PositiveIntegerSchema.describe("The total stored material quantity."),
 		maxStoredQuantity: PositiveIntegerSchema.describe(
 			"The largest quantity allowed by this input.",
 		),
@@ -26,7 +26,7 @@ export const InputCapacityExceededIssueSchema = z
 	.strict()
 	.meta({
 		id: "InputCapacityExceededIssueSchema",
-		description: "One material input buffer exceeds its configured capacity.",
+		description: "One material input exceeds its configured maximum.",
 	});
 
 export type InputCapacityExceededIssueSchema = typeof InputCapacityExceededIssueSchema;

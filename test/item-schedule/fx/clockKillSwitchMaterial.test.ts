@@ -43,7 +43,6 @@ const configFn = () => {
 								min: 1,
 								max: 1,
 							},
-							capacity: 0,
 						},
 					],
 				})),

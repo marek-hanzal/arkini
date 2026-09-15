@@ -38,7 +38,6 @@ it("rejects player production commands atomically for automatic-only owners whil
 							max: 1,
 						},
 						mode: "consume",
-						capacity: 0,
 					},
 				],
 			}),

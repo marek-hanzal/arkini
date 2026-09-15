@@ -23,7 +23,7 @@ const prepareFx = Effect.fn("prepareClosedLineInputTestFx")(function* ({
 	ownerItemId,
 	sourceItemId,
 }: {
-	lineId: "line:producer:buffer" | "line:producer:zero";
+	lineId: "line:producer:zero";
 	ownerItemId: string;
 	sourceItemId: string;
 }) {
@@ -54,7 +54,7 @@ const prepareFx = Effect.fn("prepareClosedLineInputTestFx")(function* ({
 });
 
 describe("storeInputMaterialFx closed line inputs", () => {
-	it("rejects refill of a zero-capacity input while its line runs", () => {
+	it("rejects refill while the line runs", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareFx({
@@ -100,50 +100,5 @@ describe("storeInputMaterialFx closed line inputs", () => {
 			});
 		}
 		expect(result.after).toEqual(result.before);
-	});
-
-	it("accepts refill into positive capacity while the line runs", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* prepareFx({
-					lineId: "line:producer:buffer",
-					ownerItemId: "runtime:producer",
-					sourceItemId: "runtime:material",
-				});
-				const source = yield* getItemFx({
-					itemId: "runtime:material",
-				});
-				const stored = yield* storeInputMaterialFx({
-					ownerItemId: "runtime:producer",
-					lineId: "line:producer:buffer",
-					inputIndex: 0,
-					sourceItemId: source.id,
-					sourceItemRevision: source.revision,
-					quantity: 1,
-				});
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					runtime,
-					stored,
-				};
-			}).pipe(
-				useGameFx({
-					config: purityTestConfig,
-				}),
-			),
-		);
-
-		expect(result.stored.storedItem.location).toMatchObject({
-			scope: "input",
-			ownerItemId: "runtime:producer",
-			lineId: "line:producer:buffer",
-			inputIndex: 0,
-		});
-		expect(
-			result.runtime.items
-				.filter((item) => item.location.scope === "input")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(1);
 	});
 });

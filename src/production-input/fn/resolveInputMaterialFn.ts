@@ -13,7 +13,7 @@ export namespace resolveInputMaterialFn {
 export const resolveInputMaterialFn = ({ input, storedQuantity }: resolveInputMaterialFn.Props) => {
 	const required = input.quantity;
 	const ready = storedQuantity >= required.min;
-	const maxStoredQuantity = required.max + input.capacity;
+	const maxStoredQuantity = required.max;
 
 	return {
 		type: input.type,

@@ -25,7 +25,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			min: 2,
 			max: 2,
 		},
-		capacity: 2,
 		mode: "consume",
 		...(blocker === "self-unit" || blocker === "aggregate-self-unit" || blocker === "placement"
 			? {
@@ -124,7 +123,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 												min: 1,
 												max: 1,
 											},
-											capacity: 1,
 											mode: "reserve",
 											...(blocker === "aggregate-self-unit"
 												? {

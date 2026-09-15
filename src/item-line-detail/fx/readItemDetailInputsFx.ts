@@ -113,7 +113,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 						const maxStoredQuantity =
 							resolution?.type === TypeSchema.enum.Materials
 								? resolution.maxStoredQuantity
-								: required.max + materialInput.capacity;
+								: required.max;
 						const missingQuantity = Math.max(0, required.min - storedQuantity);
 						const availableCapacity = Math.max(0, maxStoredQuantity - storedQuantity);
 						const autofillAvailability =

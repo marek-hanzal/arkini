@@ -39,7 +39,6 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 									min: 2,
 									max: 2,
 								},
-								capacity: 0,
 							},
 						],
 					},

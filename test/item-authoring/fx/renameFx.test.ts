@@ -134,7 +134,6 @@ describe("renameFx", () => {
 							id: "water-line",
 							input: [
 								{
-									capacity: 0,
 									mode: "consume",
 									type: "materials",
 									selector: {

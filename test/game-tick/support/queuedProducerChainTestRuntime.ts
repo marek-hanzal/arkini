@@ -59,7 +59,6 @@ const materialInput = (itemId: string) => ({
 		min: 1,
 		max: 1,
 	},
-	capacity: 1,
 	mode: "consume" as const,
 });
 

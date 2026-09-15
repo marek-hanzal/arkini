@@ -31,7 +31,6 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 					min: 1,
 					max: 1,
 				},
-				capacity: 0,
 			},
 			{
 				type: "units",

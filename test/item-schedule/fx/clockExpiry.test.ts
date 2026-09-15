@@ -33,7 +33,6 @@ const materialLine = createLine({
 				min: 1,
 				max: 1,
 			},
-			capacity: 0,
 		},
 	],
 });

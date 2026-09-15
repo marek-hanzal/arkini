@@ -109,7 +109,6 @@ describe("root-owned interaction chains", () => {
 						max: 1,
 					},
 					mode: "consume",
-					capacity: 0,
 				},
 			],
 		};

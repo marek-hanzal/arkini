@@ -71,7 +71,6 @@ export const resolveLineInputStoreFn = ({
 		if (requestedInputIndex !== undefined && inputIndex !== requestedInputIndex) continue;
 		if (input.type !== TypeSchema.enum.Materials) continue;
 		const closed = isLineInputClosedFn({
-			input,
 			ownerItemId: boardOwner.id,
 			lineId,
 			runtime,

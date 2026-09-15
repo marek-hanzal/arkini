@@ -77,7 +77,6 @@ const inputBeforeStackConfig = GameConfigSchema.parse({
 								min: 1,
 								max: 1,
 							},
-							capacity: 2,
 						},
 					],
 				},

@@ -347,10 +347,6 @@ Board editing help:
     Use **Space** to switch between Spaces 0–31. Changes stay with the selected Space, even before you save.
 Board placement:
   value: Where to place
-Buffer:
-  value: Buffer
-Buffer disabled:
-  value: Buffer disabled
 Build:
   value: Build
 Build blocked by validation:
@@ -1210,11 +1206,6 @@ Matches items exactly 2 cells away, including diagonals.:
 Matches only the origin itself at board distance 0.:
   value: Matches only the item running this action or production line.
   dynamic: true
-Material buffer help:
-  value: |
-    Extra delivered items this input may hold above **Maximum**.
-
-    It increases storage only, never the amount used by one run.
 Material input:
   value: Material input
 Material maximum quantity help:

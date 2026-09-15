@@ -91,7 +91,6 @@ it.each([
 				? {
 						type: "materials",
 						mode: "consume",
-						capacity: 0,
 						quantity: {
 							min: 1,
 							max: 1,

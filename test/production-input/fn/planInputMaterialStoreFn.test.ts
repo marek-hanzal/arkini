@@ -14,7 +14,6 @@ const input = MaterialSchema.parse({
 		min: 3,
 		max: 3,
 	},
-	capacity: 2,
 });
 
 describe("planInputMaterialStoreFn", () => {
@@ -28,7 +27,7 @@ describe("planInputMaterialStoreFn", () => {
 					itemId: "water",
 					quantity: 4,
 				}),
-				storedQuantity: 3,
+				storedQuantity: 1,
 			}),
 		).toEqual({
 			sourceItemId: "runtime:water",
@@ -51,7 +50,7 @@ describe("planInputMaterialStoreFn", () => {
 		).toBeUndefined();
 	});
 
-	it("returns undefined when the input buffer is already full", () => {
+	it("returns undefined when the input is already full", () => {
 		expect(
 			planInputMaterialStoreFn({
 				input,
@@ -61,7 +60,7 @@ describe("planInputMaterialStoreFn", () => {
 					itemId: "water",
 					quantity: 1,
 				}),
-				storedQuantity: 5,
+				storedQuantity: 3,
 			}),
 		).toBeUndefined();
 	});

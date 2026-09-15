@@ -152,7 +152,6 @@ describe("InputControl", () => {
 			root,
 			{
 				type: "materials",
-				capacity: 0,
 				mode: "consume",
 				quantity: {
 					min: 5,
@@ -203,7 +202,6 @@ describe("InputControl", () => {
 
 		await renderInput(root, {
 			type: "materials",
-			capacity: 0,
 			units: {
 				cost: 1,
 				from: "self",

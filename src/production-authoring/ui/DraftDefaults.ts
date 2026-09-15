@@ -77,7 +77,6 @@ export const DraftDefaults = {
 				min: 1,
 				max: 1,
 			},
-			capacity: 0,
 		},
 		units: {
 			type: "units",

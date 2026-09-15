@@ -42,18 +42,6 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 						</>
 					)}
 				</p>
-				{input.type === "materials" ? (
-					<p className="text-xs text-muted">
-						{input.capacity === 0 ? (
-							<Tx label="Buffer disabled" />
-						) : (
-							<>
-								<Tx label="Buffer" /> ·{" "}
-								<strong className="text-foreground">{input.capacity}</strong>
-							</>
-						)}
-					</p>
-				) : null}
 			</div>
 			<p className="text-right font-medium text-foreground">
 				{input.type === "materials" ? (

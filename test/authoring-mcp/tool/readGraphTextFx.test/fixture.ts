@@ -49,7 +49,6 @@ export const createRelationTraversalProject = () => {
 			input: [
 				{
 					...line.input[0],
-					capacity: 1,
 					mode: "consume" as const,
 					quantity: {
 						max: 1,

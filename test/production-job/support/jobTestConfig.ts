@@ -69,7 +69,6 @@ export const createJobTestConfig = (
 									min: 3,
 									max: 3,
 								},
-								capacity: 3,
 								mode: "consume",
 							},
 							{
@@ -82,7 +81,6 @@ export const createJobTestConfig = (
 									min: 1,
 									max: 1,
 								},
-								capacity: 1,
 								mode: "reserve",
 							},
 						],

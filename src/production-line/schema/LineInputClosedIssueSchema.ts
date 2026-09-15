@@ -5,7 +5,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckI
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
-/** One zero-capacity input retains buffered items while its line has an active job. */
+/** One material input retains stored items while its line has an active job. */
 export const LineInputClosedIssueSchema = z
 	.object({
 		ownerItemId: IdSchema.describe("The runtime item that owns the closed line input."),
@@ -13,7 +13,7 @@ export const LineInputClosedIssueSchema = z
 		inputIndex: NonNegativeIntegerSchema.describe("The zero-based closed input position."),
 		itemIds: z
 			.array(IdSchema)
-			.describe("The buffered runtime items illegally retained by the closed input."),
+			.describe("The stored runtime items illegally retained by the closed input."),
 		type: RuntimeCheckIssueEnumSchema.extract([
 			"LineInputClosed",
 		]),
@@ -21,7 +21,7 @@ export const LineInputClosedIssueSchema = z
 	.strict()
 	.meta({
 		id: "LineInputClosedIssueSchema",
-		description: "One running zero-capacity line input still owns buffered items.",
+		description: "One running line input still owns stored items.",
 	});
 
 export type LineInputClosedIssueSchema = typeof LineInputClosedIssueSchema;

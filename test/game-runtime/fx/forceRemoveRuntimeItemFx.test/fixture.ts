@@ -27,10 +27,12 @@ export const fixtureFn = (width = 2) => {
 			forge: {
 				...base.items.forge,
 				lines: [
+					base.items.forge.lines[0],
 					{
 						...base.items.forge.lines[0],
+						id: "line:forge:stored-holder",
+						title: "Stored holder",
 						input: [
-							...base.items.forge.lines[0].input,
 							{
 								type: "materials",
 								selector: {
@@ -41,7 +43,25 @@ export const fixtureFn = (width = 2) => {
 									min: 1,
 									max: 1,
 								},
-								capacity: 1,
+								mode: "consume",
+							},
+						],
+					},
+					{
+						...base.items.forge.lines[0],
+						id: "line:forge:stored-water",
+						title: "Stored water",
+						input: [
+							{
+								type: "materials",
+								selector: {
+									type: "item",
+									itemId: "water",
+								},
+								quantity: {
+									min: 1,
+									max: 5,
+								},
 								mode: "consume",
 							},
 						],
@@ -82,10 +102,14 @@ export const fixtureFn = (width = 2) => {
 		revision: `revision:${id}`,
 	});
 	const owner = itemFn("owner", "forge", boardFn(0));
-	const inputFn = (ownerItemId: string, inputIndex: number) => ({
+	const inputFn = (
+		ownerItemId: string,
+		inputIndex: number,
+		lineId = "line:forge:stored-holder",
+	) => ({
 		scope: "input" as const,
 		ownerItemId,
-		lineId: "line:forge:run",
+		lineId,
 		inputIndex,
 	});
 	const reserve = {
@@ -96,8 +120,8 @@ export const fixtureFn = (width = 2) => {
 		}),
 		remainingUnits: 1,
 	};
-	const buffer = itemFn("buffer", "holder", inputFn(owner.id, 2));
-	const child = itemFn("child", "water", inputFn(buffer.id, 0), 3);
+	const buffer = itemFn("buffer", "holder", inputFn(owner.id, 0));
+	const child = itemFn("child", "water", inputFn(buffer.id, 0, "line:forge:run"), 3);
 	const consumed = itemFn(
 		"consumed",
 		"water",

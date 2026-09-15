@@ -61,7 +61,7 @@ Tick: persisted global queue order, earliest actionable request per idle owner
 Tick: ready Job in stable ID order
 → remove Job and consumed roots from one candidate
 → place line/depletion outputs
-→ release buffered inputs
+→ release stored inputs
 → relocate reserved material
 → commit all or nothing
 
@@ -74,7 +74,7 @@ Tick: ready expired material after completion settlement
 
 clear pending owner queue
 → preserve active Job and its consumed/reserved material
-→ return buffered roots for the cleared request lines
+→ return stored roots for the cleared request lines
 → reverse their outbound deliveries
 → commit all or nothing
 ```
@@ -86,7 +86,7 @@ Scheduled owners use the same selected-line reader and one-intent admission. `Co
 ## Important invariants
 
 - Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.
-- A skipped request keeps its identity, line and valid buffered inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
+- A skipped request keeps its identity, line and valid stored inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs and stored owners stay blocked. Explicit forced owner removal can abort active Jobs.
 - Clearing pending work returns its unused line-input material without cancelling active work.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.

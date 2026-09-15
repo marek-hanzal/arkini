@@ -1,4 +1,4 @@
-import type { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
+import type { Container, Graphics, Sprite, Text } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
@@ -17,11 +17,8 @@ export interface ActorVisual {
 	readonly container: Container;
 	readonly primary: Sprite;
 	readonly composite: Sprite;
-	readonly title: Text;
-	readonly titleBackground: Graphics;
 	readonly quantity: Text;
 	readonly quantityBackground: Graphics;
-	readonly titleStyle: TextStyle;
 	readonly readyListeners: Set<VisualReadyListener>;
 	readonly reportCriticalFailureFn: (cause: unknown) => void;
 	item: TileActorItem;

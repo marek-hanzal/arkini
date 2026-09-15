@@ -1,16 +1,7 @@
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
-import {
-	Container,
-	Graphics,
-	Particle,
-	ParticleContainer,
-	Sprite,
-	Text,
-	TextStyle,
-	Texture,
-} from "pixi.js";
+import { Container, Graphics, Particle, ParticleContainer, Sprite, Text, Texture } from "pixi.js";
 import { vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -181,7 +172,6 @@ export const createItem = (
 	running: false,
 	activityEffect: false,
 	sourceUrl: `resource:${id}`,
-	title: id,
 });
 
 export const createActor = (id: string): PixiTileActor => {
@@ -192,21 +182,14 @@ export const createActor = (id: string): PixiTileActor => {
 	const offsetLayer = new Container();
 	lifecycleLayer.addChild(offsetLayer);
 	container.addChild(lifecycleLayer);
-	const titleStyle = new TextStyle();
 	const visual = {
 		container: new Container(),
 		primary: new Sprite(Texture.EMPTY),
 		composite: new Sprite(Texture.EMPTY),
-		title: new Text({
-			style: titleStyle,
-			text: item.title,
-		}),
-		titleBackground: new Graphics(),
 		quantity: new Text({
 			text: String(item.quantity),
 		}),
 		quantityBackground: new Graphics(),
-		titleStyle,
 		item,
 		readyListeners: new Set(),
 		reportCriticalFailureFn: () => {},

@@ -1,13 +1,4 @@
-import {
-	Container,
-	Graphics,
-	Particle,
-	ParticleContainer,
-	Sprite,
-	Text,
-	TextStyle,
-	Texture,
-} from "pixi.js";
+import { Container, Graphics, Particle, ParticleContainer, Sprite, Text, Texture } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -34,7 +25,6 @@ export const item = {
 	running: false,
 	activityEffect: false,
 	sourceUrl: "resource:log",
-	title: "Log",
 } satisfies TileActorItem;
 
 export const createItem = (id: string, x: number): TileActorItem => ({
@@ -49,7 +39,6 @@ export const createItem = (id: string, x: number): TileActorItem => ({
 		},
 	},
 	revision: `revision:${id}`,
-	title: id,
 });
 
 export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
@@ -60,7 +49,6 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 	const offsetLayer = new Container();
 	lifecycleLayer.addChild(offsetLayer);
 	container.addChild(lifecycleLayer);
-	const titleStyle = new TextStyle();
 	const visual = {
 		composite: new Sprite(Texture.EMPTY),
 		container: new Container(),
@@ -75,12 +63,6 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		size: 80,
 		textureGeneration: 0,
 		textureState: "ready",
-		title: new Text({
-			style: titleStyle,
-			text: actorItem.title,
-		}),
-		titleBackground: new Graphics(),
-		titleStyle,
 	} satisfies ActorVisual;
 	const particle = new Particle(Texture.EMPTY);
 	const activityParticleContainer = new ParticleContainer({

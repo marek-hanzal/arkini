@@ -48,7 +48,6 @@ const createItemFn = (artworkScale: number): TileActorItem => ({
 	activityEffect: true,
 	progressRatio: 0.5,
 	sourceUrl: "resource:tile",
-	title: "Tile",
 });
 const createHarnessFn = (item: TileActorItem) => {
 	const animations: ActorAnimation[] = [];

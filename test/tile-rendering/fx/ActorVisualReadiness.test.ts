@@ -82,7 +82,6 @@ const createItem = ({
 		activityEffect: false,
 		artworkScale: 0.8,
 		sourceUrl,
-		title: "Water",
 	}) satisfies TileActorItem;
 
 const createControlledTextures = () => {

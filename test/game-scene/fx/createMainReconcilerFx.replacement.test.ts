@@ -19,7 +19,6 @@ describe("main reconciliation / replacement visuals", () => {
 			itemId: "producer:idle",
 			revision: "revision:producer-idle",
 			sourceUrl: "resource:producer-idle",
-			title: "Idle producer",
 		});
 		const current = createItem(previous.id, boardLocation, {
 			itemId: "producer:running",
@@ -28,7 +27,6 @@ describe("main reconciliation / replacement visuals", () => {
 			jobStatus: JobStatusEnumSchema.enum.Running,
 			activityEffect: true,
 			sourceUrl: "resource:producer-running",
-			title: "Running producer",
 		});
 		const actor = createActor(previous);
 		const oldVisual = actor.currentVisual;
@@ -47,7 +45,6 @@ describe("main reconciliation / replacement visuals", () => {
 					compositeUrl: previous.compositeUrl,
 					itemId: previous.itemId,
 					sourceUrl: previous.sourceUrl,
-					title: previous.title,
 				},
 				previousQuantity: previous.quantity,
 			},
@@ -141,7 +138,6 @@ describe("main reconciliation / replacement visuals", () => {
 					artworkScale: 0.8,
 					itemId: first.itemId,
 					sourceUrl: first.sourceUrl,
-					title: first.title,
 				},
 				previousQuantity: first.quantity,
 			},
@@ -160,7 +156,6 @@ describe("main reconciliation / replacement visuals", () => {
 					artworkScale: 0.8,
 					itemId: second.itemId,
 					sourceUrl: second.sourceUrl,
-					title: second.title,
 				},
 				previousQuantity: second.quantity,
 			},

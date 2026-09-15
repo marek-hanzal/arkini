@@ -2,7 +2,6 @@
 export interface TileActorVisual {
 	readonly itemId: string;
 	readonly artworkScale: number;
-	readonly title: string;
 	readonly sourceUrl: string;
 	readonly compositeUrl?: string;
 }

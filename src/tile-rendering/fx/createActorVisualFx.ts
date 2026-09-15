@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -95,17 +95,6 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 	});
 	const primary = new Sprite(Texture.EMPTY);
 	const composite = new Sprite(Texture.EMPTY);
-	const titleBackground = new Graphics();
-	const titleStyle = new TextStyle({
-		fill: palette.overlayForeground,
-		fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
-		fontSize: 14,
-		fontWeight: "500",
-	});
-	const title = new Text({
-		style: titleStyle,
-		text: item.title,
-	});
 	const quantityBackground = new Graphics();
 	const quantity = new Text({
 		style: {
@@ -116,16 +105,13 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		},
 		text: String(item.quantity),
 	});
-	container.addChild(primary, composite, titleBackground, title, quantityBackground, quantity);
+	container.addChild(primary, composite, quantityBackground, quantity);
 	const visual = {
 		container,
 		primary,
 		composite,
-		title,
-		titleBackground,
 		quantity,
 		quantityBackground,
-		titleStyle,
 		readyListeners: new Set(),
 		reportCriticalFailureFn: frames.reportCriticalFailureFn,
 		item,

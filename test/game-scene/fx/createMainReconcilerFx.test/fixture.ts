@@ -169,7 +169,6 @@ export const createItem = (
 	activityEffect: false,
 	artworkScale: 0.8,
 	sourceUrl: "resource:water",
-	title: "Water",
 	...overrides,
 });
 

@@ -34,7 +34,6 @@ interface CreateInventoryActorStoreProps {
 
 const sameVisualFn = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
-	left.title === right.title &&
 	left.artworkScale === right.artworkScale &&
 	left.badgeCount === right.badgeCount &&
 	left.badgeKind === right.badgeKind &&

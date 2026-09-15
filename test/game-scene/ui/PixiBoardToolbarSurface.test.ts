@@ -196,7 +196,6 @@ describe("PixiBoardToolbarSurface", () => {
 			activityEffect: false,
 			artworkScale: 0.8,
 			sourceUrl: "resource:producer",
-			title: "Producer",
 		} satisfies TileActorItem;
 		const canvas = document.createElement("canvas");
 
@@ -259,7 +258,6 @@ describe("PixiBoardToolbarSurface", () => {
 			activityEffect: false,
 			artworkScale: 0.8,
 			sourceUrl: "resource:material",
-			title: "Material",
 		} satisfies TileActorItem;
 
 		await createProps.onActivateFn(stack, "split-stack", document.createElement("canvas"));
@@ -304,7 +302,6 @@ describe("PixiBoardToolbarSurface", () => {
 			activityEffect: true,
 			artworkScale: 0.8,
 			sourceUrl: "resource:producer",
-			title: "Producer",
 		} satisfies TileActorItem;
 
 		await createProps.onActivateFn(producer, "primary", document.createElement("canvas"));
@@ -368,7 +365,6 @@ describe("PixiBoardToolbarSurface", () => {
 			activityEffect: false,
 			artworkScale: 0.8,
 			sourceUrl: "resource:inventory",
-			title: "Inventory",
 		} satisfies TileActorItem;
 
 		await createProps.onActivateFn(item, "primary", document.createElement("canvas"));
@@ -412,7 +408,6 @@ describe("PixiBoardToolbarSurface", () => {
 				activityEffect: false,
 				artworkScale: 0.8,
 				sourceUrl: "asset",
-				title: "Inventory",
 			},
 			"primary",
 			document.createElement("canvas"),

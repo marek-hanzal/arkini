@@ -195,7 +195,6 @@ describe("main reconciliation / layout and landing", () => {
 	it("does not restart a rejected-drop return when a running job ticks mid-flight", () => {
 		const current = createItem("runtime:rejected-trash", boardLocation, {
 			itemId: "trash",
-			title: "Trash",
 		});
 		const actor = createActor(current);
 		actor.container.position.set(500, 400);

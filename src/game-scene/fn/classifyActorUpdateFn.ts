@@ -65,8 +65,7 @@ const isSameMainSceneVisualFn = (left: TileActorItem, right: TileActorItem) => {
 		left.location.scope === right.location.scope &&
 		left.quantity === right.quantity &&
 		left.running === right.running &&
-		left.sourceUrl === right.sourceUrl &&
-		left.title === right.title
+		left.sourceUrl === right.sourceUrl
 	);
 };
 

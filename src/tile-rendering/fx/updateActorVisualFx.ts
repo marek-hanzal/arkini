@@ -1,7 +1,5 @@
 import { Effect } from "effect";
-import { CanvasTextMetrics, type TextStyle } from "pixi.js";
 
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
@@ -14,38 +12,6 @@ export namespace updateActorVisualFx {
 		readonly visual: ActorVisual;
 	}
 }
-
-interface FitSingleLineTextProps {
-	readonly maxWidth: number;
-	readonly style: TextStyle;
-	readonly text: string;
-}
-
-const ellipsis = "…";
-
-/** Measures one actor-owned title and returns its exact single-line projection. */
-const fitSingleLineTextFx = Effect.fn("fitSingleLineTextFx")(
-	({ maxWidth, style, text }: FitSingleLineTextProps) =>
-		Effect.sync(() => {
-			if (maxWidth <= 0) return "";
-			if (CanvasTextMetrics.measureText(text, style).width <= maxWidth) return text;
-			if (CanvasTextMetrics.measureText(ellipsis, style).width > maxWidth) return "";
-
-			const graphemes = CanvasTextMetrics.graphemeSegmenter(text);
-			let lower = 0;
-			let upper = graphemes.length;
-			while (lower < upper) {
-				const middle = Math.ceil((lower + upper) / 2);
-				const candidate = `${graphemes.slice(0, middle).join("")}${ellipsis}`;
-				if (CanvasTextMetrics.measureText(candidate, style).width <= maxWidth) {
-					lower = middle;
-				} else {
-					upper = middle - 1;
-				}
-			}
-			return `${graphemes.slice(0, lower).join("")}${ellipsis}`;
-		}),
-);
 
 const layeredArtworkToFaceRatio = 0.75;
 const formatTileBadgeLabelFn = (count: number, kind?: "units" | "queue") =>
@@ -60,9 +26,6 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 }: updateActorVisualFx.Props) {
 	const inset = (size * (1 - item.artworkScale)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
-	const titlePaddingX = faceSize * 0.06;
-	const titlePaddingY = Math.max(2, faceSize * 0.025);
-	const titleFontSize = Math.max(9, Math.min(18, faceSize * 0.13));
 	const badgeFontSize = Math.max(9, Math.min(18, faceSize * 0.14));
 
 	visual.item = item;
@@ -89,30 +52,6 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	visual.composite.y = artwork.secondary.y;
 	visual.composite.width = artwork.secondary.size;
 	visual.composite.height = artwork.secondary.size;
-
-	visual.titleStyle.fontSize = titleFontSize;
-	visual.title.text = yield* fitSingleLineTextFx({
-		maxWidth: faceSize - titlePaddingX * 2,
-		style: visual.titleStyle,
-		text: item.title,
-	});
-	visual.title.visible = item.location.scope !== LocationScopeEnumSchema.enum.Board;
-	visual.titleBackground.visible = visual.title.visible;
-	visual.title.x = inset + titlePaddingX;
-	visual.title.y = inset + faceSize - visual.title.height - titlePaddingY * 2;
-	visual.titleBackground
-		.clear()
-		.roundRect(
-			inset + titlePaddingX * 0.5,
-			visual.title.y - titlePaddingY,
-			faceSize - titlePaddingX,
-			visual.title.height + titlePaddingY * 2,
-			Math.max(3, faceSize * 0.055),
-		)
-		.fill({
-			alpha: 0.78,
-			color: palette.overlay,
-		});
 
 	visual.quantity.style.fontSize = badgeFontSize;
 	visual.quantity.text =

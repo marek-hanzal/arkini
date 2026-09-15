@@ -134,7 +134,6 @@ describe("readCommittedTileReplacementsFx", () => {
 				previous: {
 					artworkScale: 0.8,
 					itemId: "stone",
-					title: "Stone",
 					sourceUrl: "resource:asset:stone",
 				},
 				previousQuantity: 1,

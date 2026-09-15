@@ -532,7 +532,6 @@ export const inventoryItem = {
 	activityEffect: false,
 	artworkScale: 0.8,
 	sourceUrl: "resource:water",
-	title: "Water",
 } satisfies TileActorItem;
 
 export const inventoryTargetItem = {
@@ -549,7 +548,6 @@ export const inventoryTargetItem = {
 	revision: "revision:stone",
 	artworkScale: 0.8,
 	sourceUrl: "resource:stone",
-	title: "Stone",
 } satisfies TileActorItem;
 
 export const pointer = (x: number, y: number, button = 0): FakePointerEvent => ({

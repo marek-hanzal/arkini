@@ -134,7 +134,6 @@ const item = (
 	running: false,
 	artworkScale: 0.8,
 	sourceUrl: `resource:${id}`,
-	title: id,
 });
 
 describe("main surface", () => {

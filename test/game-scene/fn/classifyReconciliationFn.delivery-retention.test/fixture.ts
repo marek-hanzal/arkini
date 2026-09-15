@@ -28,7 +28,6 @@ export const createDeliveryActorItem = (
 	running: false,
 	artworkScale: 0.8,
 	sourceUrl: "resource:water",
-	title: "Water",
 	...overrides,
 });
 

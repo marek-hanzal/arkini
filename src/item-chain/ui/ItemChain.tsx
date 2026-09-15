@@ -1,5 +1,5 @@
 import { Mx } from "~/translation/ui/Mx";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { ArrowRight, Clock, GitBranch } from "lucide-react";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -66,7 +66,7 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 							) : (
 								<>
 									<span className="text-sm text-muted">
-										{translator.textFn("Drop onto")}
+										{translator.textFn("Merge with")}
 									</span>
 									<ItemReference itemId={chain.targetId} />
 								</>
@@ -84,27 +84,10 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 								{chain.outcomes
 									.filter((outcome) => outcome.stop !== "no-output")
 									.map((outcome, index) => (
-										<div
+										<ChainOutcome
 											key={index}
-											className="rounded-lg border border-line p-2"
-											data-ui="EditorChainOutcome"
-										>
-											{outcome.itemId === undefined ? null : (
-												<ItemReference
-													itemId={outcome.itemId}
-													sectionId="chain"
-												/>
-											)}
-											<p className="mt-1 text-xs text-muted">
-												{translator.textFn(stopLabels[outcome.stop])}
-												{outcome.periodic
-													? ` · ${translator.textFn("Repeated output")}`
-													: ""}
-												{outcome.conditional
-													? ` · ${translator.textFn("Conditional or alternative")}`
-													: ""}
-											</p>
-										</div>
+											outcome={outcome}
+										/>
 									))}
 							</div>
 						</div>
@@ -131,16 +114,51 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 	);
 };
 
+const ChainOutcome = ({ outcome }: { readonly outcome: readItemChainsFn.Outcome }) => {
+	const translator = useTranslator();
+	const description = (
+		<span className="text-xs font-normal text-muted">
+			{translator.textFn(stopLabels[outcome.stop])}
+			{outcome.periodic ? ` · ${translator.textFn("Repeated output")}` : ""}
+			{outcome.conditional ? ` · ${translator.textFn("Conditional or alternative")}` : ""}
+		</span>
+	);
+	return (
+		<div
+			className="p-2"
+			data-ui="EditorChainOutcome"
+		>
+			{outcome.itemId === undefined ? (
+				description
+			) : (
+				<ItemReference
+					description={description}
+					itemId={outcome.itemId}
+					sectionId="chain"
+				/>
+			)}
+		</div>
+	);
+};
+
 const ItemReference = ({
+	description,
 	itemId,
 	sectionId = "identity",
 }: {
+	readonly description?: ReactNode;
 	readonly itemId: string;
 	readonly sectionId?: "identity" | "chain";
 }) => {
 	const project = useEditorProject();
 	const item = project.config.items[itemId];
-	if (item === undefined) return <span className="text-muted">{itemId}</span>;
+	if (item === undefined)
+		return (
+			<span className="flex min-w-0 flex-col gap-1 text-muted">
+				<span>{itemId}</span>
+				{description}
+			</span>
+		);
 	return (
 		<ButtonLink
 			to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
@@ -156,8 +174,62 @@ const ItemReference = ({
 				resourceIds={item.asset.default}
 				size="input"
 			/>
-			<span className="min-w-0 break-words">{item.title}</span>
+			<span className="flex min-w-0 flex-col gap-1">
+				<span className="break-words">{item.title}</span>
+				{description}
+			</span>
 		</ButtonLink>
+	);
+};
+
+const ChainBranchReference = ({ node }: { readonly node: readItemChainsFn.Node }) => {
+	const translator = useTranslator();
+	return (
+		<ItemReference
+			description={
+				<>
+					{node.quantity === undefined && node.stop === undefined ? null : (
+						<span className="flex flex-wrap items-center gap-2">
+							{node.quantity === undefined ? null : (
+								<span className="text-sm">{quantityFn(node.quantity)}</span>
+							)}
+							{node.stop === undefined ? null : (
+								<span className="text-xs text-muted">
+									{translator.textFn(stopLabels[node.stop])}
+								</span>
+							)}
+						</span>
+					)}
+					{node.output === undefined ? null : (
+						<span className="text-xs text-muted">
+							{translator.textFn(
+								node.output.alternative ? "Alternative set" : "Output set",
+							)}{" "}
+							{node.output.set + 1}
+							{node.output.alternative
+								? ` (${translator.textFn("Weight")} ${node.output.setWeight})`
+								: ""}
+							{` · ${translator.textFn("Roll")} ${node.output.roll + 1} · `}
+							{node.output.type === "chance"
+								? `${(node.output.chance ?? 0) * 100}%`
+								: translator.textFn(
+										node.output.type === "weight" ? "Weighted" : "Guaranteed",
+									)}
+							{node.output.candidate === undefined
+								? ""
+								: ` · ${translator.textFn("Candidate")} ${node.output.candidate + 1} (${translator.textFn("Weight")} ${node.output.weight})`}
+							{node.output.selections === undefined
+								? ""
+								: ` · ${translator.textFn("Selections")} ${quantityFn(node.output.selections)}`}
+							{node.output.conditional
+								? ` · ${translator.textFn("Depends on conditions")}`
+								: ""}
+						</span>
+					)}
+				</>
+			}
+			itemId={node.itemId}
+		/>
 	);
 };
 
@@ -248,45 +320,7 @@ const ChainStep = ({ step }: { readonly step: readItemChainsFn.Step }) => {
 						className="border-l-2 border-accent pl-24"
 						data-ui="EditorChainBranch"
 					>
-						<div className="flex flex-wrap items-center gap-2">
-							<ItemReference itemId={node.itemId} />
-							{node.quantity === undefined ? null : (
-								<span className="text-sm">{quantityFn(node.quantity)}</span>
-							)}
-							{node.stop === undefined ? null : (
-								<span className="text-xs text-muted">
-									{translator.textFn(stopLabels[node.stop])}
-								</span>
-							)}
-						</div>
-						{node.output === undefined ? null : (
-							<p className="mt-1 text-xs text-muted">
-								{translator.textFn(
-									node.output.alternative ? "Alternative set" : "Output set",
-								)}{" "}
-								{node.output.set + 1}
-								{node.output.alternative
-									? ` (${translator.textFn("Weight")} ${node.output.setWeight})`
-									: ""}
-								{` · ${translator.textFn("Roll")} ${node.output.roll + 1} · `}
-								{node.output.type === "chance"
-									? `${(node.output.chance ?? 0) * 100}%`
-									: translator.textFn(
-											node.output.type === "weight"
-												? "Weighted"
-												: "Guaranteed",
-										)}
-								{node.output.candidate === undefined
-									? ""
-									: ` · ${translator.textFn("Candidate")} ${node.output.candidate + 1} (${translator.textFn("Weight")} ${node.output.weight})`}
-								{node.output.selections === undefined
-									? ""
-									: ` · ${translator.textFn("Selections")} ${quantityFn(node.output.selections)}`}
-								{node.output.conditional
-									? ` · ${translator.textFn("Depends on conditions")}`
-									: ""}
-							</p>
-						)}
+						<ChainBranchReference node={node} />
 						<div className="mt-2 flex flex-col gap-2">
 							{node.steps.map((child) => (
 								<ChainStep

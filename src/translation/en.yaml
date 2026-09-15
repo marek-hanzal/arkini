@@ -679,8 +679,6 @@ Drop enable rule help:
     Adds a required check for this drop.
 
     Every Enable rule must pass. Any matching Disable rule blocks only this drop.
-Drop onto:
-  value: Drop onto
 Drop rules help:
   value: |
     These rules apply only to this drop.

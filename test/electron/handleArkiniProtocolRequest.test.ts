@@ -68,7 +68,9 @@ describe("handleArkiniProtocolRequestFx", () => {
 		);
 	});
 	it("routes Editor resource requests to the registered resource owner instead of the renderer tree", async () => {
-		const request = new Request("arkini://editor/resource?projectId=p&resourceId=r&version=v");
+		const request = new Request(
+			"arkini://app/editor/resource?projectId=p&resourceId=r&version=v",
+		);
 		const handleEditorResourceRequestFx = vi.fn(() => Effect.succeed(new Response("png")));
 		const response = await Effect.runPromise(
 			handleArkiniProtocolRequestFx({

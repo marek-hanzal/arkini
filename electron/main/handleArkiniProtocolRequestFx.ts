@@ -37,7 +37,7 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 	}: handleArkiniProtocolRequestFx.Props) =>
 		Effect.gen(function* () {
 			const url = new URL(request.url);
-			if (url.host === "editor") {
+			if (url.host === "app" && url.pathname === "/editor/resource") {
 				return handleEditorResourceRequestFx === undefined
 					? new Response("Editor storage is unavailable.", {
 							status: 503,

@@ -114,8 +114,8 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					const version = url.searchParams.get("version");
 					if (
 						url.protocol !== "arkini:" ||
-						url.host !== "editor" ||
-						url.pathname !== "/resource" ||
+						url.host !== "app" ||
+						url.pathname !== "/editor/resource" ||
 						url.username !== "" ||
 						url.password !== "" ||
 						!projectId ||

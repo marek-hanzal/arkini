@@ -23,4 +23,5 @@ export type OptionalCapability = Extract<
 export interface SectionDescriptor {
 	readonly id: SectionId;
 	readonly label: string;
+	readonly shortcut?: string;
 }

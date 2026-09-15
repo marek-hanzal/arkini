@@ -1,4 +1,5 @@
 import { Mx } from "~/translation/ui/Mx";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import type { AssetCatalogFilterSchema } from "~/asset-authoring/schema/AssetCatalogFilterSchema";
 import { FileQuestion, PackagePlus, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
@@ -22,52 +23,61 @@ import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Status } from "~/ui/ui/Status";
-
-type EditorAssetDetailPath =
-	| "/editor/$projectId/assets/$resourceId/detail/overview"
-	| "/editor/$projectId/assets/$resourceId/detail/usage"
-	| "/editor/$projectId/assets/$resourceId/detail/delete"
-	| "/editor/$projectId/assets/$resourceId/detail/notes";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import {
+	EditorAssetDetailSections,
+	type EditorAssetDetailSection,
+} from "~/asset-authoring/type/EditorAssetDetailSections";
+import { useEditorAssetDetailSectionShortcuts } from "~/asset-authoring/ui/useEditorAssetDetailSectionShortcuts";
 
 const EditorAssetDetailTab = ({
 	filter,
-	label,
 	projectId,
 	query,
 	resourceId,
-	to,
+	section,
 }: {
 	readonly filter: AssetCatalogFilterSchema.Type;
-	readonly label: string;
 	readonly projectId: string;
 	readonly query: string;
 	readonly resourceId: string;
-	readonly to: EditorAssetDetailPath;
-}) => (
-	<LinkButtonLink
-		to={to}
-		params={{
-			projectId,
-			resourceId,
-		}}
-		search={{
-			filter,
-			query,
-		}}
-		activeOptions={{
-			exact: true,
-		}}
-		activeProps={{
-			"data-ui-selected": true,
-		}}
-		inactiveProps={{
-			"data-ui-selected": false,
-		}}
-		className={editorSectionLinkClassName}
-	>
-		<Tx label={label} />
-	</LinkButtonLink>
-);
+	readonly section: EditorAssetDetailSection;
+}) => {
+	const translator = useTranslator();
+	const label = translator.textFn(section.label);
+	return (
+		<Tooltip
+			content={`${label} · ${formatForDisplay({
+				key: section.shortcut,
+			})}`}
+			placement="bottom"
+		>
+			<LinkButtonLink
+				to={section.to}
+				params={{
+					projectId,
+					resourceId,
+				}}
+				search={{
+					filter,
+					query,
+				}}
+				activeOptions={{
+					exact: true,
+				}}
+				activeProps={{
+					"data-ui-selected": true,
+				}}
+				inactiveProps={{
+					"data-ui-selected": false,
+				}}
+				className={editorSectionLinkClassName}
+			>
+				{label}
+			</LinkButtonLink>
+		</Tooltip>
+	);
+};
 
 export const EditorAssetDetail = ({
 	children,
@@ -87,6 +97,13 @@ export const EditorAssetDetail = ({
 	const translator = useTranslator();
 	const editActionRef = useEditorEditShortcut();
 	const resource = useEditorAssetById(resourceId);
+	useEditorAssetDetailSectionShortcuts({
+		enabled: resource !== undefined,
+		filter,
+		projectId: project.projectId,
+		query,
+		resourceId,
+	});
 	if (resource === undefined) {
 		return (
 			<EditorSectionPage
@@ -180,39 +197,16 @@ export const EditorAssetDetail = ({
 					}
 					help={<EditorPageHelp {...help} />}
 				>
-					<EditorAssetDetailTab
-						filter={filter}
-						label="Overview"
-						projectId={project.projectId}
-						query={query}
-						resourceId={resourceId}
-						to="/editor/$projectId/assets/$resourceId/detail/overview"
-					/>
-					<EditorAssetDetailTab
-						filter={filter}
-						label="Usage"
-						projectId={project.projectId}
-						query={query}
-						resourceId={resourceId}
-						to="/editor/$projectId/assets/$resourceId/detail/usage"
-					/>
-
-					<EditorAssetDetailTab
-						filter={filter}
-						label="Notes"
-						projectId={project.projectId}
-						query={query}
-						resourceId={resourceId}
-						to="/editor/$projectId/assets/$resourceId/detail/notes"
-					/>
-					<EditorAssetDetailTab
-						filter={filter}
-						label="Delete"
-						projectId={project.projectId}
-						query={query}
-						resourceId={resourceId}
-						to="/editor/$projectId/assets/$resourceId/detail/delete"
-					/>
+					{EditorAssetDetailSections.map((section) => (
+						<EditorAssetDetailTab
+							filter={filter}
+							key={section.id}
+							projectId={project.projectId}
+							query={query}
+							resourceId={resourceId}
+							section={section}
+						/>
+					))}
 				</EditorSectionBar>
 			}
 		>

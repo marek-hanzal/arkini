@@ -1,5 +1,8 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import { editorSectionLinkClassName } from "~/authoring-shell/ui/EditorSectionBar";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
 
@@ -32,7 +35,8 @@ export const SectionLink = ({
 	readonly section: SectionDescriptor;
 }) => {
 	const translator = useTranslator();
-	return (
+	const label = translator.textFn(section.label);
+	const link = (
 		<LinkButtonLink
 			to={
 				destination === "detail"
@@ -75,7 +79,18 @@ export const SectionLink = ({
 			inactiveProps={inactiveProps}
 			className={editorSectionLinkClassName}
 		>
-			{translator.textFn(section.label)}
+			{label}
 		</LinkButtonLink>
+	);
+	if (destination !== "detail" || section.shortcut === undefined) return link;
+	return (
+		<Tooltip
+			content={`${label} · ${formatForDisplay({
+				key: section.shortcut,
+			})}`}
+			placement="bottom"
+		>
+			{link}
+		</Tooltip>
 	);
 };

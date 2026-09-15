@@ -12,6 +12,7 @@ import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSourceExport } from "~/project-authoring/ui/ProjectSourceExport";
+import { useProjectDetailSectionShortcuts } from "~/project-authoring/ui/useProjectDetailSectionShortcuts";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 
@@ -23,6 +24,9 @@ export const ProjectDetail = ({
 }>) => {
 	const project = useEditorProject();
 	const editActionRef = useEditorEditShortcut();
+	useProjectDetailSectionShortcuts({
+		projectId: project.projectId,
+	});
 	return (
 		<EditorSectionPage
 			contentClassName="mx-auto w-3/4"

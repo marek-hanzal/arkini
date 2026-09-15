@@ -19,6 +19,7 @@ import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
+import { useItemDetailSectionShortcuts } from "~/item-authoring/ui/useItemDetailSectionShortcuts";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
 export const Detail = ({
@@ -33,6 +34,13 @@ export const Detail = ({
 	const translator = useTranslator();
 	const editActionRef = useEditorEditShortcut();
 	const item = useItemByUid(uid);
+	const sections = readSectionsFn();
+	useItemDetailSectionShortcuts({
+		enabled: item !== undefined,
+		itemUid: item?.uid ?? uid,
+		projectId: project.projectId,
+		sections,
+	});
 	if (item === undefined) return <NotFound uid={uid} />;
 	const params = {
 		projectId: project.projectId,
@@ -42,7 +50,6 @@ export const Detail = ({
 		? sectionId
 		: "identity";
 	const help = ItemSectionHelp[sectionId];
-	const sections = readSectionsFn();
 	const section = sections.find((candidate) => candidate.id === sectionId);
 	const sectionTitle =
 		sectionId === "identity"

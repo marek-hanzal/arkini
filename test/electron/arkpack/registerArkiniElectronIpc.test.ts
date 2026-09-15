@@ -45,7 +45,7 @@ describe("registerArkiniElectronIpcFx Arkpack storage", () => {
 				}),
 				resources: expect.arrayContaining([
 					expect.objectContaining({
-						url: expect.stringMatching(/^arkini:\/\/game\/resource\?/),
+						url: expect.stringMatching(/^arkini:\/\/app\/game\/resource\?/),
 					}),
 				]),
 				source: "user",

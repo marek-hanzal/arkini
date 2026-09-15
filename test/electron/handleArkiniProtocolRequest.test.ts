@@ -81,4 +81,21 @@ describe("handleArkiniProtocolRequestFx", () => {
 		expect(handleEditorResourceRequestFx).toHaveBeenCalledWith(request);
 		expect(netFetch).not.toHaveBeenCalled();
 	});
+
+	it("routes same-origin Game resource requests before the renderer tree", async () => {
+		const request = new Request(
+			"arkini://app/game/resource?packageId=p&contentHash=h&resourceId=r",
+		);
+		const handleGameResourceRequestFx = vi.fn(() => Effect.succeed(new Response("png")));
+		const response = await Effect.runPromise(
+			handleArkiniProtocolRequestFx({
+				request,
+				rendererRoot,
+				handleGameResourceRequestFx,
+			}),
+		);
+		expect(await response.text()).toBe("png");
+		expect(handleGameResourceRequestFx).toHaveBeenCalledWith(request);
+		expect(netFetch).not.toHaveBeenCalled();
+	});
 });

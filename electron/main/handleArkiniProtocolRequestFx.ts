@@ -36,15 +36,15 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 		handleGameResourceRequestFx,
 	}: handleArkiniProtocolRequestFx.Props) =>
 		Effect.gen(function* () {
-			const host = new URL(request.url).host;
-			if (host === "editor") {
+			const url = new URL(request.url);
+			if (url.host === "editor") {
 				return handleEditorResourceRequestFx === undefined
 					? new Response("Editor storage is unavailable.", {
 							status: 503,
 						})
 					: yield* handleEditorResourceRequestFx(request);
 			}
-			if (host === "game") {
+			if (url.host === "app" && url.pathname === "/game/resource") {
 				return handleGameResourceRequestFx === undefined
 					? new Response("Game storage is unavailable.", {
 							status: 503,

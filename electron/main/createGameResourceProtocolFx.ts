@@ -58,8 +58,8 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 						const resourceId = url.searchParams.get("resourceId");
 						if (
 							url.protocol !== "arkini:" ||
-							url.host !== "game" ||
-							url.pathname !== "/resource" ||
+							url.host !== "app" ||
+							url.pathname !== "/game/resource" ||
 							!packageId ||
 							!contentHash ||
 							!resourceId ||
@@ -118,6 +118,10 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 						headers.set("Content-Type", resource.mime);
 						if (range === null && !headers.has("Content-Length"))
 							headers.set("Content-Length", String(info.size));
+						if (origin !== null) {
+							headers.set("Access-Control-Allow-Origin", origin);
+							headers.set("Vary", "Origin");
+						}
 						headers.set("X-Content-Type-Options", "nosniff");
 						return new Response(response.body, {
 							status: response.status,

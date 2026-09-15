@@ -72,12 +72,13 @@ describe("Game resource protocol", () => {
 				isTrustedUrlFn: () => true,
 			}),
 		);
-		const url = `arkini://game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${contentHash}&resourceId=${encodeURIComponent("music:theme")}`;
+		const url = `arkini://app/game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${contentHash}&resourceId=${encodeURIComponent("music:theme")}`;
 
 		const response = await Effect.runPromise(
 			protocol.handleRequestFx(
 				new Request(url, {
 					headers: {
+						Origin: "arkini://app",
 						Range: "bytes=1-2",
 					},
 				}),
@@ -88,6 +89,8 @@ describe("Game resource protocol", () => {
 		expect(response.headers.get("Content-Range")).toBe("bytes 1-2/6");
 		expect(response.headers.get("Content-Length")).toBe("2");
 		expect(response.headers.get("Content-Type")).toBe("audio/ogg");
+		expect(response.headers.get("Access-Control-Allow-Origin")).toBe("arkini://app");
+		expect(response.headers.get("Vary")).toBe("Origin");
 		expect(await response.text()).toBe("bc");
 		expect(netFetch).toHaveBeenCalledWith(
 			expect.stringMatching(/^file:/),

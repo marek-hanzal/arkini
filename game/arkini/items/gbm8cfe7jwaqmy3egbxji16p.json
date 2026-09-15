@@ -4,6 +4,7 @@
 		"uid": "gbm8cfe7jwaqmy3egbxji16p",
 		"id": "flint-and-steel",
 		"title": "Flint And Steel",
+		"draft": false,
 		"description": "Can make a fire. Be carefull. Don't use it next to the flammable objects. You've been warned.",
 		"asset": {
 			"scale": 1,
@@ -61,6 +62,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "burning-paper"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "base-camp"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "basecamp-on-fire"
 			}
 		],
 		"maxQueueSize": 1,

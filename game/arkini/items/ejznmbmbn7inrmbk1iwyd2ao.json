@@ -11,7 +11,7 @@
 				"sick-beagle"
 			]
 		},
-		"scope": "board",
+		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 300000,

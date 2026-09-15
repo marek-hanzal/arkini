@@ -11,7 +11,7 @@
 				"beagle"
 			]
 		},
-		"scope": "board",
+		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

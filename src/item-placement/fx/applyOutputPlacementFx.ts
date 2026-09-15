@@ -43,7 +43,6 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
 		itemId: drop.itemId,
 	});
 	const usesRandomBoardPlacement =
-		origin.scope === "board" &&
 		drop.placement === PlacementSchema.enum.Random &&
 		(item.scope === StorageSchema.enum.Board || item.scope === StorageSchema.enum.Any);
 	const drops =

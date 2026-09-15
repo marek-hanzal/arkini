@@ -164,7 +164,7 @@ const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePlacement
 	});
 });
 
-const planPassiveStoragePlacementFx = Effect.fn("planPassiveStoragePlacementFx")(function* ({
+const planPassiveThenBoardPlacementFx = Effect.fn("planPassiveThenBoardPlacementFx")(function* ({
 	drop,
 	excludedLocations,
 	item,
@@ -221,14 +221,32 @@ const planPassiveStoragePlacementFx = Effect.fn("planPassiveStoragePlacementFx")
 			second,
 		],
 	});
+	const passiveQuantity = readPlacementPlanQuantityFn({
+		plan,
+	});
+	const boardQuantity = quantity - passiveQuantity;
+	if (boardQuantity === 0) return plan;
+
+	const board = yield* planBoardPlacementFx({
+		excludedLocations: excludedLocations?.filter(
+			(location): location is BoardLocationSchema.Type => location.scope === "board",
+		),
+		item,
+		placement: drop.placement,
+		quantity: boardQuantity,
+		runtime,
+	});
+	const completePlan = mergePlacementPlansFn({
+		plans: [
+			plan,
+			board,
+		],
+	});
 	return yield* assertPlacementPlanCompleteFx({
 		drop,
-		plan,
+		plan: completePlan,
 		quantity,
-		reason:
-			origin.scope === "inventory"
-				? PlacementUnavailableError.Reason.ToolbarFull
-				: PlacementUnavailableError.Reason.InventoryFull,
+		reason: PlacementUnavailableError.Reason.BoardFull,
 	});
 });
 
@@ -245,18 +263,8 @@ const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function*
 	return yield* match(item.scope)
 		.with(StorageSchema.enum.Board, () => {
 			return Effect.gen(function* () {
-				if (origin.scope !== "board") {
-					return yield* assertPlacementPlanCompleteFx({
-						drop,
-						plan: {
-							remove: [],
-							spawn: [],
-							stack: [],
-						},
-						quantity,
-						reason: PlacementUnavailableError.Reason.BoardOriginUnavailable,
-					});
-				}
+				const boardOrigin = origin.scope === "board" ? origin : undefined;
+				const boardSpace = boardOrigin?.space ?? runtime.currentSpace;
 				// Board-only single items cannot stack or fall back to passive storage.
 				// Count claimed cells before sorting locations or allocating spawn identities.
 				if (item.maxStackSize === 1) {
@@ -270,7 +278,7 @@ const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function*
 					]) {
 						if (
 							location.scope === "board" &&
-							location.space === origin.space &&
+							location.space === boardSpace &&
 							location.position.x >= 0 &&
 							location.position.x < config.meta.board.width &&
 							location.position.y >= 0 &&
@@ -299,7 +307,7 @@ const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function*
 							location.scope === "board",
 					),
 					item,
-					origin,
+					origin: boardOrigin,
 					placement: drop.placement,
 					quantity,
 					runtime,
@@ -359,7 +367,7 @@ const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function*
 						quantity,
 						runtime,
 					})
-				: planPassiveStoragePlacementFx({
+				: planPassiveThenBoardPlacementFx({
 						drop,
 						excludedLocations,
 						item,

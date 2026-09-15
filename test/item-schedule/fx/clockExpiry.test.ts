@@ -1,5 +1,6 @@
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
@@ -38,6 +39,282 @@ const materialLine = createLine({
 });
 
 describe("Clock expiry settlement", () => {
+	it.each([
+		"inventory",
+		"toolbar",
+	] as const)("expires in %s and places output through that storage scope", (scope) => {
+		const base = createClockConfig({
+			scope: "any",
+			lines: [],
+			clock: {
+				intervalMs: undefined,
+				durationMs: 100,
+				onExpire: expiryOutput,
+			},
+		});
+		const config = GameConfigSchema.parse({
+			...base,
+			meta: {
+				...base.meta,
+				toolbarSize: 2,
+			},
+			items: {
+				...base.items,
+				expired: {
+					...base.items.expired,
+					scope: "any",
+				},
+			},
+		});
+		const runtime = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:clock",
+					itemId: "clock",
+					quantity: 1,
+					location: {
+						scope,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				return yield* tickClockFx(100);
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(runtime.items.some((item) => item.item.id === "clock")).toBe(false);
+		expect(runtime.items.find((item) => item.item.id === "expired")?.location).toMatchObject({
+			scope,
+		});
+	});
+
+	it.each([
+		"inventory",
+		"toolbar",
+	] as const)("places Board-only expiry output on the current Board from %s", (scope) => {
+		const base = createClockConfig({
+			scope: "any",
+			lines: [],
+			clock: {
+				intervalMs: undefined,
+				durationMs: 100,
+				onExpire: expiryOutput,
+			},
+		});
+		const config = GameConfigSchema.parse({
+			...base,
+			meta: {
+				...base.meta,
+				toolbarSize: 2,
+			},
+		});
+		const runtime = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:clock",
+					itemId: "clock",
+					quantity: 1,
+					location: {
+						scope,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				return yield* tickClockFx(100);
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(runtime.items.some((item) => item.id === "runtime:clock")).toBe(false);
+		expect(runtime.items.find((item) => item.item.id === "expired")?.location).toMatchObject({
+			scope: "board",
+			space: 0,
+		});
+	});
+
+	it("keeps expiry atomic when its Toolbar-only output has no Toolbar capacity", () => {
+		const base = createClockConfig({
+			scope: "any",
+			lines: [],
+			clock: {
+				intervalMs: undefined,
+				durationMs: 100,
+				onExpire: expiryOutput,
+			},
+		});
+		const config = GameConfigSchema.parse({
+			...base,
+			meta: {
+				...base.meta,
+				toolbarSize: 1,
+			},
+			items: {
+				...base.items,
+				expired: {
+					...base.items.expired,
+					scope: "toolbar",
+				},
+			},
+		});
+		const runtime = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:clock",
+					itemId: "clock",
+					quantity: 1,
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				yield* spawnItemFx({
+					id: "runtime:toolbar:blocker",
+					itemId: "permit",
+					quantity: 1,
+					location: {
+						scope: "toolbar",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				return yield* tickClockFx(100);
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(runtime.items).toContainEqual(
+			expect.objectContaining({
+				id: "runtime:clock",
+				location: expect.objectContaining({
+					scope: "inventory",
+				}),
+				schedule: {
+					remainingDurationMs: 0,
+				},
+			}),
+		);
+		expect(runtime.items.some((item) => item.item.id === "expired")).toBe(false);
+		expect(runtime.jobs).toEqual([]);
+		expect(runtime.jobQueue).toEqual([]);
+	});
+
+	it("lets an any-scope expiry output fall through passive storage to the current Board", () => {
+		const output = OutputSchema.parse({
+			set: [
+				{
+					roll: [
+						{
+							type: "guaranteed",
+							drop: [
+								{
+									itemId: "expired",
+									quantity: {
+										min: 2,
+										max: 2,
+									},
+									placement: "drop",
+									rules: [],
+								},
+							],
+						},
+					],
+				},
+			],
+		});
+		const base = createClockConfig({
+			scope: "any",
+			lines: [],
+			clock: {
+				intervalMs: undefined,
+				durationMs: 100,
+				onExpire: output,
+			},
+		});
+		const config = GameConfigSchema.parse({
+			...base,
+			meta: {
+				...base.meta,
+				toolbarSize: 1,
+			},
+			items: {
+				...base.items,
+				expired: {
+					...base.items.expired,
+					scope: "any",
+				},
+			},
+		});
+		const runtime = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:clock",
+					itemId: "clock",
+					quantity: 1,
+					location: {
+						scope: "toolbar",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				for (let index = 0; index < 4; index++) {
+					yield* spawnItemFx({
+						id: `runtime:inventory:blocker:${index}`,
+						itemId: "permit",
+						quantity: 1,
+						location: {
+							scope: "inventory",
+							position: {
+								x: index % 2,
+								y: Math.floor(index / 2),
+							},
+						},
+					});
+				}
+				return yield* tickClockFx(100);
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(runtime.items.some((item) => item.id === "runtime:clock")).toBe(false);
+		expect(
+			runtime.items
+				.filter((item) => item.item.id === "expired")
+				.map((item) => item.location.scope)
+				.sort(),
+		).toEqual([
+			"board",
+			"toolbar",
+		]);
+		expect(
+			runtime.items.find(
+				(item) => item.item.id === "expired" && item.location.scope === "board",
+			)?.location,
+		).toMatchObject({
+			scope: "board",
+			space: 0,
+		});
+	});
+
 	it.each([
 		1,
 		5,

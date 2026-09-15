@@ -60,7 +60,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `runtime-identity` | Injectable opaque identity entropy, independent of seeded gameplay rolls | [`src/runtime-identity/context/RuntimeIdentityFx.ts`](src/runtime-identity/context/RuntimeIdentityFx.ts) |
 | `item-revision` | Opaque live Item revision and stale-write rejection | [`src/item-revision/fx/assertRevisionFx.ts`](src/item-revision/fx/assertRevisionFx.ts) |
 | `item-definition` | Immutable authored Item vocabulary and selectors | [`src/item-definition/schema/ItemSchema.ts`](src/item-definition/schema/ItemSchema.ts) |
-| `item-location` | Runtime locations, grid claims, distances and location rejection | [`src/item-location/schema/LocationSchema.ts`](src/item-location/schema/LocationSchema.ts) |
+| `item-location` | Runtime locations, ownership-derived physical origins, grid claims, distances and location rejection | [`src/item-location/schema/LocationSchema.ts`](src/item-location/schema/LocationSchema.ts) |
 | `item-resolution` | Canonical configured Item lookup | [`src/item-resolution/fx/resolveItemFx.ts`](src/item-resolution/fx/resolveItemFx.ts) |
 | `item-query` | Authored query contracts and pinned-Runtime execution | [`src/item-query/fx/queryFx.ts`](src/item-query/fx/queryFx.ts) |
 | `item-placement` | Scope-aware stack, spawn and existing-item placement | [`src/item-placement/fx/planScopePlacementFx.ts`](src/item-placement/fx/planScopePlacementFx.ts) |

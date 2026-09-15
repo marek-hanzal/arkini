@@ -12,6 +12,7 @@ import {
 	placementTestConfig,
 } from "~test/item-placement/support/placementTestConfig";
 import { placeDropForTestFx } from "~test/item-placement/support/placeDropForTestFx";
+import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 
 const requirePlacement = <Value>(value: Value | undefined): Value => {
 	expect(value).toBeDefined();
@@ -405,6 +406,113 @@ describe("drop placement transition", () => {
 			}),
 			expect.objectContaining({
 				location: boardLocation(1),
+			}),
+		]);
+		expect(result.nextRandom).toBe(0.5);
+	});
+
+	it("uses a fresh random Board origin per Board-only unit from Inventory", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtime = yield* readRuntimeFx();
+				const [placement] = yield* applyOutputPlacementFx({
+					origin: inventoryLocation(0),
+					output: {
+						drop: [
+							{
+								itemId: "board-only",
+								placement: "random",
+								quantity: 2,
+							},
+						],
+					},
+					runtime,
+				});
+				const nextRandom = yield* Random.next;
+
+				return {
+					nextRandom,
+					placement,
+				};
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0,
+						0.75,
+						0.5,
+					]),
+				),
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(result.placement.drop[0]?.placement.spawn).toEqual([
+			expect.objectContaining({
+				location: boardLocation(0),
+			}),
+			expect.objectContaining({
+				location: boardLocation(3),
+			}),
+		]);
+		expect(result.nextRandom).toBe(0.5);
+	});
+
+	it("draws separately for every any-scope unit that falls through Inventory to Board", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:inventory:blocker",
+					itemId: "blocker",
+					location: inventoryLocation(0),
+					quantity: 1,
+				});
+				const runtime = yield* readRuntimeFx();
+				const [placement] = yield* applyOutputPlacementFx({
+					origin: inventoryLocation(0),
+					output: {
+						drop: [
+							{
+								itemId: "blocker",
+								placement: "random",
+								quantity: 3,
+							},
+						],
+					},
+					runtime,
+				});
+				const nextRandom = yield* Random.next;
+
+				return {
+					nextRandom,
+					placement,
+				};
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0,
+						0.75,
+						0.5,
+					]),
+				),
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(result.placement.drop[0]?.placement.spawn).toEqual([
+			expect.objectContaining({
+				location: inventoryLocation(1),
+			}),
+			expect.objectContaining({
+				location: boardLocation(0),
+			}),
+			expect.objectContaining({
+				location: boardLocation(3),
 			}),
 		]);
 		expect(result.nextRandom).toBe(0.5);

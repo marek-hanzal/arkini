@@ -2,14 +2,14 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace releaseJobReservationsFx {
 	export interface Props {
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		originItemId: IdSchema.Type;
 		reservations: readonly ReservedRuntimeItemSchema.Type[];
 		runtime: RuntimeSchema.Type;

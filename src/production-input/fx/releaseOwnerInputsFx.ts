@@ -1,4 +1,4 @@
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -13,7 +13,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace releaseOwnerInputsFx {
 	export interface Props {
 		owner: RuntimeItemSchema.Type;
-		origin?: BoardLocationSchema.Type;
+		origin?: GridLocationSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 
@@ -24,7 +24,7 @@ export namespace releaseOwnerInputsFx {
 }
 
 /**
- * Returns every direct buffered root from its explicit visible origin or Board owner through the
+ * Returns every direct buffered root from its explicit physical origin or Board owner through the
  * canonical existing-item placement path with exact visible placement facts.
  */
 export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* ({
@@ -43,8 +43,9 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 			runtime,
 		} satisfies releaseOwnerInputsFx.Result;
 	}
-	const boardOrigin = origin ?? Option.getOrUndefined(narrowBoardRuntimeItemFn(owner))?.location;
-	if (boardOrigin === undefined) {
+	const physicalOrigin =
+		origin ?? Option.getOrUndefined(narrowBoardRuntimeItemFn(owner))?.location;
+	if (physicalOrigin === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
 				itemId: owner.id,
@@ -64,7 +65,7 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	for (const bufferedItem of bufferedItems) {
 		const placement = yield* placeRuntimeItemFx({
 			itemId: bufferedItem.id,
-			origin: boardOrigin,
+			origin: physicalOrigin,
 			originItemId: owner.id,
 			runtime: state.runtime,
 		});

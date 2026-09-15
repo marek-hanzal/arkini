@@ -524,7 +524,7 @@ describe("temporary item lifetime", () => {
 		expect(replaced?.revision).not.toBe(result.target.revision);
 	});
 
-	it("accepts paused Clock state in passive storage", () => {
+	it("accepts Clock state in passive storage", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const temporary = yield* spawnTemporaryFx({});

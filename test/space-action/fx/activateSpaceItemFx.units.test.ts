@@ -173,6 +173,16 @@ describe("Space item unit settlement", () => {
 					location: toolbar(0),
 					quantity: 1,
 				});
+				for (let y = 0; y < 2; y++) {
+					for (let x = 0; x < 4; x++) {
+						yield* spawnItemFx({
+							id: `runtime:board-blocker:${x}:${y}`,
+							itemId: "permit",
+							location: board(x, y),
+							quantity: 1,
+						});
+					}
+				}
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
 					activateItemActionFx({

@@ -131,7 +131,7 @@ describe("Clock schedule boundaries", () => {
 		expect(result.resumed.jobs).toHaveLength(0);
 	});
 
-	it("pauses phase and lifetime in Inventory and resumes the saved state on Board", () => {
+	it("keeps phase and lifetime running in Inventory before returning to Board", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnClockItemFx();
@@ -150,20 +150,20 @@ describe("Clock schedule boundaries", () => {
 						new Error(`Expected Inventory store, received "${stored.kind}".`),
 					);
 				}
-				const paused = yield* tickClockFx(500);
-				const pausedOwner = paused.items.find((item) => item.id === ownerItemId);
-				if (pausedOwner === undefined || pausedOwner.location.scope !== "inventory") {
-					return yield* Effect.die(new Error("Expected paused Clock in Inventory."));
+				const storedAging = yield* tickClockFx(500);
+				const storedOwner = storedAging.items.find((item) => item.id === ownerItemId);
+				if (storedOwner === undefined || storedOwner.location.scope !== "inventory") {
+					return yield* Effect.die(new Error("Expected Clock in Inventory."));
 				}
 				yield* releaseInventoryItemFx({
-					itemId: pausedOwner.id,
-					location: pausedOwner.location,
-					revision: pausedOwner.revision,
+					itemId: storedOwner.id,
+					location: storedOwner.location,
+					revision: storedOwner.revision,
 				});
 				const resumed = yield* tickClockFx(100);
 				const pulsed = yield* tickClockFx(100);
 				return {
-					paused,
+					storedAging,
 					pulsed,
 					resumed,
 					running,
@@ -183,14 +183,17 @@ describe("Clock schedule boundaries", () => {
 			remainingIntervalMs: 150,
 			remainingDurationMs: 900,
 		});
-		expect(result.paused.items[0].schedule).toEqual(result.running.items[0].schedule);
+		expect(result.storedAging.items[0].schedule).toMatchObject({
+			remainingIntervalMs: 150,
+			remainingDurationMs: 400,
+		});
 		expect(result.resumed.items[0].schedule).toMatchObject({
 			remainingIntervalMs: 50,
-			remainingDurationMs: 800,
+			remainingDurationMs: 300,
 		});
 		expect(result.pulsed.items[0].schedule).toMatchObject({
 			remainingIntervalMs: 200,
-			remainingDurationMs: 700,
+			remainingDurationMs: 200,
 		});
 		expect(result.pulsed.jobs).toMatchObject([
 			{

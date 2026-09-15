@@ -2,13 +2,12 @@ import { Effect } from "effect";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveActionEnableFn } from "~/production-action/fn/resolveActionEnableFn";
 import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx";
-import { readItemScheduleContextFx } from "~/item-schedule/fx/readItemScheduleContextFx";
+import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
-/** Evaluates Board-bound timer availability independently of admitted production. */
+/** Evaluates timer availability at the item's current physical origin. */
 export const resolveItemScheduleEnabledFx = Effect.fn("resolveItemScheduleEnabledFx")(function* ({
 	item,
 	runtime,
@@ -17,18 +16,12 @@ export const resolveItemScheduleEnabledFx = Effect.fn("resolveItemScheduleEnable
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const schedule = readItemScheduleFn(item.item);
-	if (
-		item.location.scope !== LocationScopeEnumSchema.enum.Board ||
-		item.schedule?.remainingDurationMs === 0 ||
-		schedule === undefined
-	)
-		return false;
+	if (item.schedule?.remainingDurationMs === 0 || schedule === undefined) return false;
 	if (schedule.rules.length === 0) return schedule.enable;
-	const context = yield* readItemScheduleContextFx({
+	const context = yield* readItemPhysicalContextFx({
 		item,
 		runtime,
-	}).pipe(Effect.catchTag("ItemNotOnBoardError", () => Effect.succeed(undefined)));
-	if (context === undefined) return false;
+	});
 	const { origin } = context;
 	const rules = yield* Effect.forEach(schedule.rules, (rule) =>
 		resolveActionRuleFx({

@@ -9,7 +9,6 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
@@ -33,7 +32,7 @@ import { planDropPlacementFx } from "./planDropPlacementFx";
 interface PlaceRuntimeItemProps {
 	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 	readonly itemId: IdSchema.Type;
-	readonly origin: BoardLocationSchema.Type;
+	readonly origin: GridLocationSchema.Type;
 	readonly originItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }
@@ -70,24 +69,30 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 }: {
 	readonly item: RuntimeItemSchema.Type;
 	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
-	readonly origin: BoardLocationSchema.Type;
+	readonly origin: GridLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const config = yield* GameConfigFx;
-	const board = excludeGridLocationsFn({
-		excludedLocations,
-		locations: readBoardLocationsFn({
-			size: config.meta.board,
-			space: origin.space,
+	const emptyBoard = readEmptyLocationsFn({
+		locations: excludeGridLocationsFn({
+			excludedLocations,
+			locations: readBoardLocationsFn({
+				size: config.meta.board,
+				space:
+					origin.scope === LocationScopeEnumSchema.enum.Board
+						? origin.space
+						: runtime.currentSpace,
+			}),
 		}),
+		runtime,
 	});
-	const orderedBoard = orderGridLocationsFn({
-		locations: readEmptyLocationsFn({
-			locations: board,
-			runtime,
-		}),
-		origin: origin.position,
-	});
+	const orderedBoard =
+		origin.scope === LocationScopeEnumSchema.enum.Board
+			? orderGridLocationsFn({
+					locations: emptyBoard,
+					origin: origin.position,
+				})
+			: emptyBoard;
 	const inventory = excludeGridLocationsFn({
 		excludedLocations,
 		locations: readInventoryLocationsFn({
@@ -98,6 +103,13 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 		locations: inventory,
 		runtime,
 	});
+	const orderedInventory =
+		origin.scope === LocationScopeEnumSchema.enum.Inventory
+			? orderGridLocationsFn({
+					locations: emptyInventory,
+					origin: origin.position,
+				})
+			: emptyInventory;
 	const toolbar = excludeGridLocationsFn({
 		excludedLocations,
 		locations: readToolbarLocationsFn({
@@ -108,12 +120,25 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 		locations: toolbar,
 		runtime,
 	});
+	const orderedToolbar =
+		origin.scope === LocationScopeEnumSchema.enum.Toolbar
+			? orderGridLocationsFn({
+					locations: emptyToolbar,
+					origin: origin.position,
+				})
+			: emptyToolbar;
 
 	const location = match(item.item.scope)
 		.with(StorageSchema.enum.Board, () => orderedBoard[0])
-		.with(StorageSchema.enum.Inventory, () => emptyInventory[0])
-		.with(StorageSchema.enum.Toolbar, () => emptyToolbar[0])
-		.with(StorageSchema.enum.Any, () => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0])
+		.with(StorageSchema.enum.Inventory, () => orderedInventory[0])
+		.with(StorageSchema.enum.Toolbar, () => orderedToolbar[0])
+		.with(StorageSchema.enum.Any, () =>
+			origin.scope === LocationScopeEnumSchema.enum.Board
+				? (orderedBoard[0] ?? orderedInventory[0] ?? orderedToolbar[0])
+				: origin.scope === LocationScopeEnumSchema.enum.Inventory
+					? (orderedInventory[0] ?? orderedToolbar[0] ?? orderedBoard[0])
+					: (orderedToolbar[0] ?? orderedInventory[0] ?? orderedBoard[0]),
+		)
 		.exhaustive() satisfies GridLocationSchema.Type | undefined;
 	if (location !== undefined) return location;
 

@@ -1,4 +1,3 @@
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { Effect } from "effect";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -31,8 +30,6 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 			config === undefined ||
 			state === undefined ||
 			state.remainingDurationMs === 0 ||
-			item.location.scope !== LocationScopeEnumSchema.enum.Board ||
-			snapshot.location.scope !== LocationScopeEnumSchema.enum.Board ||
 			!(yield* resolveItemScheduleEnabledFx({
 				item: snapshot,
 				runtime: stepStart,
@@ -71,6 +68,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 					LineRunUnavailableError: () => Effect.succeed(undefined),
 					OutputCapacityError: () => Effect.succeed(undefined),
 					PlacementUnavailableError: () => Effect.succeed(undefined),
+					ItemNotOnBoardError: () => Effect.succeed(undefined),
 				}),
 			);
 			if (attempt !== undefined) {

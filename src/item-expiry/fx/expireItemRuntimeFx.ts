@@ -7,7 +7,7 @@ import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItem
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
@@ -23,7 +23,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 }: {
 	readonly item: RuntimeItemSchema.Type;
 	readonly removalMode?: "kill-switch";
-	readonly origin: BoardLocationSchema.Type;
+	readonly origin: GridLocationSchema.Type;
 	readonly output?: OutputSchema.Type;
 	readonly randomSeed: string;
 	readonly runtime: RuntimeSchema.Type;

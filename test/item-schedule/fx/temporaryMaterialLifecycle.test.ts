@@ -83,7 +83,7 @@ const storeTemporaryFx = Effect.fn("storeTemporaryMaterialTestItemFx")(function*
 });
 
 describe("temporary material lifecycle", () => {
-	it("pauses committed Clock materials until their job consumes them", () => {
+	it("aborts a job when one committed Clock material expires", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -122,31 +122,21 @@ describe("temporary material lifecycle", () => {
 				}),
 			),
 		);
-
-		expect(result.continued.runtime.jobs).toEqual([
-			expect.objectContaining({
-				remainingMs: 600,
-			}),
-		]);
-		expect(
-			result.continued.runtime.items.find((item) => item.id === "runtime:temporary:younger")
-				?.location,
-		).toEqual({
-			scope: "job",
-			jobId: result.continued.runtime.jobs[0]?.id,
-			inputIndex: 0,
-		});
+		expect(result.continued.runtime.jobs).toEqual([]);
+		expect(result.continued.runtime.items.some((item) => item.item.id === "temporary")).toBe(
+			false,
+		);
 		expect(
 			result.continued.events.some(
-				(event) => event.type === GameEventEnumSchema.enum.ItemExpired,
+				(event) => event.type === GameEventEnumSchema.enum.JobAborted,
 			),
-		).toBe(false);
+		).toBe(true);
 		expect(result.completed.runtime.jobs).toEqual([]);
 		expect(result.completed.runtime.items.some((item) => item.item.id === "product")).toBe(
-			true,
-		);
-		expect(result.completed.runtime.items.some((item) => item.item.id === "temporary")).toBe(
 			false,
+		);
+		expect(result.completed.runtime.items.some((item) => item.item.id === "residue")).toBe(
+			true,
 		);
 	});
 
@@ -185,7 +175,7 @@ describe("temporary material lifecycle", () => {
 		).toBe(false);
 	});
 
-	it("keeps a committed Clock paused when its expiry output has no Board capacity", () => {
+	it("keeps committed expiry atomic when its output has no Board capacity", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -236,14 +226,14 @@ describe("temporary material lifecycle", () => {
 		]);
 		expect(result.stillBlocked.runtime.jobs).toEqual([
 			expect.objectContaining({
-				remainingMs: 200,
+				remainingMs: 400,
 			}),
 		]);
 		expect(result.stillBlocked.runtime.items).toContainEqual(
 			expect.objectContaining({
 				id: "runtime:temporary",
 				schedule: {
-					remainingDurationMs: 600,
+					remainingDurationMs: 0,
 				},
 			}),
 		);

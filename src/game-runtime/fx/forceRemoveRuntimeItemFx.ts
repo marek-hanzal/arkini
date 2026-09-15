@@ -5,14 +5,14 @@ import { discardRuntimeItemTreeFx } from "~/game-runtime/fx/discardRuntimeItemTr
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { placeRuntimeItemBestEffortFx } from "~/item-placement/fx/placeRuntimeItemBestEffortFx";
-import { reconcileJobAfterMaterialExpiryFx } from "~/production-job/fx/reconcileJobAfterMaterialExpiryFx";
+import { abortJobAfterMaterialExpiryFx } from "~/production-job/fx/abortJobAfterMaterialExpiryFx";
 
 export namespace forceRemoveRuntimeItemFx {
 	export interface Props {
 		readonly item: RuntimeItemSchema.Type;
-		readonly origin: BoardLocationSchema.Type;
+		readonly origin: GridLocationSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
@@ -81,7 +81,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		events.push(...placed.events);
 	}
 	if (item.location.scope === "job" || item.location.scope === "reserved") {
-		const reconciled = yield* reconcileJobAfterMaterialExpiryFx({
+		const reconciled = yield* abortJobAfterMaterialExpiryFx({
 			jobId: item.location.jobId,
 			runtime: draft,
 			overflow: "discard",

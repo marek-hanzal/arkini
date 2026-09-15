@@ -3,7 +3,6 @@ import { z } from "zod";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
@@ -108,7 +107,7 @@ const itemExpiredEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: BoardLocationSchema,
+		location: GridLocationSchema,
 		quantity: z.number().int().positive(),
 	})
 	.strict();

@@ -8,14 +8,14 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 
 export namespace placeRuntimeItemBestEffortFx {
 	export interface Props {
 		readonly itemId: IdSchema.Type;
-		readonly origin: BoardLocationSchema.Type;
+		readonly origin: GridLocationSchema.Type;
 		readonly originItemId: IdSchema.Type;
 		readonly source: "reservation" | "buffer";
 		readonly runtime: RuntimeSchema.Type;

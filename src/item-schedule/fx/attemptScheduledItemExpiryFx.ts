@@ -3,14 +3,13 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { readItemScheduleContextFx } from "~/item-schedule/fx/readItemScheduleContextFx";
+import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/fn/isExpectedPlacementDeliveryBlockFn";
-import { reconcileJobAfterMaterialExpiryFx } from "~/production-job/fx/reconcileJobAfterMaterialExpiryFx";
+import { abortJobAfterMaterialExpiryFx } from "~/production-job/fx/abortJobAfterMaterialExpiryFx";
 
 interface AttemptScheduledItemExpiryProps {
 	itemId: IdSchema.Type;
@@ -20,7 +19,7 @@ interface AttemptScheduledItemExpiryProps {
 type AttemptScheduledItemExpiryResult =
 	| {
 			type: "blocked";
-			error: ItemNotOnBoardError | PlacementUnavailableError;
+			error: PlacementUnavailableError;
 			runtime: RuntimeSchema.Type;
 	  }
 	| {
@@ -45,7 +44,7 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 	if (schedule === undefined || item.schedule?.remainingDurationMs !== 0) {
 		return yield* Effect.die(new Error(`Scheduled item ${item.id} is not ready to expire.`));
 	}
-	const context = yield* readItemScheduleContextFx({
+	const context = yield* readItemPhysicalContextFx({
 		item,
 		runtime,
 	});
@@ -83,7 +82,7 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 		...release.events,
 	];
 	if (!force && context.jobId !== undefined) {
-		const jobTransition = yield* reconcileJobAfterMaterialExpiryFx({
+		const jobTransition = yield* abortJobAfterMaterialExpiryFx({
 			jobId: context.jobId,
 			runtime: draft,
 		});
@@ -122,13 +121,6 @@ export const attemptScheduledItemExpiryFx = Effect.fn("attemptScheduledItemExpir
 						runtime,
 					} satisfies AttemptScheduledItemExpiryResult)
 				: Effect.fail(error),
-		),
-		Effect.catchTag("ItemNotOnBoardError", (error) =>
-			Effect.succeed({
-				type: "blocked",
-				error,
-				runtime,
-			} satisfies AttemptScheduledItemExpiryResult),
 		),
 	);
 });

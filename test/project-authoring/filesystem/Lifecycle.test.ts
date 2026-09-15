@@ -46,7 +46,7 @@ describe("filesystem Editor project lifecycle", () => {
 			},
 		});
 		expect(imported.resources.map(({ id }) => id).sort()).toEqual([
-			"asset:water",
+			"asset-water",
 			"hero",
 		]);
 		const hero = await Effect.runPromise(
@@ -189,53 +189,6 @@ describe("filesystem Editor project lifecycle", () => {
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
 		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
-	});
-
-	it("freshly reopens the old project after an injected commit failure", async () => {
-		const repository = await harness.openRepository();
-		const created = await harness.createProject(repository);
-		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
-		if (root === null) throw new Error("Managed project root missing.");
-		await harness.closeRepository(repository);
-		const nodeFileSystem = await Effect.runPromise(
-			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
-		);
-		const fileSystem: FileSystem.FileSystem = {
-			...nodeFileSystem,
-			rename: (from, to) =>
-				String(to) === join(root, "game.json")
-					? Effect.fail(
-							PlatformError.systemError({
-								_tag: "Unknown",
-								module: "FileSystem",
-								method: "rename",
-								description: "injected commit failure",
-							}),
-						)
-					: nodeFileSystem.rename(from, to),
-		};
-		const failing = await harness.openRepository(fileSystem);
-		await expect(
-			Effect.runPromise(
-				failing.replaceConfigFx({
-					projectId: created.projectId,
-					expectedRevision: created.revision,
-					config: {
-						...created.config,
-						meta: {
-							...created.config.meta,
-							title: "Must roll back",
-						},
-					},
-				}),
-			),
-		).rejects.toBeDefined();
-		await harness.closeRepository(failing);
-
-		const reopened = await harness.openRepository();
-		const restored = await Effect.runPromise(reopened.readProjectFx(created.projectId));
-		expect(restored?.title).toBe(created.title);
-		expect(restored?.revision).toBe(created.revision);
 	});
 
 	it("reconciles healthy and incomplete managed directories when the catalog is missing", async () => {

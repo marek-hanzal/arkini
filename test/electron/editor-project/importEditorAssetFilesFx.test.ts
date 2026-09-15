@@ -62,7 +62,7 @@ describe("importEditorAssetFilesFx", () => {
 
 		expect(result.resourceIds).toEqual([
 			"hero",
-			"asset:water",
+			"asset-water",
 		]);
 		expect(upsertResourceFilesFx).toHaveBeenCalledOnce();
 		for (const path of extractedPaths) await expect(access(path)).rejects.toBeDefined();

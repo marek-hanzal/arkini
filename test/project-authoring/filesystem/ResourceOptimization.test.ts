@@ -35,7 +35,7 @@ const createDirtyPng = () =>
 		.toBuffer();
 
 describe("filesystem Editor PNG optimization", () => {
-	it("atomically rewrites both item assets and shell resources without resizing", async () => {
+	it("rewrites both item assets and shell resources without resizing", async () => {
 		const dirtyPng = await createDirtyPng();
 		const repository = await harness.openRepository();
 		const created = await Effect.runPromise(

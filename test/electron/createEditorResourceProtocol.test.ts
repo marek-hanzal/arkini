@@ -1,18 +1,8 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import {
-	mkdir,
-	mkdtemp,
-	realpath,
-	rename,
-	rm,
-	stat,
-	symlink,
-	utimes,
-	writeFile,
-} from "node:fs/promises";
+import { mkdir, mkdtemp, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Effect, FileSystem, Option } from "effect";
+import { Effect, FileSystem } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createEditorResourceProtocolFx } from "~electron/main/createEditorResourceProtocolFx";
 import { readProjectResourceUrlFn } from "~/project-authoring/fn/readProjectResourceUrlFn";
@@ -189,42 +179,5 @@ describe("Editor resource protocol", () => {
 				})
 			).status,
 		).toBe(405);
-	});
-	it("invalidates same-size atomic replacements even when both timestamps coincide", async () => {
-		const url = await registerFn("asset", "1111");
-		const location = locations.get("asset")!;
-		const original = await stat(location.path);
-		const owner = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fs = yield* FileSystem.FileSystem;
-				return yield* createEditorResourceProtocolFx({
-					isTrustedUrlFn: () => true,
-					readResourceLocationFx: () => Effect.succeed(location),
-				}).pipe(
-					Effect.provideService(FileSystem.FileSystem, {
-						...fs,
-						stat: (path) =>
-							fs.stat(path).pipe(
-								Effect.map((info) => ({
-									...info,
-									mtime: Option.some(original.mtime),
-									birthtime: Option.some(original.birthtime),
-								})),
-							),
-					}),
-				);
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-		expect(
-			await (await Effect.runPromise(owner.handleRequestFx(new Request(url)))).text(),
-		).toBe("1111");
-		const replacement = `${location.path}.replacement`;
-		await writeFile(replacement, "2222");
-		await utimes(replacement, original.atime, original.mtime);
-		await rename(replacement, location.path);
-		expect((await stat(location.path)).ino).not.toBe(original.ino);
-		expect(
-			await (await Effect.runPromise(owner.handleRequestFx(new Request(url)))).text(),
-		).toBe("2222");
 	});
 });

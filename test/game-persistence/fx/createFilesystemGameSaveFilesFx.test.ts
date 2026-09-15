@@ -106,16 +106,16 @@ describe("createFilesystemGameSaveFilesFx", () => {
 
 	it("orders clear after an already admitted write", async () => {
 		const fileSystem = await readNodeFileSystem();
-		const renameEntered = Effect.runSync(Deferred.make<void>());
-		const releaseRename = Effect.runSync(Deferred.make<void>());
+		const writeEntered = Effect.runSync(Deferred.make<void>());
+		const releaseWrite = Effect.runSync(Deferred.make<void>());
 		const clearEntered = Effect.runSync(Deferred.make<void>());
 		const saveDirectory = join(root, "arkini", "game", "saves", first.packageId);
 		const gatedFileSystem: FileSystem.FileSystem = {
 			...fileSystem,
-			rename: (oldPath, newPath) =>
-				Deferred.succeed(renameEntered, undefined).pipe(
-					Effect.andThen(Deferred.await(releaseRename)),
-					Effect.andThen(fileSystem.rename(oldPath, newPath)),
+			writeFile: (target, bytes, options) =>
+				Deferred.succeed(writeEntered, undefined).pipe(
+					Effect.andThen(Deferred.await(releaseWrite)),
+					Effect.andThen(fileSystem.writeFile(target, bytes, options)),
 				),
 			remove: (path, options) =>
 				String(path) === saveDirectory
@@ -133,12 +133,12 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				]),
 			),
 		);
-		await Effect.runPromise(Deferred.await(renameEntered));
+		await Effect.runPromise(Deferred.await(writeEntered));
 
 		const clear = Effect.runPromise(repository.clearFx(first));
 		expect(Option.isNone(await Effect.runPromise(Deferred.poll(clearEntered)))).toBe(true);
 
-		Effect.runSync(Deferred.succeed(releaseRename, undefined));
+		Effect.runSync(Deferred.succeed(releaseWrite, undefined));
 		await Promise.all([
 			write,
 			clear,

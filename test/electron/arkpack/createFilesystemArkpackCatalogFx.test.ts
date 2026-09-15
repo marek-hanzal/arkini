@@ -136,22 +136,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const replacement = createUserBytes(packageId);
 		const source = join(root, "replacement.arkpack");
 		await writeFile(source, replacement);
-		const nodeFileSystem = await createNodeFileSystem();
-		let movedCurrentAside = false;
-		const fileSystem = {
-			...nodeFileSystem,
-			rename: (oldPath, newPath) => {
-				if (oldPath === target) movedCurrentAside = true;
-				return nodeFileSystem.rename(oldPath, newPath);
-			},
-		} satisfies FileSystem.FileSystem;
-		const catalog = await createCatalog(root, fileSystem);
+		const catalog = await createCatalog(root);
 
 		await expect(Effect.runPromise(catalog.importFx(source))).resolves.toMatchObject({
 			packageId,
 			version: "1.1",
 		});
-		expect(movedCurrentAside).toBe(false);
 		expect(new Uint8Array(await readFile(target))).toEqual(replacement);
 	});
 
@@ -240,8 +230,8 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const packageId = "serialized";
 		const output = readPackagePath(roots.user, packageId);
 		const nodeFileSystem = await createNodeFileSystem();
-		const renameEntered = createPromiseGate();
-		const releaseRename = createPromiseGate();
+		const copyEntered = createPromiseGate();
+		const releaseCopy = createPromiseGate();
 		let removeStarted = false;
 		const fileSystem = {
 			...nodeFileSystem,
@@ -249,11 +239,11 @@ describe("createFilesystemArkpackCatalogFx", () => {
 				if (path === output) removeStarted = true;
 				return nodeFileSystem.remove(path, options);
 			},
-			rename: (oldPath, newPath) => {
-				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (newPath !== output) return renameFx;
-				renameEntered.resolve();
-				return Effect.promise(() => releaseRename.promise).pipe(Effect.andThen(renameFx));
+			copyFile: (oldPath, newPath) => {
+				const copyFx = nodeFileSystem.copyFile(oldPath, newPath);
+				if (newPath !== output) return copyFx;
+				copyEntered.resolve();
+				return Effect.promise(() => releaseCopy.promise).pipe(Effect.andThen(copyFx));
 			},
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
@@ -261,12 +251,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const source = join(root, "serialized-source.arkpack");
 		await writeFile(source, createUserBytes(packageId));
 		const installing = Effect.runPromise(catalog.importFx(source));
-		await renameEntered.promise;
+		await copyEntered.promise;
 		const removing = Effect.runPromise(catalog.removeFx(packageId));
 		await new Promise<void>((resolve) => setImmediate(resolve));
 
 		expect(removeStarted).toBe(false);
-		releaseRename.resolve();
+		releaseCopy.resolve();
 		await Promise.all([
 			installing,
 			removing,
@@ -284,8 +274,8 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			bytes: createBundledBytes(packageId),
 		});
 		const nodeFileSystem = await createNodeFileSystem();
-		const publicationEntered = createPromiseGate();
-		const releasePublication = createPromiseGate();
+		const copyEntered = createPromiseGate();
+		const releaseCopy = createPromiseGate();
 		let canonicalReadStarted = false;
 		const fileSystem = {
 			...nodeFileSystem,
@@ -293,25 +283,23 @@ describe("createFilesystemArkpackCatalogFx", () => {
 				if (path === output) canonicalReadStarted = true;
 				return nodeFileSystem.readFile(path);
 			},
-			rename: (oldPath, newPath) => {
-				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (newPath !== output) return renameFx;
-				publicationEntered.resolve();
-				return Effect.promise(() => releasePublication.promise).pipe(
-					Effect.andThen(renameFx),
-				);
+			copyFile: (oldPath, newPath) => {
+				const copyFx = nodeFileSystem.copyFile(oldPath, newPath);
+				if (newPath !== output) return copyFx;
+				copyEntered.resolve();
+				return Effect.promise(() => releaseCopy.promise).pipe(Effect.andThen(copyFx));
 			},
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
 		const source = join(root, "locked-reader-source.arkpack");
 		await writeFile(source, createUserBytes(packageId));
 		const writing = Effect.runPromise(catalog.importFx(source));
-		await publicationEntered.promise;
+		await copyEntered.promise;
 		const listing = Effect.runPromise(catalog.listFx);
 		await new Promise<void>((resolve) => setImmediate(resolve));
 		expect(canonicalReadStarted).toBe(false);
 
-		releasePublication.resolve();
+		releaseCopy.resolve();
 		await writing;
 		await expect(listing).resolves.toEqual([
 			readFileRecord({

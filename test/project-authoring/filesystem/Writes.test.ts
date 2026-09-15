@@ -127,10 +127,9 @@ describe("filesystem Editor project writes", () => {
 				if (target.endsWith(".png")) pngOperations.push(target);
 				return nodeFileSystem.stat(target);
 			},
-			rename: (from, to) => {
-				if (String(from) === `${String(to)}.arkini-replace`)
-					publishedTargets.add(String(to));
-				return nodeFileSystem.rename(from, to);
+			writeFile: (target, bytes, options) => {
+				publishedTargets.add(String(target));
+				return nodeFileSystem.writeFile(target, bytes, options);
 			},
 		};
 		const repository = await harness.openRepository(fileSystem);

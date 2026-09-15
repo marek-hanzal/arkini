@@ -1,6 +1,5 @@
 import { Context, Effect, FileSystem, Path } from "effect";
 import { lock as acquireLock } from "proper-lockfile";
-import { copyFile } from "node:fs/promises";
 
 import { FilesystemWriteError } from "../error/FilesystemWriteError";
 import type { FilesystemWrite } from "../service/FilesystemWrite";
@@ -120,7 +119,7 @@ const removeFileFx = Effect.fn("removeFileFx")(function* ({
 	});
 });
 
-/** Syncs and atomically renames one exact sibling staging file over its owned target. */
+/** Replaces one exact owned file under its caller-provided lock. */
 const replaceFileFx = Effect.fn("replaceFileFx")(function* ({
 	paths,
 	props,
@@ -144,82 +143,17 @@ const replaceFileFx = Effect.fn("replaceFileFx")(function* ({
 				message: `Filesystem write target ${prepared.target} is the active lock.`,
 			}),
 		);
-	const pending = `${prepared.target}.arkini-replace`;
-	if (yield* fileSystem.exists(pending)) {
-		const info = yield* fileSystem.stat(pending);
-		if (info.type !== "File")
-			return yield* Effect.fail(
-				new FilesystemWriteError({
-					operation: "replace-file",
-					message: `Filesystem write staging path ${pending} must be a file.`,
-				}),
-			);
-		yield* fileSystem.remove(pending, {
-			force: true,
-		});
-	}
-	let ownsPending = false;
-	return yield* Effect.uninterruptibleMask((restoreFx) =>
-		Effect.gen(function* () {
-			if (props.source === undefined) {
-				yield* Effect.scoped(
-					Effect.gen(function* () {
-						const file = yield* fileSystem.open(pending, {
-							flag: "wx",
-						});
-						ownsPending = true;
-						yield* restoreFx(file.writeAll(props.bytes));
-						yield* restoreFx(file.sync);
-					}),
-				);
-			} else {
-				yield* restoreFx(
-					Effect.tryPromise({
-						try: () => copyFile(props.source, pending),
-						catch: (cause) => cause,
-					}),
-				);
-				ownsPending = true;
-				yield* Effect.scoped(
-					Effect.gen(function* () {
-						const file = yield* fileSystem.open(pending, {
-							flag: "r",
-						});
-						yield* restoreFx(file.sync);
-					}),
-				);
-			}
-		}).pipe(
-			Effect.andThen(
-				Effect.uninterruptible(
-					fileSystem.rename(pending, prepared.target).pipe(
-						Effect.tap(() =>
-							Effect.sync(() => {
-								ownsPending = false;
-							}),
-						),
-					),
-				),
-			),
-			Effect.ensuring(
-				Effect.suspend(() =>
-					ownsPending
-						? fileSystem
-								.remove(pending, {
-									force: true,
-								})
-								.pipe(Effect.ignore)
-						: Effect.void,
-				),
-			),
-		),
+	return yield* (
+		props.source === undefined
+			? fileSystem.writeFile(prepared.target, props.bytes)
+			: fileSystem.copyFile(props.source, prepared.target)
 	).pipe(
 		Effect.mapError((cause) =>
 			cause instanceof FilesystemWriteError
 				? cause
 				: new FilesystemWriteError({
 						operation: "replace-file",
-						message: "The atomic filesystem file replacement failed.",
+						message: "The filesystem file replacement failed.",
 						cause,
 					}),
 		),

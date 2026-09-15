@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { copyFile, open } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect, type FileSystem } from "effect";
 
@@ -17,7 +16,7 @@ export namespace importUserArkpackFx {
 	}
 }
 
-/** Stream-validates and atomically copies one selected Arkpack into the user catalog. */
+/** Stream-validates and copies one selected Arkpack into the user catalog. */
 export const importUserArkpackFx = Effect.fn("importUserArkpackFx")(function* ({
 	fileSystem,
 	sourcePath,
@@ -28,23 +27,10 @@ export const importUserArkpackFx = Effect.fn("importUserArkpackFx")(function* ({
 		recursive: true,
 	});
 	const importId = randomUUID();
-	const stagedArkpack = join(stagingRoot, `.import-${importId}.arkpack`);
 	const extractionRoot = join(stagingRoot, `.import-${importId}`);
 	return yield* Effect.gen(function* () {
-		yield* Effect.tryPromise({
-			try: async () => {
-				await copyFile(sourcePath, stagedArkpack);
-				const file = await open(stagedArkpack, "r");
-				try {
-					await file.sync();
-				} finally {
-					await file.close();
-				}
-			},
-			catch: (cause) => cause,
-		});
 		const extracted = yield* extractArkpackFileFx({
-			arkpackPath: stagedArkpack,
+			arkpackPath: sourcePath,
 			outputRoot: extractionRoot,
 		});
 		const target = join(userRoot, readArkpackArtifactNameFn(extracted.packageId));
@@ -56,7 +42,7 @@ export const importUserArkpackFx = Effect.fn("importUserArkpackFx")(function* ({
 				arkpackPath: target,
 				fileSystem,
 			},
-			(lockedTarget) => fileSystem.rename(stagedArkpack, lockedTarget),
+			(lockedTarget) => fileSystem.copyFile(sourcePath, lockedTarget),
 		);
 		return {
 			packageId: extracted.packageId,
@@ -71,20 +57,12 @@ export const importUserArkpackFx = Effect.fn("importUserArkpackFx")(function* ({
 		} satisfies ArkiniElectronApi.ArkpackFile;
 	}).pipe(
 		Effect.ensuring(
-			Effect.all(
-				[
-					fileSystem.remove(stagedArkpack, {
-						force: true,
-					}),
-					fileSystem.remove(extractionRoot, {
-						force: true,
-						recursive: true,
-					}),
-				],
-				{
-					discard: true,
-				},
-			).pipe(Effect.ignore),
+			fileSystem
+				.remove(extractionRoot, {
+					force: true,
+					recursive: true,
+				})
+				.pipe(Effect.ignore),
 		),
 	);
 });

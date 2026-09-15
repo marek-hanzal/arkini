@@ -13,17 +13,6 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "bio-waste"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "bio-waste-bucket"
-			}
-		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

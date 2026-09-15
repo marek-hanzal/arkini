@@ -40,6 +40,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "copper-bathtub-with-bio-waste"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-bucket"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bio-waste-bucket"
 			}
 		],
 		"maxQueueSize": 1,

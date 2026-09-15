@@ -95,6 +95,15 @@
 				},
 				"effect": "replace",
 				"result": "coin-stack"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "laboratory-glassware"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "clutter"
 			}
 		],
 		"maxQueueSize": 1,

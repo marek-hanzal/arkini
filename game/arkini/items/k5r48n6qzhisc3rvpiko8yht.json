@@ -13,6 +13,26 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "trimmed-scrubbing-brush"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "scrubbing-brush"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "trimmed-dirty-scrubbing-brush"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "scrubbing-brush"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "g1w4g5ccovd4q91eyaano0tp",
+		"id": "trimmed-scrubbing-brush",
+		"title": "Trimmed Scrubbing Brush",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"trimmed-scrubbing-brush"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

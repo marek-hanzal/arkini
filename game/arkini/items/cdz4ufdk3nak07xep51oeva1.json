@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "cdz4ufdk3nak07xep51oeva1",
+		"id": "dirty-scissors",
+		"title": "Dirty Scissors",
+		"draft": true,
+		"asset": {
+			"scale": 1,
+			"default": [
+				"dirty-scissors"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

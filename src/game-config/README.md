@@ -9,7 +9,7 @@ This map separates authored values, portable source, diagnostics, semantic valid
 | `game-value` | Foundational immutable identity, required text, quantity and whole-millisecond time schemas | [`../game-value/schema/IdSchema.ts`](../game-value/schema/IdSchema.ts), [`../game-value/schema/TimeSchema.ts`](../game-value/schema/TimeSchema.ts) |
 | `game-config` | Completed authored aggregate and loaded-config capability | [`schema/GameConfigSchema.ts`](schema/GameConfigSchema.ts), [`context/GameConfigFx.ts`](context/GameConfigFx.ts) |
 | `game-config-source` | Portable filenames, source schemas, discovery, parsing and generated JSON Schema | [`../game-config-source/schema/ProjectSchema.ts`](../game-config-source/schema/ProjectSchema.ts), [`../game-config-source/fx/collectSourceFilesFx.ts`](../game-config-source/fx/collectSourceFilesFx.ts) |
-| `game-config-resource` | Embedded PNG/source descriptors, usage, rename, discovery, byte admission, streamed source optimization and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/optimizePngResourceFileFx.ts`](../game-config-resource/fx/optimizePngResourceFileFx.ts), [`../game-config-resource/fx/normalizeArtworkPngFileFx.ts`](../game-config-resource/fx/normalizeArtworkPngFileFx.ts) |
+| `game-config-resource` | Typed visual/Music source descriptors, usage, rename, discovery, bounded admission, streamed PNG optimization and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/validateOggOpusFileFx.ts`](../game-config-resource/fx/validateOggOpusFileFx.ts), [`../game-config-resource/fx/normalizeArtworkPngFileFx.ts`](../game-config-resource/fx/normalizeArtworkPngFileFx.ts) |
 | `game-config-diagnostic` | Provenance-aware diagnostic vocabulary and presentation | [`../game-config-diagnostic/schema/GameDiagnosticsSchema.ts`](../game-config-diagnostic/schema/GameDiagnosticsSchema.ts), [`../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts`](../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts) |
 | `game-config-validation` | Completed-config semantic validation and blocking diagnostics | [`../game-config-validation/fx/validateGameConfigFx.ts`](../game-config-validation/fx/validateGameConfigFx.ts) |
 | `game-config-compiler` | Deterministic source assembly, validation orchestration and compilation result | [`../game-config-compiler/fx/compileGameDirectoryFx.ts`](../game-config-compiler/fx/compileGameDirectoryFx.ts) |
@@ -39,14 +39,14 @@ Always name the layer in architecture prose. “Validation calls input eligibili
 ## Canonical flow
 
 ```text
-project.json + schema.json + game.json + items + PNG resources
+project.json + schema.json + game.json + items + typed visual/Music resources
 → source discovery and strict parsing with provenance
 → deterministic root/item assembly
 → GameConfigSchema parse
-→ semantic and PNG validation
+→ semantic and typed resource validation
 → blocking-diagnostic gate
 → completed Game Config
-→ Arkpack-only Item-artwork normalization and encoding, or Editor preview
+→ Arkpack normalization and streamed encoding, or lazy Editor preview
 ```
 
 Source, validation, Editor Build, CLI and packing must not create variants of this flow. Conflicts remain diagnostics with exact source provenance and never silently overwrite another provider.
@@ -56,7 +56,7 @@ Source, validation, Editor Build, CLI and packing must not create variants of th
 - `game-config` owns values only; it imports no source, validation, compiler, Editor, renderer, route or Electron behavior.
 - `game-value` owns only reusable scalar schemas and imports no Arkini domain.
 - Source reads exact allowlisted paths. Arbitrary recursive JSON is not game source.
-- Source descriptors derive semantic type from `artwork/` or `image/`. Arkpack compilation normalizes only square Artwork and preserves general Image bytes.
+- Source descriptors derive semantic type from `artwork/`, `image/`, or `music/`. Arkpack compilation normalizes square Artwork while preserving general Image and canonical Ogg/Opus Music bytes.
 - The generated `schema.json` comes from the current project source-schema union and uses stable references.
 - Validation extends beyond Zod shape parsing and preserves source/entity provenance.
 - The compiler rejects blocking diagnostics and cannot publish a usable invalid result.

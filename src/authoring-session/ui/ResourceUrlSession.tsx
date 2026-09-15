@@ -129,7 +129,7 @@ const ResourceUrlProvider = ({
 	return <ResourceUrlContext value={store}>{children}</ResourceUrlContext>;
 };
 
-/** Keeps versioned file URLs stable so browser and Pixi caches share unchanged artwork. */
+/** Keeps versioned file URLs stable so consumers share unchanged project resources. */
 export const ProjectResourceUrlProvider = ({ children }: PropsWithChildren) => {
 	const { resources, projectId } = useEditorProject();
 	return (

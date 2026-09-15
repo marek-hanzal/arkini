@@ -118,7 +118,7 @@ export namespace ArkiniElectronApi {
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<{
 			readonly id: string;
-			readonly type: "artwork" | "image";
+			readonly type: "artwork" | "image" | "music";
 			readonly url: string;
 		}>;
 	}

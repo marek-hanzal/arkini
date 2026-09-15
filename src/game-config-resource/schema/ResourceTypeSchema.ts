@@ -4,6 +4,7 @@ import { z } from "zod";
 export const ResourceTypeSchema = z.enum([
 	"artwork",
 	"image",
+	"music",
 ]);
 
 export type ResourceTypeSchema = typeof ResourceTypeSchema;

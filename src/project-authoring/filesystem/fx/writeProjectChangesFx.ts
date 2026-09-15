@@ -137,16 +137,9 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				const oldId =
 					resourceRename?.to === resource.id ? resourceRename.from : resource.id;
 				const old = previousResources.get(oldId);
-				const target = yield* resource.type === "image"
-					? paths.imageFileFx(resource.id)
-					: paths.artworkFileFx(resource.id);
+				const target = yield* paths.resourceFileFx(resource);
 				yield* admitTargetFx(target);
-				const oldTarget =
-					old === undefined
-						? undefined
-						: yield* old.type === "image"
-								? paths.imageFileFx(old.id)
-								: paths.artworkFileFx(old.id);
+				const oldTarget = old === undefined ? undefined : yield* paths.resourceFileFx(old);
 				let source = resourceFiles.get(resource.id);
 				if (oldTarget !== undefined && oldTarget !== target) {
 					deletes.add(oldTarget);
@@ -166,11 +159,7 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				previousResources.delete(oldId);
 			}
 			for (const resource of previousResources.values()) {
-				deletes.add(
-					yield* resource.type === "image"
-						? paths.imageFileFx(resource.id)
-						: paths.artworkFileFx(resource.id),
-				);
+				deletes.add(yield* paths.resourceFileFx(resource));
 			}
 			for (const note of noteUpdates) {
 				writes.push({
@@ -196,9 +185,7 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				verifyFx: Effect.forEach(next.resources, (resource) =>
 					changedResources.has(resource.id)
 						? Effect.gen(function* () {
-								const target = yield* resource.type === "image"
-									? paths.imageFileFx(resource.id)
-									: paths.artworkFileFx(resource.id);
+								const target = yield* paths.resourceFileFx(resource);
 								return yield* readProjectResourceMetadataFx(
 									resource.id,
 									resource.type,

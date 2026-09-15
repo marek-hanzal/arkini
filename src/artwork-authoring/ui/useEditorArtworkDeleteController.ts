@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
-import { deleteEditorArtworkFx } from "~/artwork-authoring/fx/deleteEditorArtworkFx";
+import { deleteEditorResourceFx } from "~/resource-authoring/fx/deleteEditorResourceFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -23,7 +23,7 @@ const deleteEditorArtworkCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
 			Atom.fn((props: DeleteEditorArtworkCommandProps) =>
-				deleteEditorArtworkFx({
+				deleteEditorResourceFx({
 					...props,
 					projectId,
 				}).pipe(Effect.provideService(ProjectRepository, repository)),

@@ -6,6 +6,7 @@ import {
 } from "~/game-config-source/constant/GameProjectReference";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import type { ProjectPaths } from "./ProjectPaths";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 /** Resolves every fixed and identity-derived path below one Editor project root. */
 export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* (
@@ -16,11 +17,13 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 	const items = path.join(root, "items");
 	const artwork = path.join(root, "artwork");
 	const image = path.join(root, "image");
+	const music = path.join(root, "music");
 	const notes = path.join(root, "notes");
 
 	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
 		directory: string,
 		resourceId: string,
+		extension: ".ogg" | ".png",
 	) {
 		if (
 			path.basename(resourceId) !== resourceId ||
@@ -31,12 +34,24 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		) {
 			return yield* Effect.fail(
 				new Error(
-					`Resource ${JSON.stringify(resourceId)} cannot be represented by a PNG filename.`,
+					`Resource ${JSON.stringify(resourceId)} cannot be represented by a source filename.`,
 				),
 			);
 		}
-		return path.join(directory, `${resourceId}.png`);
+		return path.join(directory, `${resourceId}${extension}`);
 	});
+	const resourceFileFx = ({
+		id,
+		type,
+	}: {
+		readonly id: string;
+		readonly type: ResourceTypeSchema.Type;
+	}) =>
+		type === "artwork"
+			? readResourceFileFx(artwork, id, ".png")
+			: type === "image"
+				? readResourceFileFx(image, id, ".png")
+				: readResourceFileFx(music, id, ".ogg");
 
 	return {
 		root,
@@ -52,8 +67,9 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		notes,
 		itemFileFx: ({ uid }) =>
 			Effect.succeed(path.join(items, `${encodeGameProjectFileStemFn(uid)}.json`)),
-		artworkFileFx: (resourceId) => readResourceFileFx(artwork, resourceId),
-		imageFileFx: (resourceId) => readResourceFileFx(image, resourceId),
+		artworkFileFx: (resourceId) => readResourceFileFx(artwork, resourceId, ".png"),
+		imageFileFx: (resourceId) => readResourceFileFx(image, resourceId, ".png"),
+		resourceFileFx,
 		noteFileFx: (noteId) =>
 			Effect.succeed(path.join(notes, `${encodeGameProjectFileStemFn(noteId)}.json`)),
 	} satisfies ProjectPaths;

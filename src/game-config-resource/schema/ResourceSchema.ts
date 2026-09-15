@@ -14,7 +14,7 @@ export const ResourceSchema = z
 	.strict()
 	.meta({
 		id: "ResourceSchema",
-		description: "One typed binary resource embedded in a game pack.",
+		description: "One typed binary project resource.",
 	});
 
 export type ResourceSchema = typeof ResourceSchema;

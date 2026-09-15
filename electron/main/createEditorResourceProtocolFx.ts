@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { Effect, FileSystem, Path } from "effect";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { ArkiniProtocolError } from "../protocol/ArkiniProtocolError";
+import { readByteRangeFn } from "../protocol/readByteRangeFn";
 import { readResourceContentTypeFn } from "~/game-config-resource/fn/readResourceContentTypeFn";
 
 export namespace createEditorResourceProtocolFx {
@@ -87,17 +88,43 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					}
 					const stat = yield* fs.stat(filePath);
 					if (stat.type !== "File") return yield* Effect.fail(unavailableFn());
+					const byteRange = readByteRangeFn(
+						request.headers.get("Range"),
+						Number(stat.size),
+					);
+					if (byteRange.type === "invalid")
+						return new Response(null, {
+							headers: {
+								"Accept-Ranges": "bytes",
+								"Content-Range": `bytes */${stat.size}`,
+							},
+							status: 416,
+						});
 					const response = yield* Effect.tryPromise({
 						try: () =>
 							net.fetch(pathToFileURL(filePath).toString(), {
 								method: request.method,
+								...(byteRange.type === "full"
+									? {}
+									: {
+											headers: {
+												Range: `bytes=${byteRange.start}-${byteRange.end}`,
+											},
+										}),
 							}),
 						catch: unavailableFn,
 					});
 					const headers = new Headers(response.headers);
+					headers.set("Accept-Ranges", "bytes");
 					headers.set("Content-Type", readResourceContentTypeFn(location.type));
-					if (!headers.has("Content-Length"))
-						headers.set("Content-Length", String(Number(stat.size)));
+					if (byteRange.type === "full") headers.set("Content-Length", String(stat.size));
+					else {
+						headers.set("Content-Length", String(byteRange.length));
+						headers.set(
+							"Content-Range",
+							`bytes ${byteRange.start}-${byteRange.end}/${stat.size}`,
+						);
+					}
 					headers.set("Cache-Control", "no-store");
 					if (origin !== null) {
 						headers.set("Access-Control-Allow-Origin", origin);
@@ -105,7 +132,7 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					}
 					headers.set("X-Content-Type-Options", "nosniff");
 					return new Response(response.body, {
-						status: response.status,
+						status: byteRange.type === "partial" ? 206 : response.status,
 						headers,
 					});
 				}).pipe(

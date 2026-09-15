@@ -17,9 +17,7 @@ export const copyExtractedProjectResourcesFx = Effect.fn("copyExtractedProjectRe
 	}) {
 		const paths = yield* createProjectPathsFx(root);
 		for (const resource of resources) {
-			const target = yield* resource.type === "image"
-				? paths.imageFileFx(resource.id)
-				: paths.artworkFileFx(resource.id);
+			const target = yield* paths.resourceFileFx(resource);
 			yield* Effect.tryPromise({
 				try: async () => {
 					await mkdir(dirname(target), {

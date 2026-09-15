@@ -128,17 +128,15 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	for (const descriptor of descriptors) {
 		if (resourceIds.has(descriptor.id)) {
 			return yield* Effect.fail(
-				new Error(`Editor PNG resource ID ${descriptor.id} is duplicated.`),
+				new Error(`Editor resource ID ${descriptor.id} is duplicated.`),
 			);
 		}
 		resourceIds.add(descriptor.id);
-		const expectedPath = yield* descriptor.type === "image"
-			? paths.imageFileFx(descriptor.id)
-			: paths.artworkFileFx(descriptor.id);
+		const expectedPath = yield* paths.resourceFileFx(descriptor);
 		if (path.resolve(descriptor.path) !== expectedPath) {
 			return yield* Effect.fail(
 				new Error(
-					`Editor PNG ${descriptor.path} is invalid: expected resource path ${expectedPath}.`,
+					`Editor resource ${descriptor.path} is invalid: expected resource path ${expectedPath}.`,
 				),
 			);
 		}

@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorResourceFilesFx } from "~electron/main/editor-project/importEditorResourceFilesFx";
 import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import {
 	createEditorProjectIpcRepository,
@@ -27,6 +28,47 @@ afterEach(async () => {
 });
 
 describe("importEditorResourceFilesFx", () => {
+	it("imports canonical Ogg/Opus Music by native path without materializing its body", async () => {
+		const musicPath = join(root, "Opening Theme.ogg");
+		const musicBytes = createTestOggOpusBytesFn();
+		await writeFile(musicPath, musicBytes);
+		const repository = createEditorProjectIpcRepository();
+
+		await expect(
+			Effect.runPromise(
+				importEditorResourceFilesFx({
+					repository,
+					request: {
+						files: [
+							{
+								name: "Opening Theme.ogg",
+								path: musicPath,
+							},
+						],
+						projectId: "project-one",
+						source: "files",
+						type: "music",
+					},
+				}),
+			),
+		).resolves.toMatchObject({
+			resourceIds: [
+				"opening-theme",
+			],
+		});
+		expect(repository.upsertResourceFilesFx).toHaveBeenCalledWith({
+			projectId: "project-one",
+			resources: [
+				expect.objectContaining({
+					id: "opening-theme",
+					path: musicPath,
+					size: musicBytes.byteLength,
+					type: "music",
+				}),
+			],
+		});
+	});
+
 	it("accepts a non-square Image by native path while Artwork keeps its square contract", async () => {
 		const imagePath = join(root, "hero.png");
 		await sharp({

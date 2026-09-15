@@ -29,6 +29,9 @@ describe("collectSourceFilesFx", () => {
 				"artwork/kept.png",
 				"image/hero.png",
 				"image/nested/ignored.png",
+				"music/theme.ogg",
+				"music/ignored.OGG",
+				"music/nested/ignored.ogg",
 				"assets/obsolete.png",
 				"resources/obsolete.png",
 				"notes/ignored.json",
@@ -69,6 +72,10 @@ describe("collectSourceFilesFx", () => {
 					{
 						path: "image/hero.png",
 						type: "image",
+					},
+					{
+						path: "music/theme.ogg",
+						type: "music",
 					},
 				],
 			});

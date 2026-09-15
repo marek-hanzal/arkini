@@ -8,6 +8,7 @@ import { decodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpac
 import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
 import {
 	assetPng,
+	musicOgg,
 	png,
 	writeGameProjectFixtureFx,
 } from "./packDirectoryFx.test/gameProjectFixture";
@@ -29,7 +30,7 @@ describe("packDirectoryFx game-project contract", () => {
 				packageId: "project-game",
 				version: "2.3",
 				json: 3,
-				resources: 2,
+				resources: 3,
 			});
 			expect(payload).toMatchObject({
 				version: "2.3",
@@ -46,6 +47,11 @@ describe("packDirectoryFx game-project contract", () => {
 				id: "hero",
 				type: "image",
 				bytes: png,
+			});
+			expect(payload.resources).toContainEqual({
+				id: "theme",
+				type: "music",
+				bytes: musicOgg,
 			});
 			expect(itemWater).toMatchObject({
 				id: "item-water",

@@ -6,7 +6,7 @@ export namespace readProjectResourceUrlFn {
 	}
 }
 
-/** The resource version gives every replacement a distinct renderer image identity. */
+/** The resource version gives every replacement a distinct renderer URL identity. */
 export const readProjectResourceUrlFn = ({
 	projectId,
 	resourceId,

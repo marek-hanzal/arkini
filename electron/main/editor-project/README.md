@@ -69,11 +69,11 @@ Path containment and owned-file validation remain immediate write contracts. The
 
 ## Resource bodies and incremental saves
 
-Project projections carry resource ID, semantic type, byte size and a filesystem version token, never binary bodies or MIME. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged PNGs. Resource import/replacement and Artwork Optimize supply only changed bodies or native source paths. Renames read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
+Project projections carry resource ID, semantic type, byte size and a filesystem version token, never binary bodies or MIME. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged resource bodies. Resource import/replacement and Artwork Optimize supply only changed bodies or native source paths. Music import keeps canonical Ogg/Opus unchanged or streams one conversion at a time through a PATH-visible FFmpeg. Renames read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
 
 [`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
-[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image consumers, including Editor Board. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Unrequested images are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build reads source files while streaming the Arkpack.
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image and audio consumers, including Editor Board and Music preview. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Audio byte ranges are forwarded to the native file request. Unrequested resources are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build validates typed resources and streams their bodies into Arkpack.
 
 ## Renderer replacement flow
 
@@ -107,7 +107,7 @@ Project Write Admission rejects replacement during an already pending route tran
 
 An identity rename first resolves the current draft leave decision, then holds the same admission authority from its revision-pinned write through navigation to the new project ID. This excludes replacement and unrelated navigation; ordinary writes keep repository revision checks. Only the rename's terminal route bypasses the navigation guard while its lease is live. Failure releases admission and remains visible in the rename dialog.
 
-External authored JSON and resource catalog changes are ignored while mounted. Requested image bodies come directly from their registered disk paths; already mounted image/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
+External authored JSON and resource catalog changes are ignored while mounted. Requested image and audio bodies come directly from their registered disk paths; already mounted resource/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Output version and Build admission
 

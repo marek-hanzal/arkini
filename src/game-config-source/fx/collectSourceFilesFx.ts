@@ -28,14 +28,24 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 			if (file.endsWith(".json")) json.push(path.join(items, file));
 		}
 	}
-	for (const type of [
-		"artwork",
-		"image",
+	for (const { extension, type } of [
+		{
+			extension: ".png",
+			type: "artwork",
+		},
+		{
+			extension: ".png",
+			type: "image",
+		},
+		{
+			extension: ".ogg",
+			type: "music",
+		},
 	] as const) {
 		const directory = path.join(root, type);
 		if (!(yield* fileSystem.exists(directory))) continue;
 		for (const file of yield* fileSystem.readDirectory(directory)) {
-			if (file.endsWith(".png"))
+			if (file.endsWith(extension))
 				resources.push({
 					path: path.join(directory, file),
 					type,

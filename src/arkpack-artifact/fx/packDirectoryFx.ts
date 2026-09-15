@@ -16,6 +16,7 @@ import { ArkpackLimits } from "~shared/ArkpackLimits";
 import { Magic } from "~/arkpack-artifact/constant/Magic";
 import { ManifestSchema } from "~/arkpack-artifact/schema/ManifestSchema";
 import { normalizeArtworkPngFileFx } from "~/game-config-resource/fx/normalizeArtworkPngFileFx";
+import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
@@ -169,7 +170,9 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 			const length =
 				resource.type === "artwork"
 					? yield* normalizeArtworkPngFileFx(resource.path, target, resource.id)
-					: yield* validatePngResourceFileFx(resource.path, resource.id);
+					: resource.type === "image"
+						? yield* validatePngResourceFileFx(resource.path, resource.id)
+						: yield* validateOggOpusFileFx(resource.path, resource.id);
 			resources.push({
 				id: resource.id,
 				type: resource.type,

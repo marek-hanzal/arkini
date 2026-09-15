@@ -831,12 +831,18 @@ Import arkpack:
   value: Import arkpack
 Import artwork:
   value: Import artwork
+Import audio files to create the project music library.:
+  value: Import audio files to create the project music library.
 Import images:
   value: Import images
+Import music:
+  value: Import music
 Imported artwork:
   value: Imported artwork
 Imported image count:
   value: Imported {count} image resources.
+Importing music…:
+  value: Importing music…
 Indeterminate:
   value: Indeterminate
 Initial board → item {index}:
@@ -1275,6 +1281,15 @@ Minor:
   value: Minor
 Missing item marker:
   value: Missing item marker
+Music:
+  value: Music
+Music help:
+  value: |
+    Build the music library for your game. Import songs, find them quickly, and preview how they sound before using them in the game.
+
+    - Song names come from the imported filenames.
+    - **Play** previews one song at a time.
+    - **Volume** changes only the preview volume on this page.
 Must be at least {minimum}.:
   value: Must be at least {minimum}.
   dynamic: true
@@ -1349,10 +1364,16 @@ No matches found.:
   value: No matches found.
 No matching items:
   value: No matching items
+No matching music:
+  value: No matching music
 No material input required.:
   value: No material input required.
 No merges for this item:
   value: No merges for this item
+No music matches this search.:
+  value: No music matches this search.
+No music yet:
+  value: No music yet
 No other authored item outputs this item through production, expiry, units, or merges.:
   value: No saved item creates this one through Production, Clock, Units or Merges.
   dynamic: true
@@ -1454,12 +1475,16 @@ Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
   value: Paste ngrok authtoken
+Pause:
+  value: Pause
 Paused:
   value: Paused
 Pick random space:
   value: Pick random space
 Placement:
   value: Placement
+Play:
+  value: Play
 Player controls:
   value: Player controls
 Player hint:
@@ -1843,6 +1868,8 @@ Search item title, ID or type…:
   value: Search item title, ID or type…
 Search lines…:
   value: Search lines…
+Search music…:
+  value: Search music…
 Searches matching items on the current board at the selected distance from the action owner.:
   value: Searches the current Board at the chosen distance from the item using this requirement.
   dynamic: true
@@ -2093,6 +2120,8 @@ Version:
   value: Version
 Visible:
   value: Visible
+Volume:
+  value: Volume
 Waiting for active job:
   value: Waiting for active job
 Waiting for inputs · one unit missing:

@@ -100,6 +100,7 @@ const importResourcesSchema = z
 		type: z.enum([
 			"artwork",
 			"image",
+			"music",
 		]),
 	})
 	.strict();

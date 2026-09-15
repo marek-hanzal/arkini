@@ -88,7 +88,7 @@ export namespace EditorProjectTransport {
 
 	export interface Resource {
 		readonly id: string;
-		readonly type: "artwork" | "image";
+		readonly type: "artwork" | "image" | "music";
 		readonly size: number;
 		readonly version: string;
 	}

@@ -4,6 +4,7 @@ import {
 	FolderCog,
 	Images,
 	LayoutGrid,
+	Music2,
 	NotebookPen,
 	PackageCheck,
 	RadioTower,
@@ -33,6 +34,14 @@ export const EditorWorkspaceRoutes = [
 		matchTo: "/editor/$projectId/artwork",
 		shortcut: "Mod+Shift+A",
 		to: "/editor/$projectId/artwork",
+	},
+	{
+		id: "music",
+		icon: Music2,
+		label: "Music",
+		matchTo: "/editor/$projectId/music",
+		shortcut: "Mod+Shift+S",
+		to: "/editor/$projectId/music",
 	},
 	{
 		id: "board",

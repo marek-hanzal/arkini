@@ -1,4 +1,5 @@
 import type { Effect } from "effect";
+import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 /** Complete path grammar below one portable Editor project root. */
 export interface ProjectPaths {
@@ -16,5 +17,9 @@ export interface ProjectPaths {
 	readonly itemFileFx: (props: { readonly uid: string }) => Effect.Effect<string, never, never>;
 	readonly artworkFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
 	readonly imageFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
+	readonly resourceFileFx: (props: {
+		readonly id: string;
+		readonly type: ResourceTypeSchema.Type;
+	}) => Effect.Effect<string, Error, never>;
 	readonly noteFileFx: (noteId: string) => Effect.Effect<string, never, never>;
 }

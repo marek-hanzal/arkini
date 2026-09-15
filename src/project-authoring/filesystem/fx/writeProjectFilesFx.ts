@@ -143,9 +143,7 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 	for (const resource of [
 		...resources,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const target = yield* resource.type === "image"
-			? paths.imageFileFx(resource.id)
-			: paths.artworkFileFx(resource.id);
+		const target = yield* paths.resourceFileFx(resource);
 		const collision = addUniqueTargetFn(resourceWrites, {
 			target,
 			bytes: resource.bytes,

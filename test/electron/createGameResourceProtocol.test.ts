@@ -59,11 +59,7 @@ describe("Game resource protocol", () => {
 		);
 		netFetch.mockResolvedValue(
 			new Response("bc", {
-				status: 206,
-				headers: {
-					"Content-Length": "2",
-					"Content-Range": "bytes 1-2/6",
-				},
+				status: 200,
 			}),
 		);
 		const protocol = await Effect.runPromise(
@@ -86,6 +82,7 @@ describe("Game resource protocol", () => {
 		);
 
 		expect(response.status).toBe(206);
+		expect(response.headers.get("Accept-Ranges")).toBe("bytes");
 		expect(response.headers.get("Content-Range")).toBe("bytes 1-2/6");
 		expect(response.headers.get("Content-Length")).toBe("2");
 		expect(response.headers.get("Content-Type")).toBe("image/png");

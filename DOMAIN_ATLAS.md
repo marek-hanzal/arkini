@@ -110,7 +110,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-value` | Foundational immutable identity, text, quantity and time schemas | [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/IdSchema.ts) |
 | `game-config` | Completed authored aggregate and loaded-config capability | [`src/game-config/README.md`](src/game-config/README.md) |
 | `game-config-source` | Portable project layout, source schemas and discovery | [`src/game-config-source/schema/ProjectSchema.ts`](src/game-config-source/schema/ProjectSchema.ts) |
-| `game-config-resource` | Embedded PNG/source descriptors, discovery and usage | [`src/game-config-resource/schema/ResourceSchema.ts`](src/game-config-resource/schema/ResourceSchema.ts) |
+| `game-config-resource` | Typed visual/Music source descriptors, discovery, bounded admission and usage | [`src/game-config-resource/schema/ResourceSchema.ts`](src/game-config-resource/schema/ResourceSchema.ts) |
 | `game-config-diagnostic` | Provenance-aware validation diagnostics | [`src/game-config-diagnostic/schema/GameDiagnosticsSchema.ts`](src/game-config-diagnostic/schema/GameDiagnosticsSchema.ts) |
 | `game-config-validation` | Completed-config semantic validation | [`src/game-config-validation/fx/validateGameConfigFx.ts`](src/game-config-validation/fx/validateGameConfigFx.ts) |
 | `game-config-compiler` | Deterministic source assembly and blocking gate | [`src/game-config-compiler/fx/compileGameDirectoryFx.ts`](src/game-config-compiler/fx/compileGameDirectoryFx.ts) |
@@ -135,6 +135,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `authoring-form` | Shared form registry and reference controls | [`src/authoring-form/ui/EditorForm.tsx`](src/authoring-form/ui/EditorForm.tsx) |
 | `editor-control` | Reusable Editor fields, sections, selection and search | [`src/editor-control/ui/EditorFormSection.tsx`](src/editor-control/ui/EditorFormSection.tsx) |
 | `artwork-authoring` | Artwork catalog, square-PNG validation, edit/import/delete, Optimize and UI | [`src/artwork-authoring/ui/EditorArtworkManager.tsx`](src/artwork-authoring/ui/EditorArtworkManager.tsx) |
+| `music-authoring` | PATH-optional audio preparation and lazy one-track Editor preview | [`src/music-authoring/ui/EditorMusicManager.tsx`](src/music-authoring/ui/EditorMusicManager.tsx) |
 | `resource-authoring` | Shared typed Resource import orchestration | [`src/resource-authoring/fx/importEditorResourcesFx.ts`](src/resource-authoring/fx/importEditorResourcesFx.ts) |
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |

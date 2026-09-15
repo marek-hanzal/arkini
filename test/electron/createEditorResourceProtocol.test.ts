@@ -24,7 +24,7 @@ const locations = new Map<
 	{
 		root: string;
 		path: string;
-		type: "artwork";
+		type: "artwork" | "music";
 		version: string;
 		size: number;
 	}
@@ -32,8 +32,8 @@ const locations = new Map<
 let protocol: createEditorResourceProtocolFx.Output;
 let nativeBodies: Array<ReadableStream<Uint8Array> | null> = [];
 
-const registerFn = async (id: string, content: string) => {
-	const path = join(root, "artwork", `${id}.png`);
+const registerFn = async (id: string, content: string, type: "artwork" | "music" = "artwork") => {
+	const path = join(root, type, `${id}.${type === "music" ? "ogg" : "png"}`);
 	await writeFile(path, content);
 	const info = await stat(path);
 	const version = readProjectResourceVersionFn({
@@ -46,7 +46,7 @@ const registerFn = async (id: string, content: string) => {
 	locations.set(id, {
 		root,
 		path,
-		type: "artwork",
+		type,
 		version,
 		size: info.size,
 	});
@@ -63,6 +63,7 @@ const requestFn = (url: string, init?: RequestInit) =>
 beforeEach(async () => {
 	root = await realpath(await mkdtemp(join(tmpdir(), "arkini-resource-protocol-")));
 	await mkdir(join(root, "artwork"));
+	await mkdir(join(root, "music"));
 	netFetch.mockReset();
 	nativeBodies = [];
 	netFetch.mockImplementation(async (url: string, init?: RequestInit) => {
@@ -185,5 +186,32 @@ describe("Editor resource protocol", () => {
 				})
 			).status,
 		).toBe(405);
+	});
+
+	it("serves Music as Ogg audio and forwards media byte ranges", async () => {
+		const url = await registerFn("theme", "abcdef", "music");
+		netFetch.mockResolvedValueOnce(
+			new Response("cd", {
+				status: 200,
+			}),
+		);
+
+		const response = await requestFn(url, {
+			headers: {
+				Range: "bytes=2-3",
+			},
+		});
+
+		expect(response.status).toBe(206);
+		expect(response.headers.get("Accept-Ranges")).toBe("bytes");
+		expect(response.headers.get("Content-Length")).toBe("2");
+		expect(response.headers.get("Content-Type")).toBe("audio/ogg");
+		expect(response.headers.get("Content-Range")).toBe("bytes 2-3/6");
+		expect(netFetch).toHaveBeenCalledWith(expect.any(String), {
+			headers: {
+				Range: "bytes=2-3",
+			},
+			method: "GET",
+		});
 	});
 });

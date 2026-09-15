@@ -19,16 +19,31 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 		"project.json",
 		"game.json",
 	];
-	for (const directory of [
-		"artwork",
-		"image",
-		"notes",
-		"items",
-	]) {
+	for (const [directory, extension] of [
+		[
+			"artwork",
+			".png",
+		],
+		[
+			"image",
+			".png",
+		],
+		[
+			"music",
+			".ogg",
+		],
+		[
+			"notes",
+			".json",
+		],
+		[
+			"items",
+			".json",
+		],
+	] as const) {
 		const sourceDirectory = path.join(canonicalSource, directory);
 		if (!(yield* fileSystem.exists(sourceDirectory))) continue;
 		const entries = yield* fileSystem.readDirectory(sourceDirectory);
-		const extension = directory === "notes" || directory === "items" ? ".json" : ".png";
 		files.push(
 			...entries
 				.filter((file) => file.endsWith(extension))
@@ -111,7 +126,9 @@ export const createEditorJsonExportDirectoryFx = Effect.fn("createEditorJsonExpo
 					yield* validateEditorJsonExportTreeFx(target, files);
 					return {
 						json: files.filter((file) => file.endsWith(".json")).length,
-						resources: files.filter((file) => file.endsWith(".png")).length,
+						resources: files.filter(
+							(file) => file.endsWith(".png") || file.endsWith(".ogg"),
+						).length,
 						revision: project.marker.revision,
 						root: target,
 					} satisfies createEditorJsonExportDirectoryFx.Success;

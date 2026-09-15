@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 import sharp from "sharp";
 
 export const png = Uint8Array.from(
@@ -20,6 +21,8 @@ export const assetPng = Uint8Array.from(
 		"base64",
 	),
 );
+
+export const musicOgg = createTestOggOpusBytesFn();
 
 const config = GameConfigSchema.parse({
 	meta: {
@@ -91,6 +94,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	const itemDirectory = path.join(input, "items");
 	const artwork = path.join(input, "artwork");
 	const image = path.join(input, "image");
+	const musicDirectory = path.join(input, "music");
 	const { items: authoredItems, ...root } = config;
 
 	yield* fileSystem.makeDirectory(itemDirectory, {
@@ -100,6 +104,9 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		recursive: true,
 	});
 	yield* fileSystem.makeDirectory(image, {
+		recursive: true,
+	});
+	yield* fileSystem.makeDirectory(musicDirectory, {
 		recursive: true,
 	});
 	yield* fileSystem.writeFileString(
@@ -139,6 +146,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		}),
 	);
 	yield* fileSystem.writeFile(path.join(image, "hero.png"), png);
+	yield* fileSystem.writeFile(path.join(musicDirectory, "theme.ogg"), musicOgg);
 	const squareArtworkPng = yield* Effect.promise(() =>
 		sharp(assetPng)
 			.resize(512, 512, {

@@ -20,6 +20,7 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { optimizePngResourceFileFx } from "~/game-config-resource/fx/optimizePngResourceFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
+import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
@@ -448,7 +449,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	>(resources: ReadonlyArray<Resource>) {
 		if (resources.length === 0)
 			return yield* Effect.fail(
-				errorFn("upsert-resource", "Select at least one PNG resource to import."),
+				errorFn("upsert-resource", "Select at least one resource to import."),
 			);
 		if (new Set(resources.map(({ id }) => id)).size !== resources.length)
 			return yield* Effect.fail(
@@ -730,10 +731,15 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 									parsedFileResource.data.path,
 									parsedFileResource.data.id,
 								)
-							: validatePngResourceFileFx(
-									parsedFileResource.data.path,
-									parsedFileResource.data.id,
-								),
+							: parsedFileResource.data.type === "image"
+								? validatePngResourceFileFx(
+										parsedFileResource.data.path,
+										parsedFileResource.data.id,
+									)
+								: validateOggOpusFileFx(
+										parsedFileResource.data.path,
+										parsedFileResource.data.id,
+									),
 					})
 				: parsedResource;
 			const fileResource = ProjectResourceFileReplacementSchema.safeParse(resource);

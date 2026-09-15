@@ -8,6 +8,7 @@ import { z } from "zod";
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { readResourceContentTypeFn } from "~/game-config-resource/fn/readResourceContentTypeFn";
 import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
+import { readByteRangeFn } from "../protocol/readByteRangeFn";
 
 const InstallationResourceSchema = z
 	.object({
@@ -105,28 +106,44 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 							return new Response("Game resource was not found.", {
 								status: 404,
 							});
-						const range = request.headers.get("Range");
+						const byteRange = readByteRangeFn(request.headers.get("Range"), info.size);
+						if (byteRange.type === "invalid")
+							return new Response(null, {
+								headers: {
+									"Accept-Ranges": "bytes",
+									"Content-Range": `bytes */${info.size}`,
+								},
+								status: 416,
+							});
 						const response = await net.fetch(pathToFileURL(resourcePath).toString(), {
 							method: request.method,
-							...(range === null
+							...(byteRange.type === "full"
 								? {}
 								: {
 										headers: {
-											Range: range,
+											Range: `bytes=${byteRange.start}-${byteRange.end}`,
 										},
 									}),
 						});
 						const headers = new Headers(response.headers);
+						headers.set("Accept-Ranges", "bytes");
 						headers.set("Content-Type", readResourceContentTypeFn(resource.type));
-						if (range === null && !headers.has("Content-Length"))
+						if (byteRange.type === "full")
 							headers.set("Content-Length", String(info.size));
+						else {
+							headers.set("Content-Length", String(byteRange.length));
+							headers.set(
+								"Content-Range",
+								`bytes ${byteRange.start}-${byteRange.end}/${info.size}`,
+							);
+						}
 						if (origin !== null) {
 							headers.set("Access-Control-Allow-Origin", origin);
 							headers.set("Vary", "Origin");
 						}
 						headers.set("X-Content-Type-Options", "nosniff");
 						return new Response(response.body, {
-							status: response.status,
+							status: byteRange.type === "partial" ? 206 : response.status,
 							headers,
 						});
 					},

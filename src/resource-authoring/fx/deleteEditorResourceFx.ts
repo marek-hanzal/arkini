@@ -1,18 +1,14 @@
 import { Effect } from "effect";
 
-import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 
-interface DeleteEditorArtworkProps {
+/** Deletes one Editor resource and publishes the canonical project snapshot. */
+export const deleteEditorResourceFx = Effect.fn("deleteEditorResourceFx")(function* (props: {
 	readonly expectedRevision: number;
 	readonly projectId: string;
 	readonly resourceId: string;
-}
-
-/** Deletes one unreferenced Editor artwork and publishes the canonical project snapshot. */
-export const deleteEditorArtworkFx = Effect.fn("deleteEditorArtworkFx")(function* (
-	props: DeleteEditorArtworkProps,
-) {
+}) {
 	const repository = yield* ProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(

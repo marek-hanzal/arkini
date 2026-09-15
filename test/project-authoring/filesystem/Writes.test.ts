@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
+import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -364,6 +365,44 @@ describe("filesystem Editor project writes", () => {
 			operation: "replace-resource",
 		});
 		expect(await readFile(join(root, "image", "hero.png"))).toEqual(original);
+	});
+
+	it("writes and reopens Music under its canonical Ogg path", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const source = join(harness.temporaryDirectory, "theme.ogg");
+		const bytes = createTestOggOpusBytesFn();
+		await writeFile(source, bytes);
+
+		const committed = await Effect.runPromise(
+			repository.upsertResourceFilesFx({
+				projectId: project.projectId,
+				resources: [
+					{
+						id: "theme",
+						path: source,
+						size: bytes.byteLength,
+						type: "music",
+					},
+				],
+			}),
+		);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		expect(await readFile(join(root, "music", "theme.ogg"))).toEqual(bytes);
+		await harness.closeRepository(repository);
+
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.readProjectFx(project.projectId))).toMatchObject({
+			resources: expect.arrayContaining([
+				expect.objectContaining({
+					id: "theme",
+					size: bytes.byteLength,
+					type: "music",
+				}),
+			]),
+			revision: committed.revision,
+		});
 	});
 
 	it("rejects non-square Artwork replacement without changing the source", async () => {

@@ -86,9 +86,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 							(resource) => resource.id === resourceId,
 						);
 						if (state === undefined || resource === undefined) return null;
-						const target = yield* resource.type === "image"
-							? state.paths.imageFileFx(resourceId)
-							: state.paths.artworkFileFx(resourceId);
+						const target = yield* state.paths.resourceFileFx(resource);
 						return {
 							root: state.paths.root,
 							path: target,

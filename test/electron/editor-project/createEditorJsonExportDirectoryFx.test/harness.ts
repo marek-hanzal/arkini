@@ -8,6 +8,7 @@ import { writeProjectFilesFx } from "~/project-authoring/filesystem/fx/writeProj
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 
 export const filesystemFailure = (method: string) =>
 	PlatformError.systemError({
@@ -17,7 +18,7 @@ export const filesystemFailure = (method: string) =>
 		module: "FileSystem",
 	});
 
-export const writeReimportableProjectFx = (root: string, revision: number) =>
+export const writeReimportableProjectFx = (root: string, revision: number, withMusic = false) =>
 	writeProjectFilesFx({
 		root,
 		next: {
@@ -27,7 +28,16 @@ export const writeReimportableProjectFx = (root: string, revision: number) =>
 				arkini: ArkiniAppVersion,
 				revision,
 			}),
-			resources: editorTestPayload.resources,
+			resources: withMusic
+				? [
+						...editorTestPayload.resources,
+						{
+							id: "unresolved-waltz",
+							type: "music" as const,
+							bytes: createTestOggOpusBytesFn(),
+						},
+					]
+				: editorTestPayload.resources,
 		},
 	});
 

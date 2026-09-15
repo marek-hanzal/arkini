@@ -9,6 +9,7 @@ import { readImportedResourceIdFn } from "~/game-config-resource/fn/readImported
 import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { prepareEditorMusicFileFx } from "~/music-authoring/fx/prepareEditorMusicFileFx";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 
@@ -53,6 +54,43 @@ const readPngFilesFx = Effect.fn("importEditorResourceFilesFx.readPngFilesFx")(
 		),
 );
 
+const readMusicFilesFx = Effect.fn("importEditorResourceFilesFx.readMusicFilesFx")(
+	({
+		files,
+		temporaryRoot,
+	}: Pick<EditorProjectTransport.ImportResourcesRequest, "files"> & {
+		readonly temporaryRoot: string;
+	}) =>
+		Effect.forEach(
+			files,
+			(file, index) =>
+				Effect.gen(function* () {
+					const id = yield* Effect.try({
+						try: () => IdSchema.parse(readImportedResourceIdFn(file.name)),
+						catch: (cause) =>
+							failFn(
+								`Music ${file.name} does not produce a valid resource ID.`,
+								cause,
+							),
+					});
+					const prepared = yield* prepareEditorMusicFileFx({
+						id,
+						source: file.path,
+						target: join(temporaryRoot, `${index}.ogg`),
+					}).pipe(Effect.mapError((cause) => failFn(cause.message, cause)));
+					return {
+						id,
+						type: "music" as const,
+						path: prepared.path,
+						size: prepared.size,
+					};
+				}),
+			{
+				concurrency: 1,
+			},
+		),
+);
+
 /** Imports selected files without crossing IPC with their binary bodies. */
 export const importEditorResourceFilesFx = Effect.fn("importEditorResourceFilesFx")(function* ({
 	repository,
@@ -62,15 +100,44 @@ export const importEditorResourceFilesFx = Effect.fn("importEditorResourceFilesF
 	readonly request: EditorProjectTransport.ImportResourcesRequest;
 }) {
 	if (request.source === "files") {
-		const resources = yield* readPngFilesFx(request);
-		const project = yield* repository.upsertResourceFilesFx({
-			projectId: request.projectId,
-			resources,
+		if (request.type !== "music") {
+			const resources = yield* readPngFilesFx(request);
+			const project = yield* repository.upsertResourceFilesFx({
+				projectId: request.projectId,
+				resources,
+			});
+			return {
+				project,
+				resourceIds: resources.map(({ id }) => id),
+			};
+		}
+		const temporaryRoot = yield* Effect.tryPromise({
+			try: () => mkdtemp(join(tmpdir(), "arkini-music-import-")),
+			catch: (cause) => failFn("Music import could not create temporary output.", cause),
 		});
-		return {
-			project,
-			resourceIds: resources.map(({ id }) => id),
-		};
+		return yield* Effect.gen(function* () {
+			const resources = yield* readMusicFilesFx({
+				files: request.files,
+				temporaryRoot,
+			});
+			const project = yield* repository.upsertResourceFilesFx({
+				projectId: request.projectId,
+				resources,
+			});
+			return {
+				project,
+				resourceIds: resources.map(({ id }) => id),
+			};
+		}).pipe(
+			Effect.ensuring(
+				Effect.promise(() =>
+					rm(temporaryRoot, {
+						force: true,
+						recursive: true,
+					}),
+				).pipe(Effect.ignore),
+			),
+		);
 	}
 
 	if (request.files.length !== 1)

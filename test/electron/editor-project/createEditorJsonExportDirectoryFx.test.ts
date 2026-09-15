@@ -21,7 +21,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			const parent = `${root}/destination`;
 			yield* fileSystem.makeDirectory(parent);
 			yield* fileSystem.writeFileString(`${parent}/keep.txt`, "ordinary parent content");
-			yield* writeReimportableProjectFx(source, 2);
+			yield* writeReimportableProjectFx(source, 2, true);
 			yield* writeExportSourceExtrasFx(source);
 
 			const first = yield* createEditorJsonExportDirectoryFx({
@@ -38,7 +38,16 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			expect(first.root).not.toBe(second.root);
 			expect(path.dirname(first.root)).toBe(yield* fileSystem.realPath(parent));
 			expect(path.basename(first.root)).toMatch(/^project-one-json-.+$/u);
-			expect((yield* readReimportableProjectFx(first.root)).marker.revision).toBe(2);
+			const firstProject = yield* readReimportableProjectFx(first.root);
+			expect(firstProject.marker.revision).toBe(2);
+			expect(firstProject.resources).toContainEqual(
+				expect.objectContaining({
+					id: "unresolved-waltz",
+					type: "music",
+				}),
+			);
+			expect(yield* fileSystem.exists(`${first.root}/music/unresolved-waltz.ogg`)).toBe(true);
+			expect(first.resources).toBe(3);
 			expect((yield* readReimportableProjectFx(second.root)).marker.revision).toBe(2);
 			expect(yield* fileSystem.readFileString(`${parent}/keep.txt`)).toBe(
 				"ordinary parent content",

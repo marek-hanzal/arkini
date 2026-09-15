@@ -12,6 +12,7 @@ export const destroyActorVisualFx = Effect.fn("destroyActorVisualFx")(function* 
 		kind: "cancel",
 		visual,
 	});
+	visual.releaseTexturesFn();
 	visual.container.destroy({
 		children: true,
 	});

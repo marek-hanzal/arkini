@@ -21,14 +21,15 @@ export namespace createActorVisualFx {
 }
 
 interface LoadVisualTexturesProps {
+	readonly compositeTextureFx: Effect.Effect<Texture, unknown, never>;
 	readonly frames: DemandFrameLoop;
-	readonly textures: TextureStore;
+	readonly primaryTextureFx: Effect.Effect<Texture, unknown, never>;
 	readonly visual: ActorVisual;
 }
 
 /** Loads one complete visual revision before publishing any texture slot. */
 const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
-	({ frames, textures, visual }: LoadVisualTexturesProps) =>
+	({ compositeTextureFx, frames, primaryTextureFx, visual }: LoadVisualTexturesProps) =>
 		Effect.sync(() => {
 			const generation = RendererRuntime.runSync(
 				runVisualReadinessFx({
@@ -36,13 +37,9 @@ const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
 					visual,
 				}),
 			);
-			const sourceUrl = visual.item.sourceUrl;
-			const compositeUrl = visual.item.compositeUrl;
 			void Promise.all([
-				RendererRuntime.runPromise(textures.loadFx(sourceUrl)),
-				compositeUrl === undefined
-					? Promise.resolve(Texture.EMPTY)
-					: RendererRuntime.runPromise(textures.loadFx(compositeUrl)),
+				RendererRuntime.runPromise(primaryTextureFx),
+				RendererRuntime.runPromise(compositeTextureFx),
 			])
 				.then(([primary, composite]) => {
 					if (
@@ -76,6 +73,7 @@ const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
 							visual,
 						}),
 					);
+					visual.releaseTexturesFn();
 					frames.reportCriticalFailureFn(cause);
 				});
 		}),
@@ -89,6 +87,16 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 	size,
 	textures,
 }: createActorVisualFx.Props) {
+	const primaryLease = textures.acquireFn(item.sourceUrl);
+	const compositeLease =
+		item.compositeUrl === undefined ? undefined : textures.acquireFn(item.compositeUrl);
+	let texturesReleased = false;
+	const releaseTexturesFn = () => {
+		if (texturesReleased) return;
+		texturesReleased = true;
+		primaryLease.releaseFn();
+		compositeLease?.releaseFn();
+	};
 	const container = new Container({
 		eventMode: "none",
 		label: `TileActorVisual:${item.id}:${item.revision}`,
@@ -113,6 +121,7 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		quantity,
 		quantityBackground,
 		readyListeners: new Set(),
+		releaseTexturesFn,
 		reportCriticalFailureFn: frames.reportCriticalFailureFn,
 		item,
 		size,
@@ -126,8 +135,9 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		visual,
 	});
 	yield* loadVisualTexturesFx({
+		compositeTextureFx: compositeLease?.textureFx ?? Effect.succeed(Texture.EMPTY),
 		frames,
-		textures,
+		primaryTextureFx: primaryLease.textureFx,
 		visual,
 	});
 	return visual;

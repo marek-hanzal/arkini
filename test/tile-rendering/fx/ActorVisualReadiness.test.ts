@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import { classifyActorUpdateFn } from "~/game-scene/fn/classifyActorUpdateFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
+import { destroyActorVisualFx } from "~/tile-rendering/fx/destroyActorVisualFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimation, ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
@@ -86,20 +87,28 @@ const createItem = ({
 
 const createControlledTextures = () => {
 	const rejects = new Map<string, (cause: unknown) => void>();
+	const releases = new Map<string, ReturnType<typeof vi.fn>>();
 	const resolves = new Map<string, (texture: Texture) => void>();
 	const textures = {
+		acquireFn: (url: string) => {
+			const releaseFn = vi.fn();
+			releases.set(url, releaseFn);
+			return {
+				releaseFn,
+				textureFx: Effect.promise(
+					() =>
+						new Promise<Texture>((resolve, reject) => {
+							resolves.set(url, resolve);
+							rejects.set(url, reject);
+						}),
+				),
+			};
+		},
 		closeFx: Effect.void,
-		loadFx: (url: string) =>
-			Effect.promise(
-				() =>
-					new Promise<Texture>((resolve, reject) => {
-						resolves.set(url, resolve);
-						rejects.set(url, reject);
-					}),
-			),
 	} satisfies TextureStore;
 	return {
 		rejects,
+		releases,
 		resolves,
 		textures,
 	};
@@ -511,7 +520,7 @@ describe("texture readiness", () => {
 	});
 
 	it("ignores a late texture completion after the visual has been destroyed", async () => {
-		const { resolves, textures } = createControlledTextures();
+		const { releases, resolves, textures } = createControlledTextures();
 		const { actor } = createActor({
 			textures,
 		});
@@ -521,11 +530,8 @@ describe("texture readiness", () => {
 		await vi.waitFor(() => {
 			expect(resolves.has("resource:old")).toBe(true);
 		});
-		visual.textureState = "destroyed";
-		visual.textureGeneration += 1;
-		visual.container.destroy({
-			children: true,
-		});
+		Effect.runSync(destroyActorVisualFx(visual));
+		expect(releases.get("resource:old")).toHaveBeenCalledOnce();
 		resolves.get("resource:old")?.(texture);
 		await Promise.resolve();
 		await Promise.resolve();

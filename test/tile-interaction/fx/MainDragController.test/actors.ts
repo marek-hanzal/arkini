@@ -59,6 +59,7 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		}),
 		quantityBackground: new Graphics(),
 		readyListeners: new Set(),
+		releaseTexturesFn: () => {},
 		reportCriticalFailureFn: () => {},
 		size: 80,
 		textureGeneration: 0,

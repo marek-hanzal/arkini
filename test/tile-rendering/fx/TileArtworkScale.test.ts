@@ -60,8 +60,11 @@ const createHarnessFn = (item: TileActorItem) => {
 		scheduleFx: () => Effect.succeed(() => {}),
 	};
 	const textures = {
+		acquireFn: () => ({
+			releaseFn: () => {},
+			textureFx: Effect.succeed(Texture.WHITE),
+		}),
 		closeFx: Effect.void,
-		loadFx: () => Effect.succeed(Texture.WHITE),
 	};
 	const animator: ActorAnimator = {
 		animateFx: (animation) =>

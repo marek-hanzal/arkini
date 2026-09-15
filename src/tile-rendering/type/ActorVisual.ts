@@ -20,6 +20,7 @@ export interface ActorVisual {
 	readonly quantity: Text;
 	readonly quantityBackground: Graphics;
 	readonly readyListeners: Set<VisualReadyListener>;
+	readonly releaseTexturesFn: () => void;
 	readonly reportCriticalFailureFn: (cause: unknown) => void;
 	item: TileActorItem;
 	size: number;

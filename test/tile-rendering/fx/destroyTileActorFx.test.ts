@@ -22,6 +22,7 @@ const createVisual = () => {
 		visual: {
 			container,
 			readyListeners: new Set(),
+			releaseTexturesFn: () => {},
 			textureGeneration: 4,
 			textureState: "loading",
 		} as unknown as ActorVisual,

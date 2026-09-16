@@ -64,6 +64,7 @@ describe("filesystem Editor PNG optimization", () => {
 				resourceIds: [
 					"item-water",
 				],
+				type: "artwork",
 			}),
 		);
 
@@ -126,6 +127,7 @@ describe("filesystem Editor PNG optimization", () => {
 						"hero",
 						"item-water",
 					],
+					type: "artwork",
 				}),
 			),
 		).rejects.toThrow(
@@ -156,6 +158,7 @@ describe("filesystem Editor PNG optimization", () => {
 				resourceIds: [
 					"item-water",
 				],
+				type: "artwork",
 			}),
 		);
 

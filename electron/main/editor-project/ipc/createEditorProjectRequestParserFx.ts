@@ -64,6 +64,10 @@ const optimizeResourcesSchema = z
 			.refine((ids) => new Set(ids).size === ids.length, {
 				message: "Resource IDs must be unique.",
 			}),
+		type: z.enum([
+			"artwork",
+			"sfx",
+		]),
 	})
 	.strict();
 const replaceConfigSchema = z

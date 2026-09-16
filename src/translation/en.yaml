@@ -1939,6 +1939,7 @@ SFX help:
     - Sound effect names come from the imported filenames.
     - **Play** previews one sound effect at a time.
     - **Volume** changes only the preview volume on this page.
+    - **Optimize** trims silence from the beginning and end of existing sound effects.
 Safe item deletion help:
   value: |
     Nothing in the saved project uses this item. It can be deleted without changing anything else.

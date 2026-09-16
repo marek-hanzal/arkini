@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
 	assignSfxFn: vi.fn(),
 	deleteResourceFn: vi.fn(),
 	importSfxFn: vi.fn(),
+	optimizeResourcesFn: vi.fn(),
 	setCall: 0,
 	valueCall: 0,
 }));
@@ -20,15 +21,24 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 			state.importSfxFn,
 			state.deleteResourceFn,
 			state.assignSfxFn,
-		][state.setCall++ % 3],
+			state.optimizeResourcesFn,
+		][state.setCall++ % 4],
 	useAtomValue: () =>
-		state.valueCall++ % 4 === 0
+		state.valueCall++ % 5 === 0
 			? {
 					master: 100,
 					music: 10,
 					sfx: 5,
 				}
-			: AsyncResult.initial(),
+			: state.valueCall % 5 === 0
+				? {
+						kind: "idle",
+					}
+				: AsyncResult.initial(),
+}));
+
+vi.mock("~/resource-authoring/atom/EditorResourceOptimizationAtom", () => ({
+	EditorResourceOptimizationAtom: () => ({}),
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -90,6 +100,7 @@ beforeEach(async () => {
 	state.assignSfxFn.mockReset();
 	state.deleteResourceFn.mockReset();
 	state.importSfxFn.mockReset();
+	state.optimizeResourcesFn.mockReset();
 	state.setCall = 0;
 	state.valueCall = 0;
 	const container = document.createElement("div");
@@ -155,6 +166,22 @@ describe("useEditorSfxManagerController", () => {
 			},
 			expectedRevision: 7,
 			projectId: "project-one",
+		});
+	});
+
+	it("optimizes every existing SFX regardless of the current view", async () => {
+		await act(async () => controller?.setViewFn("unused"));
+		controller?.onOptimizeFn();
+
+		expect(state.optimizeResourcesFn).toHaveBeenCalledWith({
+			expectedRevision: 7,
+			kind: "optimize",
+			resourceIds: [
+				"old-start",
+				"shared-sfx",
+				"unused-sfx",
+			],
+			type: "sfx",
 		});
 	});
 });

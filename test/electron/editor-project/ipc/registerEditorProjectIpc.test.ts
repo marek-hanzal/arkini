@@ -223,6 +223,7 @@ describe("registerEditorProjectIpcFx", () => {
 				"hero",
 				"item-water",
 			],
+			type: "artwork",
 		};
 
 		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({

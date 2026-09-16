@@ -1,3 +1,5 @@
+import { Sparkles } from "lucide-react";
+
 import { EditorAudioResourceManager } from "~/audio-authoring/ui/EditorAudioResourceManager";
 import { EditorSectionShortcutNavigation } from "~/authoring-shell/ui/EditorSectionBar";
 import type { Project } from "~/project-authoring/type/Project";
@@ -5,11 +7,21 @@ import { SfxEventPresentation } from "~/sfx-authoring/constant/SfxEventPresentat
 import { EditorSfxAssignmentMenu } from "~/sfx-authoring/ui/EditorSfxAssignmentMenu";
 import { useEditorSfxManagerController } from "~/sfx-authoring/ui/useEditorSfxManagerController";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { LinkButton } from "~/ui/ui/LinkButton";
 
 /** Renders the project SFX library over the shared audio authoring surface. */
 export const EditorSfxManager = () => {
 	const translator = useTranslator();
 	const controller = useEditorSfxManagerController();
+	const optimizationPercent =
+		controller.optimizationProgress === undefined ||
+		controller.optimizationProgress.totalResourceCount === 0
+			? 0
+			: Math.round(
+					(controller.optimizationProgress.completedResourceCount /
+						controller.optimizationProgress.totalResourceCount) *
+						100,
+				);
 	const viewOptions = [
 		{
 			label: translator.textFn("All"),
@@ -48,7 +60,11 @@ export const EditorSfxManager = () => {
 				)}
 				<EditorSfxAssignmentMenu
 					assigningEvent={controller.assigningEvent}
-					disabled={controller.assignmentPending || controller.deletePending}
+					disabled={
+						controller.assignmentPending ||
+						controller.deletePending ||
+						controller.optimizePending
+					}
 					pending={
 						controller.assignmentPending &&
 						controller.assigningResourceId === resource.id
@@ -64,9 +80,32 @@ export const EditorSfxManager = () => {
 	return (
 		<EditorAudioResourceManager
 			controller={controller}
-			extraError={controller.assignmentError}
+			extraError={controller.assignmentError ?? controller.optimizeError}
 			renderResourceActionFn={renderResourceActionFn}
+			resourceMutationBlocked={controller.optimizePending}
 			resources={controller.sfx}
+			secondaryActions={
+				<LinkButton
+					className="inline-flex min-w-28 shrink-0 items-center justify-end gap-1.5 whitespace-nowrap"
+					cursorIntent={controller.optimizePending ? "progress" : undefined}
+					data-ui="EditorSfxOptimize"
+					disabled={
+						controller.optimizePending ||
+						controller.importPending ||
+						controller.deletePending ||
+						controller.assignmentPending ||
+						controller.totalResourceCount === 0
+					}
+					onClick={controller.onOptimizeFn}
+				>
+					<Sparkles className="size-4" />
+					{controller.optimizePending
+						? controller.optimizationProgress?.phase === "saving"
+							? translator.textFn("Saving…")
+							: `${translator.textFn("Optimizing")} ${optimizationPercent}%`
+						: translator.textFn("Optimize")}
+				</LinkButton>
+			}
 			secondaryNavigation={
 				<EditorSectionShortcutNavigation
 					dataUi="EditorSfxView"

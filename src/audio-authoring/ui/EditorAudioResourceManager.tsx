@@ -22,7 +22,9 @@ interface EditorAudioResourceManagerProps {
 	readonly controller: useEditorAudioResourceManagerController.Output;
 	readonly extraError?: unknown;
 	readonly renderResourceActionFn?: (resource: Project.Resource) => ReactNode;
+	readonly resourceMutationBlocked?: boolean;
 	readonly resources: ReadonlyArray<Project.Resource>;
+	readonly secondaryActions?: ReactNode;
 	readonly secondaryNavigation: ReactNode;
 }
 
@@ -31,7 +33,9 @@ export const EditorAudioResourceManager = ({
 	controller,
 	extraError,
 	renderResourceActionFn,
+	resourceMutationBlocked = false,
 	resources,
+	secondaryActions,
 	secondaryNavigation,
 }: EditorAudioResourceManagerProps) => {
 	const project = useEditorProject();
@@ -57,7 +61,7 @@ export const EditorAudioResourceManager = ({
 		<PrimaryButton
 			className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
 			cursorIntent={controller.importPending ? "progress" : undefined}
-			disabled={controller.importPending}
+			disabled={controller.importPending || resourceMutationBlocked}
 			data-ui={`${dataUiPrefix}Import`}
 			onClick={controller.openFilesImportFn}
 		>
@@ -114,6 +118,7 @@ export const EditorAudioResourceManager = ({
 			}
 			secondaryNavigation={
 				<EditorSectionBar
+					actions={secondaryActions}
 					help={
 						<EditorPageHelp
 							content={music ? <Mx label="Music help" /> : <Mx label="SFX help" />}
@@ -136,7 +141,7 @@ export const EditorAudioResourceManager = ({
 					accept="audio/*,.aac,.flac,.m4a,.mp3,.ogg,.opus,.wav,.webm"
 					multiple
 					data-ui={`${dataUiPrefix}ImportInput`}
-					disabled={controller.importPending}
+					disabled={controller.importPending || resourceMutationBlocked}
 					onChange={controller.onFilesChangeFn}
 				/>
 				<div className="min-h-0 overflow-y-auto overscroll-contain p-3">
@@ -246,7 +251,10 @@ export const EditorAudioResourceManager = ({
 													className="size-10 min-h-10 shrink-0 p-0 text-danger"
 													cursorIntent={deleting ? "progress" : undefined}
 													data-ui={`${dataUiPrefix}Delete`}
-													disabled={controller.deletePending}
+													disabled={
+														controller.deletePending ||
+														resourceMutationBlocked
+													}
 													onClick={(event) => {
 														event.stopPropagation();
 														controller.deleteResourceFn(resource.id);

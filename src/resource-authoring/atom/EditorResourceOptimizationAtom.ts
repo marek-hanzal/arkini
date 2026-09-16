@@ -2,14 +2,15 @@ import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { optimizeEditorResourcesFx } from "~/artwork-authoring/fx/optimizeEditorResourcesFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { optimizeEditorResourcesFx } from "~/resource-authoring/fx/optimizeEditorResourcesFx";
 
 export namespace EditorResourceOptimizationAtom {
 	export interface OptimizeCommand {
 		readonly expectedRevision: number;
 		readonly kind: "optimize";
 		readonly resourceIds: ProjectRepository.OptimizeResourcesProps["resourceIds"];
+		readonly type: ProjectRepository.OptimizeResourcesProps["type"];
 	}
 
 	export type Command =
@@ -25,14 +26,17 @@ export namespace EditorResourceOptimizationAtom {
 		| {
 				readonly kind: "optimizing";
 				readonly progress: ProjectRepository.OptimizeResourcesProgress;
+				readonly type: ProjectRepository.OptimizeResourcesProps["type"];
 		  }
 		| {
 				readonly error: unknown;
 				readonly kind: "failure";
+				readonly type: ProjectRepository.OptimizeResourcesProps["type"];
 		  }
 		| {
 				readonly kind: "success";
 				readonly result: ProjectRepository.OptimizeResourcesResult;
+				readonly type: ProjectRepository.OptimizeResourcesProps["type"];
 		  };
 }
 
@@ -53,10 +57,12 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 									get.set(stateAtom, {
 										kind: "optimizing",
 										progress,
+										type: command.type,
 									});
 								},
 								projectId,
 								resourceIds: command.resourceIds,
+								type: command.type,
 							}).pipe(Effect.provideService(ProjectRepository, repository)),
 						);
 						if (Exit.isFailure(exit)) {
@@ -65,12 +71,14 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 							yield* Atom.set(stateAtom, {
 								error: Cause.squash(exit.cause),
 								kind: "failure",
+								type: command.type,
 							});
 							return;
 						}
 						yield* Atom.set(stateAtom, {
 							kind: "success",
 							result: exit.value,
+							type: command.type,
 						});
 					}),
 				{
@@ -99,6 +107,7 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 							phase: "optimizing",
 							totalResourceCount: command.resourceIds.length,
 						},
+						type: command.type,
 					});
 					context.set(runnerAtom, command);
 				},

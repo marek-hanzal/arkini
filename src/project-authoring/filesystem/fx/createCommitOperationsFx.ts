@@ -18,6 +18,7 @@ import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { optimizePngResourceFileFx } from "~/game-config-resource/fx/optimizePngResourceFileFx";
+import { optimizeOggOpusResourceFileFx } from "~/game-config-resource/fx/optimizeOggOpusResourceFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
 import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
@@ -505,6 +506,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		onProgressFn,
 		projectId,
 		resourceIds,
+		type,
 	}) =>
 		operations
 			.withPermits(1)(
@@ -551,11 +553,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						let completedResourceCount = 0;
 						const totalResourceCount = resources.length;
 						const temporary = yield* fileSystem.makeTempDirectoryScoped();
-						if (resources.some(({ type }) => type !== "artwork"))
+						if (resources.some((resource) => resource.type !== type))
 							return yield* Effect.fail(
 								errorFn(
 									"optimize-resources",
-									"Only Artwork resources can be optimized.",
+									`Only ${type} resources can be optimized by this operation.`,
 								),
 							);
 						yield* Effect.sync(() =>
@@ -569,12 +571,22 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							resources,
 							(resource) =>
 								Effect.gen(function* () {
-									const source = yield* state.paths.artworkFileFx(resource.id);
-									const result = yield* optimizePngResourceFileFx(
-										source,
-										path.join(temporary, String(completedResourceCount)),
-										resource.id,
+									const source = yield* state.paths.resourceFileFx(resource);
+									const targetPrefix = path.join(
+										temporary,
+										String(completedResourceCount),
 									);
+									const result = yield* type === "artwork"
+										? optimizePngResourceFileFx(
+												source,
+												targetPrefix,
+												resource.id,
+											)
+										: optimizeOggOpusResourceFileFx(
+												source,
+												`${targetPrefix}.ogg`,
+												resource.id,
+											);
 									return {
 										...result,
 										id: resource.id,

@@ -4,6 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo, useState } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import { EditorResourceOptimizationAtom } from "~/resource-authoring/atom/EditorResourceOptimizationAtom";
 import { useEditorAudioResourceManagerController } from "~/audio-authoring/ui/useEditorAudioResourceManagerController";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { SfxSchema } from "~/game-config/schema/SfxSchema";
@@ -30,6 +31,10 @@ export namespace useEditorSfxManagerController {
 		readonly assigningResourceId?: string;
 		readonly assignmentError?: unknown;
 		readonly assignmentPending: boolean;
+		readonly onOptimizeFn: () => void;
+		readonly optimizationProgress?: ProjectRepository.OptimizeResourcesProgress;
+		readonly optimizeError?: unknown;
+		readonly optimizePending: boolean;
 		readonly setViewFn: (view: View) => void;
 		readonly sfx: ReadonlyArray<Project.Resource>;
 		readonly toggleAssignmentFn: (event: SfxEventEnumSchema.Type, resourceId: string) => void;
@@ -45,6 +50,9 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	});
 	const assignmentResult = useAtomValue(assignEditorSfxAtom);
 	const assignSfxFn = useAtomSet(assignEditorSfxAtom);
+	const optimizationAtom = EditorResourceOptimizationAtom(project.projectId);
+	const optimizationState = useAtomValue(optimizationAtom);
+	const optimizeResourcesFn = useAtomSet(optimizationAtom);
 	const [assigningEvent, setAssigningEventFn] = useState<SfxEventEnumSchema.Type>();
 	const [assigningResourceId, setAssigningResourceIdFn] = useState<string>();
 	const [view, setViewFn] = useState<useEditorSfxManagerController.View>("all");
@@ -71,8 +79,17 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	const assignmentError = RendererRuntime.runSync(
 		readSettledAsyncResultErrorFx(assignmentResult),
 	);
+	const optimizePending = optimizationState.kind === "optimizing";
+	const optimizeError =
+		optimizationState.kind === "failure" && optimizationState.type === "sfx"
+			? optimizationState.error
+			: undefined;
+	const optimizationProgress =
+		optimizationState.kind === "optimizing" && optimizationState.type === "sfx"
+			? optimizationState.progress
+			: undefined;
 	const toggleAssignmentFn = (event: SfxEventEnumSchema.Type, resourceId: string) => {
-		if (assignmentPending) return;
+		if (assignmentPending || optimizePending) return;
 		setAssigningEventFn(event);
 		setAssigningResourceIdFn(resourceId);
 		const events = {
@@ -91,6 +108,20 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 			projectId: project.projectId,
 		});
 	};
+	const onOptimizeFn = () => {
+		if (optimizePending || audio.importPending || audio.deletePending || assignmentPending)
+			return;
+		const resourceIds = project.resources
+			.filter(({ type }) => type === "sfx")
+			.map(({ id }) => id);
+		if (resourceIds.length === 0) return;
+		optimizeResourcesFn({
+			expectedRevision: project.revision,
+			kind: "optimize",
+			resourceIds,
+			type: "sfx",
+		});
+	};
 
 	return {
 		activeResourceId: audio.activeResourceId,
@@ -106,7 +137,11 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		importError: audio.importError,
 		importPending: audio.importPending,
 		onFilesChangeFn: audio.onFilesChangeFn,
+		onOptimizeFn,
 		openFilesImportFn: audio.openFilesImportFn,
+		optimizationProgress,
+		optimizeError,
+		optimizePending,
 		playbackError: audio.playbackError,
 		playbackProgress: audio.playbackProgress,
 		playing: audio.playing,

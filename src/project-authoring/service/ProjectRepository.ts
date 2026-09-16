@@ -60,6 +60,7 @@ export namespace ProjectRepository {
 		readonly onProgressFn?: (progress: OptimizeResourcesProgress) => void;
 		readonly projectId: string;
 		readonly resourceIds: ReadonlyArray<IdSchema.Type>;
+		readonly type: "artwork" | "sfx";
 	}
 
 	export interface OptimizeResourcesProgress {

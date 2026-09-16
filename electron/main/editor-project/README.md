@@ -69,7 +69,7 @@ Path containment and owned-file validation remain immediate write contracts. The
 
 ## Resource bodies and incremental saves
 
-Project projections carry resource ID, semantic type, byte size and a filesystem version token, never binary bodies or MIME. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged resource bodies. Resource import/replacement and Artwork Optimize supply only changed bodies or native source paths. Music import keeps canonical Ogg/Opus unchanged or streams one conversion at a time through a PATH-visible FFmpeg. Renames read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
+Project projections carry resource ID, semantic type, byte size and a filesystem version token, never binary bodies or MIME. Open/Refresh reads file metadata. Item/config saves compare authored objects in memory and publish only changed JSON files plus the revision marker; they do not read, compare or serialize unchanged resource bodies. Resource import, replacement and explicit optimization supply only changed bodies or native source paths. Audio import keeps canonical Ogg/Opus unchanged or analyzes and streams one conversion at a time through a PATH-visible FFmpeg, trimming only silent edges without buffering the track in application memory. Renames read only the affected disk file. New resource metadata is verified after its ordered file write and before repository publication.
 
 [`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
@@ -88,8 +88,8 @@ capture expected revision
 → publish it to the still-mounted project Atom
 ```
 
-Artwork **Optimize** follows this same write path. The renderer passes exact Artwork IDs selected by the current search and usage filter. Main holds the repository semaphore while it losslessly normalizes one selected `artwork/` PNG at a time through temporary files, then copies changed files through one ordered write plan and publishes one fresh Project projection. Selected PNG bodies are not accumulated in JavaScript memory. The same repository operation can optimize one Artwork by receiving one ID. It does not invoke Arkpack Build or its 256 px Artwork bake; general `image/` resources are not optimized.
-The filesystem operation reports completed PNGs over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
+Resource **Optimize** follows this same write path. The renderer passes exact IDs and one semantic resource type. Main holds the repository semaphore while it processes one resource at a time through temporary files, then copies only changed files through one ordered write plan and publishes one fresh Project projection. Artwork is losslessly normalized; SFX is scanned for silent edges and re-encoded only when trimming is needed. Resource bodies are not accumulated in JavaScript memory. Optimization does not invoke Arkpack Build or its 256 px Artwork bake; general `image/` and Music resources are not optimized.
+The filesystem operation reports completed resources over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
 
 Hard Refresh and project replacement use a stronger boundary:
 

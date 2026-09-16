@@ -143,6 +143,7 @@ describe("useEditorArtworkManagerController", () => {
 				"visible-one",
 				"visible-two",
 			],
+			type: "artwork",
 		});
 	});
 

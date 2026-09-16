@@ -212,6 +212,7 @@ export namespace EditorProjectTransport {
 		readonly expectedRevision: number;
 		readonly projectId: string;
 		readonly resourceIds: ReadonlyArray<string>;
+		readonly type: "artwork" | "sfx";
 	}
 
 	export interface OptimizeResourcesProgress {

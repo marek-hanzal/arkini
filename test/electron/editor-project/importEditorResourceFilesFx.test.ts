@@ -1,4 +1,4 @@
-import { access, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { access, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -14,6 +14,23 @@ import {
 	editorProjectIpcProject,
 } from "./ipc/support/createEditorProjectIpcRepository";
 
+const optimizeOggOpusResourceFileFxMock = vi.hoisted(() => vi.fn());
+
+vi.mock("~/game-config-resource/fx/optimizeOggOpusResourceFileFx", () => ({
+	optimizeOggOpusResourceFileFx: optimizeOggOpusResourceFileFxMock.mockImplementation(
+		(source: string) =>
+			Effect.promise(async () => {
+				const size = Number((await stat(source)).size);
+				return {
+					changed: false,
+					originalBytes: size,
+					optimizedBytes: size,
+					path: source,
+				};
+			}),
+	),
+}));
+
 let root = "";
 
 beforeEach(async () => {
@@ -28,7 +45,7 @@ afterEach(async () => {
 });
 
 describe("importEditorResourceFilesFx", () => {
-	it("imports canonical Ogg/Opus Music and SFX by native path without materializing their bodies", async () => {
+	it("checks canonical Ogg/Opus Music and SFX for silent edges without materializing their bodies", async () => {
 		const musicPath = join(root, "Opening Theme.ogg");
 		const musicBytes = createTestOggOpusBytesFn();
 		await writeFile(musicPath, musicBytes);
@@ -103,6 +120,7 @@ describe("importEditorResourceFilesFx", () => {
 				}),
 			],
 		});
+		expect(optimizeOggOpusResourceFileFxMock).toHaveBeenCalledTimes(2);
 	});
 
 	it("accepts a non-square Image by native path while Artwork keeps its square contract", async () => {

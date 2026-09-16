@@ -339,6 +339,7 @@ describe("createElectronProjectRepositoryFx", () => {
 					"hero",
 					"item-water",
 				],
+				type: "artwork",
 			}),
 		);
 

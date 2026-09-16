@@ -5,7 +5,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type ChangeEventHandler, type RefObject, useRef } from "react";
 
 import { importEditorArtworkFx } from "~/artwork-authoring/fx/importEditorArtworkFx";
-import { EditorResourceOptimizationAtom } from "~/artwork-authoring/atom/EditorResourceOptimizationAtom";
+import { EditorResourceOptimizationAtom } from "~/resource-authoring/atom/EditorResourceOptimizationAtom";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
@@ -90,11 +90,17 @@ export const useEditorArtworkManagerController = ({
 			? result.value.resourceIds.length
 			: undefined;
 	const optimizeError =
-		optimizationState.kind === "failure" ? optimizationState.error : undefined;
+		optimizationState.kind === "failure" && optimizationState.type === "artwork"
+			? optimizationState.error
+			: undefined;
 	const optimization =
-		optimizationState.kind === "success" ? optimizationState.result : undefined;
+		optimizationState.kind === "success" && optimizationState.type === "artwork"
+			? optimizationState.result
+			: undefined;
 	const optimizationProgress =
-		optimizationState.kind === "optimizing" ? optimizationState.progress : undefined;
+		optimizationState.kind === "optimizing" && optimizationState.type === "artwork"
+			? optimizationState.progress
+			: undefined;
 	const catalogState: useEditorArtworkManagerController.CatalogState | undefined = library.empty
 		? "empty"
 		: library.notesLoading || library.notesError !== undefined || library.resources.length > 0
@@ -134,6 +140,7 @@ export const useEditorArtworkManagerController = ({
 			expectedRevision: library.projectRevision,
 			kind: "optimize",
 			resourceIds: library.resources.map(({ id }) => id),
+			type: "artwork",
 		});
 	};
 	const onOptimizationDismissFn = () => {

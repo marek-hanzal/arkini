@@ -25,11 +25,12 @@ const state = vi.hoisted(() => ({
 				}) => void;
 				readonly projectId: string;
 				readonly resourceIds: ReadonlyArray<string>;
+				readonly type: "artwork" | "sfx";
 		  }
 		| undefined,
 }));
 
-vi.mock("~/artwork-authoring/fx/optimizeEditorResourcesFx", () => ({
+vi.mock("~/resource-authoring/fx/optimizeEditorResourcesFx", () => ({
 	optimizeEditorResourcesFx: state.optimize,
 }));
 
@@ -50,7 +51,7 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	};
 });
 
-import { EditorResourceOptimizationAtom } from "~/artwork-authoring/atom/EditorResourceOptimizationAtom";
+import { EditorResourceOptimizationAtom } from "~/resource-authoring/atom/EditorResourceOptimizationAtom";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const project = {
@@ -109,6 +110,7 @@ describe("EditorResourceOptimizationAtom", () => {
 				"three",
 				"four",
 			],
+			type: "artwork",
 		});
 		await vi.waitFor(() => expect(state.request).toBeDefined());
 		expect(state.request).toMatchObject({
@@ -133,6 +135,7 @@ describe("EditorResourceOptimizationAtom", () => {
 				phase: "optimizing",
 				totalResourceCount: 4,
 			},
+			type: "artwork",
 		});
 
 		unmount();
@@ -150,6 +153,7 @@ describe("EditorResourceOptimizationAtom", () => {
 				phase: "optimizing",
 				totalResourceCount: 4,
 			},
+			type: "artwork",
 		});
 		expect(state.optimize).toHaveBeenCalledOnce();
 
@@ -178,6 +182,7 @@ describe("EditorResourceOptimizationAtom", () => {
 			resourceIds: [
 				"one",
 			],
+			type: "artwork",
 		});
 		await vi.waitFor(() => expect(state.request).toBeDefined());
 		if (state.gate === undefined) throw new Error("Expected optimization gate.");

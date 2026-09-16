@@ -98,7 +98,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-line-detail` | Item Line reads, projections and presentation | [`src/item-line-detail/fx/readItemDetailLinesFx.ts`](src/item-line-detail/fx/readItemDetailLinesFx.ts) |
 | `item-detail` | Concrete Item Detail dialog and tabs | [`src/item-detail/ui/ItemDetailModal.tsx`](src/item-detail/ui/ItemDetailModal.tsx) |
 | `game-presentation` | Mounted-Game React capability and command settlement | [`src/game-presentation/ui/GameEngineProvider.tsx`](src/game-presentation/ui/GameEngineProvider.tsx) |
-| `game-audio` | Streamed random Music, bounded lazy SFX and committed-event cue playback | [`src/game-audio/fx/createGameAudioRuntimeFx.ts`](src/game-audio/fx/createGameAudioRuntimeFx.ts) |
+| `game-audio` | Streamed random Music, bounded lazy SFX, committed-event cues and direct presentation cues | [`src/game-audio/fx/createGameAudioRuntimeFx.ts`](src/game-audio/fx/createGameAudioRuntimeFx.ts) |
+| `sfx-event` | Assignable SFX vocabulary across committed gameplay and explicit presentation interactions | [`src/sfx-event/schema/SfxEventEnumSchema.ts`](src/sfx-event/schema/SfxEventEnumSchema.ts) |
 | `game-menu` | Menu overlay, save/close command and navigation intent | [`src/game-menu/ui/GameMenu.tsx`](src/game-menu/ui/GameMenu.tsx) |
 | `game-cheat` | Save-scoped cheats, catalog and command UI | [`src/game-cheat/ui/Cheats.tsx`](src/game-cheat/ui/Cheats.tsx) |
 | `game-shell` | Board/Inventory leaves and gameplay overlay composition | [`src/game-shell/ui/GameShell.tsx`](src/game-shell/ui/GameShell.tsx) |
@@ -137,7 +138,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `artwork-authoring` | Artwork catalog, square-PNG validation, edit/import/delete, Optimize and UI | [`src/artwork-authoring/ui/EditorArtworkManager.tsx`](src/artwork-authoring/ui/EditorArtworkManager.tsx) |
 | `audio-authoring` | Shared Music/SFX library import, lazy one-track preview and PATH-optional canonical Ogg/Opus preparation | [`src/audio-authoring/ui/EditorAudioResourceManager.tsx`](src/audio-authoring/ui/EditorAudioResourceManager.tsx) |
 | `music-authoring` | Music random-playlist selection over shared audio authoring | [`src/music-authoring/ui/EditorMusicManager.tsx`](src/music-authoring/ui/EditorMusicManager.tsx) |
-| `sfx-authoring` | Sound-effects library and gameplay-event assignment over shared audio authoring | [`src/sfx-authoring/ui/EditorSfxManager.tsx`](src/sfx-authoring/ui/EditorSfxManager.tsx) |
+| `sfx-authoring` | Sound-effects library and event assignment over shared audio authoring | [`src/sfx-authoring/ui/EditorSfxManager.tsx`](src/sfx-authoring/ui/EditorSfxManager.tsx) |
 | `resource-authoring` | Shared typed Resource import orchestration | [`src/resource-authoring/fx/importEditorResourcesFx.ts`](src/resource-authoring/fx/importEditorResourcesFx.ts) |
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |

@@ -1,5 +1,6 @@
 import { useAtom } from "@effect/atom-react";
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import {
 	type PropsWithChildren,
 	useCallback,
@@ -14,13 +15,18 @@ import { resolveItemDetailTargetFn } from "~/item-detail-read/fn/resolveItemDeta
 import { readItemDetailTabsFn } from "~/item-detail-read/fn/readItemDetailTabsFn";
 import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
 import { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
-import type { RunItemDetailPendingActionProps } from "~/item-detail-frame/type/ItemDetailControl";
+import type {
+	ItemDetailTarget,
+	RunItemDetailPendingActionProps,
+} from "~/item-detail-frame/type/ItemDetailControl";
 import { createItemDetailCommandAtom } from "~/item-detail-frame/atom/createItemDetailCommandAtom";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { createItemDetailControllerFx } from "~/item-detail-frame/fx/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/item-detail-frame/context/ItemDetailContext";
 import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailControl";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
+import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
+import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and
@@ -39,7 +45,46 @@ export const ItemDetailProvider = ({
 }: PropsWithChildren<{
 	readonly game: GameEngine;
 }>) => {
+	const { playSfxEventFn } = useGameAudioControl();
 	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
+	const openTargetFx = useCallback(
+		(target: ItemDetailTarget) =>
+			Effect.gen(function* () {
+				const phase = controller.getSnapshotFn().phase;
+				const opened = yield* controller.openTargetFx(target);
+				if (opened && (phase === "closed" || phase === "exiting")) {
+					playSfxEventFn(PresentationSfxEventEnumSchema.enum.ItemDetailOpened);
+				}
+				return opened;
+			}),
+		[
+			controller,
+			playSfxEventFn,
+		],
+	);
+	const closeFx = useCallback(
+		(props?: Parameters<typeof controller.closeFx>[0]) =>
+			Effect.suspend(() => {
+				const phase = controller.getSnapshotFn().phase;
+				if (phase !== "closed" && phase !== "exiting") {
+					playSfxEventFn(PresentationSfxEventEnumSchema.enum.ItemDetailClosed);
+				}
+				return controller.closeFx(props);
+			}),
+		[
+			controller,
+			playSfxEventFn,
+		],
+	);
+	const closeAtom = useMemo(
+		() =>
+			Atom.fn((props: Parameters<typeof closeFx>[0]) => closeFx(props), {
+				concurrent: true,
+			}).pipe(Atom.setIdleTTL(0)),
+		[
+			closeFx,
+		],
+	);
 	const commandAtom = useMemo(
 		() =>
 			createItemDetailCommandAtom({
@@ -59,7 +104,7 @@ export const ItemDetailProvider = ({
 			writeCommandFn,
 		],
 	);
-	const [closeResult, closeFn] = useAtom(controller.closeAtom);
+	const [closeResult, closeFn] = useAtom(closeAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(closeResult));
 	const snapshot = useSyncExternalStore(
 		controller.subscribeFn,
@@ -103,7 +148,7 @@ export const ItemDetailProvider = ({
 					sources,
 				});
 				if (resolved.kind === "unavailable") return Effect.succeed(false);
-				return controller.openTargetFx({
+				return openTargetFx({
 					kind: "runtime",
 					itemId: resolved.itemId,
 					tab: resolved.tab,
@@ -115,8 +160,8 @@ export const ItemDetailProvider = ({
 				});
 			}),
 		[
-			controller,
 			game,
+			openTargetFx,
 		],
 	);
 
@@ -150,7 +195,7 @@ export const ItemDetailProvider = ({
 						: tabs.includes(ItemDetailTabEnumSchema.enum.Sources)
 							? ItemDetailTabEnumSchema.enum.Sources
 							: ItemDetailTabEnumSchema.enum.Info;
-				return controller.openTargetFx({
+				return openTargetFx({
 					kind: "definition",
 					itemId: sources.targetDefinitionItemId,
 					tab: resolvedTab,
@@ -158,8 +203,8 @@ export const ItemDetailProvider = ({
 				});
 			}),
 		[
-			controller,
 			game,
+			openTargetFx,
 		],
 	);
 
@@ -226,12 +271,14 @@ export const ItemDetailProvider = ({
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
 			selectRetainedItemDetailTabFx,
-			closeAtom: controller.closeAtom,
-			closeFx: controller.closeFx,
+			closeAtom,
+			closeFx,
 			completeEnterFx: controller.completeEnterFx,
 			completeExitFx: controller.completeExitFx,
 		}),
 		[
+			closeAtom,
+			closeFx,
 			controller,
 			commandState,
 			openItemDefinitionDetailFx,

@@ -32,7 +32,7 @@
 					"$ref": "urn:arkini:schema:project#/$defs/music.MusicSchema"
 				},
 				"sfx": {
-					"description": "Optional gameplay-event SFX assignments for this game.",
+					"description": "Optional SFX event assignments for this game.",
 					"$ref": "urn:arkini:schema:project#/$defs/sfx.SfxSchema"
 				},
 				"start": {
@@ -187,21 +187,21 @@
 				"events": {
 					"type": "object",
 					"propertyNames": {
-						"$ref": "urn:arkini:schema:project#/$defs/GameEventEnumSchema"
+						"$ref": "urn:arkini:schema:project#/$defs/SfxEventEnumSchema"
 					},
 					"additionalProperties": {
 						"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
 					},
-					"description": "SFX resource IDs assigned to committed gameplay events."
+					"description": "SFX resource IDs assigned to gameplay and presentation events."
 				}
 			},
 			"required": [
 				"events"
 			],
 			"additionalProperties": false,
-			"description": "The gameplay-event SFX assignments authored for one game."
+			"description": "The event SFX assignments authored for one game."
 		},
-		"GameEventEnumSchema": {
+		"SfxEventEnumSchema": {
 			"type": "string",
 			"enum": [
 				"current-space:changed",
@@ -219,9 +219,11 @@
 				"item:input-stored",
 				"item:unit-spent",
 				"item:depleted",
-				"item:explicitly-removed"
+				"item:explicitly-removed",
+				"item-detail:opened",
+				"item-detail:closed"
 			],
-			"description": "The finite vocabulary of committed gameplay events published by one Game."
+			"description": "The finite vocabulary of events assignable to SFX."
 		},
 		"NonNegativeIntegerSchema": {
 			"type": "integer",

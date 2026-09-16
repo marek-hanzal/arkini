@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import { GameAudioContext } from "~/game-audio/context/GameAudioContext";
 import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailControl";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
@@ -104,6 +105,7 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 
 export const renderProvider = async () => {
 	let control: ItemDetailControl | undefined;
+	const playSfxEventFn = vi.fn();
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -111,15 +113,23 @@ export const renderProvider = async () => {
 	const render = (game: GameEngine = providerGame) =>
 		root.render(
 			createElement(
-				ItemDetailProvider,
+				GameAudioContext.Provider,
 				{
-					game,
-				},
-				createElement(Probe, {
-					onControl: (next) => {
-						control = next;
+					value: {
+						playSfxEventFn,
 					},
-				}),
+				},
+				createElement(
+					ItemDetailProvider,
+					{
+						game,
+					},
+					createElement(Probe, {
+						onControl: (next) => {
+							control = next;
+						},
+					}),
+				),
 			),
 		);
 	await act(async () => render());
@@ -128,6 +138,7 @@ export const renderProvider = async () => {
 			if (control === undefined) throw new Error("Missing Item Detail control.");
 			return control;
 		},
+		playSfxEventFn,
 		render,
 	};
 };

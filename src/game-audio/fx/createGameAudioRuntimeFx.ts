@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 
 import type { SoundSettings } from "~electron/contract/sound/SoundSettings";
-import type { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
+import type { GameAudioCue } from "~/game-audio/type/GameAudioCue";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 
@@ -29,9 +29,7 @@ export namespace createGameAudioRuntimeFx {
 	export interface Result {
 		readonly prepareFx: Effect.Effect<void, unknown, never>;
 		readonly unlockFx: Effect.Effect<void, unknown, never>;
-		readonly playFx: (
-			cues: ReadonlyArray<readGameAudioCuesFn.Result>,
-		) => Effect.Effect<void, never, never>;
+		readonly playFx: (cues: ReadonlyArray<GameAudioCue>) => Effect.Effect<void, never, never>;
 		readonly playMusicFx: (resourceId: string) => Effect.Effect<void, never, never>;
 		readonly setSoundFx: (sound: SoundSettings) => Effect.Effect<void, never, never>;
 		readonly closeFx: Effect.Effect<void, unknown, never>;
@@ -264,7 +262,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			);
 		};
 
-		const playCueFn = (cue: readGameAudioCuesFn.Result) => {
+		const playCueFn = (cue: GameAudioCue) => {
 			const activeContext = context;
 			const resourceId = game.config.sfx?.events[cue.event];
 			if (

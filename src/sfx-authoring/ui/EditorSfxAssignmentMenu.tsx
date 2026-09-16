@@ -2,22 +2,22 @@ import { FloatingPortal } from "@floating-ui/react";
 import { CircleAlert, CircleCheck, CirclePlus, ListPlus, LoaderCircle } from "lucide-react";
 
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
-import type { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { SfxEventPresentation } from "~/sfx-authoring/constant/SfxEventPresentation";
+import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 import { Tx } from "~/translation/ui/Tx";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 interface EditorSfxAssignmentMenuProps {
-	readonly resourceIdByEvent: Readonly<Partial<Record<GameEventEnumSchema.Type, string>>>;
-	readonly assigningEvent?: GameEventEnumSchema.Type;
+	readonly resourceIdByEvent: Readonly<Partial<Record<SfxEventEnumSchema.Type, string>>>;
+	readonly assigningEvent?: SfxEventEnumSchema.Type;
 	readonly disabled: boolean;
 	readonly pending: boolean;
 	readonly resourceId: string;
-	readonly toggleAssignmentFn: (event: GameEventEnumSchema.Type, resourceId: string) => void;
+	readonly toggleAssignmentFn: (event: SfxEventEnumSchema.Type, resourceId: string) => void;
 }
 
-/** Assigns one SFX resource to any number of exact committed gameplay events. */
+/** Assigns one SFX resource to any number of exact Game interactions. */
 export const EditorSfxAssignmentMenu = ({
 	resourceIdByEvent,
 	assigningEvent,

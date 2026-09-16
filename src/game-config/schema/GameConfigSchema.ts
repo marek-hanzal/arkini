@@ -36,11 +36,9 @@ export const GameConfigSchema = z
 		 */
 		music: MusicSchema.optional().describe("Optional global Music behavior for this game."),
 		/**
-		 * Optional gameplay-event SFX assignments. Missing assignments remain silent.
+		 * Optional SFX event assignments. Missing assignments remain silent.
 		 */
-		sfx: SfxSchema.optional().describe(
-			"Optional gameplay-event SFX assignments for this game.",
-		),
+		sfx: SfxSchema.optional().describe("Optional SFX event assignments for this game."),
 		/**
 		 * Board and inventory contents created for a new game.
 		 */

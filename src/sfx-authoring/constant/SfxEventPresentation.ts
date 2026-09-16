@@ -1,7 +1,19 @@
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
+import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 
-/** User-facing descriptions for the exact committed gameplay events assignable to SFX. */
+/** User-facing descriptions for every exact Game interaction assignable to SFX. */
 export const SfxEventPresentation = [
+	{
+		event: PresentationSfxEventEnumSchema.enum.ItemDetailOpened,
+		label: "Item detail opened",
+		description: "When the player opens an Item detail.",
+	},
+	{
+		event: PresentationSfxEventEnumSchema.enum.ItemDetailClosed,
+		label: "Item detail closed",
+		description: "When the player closes an Item detail.",
+	},
 	{
 		event: GameEventEnumSchema.enum.CurrentSpaceChanged,
 		label: "Space changed",
@@ -84,6 +96,6 @@ export const SfxEventPresentation = [
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly description: string;
-	readonly event: GameEventEnumSchema.Type;
+	readonly event: SfxEventEnumSchema.Type;
 	readonly label: string;
 }>;

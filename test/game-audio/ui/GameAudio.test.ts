@@ -3,13 +3,23 @@
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { Cause, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { StrictMode, Suspense, act, createElement, startTransition } from "react";
+import {
+	type ReactNode,
+	StrictMode,
+	Suspense,
+	act,
+	createElement,
+	startTransition,
+	useEffect,
+} from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { createGameAudioRuntimeFx } from "~/game-audio/fx/createGameAudioRuntimeFx";
+import type { GameAudioControl } from "~/game-audio/context/GameAudioContext";
+import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
 const eventState = vi.hoisted(() => ({
 	game: {
@@ -36,6 +46,7 @@ vi.mock("~/game-audio/fx/createGameAudioRuntimeFx", () => ({
 }));
 
 import { GameAudio } from "~/game-audio/ui/GameAudio";
+import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
 
 (
 	globalThis as {
@@ -112,10 +123,28 @@ const makeRegistry = () => {
 	return registry;
 };
 
+const AudioControlProbe = ({
+	onControlFn,
+}: {
+	readonly onControlFn: (control: GameAudioControl) => void;
+}) => {
+	const control = useGameAudioControl();
+	useEffect(
+		() => onControlFn(control),
+		[
+			control,
+			onControlFn,
+		],
+	);
+	return null;
+};
+
 const renderAudio = async ({
+	children,
 	registry = makeRegistry(),
 	strict = false,
 }: {
+	readonly children?: ReactNode;
 	readonly registry?: AtomRegistry.AtomRegistry;
 	readonly strict?: boolean;
 } = {}) => {
@@ -131,8 +160,8 @@ const renderAudio = async ({
 					value: registry,
 				},
 				strict
-					? createElement(StrictMode, null, createElement(GameAudio))
-					: createElement(GameAudio),
+					? createElement(StrictMode, null, createElement(GameAudio, null, children))
+					: createElement(GameAudio, null, children),
 			),
 		);
 	await act(async () => render());
@@ -184,6 +213,31 @@ describe("GameAudio", () => {
 		await act(async () => root.unmount());
 		roots.splice(roots.indexOf(root), 1);
 		await vi.waitFor(() => expect(harness.close).toHaveBeenCalledOnce());
+	});
+
+	it("routes direct presentation SFX through the same bounded audio runtime", async () => {
+		const harness = createAudioHarness();
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
+		let control: GameAudioControl | undefined;
+		await renderAudio({
+			children: createElement(AudioControlProbe, {
+				onControlFn: (next) => {
+					control = next;
+				},
+			}),
+		});
+		if (control === undefined) throw new Error("Missing Game audio control.");
+
+		control.playSfxEventFn(PresentationSfxEventEnumSchema.enum.ItemDetailOpened);
+
+		await vi.waitFor(() =>
+			expect(harness.play).toHaveBeenCalledWith([
+				{
+					event: PresentationSfxEventEnumSchema.enum.ItemDetailOpened,
+					strength: 1,
+				},
+			]),
+		);
 	});
 
 	it("does not lose synchronously settling unlocks or ordered event batches", async () => {

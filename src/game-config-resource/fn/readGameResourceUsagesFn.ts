@@ -2,7 +2,7 @@ import { Order } from "effect";
 
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { DiagnosticPathSchema } from "~/game-config-diagnostic/schema/DiagnosticPathSchema";
-import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 
 export namespace readGameResourceUsagesFn {
 	export type Usage =
@@ -95,7 +95,7 @@ export const readGameResourceUsagesFn = (
 			],
 		});
 	});
-	for (const event of GameEventEnumSchema.options) {
+	for (const event of SfxEventEnumSchema.options) {
 		const resourceId = config.sfx?.events[event];
 		if (resourceId === undefined) continue;
 		usages.push({

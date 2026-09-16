@@ -60,17 +60,18 @@ describe("readGameResourceUsagesFn", () => {
 		});
 	});
 
-	it("projects gameplay-event SFX assignments as explicit project resource usages", () => {
-		expect(
-			readGameResourceUsagesFn({
-				...editorTestConfig,
-				sfx: {
-					events: {
-						"job:started": "job-start",
-					},
+	it("projects gameplay and presentation SFX assignments as explicit project resource usages", () => {
+		const usages = readGameResourceUsagesFn({
+			...editorTestConfig,
+			sfx: {
+				events: {
+					"item-detail:opened": "detail-open",
+					"job:started": "job-start",
 				},
-			}),
-		).toContainEqual({
+			},
+		});
+
+		expect(usages).toContainEqual({
 			owner: "project",
 			ownerLabel: "Project",
 			path: [
@@ -81,6 +82,18 @@ describe("readGameResourceUsagesFn", () => {
 			resourceId: "job-start",
 			resourceType: "sfx",
 			roleLabel: "job:started",
+		});
+		expect(usages).toContainEqual({
+			owner: "project",
+			ownerLabel: "Project",
+			path: [
+				"sfx",
+				"events",
+				"item-detail:opened",
+			],
+			resourceId: "detail-open",
+			resourceType: "sfx",
+			roleLabel: "item-detail:opened",
 		});
 	});
 });

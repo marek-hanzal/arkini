@@ -6,11 +6,11 @@ import { useMemo, useState } from "react";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorAudioResourceManagerController } from "~/audio-authoring/ui/useEditorAudioResourceManagerController";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { SfxSchema } from "~/game-config/schema/SfxSchema";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import type { Project } from "~/project-authoring/type/Project";
+import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const assignEditorSfxAtom = RendererRuntime.runSync(
@@ -26,18 +26,18 @@ export namespace useEditorSfxManagerController {
 
 	export interface Output extends useEditorAudioResourceManagerController.Output {
 		readonly resourceIdByEvent: SfxSchema.Type["events"];
-		readonly assigningEvent?: GameEventEnumSchema.Type;
+		readonly assigningEvent?: SfxEventEnumSchema.Type;
 		readonly assigningResourceId?: string;
 		readonly assignmentError?: unknown;
 		readonly assignmentPending: boolean;
 		readonly setViewFn: (view: View) => void;
 		readonly sfx: ReadonlyArray<Project.Resource>;
-		readonly toggleAssignmentFn: (event: GameEventEnumSchema.Type, resourceId: string) => void;
+		readonly toggleAssignmentFn: (event: SfxEventEnumSchema.Type, resourceId: string) => void;
 		readonly view: View;
 	}
 }
 
-/** Adds one-resource-per-gameplay-event assignment to the shared SFX audio library. */
+/** Adds one-resource-per-Game-interaction assignment to the shared SFX audio library. */
 export const useEditorSfxManagerController = (): useEditorSfxManagerController.Output => {
 	const project = useEditorProject();
 	const audio = useEditorAudioResourceManagerController({
@@ -45,7 +45,7 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	});
 	const assignmentResult = useAtomValue(assignEditorSfxAtom);
 	const assignSfxFn = useAtomSet(assignEditorSfxAtom);
-	const [assigningEvent, setAssigningEventFn] = useState<GameEventEnumSchema.Type>();
+	const [assigningEvent, setAssigningEventFn] = useState<SfxEventEnumSchema.Type>();
 	const [assigningResourceId, setAssigningResourceIdFn] = useState<string>();
 	const [view, setViewFn] = useState<useEditorSfxManagerController.View>("all");
 	const resourceIdByEvent = project.config.sfx?.events ?? {};
@@ -71,7 +71,7 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	const assignmentError = RendererRuntime.runSync(
 		readSettledAsyncResultErrorFx(assignmentResult),
 	);
-	const toggleAssignmentFn = (event: GameEventEnumSchema.Type, resourceId: string) => {
+	const toggleAssignmentFn = (event: SfxEventEnumSchema.Type, resourceId: string) => {
 		if (assignmentPending) return;
 		setAssigningEventFn(event);
 		setAssigningResourceIdFn(resourceId);

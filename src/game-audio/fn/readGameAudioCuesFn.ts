@@ -2,15 +2,12 @@ import { match } from "ts-pattern";
 
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-
-export namespace readGameAudioCuesFn {
-	export interface Result {
-		readonly event: GameEventEnumSchema.Type;
-		readonly strength: number;
-	}
-}
+import type { GameAudioCue } from "~/game-audio/type/GameAudioCue";
 
 type GameEvent = GameEventBatchSchema.Type["events"][number];
+type GameEventAudioCue = GameAudioCue & {
+	readonly event: GameEventEnumSchema.Type;
+};
 
 const maximumBatchCues = 6;
 
@@ -38,12 +35,12 @@ const clampStrengthFn = (strength: number) => Math.min(3, Math.max(1, strength))
 const strengthForQuantityFn = (quantity: number) =>
 	clampStrengthFn(1 + Math.log2(Math.max(1, quantity)));
 
-const cueFn = (event: GameEventEnumSchema.Type, strength: number): readGameAudioCuesFn.Result => ({
+const cueFn = (event: GameEventEnumSchema.Type, strength: number): GameEventAudioCue => ({
 	event,
 	strength: clampStrengthFn(strength),
 });
 
-const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
+const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue =>
 	match(event)
 		.with(
 			{
@@ -178,10 +175,8 @@ const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
 		)
 		.exhaustive();
 
-const coalesceCuesFn = (
-	events: ReadonlyArray<GameEvent>,
-): ReadonlyArray<readGameAudioCuesFn.Result> => {
-	const cues: Array<readGameAudioCuesFn.Result> = [];
+const coalesceCuesFn = (events: ReadonlyArray<GameEvent>): ReadonlyArray<GameEventAudioCue> => {
+	const cues: Array<GameEventAudioCue> = [];
 	const indexByEvent = new Map<GameEventEnumSchema.Type, number>();
 
 	for (const event of events) {
@@ -206,7 +201,7 @@ const coalesceCuesFn = (
 /** Projects one committed event batch into a small, readable set of audio intentions. */
 export const readGameAudioCuesFn = (
 	batch: GameEventBatchSchema.Type,
-): ReadonlyArray<readGameAudioCuesFn.Result> => {
+): ReadonlyArray<GameAudioCue> => {
 	const cues = coalesceCuesFn(batch.events);
 	if (cues.length <= maximumBatchCues) return cues;
 

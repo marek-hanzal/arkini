@@ -41,10 +41,10 @@ export const GameSourceSchema = z
 			"The optional global Music behavior contributed by this source fragment.",
 		),
 		/**
-		 * Optional gameplay-event SFX assignments contributed by this source fragment.
+		 * Optional SFX event assignments contributed by this source fragment.
 		 */
 		sfx: SfxSchema.optional().describe(
-			"The optional gameplay-event SFX assignments contributed by this source fragment.",
+			"The optional SFX event assignments contributed by this source fragment.",
 		),
 		/**
 		 * Optional new-game state contributed by this source fragment.

@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import { GameAudioContext } from "~/game-audio/context/GameAudioContext";
 import type { GameMenuControl } from "~/game-menu/type/GameMenuControl";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { GameEngineContext } from "~/game-presentation/context/GameEngineContext";
@@ -112,25 +113,33 @@ const renderShell = async () => {
 	await act(async () => {
 		root.render(
 			createElement(
-				GameEngineContext.Provider,
+				GameAudioContext.Provider,
 				{
-					value: game,
+					value: {
+						playSfxEventFn: vi.fn(),
+					},
 				},
 				createElement(
-					PlayableGameShell,
+					GameEngineContext.Provider,
 					{
-						menu: createElement(GameMenuProbe, {
+						value: game,
+					},
+					createElement(
+						PlayableGameShell,
+						{
+							menu: createElement(GameMenuProbe, {
+								onControl: (next) => {
+									gameMenu = next;
+								},
+							}),
+							routePresentation: "embedded",
+						},
+						createElement(ItemDetailProbe, {
 							onControl: (next) => {
-								gameMenu = next;
+								itemDetail = next;
 							},
 						}),
-						routePresentation: "embedded",
-					},
-					createElement(ItemDetailProbe, {
-						onControl: (next) => {
-							itemDetail = next;
-						},
-					}),
+					),
 				),
 			),
 		);

@@ -9,8 +9,7 @@ export const PlayableGameResources = ({ children }: PropsWithChildren) => {
 	const game = useGameEngine();
 	return (
 		<CheatItemSpawnProvider game={game}>
-			<GameAudio />
-			{children}
+			<GameAudio>{children}</GameAudio>
 		</CheatItemSpawnProvider>
 	);
 };

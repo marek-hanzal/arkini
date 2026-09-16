@@ -183,6 +183,54 @@ describe("validateGameResourcesFn", () => {
 		);
 	});
 
+	it("requires every presentation-event assignment to resolve to SFX", () => {
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			sfx: {
+				events: {
+					"item-detail:opened": "missing-detail-open",
+					"item-detail:closed": "wrong-detail-close",
+				},
+			},
+		});
+		const diagnostics = validateGameResourcesFn({
+			config,
+			provenance: {
+				...provenance,
+				sfx: "game.json",
+			},
+			resources: [
+				{
+					id: "wrong-detail-close",
+					path: "image/wrong-detail-close.png",
+					type: "image",
+				},
+			],
+		});
+
+		expect(diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
+					path: [
+						"sfx",
+						"events",
+						"item-detail:opened",
+					],
+					resourceId: "missing-detail-open",
+					source: "game.json",
+				}),
+				expect.objectContaining({
+					actualType: "image",
+					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
+					expectedType: "sfx",
+					resourceId: "wrong-detail-close",
+					source: "game.json",
+				}),
+			]),
+		);
+	});
+
 	it("reports duplicate and missing exact resource IDs", () => {
 		const diagnostics = validateGameResourcesFn({
 			config: startTestConfig,

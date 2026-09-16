@@ -8,6 +8,7 @@ This map separates authored values, portable source, diagnostics, semantic valid
 | --- | --- | --- |
 | `game-value` | Foundational immutable identity, required text, quantity and whole-millisecond time schemas | [`../game-value/schema/IdSchema.ts`](../game-value/schema/IdSchema.ts), [`../game-value/schema/TimeSchema.ts`](../game-value/schema/TimeSchema.ts) |
 | `game-config` | Completed authored aggregate and loaded-config capability | [`schema/GameConfigSchema.ts`](schema/GameConfigSchema.ts), [`context/GameConfigFx.ts`](context/GameConfigFx.ts) |
+| `sfx-event` | Exact assignable SFX vocabulary across committed gameplay and explicit presentation interactions | [`../sfx-event/schema/SfxEventEnumSchema.ts`](../sfx-event/schema/SfxEventEnumSchema.ts) |
 | `game-config-source` | Portable filenames, source schemas, discovery, parsing and generated JSON Schema | [`../game-config-source/schema/ProjectSchema.ts`](../game-config-source/schema/ProjectSchema.ts), [`../game-config-source/fx/collectSourceFilesFx.ts`](../game-config-source/fx/collectSourceFilesFx.ts) |
 | `game-config-resource` | Typed visual/Music source descriptors, usage, rename, discovery, bounded admission, streamed PNG optimization and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/validateOggOpusFileFx.ts`](../game-config-resource/fx/validateOggOpusFileFx.ts), [`../game-config-resource/fx/normalizeArtworkPngFileFx.ts`](../game-config-resource/fx/normalizeArtworkPngFileFx.ts) |
 | `game-config-diagnostic` | Provenance-aware diagnostic vocabulary and presentation | [`../game-config-diagnostic/schema/GameDiagnosticsSchema.ts`](../game-config-diagnostic/schema/GameDiagnosticsSchema.ts), [`../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts`](../game-config-diagnostic/fn/readGameDiagnosticPresentationFn.ts) |
@@ -22,7 +23,7 @@ The foundational schema direction is explicit:
 
 - `game-value` imports only Zod. It owns scalar meaning, not an aggregate, role, lifecycle or behavior.
 - Config, Item, Location, Production, queries and other authored contracts may compose those exact scalars directly.
-- `game-config → item-definition + game-start + game-value + item-location` because `GameConfigSchema` is the completed authored aggregate and `MetaSchema` composes Board/Toolbar layout schemas.
+- `game-config → item-definition + game-start + game-value + item-location + sfx-event` because `GameConfigSchema` is the completed authored aggregate, `MetaSchema` composes Board/Toolbar layout schemas, and SFX assignments use the exact shared event vocabulary.
 - `item-definition → production-line + item-action + item-schedule + item-merge + game-value` because Item capabilities embed those authored contracts.
 - Production behavior reads Item definitions, so that domain-level pair still crosses schema composition in one direction and behavior in the other.
 
@@ -56,7 +57,7 @@ Source, validation, Editor Build, CLI and packing must not create variants of th
 - `game-config` owns values only; it imports no source, validation, compiler, Editor, renderer, route or Electron behavior.
 - `game-value` owns only reusable scalar schemas and imports no Arkini domain.
 - Source reads exact allowlisted paths. Arbitrary recursive JSON is not game source.
-- Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. The completed config owns the explicit global Music playlist and the mapping from exact committed gameplay events to SFX resources. Validation resolves those IDs against their semantic types; Arkpack compilation includes selected Music and every SFX source. Artwork is normalized to bounded square RGBA while general Image and canonical Ogg/Opus bytes are preserved.
+- Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. The completed config owns the explicit global Music playlist and the mapping from exact SFX events to resources; those events comprise committed gameplay plus explicit presentation interactions without converting UI lifecycle into gameplay history. Validation resolves every assigned ID against the SFX semantic type; Arkpack compilation includes selected Music and every SFX source. Artwork is normalized to bounded square RGBA while general Image and canonical Ogg/Opus bytes are preserved.
 - The generated `schema.json` comes from the current project source-schema union and uses stable references.
 - Validation extends beyond Zod shape parsing and preserves source/entity provenance.
 - The compiler rejects blocking diagnostics and cannot publish a usable invalid result.

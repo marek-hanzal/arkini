@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { useModelContext } from "~/application-settings/ui/ModelContext";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 
 const ThemeOptions: ReadonlyArray<{
@@ -53,7 +54,7 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 					className="grid gap-3"
 					disabled={model.blocked}
 				>
-					<legend className="text-sm font-semibold text-foreground">Window</legend>
+					<EditorFormSectionDivider title="Window" />
 					<SegmentedControl
 						options={WindowModeOptions}
 						value={model.windowMode}
@@ -70,10 +71,10 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 				</fieldset>
 
 				<fieldset
-					className="grid gap-3 border-t border-line pt-5"
+					className="grid gap-3"
 					disabled={model.blocked}
 				>
-					<legend className="text-sm font-semibold text-foreground">Theme</legend>
+					<EditorFormSectionDivider title="Theme" />
 					<SegmentedControl
 						options={ThemeOptions}
 						value={model.theme}

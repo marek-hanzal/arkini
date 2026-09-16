@@ -1,5 +1,5 @@
 import { FloatingPortal } from "@floating-ui/react";
-import { Check, ListPlus, LoaderCircle } from "lucide-react";
+import { CircleAlert, CircleCheck, CirclePlus, ListPlus, LoaderCircle } from "lucide-react";
 
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import type { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -58,7 +58,7 @@ export const EditorSfxAssignmentMenu = ({
 				<FloatingPortal>
 					<div
 						ref={refs.setFloating}
-						className="z-50 grid max-h-96 w-96 max-w-[calc(100vw-1rem)] gap-1 overflow-y-auto overscroll-contain rounded-xl border border-control-border bg-[var(--ak-editor-background)] p-1.5 shadow-2xl"
+						className="z-50 grid max-h-96 w-[34rem] max-w-[calc(100vw-1rem)] gap-1 overflow-y-auto overscroll-contain rounded-xl border border-control-border bg-[var(--ak-editor-background)] p-1.5 shadow-2xl"
 						data-ui="EditorSfxAssignMenu"
 						style={floatingStyles}
 						{...getFloatingPropsFn({
@@ -69,6 +69,16 @@ export const EditorSfxAssignmentMenu = ({
 							const assignedResourceId = resourceIdByEvent[option.event];
 							const assigned = assignedResourceId !== undefined;
 							const selected = assignedResourceId === resourceId;
+							const status = selected
+								? "current"
+								: assigned
+									? "assigned"
+									: "unassigned";
+							const StatusIcon = selected
+								? CircleCheck
+								: assigned
+									? CircleAlert
+									: CirclePlus;
 							const assigning = pending && assigningEvent === option.event;
 							return (
 								<button
@@ -100,15 +110,15 @@ export const EditorSfxAssignmentMenu = ({
 										<LoaderCircle className="size-4 animate-spin" />
 									) : (
 										<span
-											className="inline-flex shrink-0 items-center gap-1 rounded-full border border-control-border bg-surface-raised px-2 py-0.5 text-xs font-medium text-muted data-[ui-selected=true]:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent"
+											className="inline-flex min-w-32 shrink-0 items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold data-[ui-status=assigned]:border-warning/45 data-[ui-status=assigned]:bg-warning/10 data-[ui-status=assigned]:text-warning data-[ui-status=current]:border-accent/45 data-[ui-status=current]:bg-accent/10 data-[ui-status=current]:text-accent data-[ui-status=unassigned]:border-info/45 data-[ui-status=unassigned]:bg-info/10 data-[ui-status=unassigned]:text-info"
 											{...readDataUiFn({
 												dataUi: "EditorSfxAssignOptionStatus",
 												state: {
-													selected,
+													status,
 												},
 											})}
 										>
-											{selected ? <Check className="size-3.5" /> : null}
+											<StatusIcon className="size-4" />
 											<Tx
 												label={
 													selected

@@ -56,6 +56,12 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 				type: "sfx",
 				version: "1",
 			},
+			{
+				id: "unused-sfx",
+				size: 49,
+				type: "sfx",
+				version: "1",
+			},
 		],
 	}),
 }));
@@ -100,6 +106,25 @@ afterEach(async () => {
 });
 
 describe("useEditorSfxManagerController", () => {
+	it("filters searched SFX by assignment usage", async () => {
+		expect(controller?.sfx.map(({ id }) => id)).toEqual([
+			"old-start",
+			"shared-sfx",
+			"unused-sfx",
+		]);
+
+		await act(async () => controller?.setViewFn("assigned"));
+		expect(controller?.sfx.map(({ id }) => id)).toEqual([
+			"old-start",
+			"shared-sfx",
+		]);
+
+		await act(async () => controller?.setViewFn("unused"));
+		expect(controller?.sfx.map(({ id }) => id)).toEqual([
+			"unused-sfx",
+		]);
+	});
+
 	it("replaces the resource assigned to one exact gameplay event", async () => {
 		await act(async () => controller?.toggleAssignmentFn("job:started", "shared-sfx"));
 

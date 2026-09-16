@@ -1,7 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorAudioResourceManagerController } from "~/audio-authoring/ui/useEditorAudioResourceManagerController";
@@ -10,6 +10,7 @@ import type { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchem
 import type { SfxSchema } from "~/game-config/schema/SfxSchema";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import type { Project } from "~/project-authoring/type/Project";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const assignEditorSfxAtom = RendererRuntime.runSync(
@@ -21,13 +22,18 @@ const assignEditorSfxAtom = RendererRuntime.runSync(
 );
 
 export namespace useEditorSfxManagerController {
+	export type View = "all" | "assigned" | "unused";
+
 	export interface Output extends useEditorAudioResourceManagerController.Output {
 		readonly resourceIdByEvent: SfxSchema.Type["events"];
 		readonly assigningEvent?: GameEventEnumSchema.Type;
 		readonly assigningResourceId?: string;
 		readonly assignmentError?: unknown;
 		readonly assignmentPending: boolean;
+		readonly setViewFn: (view: View) => void;
+		readonly sfx: ReadonlyArray<Project.Resource>;
 		readonly toggleAssignmentFn: (event: GameEventEnumSchema.Type, resourceId: string) => void;
+		readonly view: View;
 	}
 }
 
@@ -41,7 +47,26 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	const assignSfxFn = useAtomSet(assignEditorSfxAtom);
 	const [assigningEvent, setAssigningEventFn] = useState<GameEventEnumSchema.Type>();
 	const [assigningResourceId, setAssigningResourceIdFn] = useState<string>();
+	const [view, setViewFn] = useState<useEditorSfxManagerController.View>("all");
 	const resourceIdByEvent = project.config.sfx?.events ?? {};
+	const assignedResourceIds = useMemo(
+		() => new Set(Object.values(resourceIdByEvent)),
+		[
+			resourceIdByEvent,
+		],
+	);
+	const sfx = useMemo(
+		() =>
+			audio.resources.filter((resource) => {
+				const assigned = assignedResourceIds.has(resource.id);
+				return view === "all" || (view === "assigned" ? assigned : !assigned);
+			}),
+		[
+			assignedResourceIds,
+			audio.resources,
+			view,
+		],
+	);
 	const assignmentPending = assignmentResult.waiting;
 	const assignmentError = RendererRuntime.runSync(
 		readSettledAsyncResultErrorFx(assignmentResult),
@@ -91,10 +116,13 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		seekPlaybackFn: audio.seekPlaybackFn,
 		setQueryFn: audio.setQueryFn,
 		setVolumeFn: audio.setVolumeFn,
+		setViewFn,
+		sfx,
 		toggleAssignmentFn,
 		togglePlaybackFn: audio.togglePlaybackFn,
 		totalResourceCount: audio.totalResourceCount,
 		type: audio.type,
+		view,
 		volume: audio.volume,
 	};
 };

@@ -15,7 +15,18 @@ export const EditorSfxManager = () => {
 			label: translator.textFn("All"),
 			value: "all",
 		},
-	] as const;
+		{
+			label: translator.textFn("Assigned"),
+			value: "assigned",
+		},
+		{
+			label: translator.textFn("Unused"),
+			value: "unused",
+		},
+	] as const satisfies ReadonlyArray<{
+		readonly label: string;
+		readonly value: useEditorSfxManagerController.View;
+	}>;
 	const renderResourceActionFn = (resource: Project.Resource) => {
 		const assignedEvents = SfxEventPresentation.filter(
 			({ event }) => controller.resourceIdByEvent[event] === resource.id,
@@ -55,13 +66,13 @@ export const EditorSfxManager = () => {
 			controller={controller}
 			extraError={controller.assignmentError}
 			renderResourceActionFn={renderResourceActionFn}
-			resources={controller.resources}
+			resources={controller.sfx}
 			secondaryNavigation={
 				<EditorSectionShortcutNavigation
 					dataUi="EditorSfxView"
-					onChangeFn={() => undefined}
+					onChangeFn={controller.setViewFn}
 					options={viewOptions}
-					value="all"
+					value={controller.view}
 				/>
 			}
 		/>

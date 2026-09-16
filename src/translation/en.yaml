@@ -109,6 +109,8 @@ Artwork usage help:
   value: Shows every saved Item that references this Artwork.
 Assign to:
   value: Assign to
+Assigned:
+  value: Assigned
 Authored Clock expiry output summary help:
   value: |
     Runs once when **Lifetime** reaches zero.

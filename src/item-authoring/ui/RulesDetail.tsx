@@ -8,6 +8,7 @@ import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import type { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
 	<li className="grid gap-1">
@@ -49,9 +50,11 @@ const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
 export const RulesDetail = ({
 	rules,
 	description,
+	variant = "default",
 }: {
 	readonly rules: readonly RuleSchema.Type[];
 	readonly description: ReactNode;
+	readonly variant?: "default" | "output-tree";
 }) => {
 	const translator = useTranslator();
 	return (
@@ -135,7 +138,12 @@ export const RulesDetail = ({
 									/>
 								)}
 							</div>
-							<ul className="grid gap-2 border-l border-line pl-3 text-muted">
+							<ul
+								className={twMerge(
+									"grid gap-2 border-l border-line pl-3 text-muted",
+									variant === "output-tree" && "border-l-2 border-accent pl-24",
+								)}
+							>
 								{rule.when.map((when, whenIndex) => (
 									<WhenDetail
 										key={`${when.type}-${whenIndex}`}

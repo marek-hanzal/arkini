@@ -1,22 +1,30 @@
 import { Tx } from "~/translation/ui/Tx";
 import { Info } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { QuantityValue } from "~/item-definition/ui/QuantityValue";
 
+type OutputsVariant = "compact" | "editor-tree";
+
 const OutputItem = <Item extends OutputProjection.Item>({
 	item,
 	renderItemDetailFn,
 	renderItemFn,
+	variant,
 }: {
 	readonly item: Item;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly variant: OutputsVariant;
 }) => (
 	<div
-		className="grid gap-1.5"
+		className={twMerge(
+			"grid gap-1.5",
+			variant === "editor-tree" && "border-l-2 border-accent pl-24",
+		)}
 		data-ui="TileLineOutputItem"
 	>
 		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
@@ -43,18 +51,21 @@ const OutputItems = <Item extends OutputProjection.Item>({
 	items,
 	renderItemDetailFn,
 	renderItemFn,
+	variant,
 }: {
 	readonly items: readonly Item[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly variant: OutputsVariant;
 }) => (
-	<div className="space-y-1.5">
+	<div className={variant === "editor-tree" ? "flex flex-col gap-3" : "space-y-1.5"}>
 		{items.map((item) => (
 			<OutputItem
 				key={item.itemId}
 				item={item}
 				renderItemDetailFn={renderItemDetailFn}
 				renderItemFn={renderItemFn}
+				variant={variant}
 			/>
 		))}
 	</div>
@@ -64,10 +75,12 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 	roll,
 	renderItemDetailFn,
 	renderItemFn,
+	variant,
 }: {
 	readonly roll: OutputProjection.Roll<Item>;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly variant: OutputsVariant;
 }) =>
 	match(roll)
 		.with(
@@ -87,6 +100,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 						items={guaranteed.item}
 						renderItemDetailFn={renderItemDetailFn}
 						renderItemFn={renderItemFn}
+						variant={variant}
 					/>
 				</div>
 			),
@@ -108,6 +122,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 						items={chance.item}
 						renderItemDetailFn={renderItemDetailFn}
 						renderItemFn={renderItemFn}
+						variant={variant}
 					/>
 				</div>
 			),
@@ -129,7 +144,10 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					{weight.option.map((option, index) => (
 						<div
 							key={`${index}:${option.weight}`}
-							className="border-l border-line pl-3"
+							className={twMerge(
+								"border-l border-line pl-3",
+								variant === "editor-tree" && "border-0 pl-0",
+							)}
 						>
 							<p className="mb-1.5 text-xs text-muted">
 								<Tx label="Weight" /> {option.weight}
@@ -138,6 +156,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 								items={option.item}
 								renderItemDetailFn={renderItemDetailFn}
 								renderItemFn={renderItemFn}
+								variant={variant}
 							/>
 						</div>
 					))}
@@ -153,21 +172,31 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	renderItemDetailFn,
 	renderItemFn,
 	title = <Tx label="Outputs" />,
+	variant = "compact",
 }: {
 	readonly emptyLabel?: ReactNode;
 	readonly output: readonly OutputProjection.Set<Item>[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
 	readonly title?: ReactNode;
+	readonly variant?: OutputsVariant;
 }) => (
-	<section className="min-w-0">
+	<section
+		className="min-w-0"
+		data-ui="Outputs"
+		data-variant={variant}
+	>
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
 			{title}
 		</h4>
 		{output.length === 0 ? (
 			<p className="py-3 text-sm text-muted">{emptyLabel}</p>
 		) : (
-			<div className="divide-y divide-line/60">
+			<div
+				className={
+					variant === "editor-tree" ? "flex flex-col gap-3" : "divide-y divide-line/60"
+				}
+			>
 				{output.map((set, setIndex) => (
 					<div
 						key={`${setIndex}:${set.weight}`}
@@ -177,13 +206,20 @@ export const Outputs = <Item extends OutputProjection.Item>({
 							<Tx label="Alternative" /> {setIndex + 1} · <Tx label="Weight" />{" "}
 							{set.weight}
 						</p>
-						<div className="divide-y divide-line/60">
+						<div
+							className={
+								variant === "editor-tree"
+									? "flex flex-col gap-3"
+									: "divide-y divide-line/60"
+							}
+						>
 							{set.roll.map((roll, rollIndex) => (
 								<OutputRoll
 									key={`${roll.kind}:${rollIndex}`}
 									roll={roll}
 									renderItemDetailFn={renderItemDetailFn}
 									renderItemFn={renderItemFn}
+									variant={variant}
 								/>
 							))}
 						</div>

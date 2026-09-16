@@ -5,7 +5,6 @@ import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeInteger
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
-import { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
@@ -136,7 +135,7 @@ const itemPlacedEventSchema = z
 		previousLocation: z.union([
 			InputLocationSchema,
 			ReservedLocationSchema,
-			InventoryLocationSchema,
+			GridLocationSchema,
 		]),
 		location: GridLocationSchema,
 		quantity: z.number().int().positive(),

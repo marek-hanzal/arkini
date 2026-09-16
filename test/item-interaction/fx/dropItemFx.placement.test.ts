@@ -5,6 +5,8 @@ import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
@@ -40,6 +42,7 @@ describe("dropItemFx / move storage and swap", () => {
 				return {
 					outcome,
 					runtime,
+					transition: yield* (yield* CommittedTransitionsFx).read,
 				};
 			}),
 		);
@@ -51,6 +54,17 @@ describe("dropItemFx / move storage and swap", () => {
 			location: emptyLocation,
 		});
 		expect(result.runtime.items[0]?.location).toEqual(emptyLocation);
+		expect(result.transition.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				itemId: "runtime:water",
+				canonicalItemId: "water",
+				originItemId: "runtime:water",
+				previousLocation: sourceLocation,
+				location: emptyLocation,
+				quantity: 1,
+			},
+		]);
 	});
 
 	it("serializes competing public moves into one empty slot", async () => {

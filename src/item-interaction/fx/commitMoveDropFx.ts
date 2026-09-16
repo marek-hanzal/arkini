@@ -12,6 +12,8 @@ import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
@@ -157,6 +159,17 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 						candidate.id === itemId ? movedItem : candidate,
 					),
 				} satisfies RuntimeSchema.Type,
+				[
+					{
+						type: GameEventEnumSchema.enum.ItemPlaced,
+						itemId: movedItem.id,
+						canonicalItemId: movedItem.item.id,
+						originItemId: movedItem.id,
+						previousLocation: item.location,
+						location: movedItem.location,
+						quantity: movedItem.quantity,
+					} satisfies GameEventSchema.Type,
+				],
 			] as const;
 		}),
 	);

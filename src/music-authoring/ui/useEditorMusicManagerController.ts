@@ -21,6 +21,7 @@ import { deleteEditorResourceFx } from "~/resource-authoring/fx/deleteEditorReso
 import { importEditorResourcesFx } from "~/resource-authoring/fx/importEditorResourcesFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
+import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
 
 const importEditorMusicAtom = Atom.fn(
 	({ files, projectId }: { readonly files: ReadonlyArray<File>; readonly projectId: string }) =>
@@ -82,6 +83,7 @@ export namespace useEditorMusicManagerController {
 /** Owns Music import and one lazily loaded Editor preview player. */
 export const useEditorMusicManagerController = (): useEditorMusicManagerController.Output => {
 	const project = useEditorProject();
+	const sound = useAtomValue(SoundSettingsAtom);
 	const filesInputRef = useRef<HTMLInputElement>(null);
 	const activeAudioRef = useRef<ActiveAudio | undefined>(undefined);
 	const importResult = useAtomValue(importEditorMusicAtom);
@@ -170,8 +172,16 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 		const boundedVolume = Math.min(100, Math.max(0, nextVolume));
 		setVolumeStateFn(boundedVolume);
 		if (activeAudioRef.current !== undefined)
-			activeAudioRef.current.audio.volume = boundedVolume / 100;
+			activeAudioRef.current.audio.volume = (boundedVolume / 100) * (sound.master / 100);
 	};
+
+	useEffect(() => {
+		if (activeAudioRef.current !== undefined)
+			activeAudioRef.current.audio.volume = (volume / 100) * (sound.master / 100);
+	}, [
+		sound.master,
+		volume,
+	]);
 
 	const startPlaybackFn = (resourceId: string, initialProgress?: number) => {
 		const url = urls.get(resourceId);
@@ -185,7 +195,7 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 		setPlaybackTimeFn(0);
 		const audio = new Audio(url);
 		let pendingInitialProgress = initialProgress;
-		audio.volume = volume / 100;
+		audio.volume = (volume / 100) * (sound.master / 100);
 		const updateTimeFn = () => {
 			if (activeAudioRef.current?.audio === audio) setPlaybackTimeFn(audio.currentTime);
 		};

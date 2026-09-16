@@ -76,7 +76,8 @@ export const validateGameResourcesFn = ({
 		});
 	}
 	for (const resource of firstById.values()) {
-		if (referenced.has(resource.id)) continue;
+		if (referenced.has(resource.id) || resource.type === "music" || resource.type === "sfx")
+			continue;
 		diagnostics.push({
 			code: DiagnosticCodeEnumSchema.enum.ResourceUnused,
 			severity: DiagnosticSeverityEnumSchema.enum.Warning,

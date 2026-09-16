@@ -67,6 +67,11 @@ describe("LauncherStartupHydrator", () => {
 					},
 					defaultPackageId: "built-in",
 					cheatsAvailable: true,
+					sound: {
+						master: 100,
+						music: 100,
+						sfx: 100,
+					},
 					windowMode: "bordered" as const,
 				};
 			}),

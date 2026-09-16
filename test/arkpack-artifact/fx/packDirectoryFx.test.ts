@@ -10,6 +10,7 @@ import {
 	assetPng,
 	musicOgg,
 	png,
+	sfxOgg,
 	writeGameProjectFixtureFx,
 } from "./packDirectoryFx.test/gameProjectFixture";
 
@@ -30,7 +31,7 @@ describe("packDirectoryFx game-project contract", () => {
 				packageId: "project-game",
 				version: "2.3",
 				json: 3,
-				resources: 3,
+				resources: 4,
 			});
 			expect(payload).toMatchObject({
 				version: "2.3",
@@ -52,6 +53,11 @@ describe("packDirectoryFx game-project contract", () => {
 				id: "theme",
 				type: "music",
 				bytes: musicOgg,
+			});
+			expect(payload.resources).toContainEqual({
+				id: "job-start",
+				type: "sfx",
+				bytes: sfxOgg,
 			});
 			expect(itemWater).toMatchObject({
 				id: "item-water",

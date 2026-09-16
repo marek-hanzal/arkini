@@ -11,6 +11,7 @@ import { createArkpackSourceProvenanceFn } from "~/arkpack-admission/fn/createAr
 import type { ExtractedArkpack } from "~/arkpack-admission/type/ExtractedArkpack";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
+import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
 import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";
 import { validateGameResourcesFn } from "~/game-config-validation/fn/validateGameResourcesFn";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
@@ -76,7 +77,9 @@ export const extractArkpackFileFx = Effect.fn("extractArkpackFileFx")(function* 
 		yield* copyRangeFx(arkpackPath, resource.offset, resource.length, path);
 		yield* resource.type === "artwork"
 			? validateArtworkPngFileFx(path, resource.id)
-			: validatePngResourceFileFx(path, resource.id);
+			: resource.type === "image"
+				? validatePngResourceFileFx(path, resource.id)
+				: validateOggOpusFileFx(path, resource.id);
 		resources.push({
 			id: resource.id,
 			type: resource.type,

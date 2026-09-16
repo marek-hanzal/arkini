@@ -1,10 +1,10 @@
 import { Effect, Option } from "effect";
 
 import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
-import { transcodeEditorMusicFileFx } from "./transcodeEditorMusicFileFx";
+import { transcodeEditorAudioFileFx } from "./transcodeEditorAudioFileFx";
 
 /** Keeps canonical Ogg/Opus input intact or converts through a PATH-visible FFmpeg. */
-export const prepareEditorMusicFileFx = Effect.fn("prepareEditorMusicFileFx")(function* ({
+export const prepareEditorAudioFileFx = Effect.fn("prepareEditorAudioFileFx")(function* ({
 	id,
 	source,
 	target,
@@ -20,7 +20,7 @@ export const prepareEditorMusicFileFx = Effect.fn("prepareEditorMusicFileFx")(fu
 			size: canonical.value,
 		};
 	}
-	yield* transcodeEditorMusicFileFx(source, target);
+	yield* transcodeEditorAudioFileFx(source, target);
 	return {
 		path: target,
 		size: yield* validateOggOpusFileFx(target, id),

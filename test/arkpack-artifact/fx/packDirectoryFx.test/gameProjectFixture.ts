@@ -23,6 +23,7 @@ export const assetPng = Uint8Array.from(
 );
 
 export const musicOgg = createTestOggOpusBytesFn();
+export const sfxOgg = createTestOggOpusBytesFn();
 
 const config = GameConfigSchema.parse({
 	meta: {
@@ -95,6 +96,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	const artwork = path.join(input, "artwork");
 	const image = path.join(input, "image");
 	const musicDirectory = path.join(input, "music");
+	const sfxDirectory = path.join(input, "sfx");
 	const { items: authoredItems, ...root } = config;
 
 	yield* fileSystem.makeDirectory(itemDirectory, {
@@ -107,6 +109,9 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		recursive: true,
 	});
 	yield* fileSystem.makeDirectory(musicDirectory, {
+		recursive: true,
+	});
+	yield* fileSystem.makeDirectory(sfxDirectory, {
 		recursive: true,
 	});
 	yield* fileSystem.writeFileString(
@@ -147,6 +152,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	);
 	yield* fileSystem.writeFile(path.join(image, "hero.png"), png);
 	yield* fileSystem.writeFile(path.join(musicDirectory, "theme.ogg"), musicOgg);
+	yield* fileSystem.writeFile(path.join(sfxDirectory, "job-start.ogg"), sfxOgg);
 	const squareArtworkPng = yield* Effect.promise(() =>
 		sharp(assetPng)
 			.resize(512, 512, {

@@ -50,6 +50,7 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.die("Lifecycle flushSaveFx must not own an explicit UI save."),
+	resources: [],
 	getResourceUrlFn: () => "blob:test",
 	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
 	failStopFn: failStop,

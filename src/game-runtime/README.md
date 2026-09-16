@@ -50,7 +50,7 @@ Important invariants:
 | `item-expiry` | Shared atomic identity removal and expiry Output | [`../item-expiry/fx/expireItemRuntimeFx.ts`](../item-expiry/fx/expireItemRuntimeFx.ts) |
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`../game-persistence/schema/StateSchema.ts`](../game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save scope, command admission, subscriptions and fail-stop | [`../game-session/fx/createGameSessionFx.ts`](../game-session/fx/createGameSessionFx.ts) |
-| `playable-game` | Package-independent Game capability and resource URLs | [`../playable-game/type/PlayableGame.ts`](../playable-game/type/PlayableGame.ts) |
+| `playable-game` | Package-independent Game capability, semantic Resource catalog and URLs | [`../playable-game/type/PlayableGame.ts`](../playable-game/type/PlayableGame.ts) |
 | `installed-game` | Arkpack/save bootstrap, resource leases, recovery, incident and finalization | [`../installed-game/fx/createGameEngineResourceServiceFx.ts`](../installed-game/fx/createGameEngineResourceServiceFx.ts) |
 
 ## Dependency shape

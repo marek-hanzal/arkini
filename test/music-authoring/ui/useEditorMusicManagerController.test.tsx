@@ -9,12 +9,20 @@ const state = vi.hoisted(() => ({
 	deleteMusicFn: vi.fn(),
 	importMusicFn: vi.fn(),
 	setCall: 0,
+	valueCall: 0,
 }));
 
 vi.mock("@effect/atom-react", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@effect/atom-react")>()),
 	useAtomSet: () => (state.setCall++ % 2 === 0 ? state.importMusicFn : state.deleteMusicFn),
-	useAtomValue: () => AsyncResult.initial(),
+	useAtomValue: () =>
+		state.valueCall++ % 3 === 0
+			? {
+					master: 80,
+					music: 100,
+					sfx: 100,
+				}
+			: AsyncResult.initial(),
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -99,6 +107,7 @@ beforeEach(async () => {
 	state.deleteMusicFn.mockReset();
 	state.importMusicFn.mockReset();
 	state.setCall = 0;
+	state.valueCall = 0;
 	AudioStub.instances = [];
 	vi.stubGlobal("Audio", AudioStub);
 	const container = document.createElement("div");
@@ -129,7 +138,7 @@ describe("useEditorMusicManagerController", () => {
 		expect(controller?.playing).toBe(true);
 
 		await act(async () => controller?.setVolumeFn(35));
-		expect(audio?.volume).toBe(0.35);
+		expect(audio?.volume).toBeCloseTo(0.28);
 		expect(controller?.volume).toBe(35);
 
 		await act(async () => controller?.togglePlaybackFn("battle-march"));

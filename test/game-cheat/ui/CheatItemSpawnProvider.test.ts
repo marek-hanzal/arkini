@@ -67,6 +67,7 @@ const makeGame = (
 	saveKey: {
 		packageId: `package:spawn-${suffix}`,
 	},
+	resources: [],
 	getResourceUrlFn: () => "blob:test",
 	runFx: ((_effect) => session.runFx(commandFx)) as Game["runFx"],
 });

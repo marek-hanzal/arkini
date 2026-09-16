@@ -101,6 +101,7 @@ const importResourcesSchema = z
 			"artwork",
 			"image",
 			"music",
+			"sfx",
 		]),
 	})
 	.strict();

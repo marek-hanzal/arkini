@@ -18,6 +18,7 @@ import { createFilesystemLauncherPreferencesFx } from "~electron/main/launcher/c
 import { registerArkiniElectronIpcFx } from "~electron/main/registerArkiniElectronIpcFx";
 import { createArkiniUserDataPathsFn } from "~/application-data/fn/createArkiniUserDataPathsFn";
 import { createFilesystemWindowPreferencesFx } from "~electron/main/window/createFilesystemWindowPreferencesFx";
+import { createFilesystemSoundPreferencesFx } from "~electron/main/sound/createFilesystemSoundPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "~electron/main/window/createWindowModeControllerOwnershipFx";
 
 const electronHarness = readElectronHarness();
@@ -89,6 +90,9 @@ export const createRegisteredIpcHarness = async () => {
 			const windowPreferences = yield* createFilesystemWindowPreferencesFx({
 				root: userDataPaths.game.preferences,
 			});
+			const soundPreferences = yield* createFilesystemSoundPreferencesFx({
+				root: userDataPaths.game.preferences,
+			});
 			const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
 			yield* windowModeControllerOwnership.attachControllerFx(
 				electronHarness.browserWindow as unknown as BrowserWindow,
@@ -113,6 +117,7 @@ export const createRegisteredIpcHarness = async () => {
 				appearancePreferences,
 				cheatPreferences,
 				launcherPreferences,
+				soundPreferences,
 				windowModeControllerOwnership,
 				windowPreferences,
 				diagnostics: {

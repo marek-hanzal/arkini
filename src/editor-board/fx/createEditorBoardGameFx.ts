@@ -56,6 +56,10 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 		const game: EditorBoardGame = {
 			...session,
 			config: project.config,
+			resources: project.resources.map(({ id, type }) => ({
+				id,
+				type,
+			})),
 			diagnosticSessionId: diagnostics.sessionId,
 			disposeFx,
 			disposeWithoutSaveFx: disposeFx,

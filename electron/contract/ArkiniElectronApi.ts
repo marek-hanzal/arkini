@@ -15,6 +15,8 @@ import type { EditorMcpCommandSchema } from "~/authoring-mcp/schema/EditorMcpCom
 import type { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
+import type { SoundChannel, SoundSettings } from "./sound/SoundSettings";
+import type { SoundVolumeSchema } from "./sound/SoundVolumeSchema";
 
 export namespace ArkiniElectronApi {
 	export const channels = {
@@ -33,6 +35,8 @@ export namespace ArkiniElectronApi {
 		appearanceAccentWrite: "arkini:appearance:accent:write",
 		cheatAvailabilityRead: "arkini:cheats:available:read",
 		cheatAvailabilityWrite: "arkini:cheats:available:write",
+		soundRead: "arkini:sound:read",
+		soundWrite: "arkini:sound:write",
 		clipboardWriteText: "arkini:clipboard:write-text",
 		cliStatus: "arkini:cli:status",
 		cliInstall: "arkini:cli:install",
@@ -118,7 +122,7 @@ export namespace ArkiniElectronApi {
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<{
 			readonly id: string;
-			readonly type: "artwork" | "image" | "music";
+			readonly type: "artwork" | "image" | "music" | "sfx";
 			readonly url: string;
 		}>;
 	}
@@ -156,6 +160,13 @@ export namespace ArkiniElectronApi {
 		readonly cheats: {
 			readonly readAvailableFn: () => Promise<CheatAvailabilitySchema.Type>;
 			readonly writeAvailableFn: (available: CheatAvailabilitySchema.Type) => Promise<void>;
+		};
+		readonly sound: {
+			readonly readFn: () => Promise<SoundSettings>;
+			readonly writeFn: (
+				channel: SoundChannel,
+				volume: SoundVolumeSchema.Type,
+			) => Promise<void>;
 		};
 		readonly clipboard: {
 			readonly writeTextFn: (text: string) => Promise<void>;

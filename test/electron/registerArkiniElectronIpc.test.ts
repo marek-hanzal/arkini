@@ -55,6 +55,34 @@ describe("registerArkiniElectronIpcFx authorization", () => {
 		expect(harness.writeClipboardText).toHaveBeenCalledTimes(1);
 	});
 
+	it("persists validated application sound levels", async () => {
+		const harness = await createRegisteredIpcHarness();
+
+		await expect(
+			harness.invoke(
+				ArkiniElectronApi.channels.soundWrite,
+				harness.trustedEvent,
+				"music",
+				37,
+			),
+		).resolves.toBeUndefined();
+		await expect(
+			harness.invoke(ArkiniElectronApi.channels.soundRead, harness.trustedEvent),
+		).resolves.toEqual({
+			master: 100,
+			music: 37,
+			sfx: 100,
+		});
+		await expect(
+			harness.invoke(
+				ArkiniElectronApi.channels.soundWrite,
+				harness.trustedEvent,
+				"unknown",
+				50,
+			),
+		).rejects.toThrow();
+	});
+
 	it("waits for native clipboard settlement and propagates a rejected write", async () => {
 		const harness = await createRegisteredIpcHarness();
 		let rejectWriteFn!: (error: Error) => void;

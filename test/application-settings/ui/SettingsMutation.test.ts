@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
+import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import {
 	buttonByText,
@@ -18,6 +19,28 @@ import {
 } from "./Settings.test/fixture";
 
 describe("Settings mutation authority", () => {
+	it("publishes and persists application-wide sound levels", async () => {
+		const { container, registry, writeSound } = await renderSettings([
+			"/settings/game",
+		]);
+		const master = container.querySelector<HTMLInputElement>('input[type="range"]');
+		if (master === null) throw new Error("Expected Master sound control.");
+		await act(async () => {
+			const valueSetter = Object.getOwnPropertyDescriptor(
+				HTMLInputElement.prototype,
+				"value",
+			)?.set;
+			valueSetter?.call(master, "35");
+			master.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		await vi.waitFor(() => expect(writeSound).toHaveBeenCalledWith("master", 35));
+		expect(registry.get(SoundSettingsAtom).master).toBe(35);
+	});
+
 	it("toggles application-wide Cheat tools without an active Game", async () => {
 		const { container, writeCheatAvailability, registry } = await renderSettings([
 			"/settings/game",

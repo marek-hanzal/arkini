@@ -41,6 +41,10 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 			extension: ".ogg",
 			type: "music",
 		},
+		{
+			extension: ".ogg",
+			type: "sfx",
+		},
 	] as const) {
 		const directory = path.join(root, type);
 		if (!(yield* fileSystem.exists(directory))) continue;

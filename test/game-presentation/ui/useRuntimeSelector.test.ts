@@ -52,6 +52,7 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 					packageId,
 				},
 				...transitions,
+				resources: [],
 				getResourceUrlFn: (resourceId: string) => `resource:${resourceId}`,
 				subscribeFn: () => () => undefined,
 				subscribeEventsFn: () => () => undefined,

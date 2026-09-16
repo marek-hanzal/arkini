@@ -47,6 +47,7 @@ export const createGame = ({
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
+	resources: [],
 	getResourceUrlFn: () => "blob:test",
 	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshotFn"]>)),
 	readFn: testGameRead,

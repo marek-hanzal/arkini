@@ -90,6 +90,11 @@ const api: ArkiniElectronApi.Api = {
 		writeAvailableFn: (available) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
 	},
+	sound: {
+		readFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.soundRead),
+		writeFn: (channel, volume) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.soundWrite, channel, volume),
+	},
 	clipboard: {
 		writeTextFn: (text) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.clipboardWriteText, text),

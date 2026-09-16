@@ -133,6 +133,7 @@ export const renderSettings = async (
 	const deferred = createDeferred();
 	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
+	const writeSound = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
 	const openUserData = vi.fn(() => Promise.resolve());
 	const replaceCli = vi.fn(() =>
@@ -199,6 +200,9 @@ export const renderSettings = async (
 			cheats: {
 				writeAvailableFn: writeCheatAvailability,
 			},
+			sound: {
+				writeFn: writeSound,
+			},
 			diagnostics: {
 				openDirectoryFn: openDiagnostics,
 			},
@@ -231,6 +235,7 @@ export const renderSettings = async (
 				source: "user",
 			},
 			config,
+			resources: [],
 			getResourceUrlFn: () => "blob:test",
 			saveKey: {
 				packageId: "package:settings",
@@ -334,6 +339,7 @@ export const renderSettings = async (
 		router,
 		write,
 		writeCheatAvailability,
+		writeSound,
 		writeWindowMode,
 		openDiagnostics,
 		openUserData,

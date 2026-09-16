@@ -107,6 +107,7 @@ describe("Cheats", () => {
 				source: "user",
 			},
 			config,
+			resources: [],
 			getResourceUrlFn: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats",
@@ -184,6 +185,7 @@ describe("Cheats", () => {
 				source: "user",
 			},
 			config,
+			resources: [],
 			getResourceUrlFn: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats-race",

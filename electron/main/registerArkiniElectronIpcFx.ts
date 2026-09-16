@@ -26,6 +26,9 @@ import type { DiagnosticLog } from "./diagnostics/createDiagnosticLogFx";
 import { writeLatestGameIncidentFx } from "./incident/writeLatestGameIncidentFx";
 import { WindowModeSchema } from "../contract/window/WindowModeSchema";
 import type { WindowPreferences } from "./window/createFilesystemWindowPreferencesFx";
+import type { SoundPreferences } from "./sound/createFilesystemSoundPreferencesFx";
+import { SoundVolumeSchema } from "../contract/sound/SoundVolumeSchema";
+import { SoundChannelSchema } from "../contract/sound/SoundSettings";
 import type { WindowModeControllerOwnership } from "./window/createWindowModeControllerOwnershipFx";
 import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { IdSchema } from "~/game-value/schema/IdSchema";
@@ -41,6 +44,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly appearancePreferences: AppearancePreferences;
 		readonly cheatPreferences: CheatPreferences;
 		readonly launcherPreferences: LauncherPreferences;
+		readonly soundPreferences: SoundPreferences;
 		readonly windowModeControllerOwnership: WindowModeControllerOwnership;
 		readonly windowPreferences: WindowPreferences;
 		readonly diagnostics: DiagnosticLog;
@@ -57,6 +61,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		soundPreferences,
 		windowModeControllerOwnership,
 		windowPreferences,
 		diagnostics,
@@ -119,6 +124,25 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.cheatAvailabilityRead, (event) =>
 					runAuthorizedFn(event, cheatPreferences.readAvailableFx),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.soundRead, (event) =>
+					runAuthorizedFn(event, soundPreferences.readFx),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.soundWrite, (event, channel, candidate) =>
+					runAuthorizedFn(
+						event,
+						Effect.try({
+							try: () => ({
+								channel: SoundChannelSchema.parse(channel),
+								volume: SoundVolumeSchema.parse(candidate),
+							}),
+							catch: (cause) => cause,
+						}).pipe(
+							Effect.flatMap(({ channel: parsedChannel, volume }) =>
+								soundPreferences.writeFx(parsedChannel, volume),
+							),
+						),
+					),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.clipboardWriteText, (event, candidate) =>
 					runAuthorizedFn(
@@ -341,6 +365,8 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.appearanceAccentWrite,
 						ArkiniElectronApi.channels.cheatAvailabilityRead,
 						ArkiniElectronApi.channels.cheatAvailabilityWrite,
+						ArkiniElectronApi.channels.soundRead,
+						ArkiniElectronApi.channels.soundWrite,
 						ArkiniElectronApi.channels.clipboardWriteText,
 						ArkiniElectronApi.channels.launcherLastPackageIdRead,
 						ArkiniElectronApi.channels.launcherLastPackageIdWrite,

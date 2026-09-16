@@ -2,14 +2,39 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { useModelContext } from "~/application-settings/ui/ModelContext";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { SoundLevelControl } from "~/application-settings/ui/SoundLevelControl";
 
 export const Route = createFileRoute("/_launcher/settings/game")({
 	component: () => {
 		const model = useModelContext();
 		return (
-			<section data-ui="SettingsGame">
+			<section
+				className="grid gap-5"
+				data-ui="SettingsGame"
+			>
+				<fieldset
+					className="grid gap-4"
+					disabled={model.blocked}
+				>
+					<legend className="mb-1 text-sm font-semibold text-foreground">Sound</legend>
+					<SoundLevelControl
+						label="Master"
+						value={model.sound.master}
+						onChangeFn={(volume) => model.setSoundVolumeFn("master", volume)}
+					/>
+					<SoundLevelControl
+						label="Music"
+						value={model.sound.music}
+						onChangeFn={(volume) => model.setSoundVolumeFn("music", volume)}
+					/>
+					<SoundLevelControl
+						label="Sound effects"
+						value={model.sound.sfx}
+						onChangeFn={(volume) => model.setSoundVolumeFn("sfx", volume)}
+					/>
+				</fieldset>
 				<label
-					className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-pending=true]:cursor-progress"
+					className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line border-t px-4 py-3 data-[ui-pending=true]:cursor-progress"
 					{...readDataUiFn({
 						dataUi: "SettingsCheatAvailability",
 						state: {

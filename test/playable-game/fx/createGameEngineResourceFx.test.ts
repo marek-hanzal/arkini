@@ -17,6 +17,7 @@ const createResourceHarness = async () => {
 	const game = {
 		...session,
 		config,
+		resources: [],
 		getResourceUrlFn: () => "blob:test",
 	} satisfies PlayableGame;
 

@@ -93,6 +93,7 @@ const createGame = (
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
+	resources: [],
 	getResourceUrlFn: () => "blob:test",
 	...Effect.runSync(
 		makeTestGameTransitionFieldsFx(

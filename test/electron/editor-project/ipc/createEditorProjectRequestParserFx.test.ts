@@ -4,7 +4,10 @@ import { describe, expect, it } from "vitest";
 import { createEditorProjectRequestParserFx } from "~electron/main/editor-project/ipc/createEditorProjectRequestParserFx";
 
 describe("createEditorProjectRequestParserFx", () => {
-	it("admits Music file imports at the renderer IPC boundary", async () => {
+	it.each([
+		"music",
+		"sfx",
+	] as const)("admits %s file imports at the renderer IPC boundary", async (type) => {
 		const parser = Effect.runSync(createEditorProjectRequestParserFx());
 		const request = {
 			files: [
@@ -15,7 +18,7 @@ describe("createEditorProjectRequestParserFx", () => {
 			],
 			projectId: "arkini",
 			source: "files" as const,
-			type: "music" as const,
+			type,
 		};
 
 		await expect(Effect.runPromise(parser.parseImportResourcesFx(request))).resolves.toEqual(

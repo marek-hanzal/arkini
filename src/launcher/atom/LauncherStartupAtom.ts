@@ -19,6 +19,8 @@ import type { LauncherStartup } from "~/launcher/type/LauncherStartup";
 import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
 import { LauncherCheatAvailabilityReadyAtom } from "~/launcher/atom/LauncherCheatAvailabilityReadyAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
+import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
+import { readSoundSettingsFx } from "~/application-settings/fx/readSoundSettingsFx";
 
 /** Publishes persisted appearance once without overwriting later user changes on retry. */
 const applyLauncherAppearanceHydrationFx = Effect.fn("applyLauncherAppearanceHydrationFx")(
@@ -86,6 +88,9 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 		Effect.tap(applyLauncherCheatAvailabilityHydrationFx),
 	);
 	const windowModeFx = readWindowModeFx().pipe(Effect.tap(applyLauncherWindowModeHydrationFx));
+	const soundFx = readSoundSettingsFx().pipe(
+		Effect.tap((sound) => Atom.set(SoundSettingsAtom, sound)),
+	);
 	const catalogFx = catalog.refreshFx.pipe(
 		Effect.andThen(SubscriptionRef.get(catalog.state)),
 		Effect.flatMap((state) =>
@@ -107,16 +112,18 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 				suspendOnWaiting: true,
 			}),
 			lifecycle: lifecycleReadyFx,
+			sound: soundFx,
 			windowMode: windowModeFx,
 		},
 		{
 			concurrency: "unbounded",
 		},
 	).pipe(
-		Effect.map(({ appearance, cheatsAvailable, windowMode }) => ({
+		Effect.map(({ appearance, cheatsAvailable, sound, windowMode }) => ({
 			appearance,
 			defaultPackageId: ArkiniDefaultPackageId,
 			cheatsAvailable,
+			sound,
 			windowMode,
 		})),
 	);
@@ -127,6 +134,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 				[
 					applyLauncherAppearanceHydrationFx(result.appearance),
 					applyLauncherCheatAvailabilityHydrationFx(result.cheatsAvailable),
+					Atom.set(SoundSettingsAtom, result.sound),
 					applyLauncherWindowModeHydrationFx(result.windowMode),
 					Atom.getResult(LauncherHeroAtom, {
 						suspendOnWaiting: true,

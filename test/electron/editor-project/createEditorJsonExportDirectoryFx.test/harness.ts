@@ -18,7 +18,7 @@ export const filesystemFailure = (method: string) =>
 		module: "FileSystem",
 	});
 
-export const writeReimportableProjectFx = (root: string, revision: number, withMusic = false) =>
+export const writeReimportableProjectFx = (root: string, revision: number, withAudio = false) =>
 	writeProjectFilesFx({
 		root,
 		next: {
@@ -28,12 +28,17 @@ export const writeReimportableProjectFx = (root: string, revision: number, withM
 				arkini: ArkiniAppVersion,
 				revision,
 			}),
-			resources: withMusic
+			resources: withAudio
 				? [
 						...editorTestPayload.resources,
 						{
 							id: "unresolved-waltz",
 							type: "music" as const,
+							bytes: createTestOggOpusBytesFn(),
+						},
+						{
+							id: "job-start",
+							type: "sfx" as const,
 							bytes: createTestOggOpusBytesFn(),
 						},
 					]

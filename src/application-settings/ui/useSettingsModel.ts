@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "@effect/atom-react";
+import { useAtom, useAtomSet, useAtomValue } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useEffect } from "react";
 
@@ -11,18 +11,23 @@ import {
 	SettingsCommandAtom,
 	type SettingsCommandState,
 } from "~/application-settings/atom/SettingsCommandAtom";
+import type { SoundChannel, SoundSettings } from "~electron/contract/sound/SoundSettings";
+import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
+import { setSoundVolumeAtom } from "~/application-settings/atom/setSoundVolumeAtom";
 
 export namespace useSettingsModel {
 	export interface Output {
 		readonly blocked: boolean;
 		readonly cheatToolsAvailable: boolean;
 		readonly status: SettingsCommandState;
+		readonly sound: SoundSettings;
 		readonly theme: AppearanceThemeSchema.Type;
 		readonly windowMode: WindowModeSchema.Type;
 		readonly goBackFn: () => void;
 		readonly selectThemeFn: (theme: AppearanceThemeSchema.Type) => void;
 		readonly selectWindowModeFn: (mode: WindowModeSchema.Type) => void;
 		readonly setCheatToolsAvailableFn: (available: boolean) => void;
+		readonly setSoundVolumeFn: (channel: SoundChannel, volume: number) => void;
 	}
 }
 
@@ -35,6 +40,8 @@ export const useSettingsModel = ({
 	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);
+	const sound = useAtomValue(SoundSettingsAtom);
+	const setSoundVolumeFn = useAtomSet(setSoundVolumeAtom);
 	const [commandState, runCommandFn] = useAtom(SettingsCommandAtom);
 	const blocked = commandState.kind === "pending";
 	const goBackFn = useCallback(() => {
@@ -63,6 +70,7 @@ export const useSettingsModel = ({
 		blocked,
 		cheatToolsAvailable: cheatAvailability.available,
 		status: commandState,
+		sound,
 		theme: appearance.theme,
 		windowMode,
 		goBackFn,
@@ -82,6 +90,12 @@ export const useSettingsModel = ({
 			runCommandFn({
 				action: "cheat-tools",
 				available,
+			});
+		},
+		setSoundVolumeFn: (channel, volume) => {
+			setSoundVolumeFn({
+				channel,
+				volume,
 			});
 		},
 	};

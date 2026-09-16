@@ -51,6 +51,8 @@ beforeEach(async () => {
 		"game/arkini/items",
 		"game/arkini/artwork",
 		"game/arkini/image",
+		"game/arkini/music",
+		"game/arkini/sfx",
 		"game/arkini/notes",
 		".out/desktop/build/main/cli",
 	]) {
@@ -73,6 +75,8 @@ beforeEach(async () => {
 	await writeFile(join(root, "electron.vite.config.ts"), "export default {};");
 	await writeFile(join(root, "src/builder.ts"), "export const builder = 1;");
 	await writeFile(join(root, "game/arkini/artwork/a space.png"), "image bytes");
+	await writeFile(join(root, "game/arkini/music/theme.ogg"), "music bytes");
+	await writeFile(join(root, "game/arkini/sfx/click.ogg"), "sfx bytes");
 	await writeFile(join(root, "bin/electron-vite"), "#!/usr/bin/env bash\nexit 0\n", {
 		mode: 0o755,
 	});
@@ -114,6 +118,8 @@ describe("repository Arkpack build cache", () => {
 			"game/arkini/game.json",
 			"package-lock.json",
 			"game/arkini/artwork/a space.png",
+			"game/arkini/music/theme.ogg",
+			"game/arkini/sfx/click.ogg",
 		]) {
 			const before = await fingerprintFn();
 			await appendFile(join(root, file), "changed");

@@ -8,7 +8,7 @@ const isMissingCommandFn = (cause: unknown) =>
 	typeof cause === "object" && cause !== null && "code" in cause && cause.code === "ENOENT";
 
 /** Uses only a PATH-visible FFmpeg to stream one source into canonical Ogg/Opus. */
-export const transcodeEditorMusicFileFx = Effect.fn("transcodeEditorMusicFileFx")(
+export const transcodeEditorAudioFileFx = Effect.fn("transcodeEditorAudioFileFx")(
 	(source: string, target: string) =>
 		Effect.tryPromise({
 			try: () =>
@@ -45,7 +45,7 @@ export const transcodeEditorMusicFileFx = Effect.fn("transcodeEditorMusicFileFx"
 					? new Error("This file is not Ogg/Opus and FFmpeg is unavailable in PATH.", {
 							cause,
 						})
-					: new Error("FFmpeg could not convert this music file to Ogg/Opus.", {
+					: new Error("FFmpeg could not convert this audio file to Ogg/Opus.", {
 							cause,
 						}),
 		}).pipe(Effect.asVoid),

@@ -18,6 +18,7 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 	const artwork = path.join(root, "artwork");
 	const image = path.join(root, "image");
 	const music = path.join(root, "music");
+	const sfx = path.join(root, "sfx");
 	const notes = path.join(root, "notes");
 
 	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
@@ -51,7 +52,9 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 			? readResourceFileFx(artwork, id, ".png")
 			: type === "image"
 				? readResourceFileFx(image, id, ".png")
-				: readResourceFileFx(music, id, ".ogg");
+				: type === "music"
+					? readResourceFileFx(music, id, ".ogg")
+					: readResourceFileFx(sfx, id, ".ogg");
 
 	return {
 		root,

@@ -2,6 +2,7 @@ import type { Effect } from "effect";
 import type { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
 import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
+import type { SoundSettings } from "~electron/contract/sound/SoundSettings";
 
 export namespace LauncherStartup {
 	export interface Appearance {
@@ -13,6 +14,7 @@ export namespace LauncherStartup {
 		readonly appearance: Appearance;
 		readonly defaultPackageId: string;
 		readonly cheatsAvailable: boolean;
+		readonly sound: SoundSettings;
 		readonly windowMode: WindowModeSchema.Type;
 	}
 

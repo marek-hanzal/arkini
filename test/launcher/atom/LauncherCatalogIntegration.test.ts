@@ -24,6 +24,14 @@ vi.mock("~/application-settings/fx/readAppearanceThemeFx", () => ({
 vi.mock("~/application-settings/fx/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
+vi.mock("~/application-settings/fx/readSoundSettingsFx", () => ({
+	readSoundSettingsFx: () =>
+		Effect.succeed({
+			master: 100,
+			music: 100,
+			sfx: 100,
+		}),
+}));
 vi.mock("~/window-mode/fx/readWindowModeFx", () => ({
 	readWindowModeFx: () => Effect.succeed("bordered"),
 }));

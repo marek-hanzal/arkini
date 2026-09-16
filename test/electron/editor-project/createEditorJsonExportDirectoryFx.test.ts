@@ -47,7 +47,14 @@ describe("createEditorJsonExportDirectoryFx", () => {
 				}),
 			);
 			expect(yield* fileSystem.exists(`${first.root}/music/unresolved-waltz.ogg`)).toBe(true);
-			expect(first.resources).toBe(3);
+			expect(firstProject.resources).toContainEqual(
+				expect.objectContaining({
+					id: "job-start",
+					type: "sfx",
+				}),
+			);
+			expect(yield* fileSystem.exists(`${first.root}/sfx/job-start.ogg`)).toBe(true);
+			expect(first.resources).toBe(4);
 			expect((yield* readReimportableProjectFx(second.root)).marker.revision).toBe(2);
 			expect(yield* fileSystem.readFileString(`${parent}/keep.txt`)).toBe(
 				"ordinary parent content",

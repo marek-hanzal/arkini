@@ -148,6 +148,10 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			...session,
 			arkpack: loaded.descriptor,
 			config: loaded.payload.config,
+			resources: loaded.payload.resources.map(({ id, type }) => ({
+				id,
+				type,
+			})),
 			diagnosticSessionId: diagnostics.sessionId,
 			disposeFx: session.disposeFx.pipe(
 				Effect.tap(() => closeDiagnosticsFx("saved")),

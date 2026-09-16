@@ -32,6 +32,8 @@ describe("collectSourceFilesFx", () => {
 				"music/theme.ogg",
 				"music/ignored.OGG",
 				"music/nested/ignored.ogg",
+				"sfx/job-start.ogg",
+				"sfx/ignored.mp3",
 				"assets/obsolete.png",
 				"resources/obsolete.png",
 				"notes/ignored.json",
@@ -76,6 +78,10 @@ describe("collectSourceFilesFx", () => {
 					{
 						path: "music/theme.ogg",
 						type: "music",
+					},
+					{
+						path: "sfx/job-start.ogg",
+						type: "sfx",
 					},
 				],
 			});

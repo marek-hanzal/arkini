@@ -5,7 +5,14 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { installArkpackFileFx } from "~electron/main/arkpack/installArkpackFileFx";
-import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { createTestArkpack, testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import {
+	encodeTestArkpackEnvelopeFx,
+	encodeTestArkpackPayloadFx,
+} from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
+import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
+import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
 
 let root = "";
 
@@ -50,5 +57,85 @@ describe("installArkpackFileFx", () => {
 		expect(second.contentHash).toBe(first.contentHash);
 		expect(second.resources[0]?.path).toBe(resourcePath);
 		expect(await readFile(resourcePath, "utf8")).toBe("locally changed");
+	});
+
+	it("installs image, Music, and SFX resources through their native validators", async () => {
+		const packageId = "package:audio";
+		const payload = Effect.runSync(
+			encodeTestArkpackPayloadFx({
+				version: "1.0",
+				arkini: ArkiniAppVersion,
+				config: {
+					...testArkpackConfig,
+					meta: {
+						...testArkpackConfig.meta,
+						id: packageId,
+					},
+				},
+				resources: [
+					{
+						id: "hero",
+						type: "image",
+						bytes: createTestPngBytes(),
+					},
+					{
+						id: "asset-water",
+						type: "artwork",
+						bytes: createTestPngBytes(),
+					},
+					{
+						id: "theme",
+						type: "music",
+						bytes: createTestOggOpusBytesFn(),
+					},
+					{
+						id: "job-start",
+						type: "sfx",
+						bytes: createTestOggOpusBytesFn(),
+					},
+				],
+			}),
+		);
+		const arkpackPath = join(root, "audio.arkpack");
+		await writeFile(
+			arkpackPath,
+			Effect.runSync(
+				encodeTestArkpackEnvelopeFx({
+					payload,
+				}),
+			),
+		);
+
+		const installed = await Effect.runPromise(
+			installArkpackFileFx({
+				arkpackPath,
+				expectedPackageId: packageId,
+				installationsRoot: join(root, "installed"),
+			}),
+		);
+
+		expect(
+			installed.resources.map(({ id, type }) => ({
+				id,
+				type,
+			})),
+		).toEqual([
+			{
+				id: "hero",
+				type: "image",
+			},
+			{
+				id: "asset-water",
+				type: "artwork",
+			},
+			{
+				id: "theme",
+				type: "music",
+			},
+			{
+				id: "job-start",
+				type: "sfx",
+			},
+		]);
 	});
 });

@@ -28,7 +28,7 @@ afterEach(async () => {
 });
 
 describe("importEditorResourceFilesFx", () => {
-	it("imports canonical Ogg/Opus Music by native path without materializing its body", async () => {
+	it("imports canonical Ogg/Opus Music and SFX by native path without materializing their bodies", async () => {
 		const musicPath = join(root, "Opening Theme.ogg");
 		const musicBytes = createTestOggOpusBytesFn();
 		await writeFile(musicPath, musicBytes);
@@ -64,6 +64,42 @@ describe("importEditorResourceFilesFx", () => {
 					path: musicPath,
 					size: musicBytes.byteLength,
 					type: "music",
+				}),
+			],
+		});
+
+		const sfxPath = join(root, "Job Start.ogg");
+		await writeFile(sfxPath, musicBytes);
+		await expect(
+			Effect.runPromise(
+				importEditorResourceFilesFx({
+					repository,
+					request: {
+						files: [
+							{
+								name: "Job Start.ogg",
+								path: sfxPath,
+							},
+						],
+						projectId: "project-one",
+						source: "files",
+						type: "sfx",
+					},
+				}),
+			),
+		).resolves.toMatchObject({
+			resourceIds: [
+				"job-start",
+			],
+		});
+		expect(repository.upsertResourceFilesFx).toHaveBeenLastCalledWith({
+			projectId: "project-one",
+			resources: [
+				expect.objectContaining({
+					id: "job-start",
+					path: sfxPath,
+					size: musicBytes.byteLength,
+					type: "sfx",
 				}),
 			],
 		});

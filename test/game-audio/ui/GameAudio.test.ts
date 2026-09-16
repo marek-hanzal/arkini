@@ -9,7 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import type { createGameAudioSynthFx } from "~/game-audio/fx/createGameAudioSynthFx";
+import type { createGameAudioRuntimeFx } from "~/game-audio/fx/createGameAudioRuntimeFx";
 
 const eventState = vi.hoisted(() => ({
 	game: {
@@ -29,10 +29,10 @@ vi.mock("~/game-presentation/ui/useGameEvents", async (importOriginal) => ({
 	},
 }));
 
-const createGameAudioSynthFxMock = vi.hoisted(() => vi.fn());
+const createGameAudioRuntimeFxMock = vi.hoisted(() => vi.fn());
 
-vi.mock("~/game-audio/fx/createGameAudioSynthFx", () => ({
-	createGameAudioSynthFx: () => createGameAudioSynthFxMock(),
+vi.mock("~/game-audio/fx/createGameAudioRuntimeFx", () => ({
+	createGameAudioRuntimeFx: () => createGameAudioRuntimeFxMock(),
 }));
 
 import { GameAudio } from "~/game-audio/ui/GameAudio";
@@ -46,33 +46,37 @@ import { GameAudio } from "~/game-audio/ui/GameAudio";
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 
-const createSynthHarness = ({
+const createAudioHarness = ({
 	closeFx,
 	playFx,
 	prepareFx,
 	unlockFx,
 }: {
 	readonly closeFx?: Effect.Effect<void, unknown>;
-	readonly playFx?: createGameAudioSynthFx.Result["playFx"];
+	readonly playFx?: createGameAudioRuntimeFx.Result["playFx"];
 	readonly prepareFx?: Effect.Effect<void, unknown>;
 	readonly unlockFx?: Effect.Effect<void, unknown>;
 } = {}) => {
 	const prepare = vi.fn();
 	const unlock = vi.fn();
 	const play = vi.fn();
+	const setSound = vi.fn();
 	const close = vi.fn();
-	const synth = {
+	const audio = {
 		prepareFx: prepareFx ?? Effect.sync(() => prepare()),
 		unlockFx: unlockFx ?? Effect.sync(() => unlock()),
 		playFx: playFx ?? ((cues) => Effect.sync(() => play(cues))),
+		playMusicFx: () => Effect.void,
+		setSoundFx: (sound) => Effect.sync(() => setSound(sound)),
 		closeFx: closeFx ?? Effect.sync(() => close()),
-	} satisfies createGameAudioSynthFx.Result;
+	} satisfies createGameAudioRuntimeFx.Result;
 
 	return {
 		close,
 		play,
 		prepare,
-		synth,
+		setSound,
+		audio,
 		unlock,
 	};
 };
@@ -149,21 +153,21 @@ afterEach(async () => {
 	};
 	eventState.listener = null;
 	document.body.replaceChildren();
-	createGameAudioSynthFxMock.mockReset();
+	createGameAudioRuntimeFxMock.mockReset();
 	vi.restoreAllMocks();
 });
 
 describe("GameAudio", () => {
-	it("unlocks from React-local input listeners and plays transient event batches", async () => {
-		const harness = createSynthHarness();
-		createGameAudioSynthFxMock.mockImplementation(() => Effect.succeed(harness.synth));
+	it("optimistically unlocks on mount, retries from local input, and plays transient event batches", async () => {
+		const harness = createAudioHarness();
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
 		const { root } = await renderAudio();
-		expect(createGameAudioSynthFxMock).toHaveBeenCalledOnce();
+		expect(createGameAudioRuntimeFxMock).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.prepare).toHaveBeenCalledOnce());
-		expect(harness.unlock).not.toHaveBeenCalled();
+		await vi.waitFor(() => expect(harness.unlock).toHaveBeenCalledOnce());
 
 		window.dispatchEvent(new Event("pointerdown"));
-		await vi.waitFor(() => expect(harness.unlock).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(harness.unlock).toHaveBeenCalledTimes(2));
 
 		const listener = eventState.listener;
 		if (listener === null) throw new Error("Missing game audio event listener.");
@@ -183,8 +187,8 @@ describe("GameAudio", () => {
 	});
 
 	it("does not lose synchronously settling unlocks or ordered event batches", async () => {
-		const harness = createSynthHarness();
-		createGameAudioSynthFxMock.mockImplementation(() => Effect.succeed(harness.synth));
+		const harness = createAudioHarness();
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
 		await renderAudio();
 
 		window.dispatchEvent(new Event("pointerdown"));
@@ -195,7 +199,7 @@ describe("GameAudio", () => {
 		listener(jobCompletedBatch);
 
 		await vi.waitFor(() => {
-			expect(harness.unlock).toHaveBeenCalledTimes(2);
+			expect(harness.unlock).toHaveBeenCalledTimes(3);
 			expect(harness.play).toHaveBeenCalledTimes(2);
 		});
 		expect(harness.play.mock.calls.map(([cues]) => cues[0]?.kind)).toEqual([
@@ -204,16 +208,16 @@ describe("GameAudio", () => {
 		]);
 	});
 
-	it("replaces the exact Game resource, closes the old synth, and routes later batches only to the new synth", async () => {
-		const first = createSynthHarness();
-		const second = createSynthHarness();
+	it("replaces the exact Game resource, closes the old audio, and routes later batches only to the new audio", async () => {
+		const first = createAudioHarness();
+		const second = createAudioHarness();
 		const synths = [
-			first.synth,
-			second.synth,
+			first.audio,
+			second.audio,
 		];
 		let synthIndex = 0;
-		createGameAudioSynthFxMock.mockImplementation(() =>
-			Effect.succeed(synths[synthIndex++] ?? second.synth),
+		createGameAudioRuntimeFxMock.mockImplementation(() =>
+			Effect.succeed(synths[synthIndex++] ?? second.audio),
 		);
 		const { render } = await renderAudio();
 
@@ -223,7 +227,7 @@ describe("GameAudio", () => {
 		await act(async () => render());
 
 		await vi.waitFor(() => expect(first.close).toHaveBeenCalledOnce());
-		expect(createGameAudioSynthFxMock).toHaveBeenCalledTimes(2);
+		expect(createGameAudioRuntimeFxMock).toHaveBeenCalledTimes(2);
 
 		const listener = eventState.listener;
 		if (listener === null) throw new Error("Missing game audio event listener.");
@@ -233,15 +237,15 @@ describe("GameAudio", () => {
 	});
 
 	it("ignores a stale event callback after replacing the Game identity", async () => {
-		const first = createSynthHarness();
-		const second = createSynthHarness();
+		const first = createAudioHarness();
+		const second = createAudioHarness();
 		const synths = [
-			first.synth,
-			second.synth,
+			first.audio,
+			second.audio,
 		];
 		let synthIndex = 0;
-		createGameAudioSynthFxMock.mockImplementation(() =>
-			Effect.succeed(synths[synthIndex++] ?? second.synth),
+		createGameAudioRuntimeFxMock.mockImplementation(() =>
+			Effect.succeed(synths[synthIndex++] ?? second.audio),
 		);
 		const { render } = await renderAudio();
 		const staleListener = eventState.listener;
@@ -265,15 +269,15 @@ describe("GameAudio", () => {
 	});
 
 	it("keeps the committed audio owner during an abandoned concurrent render", async () => {
-		const committed = createSynthHarness();
-		const abandoned = createSynthHarness();
+		const committed = createAudioHarness();
+		const abandoned = createAudioHarness();
 		const synths = [
-			committed.synth,
-			abandoned.synth,
+			committed.audio,
+			abandoned.audio,
 		];
 		let synthIndex = 0;
-		createGameAudioSynthFxMock.mockImplementation(() =>
-			Effect.succeed(synths[synthIndex++] ?? abandoned.synth),
+		createGameAudioRuntimeFxMock.mockImplementation(() =>
+			Effect.succeed(synths[synthIndex++] ?? abandoned.audio),
 		);
 		const never = new Promise<void>(() => undefined);
 		const SuspendOnDemand = ({ suspend }: { readonly suspend: boolean }) => {
@@ -335,40 +339,40 @@ describe("GameAudio", () => {
 			await Promise.resolve();
 		});
 
-		expect(createGameAudioSynthFxMock).toHaveBeenCalledOnce();
+		expect(createGameAudioRuntimeFxMock).toHaveBeenCalledOnce();
 		committedListener(jobStartedBatch);
 		await vi.waitFor(() => expect(committed.play).toHaveBeenCalledOnce());
 		expect(abandoned.play).not.toHaveBeenCalled();
 	});
 
-	it("keeps one exact synth under StrictMode and closes it exactly once", async () => {
-		const harness = createSynthHarness();
-		createGameAudioSynthFxMock.mockImplementation(() => Effect.succeed(harness.synth));
+	it("keeps one exact audio under StrictMode and closes it exactly once", async () => {
+		const harness = createAudioHarness();
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
 		const { root } = await renderAudio({
 			strict: true,
 		});
 
-		expect(createGameAudioSynthFxMock).toHaveBeenCalledOnce();
+		expect(createGameAudioRuntimeFxMock).toHaveBeenCalledOnce();
 		window.dispatchEvent(new Event("pointerdown"));
 		const listener = eventState.listener;
 		if (listener === null) throw new Error("Missing game audio event listener.");
 		listener(jobStartedBatch);
 
 		await vi.waitFor(() => {
-			expect(harness.unlock).toHaveBeenCalledOnce();
+			expect(harness.unlock).toHaveBeenCalledTimes(2);
 			expect(harness.play).toHaveBeenCalledOnce();
 		});
 
 		await act(async () => root.unmount());
 		roots.splice(roots.indexOf(root), 1);
 		await vi.waitFor(() => expect(harness.close).toHaveBeenCalledOnce());
-		expect(createGameAudioSynthFxMock).toHaveBeenCalledOnce();
+		expect(createGameAudioRuntimeFxMock).toHaveBeenCalledOnce();
 	});
 
-	it("closes the synth exactly once when the owning registry is disposed", async () => {
+	it("closes the audio exactly once when the owning registry is disposed", async () => {
 		let pendingCommands = 0;
 		let commandFinalizations = 0;
-		const harness = createSynthHarness({
+		const harness = createAudioHarness({
 			playFx: () =>
 				Effect.sync(() => {
 					pendingCommands += 1;
@@ -381,7 +385,7 @@ describe("GameAudio", () => {
 					),
 				),
 		});
-		createGameAudioSynthFxMock.mockImplementation(() => Effect.succeed(harness.synth));
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
 		const { registry, root } = await renderAudio();
 		const listener = eventState.listener;
 		if (listener === null) throw new Error("Missing game audio event listener.");
@@ -400,10 +404,10 @@ describe("GameAudio", () => {
 		expect(harness.close).toHaveBeenCalledOnce();
 	});
 
-	it("interrupts a pending audio command before closing its synth", async () => {
+	it("interrupts a pending audio command before closing its audio", async () => {
 		let pendingCommands = 0;
 		let commandFinalizations = 0;
-		const harness = createSynthHarness({
+		const harness = createAudioHarness({
 			playFx: () =>
 				Effect.sync(() => {
 					pendingCommands += 1;
@@ -416,7 +420,7 @@ describe("GameAudio", () => {
 					),
 				),
 		});
-		createGameAudioSynthFxMock.mockImplementation(() => Effect.succeed(harness.synth));
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
 		const { root } = await renderAudio();
 		const listener = eventState.listener;
 		if (listener === null) throw new Error("Missing game audio event listener.");
@@ -435,7 +439,7 @@ describe("GameAudio", () => {
 	it("interrupts old pending work when the Game is replaced", async () => {
 		let pendingCommands = 0;
 		let commandFinalizations = 0;
-		const first = createSynthHarness({
+		const first = createAudioHarness({
 			playFx: () =>
 				Effect.sync(() => {
 					pendingCommands += 1;
@@ -448,14 +452,14 @@ describe("GameAudio", () => {
 					),
 				),
 		});
-		const second = createSynthHarness();
+		const second = createAudioHarness();
 		const synths = [
-			first.synth,
-			second.synth,
+			first.audio,
+			second.audio,
 		];
 		let synthIndex = 0;
-		createGameAudioSynthFxMock.mockImplementation(() =>
-			Effect.succeed(synths[synthIndex++] ?? second.synth),
+		createGameAudioRuntimeFxMock.mockImplementation(() =>
+			Effect.succeed(synths[synthIndex++] ?? second.audio),
 		);
 		const { render } = await renderAudio();
 		const firstListener = eventState.listener;
@@ -484,12 +488,12 @@ describe("GameAudio", () => {
 		const playError = new Error("play failed");
 		const closeError = new Error("close failed");
 		const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
-		const harness = createSynthHarness({
+		const harness = createAudioHarness({
 			unlockFx: Effect.fail(unlockError),
 			playFx: () => Effect.die(playError),
 			closeFx: Effect.fail(closeError),
 		});
-		createGameAudioSynthFxMock.mockImplementation(() => Effect.succeed(harness.synth));
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
 		const { root } = await renderAudio();
 
 		window.dispatchEvent(new Event("pointerdown"));

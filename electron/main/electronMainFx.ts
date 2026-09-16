@@ -17,6 +17,7 @@ import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesyst
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
+import { createFilesystemSoundPreferencesFx } from "./sound/createFilesystemSoundPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
 import { resolveArkiniUserDataPathsFx } from "~/application-data/fx/resolveArkiniUserDataPathsFx";
 import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
@@ -167,6 +168,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const windowPreferences = yield* createFilesystemWindowPreferencesFx({
 		root: userDataPaths.game.preferences,
 	});
+	const soundPreferences = yield* createFilesystemSoundPreferencesFx({
+		root: userDataPaths.game.preferences,
+	});
 	const editorMcpOwnership = yield* createFilesystemEditorMcpOwnershipFx({
 		editor: editorProjectServiceOwnership,
 		notifyOverviewChangedFn: (overview) => {
@@ -281,6 +285,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		soundPreferences,
 		windowModeControllerOwnership,
 		windowPreferences,
 		diagnostics,

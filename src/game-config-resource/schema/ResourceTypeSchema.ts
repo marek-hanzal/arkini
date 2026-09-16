@@ -5,6 +5,7 @@ export const ResourceTypeSchema = z.enum([
 	"artwork",
 	"image",
 	"music",
+	"sfx",
 ]);
 
 export type ResourceTypeSchema = typeof ResourceTypeSchema;

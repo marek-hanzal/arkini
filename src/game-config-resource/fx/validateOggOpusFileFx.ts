@@ -86,22 +86,22 @@ export const validateOggOpusFileFx = Effect.fn("validateOggOpusFileFx")(
 			try: async () => {
 				const info = await stat(path);
 				if (!info.isFile() || info.size < 1)
-					throw new Error(`Music ${resourceId} must be a valid Ogg/Opus file.`);
+					throw new Error(`Audio ${resourceId} must be a valid Ogg/Opus file.`);
 				const file = await open(path, "r");
 				try {
 					const header = Buffer.alloc(Math.min(HeaderBytes, info.size));
 					const { bytesRead } = await file.read(header, 0, header.length, 0);
 					if (!hasCompleteOpusHeadersFn(header.subarray(0, bytesRead)))
-						throw new Error(`Music ${resourceId} must be a valid Ogg/Opus file.`);
+						throw new Error(`Audio ${resourceId} must be a valid Ogg/Opus file.`);
 					return Number(info.size);
 				} finally {
 					await file.close();
 				}
 			},
 			catch: (cause) =>
-				cause instanceof Error && cause.message.startsWith(`Music ${resourceId}`)
+				cause instanceof Error && cause.message.startsWith(`Audio ${resourceId}`)
 					? cause
-					: new Error(`Music ${resourceId} must decode as a valid Ogg/Opus file.`, {
+					: new Error(`Audio ${resourceId} must decode as a valid Ogg/Opus file.`, {
 							cause,
 						}),
 		}),

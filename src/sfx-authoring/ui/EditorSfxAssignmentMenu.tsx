@@ -66,7 +66,9 @@ export const EditorSfxAssignmentMenu = ({
 						})}
 					>
 						{SfxEventPresentation.map((option) => {
-							const selected = resourceIdByEvent[option.event] === resourceId;
+							const assignedResourceId = resourceIdByEvent[option.event];
+							const assigned = assignedResourceId !== undefined;
+							const selected = assignedResourceId === resourceId;
 							const assigning = pending && assigningEvent === option.event;
 							return (
 								<button
@@ -96,9 +98,28 @@ export const EditorSfxAssignmentMenu = ({
 									</span>
 									{assigning ? (
 										<LoaderCircle className="size-4 animate-spin" />
-									) : selected ? (
-										<Check className="size-4" />
-									) : null}
+									) : (
+										<span
+											className="inline-flex shrink-0 items-center gap-1 rounded-full border border-control-border bg-surface-raised px-2 py-0.5 text-xs font-medium text-muted data-[ui-selected=true]:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent"
+											{...readDataUiFn({
+												dataUi: "EditorSfxAssignOptionStatus",
+												state: {
+													selected,
+												},
+											})}
+										>
+											{selected ? <Check className="size-3.5" /> : null}
+											<Tx
+												label={
+													selected
+														? "Assigned here"
+														: assigned
+															? "Assigned"
+															: "Unassigned"
+												}
+											/>
+										</span>
+									)}
 								</button>
 							);
 						})}

@@ -160,6 +160,26 @@ describe("useEditorMusicManagerController", () => {
 		expect(controller?.playing).toBe(false);
 	});
 
+	it("filters the searched Music collection by playlist membership", async () => {
+		expect(controller?.music.map(({ id }) => id)).toEqual([
+			"opening-theme",
+			"battle-march",
+		]);
+
+		await act(async () => controller?.setViewFn("playlist"));
+		expect(controller?.music.map(({ id }) => id)).toEqual([
+			"opening-theme",
+		]);
+
+		await act(async () => controller?.setViewFn("unused"));
+		expect(controller?.music.map(({ id }) => id)).toEqual([
+			"battle-march",
+		]);
+
+		await act(async () => controller?.setQueryFn("opening"));
+		expect(controller?.music).toEqual([]);
+	});
+
 	it("tracks playback, seeks through the active row, and deletes the resource", async () => {
 		await act(async () => controller?.togglePlaybackFn("battle-march"));
 		const audio = AudioStub.instances[0];

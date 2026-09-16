@@ -64,6 +64,8 @@ interface ActiveAudio {
 }
 
 export namespace useEditorMusicManagerController {
+	export type View = "all" | "playlist" | "unused";
+
 	export interface Output {
 		readonly activeResourceId?: string;
 		readonly deleteError?: unknown;
@@ -84,12 +86,14 @@ export namespace useEditorMusicManagerController {
 		readonly playing: boolean;
 		readonly query: string;
 		readonly setQueryFn: (query: string) => void;
+		readonly setViewFn: (view: View) => void;
 		readonly setVolumeFn: (volume: number) => void;
 		readonly seekPlaybackFn: (resourceId: string, progress: number) => void;
 		readonly togglePlaybackFn: (resourceId: string) => void;
 		readonly togglePlaylistFn: (resourceId: string) => void;
 		readonly togglingPlaylistResourceId?: string;
 		readonly totalMusicCount: number;
+		readonly view: View;
 		readonly volume: number;
 	}
 }
@@ -114,6 +118,7 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 	const [playbackError, setPlaybackErrorFn] = useState<string>();
 	const [togglingPlaylistResourceId, setTogglingPlaylistResourceIdFn] = useState<string>();
 	const [query, setQueryFn] = useState("");
+	const [view, setViewFn] = useState<useEditorMusicManagerController.View>("all");
 	const [volume, setVolumeStateFn] = useState(100);
 	const allMusic = useMemo(
 		() => project.resources.filter(({ type }) => type === "music"),
@@ -147,17 +152,25 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 			allMusic,
 		],
 	);
-	const music = useMemo(
-		() => matchingIds.flatMap((id) => musicById.get(id) ?? []),
-		[
-			matchingIds,
-			musicById,
-		],
-	);
 	const playlistResourceIds = useMemo(
 		() => new Set(project.config.music?.playlist ?? []),
 		[
 			project.config.music?.playlist,
+		],
+	);
+	const music = useMemo(
+		() =>
+			matchingIds
+				.filter((id) => {
+					const inPlaylist = playlistResourceIds.has(id);
+					return view === "all" || (view === "playlist" ? inPlaylist : !inPlaylist);
+				})
+				.flatMap((id) => musicById.get(id) ?? []),
+		[
+			matchingIds,
+			musicById,
+			playlistResourceIds,
+			view,
 		],
 	);
 	const resourceIds = useMemo(
@@ -368,12 +381,14 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 		playing,
 		query,
 		setQueryFn,
+		setViewFn,
 		setVolumeFn,
 		seekPlaybackFn,
 		togglePlaybackFn,
 		togglePlaylistFn,
 		togglingPlaylistResourceId,
 		totalMusicCount: allMusic.length,
+		view,
 		volume,
 	};
 };

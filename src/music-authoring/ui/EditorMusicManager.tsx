@@ -3,7 +3,10 @@ import { ListMusic, LoaderCircle, Music2, Pause, Play, Plus, Trash2 } from "luci
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
-import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
+import {
+	EditorSectionBar,
+	EditorSectionShortcutNavigation,
+} from "~/authoring-shell/ui/EditorSectionBar";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { readResourceNameFn } from "~/game-config-resource/fn/readResourceNameFn";
 import { useEditorMusicManagerController } from "~/music-authoring/ui/useEditorMusicManagerController";
@@ -28,6 +31,23 @@ export const EditorMusicManager = () => {
 		controller.playbackError;
 	const errorMessage =
 		error === undefined ? undefined : error instanceof Error ? error.message : String(error);
+	const viewOptions = [
+		{
+			label: translator.textFn("All"),
+			value: "all",
+		},
+		{
+			label: translator.textFn("Playlist"),
+			value: "playlist",
+		},
+		{
+			label: translator.textFn("Unused"),
+			value: "unused",
+		},
+	] as const satisfies ReadonlyArray<{
+		readonly label: string;
+		readonly value: useEditorMusicManagerController.View;
+	}>;
 	const importButton = (
 		<PrimaryButton
 			className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
@@ -91,7 +111,14 @@ export const EditorMusicManager = () => {
 							title={translator.textFn("Music")}
 						/>
 					}
-				/>
+				>
+					<EditorSectionShortcutNavigation
+						dataUi="EditorMusicView"
+						onChangeFn={controller.setViewFn}
+						options={viewOptions}
+						value={controller.view}
+					/>
+				</EditorSectionBar>
 			}
 		>
 			<div
@@ -124,7 +151,7 @@ export const EditorMusicManager = () => {
 							description={translator.textFn(
 								controller.totalMusicCount === 0
 									? "Import audio files to create the project music library."
-									: "No music matches this search.",
+									: "No music matches the current filters.",
 							)}
 							icon={Music2}
 							size="large"

@@ -56,6 +56,8 @@ Add to playlist:
   value: Add to playlist
 After:
   value: After
+All:
+  value: All
 Already optimized:
   value: Already optimized
 Alternative:
@@ -1291,6 +1293,7 @@ Music help:
 
     - **Playlist** is the game's default background music. Songs added to it are shuffled and keep playing during gameplay.
     - Songs outside the playlist stay in the project library and do not play automatically.
+    - **Unused** shows songs that are not currently part of the playlist.
     - Song names come from the imported filenames.
     - **Play** previews one song at a time.
     - **Volume** changes only the preview volume on this page.
@@ -1374,8 +1377,8 @@ No material input required.:
   value: No material input required.
 No merges for this item:
   value: No merges for this item
-No music matches this search.:
-  value: No music matches this search.
+No music matches the current filters.:
+  value: No music matches the current filters.
 No music yet:
   value: No music yet
 No other authored item outputs this item through production, expiry, units, or merges.:
@@ -1493,6 +1496,8 @@ Player controls:
   value: Player controls
 Player hint:
   value: Player hint
+Playlist:
+  value: Playlist
 Port:
   value: Port
 Preparing artwork preview…:

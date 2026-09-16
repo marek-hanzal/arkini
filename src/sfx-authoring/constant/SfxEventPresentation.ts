@@ -1,0 +1,89 @@
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+
+/** User-facing descriptions for the exact committed gameplay events assignable to SFX. */
+export const SfxEventPresentation = [
+	{
+		event: GameEventEnumSchema.enum.CurrentSpaceChanged,
+		label: "Space changed",
+		description: "When the player switches to another Board space.",
+	},
+	{
+		event: GameEventEnumSchema.enum.JobStarted,
+		label: "Job started",
+		description: "When a production job begins.",
+	},
+	{
+		event: GameEventEnumSchema.enum.JobCompleted,
+		label: "Job completed",
+		description: "When a production job finishes successfully.",
+	},
+	{
+		event: GameEventEnumSchema.enum.JobAborted,
+		label: "Job aborted",
+		description: "When active production is cancelled.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemDiscarded,
+		label: "Item discarded",
+		description: "When an item cannot be delivered and is discarded.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemMerged,
+		label: "Items merged",
+		description: "When one item is applied to another.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemExpired,
+		label: "Item expired",
+		description: "When an item's Lifetime reaches zero.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemSpawned,
+		label: "Item spawned",
+		description: "When a new item is created.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemPlaced,
+		label: "Item placed",
+		description: "When an existing item is placed in a new location.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemStacked,
+		label: "Items stacked",
+		description: "When matching item quantities join.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemSplit,
+		label: "Item split",
+		description: "When part of an item stack is separated.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemConsumed,
+		label: "Item consumed",
+		description: "When production consumes an input.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemInputStored,
+		label: "Input stored",
+		description: "When an item is placed into a production input.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemUnitSpent,
+		label: "Unit spent",
+		description: "When an item spends one or more Units.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemDepleted,
+		label: "Item depleted",
+		description: "When an item reaches its depleted state.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+		label: "Item removed",
+		description: "When the player explicitly removes an item.",
+	},
+] as const satisfies ReadonlyArray<{
+	readonly description: string;
+	readonly event: GameEventEnumSchema.Type;
+	readonly label: string;
+}>;

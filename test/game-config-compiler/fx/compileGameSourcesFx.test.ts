@@ -31,6 +31,29 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
+	it("preserves gameplay-event SFX assignments with their source provenance", async () => {
+		const root = createRootSource();
+		const result = await compile(
+			GameSourceFileSchema.parse({
+				...root,
+				value: {
+					...root.value,
+					sfx: {
+						events: {
+							"job:started": "job-start",
+						},
+					},
+				},
+			}),
+		);
+
+		expect(result.config?.sfx?.events).toEqual({
+			"job:started": "job-start",
+		});
+		expect(result.provenance.sfx).toBe("/game/game.json");
+		expect(result.diagnostics).toEqual([]);
+	});
+
 	it("preserves authored scale and layered default composition", async () => {
 		const item = {
 			...createSimpleItem("item:layered"),

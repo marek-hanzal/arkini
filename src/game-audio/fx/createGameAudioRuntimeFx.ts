@@ -19,7 +19,7 @@ interface SfxSlot extends MusicSlot {
 export namespace createGameAudioRuntimeFx {
 	export interface Props {
 		readonly game: Pick<PlayableGame, "getResourceUrlFn" | "resources"> & {
-			readonly config: Pick<GameConfigSchema.Type, "music">;
+			readonly config: Pick<GameConfigSchema.Type, "music" | "sfx">;
 		};
 		readonly sound: SoundSettings;
 		readonly crossfadeSeconds?: number;
@@ -266,18 +266,26 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 
 		const playCueFn = (cue: readGameAudioCuesFn.Result) => {
 			const activeContext = context;
-			if (disposed || !unlocked || activeContext === null || !sfxIds.has(cue.kind)) return;
+			const resourceId = game.config.sfx?.events[cue.event];
+			if (
+				disposed ||
+				!unlocked ||
+				activeContext === null ||
+				resourceId === undefined ||
+				!sfxIds.has(resourceId)
+			)
+				return;
 			const slot = sfxSlots.find(({ busy }) => !busy);
 			if (slot === undefined) return;
 			slot.busy = true;
 			slot.generation += 1;
 			const generation = slot.generation;
-			slot.resourceId = cue.kind;
+			slot.resourceId = resourceId;
 			slot.gain.gain.setValueAtTime(
 				Math.min(1, 0.55 + cue.strength * 0.15),
 				activeContext.currentTime,
 			);
-			slot.audio.src = game.getResourceUrlFn(cue.kind);
+			slot.audio.src = game.getResourceUrlFn(resourceId);
 			slot.audio.load();
 			void slot.audio.play().catch(() => {
 				if (slot.generation === generation) releaseSfxSlotFn(slot);

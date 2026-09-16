@@ -43,6 +43,19 @@ export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* 
 							playlist: config.music.playlist.map(renameFn),
 						},
 					}),
+			...(config.sfx === undefined
+				? {}
+				: {
+						sfx: {
+							...config.sfx,
+							events: Object.fromEntries(
+								Object.entries(config.sfx.events).map(([event, id]) => [
+									event,
+									renameFn(id),
+								]),
+							),
+						},
+					}),
 			resources,
 		}),
 	);

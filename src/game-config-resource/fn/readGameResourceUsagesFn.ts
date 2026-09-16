@@ -2,12 +2,13 @@ import { Order } from "effect";
 
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { DiagnosticPathSchema } from "~/game-config-diagnostic/schema/DiagnosticPathSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 export namespace readGameResourceUsagesFn {
 	export type Usage =
 		| {
 				readonly resourceId: string;
-				readonly resourceType: "image" | "music";
+				readonly resourceType: "image" | "music" | "sfx";
 				readonly owner: "project";
 				readonly ownerLabel: "Project";
 				readonly roleLabel: string;
@@ -94,6 +95,22 @@ export const readGameResourceUsagesFn = (
 			],
 		});
 	});
+	for (const event of GameEventEnumSchema.options) {
+		const resourceId = config.sfx?.events[event];
+		if (resourceId === undefined) continue;
+		usages.push({
+			resourceId,
+			resourceType: "sfx",
+			owner: "project",
+			ownerLabel: "Project",
+			roleLabel: event,
+			path: [
+				"sfx",
+				"events",
+				event,
+			],
+		});
+	}
 	for (const [itemId, item] of Object.entries(config.items).sort(([left], [right]) =>
 		Order.String(left, right),
 	)) {

@@ -86,6 +86,12 @@ describe("createFreshProjectFx", () => {
 				resources: {
 					hero: "hero",
 				},
+				music: {
+					playlist: [],
+				},
+				sfx: {
+					events: {},
+				},
 				start: {
 					currentSpace: 0,
 					board: [],

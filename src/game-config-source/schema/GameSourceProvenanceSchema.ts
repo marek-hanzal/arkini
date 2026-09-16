@@ -8,6 +8,7 @@ export const GameSourceProvenanceSchema = z
 		schema: SchemaReferenceProviderSchema.optional(),
 		meta: z.string().min(1).optional(),
 		music: z.string().min(1).optional(),
+		sfx: z.string().min(1).optional(),
 		resources: z.string().min(1).optional(),
 		start: z.string().min(1).optional(),
 		items: z.record(IdSchema, z.string().min(1)),

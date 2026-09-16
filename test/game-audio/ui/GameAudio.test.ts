@@ -175,7 +175,7 @@ describe("GameAudio", () => {
 		await vi.waitFor(() =>
 			expect(harness.play).toHaveBeenCalledWith([
 				{
-					kind: "job-start",
+					event: GameEventEnumSchema.enum.JobStarted,
 					strength: 1,
 				},
 			]),
@@ -202,9 +202,9 @@ describe("GameAudio", () => {
 			expect(harness.unlock).toHaveBeenCalledTimes(3);
 			expect(harness.play).toHaveBeenCalledTimes(2);
 		});
-		expect(harness.play.mock.calls.map(([cues]) => cues[0]?.kind)).toEqual([
-			"job-start",
-			"job-complete",
+		expect(harness.play.mock.calls.map(([cues]) => cues[0]?.event)).toEqual([
+			GameEventEnumSchema.enum.JobStarted,
+			GameEventEnumSchema.enum.JobCompleted,
 		]);
 	});
 

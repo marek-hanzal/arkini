@@ -107,6 +107,8 @@ Artwork usage empty description:
   value: No saved Item uses this Artwork.
 Artwork usage help:
   value: Shows every saved Item that references this Artwork.
+Assign to:
+  value: Assign to
 Authored Clock expiry output summary help:
   value: |
     Runs once when **Lifetime** reaches zero.
@@ -887,6 +889,9 @@ Initial units help:
 Input:
   value: Input
   dynamic: true
+Input stored:
+  value: Input stored
+  dynamic: true
 Input type:
   value: Input type
 Inputs:
@@ -984,6 +989,9 @@ Item connections help:
     - **Produced by:** what can create this item?
 
     Rows show the exact production line, action, merge, depletion or Clock behind the link. Search filters the current list; opening a result keeps the selected relationship.
+Item consumed:
+  value: Item consumed
+  dynamic: true
 Item delete help:
   value: |
     Delete first shows every saved place that still uses this item.
@@ -991,10 +999,16 @@ Item delete help:
     Remove those links normally, or use **Force delete** to remove the listed starting items, requirements and outputs too. The confirmation shows the exact damage before anything happens.
 
     Artwork files and Notes stay; only this item's note links are removed.
+Item depleted:
+  value: Item depleted
+  dynamic: true
 Item detail is unavailable.:
   value: Item detail is unavailable.
 Item details:
   value: Item details
+Item discarded:
+  value: Item discarded
+  dynamic: true
 Item draft status help:
   value: |
     **Draft** marks work in progress for you and other authors.
@@ -1012,6 +1026,9 @@ Item estimate help:
     - Work that can happen together is counted in parallel.
 
     This is a planning shortcut, not a playthrough. Full queues, placement, player choices and unlucky rolls can make real play slower. **Incomplete** means the calculation hit a limit; **Unreachable** means no complete route starts from the project's starting items.
+Item expired:
+  value: Item expired
+  dynamic: true
 Item global count help:
   value: |
     Maximum total quantity of this item across the whole game.
@@ -1061,6 +1078,9 @@ Item notes empty title:
   value: No notes for this item yet
 Item picker keyboard hint:
   value: ↑↓ select · Enter choose · Esc close
+Item placed:
+  value: Item placed
+  dynamic: true
 Item player controls help:
   value: |
     **Interactive** lets players start production, move Materials, change the queue and select Default or Clock lines.
@@ -1079,6 +1099,9 @@ Item production help:
     - **Interactive** shows player controls; **Automatic only** leaves production to the game.
 
     Adding Production removes Action when you save. Clock may also exist without any line when you only need a Lifetime.
+Item removed:
+  value: Item removed
+  dynamic: true
 Item search shortcuts:
   value: ↑↓ Select · Enter Open · Esc Close
 Item section copy help:
@@ -1092,6 +1115,12 @@ Item section copy help:
     - Artwork, Merges and Units replace their complete section.
 
     Lists are replaced, never combined. **Save** keeps the copy; **Discard** restores the destination item.
+Item spawned:
+  value: Item spawned
+  dynamic: true
+Item split:
+  value: Item split
+  dynamic: true
 Item stack size help:
   value: |
     How many items may share one cell.
@@ -1125,6 +1154,21 @@ Item units help:
     **Initial units** sets the amount for every new item. Spending the last Unit removes it and may create **Depletion output**.
 Items:
   value: Items
+Items merged:
+  value: Items merged
+  dynamic: true
+Items stacked:
+  value: Items stacked
+  dynamic: true
+Job aborted:
+  value: Job aborted
+  dynamic: true
+Job completed:
+  value: Job completed
+  dynamic: true
+Job started:
+  value: Job started
+  dynamic: true
 Keep:
   value: Keep
 Keep at most one item.:
@@ -1990,6 +2034,9 @@ Space action type help:
     **Space** enters one chosen Board after rules pass and Unit costs are paid.
 
     The item also acts as a portal for stacks dropped onto it.
+Space changed:
+  value: Space changed
+  dynamic: true
 Speed up:
   value: Speed up
 Spend:
@@ -2094,6 +2141,9 @@ Unit cost:
   value: Unit cost
 Unit depletion:
   value: Unit depletion
+Unit spent:
+  value: Unit spent
+  dynamic: true
 Units:
   value: Units
   dynamic: true
@@ -2194,6 +2244,54 @@ Weighted selections help:
     - **2–4:** randomly two, three or four.
 
     Every pick uses the same candidate weights.
+When a new item is created.:
+  value: When a new item is created.
+  dynamic: true
+When a production job begins.:
+  value: When a production job begins.
+  dynamic: true
+When a production job finishes successfully.:
+  value: When a production job finishes successfully.
+  dynamic: true
+When active production is cancelled.:
+  value: When active production is cancelled.
+  dynamic: true
+When an existing item is placed in a new location.:
+  value: When an existing item is placed in a new location.
+  dynamic: true
+When an item cannot be delivered and is discarded.:
+  value: When an item cannot be delivered and is discarded.
+  dynamic: true
+When an item is placed into a production input.:
+  value: When an item is placed into a production input.
+  dynamic: true
+When an item reaches its depleted state.:
+  value: When an item reaches its depleted state.
+  dynamic: true
+When an item spends one or more Units.:
+  value: When an item spends one or more Units.
+  dynamic: true
+When an item's Lifetime reaches zero.:
+  value: When an item's Lifetime reaches zero.
+  dynamic: true
+When matching item quantities join.:
+  value: When matching item quantities join.
+  dynamic: true
+When one item is applied to another.:
+  value: When one item is applied to another.
+  dynamic: true
+When part of an item stack is separated.:
+  value: When part of an item stack is separated.
+  dynamic: true
+When production consumes an input.:
+  value: When production consumes an input.
+  dynamic: true
+When the player explicitly removes an item.:
+  value: When the player explicitly removes an item.
+  dynamic: true
+When the player switches to another Board space.:
+  value: When the player switches to another Board space.
+  dynamic: true
 Width:
   value: Width
 With note:

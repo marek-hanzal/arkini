@@ -13,6 +13,11 @@ describe("renameGameResourceFx", () => {
 					"hero",
 				],
 			},
+			sfx: {
+				events: {
+					"job:started": "hero",
+				},
+			},
 			items: {
 				...editorTestPayload.config.items,
 				water: {
@@ -42,6 +47,7 @@ describe("renameGameResourceFx", () => {
 		expect(renamed.music?.playlist).toEqual([
 			"cover",
 		]);
+		expect(renamed.sfx?.events["job:started"]).toBe("cover");
 		expect(renamed.items.water?.artwork.default).toEqual([
 			"cover",
 			"item-water",

@@ -6,6 +6,7 @@ import { StartSchema } from "~/game-start/schema/StartSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { RolesSchema } from "~/game-config/schema/RolesSchema";
 import { MusicSchema } from "~/game-config/schema/MusicSchema";
+import { SfxSchema } from "~/game-config/schema/SfxSchema";
 
 /**
  * The root schema for a game's configuration.
@@ -34,6 +35,12 @@ export const GameConfigSchema = z
 		 * Optional global Music behavior. Its absence means that no random playlist is authored.
 		 */
 		music: MusicSchema.optional().describe("Optional global Music behavior for this game."),
+		/**
+		 * Optional gameplay-event SFX assignments. Missing assignments remain silent.
+		 */
+		sfx: SfxSchema.optional().describe(
+			"Optional gameplay-event SFX assignments for this game.",
+		),
 		/**
 		 * Board and inventory contents created for a new game.
 		 */

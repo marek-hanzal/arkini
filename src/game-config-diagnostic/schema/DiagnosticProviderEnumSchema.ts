@@ -5,6 +5,7 @@ export const DiagnosticProviderEnumSchema = z
 	.enum({
 		Meta: "meta",
 		Music: "music",
+		Sfx: "sfx",
 		Resources: "resources",
 		Start: "start",
 	})

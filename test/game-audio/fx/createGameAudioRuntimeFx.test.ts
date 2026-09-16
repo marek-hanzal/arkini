@@ -174,10 +174,16 @@ describe("createGameAudioRuntimeFx", () => {
 		const runtime = Effect.runSync(
 			createGameAudioRuntimeFx({
 				game: {
-					config: {},
+					config: {
+						sfx: {
+							events: {
+								"job:started": "custom-job-start",
+							},
+						},
+					},
 					resources: [
 						{
-							id: "job-start",
+							id: "custom-job-start",
 							type: "sfx",
 						},
 					],
@@ -196,24 +202,24 @@ describe("createGameAudioRuntimeFx", () => {
 		await Effect.runPromise(
 			runtime.playFx([
 				{
-					kind: "job-start",
+					event: "job:started",
 					strength: 1,
 				},
 				{
-					kind: "job-start",
+					event: "job:started",
 					strength: 2,
 				},
 			]),
 		);
 		const sfx = harness.audios.find(({ preload }) => preload === "none");
 		if (sfx === undefined) throw new Error("Expected one streamed SFX voice.");
-		expect(sfx.src).toBe("arkini://resource/job-start");
+		expect(sfx.src).toBe("arkini://resource/custom-job-start");
 		expect(sfx.play).toHaveBeenCalledOnce();
 
 		await Effect.runPromise(
 			runtime.playFx([
 				{
-					kind: "job-start",
+					event: "job:started",
 					strength: 1,
 				},
 			]),
@@ -224,12 +230,53 @@ describe("createGameAudioRuntimeFx", () => {
 		await Effect.runPromise(
 			runtime.playFx([
 				{
-					kind: "job-start",
+					event: "job:started",
 					strength: 1,
 				},
 			]),
 		);
 		expect(sfx.play).toHaveBeenCalledTimes(2);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("keeps unassigned gameplay events silent", async () => {
+		const harness = createHarness();
+		const runtime = Effect.runSync(
+			createGameAudioRuntimeFx({
+				game: {
+					config: {
+						sfx: {
+							events: {},
+						},
+					},
+					resources: [
+						{
+							id: "unused-sfx",
+							type: "sfx",
+						},
+					],
+					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+				},
+				maximumSfxVoices: 1,
+				sound: {
+					master: 100,
+					music: 100,
+					sfx: 100,
+				},
+			}),
+		);
+		await Effect.runPromise(runtime.unlockFx);
+		await Effect.runPromise(
+			runtime.playFx([
+				{
+					event: "item:spawned",
+					strength: 1,
+				},
+			]),
+		);
+
+		const sfx = harness.audios.find(({ preload }) => preload === "none");
+		expect(sfx?.play).not.toHaveBeenCalled();
 		await Effect.runPromise(runtime.closeFx);
 	});
 

@@ -135,6 +135,54 @@ describe("validateGameResourcesFn", () => {
 		);
 	});
 
+	it("requires every gameplay-event assignment to resolve to SFX", () => {
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			sfx: {
+				events: {
+					"job:started": "missing-job-start",
+					"item:spawned": "wrong-spawn",
+				},
+			},
+		});
+		const diagnostics = validateGameResourcesFn({
+			config,
+			provenance: {
+				...provenance,
+				sfx: "game.json",
+			},
+			resources: [
+				{
+					id: "wrong-spawn",
+					path: "image/wrong-spawn.png",
+					type: "image",
+				},
+			],
+		});
+
+		expect(diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
+					path: [
+						"sfx",
+						"events",
+						"job:started",
+					],
+					resourceId: "missing-job-start",
+					source: "game.json",
+				}),
+				expect.objectContaining({
+					actualType: "image",
+					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
+					expectedType: "sfx",
+					resourceId: "wrong-spawn",
+					source: "game.json",
+				}),
+			]),
+		);
+	});
+
 	it("reports duplicate and missing exact resource IDs", () => {
 		const diagnostics = validateGameResourcesFn({
 			config: startTestConfig,

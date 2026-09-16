@@ -31,6 +31,10 @@
 					"description": "Optional global Music behavior for this game.",
 					"$ref": "urn:arkini:schema:project#/$defs/music.MusicSchema"
 				},
+				"sfx": {
+					"description": "Optional gameplay-event SFX assignments for this game.",
+					"$ref": "urn:arkini:schema:project#/$defs/sfx.SfxSchema"
+				},
 				"start": {
 					"description": "The initial board, inventory, and toolbar contents created for a new game.",
 					"$ref": "urn:arkini:schema:project#/$defs/StartSchema"
@@ -176,6 +180,48 @@
 			],
 			"additionalProperties": false,
 			"description": "The global random Music playlist authored for one game."
+		},
+		"sfx.SfxSchema": {
+			"type": "object",
+			"properties": {
+				"events": {
+					"type": "object",
+					"propertyNames": {
+						"$ref": "urn:arkini:schema:project#/$defs/GameEventEnumSchema"
+					},
+					"additionalProperties": {
+						"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+					},
+					"description": "SFX resource IDs assigned to committed gameplay events."
+				}
+			},
+			"required": [
+				"events"
+			],
+			"additionalProperties": false,
+			"description": "The gameplay-event SFX assignments authored for one game."
+		},
+		"GameEventEnumSchema": {
+			"type": "string",
+			"enum": [
+				"current-space:changed",
+				"job:started",
+				"job:completed",
+				"job:aborted",
+				"item:discarded",
+				"item:merged",
+				"item:expired",
+				"item:spawned",
+				"item:placed",
+				"item:stacked",
+				"item:split",
+				"item:consumed",
+				"item:input-stored",
+				"item:unit-spent",
+				"item:depleted",
+				"item:explicitly-removed"
+			],
+			"description": "The finite vocabulary of committed gameplay events published by one Game."
 		},
 		"NonNegativeIntegerSchema": {
 			"type": "integer",

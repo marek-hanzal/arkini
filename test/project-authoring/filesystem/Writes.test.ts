@@ -454,6 +454,56 @@ describe("filesystem Editor project writes", () => {
 		});
 	});
 
+	it("removes a deleted SFX resource from every gameplay-event assignment", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const source = join(harness.temporaryDirectory, "shared-sfx.ogg");
+		const bytes = createTestOggOpusBytesFn();
+		await writeFile(source, bytes);
+		const imported = await Effect.runPromise(
+			repository.upsertResourceFilesFx({
+				projectId: project.projectId,
+				resources: [
+					{
+						id: "shared-sfx",
+						path: source,
+						size: bytes.byteLength,
+						type: "sfx",
+					},
+				],
+			}),
+		);
+		const marked = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: project.projectId,
+				expectedRevision: imported.revision,
+				config: {
+					...imported.config,
+					sfx: {
+						events: {
+							"job:started": "shared-sfx",
+							"item:spawned": "shared-sfx",
+						},
+					},
+				},
+			}),
+		);
+		const deleted = await Effect.runPromise(
+			repository.deleteResourceFx({
+				projectId: project.projectId,
+				expectedRevision: marked.revision,
+				resourceId: "shared-sfx",
+			}),
+		);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+
+		expect(deleted.config.sfx?.events).toEqual({});
+		await expect(readFile(join(root, "sfx", "shared-sfx.ogg"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+	});
+
 	it("rejects non-square Artwork replacement without changing the source", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);

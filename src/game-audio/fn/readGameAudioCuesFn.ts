@@ -4,24 +4,8 @@ import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSch
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 export namespace readGameAudioCuesFn {
-	export type Kind =
-		| "space-change"
-		| "job-start"
-		| "job-complete"
-		| "merge"
-		| "expire"
-		| "spawn"
-		| "place"
-		| "stack"
-		| "split"
-		| "consume"
-		| "store"
-		| "unit"
-		| "deplete"
-		| "remove";
-
 	export interface Result {
-		readonly kind: Kind;
+		readonly event: GameEventEnumSchema.Type;
 		readonly strength: number;
 	}
 }
@@ -30,21 +14,23 @@ type GameEvent = GameEventBatchSchema.Type["events"][number];
 
 const maximumBatchCues = 6;
 
-const cuePriority: Record<readGameAudioCuesFn.Kind, number> = {
-	"space-change": 1,
-	"job-start": 2,
-	"job-complete": 3,
-	merge: 3,
-	expire: 3,
-	spawn: 2,
-	place: 2,
-	stack: 2,
-	split: 2,
-	consume: 2,
-	store: 2,
-	unit: 2,
-	deplete: 3,
-	remove: 3,
+const cuePriority: Record<GameEventEnumSchema.Type, number> = {
+	[GameEventEnumSchema.enum.CurrentSpaceChanged]: 1,
+	[GameEventEnumSchema.enum.JobStarted]: 2,
+	[GameEventEnumSchema.enum.JobCompleted]: 3,
+	[GameEventEnumSchema.enum.JobAborted]: 3,
+	[GameEventEnumSchema.enum.ItemDiscarded]: 3,
+	[GameEventEnumSchema.enum.ItemMerged]: 3,
+	[GameEventEnumSchema.enum.ItemExpired]: 3,
+	[GameEventEnumSchema.enum.ItemSpawned]: 2,
+	[GameEventEnumSchema.enum.ItemPlaced]: 2,
+	[GameEventEnumSchema.enum.ItemStacked]: 2,
+	[GameEventEnumSchema.enum.ItemSplit]: 2,
+	[GameEventEnumSchema.enum.ItemConsumed]: 2,
+	[GameEventEnumSchema.enum.ItemInputStored]: 2,
+	[GameEventEnumSchema.enum.ItemUnitSpent]: 2,
+	[GameEventEnumSchema.enum.ItemDepleted]: 3,
+	[GameEventEnumSchema.enum.ItemExplicitlyRemoved]: 3,
 };
 
 const clampStrengthFn = (strength: number) => Math.min(3, Math.max(1, strength));
@@ -52,107 +38,143 @@ const clampStrengthFn = (strength: number) => Math.min(3, Math.max(1, strength))
 const strengthForQuantityFn = (quantity: number) =>
 	clampStrengthFn(1 + Math.log2(Math.max(1, quantity)));
 
-const cueFn = (kind: readGameAudioCuesFn.Kind, strength: number): readGameAudioCuesFn.Result => ({
-	kind,
+const cueFn = (event: GameEventEnumSchema.Type, strength: number): readGameAudioCuesFn.Result => ({
+	event,
 	strength: clampStrengthFn(strength),
 });
 
-const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result | null =>
+const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
 	match(event)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 			},
-			() => cueFn("space-change", 1),
+			() => cueFn(GameEventEnumSchema.enum.CurrentSpaceChanged, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobStarted,
 			},
-			() => cueFn("job-start", 1),
+			() => cueFn(GameEventEnumSchema.enum.JobStarted, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobCompleted,
 			},
-			() => cueFn("job-complete", 2),
+			() => cueFn(GameEventEnumSchema.enum.JobCompleted, 2),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.JobAborted,
+			},
+			() => cueFn(GameEventEnumSchema.enum.JobAborted, 2),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.ItemDiscarded,
+			},
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemDiscarded,
+					strengthForQuantityFn(event.quantity),
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemMerged,
 			},
-			() => cueFn("merge", 2),
+			() => cueFn(GameEventEnumSchema.enum.ItemMerged, 2),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 			},
-			(event) => cueFn("expire", strengthForQuantityFn(event.quantity)),
+			(event) =>
+				cueFn(GameEventEnumSchema.enum.ItemExpired, strengthForQuantityFn(event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 			},
-			(event) => cueFn("spawn", strengthForQuantityFn(event.quantity)),
+			(event) =>
+				cueFn(GameEventEnumSchema.enum.ItemSpawned, strengthForQuantityFn(event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 			},
-			(event) => cueFn("place", strengthForQuantityFn(event.quantity)),
+			(event) =>
+				cueFn(GameEventEnumSchema.enum.ItemPlaced, strengthForQuantityFn(event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemStacked,
 			},
 			(event) =>
-				cueFn("stack", strengthForQuantityFn(event.quantity - event.previousQuantity)),
+				cueFn(
+					GameEventEnumSchema.enum.ItemStacked,
+					strengthForQuantityFn(event.quantity - event.previousQuantity),
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemSplit,
 			},
 			(event) =>
-				cueFn("split", strengthForQuantityFn(event.previousQuantity - event.quantity)),
+				cueFn(
+					GameEventEnumSchema.enum.ItemSplit,
+					strengthForQuantityFn(event.previousQuantity - event.quantity),
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemConsumed,
 			},
-			(event) => cueFn("consume", strengthForQuantityFn(event.consumedQuantity)),
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemConsumed,
+					strengthForQuantityFn(event.consumedQuantity),
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemInputStored,
 			},
-			(event) => cueFn("store", strengthForQuantityFn(event.storedQuantity)),
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemInputStored,
+					strengthForQuantityFn(event.storedQuantity),
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemUnitSpent,
 			},
-			(event) => cueFn("unit", event.previousUnits - event.resultingUnits),
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemUnitSpent,
+					event.previousUnits - event.resultingUnits,
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 			},
-			(event) => cueFn("deplete", strengthForQuantityFn(event.previousQuantity)),
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemDepleted,
+					strengthForQuantityFn(event.previousQuantity),
+				),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
 			},
-			(event) => cueFn("remove", strengthForQuantityFn(event.quantity)),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.JobAborted,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemDiscarded,
-			},
-			() => null,
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+					strengthForQuantityFn(event.quantity),
+				),
 		)
 		.exhaustive();
 
@@ -160,14 +182,13 @@ const coalesceCuesFn = (
 	events: ReadonlyArray<GameEvent>,
 ): ReadonlyArray<readGameAudioCuesFn.Result> => {
 	const cues: Array<readGameAudioCuesFn.Result> = [];
-	const indexByKind = new Map<readGameAudioCuesFn.Kind, number>();
+	const indexByEvent = new Map<GameEventEnumSchema.Type, number>();
 
 	for (const event of events) {
 		const next = readGameAudioCueFn(event);
-		if (next === null) continue;
-		const existingIndex = indexByKind.get(next.kind);
+		const existingIndex = indexByEvent.get(next.event);
 		if (existingIndex === undefined) {
-			indexByKind.set(next.kind, cues.length);
+			indexByEvent.set(next.event, cues.length);
 			cues.push(next);
 			continue;
 		}
@@ -196,7 +217,7 @@ export const readGameAudioCuesFn = (
 		}))
 		.sort(
 			(left, right) =>
-				cuePriority[right.candidate.kind] - cuePriority[left.candidate.kind] ||
+				cuePriority[right.candidate.event] - cuePriority[left.candidate.event] ||
 				left.index - right.index,
 		);
 

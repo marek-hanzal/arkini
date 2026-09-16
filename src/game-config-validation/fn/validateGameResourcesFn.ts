@@ -50,7 +50,9 @@ export const validateGameResourcesFn = ({
 			? provenance.items[usage.ownerId]
 			: usage.path[0] === "music"
 				? provenance.music
-				: provenance.resources;
+				: usage.path[0] === "sfx"
+					? provenance.sfx
+					: provenance.resources;
 	const referenced = new Set(usages.map(({ resourceId }) => resourceId));
 	for (const usage of usages) {
 		const resource = firstById.get(usage.resourceId);

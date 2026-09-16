@@ -59,4 +59,28 @@ describe("readGameResourceUsagesFn", () => {
 			roleLabel: "Random playlist track 1",
 		});
 	});
+
+	it("projects gameplay-event SFX assignments as explicit project resource usages", () => {
+		expect(
+			readGameResourceUsagesFn({
+				...editorTestConfig,
+				sfx: {
+					events: {
+						"job:started": "job-start",
+					},
+				},
+			}),
+		).toContainEqual({
+			owner: "project",
+			ownerLabel: "Project",
+			path: [
+				"sfx",
+				"events",
+				"job:started",
+			],
+			resourceId: "job-start",
+			resourceType: "sfx",
+			roleLabel: "job:started",
+		});
+	});
 });

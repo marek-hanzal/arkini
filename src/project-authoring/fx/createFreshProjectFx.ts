@@ -43,6 +43,9 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 		music: {
 			playlist: [],
 		},
+		sfx: {
+			events: {},
+		},
 		start: {
 			currentSpace: 0,
 			board: [],

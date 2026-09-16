@@ -677,7 +677,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					return yield* Effect.fail(
 						errorFn("delete-resource", `Resource ${resourceId} does not exist.`),
 					);
-				const config =
+				const withoutMusicReference =
 					resource.type === "music" && state.project.config.music !== undefined
 						? GameConfigSchema.parse({
 								...state.project.config,
@@ -689,6 +689,20 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 								},
 							})
 						: state.project.config;
+				const config =
+					resource.type === "sfx" && withoutMusicReference.sfx !== undefined
+						? GameConfigSchema.parse({
+								...withoutMusicReference,
+								sfx: {
+									...withoutMusicReference.sfx,
+									events: Object.fromEntries(
+										Object.entries(withoutMusicReference.sfx.events).filter(
+											([, id]) => id !== resourceId,
+										),
+									),
+								},
+							})
+						: withoutMusicReference;
 				const blockers = readEditorArtworkDeleteBlockersFn({
 					config,
 					resourceId,

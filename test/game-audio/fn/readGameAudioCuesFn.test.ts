@@ -21,7 +21,7 @@ const inputLocation = {
 };
 
 describe("readGameAudioCuesFn", () => {
-	it("keeps cancellation audit facts silent instead of sounding completed work or spawned losses", () => {
+	it("projects every committed event and leaves silence to authored runtime assignment", () => {
 		expect(
 			readGameAudioCuesFn({
 				events: [
@@ -42,7 +42,16 @@ describe("readGameAudioCuesFn", () => {
 					},
 				],
 			}),
-		).toEqual([]);
+		).toEqual([
+			{
+				event: GameEventEnumSchema.enum.JobAborted,
+				strength: 2,
+			},
+			{
+				event: GameEventEnumSchema.enum.ItemDiscarded,
+				strength: 2,
+			},
+		]);
 	});
 	it("preserves semantic order while coalescing repeated event kinds", () => {
 		const batch = {
@@ -92,15 +101,15 @@ describe("readGameAudioCuesFn", () => {
 
 		expect(readGameAudioCuesFn(batch)).toEqual([
 			{
-				kind: "job-complete",
+				event: GameEventEnumSchema.enum.JobCompleted,
 				strength: 2,
 			},
 			{
-				kind: "spawn",
+				event: GameEventEnumSchema.enum.ItemSpawned,
 				strength: 3,
 			},
 			{
-				kind: "stack",
+				event: GameEventEnumSchema.enum.ItemStacked,
 				strength: 2.25,
 			},
 		]);
@@ -172,13 +181,13 @@ describe("readGameAudioCuesFn", () => {
 			],
 		} satisfies GameEventBatchSchema.Type;
 
-		expect(readGameAudioCuesFn(batch).map(({ kind }) => kind)).toEqual([
-			"job-start",
-			"spawn",
-			"place",
-			"stack",
-			"job-complete",
-			"deplete",
+		expect(readGameAudioCuesFn(batch).map(({ event }) => event)).toEqual([
+			GameEventEnumSchema.enum.JobStarted,
+			GameEventEnumSchema.enum.ItemSpawned,
+			GameEventEnumSchema.enum.ItemPlaced,
+			GameEventEnumSchema.enum.ItemStacked,
+			GameEventEnumSchema.enum.JobCompleted,
+			GameEventEnumSchema.enum.ItemDepleted,
 		]);
 	});
 });

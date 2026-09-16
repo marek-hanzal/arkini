@@ -25,7 +25,7 @@ Only `game.json`, `items/<uid>.json`, `artwork/*.png`, `image/*.png`, `music/*.o
 - `game.json` is the strict complete non-item root and owns `$schema`, package metadata/ID, structured output version, resources, and start state.
 - Each item file is a strict `{ $schema, item }` document. Its path owns canonical type and immutable encoded UID; its item owns the human-authored ID.
 - `artwork/` contains square Item Artwork. `image/` contains unrestricted-aspect launcher and shell images such as Hero and About avatars. Both accept PNG and share one global resource-ID namespace; the typed root owns semantic type and the filename owns ID. Artwork **Optimize** is an explicit source edit that losslessly re-encodes selected Artwork at its original dimensions; imports never rewrite source bodies automatically. Build bounds only Artwork to square RGBA no larger than 256 × 256; Image bytes and dimensions are preserved.
-- `music/` contains canonical Ogg/Opus tracks. Music shares the global resource-ID namespace and derives its ID from the filename. The Editor keeps valid Ogg/Opus bytes unchanged, or converts another selected audio format one file at a time through `ffmpeg` when that command exists in `PATH`. Music preview is requested lazily from the native file and supports byte ranges; no audio body crosses renderer IPC. Build validates each track and streams its unchanged bytes into Arkpack.
+- `music/` contains the Editor's canonical Ogg/Opus track library. Music shares the global resource-ID namespace and derives its ID from the filename. `game.json.music.playlist` explicitly selects the unique tracks used by the global random playlist; only those selected tracks enter the current Arkpack. Unselected tracks remain project sources for later explicit authored use. The Editor keeps valid Ogg/Opus bytes unchanged, or converts another selected audio format one file at a time through `ffmpeg` when that command exists in `PATH`. Music preview is requested lazily from the native file and supports byte ranges; no audio body crosses renderer IPC. Build validates and streams each selected track unchanged into Arkpack.
 - `sfx/` contains canonical Ogg/Opus sound effects. SFX share the global resource-ID namespace and derive IDs from filenames. Game playback loads and decodes a short effect only when its cue is first used; build validates and streams the unchanged bytes like Music.
 
 There is no free-form recursive JSON-fragment grammar. JSON outside the exact root and item paths is ignored as game source, and a missing/invalid marker, schema, root, path identity, or reference is a diagnostic.
@@ -42,7 +42,7 @@ read marker + schema + exact source paths
 → semantic and PNG-resource validation
 → assert no errors
 → bounded square RGBA normalization for `artwork/`; byte-preserving `image/`
-→ JSON manifest + JSON GameConfig + ordered raw resource bodies
+→ JSON manifest + JSON GameConfig + ordered raw resource bodies, with Music filtered by the authored playlist
 → ARKPACK envelope with optional distribution proof
 ```
 
@@ -131,7 +131,7 @@ The project stores `game.json.version` as `{ major, minor, suffix? }`, the last 
 
 Editor operations use the same directory, schemas, validation, compiler, and packer as the CLI. JSON import opens or creates this exact format; export creates a new unique child, copies only portable allowlisted paths, validates it, and never overwrites an existing destination. External project roots preserve `.git` and unrelated files.
 
-`src/artwork-authoring` owns the Artwork catalog, square-PNG admission, import/edit/delete sessions, Optimize, and presentation. Project Images owns general-PNG import and launcher/shell mappings. `src/audio-authoring` owns canonical Ogg/Opus preparation for Music and SFX; noncanonical input conversion depends only on a PATH-visible `ffmpeg`. `src/music-authoring` owns Music library management and one-track preview presentation. `src/resource-authoring` owns shared typed import orchestration; `src/authoring-session` owns mounted-project resource URLs; `src/authoring-form` owns the typed Resource-reference control. `src/game-config-resource` owns the generic Resource schema, semantic type, exact source discovery, PNG and Ogg/Opus admission, references, usage, and rename semantics. Explicit non-item Image roles belong to the completed `src/game-config` value they populate.
+`src/artwork-authoring` owns the Artwork catalog, square-PNG admission, import/edit/delete sessions, Optimize, and presentation. Project Images owns general-PNG import and launcher/shell mappings. `src/audio-authoring` owns canonical Ogg/Opus preparation for Music and SFX; noncanonical input conversion depends only on a PATH-visible `ffmpeg`. `src/music-authoring` owns Music library management, random-playlist selection and one-track preview presentation. `src/resource-authoring` owns shared typed import orchestration; `src/authoring-session` owns mounted-project resource URLs; `src/authoring-form` owns the typed Resource-reference control. `src/game-config-resource` owns the generic Resource schema, semantic type, exact source discovery, PNG and Ogg/Opus admission, references, usage, and rename semantics. Explicit non-item Image roles and the global Music playlist belong to the completed `src/game-config` value they populate.
 
 ## Content workflow
 

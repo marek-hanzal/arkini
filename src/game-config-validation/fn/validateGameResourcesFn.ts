@@ -45,6 +45,12 @@ export const validateGameResourcesFn = ({
 	}
 
 	const usages = readGameResourceUsagesFn(config);
+	const readUsageSourceFn = (usage: readGameResourceUsagesFn.Usage) =>
+		usage.owner === "item"
+			? provenance.items[usage.ownerId]
+			: usage.path[0] === "music"
+				? provenance.music
+				: provenance.resources;
 	const referenced = new Set(usages.map(({ resourceId }) => resourceId));
 	for (const usage of usages) {
 		const resource = firstById.get(usage.resourceId);
@@ -54,10 +60,7 @@ export const validateGameResourcesFn = ({
 					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
 					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: usage.path,
-					source:
-						usage.owner === "project"
-							? provenance.resources
-							: provenance.items[usage.ownerId],
+					source: readUsageSourceFn(usage),
 					message: `Referenced resource ${usage.resourceId} must be ${usage.resourceType}, but its source type is ${resource.type}.`,
 					resourceId: usage.resourceId,
 					expectedType: usage.resourceType,
@@ -69,8 +72,7 @@ export const validateGameResourcesFn = ({
 			code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: usage.path,
-			source:
-				usage.owner === "project" ? provenance.resources : provenance.items[usage.ownerId],
+			source: readUsageSourceFn(usage),
 			message: `Referenced resource ${usage.resourceId} has no matching source file.`,
 			resourceId: usage.resourceId,
 		});

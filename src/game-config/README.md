@@ -56,7 +56,7 @@ Source, validation, Editor Build, CLI and packing must not create variants of th
 - `game-config` owns values only; it imports no source, validation, compiler, Editor, renderer, route or Electron behavior.
 - `game-value` owns only reusable scalar schemas and imports no Arkini domain.
 - Source reads exact allowlisted paths. Arbitrary recursive JSON is not game source.
-- Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. Arkpack compilation normalizes square Artwork while preserving general Image and canonical Ogg/Opus audio bytes.
+- Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. The completed config owns the explicit global Music playlist; validation resolves its IDs as Music and Arkpack compilation includes only those selected Music bodies. Artwork is normalized to bounded square RGBA while general Image and selected canonical Ogg/Opus bytes are preserved.
 - The generated `schema.json` comes from the current project source-schema union and uses stable references.
 - Validation extends beyond Zod shape parsing and preserves source/entity provenance.
 - The compiler rejects blocking diagnostics and cannot publish a usable invalid result.

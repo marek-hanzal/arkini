@@ -405,6 +405,55 @@ describe("filesystem Editor project writes", () => {
 		});
 	});
 
+	it("removes a deleted Music resource from the random playlist", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const source = join(harness.temporaryDirectory, "playlist-theme.ogg");
+		const bytes = createTestOggOpusBytesFn();
+		await writeFile(source, bytes);
+		const imported = await Effect.runPromise(
+			repository.upsertResourceFilesFx({
+				projectId: project.projectId,
+				resources: [
+					{
+						id: "playlist-theme",
+						path: source,
+						size: bytes.byteLength,
+						type: "music",
+					},
+				],
+			}),
+		);
+		const marked = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: project.projectId,
+				expectedRevision: imported.revision,
+				config: {
+					...imported.config,
+					music: {
+						playlist: [
+							"playlist-theme",
+						],
+					},
+				},
+			}),
+		);
+		const deleted = await Effect.runPromise(
+			repository.deleteResourceFx({
+				projectId: project.projectId,
+				expectedRevision: marked.revision,
+				resourceId: "playlist-theme",
+			}),
+		);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+
+		expect(deleted.config.music?.playlist).toEqual([]);
+		await expect(readFile(join(root, "music", "playlist-theme.ogg"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+	});
+
 	it("rejects non-square Artwork replacement without changing the source", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);

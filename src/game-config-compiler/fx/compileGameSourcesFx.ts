@@ -155,6 +155,9 @@ const assembleGameSourcesFn = (sources: ReadonlyArray<GameSourceFileSchema.Type>
 				.with(DiagnosticProviderEnumSchema.enum.Meta, () => {
 					value.meta = source.value.meta;
 				})
+				.with(DiagnosticProviderEnumSchema.enum.Music, () => {
+					value.music = source.value.music;
+				})
 				.with(DiagnosticProviderEnumSchema.enum.Resources, () => {
 					value.resources = source.value.resources;
 				})
@@ -209,6 +212,9 @@ const readSourcePathFn = (
 	}
 	if (root === "meta") {
 		return provenance.meta;
+	}
+	if (root === "music") {
+		return provenance.music;
 	}
 	if (root === "resources") {
 		return provenance.resources;

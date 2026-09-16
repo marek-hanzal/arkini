@@ -2,6 +2,7 @@ import { Effect, Random } from "effect";
 
 import type { SoundSettings } from "~electron/contract/sound/SoundSettings";
 import type { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 
 interface MusicSlot {
@@ -17,7 +18,9 @@ interface SfxSlot extends MusicSlot {
 
 export namespace createGameAudioRuntimeFx {
 	export interface Props {
-		readonly game: Pick<PlayableGame, "getResourceUrlFn" | "resources">;
+		readonly game: Pick<PlayableGame, "getResourceUrlFn" | "resources"> & {
+			readonly config: Pick<GameConfigSchema.Type, "music">;
+		};
 		readonly sound: SoundSettings;
 		readonly crossfadeSeconds?: number;
 		readonly maximumSfxVoices?: number;
@@ -44,7 +47,12 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 }: createGameAudioRuntimeFx.Props) {
 	const random = yield* Random.Random;
 	return yield* Effect.sync(() => {
-		const musicIds = game.resources.filter(({ type }) => type === "music").map(({ id }) => id);
+		const packagedMusicIds = new Set(
+			game.resources.filter(({ type }) => type === "music").map(({ id }) => id),
+		);
+		const musicIds = (game.config.music?.playlist ?? []).filter((id) =>
+			packagedMusicIds.has(id),
+		);
 		const sfxIds = new Set(
 			game.resources.filter(({ type }) => type === "sfx").map(({ id }) => id),
 		);

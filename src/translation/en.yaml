@@ -52,6 +52,8 @@ Add at least {minimum} items.:
   dynamic: true
 Add avatars:
   value: Add avatars
+Add to random playlist:
+  value: Add to random playlist
 After:
   value: After
 Already optimized:
@@ -1731,6 +1733,8 @@ Remove folder project help:
     **Its folder and files stay on disk.** You can open it again later.
 Remove from Recent:
   value: Remove from Recent
+Remove from random playlist:
+  value: Remove from random playlist
 Remove managed project help:
   value: |
     Permanently deletes this project and **all of its files**.

@@ -1,4 +1,4 @@
-import { LoaderCircle, Music2, Pause, Play, Plus, Trash2 } from "lucide-react";
+import { ListMusic, LoaderCircle, Music2, Pause, Play, Plus, Trash2 } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -21,7 +21,11 @@ export const EditorMusicManager = () => {
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const controller = useEditorMusicManagerController();
-	const error = controller.importError ?? controller.deleteError ?? controller.playbackError;
+	const error =
+		controller.importError ??
+		controller.deleteError ??
+		controller.playlistError ??
+		controller.playbackError;
 	const errorMessage =
 		error === undefined ? undefined : error instanceof Error ? error.message : String(error);
 	const importButton = (
@@ -138,13 +142,17 @@ export const EditorMusicManager = () => {
 						>
 							{controller.music.map((resource) => {
 								const active = controller.activeResourceId === resource.id;
+								const inPlaylist = controller.playlistResourceIds.has(resource.id);
 								const playing = active && controller.playing;
 								const deleting =
 									controller.deletePending &&
 									controller.deletingResourceId === resource.id;
+								const togglingPlaylist =
+									controller.playlistPending &&
+									controller.togglingPlaylistResourceId === resource.id;
 								return (
 									<li
-										className="ak-list-row ak-list-row-interactive grid min-w-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 overflow-hidden rounded-xl px-4 py-3"
+										className="ak-list-row ak-list-row-interactive grid min-w-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 overflow-hidden rounded-xl px-4 py-3"
 										key={resource.id}
 										onClick={(event) => {
 											const bounds =
@@ -183,6 +191,42 @@ export const EditorMusicManager = () => {
 												{formatByteSizeFn(resource.size)}
 											</p>
 										</div>
+										<Tooltip
+											content={translator.textFn(
+												inPlaylist
+													? "Remove from random playlist"
+													: "Add to random playlist",
+											)}
+											placement="left"
+										>
+											<Button
+												className="relative z-10 size-10 min-h-10 shrink-0 p-0 data-[ui-selected=true]:border-accent/40 data-[ui-selected=true]:bg-accent/15 data-[ui-selected=true]:text-accent"
+												cursorIntent={
+													togglingPlaylist ? "progress" : undefined
+												}
+												disabled={
+													controller.playlistPending ||
+													controller.deletePending
+												}
+												onClick={(event) => {
+													event.stopPropagation();
+													controller.togglePlaylistFn(resource.id);
+												}}
+												{...readDataUiFn({
+													dataUi: "EditorMusicPlaylist",
+													state: {
+														pending: togglingPlaylist,
+														selected: inPlaylist,
+													},
+												})}
+											>
+												{togglingPlaylist ? (
+													<LoaderCircle className="size-4 animate-spin" />
+												) : (
+													<ListMusic className="size-4" />
+												)}
+											</Button>
+										</Tooltip>
 										<Tooltip
 											content={translator.textFn(playing ? "Pause" : "Play")}
 											placement="left"

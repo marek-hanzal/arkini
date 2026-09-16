@@ -164,8 +164,12 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		const resourcesRoot = path.join(temporary, "resources");
 		yield* fileSystem.makeDirectory(resourcesRoot);
 		const resources: PackedResourceFile[] = [];
-		for (let index = 0; index < compilation.resources.length; index += 1) {
-			const resource = compilation.resources[index];
+		const playlistIds = new Set(config.music?.playlist ?? []);
+		const packedResources = compilation.resources.filter(
+			(resource) => resource.type !== "music" || playlistIds.has(resource.id),
+		);
+		for (let index = 0; index < packedResources.length; index += 1) {
+			const resource = packedResources[index];
 			const target = path.join(resourcesRoot, String(index).padStart(6, "0"));
 			const length =
 				resource.type === "artwork"
@@ -212,7 +216,10 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		});
 		yield* fileSystem.makeDirectory(build);
 		yield* fileSystem.rename(stagedArkpack, path.join(build, filename));
-		return artifact;
+		return {
+			...artifact,
+			resources: resources.length,
+		};
 	}).pipe(
 		Effect.ensuring(
 			fileSystem
@@ -231,7 +238,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		packageId: identity.packageId,
 		version: identity.version,
 		json: compilation.json,
-		resources: compilation.resources.length,
+		resources: artifact.resources,
 		bytes: artifact.bytes,
 		contentHash: artifact.contentHash,
 		diagnostics: compilation.diagnostics,

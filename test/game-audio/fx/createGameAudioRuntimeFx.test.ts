@@ -106,9 +106,20 @@ describe("createGameAudioRuntimeFx", () => {
 		const runtime = Effect.runSync(
 			createGameAudioRuntimeFx({
 				game: {
+					config: {
+						music: {
+							playlist: [
+								"theme",
+							],
+						},
+					},
 					resources: [
 						{
 							id: "theme",
+							type: "music",
+						},
+						{
+							id: "item-theme",
 							type: "music",
 						},
 					],
@@ -139,6 +150,9 @@ describe("createGameAudioRuntimeFx", () => {
 		expect(harness.resume).toHaveBeenCalledOnce();
 		expect(harness.audios.filter(({ play }) => play.mock.calls.length === 1)).toHaveLength(1);
 		expect(harness.audios.some(({ src }) => src === "arkini://resource/theme")).toBe(true);
+		expect(harness.audios.some(({ src }) => src === "arkini://resource/item-theme")).toBe(
+			false,
+		);
 
 		Effect.runSync(
 			runtime.setSoundFx({
@@ -160,6 +174,7 @@ describe("createGameAudioRuntimeFx", () => {
 		const runtime = Effect.runSync(
 			createGameAudioRuntimeFx({
 				game: {
+					config: {},
 					resources: [
 						{
 							id: "job-start",
@@ -223,6 +238,14 @@ describe("createGameAudioRuntimeFx", () => {
 		const runtime = Effect.runSync(
 			createGameAudioRuntimeFx({
 				game: {
+					config: {
+						music: {
+							playlist: [
+								"theme-a",
+								"theme-b",
+							],
+						},
+					},
 					resources: [
 						{
 							id: "theme-a",

@@ -27,6 +27,10 @@
 					"description": "Explicit non-item resource roles used by the game shell.",
 					"$ref": "urn:arkini:schema:project#/$defs/resource.RolesSchema"
 				},
+				"music": {
+					"description": "Optional global Music behavior for this game.",
+					"$ref": "urn:arkini:schema:project#/$defs/music.MusicSchema"
+				},
 				"start": {
 					"description": "The initial board, inventory, and toolbar contents created for a new game.",
 					"$ref": "urn:arkini:schema:project#/$defs/StartSchema"
@@ -155,6 +159,23 @@
 			],
 			"additionalProperties": false,
 			"description": "Named non-item resource references required by the game."
+		},
+		"music.MusicSchema": {
+			"type": "object",
+			"properties": {
+				"playlist": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+					},
+					"description": "Music resource IDs included in the global random playlist."
+				}
+			},
+			"required": [
+				"playlist"
+			],
+			"additionalProperties": false,
+			"description": "The global random Music playlist authored for one game."
 		},
 		"NonNegativeIntegerSchema": {
 			"type": "integer",

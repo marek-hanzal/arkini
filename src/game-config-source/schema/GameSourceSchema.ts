@@ -5,6 +5,7 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
 import { RolesSchema } from "~/game-config/schema/RolesSchema";
+import { MusicSchema } from "~/game-config/schema/MusicSchema";
 
 /**
  * Internal assembly value shared by the canonical `game.json` root and
@@ -31,6 +32,12 @@ export const GameSourceSchema = z
 		 */
 		resources: RolesSchema.optional().describe(
 			"The optional named non-item resources contributed by this source fragment.",
+		),
+		/**
+		 * Optional global Music behavior contributed by this source fragment.
+		 */
+		music: MusicSchema.optional().describe(
+			"The optional global Music behavior contributed by this source fragment.",
 		),
 		/**
 		 * Optional new-game state contributed by this source fragment.

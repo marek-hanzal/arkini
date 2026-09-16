@@ -7,7 +7,7 @@ export namespace readGameResourceUsagesFn {
 	export type Usage =
 		| {
 				readonly resourceId: string;
-				readonly resourceType: "image";
+				readonly resourceType: "image" | "music";
 				readonly owner: "project";
 				readonly ownerLabel: "Project";
 				readonly roleLabel: string;
@@ -80,6 +80,20 @@ export const readGameResourceUsagesFn = (
 			],
 		});
 	}
+	config.music?.playlist.forEach((resourceId, index) => {
+		usages.push({
+			resourceId,
+			resourceType: "music",
+			owner: "project",
+			ownerLabel: "Project",
+			roleLabel: `Random playlist track ${index + 1}`,
+			path: [
+				"music",
+				"playlist",
+				index,
+			],
+		});
+	});
 	for (const [itemId, item] of Object.entries(config.items).sort(([left], [right]) =>
 		Order.String(left, right),
 	)) {

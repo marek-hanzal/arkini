@@ -5,6 +5,7 @@ import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { RolesSchema } from "~/game-config/schema/RolesSchema";
+import { MusicSchema } from "~/game-config/schema/MusicSchema";
 
 /**
  * The root schema for a game's configuration.
@@ -29,6 +30,10 @@ export const GameConfigSchema = z
 		 * Explicit non-item resource roles used by the game shell.
 		 */
 		resources: RolesSchema.describe("Explicit non-item resource roles used by the game shell."),
+		/**
+		 * Optional global Music behavior. Its absence means that no random playlist is authored.
+		 */
+		music: MusicSchema.optional().describe("Optional global Music behavior for this game."),
 		/**
 		 * Board and inventory contents created for a new game.
 		 */

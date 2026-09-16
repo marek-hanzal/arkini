@@ -19,6 +19,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import type { Project } from "~/project-authoring/type/Project";
 import { deleteEditorResourceFx } from "~/resource-authoring/fx/deleteEditorResourceFx";
 import { importEditorResourcesFx } from "~/resource-authoring/fx/importEditorResourcesFx";
+import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
@@ -48,6 +49,14 @@ const deleteEditorMusicAtom = RendererRuntime.runSync(
 	),
 );
 
+const toggleEditorMusicPlaylistAtom = RendererRuntime.runSync(
+	Effect.map(ProjectRepository, (repository) =>
+		Atom.fn((props: saveProjectConfigFx.Props) =>
+			saveProjectConfigFx(props).pipe(Effect.provideService(ProjectRepository, repository)),
+		).pipe(Atom.withLabel("EditorMusicPlaylistToggle"), Atom.setIdleTTL(0)),
+	),
+);
+
 interface ActiveAudio {
 	readonly audio: HTMLAudioElement;
 	readonly disposeFn: () => void;
@@ -69,12 +78,17 @@ export namespace useEditorMusicManagerController {
 		readonly openFilesImportFn: () => void;
 		readonly playbackError?: string;
 		readonly playbackProgress: number;
+		readonly playlistError?: unknown;
+		readonly playlistPending: boolean;
+		readonly playlistResourceIds: ReadonlySet<string>;
 		readonly playing: boolean;
 		readonly query: string;
 		readonly setQueryFn: (query: string) => void;
 		readonly setVolumeFn: (volume: number) => void;
 		readonly seekPlaybackFn: (resourceId: string, progress: number) => void;
 		readonly togglePlaybackFn: (resourceId: string) => void;
+		readonly togglePlaylistFn: (resourceId: string) => void;
+		readonly togglingPlaylistResourceId?: string;
 		readonly totalMusicCount: number;
 		readonly volume: number;
 	}
@@ -90,12 +104,15 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 	const importMusicFn = useAtomSet(importEditorMusicAtom);
 	const deleteResult = useAtomValue(deleteEditorMusicAtom);
 	const deleteMusicCommandFn = useAtomSet(deleteEditorMusicAtom);
+	const playlistResult = useAtomValue(toggleEditorMusicPlaylistAtom);
+	const togglePlaylistCommandFn = useAtomSet(toggleEditorMusicPlaylistAtom);
 	const [activeResourceId, setActiveResourceIdFn] = useState<string>();
 	const [deletingResourceId, setDeletingResourceIdFn] = useState<string>();
 	const [playbackDuration, setPlaybackDurationFn] = useState(0);
 	const [playbackTime, setPlaybackTimeFn] = useState(0);
 	const [playing, setPlayingFn] = useState(false);
 	const [playbackError, setPlaybackErrorFn] = useState<string>();
+	const [togglingPlaylistResourceId, setTogglingPlaylistResourceIdFn] = useState<string>();
 	const [query, setQueryFn] = useState("");
 	const [volume, setVolumeStateFn] = useState(100);
 	const allMusic = useMemo(
@@ -137,6 +154,12 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 			musicById,
 		],
 	);
+	const playlistResourceIds = useMemo(
+		() => new Set(project.config.music?.playlist ?? []),
+		[
+			project.config.music?.playlist,
+		],
+	);
 	const resourceIds = useMemo(
 		() => allMusic.map(({ id }) => id),
 		[
@@ -148,6 +171,8 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 	const importError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(importResult));
 	const deleteError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(deleteResult));
 	const deletePending = deleteResult.waiting;
+	const playlistError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(playlistResult));
+	const playlistPending = playlistResult.waiting;
 
 	const disposeActiveFn = useCallback(() => {
 		const active = activeAudioRef.current;
@@ -302,6 +327,26 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 			resourceId,
 		});
 	};
+	const togglePlaylistFn = (resourceId: string) => {
+		if (playlistPending) return;
+		setTogglingPlaylistResourceIdFn(resourceId);
+		const playlist = playlistResourceIds.has(resourceId)
+			? (project.config.music?.playlist ?? []).filter((id) => id !== resourceId)
+			: [
+					...(project.config.music?.playlist ?? []),
+					resourceId,
+				];
+		togglePlaylistCommandFn({
+			config: {
+				...project.config,
+				music: {
+					playlist,
+				},
+			},
+			expectedRevision: project.revision,
+			projectId: project.projectId,
+		});
+	};
 
 	return {
 		activeResourceId,
@@ -317,12 +362,17 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 		openFilesImportFn: () => filesInputRef.current?.click(),
 		playbackError,
 		playbackProgress: playbackDuration > 0 ? Math.min(1, playbackTime / playbackDuration) : 0,
+		playlistError,
+		playlistPending,
+		playlistResourceIds,
 		playing,
 		query,
 		setQueryFn,
 		setVolumeFn,
 		seekPlaybackFn,
 		togglePlaybackFn,
+		togglePlaylistFn,
+		togglingPlaylistResourceId,
 		totalMusicCount: allMusic.length,
 		volume,
 	};

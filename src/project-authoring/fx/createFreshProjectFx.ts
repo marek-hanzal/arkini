@@ -40,6 +40,9 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 		resources: {
 			hero: "hero",
 		},
+		music: {
+			playlist: [],
+		},
 		start: {
 			currentSpace: 0,
 			board: [],

@@ -672,12 +672,25 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	}) =>
 		commitResourcesFx("delete-resource", projectId, expectedRevision, (state) =>
 			Effect.gen(function* () {
-				if (!state.project.resources.some(({ id }) => id === resourceId))
+				const resource = state.project.resources.find(({ id }) => id === resourceId);
+				if (resource === undefined)
 					return yield* Effect.fail(
 						errorFn("delete-resource", `Resource ${resourceId} does not exist.`),
 					);
+				const config =
+					resource.type === "music" && state.project.config.music !== undefined
+						? GameConfigSchema.parse({
+								...state.project.config,
+								music: {
+									...state.project.config.music,
+									playlist: state.project.config.music.playlist.filter(
+										(id) => id !== resourceId,
+									),
+								},
+							})
+						: state.project.config;
 				const blockers = readEditorArtworkDeleteBlockersFn({
-					config: state.project.config,
+					config,
 					resourceId,
 				});
 				if (blockers.length > 0)
@@ -688,7 +701,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						),
 					);
 				return {
-					config: state.project.config,
+					config,
 					resources: state.project.resources.filter(({ id }) => id !== resourceId),
 					resourceDelete: resourceId,
 				};

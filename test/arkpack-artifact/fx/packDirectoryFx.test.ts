@@ -54,6 +54,7 @@ describe("packDirectoryFx game-project contract", () => {
 				type: "music",
 				bytes: musicOgg,
 			});
+			expect(payload.resources.some(({ id }) => id === "unused-theme")).toBe(false);
 			expect(payload.resources).toContainEqual({
 				id: "job-start",
 				type: "sfx",

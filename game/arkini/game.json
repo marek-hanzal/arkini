@@ -27,6 +27,12 @@
 		"avatar-06": "avatar-06",
 		"avatar-07": "avatar-07"
 	},
+	"music": {
+		"playlist": [
+			"the-tavern-at-the-crossroads-1",
+			"unresolved-waltz"
+		]
+	},
 	"start": {
 		"currentSpace": 0,
 		"board": [

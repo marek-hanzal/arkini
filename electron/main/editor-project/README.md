@@ -73,7 +73,7 @@ Project projections carry resource ID, semantic type, byte size and a filesystem
 
 [`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
-[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image and audio consumers, including Editor Board and Music preview. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Audio byte ranges are forwarded to the native file request. Unrequested resources are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build validates typed resources and streams their bodies into Arkpack.
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image and audio consumers, including Editor Board and Music preview. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Audio byte ranges are forwarded to the native file request. Unrequested resources are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build validates typed resources and streams their bodies into Arkpack, filtering Music to the explicit global playlist.
 
 ## Renderer replacement flow
 

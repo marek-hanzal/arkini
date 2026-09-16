@@ -35,6 +35,14 @@ export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* 
 		GameConfigSchema.parse({
 			...config,
 			items,
+			...(config.music === undefined
+				? {}
+				: {
+						music: {
+							...config.music,
+							playlist: config.music.playlist.map(renameFn),
+						},
+					}),
 			resources,
 		}),
 	);

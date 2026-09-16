@@ -8,6 +8,11 @@ describe("renameGameResourceFx", () => {
 	it("renames project and item references without changing unrelated identities", () => {
 		const config = {
 			...editorTestPayload.config,
+			music: {
+				playlist: [
+					"hero",
+				],
+			},
 			items: {
 				...editorTestPayload.config.items,
 				water: {
@@ -34,6 +39,9 @@ describe("renameGameResourceFx", () => {
 		);
 
 		expect(renamed.resources.hero).toBe("cover");
+		expect(renamed.music?.playlist).toEqual([
+			"cover",
+		]);
 		expect(renamed.items.water?.artwork.default).toEqual([
 			"cover",
 			"item-water",

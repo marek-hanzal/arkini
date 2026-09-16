@@ -4,6 +4,7 @@ import { z } from "zod";
 export const DiagnosticProviderEnumSchema = z
 	.enum({
 		Meta: "meta",
+		Music: "music",
 		Resources: "resources",
 		Start: "start",
 	})

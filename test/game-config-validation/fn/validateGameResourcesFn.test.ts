@@ -87,6 +87,54 @@ describe("validateGameResourcesFn", () => {
 		).toBe(false);
 	});
 
+	it("requires every random playlist entry to resolve to Music", () => {
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			music: {
+				playlist: [
+					"missing-theme",
+					"wrong-theme",
+				],
+			},
+		});
+		const diagnostics = validateGameResourcesFn({
+			config,
+			provenance: {
+				...provenance,
+				music: "game.json",
+			},
+			resources: [
+				{
+					id: "wrong-theme",
+					path: "image/wrong-theme.png",
+					type: "image",
+				},
+			],
+		});
+
+		expect(diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
+					path: [
+						"music",
+						"playlist",
+						0,
+					],
+					resourceId: "missing-theme",
+					source: "game.json",
+				}),
+				expect.objectContaining({
+					actualType: "image",
+					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
+					expectedType: "music",
+					resourceId: "wrong-theme",
+					source: "game.json",
+				}),
+			]),
+		);
+	});
+
 	it("reports duplicate and missing exact resource IDs", () => {
 		const diagnostics = validateGameResourcesFn({
 			config: startTestConfig,

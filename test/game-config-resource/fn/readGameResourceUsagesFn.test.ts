@@ -35,4 +35,28 @@ describe("readGameResourceUsagesFn", () => {
 			},
 		]);
 	});
+
+	it("projects random playlist Music as an explicit project resource usage", () => {
+		expect(
+			readGameResourceUsagesFn({
+				...editorTestConfig,
+				music: {
+					playlist: [
+						"theme",
+					],
+				},
+			}),
+		).toContainEqual({
+			owner: "project",
+			ownerLabel: "Project",
+			path: [
+				"music",
+				"playlist",
+				0,
+			],
+			resourceId: "theme",
+			resourceType: "music",
+			roleLabel: "Random playlist track 1",
+		});
+	});
 });

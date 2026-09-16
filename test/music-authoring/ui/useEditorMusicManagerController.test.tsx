@@ -8,15 +8,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
 	deleteMusicFn: vi.fn(),
 	importMusicFn: vi.fn(),
+	playlistMusicFn: vi.fn(),
 	setCall: 0,
 	valueCall: 0,
 }));
 
 vi.mock("@effect/atom-react", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@effect/atom-react")>()),
-	useAtomSet: () => (state.setCall++ % 2 === 0 ? state.importMusicFn : state.deleteMusicFn),
+	useAtomSet: () =>
+		[
+			state.importMusicFn,
+			state.deleteMusicFn,
+			state.playlistMusicFn,
+		][state.setCall++ % 3],
 	useAtomValue: () =>
-		state.valueCall++ % 3 === 0
+		state.valueCall++ % 4 === 0
 			? {
 					master: 80,
 					music: 100,
@@ -27,6 +33,13 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
+		config: {
+			music: {
+				playlist: [
+					"opening-theme",
+				],
+			},
+		},
 		projectId: "project-one",
 		revision: 7,
 		resources: [
@@ -106,6 +119,7 @@ const Probe = () => {
 beforeEach(async () => {
 	state.deleteMusicFn.mockReset();
 	state.importMusicFn.mockReset();
+	state.playlistMusicFn.mockReset();
 	state.setCall = 0;
 	state.valueCall = 0;
 	AudioStub.instances = [];
@@ -168,5 +182,24 @@ describe("useEditorMusicManagerController", () => {
 		});
 		expect(audio.pause).toHaveBeenCalledOnce();
 		expect(controller?.activeResourceId).toBeUndefined();
+	});
+
+	it("toggles one Music resource in the authored random playlist", async () => {
+		expect(controller?.playlistResourceIds.has("opening-theme")).toBe(true);
+		expect(controller?.playlistResourceIds.has("battle-march")).toBe(false);
+
+		await act(async () => controller?.togglePlaylistFn("battle-march"));
+		expect(state.playlistMusicFn).toHaveBeenCalledWith({
+			config: {
+				music: {
+					playlist: [
+						"opening-theme",
+						"battle-march",
+					],
+				},
+			},
+			expectedRevision: 7,
+			projectId: "project-one",
+		});
 	});
 });

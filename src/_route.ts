@@ -35,6 +35,7 @@ import { Route as EditorProjectIdMcpRouteImport } from "./@routes/editor/$projec
 import { Route as EditorProjectIdMusicRouteImport } from "./@routes/editor/$projectId/music"
 import { Route as EditorProjectIdNotesRouteImport } from "./@routes/editor/$projectId/notes"
 import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
+import { Route as EditorProjectIdSfxRouteImport } from "./@routes/editor/$projectId/sfx"
 import { Route as GamePackageIdSceneRouteImport } from "./@routes/game/$packageId/_scene"
 import { Route as GamePackageIdCheatsRouteImport } from "./@routes/game/$packageId/cheats"
 import { Route as EditorProjectIdArtworkIndexRouteImport } from "./@routes/editor/$projectId/artwork/index"
@@ -201,6 +202,11 @@ const EditorProjectIdNotesRoute = EditorProjectIdNotesRouteImport.update({
 const EditorProjectIdProjectRoute = EditorProjectIdProjectRouteImport.update({
   id: "/project",
   path: "/project",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
+const EditorProjectIdSfxRoute = EditorProjectIdSfxRouteImport.update({
+  id: "/sfx",
+  path: "/sfx",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
 const GamePackageIdSceneRoute = GamePackageIdSceneRouteImport.update({
@@ -451,6 +457,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/music": typeof EditorProjectIdMusicRoute
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
+  "/editor/$projectId/sfx": typeof EditorProjectIdSfxRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/settings/": typeof LauncherSettingsIndexRoute
   "/editor/$projectId/artwork/$resourceId": typeof EditorProjectIdArtworkResourceIdRouteWithChildren
@@ -509,6 +516,7 @@ export interface FileRoutesByTo {
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
   "/editor/$projectId/music": typeof EditorProjectIdMusicRoute
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
+  "/editor/$projectId/sfx": typeof EditorProjectIdSfxRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/settings": typeof LauncherSettingsIndexRoute
   "/editor/$projectId/artwork/$resourceId": typeof EditorProjectIdArtworkResourceIdRouteWithChildren
@@ -571,6 +579,7 @@ export interface FileRoutesById {
   "/editor/$projectId/music": typeof EditorProjectIdMusicRoute
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
+  "/editor/$projectId/sfx": typeof EditorProjectIdSfxRoute
   "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/_launcher/settings/": typeof LauncherSettingsIndexRoute
@@ -638,6 +647,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/music"
     | "/editor/$projectId/notes"
     | "/editor/$projectId/project"
+    | "/editor/$projectId/sfx"
     | "/game/$packageId/cheats"
     | "/settings/"
     | "/editor/$projectId/artwork/$resourceId"
@@ -696,6 +706,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/build"
     | "/editor/$projectId/music"
     | "/editor/$projectId/notes"
+    | "/editor/$projectId/sfx"
     | "/game/$packageId/cheats"
     | "/settings"
     | "/editor/$projectId/artwork/$resourceId"
@@ -757,6 +768,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/music"
     | "/editor/$projectId/notes"
     | "/editor/$projectId/project"
+    | "/editor/$projectId/sfx"
     | "/game/$packageId/_scene"
     | "/game/$packageId/cheats"
     | "/_launcher/settings/"
@@ -990,6 +1002,13 @@ declare module "@tanstack/react-router" {
       path: "/project"
       fullPath: "/editor/$projectId/project"
       preLoaderRoute: typeof EditorProjectIdProjectRouteImport
+      parentRoute: typeof EditorProjectIdRoute
+    }
+    "/editor/$projectId/sfx": {
+      id: "/editor/$projectId/sfx"
+      path: "/sfx"
+      fullPath: "/editor/$projectId/sfx"
+      preLoaderRoute: typeof EditorProjectIdSfxRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
     "/game/$packageId/_scene": {
@@ -1537,6 +1556,7 @@ interface EditorProjectIdRouteChildren {
   EditorProjectIdMusicRoute: typeof EditorProjectIdMusicRoute
   EditorProjectIdNotesRoute: typeof EditorProjectIdNotesRoute
   EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRouteWithChildren
+  EditorProjectIdSfxRoute: typeof EditorProjectIdSfxRoute
 }
 
 const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
@@ -1548,6 +1568,7 @@ const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
   EditorProjectIdMusicRoute: EditorProjectIdMusicRoute,
   EditorProjectIdNotesRoute: EditorProjectIdNotesRoute,
   EditorProjectIdProjectRoute: EditorProjectIdProjectRouteWithChildren,
+  EditorProjectIdSfxRoute: EditorProjectIdSfxRoute,
 }
 
 const EditorProjectIdRouteWithChildren = EditorProjectIdRoute._addFileChildren(

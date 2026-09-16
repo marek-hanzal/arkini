@@ -135,8 +135,9 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `authoring-form` | Shared form registry and reference controls | [`src/authoring-form/ui/EditorForm.tsx`](src/authoring-form/ui/EditorForm.tsx) |
 | `editor-control` | Reusable Editor fields, sections, selection and search | [`src/editor-control/ui/EditorFormSection.tsx`](src/editor-control/ui/EditorFormSection.tsx) |
 | `artwork-authoring` | Artwork catalog, square-PNG validation, edit/import/delete, Optimize and UI | [`src/artwork-authoring/ui/EditorArtworkManager.tsx`](src/artwork-authoring/ui/EditorArtworkManager.tsx) |
-| `audio-authoring` | PATH-optional canonical Ogg/Opus preparation for Editor audio imports | [`src/audio-authoring/fx/prepareEditorAudioFileFx.ts`](src/audio-authoring/fx/prepareEditorAudioFileFx.ts) |
-| `music-authoring` | Music library management and lazy one-track Editor preview | [`src/music-authoring/ui/EditorMusicManager.tsx`](src/music-authoring/ui/EditorMusicManager.tsx) |
+| `audio-authoring` | Shared Music/SFX library import, lazy one-track preview and PATH-optional canonical Ogg/Opus preparation | [`src/audio-authoring/ui/EditorAudioResourceManager.tsx`](src/audio-authoring/ui/EditorAudioResourceManager.tsx) |
+| `music-authoring` | Music random-playlist selection over shared audio authoring | [`src/music-authoring/ui/EditorMusicManager.tsx`](src/music-authoring/ui/EditorMusicManager.tsx) |
+| `sfx-authoring` | Sound-effects library workspace over shared audio authoring | [`src/sfx-authoring/ui/EditorSfxManager.tsx`](src/sfx-authoring/ui/EditorSfxManager.tsx) |
 | `resource-authoring` | Shared typed Resource import orchestration | [`src/resource-authoring/fx/importEditorResourcesFx.ts`](src/resource-authoring/fx/importEditorResourcesFx.ts) |
 | `item-authoring` | Item forms, delete/rename policy and UI | [`src/item-authoring/ui/Detail.tsx`](src/item-authoring/ui/Detail.tsx) |
 | `editor-board` | Live Editor Board Game and its routed lifecycle | [`src/editor-board/fx/createEditorBoardGameResourceFx.ts`](src/editor-board/fx/createEditorBoardGameResourceFx.ts) |

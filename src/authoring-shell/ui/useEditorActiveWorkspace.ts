@@ -1,6 +1,7 @@
 import { useMatchRoute } from "@tanstack/react-router";
 import {
 	Boxes,
+	AudioLines,
 	FolderCog,
 	Images,
 	LayoutGrid,
@@ -42,6 +43,14 @@ export const EditorWorkspaceRoutes = [
 		matchTo: "/editor/$projectId/music",
 		shortcut: "Mod+Shift+S",
 		to: "/editor/$projectId/music",
+	},
+	{
+		id: "sfx",
+		icon: AudioLines,
+		label: "SFX",
+		matchTo: "/editor/$projectId/sfx",
+		shortcut: "Mod+Shift+F",
+		to: "/editor/$projectId/sfx",
 	},
 	{
 		id: "board",

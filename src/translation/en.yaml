@@ -831,12 +831,16 @@ Image:
   value: Image
 Images:
   value: Images
+Import SFX:
+  value: Import SFX
 Import arkpack:
   value: Import arkpack
 Import artwork:
   value: Import artwork
 Import audio files to create the project music library.:
   value: Import audio files to create the project music library.
+Import audio files to create the project sound effects library.:
+  value: Import audio files to create the project sound effects library.
 Import images:
   value: Import images
 Import music:
@@ -845,6 +849,8 @@ Imported artwork:
   value: Imported artwork
 Imported image count:
   value: Imported {count} image resources.
+Importing SFX…:
+  value: Importing SFX…
 Importing music…:
   value: Importing music…
 Indeterminate:
@@ -1328,6 +1334,8 @@ No active job:
   value: No active job
 No artwork matches this search.:
   value: No artwork matches this search.
+No audio matches the current filters.:
+  value: No audio matches the current filters.
 No authored item directly inputs or positively requires this item.:
   value: No saved item directly uses this item as an input or required condition.
   dynamic: true
@@ -1373,12 +1381,12 @@ No matching items:
   value: No matching items
 No matching music:
   value: No matching music
+No matching sound effects:
+  value: No matching sound effects
 No material input required.:
   value: No material input required.
 No merges for this item:
   value: No merges for this item
-No music matches the current filters.:
-  value: No music matches the current filters.
 No music yet:
   value: No music yet
 No other authored item outputs this item through production, expiry, units, or merges.:
@@ -1400,6 +1408,8 @@ No rules:
   value: No rules
 No saved item has this UID.:
   value: No saved item has this UID.
+No sound effects yet:
+  value: No sound effects yet
 No visible lines match {query}.:
   value: No visible lines match {query}.
 None:
@@ -1858,6 +1868,15 @@ Runtime adjustment (seconds):
   value: Time adjustment (seconds)
 Runtime multiplier:
   value: Time multiplier
+SFX:
+  value: SFX
+SFX help:
+  value: |
+    Build the sound effects library for your game. Import sounds, find them quickly, and preview how they sound before assigning them to gameplay events.
+
+    - Sound effect names come from the imported filenames.
+    - **Play** previews one sound effect at a time.
+    - **Volume** changes only the preview volume on this page.
 Safe item deletion help:
   value: |
     Nothing in the saved project uses this item. It can be deleted without changing anything else.
@@ -1871,6 +1890,8 @@ Schedule:
   value: Schedule
 Search:
   value: Search
+Search SFX…:
+  value: Search SFX…
 Search artwork…:
   value: Search artwork…
 Search item title or ID…:

@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
-	deleteMusicFn: vi.fn(),
+	deleteResourceFn: vi.fn(),
 	importMusicFn: vi.fn(),
 	playlistMusicFn: vi.fn(),
 	setCall: 0,
@@ -18,7 +18,7 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 	useAtomSet: () =>
 		[
 			state.importMusicFn,
-			state.deleteMusicFn,
+			state.deleteResourceFn,
 			state.playlistMusicFn,
 		][state.setCall++ % 3],
 	useAtomValue: () =>
@@ -117,7 +117,7 @@ const Probe = () => {
 };
 
 beforeEach(async () => {
-	state.deleteMusicFn.mockReset();
+	state.deleteResourceFn.mockReset();
 	state.importMusicFn.mockReset();
 	state.playlistMusicFn.mockReset();
 	state.setCall = 0;
@@ -194,8 +194,8 @@ describe("useEditorMusicManagerController", () => {
 		expect(audio.currentTime).toBe(90);
 		expect(controller?.playbackProgress).toBe(0.75);
 
-		await act(async () => controller?.deleteMusicFn("battle-march"));
-		expect(state.deleteMusicFn).toHaveBeenCalledWith({
+		await act(async () => controller?.deleteResourceFn("battle-march"));
+		expect(state.deleteResourceFn).toHaveBeenCalledWith({
 			expectedRevision: 7,
 			projectId: "project-one",
 			resourceId: "battle-march",

@@ -21,24 +21,34 @@ import {
 describe("Settings mutation authority", () => {
 	it("publishes and persists application-wide sound levels", async () => {
 		const { container, registry, writeSound } = await renderSettings([
-			"/settings/game",
+			"/settings/sound",
 		]);
-		const master = container.querySelector<HTMLInputElement>('input[type="range"]');
+		const master = container.querySelector<HTMLButtonElement>(
+			'[data-ui="SoundLevelControl"][data-ui-label="Master"]',
+		);
 		if (master === null) throw new Error("Expected Master sound control.");
+		vi.spyOn(master, "getBoundingClientRect").mockReturnValue({
+			left: 0,
+			width: 100,
+		} as DOMRect);
 		await act(async () => {
-			const valueSetter = Object.getOwnPropertyDescriptor(
-				HTMLInputElement.prototype,
-				"value",
-			)?.set;
-			valueSetter?.call(master, "35");
 			master.dispatchEvent(
-				new Event("input", {
+				new MouseEvent("mousedown", {
 					bubbles: true,
+					clientX: 20,
+				}),
+			);
+			master.dispatchEvent(
+				new MouseEvent("mousemove", {
+					bubbles: true,
+					buttons: 1,
+					clientX: 35,
 				}),
 			);
 		});
-		await vi.waitFor(() => expect(writeSound).toHaveBeenCalledWith("master", 35));
+		await vi.waitFor(() => expect(writeSound).toHaveBeenLastCalledWith("master", 35));
 		expect(registry.get(SoundSettingsAtom).master).toBe(35);
+		expect(container.querySelector('input[type="range"]')).toBeNull();
 	});
 
 	it("toggles application-wide Cheat tools without an active Game", async () => {

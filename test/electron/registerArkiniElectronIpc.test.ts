@@ -62,16 +62,16 @@ describe("registerArkiniElectronIpcFx authorization", () => {
 			harness.invoke(
 				ArkiniElectronApi.channels.soundWrite,
 				harness.trustedEvent,
-				"music",
+				"master",
 				37,
 			),
 		).resolves.toBeUndefined();
 		await expect(
 			harness.invoke(ArkiniElectronApi.channels.soundRead, harness.trustedEvent),
 		).resolves.toEqual({
-			master: 100,
-			music: 37,
-			sfx: 100,
+			master: 37,
+			music: 10,
+			sfx: 5,
 		});
 		await expect(
 			harness.invoke(

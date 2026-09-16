@@ -17,6 +17,9 @@ describe("Settings", () => {
 		await act(async () => linkByText(container, "Game").click());
 		expect(router.state.location.pathname).toBe("/settings/game");
 		expect(container.querySelector('[data-ui="SettingsGame"]')).not.toBeNull();
+		await act(async () => linkByText(container, "Sound").click());
+		expect(router.state.location.pathname).toBe("/settings/sound");
+		expect(container.querySelector('[data-ui="SettingsSound"]')).not.toBeNull();
 		await act(async () => linkByText(container, "Dev").click());
 		expect(router.state.location.pathname).toBe("/settings/dev");
 		expect(container.querySelector('[data-ui="SettingsDev"]')).not.toBeNull();

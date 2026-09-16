@@ -25,6 +25,7 @@ import { Route as SettingsRouteDefinition } from "~/@routes/_launcher/settings";
 import { Route as CommonSettingsRouteDefinition } from "~/@routes/_launcher/settings/common";
 import { Route as DevSettingsRouteDefinition } from "~/@routes/_launcher/settings/dev";
 import { Route as GameSettingsRouteDefinition } from "~/@routes/_launcher/settings/game";
+import { Route as SoundSettingsRouteDefinition } from "~/@routes/_launcher/settings/sound";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
@@ -37,10 +38,12 @@ const SettingsRoute = SettingsRouteDefinition.options.component;
 const CommonSection = CommonSettingsRouteDefinition.options.component;
 const DevSection = DevSettingsRouteDefinition.options.component;
 const GameSection = GameSettingsRouteDefinition.options.component;
+const SoundSection = SoundSettingsRouteDefinition.options.component;
 if (SettingsRoute === undefined) throw new Error("Settings route component is missing.");
 if (CommonSection === undefined) throw new Error("Common Settings route component is missing.");
 if (DevSection === undefined) throw new Error("Dev Settings route component is missing.");
 if (GameSection === undefined) throw new Error("Game Settings route component is missing.");
+if (SoundSection === undefined) throw new Error("Sound Settings route component is missing.");
 
 (
 	globalThis as {
@@ -287,6 +290,11 @@ export const renderSettings = async (
 		path: "/game",
 		component: GameSection,
 	});
+	const settingsSoundRoute = createRoute({
+		getParentRoute: () => settingsRoute,
+		path: "/sound",
+		component: SoundSection,
+	});
 	const settingsDevRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/dev",
@@ -308,6 +316,7 @@ export const renderSettings = async (
 				settingsIndexRoute,
 				settingsCommonRoute,
 				settingsGameRoute,
+				settingsSoundRoute,
 				settingsDevRoute,
 			]),
 			mainMenuRoute,

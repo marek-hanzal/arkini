@@ -333,7 +333,12 @@ describe("createArkiniRouterFx", () => {
 			"hero-to-hero",
 			"settings-to-settings",
 		]);
-		expect(resolveTypes("/settings/game", "/settings/dev")).toEqual([
+		expect(resolveTypes("/settings/game", "/settings/sound")).toEqual([
+			"arkini-route",
+			"hero-to-hero",
+			"settings-to-settings",
+		]);
+		expect(resolveTypes("/settings/sound", "/settings/dev")).toEqual([
 			"arkini-route",
 			"hero-to-hero",
 			"settings-to-settings",

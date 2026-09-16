@@ -7,6 +7,12 @@ export interface SoundSettings {
 	readonly sfx: SoundVolumeSchema.Type;
 }
 
+export const defaultSoundSettings = {
+	master: 100,
+	music: 10,
+	sfx: 5,
+} satisfies SoundSettings;
+
 export const SoundChannelSchema = z.enum([
 	"master",
 	"music",

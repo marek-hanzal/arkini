@@ -25,6 +25,7 @@ import { Route as LauncherSettingsIndexRouteImport } from "./@routes/_launcher/s
 import { Route as LauncherSettingsCommonRouteImport } from "./@routes/_launcher/settings/common"
 import { Route as LauncherSettingsDevRouteImport } from "./@routes/_launcher/settings/dev"
 import { Route as LauncherSettingsGameRouteImport } from "./@routes/_launcher/settings/game"
+import { Route as LauncherSettingsSoundRouteImport } from "./@routes/_launcher/settings/sound"
 import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/load-game/$packageId"
 import { Route as EditorProjectIdArtworkRouteImport } from "./@routes/editor/$projectId/artwork"
 import { Route as EditorProjectIdBoardRouteImport } from "./@routes/editor/$projectId/board"
@@ -150,6 +151,11 @@ const LauncherSettingsDevRoute = LauncherSettingsDevRouteImport.update({
 const LauncherSettingsGameRoute = LauncherSettingsGameRouteImport.update({
   id: "/game",
   path: "/game",
+  getParentRoute: () => LauncherSettingsRoute,
+} as any)
+const LauncherSettingsSoundRoute = LauncherSettingsSoundRouteImport.update({
+  id: "/sound",
+  path: "/sound",
   getParentRoute: () => LauncherSettingsRoute,
 } as any)
 const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
@@ -435,6 +441,7 @@ export interface FileRoutesByFullPath {
   "/settings/common": typeof LauncherSettingsCommonRoute
   "/settings/dev": typeof LauncherSettingsDevRoute
   "/settings/game": typeof LauncherSettingsGameRoute
+  "/settings/sound": typeof LauncherSettingsSoundRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/artwork": typeof EditorProjectIdArtworkRouteWithChildren
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
@@ -497,6 +504,7 @@ export interface FileRoutesByTo {
   "/settings/common": typeof LauncherSettingsCommonRoute
   "/settings/dev": typeof LauncherSettingsDevRoute
   "/settings/game": typeof LauncherSettingsGameRoute
+  "/settings/sound": typeof LauncherSettingsSoundRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
   "/editor/$projectId/music": typeof EditorProjectIdMusicRoute
@@ -553,6 +561,7 @@ export interface FileRoutesById {
   "/_launcher/settings/common": typeof LauncherSettingsCommonRoute
   "/_launcher/settings/dev": typeof LauncherSettingsDevRoute
   "/_launcher/settings/game": typeof LauncherSettingsGameRoute
+  "/_launcher/settings/sound": typeof LauncherSettingsSoundRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/artwork": typeof EditorProjectIdArtworkRouteWithChildren
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
@@ -619,6 +628,7 @@ export interface FileRouteTypes {
     | "/settings/common"
     | "/settings/dev"
     | "/settings/game"
+    | "/settings/sound"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/artwork"
     | "/editor/$projectId/board"
@@ -681,6 +691,7 @@ export interface FileRouteTypes {
     | "/settings/common"
     | "/settings/dev"
     | "/settings/game"
+    | "/settings/sound"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/build"
     | "/editor/$projectId/music"
@@ -736,6 +747,7 @@ export interface FileRouteTypes {
     | "/_launcher/settings/common"
     | "/_launcher/settings/dev"
     | "/_launcher/settings/game"
+    | "/_launcher/settings/sound"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/artwork"
     | "/editor/$projectId/board"
@@ -908,6 +920,13 @@ declare module "@tanstack/react-router" {
       path: "/game"
       fullPath: "/settings/game"
       preLoaderRoute: typeof LauncherSettingsGameRouteImport
+      parentRoute: typeof LauncherSettingsRoute
+    }
+    "/_launcher/settings/sound": {
+      id: "/_launcher/settings/sound"
+      path: "/sound"
+      fullPath: "/settings/sound"
+      preLoaderRoute: typeof LauncherSettingsSoundRouteImport
       parentRoute: typeof LauncherSettingsRoute
     }
     "/action/load-game/$packageId": {
@@ -1246,6 +1265,7 @@ interface LauncherSettingsRouteChildren {
   LauncherSettingsCommonRoute: typeof LauncherSettingsCommonRoute
   LauncherSettingsDevRoute: typeof LauncherSettingsDevRoute
   LauncherSettingsGameRoute: typeof LauncherSettingsGameRoute
+  LauncherSettingsSoundRoute: typeof LauncherSettingsSoundRoute
   LauncherSettingsIndexRoute: typeof LauncherSettingsIndexRoute
 }
 
@@ -1253,6 +1273,7 @@ const LauncherSettingsRouteChildren: LauncherSettingsRouteChildren = {
   LauncherSettingsCommonRoute: LauncherSettingsCommonRoute,
   LauncherSettingsDevRoute: LauncherSettingsDevRoute,
   LauncherSettingsGameRoute: LauncherSettingsGameRoute,
+  LauncherSettingsSoundRoute: LauncherSettingsSoundRoute,
   LauncherSettingsIndexRoute: LauncherSettingsIndexRoute,
 }
 

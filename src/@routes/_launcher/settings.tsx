@@ -21,6 +21,10 @@ const sections = [
 		label: "Game",
 	},
 	{
+		id: "sound",
+		label: "Sound",
+	},
+	{
 		id: "dev",
 		label: "Dev",
 	},

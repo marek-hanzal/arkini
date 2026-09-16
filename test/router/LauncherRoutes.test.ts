@@ -57,6 +57,7 @@ describe("launcher routes", () => {
 		for (const pathname of [
 			"/settings/common",
 			"/settings/game",
+			"/settings/sound",
 			"/settings/dev",
 		]) {
 			const router = await loadRoute(pathname);

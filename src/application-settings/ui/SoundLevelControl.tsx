@@ -1,4 +1,6 @@
-import type { ChangeEventHandler } from "react";
+import type { MouseEvent, MouseEventHandler } from "react";
+
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export const SoundLevelControl = ({
 	label,
@@ -9,27 +11,39 @@ export const SoundLevelControl = ({
 	readonly value: number;
 	readonly onChangeFn: (value: number) => void;
 }) => {
-	const onChange: ChangeEventHandler<HTMLInputElement> = (event) =>
-		onChangeFn(event.currentTarget.valueAsNumber);
+	const updateVolumeFn = (event: MouseEvent<HTMLButtonElement>) => {
+		const bounds = event.currentTarget.getBoundingClientRect();
+		const progress = Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width));
+		onChangeFn(Math.round(progress * 100));
+	};
+	const onMouseMove: MouseEventHandler<HTMLButtonElement> = (event) => {
+		if ((event.buttons & 1) === 1) updateVolumeFn(event);
+	};
 	return (
-		<label
-			className="grid grid-cols-[7rem_minmax(0,1fr)_3rem] items-center gap-3"
-			data-ui="SoundLevelControl"
+		<button
+			type="button"
+			className="ak-list-row ak-list-row-interactive relative grid h-9 w-full cursor-pointer grid-cols-[minmax(0,1fr)_3rem] items-center overflow-hidden rounded-lg px-3 text-left"
+			onMouseDown={updateVolumeFn}
+			onMouseMove={onMouseMove}
+			{...readDataUiFn({
+				dataUi: "SoundLevelControl",
+				state: {
+					label,
+					value,
+				},
+			})}
 		>
-			<span className="text-sm font-medium text-foreground">{label}</span>
-			<input
-				type="range"
-				min={0}
-				max={100}
-				step={1}
-				value={value}
-				onChange={onChange}
-				className="h-2 w-full cursor-pointer appearance-none rounded-full bg-line accent-accent [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent"
+			<span
+				className="pointer-events-none absolute inset-y-0 left-0 z-0 bg-[var(--ak-list-row-active-progress-surface)]"
+				data-ui="SoundLevelProgress"
 				style={{
-					background: `linear-gradient(to right, var(--color-accent) ${value}%, var(--color-line) ${value}%)`,
+					width: `${value}%`,
 				}}
 			/>
-			<output className="text-right text-sm tabular-nums text-muted">{value}</output>
-		</label>
+			<span className="relative z-10 text-sm font-medium text-foreground">{label}</span>
+			<output className="relative z-10 text-right text-sm tabular-nums text-muted">
+				{value}
+			</output>
+		</button>
 	);
 };

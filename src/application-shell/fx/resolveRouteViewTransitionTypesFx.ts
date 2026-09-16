@@ -24,7 +24,7 @@ const editorBoardPattern = /^\/editor\/[^/]+\/board\/?$/;
 const editorBoardInventoryPattern = /^\/editor\/[^/]+\/board\/inventory\/?$/;
 const editorArtworkDetailLeafPattern =
 	/^\/editor\/([^/]+)\/artwork\/([^/]+)\/detail\/(?:overview|usage|notes|delete)\/?$/;
-const settingsPattern = /^\/settings(?:\/(?:common|game|dev))?\/?$/;
+const settingsPattern = /^\/settings(?:\/(?:common|game|sound|dev))?\/?$/;
 
 const isEditorBoardLeafTransitionFn = (from: string, to: string) =>
 	(editorBoardPattern.test(from) && editorBoardInventoryPattern.test(to)) ||

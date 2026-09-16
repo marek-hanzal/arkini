@@ -1,7 +1,11 @@
 import { Effect, FileSystem } from "effect";
 import { join } from "node:path";
 
-import type { SoundChannel, SoundSettings } from "../../contract/sound/SoundSettings";
+import {
+	defaultSoundSettings,
+	type SoundChannel,
+	type SoundSettings,
+} from "../../contract/sound/SoundSettings";
 import { SoundVolumeSchema } from "../../contract/sound/SoundVolumeSchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
@@ -35,7 +39,7 @@ export const createFilesystemSoundPreferencesFx = Effect.fn("createFilesystemSou
 			readElectronPreferenceFx({
 				fileSystem,
 				path: pathFn(channel),
-				fallback: 100,
+				fallback: defaultSoundSettings[channel],
 				operation: `read the ${channel} sound preference`,
 				parseFn: (stored) => {
 					try {

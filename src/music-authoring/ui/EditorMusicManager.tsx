@@ -194,8 +194,8 @@ export const EditorMusicManager = () => {
 										<Tooltip
 											content={translator.textFn(
 												inPlaylist
-													? "Remove from random playlist"
-													: "Add to random playlist",
+													? "Remove from playlist"
+													: "Add to playlist",
 											)}
 											placement="left"
 										>

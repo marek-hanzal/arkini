@@ -52,8 +52,8 @@ Add at least {minimum} items.:
   dynamic: true
 Add avatars:
   value: Add avatars
-Add to random playlist:
-  value: Add to random playlist
+Add to playlist:
+  value: Add to playlist
 After:
   value: After
 Already optimized:
@@ -1289,6 +1289,8 @@ Music help:
   value: |
     Build the music library for your game. Import songs, find them quickly, and preview how they sound before using them in the game.
 
+    - **Playlist** is the game's default background music. Songs added to it are shuffled and keep playing during gameplay.
+    - Songs outside the playlist stay in the project library and do not play automatically.
     - Song names come from the imported filenames.
     - **Play** previews one song at a time.
     - **Volume** changes only the preview volume on this page.
@@ -1733,8 +1735,8 @@ Remove folder project help:
     **Its folder and files stay on disk.** You can open it again later.
 Remove from Recent:
   value: Remove from Recent
-Remove from random playlist:
-  value: Remove from random playlist
+Remove from playlist:
+  value: Remove from playlist
 Remove managed project help:
   value: |
     Permanently deletes this project and **all of its files**.

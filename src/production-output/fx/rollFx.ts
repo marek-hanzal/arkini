@@ -3,9 +3,12 @@ import { match } from "ts-pattern";
 
 import { rollQuantityFx } from "~/production-output/fx/rollQuantityFx";
 import type { ChanceRollSchema } from "~/production-output/schema/ChanceRollSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { resolveDropRulesEnabledFx } from "~/production-output/fx/resolveDropRulesEnabledFx";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { RollResultSchema } from "~/production-output/schema/RollResultSchema";
 import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
+import type { WeightedDropSchema } from "~/production-output/schema/WeightedDropSchema";
 import type { WeightedRollSchema } from "~/production-output/schema/WeightedRollSchema";
 
 const resolveChanceRollFx = Effect.fn("resolveChanceRollFx")(function* ({
@@ -22,7 +25,10 @@ const resolveChanceRollFx = Effect.fn("resolveChanceRollFx")(function* ({
 const selectWeightedDropFx = Effect.fn("selectWeightedDropFx")(function* ({
 	drop,
 }: {
-	readonly drop: WeightedRollSchema.Type["drop"];
+	readonly drop: readonly [
+		WeightedDropSchema.Type,
+		...WeightedDropSchema.Type[],
+	];
 }) {
 	const [totalWeight, weightedDrop] = Array.mapAccum(drop, 0, (accumulatedWeight, candidate) => {
 		const maximumWeight = accumulatedWeight + candidate.weight;
@@ -44,17 +50,39 @@ const selectWeightedDropFx = Effect.fn("selectWeightedDropFx")(function* ({
 });
 
 const resolveWeightedRollFx = Effect.fn("resolveWeightedRollFx")(function* ({
+	origin,
 	roll,
 }: {
+	readonly origin: GridLocationSchema.Type;
 	readonly roll: WeightedRollSchema.Type;
 }) {
+	const available: WeightedDropSchema.Type[] = [];
+	for (const candidate of roll.drop) {
+		if (
+			yield* resolveDropRulesEnabledFx({
+				origin,
+				rules: candidate.rules,
+			})
+		) {
+			available.push(candidate);
+		}
+	}
+	if (available.length === 0) {
+		return {
+			drop: [],
+		} satisfies RollResultSchema.Type;
+	}
+	const candidates = available as [
+		WeightedDropSchema.Type,
+		...WeightedDropSchema.Type[],
+	];
 	const quantity = yield* rollQuantityFx({
 		quantity: roll.quantity,
 	});
 	const drop: RollResultSchema.Type["drop"] = [];
 	for (let index = 0; index < quantity; index += 1) {
 		const selected = yield* selectWeightedDropFx({
-			drop: roll.drop,
+			drop: candidates,
 		});
 		drop.push(...selected.drop);
 	}
@@ -64,13 +92,14 @@ const resolveWeightedRollFx = Effect.fn("resolveWeightedRollFx")(function* ({
 });
 
 interface Props {
+	readonly origin: GridLocationSchema.Type;
 	readonly roll: RollSchema.Type;
 }
 
 /**
  * Dispatches one roll to the specialized resolver selected by its type.
  */
-export const rollFx = Effect.fn("rollFx")(function* ({ roll }: Props) {
+export const rollFx = Effect.fn("rollFx")(function* ({ origin, roll }: Props) {
 	return yield* match(roll)
 		.with(
 			{
@@ -97,6 +126,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: Props) {
 			},
 			(roll) => {
 				return resolveWeightedRollFx({
+					origin,
 					roll,
 				});
 			},

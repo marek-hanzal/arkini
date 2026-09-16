@@ -52,6 +52,19 @@ export const OutputDetail = ({
 			output={projectAuthoredOutputFn(output, items)}
 			renderItemDetailFn={(item) => <AuthoredOutputItemDetail item={item} />}
 			renderItemFn={(item) => <DetailReference itemId={item.itemId} />}
+			renderWeightedOptionDetailFn={(option) =>
+				option.rules === undefined || option.rules.length === 0 ? null : (
+					<div className="mb-3">
+						<RulesDetail
+							rules={option.rules}
+							description={
+								<Mx label="Authored weighted candidate rules summary help" />
+							}
+							variant="output-tree"
+						/>
+					</div>
+				)
+			}
 			title={
 				<span className="flex items-center gap-1">
 					{title ?? translator.textFn("Outputs")}

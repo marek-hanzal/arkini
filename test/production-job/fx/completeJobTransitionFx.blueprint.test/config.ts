@@ -268,6 +268,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 									},
 									drop: [
 										{
+											rules: [],
 											weight: 1,
 											drop: [
 												{
@@ -282,6 +283,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 											],
 										},
 										{
+											rules: [],
 											weight: 1,
 											drop: [
 												{
@@ -500,6 +502,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 										},
 										drop: [
 											{
+												rules: [],
 												weight: 1,
 												drop: [
 													{
@@ -514,6 +517,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 												],
 											},
 											{
+												rules: [],
 												weight: 1,
 												drop: [
 													{
@@ -557,6 +561,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 										},
 										drop: [
 											{
+												rules: [],
 												weight: 1,
 												drop: [
 													{
@@ -571,6 +576,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 												],
 											},
 											{
+												rules: [],
 												weight: 1,
 												drop: [
 													{

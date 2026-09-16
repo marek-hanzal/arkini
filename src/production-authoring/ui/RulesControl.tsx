@@ -38,7 +38,7 @@ import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearc
 
 type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
-type RuleTarget = "action" | "drop" | "line";
+type RuleTarget = "action" | "candidate" | "drop" | "line";
 type DraftWhen =
 	| WhenSchema.Type
 	| {
@@ -221,6 +221,12 @@ const QueryScopeControl = ({
 };
 
 const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget): ReactNode => {
+	if (target === "candidate")
+		return type === "enable" ? (
+			<Mx label="Candidate enable rule help" />
+		) : (
+			<Mx label="Candidate disable rule help" />
+		);
 	if (target === "drop")
 		return type === "enable" ? (
 			<Mx label="Drop enable rule help" />
@@ -603,6 +609,7 @@ export const RulesControl = ({
 	allowedTypes,
 	description,
 	headerVisible = true,
+	label,
 	onChangeFn,
 	rules,
 	target,
@@ -610,6 +617,7 @@ export const RulesControl = ({
 	readonly allowedTypes: ReadonlyArray<RuleType>;
 	readonly description: ReactNode;
 	readonly headerVisible?: boolean;
+	readonly label?: string;
 	readonly onChangeFn: (rules: RuleValue[]) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
@@ -620,6 +628,7 @@ export const RulesControl = ({
 	const invalidRuleIndex = useFormValidationFocusIndex(rules as object);
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const translator = useTranslator();
+	const collectionLabel = label ?? translator.textFn("Rules");
 	const createRuleFn = (type: RuleType): DraftRule =>
 		({
 			type,
@@ -640,7 +649,7 @@ export const RulesControl = ({
 			{headerVisible ? (
 				<EditorFormSectionDivider
 					description={description}
-					title={translator.textFn("Rules")}
+					title={collectionLabel}
 					variant="secondary"
 				/>
 			) : null}
@@ -662,7 +671,7 @@ export const RulesControl = ({
 						readItemLabelFn(itemId, ""),
 					])
 				}
-				label={translator.textFn("Rules")}
+				label={collectionLabel}
 				onAddFn={() =>
 					emitChangeFn([
 						...draftRules,

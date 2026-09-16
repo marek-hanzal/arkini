@@ -41,6 +41,7 @@ it("keeps exact drop positions including repeated identities in weighted candida
 								},
 								drop: [
 									{
+										rules: [],
 										weight: 1,
 										drop: [
 											drop,
@@ -48,6 +49,7 @@ it("keeps exact drop positions including repeated identities in weighted candida
 										],
 									},
 									{
+										rules: [],
 										weight: 2,
 										drop: [
 											drop,

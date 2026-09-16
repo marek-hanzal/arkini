@@ -74,6 +74,25 @@ const addOutputFactsFn = (
 	if (output === undefined) return;
 	for (const [setIndex, set] of output.set.entries())
 		for (const [rollIndex, roll] of set.roll.entries()) {
+			if (roll.type === "weight") {
+				for (const [candidateIndex, candidate] of roll.drop.entries()) {
+					for (const { factId, condition } of readAvailabilityFactsFn(candidate.rules))
+						facts.push({
+							factId,
+							origin: {
+								source,
+								role: "condition",
+								condition,
+								roll: {
+									setIndex,
+									rollIndex,
+									rollType: roll.type,
+									candidateIndex,
+								},
+							},
+						});
+				}
+			}
 			const drops =
 				roll.type === "weight"
 					? roll.drop.flatMap((candidate, candidateIndex) =>
@@ -284,7 +303,7 @@ export namespace readItemConnectionFactsFn {
 		readonly roll?: {
 			readonly setIndex: number;
 			readonly rollIndex: number;
-			readonly dropIndex: number;
+			readonly dropIndex?: number;
 			readonly candidateIndex?: number;
 			readonly rollType: RollSchema.Type["type"];
 		};

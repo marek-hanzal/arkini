@@ -480,12 +480,14 @@ it.each([
 					},
 					drop: [
 						{
+							rules: [],
 							weight: 1,
 							drop: [
 								drop("other"),
 							],
 						},
 						{
+							rules: [],
 							weight: 1,
 							drop: targetDrops,
 						},

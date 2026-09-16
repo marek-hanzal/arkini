@@ -4,6 +4,19 @@ import { describe, expect, it } from "vitest";
 
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import { rollFx } from "~/production-output/fx/rollFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+
+const origin = {
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x: 0,
+		y: 0,
+	},
+};
+const provideUnusedRuntimeFx = Effect.provideService(RuntimeFx, {
+	read: Effect.die("This test must not read Runtime."),
+});
 
 const logDrop: DropSchema.Type = {
 	itemId: "item:log",
@@ -39,13 +52,14 @@ describe("rollFx", () => {
 	it("dispatches guaranteed rolls without asking for random input", () => {
 		const result = Effect.runSync(
 			rollFx({
+				origin,
 				roll: {
 					type: "guaranteed",
 					drop: [
 						logDrop,
 					],
 				},
-			}),
+			}).pipe(provideUnusedRuntimeFx),
 		);
 
 		expect(result.drop).toEqual([
@@ -56,6 +70,7 @@ describe("rollFx", () => {
 	it("composes a chance roll with the isolated probability check", () => {
 		const result = Effect.runSync(
 			rollFx({
+				origin,
 				roll: {
 					type: "chance",
 					chance: 0.5,
@@ -64,6 +79,7 @@ describe("rollFx", () => {
 					],
 				},
 			}).pipe(
+				provideUnusedRuntimeFx,
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([
@@ -81,6 +97,7 @@ describe("rollFx", () => {
 	it("composes repeated weighted rolls with cumulative relative weights", () => {
 		const result = Effect.runSync(
 			rollFx({
+				origin,
 				roll: {
 					type: "weight",
 					quantity: {
@@ -89,18 +106,21 @@ describe("rollFx", () => {
 					},
 					drop: [
 						{
+							rules: [],
 							weight: 1,
 							drop: [
 								logDrop,
 							],
 						},
 						{
+							rules: [],
 							weight: 2,
 							drop: [
 								stoneDrop,
 							],
 						},
 						{
+							rules: [],
 							weight: 1,
 							drop: [
 								clayDrop,
@@ -109,6 +129,7 @@ describe("rollFx", () => {
 					],
 				},
 			}).pipe(
+				provideUnusedRuntimeFx,
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([

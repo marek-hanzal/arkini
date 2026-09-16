@@ -50,6 +50,7 @@
 									},
 									"drop": [
 										{
+											"rules": [],
 											"weight": 10,
 											"drop": [
 												{
@@ -64,6 +65,7 @@
 											]
 										},
 										{
+											"rules": [],
 											"weight": 15,
 											"drop": [
 												{

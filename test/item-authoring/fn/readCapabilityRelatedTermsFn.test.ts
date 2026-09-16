@@ -87,12 +87,14 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 							},
 							drop: [
 								{
+									rules: [],
 									weight: 1,
 									drop: [
 										dropFn("weighted-a"),
 									],
 								},
 								{
+									rules: [],
 									weight: 1,
 									drop: [
 										{

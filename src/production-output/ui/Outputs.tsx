@@ -75,11 +75,15 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 	roll,
 	renderItemDetailFn,
 	renderItemFn,
+	renderWeightedOptionDetailFn,
 	variant,
 }: {
 	readonly roll: OutputProjection.Roll<Item>;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly renderWeightedOptionDetailFn?: (
+		option: OutputProjection.WeightedOption<Item>,
+	) => ReactNode;
 	readonly variant: OutputsVariant;
 }) =>
 	match(roll)
@@ -152,6 +156,17 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 							<p className="mb-1.5 text-xs text-muted">
 								<Tx label="Weight" /> {option.weight}
 							</p>
+							{renderWeightedOptionDetailFn?.(option)}
+							{option.activeRuleHints.map((hint, hintIndex) => (
+								<p
+									className="mb-1.5 flex items-start gap-1.5 text-xs text-muted"
+									data-ui="TileLineOutputCandidateRuleHint"
+									key={`${hint}-${hintIndex}`}
+								>
+									<Info className="mt-px size-3.5 shrink-0 text-secondary-foreground" />
+									<span>{hint}</span>
+								</p>
+							))}
 							<OutputItems
 								items={option.item}
 								renderItemDetailFn={renderItemDetailFn}
@@ -171,6 +186,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	output,
 	renderItemDetailFn,
 	renderItemFn,
+	renderWeightedOptionDetailFn,
 	title = <Tx label="Outputs" />,
 	variant = "compact",
 }: {
@@ -178,6 +194,9 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	readonly output: readonly OutputProjection.Set<Item>[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly renderWeightedOptionDetailFn?: (
+		option: OutputProjection.WeightedOption<Item>,
+	) => ReactNode;
 	readonly title?: ReactNode;
 	readonly variant?: OutputsVariant;
 }) => (
@@ -219,6 +238,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 									roll={roll}
 									renderItemDetailFn={renderItemDetailFn}
 									renderItemFn={renderItemFn}
+									renderWeightedOptionDetailFn={renderWeightedOptionDetailFn}
 									variant={variant}
 								/>
 							))}

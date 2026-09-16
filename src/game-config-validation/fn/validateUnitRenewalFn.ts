@@ -59,9 +59,12 @@ const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSc
 							type: RollTypeSchema.enum.Weight,
 						},
 						(weight) => {
-							const candidates = weight.drop.map((candidate) =>
-								readDropCertaintyFn(candidate.drop, itemId),
-							);
+							const candidates = weight.drop.map((candidate) => {
+								const certainty = readDropCertaintyFn(candidate.drop, itemId);
+								return certainty === "guaranteed" && candidate.rules.length > 0
+									? "stochastic"
+									: certainty;
+							});
 							if (candidates.every((candidate) => candidate === "guaranteed"))
 								return "guaranteed";
 							return candidates.some((candidate) => candidate !== "none")

@@ -667,7 +667,7 @@
 					"$ref": "urn:arkini:schema:project#/$defs/drop.rule.DisableSchema"
 				}
 			],
-			"description": "An availability rule evaluated for a selected drop."
+			"description": "An availability rule evaluated for an output candidate or drop."
 		},
 		"drop.rule.EnableSchema": {
 			"type": "object",
@@ -1071,7 +1071,7 @@
 						"$ref": "urn:arkini:schema:project#/$defs/roll.WeightedDropSchema"
 					},
 					"minItems": 2,
-					"description": "At least two weighted drop candidates selected by this roll."
+					"description": "At least two authored candidates filtered before weighted selection."
 				}
 			},
 			"required": [
@@ -1085,6 +1085,13 @@
 		"roll.WeightedDropSchema": {
 			"type": "object",
 			"properties": {
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/drop.RuleSchema"
+					},
+					"description": "Rules that decide whether this candidate enters selection."
+				},
 				"weight": {
 					"description": "The positive integer weight used to select this drop.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
@@ -1104,11 +1111,12 @@
 				}
 			},
 			"required": [
+				"rules",
 				"weight",
 				"drop"
 			],
 			"additionalProperties": false,
-			"description": "Items and their relative weight in a weight-based output roll."
+			"description": "An optionally available output candidate and its relative selection weight."
 		},
 		"MergeSchema": {
 			"oneOf": [

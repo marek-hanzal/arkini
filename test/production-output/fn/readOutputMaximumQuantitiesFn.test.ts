@@ -128,6 +128,7 @@ describe("readOutputMaximumQuantitiesFn", () => {
 							quantity: range(1, 5),
 							drop: [
 								{
+									rules: [],
 									weight: 1,
 									drop: [
 										{
@@ -145,6 +146,7 @@ describe("readOutputMaximumQuantitiesFn", () => {
 									],
 								},
 								{
+									rules: [],
 									weight: 1,
 									drop: [
 										{

@@ -14,6 +14,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 						{
 							drop: [
 								{
+									rules: [],
 									drop: [
 										{
 											itemId: "a",
@@ -27,6 +28,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 									weight: 1,
 								},
 								{
+									rules: [],
 									drop: [
 										{
 											itemId: "b",
@@ -159,6 +161,83 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 				}),
 			]),
 		});
+	});
+
+	it("keeps candidate requirements while refusing a false static weight distribution", () => {
+		const result = readFn({
+			set: [
+				{
+					roll: [
+						{
+							type: "weight",
+							quantity: {
+								min: 1,
+								max: 1,
+							},
+							drop: [
+								{
+									rules: [
+										{
+											type: "enable",
+											when: [
+												{
+													type: "exists",
+													query: {
+														scope: "universe",
+														selector: {
+															type: "item",
+															itemId: "permit",
+														},
+													},
+												},
+											],
+										},
+									],
+									weight: 1,
+									drop: [
+										{
+											itemId: "a",
+											quantity: {
+												min: 1,
+												max: 1,
+											},
+											rules: [],
+										},
+									],
+								},
+								{
+									rules: [],
+									weight: 1,
+									drop: [
+										{
+											itemId: "b",
+											quantity: {
+												min: 1,
+												max: 1,
+											},
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					weight: 1,
+				},
+			],
+		});
+
+		expect(result.compilation).toBe("state-space-unsupported");
+		expect(result.outputDistribution).toEqual([]);
+		expect(result.occurrences.find(({ factId }) => factId === "a")?.requirements).toMatchObject(
+			{
+				allOf: [
+					expect.objectContaining({
+						factId: "permit",
+					}),
+				],
+			},
+		);
 	});
 
 	it("returns explicit overflow before authored output expansion becomes unbounded", () => {

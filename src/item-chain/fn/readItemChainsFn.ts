@@ -150,7 +150,7 @@ export const readItemChainsFn = (
 			nodes.push(
 				nodeFn(drop.itemId, `${path}/${suffix}`, depth, ancestors, drop.quantity, {
 					...meta,
-					conditional: drop.rules.length > 0,
+					conditional: meta.conditional || drop.rules.length > 0,
 				}),
 			);
 		};
@@ -176,6 +176,7 @@ export const readItemChainsFn = (
 								{
 									...meta,
 									candidate: candidateIndex,
+									conditional: candidate.rules.length > 0,
 									weight: candidate.weight,
 									selections: roll.quantity,
 								},

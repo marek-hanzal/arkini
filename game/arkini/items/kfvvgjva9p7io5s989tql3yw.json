@@ -34,6 +34,7 @@
 									},
 									"drop": [
 										{
+											"rules": [],
 											"weight": 1,
 											"drop": [
 												{
@@ -48,6 +49,7 @@
 											]
 										},
 										{
+											"rules": [],
 											"weight": 1,
 											"drop": [
 												{

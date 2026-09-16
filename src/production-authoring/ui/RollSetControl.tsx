@@ -44,6 +44,8 @@ const readDropSummaryFn = (drop: DropSchema.Type, textFn: (key: string) => strin
 	const rules = drop.rules.length;
 	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`}`;
 };
+const readRulesItemIdsFn = (rules: WeightedRoll["drop"][number]["rules"]) =>
+	rules.flatMap((rule) => rule.when.map((when) => when.query.selector.itemId));
 const RollTypeLabelByType = {
 	chance: "Chance",
 	guaranteed: "Guaranteed",
@@ -317,16 +319,24 @@ const WeightedRollControl = ({
 						translator.textFn("No item selected"),
 					)}`;
 				}}
-				itemSearchTermsFn={(candidateIndex) =>
-					roll.drop[candidateIndex].drop.flatMap((drop) => [
+				itemSearchTermsFn={(candidateIndex) => [
+					...readRulesItemIdsFn(roll.drop[candidateIndex].rules),
+					...roll.drop[candidateIndex].drop.flatMap((drop) => [
 						drop.itemId,
 						readItemLabelFn(drop.itemId, ""),
-					])
-				}
+					]),
+				]}
 				renderItemContentFn={(candidateIndex, label) => {
 					const candidate = roll.drop[candidateIndex];
 					const summary = [
 						`${translator.textFn("Weight")} ${candidate.weight}`,
+						...(candidate.rules.length === 0
+							? []
+							: [
+									`${candidate.rules.length} ${translator.textFn(
+										candidate.rules.length === 1 ? "rule" : "rules",
+									)}`,
+								]),
 						...candidate.drop.map((drop) =>
 							candidate.drop.length === 1
 								? readDropSummaryFn(drop, translator.textFn)
@@ -348,6 +358,7 @@ const WeightedRollControl = ({
 						drop: [
 							...roll.drop,
 							{
+								rules: [],
 								weight: 1,
 								drop: [
 									structuredClone(DraftDefaults.drop),
@@ -395,14 +406,52 @@ const WeightedRollControl = ({
 									})
 								}
 							/>
-							<DropList
+							<EditorFormBranchEnd />
+							<RulesControl
 								initialRuleIndex={
-									candidateIndex === initialCandidateIndex
+									candidateIndex === initialCandidateIndex &&
+									initialDropIndex === undefined
 										? initialRuleIndex
 										: undefined
 								}
 								initialWhenIndex={
-									candidateIndex === initialCandidateIndex
+									candidateIndex === initialCandidateIndex &&
+									initialDropIndex === undefined
+										? initialWhenIndex
+										: undefined
+								}
+								rules={candidate.rules}
+								target="candidate"
+								label={translator.textFn("Candidate rules")}
+								description={<Mx label="Weighted candidate rules help" />}
+								allowedTypes={[
+									"enable",
+									"disable",
+								]}
+								onChangeFn={(rules) =>
+									onChangeFn({
+										...roll,
+										drop: roll.drop.map((current, currentIndex) =>
+											currentIndex === candidateIndex
+												? {
+														...current,
+														rules: rules as typeof current.rules,
+													}
+												: current,
+										) as typeof roll.drop,
+									})
+								}
+							/>
+							<DropList
+								initialRuleIndex={
+									candidateIndex === initialCandidateIndex &&
+									initialDropIndex !== undefined
+										? initialRuleIndex
+										: undefined
+								}
+								initialWhenIndex={
+									candidateIndex === initialCandidateIndex &&
+									initialDropIndex !== undefined
 										? initialWhenIndex
 										: undefined
 								}

@@ -286,6 +286,8 @@ Authored queue capacity summary help:
     Maximum work accepted across all lines on this item.
 
     The active job counts too.
+Authored weighted candidate rules summary help:
+  value: Candidate rules are evaluated before this option enters the weighted selection pool.
 Authtoken:
   value: Authtoken
 Automatic only:
@@ -369,6 +371,18 @@ Cancel edit:
   value: Cancel edit
 Candidate:
   value: Candidate
+Candidate disable rule help:
+  value: |
+    Removes this candidate from the current selection pool while all conditions match.
+
+    Its weight is not counted and another available candidate is selected normally.
+Candidate enable rule help:
+  value: |
+    Adds a required check before this candidate enters the selection pool.
+
+    Every Enable rule must pass. Any matching Disable rule removes only this candidate.
+Candidate rules:
+  value: Candidate rules
 Capacity:
   value: Capacity
 Chain:
@@ -2222,23 +2236,28 @@ Weight:
   value: Weight
 Weighted:
   value: Weighted
+Weighted candidate rules help:
+  value: |
+    These rules decide whether this candidate joins the current selection pool.
+
+    Every **Enable** must pass. Any matching **Disable** removes it before weights are calculated.
 Weighted candidate weight help:
   value: |
     This candidate's chance on each pick.
 
-    Weights are ratios: **70** and **30** mean 70% and 30%. The same candidate may win again.
+    Weights are ratios among currently available candidates: **70** and **30** mean 70% and 30%. The same candidate may win again.
 Weighted candidates:
   value: Weighted candidates
 Weighted candidates help:
   value: |
     The choices available to a Weighted roll.
 
-    Each pick selects one candidate by weight and creates every drop inside it. Add at least two candidates.
+    Rules first remove unavailable candidates. Each pick then selects one remaining candidate by weight and creates every drop inside it. Add at least two authored candidates.
 Weighted roll type help:
   value: |
     Makes the number of independent picks configured under **Selections**.
 
-    Each pick chooses one candidate by weight. Candidates stay available, so one may win several times.
+    Each pick filters candidate rules, then chooses one available candidate by weight. Available candidates remain in the pool, so one may win several times.
 Weighted selections:
   value: Weighted selections
 Weighted selections help:
@@ -2362,6 +2381,10 @@ remove:
   value: remove
 rolls:
   value: rolls
+rule:
+  value: rule
+rules:
+  value: rules
 saved:
   value: saved
 self:

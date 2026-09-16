@@ -13,6 +13,13 @@ const readOutputDropsFn = (output: OutputSchema.Type | undefined) =>
 		),
 	) ?? [];
 
+const readOutputCandidateRulesFn = (output: OutputSchema.Type | undefined) =>
+	output?.set.flatMap((set) =>
+		set.roll.flatMap((roll) =>
+			roll.type === "weight" ? roll.drop.flatMap((candidate) => candidate.rules) : [],
+		),
+	) ?? [];
+
 const requiresAbsentFactFn = (when: WhenSchema.Type) => {
 	switch (when.type) {
 		case "exists":
@@ -56,18 +63,19 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 				limitations.add("spatial-requirements-approximated");
 		}
 		if (
-			readItemOutputsFn(item).some((output) =>
-				readOutputDropsFn(output).some(({ rules }) => {
-					if (
-						rules.some(
-							(rule) =>
-								rule.type === "disable" && rule.when.some(requiresAbsentFactFn),
-						)
+			readItemOutputsFn(item).some((output) => {
+				const rules = [
+					...readOutputCandidateRulesFn(output),
+					...readOutputDropsFn(output).flatMap((drop) => drop.rules),
+				];
+				if (
+					rules.some(
+						(rule) => rule.type === "disable" && rule.when.some(requiresAbsentFactFn),
 					)
-						limitations.add("negative-availability-constraints-ignored");
-					return rules.length > 0;
-				}),
-			)
+				)
+					limitations.add("negative-availability-constraints-ignored");
+				return rules.length > 0;
+			})
 		)
 			limitations.add("spatial-requirements-approximated");
 	}

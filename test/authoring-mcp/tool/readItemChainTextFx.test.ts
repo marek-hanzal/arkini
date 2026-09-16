@@ -32,6 +32,7 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 						},
 						drop: [
 							{
+								rules: [],
 								weight: 9,
 								drop: [
 									{
@@ -44,6 +45,7 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 								],
 							},
 							{
+								rules: [],
 								weight: 4,
 								drop: outputFn("end").set[0].roll[0].drop,
 							},

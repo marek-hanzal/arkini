@@ -124,6 +124,8 @@ A non-depleted owner, its stored inputs, and pending queue remain. Any unit, pla
 
 Every active job reserves the worst possible future quantity of each canonical output against `maxCount`, including deferred owner-depletion output. Fixed quantities reserve their value, ranges their maximum, chance rolls success, repeated weighted rolls the worst candidate for every draw, rolls in a selected set add, and alternative sets use the per-item maximum. Queued requests reserve nothing.
 
+Before each weighted roll resolves, every candidate evaluates its own availability rules against the current output origin and Runtime snapshot. Only available candidates contribute to the weight total, so their authored weights are ratios within that filtered pool. If no candidate remains, the roll emits nothing and consumes neither quantity nor selection randomness. Once a candidate is selected, rules on its individual drops are evaluated separately; a rejected drop is discarded without replacing the candidate or rerolling.
+
 All quantity-creating paths and hydration include active-job reservations. Completion removes its own job before placement, spending rather than double-counting its reservation. Quantities that the same completion destroys—consumed material and a depleted owner—offset output of that canonical item. Immediate external depletion output is live output during start, not a later reservation. Overbooking rejects the whole candidate.
 
 Randomness derives from stable canonical identities and explicit algorithm versions, never Tick or wall time. Unchanged blocked start/completion/expiry retries therefore resolve the same rolls and placement order.

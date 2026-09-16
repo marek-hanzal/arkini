@@ -9,6 +9,7 @@ import type {
 } from "~/flow/type/AcquisitionGraph";
 import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisitionAvailabilityRequirementsFn";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 interface DistributionOutcome {
@@ -221,9 +222,13 @@ export const readAcquisitionOutputOccurrencesFn = (
 		drop: DropSchema.Type,
 		id: string,
 		annotation: AcquisitionOutputAnnotation,
+		candidateRules: ReadonlyArray<DropRuleSchema.Type> = [],
 	): Distribution | undefined => {
 		const requirements = readAcquisitionAvailabilityRequirementsFn({
-			rules: drop.rules,
+			rules: [
+				...candidateRules,
+				...drop.rules,
+			],
 			source: "output-condition",
 		});
 		const key = `${drop.itemId}\u0000${requirementKeyFn(requirements)}`;
@@ -269,6 +274,7 @@ export const readAcquisitionOutputOccurrencesFn = (
 			if (roll.type === "chance" && roll.chance === 0) continue;
 			let rollDistribution: Distribution | undefined;
 			if (roll.type === "weight") {
+				if (roll.drop.some((candidate) => candidate.rules.length > 0)) unsupported = true;
 				const totalWeight = roll.drop.reduce(
 					(total, candidate) => total + candidate.weight,
 					0,
@@ -283,12 +289,17 @@ export const readAcquisitionOutputOccurrencesFn = (
 						const id = `set:${setIndex}:roll:${rollIndex}:candidate:${candidateIndex}:drop:${dropIndex}`;
 						candidateDistribution = convolveDistributionsFn(
 							candidateDistribution,
-							readDropFn(drop, id, {
-								alternativeSet: output.set.length > 1,
-								placement: drop.placement,
-								quantity: drop.quantity,
-								selectionKind: "weighted",
-							}),
+							readDropFn(
+								drop,
+								id,
+								{
+									alternativeSet: output.set.length > 1,
+									placement: drop.placement,
+									quantity: drop.quantity,
+									selectionKind: "weighted",
+								},
+								candidate.rules,
+							),
 						);
 					}
 					if (candidateDistribution === undefined) unsupported = true;

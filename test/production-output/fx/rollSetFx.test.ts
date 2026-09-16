@@ -4,6 +4,19 @@ import { describe, expect, it } from "vitest";
 
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import { rollSetFx } from "~/production-output/fx/rollSetFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+
+const origin = {
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x: 0,
+		y: 0,
+	},
+};
+const provideUnusedRuntimeFx = Effect.provideService(RuntimeFx, {
+	read: Effect.die("This test must not read Runtime."),
+});
 
 const createDrop = (itemId: string): DropSchema.Type => {
 	return {
@@ -24,6 +37,7 @@ describe("rollSetFx", () => {
 		const third = createDrop("item:third");
 		const result = Effect.runSync(
 			rollSetFx({
+				origin,
 				rollSet: {
 					weight: 1,
 					roll: [
@@ -42,7 +56,7 @@ describe("rollSetFx", () => {
 						},
 					],
 				},
-			}),
+			}).pipe(provideUnusedRuntimeFx),
 		);
 
 		expect(result.drop).toEqual([
@@ -55,6 +69,7 @@ describe("rollSetFx", () => {
 	it("accepts an empty aggregate when every roll selects no drops", () => {
 		const result = Effect.runSync(
 			rollSetFx({
+				origin,
 				rollSet: {
 					weight: 1,
 					roll: [
@@ -68,6 +83,7 @@ describe("rollSetFx", () => {
 					],
 				},
 			}).pipe(
+				provideUnusedRuntimeFx,
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([

@@ -17,7 +17,7 @@ export namespace dropRuleFx {
 }
 
 /**
- * Dispatches one selected-drop availability rule to its specialized evaluator.
+ * Dispatches one output availability rule to its specialized evaluator.
  */
 export const dropRuleFx = Effect.fn("dropRuleFx")(function* ({ origin, rule }: dropRuleFx.Props) {
 	let active = true;

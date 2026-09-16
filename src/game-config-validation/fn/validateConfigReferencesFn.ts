@@ -272,6 +272,30 @@ const validateOutputReferencesFn = ({
 			}
 
 			for (const [candidateIndex, candidate] of roll.drop.entries()) {
+				for (const [ruleIndex, rule] of candidate.rules.entries()) {
+					for (const [whenIndex, when] of rule.when.entries()) {
+						diagnostics.push(
+							...validateWhenReferenceFn({
+								config,
+								when,
+								path: [
+									...path,
+									"set",
+									setIndex,
+									"roll",
+									rollIndex,
+									"drop",
+									candidateIndex,
+									"rules",
+									ruleIndex,
+									"when",
+									whenIndex,
+								],
+								source,
+							}),
+						);
+					}
+				}
 				for (const [dropIndex, drop] of candidate.drop.entries()) {
 					diagnostics.push(
 						...validateDropFn({

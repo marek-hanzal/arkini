@@ -119,6 +119,7 @@ const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputRollFx")
 							),
 						).pipe(
 							Effect.map((item) => ({
+								activeRuleHints: option.activeRuleHints,
 								weight: option.weight,
 								item,
 							})),

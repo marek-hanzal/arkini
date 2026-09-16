@@ -100,10 +100,12 @@ describe("chain termination and authored output boundaries", () => {
 							},
 							drop: [
 								{
+									rules: [],
 									weight: 1,
 									drop: outputFn("a", "b").set[0].roll[0].drop,
 								},
 								{
+									rules: [],
 									weight: 3,
 									drop: outputFn("c").set[0].roll[0].drop,
 								},

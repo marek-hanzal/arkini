@@ -242,4 +242,108 @@ describe("completed config reference validation", () => {
 			}),
 		);
 	});
+
+	it("validates selectors in weighted candidate rules before their drops", async () => {
+		const producer = createProducerItem({
+			id: "item:producer",
+			lines: [
+				{
+					...createLine({}),
+					output: {
+						set: [
+							{
+								weight: 1,
+								roll: [
+									{
+										type: "weight",
+										quantity: {
+											min: 1,
+											max: 1,
+										},
+										drop: [
+											{
+												rules: [
+													{
+														type: "enable",
+														when: [
+															{
+																type: "exists",
+																query: {
+																	scope: "universe",
+																	selector: {
+																		type: "item",
+																		itemId: "item:missing-candidate-rule",
+																	},
+																},
+															},
+														],
+													},
+												],
+												weight: 1,
+												drop: [
+													{
+														itemId: "item:producer",
+														quantity: {
+															min: 1,
+															max: 1,
+														},
+														placement: "drop",
+														rules: [],
+													},
+												],
+											},
+											{
+												rules: [],
+												weight: 1,
+												drop: [
+													{
+														itemId: "item:producer",
+														quantity: {
+															min: 1,
+															max: 1,
+														},
+														placement: "drop",
+														rules: [],
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				},
+			],
+		});
+		const result = await compileItems({
+			[producer.id]: producer,
+		});
+
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				path: [
+					"items",
+					producer.id,
+					"lines",
+					0,
+					"output",
+					"set",
+					0,
+					"roll",
+					0,
+					"drop",
+					0,
+					"rules",
+					0,
+					"when",
+					0,
+					"query",
+					"selector",
+					"itemId",
+				],
+				referenceId: "item:missing-candidate-rule",
+			}),
+		);
+	});
 });

@@ -25,6 +25,7 @@ export const outputFx = Effect.fn("outputFx")(function* ({ origin, output }: out
 		set: output.set,
 	});
 	const rollSetResult = yield* rollSetFx({
+		origin,
 		rollSet: selectedSet,
 	});
 	const results = yield* Effect.forEach(rollSetResult.drop, (drop) => {

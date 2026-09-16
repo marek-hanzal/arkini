@@ -1,13 +1,11 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
-import { DropRuleTypeSchema } from "~/production-output/schema/DropRuleTypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { dropRuleFx } from "./dropRuleFx";
+import { resolveDropRulesEnabledFx } from "./resolveDropRulesEnabledFx";
 import { rollQuantityFx } from "./rollQuantityFx";
 
 interface Props {
@@ -32,34 +30,10 @@ export namespace dropFx {
  * replacement candidate.
  */
 export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: Props) {
-	let enabled = true;
-	for (const rule of drop.rules) {
-		const ruleEnabled = yield* dropRuleFx({
-			origin,
-			rule,
-		}).pipe(
-			Effect.map((result) =>
-				match(result)
-					.with(
-						{
-							type: DropRuleTypeSchema.enum.Enable,
-						},
-						({ active }) => active,
-					)
-					.with(
-						{
-							type: DropRuleTypeSchema.enum.Disable,
-						},
-						({ active }) => !active,
-					)
-					.exhaustive(),
-			),
-		);
-		if (!ruleEnabled) {
-			enabled = false;
-			break;
-		}
-	}
+	const enabled = yield* resolveDropRulesEnabledFx({
+		origin,
+		rules: drop.rules,
+	});
 	if (!enabled) {
 		return undefined;
 	}

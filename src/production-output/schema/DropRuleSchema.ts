@@ -4,7 +4,7 @@ import { DisableDropRuleSchema } from "./DisableDropRuleSchema";
 import { EnableDropRuleSchema } from "./EnableDropRuleSchema";
 
 /**
- * An availability rule evaluated for a drop selected by a successful roll.
+ * An output availability rule used by weighted candidates or selected drops.
  *
  * Each member owns its own behavior and fields. The `type` discriminator keeps
  * the union explicit and directly compatible with `ts-pattern`.
@@ -16,7 +16,7 @@ export const DropRuleSchema = z
 	])
 	.meta({
 		id: "drop.RuleSchema",
-		description: "An availability rule evaluated for a selected drop.",
+		description: "An availability rule evaluated for an output candidate or drop.",
 	});
 
 export type DropRuleSchema = typeof DropRuleSchema;

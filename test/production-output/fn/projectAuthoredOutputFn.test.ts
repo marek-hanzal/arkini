@@ -35,12 +35,30 @@ describe("projectAuthoredOutputFn", () => {
 						{
 							drop: [
 								{
+									rules: [
+										{
+											type: "enable",
+											when: [
+												{
+													type: "exists",
+													query: {
+														scope: "any",
+														selector: {
+															type: "item",
+															itemId: "item:known",
+														},
+													},
+												},
+											],
+										},
+									],
 									drop: [
 										drop("item:known"),
 									],
 									weight: 3,
 								},
 								{
+									rules: [],
 									drop: [
 										drop("item:missing"),
 									],
@@ -93,6 +111,7 @@ describe("projectAuthoredOutputFn", () => {
 						kind: "weight",
 						option: [
 							{
+								activeRuleHints: [],
 								item: [
 									{
 										activeRuleHints: [],
@@ -100,9 +119,14 @@ describe("projectAuthoredOutputFn", () => {
 										title: "Known item",
 									},
 								],
+								rules:
+									output.set[0].roll[2].type === "weight"
+										? output.set[0].roll[2].drop[0].rules
+										: [],
 								weight: 3,
 							},
 							{
+								activeRuleHints: [],
 								item: [
 									{
 										activeRuleHints: [],
@@ -110,6 +134,7 @@ describe("projectAuthoredOutputFn", () => {
 										title: "item:missing",
 									},
 								],
+								rules: [],
 								weight: 1,
 							},
 						],

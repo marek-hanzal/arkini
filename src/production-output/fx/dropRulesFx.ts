@@ -7,15 +7,15 @@ import { dropRuleFx } from "./dropRuleFx";
 export namespace dropRulesFx {
 	export interface Props {
 		origin: GridLocationSchema.Type;
-		rules: DropRuleSchema.Type[];
+		rules: readonly DropRuleSchema.Type[];
 	}
 
 	export type Result = ReadonlyArray<dropRuleFx.Result>;
 }
 
 /**
- * Evaluates an ordered collection of selected-drop rules without interpreting
- * whether the selected drop should be emitted.
+ * Evaluates an ordered output-rule collection without interpreting whether its
+ * candidate or selected drop is available.
  */
 export const dropRulesFx = Effect.fn("dropRulesFx")(function* ({
 	origin,

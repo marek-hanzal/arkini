@@ -34,7 +34,9 @@ export const projectAuthoredOutputFn = (
 				return {
 					kind: "weight",
 					option: roll.drop.map((option) => ({
+						activeRuleHints: [],
 						item: option.drop.map((drop) => projectDropFn(drop, items)),
+						rules: option.rules,
 						weight: option.weight,
 					})),
 					selections: roll.quantity,

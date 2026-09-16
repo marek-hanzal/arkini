@@ -277,6 +277,82 @@ describe("outputFx", () => {
 		});
 	});
 
+	it("filters unavailable weighted candidates before calculating selection weights", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const origin = yield* createOriginFx();
+
+				return yield* outputFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					output: {
+						set: [
+							createRollSet({
+								roll: {
+									type: "weight",
+									quantity: {
+										min: 1,
+										max: 1,
+									},
+									drop: [
+										{
+											rules: [],
+											weight: 1,
+											drop: [
+												createDrop({
+													itemId: "item:normal",
+												}),
+											],
+										},
+										{
+											rules: [
+												{
+													type: "enable",
+													when: [
+														missingPermitWhen,
+													],
+												},
+											],
+											weight: 99,
+											drop: [
+												createDrop({
+													itemId: "item:blocked",
+												}),
+											],
+										},
+									],
+								},
+							}),
+						],
+					},
+				});
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.99,
+					]),
+				),
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result).toEqual({
+			drop: [
+				{
+					itemId: "item:normal",
+					placement: "drop",
+					quantity: 1,
+				},
+			],
+		});
+	});
+
 	it("does not evaluate unselected roll sets", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

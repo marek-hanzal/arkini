@@ -18,14 +18,14 @@ export const WeightedRollSchema = z
 		/**
 		 * Number of independent weighted selections made by this roll.
 		 *
-		 * Each selection chooses one weighted drop candidate and emits all of its
-		 * configured drops. Candidates may therefore be selected more than once.
+		 * Each selection chooses one available weighted drop candidate and emits all
+		 * of its configured drops. Candidates may therefore be selected more than once.
 		 */
 		quantity: QuantitySchema.describe(
 			"The number of independent weighted selections made by this roll.",
 		),
 		/**
-		 * At least two weighted drop candidates from which this roll selects.
+		 * At least two authored candidates. Availability rules may reduce the pool.
 		 */
 		drop: z
 			.tuple(
@@ -35,7 +35,7 @@ export const WeightedRollSchema = z
 				],
 				WeightedDropSchema,
 			)
-			.describe("At least two weighted drop candidates selected by this roll."),
+			.describe("At least two authored candidates filtered before weighted selection."),
 	})
 	.strict()
 	.meta({

@@ -10,6 +10,7 @@ import { dropRulesFx } from "~/production-output/fx/dropRulesFx";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
@@ -17,6 +18,34 @@ interface ItemDetailOutputRuleContext {
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }
+
+const readActiveRuleHintsFx = Effect.fn("readActiveOutputRuleHintsFx")(function* ({
+	rules,
+	ruleContext,
+}: {
+	readonly rules: readonly DropRuleSchema.Type[];
+	readonly ruleContext?: ItemDetailOutputRuleContext;
+}) {
+	if (ruleContext === undefined) return [];
+	return yield* dropRulesFx({
+		origin: ruleContext.origin,
+		rules,
+	}).pipe(
+		Effect.provideService(RuntimeFx, {
+			read: Effect.succeed(ruleContext.runtime),
+		}),
+		Effect.map((results) =>
+			results.flatMap((result, ruleIndex) => {
+				const hint = rules[ruleIndex]?.hint;
+				return result.active && hint !== undefined
+					? [
+							hint,
+						]
+					: [];
+			}),
+		),
+	);
+});
 
 const readItemDetailOutputItemsFx = Effect.fn("readItemDetailOutputItemsFx")(function* ({
 	drops,
@@ -27,27 +56,10 @@ const readItemDetailOutputItemsFx = Effect.fn("readItemDetailOutputItemsFx")(fun
 }) {
 	const grouped = new Map<IdSchema.Type, ItemDetailLines.OutputItem>();
 	for (const drop of drops) {
-		const activeRuleHints =
-			ruleContext === undefined
-				? []
-				: yield* dropRulesFx({
-						origin: ruleContext.origin,
-						rules: drop.rules,
-					}).pipe(
-						Effect.provideService(RuntimeFx, {
-							read: Effect.succeed(ruleContext.runtime),
-						}),
-						Effect.map((results) =>
-							results.flatMap((result, ruleIndex) => {
-								const hint = drop.rules[ruleIndex]?.hint;
-								return result.active && hint !== undefined
-									? [
-											hint,
-										]
-									: [];
-							}),
-						),
-					);
+		const activeRuleHints = yield* readActiveRuleHintsFx({
+			rules: drop.rules,
+			ruleContext,
+		});
 		const previous = grouped.get(drop.itemId);
 		grouped.set(drop.itemId, {
 			itemId: drop.itemId,
@@ -113,12 +125,14 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 			},
 			({ quantity, drop }) =>
 				Effect.gen(function* () {
-					const option: {
-						readonly weight: number;
-						readonly item: readonly ItemDetailLines.OutputItem[];
-					}[] = [];
+					const option: OutputProjection.WeightedOption<ItemDetailLines.OutputItem>[] =
+						[];
 					for (const candidate of drop) {
 						option.push({
+							activeRuleHints: yield* readActiveRuleHintsFx({
+								rules: candidate.rules,
+								ruleContext,
+							}),
 							weight: candidate.weight,
 							item: yield* readItemDetailOutputItemsFx({
 								drops: candidate.drop,

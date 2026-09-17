@@ -7,6 +7,7 @@ import {
 	itemDetailFadeMotion,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { Tx } from "~/translation/ui/Tx";
 
 /** Renders one line's identity, default marker, and description. */
@@ -17,6 +18,7 @@ export const ItemLineSummary = ({
 	readonly line: ItemDetailLinesProjection.Line;
 	readonly stale?: boolean;
 }) => {
+	const durationMs = line.activeJob?.remainingMs ?? line.effectiveRuntimeMs;
 	const status =
 		line.activeJob?.status === JobStatusEnumSchema.enum.Paused
 			? "paused"
@@ -28,6 +30,17 @@ export const ItemLineSummary = ({
 			<div className="flex flex-wrap items-center gap-2">
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
 					{line.title}
+					{stale ? null : (
+						<span
+							className="whitespace-nowrap font-normal tabular-nums text-muted"
+							data-ui="TileLineRuntime"
+						>
+							{" · "}
+							{formatDurationFn(
+								line.activeJob?.remainingMs ?? line.effectiveRuntimeMs,
+							)}
+						</span>
+					)}
 				</h3>
 				<AnimatePresence initial={false}>
 					{stale || status === undefined ? null : (

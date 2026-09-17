@@ -155,7 +155,9 @@ export const Outputs = <Item extends OutputProjection.Item>({
 										{Number(((set.weight / totalWeight) * 100).toFixed(1))} %
 									</span>
 								</header>
-							) : null}
+							) : (
+								<div className="mb-3 border-t border-line" />
+							)}
 							{renderSetDetailFn?.(set)}
 							{set.activeRuleHints.map((hint, index) => (
 								<p

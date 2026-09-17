@@ -41,7 +41,8 @@ read marker + schema + exact source paths
 → completed GameConfig parse
 → semantic and PNG-resource validation
 → assert no errors
-→ bounded square RGBA normalization for `artwork/`; byte-preserving `image/`
+→ bounded square RGBA normalization for `artwork/`; byte-preserving staging for `image/`, Music, and SFX
+→ validate staged resource bytes and pack those same owned files
 → JSON manifest + JSON GameConfig + ordered raw resource bodies, with Music filtered by the authored playlist and SFX event assignments preserved
 → ARKPACK envelope with optional distribution proof
 ```

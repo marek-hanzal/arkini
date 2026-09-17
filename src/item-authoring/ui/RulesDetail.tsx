@@ -150,7 +150,7 @@ export const RulesDetail = ({ rules }: { readonly rules: readonly RuleSchema.Typ
 							className="grid gap-2 py-3 first:pt-0 last:pb-0"
 							key={`${rule.type}-${index}`}
 						>
-							<ul className="grid gap-3 border-l-2 border-accent pl-24 text-muted">
+							<ul className="grid gap-3 text-muted">
 								{rule.when.map((when, whenIndex) => (
 									<WhenDetail
 										key={`${when.type}-${whenIndex}`}

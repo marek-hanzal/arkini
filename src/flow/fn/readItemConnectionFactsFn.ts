@@ -27,6 +27,7 @@ const readInputItemIdFn = (input: LineInputSchema.Type | ActionInputSchema.Type)
 };
 
 const readAvailabilityFactsFn = (
+	items: GameConfigSchema.Type["items"],
 	rules: ReadonlyArray<{
 		readonly type: string;
 		readonly when: ReadonlyArray<WhenSchema.Type>;
@@ -34,6 +35,7 @@ const readAvailabilityFactsFn = (
 ) =>
 	rules.flatMap((rule, ruleIndex) => {
 		const requirements = readAcquisitionAvailabilityRequirementsFn({
+			items,
 			rules: [
 				rule,
 			],
@@ -43,6 +45,7 @@ const readAvailabilityFactsFn = (
 		if (requirements.allOf.length === 0 && requirements.anyOf.length === 0) return [];
 		return rule.when.flatMap((when, whenIndex) => {
 			const condition = readAcquisitionAvailabilityRequirementsFn({
+				items,
 				rules: [
 					{
 						...rule,
@@ -67,6 +70,7 @@ const readAvailabilityFactsFn = (
 	});
 
 const addOutputFactsFn = (
+	items: GameConfigSchema.Type["items"],
 	facts: ItemConnectionFact[],
 	output: OutputSchema.Type | undefined,
 	source: readItemConnectionFactsFn.Source,
@@ -76,7 +80,10 @@ const addOutputFactsFn = (
 		for (const [rollIndex, roll] of set.roll.entries()) {
 			if (roll.type === "weight") {
 				for (const [candidateIndex, candidate] of roll.drop.entries()) {
-					for (const { factId, condition } of readAvailabilityFactsFn(candidate.rules))
+					for (const { factId, condition } of readAvailabilityFactsFn(
+						items,
+						candidate.rules,
+					))
 						facts.push({
 							factId,
 							origin: {
@@ -121,7 +128,7 @@ const addOutputFactsFn = (
 						roll: position,
 					},
 				});
-				for (const { factId, condition } of readAvailabilityFactsFn(drop.rules))
+				for (const { factId, condition } of readAvailabilityFactsFn(items, drop.rules))
 					facts.push({
 						factId,
 						origin: {
@@ -135,7 +142,10 @@ const addOutputFactsFn = (
 		}
 };
 
-const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
+const readOwnerFactsFn = (
+	items: GameConfigSchema.Type["items"],
+	item: ItemSchema.Type,
+): ItemConnectionFact[] => {
 	const facts: ItemConnectionFact[] = [];
 	for (const [lineIndex, line] of item.lines.entries()) {
 		const source: readItemConnectionFactsFn.Source = {
@@ -155,7 +165,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					},
 				});
 		}
-		for (const { factId, condition } of readAvailabilityFactsFn(line.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(items, line.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -164,7 +174,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					condition,
 				},
 			});
-		addOutputFactsFn(facts, line.output, source);
+		addOutputFactsFn(items, facts, line.output, source);
 	}
 	if (item.action !== undefined) {
 		const source = {
@@ -182,7 +192,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					},
 				});
 		}
-		for (const { factId, condition } of readAvailabilityFactsFn(item.action.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(items, item.action.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -212,16 +222,16 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					role: "replacement",
 				},
 			});
-		addOutputFactsFn(facts, merge.output, source);
+		addOutputFactsFn(items, facts, merge.output, source);
 	}
-	addOutputFactsFn(facts, item.units?.output, {
+	addOutputFactsFn(items, facts, item.units?.output, {
 		type: "units",
 	});
 	if (item.clock !== undefined) {
-		addOutputFactsFn(facts, item.clock.onExpire, {
+		addOutputFactsFn(items, facts, item.clock.onExpire, {
 			type: "expiry",
 		});
-		for (const { factId, condition } of readAvailabilityFactsFn(item.clock.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(items, item.clock.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -252,7 +262,7 @@ export const readItemConnectionFactsFn = (
 			];
 	for (const owner of owners) {
 		if (owner === undefined) continue;
-		for (const fact of readOwnerFactsFn(owner)) {
+		for (const fact of readOwnerFactsFn(config.items, owner)) {
 			const isOutput = fact.origin.role === "output" || fact.origin.role === "replacement";
 			if (isOutput !== outputs || (reverse && fact.factId !== factId)) continue;
 			const itemId = reverse ? owner.id : fact.factId;

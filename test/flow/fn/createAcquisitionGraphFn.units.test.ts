@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
@@ -487,7 +488,7 @@ describe("createAcquisitionGraphFn", () => {
 					jobQueue: [],
 					defaultLineByOwnerItemId: {},
 				},
-			}),
+			}).pipe(Effect.provideService(GameConfigFx, result.config)),
 		);
 		expect(run).toMatchObject({
 			input: [

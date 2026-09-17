@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import { rollSetFx } from "~/production-output/fx/rollSetFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 
 const origin = {
@@ -14,6 +16,30 @@ const origin = {
 		y: 0,
 	},
 };
+const provideConfigFx = Effect.provideService(
+	GameConfigFx,
+	GameConfigSchema.parse({
+		resources: {
+			hero: "hero",
+		},
+		meta: {
+			id: "game:roll-test",
+			title: "Roll test",
+			board: {
+				width: 1,
+				height: 1,
+			},
+			inventory: {
+				width: 1,
+				height: 1,
+			},
+		},
+		start: {
+			currentSpace: 0,
+		},
+		items: {},
+	}),
+);
 const provideUnusedRuntimeFx = Effect.provideService(RuntimeFx, {
 	read: Effect.die("This test must not read Runtime."),
 });
@@ -56,7 +82,7 @@ describe("rollSetFx", () => {
 						},
 					],
 				},
-			}).pipe(provideUnusedRuntimeFx),
+			}).pipe(provideUnusedRuntimeFx, provideConfigFx),
 		);
 
 		expect(result.drop).toEqual([
@@ -84,6 +110,7 @@ describe("rollSetFx", () => {
 				},
 			}).pipe(
 				provideUnusedRuntimeFx,
+				provideConfigFx,
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([

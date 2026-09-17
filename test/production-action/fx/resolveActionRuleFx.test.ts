@@ -1,11 +1,15 @@
 import { Effect, Result } from "effect";
 import { expect, it } from "vitest";
 
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
-import { lineRunRuntime } from "~test/production-line/support/lineRunTestRuntime";
+import {
+	lineRunRuntime,
+	lineRunTestConfig,
+} from "~test/production-line/support/lineRunTestRuntime";
 
 it("keeps rules inactive when a Board condition has no physical origin in either condition order", () => {
 	const origin = {
@@ -41,6 +45,7 @@ it("keeps rules inactive when a Board condition has no physical origin in either
 					rule,
 				}),
 			).pipe(
+				Effect.provideService(GameConfigFx, lineRunTestConfig),
 				Effect.provideService(RuntimeFx, {
 					read: Effect.succeed(lineRunRuntime({})),
 				}),

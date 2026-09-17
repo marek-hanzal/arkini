@@ -45,7 +45,9 @@ const readDropSummaryFn = (drop: DropSchema.Type, textFn: (key: string) => strin
 	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`}`;
 };
 const readRulesItemIdsFn = (rules: WeightedRoll["drop"][number]["rules"]) =>
-	rules.flatMap((rule) => rule.when.map((when) => when.query.selector.itemId));
+	rules.flatMap((rule) =>
+		rule.when.map((when) => (when.type === "limit" ? when.itemId : when.query.selector.itemId)),
+	);
 const RollTypeLabelByType = {
 	chance: "Chance",
 	guaranteed: "Guaranteed",

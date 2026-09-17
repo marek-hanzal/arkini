@@ -90,7 +90,7 @@ Scheduled owners use the same selected-line reader and one-intent admission. `Co
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs and stored owners stay blocked. Explicit forced owner removal can abort active Jobs.
 - Clearing pending work returns its unused line-input material without cancelling active work.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.
-- Active Jobs reserve the worst possible output quantity; queued requests reserve nothing.
+- Active Jobs reserve the worst possible output quantity; queued requests reserve nothing. The shared `limit` condition observes global existing quantities against the selected item's `maxCount`, independently of future reservations; Rule controls expose it to both lines and drops.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.
 - Job, delivery and item-schedule advancement order belongs to Game Tick, not to any production root.

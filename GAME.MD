@@ -25,6 +25,8 @@ Only compatible pure items stack, up to `maxStackSize`. Purity is derived from l
 
 When a Board operation first attaches state to a stacked identity, the original identity becomes quantity `1` and the pure remainder uses standard placement in the same atomic transition. Failure to place the remainder changes nothing. Generic stack/quantity operations accept only pure items.
 
+A `limit` rule condition selects one canonical item and is true when its existing quantity across the entire Runtime reaches or exceeds its authored `maxCount`. It includes every Board, Inventory, Toolbar, stored input, delivery and committed job material, regardless of the rule origin. Future job output reservations and queued intent do not contribute; an item without `maxCount` never satisfies it. `Disable + Limit` therefore blocks a line or suppresses a drop while the target limit is reached. It uses the same rule ordering and pinned snapshot as other conditions; ordinary live-plus-reserved capacity admission remains authoritative and unchanged.
+
 ## Lines, intent, and delivery
 
 Item production lines share one lifecycle. Each item owns zero or more `lines`; without lines or an immediate action it is passive. Production uses `maxQueueSize` (default `1`). A default line selects the click action; it does not schedule work automatically. Input filling is passive and never starts work. Each material input stores at most its authored `quantity.max`; there is no extra input capacity. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units, output capacity, and queue capacity. Missing concrete material may wait.

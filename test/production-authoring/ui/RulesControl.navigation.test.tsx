@@ -4,6 +4,14 @@ import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
 import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
+	useEditorProject: () => ({
+		config: {
+			items: {},
+		},
+	}),
+}));
+
 vi.mock("~/item-authoring/ui/useFormValidationIssues", () => ({
 	useFormValidationFocusIndex: () => undefined,
 	useFormValidationIssues: () => [],

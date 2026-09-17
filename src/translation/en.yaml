@@ -1196,6 +1196,13 @@ Lifetime (seconds):
   value: Lifetime (seconds)
 Lifetime remaining:
   value: Lifetime remaining
+Limit:
+  value: Limit
+Limit condition help:
+  value: |
+    Passes when the selected item has reached its **Maximum global count**. Counts existing quantities across all Boards, Inventory, Toolbar, stored inputs and jobs. Future job output is not counted.
+
+    An item without a maximum never satisfies this condition. Use **Disable + Limit** to stop a line or skip a drop while the limit is reached.
 Line ID:
   value: Line ID
 Line description:
@@ -2346,6 +2353,8 @@ keep:
   value: keep
 kill-switch:
   value: stop immediately
+limit:
+  value: limit
 managed:
   value: managed
 negligible:

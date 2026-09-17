@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { readAcquisitionOutputOccurrencesFn } from "~/flow/fn/readAcquisitionOutputOccurrencesFn";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 
-const readFn = (input: unknown) => readAcquisitionOutputOccurrencesFn(OutputSchema.parse(input));
+const readFn = (input: unknown) =>
+	readAcquisitionOutputOccurrencesFn(OutputSchema.parse(input), {});
 
 describe("readAcquisitionOutputOccurrencesFn", () => {
 	it("keeps weighted selection and authored range probability mass", () => {

@@ -2,15 +2,19 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { lineRunRuntime } from "~test/production-line/support/lineRunTestRuntime";
+import {
+	lineRunRuntime,
+	lineRunTestConfig,
+} from "~test/production-line/support/lineRunTestRuntime";
 
 const resolveFx = (runtime: ReturnType<typeof lineRunRuntime>) => {
 	return resolveLineRunFx({
 		ownerItemId: "runtime:workshop",
 		lineId: "line:workshop:build",
 		runtime,
-	});
+	}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig));
 };
 
 describe("resolveLineRunFx", () => {

@@ -721,9 +721,12 @@
 				},
 				{
 					"$ref": "urn:arkini:schema:project#/$defs/when.RangeSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/when.LimitSchema"
 				}
 			],
-			"description": "A standalone condition that evaluates an item-query quantity."
+			"description": "A standalone condition that evaluates an item-query quantity or an item's global quantity limit."
 		},
 		"when.ExistsSchema": {
 			"type": "object",
@@ -969,6 +972,28 @@
 			],
 			"additionalProperties": false,
 			"description": "A condition that checks an item query against an inclusive quantity range."
+		},
+		"when.LimitSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"limit"
+					],
+					"description": "Checks whether an item's global quantity limit is reached."
+				},
+				"itemId": {
+					"description": "The exact item whose maxCount is compared with its live quantity across every location.",
+					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"type",
+				"itemId"
+			],
+			"additionalProperties": false,
+			"description": "True when an item's global live quantity reaches maxCount; false for an uncapped item. Future output reservations are excluded."
 		},
 		"drop.rule.DisableSchema": {
 			"type": "object",

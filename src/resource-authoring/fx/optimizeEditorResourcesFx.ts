@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { Effect } from "effect";
 
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
@@ -16,14 +17,18 @@ export const optimizeEditorResourcesFx = Effect.fn("optimizeEditorResourcesFx")(
 	props: OptimizeEditorResourcesProps,
 ) {
 	const repository = yield* ProjectRepository;
+	const admission = yield* ProjectWriteAdmission;
 	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const result = yield* repository.optimizeResourcesFx(props);
-			yield* publishEditorProjectFx(props.projectId, {
-				project: result.project,
-			});
-			return result;
-		}),
+	return yield* admission.admitWriteFx(
+		"optimize-resources",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const result = yield* repository.optimizeResourcesFx(props);
+				yield* publishEditorProjectFx(props.projectId, {
+					project: result.project,
+				});
+				return result;
+			}),
+		),
 	);
 });

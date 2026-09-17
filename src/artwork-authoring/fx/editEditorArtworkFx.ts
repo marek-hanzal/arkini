@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { Effect } from "effect";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -31,45 +32,49 @@ export const editEditorArtworkFx = Effect.fn("editEditorArtworkFx")(function* ({
 			}),
 	});
 	const repository = yield* ProjectRepository;
+	const admission = yield* ProjectWriteAdmission;
 	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const project = yield* repository.readProjectFx(projectId);
-			const existing = project?.resources.find(({ id }) => id === currentId);
-			if (project === null || existing?.type !== "artwork") {
-				return yield* Effect.fail(
-					new ProjectOperationError({
-						reason: "invalid-artwork",
-						message: `Artwork ${currentId} no longer exists.`,
-					}),
-				);
-			}
-			const resource =
-				file === undefined
-					? {
-							type: existing.type,
-							id: resourceId,
-						}
-					: {
-							...(yield* validateEditorArtworkFileFx(file, resourceId)),
-							path: window.arkini.file.readPathFn(file),
-						};
-			const config = yield* renameGameResourceFx({
-				config: project.config,
-				from: currentId,
-				to: resourceId,
-			});
-			const saved = yield* repository.replaceResourceFx({
-				config,
-				currentId,
-				expectedRevision: project.revision,
-				projectId,
-				resource,
-			});
-			yield* publishEditorProjectFx(projectId, {
-				project: saved,
-			});
-			return saved;
-		}),
+	return yield* admission.admitWriteFx(
+		"replace-resource",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const project = yield* repository.readProjectFx(projectId);
+				const existing = project?.resources.find(({ id }) => id === currentId);
+				if (project === null || existing?.type !== "artwork") {
+					return yield* Effect.fail(
+						new ProjectOperationError({
+							reason: "invalid-artwork",
+							message: `Artwork ${currentId} no longer exists.`,
+						}),
+					);
+				}
+				const resource =
+					file === undefined
+						? {
+								type: existing.type,
+								id: resourceId,
+							}
+						: {
+								...(yield* validateEditorArtworkFileFx(file, resourceId)),
+								path: window.arkini.file.readPathFn(file),
+							};
+				const config = yield* renameGameResourceFx({
+					config: project.config,
+					from: currentId,
+					to: resourceId,
+				});
+				const saved = yield* repository.replaceResourceFx({
+					config,
+					currentId,
+					expectedRevision: project.revision,
+					projectId,
+					resource,
+				});
+				yield* publishEditorProjectFx(projectId, {
+					project: saved,
+				});
+				return saved;
+			}),
+		),
 	);
 });

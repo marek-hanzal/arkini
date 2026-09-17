@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -21,35 +22,47 @@ interface DeleteEditorArtworkCommandProps {
 }
 
 const deleteEditorArtworkCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn(({ onDeletedFn, ...props }: DeleteEditorArtworkCommandProps) =>
-				Effect.gen(function* () {
-					yield* Effect.yieldNow;
-					return yield* Effect.uninterruptible(
-						Effect.gen(function* () {
-							const project = yield* repository.deleteResourceFx({
-								...props,
-								projectId,
-							});
-							// Leave before publication removes the detail's mounted readers.
-							// Canonical publication survives route departure and navigation failure.
-							yield* Effect.tryPromise({
-								try: onDeletedFn,
-								catch: (cause) => cause,
-							}).pipe(
-								Effect.ensuring(
-									publishEditorProjectFx(projectId, {
-										project,
-									}),
-								),
-							);
-							return project;
-						}),
-					);
-				}),
-			).pipe(Atom.setIdleTTL(0)),
-		),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.family((projectId: string) =>
+				Atom.fn(({ onDeletedFn, ...props }: DeleteEditorArtworkCommandProps) =>
+					Effect.gen(function* () {
+						yield* Effect.yieldNow;
+						return yield* admission.admitWriteFx(
+							"delete-resource",
+							Effect.uninterruptible(
+								Effect.gen(function* () {
+									const project = yield* repository.deleteResourceFx({
+										...props,
+										projectId,
+									});
+									// Leave before publication removes the detail's mounted readers.
+									// Canonical publication survives route departure and navigation failure.
+									yield* Effect.tryPromise({
+										// Refresh owns the route while it waits for this command to publish.
+										try: () =>
+											admission.isNavigationBlockedFn()
+												? Promise.resolve()
+												: onDeletedFn(),
+										catch: (cause) => cause,
+									}).pipe(
+										Effect.ensuring(
+											publishEditorProjectFx(projectId, {
+												project,
+											}),
+										),
+									);
+									return project;
+								}),
+							),
+						);
+					}),
+				).pipe(Atom.setIdleTTL(0)),
+			),
 	),
 );
 

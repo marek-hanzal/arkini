@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect } from "effect";
@@ -12,15 +13,23 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const saveDraftStatusCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<saveDraftStatusFx.Props, "projectId">) =>
-				saveDraftStatusFx({
-					...props,
-					projectId,
-				}).pipe(Effect.provideService(ProjectRepository, repository)),
-			).pipe(Atom.setIdleTTL(0)),
-		),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.family((projectId: string) =>
+				Atom.fn((props: Omit<saveDraftStatusFx.Props, "projectId">) =>
+					saveDraftStatusFx({
+						...props,
+						projectId,
+					}).pipe(
+						Effect.provideService(ProjectRepository, repository),
+						Effect.provideService(ProjectWriteAdmission, admission),
+					),
+				).pipe(Atom.setIdleTTL(0)),
+			),
 	),
 );
 

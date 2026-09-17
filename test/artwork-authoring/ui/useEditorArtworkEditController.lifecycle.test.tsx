@@ -53,6 +53,13 @@ vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
 vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	const { ProjectRepository } = await import("~/project-authoring/service/ProjectRepository");
+	const { ProjectWriteAdmission } = await import(
+		"~/project-authoring/service/ProjectWriteAdmission"
+	);
+	const { createProjectWriteAdmissionFx } = await import(
+		"~/project-authoring/fx/createProjectWriteAdmissionFx"
+	);
+	const admission = Effect.runSync(createProjectWriteAdmissionFx);
 	const repository = {
 		readProjectFx: () => Effect.succeed(state.project),
 		replaceResourceFx: (...args: ReadonlyArray<unknown>) => state.replaceResource(...args),
@@ -60,6 +67,7 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	const provideRepositoryFn = (effect: EffectModule.Effect<unknown, unknown, unknown>) =>
 		effect.pipe(
 			Effect.provideService(ProjectRepository, repository as never),
+			Effect.provideService(ProjectWriteAdmission, admission),
 		) as EffectModule.Effect<unknown, unknown, never>;
 	return {
 		RendererRuntime: {

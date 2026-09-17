@@ -1,3 +1,5 @@
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
@@ -87,6 +89,10 @@ describe("saveProjectConfigFx", () => {
 				}).pipe(
 					Effect.provideService(ProjectRepository, repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
+					Effect.provideService(
+						ProjectWriteAdmission,
+						Effect.runSync(createProjectWriteAdmissionFx),
+					),
 				),
 			),
 		).resolves.toEqual(config);
@@ -143,6 +149,10 @@ describe("saveProjectConfigFx", () => {
 				}).pipe(
 					Effect.provideService(ProjectRepository, repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
+					Effect.provideService(
+						ProjectWriteAdmission,
+						Effect.runSync(createProjectWriteAdmissionFx),
+					),
 				),
 			),
 		).rejects.toThrow("stale revision");
@@ -176,6 +186,10 @@ describe("saveProjectConfigFx", () => {
 				}).pipe(
 					Effect.provideService(ProjectRepository, repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
+					Effect.provideService(
+						ProjectWriteAdmission,
+						Effect.runSync(createProjectWriteAdmissionFx),
+					),
 				),
 			),
 		).rejects.toThrow("project configuration is invalid");

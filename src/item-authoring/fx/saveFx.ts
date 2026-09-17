@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { Effect } from "effect";
 
@@ -23,20 +24,24 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 	projectId,
 }: saveFx.Props) {
 	const repository = yield* ProjectRepository;
+	const admission = yield* ProjectWriteAdmission;
 	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const { commit, item } = yield* saveWithRepositoryFx({
-				config,
-				expectedRevision,
-				item: candidate,
-				projectId,
-				repository,
-			});
-			yield* publishEditorProjectFx(projectId, {
-				commit,
-			});
-			return item;
-		}),
+	return yield* admission.admitWriteFx(
+		"upsert-item",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const { commit, item } = yield* saveWithRepositoryFx({
+					config,
+					expectedRevision,
+					item: candidate,
+					projectId,
+					repository,
+				});
+				yield* publishEditorProjectFx(projectId, {
+					commit,
+				});
+				return item;
+			}),
+		),
 	);
 });

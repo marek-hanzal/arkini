@@ -22,7 +22,7 @@ export interface ProjectWriteAdmissionService {
 	) => Effect.Effect<Value, Error | ProjectRepositoryError, Requirements>;
 }
 
-/** Excludes writes and navigation during replacement, and navigation through an identity rename's terminal route. */
+/** Serializes admitted writes and drains them before replacement; also owns replacement/rename navigation exclusion. */
 export class ProjectWriteAdmission extends Context.Service<
 	ProjectWriteAdmission,
 	ProjectWriteAdmissionService

@@ -1,3 +1,5 @@
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
@@ -107,6 +109,10 @@ describe("saveFx", () => {
 			}).pipe(
 				Effect.provideService(ProjectRepository, fixture.repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
 			),
 		);
 
@@ -139,6 +145,10 @@ describe("saveFx", () => {
 			}).pipe(
 				Effect.provideService(ProjectRepository, fixture.repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
 			),
 		);
 
@@ -173,6 +183,10 @@ describe("saveFx", () => {
 				}).pipe(
 					Effect.provideService(ProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+					Effect.provideService(
+						ProjectWriteAdmission,
+						Effect.runSync(createProjectWriteAdmissionFx),
+					),
 				),
 			),
 		).rejects.toThrow("does not satisfy");

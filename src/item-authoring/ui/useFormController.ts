@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { copyItemSectionFn } from "~/item-authoring/fn/copyItemSectionFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -26,15 +27,23 @@ import { readEditorFormValidationMessageFn as readSharedValidationMessageFn } fr
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 const saveCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<saveFx.Props, "projectId">) =>
-				saveFx({
-					...props,
-					projectId,
-				}).pipe(Effect.provideService(ProjectRepository, repository)),
-			).pipe(Atom.setIdleTTL(0)),
-		),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.family((projectId: string) =>
+				Atom.fn((props: Omit<saveFx.Props, "projectId">) =>
+					saveFx({
+						...props,
+						projectId,
+					}).pipe(
+						Effect.provideService(ProjectRepository, repository),
+						Effect.provideService(ProjectWriteAdmission, admission),
+					),
+				).pipe(Atom.setIdleTTL(0)),
+			),
 	),
 );
 

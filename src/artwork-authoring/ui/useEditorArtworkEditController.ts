@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -63,15 +64,23 @@ const isArtworkIdCollisionFn = (error: unknown, resourceId: string) =>
 	error.message === `Resource ID ${resourceId} already exists.`;
 
 const editEditorArtworkCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn((props: EditEditorArtworkCommandProps) =>
-				editEditorArtworkFx({
-					...props,
-					projectId,
-				}).pipe(Effect.provideService(ProjectRepository, repository)),
-			).pipe(Atom.setIdleTTL(0)),
-		),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.family((projectId: string) =>
+				Atom.fn((props: EditEditorArtworkCommandProps) =>
+					editEditorArtworkFx({
+						...props,
+						projectId,
+					}).pipe(
+						Effect.provideService(ProjectRepository, repository),
+						Effect.provideService(ProjectWriteAdmission, admission),
+					),
+				).pipe(Atom.setIdleTTL(0)),
+			),
 	),
 );
 
@@ -106,6 +115,7 @@ export const useEditorArtworkEditController = ({
 	resourceId,
 }: useEditorArtworkEditController.Props): useEditorArtworkEditController.Output => {
 	const project = useEditorProject();
+	const admission = RendererRuntime.runSync(ProjectWriteAdmission);
 	const resource = useEditorArtworkById(resourceId);
 	const currentUrl = useResourceUrl(resourceId);
 	const navigateFn = useNavigate();
@@ -265,7 +275,12 @@ export const useEditorArtworkEditController = ({
 	]);
 	const saveFn = useCallback(async () => {
 		const epoch = draftEpochRef.current;
-		if (!(await persistFn()) || !mountedRef.current || draftEpochRef.current !== epoch)
+		if (
+			!(await persistFn()) ||
+			!mountedRef.current ||
+			draftEpochRef.current !== epoch ||
+			admission.isNavigationBlockedFn()
+		)
 			return false;
 		const id = nextId.trim();
 		await navigateFn({
@@ -282,6 +297,7 @@ export const useEditorArtworkEditController = ({
 		});
 		return true;
 	}, [
+		admission,
 		filter,
 		navigateFn,
 		nextId,

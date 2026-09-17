@@ -107,6 +107,8 @@ acquire replacement admission
 → recreate Editor Board Game
 ```
 
+Project Write Admission serializes accepted renderer writes. Save, delete, import and optimization commands hold admission through preparation, native commit and canonical publication; nested repository writes reuse the same fiber-owned admission. Refresh closes admission to new writes and drains accepted commands before rereading disk or discarding drafts. Waiting commands remain interruptible before execution, and revision checks still reject stale content.
+
 Project Write Admission rejects replacement during an already pending route transition, reading current router state before taking the lock. Once acquired, it excludes ordinary writes and route changes until this replacement handshake finishes, including hard Refresh. Navigation reads the live admission before and after any asynchronous draft decision, so replacement cannot discard drafts or resynchronize a Board belonging to a successor route.
 
 An identity rename first resolves the current draft leave decision, then holds the same admission authority from its revision-pinned write through navigation to the new project ID. This excludes replacement and unrelated navigation; ordinary writes keep repository revision checks. Only the rename's terminal route bypasses the navigation guard while its lease is live. Failure releases admission and remains visible in the rename dialog.
@@ -117,7 +119,7 @@ External authored JSON and resource catalog changes are ignored while mounted. R
 
 Output version settings live as structured `game.json.version` fields. Ordinary authoring preserves them. Build saves a validated choice without changing authoring revision, then builds that exact saved version and content revision. Saving and updating the renderer metadata settle together even when compilation fails; this metadata update never publishes or resets the live Board.
 
-Build and CLI pack verify the current source set and bytes before publishing the staged artifact. The build descriptor carries its actual formatted version, revision and content hash. Installation derives compatibility from that artifact, not from mutable output settings. There are no history, object-store or scenario operations.
+Build and CLI pack publish compiled JSON and validated staged resource bytes. Image and audio sources are copied before validation; Artwork is normalized into an owned staged file. Packing reads those same files, so external source edits cannot invalidate admitted resource lengths or bytes. Invalid staged resources leave the previous build intact. The build descriptor carries its actual formatted version, revision and content hash. Installation derives compatibility from that artifact, not from mutable output settings. There are no history, object-store or scenario operations.
 
 ## IPC and MCP
 

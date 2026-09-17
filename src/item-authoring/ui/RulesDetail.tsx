@@ -144,7 +144,7 @@ export const RulesDetail = ({ rules }: { readonly rules: readonly RuleSchema.Typ
 					<Tx label="No rules" />
 				</p>
 			) : (
-				<ul className="divide-y divide-line/60 text-sm">
+				<ul className="text-sm">
 					{rules.map((rule, index) => (
 						<li
 							className="grid gap-2 py-3 first:pt-0 last:pb-0"

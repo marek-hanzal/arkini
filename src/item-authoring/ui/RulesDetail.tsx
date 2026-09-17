@@ -1,3 +1,4 @@
+import { GitBranch } from "lucide-react";
 import { match } from "ts-pattern";
 import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
@@ -10,6 +11,7 @@ import type { ReactNode } from "react";
 
 const RuleLabel = ({ rule }: { readonly rule: RuleSchema.Type }) => (
 	<span className="mb-1 flex items-center gap-1 text-sm font-semibold text-accent">
+		<GitBranch className="size-3.5 shrink-0" />
 		{match(rule)
 			.with(
 				{

@@ -79,7 +79,13 @@ export const ItemReferenceButton = ({
 				artworkImageClassName="p-0.5"
 				compositeUrl={compositeUrl}
 				description={description}
-				eyebrow={eyebrow}
+				eyebrow={
+					eyebrow === undefined ? undefined : (
+						<span className="block [&>span]:transition-colors group-enabled:group-hover:[&>span]:text-accent">
+							{eyebrow}
+						</span>
+					)
+				}
 				rootTag="span"
 				sourceUrl={sourceUrl}
 				title={label}

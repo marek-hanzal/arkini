@@ -24,7 +24,6 @@ const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.Au
 				<RulesDetail
 					rules={item.rules}
 					description={<Mx label="Authored drop rules summary help" />}
-					variant="output-tree"
 				/>
 			)}
 		</div>
@@ -60,7 +59,6 @@ export const OutputDetail = ({
 							description={
 								<Mx label="Authored weighted candidate rules summary help" />
 							}
-							variant="output-tree"
 						/>
 					</div>
 				)

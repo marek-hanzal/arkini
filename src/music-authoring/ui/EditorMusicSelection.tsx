@@ -9,6 +9,7 @@ import { Fact, FactList } from "~/ui/ui/FactList";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 /** Selects an item-detail track with one shared preview session for options and the selected track. */
 export const EditorMusicSelection = ({
@@ -56,8 +57,13 @@ export const EditorMusicSelection = ({
 	const selectedActive = preview.activeResourceId === resourceId;
 	return (
 		<div
-			className="grid gap-4"
-			data-ui="EditorMusicSelection"
+			className="grid gap-4 data-[ui-read-only=true]:gap-1"
+			{...readDataUiFn({
+				dataUi: "EditorMusicSelection",
+				state: {
+					readOnly: onChangeFn === undefined,
+				},
+			})}
 		>
 			{onChangeFn === undefined ? (
 				<FactList columns={1}>

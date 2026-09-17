@@ -43,7 +43,7 @@ export namespace createGameAudioRuntimeFx {
 export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(function* ({
 	game,
 	sound: initialSound,
-	crossfadeSeconds = 4,
+	crossfadeSeconds = 2,
 	maximumSfxVoices = 8,
 }: createGameAudioRuntimeFx.Props) {
 	const random = yield* Random.Random;

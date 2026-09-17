@@ -390,7 +390,7 @@ describe("item detail music", () => {
 		global.currentTime = 43;
 		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
 		await Promise.resolve();
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		expect(global.paused).toBe(true);
 		const b = harness.audios.find((audio) => audio.src.endsWith("/detail-b"))!;
 		expect(b.currentTime).toBeGreaterThanOrEqual(12);
@@ -408,12 +408,12 @@ describe("item detail music", () => {
 				gain.linearRampToValueAtTime.mock.calls.some(([value]) => value === 1),
 			),
 		).toBe(true);
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		Effect.runSync(runtime.requestDetailMusicFx(undefined));
 		await Promise.resolve();
 		expect(global.currentTime).toBe(43);
 		expect(global.play).toHaveBeenCalledTimes(2);
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		expect(harness.audios.filter((audio) => !audio.paused)).toEqual([
 			global,
 		]);
@@ -424,9 +424,9 @@ describe("item detail music", () => {
 		const { harness, runtime } = await setupFn();
 		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
 		await Promise.resolve();
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		const b = harness.audios.find((audio) => audio.src.endsWith("/detail-b"))!;
-		b.currentTime = 117;
+		b.currentTime = 119;
 		b.dispatchEvent(new Event("timeupdate"));
 		await Promise.resolve();
 		const repeat = harness.audios.find(
@@ -435,7 +435,7 @@ describe("item detail music", () => {
 		expect(repeat).toBeDefined();
 		expect(repeat.currentTime).toBeCloseTo(84);
 		expect(repeat.play).toHaveBeenCalledOnce();
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		expect(b.paused).toBe(true);
 		expect(
 			harness.audios.find((audio) => audio.src.endsWith("/global"))?.play,
@@ -447,7 +447,7 @@ describe("item detail music", () => {
 		const { harness, runtime } = await setupFn();
 		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
 		await Promise.resolve();
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		const b = harness.audios.find((audio) => audio.src.endsWith("/detail-b"))!;
 		const spare = harness.audios.find((audio, index) => index >= 2 && audio !== b)!;
 		spare.readyState = 0;
@@ -456,13 +456,13 @@ describe("item detail music", () => {
 		spare.dispatchEvent(new Event("loadedmetadata"));
 		await Promise.resolve();
 		expect(spare.play).not.toHaveBeenCalled();
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		spare.readyState = 1;
 		b.readyState = 1;
 		b.play.mockRejectedValueOnce(new Error("decode failure"));
 		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
 		await Promise.resolve();
-		await vi.advanceTimersByTimeAsync(4000);
+		await vi.advanceTimersByTimeAsync(2000);
 		expect(harness.audios.find((audio) => audio.src.endsWith("/global"))?.paused).toBe(false);
 		await Effect.runPromise(runtime.closeFx);
 	});

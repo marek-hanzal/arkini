@@ -288,13 +288,18 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 							}),
 						},
 					});
-					const replacedTarget = yield* createRuntimeItemFx({
+					const replacement = yield* createRuntimeItemFx({
 						id: target.id,
 						item: resultItem,
 						location: target.location,
 						quantity: 1,
 						...replacementUnits,
 					});
+					// Replacement retains the target identity, including its random-stream cursor.
+					const replacedTarget = {
+						...replacement,
+						mergeSequence: target.mergeSequence,
+					};
 					const replacedRuntime = {
 						...runtime,
 						items: runtime.items.map((item) =>
@@ -390,7 +395,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 }: ApplyMergeRuntimeProps) {
 	const sourceAction = yield* applyMergeSourceActionFx({
 		action: rule.action,
-		actionId: `merge:${ruleIndex}`,
+		actionId: `merge:${ruleIndex}:${source.mergeSequence ?? 0}`,
 		runtime,
 		source,
 	});
@@ -401,7 +406,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		runtime: sourceAction.runtime,
 	});
 	const targetEffect = yield* applyMergeTargetEffectFx({
-		actionId: `merge:${ruleIndex}:target`,
+		actionId: `merge:${ruleIndex}:target:${source.mergeSequence ?? 0}`,
 		ownerItemId: source.id,
 		rule,
 		runtime: sourceAction.runtime,

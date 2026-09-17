@@ -21,7 +21,7 @@ Configured storage scope is `board | inventory | toolbar | any`. Query reach is 
 
 A Board-relative condition requires a physical Board origin. From Inventory or Toolbar it evaluates false, including `count: 0` and ranges containing zero; it does not reinterpret passive coordinates or invent an empty Board query. This applies uniformly to action, line, Clock, and output rules. An unavailable Enable condition denies availability; an unavailable Disable condition casts no veto. Direct Board queries without a Board origin remain invalid.
 
-Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial unit count. An impure item has effective stack size `1`.
+Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial unit count. An impure item has effective stack size `1`. Merge random-stream history does not restrict stacking: a surviving identity keeps its cursor, while a new identity starts its own stream.
 
 When a Board operation first attaches state to a stacked identity, the original identity becomes quantity `1` and the pure remainder uses standard placement in the same atomic transition. Failure to place the remainder changes nothing. Generic stack/quantity operations accept only pure items.
 
@@ -128,9 +128,11 @@ Every active job reserves the worst possible future quantity of each canonical o
 
 Before each weighted roll resolves, every candidate evaluates its own availability rules against the current output origin and Runtime snapshot. Only available candidates contribute to the weight total, so their authored weights are ratios within that filtered pool. If no candidate remains, the roll emits nothing and consumes neither quantity nor selection randomness. Once a candidate is selected, rules on its individual drops are evaluated separately; a rejected drop is discarded without replacing the candidate or rerolling.
 
-All quantity-creating paths and hydration include active-job reservations. Completion removes its own job before placement, spending rather than double-counting its reservation. Quantities that the same completion destroys—consumed material and a depleted owner—offset output of that canonical item. Immediate external depletion output is live output during start, not a later reservation. Overbooking rejects the whole candidate.
+All quantity-creating paths and hydration include active-job reservations. Completion removes its own job before placement, spending rather than double-counting its reservation. Quantities that the same completion destroys—consumed material and a depleted owner—offset output of that canonical item. Admission also credits the passive descendants that a complete material consumption destroys at start; reserved material grants no such credit, and active-job reservations use the resulting post-start state. Immediate external depletion output is live output during start, not a later reservation. Overbooking rejects the whole candidate.
 
 Randomness derives from stable canonical identities and explicit algorithm versions, never Tick or wall time. Unchanged blocked start/completion/expiry retries therefore resolve the same rolls and placement order.
+
+Each surviving merge source also persists a `mergeSequence` cursor (omission means zero). Every successful source merge advances it once; a rejected or interrupted transaction never advances it. Both merge output and participant depletion rolls use the incoming cursor, so repeated successful `use` actions draw fresh results even when the source returns to the same stack. Save/load and same-identity target replacement preserve the cursor. Stack normalization retains the surviving identity's cursor without combining histories.
 
 ## Placement and merge
 

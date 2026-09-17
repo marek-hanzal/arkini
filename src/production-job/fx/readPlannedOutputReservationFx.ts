@@ -8,6 +8,7 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { LineRun } from "~/production-line/type/LineRun";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
+import { readRuntimeItemOwnedStateFn } from "~/game-runtime/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { applyFinalUnitReservationFx } from "./applyFinalUnitReservationFx";
 import { adjustOutputReservationFx } from "./adjustOutputReservationFx";
@@ -36,6 +37,7 @@ export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReserv
 						}),
 					);
 
+		const discardedItemIds = new Set<IdSchema.Type>();
 		for (const input of plan.input) {
 			if (
 				input.type !== TypeSchema.enum.Materials ||
@@ -49,6 +51,24 @@ export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReserv
 					runtime,
 				});
 				yield* adjustOutputReservationFx(quantities, item.item.id, -allocation.quantity);
+				if (allocation.quantity !== item.quantity) continue;
+				const owned = readRuntimeItemOwnedStateFn({
+					ownerItemId: item.id,
+					runtime,
+				});
+				if (owned.jobs.length > 0 || owned.jobItems.length > 0 || owned.queue.length > 0)
+					continue;
+				// Full consume discards this passive subtree at start. This admission-only
+				// credit disappears when active-job reservations read the post-start Runtime.
+				for (const descendant of owned.inputItems) {
+					if (discardedItemIds.has(descendant.id)) continue;
+					discardedItemIds.add(descendant.id);
+					yield* adjustOutputReservationFx(
+						quantities,
+						descendant.item.id,
+						-descendant.quantity,
+					);
+				}
 			}
 		}
 

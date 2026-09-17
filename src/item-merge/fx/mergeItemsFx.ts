@@ -23,7 +23,7 @@ import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
-const MergeRandomVersion = 3;
+const MergeRandomVersion = 4;
 
 const readRemainingUnitsSeedFn = (item: RuntimeItemSchema.Type) => {
 	return item.remainingUnits ?? item.item.units?.amount ?? "full";
@@ -53,6 +53,7 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 				"arkini:merge",
 				`v${MergeRandomVersion}`,
 				source.id,
+				source.mergeSequence ?? 0,
 				source.item.id,
 				source.quantity,
 				readRemainingUnitsSeedFn(source),
@@ -171,7 +172,20 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				source,
 				target,
 			});
-			const nextRuntime = mergeTransition.runtime;
+			// A successful reusable source can return to the same stack with identical
+			// quantities. Advance its persisted stream only in this committed candidate;
+			// revisions cannot seed it because hydration replaces those tokens.
+			const nextRuntime = {
+				...mergeTransition.runtime,
+				items: mergeTransition.runtime.items.map((item) =>
+					item.id === source.id
+						? {
+								...item,
+								mergeSequence: (source.mergeSequence ?? 0) + 1,
+							}
+						: item,
+				),
+			};
 			const event = {
 				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: source.id,

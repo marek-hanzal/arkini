@@ -798,6 +798,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				const pendingCounterpartIds = new Set<string>();
 				const activeSpawnActorIds = new Set<string>();
 				const pendingSpawnActorIds = new Set<string>();
+				const releasedSpawnOriginIds = new Set<string>();
 				for (const cue of superseded) {
 					const cueKey = readCueKeyFn(cue);
 					const lifecycle = cueLifecycleByKey.get(cueKey);
@@ -810,6 +811,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 							},
 							(spawn) =>
 								Effect.gen(function* () {
+									releasedSpawnOriginIds.add(spawn.originActorId);
 									if (!started) {
 										pendingSpawnActorIds.add(spawn.actorId);
 										return;
@@ -884,9 +886,16 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 							!stillClaimedActorIds.has(counterpartId),
 					),
 				);
-				if (settleActorIds.size > 0) {
+				// Handoff retires the spawn origin's retention too, even when no later
+				// canonical transition arrives to remove a depleted producer.
+				const releasedActorIds = new Set([
+					...settleActorIds,
+					...releasedSpawnOriginIds,
+				]);
+				releasedActorIds.delete(actorId);
+				if (releasedActorIds.size > 0) {
 					yield* finalizeMotionActorsFx({
-						actorIds: settleActorIds,
+						actorIds: releasedActorIds,
 						actorStore,
 						animator,
 						application,

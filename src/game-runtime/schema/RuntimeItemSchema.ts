@@ -36,6 +36,10 @@ export const RuntimeItemSchema = z
 			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
 		schedule: ScheduleStateSchema.optional(),
+		/** Persisted merge random-stream cursor; bookkeeping does not make a stack impure. */
+		mergeSequence: NonNegativeIntegerSchema.optional().describe(
+			"Successful source merges on this surviving identity; omitted means zero.",
+		),
 		/**
 		 * Number of canonical items represented by this live runtime entry.
 		 */

@@ -114,6 +114,8 @@ Game and Editor inject the fixed `GameplaySpeedUpMultiplier` from `game-cheat` i
 
 Runtime item IDs, revisions, and job IDs use the injectable [`RuntimeIdentityFx`](../runtime-identity/context/RuntimeIdentityFx.ts) entropy source, backed by host UUIDs. Identity entropy stays separate from seeded gameplay Random so retries cannot reuse identities merely by replaying the same roll seed. Tokens remain opaque; saved identities are not rewritten.
 
+Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successful source merges advance it atomically, including nested participant depletion rolls; blocked retries and hydration retain it. It is history for the surviving identity, not input/production ownership, so it does not make an otherwise pure stack impure. Runtime and State item schemas carry it; `fromRuntimeFn` and `fromStateFx` preserve it while session revisions remain transient.
+
 ### Performance diagnostics
 
 Game and Editor Board keep `tick-performance` records in `~/.arkini/diagnostics/diagnostics.jsonl` (logger `arkini.game.performance`, correlated by `sessionId`). Tick aggregates numeric counters over wall-time windows of at least one second; there is no per-step IPC, full-runtime serialization, or extra sampling timer. Closing the diagnostic session detaches its listener. Diagnostic sink failures cannot stop gameplay.

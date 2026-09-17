@@ -6,12 +6,12 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 const JobCompletionRandomVersion = 3;
 
 /**
- * Runs the owned program with the deterministic random stream for one stable job completion.
+ * Runs the owned program with the deterministic random stream for one stable job settlement.
  *
  * Retries, blocked delivery and state restore must replay the same random
  * choices. Wall-clock state is deliberately excluded.
  */
-export const makeJobCompletionRandomFx = Effect.fn("makeJobCompletionRandomFx")(function* <
+export const makeJobSettlementRandomFx = Effect.fn("makeJobSettlementRandomFx")(function* <
 	Result,
 	Error,
 	Requirements,

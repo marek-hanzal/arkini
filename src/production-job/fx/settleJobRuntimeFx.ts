@@ -4,7 +4,11 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
-import type { JobCompletionContext } from "~/production-job/type/JobCompletionContext";
+import type { JobSchema } from "~/production-job/schema/JobSchema";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { makeUnitDepletionRandomFx } from "~/production-job/fx/makeUnitDepletionRandomFx";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
@@ -15,24 +19,28 @@ const emptyOutput = {
 	drop: [],
 } satisfies outputFx.Result;
 
-export namespace completeLineJobRuntimeFx {
+export namespace settleJobRuntimeFx {
+	export interface Props {
+		readonly job: JobSchema.Type;
+		readonly owner: GridRuntimeItemSchema.Type;
+		readonly lineOutput?: OutputSchema.Type;
+		readonly reservations: readonly ReservedRuntimeItemSchema.Type[];
+		readonly overflow?: "discard";
+		readonly runtime: RuntimeSchema.Type;
+	}
 	export interface Result {
 		readonly events: readonly GameEventSchema.Type[];
-		readonly runtime: JobCompletionContext["runtime"];
+		readonly runtime: RuntimeSchema.Type;
 	}
 }
 
 /**
- * Completes one line job and returns exact semantic facts in commit order.
- *
- * A depleted owner is detached before output placement so its board cell becomes
- * available while its last location remains the placement origin. Line output is
- * delivered before unit-depletion output, then owned inputs and job reservations
- * are released through canonical placement. The caller publishes the resulting
- * draft and this event order atomically.
+ * Settles completion or material abort after the job and consumed roots are detached.
+ * A depleted owner's cell is freed before output and returns; abort supplies no line output.
+ * Output conditions read the caller-provided input snapshot, never this partial draft.
  */
-export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(function* (
-	context: JobCompletionContext,
+export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
+	context: settleJobRuntimeFx.Props,
 ) {
 	const depleted = context.owner.item.units !== undefined && context.owner.remainingUnits === 0;
 	let draft = context.runtime;
@@ -59,11 +67,11 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	}
 
 	const lineOutput =
-		context.line.output === undefined
+		context.lineOutput === undefined
 			? emptyOutput
 			: yield* outputFx({
 					origin: context.owner.location,
-					output: context.line.output,
+					output: context.lineOutput,
 				});
 	if (lineOutput.drop.length > 0) {
 		const [placement, withLineOutput] = yield* applyOutputPlacementFx({
@@ -93,13 +101,26 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 			const [placement, withDepletionOutput] = yield* applyOutputPlacementFx({
 				origin: context.owner.location,
 				output: depletionOutput,
+				overflow: context.overflow,
 				runtime: draft,
 			});
 			const placementEvents = yield* readOutputPlacementItemEventsFx({
 				originItemId: context.owner.id,
 				placement,
 			});
-			events.push(...placementEvents);
+			events.push(
+				...placementEvents,
+				...(placement.discarded ?? []).map(
+					(loss): GameEventSchema.Type => ({
+						type: GameEventEnumSchema.enum.ItemDiscarded,
+						ownerItemId: context.owner.id,
+						canonicalItemId: loss.itemId,
+						quantity: loss.quantity,
+						source: "depletion-output",
+						reason: loss.reason,
+					}),
+				),
+			);
 			depletionReplacementPlaced = placementEvents.length > 0;
 			draft = withDepletionOutput;
 		}
@@ -118,6 +139,8 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	if (depleted) {
 		const releasedInputs = yield* releaseOwnerInputsFx({
 			owner: context.owner,
+			origin: context.owner.location,
+			overflow: context.overflow,
 			runtime: draft,
 		});
 		events.push(...releasedInputs.events);
@@ -128,6 +151,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 		origin: context.owner.location,
 		originItemId: context.owner.id,
 		reservations: context.reservations,
+		overflow: context.overflow,
 		runtime: draft,
 	});
 	events.push(...releasedReservations.events);
@@ -135,5 +159,5 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	return {
 		events,
 		runtime: releasedReservations.runtime,
-	} satisfies completeLineJobRuntimeFx.Result;
+	} satisfies settleJobRuntimeFx.Result;
 });

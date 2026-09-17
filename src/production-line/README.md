@@ -66,9 +66,9 @@ Tick: ready Job in stable ID order
 → commit all or nothing
 
 Tick: ready expired material after completion settlement
-→ remove the expired identity and place expiry output from the visible owner origin
-→ keep the Job when every material minimum still holds
-→ otherwise remove the Job and consumed roots, then relocate reservations
+→ remove the expired identity, its Job and remaining consumed roots
+→ settle a depleted owner and return stored inputs and reservations
+→ place expiry output from the physical owner origin with canceled-job capacity freed
 → retry idle owners' queued requests in global intent order
 → commit all or nothing
 

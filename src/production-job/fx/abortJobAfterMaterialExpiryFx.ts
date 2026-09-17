@@ -1,7 +1,7 @@
-import { placeRuntimeItemBestEffortFx } from "~/item-placement/fx/placeRuntimeItemBestEffortFx";
+import { makeJobSettlementRandomFx } from "./makeJobSettlementRandomFx";
 import { discardRuntimeItemTreeFx } from "~/game-runtime/fx/discardRuntimeItemTreeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
@@ -9,10 +9,10 @@ import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRu
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 
-import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
+import { settleJobRuntimeFx } from "./settleJobRuntimeFx";
 
 export namespace abortJobAfterMaterialExpiryFx {
 	export interface Props {
@@ -35,14 +35,13 @@ export const abortJobAfterMaterialExpiryFx = Effect.fn("abortJobAfterMaterialExp
 }: abortJobAfterMaterialExpiryFx.Props) {
 	const job = runtime.jobs.find((candidate) => candidate.id === jobId);
 	if (job === undefined) return yield* Effect.die(new Error(`Job ${jobId} is missing.`));
-	const owner = yield* readRuntimeItemByIdFx({
+	const runtimeOwner = yield* readRuntimeItemByIdFx({
 		itemId: job.ownerItemId,
 		runtime,
 	});
-	const ownerContext = yield* readItemPhysicalContextFx({
-		item: owner,
-		runtime,
-	});
+	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeOwner));
+	if (owner === undefined)
+		return yield* Effect.die(new Error(`Job ${jobId} owner has no grid origin.`));
 
 	const consumedItems = runtime.items.filter(
 		(item): item is JobRuntimeItemSchema.Type =>
@@ -78,28 +77,15 @@ export const abortJobAfterMaterialExpiryFx = Effect.fn("abortJobAfterMaterialExp
 		draft = discarded.runtime;
 		events.push(...discarded.events);
 	}
-	if (overflow === "discard") {
-		for (const reservation of reservations) {
-			const placement = yield* placeRuntimeItemBestEffortFx({
-				itemId: reservation.id,
-				origin: ownerContext.origin,
-				originItemId: owner.id,
-				source: "reservation",
-				runtime: draft,
-			});
-			draft = placement.runtime;
-			events.push(...placement.events);
-		}
-		return {
-			events,
+	const released = yield* makeJobSettlementRandomFx({
+		job,
+		program: settleJobRuntimeFx({
+			job,
+			owner,
+			reservations,
+			overflow,
 			runtime: draft,
-		} satisfies abortJobAfterMaterialExpiryFx.Result;
-	}
-	const released = yield* releaseJobReservationsFx({
-		origin: ownerContext.origin,
-		originItemId: owner.id,
-		reservations,
-		runtime: draft,
+		}),
 	});
 	return {
 		events: [

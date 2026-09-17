@@ -30,72 +30,79 @@ afterEach(async () => {
 });
 
 describe("Game resource protocol", () => {
-	it("serves one installed file lazily and forwards media byte ranges", async () => {
-		const packageId = "package:image";
-		const contentHash = "a".repeat(64);
-		const installationRoot = join(
-			root,
-			encodeGameProjectFileStemFn(packageId).replaceAll("%2E", "."),
-			contentHash,
-		);
-		await mkdir(join(installationRoot, "resources"), {
-			recursive: true,
-		});
-		await writeFile(join(installationRoot, "resources", "000000"), "abcdef");
-		await writeFile(
-			join(installationRoot, "installation.json"),
-			JSON.stringify({
-				packageId,
+	it.each([
+		"package:image",
+		"..",
+		"\ud800",
+	])(
+		"serves exact package %j and resource identities with media byte ranges",
+		async (packageId) => {
+			const resourceId = "image:\udc00";
+			const contentHash = "a".repeat(64);
+			const installationRoot = join(
+				root,
+				encodeGameProjectFileStemFn(packageId),
 				contentHash,
-				resources: [
-					{
-						id: "image:hero",
-						type: "image",
-						path: "resources/000000",
-						size: 6,
-					},
-				],
-			}),
-		);
-		netFetch.mockResolvedValue(
-			new Response("bc", {
-				status: 200,
-			}),
-		);
-		const protocol = await Effect.runPromise(
-			createGameResourceProtocolFx({
-				installationsRoot: root,
-				isTrustedUrlFn: () => true,
-			}),
-		);
-		const url = `arkini://app/game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${contentHash}&resourceId=${encodeURIComponent("image:hero")}`;
+			);
+			await mkdir(join(installationRoot, "resources"), {
+				recursive: true,
+			});
+			await writeFile(join(installationRoot, "resources", "000000"), "abcdef");
+			await writeFile(
+				join(installationRoot, "installation.json"),
+				JSON.stringify({
+					packageId,
+					contentHash,
+					resources: [
+						{
+							id: resourceId,
+							type: "image",
+							path: "resources/000000",
+							size: 6,
+						},
+					],
+				}),
+			);
+			netFetch.mockResolvedValue(
+				new Response("bc", {
+					status: 200,
+				}),
+			);
+			const protocol = await Effect.runPromise(
+				createGameResourceProtocolFx({
+					installationsRoot: root,
+					isTrustedUrlFn: () => true,
+				}),
+			);
+			const url = `arkini://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${contentHash}&resourceId=${encodeURIComponent(JSON.stringify(resourceId))}`;
 
-		const response = await Effect.runPromise(
-			protocol.handleRequestFx(
-				new Request(url, {
+			const response = await Effect.runPromise(
+				protocol.handleRequestFx(
+					new Request(url, {
+						headers: {
+							Origin: "arkini://app",
+							Range: "bytes=1-2",
+						},
+					}),
+				),
+			);
+
+			expect(response.status).toBe(206);
+			expect(response.headers.get("Accept-Ranges")).toBe("bytes");
+			expect(response.headers.get("Content-Range")).toBe("bytes 1-2/6");
+			expect(response.headers.get("Content-Length")).toBe("2");
+			expect(response.headers.get("Content-Type")).toBe("image/png");
+			expect(response.headers.get("Access-Control-Allow-Origin")).toBe("arkini://app");
+			expect(response.headers.get("Vary")).toBe("Origin");
+			expect(await response.text()).toBe("bc");
+			expect(netFetch).toHaveBeenCalledWith(
+				expect.stringMatching(/^file:/),
+				expect.objectContaining({
 					headers: {
-						Origin: "arkini://app",
 						Range: "bytes=1-2",
 					},
 				}),
-			),
-		);
-
-		expect(response.status).toBe(206);
-		expect(response.headers.get("Accept-Ranges")).toBe("bytes");
-		expect(response.headers.get("Content-Range")).toBe("bytes 1-2/6");
-		expect(response.headers.get("Content-Length")).toBe("2");
-		expect(response.headers.get("Content-Type")).toBe("image/png");
-		expect(response.headers.get("Access-Control-Allow-Origin")).toBe("arkini://app");
-		expect(response.headers.get("Vary")).toBe("Origin");
-		expect(await response.text()).toBe("bc");
-		expect(netFetch).toHaveBeenCalledWith(
-			expect.stringMatching(/^file:/),
-			expect.objectContaining({
-				headers: {
-					Range: "bytes=1-2",
-				},
-			}),
-		);
-	});
+			);
+		},
+	);
 });

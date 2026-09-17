@@ -73,6 +73,10 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			const source = join(root, `source-${index}.arkpack`);
 			await writeFile(source, createUserBytes(packageId));
 			await Effect.runPromise(catalog.importFx(source));
+			const loaded = await Effect.runPromise(catalog.readFx(packageId));
+			expect(loaded).toHaveLength(1);
+			const resourceUrl = new URL(loaded[0]!.resources[0]!.url);
+			expect(JSON.parse(resourceUrl.searchParams.get("packageId")!)).toBe(packageId);
 		}
 
 		const files = await Effect.runPromise(catalog.listFx);

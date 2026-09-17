@@ -8,6 +8,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { importEditorArtworkFx } from "~/artwork-authoring/fx/importEditorArtworkFx";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const project = {
@@ -67,7 +69,13 @@ describe("Artwork Authoring importEditorArtworkFx from PNG files", () => {
 				projectId: "project",
 				source: "files",
 				files,
-			}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
+			}).pipe(
+				Effect.provideService(AtomRegistry.AtomRegistry, registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
+			),
 		);
 
 		expect(importResourcesFn).toHaveBeenCalledWith({

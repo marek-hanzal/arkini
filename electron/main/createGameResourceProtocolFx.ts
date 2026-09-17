@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameProjectFileStemFn";
 import { readResourceContentTypeFn } from "~/game-config-resource/fn/readResourceContentTypeFn";
+import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 import { readByteRangeFn } from "../protocol/readByteRangeFn";
 
@@ -56,9 +57,14 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 								status: 403,
 							});
 						const url = new URL(request.url);
-						const packageId = url.searchParams.get("packageId");
+						// JSON preserves exact UTF-16 identities through the URL UTF-8 boundary.
+						const packageId = IdSchema.parse(
+							JSON.parse(url.searchParams.get("packageId") ?? "null"),
+						);
 						const contentHash = url.searchParams.get("contentHash");
-						const resourceId = url.searchParams.get("resourceId");
+						const resourceId = IdSchema.parse(
+							JSON.parse(url.searchParams.get("resourceId") ?? "null"),
+						);
 						if (
 							url.protocol !== "arkini:" ||
 							url.host !== "app" ||
@@ -73,7 +79,7 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 							});
 						const root = join(
 							installationsRoot,
-							encodeGameProjectFileStemFn(packageId).replaceAll("%2E", "."),
+							encodeGameProjectFileStemFn(packageId),
 							contentHash,
 						);
 						const installation = InstallationResourceSchema.parse(

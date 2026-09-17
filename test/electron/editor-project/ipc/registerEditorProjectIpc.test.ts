@@ -1,6 +1,6 @@
 import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import type { IpcMainInvokeEvent } from "electron";
-import { Effect } from "effect";
+import { Effect, Semaphore } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
@@ -18,6 +18,13 @@ import {
 	editorProjectIpcDescriptor,
 	editorProjectIpcProject,
 } from "./support/createEditorProjectIpcRepository";
+
+const sourceImport = vi.hoisted(() => ({
+	runFn: vi.fn(),
+}));
+vi.mock("~electron/main/editor-project/importEditorResourceFilesFx", () => ({
+	importEditorResourceFilesFx: (props: unknown) => sourceImport.runFn(props),
+}));
 
 const sourceExport = vi.hoisted(() => ({
 	effect: undefined as unknown,
@@ -506,6 +513,83 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "success",
 		});
 	});
+
+	it.each([
+		false,
+		true,
+	])(
+		"waits for native import preparation and releases its permit after failure=%s",
+		async (fail) => {
+			const operations = Effect.runSync(Semaphore.make(1));
+			const base = createEditorProjectIpcRepository();
+			const repository = {
+				...base,
+				awaitIdleFx: operations.withPermits(1)(Effect.void),
+				upsertResourceFilesFx: (props: Parameters<typeof base.upsertResourceFilesFx>[0]) =>
+					operations.withPermits(1)(base.upsertResourceFilesFx(props)),
+			};
+			let markStarted!: () => void;
+			const started = new Promise<void>((resolve) => {
+				markStarted = resolve;
+			});
+			let finishPreparation!: () => void;
+			const prepared = new Promise<void>((resolve) => {
+				finishPreparation = resolve;
+			});
+			sourceImport.runFn.mockImplementation(() =>
+				Effect.gen(function* () {
+					markStarted();
+					yield* Effect.promise(() => prepared);
+					if (fail)
+						return yield* Effect.fail(
+							new ProjectRepositoryError({
+								operation: "upsert-resource",
+								message: "Preparation failed.",
+							}),
+						);
+					const project = yield* repository.upsertResourceFilesFx({
+						projectId: "project-one",
+						resources: [],
+					});
+					return {
+						project,
+						resourceIds: [],
+					};
+				}),
+			);
+			register({
+				type: "ready",
+				repository,
+			});
+			const importing = invoke(ArkiniElectronApi.channels.editorProjectImportResources, {
+				projectId: "project-one",
+				source: "files",
+				type: "artwork",
+				files: [
+					{
+						name: "source.png",
+						path: "/selected/source.png",
+					},
+				],
+			});
+			await started;
+			let idleSettled = false;
+			const idle = Promise.resolve(
+				invoke(ArkiniElectronApi.channels.editorAwaitIdle),
+			).finally(() => {
+				idleSettled = true;
+			});
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			expect(idleSettled).toBe(false);
+			finishPreparation();
+			await expect(importing).resolves.toMatchObject({
+				type: fail ? "failure" : "success",
+			});
+			await expect(idle).resolves.toMatchObject({
+				type: "success",
+			});
+		},
+	);
 
 	it("publishes stable failures, unavailable status, and owns handler cleanup", async () => {
 		const repository = {

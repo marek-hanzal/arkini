@@ -1,3 +1,4 @@
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -85,7 +86,11 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 			jobId: item.location.jobId,
 			runtime: draft,
 			overflow: "discard",
-		});
+		}).pipe(
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(runtime),
+			}),
+		);
 		draft = reconciled.runtime;
 		events.push(...reconciled.events);
 	}

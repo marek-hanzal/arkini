@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -5,6 +6,7 @@ import { ImagePlus } from "lucide-react";
 import { type ChangeEventHandler, useRef } from "react";
 
 import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { importEditorResourcesFx } from "~/resource-authoring/fx/importEditorResourcesFx";
 import type { Project } from "~/project-authoring/type/Project";
@@ -12,15 +14,25 @@ import { PrimaryButton } from "~/ui/ui/Button";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-const importProjectImagesAtom = Atom.fn(
-	({ files, projectId }: { readonly files: ReadonlyArray<File>; readonly projectId: string }) =>
-		importEditorResourcesFx({
-			files,
-			projectId,
-			source: "files",
-			type: "image",
-		}),
-).pipe(Atom.withLabel("ProjectImageImport"), Atom.setIdleTTL(0));
+const importProjectImagesAtom = RendererRuntime.runSync(
+	Effect.map(ProjectWriteAdmission, (admission) =>
+		Atom.fn(
+			({
+				files,
+				projectId,
+			}: {
+				readonly files: ReadonlyArray<File>;
+				readonly projectId: string;
+			}) =>
+				importEditorResourcesFx({
+					files,
+					projectId,
+					source: "files",
+					type: "image",
+				}).pipe(Effect.provideService(ProjectWriteAdmission, admission)),
+		).pipe(Atom.withLabel("ProjectImageImport"), Atom.setIdleTTL(0)),
+	),
+);
 
 /** Owns the small general-image library used by launcher and shell configuration. */
 export const ProjectImageLibrary = ({ project }: { readonly project: Project }) => {

@@ -1,3 +1,4 @@
+import { placeRuntimeItemBestEffortFx } from "~/item-placement/fx/placeRuntimeItemBestEffortFx";
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -12,6 +13,7 @@ export namespace releaseJobReservationsFx {
 		origin: GridLocationSchema.Type;
 		originItemId: IdSchema.Type;
 		reservations: readonly ReservedRuntimeItemSchema.Type[];
+		overflow?: "discard";
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -22,6 +24,7 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 	originItemId,
 	reservations,
 	runtime,
+	overflow,
 }: releaseJobReservationsFx.Props) {
 	return yield* Effect.reduce(
 		reservations,
@@ -31,12 +34,20 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 		}),
 		(state, reservation) =>
 			Effect.gen(function* () {
-				const placement = yield* placeRuntimeItemFx({
-					itemId: reservation.id,
-					origin,
-					originItemId,
-					runtime: state.runtime,
-				});
+				const placement = yield* overflow === "discard"
+					? placeRuntimeItemBestEffortFx({
+							itemId: reservation.id,
+							origin,
+							originItemId,
+							runtime: state.runtime,
+							source: "reservation",
+						})
+					: placeRuntimeItemFx({
+							itemId: reservation.id,
+							origin,
+							originItemId,
+							runtime: state.runtime,
+						});
 				return {
 					events: [
 						...state.events,

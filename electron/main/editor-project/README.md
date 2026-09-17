@@ -91,6 +91,8 @@ capture expected revision
 Resource **Optimize** follows this same write path. The renderer passes exact IDs and one semantic resource type. Main holds the repository semaphore while it processes one resource at a time through temporary files, then copies only changed files through one ordered write plan and publishes one fresh Project projection. Artwork is losslessly normalized; SFX is scanned for silent edges and re-encoded only when trimming is needed. Resource bodies are not accumulated in JavaScript memory. Optimization does not invoke Arkpack Build or its 256 px Artwork bake; general `image/` and Music resources are not optimized.
 The filesystem operation reports completed resources over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
 
+Resource import checks the same renderer write admission and finishes an admitted native commit through Project publication even if its caller unmounts. Native source transfers serialize import preparation, conversion, commit and cleanup with source export. Idle waits acquire the transfer permit before awaiting repository operations, so Refresh also drains imports that have not reached their repository write yet.
+
 Hard Refresh and project replacement use a stronger boundary:
 
 ```text

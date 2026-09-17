@@ -7,6 +7,7 @@ import { type ChangeEventHandler, type RefObject, useRef } from "react";
 import { importEditorArtworkFx } from "~/artwork-authoring/fx/importEditorArtworkFx";
 import { EditorResourceOptimizationAtom } from "~/resource-authoring/atom/EditorResourceOptimizationAtom";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useEditorArtworkLibrary } from "~/artwork-authoring/ui/useEditorArtworkLibrary";
@@ -58,10 +59,10 @@ type ImportEditorArtworkProps =
 	  };
 
 const importEditorArtworkCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
+	Effect.map(ProjectWriteAdmission, (admission) =>
 		Atom.fn((variables: ImportEditorArtworkProps) =>
 			importEditorArtworkFx(variables).pipe(
-				Effect.provideService(ProjectRepository, repository),
+				Effect.provideService(ProjectWriteAdmission, admission),
 			),
 		).pipe(Atom.withLabel("EditorArtworkImport"), Atom.setIdleTTL(0)),
 	),

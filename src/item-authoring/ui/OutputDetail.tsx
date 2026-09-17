@@ -30,7 +30,11 @@ export const OutputDetail = ({
 			emptyLabel={emptyLabel ?? translator.textFn("No output configured.")}
 			output={projectAuthoredOutputFn(output, items)}
 			renderItemDetailFn={(item) =>
-				item.rules.length === 0 ? null : <RulesDetail rules={item.rules} />
+				item.rules.length === 0 ? null : (
+					<div className="border-l-2 border-accent pl-24">
+						<RulesDetail rules={item.rules} />
+					</div>
+				)
 			}
 			renderItemFn={(item, eyebrow) => (
 				<DetailReference
@@ -49,7 +53,7 @@ export const OutputDetail = ({
 			)}
 			renderWeightedOptionDetailFn={(option) =>
 				option.rules === undefined || option.rules.length === 0 ? null : (
-					<div className="mb-3">
+					<div className="mb-3 border-l-2 border-accent">
 						<RulesDetail rules={option.rules} />
 					</div>
 				)

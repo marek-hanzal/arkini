@@ -9,7 +9,11 @@ import { sourceLocation } from "~test/production-input/support/inputRuntimeTestC
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 
-import { configFn, setupFx } from "./consumeSubtreeOutputCapacity.test/fixture";
+import {
+	configFn,
+	externalPayerConfigFn,
+	setupFx,
+} from "./consumeSubtreeOutputCapacity.test/fixture";
 
 const command = {
 	ownerItemId: "outer",
@@ -70,6 +74,56 @@ describe("consume subtree output capacity", () => {
 				.reduce((total, item) => total + item.quantity, 0),
 		).toBe(2);
 	});
+
+	it.each([
+		false,
+		true,
+	])(
+		"uses immediate subtree disposal for external depletion with active payer = %s",
+		(active) => {
+			const completed = Effect.runSync(
+				Effect.gen(function* () {
+					yield* setupFx;
+					yield* spawnItemFx({
+						id: "payer",
+						itemId: "payer",
+						location: sourceLocation(4),
+						quantity: 1,
+					});
+					if (active) {
+						yield* enqueueLineFx({
+							ownerItemId: "payer",
+							lineId: "work",
+						});
+						yield* advanceRuntimeElapsedFx({
+							elapsedMs: 100,
+						});
+					}
+					yield* enqueueLineFx(command);
+					yield* advanceRuntimeElapsedFx({
+						elapsedMs: 10000,
+					});
+					return yield* readRuntimeFx();
+				}).pipe(
+					useGameFx({
+						config: externalPayerConfigFn(),
+					}),
+				),
+			);
+
+			expect(completed.jobs).toEqual([]);
+			expect(
+				completed.items.some(
+					(item) => item.id === "payer" || item.id === "inner" || item.id === "vessel",
+				),
+			).toBe(false);
+			expect(
+				completed.items
+					.filter((item) => item.item.id === "water")
+					.reduce((sum, item) => sum + item.quantity, 0),
+			).toBe(2);
+		},
+	);
 
 	it.each([
 		{

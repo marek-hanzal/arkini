@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { Effect } from "effect";
 
@@ -25,32 +26,36 @@ export const saveDraftStatusFx = Effect.fn("saveEditorItemDraftStatusFx")(functi
 	projectId,
 }: saveDraftStatusFx.Props) {
 	const repository = yield* ProjectRepository;
+	const admission = yield* ProjectWriteAdmission;
 	const item = config.items[itemId];
 	if (item === undefined)
 		return yield* Effect.fail(
 			new Error(`Item ${itemId} does not exist in the current project.`),
 		);
 	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const saved = yield* saveWithRepositoryFx({
-				config,
-				expectedRevision,
-				item: {
-					...item,
-					draft,
-				},
-				projectId,
-				repository,
-			});
-			yield* publishEditorProjectFx(
-				projectId,
-				{
-					commit: saved.commit,
-				},
-				"advance-noop",
-			);
-			return saved.item;
-		}),
+	return yield* admission.admitWriteFx(
+		"upsert-item",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const saved = yield* saveWithRepositoryFx({
+					config,
+					expectedRevision,
+					item: {
+						...item,
+						draft,
+					},
+					projectId,
+					repository,
+				});
+				yield* publishEditorProjectFx(
+					projectId,
+					{
+						commit: saved.commit,
+					},
+					"advance-noop",
+				);
+				return saved.item;
+			}),
+		),
 	);
 });

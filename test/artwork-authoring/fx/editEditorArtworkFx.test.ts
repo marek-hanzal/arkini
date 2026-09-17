@@ -1,3 +1,5 @@
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
@@ -94,6 +96,10 @@ describe("Artwork Authoring editEditorArtworkFx", () => {
 			}).pipe(
 				Effect.provideService(ProjectRepository, createRepository(replaceResourceFx)),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
 			),
 		);
 
@@ -142,6 +148,10 @@ describe("Artwork Authoring editEditorArtworkFx", () => {
 				}).pipe(
 					Effect.provideService(ProjectRepository, createRepository(replaceResourceFx)),
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
+					Effect.provideService(
+						ProjectWriteAdmission,
+						Effect.runSync(createProjectWriteAdmissionFx),
+					),
 				),
 			),
 		).rejects.toThrow("stale revision");

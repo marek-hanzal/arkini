@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -22,35 +23,47 @@ interface DeleteCommandProps {
 }
 
 const deleteCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn(({ onDeletedFn, ...props }: DeleteCommandProps) =>
-				Effect.gen(function* () {
-					yield* Effect.yieldNow;
-					return yield* Effect.uninterruptible(
-						Effect.gen(function* () {
-							const commit = yield* repository.deleteItemFx({
-								...props,
-								projectId,
-							});
-							// Leave the item route before its mounted readers can observe the deletion.
-							// Publication must survive both route unmount and navigation failure.
-							yield* Effect.tryPromise({
-								try: onDeletedFn,
-								catch: (cause) => cause,
-							}).pipe(
-								Effect.ensuring(
-									publishEditorProjectFx(projectId, {
-										commit,
-									}),
-								),
-							);
-							return commit;
-						}),
-					);
-				}),
-			).pipe(Atom.setIdleTTL(0)),
-		),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.family((projectId: string) =>
+				Atom.fn(({ onDeletedFn, ...props }: DeleteCommandProps) =>
+					Effect.gen(function* () {
+						yield* Effect.yieldNow;
+						return yield* admission.admitWriteFx(
+							"delete-item",
+							Effect.uninterruptible(
+								Effect.gen(function* () {
+									const commit = yield* repository.deleteItemFx({
+										...props,
+										projectId,
+									});
+									// Leave the item route before its mounted readers can observe the deletion.
+									// Publication must survive both route unmount and navigation failure.
+									yield* Effect.tryPromise({
+										// Refresh owns the route while it waits for this command to publish.
+										try: () =>
+											admission.isNavigationBlockedFn()
+												? Promise.resolve()
+												: onDeletedFn(),
+										catch: (cause) => cause,
+									}).pipe(
+										Effect.ensuring(
+											publishEditorProjectFx(projectId, {
+												commit,
+											}),
+										),
+									);
+									return commit;
+								}),
+							),
+						);
+					}),
+				).pipe(Atom.setIdleTTL(0)),
+			),
 	),
 );
 

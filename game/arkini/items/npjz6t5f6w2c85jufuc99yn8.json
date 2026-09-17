@@ -25,7 +25,6 @@
 				"title": "Milk",
 				"description": "Milk",
 				"clock": true,
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

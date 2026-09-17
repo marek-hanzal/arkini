@@ -34,7 +34,6 @@ describe("resolveItemDetailTargetFn", () => {
 				lines: [
 					{
 						...lines[0],
-						ahead: true,
 					},
 				],
 			},

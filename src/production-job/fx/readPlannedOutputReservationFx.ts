@@ -20,6 +20,11 @@ export namespace readPlannedOutputReservationFx {
 		readonly plan: LineRun.Plan;
 		readonly runtime: RuntimeSchema.Type;
 	}
+
+	export interface Result {
+		readonly quantities: ReadonlyMap<IdSchema.Type, number>;
+		readonly discardedItemIds: ReadonlySet<IdSchema.Type>;
+	}
 }
 
 /**
@@ -58,16 +63,10 @@ export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReserv
 				});
 				if (owned.jobs.length > 0 || owned.jobItems.length > 0 || owned.queue.length > 0)
 					continue;
-				// Full consume discards this passive subtree at start. This admission-only
-				// credit disappears when active-job reservations read the post-start Runtime.
+				// Descendants disappear at start, so admission removes them from live counts.
+				// They may free capacity for any job, unlike this root's completion credit.
 				for (const descendant of owned.inputItems) {
-					if (discardedItemIds.has(descendant.id)) continue;
 					discardedItemIds.add(descendant.id);
-					yield* adjustOutputReservationFx(
-						quantities,
-						descendant.item.id,
-						-descendant.quantity,
-					);
 				}
 			}
 		}
@@ -84,12 +83,22 @@ export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReserv
 			});
 			const remainingUnits = readItemRemainingUnitsFn(payer);
 			if (remainingUnits !== cost) continue;
+			// An external active payer settles with its own job. Its future removal
+			// cannot offset this candidate's output; admission projects that job separately.
+			if (
+				payerId !== plan.ownerItemId &&
+				runtime.jobs.some((job) => job.ownerItemId === payerId)
+			)
+				continue;
 			yield* applyFinalUnitReservationFx({
 				payer: payer.item,
 				quantities,
 			});
 		}
 
-		return yield* clampOutputReservationFx(quantities);
+		return {
+			quantities: yield* clampOutputReservationFx(quantities),
+			discardedItemIds,
+		} satisfies readPlannedOutputReservationFx.Result;
 	},
 );

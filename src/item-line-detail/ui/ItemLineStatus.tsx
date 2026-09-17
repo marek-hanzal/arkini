@@ -24,9 +24,6 @@ const ItemLineUnavailableReason = ({
 			{
 				kind: "direct-output-capacity",
 			},
-			{
-				kind: "downstream-output-capacity",
-			},
 			(limit) => (
 				<p>
 					<strong className="font-semibold text-foreground">{limit.itemTitle}</strong>{" "}

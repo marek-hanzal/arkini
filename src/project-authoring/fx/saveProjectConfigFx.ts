@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { Effect } from "effect";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -29,18 +30,22 @@ export const saveProjectConfigFx = Effect.fn("saveEditorProjectConfigFx")(functi
 			}),
 	});
 	const repository = yield* ProjectRepository;
+	const admission = yield* ProjectWriteAdmission;
 	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const commit = yield* repository.replaceConfigFx({
-				config,
-				expectedRevision,
-				projectId,
-			});
-			yield* publishEditorProjectFx(projectId, {
-				commit,
-			});
-			return config;
-		}),
+	return yield* admission.admitWriteFx(
+		"replace-config",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const commit = yield* repository.replaceConfigFx({
+					config,
+					expectedRevision,
+					projectId,
+				});
+				yield* publishEditorProjectFx(projectId, {
+					commit,
+				});
+				return config;
+			}),
+		),
 	);
 });

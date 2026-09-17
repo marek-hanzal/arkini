@@ -12,7 +12,9 @@ import type { Project } from "~/project-authoring/type/Project";
 const state = vi.hoisted(() => ({
 	navigate: vi.fn().mockResolvedValue(undefined),
 	project: undefined as Project | undefined,
-	remove: vi.fn().mockResolvedValue(undefined),
+	remove: vi.fn(async ({ onDeletedFn }: { readonly onDeletedFn: () => Promise<void> }) =>
+		onDeletedFn(),
+	),
 	result: undefined as unknown,
 }));
 
@@ -158,6 +160,7 @@ describe("EditorArtworkDeleteSection", () => {
 		expect(state.remove).toHaveBeenCalledWith({
 			expectedRevision: 0,
 			resourceId: "unused/artwork",
+			onDeletedFn: expect.any(Function),
 		});
 		expect(state.navigate).toHaveBeenCalledWith({
 			to: "/editor/$projectId/artwork",

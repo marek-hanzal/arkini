@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Context, Effect, Semaphore } from "effect";
 
 import {
 	ProjectRepositoryError,
@@ -9,18 +9,27 @@ import type {
 	ProjectWriteAdmissionService,
 } from "~/project-authoring/service/ProjectWriteAdmission";
 
+const HeldWriteAdmissions = Context.Reference<ReadonlyMap<symbol, number>>(
+	"Arkini/ProjectWriteAdmission/Held",
+	{
+		defaultValue: () => new Map(),
+	},
+);
+
 /** Creates one isolated write-admission authority for a renderer lifecycle. */
-export const createProjectWriteAdmissionFx = Effect.sync(() => {
+export const createProjectWriteAdmissionFx = Effect.gen(function* () {
+	const writes = yield* Semaphore.make(1);
+	const identity = Symbol();
 	let activeOperation: ProjectReplacementOperation | "rename-project" | undefined;
 	const acquireFx = (
 		operation: NonNullable<typeof activeOperation>,
 		isNavigationPendingFn: () => boolean,
 	) =>
-		Effect.suspend(() => {
+		Effect.gen(function* () {
 			const repositoryOperation =
 				operation === "rename-project" ? "replace-config" : operation;
 			if (activeOperation !== undefined)
-				return Effect.fail(
+				return yield* Effect.fail(
 					new ProjectRepositoryError({
 						operation: repositoryOperation,
 						message:
@@ -28,15 +37,25 @@ export const createProjectWriteAdmissionFx = Effect.sync(() => {
 					}),
 				);
 			if (isNavigationPendingFn())
-				return Effect.fail(
+				return yield* Effect.fail(
 					new ProjectRepositoryError({
 						operation: repositoryOperation,
 						message: "The editor is navigating to another route.",
 					}),
 				);
 			activeOperation = operation;
+			// Close admission before draining accepted writes, including their preparation/publication.
+			yield* writes
+				.withPermits(1)(Effect.void)
+				.pipe(
+					Effect.onError(() =>
+						Effect.sync(() => {
+							activeOperation = undefined;
+						}),
+					),
+				);
 			let released = false;
-			return Effect.succeed(
+			return yield* Effect.succeed(
 				Effect.sync(() => {
 					if (released) return;
 					released = true;
@@ -53,16 +72,27 @@ export const createProjectWriteAdmissionFx = Effect.sync(() => {
 			operation: ProjectRepositoryOperation,
 			effect: Effect.Effect<Value, Error, Requirements>,
 		): Effect.Effect<Value, Error | ProjectRepositoryError, Requirements> =>
-			Effect.suspend<Value, Error | ProjectRepositoryError, Requirements>(() =>
-				activeOperation !== undefined && activeOperation !== "rename-project"
-					? Effect.fail(
-							new ProjectRepositoryError({
-								operation,
-								message:
-									"The editor project is being refreshed from its saved state.",
-							}),
-						)
-					: effect,
-			),
+			Effect.gen(function* () {
+				const held = yield* HeldWriteAdmissions;
+				const fiberId = yield* Effect.fiberId;
+				// An admitted command may call the same repository gate while Refresh drains it.
+				if (held.get(identity) === fiberId) return yield* effect;
+				if (activeOperation !== undefined && activeOperation !== "rename-project") {
+					return yield* Effect.fail(
+						new ProjectRepositoryError({
+							operation,
+							message: "The editor project is being refreshed from its saved state.",
+						}),
+					);
+				}
+				return yield* writes.withPermits(1)(
+					effect.pipe(
+						Effect.provideService(
+							HeldWriteAdmissions,
+							new Map(held).set(identity, fiberId),
+						),
+					),
+				);
+			}),
 	} satisfies ProjectWriteAdmissionService;
 });

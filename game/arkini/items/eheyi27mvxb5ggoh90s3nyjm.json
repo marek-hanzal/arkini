@@ -24,7 +24,6 @@
 				"id": "townhall-t1",
 				"title": "Townhall I",
 				"description": "Longer wait, bigger gain!",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

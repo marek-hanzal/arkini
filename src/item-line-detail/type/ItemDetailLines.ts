@@ -90,14 +90,6 @@ export namespace ItemDetailLines {
 				readonly liveQuantity: number;
 				readonly reservedQuantity: number;
 				readonly maxCount: number;
-		  }
-		| {
-				readonly kind: "downstream-output-capacity";
-				readonly intermediateItemId: IdSchema.Type;
-				readonly itemId: IdSchema.Type;
-				readonly liveQuantity: number;
-				readonly reservedQuantity: number;
-				readonly maxCount: number;
 		  };
 
 	export type Availability =

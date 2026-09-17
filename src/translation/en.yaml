@@ -227,11 +227,6 @@ Authored player controls summary help:
     **Interactive** lets players run production and manage its inputs, queue and selected lines.
 
     **Automatic only** leaves production to the game.
-Authored production Check ahead marker help:
-  value: |
-    Before creating this item, checks whether one next run could stay within item limits.
-
-    Nothing is reserved. One fitting line is enough.
 Authored production Clock marker help:
   value: |
     The line attempted on every Clock interval.
@@ -418,8 +413,6 @@ Chance roll type help:
     Makes one probability check.
 
     On success, every drop in this roll continues. On failure, this roll creates nothing; the other rolls still run.
-Check ahead:
-  value: Check next run
 Choose a different Project ID.:
   value: Choose a different Project ID.
 Choose a valid value.:
@@ -1627,11 +1620,6 @@ Production line Clock help:
     The line tried on every Clock interval.
 
     Only one line may hold this role. It is separate from **Default** and changing it does not restart the Clock.
-Production line check ahead help:
-  value: |
-    Before creating this item, checks whether one next run could stay within item limits.
-
-    Only visible and enabled lines marked **Check next run** are tested. One fitting line is enough; nothing is reserved.
 Production line default help:
   value: |
     The initial line selected for manual production.

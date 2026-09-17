@@ -1,3 +1,5 @@
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { scheduleTask } from "@effect/atom-react";
 import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
@@ -97,6 +99,10 @@ describe("saveDraftStatusFx", () => {
 		Effect.runSync(
 			Atom.set(EditorBoardGameResourceOwnerAtom, board).pipe(
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
 			),
 		);
 
@@ -110,6 +116,10 @@ describe("saveDraftStatusFx", () => {
 			}).pipe(
 				Effect.provideService(ProjectRepository, repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
 			),
 		);
 

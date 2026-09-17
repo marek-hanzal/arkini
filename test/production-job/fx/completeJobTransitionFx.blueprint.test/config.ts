@@ -66,7 +66,6 @@ const blueprintItem = ({
 		maxStackSize: 1,
 		lines: [
 			{
-				ahead: true,
 				id: lineId,
 				title: lineId,
 				description: lineId,
@@ -174,14 +173,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 			lineId: "line:blueprint:plain",
 			output: blueprintOutput("item:target"),
 		}),
-		"blueprint:capped": {
-			...blueprintItem({
-				id: "blueprint:capped",
-				lineId: "line:blueprint:capped",
-				output: blueprintOutput("item:target"),
-			}),
-			maxCount: 1,
-		},
 		"blueprint:output": blueprintItem({
 			id: "blueprint:output",
 			lineId: "line:blueprint:output",
@@ -314,31 +305,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 			}),
 			maxCount: 1,
 		},
-		"blueprint:hop-a": blueprintItem({
-			id: "blueprint:hop-a",
-			lineId: "line:blueprint:hop-a",
-			output: blueprintOutput("blueprint:hop-b"),
-		}),
-		"blueprint:hop-b": blueprintItem({
-			id: "blueprint:hop-b",
-			lineId: "line:blueprint:hop-b",
-			output: guaranteedOutput([
-				{
-					itemId: "blueprint:hop-a",
-					quantity: {
-						min: 1,
-						max: 1,
-					},
-				},
-				{
-					itemId: "item:target",
-					quantity: {
-						min: 1,
-						max: 1,
-					},
-				},
-			]),
-		}),
 		"item:target": simpleItem({
 			id: "item:target",
 			maxCount: 1,
@@ -439,189 +405,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 						},
 					],
 					output: blueprintOutput("blueprint:plain"),
-					rules: [],
-				},
-				{
-					id: "line:producer:capped-blueprint",
-					title: "Produce capped blueprint",
-					description: "Produce one capped purpose-bound blueprint.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: blueprintOutput("blueprint:capped"),
-					rules: [],
-				},
-				{
-					id: "line:producer:ordinary-material",
-					title: "Produce ordinary material",
-					description: "Produce one ordinary material.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: blueprintOutput("item:target-unlimited"),
-					rules: [],
-				},
-				{
-					id: "line:producer:safe-blueprint",
-					title: "Produce safe blueprint",
-					description: "Produce one blueprint with a usable immediate line.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: blueprintOutput("blueprint:output"),
-					rules: [],
-				},
-				{
-					id: "line:producer:random-blueprint",
-					title: "Produce random result",
-					description: "May produce a capped dead-end blueprint.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: {
-						set: [
-							{
-								roll: [
-									{
-										type: "weight",
-										quantity: {
-											min: 1,
-											max: 1,
-										},
-										drop: [
-											{
-												rules: [],
-												weight: 1,
-												drop: [
-													{
-														itemId: "item:target-unlimited",
-														quantity: {
-															min: 1,
-															max: 1,
-														},
-														placement: "drop",
-														rules: [],
-													},
-												],
-											},
-											{
-												rules: [],
-												weight: 1,
-												drop: [
-													{
-														itemId: "blueprint:plain",
-														quantity: {
-															min: 1,
-															max: 1,
-														},
-														placement: "drop",
-														rules: [],
-													},
-												],
-											},
-										],
-									},
-								],
-							},
-						],
-					},
-					rules: [],
-				},
-				{
-					id: "line:producer:correlated-blueprint",
-					title: "Produce correlated result",
-					description: "Produces either one blueprint or its one capped result.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: {
-						set: [
-							{
-								roll: [
-									{
-										type: "weight",
-										quantity: {
-											min: 1,
-											max: 1,
-										},
-										drop: [
-											{
-												rules: [],
-												weight: 1,
-												drop: [
-													{
-														itemId: "blueprint:plain",
-														quantity: {
-															min: 1,
-															max: 1,
-														},
-														placement: "drop",
-														rules: [],
-													},
-												],
-											},
-											{
-												rules: [],
-												weight: 1,
-												drop: [
-													{
-														itemId: "item:target",
-														quantity: {
-															min: 1,
-															max: 1,
-														},
-														placement: "drop",
-														rules: [],
-													},
-												],
-											},
-										],
-									},
-								],
-							},
-						],
-					},
-					rules: [],
-				},
-				{
-					id: "line:producer:two-hop-cycle",
-					title: "Produce bounded cycle",
-					description: "Produces a blueprint whose next hop enters a bounded cycle.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: blueprintOutput("blueprint:hop-a"),
-					rules: [],
-				},
-				{
-					id: "line:producer:lifecycle-blueprint",
-					title: "Produce lifecycle blueprint",
-					description: "Produces a blueprint whose final unit has a capped branch.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
-					output: blueprintOutput("blueprint:depletion-random"),
 					rules: [],
 				},
 			],

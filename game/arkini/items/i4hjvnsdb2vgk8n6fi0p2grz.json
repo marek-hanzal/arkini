@@ -24,7 +24,6 @@
 				"id": "lumber-camp",
 				"title": "Lumber Camp",
 				"description": "Build a new lumber-camp",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

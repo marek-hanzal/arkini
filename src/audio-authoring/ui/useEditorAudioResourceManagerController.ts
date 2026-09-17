@@ -47,17 +47,23 @@ const importEditorAudioAtom = RendererRuntime.runSync(
 );
 
 const deleteEditorAudioAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.fn(
-			(props: {
-				readonly expectedRevision: number;
-				readonly projectId: string;
-				readonly resourceId: string;
-			}) =>
-				deleteEditorResourceFx(props).pipe(
-					Effect.provideService(ProjectRepository, repository),
-				),
-		).pipe(Atom.withLabel("EditorAudioDelete"), Atom.setIdleTTL(0)),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.fn(
+				(props: {
+					readonly expectedRevision: number;
+					readonly projectId: string;
+					readonly resourceId: string;
+				}) =>
+					deleteEditorResourceFx(props).pipe(
+						Effect.provideService(ProjectRepository, repository),
+						Effect.provideService(ProjectWriteAdmission, admission),
+					),
+			).pipe(Atom.withLabel("EditorAudioDelete"), Atom.setIdleTTL(0)),
 	),
 );
 

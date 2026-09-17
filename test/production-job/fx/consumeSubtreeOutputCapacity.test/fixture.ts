@@ -162,3 +162,64 @@ export const setupFx = Effect.gen(function* () {
 		});
 	}
 });
+
+export const externalPayerConfigFn = () => {
+	const base = configFn();
+	const recycler = base.items.recycler;
+	const line = recycler.lines[0]!;
+	return GameConfigSchema.parse({
+		...base,
+		items: {
+			...base.items,
+			payer: {
+				...recycler,
+				uid: "payer",
+				id: "payer",
+				units: {
+					amount: 1,
+					output: line.output,
+				},
+				lines: [
+					{
+						...line,
+						id: "work",
+						runtimeMs: 10000,
+						input: [
+							{
+								type: "simple",
+							},
+						],
+						output: undefined,
+					},
+				],
+			},
+			recycler: {
+				...recycler,
+				lines: [
+					{
+						...line,
+						output: undefined,
+						input: [
+							...line.input,
+							{
+								type: "units",
+								units: {
+									from: "target",
+									cost: 1,
+								},
+								query: {
+									scope: "board",
+									distance: "far",
+									selector: {
+										type: "item",
+										itemId: "payer",
+									},
+								},
+							},
+						],
+					},
+				],
+			},
+		},
+	});
+};

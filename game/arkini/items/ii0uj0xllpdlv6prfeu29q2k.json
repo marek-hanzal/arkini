@@ -23,7 +23,6 @@
 				"id": "magic-sawmill",
 				"title": "Magic Sawmill",
 				"description": "Better sawmill-jack",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": false,

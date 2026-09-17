@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { Effect } from "effect";
 
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
@@ -10,14 +11,18 @@ export const deleteEditorResourceFx = Effect.fn("deleteEditorResourceFx")(functi
 	readonly resourceId: string;
 }) {
 	const repository = yield* ProjectRepository;
+	const admission = yield* ProjectWriteAdmission;
 	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const project = yield* repository.deleteResourceFx(props);
-			yield* publishEditorProjectFx(props.projectId, {
-				project,
-			});
-			return project;
-		}),
+	return yield* admission.admitWriteFx(
+		"delete-resource",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const project = yield* repository.deleteResourceFx(props);
+				yield* publishEditorProjectFx(props.projectId, {
+					project,
+				});
+				return project;
+			}),
+		),
 	);
 });

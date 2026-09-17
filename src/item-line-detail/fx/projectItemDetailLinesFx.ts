@@ -362,37 +362,6 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 					} as const;
 				}),
 		)
-		.with(
-			{
-				kind: "unavailable",
-				reason: {
-					kind: "downstream-output-capacity",
-				},
-			},
-			({ reason }) =>
-				Effect.gen(function* () {
-					const item = yield* resolveItemFx({
-						itemId: reason.itemId,
-					});
-					const intermediate = yield* resolveItemFx({
-						itemId: reason.intermediateItemId,
-					});
-					const messageAfterTitle = readMaxCountMessageAfterTitleFn({
-						liveQuantity: reason.liveQuantity,
-						maxCount: reason.maxCount,
-					});
-					return {
-						kind: "unavailable",
-						reason: {
-							...reason,
-							itemTitle: item.title,
-							intermediateItemTitle: intermediate.title,
-							messageAfterTitle,
-							message: `${item.title} ${messageAfterTitle}`,
-						},
-					} as const;
-				}),
-		)
 		.exhaustive();
 });
 

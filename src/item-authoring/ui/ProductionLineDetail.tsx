@@ -100,11 +100,6 @@ export const ProductionLineDetail = ({
 							label={<Tx label="Enabled" />}
 							description={<Mx label="Authored production Enabled marker help" />}
 						/>
-						<LineFlag
-							checked={line.ahead === true}
-							label={<Tx label="Check ahead" />}
-							description={<Mx label="Authored production Check ahead marker help" />}
-						/>
 					</div>
 					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
 						{line.description}

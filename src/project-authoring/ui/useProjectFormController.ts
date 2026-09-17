@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
@@ -163,15 +164,23 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 });
 
 const saveProjectConfigCommandAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<saveProjectConfigFx.Props, "projectId">) =>
-				saveProjectConfigFx({
-					...props,
-					projectId,
-				}).pipe(Effect.provideService(ProjectRepository, repository)),
-			).pipe(Atom.setIdleTTL(0)),
-		),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.family((projectId: string) =>
+				Atom.fn((props: Omit<saveProjectConfigFx.Props, "projectId">) =>
+					saveProjectConfigFx({
+						...props,
+						projectId,
+					}).pipe(
+						Effect.provideService(ProjectRepository, repository),
+						Effect.provideService(ProjectWriteAdmission, admission),
+					),
+				).pipe(Atom.setIdleTTL(0)),
+			),
 	),
 );
 

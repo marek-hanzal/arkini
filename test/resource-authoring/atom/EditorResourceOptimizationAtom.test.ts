@@ -37,6 +37,13 @@ vi.mock("~/resource-authoring/fx/optimizeEditorResourcesFx", () => ({
 vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	const { ProjectRepository } = await import("~/project-authoring/service/ProjectRepository");
+	const { ProjectWriteAdmission } = await import(
+		"~/project-authoring/service/ProjectWriteAdmission"
+	);
+	const { createProjectWriteAdmissionFx } = await import(
+		"~/project-authoring/fx/createProjectWriteAdmissionFx"
+	);
+	const admission = Effect.runSync(createProjectWriteAdmissionFx);
 	return {
 		RendererRuntime: {
 			runSync: <Value, Failure>(
@@ -45,6 +52,7 @@ vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 				Effect.runSync(
 					effect.pipe(
 						Effect.provideService(ProjectRepository, {} as ProjectRepositoryService),
+						Effect.provideService(ProjectWriteAdmission, admission),
 					),
 				),
 		},

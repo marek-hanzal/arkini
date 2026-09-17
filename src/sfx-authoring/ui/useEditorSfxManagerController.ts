@@ -1,3 +1,4 @@
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
@@ -15,10 +16,18 @@ import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 const assignEditorSfxAtom = RendererRuntime.runSync(
-	Effect.map(ProjectRepository, (repository) =>
-		Atom.fn((props: saveProjectConfigFx.Props) =>
-			saveProjectConfigFx(props).pipe(Effect.provideService(ProjectRepository, repository)),
-		).pipe(Atom.withLabel("EditorSfxAssignment"), Atom.setIdleTTL(0)),
+	Effect.map(
+		Effect.all([
+			ProjectRepository,
+			ProjectWriteAdmission,
+		]),
+		([repository, admission]) =>
+			Atom.fn((props: saveProjectConfigFx.Props) =>
+				saveProjectConfigFx(props).pipe(
+					Effect.provideService(ProjectRepository, repository),
+					Effect.provideService(ProjectWriteAdmission, admission),
+				),
+			).pipe(Atom.withLabel("EditorSfxAssignment"), Atom.setIdleTTL(0)),
 	),
 );
 

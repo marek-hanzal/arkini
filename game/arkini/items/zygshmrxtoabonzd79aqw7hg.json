@@ -23,7 +23,6 @@
 				"id": "dairy",
 				"title": "Dairy",
 				"description": "Build a Dairy",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

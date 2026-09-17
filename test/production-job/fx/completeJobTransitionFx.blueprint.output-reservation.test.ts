@@ -98,7 +98,7 @@ describe("blueprint output reservation", () => {
 		);
 
 		expect([
-			...result.candidate,
+			...result.candidate.quantities,
 		]).toEqual([]);
 		expect(result.reserved.get("item:shared")?.quantity).toBe(1);
 	});

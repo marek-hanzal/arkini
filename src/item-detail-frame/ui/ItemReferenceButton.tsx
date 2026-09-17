@@ -1,5 +1,4 @@
-import { motion } from "motion/react";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
@@ -33,29 +32,14 @@ export const ItemReferenceButton = ({
 	sourceUrl,
 }: ItemReferenceButtonProps) => {
 	const itemDetail = useItemDetailControl();
-	const [hovered, setHoveredFn] = useState(false);
 	const canOpen = !disabled && (runtimeItemId !== undefined || definitionItemId !== undefined);
 	return (
-		<motion.button
+		<button
 			type="button"
 			className="group flex min-w-0 items-center gap-3 text-left outline-none enabled:cursor-pointer disabled:cursor-default"
 			disabled={!canOpen}
 			data-ui={dataUi}
 			data-detail-available={canOpen ? "true" : "false"}
-			animate={{
-				scale: hovered && canOpen ? 1.035 : 1,
-			}}
-			onHoverStart={() => setHoveredFn(true)}
-			onHoverEnd={() => setHoveredFn(false)}
-			transition={{
-				duration: 0.14,
-				ease: [
-					0.22,
-					1,
-					0.36,
-					1,
-				],
-			}}
 			onClick={() => {
 				if (runtimeItemId !== undefined) {
 					RendererRuntime.runSync(
@@ -91,6 +75,6 @@ export const ItemReferenceButton = ({
 				title={label}
 				titleClassName="truncate font-medium text-foreground transition-colors group-enabled:group-hover:text-accent"
 			/>
-		</motion.button>
+		</button>
 	);
 };

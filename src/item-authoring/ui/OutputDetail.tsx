@@ -32,8 +32,9 @@ export const OutputDetail = ({
 			renderItemDetailFn={(item) =>
 				item.rules.length === 0 ? null : <RulesDetail rules={item.rules} />
 			}
-			renderItemFn={(item) => (
+			renderItemFn={(item, eyebrow) => (
 				<DetailReference
+					eyebrow={eyebrow}
 					itemId={item.itemId}
 					description={
 						<>

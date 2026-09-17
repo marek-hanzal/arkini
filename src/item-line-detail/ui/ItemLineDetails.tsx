@@ -81,15 +81,17 @@ export const ItemLineDetails = ({
 					</div>
 					<Outputs
 						output={line.output}
-						renderItemFn={(item) =>
+						renderItemFn={(item, eyebrow) =>
 							item.sourceUrl === undefined ? (
 								<span className="truncate font-medium text-foreground">
+									{eyebrow}
 									{item.title}
 								</span>
 							) : (
 								<ItemReferenceButton
 									compositeUrl={item.compositeUrl}
 									dataUi="TileLineOutputDetailLink"
+									eyebrow={eyebrow}
 									definitionItemId={item.definitionItemId}
 									disabled={contentReadOnly}
 									label={item.title}

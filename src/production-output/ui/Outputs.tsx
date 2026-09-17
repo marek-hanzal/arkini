@@ -11,24 +11,26 @@ type OutputsVariant = "compact" | "editor-tree";
 
 const OutputItem = <Item extends OutputProjection.Item>({
 	item,
+	eyebrow,
 	renderItemDetailFn,
 	renderItemFn,
 	variant,
 }: {
 	readonly item: Item;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
-	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly variant: OutputsVariant;
+	readonly eyebrow?: ReactNode;
 }) => (
 	<div
 		className={twMerge(
 			"grid gap-1.5",
-			variant === "editor-tree" && "border-l-2 border-accent pl-24",
+			variant === "editor-tree" && eyebrow === undefined && "border-l-2 border-accent pl-24",
 		)}
 		data-ui="TileLineOutputItem"
 	>
 		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
-			{renderItemFn(item)}
+			{renderItemFn(item, eyebrow)}
 			<span className="shrink-0 text-muted">
 				×<QuantityValue quantity={item.quantity} />
 			</span>
@@ -49,20 +51,23 @@ const OutputItem = <Item extends OutputProjection.Item>({
 
 const OutputItems = <Item extends OutputProjection.Item>({
 	items,
+	eyebrow,
 	renderItemDetailFn,
 	renderItemFn,
 	variant,
 }: {
 	readonly items: readonly Item[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
-	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly variant: OutputsVariant;
+	readonly eyebrow?: ReactNode;
 }) => (
 	<div className={variant === "editor-tree" ? "flex flex-col gap-3" : "space-y-1.5"}>
 		{items.map((item) => (
 			<OutputItem
 				key={item.itemId}
 				item={item}
+				eyebrow={eyebrow}
 				renderItemDetailFn={renderItemDetailFn}
 				renderItemFn={renderItemFn}
 				variant={variant}
@@ -80,7 +85,7 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 }: {
 	readonly roll: OutputProjection.Roll<Item>;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
-	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly renderWeightedOptionDetailFn?: (
 		option: OutputProjection.WeightedOption<Item>,
 	) => ReactNode;
@@ -97,11 +102,13 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					data-ui="TileLineOutputRoll"
 					data-roll-kind="guaranteed"
 				>
-					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						<Tx label="Guaranteed" />
-					</p>
 					<OutputItems
 						items={guaranteed.item}
+						eyebrow={
+							<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
+								<Tx label="Guaranteed" />
+							</span>
+						}
 						renderItemDetailFn={renderItemDetailFn}
 						renderItemFn={renderItemFn}
 						variant={variant}
@@ -193,7 +200,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	readonly emptyLabel?: ReactNode;
 	readonly output: readonly OutputProjection.Set<Item>[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
-	readonly renderItemFn: (item: Item) => ReactNode;
+	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly renderWeightedOptionDetailFn?: (
 		option: OutputProjection.WeightedOption<Item>,
 	) => ReactNode;

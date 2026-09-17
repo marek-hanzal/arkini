@@ -10,6 +10,7 @@ interface ItemIdentityProps {
 	readonly compositeUrl?: string;
 	readonly dataUi?: string;
 	readonly description?: ReactNode;
+	readonly eyebrow?: ReactNode;
 	readonly rootTag?: "div" | "span";
 	readonly size?: ItemArtworkProps["size"];
 	readonly sourceUrl: string;
@@ -27,6 +28,7 @@ export const ItemIdentity = ({
 	compositeUrl,
 	dataUi,
 	description,
+	eyebrow,
 	rootTag: Root = "div",
 	size = "sm",
 	sourceUrl,
@@ -49,6 +51,7 @@ export const ItemIdentity = ({
 				sourceUrl={sourceUrl}
 			/>
 			<Text className="min-w-0">
+				{eyebrow}
 				<Title className={titleClassName}>{title}</Title>
 				{description}
 			</Text>

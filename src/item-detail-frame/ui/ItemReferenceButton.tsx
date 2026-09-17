@@ -13,6 +13,7 @@ interface ItemReferenceButtonProps {
 		| "TileLineUnavailableDependencyLink";
 	readonly definitionItemId?: string;
 	readonly description?: ReactNode;
+	readonly eyebrow?: ReactNode;
 	readonly disabled: boolean;
 	readonly label: string;
 	readonly runtimeItemId?: string;
@@ -25,6 +26,7 @@ export const ItemReferenceButton = ({
 	dataUi,
 	definitionItemId,
 	description,
+	eyebrow,
 	disabled,
 	label,
 	runtimeItemId,
@@ -77,6 +79,7 @@ export const ItemReferenceButton = ({
 				artworkImageClassName="p-0.5"
 				compositeUrl={compositeUrl}
 				description={description}
+				eyebrow={eyebrow}
 				rootTag="span"
 				sourceUrl={sourceUrl}
 				title={label}

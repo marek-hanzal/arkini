@@ -10,7 +10,7 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import type { ReactNode } from "react";
 
 const RuleLabel = ({ rule }: { readonly rule: RuleSchema.Type }) => (
-	<span className="mb-1 flex items-center gap-1 text-sm font-semibold text-accent">
+	<span className="mb-1 flex items-center gap-1 text-sm font-normal text-foreground">
 		<GitBranch className="size-3.5 shrink-0" />
 		{match(rule)
 			.with(

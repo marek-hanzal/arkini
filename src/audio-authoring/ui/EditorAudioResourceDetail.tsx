@@ -219,9 +219,8 @@ const EditorAudioResourceEdit = ({
 		>
 			<section
 				data-ui="EditorAudioResourceEdit"
-				className="grid gap-4"
+				className="grid w-full max-w-3xl gap-6"
 			>
-				<p className="text-sm text-muted">ID: {resource.id}</p>
 				<EditorTextControl
 					label={translator.textFn("Name")}
 					value={controller.name}

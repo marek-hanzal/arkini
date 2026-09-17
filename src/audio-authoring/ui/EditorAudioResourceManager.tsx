@@ -1,5 +1,5 @@
 import { type DragEvent, type ReactNode, useLayoutEffect, useRef } from "react";
-import { AudioLines, LoaderCircle, Music2, Pause, Play, Plus } from "lucide-react";
+import { AudioLines, LoaderCircle, Music2, Pause, Play, Plus, Trash2 } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -14,7 +14,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { PrimaryButton } from "~/ui/ui/Button";
-import { LinkButton } from "~/ui/ui/LinkButton";
+import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { Status } from "~/ui/ui/Status";
 
@@ -298,6 +298,23 @@ export const EditorAudioResourceManager = ({
 													<Play className="size-4" />
 												)}
 											</LinkButton>
+											{music ? null : (
+												<LinkButtonLink
+													className="grid size-10 shrink-0 place-items-center"
+													data-ui="EditorSfxDeleteLink"
+													title={translator.textFn("Delete")}
+													draggable={false}
+													to="/editor/$projectId/sfx/$resourceId/$sectionId"
+													params={{
+														projectId: project.projectId,
+														resourceId: resource.id,
+														sectionId: "delete",
+													}}
+													onClick={(event) => event.stopPropagation()}
+												>
+													<Trash2 className="size-4" />
+												</LinkButtonLink>
+											)}
 										</div>
 									</li>
 								);

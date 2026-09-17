@@ -161,6 +161,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	if (resultingQuantity === 0) {
 		const releasedInputs = yield* releaseOwnerInputsFx({
 			owner: item,
+			origin: item.location,
 			runtime: draft,
 		});
 		releasedInputEvents = releasedInputs.events;

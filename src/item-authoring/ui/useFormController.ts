@@ -100,6 +100,16 @@ export const useFormController = ({
 	onSavedFn,
 }: useFormController.Props) => {
 	const project = useEditorProject();
+	const sessionGeneration = useRef(0);
+	useLayoutEffect(
+		() => () => {
+			sessionGeneration.current += 1;
+		},
+		[
+			project.projectId,
+			initialItem.uid,
+		],
+	);
 	const translator = useTranslator();
 	const formValues = useMemo<FormValues>(
 		() => readFormValuesFn(initialItem),
@@ -131,12 +141,15 @@ export const useFormController = ({
 			onDynamic: schema,
 		},
 		onSubmit: async ({ formApi, value }) => {
+			const submittedSession = sessionGeneration.current;
 			const item = schema.parse(value);
 			const saved = await saveItemFn({
 				config: project.config,
 				expectedRevision: draftRevision.current,
 				item,
 			});
+			// Persistence survives the draft; completion UI belongs only to its original session.
+			if (sessionGeneration.current !== submittedSession) return;
 			submitSucceeded.current = true;
 			formApi.reset(readFormValuesFn(saved));
 			if (notifyOnSaved.current) await onSavedFn?.(saved);
@@ -261,6 +274,7 @@ export const useFormController = ({
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (submitting || (!dirty && !isNew)) return false;
+			const submittedSession = sessionGeneration.current;
 			notifyOnSaved.current = notify;
 			submitSucceeded.current = false;
 			try {
@@ -268,6 +282,7 @@ export const useFormController = ({
 			} finally {
 				notifyOnSaved.current = true;
 			}
+			if (sessionGeneration.current !== submittedSession) return false;
 			if (submitSucceeded.current) return true;
 
 			const result = schema.safeParse(form.state.values);

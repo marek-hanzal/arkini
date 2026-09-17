@@ -66,7 +66,7 @@ Before delivery takes an existing actor's pose, reconciliation retires its activ
 - Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
 - Board Clock rings project the canonical interval phase and Clock enable/rules independently of jobs and queue admission. They have no pointer interaction; the existing job/lifetime bar retains its precedence. Exhausted finite Clocks have no upcoming pulse ring.
 - Async texture completion is generation-guarded. A complete current visual remains until a complete replacement is ready; superseded work cannot publish or destroy the surviving generation.
-- Every physical visual generation owns reference-counted texture leases. Active visuals pin their shared textures; released textures enter the route-local decoded-byte LRU, and the texture store evicts idle entries without unloading a texture behind another visual.
+- Every physical visual generation owns reference-counted texture leases. Active visuals pin their shared textures; released textures enter the route-local decoded-byte LRU, and the texture store evicts idle entries without unloading a texture behind another visual. Backing texture ownership and per-URL unload ordering are shared across route stores to match the global Pixi Assets cache, so an old provider cannot destroy a reopened Board's textures.
 - Teardown cancels gestures, subscriptions, animation, and async readiness before destroying actors, layers, textures, or the application.
 
 ## Navigation

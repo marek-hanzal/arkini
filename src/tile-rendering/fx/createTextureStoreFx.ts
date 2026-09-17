@@ -11,14 +11,24 @@ export interface TextureStore {
 	readonly closeFx: Effect.Effect<void, unknown, never>;
 }
 
-interface TextureEntry {
+interface SharedTextureEntry {
 	readonly load: Promise<Texture>;
 	readonly url: string;
+	stores: number;
+}
+
+interface TextureEntry {
+	readonly shared: SharedTextureEntry;
 	estimatedBytes: number;
 	idleOrder: number;
 	leases: number;
 	texture: Texture | undefined;
 }
+
+// Pixi Assets caches and destroys textures globally, so leases and unload barriers must
+// outlive an individual route. Each route's active and idle entries hold one shared pin.
+const sharedEntries = new Map<string, SharedTextureEntry>();
+const sharedUnloadsByUrl = new Map<string, Promise<void>>();
 
 const defaultIdleBudgetBytes = 64 * 1024 * 1024;
 
@@ -31,27 +41,31 @@ export const createTextureStoreFx = Effect.fn("createTextureStoreFx")(
 		Effect.sync((): TextureStore => {
 			const entries = new Map<string, TextureEntry>();
 			const unloads = new Set<Promise<void>>();
-			const unloadsByUrl = new Map<string, Promise<void>>();
 			let closed = false;
 			let idleClock = 0;
 			let unloadFailure: unknown;
 
 			const unloadFn = (entry: TextureEntry) => {
-				if (entries.get(entry.url) !== entry) return;
-				entries.delete(entry.url);
-				const unload = entry.load.then(
-					() => Assets.unload(entry.url).then(() => undefined),
+				const shared = entry.shared;
+				if (entries.get(shared.url) !== entry) return;
+				entries.delete(shared.url);
+				shared.stores -= 1;
+				if (shared.stores > 0) return;
+				sharedEntries.delete(shared.url);
+				const unload = shared.load.then(
+					() => Assets.unload(shared.url).then(() => undefined),
 					() => undefined,
 				);
 				unloads.add(unload);
-				unloadsByUrl.set(entry.url, unload);
+				sharedUnloadsByUrl.set(shared.url, unload);
 				void unload
 					.catch((cause) => {
 						unloadFailure ??= cause;
 					})
 					.finally(() => {
 						unloads.delete(unload);
-						if (unloadsByUrl.get(entry.url) === unload) unloadsByUrl.delete(entry.url);
+						if (sharedUnloadsByUrl.get(shared.url) === unload)
+							sharedUnloadsByUrl.delete(shared.url);
 					});
 			};
 
@@ -68,30 +82,38 @@ export const createTextureStoreFx = Effect.fn("createTextureStoreFx")(
 			};
 
 			const createEntryFn = (url: string) => {
-				const precedingUnload = unloadsByUrl.get(url);
+				let shared = sharedEntries.get(url);
+				if (shared === undefined) {
+					shared = {
+						load: (sharedUnloadsByUrl.get(url) ?? Promise.resolve())
+							.catch(() => undefined)
+							.then(() =>
+								Assets.load<Texture>({
+									parser: "texture",
+									src: url,
+								}),
+							),
+						stores: 0,
+						url,
+					};
+					sharedEntries.set(url, shared);
+				}
+				shared.stores += 1;
 				const entry: TextureEntry = {
 					estimatedBytes: 0,
 					idleOrder: 0,
 					leases: 0,
-					load: (precedingUnload ?? Promise.resolve())
-						.catch(() => undefined)
-						.then(() =>
-							Assets.load<Texture>({
-								parser: "texture",
-								src: url,
-							}),
-						),
+					shared,
 					texture: undefined,
-					url,
 				};
-				void entry.load
+				void entry.shared.load
 					.then((texture) => {
 						entry.texture = texture;
 						entry.estimatedBytes = estimateTextureBytesFn(texture);
 						evictIdleFn();
 					})
 					.catch(() => {
-						if (entries.get(url) === entry) entries.delete(url);
+						unloadFn(entry);
 					});
 				entries.set(url, entry);
 				return entry;
@@ -104,7 +126,7 @@ export const createTextureStoreFx = Effect.fn("createTextureStoreFx")(
 				let released = false;
 				return {
 					textureFx: Effect.tryPromise({
-						try: () => entry.load,
+						try: () => entry.shared.load,
 						catch: (cause) => cause,
 					}),
 					releaseFn: () => {

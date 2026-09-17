@@ -3,7 +3,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -193,6 +193,15 @@ export const useProjectFormController = ({
 }: useProjectFormController.Props) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
+	const sessionGeneration = useRef(0);
+	useLayoutEffect(
+		() => () => {
+			sessionGeneration.current += 1;
+		},
+		[
+			project.projectId,
+		],
+	);
 	const canonicalValues = useMemo(
 		() => readProjectFormValuesFn(project),
 		[
@@ -222,12 +231,15 @@ export const useProjectFormController = ({
 			onDynamic: schema,
 		},
 		onSubmit: async ({ formApi, value }) => {
+			const submittedSession = sessionGeneration.current;
 			const parsed = schema.parse(value);
 			const config = createProjectConfigFn(project, parsed);
 			await saveConfigFn({
 				config,
 				expectedRevision: draftRevision.current,
 			});
+			// Persistence survives the draft; completion UI belongs only to its original session.
+			if (sessionGeneration.current !== submittedSession) return;
 			submitSucceeded.current = true;
 			formApi.reset(parsed);
 			if (notifyOnSaved.current) await onSavedFn?.();
@@ -247,6 +259,7 @@ export const useProjectFormController = ({
 	const runSaveFn = useCallback(
 		async (notify: boolean) => {
 			if (!dirty || submitting) return false;
+			const submittedSession = sessionGeneration.current;
 			submitSucceeded.current = false;
 			notifyOnSaved.current = notify;
 			try {
@@ -254,6 +267,7 @@ export const useProjectFormController = ({
 			} finally {
 				notifyOnSaved.current = true;
 			}
+			if (sessionGeneration.current !== submittedSession) return false;
 			if (!submitSucceeded.current) {
 				const result = schema.safeParse(form.state.values);
 				const issue = result.success ? undefined : result.error.issues[0];

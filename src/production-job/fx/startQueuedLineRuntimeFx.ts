@@ -9,6 +9,8 @@ import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 
 export namespace startQueuedLineRuntimeFx {
 	export interface Props {
@@ -84,30 +86,38 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 		);
 	}
 
-	const coverage = yield* readLineInputAutofillCoverageFx({
-		lineId,
-		ownerItemId,
+	const owner = yield* readRuntimeItemByIdFx({
+		itemId: ownerItemId,
 		runtime,
 	});
-	if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
-		// Missing material permits delivery only while the line's other admission
-		// conditions still hold. A blocked probe must not lease shared supply.
-		const resolution = yield* resolveLineStartFx({
-			ownerItemId,
+	// Exhausted owners may use settled material, but optional top-ups must not
+	// turn that accepted work into a blocked Autofill request.
+	if (isItemProductionAdmissionOpenFn(owner)) {
+		const coverage = yield* readLineInputAutofillCoverageFx({
 			lineId,
+			ownerItemId,
 			runtime,
 		});
-		yield* assertLineEnqueueConditionsFx({
-			candidateId: queueRequestId,
-			resolution,
-			runtime,
-		});
-		return {
-			type: "incomplete",
-			missingQuantity: coverage.type === "incomplete" ? coverage.missingQuantity : 0,
-			runtime,
-			selectedQuantity: coverage.selectedQuantity,
-		} satisfies startQueuedLineRuntimeFx.Result;
+		if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
+			// Missing material permits delivery only while the line's other admission
+			// conditions still hold. A blocked probe must not lease shared supply.
+			const resolution = yield* resolveLineStartFx({
+				ownerItemId,
+				lineId,
+				runtime,
+			});
+			yield* assertLineEnqueueConditionsFx({
+				candidateId: queueRequestId,
+				resolution,
+				runtime,
+			});
+			return {
+				type: "incomplete",
+				missingQuantity: coverage.type === "incomplete" ? coverage.missingQuantity : 0,
+				runtime,
+				selectedQuantity: coverage.selectedQuantity,
+			} satisfies startQueuedLineRuntimeFx.Result;
+		}
 	}
 
 	const candidate = {

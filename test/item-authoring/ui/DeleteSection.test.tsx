@@ -7,6 +7,7 @@ import {
 	createRoute,
 	createRouter,
 	RouterProvider,
+	useParams,
 } from "@tanstack/react-router";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
@@ -72,6 +73,14 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 		revision: 0,
 		config: {
 			...editorTestPayload.config,
+			items: {
+				...editorTestPayload.config.items,
+				stone: {
+					...editorTestPayload.config.items.water!,
+					uid: "stone",
+					id: "stone",
+				},
+			},
 			start: {
 				...editorTestPayload.config.start,
 				board: force ? editorTestPayload.config.start.board : [],
@@ -111,13 +120,16 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 	});
 
 	const DetailRoute = () => {
-		const item = useItemByUid("water");
+		const { itemUid = "water" } = useParams({
+			strict: false,
+		});
+		const item = useItemByUid(itemUid);
 		return (
 			<Detail
-				uid="water"
+				uid={itemUid}
 				sectionId="delete"
 			>
-				{item === undefined ? <NotFound uid="water" /> : <DeleteSection item={item} />}
+				{item === undefined ? <NotFound uid={itemUid} /> : <DeleteSection item={item} />}
 			</Detail>
 		);
 	};
@@ -129,6 +141,11 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 	const listLoader = vi.fn(() => navigation.promise);
 	const router = createRouter({
 		routeTree: rootRoute.addChildren([
+			createRoute({
+				getParentRoute: () => rootRoute,
+				path: "/editor/$projectId/board",
+				component: () => <div>Board</div>,
+			}),
 			createRoute({
 				getParentRoute: () => rootRoute,
 				path: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
@@ -221,6 +238,39 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 };
 
 describe("DeleteSection", () => {
+	it.each([
+		"board",
+		"another-item",
+	] as const)(
+		"publishes an admitted deletion without navigating away from %s",
+		async (destination) => {
+			const fixture = await createFixture();
+			const successorPath =
+				destination === "board"
+					? "/editor/project-one/board"
+					: "/editor/project-one/editor/items/stone/detail/delete";
+			await act(async () => {
+				await fixture.router.navigate({
+					href: successorPath,
+				});
+			});
+			expect(fixture.router.state.location.pathname).toBe(successorPath);
+			await act(async () => {
+				fixture.navigation.resolve();
+				fixture.deletion.resolve({
+					type: "success",
+					value: fixture.commit,
+				});
+				await vi.waitFor(() =>
+					expect(RendererAtomRegistry.get(projectAtom)?.revision).toBe(1),
+				);
+			});
+			expect(RendererAtomRegistry.get(projectAtom)?.config.items.water).toBeUndefined();
+			expect(fixture.router.state.location.pathname).toBe(successorPath);
+			expect(fixture.listLoader).not.toHaveBeenCalled();
+		},
+	);
+
 	it.each([
 		{
 			force: false,

@@ -3,7 +3,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -78,6 +78,16 @@ export const useDeleteController = ({
 }: useDeleteController.Props): useDeleteController.Output => {
 	const project = useEditorProject();
 	const navigateFn = useNavigate();
+	const sessionGeneration = useRef(0);
+	useLayoutEffect(
+		() => () => {
+			sessionGeneration.current += 1;
+		},
+		[
+			project.projectId,
+			item.uid,
+		],
+	);
 	const commandAtom = deleteCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
 	const removeFn = useAtomSet(commandAtom, {
@@ -126,19 +136,23 @@ export const useDeleteController = ({
 	const confirmFn = useCallback(async () => {
 		if (confirming === null || (confirming === "safe" && blockers.length > 0) || result.waiting)
 			return;
+		const submittedSession = sessionGeneration.current;
 		try {
 			await removeFn({
 				expectedRevision: project.revision,
 				force: confirming === "force",
 				itemUid: item.uid,
-				onDeletedFn: () =>
-					navigateFn({
+				onDeletedFn: async () => {
+					// The admitted deletion still publishes after its original route has left.
+					if (sessionGeneration.current !== submittedSession) return;
+					await navigateFn({
 						to: "/editor/$projectId/editor/items/list",
 						params: {
 							projectId: project.projectId,
 						},
 						replace: true,
-					}),
+					});
+				},
 			});
 		} catch {
 			// The settled command error remains visible in the confirmation dialog.

@@ -1,3 +1,4 @@
+import { Overlay } from "~/ui/ui/Overlay";
 import { Trash2, X } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -97,7 +98,11 @@ export const DeleteDialog = ({
 }) => {
 	const translator = useTranslator();
 	return (
-		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
+		<Overlay
+			onCloseFn={() => {
+				if (!pending) onCancelFn();
+			}}
+		>
 			<div
 				className="w-full max-w-2xl rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 				data-ui="EditorItemDeleteDialog"
@@ -148,6 +153,6 @@ export const DeleteDialog = ({
 					</div>
 				</div>
 			</div>
-		</div>
+		</Overlay>
 	);
 };

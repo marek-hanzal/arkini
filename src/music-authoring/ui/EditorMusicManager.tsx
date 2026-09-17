@@ -17,17 +17,21 @@ export const EditorMusicManager = () => {
 		{
 			label: translator.textFn("All"),
 			value: "all",
+			shortcut: "a",
 		},
 		{
 			label: translator.textFn("Playlist"),
 			value: "playlist",
+			shortcut: "p",
 		},
 		{
 			label: translator.textFn("Unused"),
 			value: "unused",
+			shortcut: "u",
 		},
 	] as const satisfies ReadonlyArray<{
 		readonly label: string;
+		readonly shortcut: string;
 		readonly value: useEditorMusicManagerController.View;
 	}>;
 	const renderResourceActionFn = (resource: Project.Resource) => {

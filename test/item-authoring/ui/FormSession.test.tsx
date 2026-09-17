@@ -763,6 +763,27 @@ describe("item section form session", () => {
 		if (title === null) throw new Error("Missing item title input.");
 
 		await changeInput(title, "Changed water");
+		await act(async () =>
+			document.body.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "a",
+					bubbles: true,
+					cancelable: true,
+				}),
+			),
+		);
+		expect(state.navigate).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
+				params: {
+					projectId: "editor-test",
+					itemUid: item.uid,
+					sectionId: "artwork",
+				},
+			}),
+		);
+		expect(state.saveItem).not.toHaveBeenCalled();
+		expect(state.requestLeave).not.toHaveBeenCalled();
 		await renderSection(<div>Artwork section</div>, "artwork");
 		await renderSection(<IdentitySection />, "identity");
 

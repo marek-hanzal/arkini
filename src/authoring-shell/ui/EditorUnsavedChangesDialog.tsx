@@ -27,12 +27,15 @@ const EditorUnsavedChangesPrompt = ({
 		saveFn: () => owner.decideFn("save"),
 	});
 	return (
-		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
+		<div
+			ref={focus.overlayRef}
+			tabIndex={-1}
+			onKeyDown={focus.onKeyDownFn}
+			className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]"
+		>
 			<div
-				ref={focus.overlayRef}
 				className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 				data-ui="EditorUnsavedChangesDialog"
-				onKeyDown={focus.onKeyDownFn}
 			>
 				<h2 className="text-lg font-semibold">{translator.textFn("Unsaved changes")}</h2>
 				<div className="mt-2 text-sm leading-6 text-muted">

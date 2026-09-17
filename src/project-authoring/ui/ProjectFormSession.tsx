@@ -1,3 +1,4 @@
+import { useProjectSectionShortcuts } from "~/project-authoring/ui/useProjectSectionShortcuts";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, type PropsWithChildren } from "react";
 
@@ -22,6 +23,10 @@ export const ProjectFormSession = ({
 }>) => {
 	const navigateFn = useNavigate();
 	const project = useEditorProject();
+	useProjectSectionShortcuts({
+		projectId: project.projectId,
+		destination: "form",
+	});
 	const unsavedChanges = useEditorUnsavedChangesOwner();
 	const onInvalidDestinationFn = useCallback(
 		({ avatar, sectionId: nextSectionId }: ProjectFormDestination) =>

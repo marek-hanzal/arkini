@@ -1,3 +1,6 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import type { PropsWithChildren, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
@@ -13,6 +16,7 @@ interface EditorSectionShortcutNavigationProps<Value extends string> {
 	readonly options: ReadonlyArray<{
 		readonly icon?: LucideIcon;
 		readonly label: string;
+		readonly shortcut: string;
 		readonly value: Value;
 	}>;
 	readonly value: Value;
@@ -24,29 +28,42 @@ export const EditorSectionShortcutNavigation = <Value extends string>({
 	onChangeFn,
 	options,
 	value,
-}: EditorSectionShortcutNavigationProps<Value>) => (
-	<>
-		{options.map((option) => {
-			const Icon = option.icon;
-			return (
-				<LinkButton
-					key={option.value}
-					className={`${editorSectionLinkClassName} gap-1.5`}
-					onClick={() => onChangeFn(option.value)}
-					{...readDataUiFn({
-						dataUi,
-						state: {
-							selected: value === option.value,
-						},
-					})}
-				>
-					{Icon === undefined ? null : <Icon className="size-4 shrink-0" />}
-					{option.label}
-				</LinkButton>
-			);
-		})}
-	</>
-);
+}: EditorSectionShortcutNavigationProps<Value>) => {
+	useEditorSectionShortcuts({
+		options,
+		onSelectFn: (option) => onChangeFn(option.value),
+	});
+	return (
+		<>
+			{options.map((option) => {
+				const Icon = option.icon;
+				return (
+					<Tooltip
+						key={option.value}
+						content={`${option.label} · ${formatForDisplay({
+							key: option.shortcut,
+						})}`}
+						placement="bottom"
+					>
+						<LinkButton
+							className={`${editorSectionLinkClassName} gap-1.5`}
+							onClick={() => onChangeFn(option.value)}
+							{...readDataUiFn({
+								dataUi,
+								state: {
+									selected: value === option.value,
+								},
+							})}
+						>
+							{Icon === undefined ? null : <Icon className="size-4 shrink-0" />}
+							{option.label}
+						</LinkButton>
+					</Tooltip>
+				);
+			})}
+		</>
+	);
+};
 
 /** Keeps section links separate from primary actions, with optional help always last. */
 export const EditorSectionBar = ({

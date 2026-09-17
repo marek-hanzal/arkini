@@ -39,7 +39,6 @@ export const ProjectSectionLink = ({
 			{label}
 		</LinkButtonLink>
 	);
-	if (destination !== "detail") return link;
 	return (
 		<Tooltip
 			content={`${label} · ${formatForDisplay({

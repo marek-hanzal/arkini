@@ -1,3 +1,8 @@
+import { Overlay } from "~/ui/ui/Overlay";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { useNavigate } from "@tanstack/react-router";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { AudioLines, FileQuestion, Music2, Pause, Pencil, Play } from "lucide-react";
 import { useMemo } from "react";
 
@@ -31,6 +36,19 @@ interface EditorAudioResourceDetailProps {
 	readonly type: "music" | "sfx";
 	readonly section: "view" | "edit" | "delete";
 }
+
+const AudioDetailSections = [
+	{
+		id: "view",
+		label: "View",
+		shortcut: "v",
+	},
+	{
+		id: "delete",
+		label: "Delete",
+		shortcut: "d",
+	},
+] as const;
 
 const EditorAudioPreview = ({
 	resource,
@@ -232,7 +250,7 @@ const EditorAudioResourceDelete = ({
 				</DangerButton>
 			</div>
 			{controller.confirming ? (
-				<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
+				<Overlay onCloseFn={controller.cancelFn}>
 					<div
 						data-ui="EditorAudioDeleteDialog"
 						className="grid w-full max-w-md gap-4 rounded-2xl border border-line-strong bg-surface-raised p-6 shadow-2xl"
@@ -267,7 +285,7 @@ const EditorAudioResourceDelete = ({
 							</DangerButton>
 						</div>
 					</div>
-				</div>
+				</Overlay>
 			) : null}
 		</section>
 	);
@@ -290,6 +308,21 @@ export const EditorAudioResourceDetail = ({
 		type === "music"
 			? "/editor/$projectId/music/$resourceId/$sectionId"
 			: "/editor/$projectId/sfx/$resourceId/$sectionId";
+	const navigateFn = useNavigate();
+	useEditorSectionShortcuts({
+		enabled: resource !== undefined && section !== "edit",
+		options: AudioDetailSections,
+		onSelectFn: (tab) => {
+			void navigateFn({
+				to,
+				params: {
+					projectId: project.projectId,
+					resourceId,
+					sectionId: tab.id,
+				},
+			});
+		},
+	});
 	if (resource !== undefined && section === "edit")
 		return (
 			<EditorAudioResourceEdit
@@ -342,36 +375,32 @@ export const EditorAudioResourceDetail = ({
 			secondaryNavigation={
 				resource === undefined ? undefined : (
 					<EditorSectionBar>
-						{(
-							[
-								{
-									id: "view",
-									label: "View",
-								},
-								{
-									id: "delete",
-									label: "Delete",
-								},
-							] as const
-						).map((tab) => (
-							<LinkButtonLink
+						{AudioDetailSections.map((tab) => (
+							<Tooltip
 								key={tab.id}
-								to={to}
-								params={{
-									projectId: project.projectId,
-									resourceId,
-									sectionId: tab.id,
-								}}
-								className={editorSectionLinkClassName}
-								activeProps={{
-									"data-ui-selected": true,
-								}}
-								inactiveProps={{
-									"data-ui-selected": false,
-								}}
+								content={`${translator.textFn(tab.label)} · ${formatForDisplay({
+									key: tab.shortcut,
+								})}`}
+								placement="bottom"
 							>
-								<Tx label={tab.label} />
-							</LinkButtonLink>
+								<LinkButtonLink
+									to={to}
+									params={{
+										projectId: project.projectId,
+										resourceId,
+										sectionId: tab.id,
+									}}
+									className={editorSectionLinkClassName}
+									activeProps={{
+										"data-ui-selected": true,
+									}}
+									inactiveProps={{
+										"data-ui-selected": false,
+									}}
+								>
+									<Tx label={tab.label} />
+								</LinkButtonLink>
+							</Tooltip>
 						))}
 					</EditorSectionBar>
 				)

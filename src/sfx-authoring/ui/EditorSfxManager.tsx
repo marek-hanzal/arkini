@@ -26,17 +26,21 @@ export const EditorSfxManager = () => {
 		{
 			label: translator.textFn("All"),
 			value: "all",
+			shortcut: "a",
 		},
 		{
 			label: translator.textFn("Assigned"),
 			value: "assigned",
+			shortcut: "s",
 		},
 		{
 			label: translator.textFn("Unused"),
 			value: "unused",
+			shortcut: "u",
 		},
 	] as const satisfies ReadonlyArray<{
 		readonly label: string;
+		readonly shortcut: string;
 		readonly value: useEditorSfxManagerController.View;
 	}>;
 	const renderResourceActionFn = (resource: Project.Resource) => {

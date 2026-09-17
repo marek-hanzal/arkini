@@ -342,9 +342,13 @@ it.each([
 			expect(RendererAtomRegistry.get(atom)?.config).toEqual(originalConfig);
 			expect(audioConstructor).not.toHaveBeenCalled();
 			await act(async () => {
-				await router.navigate({
-					to: `/editor/${state.projectId}/${type}/second/delete`,
-				});
+				document.body.dispatchEvent(
+					new KeyboardEvent("keydown", {
+						key: "d",
+						bubbles: true,
+						cancelable: true,
+					}),
+				);
 			});
 			expect(
 				host.querySelector('[data-ui="EditorAudioResourceUsage"]')?.textContent,
@@ -352,6 +356,25 @@ it.each([
 			await act(async () =>
 				host.querySelector<HTMLButtonElement>('[data-ui="EditorAudioDeleteOpen"]')!.click(),
 			);
+			expect(deleteResourceFn).not.toHaveBeenCalled();
+			await act(async () => {
+				for (const key of [
+					"v",
+					"e",
+					"d",
+				])
+					document.activeElement?.dispatchEvent(
+						new KeyboardEvent("keydown", {
+							key,
+							bubbles: true,
+							cancelable: true,
+						}),
+					);
+			});
+			expect(router.state.location.pathname).toBe(
+				`/editor/${state.projectId}/${type}/second/delete`,
+			);
+			expect(host.querySelector('[data-ui="EditorAudioDeleteDialog"]')).not.toBeNull();
 			expect(deleteResourceFn).not.toHaveBeenCalled();
 			await act(async () =>
 				host

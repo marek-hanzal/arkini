@@ -1,3 +1,4 @@
+import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 import { ItemSectionDisableControl } from "~/item-authoring/ui/ItemSectionDisableControl";
 import { ItemSectionCopyControl } from "~/item-authoring/ui/ItemSectionCopyControl";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
@@ -64,6 +65,20 @@ export const FormSession = ({
 	const navigateFn = useNavigate();
 	const translator = useTranslator();
 	const project = useEditorProject();
+	useItemSectionShortcuts({
+		enabled: true,
+		destination: "form",
+		itemUid: initialItem.uid,
+		projectId: project.projectId,
+		sections: readSectionsFn("form"),
+		search: {
+			defaultDraft,
+			defaultItemId,
+			defaultTitle,
+			create,
+			resourceId,
+		},
+	});
 	const unsavedChanges = useEditorUnsavedChangesOwner();
 	const onInvalidSectionFn = useCallback(
 		(nextSectionId: SectionId, path: ReadonlyArray<PropertyKey>) =>

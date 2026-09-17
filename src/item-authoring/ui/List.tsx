@@ -1,3 +1,6 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import {
 	editorSectionLinkClassName,
@@ -68,40 +71,55 @@ export const List = ({
 			notes.notes,
 		],
 	);
+	useEditorSectionShortcuts({
+		options: [
+			{
+				shortcut: "d",
+			},
+		],
+		onSelectFn: () => onDraftChangeFn(!draft),
+	});
 	const itemViewOptions = [
 		{
 			icon: ArrowDownAZ,
 			label: translator.textFn("Name"),
 			value: "name",
+			shortcut: "n",
 		},
 		{
 			icon: CircleOff,
 			label: translator.textFn("Unreachable"),
 			value: "incomplete",
+			shortcut: "u",
 		},
 		{
 			icon: Gauge,
 			label: translator.textFn("Fastest first"),
 			value: "fastest",
+			shortcut: "f",
 		},
 		{
 			icon: Hourglass,
 			label: translator.textFn("Slowest first"),
 			value: "slowest",
+			shortcut: "s",
 		},
 		{
 			icon: TrendingUp,
 			label: translator.textFn("Highest demand first"),
 			value: "demand",
+			shortcut: "h",
 		},
 		{
 			icon: NotebookPen,
 			label: translator.textFn("With note"),
 			value: "with-note",
+			shortcut: "w",
 		},
 	] as const satisfies ReadonlyArray<{
 		readonly icon: typeof ArrowDownAZ;
 		readonly label: string;
+		readonly shortcut: string;
 		readonly value: selectItemCollectionFn.View;
 	}>;
 
@@ -278,19 +296,26 @@ export const List = ({
 						options={itemViewOptions}
 						value={view}
 					/>
-					<LinkButton
-						className={`${editorSectionLinkClassName} gap-1.5`}
-						onClick={() => onDraftChangeFn(!draft)}
-						{...readDataUiFn({
-							dataUi: "EditorItemDraftFilter",
-							state: {
-								selected: draft,
-							},
-						})}
+					<Tooltip
+						content={`${translator.textFn("Draft")} · ${formatForDisplay({
+							key: "d",
+						})}`}
+						placement="bottom"
 					>
-						<FilePenLine className="size-4 shrink-0" />
-						{translator.textFn("Draft")}
-					</LinkButton>
+						<LinkButton
+							className={`${editorSectionLinkClassName} gap-1.5`}
+							onClick={() => onDraftChangeFn(!draft)}
+							{...readDataUiFn({
+								dataUi: "EditorItemDraftFilter",
+								state: {
+									selected: draft,
+								},
+							})}
+						>
+							<FilePenLine className="size-4 shrink-0" />
+							{translator.textFn("Draft")}
+						</LinkButton>
+					</Tooltip>
 				</EditorSectionBar>
 			}
 			scrollRestorationId="editor-item-list"

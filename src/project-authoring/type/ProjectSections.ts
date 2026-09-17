@@ -23,7 +23,7 @@ export const ProjectSections = [
 	{
 		id: "images",
 		label: "Images",
-		shortcut: "a",
+		shortcut: "i",
 	},
 	{
 		id: "board",
@@ -38,6 +38,6 @@ export const ProjectSections = [
 	{
 		id: "inventory",
 		label: "Inventory",
-		shortcut: "i",
+		shortcut: "n",
 	},
 ] as const satisfies ReadonlyArray<ProjectSectionDescriptor>;

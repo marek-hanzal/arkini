@@ -40,6 +40,9 @@ const EditorPageHelpDialog = ({
 			}}
 			className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]"
 			data-ui="EditorPageHelpBackdrop"
+			ref={focus.overlayRef}
+			tabIndex={-1}
+			onKeyDown={focus.onKeyDownFn}
 			exit={{
 				opacity: 0,
 			}}
@@ -52,7 +55,6 @@ const EditorPageHelpDialog = ({
 			transition={EditorPageHelpTransition}
 		>
 			<motion.div
-				ref={focus.overlayRef}
 				animate={{
 					opacity: 1,
 				}}
@@ -64,7 +66,6 @@ const EditorPageHelpDialog = ({
 				initial={{
 					opacity: 0,
 				}}
-				onKeyDown={focus.onKeyDownFn}
 				transition={EditorPageHelpTransition}
 			>
 				<div className="flex items-center gap-3">

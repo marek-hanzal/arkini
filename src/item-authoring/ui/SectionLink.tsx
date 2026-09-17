@@ -82,7 +82,7 @@ export const SectionLink = ({
 			{label}
 		</LinkButtonLink>
 	);
-	if (destination !== "detail" || section.shortcut === undefined) return link;
+	if (section.shortcut === undefined) return link;
 	return (
 		<Tooltip
 			content={`${label} · ${formatForDisplay({

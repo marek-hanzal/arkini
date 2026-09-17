@@ -132,6 +132,19 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 				concurrent: true,
 			},
 		).pipe(Atom.setIdleTTL(0));
+		const requestDetailMusicAtom = Atom.fn((resourceId: string | undefined, get) =>
+			get.result(audioAtom).pipe(
+				Effect.flatMap((audio) => audio.requestDetailMusicFx(resourceId)),
+				Effect.catchCause((cause) =>
+					Cause.hasInterruptsOnly(cause)
+						? Effect.void
+						: logGameAudioFailureFx(
+								"Arkini detail music failed; gameplay continues.",
+								cause,
+							),
+				),
+			),
+		).pipe(Atom.setIdleTTL(0));
 		const setSoundAtom = Atom.fn(
 			(sound: SoundSettings, get) =>
 				get.result(audioAtom).pipe(
@@ -149,6 +162,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 			playSfxEventAtom,
 			prepareAtom,
 			setSoundAtom,
+			requestDetailMusicAtom,
 			unlockAtom,
 		};
 	}, [
@@ -166,6 +180,7 @@ export const GameAudio = ({ children }: PropsWithChildren) => {
 	const unlockFn = useAtomSet(audioAtoms.unlockAtom);
 	const playBatchFn = useAtomSet(audioAtoms.playBatchAtom);
 	const playSfxEventAtomFn = useAtomSet(audioAtoms.playSfxEventAtom);
+	const requestDetailMusicAtomFn = useAtomSet(audioAtoms.requestDetailMusicAtom);
 	const setSoundFn = useAtomSet(audioAtoms.setSoundAtom);
 
 	useLayoutEffect(() => {
@@ -220,12 +235,23 @@ export const GameAudio = ({ children }: PropsWithChildren) => {
 			playSfxEventAtomFn,
 		],
 	);
+	const requestDetailMusicFn = useCallback(
+		(resourceId: string | undefined) => {
+			if (activeAudioAtomsRef.current === audioAtoms) requestDetailMusicAtomFn(resourceId);
+		},
+		[
+			audioAtoms,
+			requestDetailMusicAtomFn,
+		],
+	);
 	const control = useMemo(
 		() => ({
 			playSfxEventFn,
+			requestDetailMusicFn,
 		}),
 		[
 			playSfxEventFn,
+			requestDetailMusicFn,
 		],
 	);
 

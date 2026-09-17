@@ -1,3 +1,4 @@
+import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection";
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -82,6 +83,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								}
 							/>
 						</FactList>
+						<EditorMusicSelection resourceId={item.music} />
 						{item.description === undefined ? null : (
 							<FactList columns={1}>
 								<Fact

@@ -1,18 +1,10 @@
+import { EditorAudioPreviewPlayer } from "~/audio-authoring/ui/EditorAudioPreviewPlayer";
 import { Overlay } from "~/ui/ui/Overlay";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
-import {
-	FileQuestion,
-	Pause,
-	Pencil,
-	Play,
-	ShieldAlert,
-	ShieldCheck,
-	Trash2,
-	X,
-} from "lucide-react";
+import { FileQuestion, Pencil, ShieldAlert, ShieldCheck, Trash2, X } from "lucide-react";
 import { useMemo } from "react";
 
 import { useEditorAudioPreview } from "~/audio-authoring/ui/useEditorAudioPreview";
@@ -81,48 +73,13 @@ const EditorAudioPreview = ({
 		type,
 	});
 	return (
-		<div
-			data-ui="EditorAudioPreview"
-			className="flex h-9 items-center gap-3"
-		>
-			{preview.playbackError === undefined ? null : (
-				<p
-					className="max-w-64 truncate text-xs text-danger"
-					title={preview.playbackError}
-				>
-					{preview.playbackError}
-				</p>
-			)}
-			<div
-				data-ui="EditorAudioPreviewSeek"
-				className="relative flex h-[75%] w-64 cursor-pointer items-center justify-end overflow-hidden bg-surface-raised"
-				onClick={(event) => {
-					const bounds = event.currentTarget.getBoundingClientRect();
-					preview.seekPlaybackFn(
-						resource.id,
-						(event.clientX - bounds.left) / bounds.width,
-					);
-				}}
-			>
-				<div
-					data-ui="EditorAudioPreviewProgress"
-					className="pointer-events-none absolute inset-y-0 left-0 bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
-					style={{
-						width: `${preview.playbackProgress * 100}%`,
-					}}
-				/>
-				<LinkButton
-					className="relative grid h-full w-9 shrink-0 place-items-center text-foreground"
-					data-ui="EditorAudioPreviewToggle"
-					onClick={(event) => {
-						event.stopPropagation();
-						preview.togglePlaybackFn(resource.id);
-					}}
-				>
-					{preview.playing ? <Pause className="size-4" /> : <Play className="size-4" />}
-				</LinkButton>
-			</div>
-		</div>
+		<EditorAudioPreviewPlayer
+			error={preview.playbackError}
+			progress={preview.playbackProgress}
+			playing={preview.playing}
+			seekFn={(progress) => preview.seekPlaybackFn(resource.id, progress)}
+			toggleFn={() => preview.togglePlaybackFn(resource.id)}
+		/>
 	);
 };
 
@@ -139,12 +96,14 @@ const EditorAudioResourceUsage = ({
 		(usage) => usage.resourceId === resourceId,
 	);
 	const usageLabels = usages.map((usage) =>
-		usage.resourceType === "sfx"
-			? translator.textFn(
-					SfxEventPresentation.find(({ event }) => event === usage.roleLabel)?.label ??
-						usage.roleLabel,
-				)
-			: translator.textFn("Playlist"),
+		usage.owner === "item"
+			? usage.ownerLabel
+			: usage.resourceType === "sfx"
+				? translator.textFn(
+						SfxEventPresentation.find(({ event }) => event === usage.roleLabel)
+							?.label ?? usage.roleLabel,
+					)
+				: translator.textFn("Playlist"),
 	);
 	if (asFact)
 		return (

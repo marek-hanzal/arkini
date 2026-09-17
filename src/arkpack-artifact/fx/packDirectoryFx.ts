@@ -4,6 +4,7 @@ import { open, stat } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { FileSystem, Path } from "effect";
+import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { Effect } from "effect";
 
 import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
@@ -164,9 +165,13 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		const resourcesRoot = path.join(temporary, "resources");
 		yield* fileSystem.makeDirectory(resourcesRoot);
 		const resources: PackedResourceFile[] = [];
-		const playlistIds = new Set(config.music?.playlist ?? []);
+		const musicIds = new Set(
+			readGameResourceUsagesFn(config)
+				.filter((usage) => usage.resourceType === "music")
+				.map((usage) => usage.resourceId),
+		);
 		const packedResources = compilation.resources.filter(
-			(resource) => resource.type !== "music" || playlistIds.has(resource.id),
+			(resource) => resource.type !== "music" || musicIds.has(resource.id),
 		);
 		for (let index = 0; index < packedResources.length; index += 1) {
 			const resource = packedResources[index];

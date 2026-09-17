@@ -26,6 +26,7 @@ import { ItemDetailContext } from "~/item-detail-frame/context/ItemDetailContext
 import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailControl";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
+import { useItemDetailMusic } from "~/item-detail-frame/ui/useItemDetailMusic";
 import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
 /**
@@ -111,6 +112,7 @@ export const ItemDetailProvider = ({
 		controller.getSnapshotFn,
 		controller.getSnapshotFn,
 	);
+	useItemDetailMusic(game, snapshot);
 
 	useEffect(() => {
 		writeCommandFn({

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
-import { Effect } from "effect";
+import { Effect, Random } from "effect";
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createGameAudioRuntimeFx } from "~/game-audio/fx/createGameAudioRuntimeFx";
@@ -12,6 +13,7 @@ class AudioHarness extends EventTarget {
 	currentTime = 0;
 	duration = 120;
 	paused = true;
+	readyState = 1;
 	readonly load = vi.fn();
 	readonly play = vi.fn(async () => {
 		this.paused = false;
@@ -96,6 +98,7 @@ const createHarness = () => {
 };
 
 afterEach(() => {
+	vi.useRealTimers();
 	vi.unstubAllGlobals();
 	vi.restoreAllMocks();
 });
@@ -328,6 +331,139 @@ describe("createGameAudioRuntimeFx", () => {
 		await Promise.resolve();
 
 		expect(harness.audios.reduce((sum, { play }) => sum + play.mock.calls.length, 0)).toBe(3);
+		await Effect.runPromise(runtime.closeFx);
+	});
+});
+
+describe("item detail music", () => {
+	const setupFn = async () => {
+		vi.useFakeTimers();
+		const harness = createHarness();
+		const runtime = Effect.runSync(
+			createGameAudioRuntimeFx({
+				game: {
+					config: {
+						music: {
+							playlist: [
+								"global",
+							],
+						},
+					},
+					resources: [
+						"global",
+						"detail-b",
+						"detail-c",
+					].map((id) => ({
+						id,
+						type: "music" as const,
+					})),
+					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+				},
+				maximumSfxVoices: 0,
+				sound: {
+					master: 100,
+					music: 100,
+					sfx: 100,
+				},
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.25,
+						0.75,
+						0.5,
+						0.25,
+					]),
+				),
+			),
+		);
+		await Effect.runPromise(runtime.unlockFx);
+		return {
+			harness,
+			runtime,
+		};
+	};
+
+	it("retains the global position across B to C and resumes it when the next detail has no music", async () => {
+		const { harness, runtime } = await setupFn();
+		const global = harness.audios.find((audio) => audio.src.endsWith("/global"))!;
+		global.currentTime = 43;
+		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
+		await Promise.resolve();
+		await vi.advanceTimersByTimeAsync(4000);
+		expect(global.paused).toBe(true);
+		const b = harness.audios.find((audio) => audio.src.endsWith("/detail-b"))!;
+		expect(b.currentTime).toBeGreaterThanOrEqual(12);
+		expect(b.currentTime).toBeLessThanOrEqual(108);
+		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
+		expect(b.play).toHaveBeenCalledOnce();
+		Effect.runSync(runtime.requestDetailMusicFx("detail-c"));
+		await Promise.resolve();
+		expect(global.play).toHaveBeenCalledOnce();
+		expect(
+			harness.audios.some((audio) => audio.src.endsWith("/detail-c") && !audio.paused),
+		).toBe(true);
+		expect(
+			harness.gains.some(({ gain }) =>
+				gain.linearRampToValueAtTime.mock.calls.some(([value]) => value === 1),
+			),
+		).toBe(true);
+		await vi.advanceTimersByTimeAsync(4000);
+		Effect.runSync(runtime.requestDetailMusicFx(undefined));
+		await Promise.resolve();
+		expect(global.currentTime).toBe(43);
+		expect(global.play).toHaveBeenCalledTimes(2);
+		await vi.advanceTimersByTimeAsync(4000);
+		expect(harness.audios.filter((audio) => !audio.paused)).toEqual([
+			global,
+		]);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("repeats the requested excerpt in another voice without advancing the global playlist", async () => {
+		const { harness, runtime } = await setupFn();
+		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
+		await Promise.resolve();
+		await vi.advanceTimersByTimeAsync(4000);
+		const b = harness.audios.find((audio) => audio.src.endsWith("/detail-b"))!;
+		b.currentTime = 117;
+		b.dispatchEvent(new Event("timeupdate"));
+		await Promise.resolve();
+		const repeat = harness.audios.find(
+			(audio) => audio !== b && audio.src.endsWith("/detail-b"),
+		)!;
+		expect(repeat).toBeDefined();
+		expect(repeat.currentTime).toBeCloseTo(84);
+		expect(repeat.play).toHaveBeenCalledOnce();
+		await vi.advanceTimersByTimeAsync(4000);
+		expect(b.paused).toBe(true);
+		expect(
+			harness.audios.find((audio) => audio.src.endsWith("/global"))?.play,
+		).toHaveBeenCalledOnce();
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("ignores stale metadata after leaving a detail and isolates playback failure", async () => {
+		const { harness, runtime } = await setupFn();
+		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
+		await Promise.resolve();
+		await vi.advanceTimersByTimeAsync(4000);
+		const b = harness.audios.find((audio) => audio.src.endsWith("/detail-b"))!;
+		const spare = harness.audios.find((audio, index) => index >= 2 && audio !== b)!;
+		spare.readyState = 0;
+		Effect.runSync(runtime.requestDetailMusicFx("detail-c"));
+		Effect.runSync(runtime.requestDetailMusicFx(undefined));
+		spare.dispatchEvent(new Event("loadedmetadata"));
+		await Promise.resolve();
+		expect(spare.play).not.toHaveBeenCalled();
+		await vi.advanceTimersByTimeAsync(4000);
+		spare.readyState = 1;
+		b.readyState = 1;
+		b.play.mockRejectedValueOnce(new Error("decode failure"));
+		Effect.runSync(runtime.requestDetailMusicFx("detail-b"));
+		await Promise.resolve();
+		await vi.advanceTimersByTimeAsync(4000);
+		expect(harness.audios.find((audio) => audio.src.endsWith("/global"))?.paused).toBe(false);
 		await Effect.runPromise(runtime.closeFx);
 	});
 });

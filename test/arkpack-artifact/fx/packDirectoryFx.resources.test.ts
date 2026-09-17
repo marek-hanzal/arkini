@@ -16,6 +16,34 @@ import {
 } from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx resource isolation", () => {
+	it.effect("packages item-requested music outside the global playlist", () =>
+		Effect.gen(function* () {
+			const fs = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const itemPath = path.join(input, "items", "water.json");
+			const item = JSON.parse(yield* fs.readFileString(itemPath));
+			yield* fs.writeFileString(
+				itemPath,
+				JSON.stringify({
+					...item,
+					item: {
+						...item.item,
+						music: "unused-theme",
+					},
+				}),
+			);
+			const result = yield* packDirectoryFx({
+				input,
+			});
+			const envelope = yield* decodeTestArkpackEnvelopeFx(yield* fs.readFile(result.arkpack));
+			const payload = yield* decodeTestArkpackPayloadFx(envelope.payload);
+			expect(payload.resources.find(({ id }) => id === "unused-theme")?.bytes).toEqual(
+				Uint8Array.from(musicOgg),
+			);
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
 	it.effect(
 		"keeps admitted media bytes when external editors replace the source files during Build",
 		() =>

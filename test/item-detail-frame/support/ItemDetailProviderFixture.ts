@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
@@ -46,6 +47,11 @@ vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const providerGame = {
+	committedTransitionAtom: Atom.make({
+		runtime: {
+			items: [],
+		},
+	}),
 	config: {
 		items: {},
 	},
@@ -106,6 +112,7 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 export const renderProvider = async () => {
 	let control: ItemDetailControl | undefined;
 	const playSfxEventFn = vi.fn();
+	const requestDetailMusicFn = vi.fn();
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -117,12 +124,16 @@ export const renderProvider = async () => {
 				{
 					value: {
 						playSfxEventFn,
+						requestDetailMusicFn,
 					},
 				},
 				createElement(
 					ItemDetailProvider,
 					{
-						game,
+						game: {
+							...providerGame,
+							...game,
+						},
 					},
 					createElement(Probe, {
 						onControl: (next) => {

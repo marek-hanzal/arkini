@@ -19,6 +19,67 @@ const projectImageIds = new Set(Object.values(startTestConfig.resources));
 const readResourceTypeFn = (id: string) => (projectImageIds.has(id) ? "image" : "artwork");
 
 describe("validateGameResourcesFn", () => {
+	it("validates item detail music against Music sources with item provenance", () => {
+		const [itemId, item] = Object.entries(startTestConfig.items)[0]!;
+		const config = {
+			...startTestConfig,
+			items: {
+				...startTestConfig.items,
+				[itemId]: {
+					...item,
+					music: "detail-track",
+				},
+			},
+		};
+		for (const resources of [
+			[],
+			[
+				{
+					id: "detail-track",
+					path: "sfx/detail-track.ogg",
+					type: "sfx" as const,
+				},
+			],
+		]) {
+			const diagnostics = validateGameResourcesFn({
+				config,
+				provenance,
+				resources,
+			});
+			expect(diagnostics).toContainEqual(
+				expect.objectContaining({
+					code:
+						resources.length === 0
+							? DiagnosticCodeEnumSchema.enum.ResourceMissing
+							: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
+					resourceId: "detail-track",
+					path: [
+						"items",
+						itemId,
+						"music",
+					],
+					source: `${itemId}.json`,
+				}),
+			);
+		}
+		expect(
+			validateGameResourcesFn({
+				config,
+				provenance,
+				resources: [
+					{
+						id: "detail-track",
+						path: "music/detail-track.ogg",
+						type: "music",
+					},
+				],
+			}).filter(
+				(diagnostic) =>
+					"resourceId" in diagnostic && diagnostic.resourceId === "detail-track",
+			),
+		).toEqual([]);
+	});
+
 	it("accepts exact filename resource IDs", () => {
 		const ids = new Set<string>([
 			startTestConfig.resources.hero,

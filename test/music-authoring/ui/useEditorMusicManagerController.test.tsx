@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
 	playlistMusicFn: vi.fn(),
 	setCall: 0,
 	valueCall: 0,
+	detailMusic: undefined as string | undefined,
 }));
 
 vi.mock("@effect/atom-react", async (importOriginal) => ({
@@ -32,6 +33,20 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		config: {
+			resources: {},
+			items:
+				state.detailMusic === undefined
+					? {}
+					: {
+							tavern: {
+								uid: "tavern-uid",
+								title: "Tavern",
+								music: state.detailMusic,
+								artwork: {
+									default: [],
+								},
+							},
+						},
 			music: {
 				playlist: [
 					"opening-theme",
@@ -119,6 +134,7 @@ beforeEach(async () => {
 	state.playlistMusicFn.mockReset();
 	state.setCall = 0;
 	state.valueCall = 0;
+	state.detailMusic = undefined;
 	AudioStub.instances = [];
 	vi.stubGlobal("Audio", AudioStub);
 	const container = document.createElement("div");
@@ -177,6 +193,13 @@ describe("useEditorMusicManagerController", () => {
 		expect(controller?.music).toEqual([]);
 	});
 
+	it("keeps item-only music out of Unused without adding it to the global playlist", async () => {
+		state.detailMusic = "battle-march";
+		await act(async () => root?.render(<Probe />));
+		await act(async () => controller?.setViewFn("unused"));
+		expect(controller?.music).toEqual([]);
+		expect(controller?.playlistResourceIds.has("battle-march")).toBe(false);
+	});
 	it("tracks playback, seeks through the active row, and disposes on departure", async () => {
 		await act(async () => controller?.togglePlaybackFn("battle-march"));
 		const audio = AudioStub.instances[0];
@@ -204,6 +227,8 @@ describe("useEditorMusicManagerController", () => {
 		await act(async () => controller?.togglePlaylistFn("battle-march"));
 		expect(state.playlistMusicFn).toHaveBeenCalledWith({
 			config: {
+				resources: {},
+				items: {},
 				music: {
 					playlist: [
 						"opening-theme",

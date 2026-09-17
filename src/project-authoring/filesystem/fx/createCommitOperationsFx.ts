@@ -786,15 +786,34 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						errorFn("delete-resource", `Resource ${resourceId} does not exist.`),
 					);
 				const withoutMusicReference =
-					resource.type === "music" && state.project.config.music !== undefined
+					resource.type === "music"
 						? GameConfigSchema.parse({
 								...state.project.config,
-								music: {
-									...state.project.config.music,
-									playlist: state.project.config.music.playlist.filter(
-										(id) => id !== resourceId,
-									),
-								},
+								items: Object.fromEntries(
+									Object.entries(state.project.config.items).map(([id, item]) => {
+										if (item.music !== resourceId)
+											return [
+												id,
+												item,
+											];
+										const { music: _music, ...withoutMusic } = item;
+										return [
+											id,
+											withoutMusic,
+										];
+									}),
+								),
+								...(state.project.config.music === undefined
+									? {}
+									: {
+											music: {
+												...state.project.config.music,
+												playlist:
+													state.project.config.music.playlist.filter(
+														(id) => id !== resourceId,
+													),
+											},
+										}),
 							})
 						: state.project.config;
 				const config =

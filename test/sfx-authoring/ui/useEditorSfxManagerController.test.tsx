@@ -19,6 +19,9 @@ vi.mock("~/authoring-shell/ui/EditorPageHelp", () => ({
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@tanstack/react-router")>()),
 	Link: ({ children }: PropsWithChildren) => <span>{children}</span>,
+	createLink:
+		() =>
+		({ children }: PropsWithChildren) => <span>{children}</span>,
 }));
 
 const state = vi.hoisted(() => ({

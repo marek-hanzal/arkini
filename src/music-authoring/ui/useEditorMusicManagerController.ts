@@ -1,3 +1,4 @@
+import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect } from "effect";
@@ -59,15 +60,30 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 			project.config.music?.playlist,
 		],
 	);
+	const usedResourceIds = useMemo(
+		() =>
+			new Set(
+				readGameResourceUsagesFn(project.config)
+					.filter((usage) => usage.resourceType === "music")
+					.map((usage) => usage.resourceId),
+			),
+		[
+			project.config,
+		],
+	);
 	const music = useMemo(
 		() =>
 			audio.resources.filter((resource) => {
 				const inPlaylist = playlistResourceIds.has(resource.id);
-				return view === "all" || (view === "playlist" ? inPlaylist : !inPlaylist);
+				return (
+					view === "all" ||
+					(view === "playlist" ? inPlaylist : !usedResourceIds.has(resource.id))
+				);
 			}),
 		[
 			audio.resources,
 			playlistResourceIds,
+			usedResourceIds,
 			view,
 		],
 	);

@@ -51,6 +51,9 @@ export const ItemSchema = z
 		description: DescriptionSchema.optional().describe(
 			"The optional human-readable explanation of this item's purpose.",
 		),
+		music: IdSchema.optional().describe(
+			"Music resource requested while this item detail is open; omission keeps the global playlist.",
+		),
 		/**
 		 * Visual artwork definition used to render this item.
 		 */

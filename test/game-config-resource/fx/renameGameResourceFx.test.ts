@@ -22,6 +22,7 @@ describe("renameGameResourceFx", () => {
 				...editorTestPayload.config.items,
 				water: {
 					...editorTestPayload.config.items.water,
+					music: "hero",
 					artwork: {
 						scale: 0.8,
 						default: [
@@ -43,6 +44,7 @@ describe("renameGameResourceFx", () => {
 			}),
 		);
 
+		expect(renamed.items.water?.music).toBe("cover");
 		expect(renamed.resources.hero).toBe("cover");
 		expect(renamed.music?.playlist).toEqual([
 			"cover",

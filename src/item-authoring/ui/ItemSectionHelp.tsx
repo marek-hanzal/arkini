@@ -10,6 +10,7 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 		content: (
 			<>
 				<Mx label="Item identity help" />
+				<Mx label="Item detail music help" />
 				<Mx label="Item section copy help" />
 			</>
 		),

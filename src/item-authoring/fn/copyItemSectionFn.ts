@@ -29,6 +29,7 @@ export const copyItemSectionFn = (
 				scope: source.scope,
 				maxStackSize: current.clock === undefined ? source.maxStackSize : 1,
 				maxCount: source.maxCount,
+				music: source.music,
 			};
 		case "artwork":
 			return {

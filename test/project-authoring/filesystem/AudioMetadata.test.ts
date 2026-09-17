@@ -50,6 +50,15 @@ describe("filesystem audio metadata", () => {
 						...imported.config,
 						...(type === "music"
 							? {
+									items: Object.fromEntries(
+										Object.entries(imported.config.items).map(([id, item]) => [
+											id,
+											{
+												...item,
+												music: "stable-audio",
+											},
+										]),
+									),
 									music: {
 										playlist: [
 											"stable-audio",
@@ -212,6 +221,9 @@ describe("filesystem audio metadata", () => {
 					resourceId: "stable-audio",
 				}),
 			);
+			expect(
+				Object.values(deleted.config.items).every((item) => item.music === undefined),
+			).toBe(true);
 			expect(deleted.resources.some(({ id }) => id === "stable-audio")).toBe(false);
 			for (const extension of [
 				"ogg",

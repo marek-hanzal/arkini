@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { act, createElement, type ReactNode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -56,6 +57,11 @@ vi.mock("~/game-menu/ui/GameMenu", () => ({
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const game = {
+	committedTransitionAtom: Atom.make({
+		runtime: {
+			items: [],
+		},
+	}),
 	config: {
 		items: {},
 	},
@@ -117,6 +123,7 @@ const renderShell = async () => {
 				{
 					value: {
 						playSfxEventFn: vi.fn(),
+						requestDetailMusicFn: vi.fn(),
 					},
 				},
 				createElement(

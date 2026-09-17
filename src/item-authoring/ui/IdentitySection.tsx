@@ -7,6 +7,8 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 
+import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection";
+
 const scopeOptions = [
 	{
 		label: "Any",
@@ -34,7 +36,7 @@ export const IdentitySection = () => {
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormSectionDivider title={translator.textFn("Item details")} />
 			<div className="grid grid-cols-2 items-stretch gap-4">
-				<div className="grid auto-rows-fr gap-4">
+				<div className="grid content-start gap-4">
 					<div className="grid min-w-0 grid-cols-2 items-start gap-3">
 						<form.AppField name="title">
 							{(field) => (
@@ -118,6 +120,15 @@ export const IdentitySection = () => {
 							)}
 						</form.AppField>
 					</div>
+					<form.AppField name="music">
+						{(field) => (
+							<EditorMusicSelection
+								resourceId={field.state.value}
+								onChangeFn={field.handleChange}
+								error={readEditorFieldErrorFn(field.state.meta.errors)}
+							/>
+						)}
+					</form.AppField>
 				</div>
 				<form.AppField name="description">
 					{(field) => (

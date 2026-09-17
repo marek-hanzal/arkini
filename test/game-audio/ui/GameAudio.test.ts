@@ -72,12 +72,14 @@ const createAudioHarness = ({
 	const unlock = vi.fn();
 	const play = vi.fn();
 	const setSound = vi.fn();
+	const requestDetailMusic = vi.fn();
 	const close = vi.fn();
 	const audio = {
 		prepareFx: prepareFx ?? Effect.sync(() => prepare()),
 		unlockFx: unlockFx ?? Effect.sync(() => unlock()),
 		playFx: playFx ?? ((cues) => Effect.sync(() => play(cues))),
 		playMusicFx: () => Effect.void,
+		requestDetailMusicFx: (resourceId) => Effect.sync(() => requestDetailMusic(resourceId)),
 		setSoundFx: (sound) => Effect.sync(() => setSound(sound)),
 		closeFx: closeFx ?? Effect.sync(() => close()),
 	} satisfies createGameAudioRuntimeFx.Result;
@@ -87,6 +89,7 @@ const createAudioHarness = ({
 		play,
 		prepare,
 		setSound,
+		requestDetailMusic,
 		audio,
 		unlock,
 	};
@@ -238,6 +241,32 @@ describe("GameAudio", () => {
 				},
 			]),
 		);
+	});
+
+	it("routes detail music changes and ignores the stale control after unmount", async () => {
+		const harness = createAudioHarness();
+		createGameAudioRuntimeFxMock.mockImplementation(() => Effect.succeed(harness.audio));
+		let control: GameAudioControl | undefined;
+		const { root } = await renderAudio({
+			children: createElement(AudioControlProbe, {
+				onControlFn: (next) => {
+					control = next;
+				},
+			}),
+		});
+		if (control === undefined) throw new Error("Missing Game audio control.");
+		control.requestDetailMusicFn("b");
+		await vi.waitFor(() => expect(harness.requestDetailMusic).toHaveBeenLastCalledWith("b"));
+		control.requestDetailMusicFn("c");
+		await vi.waitFor(() => expect(harness.requestDetailMusic).toHaveBeenLastCalledWith("c"));
+		control.requestDetailMusicFn(undefined);
+		await vi.waitFor(() =>
+			expect(harness.requestDetailMusic).toHaveBeenLastCalledWith(undefined),
+		);
+		await act(async () => root.unmount());
+		roots.splice(roots.indexOf(root), 1);
+		control.requestDetailMusicFn("stale");
+		expect(harness.requestDetailMusic).toHaveBeenCalledTimes(3);
 	});
 
 	it("does not lose synchronously settling unlocks or ordered event batches", async () => {

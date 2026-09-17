@@ -16,7 +16,7 @@ export namespace readGameResourceUsagesFn {
 		  }
 		| {
 				readonly resourceId: string;
-				readonly resourceType: "artwork";
+				readonly resourceType: "artwork" | "music";
 				readonly owner: "item";
 				readonly ownerId: string;
 				readonly ownerUid: string;
@@ -114,6 +114,22 @@ export const readGameResourceUsagesFn = (
 	for (const [itemId, item] of Object.entries(config.items).sort(([left], [right]) =>
 		Order.String(left, right),
 	)) {
+		if (item.music !== undefined) {
+			usages.push({
+				resourceId: item.music,
+				resourceType: "music",
+				owner: "item",
+				ownerId: itemId,
+				ownerUid: item.uid,
+				ownerLabel: item.title,
+				roleLabel: "Item detail music",
+				path: [
+					"items",
+					itemId,
+					"music",
+				],
+			});
+		}
 		item.artwork.default.forEach((resourceId, index) => {
 			usages.push({
 				resourceId,

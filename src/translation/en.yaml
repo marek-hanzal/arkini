@@ -418,6 +418,8 @@ Choose a valid value.:
   dynamic: true
 Choose an existing .arkpack file:
   value: Create a project from an .arkpack file
+Clear:
+  value: Clear
 Clear interval:
   value: Clear interval
 Clear lifetime:
@@ -833,6 +835,8 @@ General:
   value: General
 General PNG images keep their original dimensions.:
   value: General PNG images keep their original dimensions.
+Global playlist:
+  value: Global playlist
 Guaranteed:
   value: Guaranteed
 Guaranteed roll type help:
@@ -1025,6 +1029,15 @@ Item depleted:
   dynamic: true
 Item detail is unavailable.:
   value: Item detail is unavailable.
+Item detail music help:
+  value: |
+    Choose music to set the mood while the player explores this item's detail. Use **Play** to listen before choosing.
+
+    The music fades in gently and keeps playing while the detail is open. Each repeat starts somewhere different in the track, so it doesn't always sound the same.
+
+    When the player closes the detail, the previous music picks up where it left off. Opening another item switches to that item's music, or returns to the regular playlist if none is set.
+
+    Leave **Music** empty to keep the regular playlist playing.
 Item details:
   value: Item details
 Item disappeared:

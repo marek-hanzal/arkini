@@ -36,9 +36,7 @@ export const ItemLineSummary = ({
 							data-ui="TileLineRuntime"
 						>
 							{" · "}
-							{formatDurationFn(
-								line.activeJob?.remainingMs ?? line.effectiveRuntimeMs,
-							)}
+							{durationMs === 0 ? "0 s" : formatDurationFn(durationMs)}
 						</span>
 					)}
 				</h3>

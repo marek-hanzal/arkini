@@ -130,11 +130,6 @@ Authored Clock lifetime summary help:
 Authored Clock loose-kill summary help:
   value: |
     **Wait for output** lets started jobs finish before the expired item disappears. If output has nowhere to go, the item waits too.
-Authored Clock rules summary help:
-  value: |
-    These rules pause or resume the Clock.
-
-    Every **Enable** rule must pass. Any matching **Disable** rule pauses it.
 Authored Clock status summary help:
   value: |
     The Clock's starting state.
@@ -163,11 +158,6 @@ Authored Units summary help:
     Units are a spendable supply inside each item.
 
     A stack of several items has several separate Unit supplies.
-Authored action rules summary help:
-  value: |
-    These rules run before the action pays its costs.
-
-    Every **Enable** rule must pass. Any matching **Disable** rule blocks the action.
 Authored action summary help:
   value: |
     Runs when the player uses this item.
@@ -178,11 +168,6 @@ Authored artwork summary help:
     Combines a base image and optional overlay at one shared scale.
 
     Artwork changes only appearance, never placement or gameplay.
-Authored drop rules summary help:
-  value: |
-    These rules apply only to this drop.
-
-    A blocked drop does not cancel the other drops in the same roll.
 Authored merge output summary help:
   value: |
     Extra output created after both sides of the merge are updated.
@@ -257,11 +242,6 @@ Authored production output summary help:
     Runs when this production line finishes.
 
     One set is picked by weight, then every roll inside that set runs independently.
-Authored production rules summary help:
-  value: |
-    Rules control whether players see the line, whether it can start, and how long it takes.
-
-    Every **Enable** must pass. **Hide** and **Disable** win when they match.
 Authored production runtime summary help:
   value: |
     How long one run normally takes.
@@ -277,8 +257,6 @@ Authored queue capacity summary help:
     Maximum work accepted across all lines on this item.
 
     The active job counts too.
-Authored weighted candidate rules summary help:
-  value: Candidate rules are evaluated before this option enters the weighted selection pool.
 Authtoken:
   value: Authtoken
 Automatic only:

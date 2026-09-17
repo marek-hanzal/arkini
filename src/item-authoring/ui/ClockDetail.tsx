@@ -85,10 +85,7 @@ export const ClockDetail = ({
 						value={translator.textFn(clock.enable ? "Enabled" : "Disabled")}
 					/>
 				</DetailFacts>
-				<RulesDetail
-					rules={clock.rules}
-					description={<Mx label="Authored Clock rules summary help" />}
-				/>
+				<RulesDetail rules={clock.rules} />
 			</EditorRootCard>
 			{clock.durationMs === undefined ? null : (
 				<EditorRootCard dataUi="EditorClockExpiryOutputCard">

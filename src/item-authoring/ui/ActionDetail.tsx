@@ -69,10 +69,7 @@ export const ActionDetail = ({
 				input={action.input}
 				title={translator.textFn("Requirements")}
 			/>
-			<RulesDetail
-				rules={action.rules}
-				description={<Mx label="Authored action rules summary help" />}
-			/>
+			<RulesDetail rules={action.rules} />
 		</EditorRootCard>
 	);
 };

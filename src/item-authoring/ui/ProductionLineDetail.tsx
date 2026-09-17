@@ -121,10 +121,7 @@ export const ProductionLineDetail = ({
 					output={line.output}
 				/>
 			</div>
-			<RulesDetail
-				rules={line.rules}
-				description={<Mx label="Authored production rules summary help" />}
-			/>
+			<RulesDetail rules={line.rules} />
 		</EditorRootCard>
 	);
 };

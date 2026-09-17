@@ -1,16 +1,81 @@
 import { match } from "ts-pattern";
 import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
 import { Tx } from "~/translation/ui/Tx";
-import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import type { ReactNode } from "react";
 
-const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => {
+const RuleLabel = ({ rule }: { readonly rule: RuleSchema.Type }) => (
+	<span className="mb-1 flex items-center gap-1 text-sm font-semibold text-accent">
+		{match(rule)
+			.with(
+				{
+					type: "enable",
+				},
+				() => <Tx label="Enable" />,
+			)
+			.with(
+				{
+					type: "disable",
+				},
+				() => <Tx label="Disable" />,
+			)
+			.with(
+				{
+					type: "show",
+				},
+				() => <Tx label="Show" />,
+			)
+			.with(
+				{
+					type: "hide",
+				},
+				() => <Tx label="Hide" />,
+			)
+			.with(
+				{
+					type: "runtime:multiplier",
+				},
+				(value) => (
+					<>
+						<Tx label="Runtime multiplier" /> × {value.multiplier}
+					</>
+				),
+			)
+			.with(
+				{
+					type: "runtime:adjust",
+				},
+				(value) => (
+					<>
+						<Tx label="Runtime adjustment" /> · {value.adjustMs < 0 ? "−" : "+"}
+						{formatDurationFn(Math.abs(value.adjustMs))}
+					</>
+				),
+			)
+			.exhaustive()}
+		{rule.hint === undefined ? null : (
+			<EditorInfoTooltip
+				content={
+					<>
+						<Tx label="Player hint" />: {rule.hint}
+					</>
+				}
+			/>
+		)}
+	</span>
+);
+
+const WhenDetail = ({
+	when,
+	eyebrow,
+}: {
+	readonly when: WhenSchema.Type;
+	readonly eyebrow: ReactNode;
+}) => {
 	const heading = match(when)
 		.with(
 			{
@@ -48,17 +113,17 @@ const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => {
 	return (
 		<li className="grid gap-1">
 			{when.type === "limit" ? (
-				<>
-					<p className="font-medium">{heading}</p>
-					<SelectorDetail
-						selector={{
-							type: "item",
-							itemId: when.itemId,
-						}}
-					/>
-				</>
+				<SelectorDetail
+					eyebrow={eyebrow}
+					description={heading}
+					selector={{
+						type: "item",
+						itemId: when.itemId,
+					}}
+				/>
 			) : (
 				<QueryDetail
+					eyebrow={eyebrow}
 					query={when.query}
 					heading={heading}
 				/>
@@ -68,33 +133,12 @@ const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => {
 };
 
 /** Shows authored conditions directly for line, action, clock, and selected-drop rules. */
-export const RulesDetail = ({
-	rules,
-	description,
-	nested = false,
-}: {
-	readonly rules: readonly RuleSchema.Type[];
-	readonly description: ReactNode;
-	readonly nested?: boolean;
-}) => {
-	const translator = useTranslator();
+export const RulesDetail = ({ rules }: { readonly rules: readonly RuleSchema.Type[] }) => {
 	return (
 		<section
 			className="grid gap-3"
 			data-ui="EditorRulesDetail"
 		>
-			{nested ? (
-				<div className="flex items-center gap-1 text-xs font-medium text-muted">
-					<Tx label="Rules" />
-					<EditorInfoTooltip content={description} />
-				</div>
-			) : (
-				<EditorFormSectionDivider
-					title={translator.textFn("Rules")}
-					description={description}
-					variant="secondary"
-				/>
-			)}
 			{rules.length === 0 ? (
 				<p className="text-sm text-muted">
 					<Tx label="No rules" />
@@ -106,71 +150,12 @@ export const RulesDetail = ({
 							className="grid gap-2 py-3 first:pt-0 last:pb-0"
 							key={`${rule.type}-${index}`}
 						>
-							<div className="flex items-center gap-1 font-semibold text-accent">
-								{match(rule)
-									.with(
-										{
-											type: "enable",
-										},
-										() => <Tx label="Enable" />,
-									)
-									.with(
-										{
-											type: "disable",
-										},
-										() => <Tx label="Disable" />,
-									)
-									.with(
-										{
-											type: "show",
-										},
-										() => <Tx label="Show" />,
-									)
-									.with(
-										{
-											type: "hide",
-										},
-										() => <Tx label="Hide" />,
-									)
-									.with(
-										{
-											type: "runtime:multiplier",
-										},
-										(value) => (
-											<>
-												<Tx label="Runtime multiplier" /> ×{" "}
-												{value.multiplier}
-											</>
-										),
-									)
-									.with(
-										{
-											type: "runtime:adjust",
-										},
-										(value) => (
-											<>
-												<Tx label="Runtime adjustment" /> ·{" "}
-												{value.adjustMs < 0 ? "−" : "+"}
-												{formatDurationFn(Math.abs(value.adjustMs))}
-											</>
-										),
-									)
-									.exhaustive()}
-								{rule.hint === undefined ? null : (
-									<EditorInfoTooltip
-										content={
-											<>
-												<Tx label="Player hint" />: {rule.hint}
-											</>
-										}
-									/>
-								)}
-							</div>
 							<ul className="grid gap-3 border-l-2 border-accent pl-24 text-muted">
 								{rule.when.map((when, whenIndex) => (
 									<WhenDetail
 										key={`${when.type}-${whenIndex}`}
 										when={when}
+										eyebrow={<RuleLabel rule={rule} />}
 									/>
 								))}
 							</ul>

@@ -10,12 +10,14 @@ import { Tx } from "~/translation/ui/Tx";
 export const DetailReference = ({
 	itemId,
 	description,
+	eyebrow,
 	search = {},
 	sectionId = "identity",
 	stretched = false,
 }: {
 	readonly itemId: string;
 	readonly description?: ReactNode;
+	readonly eyebrow?: ReactNode;
 	readonly search?: {
 		readonly filter?: ItemConnectionFilter;
 	};
@@ -27,6 +29,7 @@ export const DetailReference = ({
 	if (item === undefined)
 		return (
 			<span className="min-w-0 break-all font-mono text-sm font-medium text-muted">
+				{eyebrow}
 				{itemId} <Tx label="Missing item marker" />
 			</span>
 		);
@@ -48,6 +51,7 @@ export const DetailReference = ({
 				size="sm"
 			/>
 			<span className="min-w-0">
+				{eyebrow}
 				<span className="block truncate font-medium text-foreground transition-colors group-hover:text-accent">
 					{item.title}
 				</span>

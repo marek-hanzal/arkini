@@ -6,12 +6,15 @@ import { DetailReference } from "~/item-authoring/ui/DetailReference";
 export const SelectorDetail = ({
 	selector,
 	description,
+	eyebrow,
 }: {
 	readonly selector: SelectorSchema.Type;
 	readonly description?: ReactNode;
+	readonly eyebrow?: ReactNode;
 }) => (
 	<DetailReference
 		itemId={selector.itemId}
+		eyebrow={eyebrow}
 		description={description}
 	/>
 );

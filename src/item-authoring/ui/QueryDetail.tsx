@@ -15,13 +15,16 @@ export const QueryDetail = ({
 	query,
 	heading,
 	description,
+	eyebrow,
 }: {
 	readonly query: QuerySchema.Type;
 	readonly heading?: ReactNode;
 	readonly description?: ReactNode;
+	readonly eyebrow?: ReactNode;
 }) => (
 	<SelectorDetail
 		selector={query.selector}
+		eyebrow={eyebrow}
 		description={
 			<>
 				{description}

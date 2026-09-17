@@ -625,6 +625,7 @@ export const createGame = ({ subscribeError }: { readonly subscribeError?: Error
 export const mountScene = async ({
 	game = createGame(),
 	onActivate = vi.fn(),
+	onRejectedDrop = vi.fn(),
 	onDrop = vi.fn((command: unknown) => {
 		sceneState.drop(command);
 		return Promise.resolve({
@@ -633,6 +634,7 @@ export const mountScene = async ({
 	}),
 }: {
 	readonly game?: GameEngine;
+	readonly onRejectedDrop?: () => void;
 	readonly onActivate?: CreateInventoryRuntimeProps["onActivateFn"];
 	readonly onDrop?: CreateInventoryRuntimeProps["onDropFn"];
 } = {}) => {
@@ -645,6 +647,7 @@ export const mountScene = async ({
 			host,
 			onActivateFn: onActivate,
 			onDropFn: onDrop,
+			onRejectedDropFn: onRejectedDrop,
 			textures: {} as never,
 		}),
 	);

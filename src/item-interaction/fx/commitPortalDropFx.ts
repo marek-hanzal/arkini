@@ -1,3 +1,5 @@
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Array, Data, Effect, Option, pipe } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -206,6 +208,17 @@ export const commitPortalDropFx = Effect.fn("commitPortalDropFx")(function* ({
 						candidate.id === sourceItemId ? item : candidate,
 					),
 				} satisfies RuntimeSchema.Type,
+				[
+					{
+						type: GameEventEnumSchema.enum.ItemPortalTransferred,
+						itemId: item.id,
+						canonicalItemId: item.item.id,
+						portalItemId: target.id,
+						previousLocation: source.location,
+						location: item.location,
+						quantity: item.quantity,
+					} satisfies GameEventSchema.Type,
+				],
 			] as const;
 		}),
 	).pipe(

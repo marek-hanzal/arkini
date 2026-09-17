@@ -41,6 +41,16 @@ const boardState = vi.hoisted(() => ({
 	unregisterInteraction: vi.fn(),
 }));
 
+vi.mock("~/game-audio/ui/useGameAudioControl", () => {
+	const control = {
+		playSfxEventFn: vi.fn(),
+		requestDetailMusicFn: vi.fn(),
+	};
+	return {
+		useGameAudioControl: () => control,
+	};
+});
+
 vi.mock("@effect/atom-react", () => ({
 	useAtom: () => [
 		boardState.enqueueLineState,

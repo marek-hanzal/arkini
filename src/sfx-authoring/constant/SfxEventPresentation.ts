@@ -5,6 +5,24 @@ import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 /** User-facing descriptions for every exact Game interaction assignable to SFX. */
 export const SfxEventPresentation = [
 	{
+		event: GameEventEnumSchema.enum.ItemSwapped,
+		group: "Item",
+		label: "Items swapped",
+		description: "When two items swap places.",
+	},
+	{
+		event: PresentationSfxEventEnumSchema.enum.ItemDropRejected,
+		group: "Item",
+		label: "Item drop rejected",
+		description: "When an item cannot be dropped there, including into a portal or inventory.",
+	},
+	{
+		event: GameEventEnumSchema.enum.ItemPortalTransferred,
+		group: "Item",
+		label: "Item sent through portal",
+		description: "When an item is successfully dropped through a portal.",
+	},
+	{
 		event: PresentationSfxEventEnumSchema.enum.ItemDetailOpened,
 		group: "Item",
 		label: "Item detail opened",

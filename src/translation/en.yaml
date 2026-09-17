@@ -1051,6 +1051,9 @@ Item draft status help:
     **Draft** marks work in progress for you and other authors.
 
     The item still validates, runs in the game and appears in builds.
+Item drop rejected:
+  value: Item drop rejected
+  dynamic: true
 Item estimate help:
   value: |
     Estimate answers: **roughly what does the game need to obtain this item?**
@@ -1149,6 +1152,9 @@ Item section copy help:
     - Artwork, Merges and Units replace their complete section.
 
     Lists are replaced, never combined. **Save** keeps the copy; **Discard** restores the destination item.
+Item sent through portal:
+  value: Item sent through portal
+  dynamic: true
 Item spawned:
   value: Item spawned
   dynamic: true
@@ -1193,6 +1199,9 @@ Items merged:
   dynamic: true
 Items stacked:
   value: Items stacked
+  dynamic: true
+Items swapped:
+  value: Items swapped
   dynamic: true
 Job:
   value: Job
@@ -2330,11 +2339,17 @@ When an existing item is placed in a new location.:
 When an item cannot be delivered and is discarded.:
   value: When an item cannot be delivered and is discarded.
   dynamic: true
+When an item cannot be dropped there, including into a portal or inventory.:
+  value: When an item cannot be dropped there, including into a portal or inventory.
+  dynamic: true
 When an item disappears without creating a replacement.:
   value: When an item disappears without creating a replacement.
   dynamic: true
 When an item is placed into a production input.:
   value: When an item is placed into a production input.
+  dynamic: true
+When an item is successfully dropped through a portal.:
+  value: When an item is successfully dropped through a portal.
   dynamic: true
 When an item reaches its depleted state.:
   value: When an item reaches its depleted state.
@@ -2359,6 +2374,9 @@ When production consumes an input.:
   dynamic: true
 When the player switches to another Board space.:
   value: When the player switches to another Board space.
+  dynamic: true
+When two items swap places.:
+  value: When two items swap places.
   dynamic: true
 Width:
   value: Width

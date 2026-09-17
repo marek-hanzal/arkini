@@ -23,6 +23,8 @@ const cuePriority: Record<GameEventEnumSchema.Type, number> = {
 	[GameEventEnumSchema.enum.ItemExpired]: 3,
 	[GameEventEnumSchema.enum.ItemSpawned]: 2,
 	[GameEventEnumSchema.enum.ItemPlaced]: 2,
+	[GameEventEnumSchema.enum.ItemSwapped]: 2,
+	[GameEventEnumSchema.enum.ItemPortalTransferred]: 2,
 	[GameEventEnumSchema.enum.ItemStacked]: 2,
 	[GameEventEnumSchema.enum.ItemSplit]: 2,
 	[GameEventEnumSchema.enum.ItemConsumed]: 2,
@@ -116,6 +118,16 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue =>
 		)
 		.with(
 			{
+				type: GameEventEnumSchema.enum.ItemPortalTransferred,
+			},
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.ItemPortalTransferred,
+					strengthForQuantityFn(event.quantity),
+				),
+		)
+		.with(
+			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 			},
 			(event) =>
@@ -190,6 +202,12 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue =>
 					GameEventEnumSchema.enum.ItemDisappeared,
 					strengthForQuantityFn(event.quantity),
 				),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.ItemSwapped,
+			},
+			() => cueFn(GameEventEnumSchema.enum.ItemSwapped, 1),
 		)
 		.exhaustive();
 

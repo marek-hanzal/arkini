@@ -36,6 +36,7 @@ interface CreateInventoryRuntimeProps {
 		openDetail: boolean,
 		origin: HTMLElement,
 	) => void | PromiseLike<unknown>;
+	readonly onRejectedDropFn?: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly textures: TextureStore;
 }
@@ -52,6 +53,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 	host,
 	onActivateFn,
 	onDropFn,
+	onRejectedDropFn,
 	textures,
 }: CreateInventoryRuntimeProps) {
 	const reportCriticalFailureFn = (cause: unknown) =>
@@ -146,6 +148,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 			onActivateFn,
 			onAcceptedDropFx: Effect.sync(() => replayCurrentTransitionFn()),
 			onDropFn,
+			onRejectedDropFn,
 			surface: createdSurface,
 		});
 		drag = createdDrag;

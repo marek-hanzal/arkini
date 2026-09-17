@@ -1,3 +1,4 @@
+import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
@@ -226,10 +227,28 @@ describe("dropItemFx / move storage and swap", () => {
 				return {
 					outcome,
 					runtime: yield* readRuntimeFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
 				};
 			}),
 		);
 
+		expect(result.transition.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemSwapped,
+				sourceItemId: "runtime:water",
+				sourceCanonicalItemId: "water",
+				targetItemId: "runtime:stone",
+				targetCanonicalItemId: "stone",
+				sourceLocation,
+				targetLocation: occupiedLocation,
+			},
+		]);
+		expect(readGameAudioCuesFn(result.transition)).toEqual([
+			{
+				event: GameEventEnumSchema.enum.ItemSwapped,
+				strength: 1,
+			},
+		]);
 		expect(result.outcome).toMatchObject({
 			kind: DropItemResultKind.Swap,
 			source: {

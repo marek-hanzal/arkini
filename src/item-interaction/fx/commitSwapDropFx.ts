@@ -1,5 +1,8 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -159,6 +162,17 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 						return candidate;
 					}),
 				} satisfies RuntimeSchema.Type,
+				[
+					{
+						type: GameEventEnumSchema.enum.ItemSwapped,
+						sourceItemId: first.id,
+						sourceCanonicalItemId: first.item.id,
+						targetItemId: second.id,
+						targetCanonicalItemId: second.item.id,
+						sourceLocation: first.location,
+						targetLocation: second.location,
+					} satisfies GameEventSchema.Type,
+				],
 			] as const;
 		}),
 	);

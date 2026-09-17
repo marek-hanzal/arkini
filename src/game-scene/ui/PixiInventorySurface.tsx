@@ -1,3 +1,5 @@
+import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
+import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 import { useCallback, useRef } from "react";
 
 import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
@@ -18,6 +20,13 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
  */
 export const PixiInventorySurface = () => {
 	const game = useGameEngine();
+	const { playSfxEventFn } = useGameAudioControl();
+	const onRejectedDropFn = useCallback(
+		() => playSfxEventFn(PresentationSfxEventEnumSchema.enum.ItemDropRejected),
+		[
+			playSfxEventFn,
+		],
+	);
 	const { releaseInventoryItemFn, runDropFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
@@ -63,12 +72,14 @@ export const PixiInventorySurface = () => {
 				host,
 				onActivateFn: activateFn,
 				onDropFn: runDropFn,
+				onRejectedDropFn,
 				textures,
 			}),
 		[
 			activateFn,
 			game,
 			runDropFn,
+			onRejectedDropFn,
 			textures,
 		],
 	);

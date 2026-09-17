@@ -1,3 +1,6 @@
+import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
+import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
+import { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -132,7 +135,9 @@ describe("dropItemFx / portal direction", () => {
 					sourceId: source.id,
 					targetId: portal.id,
 				});
+				const store = yield* RuntimeStoreFx;
 				return {
+					transition: yield* store.read,
 					outcome,
 					runtime: yield* readRuntimeFx(),
 					portal,
@@ -148,6 +153,29 @@ describe("dropItemFx / portal direction", () => {
 			previousLocation: board(0, 0, 0),
 			location: board(0, 0, 7),
 		});
+		expect(result.transition.events).toEqual([
+			{
+				type: "item:portal-transferred",
+				itemId: result.source.id,
+				canonicalItemId: "water",
+				portalItemId: result.portal.id,
+				previousLocation: board(0, 0, 0),
+				location: board(0, 0, 7),
+				quantity: 2,
+			},
+		]);
+		expect(GameEventSchema.safeParse(result.transition.events[0]).success).toBe(true);
+		expect(
+			readGameAudioCuesFn({
+				events: result.transition.events,
+			}),
+		).toEqual([
+			{
+				event: "item:portal-transferred",
+				strength: 2,
+			},
+		]);
+
 		expect(result.runtime.currentSpace).toBe(0);
 		expect(result.runtime.items).toHaveLength(2);
 		expect(result.runtime.items.find((item) => item.id === result.source.id)).toMatchObject({
@@ -279,12 +307,16 @@ describe("dropItemFx / portal direction", () => {
 					}
 				}
 				const before = yield* readRuntimeFx();
+				const store = yield* RuntimeStoreFx;
+				const beforeTransition = yield* store.read;
 				const outcome = yield* dropOntoFx({
 					sourceId: source.id,
 					targetId: portal.id,
 				});
 				return {
 					before,
+					beforeTransition,
+					afterTransition: yield* store.read,
 					outcome,
 					runtime: yield* readRuntimeFx(),
 				};
@@ -299,6 +331,7 @@ describe("dropItemFx / portal direction", () => {
 			targetItemId: "runtime:portal",
 		});
 		expect(result.runtime).toEqual(result.before);
+		expect(result.afterTransition).toBe(result.beforeTransition);
 	});
 
 	it("rejects an item whose authored scope cannot enter a Board", () => {

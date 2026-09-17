@@ -146,6 +146,34 @@ const itemSpawnedEventSchema = z
 	})
 	.strict();
 
+const itemPortalTransferredEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"ItemPortalTransferred",
+		]),
+		itemId: IdSchema,
+		canonicalItemId: IdSchema,
+		portalItemId: IdSchema,
+		previousLocation: GridLocationSchema,
+		location: GridLocationSchema,
+		quantity: PositiveIntegerSchema,
+	})
+	.strict();
+
+const itemSwappedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"ItemSwapped",
+		]),
+		sourceItemId: IdSchema,
+		sourceCanonicalItemId: IdSchema,
+		targetItemId: IdSchema,
+		targetCanonicalItemId: IdSchema,
+		sourceLocation: GridLocationSchema,
+		targetLocation: GridLocationSchema,
+	})
+	.strict();
+
 const itemPlacedEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
@@ -296,6 +324,8 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	itemExpiredEventSchema,
 	itemSpawnedEventSchema,
 	itemPlacedEventSchema,
+	itemSwappedEventSchema,
+	itemPortalTransferredEventSchema,
 	itemStackedEventSchema,
 	itemSplitEventSchema,
 	itemConsumedEventSchema,

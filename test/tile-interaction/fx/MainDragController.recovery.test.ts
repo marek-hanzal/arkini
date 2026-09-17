@@ -76,6 +76,7 @@ describe("main drag controller: recovery", () => {
 		await flushMicrotasks();
 
 		expect(mounted.onSettledDrop).not.toHaveBeenCalled();
+		expect(mounted.onRejectedDrop).not.toHaveBeenCalled();
 		expect(
 			mounted.animations.some(
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
@@ -132,6 +133,7 @@ describe("main drag controller: recovery", () => {
 		} as never);
 		mounted.stage.emit("pointerup", pointer(45, 20));
 		await flushMicrotasks();
+		expect(mounted.onRejectedDrop).toHaveBeenCalledOnce();
 
 		const settleAnimation = mounted.animations.at(-1);
 		if (settleAnimation === undefined) throw new Error("Expected a settle animation.");

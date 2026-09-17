@@ -40,6 +40,7 @@ interface CreateMainRuntimeProps {
 		intent: MainActivationIntent,
 		origin: HTMLElement,
 	) => void | PromiseLike<void>;
+	readonly onRejectedDropFn?: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly textures: TextureStore;
 }
@@ -57,6 +58,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 	host,
 	onActivateFn,
 	onDropFn,
+	onRejectedDropFn,
 	textures,
 }: CreateMainRuntimeProps) {
 	const reportCriticalFailureFn = (cause: unknown) =>
@@ -152,6 +154,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			motion,
 			onSettledDropFn: () => replayCurrentTransitionFn(),
 			onDropFn,
+			onRejectedDropFn,
 			surface,
 		});
 		registerRollbackFn(dropSubmission.closeFx);

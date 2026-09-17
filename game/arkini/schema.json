@@ -217,7 +217,9 @@
 				"item:merged",
 				"item:expired",
 				"item:spawned",
+				"item:portal-transferred",
 				"item:placed",
+				"item:swapped",
 				"item:stacked",
 				"item:split",
 				"item:consumed",
@@ -225,6 +227,7 @@
 				"item:unit-spent",
 				"item:depleted",
 				"item:disappeared",
+				"item-drop:rejected",
 				"item-detail:opened",
 				"item-detail:closed"
 			],

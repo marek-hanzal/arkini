@@ -60,6 +60,16 @@ const game = {
 	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
 } as GameEngine;
 
+vi.mock("~/game-audio/ui/useGameAudioControl", () => {
+	const control = {
+		playSfxEventFn: vi.fn(),
+		requestDetailMusicFn: vi.fn(),
+	};
+	return {
+		useGameAudioControl: () => control,
+	};
+});
+
 vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));

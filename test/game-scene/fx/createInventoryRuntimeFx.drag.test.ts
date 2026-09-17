@@ -17,6 +17,28 @@ import {
 import type { FakeContainer } from "./createInventoryRuntimeFx.test/fixture";
 
 describe("Inventory runtime / drag authority", () => {
+	it.each([
+		"reject",
+		"ignored",
+		"move",
+	] as const)("plays rejection feedback only for rejected inventory drops: %s", async (kind) => {
+		const onRejectedDrop = vi.fn();
+		const { actor, runtime, stage } = await mountScene({
+			onRejectedDrop,
+			onDrop: vi.fn(
+				async () =>
+					({
+						kind,
+					}) as never,
+			),
+		});
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
+		await flushMicrotasks();
+		expect(onRejectedDrop).toHaveBeenCalledTimes(kind === "reject" ? 1 : 0);
+		await Effect.runPromise(runtime.closeFx);
+	});
 	it("keeps the drag threshold in screen pixels and releases into world slots after zoom and pan", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		stage.scale.set(0.137);

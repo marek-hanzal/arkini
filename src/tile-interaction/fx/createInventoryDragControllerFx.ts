@@ -50,6 +50,7 @@ interface Props {
 		origin: HTMLElement,
 	) => void | PromiseLike<unknown>;
 	readonly onAcceptedDropFx: Effect.Effect<void, never, never>;
+	readonly onRejectedDropFn?: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly surface: InventoryInteractionSurface;
 }
@@ -101,6 +102,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 		onActivateFn,
 		onAcceptedDropFx,
 		onDropFn,
+		onRejectedDropFn,
 		surface,
 	}: Props) {
 		const removalFeedbackGenerationByActorId = new Map<string, number>();
@@ -420,6 +422,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					if (result === null || closed || activeDrag !== drag) return;
 					activeDrag = null;
 					try {
+						if (result.kind === DropItemResultKind.Reject) onRejectedDropFn?.();
 						const current = RendererRuntime.runSync(
 							actorStore.readActorFx(drag.sourceItem.id),
 						);

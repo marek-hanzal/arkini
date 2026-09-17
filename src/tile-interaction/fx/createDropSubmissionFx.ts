@@ -49,6 +49,7 @@ interface Props {
 	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
 	readonly onSettledDropFn: () => void;
+	readonly onRejectedDropFn?: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly surface: MainInteractionSurface;
 }
@@ -200,6 +201,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	motion,
 	onSettledDropFn,
 	onDropFn,
+	onRejectedDropFn,
 	surface,
 }: Props) {
 	let closed = false;
@@ -294,6 +296,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 					const finalizeResultFn = (result: DropItemResult) => {
 						if (finalized || closed) return;
 						try {
+							if (result.kind === DropItemResultKind.Reject) onRejectedDropFn?.();
 							if (!targetRedirected) {
 								const targetRedirect = readTargetRedirectFn(result);
 								if (targetRedirect !== null) {

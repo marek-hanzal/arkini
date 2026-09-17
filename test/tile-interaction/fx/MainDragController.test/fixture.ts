@@ -444,6 +444,7 @@ export const mountController = ({
 		renderDropFeedbackFx: () => Effect.void,
 		transientActorLayer,
 	} satisfies MainInteractionSurface;
+	const onRejectedDrop = vi.fn();
 	const dropSubmission = Effect.runSync(
 		createDropSubmissionFx({
 			actorStore,
@@ -455,6 +456,7 @@ export const mountController = ({
 			motion,
 			onSettledDropFn: onSettledDrop,
 			onDropFn: onDrop as never,
+			onRejectedDropFn: onRejectedDrop,
 			surface,
 		}),
 	);
@@ -539,6 +541,7 @@ export const mountController = ({
 		onActivate,
 		onSettledDrop,
 		onDrop,
+		onRejectedDrop,
 		presentationWrites,
 		releasePointerCapture,
 		reportCriticalFailureFn,

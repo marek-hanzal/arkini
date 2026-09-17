@@ -1,3 +1,5 @@
+import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
+import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 import { useAtom } from "@effect/atom-react";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useRef } from "react";
@@ -28,6 +30,13 @@ interface PixiBoardToolbarSurfaceProps {
 
 export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarSurfaceProps) => {
 	const game = useGameEngine();
+	const { playSfxEventFn } = useGameAudioControl();
+	const onRejectedDropFn = useCallback(
+		() => playSfxEventFn(PresentationSfxEventEnumSchema.enum.ItemDropRejected),
+		[
+			playSfxEventFn,
+		],
+	);
 	const { runItemActionFn, runDropFn, runSplitFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
@@ -148,12 +157,14 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 				host,
 				onActivateFn: activateFn,
 				onDropFn: runDropFn,
+				onRejectedDropFn,
 				textures,
 			}),
 		[
 			activateFn,
 			game,
 			runDropFn,
+			onRejectedDropFn,
 			textures,
 		],
 	);

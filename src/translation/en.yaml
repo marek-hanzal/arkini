@@ -65,8 +65,6 @@ An unexpected error prevented the build. Try again.:
 Any local:
   value: Any local
   dynamic: true
-Approximate acquisition path:
-  value: Estimated route
 Artwork:
   value: Artwork
 Artwork Arkpack import summary:
@@ -2018,8 +2016,6 @@ Self-paid units input:
   value: Self-paid units input
 Set clock:
   value: Set clock
-Set default:
-  value: Set default
 Set rules:
   value: Set rules
 Settings:
@@ -2222,8 +2218,6 @@ Unsaved changes:
   value: Unsaved changes
 Unset clock:
   value: Unset clock
-Unset default:
-  value: Unset default
 Unused:
   value: Unused
 Update:

@@ -57,7 +57,9 @@ export const Detail = ({
 			: sectionId === "delete"
 				? translator.textFn("Delete item")
 				: translator.textFn(section?.label ?? "Item details");
-	const sectionHeading = <EditorFormSectionDivider title={sectionTitle} />;
+	// Estimate owns its heading because its live summary and sort controls share that row.
+	const sectionHeading =
+		sectionId === "estimate" ? null : <EditorFormSectionDivider title={sectionTitle} />;
 	return (
 		<EditorSectionPage
 			contentClassName="mx-auto w-3/4"

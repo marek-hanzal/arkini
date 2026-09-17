@@ -1,15 +1,23 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { TriangleAlert, Unlink } from "lucide-react";
+import { useState } from "react";
 
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemEstimate, ItemEstimateDiagnostic } from "~/estimate/type/ItemEstimate";
 import { formatItemEstimateResultFn } from "~/estimate/ui/formatItemEstimateResultFn";
-import { ItemEstimateRouteGraph } from "~/estimate/ui/ItemEstimateRouteGraph";
+import {
+	ItemEstimateRouteGraph,
+	type ItemEstimateSort,
+} from "~/estimate/ui/ItemEstimateRouteGraph";
 import { ItemEstimateLoading } from "~/estimate/ui/ItemEstimateLoading";
 import { useItemEstimate } from "~/estimate/ui/useItemEstimate";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { SegmentedControl } from "~/ui/ui/SegmentedControl";
 import { Status } from "~/ui/ui/Status";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -62,33 +70,26 @@ const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic, textFn: (key: stri
 	}
 };
 
-const ItemEstimateHeading = () => (
-	<h2 className="text-lg font-semibold text-foreground">
-		<Tx label="Approximate acquisition path" />
-	</h2>
-);
-
 const ItemEstimateSummary = ({ estimate }: { readonly estimate: ItemEstimate }) => (
-	<div className="flex min-w-0 flex-1 items-center justify-between gap-4">
-		<ItemEstimateHeading />
-		<p className="shrink-0 font-semibold tabular-nums text-foreground">
-			{estimate.obtainable ? (
-				formatItemEstimateResultFn(estimate)
-			) : (
-				<Tx label={estimate.status === "partial" ? "Indeterminate" : "Unreachable"} />
-			)}
-		</p>
-	</div>
+	<p className="shrink-0 font-semibold tabular-nums text-foreground">
+		{estimate.obtainable ? (
+			formatItemEstimateResultFn(estimate)
+		) : (
+			<Tx label={estimate.status === "partial" ? "Indeterminate" : "Unreachable"} />
+		)}
+	</p>
 );
 
 const ItemEstimateResult = ({
 	config,
 	estimate,
 	limit,
+	sort,
 }: {
 	readonly config: GameConfigSchema.Type;
 	readonly estimate: ItemEstimate;
 	readonly limit?: number;
+	readonly sort: ItemEstimateSort;
 }) => {
 	const translator = useTranslator();
 	return estimate.status === "unreachable" ? (
@@ -114,17 +115,14 @@ const ItemEstimateResult = ({
 	) : estimate.obtainable ? (
 		<ItemEstimateRouteGraph
 			config={config}
-			header={<ItemEstimateSummary estimate={estimate} />}
-			routeSteps={estimate.routeSteps}
 			limit={limit}
+			routeSteps={estimate.routeSteps}
+			sort={sort}
 		/>
 	) : (
-		<EditorRootCard
-			className="gap-0"
-			dataUi="EditorItemEstimateHeader"
-		>
-			<ItemEstimateSummary estimate={estimate} />
-			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
+		<EditorRootCard dataUi="EditorItemEstimateDiagnostics">
+			{limit === undefined ? null : <ItemEstimateSummary estimate={estimate} />}
+			<div className="grid gap-3 text-sm leading-relaxed text-muted">
 				<Mx label="Estimate incomplete description" />
 				<ul className="grid gap-2">
 					{estimate.diagnostics.slice(0, limit).map((diagnostic, index) => (
@@ -147,7 +145,51 @@ export const ItemEstimateSection = ({
 	readonly previewItemUid?: string;
 }) => {
 	const project = useEditorProject();
+	const translator = useTranslator();
 	const state = useItemEstimate(project, itemId);
+	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
+	// Item Detail owns every letter in Time, including E for Edit; nested sorting uses Shift.
+	const sortOptions = [
+		{
+			label: translator.textFn("Time"),
+			value: "time",
+			shortcut: "t",
+			shift: true,
+		},
+		{
+			label: translator.textFn("Quantity"),
+			value: "quantity",
+			shortcut: "q",
+			shift: true,
+		},
+	] as const;
+	useEditorSectionShortcuts({
+		enabled: previewItemUid === undefined,
+		options: sortOptions,
+		onSelectFn: (option) => setSortFn(option.value),
+	});
+	const headerAction =
+		state.status === "ready" ? (
+			<div className="flex items-center gap-3">
+				<ItemEstimateSummary estimate={state.estimate} />
+				{state.estimate.obtainable ? (
+					<SegmentedControl
+						dataUi="EditorItemEstimateRouteSortOptions"
+						onChangeFn={setSortFn}
+						optionDataUi="EditorItemEstimateRouteSort"
+						options={sortOptions.map((option) => ({
+							...option,
+							description: `${option.label} · ${formatForDisplay({
+								key: option.shortcut,
+								shift: option.shift,
+							})}`,
+						}))}
+						size="compact"
+						value={sort}
+					/>
+				) : null}
+			</div>
+		) : undefined;
 	return (
 		<section
 			className="grid content-start gap-4 data-[ui-unreachable=true]:content-stretch"
@@ -159,11 +201,14 @@ export const ItemEstimateSection = ({
 				},
 			})}
 		>
-			{state.status === "ready" ? null : (
-				<EditorRootCard dataUi="EditorItemEstimateHeader">
-					<ItemEstimateHeading />
-				</EditorRootCard>
-			)}
+			{previewItemUid === undefined ? (
+				<div data-ui="EditorItemEstimateHeader">
+					<EditorFormSectionDivider
+						action={headerAction}
+						title={translator.textFn("Estimate")}
+					/>
+				</div>
+			) : null}
 			{state.status === "loading" ? <ItemEstimateLoading /> : null}
 			{state.status === "error" ? (
 				<Status
@@ -178,6 +223,7 @@ export const ItemEstimateSection = ({
 					config={state.config}
 					estimate={state.estimate}
 					limit={previewItemUid === undefined ? undefined : 2}
+					sort={sort}
 				/>
 			) : null}
 		</section>

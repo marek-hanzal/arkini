@@ -32,7 +32,7 @@ const OutputItem = <Item extends OutputProjection.Item>({
 	>
 		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
 			{renderItemFn(item, eyebrow)}
-			<span className="shrink-0 text-muted">
+			<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
 				×<QuantityValue quantity={item.quantity} />
 			</span>
 		</div>
@@ -233,7 +233,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 								<Tx label="Output set" /> {setIndex + 1}
 							</h5>
 							<span className="min-w-0 flex-1 border-t border-line-strong" />
-							<span className="shrink-0 text-xs text-muted">
+							<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
 								<Tx label="Weight" /> {set.weight}
 							</span>
 						</header>

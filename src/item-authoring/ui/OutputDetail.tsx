@@ -40,15 +40,7 @@ export const OutputDetail = ({
 				<DetailReference
 					eyebrow={eyebrow}
 					itemId={item.itemId}
-					description={
-						<>
-							<span className="font-medium uppercase tracking-[0.08em]">
-								<Tx label="Placement" />
-							</span>
-							{" · "}
-							<Tx label={item.placement === "random" ? "Random" : "Drop"} />
-						</>
-					}
+					description={<Tx label={item.placement === "random" ? "Random" : "Drop"} />}
 				/>
 			)}
 			renderWeightedOptionDetailFn={(option) =>

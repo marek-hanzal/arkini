@@ -51,33 +51,6 @@ const OutputItem = <Item extends OutputProjection.Item>({
 	</div>
 );
 
-const OutputItems = <Item extends OutputProjection.Item>({
-	items,
-	eyebrow,
-	renderItemDetailFn,
-	renderItemFn,
-	variant,
-}: {
-	readonly items: readonly Item[];
-	readonly renderItemDetailFn?: (item: Item) => ReactNode;
-	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
-	readonly variant: OutputsVariant;
-	readonly eyebrow?: ReactNode;
-}) => (
-	<div className={variant === "editor-tree" ? "flex flex-col gap-3" : "space-y-1.5"}>
-		{items.map((item) => (
-			<OutputItem
-				key={item.itemId}
-				item={item}
-				eyebrow={eyebrow}
-				renderItemDetailFn={renderItemDetailFn}
-				renderItemFn={renderItemFn}
-				variant={variant}
-			/>
-		))}
-	</div>
-);
-
 const OutputRoll = <Item extends OutputProjection.Item>({
 	roll,
 	renderItemDetailFn,
@@ -88,57 +61,48 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly variant: OutputsVariant;
-}) =>
-	match(roll)
-		.with(
-			{
-				kind: "guaranteed",
-			},
-			(guaranteed) => (
-				<div
-					className="grid gap-2 py-2"
-					data-ui="TileLineOutputRoll"
-					data-roll-kind="guaranteed"
-				>
-					<OutputItems
-						items={guaranteed.item}
-						eyebrow={
-							<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
-								<Tx label="Guaranteed" />
-							</span>
-						}
-						renderItemDetailFn={renderItemDetailFn}
-						renderItemFn={renderItemFn}
-						variant={variant}
-					/>
-				</div>
-			),
-		)
-		.with(
-			{
-				kind: "chance",
-			},
-			(chance) => (
-				<div
-					className="grid gap-2 py-2"
-					data-ui="TileLineOutputRoll"
-					data-roll-kind="chance"
-				>
-					<OutputItems
-						items={chance.item}
-						eyebrow={
-							<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
-								{Math.round(chance.chance * 100)}% <Tx label="chance" />
-							</span>
-						}
-						renderItemDetailFn={renderItemDetailFn}
-						renderItemFn={renderItemFn}
-						variant={variant}
-					/>
-				</div>
-			),
-		)
-		.exhaustive();
+}) => {
+	const eyebrow = (
+		<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
+			{match(roll)
+				.with(
+					{
+						kind: "guaranteed",
+					},
+					() => <Tx label="Guaranteed" />,
+				)
+				.with(
+					{
+						kind: "chance",
+					},
+					({ chance }) => (
+						<>
+							{Math.round(chance * 100)}% <Tx label="chance" />
+						</>
+					),
+				)
+				.exhaustive()}
+		</span>
+	);
+	return (
+		<div
+			className={variant === "editor-tree" ? "flex flex-col gap-3" : "flex flex-col gap-1.5"}
+			data-ui="TileLineOutputRoll"
+			data-roll-kind={roll.kind}
+		>
+			{roll.item.map((item) => (
+				<OutputItem
+					key={item.itemId}
+					item={item}
+					eyebrow={eyebrow}
+					renderItemDetailFn={renderItemDetailFn}
+					renderItemFn={renderItemFn}
+					variant={variant}
+				/>
+			))}
+		</div>
+	);
+};
 
 /** Renders every authored output alternative and roll for one visible product line. */
 export const Outputs = <Item extends OutputProjection.Item>({
@@ -204,7 +168,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 							className={
 								variant === "editor-tree"
 									? "flex flex-col gap-3"
-									: "divide-y divide-line/60"
+									: "flex flex-col gap-1.5"
 							}
 						>
 							{set.roll.map((roll, rollIndex) => (

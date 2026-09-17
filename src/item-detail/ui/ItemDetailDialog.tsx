@@ -1,24 +1,13 @@
 import { motion } from "motion/react";
 import { match } from "ts-pattern";
 
-import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { DefinitionItemDetailScene } from "~/item-detail/ui/DefinitionItemDetailScene";
 import { RuntimeItemDetailScene } from "~/item-detail/ui/RuntimeItemDetailScene";
 import { useItemDetailFocus } from "~/item-detail/ui/useItemDetailFocus";
 import { itemDetailTransition, useItemDetailMotion } from "~/item-detail/ui/useItemDetailMotion";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 
-interface ItemDetailDialogProps extends useItemDetailMotion.Props {
-	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
-	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
-}
-
-export const ItemDetailDialog = ({
-	renderIdentity,
-	renderLineIdentity,
-	state,
-}: ItemDetailDialogProps) => {
+export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 	const closeItemDetailFn = useCloseItemDetail();
 	const motionState = useItemDetailMotion({
 		state,
@@ -30,7 +19,6 @@ export const ItemDetailDialog = ({
 		focusKey: `${state.target.kind}:${state.target.itemId}:${state.target.tab}`,
 	});
 	const disabled = state.phase === "exiting";
-
 	return (
 		<motion.div
 			className="absolute inset-0 z-[70] grid cursor-default place-items-center overflow-hidden bg-overlay/70 p-[var(--ak-viewport-padding)] text-overlay-foreground"
@@ -72,8 +60,6 @@ export const ItemDetailDialog = ({
 						(target) => (
 							<RuntimeItemDetailScene
 								disabled={disabled}
-								renderIdentity={renderIdentity}
-								renderLineIdentity={renderLineIdentity}
 								target={target}
 							/>
 						),
@@ -85,7 +71,6 @@ export const ItemDetailDialog = ({
 						(target) => (
 							<DefinitionItemDetailScene
 								disabled={disabled}
-								renderIdentity={renderIdentity}
 								target={target}
 							/>
 						),

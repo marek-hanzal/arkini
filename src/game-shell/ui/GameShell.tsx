@@ -5,10 +5,8 @@ import { usePackageGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { GameMenu } from "~/game-menu/ui/GameMenu";
 import { GameMenuProvider } from "~/game-menu/ui/GameMenuProvider";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
-import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemDetailModal } from "~/item-detail/ui/ItemDetailModal";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
@@ -25,7 +23,6 @@ const ItemDetailOverlayPrecedence = () => {
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const closeItemDetailFn = useCloseItemDetail();
-
 	useEffect(() => {
 		if (
 			gameMenu.phase === "closed" ||
@@ -42,7 +39,6 @@ const ItemDetailOverlayPrecedence = () => {
 		gameMenu.phase,
 		itemDetail.state.phase,
 	]);
-
 	return null;
 };
 
@@ -96,14 +92,10 @@ const GameTileScene = ({
 const GameShellLayers = ({
 	children,
 	game,
-	itemDetailIdentityRenderer,
-	itemDetailLineIdentityRenderer,
 	menu,
 	routePresentation,
 }: PropsWithChildren<{
 	readonly game: GameEngine;
-	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
-	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
 	readonly menu?: ReactNode;
 	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
@@ -113,10 +105,7 @@ const GameShellLayers = ({
 				<PixiGameProvider>
 					<ItemDetailOverlayPrecedence />
 					<GameTileScene routePresentation={routePresentation}>{children}</GameTileScene>
-					<ItemDetailModal
-						renderIdentity={itemDetailIdentityRenderer}
-						renderLineIdentity={itemDetailLineIdentityRenderer}
-					/>
+					<ItemDetailModal />
 				</PixiGameProvider>
 			</ItemDetailProvider>
 			{menu}
@@ -139,14 +128,10 @@ const GameShellLayers = ({
  */
 export const PlayableGameShell = ({
 	children,
-	itemDetailIdentityRenderer,
-	itemDetailLineIdentityRenderer,
 	menu,
 	routePresentation,
 }: PropsWithChildren<{
 	readonly menu?: ReactNode;
-	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
-	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
 	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
 	const game = useGameEngine();
@@ -160,8 +145,6 @@ export const PlayableGameShell = ({
 			<GameMenuProvider keyboardEnabled={menu !== undefined}>
 				<GameShellLayers
 					game={game}
-					itemDetailIdentityRenderer={itemDetailIdentityRenderer}
-					itemDetailLineIdentityRenderer={itemDetailLineIdentityRenderer}
 					menu={menu}
 					routePresentation={routePresentation}
 				>

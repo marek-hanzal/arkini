@@ -1,19 +1,12 @@
 import { match } from "ts-pattern";
 
-import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemDetailDialog } from "~/item-detail/ui/ItemDetailDialog";
 
 import "./item-detail.css";
 
-interface ItemDetailModalProps {
-	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
-	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
-}
-
 /** Renders the one active Item Detail modal over the unchanged tile scene. */
-export const ItemDetailModal = ({ renderIdentity, renderLineIdentity }: ItemDetailModalProps) => {
+export const ItemDetailModal = () => {
 	const itemDetail = useItemDetailControl();
 	return match(itemDetail.state)
 		.with(
@@ -32,13 +25,7 @@ export const ItemDetailModal = ({ renderIdentity, renderLineIdentity }: ItemDeta
 			{
 				phase: "exiting",
 			},
-			(state) => (
-				<ItemDetailDialog
-					renderIdentity={renderIdentity}
-					renderLineIdentity={renderLineIdentity}
-					state={state}
-				/>
-			),
+			(state) => <ItemDetailDialog state={state} />,
 		)
 		.exhaustive();
 };

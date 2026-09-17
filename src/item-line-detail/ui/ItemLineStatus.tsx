@@ -8,10 +8,7 @@ import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton"
 import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
-import {
-	ItemLineSummary,
-	type ItemLineSummaryIdentityRenderer,
-} from "~/item-line-detail/ui/ItemLineSummary";
+import { ItemLineSummary } from "~/item-line-detail/ui/ItemLineSummary";
 
 const ItemLineUnavailableReason = ({
 	reason,
@@ -147,18 +144,14 @@ const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
 
 /** Renders one line identity together with its queue, rule, and availability status. */
 export const ItemLineStatus = ({
-	definitionItemId,
 	disabled,
 	line,
 	queued,
-	renderIdentity,
 	stale,
 }: {
-	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly line: ItemDetailLinesProjection.Line;
 	readonly queued: boolean;
-	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale: boolean;
 }) => {
 	const translator = useTranslator();
@@ -176,14 +169,10 @@ export const ItemLineStatus = ({
 		disclosedDisabledHint === undefined
 			? line.activeRuleHints
 			: line.activeRuleHints.filter((hint) => hint !== disclosedDisabledHint);
-
 	return (
 		<div className="min-w-0 flex-1">
 			<ItemLineSummary
-				disabled={disabled}
-				itemId={definitionItemId}
 				line={line}
-				renderIdentity={renderIdentity}
 				stale={stale}
 			/>
 			{stale ? null : <ItemLineRuleHints hints={activeRuleHints} />}

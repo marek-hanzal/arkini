@@ -10,8 +10,6 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
 import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
-import { EditorBoardItemDetailLink } from "~/editor-board/ui/EditorBoardItemDetailLink";
-import { EditorBoardProductionLineLink } from "~/editor-board/ui/EditorBoardProductionLineLink";
 import { EditorBoardToolbar } from "~/editor-board/ui/EditorBoardToolbar";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
@@ -53,11 +51,7 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 	return (
 		<GameEngineProvider game={resource.game}>
 			<PlayableGameResources>
-				<PlayableGameShell
-					itemDetailIdentityRenderer={EditorBoardItemDetailLink}
-					itemDetailLineIdentityRenderer={EditorBoardProductionLineLink}
-					routePresentation="embedded-transition"
-				>
+				<PlayableGameShell routePresentation="embedded-transition">
 					<Outlet />
 				</PlayableGameShell>
 			</PlayableGameResources>

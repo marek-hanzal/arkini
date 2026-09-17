@@ -10,7 +10,6 @@ import {
 	itemDetailMotionTransition,
 } from "~/item-detail-frame/ui/ItemDetailMotion";
 import { ItemLineRow } from "~/item-line-detail/ui/ItemLineRow";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
 import { Scrollable } from "~/ui/ui/Scrollable";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
@@ -96,7 +95,6 @@ const useItemLinesAutoFocus = ({
 	}, [
 		itemId,
 	]);
-
 	const registerRowFn = useCallback((lineId: string, row: HTMLElement | null) => {
 		if (row === null) {
 			rowByLineIdRef.current.delete(lineId);
@@ -104,7 +102,6 @@ const useItemLinesAutoFocus = ({
 			rowByLineIdRef.current.set(lineId, row);
 		}
 	}, []);
-
 	return {
 		registerRowFn,
 		scrollContainerRef,
@@ -150,14 +147,11 @@ const ItemLinesEmptyState = ({
 
 /** Renders the authoritative visible product-line overview inside Item Detail. */
 export const ItemLinesTab = ({
-	definitionItemId,
 	disabled = false,
 	initialQuery,
 	lines,
-	renderIdentity,
 	stale = false,
 }: {
-	readonly definitionItemId?: string;
 	readonly disabled?: boolean;
 	readonly initialQuery?: string;
 	readonly lines: Extract<
@@ -166,7 +160,6 @@ export const ItemLinesTab = ({
 			readonly kind: "available";
 		}
 	>;
-	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {
 	const translator = useTranslator();
@@ -291,11 +284,9 @@ export const ItemLinesTab = ({
 									<ItemLineRow
 										ref={(row) => registerRowFn(line.lineId, row)}
 										key={line.lineId}
-										definitionItemId={definitionItemId}
 										disabled={disabled}
 										line={line}
 										ownerItemId={lines.itemId}
-										renderIdentity={renderIdentity}
 										stale={stale}
 									/>
 								))}

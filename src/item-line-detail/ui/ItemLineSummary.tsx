@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from "motion/react";
-import type { ComponentType, ReactNode } from "react";
 
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
@@ -10,27 +9,12 @@ import {
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tx } from "~/translation/ui/Tx";
 
-interface ItemLineSummaryIdentityRenderProps {
-	readonly children: ReactNode;
-	readonly disabled: boolean;
-	readonly itemId: string;
-	readonly lineId: string;
-}
-
-export type ItemLineSummaryIdentityRenderer = ComponentType<ItemLineSummaryIdentityRenderProps>;
-
 /** Renders one line's identity, default marker, and description. */
 export const ItemLineSummary = ({
-	disabled = false,
-	itemId,
 	line,
-	renderIdentity,
 	stale = false,
 }: {
-	readonly disabled?: boolean;
-	readonly itemId?: string;
 	readonly line: ItemDetailLinesProjection.Line;
-	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {
 	const status =
@@ -39,23 +23,11 @@ export const ItemLineSummary = ({
 			: line.activeJob === undefined && line.availability.kind === "unavailable"
 				? "disabled"
 				: undefined;
-
-	const IdentityRenderer = renderIdentity;
 	return (
 		<div className="min-w-0 flex-1">
 			<div className="flex flex-wrap items-center gap-2">
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
-					{IdentityRenderer === undefined || itemId === undefined ? (
-						line.title
-					) : (
-						<IdentityRenderer
-							disabled={disabled}
-							itemId={itemId}
-							lineId={line.lineId}
-						>
-							{line.title}
-						</IdentityRenderer>
-					)}
+					{line.title}
 				</h3>
 				<AnimatePresence initial={false}>
 					{stale || status === undefined ? null : (

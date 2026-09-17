@@ -12,13 +12,11 @@ import type { useItemDetailNavigationController } from "~/item-detail/ui/useItem
 import { itemDetailTransition } from "~/item-detail/ui/useItemDetailMotion";
 import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tx } from "~/translation/ui/Tx";
 
 interface RuntimeItemDetailContentProps {
 	readonly kind: "runtime";
-	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly identity?: useRuntimeItemDetailSceneController.IdentityProjection;
 	readonly info?: useRuntimeItemDetailSceneController.Output["info"];
@@ -26,7 +24,6 @@ interface RuntimeItemDetailContentProps {
 	readonly lines?: useRuntimeItemDetailSceneController.Output["lines"];
 	readonly queue?: ItemDetailQueueProjection;
 	readonly queueStale: boolean;
-	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly sources?: useItemDetailNavigationController.SourcesProjection;
 	readonly stale: boolean;
 	readonly target: Extract<
@@ -125,18 +122,14 @@ const ItemInfoContent = ({
 };
 
 const ItemLinesContent = ({
-	definitionItemId,
 	disabled,
 	initialQuery,
 	lines,
-	renderIdentity,
 	stale,
 }: {
-	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly initialQuery?: string;
 	readonly lines?: useRuntimeItemDetailSceneController.Output["lines"];
-	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale: boolean;
 }) => {
 	if (lines?.kind !== "available") {
@@ -148,11 +141,9 @@ const ItemLinesContent = ({
 	}
 	return (
 		<ItemLinesTab
-			definitionItemId={definitionItemId}
 			disabled={disabled}
 			initialQuery={initialQuery}
 			lines={lines}
-			renderIdentity={renderIdentity}
 			stale={stale}
 		/>
 	);
@@ -218,7 +209,6 @@ const ItemSourcesContent = ({
 };
 
 const RuntimeItemDetailContent = ({
-	definitionItemId,
 	disabled,
 	identity,
 	info,
@@ -226,7 +216,6 @@ const RuntimeItemDetailContent = ({
 	lines,
 	queue,
 	queueStale,
-	renderLineIdentity,
 	sources,
 	stale,
 	tab,
@@ -244,11 +233,9 @@ const RuntimeItemDetailContent = ({
 		))
 		.with("lines", () => (
 			<ItemLinesContent
-				definitionItemId={definitionItemId}
 				disabled={disabled}
 				initialQuery={linesSearchQuery}
 				lines={lines}
-				renderIdentity={renderLineIdentity}
 				stale={stale}
 			/>
 		))
@@ -288,7 +275,6 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 	>
 		{props.kind === "runtime" ? (
 			<RuntimeItemDetailContent
-				definitionItemId={props.definitionItemId}
 				disabled={props.disabled}
 				identity={props.identity}
 				info={props.info}
@@ -296,7 +282,6 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 				lines={props.lines}
 				queue={props.queue}
 				queueStale={props.queueStale}
-				renderLineIdentity={props.renderLineIdentity}
 				sources={props.sources}
 				stale={props.stale}
 				tab={props.target.tab}

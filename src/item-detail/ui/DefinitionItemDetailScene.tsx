@@ -1,8 +1,5 @@
 import { Tx } from "~/translation/ui/Tx";
-import {
-	ItemDetailHeader,
-	type ItemDetailHeaderIdentityRenderer,
-} from "~/item-detail-frame/ui/ItemDetailHeader";
+import { ItemDetailHeader } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { ItemDetailContent } from "~/item-detail/ui/ItemDetailContent";
 import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
@@ -10,19 +7,13 @@ import { useDefinitionItemDetailSceneController } from "~/item-detail/ui/useDefi
 
 interface DefinitionItemDetailSceneProps extends useDefinitionItemDetailSceneController.Props {
 	readonly disabled: boolean;
-	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
 }
 
-export const DefinitionItemDetailScene = ({
-	disabled,
-	renderIdentity,
-	target,
-}: DefinitionItemDetailSceneProps) => {
+export const DefinitionItemDetailScene = ({ disabled, target }: DefinitionItemDetailSceneProps) => {
 	const controller = useDefinitionItemDetailSceneController({
 		target,
 	});
 	const closeItemDetailFn = useCloseItemDetail();
-
 	if (controller.definition.kind === "unavailable") {
 		return (
 			<header className="flex items-center justify-between border-b border-line pb-3">
@@ -49,12 +40,10 @@ export const DefinitionItemDetailScene = ({
 			<ItemDetailHeader
 				disabled={disabled}
 				identity={{
-					definitionId: controller.definition.itemId,
 					title: controller.definition.title,
 					sourceUrl: controller.definition.sourceUrl,
 					compositeUrl: controller.definition.compositeUrl,
 				}}
-				renderIdentity={renderIdentity}
 				stale={false}
 			/>
 			<ItemDetailTabs

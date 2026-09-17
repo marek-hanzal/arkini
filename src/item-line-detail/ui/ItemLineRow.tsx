@@ -6,22 +6,19 @@ import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDeta
 import { ItemLineCommandPanel } from "~/item-line-detail/ui/ItemLineCommandPanel";
 import { ItemLineDetails } from "~/item-line-detail/ui/ItemLineDetails";
 import { ItemLineStatus } from "~/item-line-detail/ui/ItemLineStatus";
-import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineCommandController } from "~/item-line-detail/ui/useItemLineCommandController";
 import { ProductionJobProgress } from "~/production-job/ui/ProductionJobProgress";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemLineRowProps extends useItemLineCommandController.Props {
-	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly line: ItemDetailLinesProjection.Line;
-	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }
 
 /** Composes one live product line from status, commands, runtime, inputs, and outputs. */
 export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function ItemLineRow(
-	{ definitionItemId, disabled, line, ownerItemId, renderIdentity, stale = false },
+	{ disabled, line, ownerItemId, stale = false },
 	ref,
 ) {
 	const commands = useItemLineCommandController({
@@ -36,7 +33,6 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 			: queued
 				? "queued"
 				: "idle";
-
 	return (
 		<motion.article
 			ref={ref}
@@ -73,11 +69,9 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 			</AnimatePresence>
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<ItemLineStatus
-					definitionItemId={definitionItemId}
 					disabled={disabled}
 					line={line}
 					queued={queued}
-					renderIdentity={renderIdentity}
 					stale={stale}
 				/>
 				{stale ? null : (

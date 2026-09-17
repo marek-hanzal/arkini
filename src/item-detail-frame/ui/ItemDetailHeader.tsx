@@ -1,38 +1,25 @@
 import { X } from "lucide-react";
-import type { ComponentType, ReactNode } from "react";
 
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 
 interface ItemDetailHeaderIdentity {
-	readonly definitionId: string;
 	readonly title: string;
 	readonly sourceUrl: string;
 	readonly compositeUrl?: string;
 }
 
-interface ItemDetailHeaderIdentityRenderProps {
-	readonly children: ReactNode;
-	readonly disabled: boolean;
-	readonly itemId: string;
-}
-
-export type ItemDetailHeaderIdentityRenderer = ComponentType<ItemDetailHeaderIdentityRenderProps>;
-
-/** Renders the stable Item Detail identity and close control around an optional host-owned link. */
+/** Renders the stable Item Detail identity and close control. */
 export const ItemDetailHeader = ({
 	disabled,
 	identity,
-	renderIdentity,
 	stale,
 }: {
 	readonly disabled: boolean;
 	readonly identity: ItemDetailHeaderIdentity;
-	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
 	readonly stale: boolean;
 }) => {
 	const closeItemDetailFn = useCloseItemDetail();
-	const IdentityRenderer = renderIdentity;
 	const identityNode = (
 		<ItemIdentity
 			artworkDataUi="ItemDetailHeaderArtwork"
@@ -53,16 +40,7 @@ export const ItemDetailHeader = ({
 	);
 	return (
 		<header className="flex min-w-0 items-center justify-between gap-4 border-b border-line pb-3">
-			{IdentityRenderer === undefined ? (
-				identityNode
-			) : (
-				<IdentityRenderer
-					disabled={disabled}
-					itemId={identity.definitionId}
-				>
-					{identityNode}
-				</IdentityRenderer>
-			)}
+			{identityNode}
 			<button
 				type="button"
 				className="grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"

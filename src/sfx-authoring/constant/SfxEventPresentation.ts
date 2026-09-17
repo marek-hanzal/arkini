@@ -100,9 +100,9 @@ export const SfxEventPresentation = [
 		description: "When an item reaches its depleted state.",
 	},
 	{
-		event: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
-		label: "Item removed",
-		description: "When the player explicitly removes an item.",
+		event: GameEventEnumSchema.enum.ItemDisappeared,
+		label: "Item disappeared",
+		description: "When an item disappears without creating a replacement.",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly description: string;

@@ -40,8 +40,8 @@ export const removeItemRuntimeTransitionFx = Effect.fn("removeItemRuntimeTransit
 		runtime,
 	});
 
-	const explicitlyRemovedEvent = {
-		type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+	const disappearedEvent = {
+		type: GameEventEnumSchema.enum.ItemDisappeared,
 		itemId: item.id,
 		canonicalItemId: item.item.id,
 		location: item.location,
@@ -54,7 +54,7 @@ export const removeItemRuntimeTransitionFx = Effect.fn("removeItemRuntimeTransit
 
 	return {
 		events: [
-			explicitlyRemovedEvent,
+			disappearedEvent,
 			...removal.events,
 		],
 		item,

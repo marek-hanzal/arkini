@@ -50,6 +50,9 @@ describe("item units / atomic depletion", () => {
 			previousQuantity: 2,
 			resultingQuantity: 1,
 		});
+		expect(
+			result.events.some((event) => event.type === GameEventEnumSchema.enum.ItemDisappeared),
+		).toBe(false);
 		expect(result.runtime.items.find((item) => item.id === result.sapling.id)).toMatchObject({
 			quantity: 1,
 			location: board(1),

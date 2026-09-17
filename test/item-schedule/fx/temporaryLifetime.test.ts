@@ -16,6 +16,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 const config = createTemporaryLifetimeTestConfig();
@@ -131,6 +132,48 @@ describe("temporary item lifetime", () => {
 				},
 				quantity: 1,
 			},
+			{
+				type: GameEventEnumSchema.enum.ItemDisappeared,
+				itemId: "runtime:temporary",
+				canonicalItemId: "temporaryPlain",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			},
+		]);
+	});
+
+	it("reports disappearance when configured expiry output resolves to nothing", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const temporary = yield* spawnTemporaryFx({
+					itemId: "temporaryEmptyOutput",
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 600,
+				});
+				return {
+					runtime: yield* readRuntimeFx(),
+					temporary,
+					transition: yield* (yield* CommittedTransitionsFx).read,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.runtime.items.some((item) => item.id === result.temporary.id)).toBe(false);
+		expect(result.transition.events.map((event) => event.type)).toEqual([
+			GameEventEnumSchema.enum.ItemExpired,
+			GameEventEnumSchema.enum.ItemDisappeared,
 		]);
 	});
 
@@ -289,6 +332,11 @@ describe("temporary item lifetime", () => {
 				quantity: 1,
 			},
 		]);
+		expect(
+			result.expiry.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemDisappeared,
+			),
+		).toBe(false);
 		expect(result.output.location).toEqual(result.temporary.location);
 		expect(result.output.id).not.toBe(result.temporary.id);
 	});

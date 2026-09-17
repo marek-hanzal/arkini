@@ -29,7 +29,7 @@ const cuePriority: Record<GameEventEnumSchema.Type, number> = {
 	[GameEventEnumSchema.enum.ItemInputStored]: 2,
 	[GameEventEnumSchema.enum.ItemUnitSpent]: 2,
 	[GameEventEnumSchema.enum.ItemDepleted]: 3,
-	[GameEventEnumSchema.enum.ItemExplicitlyRemoved]: 3,
+	[GameEventEnumSchema.enum.ItemDisappeared]: 3,
 };
 
 const clampStrengthFn = (strength: number) => Math.min(3, Math.max(1, strength));
@@ -183,11 +183,11 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue =>
 		)
 		.with(
 			{
-				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				type: GameEventEnumSchema.enum.ItemDisappeared,
 			},
 			(event) =>
 				cueFn(
-					GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+					GameEventEnumSchema.enum.ItemDisappeared,
 					strengthForQuantityFn(event.quantity),
 				),
 		)

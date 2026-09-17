@@ -381,8 +381,19 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		...sourceAction.events,
 		...targetEffect.events,
 	];
+	const targetDisappeared =
+		rule.effect === TargetEffectSchema.enum.Remove && target.quantity === 1;
 
 	if (rule.output === undefined) {
+		if (targetDisappeared) {
+			events.push({
+				type: GameEventEnumSchema.enum.ItemDisappeared,
+				itemId: target.id,
+				canonicalItemId: target.item.id,
+				location: target.location,
+				quantity: 1,
+			});
+		}
 		return {
 			events,
 			runtime: draft,
@@ -397,12 +408,20 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		output,
 		runtime: draft,
 	});
-	events.push(
-		...(yield* readOutputPlacementItemEventsFx({
-			originItemId: target.id,
-			placement,
-		})),
-	);
+	const placementEvents = yield* readOutputPlacementItemEventsFx({
+		originItemId: target.id,
+		placement,
+	});
+	events.push(...placementEvents);
+	if (targetDisappeared && placementEvents.length === 0) {
+		events.push({
+			type: GameEventEnumSchema.enum.ItemDisappeared,
+			itemId: target.id,
+			canonicalItemId: target.item.id,
+			location: target.location,
+			quantity: 1,
+		});
+	}
 	draft = withOutput;
 	return {
 		events,

@@ -183,6 +183,7 @@ describe("readItemConnectionsFn", () => {
 			"craft",
 			"stash",
 			"spent",
+			"temporaryEmptyOutput",
 			"temporaryOutput",
 		])
 			expect(readIdsFn(config, ownerItemId, "produces")).toEqual([
@@ -201,6 +202,7 @@ describe("readItemConnectionsFn", () => {
 			"producer",
 			"spent",
 			"stash",
+			"temporaryEmptyOutput",
 			"temporaryOutput",
 			"temporaryRandomOutput",
 		]);

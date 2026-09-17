@@ -37,6 +37,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	const depleted = context.owner.item.units !== undefined && context.owner.remainingUnits === 0;
 	let draft = context.runtime;
 	const events: GameEventSchema.Type[] = [];
+	let depletionReplacementPlaced = false;
 
 	if (depleted) {
 		const withoutDepletedOwnerQueue = {
@@ -94,14 +95,24 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 				output: depletionOutput,
 				runtime: draft,
 			});
-			events.push(
-				...(yield* readOutputPlacementItemEventsFx({
-					originItemId: context.owner.id,
-					placement,
-				})),
-			);
+			const placementEvents = yield* readOutputPlacementItemEventsFx({
+				originItemId: context.owner.id,
+				placement,
+			});
+			events.push(...placementEvents);
+			depletionReplacementPlaced = placementEvents.length > 0;
 			draft = withDepletionOutput;
 		}
+	}
+
+	if (depleted && !depletionReplacementPlaced) {
+		events.push({
+			type: GameEventEnumSchema.enum.ItemDisappeared,
+			itemId: context.owner.id,
+			canonicalItemId: context.owner.item.id,
+			location: context.owner.location,
+			quantity: context.owner.quantity,
+		});
 	}
 
 	if (depleted) {

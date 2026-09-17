@@ -264,10 +264,10 @@ const itemDepletedEventSchema = z
 	})
 	.strict();
 
-const itemExplicitlyRemovedEventSchema = z
+const itemDisappearedEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
-			"ItemExplicitlyRemoved",
+			"ItemDisappeared",
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
@@ -301,7 +301,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	itemInputStoredEventSchema,
 	itemUnitSpentEventSchema,
 	itemDepletedEventSchema,
-	itemExplicitlyRemovedEventSchema,
+	itemDisappearedEventSchema,
 ]);
 
 export type GameEventSchema = typeof GameEventSchema;

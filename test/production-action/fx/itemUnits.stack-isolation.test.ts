@@ -160,5 +160,8 @@ describe("item units / stack isolation", () => {
 				},
 			]),
 		);
+		expect(
+			result.events.some((event) => event.type === GameEventEnumSchema.enum.ItemDisappeared),
+		).toBe(false);
 	});
 });

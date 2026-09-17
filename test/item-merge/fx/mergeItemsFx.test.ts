@@ -189,8 +189,50 @@ describe("mergeItemsFx", () => {
 				effect,
 				resultCanonicalItemId: effect === "replace" ? "result" : undefined,
 			});
+			expect(result.transition.events.map((event) => event.type)).toEqual(
+				effect === "remove"
+					? [
+							GameEventEnumSchema.enum.ItemMerged,
+							GameEventEnumSchema.enum.ItemDisappeared,
+						]
+					: [
+							GameEventEnumSchema.enum.ItemMerged,
+						],
+			);
 		});
 	}
+
+	it("treats placed merge output as the removed target's replacement", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: {
+							target: {
+								type: "item",
+								itemId: "target",
+							},
+							action: "consume",
+							effect: "remove",
+							output: guaranteedMergeOutput(),
+						},
+					}),
+					state: makeState(),
+				}),
+			),
+		);
+
+		expect(
+			result.transition.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemDisappeared,
+			),
+		).toBe(false);
+		expect(
+			result.transition.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemSpawned,
+			),
+		).toBe(true);
+	});
 
 	it("isolates a stacked replacement target through standard placement", () => {
 		const result = Effect.runSync(

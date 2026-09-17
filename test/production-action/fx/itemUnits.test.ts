@@ -71,6 +71,13 @@ describe("item units / owner lifecycle", () => {
 			previousQuantity: 1,
 			resultingQuantity: 0,
 		});
+		expect(result.finalCompletion.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemDisappeared,
+			itemId: result.well.id,
+			canonicalItemId: "units:self-well",
+			location: board(0),
+			quantity: 1,
+		});
 		expect(result.runtime.items.some((item) => item.id === result.well.id)).toBe(false);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(2);
 	});
@@ -132,6 +139,11 @@ describe("item units / owner lifecycle", () => {
 				(event) => event.type === GameEventEnumSchema.enum.ItemDepleted,
 			),
 		).toHaveLength(1);
+		expect(
+			runtime.finalCompletion.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemDisappeared,
+			),
+		).toBe(false);
 		expect(
 			runtime.finalCompletion.events.some(
 				(event) => event.type === GameEventEnumSchema.enum.ItemUnitSpent,

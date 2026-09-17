@@ -221,7 +221,7 @@
 				"item:input-stored",
 				"item:unit-spent",
 				"item:depleted",
-				"item:explicitly-removed",
+				"item:disappeared",
 				"item-detail:opened",
 				"item-detail:closed"
 			],

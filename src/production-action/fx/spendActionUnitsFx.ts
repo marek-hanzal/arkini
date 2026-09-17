@@ -180,6 +180,17 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 				previousQuantity: item.quantity,
 				resultingQuantity,
 			} satisfies GameEventSchema.Type,
+			...(resultingQuantity === 0 && placementEvents.length === 0
+				? [
+						{
+							type: GameEventEnumSchema.enum.ItemDisappeared,
+							itemId: item.id,
+							canonicalItemId: item.item.id,
+							location: item.location,
+							quantity: item.quantity,
+						} satisfies GameEventSchema.Type,
+					]
+				: []),
 			...placementEvents,
 			...releasedInputEvents,
 		],

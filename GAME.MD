@@ -62,7 +62,7 @@ durationMs
 remainingMs
 ```
 
-Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. There is no player cancellation command for an active job; expiry of committed material and explicit forced owner removal are engine-owned abort paths.
+Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. There is no player cancellation command for an active job; expiry of committed material and cheat-only forced owner removal are engine-owned abort paths.
 
 Items with `clock` are identity-bound and non-stackable, and may author any storage scope. A finite lifetime persists `schedule.remainingDurationMs`, initialized from `clock.durationMs`. Enabled identities present at both step boundaries age by that step in every location scope. Moving an identity between scopes neither pauses nor resets its schedule. Job output created in the current step starts at full duration.
 
@@ -76,7 +76,7 @@ Optional `clock.intervalMs` is at least 100 ms; optional `clock.durationMs` is a
 
 Line `default` and `clock` are independent authored booleans: at most one line per owner may carry each flag, and the same line may carry both. Editor selection clears only that flag on sibling lines in one update. Conflicting external configurations are rejected. Runtime selection similarly holds one ID per role; missing overrides inherit the authored choice, and `null` explicitly selects none. Changing either role leaves the other role, accepted requests, phase and lifetime unchanged. Default selects the manual click action; Clock selects periodic admission.
 
-Item `control` is optional: omission means `interactive`, while `automatic-only` denies player production commands, material storage/withdrawal, queue changes and both line selections. It leaves ordinary movement, merge and removal policies intact. Interactive players may enqueue any available line independently of Clock, including with no Clock selection or while rules pause the timer. Manual and periodic requests share ordinary queue order and capacity; neither receives priority over previously accepted runnable work.
+Item `control` is optional: omission means `interactive`, while `automatic-only` denies player production commands, material storage/withdrawal, queue changes and both line selections. It leaves ordinary movement and merge policies intact; neither control mode gives the player an item-removal command. Interactive players may enqueue any available line independently of Clock, including with no Clock selection or while rules pause the timer. Manual and periodic requests share ordinary queue order and capacity; neither receives priority over previously accepted runnable work.
 
 With `clock.expiryMode: "loose-kill"` (also the meaning of omission), existing production earns its step before schedule pulses are admitted; work started by a new pulse earns no retroactive time. A pulse exactly tied with the final lifetime boundary still attempts ordinary admission with no queue privilege. Lifetime then closes all new intent. Active jobs and currently startable requests may outlive the schedule under ordinary global queue order. Exhausted owners start no new Autofill and do not wait for incoming material once idle. After the dispatch pass, an exhausted idle owner discards unstartable requests, returns outstanding deliveries and stored input roots through ordinary placement, and atomically disappears with its optional `clock.onExpire` Output. Blocked expiry placement preserves the exact exhausted owner and pending state for deterministic retry; no output or material is lost or duplicated.
 
@@ -96,7 +96,7 @@ Neither mode remembers historical stack, slot, or position. Each committed root 
 
 When any committed material expires, the engine aborts that job, removes its remaining consumed roots, returns every reservation from the job owner's physical grid origin through canonical placement, preserves queued intent, and produces no line output. Units spent at start are not refunded. After a successful expiry pass, idle owners' queued requests are retried in global intent order against the resulting Runtime.
 
-Player removal of an authored idle Board owner releases its stored input roots through canonical existing-item placement in the same transition. A loaded passive owner must return to a Board before that player command because no passive coordinate is reinterpreted as a Board origin. Clock expiry is the explicit exception above: it removes the owner in its current scope and returns stored roots from that physical grid origin. Any blocked release rolls the removal back.
+Cheat removal of an authored idle Board owner releases its stored input roots through canonical existing-item placement in the same transition. A loaded passive owner must return to a Board before that cheat command because no passive coordinate is reinterpreted as a Board origin. Clock expiry is the explicit exception above: it removes the owner in its current scope and returns stored roots from that physical grid origin. Any blocked release rolls the removal back.
 
 ## Units and completion
 
@@ -149,6 +149,8 @@ Directional merge is one canonical gameplay command. The source item owns ordere
 ## Audio
 
 `game.json.music.playlist` is the only global random Music pool. Its entries are exact Music resource IDs, each selected track is packaged, and the Game streams them through the two-slot crossfade mixer without treating other Music resources as playlist members. An empty or absent playlist produces no background Music. Explicit Item-requested Music is a separate future authoring path and does not implicitly alter this pool. SFX use their independent bounded voice mixer.
+
+Committed lifecycle events remain composable audio facts. Expiry and full unit depletion keep their own events. When the final visible item identity vanishes and its expiry, depletion, or authored removal output places no replacement, the same transaction additionally emits `item:disappeared`; configured output that rolls nothing or is fully discarded is not a replacement. A surviving stack quantity or an actually spawned/stacked lifecycle output suppresses only this additional event. Ordinary line output and released stored inputs are not lifecycle replacements. Merge source consumption and internal consumed production material do not emit disappearance because they are inputs to another surviving or replacement result.
 
 ## Cheats, save, and presentation
 

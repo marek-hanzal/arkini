@@ -207,6 +207,13 @@ describe("readGameAudioCuesFn", () => {
 					previousQuantity: 1,
 					resultingQuantity: 0,
 				},
+				{
+					type: GameEventEnumSchema.enum.ItemDisappeared,
+					itemId: "runtime:spent",
+					canonicalItemId: "item:spent",
+					location: boardLocation,
+					quantity: 1,
+				},
 			],
 		} satisfies GameEventBatchSchema.Type;
 
@@ -214,9 +221,9 @@ describe("readGameAudioCuesFn", () => {
 			GameEventEnumSchema.enum.JobStarted,
 			GameEventEnumSchema.enum.ItemSpawned,
 			GameEventEnumSchema.enum.ItemPlaced,
-			GameEventEnumSchema.enum.ItemStacked,
 			GameEventEnumSchema.enum.JobCompleted,
 			GameEventEnumSchema.enum.ItemDepleted,
+			GameEventEnumSchema.enum.ItemDisappeared,
 		]);
 	});
 });

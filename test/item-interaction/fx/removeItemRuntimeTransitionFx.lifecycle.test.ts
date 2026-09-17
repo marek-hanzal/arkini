@@ -153,7 +153,7 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 
 		expect(result.removed.id).toBe(startProps.ownerItemId);
 		expect(result.transition.events[0]).toEqual({
-			type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: startProps.ownerItemId,
 			canonicalItemId: "forge",
 			location: {
@@ -170,7 +170,7 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 		expect(
 			result.transition.events
 				.slice(1)
-				.some((event) => event.type === GameEventEnumSchema.enum.ItemExplicitlyRemoved),
+				.some((event) => event.type === GameEventEnumSchema.enum.ItemDisappeared),
 		).toBe(false);
 		expect(result.runtime.items.some((item) => item.id === startProps.ownerItemId)).toBe(false);
 		expect(result.runtime.items.some((item) => item.location.scope === "input")).toBe(false);

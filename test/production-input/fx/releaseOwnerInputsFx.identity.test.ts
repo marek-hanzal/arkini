@@ -251,7 +251,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		});
 		expect(result.events).toEqual([
 			{
-				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				type: GameEventEnumSchema.enum.ItemDisappeared,
 				itemId: boardOwner.id,
 				canonicalItemId: boardOwner.itemId,
 				location: boardOwner.location,
@@ -329,7 +329,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		});
 		expect(result.events).toEqual([
 			{
-				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				type: GameEventEnumSchema.enum.ItemDisappeared,
 				itemId: boardOwner.id,
 				canonicalItemId: boardOwner.itemId,
 				location: boardOwner.location,

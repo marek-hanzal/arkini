@@ -58,6 +58,30 @@ const guaranteedOutput = ({
 	],
 });
 
+const emptyChanceOutput = (itemId: string) => ({
+	set: [
+		{
+			roll: [
+				{
+					type: "chance" as const,
+					chance: 0,
+					drop: [
+						{
+							itemId,
+							quantity: {
+								min: 1,
+								max: 1,
+							},
+							placement: "drop" as const,
+							rules: [],
+						},
+					],
+				},
+			],
+		},
+	],
+});
+
 export const createTemporaryLifetimeTestConfig = () =>
 	GameConfigSchema.parse({
 		resources: {
@@ -147,6 +171,18 @@ export const createTemporaryLifetimeTestConfig = () =>
 					onExpire: guaranteedOutput({
 						itemId: "result",
 					}),
+				},
+			},
+			temporaryEmptyOutput: {
+				...baseItem({
+					id: "temporaryEmptyOutput",
+				}),
+
+				lines: [],
+				maxQueueSize: 1,
+				clock: {
+					durationMs: 600,
+					onExpire: emptyChanceOutput("result"),
 				},
 			},
 			temporaryRandomOutput: {

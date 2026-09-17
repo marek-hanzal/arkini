@@ -1024,6 +1024,9 @@ Item detail is unavailable.:
   value: Item detail is unavailable.
 Item details:
   value: Item details
+Item disappeared:
+  value: Item disappeared
+  dynamic: true
 Item discarded:
   value: Item discarded
   dynamic: true
@@ -1117,9 +1120,6 @@ Item production help:
     - **Interactive** shows player controls; **Automatic only** leaves production to the game.
 
     Adding Production removes Action when you save. Clock may also exist without any line when you only need a Lifetime.
-Item removed:
-  value: Item removed
-  dynamic: true
 Item search shortcuts:
   value: ↑↓ Select · Enter Open · Esc Close
 Item section copy help:
@@ -2288,6 +2288,9 @@ When an existing item is placed in a new location.:
 When an item cannot be delivered and is discarded.:
   value: When an item cannot be delivered and is discarded.
   dynamic: true
+When an item disappears without creating a replacement.:
+  value: When an item disappears without creating a replacement.
+  dynamic: true
 When an item is placed into a production input.:
   value: When an item is placed into a production input.
   dynamic: true
@@ -2311,9 +2314,6 @@ When part of an item stack is separated.:
   dynamic: true
 When production consumes an input.:
   value: When production consumes an input.
-  dynamic: true
-When the player explicitly removes an item.:
-  value: When the player explicitly removes an item.
   dynamic: true
 When the player switches to another Board space.:
   value: When the player switches to another Board space.

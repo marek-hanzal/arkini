@@ -131,6 +131,11 @@ describe("temporary material lifecycle", () => {
 				(event) => event.type === GameEventEnumSchema.enum.JobAborted,
 			),
 		).toBe(true);
+		expect(
+			result.continued.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemDisappeared,
+			),
+		).toBe(false);
 		expect(result.completed.runtime.jobs).toEqual([]);
 		expect(result.completed.runtime.items.some((item) => item.item.id === "product")).toBe(
 			false,

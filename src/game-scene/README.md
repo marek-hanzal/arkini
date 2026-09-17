@@ -46,6 +46,8 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 
 Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn/input/swap cues and detached swap legs through `MotionRuntime.handoffDeliveriesFx`. The real actor keeps its live pose; input-only payloads are destroyed, and released producers/receivers and remaining cue lanes settle normally. A superseded swap releases both writers and settles its other grid actor from the live pose. Cancelling the pose writer alone does not release cue ownership.
 
+Pointer takeover of a spawn also releases its origin claim. Once no remaining cue retains that origin, Motion finalizes it against the current canonical state; canceling the later drag needs no new Runtime transition to remove an already consumed source.
+
 ## Interaction
 
 - Board + Toolbar and Inventory use fixed 512 px world cells under the same camera implementation, with one camera per canvas, including masks, feedback and transient actors. The initial camera fits the whole scene; wheel/pinch zoom anchors at the pointer and right drag pans freely. A short right click still opens Item Detail; crossing the screen-space drag threshold gives the gesture to the camera. `0` restores the fitted default view for the mounted board or inventory in both Game and Editor. Resize preserves the viewed world center and zoom. Pointer coordinates enter world space before tile gestures; the drag threshold stays in screen pixels. Camera gestures cancel tile gestures, and overlays block both.

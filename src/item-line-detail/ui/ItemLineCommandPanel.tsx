@@ -19,22 +19,9 @@ export const ItemLineCommandPanel = ({
 	readonly selectFn: (selection: "default" | "clock", selected: boolean) => void;
 }) => {
 	const translator = useTranslator();
-	const unavailable = line.availability.kind === "unavailable";
 
 	return (
 		<div className="flex shrink-0 flex-wrap justify-end gap-2">
-			<Button
-				className="min-h-8 px-3 py-1 text-xs"
-				cursorIntent={pendingSelection ? "progress" : undefined}
-				data-ui="TileLineSetDefaultButton"
-				data-default={line.isDefault ? "true" : "false"}
-				disabled={
-					disabled || pendingSelection || unavailable || !line.actions.canChangeDefault
-				}
-				onClick={() => selectFn("default", !line.isDefault)}
-			>
-				{translator.textFn(line.isDefault ? "Unset default" : "Set default")}
-			</Button>
 			{line.clock === undefined ? null : (
 				<Button
 					className="min-h-8 px-3 py-1 text-xs"

@@ -27,47 +27,51 @@ export const OutputDetail = ({
 	const translator = useTranslator();
 	const items = project.config.items;
 	return (
-		<Outputs
-			emptyLabel={emptyLabel ?? translator.textFn("No output configured.")}
-			output={projectAuthoredOutputFn(output, items)}
-			renderItemDetailFn={(item) =>
-				item.rules.length === 0 ? null : (
-					<div className="ml-24">
-						<RulesDetail rules={item.rules} />
-					</div>
-				)
-			}
-			renderItemFn={(item, eyebrow) => (
-				<DetailReference
-					eyebrow={eyebrow}
-					itemId={item.itemId}
-					description={<Tx label={item.placement === "random" ? "Random" : "Drop"} />}
+		<section
+			className="min-w-0"
+			data-ui="EditorOutputDetail"
+		>
+			<h4 className="flex items-center gap-1 pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+				{title ?? translator.textFn("Outputs")}
+				<EditorInfoTooltip
+					content={description ?? <Mx label="Authored output summary help" />}
 				/>
-			)}
-			renderSetDetailFn={(set) =>
-				set.rules === undefined || set.rules.length === 0 ? null : (
-					<div className="mb-3 grid gap-3">
-						<EditorFormSectionDivider
-							title={translator.textFn("Rules")}
-							variant="secondary"
-						/>
-						<RulesDetail rules={set.rules} />
-						<EditorFormSectionDivider
-							title={translator.textFn("Items")}
-							variant="secondary"
-						/>
-					</div>
-				)
-			}
-			title={
-				<span className="flex items-center gap-1">
-					{title ?? translator.textFn("Outputs")}
-					<EditorInfoTooltip
-						content={description ?? <Mx label="Authored output summary help" />}
+			</h4>
+			{output?.set.length === 1 ? <div className="mb-3 border-t border-line" /> : null}
+			<Outputs
+				emptyLabel={emptyLabel ?? translator.textFn("No output configured.")}
+				output={projectAuthoredOutputFn(output, items)}
+				renderItemDetailFn={(item) =>
+					item.rules.length === 0 ? null : (
+						<div className="ml-24">
+							<RulesDetail rules={item.rules} />
+						</div>
+					)
+				}
+				renderItemFn={(item, eyebrow) => (
+					<DetailReference
+						eyebrow={eyebrow}
+						itemId={item.itemId}
+						description={<Tx label={item.placement === "random" ? "Random" : "Drop"} />}
 					/>
-				</span>
-			}
-			variant="editor-tree"
-		/>
+				)}
+				renderSetDetailFn={(set) =>
+					set.rules === undefined || set.rules.length === 0 ? null : (
+						<div className="mb-3 grid gap-3">
+							<EditorFormSectionDivider
+								title={translator.textFn("Rules")}
+								variant="secondary"
+							/>
+							<RulesDetail rules={set.rules} />
+							<EditorFormSectionDivider
+								title={translator.textFn("Items")}
+								variant="secondary"
+							/>
+						</div>
+					)
+				}
+				variant="editor-tree"
+			/>
+		</section>
 	);
 };

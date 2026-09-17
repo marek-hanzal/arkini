@@ -1,3 +1,4 @@
+import { Button } from "~/ui/ui/Button";
 import { AnimatePresence, motion } from "motion/react";
 
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
@@ -12,10 +13,16 @@ import { Tx } from "~/translation/ui/Tx";
 
 /** Renders one line's identity, default marker, and description. */
 export const ItemLineSummary = ({
+	disabled,
 	line,
+	pendingSelection,
+	selectFn,
 	stale = false,
 }: {
+	readonly disabled: boolean;
 	readonly line: ItemDetailLinesProjection.Line;
+	readonly pendingSelection: boolean;
+	readonly selectFn: (selection: "default" | "clock", selected: boolean) => void;
 	readonly stale?: boolean;
 }) => {
 	const durationMs = line.activeJob?.remainingMs ?? line.effectiveRuntimeMs;
@@ -59,15 +66,32 @@ export const ItemLineSummary = ({
 					)}
 				</AnimatePresence>
 				<AnimatePresence initial={false}>
-					{stale || !line.isDefault ? null : (
+					{stale ? null : (
 						<motion.span
 							key="default"
 							layout
-							className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground"
 							data-ui="TileLineDefaultBadge"
 							{...itemDetailBadgeMotion}
 						>
-							<Tx label="Default" />
+							<Button
+								className="min-h-0 rounded-full border-control-border bg-secondary-subtle px-2.5 py-1 text-xs font-semibold text-muted shadow-none hover:bg-secondary-hover disabled:hover:border-control-border disabled:hover:bg-secondary-subtle data-[ui-selected=true]:border-accent/35 data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-foreground data-[ui-selected=true]:hover:border-accent/35 data-[ui-selected=true]:hover:bg-accent/15 data-[ui-selected=true]:active:bg-accent/15 data-[ui-selected=true]:disabled:hover:border-accent/35 data-[ui-selected=true]:disabled:hover:bg-accent/10 data-[ui-selected=true]:disabled:active:bg-accent/10"
+								cursorIntent={pendingSelection ? "progress" : undefined}
+								disabled={
+									disabled ||
+									pendingSelection ||
+									line.availability.kind === "unavailable" ||
+									!line.actions.canChangeDefault
+								}
+								onClick={() => selectFn("default", !line.isDefault)}
+								{...readDataUiFn({
+									dataUi: "TileLineSetDefaultButton",
+									state: {
+										selected: line.isDefault,
+									},
+								})}
+							>
+								<Tx label="Default" />
+							</Button>
 						</motion.span>
 					)}
 				</AnimatePresence>

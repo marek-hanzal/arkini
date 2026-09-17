@@ -146,11 +146,15 @@ const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
 export const ItemLineStatus = ({
 	disabled,
 	line,
+	pendingSelection,
+	selectFn,
 	queued,
 	stale,
 }: {
 	readonly disabled: boolean;
 	readonly line: ItemDetailLinesProjection.Line;
+	readonly pendingSelection: boolean;
+	readonly selectFn: (selection: "default" | "clock", selected: boolean) => void;
 	readonly queued: boolean;
 	readonly stale: boolean;
 }) => {
@@ -172,6 +176,9 @@ export const ItemLineStatus = ({
 	return (
 		<div className="min-w-0 flex-1">
 			<ItemLineSummary
+				disabled={disabled}
+				pendingSelection={pendingSelection}
+				selectFn={selectFn}
 				line={line}
 				stale={stale}
 			/>

@@ -111,7 +111,6 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	renderItemDetailFn,
 	renderItemFn,
 	renderSetDetailFn,
-	title = <Tx label="Outputs" />,
 	variant = "compact",
 }: {
 	readonly emptyLabel?: ReactNode;
@@ -119,7 +118,6 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly renderSetDetailFn?: (set: OutputProjection.Set<Item>) => ReactNode;
-	readonly title?: ReactNode;
 	readonly variant?: OutputsVariant;
 }) => {
 	const totalWeight = output.reduce((total, set) => total + set.weight, 0);
@@ -129,9 +127,6 @@ export const Outputs = <Item extends OutputProjection.Item>({
 			data-ui="Outputs"
 			data-variant={variant}
 		>
-			<h4 className="pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-				{title}
-			</h4>
 			{output.length === 0 ? (
 				<p className="py-3 text-sm text-muted">{emptyLabel}</p>
 			) : (
@@ -139,7 +134,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 					{output.map((set, setIndex) => (
 						<div
 							key={`${setIndex}:${set.weight}`}
-							className="py-1"
+							className="min-w-0"
 						>
 							{output.length > 1 ? (
 								<header
@@ -155,9 +150,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 										{Number(((set.weight / totalWeight) * 100).toFixed(1))} %
 									</span>
 								</header>
-							) : (
-								<div className="mb-3 border-t border-line" />
-							)}
+							) : null}
 							{renderSetDetailFn?.(set)}
 							{set.activeRuleHints.map((hint, index) => (
 								<p

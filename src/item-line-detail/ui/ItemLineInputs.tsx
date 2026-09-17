@@ -4,7 +4,7 @@ import { AnimatePresence } from "motion/react";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineInput } from "~/item-line-detail/ui/ItemLineInput";
 import {
-	ItemLineInputsHeader,
+	ItemLineWithdrawAction,
 	type ItemLineInputsWithdrawAction,
 } from "~/item-line-detail/ui/ItemLineInputWithdrawal";
 
@@ -27,14 +27,14 @@ export const ItemLineInputs = ({
 	readonly withdraw?: ItemLineInputsWithdrawAction;
 }) => (
 	<section className="min-w-0">
-		<ItemLineInputsHeader withdraw={withdraw} />
+		<ItemLineWithdrawAction withdraw={withdraw} />
 		{input.length === 0 ? (
 			<p className="py-3 text-sm text-muted">
 				<Tx label="No material input required." />
 			</p>
 		) : (
 			<div
-				className="space-y-1 pt-2"
+				className="space-y-1"
 				data-ui="TileLineInputsList"
 			>
 				<AnimatePresence

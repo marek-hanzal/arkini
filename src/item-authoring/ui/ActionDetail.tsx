@@ -1,3 +1,4 @@
+import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { MousePointerClick } from "lucide-react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
@@ -64,11 +65,20 @@ export const ActionDetail = ({
 					</DetailFacts>
 				) : null}
 			</DetailSection>
-			<ProductionLineInputs
-				emptyLabel={translator.textFn("No inputs")}
-				input={action.input}
-				title={translator.textFn("Requirements")}
-			/>
+			<section className="min-w-0">
+				<h4 className="flex items-center gap-1 border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+					{translator.textFn("Requirements")}
+					<EditorInfoTooltip
+						content={<Mx label="Authored production inputs summary help" />}
+					/>
+				</h4>
+				<div className="pt-2">
+					<ProductionLineInputs
+						emptyLabel={translator.textFn("No inputs")}
+						input={action.input}
+					/>
+				</div>
+			</section>
 			<RulesDetail rules={action.rules} />
 		</EditorRootCard>
 	);

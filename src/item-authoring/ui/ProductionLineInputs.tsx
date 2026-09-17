@@ -1,6 +1,4 @@
 import { Tx } from "~/translation/ui/Tx";
-import { Mx } from "~/translation/ui/Mx";
-import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { QuantityValue } from "~/item-definition/ui/QuantityValue";
@@ -68,11 +66,9 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 export const ProductionLineInputs = ({
 	emptyLabel,
 	input,
-	title,
 }: {
 	readonly emptyLabel?: string;
 	readonly input: readonly LineInputSchema.Type[];
-	readonly title?: string;
 }) => {
 	const translator = useTranslator();
 	const visibleInput = input.filter(
@@ -80,18 +76,12 @@ export const ProductionLineInputs = ({
 	);
 	return (
 		<section className="min-w-0">
-			<h4 className="flex items-center gap-1 border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-				{title ?? translator.textFn("Inputs")}
-				<EditorInfoTooltip
-					content={<Mx label="Authored production inputs summary help" />}
-				/>
-			</h4>
 			{visibleInput.length === 0 ? (
 				<p className="py-3 text-sm text-muted">
 					{emptyLabel ?? translator.textFn("No inputs")}
 				</p>
 			) : (
-				<div className="space-y-1 pt-2">
+				<div className="space-y-1">
 					{visibleInput.map((entry, index) => (
 						<LineInput
 							input={entry}

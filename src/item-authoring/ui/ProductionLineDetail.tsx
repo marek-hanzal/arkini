@@ -108,7 +108,17 @@ export const ProductionLineDetail = ({
 				<LineRuntime runtimeMs={line.runtimeMs} />
 			</div>
 			<div className="grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
-				<ProductionLineInputs input={line.input} />
+				<section className="min-w-0">
+					<h4 className="flex items-center gap-1 border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+						{translator.textFn("Inputs")}
+						<EditorInfoTooltip
+							content={<Mx label="Authored production inputs summary help" />}
+						/>
+					</h4>
+					<div className="pt-2">
+						<ProductionLineInputs input={line.input} />
+					</div>
+				</section>
 				<div
 					className="grid place-items-center text-muted"
 					data-ui="EditorProductionLineFlowChevron"

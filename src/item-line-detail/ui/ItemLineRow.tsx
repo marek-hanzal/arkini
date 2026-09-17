@@ -69,6 +69,8 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 			</AnimatePresence>
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<ItemLineStatus
+					pendingSelection={commands.pending.selection}
+					selectFn={commands.selectFn}
 					disabled={disabled}
 					line={line}
 					queued={queued}

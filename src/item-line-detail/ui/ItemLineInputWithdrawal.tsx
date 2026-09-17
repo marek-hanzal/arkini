@@ -12,15 +12,12 @@ export interface ItemLineInputsWithdrawAction {
 	readonly pending: boolean;
 }
 
-export const ItemLineInputsHeader = ({
+export const ItemLineWithdrawAction = ({
 	withdraw,
 }: {
 	readonly withdraw?: ItemLineInputsWithdrawAction;
 }) => (
-	<div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
-		<h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-			<Tx label="Inputs" />
-		</h4>
+	<div className="flex justify-end">
 		<AnimatePresence initial={false}>
 			{withdraw === undefined ? null : (
 				<motion.div
@@ -112,7 +109,7 @@ export const ItemLineUnavailableWithdrawals = ({
 			className="mt-4 min-w-0"
 			data-ui="TileLineUnavailableWithdrawals"
 		>
-			<ItemLineInputsHeader withdraw={withdraw} />
+			<ItemLineWithdrawAction withdraw={withdraw} />
 			<div className="ml-auto flex flex-wrap justify-end gap-2 pt-3">
 				{buffered.map((candidate) => (
 					<MaterialInputWithdraw

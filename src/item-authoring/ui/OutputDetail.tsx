@@ -8,6 +8,7 @@ import { RulesDetail } from "~/item-authoring/ui/RulesDetail";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { Mx } from "~/translation/ui/Mx";
 
 /** Renders canonical authored output through the shared output presentation. */
@@ -45,8 +46,16 @@ export const OutputDetail = ({
 			)}
 			renderSetDetailFn={(set) =>
 				set.rules === undefined || set.rules.length === 0 ? null : (
-					<div className="mb-3">
+					<div className="mb-3 grid gap-3">
+						<EditorFormSectionDivider
+							title={translator.textFn("Rules")}
+							variant="secondary"
+						/>
 						<RulesDetail rules={set.rules} />
+						<EditorFormSectionDivider
+							title={translator.textFn("Items")}
+							variant="secondary"
+						/>
 					</div>
 				)
 			}

@@ -219,7 +219,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 		{output.length === 0 ? (
 			<p className="py-3 text-sm text-muted">{emptyLabel}</p>
 		) : (
-			<div className="flex flex-col gap-6 pt-4">
+			<div className="flex flex-col gap-6">
 				{output.map((set, setIndex) => (
 					<div
 						key={`${setIndex}:${set.weight}`}

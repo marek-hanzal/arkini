@@ -31,7 +31,7 @@ export const OutputDetail = ({
 			output={projectAuthoredOutputFn(output, items)}
 			renderItemDetailFn={(item) =>
 				item.rules.length === 0 ? null : (
-					<div className="border-l-2 border-accent pl-24">
+					<div className="ml-24 border-l-2 border-accent">
 						<RulesDetail rules={item.rules} />
 					</div>
 				)

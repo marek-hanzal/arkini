@@ -146,13 +146,13 @@ export const RulesDetail = ({ rules }: { readonly rules: readonly RuleSchema.Typ
 					<Tx label="No rules" />
 				</p>
 			) : (
-				<ul className="text-sm">
+				<ul className="grid gap-1.5 text-sm">
 					{rules.map((rule, index) => (
 						<li
-							className="grid gap-2 py-3 first:pt-0 last:pb-0"
+							className="grid gap-1.5"
 							key={`${rule.type}-${index}`}
 						>
-							<ul className="grid gap-3 text-muted">
+							<ul className="grid gap-1.5 text-muted">
 								{rule.when.map((when, whenIndex) => (
 									<WhenDetail
 										key={`${when.type}-${whenIndex}`}

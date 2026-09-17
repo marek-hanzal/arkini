@@ -3,6 +3,7 @@ import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
+import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -40,9 +41,24 @@ const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
 						</>
 					),
 				)
+				.with(
+					{
+						type: "limit",
+					},
+					() => <Tx label="Limit" />,
+				)
 				.exhaustive()}
 		</p>
-		<QueryDetail query={when.query} />
+		{when.type === "limit" ? (
+			<SelectorDetail
+				selector={{
+					type: "item",
+					itemId: when.itemId,
+				}}
+			/>
+		) : (
+			<QueryDetail query={when.query} />
+		)}
 	</li>
 );
 

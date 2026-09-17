@@ -4,10 +4,12 @@ import type {
 	AcquisitionRequirement,
 	AcquisitionUnsupportedRequirement,
 } from "~/flow/type/AcquisitionGraph";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 export namespace readAcquisitionAvailabilityRequirementsFn {
 	export interface Props {
+		readonly items: GameConfigSchema.Type["items"];
 		readonly rules: ReadonlyArray<{
 			readonly type: string;
 			readonly when: ReadonlyArray<WhenSchema.Type>;
@@ -16,8 +18,10 @@ export namespace readAcquisitionAvailabilityRequirementsFn {
 	}
 }
 
-const readSatisfyQuantityFn = (when: WhenSchema.Type) => {
+const readSatisfyQuantityFn = (when: WhenSchema.Type, items: GameConfigSchema.Type["items"]) => {
 	switch (when.type) {
+		case "limit":
+			return items[when.itemId]?.maxCount;
 		case "exists":
 			return 1;
 		case "count":
@@ -29,6 +33,7 @@ const readSatisfyQuantityFn = (when: WhenSchema.Type) => {
 
 const readFalsifyQuantityFn = (when: WhenSchema.Type) => {
 	switch (when.type) {
+		case "limit":
 		case "exists":
 			return undefined;
 		case "count":
@@ -43,7 +48,7 @@ const makeRequirementFn = (
 	quantity: number,
 	source: "line-condition" | "output-condition",
 ): AcquisitionRequirement => ({
-	factId: when.query.selector.itemId,
+	factId: when.type === "limit" ? when.itemId : when.query.selector.itemId,
 	quantity,
 	source,
 	usage: "ongoing",
@@ -56,13 +61,14 @@ const addUnsupportedRequirementFn = (
 	source: "line-condition" | "output-condition",
 ) =>
 	unsupported.push({
-		factId: when.query.selector.itemId,
+		factId: when.type === "limit" ? when.itemId : when.query.selector.itemId,
 		reason,
 		source,
 	});
 
 /** Projects authored enable/disable conditions into positive static facts. */
 export const readAcquisitionAvailabilityRequirementsFn = ({
+	items,
 	rules,
 	source,
 }: readAcquisitionAvailabilityRequirementsFn.Props) => {
@@ -72,9 +78,11 @@ export const readAcquisitionAvailabilityRequirementsFn = ({
 	for (const rule of rules) {
 		if (rule.type === "enable") {
 			for (const when of rule.when) {
-				const quantity = readSatisfyQuantityFn(when);
+				const quantity = readSatisfyQuantityFn(when, items);
 				if (quantity !== undefined && quantity > 0)
 					allOf.push(makeRequirementFn(when, quantity, source));
+				if (when.type === "limit" && quantity === undefined)
+					addUnsupportedRequirementFn(unsupported, when, "uncapped-limit", source);
 				if (when.type === "count")
 					addUnsupportedRequirementFn(unsupported, when, "exact-count", source);
 				if (when.type === "range")
@@ -86,6 +94,11 @@ export const readAcquisitionAvailabilityRequirementsFn = ({
 		const alternatives: AcquisitionRequirement[] = [];
 		let factFree = false;
 		for (const when of rule.when) {
+			// An uncapped Limit is always false, so the complete Disable conjunction cannot veto.
+			if (when.type === "limit" && items[when.itemId]?.maxCount === undefined) {
+				factFree = true;
+				break;
+			}
 			const quantity = readFalsifyQuantityFn(when);
 			if (quantity === undefined) {
 				addUnsupportedRequirementFn(unsupported, when, "negative-condition", source);

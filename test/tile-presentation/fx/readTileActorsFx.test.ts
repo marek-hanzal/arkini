@@ -5,8 +5,10 @@ import {
 	createTileActorRuntime,
 	createTemporaryTileActorRuntime,
 	tileActorGame,
+	tileActorTestConfig,
 } from "~test/tile-presentation/support/tileActorTestFixture";
 import { readTileActorsFx } from "~/tile-presentation/fx/readTileActorsFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 
@@ -16,7 +18,7 @@ const readMainActor = (runtime: RuntimeSchema.Type) =>
 			game: tileActorGame,
 			runtime,
 			surface: "main",
-		}),
+		}).pipe(Effect.provideService(GameConfigFx, tileActorTestConfig)),
 	)[0];
 
 describe("readTileActorsFx", () => {

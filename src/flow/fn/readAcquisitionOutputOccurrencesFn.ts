@@ -1,5 +1,7 @@
 import { Order } from "effect";
 
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+
 import type {
 	AcquisitionOperationOutcome,
 	AcquisitionOutputAnnotation,
@@ -44,8 +46,12 @@ const maximumOutcomeStates = 4_096;
 const requirementKeyFn = (requirements: {
 	readonly allOf: ReadonlyArray<AcquisitionRequirement>;
 	readonly anyOf: ReadonlyArray<ReadonlyArray<AcquisitionRequirement>>;
+	readonly unsupported?: ReadonlyArray<AcquisitionUnsupportedRequirement>;
 }) =>
 	JSON.stringify({
+		// A permanently false Limit must not share co-product credit with an available occurrence.
+		unavailable:
+			requirements.unsupported?.some(({ reason }) => reason === "uncapped-limit") ?? false,
 		allOf: [
 			...requirements.allOf,
 		].sort((left, right) => Order.String(JSON.stringify(left), JSON.stringify(right))),
@@ -200,6 +206,7 @@ const readMarginalDistributionFn = (
 /** Translates authored output schema into bounded occurrence, group and joint distributions. */
 export const readAcquisitionOutputOccurrencesFn = (
 	output: OutputSchema.Type | undefined,
+	items: GameConfigSchema.Type["items"],
 ): AcquisitionOutputModel => {
 	if (output === undefined)
 		return {
@@ -225,6 +232,7 @@ export const readAcquisitionOutputOccurrencesFn = (
 		candidateRules: ReadonlyArray<DropRuleSchema.Type> = [],
 	): Distribution | undefined => {
 		const requirements = readAcquisitionAvailabilityRequirementsFn({
+			items,
 			rules: [
 				...candidateRules,
 				...drop.rules,

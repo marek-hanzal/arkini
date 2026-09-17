@@ -24,18 +24,25 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 		}
 	}
 	for (const rule of line.rules)
-		for (const when of rule.when) inputs.add(when.query.selector.itemId);
+		for (const when of rule.when)
+			inputs.add(when.type === "limit" ? when.itemId : when.query.selector.itemId);
 	for (const set of line.output?.set ?? []) {
 		for (const roll of set.roll) {
 			if (roll.type === "weight")
 				for (const candidate of roll.drop)
 					for (const rule of candidate.rules)
-						for (const when of rule.when) outputs.add(when.query.selector.itemId);
+						for (const when of rule.when)
+							outputs.add(
+								when.type === "limit" ? when.itemId : when.query.selector.itemId,
+							);
 			const drops = readDraftRollDropsFn(roll);
 			for (const drop of drops) outputs.add(drop.itemId);
 			for (const drop of drops)
 				for (const rule of drop.rules)
-					for (const when of rule.when) outputs.add(when.query.selector.itemId);
+					for (const when of rule.when)
+						outputs.add(
+							when.type === "limit" ? when.itemId : when.query.selector.itemId,
+						);
 		}
 	}
 	return {

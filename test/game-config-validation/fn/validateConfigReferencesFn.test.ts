@@ -49,6 +49,48 @@ const unitsInput = (itemId: string) => ({
 });
 
 describe("completed config reference validation", () => {
+	it("reports the exact Limit target path through canonical source compilation", async () => {
+		const result = await compileItems({
+			producer: createProducerItem({
+				id: "producer",
+				lines: [
+					{
+						...createLine({}),
+						rules: [
+							{
+								type: "disable",
+								when: [
+									{
+										type: "limit",
+										itemId: "missing",
+									},
+								],
+							},
+						],
+					},
+				],
+			}),
+		});
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+				reference: DiagnosticRecordEntityEnumSchema.enum.Item,
+				referenceId: "missing",
+				path: [
+					"items",
+					"producer",
+					"lines",
+					0,
+					"rules",
+					0,
+					"when",
+					0,
+					"itemId",
+				],
+			}),
+		);
+	});
+
 	it("reports canonical record key and embedded ID mismatches", async () => {
 		const result = await compileItems({
 			"item:key": createSimpleItem("item:embedded"),

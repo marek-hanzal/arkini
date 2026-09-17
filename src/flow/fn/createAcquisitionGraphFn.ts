@@ -86,7 +86,11 @@ const readLineOperationInputsFn = (line: LineSchema.Type) =>
 		}
 	});
 
-const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => {
+const readLineDescriptorFn = (
+	config: GameConfigSchema.Type,
+	owner: ItemSchema.Type,
+	line: LineSchema.Type,
+) => {
 	if (!line.enable && !line.rules.some(({ type }) => type === "enable")) return undefined;
 	const requirements: AcquisitionRequirement[] = [
 		{
@@ -133,6 +137,7 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 	}
 
 	const availability = readAcquisitionAvailabilityRequirementsFn({
+		items: config.items,
 		rules: line.rules,
 		source: "line-condition",
 	});
@@ -152,6 +157,7 @@ const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => 
 			availability,
 			owner.clock !== undefined && owner.control === "automatic-only"
 				? readAcquisitionAvailabilityRequirementsFn({
+						items: config.items,
 						rules: owner.clock.rules,
 						source: "line-condition",
 					})
@@ -216,7 +222,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 					minimumActionIntervalMs,
 				}),
 	};
-	const outputModel = readAcquisitionOutputOccurrencesFn(descriptor.line.output);
+	const outputModel = readAcquisitionOutputOccurrencesFn(descriptor.line.output, config.items);
 	const operation = {
 		...descriptor.operation,
 		...(outputModel.compilation === "complete"
@@ -265,7 +271,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 		if (units?.output === undefined || spendPerRun > units.amount) continue;
 		if (units.amount % spendPerRun !== 0) continue;
 		const runMultiplier = units.amount / spendPerRun;
-		const unitOutputModel = readAcquisitionOutputOccurrencesFn(units.output);
+		const unitOutputModel = readAcquisitionOutputOccurrencesFn(units.output, config.items);
 		for (const occurrence of unitOutputModel.occurrences)
 			routes.push({
 				...execution,
@@ -317,7 +323,7 @@ const compileAcquisitionLineRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items))
 		for (const line of item.lines) {
-			const descriptor = readLineDescriptorFn(item, line);
+			const descriptor = readLineDescriptorFn(config, item, line);
 			if (descriptor !== undefined) routes.push(...readLineRoutesFn(config, descriptor));
 		}
 	return routes;
@@ -393,7 +399,7 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 			sourceItemId: source.id,
 			targetItemId: merge.target.itemId,
 		} as const;
-		const outputModel = readAcquisitionOutputOccurrencesFn(merge.output);
+		const outputModel = readAcquisitionOutputOccurrencesFn(merge.output, config.items);
 		const replacementOutputGroupId = "output:replacement";
 		const operation = {
 			id: readAcquisitionIdentityFn("source", source.id, "merge", mergeIndex),
@@ -494,7 +500,10 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 
 		for (const [participantIndex, participant] of unitParticipants.entries()) {
 			if (participant.units.output === undefined) continue;
-			const unitOutputModel = readAcquisitionOutputOccurrencesFn(participant.units.output);
+			const unitOutputModel = readAcquisitionOutputOccurrencesFn(
+				participant.units.output,
+				config.items,
+			);
 			const depletionRequirements: AcquisitionRoute["requirements"] = {
 				...requirements,
 				allOf: requirements.allOf.map((requirement) =>
@@ -561,12 +570,12 @@ const compileAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 	return routes;
 };
 
-const readExpiryRoutesFn = (item: ItemSchema.Type) => {
+const readExpiryRoutesFn = (config: GameConfigSchema.Type, item: ItemSchema.Type) => {
 	const clock = item.clock;
 	const durationMs = clock?.durationMs;
 	if (clock === undefined || durationMs === undefined) return [];
 	const kind = "clock-expiry";
-	const outputModel = readAcquisitionOutputOccurrencesFn(clock.onExpire);
+	const outputModel = readAcquisitionOutputOccurrencesFn(clock.onExpire, config.items);
 	return outputModel.occurrences.map(
 		(output): AcquisitionRoute => ({
 			...(!clock.enable && !clock.rules.some(({ type }) => type === "enable")
@@ -615,6 +624,7 @@ const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 					unsupported: output.requirements.unsupported ?? [],
 				},
 				readAcquisitionAvailabilityRequirementsFn({
+					items: config.items,
 					rules: clock.rules,
 					source: "line-condition",
 				}),
@@ -628,7 +638,7 @@ const readExpiryRoutesFn = (item: ItemSchema.Type) => {
 const compileAcquisitionExpiryRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: AcquisitionRoute[] = [];
 	for (const item of Object.values(config.items)) {
-		routes.push(...readExpiryRoutesFn(item));
+		routes.push(...readExpiryRoutesFn(config, item));
 	}
 	return routes;
 };
@@ -640,7 +650,17 @@ export const createAcquisitionGraphFn = (config: GameConfigSchema.Type) => {
 		...compileAcquisitionLineRoutesFn(config),
 		...compileAcquisitionMergeRoutesFn(config),
 		...compileAcquisitionExpiryRoutesFn(config),
-	].sort((left, right) => Order.String(left.id, right.id));
+	]
+		.map(
+			(route): AcquisitionRoute =>
+				route.requirements.unsupported?.some(({ reason }) => reason === "uncapped-limit")
+					? {
+							...route,
+							executionConstraint: "unavailable",
+						}
+					: route,
+		)
+		.sort((left, right) => Order.String(left.id, right.id));
 
 	return {
 		factIds: Object.keys(config.items).sort(Order.String),

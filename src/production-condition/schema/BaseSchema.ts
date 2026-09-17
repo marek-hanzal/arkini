@@ -20,7 +20,7 @@ export const BaseSchema = z
 	.strict()
 	.meta({
 		id: "when.BaseSchema",
-		description: "The common item query shared by every condition.",
+		description: "The common item query shared by query-based conditions.",
 	});
 
 export type BaseSchema = typeof BaseSchema;

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
@@ -129,6 +130,7 @@ describe("whenFx", () => {
 						when,
 					}),
 				).pipe(
+					Effect.provideService(GameConfigFx, config),
 					Effect.provideService(RuntimeFx, {
 						read: Effect.die(
 							new Error("An unavailable Board origin must not read Runtime."),

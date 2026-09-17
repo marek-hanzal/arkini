@@ -19,7 +19,7 @@ export const ItemConnectionRow = ({
 	const project = useEditorProject();
 	return (
 		<article
-			className="relative flex min-h-16 min-w-0 items-center gap-4 rounded-xl bg-secondary-subtle p-3 ring-1 ring-inset ring-control-border/60 transition-colors hover:bg-secondary-hover hover:ring-control-border"
+			className="ak-list-row ak-list-row-interactive flex min-h-16 min-w-0 items-center gap-4 p-3"
 			data-ui="EditorItemConnectionsRow"
 		>
 			<EditorItemThumbnail
@@ -128,7 +128,7 @@ const ConnectionOrigin = ({
 				outputCandidate: roll?.candidateIndex,
 			}}
 			data-ui="EditorItemConnectionOriginLink"
-			className="relative z-10 inline min-h-0 border-0 bg-transparent p-0 text-left text-xs font-normal text-accent/65 underline-offset-4 shadow-none hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
+			className="relative z-10 inline min-h-0 border-0 bg-transparent p-0 text-left text-xs font-normal text-muted underline-offset-4 shadow-none hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
 		>
 			{label}
 			{" · "}

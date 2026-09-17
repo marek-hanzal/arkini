@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "i7unvc2otmcnyzljh9spq33d",
+		"id": "beagle-with-battle-axe-and-shield",
+		"title": "Beagle With Battle Axe And Shield",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"beagle-with-battle-axe-and-shield"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

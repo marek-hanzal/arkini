@@ -13,6 +13,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle-with-battle-axe-and-shield"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "armored-beagle-with-sword-and-shield"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

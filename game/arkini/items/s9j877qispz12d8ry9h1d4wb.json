@@ -2,8 +2,8 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "s9j877qispz12d8ry9h1d4wb",
-		"id": "water",
-		"title": "Water",
+		"id": "bucket-with-water",
+		"title": "Bucket with Water",
 		"description": "Everybody needs to drink.",
 		"artwork": {
 			"scale": 1,
@@ -103,6 +103,38 @@
 					]
 				},
 				"effect": "spend"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-well"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "empty-well-with-water-bucket"
 			}
 		],
 		"maxQueueSize": 1,

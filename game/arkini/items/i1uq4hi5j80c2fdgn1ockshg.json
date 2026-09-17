@@ -154,6 +154,15 @@
 				},
 				"effect": "replace",
 				"result": "hungry-british-shorthair"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "british-shorthair-kitten"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "british-shorthair-kitten-on-sword"
 			}
 		],
 		"maxQueueSize": 1,

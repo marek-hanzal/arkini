@@ -1,20 +1,20 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "nh9tf1n52h19igah115s36jk",
-		"id": "air-pollution",
-		"title": "Air Pollution",
-		"description": "Ugly thing, it will disappear by itself, but you can also clear it by yourself.",
+		"uid": "zvnxyu8zrm905pmg1c29vv5l",
+		"id": "british-shorthair-kitten-on-sword",
+		"title": "British Shorthair Kitten On Sword",
+		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"air-pollution"
+				"british-shorthair-kitten-on-sword"
 			]
 		},
-		"scope": "board",
+		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 15000,
+			"durationMs": 30000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -26,12 +26,21 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "air-pollution",
+										"itemId": "hungry-british-shorthair-kitten",
 										"quantity": {
 											"min": 1,
 											"max": 1
 										},
-										"placement": "random",
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "sword",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
 										"rules": []
 									}
 								]

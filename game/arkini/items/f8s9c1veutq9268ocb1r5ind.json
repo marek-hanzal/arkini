@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "f8s9c1veutq9268ocb1r5ind",
+		"id": "empty-well-with-water-bucket",
+		"title": "Empty Well With Water Bucket",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"empty-well-with-water-bucket"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

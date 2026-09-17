@@ -1,0 +1,74 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "z8gv8nfkz0iatnszvpol3duk",
+		"id": "armored-beagle-with-sword-and-shield",
+		"title": "Armored Beagle With Sword And Shield",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"armored-beagle-with-sword-and-shield"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "hungry-beagle",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "sword",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "shield",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "steel-armor",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

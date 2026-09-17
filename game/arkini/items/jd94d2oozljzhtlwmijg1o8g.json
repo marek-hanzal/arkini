@@ -40,7 +40,7 @@
 						"type": "materials",
 						"selector": {
 							"type": "item",
-							"itemId": "water"
+							"itemId": "bucket-with-water"
 						},
 						"mode": "consume",
 						"quantity": {

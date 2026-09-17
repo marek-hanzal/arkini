@@ -29,9 +29,34 @@
 	},
 	"music": {
 		"playlist": [
+			"unresolved-waltz",
 			"the-tavern-at-the-crossroads-1",
-			"unresolved-waltz"
+			"open-vowels",
+			"dusty-plains",
+			"windswept-ambience",
+			"mystic-waltz",
+			"dust-and-silence",
+			"cavernous-hum",
+			"cavernous-hum-2"
 		]
+	},
+	"sfx": {
+		"events": {
+			"current-space:changed": "mixkit-space-impact-774",
+			"job:completed": "mixkit-metal-tool-drop-835",
+			"item:merged": "mixkit-impact-of-a-blow-2150",
+			"item:placed": "mixkit-heavy-sliding-door-1523",
+			"job:started": "mixkit-handgun-click-1660",
+			"job:aborted": "mixkit-hard-horror-hit-drum-565",
+			"item:expired": "mixkit-deep-water-bubbles-1321",
+			"item:spawned": "mixkit-hand-tribal-drum-562",
+			"item:unit-spent": "mixkit-hard-pop-click-2364",
+			"item:input-stored": "mixkit-train-door-open-1637",
+			"item:consumed": "mixkit-train-door-open-1637",
+			"item:depleted": "mixkit-glass-break-with-hammer-thud-759",
+			"item:split": "mixkit-pouring-a-carbonated-drink-158",
+			"item:stacked": "mixkit-deep-water-bubbles-1321"
+		}
 	},
 	"start": {
 		"currentSpace": 0,

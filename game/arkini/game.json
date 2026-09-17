@@ -45,17 +45,21 @@
 			"current-space:changed": "mixkit-space-impact-774",
 			"job:completed": "mixkit-metal-tool-drop-835",
 			"item:merged": "mixkit-impact-of-a-blow-2150",
-			"item:placed": "mixkit-heavy-sliding-door-1523",
+			"item:placed": "mixkit-quest-game-heavy-stomp-v-3049",
 			"job:started": "mixkit-handgun-click-1660",
 			"job:aborted": "mixkit-hard-horror-hit-drum-565",
-			"item:expired": "mixkit-deep-water-bubbles-1321",
 			"item:spawned": "mixkit-hand-tribal-drum-562",
 			"item:unit-spent": "mixkit-hard-pop-click-2364",
 			"item:input-stored": "mixkit-train-door-open-1637",
 			"item:consumed": "mixkit-train-door-open-1637",
 			"item:depleted": "mixkit-glass-break-with-hammer-thud-759",
 			"item:split": "mixkit-pouring-a-carbonated-drink-158",
-			"item:stacked": "mixkit-deep-water-bubbles-1321"
+			"item:stacked": "mixkit-deep-water-bubbles-1321",
+			"item-detail:closed": "mixkit-gate-latch-click-1924",
+			"item-detail:opened": "mixkit-single-classic-click-1116",
+			"job:queued": "mixkit-hard-pop-click-2364",
+			"job-queue:cleared": "mixkit-hard-horror-hit-drum-565",
+			"item:expired": "mixkit-deep-water-bubbles-1321"
 		}
 	},
 	"start": {

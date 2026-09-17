@@ -7,7 +7,6 @@ export const RollTypeSchema = z
 	.enum({
 		Guaranteed: "guaranteed",
 		Chance: "chance",
-		Weight: "weight",
 	})
 	.meta({
 		id: "roll.TypeSchema",

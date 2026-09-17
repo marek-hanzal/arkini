@@ -54,6 +54,7 @@ const config = GameConfigSchema.parse({
 				output: {
 					set: [
 						{
+							rules: [],
 							roll: [
 								{
 									type: "guaranteed",

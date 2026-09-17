@@ -38,7 +38,7 @@ immutable Project revision
 → immutable catalog/index cached for that revision
 ```
 
-Editor Connections uses [`readItemConnectionFactsFn`](../flow/fn/readItemConnectionFactsFn.ts) to project direct authored inputs and outputs in either direction. Each item retains its source paths (line, action, merge, Units, or Clock, plus exact input, rule/condition, and output set/roll/candidate/drop positions); this lookup does not evaluate runtime availability or Estimate reachability.
+Editor Connections uses [`readItemConnectionFactsFn`](../flow/fn/readItemConnectionFactsFn.ts) to project direct authored inputs and outputs in either direction. Each item retains its source paths (line, action, merge, Units, or Clock, plus exact input, rule/condition, and output set/roll/drop positions); this lookup does not evaluate runtime availability or Estimate reachability.
 
 Item Chain is a separate authored consequence projection in [`readItemChainsFn`](../item-chain/fn/readItemChainsFn.ts), available in Item detail and through the read-only MCP `item_chain` tool. It starts only the selected item's own directional merges and Clock, then traverses Clock expiry and Clock-selected line output. It never follows intermediate merges, other production lines or input acquisition. Each no-Clock output is terminal; periodic occurrences, roll alternatives, retained participants, finite exploration limits and cycles remain explicit. It does not consume or alter the acquisition graph, Estimate policy, runtime schedules or project persistence.
 
@@ -52,6 +52,7 @@ Item Chain is a separate authored consequence projection in [`readItemChainsFn`]
 - Additive consumed demand sums. Reusable one-time and ongoing requirements share by maximum. Concurrent route demand uses the larger consumed-plus-reusable requirement.
 - A finite root is credited once across the witness. One selected co-product operation is spent once.
 - Independent witness branches overlap on the optimistic critical path.
+- Conditional set eligibility changes the live weight denominator, so its distribution remains unsupported rather than assigning fixed probabilities.
 - Unsupported bounded distribution state returns `partial`; it never invents a scalar answer.
 - Clock lines remain ordinary authored Flow relations, and finite Clock `onExpire` uses the shared expiry projection. Automatic-only lines without both an interval and the Clock flag, and permanently disabled automatic schedules, have no Estimate execution route.
 - An unbounded automatic Clock line uses the larger of interval and line runtime as its optimistic action cadence. Initial impulse delay, queue contention and conditional runtime changes remain outside this lower bound; interactive production retains ordinary line timing.
@@ -84,4 +85,4 @@ An authored schema or production semantic change can affect both Runtime and ana
 
 Item Chain uses the default `maxDepth = 5` in [`readItemChainsFn`](../item-chain/fn/readItemChainsFn.ts); there is no depth selector. One merge or Clock operation consumes one step. If a chain stops too early with `Depth limit`, revisit this default first. The separate 400-expansion safety budget and cycle detection still bound exploration.
 
-MCP [`readItemChainTextFx`](../authoring-mcp/tool/readItemChainTextFx.ts) calls the same projection with its default depth and formats every outcome and nested step as text. Use `item_chain({ itemId })` to inspect transformations and Clock consequences, `item_input`/`item_output` for general relations, and `item_estimate` for acquisition planning. The tool has no depth input, adds no traversal or pagination, and preserves local quantities, timing, alternative sets, rolls, candidate weights, conditions and incomplete states.
+MCP [`readItemChainTextFx`](../authoring-mcp/tool/readItemChainTextFx.ts) calls the same projection with its default depth and formats every outcome and nested step as text. Use `item_chain({ itemId })` to inspect transformations and Clock consequences, `item_input`/`item_output` for general relations, and `item_estimate` for acquisition planning. The tool has no depth input, adds no traversal or pagination, and preserves local quantities, timing, alternative sets, rolls, set weights, conditions and incomplete states.

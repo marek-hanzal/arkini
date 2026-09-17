@@ -68,6 +68,7 @@ export const createRandomCompletionConfig = () => {
 							set: [
 								{
 									weight: 1,
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",
@@ -87,6 +88,7 @@ export const createRandomCompletionConfig = () => {
 								},
 								{
 									weight: 1,
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",

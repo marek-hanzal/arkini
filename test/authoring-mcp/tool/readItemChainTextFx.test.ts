@@ -18,6 +18,7 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 		set: [
 			{
 				weight: 7,
+				rules: [],
 				roll: [
 					{
 						type: "chance",
@@ -25,29 +26,14 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 						drop: outputFn("bonus").set[0].roll[0].drop,
 					},
 					{
-						type: "weight",
-						quantity: {
-							min: 2,
-							max: 3,
-						},
+						type: "guaranteed",
 						drop: [
 							{
-								rules: [],
-								weight: 9,
-								drop: [
-									{
-										...outputFn("bonus").set[0].roll[0].drop[0],
-										quantity: {
-											min: 4,
-											max: 6,
-										},
-									},
-								],
-							},
-							{
-								rules: [],
-								weight: 4,
-								drop: outputFn("end").set[0].roll[0].drop,
+								...outputFn("bonus").set[0].roll[0].drop[0],
+								quantity: {
+									min: 4,
+									max: 6,
+								},
 							},
 						],
 					},
@@ -55,6 +41,7 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 			},
 			{
 				weight: 1,
+				rules: [],
 				roll: outputFn("end").set[0].roll,
 			},
 		],
@@ -110,7 +97,7 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 		"Inputs: 0 (not expanded)",
 		"bonus [bonus] ×4–6",
 		"Alternative set 1 (weight 7) · Roll 1: chance · Chance 25%",
-		"Alternative set 1 (weight 7) · Roll 2: weight · Candidate 1 · Candidate weight 9 · Selections ×2–3",
+		"Alternative set 1 (weight 7) · Roll 2: guaranteed",
 		"Alternative set 2 (weight 1) · Roll 1: guaranteed",
 		"later [later] · Clock expiry",
 		"After: 60 s",

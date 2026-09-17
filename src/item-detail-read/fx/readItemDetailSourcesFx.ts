@@ -47,15 +47,6 @@ export namespace readItemDetailSourcesFx {
 				readonly quantity: QuantityBounds;
 				readonly setWeight: number;
 				readonly totalSetWeight: number;
-		  }
-		| {
-				readonly kind: "weight";
-				readonly optionWeight: number;
-				readonly quantity: QuantityBounds;
-				readonly selections: QuantityBounds;
-				readonly setWeight: number;
-				readonly totalOptionWeight: number;
-				readonly totalSetWeight: number;
 		  };
 
 	export interface Line {
@@ -165,33 +156,6 @@ const readMatchingFactsFn = ({
 							setWeight,
 							totalSetWeight,
 						});
-					},
-				)
-				.with(
-					{
-						type: RollTypeSchema.enum.Weight,
-					},
-					({ drop, quantity: selections }) => {
-						const totalOptionWeight = drop.reduce(
-							(total, candidate) => total + candidate.weight,
-							0,
-						);
-						for (const candidate of drop) {
-							const quantity = targetQuantityFn({
-								drop: candidate.drop,
-								targetDefinitionItemId,
-							});
-							if (quantity === undefined) continue;
-							facts.push({
-								kind: "weight",
-								optionWeight: candidate.weight,
-								quantity,
-								selections: quantityBoundsFn(selections),
-								setWeight,
-								totalOptionWeight,
-								totalSetWeight,
-							});
-						}
 					},
 				)
 				.exhaustive();

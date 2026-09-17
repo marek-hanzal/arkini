@@ -7,6 +7,7 @@ const output = (itemId: string, conditional = false) => ({
 	set: [
 		{
 			weight: 1,
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed",

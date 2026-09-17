@@ -41,6 +41,7 @@ const drop = (itemId: string, min = 1, max = min) => ({
 const guaranteedOutput = (itemId: string) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
@@ -57,6 +58,7 @@ const targetOutput = {
 	set: [
 		{
 			weight: 3,
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
@@ -75,6 +77,7 @@ const targetOutput = {
 		},
 		{
 			weight: 1,
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,

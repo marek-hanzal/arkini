@@ -54,24 +54,6 @@ const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSc
 								: "stochastic";
 						},
 					)
-					.with(
-						{
-							type: RollTypeSchema.enum.Weight,
-						},
-						(weight) => {
-							const candidates = weight.drop.map((candidate) => {
-								const certainty = readDropCertaintyFn(candidate.drop, itemId);
-								return certainty === "guaranteed" && candidate.rules.length > 0
-									? "stochastic"
-									: certainty;
-							});
-							if (candidates.every((candidate) => candidate === "guaranteed"))
-								return "guaranteed";
-							return candidates.some((candidate) => candidate !== "none")
-								? "stochastic"
-								: "none";
-						},
-					)
 					.exhaustive(),
 		);
 
@@ -80,7 +62,11 @@ const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSc
 		return "none" as const;
 	});
 
-	if (sets.every((set) => set === "guaranteed")) return "guaranteed";
+	if (
+		sets.every((set) => set === "guaranteed") &&
+		output.set.some((set) => set.rules.length === 0)
+	)
+		return "guaranteed";
 	if (sets.some((set) => set !== "none")) return "stochastic";
 	return "none";
 };

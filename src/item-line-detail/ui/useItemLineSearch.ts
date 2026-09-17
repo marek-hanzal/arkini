@@ -124,18 +124,6 @@ const useItemLineSearchCandidates = (
 						...chance.item.flatMap(readOutputItemSearchTermsFn),
 					],
 				)
-				.with(
-					{
-						kind: "weight",
-					},
-					(weight) => [
-						"weighted",
-						"selection",
-						...weight.option.flatMap((option) =>
-							option.item.flatMap(readOutputItemSearchTermsFn),
-						),
-					],
-				)
 				.exhaustive();
 		const readAvailabilityLabelFn = (availability: ItemDetailLinesProjection.Availability) =>
 			match(availability)

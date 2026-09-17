@@ -3,7 +3,7 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /**
- * Inclusive positive bounds resolved by one input, output, or weighted roll.
+ * Inclusive positive bounds resolved by one input or output drop.
  */
 export const QuantitySchema = z
 	.object({

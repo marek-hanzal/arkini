@@ -11,46 +11,42 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 		const result = readFn({
 			set: [
 				{
+					weight: 1,
+					rules: [],
 					roll: [
 						{
+							type: "guaranteed",
 							drop: [
 								{
+									itemId: "a",
+									quantity: {
+										min: 1,
+										max: 2,
+									},
 									rules: [],
-									drop: [
-										{
-											itemId: "a",
-											quantity: {
-												max: 2,
-												min: 1,
-											},
-											rules: [],
-										},
-									],
-									weight: 1,
-								},
-								{
-									rules: [],
-									drop: [
-										{
-											itemId: "b",
-											quantity: {
-												max: 1,
-												min: 1,
-											},
-											rules: [],
-										},
-									],
-									weight: 1,
 								},
 							],
-							quantity: {
-								max: 1,
-								min: 1,
-							},
-							type: "weight",
 						},
 					],
+				},
+				{
 					weight: 1,
+					rules: [],
+					roll: [
+						{
+							type: "guaranteed",
+							drop: [
+								{
+									itemId: "b",
+									quantity: {
+										min: 1,
+										max: 1,
+									},
+									rules: [],
+								},
+							],
+						},
+					],
 				},
 			],
 		});
@@ -78,6 +74,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 		const result = readFn({
 			set: [
 				{
+					rules: [],
 					roll: [
 						{
 							drop: [
@@ -164,66 +161,62 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 		});
 	});
 
-	it("keeps candidate requirements while refusing a false static weight distribution", () => {
+	it("keeps set requirements while refusing a false static weight distribution", () => {
 		const result = readFn({
 			set: [
 				{
-					roll: [
+					weight: 1,
+					rules: [
 						{
-							type: "weight",
-							quantity: {
-								min: 1,
-								max: 1,
-							},
-							drop: [
+							type: "enable",
+							when: [
 								{
-									rules: [
-										{
-											type: "enable",
-											when: [
-												{
-													type: "exists",
-													query: {
-														scope: "universe",
-														selector: {
-															type: "item",
-															itemId: "permit",
-														},
-													},
-												},
-											],
+									type: "exists",
+									query: {
+										scope: "universe",
+										selector: {
+											type: "item",
+											itemId: "permit",
 										},
-									],
-									weight: 1,
-									drop: [
-										{
-											itemId: "a",
-											quantity: {
-												min: 1,
-												max: 1,
-											},
-											rules: [],
-										},
-									],
-								},
-								{
-									rules: [],
-									weight: 1,
-									drop: [
-										{
-											itemId: "b",
-											quantity: {
-												min: 1,
-												max: 1,
-											},
-											rules: [],
-										},
-									],
+									},
 								},
 							],
 						},
 					],
+					roll: [
+						{
+							type: "guaranteed",
+							drop: [
+								{
+									itemId: "a",
+									quantity: {
+										min: 1,
+										max: 1,
+									},
+									rules: [],
+								},
+							],
+						},
+					],
+				},
+				{
 					weight: 1,
+					rules: [],
+					roll: [
+						{
+							type: "guaranteed",
+							drop: [
+								{
+									itemId: "b",
+									quantity: {
+										min: 1,
+										max: 1,
+									},
+									rules: [],
+								},
+							],
+						},
+					],
 				},
 			],
 		});
@@ -259,6 +252,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 		const result = readFn({
 			set: [
 				{
+					rules: [],
 					roll: Array.from(
 						{
 							length: 14,
@@ -281,6 +275,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 			readFn({
 				set: [
 					{
+						rules: [],
 						roll: [
 							{
 								drop: [

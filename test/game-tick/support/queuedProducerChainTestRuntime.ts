@@ -29,6 +29,7 @@ const simpleItem = (id: string) => ({
 const output = (itemId: string) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,

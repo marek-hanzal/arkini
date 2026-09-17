@@ -83,6 +83,7 @@ const createConfig = (scope: "any" | "universe") => {
 					output: {
 						set: [
 							{
+								rules: [],
 								roll: [
 									{
 										type: "guaranteed",

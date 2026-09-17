@@ -17,13 +17,6 @@ export namespace OutputProjection {
 		readonly rules: readonly DropRuleSchema.Type[];
 	}
 
-	export interface WeightedOption<Item> {
-		readonly activeRuleHints: readonly string[];
-		readonly weight: number;
-		readonly item: readonly Item[];
-		readonly rules?: readonly DropRuleSchema.Type[];
-	}
-
 	export type Roll<Item> =
 		| {
 				readonly kind: "guaranteed";
@@ -33,14 +26,11 @@ export namespace OutputProjection {
 				readonly kind: "chance";
 				readonly chance: number;
 				readonly item: readonly Item[];
-		  }
-		| {
-				readonly kind: "weight";
-				readonly selections: Readonly<QuantitySchema.Type>;
-				readonly option: readonly WeightedOption<Item>[];
 		  };
 
 	export interface Set<Item> {
+		readonly activeRuleHints: readonly string[];
+		readonly rules?: readonly DropRuleSchema.Type[];
 		readonly weight: number;
 		readonly roll: readonly Roll<Item>[];
 	}

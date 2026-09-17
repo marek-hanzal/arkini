@@ -4,7 +4,7 @@ import { DisableDropRuleSchema } from "./DisableDropRuleSchema";
 import { EnableDropRuleSchema } from "./EnableDropRuleSchema";
 
 /**
- * An output availability rule used by weighted candidates or selected drops.
+ * An output availability rule used by output sets or selected drops.
  *
  * Each member owns its own behavior and fields. The `type` discriminator keeps
  * the union explicit and directly compatible with `ts-pattern`.

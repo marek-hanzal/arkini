@@ -22,6 +22,7 @@
 				"set": [
 					{
 						"weight": 1,
+						"rules": [],
 						"roll": [
 							{
 								"type": "guaranteed",
@@ -62,88 +63,99 @@
 					"set": [
 						{
 							"weight": 1,
+							"rules": [],
 							"roll": [
 								{
-									"type": "weight",
-									"quantity": {
-										"min": 1,
-										"max": 1
-									},
+									"type": "guaranteed",
 									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "clay-bowl-with-milk",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "clay-bowl-with-milk",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "clay-jug-with-milk",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "clay-jug-with-milk",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "clay-bowl-with-cream",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "clay-bowl-with-cream",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "cauldron-with-milk",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "cauldron-with-milk",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "milk-mug",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
+											"itemId": "milk-mug",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										}
 									]
 								}

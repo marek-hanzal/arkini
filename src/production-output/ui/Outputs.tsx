@@ -85,15 +85,11 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 	roll,
 	renderItemDetailFn,
 	renderItemFn,
-	renderWeightedOptionDetailFn,
 	variant,
 }: {
 	readonly roll: OutputProjection.Roll<Item>;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
-	readonly renderWeightedOptionDetailFn?: (
-		option: OutputProjection.WeightedOption<Item>,
-	) => ReactNode;
 	readonly variant: OutputsVariant;
 }) =>
 	match(roll)
@@ -143,53 +139,6 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 				</div>
 			),
 		)
-		.with(
-			{
-				kind: "weight",
-			},
-			(weight) => (
-				<div
-					className="grid gap-3 py-2"
-					data-ui="TileLineOutputRoll"
-					data-roll-kind="weight"
-				>
-					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						<QuantityValue quantity={weight.selections} />{" "}
-						<Tx label="Weighted selections" />
-					</p>
-					{weight.option.map((option, index) => (
-						<div
-							key={`${index}:${option.weight}`}
-							className={twMerge(
-								"pl-3",
-								variant === "editor-tree" && "pl-0",
-							)}
-						>
-							<p className="mb-1.5 text-xs text-muted">
-								<Tx label="Weight" /> {option.weight}
-							</p>
-							{renderWeightedOptionDetailFn?.(option)}
-							{option.activeRuleHints.map((hint, hintIndex) => (
-								<p
-									className="mb-1.5 flex items-start gap-1.5 text-xs text-muted"
-									data-ui="TileLineOutputCandidateRuleHint"
-									key={`${hint}-${hintIndex}`}
-								>
-									<Info className="mt-px size-3.5 shrink-0 text-secondary-foreground" />
-									<span>{hint}</span>
-								</p>
-							))}
-							<OutputItems
-								items={option.item}
-								renderItemDetailFn={renderItemDetailFn}
-								renderItemFn={renderItemFn}
-								variant={variant}
-							/>
-						</div>
-					))}
-				</div>
-			),
-		)
 		.exhaustive();
 
 /** Renders every authored output alternative and roll for one visible product line. */
@@ -198,7 +147,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	output,
 	renderItemDetailFn,
 	renderItemFn,
-	renderWeightedOptionDetailFn,
+	renderSetDetailFn,
 	title = <Tx label="Outputs" />,
 	variant = "compact",
 }: {
@@ -206,9 +155,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	readonly output: readonly OutputProjection.Set<Item>[];
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
-	readonly renderWeightedOptionDetailFn?: (
-		option: OutputProjection.WeightedOption<Item>,
-	) => ReactNode;
+	readonly renderSetDetailFn?: (set: OutputProjection.Set<Item>) => ReactNode;
 	readonly title?: ReactNode;
 	readonly variant?: OutputsVariant;
 }) => (
@@ -237,10 +184,23 @@ export const Outputs = <Item extends OutputProjection.Item>({
 								<Tx label="Output set" /> {setIndex + 1}
 							</h5>
 							<span className="min-w-0 flex-1 border-t border-line-strong" />
-							<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
-								<Tx label="Weight" /> {set.weight}
-							</span>
+							{output.length > 1 ? (
+								<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
+									<Tx label="Weight" /> {set.weight}
+								</span>
+							) : null}
 						</header>
+						{renderSetDetailFn?.(set)}
+						{set.activeRuleHints.map((hint, index) => (
+							<p
+								className="mb-1.5 flex items-start gap-1.5 text-xs text-muted"
+								data-ui="TileLineOutputSetRuleHint"
+								key={`${hint}-${index}`}
+							>
+								<Info className="mt-px size-3.5 shrink-0 text-secondary-foreground" />
+								<span>{hint}</span>
+							</p>
+						))}
 						<div
 							className={
 								variant === "editor-tree"
@@ -254,7 +214,6 @@ export const Outputs = <Item extends OutputProjection.Item>({
 									roll={roll}
 									renderItemDetailFn={renderItemDetailFn}
 									renderItemFn={renderItemFn}
-									renderWeightedOptionDetailFn={renderWeightedOptionDetailFn}
 									variant={variant}
 								/>
 							))}

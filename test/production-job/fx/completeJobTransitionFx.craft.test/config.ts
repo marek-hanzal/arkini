@@ -20,6 +20,7 @@ const guaranteedOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 	OutputSchema.parse({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						drop: itemIds.map((itemId) => fixedDrop(itemId)),
@@ -33,6 +34,7 @@ const guaranteedOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 const randomOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 	OutputSchema.parse({
 		set: itemIds.map((itemId) => ({
+			rules: [],
 			roll: [
 				{
 					drop: [

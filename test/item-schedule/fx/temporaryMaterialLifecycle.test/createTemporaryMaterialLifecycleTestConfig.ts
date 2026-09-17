@@ -18,6 +18,7 @@ const baseItem = (id: string, maxStackSize = 1) => ({
 const guaranteedOutput = (itemId: string) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,

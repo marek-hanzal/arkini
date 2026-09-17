@@ -1,10 +1,11 @@
+import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readItemConnectionFactsFn } from "~/flow/fn/readItemConnectionFactsFn";
 import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
 
-it("keeps exact drop positions including repeated identities in weighted candidates", () => {
+it("keeps exact drop positions including repeated identities in output sets", () => {
 	const drop = {
 		itemId: "result",
 		placement: "drop" as const,
@@ -26,6 +27,20 @@ it("keeps exact drop positions including repeated identities in weighted candida
 				set: [
 					{
 						weight: 1,
+						rules: [],
+						roll: [
+							{
+								type: "guaranteed",
+								drop: [
+									drop,
+									drop,
+								],
+							},
+						],
+					},
+					{
+						weight: 2,
+						rules: [],
 						roll: [
 							{
 								type: "guaranteed",
@@ -33,34 +48,11 @@ it("keeps exact drop positions including repeated identities in weighted candida
 									drop,
 								],
 							},
-							{
-								type: "weight",
-								quantity: {
-									min: 1,
-									max: 1,
-								},
-								drop: [
-									{
-										rules: [],
-										weight: 1,
-										drop: [
-											drop,
-											drop,
-										],
-									},
-									{
-										rules: [],
-										weight: 2,
-										drop: [
-											drop,
-										],
-									},
-								],
-							},
 						],
 					},
 					{
 						weight: 1,
+						rules: [],
 						roll: [
 							{
 								type: "chance",
@@ -84,27 +76,18 @@ it("keeps exact drop positions including repeated identities in weighted candida
 		},
 		{
 			setIndex: 0,
-			rollIndex: 1,
-			rollType: "weight",
-			candidateIndex: 0,
-			dropIndex: 0,
-		},
-		{
-			setIndex: 0,
-			rollIndex: 1,
-			rollType: "weight",
-			candidateIndex: 0,
+			rollIndex: 0,
+			rollType: "guaranteed",
 			dropIndex: 1,
 		},
 		{
-			setIndex: 0,
-			rollIndex: 1,
-			rollType: "weight",
-			candidateIndex: 1,
+			setIndex: 1,
+			rollIndex: 0,
+			rollType: "guaranteed",
 			dropIndex: 0,
 		},
 		{
-			setIndex: 1,
+			setIndex: 2,
 			rollIndex: 0,
 			rollType: "chance",
 			dropIndex: 0,
@@ -275,4 +258,94 @@ it("retains input and condition positions without turning absence-only guards in
 			(connection) => connection.itemId === "result",
 		)?.origins,
 	).toEqual(origins);
+});
+
+it("keeps set eligibility separate from individual drop conditions", () => {
+	const rule: DropRuleSchema.Type = {
+		type: "enable",
+		when: [
+			{
+				type: "exists" as const,
+				query: {
+					scope: "universe" as const,
+					selector: {
+						type: "item" as const,
+						itemId: "target",
+					},
+				},
+			},
+		],
+	};
+	const config = createMergeTestConfig({
+		rule: {
+			action: "use",
+			effect: "keep",
+			target: {
+				type: "item",
+				itemId: "target",
+			},
+			output: {
+				set: [
+					{
+						weight: 1,
+						rules: [
+							rule,
+						],
+						roll: [
+							{
+								type: "guaranteed",
+								drop: [
+									{
+										itemId: "result",
+										quantity: {
+											min: 1,
+											max: 1,
+										},
+										placement: "drop",
+										rules: [
+											rule,
+										],
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		},
+	});
+	const connection = readItemConnectionFactsFn(config, "source", "inputs").find(
+		({ itemId }) => itemId === "target",
+	);
+	expect(connection?.origins.filter(({ role }) => role === "condition")).toEqual([
+		{
+			source: {
+				type: "merge",
+				mergeIndex: 0,
+			},
+			role: "condition",
+			condition: {
+				ruleIndex: 0,
+				whenIndex: 0,
+			},
+			setIndex: 0,
+		},
+		{
+			source: {
+				type: "merge",
+				mergeIndex: 0,
+			},
+			role: "condition",
+			condition: {
+				ruleIndex: 0,
+				whenIndex: 0,
+			},
+			roll: {
+				setIndex: 0,
+				rollIndex: 0,
+				dropIndex: 0,
+				rollType: "guaranteed",
+			},
+		},
+	]);
 });

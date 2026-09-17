@@ -24,6 +24,7 @@
 					"set": [
 						{
 							"weight": 1,
+							"rules": [],
 							"roll": [
 								{
 									"type": "chance",
@@ -106,6 +107,7 @@
 				"set": [
 					{
 						"weight": 1,
+						"rules": [],
 						"roll": [
 							{
 								"type": "guaranteed",

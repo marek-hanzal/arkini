@@ -218,6 +218,7 @@ describe("Clock expiry settlement", () => {
 		const output = OutputSchema.parse({
 			set: [
 				{
+					rules: [],
 					roll: [
 						{
 							type: "guaranteed",
@@ -495,6 +496,7 @@ describe("Clock expiry settlement", () => {
 		const output = OutputSchema.parse({
 			set: [
 				{
+					rules: [],
 					roll: [
 						{
 							type: "guaranteed",

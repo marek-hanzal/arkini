@@ -152,6 +152,7 @@ export const guaranteedMergeOutput = ({
 	set: [
 		{
 			weight: 1,
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed",
@@ -176,6 +177,7 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 	set: [
 		{
 			weight: 1,
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed",
@@ -195,6 +197,7 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 		},
 		{
 			weight: 1,
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed",

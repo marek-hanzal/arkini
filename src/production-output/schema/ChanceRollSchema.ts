@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { DropSchema } from "~/production-output/schema/DropSchema";
 
-import { BaseRollSchema } from "./BaseRollSchema";
 import { RollTypeSchema } from "./RollTypeSchema";
 
 const ProbabilitySchema = z.number().min(0).max(1).meta({
@@ -15,7 +14,6 @@ const ProbabilitySchema = z.number().min(0).max(1).meta({
  */
 export const ChanceRollSchema = z
 	.object({
-		...BaseRollSchema.shape,
 		type: RollTypeSchema.extract([
 			"Chance",
 		]),

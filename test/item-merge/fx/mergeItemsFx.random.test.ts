@@ -117,6 +117,7 @@ describe("merge random stream lifecycle", () => {
 			const output = {
 				set: weighted.set.map((set) => ({
 					...set,
+					rules: [],
 					roll: [
 						...guaranteedMergeOutput({
 							itemId: payer,

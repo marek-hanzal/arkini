@@ -7,18 +7,10 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const readOutputDropsFn = (output: OutputSchema.Type | undefined) =>
-	output?.set.flatMap((set) =>
-		set.roll.flatMap((roll) =>
-			roll.type === "weight" ? roll.drop.flatMap((candidate) => candidate.drop) : roll.drop,
-		),
-	) ?? [];
+	output?.set.flatMap((set) => set.roll.flatMap((roll) => roll.drop)) ?? [];
 
-const readOutputCandidateRulesFn = (output: OutputSchema.Type | undefined) =>
-	output?.set.flatMap((set) =>
-		set.roll.flatMap((roll) =>
-			roll.type === "weight" ? roll.drop.flatMap((candidate) => candidate.rules) : [],
-		),
-	) ?? [];
+const readOutputSetRulesFn = (output: OutputSchema.Type | undefined) =>
+	output?.set.flatMap((set) => set.rules) ?? [];
 
 const requiresAbsentFactFn = (when: WhenSchema.Type, config: GameConfigSchema.Type) => {
 	switch (when.type) {
@@ -69,7 +61,7 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 		if (
 			readItemOutputsFn(item).some((output) => {
 				const rules = [
-					...readOutputCandidateRulesFn(output),
+					...readOutputSetRulesFn(output),
 					...readOutputDropsFn(output).flatMap((drop) => drop.rules),
 				];
 				if (

@@ -60,6 +60,7 @@ export const createGraphProject = () => {
 						output: {
 							set: [
 								{
+									rules: [],
 									roll: [
 										{
 											drop: [

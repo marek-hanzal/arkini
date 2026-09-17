@@ -30,6 +30,7 @@ const output = (
 ) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed",

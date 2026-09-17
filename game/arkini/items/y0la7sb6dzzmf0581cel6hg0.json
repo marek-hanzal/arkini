@@ -24,6 +24,7 @@
 					"set": [
 						{
 							"weight": 1,
+							"rules": [],
 							"roll": [
 								{
 									"type": "guaranteed",
@@ -65,6 +66,7 @@
 					"set": [
 						{
 							"weight": 1,
+							"rules": [],
 							"roll": [
 								{
 									"type": "guaranteed",
@@ -97,6 +99,7 @@
 					"set": [
 						{
 							"weight": 1,
+							"rules": [],
 							"roll": [
 								{
 									"type": "guaranteed",
@@ -170,6 +173,7 @@
 				"set": [
 					{
 						"weight": 1,
+						"rules": [],
 						"roll": [
 							{
 								"type": "guaranteed",

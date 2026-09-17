@@ -215,15 +215,7 @@ const ChainBranchReference = ({ node }: { readonly node: readItemChainsFn.Node }
 							{` · ${translator.textFn("Roll")} ${node.output.roll + 1} · `}
 							{node.output.type === "chance"
 								? `${(node.output.chance ?? 0) * 100}%`
-								: translator.textFn(
-										node.output.type === "weight" ? "Weighted" : "Guaranteed",
-									)}
-							{node.output.candidate === undefined
-								? ""
-								: ` · ${translator.textFn("Candidate")} ${node.output.candidate + 1} (${translator.textFn("Weight")} ${node.output.weight})`}
-							{node.output.selections === undefined
-								? ""
-								: ` · ${translator.textFn("Selections")} ${quantityFn(node.output.selections)}`}
+								: translator.textFn("Guaranteed")}
 							{node.output.conditional
 								? ` · ${translator.textFn("Depends on conditions")}`
 								: ""}

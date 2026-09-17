@@ -23,9 +23,13 @@ export namespace outputFx {
 export const outputFx = Effect.fn("outputFx")(function* ({ origin, output }: outputFx.Props) {
 	const selectedSet = yield* selectRollSetFx({
 		set: output.set,
-	});
-	const rollSetResult = yield* rollSetFx({
 		origin,
+	});
+	if (selectedSet === undefined)
+		return {
+			drop: [],
+		} satisfies outputFx.Result;
+	const rollSetResult = yield* rollSetFx({
 		rollSet: selectedSet,
 	});
 	const results = yield* Effect.forEach(rollSetResult.drop, (drop) => {

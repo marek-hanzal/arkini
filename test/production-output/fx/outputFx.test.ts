@@ -117,12 +117,15 @@ const chanceRoll = ({
 const createRollSet = ({
 	roll,
 	weight,
+	rules = [],
 }: {
 	roll: RollSchema.Type;
 	weight?: number;
+	rules?: RollSetSchema.Type["rules"];
 }): RollSetSchema.Type => {
 	return {
 		weight: weight ?? 1,
+		rules,
 		roll: [
 			roll,
 		],
@@ -277,12 +280,22 @@ describe("outputFx", () => {
 		});
 	});
 
-	it("filters unavailable weighted candidates before calculating selection weights", () => {
+	it.each([
+		false,
+		true,
+	])("filters unavailable sets before selection (all blocked: %s)", (allBlocked) => {
+		const rules: RollSetSchema.Type["rules"] = [
+			{
+				type: "enable",
+				when: [
+					missingPermitWhen,
+				],
+			},
+		];
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* createOriginFx();
-
-				return yield* outputFx({
+				const output = yield* outputFx({
 					origin: {
 						scope: "board",
 						space: 0,
@@ -291,49 +304,41 @@ describe("outputFx", () => {
 					output: {
 						set: [
 							createRollSet({
-								roll: {
-									type: "weight",
-									quantity: {
-										min: 1,
-										max: 1,
-									},
-									drop: [
-										{
-											rules: [],
-											weight: 1,
-											drop: [
-												createDrop({
-													itemId: "item:normal",
-												}),
-											],
+								weight: 1,
+								rules: allBlocked ? rules : [],
+								roll: guaranteedRoll(
+									createDrop({
+										itemId: "item:normal",
+									}),
+								),
+							}),
+							createRollSet({
+								weight: 99,
+								rules,
+								roll: chanceRoll({
+									chance: 0.5,
+									drop: createDrop({
+										itemId: "item:blocked",
+										quantity: {
+											min: 1,
+											max: 4,
 										},
-										{
-											rules: [
-												{
-													type: "enable",
-													when: [
-														missingPermitWhen,
-													],
-												},
-											],
-											weight: 99,
-											drop: [
-												createDrop({
-													itemId: "item:blocked",
-												}),
-											],
-										},
-									],
-								},
+									}),
+								}),
 							}),
 						],
 					},
 				});
+				return {
+					output,
+					nextRandom: yield* Random.next,
+				};
 			}).pipe(
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([
 						0.99,
+						0.25,
 					]),
 				),
 				useGameFx({
@@ -341,15 +346,19 @@ describe("outputFx", () => {
 				}),
 			),
 		);
-
 		expect(result).toEqual({
-			drop: [
-				{
-					itemId: "item:normal",
-					placement: "drop",
-					quantity: 1,
-				},
-			],
+			output: {
+				drop: allBlocked
+					? []
+					: [
+							{
+								itemId: "item:normal",
+								placement: "drop",
+								quantity: 1,
+							},
+						],
+			},
+			nextRandom: 0.99,
 		});
 	});
 

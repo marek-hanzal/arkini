@@ -24,6 +24,7 @@ const dropOf = (itemId: string): DropSchema.Type => ({
 const outputOf = (itemId: string): OutputSchema.Type => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					drop: [
@@ -63,6 +64,7 @@ describe("readItemOriginSourcesFn", () => {
 		line.output = {
 			set: [
 				{
+					rules: [],
 					roll: [
 						{
 							chance: 0,
@@ -187,6 +189,7 @@ describe("readItemOriginSourcesFn", () => {
 		forge.lines[0]!.output = {
 			set: [
 				{
+					rules: [],
 					roll: [
 						{
 							drop: [

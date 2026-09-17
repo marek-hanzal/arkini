@@ -18,6 +18,7 @@ const item = (id: string) => ({
 const output = (itemId: string) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed",

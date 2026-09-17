@@ -11,7 +11,6 @@ type FormSession = useFormController.Output & {
 	readonly outputSetIndex?: number;
 	readonly outputRollIndex?: number;
 	readonly outputDropIndex?: number;
-	readonly outputCandidateIndex?: number;
 	readonly productionLineId?: string;
 };
 

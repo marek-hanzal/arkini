@@ -112,6 +112,7 @@ describe("Clock rules at passive physical origins", () => {
 					set: [
 						{
 							weight: 1,
+							rules: [],
 							roll: [
 								{
 									type: "guaranteed",

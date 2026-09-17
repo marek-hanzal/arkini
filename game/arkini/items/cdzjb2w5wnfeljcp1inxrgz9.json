@@ -40,44 +40,40 @@
 				"output": {
 					"set": [
 						{
-							"weight": 1,
+							"weight": 10,
+							"rules": [],
 							"roll": [
 								{
-									"type": "weight",
-									"quantity": {
-										"min": 1,
-										"max": 1
-									},
+									"type": "guaranteed",
 									"drop": [
 										{
-											"rules": [],
-											"weight": 10,
-											"drop": [
-												{
-													"itemId": "disease",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "disease",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 15,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 15,
-											"drop": [
-												{
-													"itemId": "plague",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
+											"itemId": "plague",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										}
 									]
 								}

@@ -76,49 +76,24 @@ const addOutputFactsFn = (
 	source: readItemConnectionFactsFn.Source,
 ) => {
 	if (output === undefined) return;
-	for (const [setIndex, set] of output.set.entries())
+	for (const [setIndex, set] of output.set.entries()) {
+		for (const { factId, condition } of readAvailabilityFactsFn(items, set.rules))
+			facts.push({
+				factId,
+				origin: {
+					source,
+					role: "condition",
+					condition,
+					setIndex,
+				},
+			});
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			if (roll.type === "weight") {
-				for (const [candidateIndex, candidate] of roll.drop.entries()) {
-					for (const { factId, condition } of readAvailabilityFactsFn(
-						items,
-						candidate.rules,
-					))
-						facts.push({
-							factId,
-							origin: {
-								source,
-								role: "condition",
-								condition,
-								roll: {
-									setIndex,
-									rollIndex,
-									rollType: roll.type,
-									candidateIndex,
-								},
-							},
-						});
-				}
-			}
-			const drops =
-				roll.type === "weight"
-					? roll.drop.flatMap((candidate, candidateIndex) =>
-							candidate.drop.map((drop, dropIndex) => ({
-								drop,
-								dropIndex,
-								candidateIndex,
-							})),
-						)
-					: roll.drop.map((drop, dropIndex) => ({
-							drop,
-							dropIndex,
-						}));
-			for (const { drop, ...dropPosition } of drops) {
+			for (const [dropIndex, drop] of roll.drop.entries()) {
 				const position = {
 					setIndex,
 					rollIndex,
 					rollType: roll.type,
-					...dropPosition,
+					dropIndex,
 				};
 				facts.push({
 					factId: drop.itemId,
@@ -140,6 +115,7 @@ const addOutputFactsFn = (
 					});
 			}
 		}
+	}
 };
 
 const readOwnerFactsFn = (
@@ -306,6 +282,7 @@ export namespace readItemConnectionFactsFn {
 		readonly source: Source;
 		readonly role: "input" | "condition" | "output" | "replacement";
 		readonly inputIndex?: number;
+		readonly setIndex?: number;
 		readonly condition?: {
 			readonly ruleIndex: number;
 			readonly whenIndex: number;
@@ -314,7 +291,6 @@ export namespace readItemConnectionFactsFn {
 			readonly setIndex: number;
 			readonly rollIndex: number;
 			readonly dropIndex?: number;
-			readonly candidateIndex?: number;
 			readonly rollType: RollSchema.Type["type"];
 		};
 	}

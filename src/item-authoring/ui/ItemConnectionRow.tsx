@@ -97,7 +97,6 @@ const ConnectionOrigin = ({
 	const rollLabels = {
 		guaranteed: translator.textFn("Guaranteed"),
 		chance: translator.textFn("Chance"),
-		weight: translator.textFn("Weighted"),
 	};
 	const roll = origin.roll;
 	const sectionId =
@@ -119,13 +118,12 @@ const ConnectionOrigin = ({
 			search={{
 				lineId: source.type === "line" ? owner.lines?.[source.lineIndex]?.id : undefined,
 				merge: source.type === "merge" ? source.mergeIndex : undefined,
-				outputSet: roll?.setIndex,
+				outputSet: origin.setIndex ?? roll?.setIndex,
 				outputRoll: roll?.rollIndex,
 				outputDrop: roll?.dropIndex,
 				input: origin.inputIndex,
 				rule: origin.condition?.ruleIndex,
 				when: origin.condition?.whenIndex,
-				outputCandidate: roll?.candidateIndex,
 			}}
 			data-ui="EditorItemConnectionOriginLink"
 			className="relative z-10 inline min-h-0 border-0 bg-transparent p-0 text-left text-xs font-normal text-muted underline-offset-4 shadow-none hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
@@ -134,6 +132,12 @@ const ConnectionOrigin = ({
 			{" · "}
 			{translator.textFn(roleLabels[origin.role])}
 			{origin.inputIndex === undefined ? null : ` ${origin.inputIndex + 1}`}
+			{origin.setIndex === undefined ? null : (
+				<>
+					{" · "}
+					{translator.textFn("Output set")} {origin.setIndex + 1}
+				</>
+			)}
 			{roll === undefined ? null : (
 				<>
 					{" · "}

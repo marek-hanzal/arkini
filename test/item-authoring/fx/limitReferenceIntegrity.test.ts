@@ -49,6 +49,7 @@ const makeConfig = () =>
 						output: {
 							set: [
 								{
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",

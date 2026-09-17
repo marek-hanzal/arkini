@@ -22,6 +22,7 @@
 				"set": [
 					{
 						"weight": 1,
+						"rules": [],
 						"roll": [
 							{
 								"type": "guaranteed",
@@ -62,119 +63,140 @@
 				"output": {
 					"set": [
 						{
-							"weight": 1,
+							"weight": 10,
+							"rules": [],
 							"roll": [
 								{
-									"type": "weight",
-									"quantity": {
-										"min": 1,
-										"max": 1
-									},
+									"type": "guaranteed",
 									"drop": [
 										{
-											"rules": [],
-											"weight": 10,
-											"drop": [
-												{
-													"itemId": "beer-mug",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "beer-mug",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "clay-jug-with-beer",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "clay-jug-with-beer",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "beer-bath",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "beer-bath",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 5,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 5,
-											"drop": [
-												{
-													"itemId": "beer-barrel",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "beer-barrel",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 7,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 7,
-											"drop": [
-												{
-													"itemId": "clay-bowl-with-beer",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "clay-bowl-with-beer",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 3,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 3,
-											"drop": [
-												{
-													"itemId": "cauldron-with-beer",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "cauldron-with-beer",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 4,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 4,
-											"drop": [
-												{
-													"itemId": "laboratory-glassware-with-beer",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
+											"itemId": "laboratory-glassware-with-beer",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										}
 									]
 								}

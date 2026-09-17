@@ -43,6 +43,7 @@ export const createFixedStepTestConfig = () => {
 						output: {
 							set: [
 								{
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",

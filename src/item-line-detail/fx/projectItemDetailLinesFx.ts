@@ -103,36 +103,6 @@ const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputRollFx")
 					})),
 				),
 		)
-		.with(
-			{
-				kind: "weight",
-			},
-			(weight) =>
-				Effect.all(
-					weight.option.map((option) =>
-						Effect.all(
-							option.item.map((item) =>
-								projectOutputItemFx({
-									game,
-									item,
-								}),
-							),
-						).pipe(
-							Effect.map((item) => ({
-								activeRuleHints: option.activeRuleHints,
-								weight: option.weight,
-								item,
-							})),
-						),
-					),
-				).pipe(
-					Effect.map((option) => ({
-						kind: "weight" as const,
-						selections: weight.selections,
-						option,
-					})),
-				),
-		)
 		.exhaustive();
 });
 
@@ -420,6 +390,7 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 								),
 							).pipe(
 								Effect.map((roll) => ({
+									activeRuleHints: set.activeRuleHints,
 									weight: set.weight,
 									roll,
 								})),

@@ -17,6 +17,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckI
 const output = {
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
@@ -153,6 +154,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					output: {
 						set: [
 							{
+								rules: [],
 								roll: [
 									{
 										type: "guaranteed",

@@ -8,6 +8,7 @@ export const createRelationTraversalProject = () => {
 	const readOutput = (itemId: string) => ({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						drop: [

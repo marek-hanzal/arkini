@@ -74,6 +74,7 @@ export const drop = (itemId: string) => ({
 export const output = (...itemIds: string[]) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,

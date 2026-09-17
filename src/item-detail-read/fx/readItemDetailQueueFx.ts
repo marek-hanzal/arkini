@@ -58,7 +58,7 @@ const unavailable = {
 const readPrimaryOutputItemIdFn = (line: LineSchema.Type | undefined) => {
 	const roll = line?.output?.set[0]?.roll[0];
 	if (roll === undefined) return undefined;
-	return roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
+	return roll.drop[0]?.itemId;
 };
 
 /** Projects active and queued line work for one exact line owner. */

@@ -71,50 +71,39 @@ describe("chain termination and authored output boundaries", () => {
 		);
 	});
 
-	it("preserves roll/set/candidate grouping and excludes impossible chance rolls", () => {
+	it("preserves roll/set grouping and conditional sets and excludes impossible chance rolls", () => {
 		const output = OutputSchema.parse({
 			set: [
 				{
 					weight: 2,
+					rules: [],
 					roll: [
 						{
 							type: "chance",
 							chance: 0,
-							drop: [
-								{
-									itemId: "never",
-									quantity: {
-										min: 1,
-										max: 1,
-									},
-									placement: "drop",
-									rules: [],
-								},
-							],
+							drop: outputFn("never").set[0].roll[0].drop,
 						},
+						...outputFn("a", "b").set[0].roll,
+					],
+				},
+				{
+					weight: 3,
+					rules: [
 						{
-							type: "weight",
-							quantity: {
-								min: 2,
-								max: 3,
-							},
-							drop: [
+							type: "enable",
+							when: [
 								{
-									rules: [],
-									weight: 1,
-									drop: outputFn("a", "b").set[0].roll[0].drop,
-								},
-								{
-									rules: [],
-									weight: 3,
-									drop: outputFn("c").set[0].roll[0].drop,
+									type: "limit",
+									itemId: "a",
 								},
 							],
 						},
 					],
+					roll: outputFn("c").set[0].roll,
 				},
 				{
 					weight: 1,
+					rules: [],
 					roll: outputFn("d").set[0].roll,
 				},
 			],
@@ -144,15 +133,15 @@ describe("chain termination and authored output boundaries", () => {
 			set: 0,
 			alternative: true,
 			roll: 1,
-			candidate: 0,
-			selections: {
-				min: 2,
-				max: 3,
-			},
+			conditional: false,
 		});
-		expect(branches[1].output?.candidate).toBe(0);
-		expect(branches[2].output?.candidate).toBe(1);
-		expect(branches[3].output?.set).toBe(1);
+		expect(branches[1].output?.set).toBe(0);
+		expect(branches[2].output).toMatchObject({
+			set: 1,
+			setWeight: 3,
+			conditional: true,
+		});
+		expect(branches[3].output?.set).toBe(2);
 	});
 
 	it("does not invent pulses before a shorter lifetime and retains the boundary pulse", () => {

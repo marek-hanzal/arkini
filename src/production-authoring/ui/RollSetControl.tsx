@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
-import { QuantityControl, QuantityFields } from "~/production-authoring/ui/QuantityControl";
+import { QuantityControl } from "~/production-authoring/ui/QuantityControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
@@ -29,13 +29,6 @@ import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 type DropListValue = DropSchema.Type[];
-type WeightedRoll = Extract<
-	RollSchema.Type,
-	{
-		readonly type: "weight";
-	}
->;
-
 const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
 const readDropSummaryFn = (drop: DropSchema.Type, textFn: (key: string) => string) => {
 	const { min, max } = drop.quantity;
@@ -44,14 +37,9 @@ const readDropSummaryFn = (drop: DropSchema.Type, textFn: (key: string) => strin
 	const rules = drop.rules.length;
 	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`}`;
 };
-const readRulesItemIdsFn = (rules: WeightedRoll["drop"][number]["rules"]) =>
-	rules.flatMap((rule) =>
-		rule.when.map((when) => (when.type === "limit" ? when.itemId : when.query.selector.itemId)),
-	);
 const RollTypeLabelByType = {
 	chance: "Chance",
 	guaranteed: "Guaranteed",
-	weight: "Weighted",
 } as const satisfies Record<RollSchema.Type["type"], string>;
 
 const DropControl = ({
@@ -248,253 +236,14 @@ const DropList = ({
 	);
 };
 
-const WeightedRollControl = ({
-	initialRuleIndex,
-	initialWhenIndex,
-	initialDropIndex,
-	initialCandidateIndex,
-	onChangeFn,
-	roll,
-}: {
-	readonly initialDropIndex?: number;
-	readonly initialCandidateIndex?: number;
-	readonly onChangeFn: (roll: RollSchema.Type) => void;
-	readonly initialRuleIndex?: number;
-	readonly initialWhenIndex?: number;
-	readonly roll: WeightedRoll;
-}) => {
-	const readItemLabelFn = useEditorItemOptionLabel();
-	const translator = useTranslator();
-	const validationIssues = useFormValidationIssues(roll);
-	const invalidCandidateIndex = useFormValidationFocusIndex(roll, "drop");
-	return (
-		<div className="grid gap-4">
-			<div className="grid gap-3">
-				<EditorFormSectionDivider
-					description={<Mx label="Weighted selections help" />}
-					title={translator.textFn("Selections")}
-					variant="secondary"
-				/>
-				<div className="grid gap-3 sm:grid-cols-2">
-					<QuantityFields
-						minimumError={readEditorFormValidationErrorFn(
-							validationIssues,
-							"quantity",
-							"min",
-						)}
-						maximumError={readEditorFormValidationErrorFn(
-							validationIssues,
-							"quantity",
-							"max",
-						)}
-						value={roll.quantity}
-						onChangeFn={(quantity) =>
-							onChangeFn({
-								...roll,
-								quantity,
-							})
-						}
-					/>
-				</div>
-			</div>
-			<EditorFormSectionDivider
-				description={<Mx label="Weighted candidates help" />}
-				title={translator.textFn("Weighted candidates")}
-				variant="secondary"
-			/>
-			<EditorCollectionSelector
-				dataUi="EditorWeightedCandidatesCollection"
-				count={roll.drop.length}
-				error={readRequiredEditorCollectionErrorFn(
-					validationIssues,
-					roll.drop.length,
-					2,
-					translator.textFn("Add at least two weighted candidates."),
-					"drop",
-				)}
-				initialSelectedIndex={initialCandidateIndex}
-				key={initialCandidateIndex}
-				itemLabelFn={(candidateIndex) => {
-					const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
-					return `${translator.textFn("Candidate")} ${candidateIndex + 1} — ${readItemLabelFn(
-						itemId ?? "",
-						translator.textFn("No item selected"),
-					)}`;
-				}}
-				itemSearchTermsFn={(candidateIndex) => [
-					...readRulesItemIdsFn(roll.drop[candidateIndex].rules),
-					...roll.drop[candidateIndex].drop.flatMap((drop) => [
-						drop.itemId,
-						readItemLabelFn(drop.itemId, ""),
-					]),
-				]}
-				renderItemContentFn={(candidateIndex, label) => {
-					const candidate = roll.drop[candidateIndex];
-					const summary = [
-						`${translator.textFn("Weight")} ${candidate.weight}`,
-						...(candidate.rules.length === 0
-							? []
-							: [
-									`${candidate.rules.length} ${translator.textFn(
-										candidate.rules.length === 1 ? "rule" : "rules",
-									)}`,
-								]),
-						...candidate.drop.map((drop) =>
-							candidate.drop.length === 1
-								? readDropSummaryFn(drop, translator.textFn)
-								: `${readItemLabelFn(drop.itemId, translator.textFn("No item selected"))}: ${readDropSummaryFn(drop, translator.textFn)}`,
-						),
-					].join(" · ");
-					return (
-						<OutputDropOption
-							label={label}
-							drops={candidate.drop}
-							summary={summary}
-						/>
-					);
-				}}
-				label={translator.textFn("Weighted candidates")}
-				onAddFn={() =>
-					onChangeFn({
-						...roll,
-						drop: [
-							...roll.drop,
-							{
-								rules: [],
-								weight: 1,
-								drop: [
-									structuredClone(DraftDefaults.drop),
-								],
-							},
-						],
-					})
-				}
-				onRemoveFn={(candidateIndex) =>
-					onChangeFn({
-						...roll,
-						drop: roll.drop.filter(
-							(_current, currentIndex) => currentIndex !== candidateIndex,
-						) as typeof roll.drop,
-					})
-				}
-				selectedIndex={invalidCandidateIndex}
-			>
-				{(candidateIndex) => {
-					const candidate = roll.drop[candidateIndex];
-					return (
-						<div className="grid gap-3">
-							<EditorNumberControl
-								description={<Mx label="Weighted candidate weight help" />}
-								error={readEditorFormValidationErrorFn(
-									validationIssues,
-									"drop",
-									candidateIndex,
-									"weight",
-								)}
-								label={`${translator.textFn("Candidate")} ${candidateIndex + 1} ${translator.textFn("weight")}`}
-								value={candidate.weight}
-								min={1}
-								onChangeFn={(weight) =>
-									onChangeFn({
-										...roll,
-										drop: roll.drop.map((current, currentIndex) =>
-											currentIndex === candidateIndex
-												? {
-														...current,
-														weight,
-													}
-												: current,
-										) as typeof roll.drop,
-									})
-								}
-							/>
-							<EditorFormBranchEnd />
-							<RulesControl
-								initialRuleIndex={
-									candidateIndex === initialCandidateIndex &&
-									initialDropIndex === undefined
-										? initialRuleIndex
-										: undefined
-								}
-								initialWhenIndex={
-									candidateIndex === initialCandidateIndex &&
-									initialDropIndex === undefined
-										? initialWhenIndex
-										: undefined
-								}
-								rules={candidate.rules}
-								target="candidate"
-								label={translator.textFn("Candidate rules")}
-								description={<Mx label="Weighted candidate rules help" />}
-								allowedTypes={[
-									"enable",
-									"disable",
-								]}
-								onChangeFn={(rules) =>
-									onChangeFn({
-										...roll,
-										drop: roll.drop.map((current, currentIndex) =>
-											currentIndex === candidateIndex
-												? {
-														...current,
-														rules: rules as typeof current.rules,
-													}
-												: current,
-										) as typeof roll.drop,
-									})
-								}
-							/>
-							<DropList
-								initialRuleIndex={
-									candidateIndex === initialCandidateIndex &&
-									initialDropIndex !== undefined
-										? initialRuleIndex
-										: undefined
-								}
-								initialWhenIndex={
-									candidateIndex === initialCandidateIndex &&
-									initialDropIndex !== undefined
-										? initialWhenIndex
-										: undefined
-								}
-								value={candidate.drop}
-								initialDropIndex={
-									candidateIndex === initialCandidateIndex
-										? initialDropIndex
-										: undefined
-								}
-								onChangeFn={(drop) =>
-									onChangeFn({
-										...roll,
-										drop: roll.drop.map((current, currentIndex) =>
-											currentIndex === candidateIndex
-												? {
-														...current,
-														drop: drop as typeof current.drop,
-													}
-												: current,
-										) as typeof roll.drop,
-									})
-								}
-							/>
-						</div>
-					);
-				}}
-			</EditorCollectionSelector>
-		</div>
-	);
-};
-
 const RollControl = ({
 	initialRuleIndex,
 	initialWhenIndex,
 	initialDropIndex,
-	initialCandidateIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly initialDropIndex?: number;
-	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (roll: RollSchema.Type) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
@@ -518,11 +267,6 @@ const RollControl = ({
 						description: <Mx label="Chance roll type help" />,
 						label: translator.textFn("Chance"),
 						value: "chance",
-					},
-					{
-						description: <Mx label="Weighted roll type help" />,
-						label: translator.textFn("Weighted"),
-						value: "weight",
 					},
 				]}
 				onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
@@ -588,21 +332,6 @@ const RollControl = ({
 								</div>
 							),
 						)
-						.with(
-							{
-								type: "weight",
-							},
-							(roll) => (
-								<WeightedRollControl
-									initialRuleIndex={initialRuleIndex}
-									initialWhenIndex={initialWhenIndex}
-									roll={roll}
-									initialDropIndex={initialDropIndex}
-									initialCandidateIndex={initialCandidateIndex}
-									onChangeFn={onChangeFn}
-								/>
-							),
-						)
 						.exhaustive()}
 		</div>
 	);
@@ -612,16 +341,16 @@ export const RollSetControl = ({
 	initialRuleIndex,
 	initialWhenIndex,
 	index,
+	showWeight,
 	initialRollIndex,
 	initialDropIndex,
-	initialCandidateIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly index: number;
+	readonly showWeight: boolean;
 	readonly initialRollIndex?: number;
 	readonly initialDropIndex?: number;
-	readonly initialCandidateIndex?: number;
 	readonly onChangeFn: (set: RollSetSchema.Type) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
@@ -633,19 +362,40 @@ export const RollSetControl = ({
 	const invalidRollIndex = useFormValidationFocusIndex(value, "roll");
 	return (
 		<section className="grid gap-3">
-			<EditorNumberControl
-				description={<Mx label="Output set weight help" />}
-				error={readEditorFormValidationErrorFn(validationIssues, "weight")}
-				label={translator.textFn("Relative set weight")}
-				value={value.weight}
-				min={1}
-				onChangeFn={(weight) =>
+			{showWeight ? (
+				<EditorNumberControl
+					description={<Mx label="Output set weight help" />}
+					error={readEditorFormValidationErrorFn(validationIssues, "weight")}
+					label={translator.textFn("Relative set weight")}
+					value={value.weight}
+					min={1}
+					onChangeFn={(weight) =>
+						onChangeFn({
+							...value,
+							weight,
+						})
+					}
+				/>
+			) : null}
+			<RulesControl
+				initialRuleIndex={initialRollIndex === undefined ? initialRuleIndex : undefined}
+				initialWhenIndex={initialRollIndex === undefined ? initialWhenIndex : undefined}
+				rules={value.rules}
+				target="set"
+				label={translator.textFn("Set rules")}
+				description={<Mx label="Output set rules help" />}
+				allowedTypes={[
+					"enable",
+					"disable",
+				]}
+				onChangeFn={(rules) =>
 					onChangeFn({
 						...value,
-						weight,
+						rules: rules as RollSetSchema.Type["rules"],
 					})
 				}
 			/>
+
 			<EditorFormSectionDivider
 				description={<Mx label="Rolls help" />}
 				required
@@ -724,9 +474,6 @@ export const RollSetControl = ({
 						value={value.roll[rollIndex]}
 						initialDropIndex={
 							rollIndex === initialRollIndex ? initialDropIndex : undefined
-						}
-						initialCandidateIndex={
-							rollIndex === initialRollIndex ? initialCandidateIndex : undefined
 						}
 						onChangeFn={(next) =>
 							onChangeFn({

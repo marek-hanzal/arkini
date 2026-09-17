@@ -27,6 +27,7 @@ const output = (
 ) => ({
 	set: [
 		{
+			rules: [],
 			roll: drops.map(({ itemId, type = "guaranteed" }) =>
 				type === "chance"
 					? {

@@ -2,7 +2,7 @@ import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
 export type AcquisitionRequirementUsage = "consume" | "one-time" | "ongoing";
 
-type AcquisitionOutputKind = "chance" | "guaranteed" | "replace" | "weighted";
+type AcquisitionOutputKind = "chance" | "guaranteed" | "replace";
 
 export interface AcquisitionOutputAnnotation {
 	readonly alternativeSet: boolean;

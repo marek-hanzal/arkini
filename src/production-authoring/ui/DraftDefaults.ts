@@ -4,7 +4,6 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { RollSchema } from "~/production-output/schema/RollSchema";
 import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
-import type { WeightedDropSchema } from "~/production-output/schema/WeightedDropSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const drop = {
@@ -31,20 +30,6 @@ const rolls = {
 		type: "chance",
 		chance: 0.5,
 		drop: drops,
-	},
-	weight: {
-		type: "weight",
-		quantity: {
-			min: 1,
-			max: 1,
-		},
-		// Candidate alternatives are deliberate authoring branches; canonical validation
-		// keeps Save blocked until the user adds the required pair.
-		drop: [] as unknown as [
-			WeightedDropSchema.Type,
-			WeightedDropSchema.Type,
-			...WeightedDropSchema.Type[],
-		],
 	},
 } satisfies Record<RollSchema.Type["type"], RollSchema.Type>;
 
@@ -101,6 +86,7 @@ export const DraftDefaults = {
 		set: [
 			{
 				weight: 1,
+				rules: [],
 				roll: [] as unknown as RollSetSchema.Type["roll"],
 			},
 		] as [

@@ -15,6 +15,7 @@ describe("createAcquisitionGraphFn output distributions", () => {
 		const output = OutputSchema.parse({
 			set: [
 				{
+					rules: [],
 					roll: Array.from(
 						{
 							length: 14,

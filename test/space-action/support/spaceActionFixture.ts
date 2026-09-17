@@ -28,6 +28,7 @@ const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => (
 const depletionOutput = (itemId: string) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,

@@ -119,34 +119,6 @@ const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(funct
 					} satisfies OutputProjection.Roll<ItemDetailLines.OutputItem>;
 				}),
 		)
-		.with(
-			{
-				type: RollTypeSchema.enum.Weight,
-			},
-			({ quantity, drop }) =>
-				Effect.gen(function* () {
-					const option: OutputProjection.WeightedOption<ItemDetailLines.OutputItem>[] =
-						[];
-					for (const candidate of drop) {
-						option.push({
-							activeRuleHints: yield* readActiveRuleHintsFx({
-								rules: candidate.rules,
-								ruleContext,
-							}),
-							weight: candidate.weight,
-							item: yield* readItemDetailOutputItemsFx({
-								drops: candidate.drop,
-								ruleContext,
-							}),
-						});
-					}
-					return {
-						kind: "weight",
-						selections: quantity,
-						option,
-					} satisfies OutputProjection.Roll<ItemDetailLines.OutputItem>;
-				}),
-		)
 		.exhaustive();
 });
 
@@ -170,6 +142,10 @@ export const readItemDetailOutputFx = Effect.fn("readItemDetailOutputFx")(functi
 			);
 		}
 		output.push({
+			activeRuleHints: yield* readActiveRuleHintsFx({
+				rules: set.rules,
+				ruleContext,
+			}),
 			weight: set.weight,
 			roll,
 		});

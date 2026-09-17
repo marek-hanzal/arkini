@@ -161,14 +161,6 @@ const convolveDistributionsFn = (
 	);
 };
 
-const repeatDistributionFn = (distribution: Distribution | undefined, count: number) => {
-	if (distribution === undefined || count > maximumOutcomeStates) return undefined;
-	let result: Distribution | undefined = constantDistributionFn();
-	for (let index = 0; index < count && result !== undefined; index += 1)
-		result = convolveDistributionsFn(result, distribution);
-	return result;
-};
-
 const optionalDistributionFn = (distribution: Distribution | undefined, probability: number) =>
 	distribution === undefined
 		? undefined
@@ -229,12 +221,12 @@ export const readAcquisitionOutputOccurrencesFn = (
 		drop: DropSchema.Type,
 		id: string,
 		annotation: AcquisitionOutputAnnotation,
-		candidateRules: ReadonlyArray<DropRuleSchema.Type> = [],
+		setRules: ReadonlyArray<DropRuleSchema.Type>,
 	): Distribution | undefined => {
 		const requirements = readAcquisitionAvailabilityRequirementsFn({
 			items,
 			rules: [
-				...candidateRules,
+				...setRules,
 				...drop.rules,
 			],
 			source: "output-condition",
@@ -275,88 +267,32 @@ export const readAcquisitionOutputOccurrencesFn = (
 		distribution: Distribution;
 		probability: number;
 	}> = [];
-	let unsupported = false;
+	// Set eligibility changes the live weight denominator; static analysis cannot assign fixed probabilities.
+	let unsupported = output.set.some((set) => set.rules.length > 0);
 	for (const [setIndex, set] of output.set.entries()) {
 		let setDistribution: Distribution | undefined = constantDistributionFn();
 		for (const [rollIndex, roll] of set.roll.entries()) {
 			if (roll.type === "chance" && roll.chance === 0) continue;
-			let rollDistribution: Distribution | undefined;
-			if (roll.type === "weight") {
-				if (roll.drop.some((candidate) => candidate.rules.length > 0)) unsupported = true;
-				const totalWeight = roll.drop.reduce(
-					(total, candidate) => total + candidate.weight,
-					0,
-				);
-				const candidates: Array<{
-					distribution: Distribution;
-					probability: number;
-				}> = [];
-				for (const [candidateIndex, candidate] of roll.drop.entries()) {
-					let candidateDistribution: Distribution | undefined = constantDistributionFn();
-					for (const [dropIndex, drop] of candidate.drop.entries()) {
-						const id = `set:${setIndex}:roll:${rollIndex}:candidate:${candidateIndex}:drop:${dropIndex}`;
-						candidateDistribution = convolveDistributionsFn(
-							candidateDistribution,
-							readDropFn(
-								drop,
-								id,
-								{
-									alternativeSet: output.set.length > 1,
-									placement: drop.placement,
-									quantity: drop.quantity,
-									selectionKind: "weighted",
-								},
-								candidate.rules,
-							),
-						);
-					}
-					if (candidateDistribution === undefined) unsupported = true;
-					else
-						candidates.push({
-							distribution: candidateDistribution,
-							probability: candidate.weight / totalWeight,
-						});
-				}
-				const selection = unsupported ? undefined : mixDistributionsFn(candidates);
-				const count = roll.quantity.max - roll.quantity.min + 1;
-				const repetitions: Array<{
-					distribution: Distribution;
-					probability: number;
-				}> = [];
-				if (!Number.isSafeInteger(count) || count > maximumOutcomeStates)
-					rollDistribution = undefined;
-				else {
-					for (let index = 0; index < count; index += 1) {
-						const distribution = repeatDistributionFn(
-							selection,
-							roll.quantity.min + index,
-						);
-						if (distribution === undefined) break;
-						repetitions.push({
-							distribution,
-							probability: 1 / count,
-						});
-					}
-					rollDistribution =
-						repetitions.length === count ? mixDistributionsFn(repetitions) : undefined;
-				}
-			} else {
-				let drops: Distribution | undefined = constantDistributionFn();
-				for (const [dropIndex, drop] of roll.drop.entries()) {
-					const id = `set:${setIndex}:roll:${rollIndex}:drop:${dropIndex}`;
-					drops = convolveDistributionsFn(
-						drops,
-						readDropFn(drop, id, {
+			let drops: Distribution | undefined = constantDistributionFn();
+			for (const [dropIndex, drop] of roll.drop.entries()) {
+				const id = `set:${setIndex}:roll:${rollIndex}:drop:${dropIndex}`;
+				drops = convolveDistributionsFn(
+					drops,
+					readDropFn(
+						drop,
+						id,
+						{
 							alternativeSet: output.set.length > 1,
 							placement: drop.placement,
 							quantity: drop.quantity,
 							selectionKind: roll.type,
-						}),
-					);
-				}
-				rollDistribution =
-					roll.type === "chance" ? optionalDistributionFn(drops, roll.chance) : drops;
+						},
+						set.rules,
+					),
+				);
 			}
+			const rollDistribution =
+				roll.type === "chance" ? optionalDistributionFn(drops, roll.chance) : drops;
 			setDistribution = convolveDistributionsFn(setDistribution, rollDistribution);
 			if (setDistribution === undefined) unsupported = true;
 		}

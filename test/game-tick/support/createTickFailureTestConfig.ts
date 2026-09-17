@@ -33,6 +33,7 @@ export const createTickFailureTestConfig = () => {
 						output: {
 							set: [
 								{
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",

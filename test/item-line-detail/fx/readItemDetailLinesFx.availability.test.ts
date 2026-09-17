@@ -96,6 +96,7 @@ describe("readItemDetailLinesFx / autofill availability", () => {
 							output: {
 								set: [
 									{
+										rules: [],
 										roll: [
 											{
 												type: "guaranteed",

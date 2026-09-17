@@ -39,6 +39,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 	const output = (itemId: string, quantity: number, placement = "drop") => ({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						type: "guaranteed",

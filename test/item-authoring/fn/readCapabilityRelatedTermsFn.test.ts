@@ -65,6 +65,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 			set: [
 				{
 					weight: 1,
+					rules: [],
 					roll: [
 						{
 							type: "guaranteed",
@@ -79,41 +80,41 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 								dropFn("chance-result"),
 							],
 						},
+					],
+				},
+				{
+					weight: 3,
+					rules: [
 						{
-							type: "weight",
-							quantity: {
-								min: 1,
-								max: 1,
-							},
-							drop: [
+							type: "enable",
+							when: [
 								{
-									rules: [],
-									weight: 1,
-									drop: [
-										dropFn("weighted-a"),
-									],
+									type: "limit",
+									itemId: "set-permit",
 								},
+							],
+						},
+					],
+					roll: [
+						{
+							type: "guaranteed",
+							drop: [
+								dropFn("alternative-a"),
 								{
-									rules: [],
-									weight: 1,
-									drop: [
+									...dropFn("alternative-b"),
+									rules: [
 										{
-											...dropFn("weighted-b"),
-											rules: [
+											type: "enable",
+											when: [
 												{
-													type: "enable",
-													when: [
-														{
-															type: "exists",
-															query: {
-																scope: "any",
-																selector: {
-																	type: "item",
-																	itemId: "output-permit",
-																},
-															},
+													type: "exists",
+													query: {
+														scope: "any",
+														selector: {
+															type: "item",
+															itemId: "output-permit",
 														},
-													],
+													},
 												},
 											],
 										},
@@ -140,8 +141,9 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 		"fuel",
 		"permit",
 		"chance-result",
-		"weighted-a",
-		"weighted-b",
+		"set-permit",
+		"alternative-a",
+		"alternative-b",
 		"output-permit",
 	]);
 });
@@ -161,6 +163,7 @@ it("finds merge targets, replacement items and extra output by ID and title", ()
 					set: [
 						{
 							weight: 1,
+							rules: [],
 							roll: [
 								{
 									type: "guaranteed",

@@ -85,6 +85,7 @@ export const limitConfig = GameConfigSchema.parse({
 					output: {
 						set: [
 							{
+								rules: [],
 								roll: [
 									{
 										type: "guaranteed",

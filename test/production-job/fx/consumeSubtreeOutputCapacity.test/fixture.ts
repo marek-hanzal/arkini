@@ -80,6 +80,7 @@ export const configFn = ({
 						output: {
 							set: [
 								{
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",

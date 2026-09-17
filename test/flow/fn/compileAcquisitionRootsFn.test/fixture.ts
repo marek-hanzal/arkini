@@ -13,6 +13,7 @@ const createRuledOutput = (type: "disable" | "enable") =>
 	OutputSchema.parse({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						drop: [

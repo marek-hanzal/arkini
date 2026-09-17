@@ -416,6 +416,7 @@ describe("validateGameResourcesFn", () => {
 					output: {
 						set: [
 							{
+								rules: [],
 								roll: [
 									{
 										type: "guaranteed" as const,

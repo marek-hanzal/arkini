@@ -114,6 +114,7 @@ const guaranteedOutput = (
 	OutputSchema.parse({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						type: "guaranteed" as const,
@@ -249,49 +250,8 @@ export const blueprintConfig = GameConfigSchema.parse({
 				amount: 1,
 				output: {
 					set: [
-						{
-							roll: [
-								{
-									type: "weight",
-									quantity: {
-										min: 1,
-										max: 1,
-									},
-									drop: [
-										{
-											rules: [],
-											weight: 1,
-											drop: [
-												{
-													itemId: "item:target-unlimited",
-													quantity: {
-														min: 1,
-														max: 1,
-													},
-													placement: "drop",
-													rules: [],
-												},
-											],
-										},
-										{
-											rules: [],
-											weight: 1,
-											drop: [
-												{
-													itemId: "item:depletion-product",
-													quantity: {
-														min: 1,
-														max: 1,
-													},
-													placement: "drop",
-													rules: [],
-												},
-											],
-										},
-									],
-								},
-							],
-						},
+						...blueprintOutput("item:target-unlimited").set,
+						...blueprintOutput("item:depletion-product").set,
 					],
 				},
 			},

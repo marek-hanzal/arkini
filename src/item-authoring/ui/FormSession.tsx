@@ -38,7 +38,6 @@ export const FormSession = ({
 	outputSetIndex,
 	outputRollIndex,
 	outputDropIndex,
-	outputCandidateIndex,
 	productionLineId,
 	resourceId,
 	sectionId,
@@ -57,7 +56,6 @@ export const FormSession = ({
 	readonly outputSetIndex?: number;
 	readonly outputRollIndex?: number;
 	readonly outputDropIndex?: number;
-	readonly outputCandidateIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
 	readonly sectionId: SectionId;
@@ -194,7 +192,6 @@ export const FormSession = ({
 			outputSetIndex,
 			outputRollIndex,
 			outputDropIndex,
-			outputCandidateIndex,
 			productionLineId,
 		}),
 		[
@@ -208,7 +205,6 @@ export const FormSession = ({
 			outputSetIndex,
 			outputRollIndex,
 			outputDropIndex,
-			outputCandidateIndex,
 			productionLineId,
 		],
 	);

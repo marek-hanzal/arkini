@@ -1,150 +1,124 @@
 import { describe, expect, it } from "vitest";
 
 import { projectAuthoredOutputFn } from "~/production-output/fn/projectAuthoredOutputFn";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-
-const drop = (itemId: string) => ({
-	itemId,
-	placement: "drop" as const,
-	quantity: {
-		max: 1,
-		min: 1,
-	},
-	rules: [],
-});
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 describe("projectAuthoredOutputFn", () => {
-	it("preserves every roll alternative and authored drop metadata for shared presentation", () => {
-		const output: OutputSchema.Type = {
+	it("keeps set eligibility separate from item rules and grouped chance output", () => {
+		const output = OutputSchema.parse({
 			set: [
 				{
+					weight: 2,
+					rules: [
+						{
+							type: "enable",
+							when: [
+								{
+									type: "exists",
+									query: {
+										scope: "any",
+										selector: {
+											type: "item",
+											itemId: "item:key",
+										},
+									},
+								},
+							],
+						},
+					],
 					roll: [
 						{
-							drop: [
-								drop("item:known"),
-							],
 							type: "guaranteed",
-						},
-						{
-							chance: 0.25,
-							drop: [
-								drop("item:missing"),
-							],
-							type: "chance",
-						},
-						{
 							drop: [
 								{
+									itemId: "item:known",
+									quantity: {
+										min: 1,
+										max: 1,
+									},
+									rules: [],
+								},
+							],
+						},
+						{
+							type: "chance",
+							chance: 0.25,
+							drop: [
+								{
+									itemId: "item:missing",
+									placement: "random",
+									quantity: {
+										min: 2,
+										max: 4,
+									},
 									rules: [
 										{
-											type: "enable",
+											type: "disable",
 											when: [
 												{
-													type: "exists",
-													query: {
-														scope: "any",
-														selector: {
-															type: "item",
-															itemId: "item:known",
-														},
-													},
+													type: "limit",
+													itemId: "item:missing",
 												},
 											],
 										},
 									],
-									drop: [
-										drop("item:known"),
-									],
-									weight: 3,
 								},
 								{
+									itemId: "item:known",
+									quantity: {
+										min: 1,
+										max: 1,
+									},
 									rules: [],
-									drop: [
-										drop("item:missing"),
-									],
-									weight: 1,
 								},
 							],
-							quantity: {
-								max: 2,
-								min: 1,
-							},
-							type: "weight",
 						},
 					],
-					weight: 2,
 				},
 			],
-		};
-
-		expect(
-			projectAuthoredOutputFn(output, {
-				"item:known": {
-					title: "Known item",
-				},
-			}),
-		).toEqual([
+		});
+		const result = projectAuthoredOutputFn(output, {
+			"item:known": {
+				title: "Known item",
+			},
+		});
+		expect(result).toMatchObject([
 			{
+				weight: 2,
+				rules: output.set[0].rules,
+				activeRuleHints: [],
 				roll: [
 					{
+						kind: "guaranteed",
 						item: [
 							{
-								activeRuleHints: [],
-								...drop("item:known"),
+								itemId: "item:known",
 								title: "Known item",
+								rules: [],
 							},
 						],
-						kind: "guaranteed",
 					},
 					{
+						kind: "chance",
 						chance: 0.25,
 						item: [
 							{
-								activeRuleHints: [],
-								...drop("item:missing"),
+								itemId: "item:missing",
 								title: "item:missing",
-							},
-						],
-						kind: "chance",
-					},
-					{
-						kind: "weight",
-						option: [
-							{
-								activeRuleHints: [],
-								item: [
-									{
-										activeRuleHints: [],
-										...drop("item:known"),
-										title: "Known item",
-									},
-								],
-								rules:
-									output.set[0].roll[2].type === "weight"
-										? output.set[0].roll[2].drop[0].rules
-										: [],
-								weight: 3,
+								placement: "random",
+								quantity: {
+									min: 2,
+									max: 4,
+								},
+								rules: output.set[0].roll[1].drop[0].rules,
 							},
 							{
-								activeRuleHints: [],
-								item: [
-									{
-										activeRuleHints: [],
-										...drop("item:missing"),
-										title: "item:missing",
-									},
-								],
-								rules: [],
-								weight: 1,
+								itemId: "item:known",
+								title: "Known item",
 							},
 						],
-						selections: {
-							max: 2,
-							min: 1,
-						},
 					},
 				],
-				weight: 2,
 			},
 		]);
 	});

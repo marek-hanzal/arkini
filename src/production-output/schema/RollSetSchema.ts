@@ -1,13 +1,14 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { DropRuleSchema } from "./DropRuleSchema";
 import { RollSchema } from "./RollSchema";
 
 /**
  * An alternative non-empty collection of output rolls.
  *
- * An output selects exactly one roll set according to the relative weights of
- * its sets, then evaluates every roll in the selected set.
+ * An output filters available sets by their rules, selects one by relative weight,
+ * then evaluates every roll in that set. No available set means no output.
  */
 export const RollSetSchema = z
 	.object({
@@ -19,6 +20,9 @@ export const RollSetSchema = z
 		weight: PositiveIntegerSchema.default(1).describe(
 			"The positive relative weight used to select this roll set.",
 		),
+		rules: z
+			.array(DropRuleSchema)
+			.describe("Availability rules evaluated before this set enters weighted selection."),
 		/**
 		 * One or more rolls evaluated after this set is selected.
 		 */

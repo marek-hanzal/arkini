@@ -126,6 +126,7 @@ export const createContendedQueueConfigFn = (budget: "units" | "output") => {
 											output: {
 												set: [
 													{
+														rules: [],
 														roll: [
 															{
 																type: "guaranteed",

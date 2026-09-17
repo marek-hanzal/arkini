@@ -73,6 +73,24 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							output: {
 								set: [
 									{
+										rules: [
+											{
+												type: "enable",
+												hint: "This output set needs the workshop.",
+												when: [
+													{
+														type: "exists",
+														query: {
+															scope: "any",
+															selector: {
+																type: "item",
+																itemId: "workshop",
+															},
+														},
+													},
+												],
+											},
+										],
 										roll: [
 											{
 												type: "guaranteed",
@@ -186,6 +204,9 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 		expect(lines.line[0]?.output).toEqual([
 			{
 				weight: 1,
+				activeRuleHints: [
+					"This output set needs the workshop.",
+				],
 				roll: [
 					{
 						kind: "guaranteed",

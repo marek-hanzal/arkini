@@ -18,6 +18,7 @@ describe("readOutputMaximumQuantitiesFn", () => {
 			set: [
 				{
 					weight: 1,
+					rules: [],
 					roll: [
 						{
 							type: "chance",
@@ -50,6 +51,7 @@ describe("readOutputMaximumQuantitiesFn", () => {
 			set: [
 				{
 					weight: 1,
+					rules: [],
 					roll: [
 						{
 							type: "guaranteed",
@@ -84,6 +86,7 @@ describe("readOutputMaximumQuantitiesFn", () => {
 				},
 				{
 					weight: 1,
+					rules: [],
 					roll: [
 						{
 							type: "guaranteed",
@@ -114,69 +117,6 @@ describe("readOutputMaximumQuantitiesFn", () => {
 		expect(Object.fromEntries(quantities)).toEqual({
 			"item:a": 6,
 			"item:b": 3,
-		});
-	});
-
-	it("reserves the worst repeatable weighted candidate and maximum selection range", () => {
-		const output: OutputSchema.Type = {
-			set: [
-				{
-					weight: 1,
-					roll: [
-						{
-							type: "weight",
-							quantity: range(1, 5),
-							drop: [
-								{
-									rules: [],
-									weight: 1,
-									drop: [
-										{
-											itemId: "item:a",
-											quantity: value(2),
-											placement: "drop",
-											rules: [],
-										},
-										{
-											itemId: "item:b",
-											quantity: value(1),
-											placement: "drop",
-											rules: [],
-										},
-									],
-								},
-								{
-									rules: [],
-									weight: 1,
-									drop: [
-										{
-											itemId: "item:a",
-											quantity: value(1),
-											placement: "drop",
-											rules: [],
-										},
-										{
-											itemId: "item:b",
-											quantity: value(4),
-											placement: "drop",
-											rules: [],
-										},
-									],
-								},
-							],
-						},
-					],
-				},
-			],
-		};
-
-		const quantities = readOutputMaximumQuantitiesFn({
-			output,
-		});
-
-		expect(Object.fromEntries(quantities)).toEqual({
-			"item:a": 10,
-			"item:b": 20,
 		});
 	});
 });

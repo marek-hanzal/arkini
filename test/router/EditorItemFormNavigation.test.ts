@@ -28,7 +28,6 @@ describe("item form deep-link admission", () => {
 				rule: "1",
 				when: -1,
 				outputDrop: -1,
-				outputCandidate: Number.NaN,
 			}),
 		).toEqual({
 			merge: 2,
@@ -42,7 +41,6 @@ describe("item form deep-link admission", () => {
 				outputSet: 1,
 				outputRoll: 2,
 				outputDrop: 1,
-				outputCandidate: 1,
 			}),
 		).toEqual({
 			input: 2,
@@ -52,7 +50,6 @@ describe("item form deep-link admission", () => {
 			outputSet: 1,
 			outputRoll: 2,
 			outputDrop: 1,
-			outputCandidate: 1,
 		});
 	});
 });

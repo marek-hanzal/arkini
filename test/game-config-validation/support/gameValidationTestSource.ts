@@ -85,6 +85,7 @@ export const createOutput = (
 	OutputSchema.parse({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						type: "guaranteed",

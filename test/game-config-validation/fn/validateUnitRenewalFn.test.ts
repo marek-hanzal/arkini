@@ -1,3 +1,4 @@
+import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -37,6 +38,7 @@ const chanceOutput = (itemId: string, chance: number) =>
 	OutputSchema.parse({
 		set: [
 			{
+				rules: [],
 				roll: [
 					{
 						type: "chance",
@@ -92,6 +94,68 @@ describe("validateUnitRenewalFn", () => {
 				code: DiagnosticCodeEnumSchema.enum.UnitRenewalMissing,
 			}),
 		]);
+	});
+
+	it("requires an unconditional eligible set before claiming guaranteed renewal", async () => {
+		const units = createFiniteItem("item:units");
+		const output = createOutput([
+			{
+				itemId: units.id,
+			},
+		]);
+		const conditionalSet: RollSetSchema.Type = {
+			...output.set[0],
+			rules: [
+				{
+					type: "enable" as const,
+					when: [
+						{
+							type: "exists" as const,
+							query: {
+								scope: "universe" as const,
+								selector: {
+									type: "item" as const,
+									itemId: units.id,
+								},
+							},
+						},
+					],
+				},
+			],
+		};
+		const producer = createProducerItem({
+			id: "item:producer",
+			output: {
+				set: [
+					conditionalSet,
+				],
+			},
+		});
+		expect(
+			await diagnostics({
+				[units.id]: units,
+				[producer.id]: producer,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.UnitRenewalStochastic,
+			}),
+		]);
+		const fallback = createProducerItem({
+			id: producer.id,
+			output: {
+				set: [
+					conditionalSet,
+					output.set[0],
+				],
+			},
+		});
+		expect(
+			await diagnostics({
+				[units.id]: units,
+				[fallback.id]: fallback,
+			}),
+		).toEqual([]);
 	});
 
 	it("warns when recreation is only stochastic", async () => {

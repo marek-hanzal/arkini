@@ -9,14 +9,8 @@ export namespace readItemChainsFn {
 		readonly setWeight: number;
 		readonly alternative: boolean;
 		readonly roll: number;
-		readonly type: "guaranteed" | "chance" | "weight";
+		readonly type: "guaranteed" | "chance";
 		readonly chance?: number;
-		readonly candidate?: number;
-		readonly weight?: number;
-		readonly selections?: {
-			readonly min: number;
-			readonly max: number;
-		};
 		readonly conditional: boolean;
 	}
 	export interface Node {
@@ -163,28 +157,11 @@ export const readItemChainsFn = (
 					alternative: (output?.set.length ?? 0) > 1,
 					roll: rollIndex,
 					type: roll.type,
-					conditional: false,
+					conditional: set.rules.length > 0,
 					chance: roll.type === "chance" ? roll.chance : undefined,
 				};
-				if (roll.type === "weight") {
-					if (roll.quantity.max === 0) continue;
-					for (const [candidateIndex, candidate] of roll.drop.entries())
-						for (const [dropIndex, drop] of candidate.drop.entries())
-							appendFn(
-								drop,
-								`${setIndex}/${rollIndex}/${candidateIndex}/${dropIndex}`,
-								{
-									...meta,
-									candidate: candidateIndex,
-									conditional: candidate.rules.length > 0,
-									weight: candidate.weight,
-									selections: roll.quantity,
-								},
-							);
-				} else {
-					for (const [dropIndex, drop] of roll.drop.entries())
-						appendFn(drop, `${setIndex}/${rollIndex}/${dropIndex}`, meta);
-				}
+				for (const [dropIndex, drop] of roll.drop.entries())
+					appendFn(drop, `${setIndex}/${rollIndex}/${dropIndex}`, meta);
 			}
 		}
 		return nodes;

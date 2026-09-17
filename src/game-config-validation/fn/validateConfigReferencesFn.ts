@@ -14,7 +14,6 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
@@ -263,77 +262,44 @@ const validateOutputReferencesFn = ({
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [setIndex, set] of output.set.entries()) {
-		for (const [rollIndex, roll] of set.roll.entries()) {
-			if (
-				roll.type === RollTypeSchema.enum.Guaranteed ||
-				roll.type === RollTypeSchema.enum.Chance
-			) {
-				for (const [dropIndex, drop] of roll.drop.entries()) {
-					diagnostics.push(
-						...validateDropFn({
-							config,
-							drop,
-							path: [
-								...path,
-								"set",
-								setIndex,
-								"roll",
-								rollIndex,
-								"drop",
-								dropIndex,
-							],
-							source,
-						}),
-					);
-				}
-				continue;
+		for (const [ruleIndex, rule] of set.rules.entries()) {
+			for (const [whenIndex, when] of rule.when.entries()) {
+				diagnostics.push(
+					...validateWhenReferenceFn({
+						config,
+						when,
+						source,
+						path: [
+							...path,
+							"set",
+							setIndex,
+							"rules",
+							ruleIndex,
+							"when",
+							whenIndex,
+						],
+					}),
+				);
 			}
-
-			for (const [candidateIndex, candidate] of roll.drop.entries()) {
-				for (const [ruleIndex, rule] of candidate.rules.entries()) {
-					for (const [whenIndex, when] of rule.when.entries()) {
-						diagnostics.push(
-							...validateWhenReferenceFn({
-								config,
-								when,
-								path: [
-									...path,
-									"set",
-									setIndex,
-									"roll",
-									rollIndex,
-									"drop",
-									candidateIndex,
-									"rules",
-									ruleIndex,
-									"when",
-									whenIndex,
-								],
-								source,
-							}),
-						);
-					}
-				}
-				for (const [dropIndex, drop] of candidate.drop.entries()) {
-					diagnostics.push(
-						...validateDropFn({
-							config,
-							drop,
-							path: [
-								...path,
-								"set",
-								setIndex,
-								"roll",
-								rollIndex,
-								"drop",
-								candidateIndex,
-								"drop",
-								dropIndex,
-							],
-							source,
-						}),
-					);
-				}
+		}
+		for (const [rollIndex, roll] of set.roll.entries()) {
+			for (const [dropIndex, drop] of roll.drop.entries()) {
+				diagnostics.push(
+					...validateDropFn({
+						config,
+						drop,
+						source,
+						path: [
+							...path,
+							"set",
+							setIndex,
+							"roll",
+							rollIndex,
+							"drop",
+							dropIndex,
+						],
+					}),
+				);
 			}
 		}
 	}

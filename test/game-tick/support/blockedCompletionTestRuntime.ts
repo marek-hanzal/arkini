@@ -55,6 +55,7 @@ export const createBlockedCompletionTestConfig = () => {
 						output: {
 							set: [
 								{
+									rules: [],
 									roll: [
 										{
 											type: "guaranteed",

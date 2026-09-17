@@ -30,21 +30,6 @@ const outputTextFn = (output: readItemChainsFn.OutputPath) =>
 			: [
 					`Chance ${output.chance * 100}%`,
 				]),
-		...(output.candidate === undefined
-			? []
-			: [
-					`Candidate ${output.candidate + 1}`,
-				]),
-		...(output.weight === undefined
-			? []
-			: [
-					`Candidate weight ${output.weight}`,
-				]),
-		...(output.selections === undefined
-			? []
-			: [
-					`Selections ${quantityFn(output.selections)}`,
-				]),
 		...(output.conditional
 			? [
 					"Depends on conditions",
@@ -112,7 +97,7 @@ export const readItemChainTextFx = Effect.fn("readItemChainTextFx")(function* (
 		`Project revision: ${project.revision}`,
 		"Scope: the root item's own directional merges and Clock; after the first operation, only Clock expiry and Clock-selected line outputs continue. Reverse merges, intermediate merges and production input acquisition are not traversed.",
 		"Limits: the same default depth of 5 operations as Item → Chain, cycle detection and 400-expansion safety budget. Depth/loop/ongoing states are not final items.",
-		"Interpretation: authored possibilities, not runtime simulation. Times and quantities belong to individual operations. Periodic outputs are shown once per admitted run; quantities are not cumulative yields. Output sets are alternatives, rolls within a selected set run together, and weighted candidates are alternatives per selection. Disabled defaults and runtime conditions can prevent outcomes.",
+		"Interpretation: authored possibilities, not runtime simulation. Times and quantities belong to individual operations. Periodic outputs are shown once per admitted run; quantities are not cumulative yields. One eligible output set is selected by weight. Guaranteed groups and chance groups run within that set; a chance group emits all its drops together when successful. Disabled defaults and runtime conditions can prevent outcomes.",
 		`Truncated by safety limit: ${result.truncated ? "yes; some branches omitted" : "no"}`,
 	];
 	if (result.chains.length === 0)

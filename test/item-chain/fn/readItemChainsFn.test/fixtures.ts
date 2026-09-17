@@ -6,6 +6,7 @@ export const outputFn = (...ids: string[]) =>
 		set: [
 			{
 				weight: 1,
+				rules: [],
 				roll: [
 					{
 						type: "guaranteed",

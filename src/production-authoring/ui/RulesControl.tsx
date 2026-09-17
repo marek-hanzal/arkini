@@ -39,7 +39,7 @@ import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearc
 
 type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
-type RuleTarget = "action" | "candidate" | "drop" | "line";
+type RuleTarget = "action" | "set" | "drop" | "line";
 type DraftWhen =
 	| WhenSchema.Type
 	| {
@@ -226,11 +226,11 @@ const QueryScopeControl = ({
 };
 
 const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget): ReactNode => {
-	if (target === "candidate")
+	if (target === "set")
 		return type === "enable" ? (
-			<Mx label="Candidate enable rule help" />
+			<Mx label="Output set enable rule help" />
 		) : (
-			<Mx label="Candidate disable rule help" />
+			<Mx label="Output set disable rule help" />
 		);
 	if (target === "drop")
 		return type === "enable" ? (

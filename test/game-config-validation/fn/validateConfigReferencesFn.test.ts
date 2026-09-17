@@ -285,7 +285,7 @@ describe("completed config reference validation", () => {
 		);
 	});
 
-	it("validates selectors in weighted candidate rules before their drops", async () => {
+	it("validates selectors in output set rules before their drops", async () => {
 		const producer = createProducerItem({
 			id: "item:producer",
 			lines: [
@@ -295,59 +295,35 @@ describe("completed config reference validation", () => {
 						set: [
 							{
 								weight: 1,
+								rules: [
+									{
+										type: "enable",
+										when: [
+											{
+												type: "exists",
+												query: {
+													scope: "universe",
+													selector: {
+														type: "item",
+														itemId: "item:missing-set-rule",
+													},
+												},
+											},
+										],
+									},
+								],
 								roll: [
 									{
-										type: "weight",
-										quantity: {
-											min: 1,
-											max: 1,
-										},
+										type: "guaranteed",
 										drop: [
 											{
-												rules: [
-													{
-														type: "enable",
-														when: [
-															{
-																type: "exists",
-																query: {
-																	scope: "universe",
-																	selector: {
-																		type: "item",
-																		itemId: "item:missing-candidate-rule",
-																	},
-																},
-															},
-														],
-													},
-												],
-												weight: 1,
-												drop: [
-													{
-														itemId: "item:producer",
-														quantity: {
-															min: 1,
-															max: 1,
-														},
-														placement: "drop",
-														rules: [],
-													},
-												],
-											},
-											{
+												itemId: "item:producer",
+												quantity: {
+													min: 1,
+													max: 1,
+												},
+												placement: "drop",
 												rules: [],
-												weight: 1,
-												drop: [
-													{
-														itemId: "item:producer",
-														quantity: {
-															min: 1,
-															max: 1,
-														},
-														placement: "drop",
-														rules: [],
-													},
-												],
 											},
 										],
 									},
@@ -372,10 +348,6 @@ describe("completed config reference validation", () => {
 					"output",
 					"set",
 					0,
-					"roll",
-					0,
-					"drop",
-					0,
 					"rules",
 					0,
 					"when",
@@ -384,7 +356,7 @@ describe("completed config reference validation", () => {
 					"selector",
 					"itemId",
 				],
-				referenceId: "item:missing-candidate-rule",
+				referenceId: "item:missing-set-rule",
 			}),
 		);
 	});

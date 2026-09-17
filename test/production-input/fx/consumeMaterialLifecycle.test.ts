@@ -52,6 +52,7 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 			: {
 					set: [
 						{
+							rules: [],
 							roll: [
 								{
 									type: "guaranteed" as const,

@@ -34,28 +34,5 @@ export const readRollMaximumQuantitiesFn = ({ roll }: readRollMaximumQuantitiesF
 							drop,
 						}),
 		)
-		.with(
-			{
-				type: RollTypeSchema.enum.Weight,
-			},
-			(roll) => {
-				const selectionCount = roll.quantity.max;
-				const quantities = new Map<IdSchema.Type, number>();
-
-				for (const candidate of roll.drop) {
-					const candidateQuantities = readDropMaximumQuantitiesFn({
-						drop: candidate.drop,
-					});
-					for (const [itemId, quantity] of candidateQuantities) {
-						quantities.set(
-							itemId,
-							Math.max(quantities.get(itemId) ?? 0, quantity * selectionCount),
-						);
-					}
-				}
-
-				return quantities;
-			},
-		)
 		.exhaustive();
 };

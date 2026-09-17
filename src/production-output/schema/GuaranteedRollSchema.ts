@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { DropSchema } from "~/production-output/schema/DropSchema";
 
-import { BaseRollSchema } from "./BaseRollSchema";
 import { RollTypeSchema } from "./RollTypeSchema";
 
 /**
@@ -10,7 +9,6 @@ import { RollTypeSchema } from "./RollTypeSchema";
  */
 export const GuaranteedRollSchema = z
 	.object({
-		...BaseRollSchema.shape,
 		type: RollTypeSchema.extract([
 			"Guaranteed",
 		]),

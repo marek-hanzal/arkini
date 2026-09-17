@@ -2,12 +2,45 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { useGameFx } from "~test/support/useGameFx";
+import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
 import { selectRollSetFx } from "~/production-output/fx/selectRollSetFx";
+
+const origin = {
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x: 0,
+		y: 0,
+	},
+};
+const config = GameConfigSchema.parse({
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:set-test",
+		title: "Set test",
+		board: {
+			width: 1,
+			height: 1,
+		},
+		inventory: {
+			width: 1,
+			height: 1,
+		},
+	},
+	start: {
+		currentSpace: 0,
+	},
+	items: {},
+});
 
 const createSet = (itemId: string, weight = 1): RollSetSchema.Type => {
 	return {
 		weight,
+		rules: [],
 		roll: [
 			{
 				type: "guaranteed",
@@ -28,24 +61,22 @@ const createSet = (itemId: string, weight = 1): RollSetSchema.Type => {
 };
 
 describe("selectRollSetFx", () => {
-	it("normalizes authored shorthand to the canonical weight one", () => {
-		const { weight: _weight, ...source } = createSet("item:first");
-
-		expect(RollSetSchema.parse(source).weight).toBe(1);
-	});
-
 	it("selects a candidate from the middle cumulative weight range", () => {
 		const first = createSet("item:first", 1);
 		const middle = createSet("item:middle", 2);
 		const last = createSet("item:last", 1);
 		const result = Effect.runSync(
 			selectRollSetFx({
+				origin,
 				set: [
 					first,
 					middle,
 					last,
 				],
 			}).pipe(
+				useGameFx({
+					config,
+				}),
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([
@@ -63,11 +94,15 @@ describe("selectRollSetFx", () => {
 		const rare = createSet("item:rare", 1);
 		const result = Effect.runSync(
 			selectRollSetFx({
+				origin,
 				set: [
 					frequent,
 					rare,
 				],
 			}).pipe(
+				useGameFx({
+					config,
+				}),
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([
@@ -85,6 +120,7 @@ describe("selectRollSetFx", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const selected = yield* selectRollSetFx({
+					origin,
 					set: [
 						only,
 					],
@@ -96,6 +132,9 @@ describe("selectRollSetFx", () => {
 					selected,
 				};
 			}).pipe(
+				useGameFx({
+					config,
+				}),
 				Effect.provideServiceEffect(
 					Random.Random,
 					makeFixedRandomFx([

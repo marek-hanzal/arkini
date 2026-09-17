@@ -43,10 +43,10 @@ export const OutputDetail = ({
 					description={<Tx label={item.placement === "random" ? "Random" : "Drop"} />}
 				/>
 			)}
-			renderWeightedOptionDetailFn={(option) =>
-				option.rules === undefined || option.rules.length === 0 ? null : (
+			renderSetDetailFn={(set) =>
+				set.rules === undefined || set.rules.length === 0 ? null : (
 					<div className="mb-3">
-						<RulesDetail rules={option.rules} />
+						<RulesDetail rules={set.rules} />
 					</div>
 				)
 			}

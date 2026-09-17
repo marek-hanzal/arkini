@@ -22,6 +22,7 @@
 				"set": [
 					{
 						"weight": 1,
+						"rules": [],
 						"roll": [
 							{
 								"type": "guaranteed",
@@ -63,88 +64,99 @@
 					"set": [
 						{
 							"weight": 1,
+							"rules": [],
 							"roll": [
 								{
-									"type": "weight",
-									"quantity": {
-										"min": 1,
-										"max": 1
-									},
+									"type": "guaranteed",
 									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "clay-mug-with-coffee",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "clay-mug-with-coffee",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "roasted-coffee-bag",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "roasted-coffee-bag",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "cauldron-with-coffee",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "cauldron-with-coffee",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "roasted-coffee-beans",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
-										},
+											"itemId": "roasted-coffee-beans",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
 										{
-											"rules": [],
-											"weight": 1,
-											"drop": [
-												{
-													"itemId": "coffee-tankard",
-													"quantity": {
-														"min": 1,
-														"max": 1
-													},
-													"placement": "drop",
-													"rules": []
-												}
-											]
+											"itemId": "coffee-tankard",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										}
 									]
 								}

@@ -29,18 +29,9 @@ export const projectAuthoredOutputFn = (
 	items: ItemTitles,
 ): readonly OutputProjection.Set<OutputProjection.AuthoredItem>[] =>
 	output?.set.map((set) => ({
+		activeRuleHints: [],
+		rules: set.rules,
 		roll: set.roll.map((roll): OutputProjection.Roll<OutputProjection.AuthoredItem> => {
-			if (roll.type === "weight")
-				return {
-					kind: "weight",
-					option: roll.drop.map((option) => ({
-						activeRuleHints: [],
-						item: option.drop.map((drop) => projectDropFn(drop, items)),
-						rules: option.rules,
-						weight: option.weight,
-					})),
-					selections: roll.quantity,
-				};
 			return roll.type === "guaranteed"
 				? {
 						item: roll.drop.map((drop) => projectDropFn(drop, items)),

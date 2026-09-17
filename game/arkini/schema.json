@@ -541,6 +541,13 @@
 					"description": "The positive relative weight used to select this roll set.",
 					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
 				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/drop.RuleSchema"
+					},
+					"description": "Availability rules evaluated before this set enters weighted selection."
+				},
 				"roll": {
 					"type": "array",
 					"prefixItems": [
@@ -557,114 +564,11 @@
 			},
 			"required": [
 				"weight",
+				"rules",
 				"roll"
 			],
 			"additionalProperties": false,
 			"description": "An alternative non-empty collection of output rolls."
-		},
-		"RollSchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/roll.GuaranteedSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/roll.ChanceSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:project#/$defs/roll.WeightSchema"
-				}
-			],
-			"description": "A typed roll that an output may produce."
-		},
-		"roll.GuaranteedSchema": {
-			"type": "object",
-			"properties": {
-				"type": {
-					"type": "string",
-					"enum": [
-						"guaranteed"
-					]
-				},
-				"drop": {
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
-					},
-					"minItems": 1,
-					"description": "One or more items emitted when this roll succeeds."
-				}
-			},
-			"required": [
-				"type",
-				"drop"
-			],
-			"additionalProperties": false,
-			"description": "A roll that guarantees its output when its rules allow it."
-		},
-		"DropSchema": {
-			"type": "object",
-			"properties": {
-				"itemId": {
-					"description": "The ID of the canonical game item emitted by this drop.",
-					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
-				},
-				"quantity": {
-					"description": "The quantity emitted by this drop.",
-					"$ref": "urn:arkini:schema:project#/$defs/QuantitySchema"
-				},
-				"placement": {
-					"default": "drop",
-					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
-					"$ref": "urn:arkini:schema:project#/$defs/PlacementSchema"
-				},
-				"rules": {
-					"type": "array",
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/drop.RuleSchema"
-					},
-					"description": "Rules evaluated after this drop is selected by a successful roll."
-				}
-			},
-			"required": [
-				"itemId",
-				"quantity",
-				"placement",
-				"rules"
-			],
-			"additionalProperties": false,
-			"description": "A canonical game item, quantity, board-placement strategy, and rules for a successful roll's drop."
-		},
-		"QuantitySchema": {
-			"type": "object",
-			"properties": {
-				"min": {
-					"description": "The smallest quantity that may resolve.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"max": {
-					"description": "The largest quantity that may resolve.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				}
-			},
-			"required": [
-				"min",
-				"max"
-			],
-			"additionalProperties": false,
-			"description": "The inclusive positive bounds resolved by one quantity contract."
-		},
-		"PlacementSchema": {
-			"type": "string",
-			"enum": [
-				"drop",
-				"random"
-			],
-			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement, independently from inventory fallback."
 		},
 		"drop.RuleSchema": {
 			"oneOf": [
@@ -1036,6 +940,107 @@
 			"additionalProperties": false,
 			"description": "A rule that disables a selected drop when its conditions pass."
 		},
+		"RollSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/roll.GuaranteedSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:project#/$defs/roll.ChanceSchema"
+				}
+			],
+			"description": "A typed roll that an output may produce."
+		},
+		"roll.GuaranteedSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"guaranteed"
+					]
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
+					},
+					"minItems": 1,
+					"description": "One or more items emitted when this roll succeeds."
+				}
+			},
+			"required": [
+				"type",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "A roll that guarantees its output when its rules allow it."
+		},
+		"DropSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The ID of the canonical game item emitted by this drop.",
+					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The quantity emitted by this drop.",
+					"$ref": "urn:arkini:schema:project#/$defs/QuantitySchema"
+				},
+				"placement": {
+					"default": "drop",
+					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
+					"$ref": "urn:arkini:schema:project#/$defs/PlacementSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:project#/$defs/drop.RuleSchema"
+					},
+					"description": "Rules evaluated after this drop is selected by a successful roll."
+				}
+			},
+			"required": [
+				"itemId",
+				"quantity",
+				"placement",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "A canonical game item, quantity, board-placement strategy, and rules for a successful roll's drop."
+		},
+		"QuantitySchema": {
+			"type": "object",
+			"properties": {
+				"min": {
+					"description": "The smallest quantity that may resolve.",
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"max": {
+					"description": "The largest quantity that may resolve.",
+					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"min",
+				"max"
+			],
+			"additionalProperties": false,
+			"description": "The inclusive positive bounds resolved by one quantity contract."
+		},
+		"PlacementSchema": {
+			"type": "string",
+			"enum": [
+				"drop",
+				"random"
+			],
+			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement, independently from inventory fallback."
+		},
 		"roll.ChanceSchema": {
 			"type": "object",
 			"properties": {
@@ -1076,80 +1081,6 @@
 			"minimum": 0,
 			"maximum": 1,
 			"description": "A probability from zero to one inclusive."
-		},
-		"roll.WeightSchema": {
-			"type": "object",
-			"properties": {
-				"type": {
-					"type": "string",
-					"enum": [
-						"weight"
-					]
-				},
-				"quantity": {
-					"description": "The number of independent weighted selections made by this roll.",
-					"$ref": "urn:arkini:schema:project#/$defs/QuantitySchema"
-				},
-				"drop": {
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/roll.WeightedDropSchema"
-						},
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/roll.WeightedDropSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/roll.WeightedDropSchema"
-					},
-					"minItems": 2,
-					"description": "At least two authored candidates filtered before weighted selection."
-				}
-			},
-			"required": [
-				"type",
-				"quantity",
-				"drop"
-			],
-			"additionalProperties": false,
-			"description": "A roll that selects its output according to relative item weights."
-		},
-		"roll.WeightedDropSchema": {
-			"type": "object",
-			"properties": {
-				"rules": {
-					"type": "array",
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/drop.RuleSchema"
-					},
-					"description": "Rules that decide whether this candidate enters selection."
-				},
-				"weight": {
-					"description": "The positive integer weight used to select this drop.",
-					"$ref": "urn:arkini:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"drop": {
-					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
-						}
-					],
-					"items": {
-						"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
-					},
-					"minItems": 1,
-					"description": "One or more items emitted when this weighted drop is selected."
-				}
-			},
-			"required": [
-				"rules",
-				"weight",
-				"drop"
-			],
-			"additionalProperties": false,
-			"description": "An optionally available output candidate and its relative selection weight."
 		},
 		"MergeSchema": {
 			"oneOf": [

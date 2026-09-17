@@ -41,6 +41,7 @@ const guaranteedOutput = ({
 }) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
@@ -61,6 +62,7 @@ const guaranteedOutput = ({
 const emptyChanceOutput = (itemId: string) => ({
 	set: [
 		{
+			rules: [],
 			roll: [
 				{
 					type: "chance" as const,

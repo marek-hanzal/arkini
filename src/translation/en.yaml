@@ -45,8 +45,6 @@ Add at least one output set.:
   value: Add at least one output set.
 Add at least one roll.:
   value: Add at least one roll.
-Add at least two weighted candidates.:
-  value: Add at least two weighted candidates.
 Add at least {minimum} items.:
   value: Add at least {minimum} items.
   dynamic: true
@@ -200,9 +198,9 @@ Authored merges summary help:
     It updates the dragged item, updates the target, then creates any extra output.
 Authored output summary help:
   value: |
-    One output set is picked by weight, then every roll inside it runs.
+    One available output set is picked by weight, then every group inside it runs.
 
-    A roll can be **Guaranteed**, use one **Chance**, or make **Weighted** picks.
+    A group can be **Guaranteed** or share one **Chance** check. Set rules decide which sets may be picked; drop rules decide which items may be created.
 Authored player controls summary help:
   value: |
     **Interactive** lets players run production and manage its inputs, queue and selected lines.
@@ -241,7 +239,7 @@ Authored production output summary help:
   value: |
     Runs when this production line finishes.
 
-    One set is picked by weight, then every roll inside that set runs independently.
+    One available set is picked by weight, then every Guaranteed or Chance group inside it runs independently.
 Authored production runtime summary help:
   value: |
     How long one run normally takes.
@@ -338,20 +336,6 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
-Candidate:
-  value: Candidate
-Candidate disable rule help:
-  value: |
-    Removes this candidate from the current selection pool while all conditions match.
-
-    Its weight is not counted and another available candidate is selected normally.
-Candidate enable rule help:
-  value: |
-    Adds a required check before this candidate enters the selection pool.
-
-    Every Enable rule must pass. Any matching Disable rule removes only this candidate.
-Candidate rules:
-  value: Candidate rules
 Capacity:
   value: Capacity
 Chain:
@@ -1547,11 +1531,26 @@ Other:
   dynamic: true
 Output set:
   value: Output set
+Output set disable rule help:
+  value: |
+    Removes this set from the selection pool while all conditions match.
+
+    Its weight is not counted. One of the remaining available sets is selected normally.
+Output set enable rule help:
+  value: |
+    Adds a required check before this set enters the selection pool.
+
+    Every Enable rule must pass. Any matching Disable rule removes this set.
+Output set rules help:
+  value: |
+    These rules decide whether the complete output set joins the selection pool.
+
+    Every **Enable** must pass. Any matching **Disable** removes the set before weights are calculated. If no set is available, this output creates nothing.
 Output set weight help:
   value: |
-    Exactly **one set** is picked each time this output runs.
+    Exactly **one available set** is picked each time this output runs.
 
-    Weights are ratios. With weights **3** and **1**, the sets have **75%** and **25%** chances. After a set wins, every roll inside it runs.
+    Weights are ratios. With weights **3** and **1**, the sets have **75%** and **25%** chances. Rules first remove unavailable sets. After a set wins, every Guaranteed or Chance group inside it runs.
 Output sets:
   value: Output sets
 Outputs:
@@ -1676,11 +1675,11 @@ Production output help:
   value: |
     Items created when this production job finishes.
 
-    1. One **output set** is picked by weight.
+    1. Set rules filter availability, then one **output set** is picked by weight.
     2. Every **roll** in that set runs.
     3. Each **drop** checks its rules, quantity and placement.
 
-    Equal set weights are equally likely.
+    Equal weights among available sets are equally likely. If none is available, no output is created.
 Production queue capacity help:
   value: |
     Maximum work accepted across all lines on this item.
@@ -1917,9 +1916,8 @@ Rolls help:
 
     - **Guaranteed:** always creates all its drops.
     - **Chance:** makes one probability check for all its drops.
-    - **Weighted:** makes the number of picks under **Selections**; every pick chooses one candidate by weight.
 
-    Example: two picks between **3 Iron, weight 3** and **1 Coal, weight 1** give each pick a 75% Iron / 25% Coal chance. The result can be **6 Iron**, **3 Iron + 1 Coal**, or **2 Coal**.
+    All drops in a Chance group share the same check. For example, a key and map in one 20% group appear together when the chance succeeds, subject to their individual drop rules.
 Route {routeId} can never yield {factId}.:
   value: Route {routeId} cannot create {factId}.
   dynamic: true
@@ -2008,8 +2006,6 @@ Selected target must have Units enabled before choosing Spend.:
   value: Selected target must have Units enabled before choosing Spend.
 Selected target must have Units enabled.:
   value: Selected target must have Units enabled.
-Selections:
-  value: Selections
 Self:
   value: Self
   dynamic: true
@@ -2024,6 +2020,8 @@ Set clock:
   value: Set clock
 Set default:
   value: Set default
+Set rules:
+  value: Set rules
 Settings:
   value: Settings
 Show:
@@ -2260,41 +2258,6 @@ Waiting for runtime conditions:
   value: Waiting for rules
 Weight:
   value: Weight
-Weighted:
-  value: Weighted
-Weighted candidate rules help:
-  value: |
-    These rules decide whether this candidate joins the current selection pool.
-
-    Every **Enable** must pass. Any matching **Disable** removes it before weights are calculated.
-Weighted candidate weight help:
-  value: |
-    This candidate's chance on each pick.
-
-    Weights are ratios among currently available candidates: **70** and **30** mean 70% and 30%. The same candidate may win again.
-Weighted candidates:
-  value: Weighted candidates
-Weighted candidates help:
-  value: |
-    The choices available to a Weighted roll.
-
-    Rules first remove unavailable candidates. Each pick then selects one remaining candidate by weight and creates every drop inside it. Add at least two authored candidates.
-Weighted roll type help:
-  value: |
-    Makes the number of independent picks configured under **Selections**.
-
-    Each pick filters candidate rules, then chooses one available candidate by weight. Available candidates remain in the pool, so one may win several times.
-Weighted selections:
-  value: Weighted selections
-Weighted selections help:
-  value: |
-    How many picks this Weighted roll makes.
-
-    - **1–1:** exactly one.
-    - **3–3:** exactly three.
-    - **2–4:** randomly two, three or four.
-
-    Every pick uses the same candidate weights.
 When a new item is created.:
   value: When a new item is created.
   dynamic: true
@@ -2422,10 +2385,6 @@ remove:
   value: remove
 rolls:
   value: rolls
-rule:
-  value: rule
-rules:
-  value: rules
 saved:
   value: saved
 self:
@@ -2458,8 +2417,6 @@ warning:
   value: warning
 warnings:
   value: warnings
-weight:
-  value: weight
 "{factId} × {quantity} exceeds the static estimate limit of {maximumQuantity} ({source}).":
   value: "Estimate stopped: {factId} needs {quantity}, above the limit of {maximumQuantity} ({source})."
   dynamic: true

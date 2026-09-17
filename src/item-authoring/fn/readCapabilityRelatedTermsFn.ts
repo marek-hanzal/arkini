@@ -30,14 +30,10 @@ export const readCapabilityRelatedTermsFn = (
 		if (capability.effect === "replace") ids.add(capability.result);
 	}
 	for (const set of capability.output?.set ?? []) {
+		for (const rule of set.rules)
+			for (const when of rule.when)
+				ids.add(when.type === "limit" ? when.itemId : when.query.selector.itemId);
 		for (const roll of set.roll) {
-			if (roll.type === "weight")
-				for (const candidate of roll.drop)
-					for (const rule of candidate.rules)
-						for (const when of rule.when)
-							ids.add(
-								when.type === "limit" ? when.itemId : when.query.selector.itemId,
-							);
 			const drops = readDraftRollDropsFn(roll);
 			for (const drop of drops) {
 				ids.add(drop.itemId);

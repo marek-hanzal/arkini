@@ -5,7 +5,7 @@ import type {
 } from "~/flow/type/AcquisitionGraph";
 
 export type ItemOriginOperationKind = "line" | "units" | "merge" | "expiry";
-type ItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
+type ItemOriginOutputKind = "guaranteed" | "chance" | "replace";
 
 export interface ItemOriginOutputOccurrence {
 	readonly itemId: string;

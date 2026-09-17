@@ -1,36 +1,56 @@
 import { Array, Effect, Option, pipe, Random } from "effect";
 
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import { resolveDropRulesEnabledFx } from "./resolveDropRulesEnabledFx";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 export namespace selectRollSetFx {
 	export interface Props {
-		set: OutputSchema.Type["set"];
+		readonly set: OutputSchema.Type["set"];
+		readonly origin: GridLocationSchema.Type;
 	}
 }
 
 /**
- * Selects exactly one roll set according to its relative configured weight.
+ * Filters unavailable sets before selecting one by its relative weight.
  *
  * Every canonical set has one explicit positive relative weight.
  */
 export const selectRollSetFx = Effect.fn("selectRollSetFx")(function* ({
 	set,
+	origin,
 }: selectRollSetFx.Props) {
-	if (set.length === 1) {
-		return set[0];
+	const available: RollSetSchema.Type[] = [];
+	for (const candidate of set) {
+		if (
+			yield* resolveDropRulesEnabledFx({
+				origin,
+				rules: candidate.rules,
+			})
+		)
+			available.push(candidate);
+	}
+	if (available.length === 0) return undefined;
+	if (available.length === 1) {
+		return available[0];
 	}
 
-	const [totalWeight, weightedSet] = Array.mapAccum(set, 0, (accumulatedWeight, candidate) => {
-		const maximumWeight = accumulatedWeight + candidate.weight;
+	const [totalWeight, weightedSet] = Array.mapAccum(
+		available,
+		0,
+		(accumulatedWeight, candidate) => {
+			const maximumWeight = accumulatedWeight + candidate.weight;
 
-		return [
-			maximumWeight,
-			{
-				candidate,
+			return [
 				maximumWeight,
-			},
-		] as const;
-	});
+				{
+					candidate,
+					maximumWeight,
+				},
+			] as const;
+		},
+	);
 	const selectedWeight = yield* Random.nextBetween(0, totalWeight);
 
 	return pipe(
@@ -39,6 +59,6 @@ export const selectRollSetFx = Effect.fn("selectRollSetFx")(function* ({
 			return selectedWeight < maximumWeight;
 		}),
 		Option.map(({ candidate }) => candidate),
-		Option.getOrElse(() => set[set.length - 1]),
+		Option.getOrElse(() => available[available.length - 1]),
 	);
 });

@@ -354,6 +354,24 @@ describe("project section form session", () => {
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
 		await changeInput(title, "Changed project");
+		await act(async () =>
+			document.body.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "b",
+					bubbles: true,
+					cancelable: true,
+				}),
+			),
+		);
+		expect(state.navigate).toHaveBeenLastCalledWith({
+			to: "/editor/$projectId/project/form/$sectionId",
+			params: {
+				projectId: "project",
+				sectionId: "board",
+			},
+		});
+		expect(state.saveConfig).not.toHaveBeenCalled();
+		expect(state.requestLeave).not.toHaveBeenCalled();
 		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBeNull();
 		await renderSection(<div data-ui="BoardSection">Board</div>);
 		await renderSection(<ProjectGeneralSection />);

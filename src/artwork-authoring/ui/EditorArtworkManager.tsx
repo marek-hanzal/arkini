@@ -63,19 +63,23 @@ const artworkFilters = [
 		icon: Images,
 		label: "All",
 		value: "all",
+		shortcut: "a",
 	},
 	{
 		icon: ImageOff,
 		label: "Unused",
 		value: "unused",
+		shortcut: "u",
 	},
 	{
 		icon: NotebookPen,
 		label: "With note",
 		value: "with-note",
+		shortcut: "w",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly label: string;
+	readonly shortcut: string;
 	readonly icon: LucideIcon;
 	readonly value: useEditorArtworkManagerController.Filter;
 }>;

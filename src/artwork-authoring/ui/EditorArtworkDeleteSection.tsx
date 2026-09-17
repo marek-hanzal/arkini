@@ -1,3 +1,4 @@
+import { Overlay } from "~/ui/ui/Overlay";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Tx } from "~/translation/ui/Tx";
 import { Mx } from "~/translation/ui/Mx";
@@ -31,7 +32,11 @@ const EditorArtworkDeleteDialog = ({
 	readonly onCancelFn: () => void;
 	readonly onConfirmFn: () => void;
 }) => (
-	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
+	<Overlay
+		onCloseFn={() => {
+			if (!pending) onCancelFn();
+		}}
+	>
 		<div
 			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 			data-ui="EditorArtworkDeleteDialog"
@@ -67,7 +72,7 @@ const EditorArtworkDeleteDialog = ({
 				</DangerButton>
 			</div>
 		</div>
-	</div>
+	</Overlay>
 );
 
 const EditorArtworkDeleteBlockerLink = ({

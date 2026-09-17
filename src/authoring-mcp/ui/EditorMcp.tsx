@@ -1,3 +1,7 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { useNavigate } from "@tanstack/react-router";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
@@ -25,6 +29,19 @@ import { useEditorMcpSettingsController } from "./useEditorMcpSettingsController
 export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
+	const navigateFn = useNavigate();
+	useEditorSectionShortcuts({
+		options: EditorMcpSections,
+		onSelectFn: (candidate) => {
+			void navigateFn({
+				to: "/editor/$projectId/mcp/$sectionId",
+				params: {
+					projectId: project.projectId,
+					sectionId: candidate.id,
+				},
+			});
+		},
+	});
 	const overviewController = useEditorMcpOverviewController();
 	const settingsController = useEditorMcpSettingsController({
 		onConfigureFn: overviewController.configureFn,
@@ -97,23 +114,32 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 						}
 					>
 						{EditorMcpSections.map((candidate) => (
-							<LinkButtonLink
+							<Tooltip
 								key={candidate.id}
-								to="/editor/$projectId/mcp/$sectionId"
-								params={{
-									projectId: project.projectId,
-									sectionId: candidate.id,
-								}}
-								activeOptions={{
-									exact: true,
-								}}
-								activeProps={{
-									"data-ui-selected": true,
-								}}
-								className={editorSectionLinkClassName}
+								content={`${translator.textFn(candidate.label)} · ${formatForDisplay(
+									{
+										key: candidate.shortcut,
+									},
+								)}`}
+								placement="bottom"
 							>
-								{translator.textFn(candidate.label)}
-							</LinkButtonLink>
+								<LinkButtonLink
+									to="/editor/$projectId/mcp/$sectionId"
+									params={{
+										projectId: project.projectId,
+										sectionId: candidate.id,
+									}}
+									activeOptions={{
+										exact: true,
+									}}
+									activeProps={{
+										"data-ui-selected": true,
+									}}
+									className={editorSectionLinkClassName}
+								>
+									{translator.textFn(candidate.label)}
+								</LinkButtonLink>
+							</Tooltip>
 						))}
 					</EditorSectionBar>
 				}

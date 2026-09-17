@@ -2,7 +2,7 @@ import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef } from "rea
 
 import { overlayFocusableSelector } from "~/ui/constant/overlayFocusableSelector";
 
-/** Owns first-control focus, Escape, and focus return for one mounted overlay. */
+/** Owns modal keyboard isolation, focus containment, Escape, and focus return. */
 export const useOverlayFocus = ({ onCloseFn }: { readonly onCloseFn: () => void }) => {
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -18,9 +18,30 @@ export const useOverlayFocus = ({ onCloseFn }: { readonly onCloseFn: () => void 
 	}, []);
 
 	const onKeyDownFn = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+		event.stopPropagation();
+		// Keep subsequent page shortcuts inside the modal after Tab reaches either edge.
+		if (event.key === "Tab") {
+			const controls = Array.from(
+				event.currentTarget.querySelectorAll<HTMLElement>(overlayFocusableSelector),
+			).filter(
+				(control) =>
+					!control.matches(":disabled") && control.closest("[hidden], [inert]") === null,
+			);
+			const first = controls[0];
+			const last = controls[controls.length - 1];
+			if (
+				first === undefined ||
+				document.activeElement === event.currentTarget ||
+				(event.shiftKey
+					? document.activeElement === first
+					: document.activeElement === last)
+			) {
+				event.preventDefault();
+				(event.shiftKey ? last : first)?.focus();
+			}
+		}
 		if (event.key !== "Escape") return;
 		event.preventDefault();
-		event.stopPropagation();
 		onCloseFn();
 	};
 

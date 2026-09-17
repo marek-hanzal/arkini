@@ -12,7 +12,7 @@ import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { ProjectSectionLink } from "~/project-authoring/ui/ProjectSectionLink";
 import { ProjectSourceExport } from "~/project-authoring/ui/ProjectSourceExport";
-import { useProjectDetailSectionShortcuts } from "~/project-authoring/ui/useProjectDetailSectionShortcuts";
+import { useProjectSectionShortcuts } from "~/project-authoring/ui/useProjectSectionShortcuts";
 import { ProjectSections, type ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 import { PrimaryButtonLink } from "~/ui/ui/Button";
 
@@ -24,7 +24,7 @@ export const ProjectDetail = ({
 }>) => {
 	const project = useEditorProject();
 	const editActionRef = useEditorEditShortcut();
-	useProjectDetailSectionShortcuts({
+	useProjectSectionShortcuts({
 		projectId: project.projectId,
 	});
 	return (

@@ -1,4 +1,4 @@
-import { useHotkeys } from "@tanstack/react-hotkeys";
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { useRouter } from "@tanstack/react-router";
 
 import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
@@ -23,31 +23,21 @@ export const useEditorArtworkDetailSectionShortcuts = ({
 	resourceId,
 }: useEditorArtworkDetailSectionShortcuts.Props) => {
 	const router = useRouter();
-	useHotkeys(
-		EditorArtworkDetailSections.map((section) => ({
-			hotkey: {
-				key: section.shortcut,
-			},
-			callback: (event: KeyboardEvent) => {
-				if (event.repeat || event.isComposing) return;
-				void router.navigate({
-					to: section.to,
-					params: {
-						projectId,
-						resourceId,
-					},
-					search: {
-						filter,
-						query,
-					},
-				});
-			},
-		})),
-		{
-			enabled,
-			ignoreInputs: true,
-			preventDefault: true,
-			stopPropagation: true,
+	useEditorSectionShortcuts({
+		enabled,
+		options: EditorArtworkDetailSections,
+		onSelectFn: (section) => {
+			void router.navigate({
+				to: section.to,
+				params: {
+					projectId,
+					resourceId,
+				},
+				search: {
+					filter,
+					query,
+				},
+			});
 		},
-	);
+	});
 };

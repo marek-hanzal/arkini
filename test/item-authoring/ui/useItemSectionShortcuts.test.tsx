@@ -10,13 +10,11 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
-	useRouter: () => ({
-		navigate: state.navigateFn,
-	}),
+	useNavigate: () => state.navigateFn,
 }));
 
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
-import { useItemDetailSectionShortcuts } from "~/item-authoring/ui/useItemDetailSectionShortcuts";
+import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 
 (
 	globalThis as {
@@ -27,7 +25,7 @@ import { useItemDetailSectionShortcuts } from "~/item-authoring/ui/useItemDetail
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const Harness = () => {
-	useItemDetailSectionShortcuts({
+	useItemSectionShortcuts({
 		enabled: true,
 		itemUid: "item-uid",
 		projectId: "project-id",

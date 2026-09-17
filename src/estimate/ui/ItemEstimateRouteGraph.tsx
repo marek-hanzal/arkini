@@ -1,3 +1,5 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { Tx } from "~/translation/ui/Tx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { Project } from "~/project-authoring/type/Project";
@@ -30,6 +32,25 @@ export const ItemEstimateRouteGraph = ({
 }) => {
 	const translator = useTranslator();
 	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
+	// Item Detail owns every letter in Time, including E for Edit; nested sorting uses Shift.
+	const sortOptions = [
+		{
+			label: translator.textFn("Time"),
+			value: "time",
+			shortcut: "t",
+			shift: true,
+		},
+		{
+			label: translator.textFn("Quantity"),
+			value: "quantity",
+			shortcut: "q",
+			shift: true,
+		},
+	] as const;
+	useEditorSectionShortcuts({
+		options: sortOptions,
+		onSelectFn: (option) => setSortFn(option.value),
+	});
 	const sortedRouteSteps = [
 		...routeSteps,
 	].sort((left, right) => {
@@ -51,16 +72,13 @@ export const ItemEstimateRouteGraph = ({
 					dataUi="EditorItemEstimateRouteSortOptions"
 					onChangeFn={setSortFn}
 					optionDataUi="EditorItemEstimateRouteSort"
-					options={[
-						{
-							label: translator.textFn("Time"),
-							value: "time",
-						},
-						{
-							label: translator.textFn("Quantity"),
-							value: "quantity",
-						},
-					]}
+					options={sortOptions.map((option) => ({
+						...option,
+						description: `${option.label} · ${formatForDisplay({
+							key: option.shortcut,
+							shift: option.shift,
+						})}`,
+					}))}
 					size="compact"
 					value={sort}
 				/>

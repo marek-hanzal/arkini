@@ -1,3 +1,4 @@
+import { Overlay } from "~/ui/ui/Overlay";
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import { Copy, X } from "lucide-react";
@@ -63,7 +64,11 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 			{source === undefined
 				? null
 				: createPortal(
-						<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
+						<Overlay
+							onCloseFn={() => {
+								if (!isSaving) setSourceFn(undefined);
+							}}
+						>
 							<div
 								className="grid w-full max-w-lg gap-4 rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 								data-ui="ItemSectionCopyDialog"
@@ -113,7 +118,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 									</PrimaryButton>
 								</div>
 							</div>
-						</div>,
+						</Overlay>,
 						document.body,
 					)}
 		</>

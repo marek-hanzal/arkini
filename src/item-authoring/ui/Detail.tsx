@@ -19,7 +19,7 @@ import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
-import { useItemDetailSectionShortcuts } from "~/item-authoring/ui/useItemDetailSectionShortcuts";
+import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
 export const Detail = ({
@@ -35,7 +35,7 @@ export const Detail = ({
 	const editActionRef = useEditorEditShortcut();
 	const item = useItemByUid(uid);
 	const sections = readSectionsFn();
-	useItemDetailSectionShortcuts({
+	useItemSectionShortcuts({
 		enabled: item !== undefined,
 		itemUid: item?.uid ?? uid,
 		projectId: project.projectId,

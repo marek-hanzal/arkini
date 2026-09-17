@@ -35,6 +35,13 @@ export namespace ProjectRepository {
 		readonly force: boolean;
 	}
 
+	export interface SaveResourceMetadataProps {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly resourceId: string;
+		readonly name: string;
+	}
+
 	export interface DeleteResourceProps {
 		readonly expectedRevision: number;
 		readonly projectId: string;
@@ -119,6 +126,9 @@ export interface ProjectRepositoryService {
 	readonly deleteItemFx: (
 		props: ProjectRepository.DeleteItemProps,
 	) => Effect.Effect<ProjectCommit, ProjectRepositoryError, never>;
+	readonly saveResourceMetadataFx: (
+		props: ProjectRepository.SaveResourceMetadataProps,
+	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly deleteResourceFx: (
 		props: ProjectRepository.DeleteResourceProps,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;

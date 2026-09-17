@@ -96,10 +96,6 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 
 	return {
 		activeResourceId: audio.activeResourceId,
-		deleteError: audio.deleteError,
-		deletePending: audio.deletePending,
-		deleteResourceFn: audio.deleteResourceFn,
-		deletingResourceId: audio.deletingResourceId,
 		filesInputRef: audio.filesInputRef,
 		importError: audio.importError,
 		importPending: audio.importPending,

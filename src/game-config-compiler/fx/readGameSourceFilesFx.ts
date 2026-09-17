@@ -11,6 +11,9 @@ import {
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
+import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { readRequiredGameProjectJsonFx } from "~/game-config-source/fx/readRequiredGameProjectJsonFx";
+import { gameSourceSchemaDiagnosticsFn } from "~/game-config-source/fn/gameSourceSchemaDiagnosticsFn";
 
 export namespace readGameSourceFilesFx {
 	export interface Props {
@@ -71,6 +74,42 @@ export const readGameSourceFilesFx = Effect.fn("readGameSourceFilesFx")(function
 				]),
 	];
 	const sources = [];
+	const audioPaths = new Set(
+		sourceFiles.resources
+			.filter(({ type }) => type === "music" || type === "sfx")
+			.map(({ path }) => path),
+	);
+	const metadataPaths = new Set([
+		...sourceFiles.audioMetadata,
+		...Array.from(audioPaths, (path) => `${path.slice(0, -4)}.json`),
+	]);
+	for (const metadataPath of [
+		...metadataPaths,
+	].sort()) {
+		const audioPath = `${metadataPath.slice(0, -5)}.ogg`;
+		if (!audioPaths.has(audioPath))
+			diagnostics.push({
+				code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
+				path: [],
+				source: metadataPath,
+				message: `Audio metadata requires its paired file ${audioPath}.`,
+				issueCode: "audio-resource-body-missing",
+			});
+		diagnostics.push(
+			...(yield* readRequiredGameProjectJsonFx({
+				path: metadataPath,
+				missingIssueCode: "audio-resource-metadata-missing",
+				missingMessage: `Audio resource ${audioPath} requires metadata ${metadataPath}.`,
+				validateFn: (json) => {
+					const result = AudioResourceMetadataSchema.safeParse(json);
+					return result.success
+						? []
+						: gameSourceSchemaDiagnosticsFn(metadataPath, result.error);
+				},
+			})),
+		);
+	}
 	let projectIdentity;
 	for (const result of results) {
 		diagnostics.push(...result.diagnostics);

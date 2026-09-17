@@ -1,10 +1,11 @@
 import { Effect, FileSystem, Option } from "effect";
 
+import { readAudioResourceMetadataFx } from "~/audio-authoring/fx/readAudioResourceMetadataFx";
 import type { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 import { readProjectResourceVersionFn } from "../fn/readProjectResourceVersionFn";
 
-/** Reads a resource's cache identity without opening or decoding its PNG body. */
+/** Reads resource presentation and cache identity without opening or decoding media bodies. */
 export const readProjectResourceMetadataFx = Effect.fn("readProjectResourceMetadataFx")(function* (
 	resourceId: string,
 	type: ResourceTypeSchema.Type,
@@ -18,6 +19,9 @@ export const readProjectResourceMetadataFx = Effect.fn("readProjectResourceMetad
 	return {
 		id: resourceId,
 		type,
+		...(type === "music" || type === "sfx"
+			? yield* readAudioResourceMetadataFx(`${target.slice(0, -4)}.json`)
+			: {}),
 		size,
 		version: readProjectResourceVersionFn({
 			size,

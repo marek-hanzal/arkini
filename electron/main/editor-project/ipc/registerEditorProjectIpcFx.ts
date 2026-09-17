@@ -434,6 +434,17 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handleFn(
+					ArkiniElectronApi.channels.editorProjectSaveResourceMetadata,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"save-resource-metadata",
+							ownership,
+							diagnostics,
+							requestParser.parseSaveResourceMetadataFx(candidate),
+							(repository, request) => repository.saveResourceMetadataFx(request),
+						),
+				);
+				handleFn(
 					ArkiniElectronApi.channels.editorProjectDeleteResource,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -483,6 +494,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectDelete,
 					ArkiniElectronApi.channels.editorProjectDeleteItem,
 					ArkiniElectronApi.channels.editorProjectDeleteResource,
+					ArkiniElectronApi.channels.editorProjectSaveResourceMetadata,
 					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectImportArkpack,

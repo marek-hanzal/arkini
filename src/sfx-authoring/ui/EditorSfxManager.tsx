@@ -60,11 +60,7 @@ export const EditorSfxManager = () => {
 				)}
 				<EditorSfxAssignmentMenu
 					assigningEvent={controller.assigningEvent}
-					disabled={
-						controller.assignmentPending ||
-						controller.deletePending ||
-						controller.optimizePending
-					}
+					disabled={controller.assignmentPending || controller.optimizePending}
 					pending={
 						controller.assignmentPending &&
 						controller.assigningResourceId === resource.id
@@ -92,7 +88,6 @@ export const EditorSfxManager = () => {
 					disabled={
 						controller.optimizePending ||
 						controller.importPending ||
-						controller.deletePending ||
 						controller.assignmentPending ||
 						controller.totalResourceCount === 0
 					}

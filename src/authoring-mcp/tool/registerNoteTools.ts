@@ -132,6 +132,11 @@ const readLinkedResourcesFn = (note: NoteSchema.Type, project: Project) =>
 		return {
 			id,
 			type: resource?.type ?? null,
+			...(resource?.name === undefined
+				? {}
+				: {
+						name: resource.name,
+					}),
 		};
 	});
 

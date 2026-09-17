@@ -69,6 +69,7 @@ const installEditorApi = () => {
 		deleteProjectFn: vi.fn(async () => success(undefined)),
 		deleteNoteFn: vi.fn(async () => success(undefined)),
 		deleteItemFn: vi.fn(async () => success(commit)),
+		saveResourceMetadataFn: vi.fn(async () => success(project)),
 		deleteResourceFn: vi.fn(async () => success(project)),
 		optimizeResourcesFn: vi.fn(async () =>
 			success({
@@ -158,6 +159,45 @@ afterEach(() => {
 });
 
 describe("createElectronProjectRepositoryFx", () => {
+	it("admits audio metadata saves only outside project replacement and preserves returned names", async () => {
+		const editor = installEditorApi();
+		const { repository, admission } = createRepository();
+		const request = {
+			projectId: project.projectId,
+			expectedRevision: project.revision,
+			resourceId: "track",
+			name: "Dusty Plains",
+		};
+		vi.mocked(editor.saveResourceMetadataFn).mockResolvedValue(
+			success({
+				...project,
+				resources: [
+					{
+						id: "track",
+						type: "music",
+						name: "Dusty Plains",
+						size: 10,
+						version: "audio-version",
+					},
+				],
+			}),
+		);
+		const release = await Effect.runPromise(
+			admission.acquireReplacementFx("refresh-project", () => false),
+		);
+		const failure = await readTypedFailure(repository.saveResourceMetadataFx(request));
+		expect(failure.operation).toBe("save-resource-metadata");
+		expect(editor.saveResourceMetadataFn).not.toHaveBeenCalled();
+		await Effect.runPromise(release);
+		const saved = await Effect.runPromise(repository.saveResourceMetadataFx(request));
+		expect(editor.saveResourceMetadataFn).toHaveBeenCalledExactlyOnceWith(request);
+		expect(saved.resources[0]).toMatchObject({
+			id: "track",
+			name: "Dusty Plains",
+			version: "audio-version",
+		});
+	});
+
 	it("creates a fresh project over IPC using only its ID", async () => {
 		const editor = installEditorApi();
 		const { repository } = createRepository();

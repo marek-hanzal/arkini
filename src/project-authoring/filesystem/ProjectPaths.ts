@@ -21,5 +21,9 @@ export interface ProjectPaths {
 		readonly id: string;
 		readonly type: ResourceTypeSchema.Type;
 	}) => Effect.Effect<string, Error, never>;
+	readonly audioMetadataFileFx: (props: {
+		readonly id: string;
+		readonly type: "music" | "sfx";
+	}) => Effect.Effect<string, Error, never>;
 	readonly noteFileFx: (noteId: string) => Effect.Effect<string, never, never>;
 }

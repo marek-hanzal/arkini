@@ -76,7 +76,9 @@ beforeEach(async () => {
 	await writeFile(join(root, "src/builder.ts"), "export const builder = 1;");
 	await writeFile(join(root, "game/arkini/artwork/a space.png"), "image bytes");
 	await writeFile(join(root, "game/arkini/music/theme.ogg"), "music bytes");
+	await writeFile(join(root, "game/arkini/music/theme.json"), '{"name":"Theme"}');
 	await writeFile(join(root, "game/arkini/sfx/click.ogg"), "sfx bytes");
+	await writeFile(join(root, "game/arkini/sfx/click.json"), '{"name":"Click"}');
 	await writeFile(join(root, "bin/electron-vite"), "#!/usr/bin/env bash\nexit 0\n", {
 		mode: 0o755,
 	});
@@ -119,7 +121,9 @@ describe("repository Arkpack build cache", () => {
 			"package-lock.json",
 			"game/arkini/artwork/a space.png",
 			"game/arkini/music/theme.ogg",
+			"game/arkini/music/theme.json",
 			"game/arkini/sfx/click.ogg",
+			"game/arkini/sfx/click.json",
 		]) {
 			const before = await fingerprintFn();
 			await appendFile(join(root, file), "changed");
@@ -151,6 +155,33 @@ describe("repository Arkpack build cache", () => {
 		await rm(join(root, artifact));
 		await runFn("build");
 		expect(await countFn()).toBe(5);
+	});
+
+	it("revalidates audio sidecar removal and corruption instead of reusing a valid build", async () => {
+		await runFn("build");
+		const previousArtifact = await readFile(join(root, artifact), "utf8");
+		const previousCache = await readFile(join(root, `${artifact}.cache`), "utf8");
+		await rm(join(root, "game/arkini/music/theme.json"));
+		// The compiler owns pair validation; this boundary must reach it despite a cached pack.
+		await expect(
+			runFn("build", {
+				FAIL_PACK: "1",
+			}),
+		).rejects.toThrow();
+		expect(await countFn()).toBe(2);
+		expect(await readFile(join(root, artifact), "utf8")).toBe(previousArtifact);
+		expect(await readFile(join(root, `${artifact}.cache`), "utf8")).toBe(previousCache);
+
+		await writeFile(join(root, "game/arkini/music/theme.json"), '{"name":"Theme"}');
+		await writeFile(join(root, "game/arkini/sfx/click.json"), "{invalid");
+		await expect(
+			runFn("build", {
+				FAIL_PACK: "1",
+			}),
+		).rejects.toThrow();
+		expect(await countFn()).toBe(3);
+		expect(await readFile(join(root, artifact), "utf8")).toBe(previousArtifact);
+		expect(await readFile(join(root, `${artifact}.cache`), "utf8")).toBe(previousCache);
 	});
 
 	it("does not publish a reuse record after a failed build or verification", async () => {

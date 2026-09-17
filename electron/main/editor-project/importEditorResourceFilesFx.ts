@@ -1,6 +1,8 @@
+import { createId } from "@paralleldrive/cuid2";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
+import { readInitialAudioResourceNameFn } from "~/audio-authoring/fn/readInitialAudioResourceNameFn";
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
@@ -66,14 +68,12 @@ const readAudioFilesFx = Effect.fn("importEditorResourceFilesFx.readAudioFilesFx
 			files,
 			(file, index) =>
 				Effect.gen(function* () {
-					const id = yield* Effect.try({
-						try: () => IdSchema.parse(readImportedResourceIdFn(file.name)),
-						catch: (cause) =>
-							failFn(
-								`${type} ${file.name} does not produce a valid resource ID.`,
-								cause,
-							),
-					});
+					const id = createId();
+					const name =
+						basename(file.name)
+							.replace(/\.[^.]*$/, "")
+							.replace(/[_-]+/g, " ")
+							.trim() || "Audio";
 					const prepared = yield* prepareEditorAudioFileFx({
 						id,
 						source: file.path,
@@ -82,6 +82,7 @@ const readAudioFilesFx = Effect.fn("importEditorResourceFilesFx.readAudioFilesFx
 					return {
 						id,
 						type: type as "music" | "sfx",
+						name,
 						path: prepared.path,
 						size: prepared.size,
 					};
@@ -164,6 +165,11 @@ export const importEditorResourceFilesFx = Effect.fn("importEditorResourceFilesF
 		const project = yield* repository.upsertResourceFilesFx({
 			projectId: request.projectId,
 			resources: resources.map(({ id, path, size, type }) => ({
+				...(type === "music" || type === "sfx"
+					? {
+							name: readInitialAudioResourceNameFn(id),
+						}
+					: {}),
 				id,
 				type,
 				path,

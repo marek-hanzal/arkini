@@ -22,6 +22,18 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			yield* fileSystem.makeDirectory(parent);
 			yield* fileSystem.writeFileString(`${parent}/keep.txt`, "ordinary parent content");
 			yield* writeReimportableProjectFx(source, 2, true);
+			yield* fileSystem.writeFileString(
+				`${source}/music/unresolved-waltz.json`,
+				JSON.stringify({
+					name: "Dusty Plains",
+				}),
+			);
+			yield* fileSystem.writeFileString(
+				`${source}/sfx/job-start.json`,
+				JSON.stringify({
+					name: "Workshop Bell",
+				}),
+			);
 			yield* writeExportSourceExtrasFx(source);
 
 			const first = yield* createEditorJsonExportDirectoryFx({
@@ -44,6 +56,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 				expect.objectContaining({
 					id: "unresolved-waltz",
 					type: "music",
+					name: "Dusty Plains",
 				}),
 			);
 			expect(yield* fileSystem.exists(`${first.root}/music/unresolved-waltz.ogg`)).toBe(true);
@@ -51,6 +64,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 				expect.objectContaining({
 					id: "job-start",
 					type: "sfx",
+					name: "Workshop Bell",
 				}),
 			);
 			expect(yield* fileSystem.exists(`${first.root}/sfx/job-start.ogg`)).toBe(true);

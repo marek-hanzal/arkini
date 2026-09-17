@@ -1,4 +1,5 @@
 import { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
+import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
 import { Effect } from "effect";
 import { z } from "zod";
 
@@ -55,6 +56,9 @@ const deleteResourceSchema = z
 		resourceId: IdSchema,
 	})
 	.strict();
+const saveResourceMetadataSchema = deleteResourceSchema.extend({
+	name: AudioResourceMetadataSchema.shape.name,
+});
 const optimizeResourcesSchema = z
 	.object({
 		expectedRevision: z.number().int().nonnegative(),
@@ -157,6 +161,18 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				candidate: unknown,
 			): Effect.Effect<ProjectRepository.DeleteItemProps, ProjectRepositoryError, never> =>
 				parseEditorProjectIpcRequestFx("delete-item", deleteItemSchema, candidate),
+			parseSaveResourceMetadataFx: (
+				candidate: unknown,
+			): Effect.Effect<
+				ProjectRepository.SaveResourceMetadataProps,
+				ProjectRepositoryError,
+				never
+			> =>
+				parseEditorProjectIpcRequestFx(
+					"save-resource-metadata",
+					saveResourceMetadataSchema,
+					candidate,
+				),
 			parseDeleteResourceFx: (
 				candidate: unknown,
 			): Effect.Effect<

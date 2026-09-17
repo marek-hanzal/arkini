@@ -41,7 +41,7 @@ export const ItemLineRow = forwardRef<HTMLElement, ItemLineRowProps>(function It
 		<motion.article
 			ref={ref}
 			layout
-			className="ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line border-l-line/55 px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 data-[ui-state=active]:border-l-success data-[ui-state=queued]:border-l-warning data-[ui-state=queued]:bg-warning/[0.06]"
+			className="ak-list-row overflow-hidden px-3 py-5 pl-4 first:pt-3 last:pb-5"
 			data-line-id={line.lineId}
 			{...readDataUiFn({
 				dataUi: "TileLine",

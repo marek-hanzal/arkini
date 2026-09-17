@@ -21,7 +21,7 @@ export const SettingsOpenActionRow = ({
 	onClickFn,
 }: SettingsOpenActionRowProps) => (
 	<div
-		className="ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3"
+		className="ak-list-row flex items-center justify-between gap-4 px-4 py-3"
 		data-ui={dataUi}
 	>
 		<span className="grid gap-1">

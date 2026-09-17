@@ -71,7 +71,7 @@ export const ItemQueueActiveSlot = ({
 				{job === undefined ? (
 					<motion.article
 						key="idle"
-						className="ak-list-row absolute inset-0 grid min-h-28 content-center rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
+						className="ak-list-row absolute inset-0 grid min-h-28 content-center px-4 py-5"
 						data-ui="ItemQueueIdleSlot"
 						initial={{
 							opacity: 0,
@@ -111,7 +111,7 @@ export const ItemQueueActiveSlot = ({
 				) : (
 					<motion.article
 						key={job.jobId}
-						className="ak-list-row absolute inset-0 min-h-28 overflow-hidden rounded-xl border-b border-l-2 border-line border-l-success px-4 py-5"
+						className="ak-list-row absolute inset-0 min-h-28 overflow-hidden px-4 py-5"
 						{...readDataUiFn({
 							dataUi: "ItemQueueRow",
 							state: {
@@ -180,7 +180,7 @@ const QueueRequestRow = ({
 	const translator = useTranslator();
 	return (
 		<article
-			className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
+			className="px-4 py-5"
 			{...readDataUiFn({
 				dataUi: "ItemQueueRow",
 				state: {
@@ -263,7 +263,7 @@ export const ItemQueueRequestList = ({
 			request.map((entry, index) => (
 				<motion.div
 					key={entry.requestId}
-					className="overflow-hidden"
+					className="ak-list-row overflow-hidden"
 					layout
 					initial={{
 						height: 0,

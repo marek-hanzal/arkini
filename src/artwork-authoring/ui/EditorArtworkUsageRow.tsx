@@ -40,7 +40,7 @@ export const EditorArtworkUsageRow = ({
 		</>
 	);
 	const className =
-		"ak-list-row ak-list-row-interactive flex min-h-0 min-w-0 items-center justify-start gap-4 rounded-xl border-0 p-4 text-left shadow-none";
+		"ak-list-row ak-list-row-interactive flex min-h-0 min-w-0 items-center justify-start gap-4 p-4 text-left";
 	if (usage.owner === "item")
 		return (
 			<ButtonLink

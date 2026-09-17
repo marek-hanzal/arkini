@@ -91,7 +91,7 @@ export const ItemEstimateRouteGraph = ({
 					const item = config.items[route.factId];
 					return (
 						<article
-							className="ak-list-row ak-list-row-interactive flex min-h-16 min-w-0 items-center justify-between gap-4 rounded-xl p-3 text-sm"
+							className="ak-list-row ak-list-row-interactive flex min-h-16 min-w-0 items-center justify-between gap-4 p-3 text-sm"
 							key={route.factId}
 							{...readDataUiFn({
 								dataUi: "EditorItemEstimateRouteStep",

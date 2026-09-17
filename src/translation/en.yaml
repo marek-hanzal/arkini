@@ -107,12 +107,8 @@ Artwork usage empty description:
   value: No saved Item uses this Artwork.
 Artwork usage help:
   value: Shows every saved Item that references this Artwork.
-Assign to:
-  value: Assign to
 Assigned:
   value: Assigned
-Assigned here:
-  value: Assigned here
 Audio not found:
   value: Audio not found
 Authored Clock expiry output summary help:
@@ -1944,7 +1940,11 @@ SFX help:
     Build the sound effects library for your game. Import sounds, find them quickly, and preview how they sound before assigning them to gameplay events.
 
     - Sound effect names come from the imported filenames.
-    - **Play** previews one sound effect at a time.
+    - Drag a sound from the left library onto an event slot on the right to assign it or replace its current sound.
+    - Assigned sounds carry a check badge. Empty slots remain visible while filtering the library.
+    - Click an assigned sound in a slot to reveal and highlight it in the library. This clears the library filters.
+    - **Play** previews one sound effect at a time, from either the library or an assigned slot.
+    - Use the slot's remove button to clear its assignment.
     - **Volume** changes only the preview volume on this page.
     - **Optimize** trims silence from the beginning and end of existing sound effects.
 Safe item deletion help:

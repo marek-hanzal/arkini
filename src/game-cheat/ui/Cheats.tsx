@@ -44,7 +44,7 @@ export const Cheats = ({
 
 				<div className="ak-list grid gap-2">
 					<label
-						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-pending=true]:cursor-progress"
+						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 px-4 py-3 data-[ui-pending=true]:cursor-progress"
 						{...readDataUiFn({
 							dataUi: "CheatsEnabledForGame",
 							state: {
@@ -70,7 +70,7 @@ export const Cheats = ({
 					</label>
 
 					<label
-						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-enabled=false]:cursor-default data-[ui-enabled=false]:opacity-60 data-[ui-pending=true]:cursor-progress"
+						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 px-4 py-3 data-[ui-enabled=false]:cursor-default data-[ui-enabled=false]:opacity-60 data-[ui-pending=true]:cursor-progress"
 						{...readDataUiFn({
 							dataUi: "CheatsSpeedUpGameplay",
 							state: {

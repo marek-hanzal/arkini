@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_launcher/settings/game")({
 				data-ui="SettingsGame"
 			>
 				<label
-					className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line border-t px-4 py-3 data-[ui-pending=true]:cursor-progress"
+					className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 px-4 py-3 data-[ui-pending=true]:cursor-progress"
 					{...readDataUiFn({
 						dataUi: "SettingsCheatAvailability",
 						state: {

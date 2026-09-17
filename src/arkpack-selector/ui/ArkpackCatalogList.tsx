@@ -47,7 +47,7 @@ export const ArkpackCatalogList = ({
 						<article
 							key={arkpack.packageId}
 							data-ui="ArkpackCatalogRow"
-							className="ak-list-row flex min-w-0 flex-col items-stretch justify-between gap-4 rounded-xl p-4 sm:flex-row sm:items-center"
+							className="ak-list-row flex min-w-0 flex-col items-stretch justify-between gap-4 p-4 sm:flex-row sm:items-center"
 						>
 							<div className="min-w-0">
 								<div className="flex flex-wrap items-center gap-2">

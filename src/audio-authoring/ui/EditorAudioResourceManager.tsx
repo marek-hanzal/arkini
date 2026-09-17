@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type DragEvent, type ReactNode, useLayoutEffect, useRef } from "react";
 import { AudioLines, LoaderCircle, Music2, Pause, Play, Plus } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -13,7 +13,8 @@ import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { Status } from "~/ui/ui/Status";
 import { Tooltip } from "~/ui/ui/Tooltip";
@@ -21,6 +22,12 @@ import { Tooltip } from "~/ui/ui/Tooltip";
 interface EditorAudioResourceManagerProps {
 	readonly controller: useEditorAudioResourceManagerController.Output;
 	readonly extraError?: unknown;
+	readonly sidePanel?: ReactNode;
+	readonly revealedResource?: {
+		readonly id: string;
+	};
+	readonly onResourceDragStartFn?: (event: DragEvent<HTMLLIElement>, resourceId: string) => void;
+	readonly onResourceDragEndFn?: () => void;
 	readonly renderResourceActionFn?: (resource: Project.Resource) => ReactNode;
 	readonly resourceMutationBlocked?: boolean;
 	readonly resources: ReadonlyArray<Project.Resource>;
@@ -32,12 +39,25 @@ interface EditorAudioResourceManagerProps {
 export const EditorAudioResourceManager = ({
 	controller,
 	extraError,
+	sidePanel,
+	revealedResource,
+	onResourceDragStartFn,
+	onResourceDragEndFn,
 	renderResourceActionFn,
 	resourceMutationBlocked = false,
 	resources,
 	secondaryActions,
 	secondaryNavigation,
 }: EditorAudioResourceManagerProps) => {
+	const selectedRowRef = useRef<HTMLLIElement>(null);
+	useLayoutEffect(() => {
+		selectedRowRef.current?.scrollIntoView({
+			block: "nearest",
+		});
+	}, [
+		revealedResource,
+		resources,
+	]);
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const music = controller.type === "music";
@@ -130,7 +150,7 @@ export const EditorAudioResourceManager = ({
 			}
 		>
 			<div
-				className="h-full min-h-0"
+				className="flex h-full min-h-0 min-w-0"
 				data-ui={`${dataUiPrefix}Manager`}
 			>
 				<input
@@ -144,7 +164,7 @@ export const EditorAudioResourceManager = ({
 					onChange={controller.onFilesChangeFn}
 				/>
 				<div
-					className="h-full min-h-0 overflow-y-auto overscroll-contain p-3"
+					className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-3"
 					data-ui={`${dataUiPrefix}Scroll`}
 				>
 					{errorMessage === undefined ? null : (
@@ -180,9 +200,20 @@ export const EditorAudioResourceManager = ({
 
 								return (
 									<li
-										className="ak-list-row ak-list-row-interactive grid min-w-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-xl px-4 py-3"
+										className="ak-list-row ak-list-row-interactive grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden px-4 py-3 data-[ui-selected=true]:outline-2 data-[ui-selected=true]:-outline-offset-2 data-[ui-selected=true]:outline-accent data-[ui-seekable=true]:cursor-pointer [&[draggable=true]]:cursor-grab"
 										key={resource.id}
+										ref={
+											revealedResource?.id === resource.id
+												? selectedRowRef
+												: undefined
+										}
+										draggable={onResourceDragStartFn !== undefined}
+										onDragStart={(event) =>
+											onResourceDragStartFn?.(event, resource.id)
+										}
+										onDragEnd={onResourceDragEndFn}
 										onClick={(event) => {
+											if (!music) return;
 											const bounds =
 												event.currentTarget.getBoundingClientRect();
 											controller.seekPlaybackFn(
@@ -194,11 +225,13 @@ export const EditorAudioResourceManager = ({
 											dataUi: `${dataUiPrefix}Row`,
 											state: {
 												playing,
+												selected: revealedResource?.id === resource.id,
+												seekable: music,
 												state: active ? "active" : undefined,
 											},
 										})}
 									>
-										{active ? (
+										{active && music ? (
 											<div
 												className="pointer-events-none absolute inset-y-0 left-0 z-0 bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
 												data-ui={`${dataUiPrefix}Progress`}
@@ -212,8 +245,9 @@ export const EditorAudioResourceManager = ({
 										</div>
 										<div className="relative z-10 min-w-0">
 											<Link
-												className="block truncate font-semibold hover:underline"
+												className="block w-fit max-w-full truncate font-semibold hover:underline"
 												data-ui={`${dataUiPrefix}DetailLink`}
+												draggable={false}
 												to={
 													music
 														? "/editor/$projectId/music/$resourceId/$sectionId"
@@ -240,8 +274,8 @@ export const EditorAudioResourceManager = ({
 												)}
 												placement="left"
 											>
-												<Button
-													className="size-10 min-h-10 shrink-0 p-0"
+												<LinkButton
+													className="grid size-10 shrink-0 place-items-center text-foreground"
 													data-ui={`${dataUiPrefix}Playback`}
 													onClick={(event) => {
 														event.stopPropagation();
@@ -253,7 +287,7 @@ export const EditorAudioResourceManager = ({
 													) : (
 														<Play className="size-4" />
 													)}
-												</Button>
+												</LinkButton>
 											</Tooltip>
 										</div>
 									</li>
@@ -262,6 +296,14 @@ export const EditorAudioResourceManager = ({
 						</ul>
 					)}
 				</div>
+				{sidePanel === undefined ? null : (
+					<div
+						className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain border-l border-control-border p-3"
+						data-ui={`${dataUiPrefix}SidePanel`}
+					>
+						{sidePanel}
+					</div>
+				)}
 			</div>
 		</EditorSectionPage>
 	);

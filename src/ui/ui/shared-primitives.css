@@ -13,12 +13,20 @@
 
 .ak-list {
 	isolation: isolate;
+	row-gap: 0;
+}
+
+/* Lists own separators; standalone rows have no surrounding frame. */
+.ak-list > .ak-list-row + .ak-list-row {
+	border-top: 1px solid color-mix(in srgb, var(--ak-line) 60%, transparent);
 }
 
 .ak-list-row {
 	position: relative;
-	background-color: var(--ak-list-row-surface);
-	box-shadow: inset 0 0 0 1px var(--ak-line);
+	background-color: transparent;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
 	transition:
 		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
@@ -30,8 +38,7 @@
 	.ak-list-row-interactive:not(.ak-list-row-pending):not([data-ui-pending="true"]):not(
 		:disabled
 	):not([data-ui-disabled="true"]):not([data-ui-enabled="false"]):hover {
-		background-color: var(--ak-list-row-interactive-surface);
-		box-shadow: inset 0 0 0 1px var(--ak-list-row-emphasis-border);
+		background-color: color-mix(in srgb, var(--ak-foreground) 4%, transparent);
 	}
 }
 
@@ -42,8 +49,7 @@
 
 .ak-list-row-active,
 .ak-list-row[data-ui-state="active"] {
-	background-color: var(--ak-list-row-active-surface);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-success) 34%, transparent);
+	box-shadow: inset 3px 0 0 var(--ak-success);
 }
 
 .ak-line-input {
@@ -77,33 +83,23 @@
 	opacity: 0.7;
 }
 
-.ak-list-row-selected {
-	color: var(--ak-list-row-selected-foreground);
-	background-color: var(--ak-list-row-selected-surface);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-accent-contrast) 18%, transparent);
+.ak-list-row[data-ui-state="queued"] {
+	box-shadow: inset 3px 0 0 var(--ak-warning);
 }
 
-@media (hover: hover) and (pointer: fine) {
-	.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):not(:disabled):not(
-		[data-ui-disabled="true"]
-	):hover {
-		color: var(--ak-list-row-selected-foreground);
-		background-color: var(--ak-list-row-selected-surface);
-		box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 48%, transparent);
-	}
+.ak-list-row-selected {
+	color: var(--ak-foreground);
+	box-shadow: inset 3px 0 0 var(--ak-accent);
 }
 
 .ak-list-row-pending,
 .ak-list-row[data-ui-pending="true"] {
-	background-color: var(--ak-list-row-pending-surface);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-info) 40%, transparent);
+	box-shadow: inset 3px 0 0 var(--ak-info);
 }
 
 .ak-list-row-disabled,
 .ak-list-row:disabled:not(.ak-list-row-pending),
 .ak-list-row[data-ui-disabled="true"]:not(.ak-list-row-pending) {
-	background-color: var(--ak-list-row-disabled-surface);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-line) 58%, transparent);
 	opacity: 0.62;
 }
 

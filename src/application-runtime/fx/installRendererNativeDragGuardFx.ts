@@ -5,7 +5,7 @@ interface Props {
 }
 
 /**
- * Prevents Chromium's native link, image, and text drag payloads inside the renderer application.
+ * Blocks implicit link, image, and text drags while admitting explicitly draggable product controls.
  *
  * Gameplay drag remains unaffected because Pixi owns it through pointer events rather than the
  * browser drag-and-drop API.
@@ -14,6 +14,11 @@ export const installRendererNativeDragGuardFx = Effect.fn("installRendererNative
 	({ root }: Props) =>
 		Effect.sync(() => {
 			const preventNativeDragFn = (event: DragEvent) => {
+				if (
+					event.target instanceof HTMLElement &&
+					event.target.getAttribute("draggable") === "true"
+				)
+					return;
 				event.preventDefault();
 			};
 			root.addEventListener("dragstart", preventNativeDragFn, {

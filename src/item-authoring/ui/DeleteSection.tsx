@@ -34,7 +34,7 @@ const DeleteBlockerLink = ({
 					projectId: project.projectId,
 					sectionId: "delete",
 				}}
-				className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
+				className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 p-4 text-left"
 			>
 				<EditorItemThumbnail
 					resourceIds={owner.artwork.default}
@@ -62,7 +62,7 @@ const DeleteBlockerLink = ({
 				projectId: project.projectId,
 				sectionId,
 			}}
-			className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 rounded-xl border-0 p-4 text-left shadow-none"
+			className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[1fr_auto] items-center gap-4 p-4 text-left"
 		>
 			<span className="min-w-0">
 				<span className="block truncate text-sm font-semibold">

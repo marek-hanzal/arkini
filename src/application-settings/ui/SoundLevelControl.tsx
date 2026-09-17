@@ -22,7 +22,7 @@ export const SoundLevelControl = ({
 	return (
 		<button
 			type="button"
-			className="ak-list-row ak-list-row-interactive relative grid h-9 w-full cursor-pointer grid-cols-[minmax(0,1fr)_3rem] items-center overflow-hidden rounded-lg px-3 text-left"
+			className="ak-list-row ak-list-row-interactive relative grid h-9 w-full cursor-pointer grid-cols-[minmax(0,1fr)_3rem] items-center overflow-hidden px-3 text-left"
 			onMouseDown={updateVolumeFn}
 			onMouseMove={onMouseMove}
 			{...readDataUiFn({

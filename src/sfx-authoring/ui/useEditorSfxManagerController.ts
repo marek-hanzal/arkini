@@ -46,7 +46,17 @@ export namespace useEditorSfxManagerController {
 		readonly optimizePending: boolean;
 		readonly setViewFn: (view: View) => void;
 		readonly sfx: ReadonlyArray<Project.Resource>;
-		readonly toggleAssignmentFn: (event: SfxEventEnumSchema.Type, resourceId: string) => void;
+		readonly assignResourceFn: (
+			event: SfxEventEnumSchema.Type,
+			resourceId: string | undefined,
+		) => void;
+		readonly revealedResource?: {
+			readonly id: string;
+		};
+		readonly revealResourceFn: (resourceId: string) => void;
+		readonly draggedResourceId?: string;
+		readonly setDraggedResourceIdFn: (resourceId: string | undefined) => void;
+		readonly allSfx: ReadonlyArray<Project.Resource>;
 		readonly view: View;
 	}
 }
@@ -65,6 +75,18 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	const [assigningEvent, setAssigningEventFn] = useState<SfxEventEnumSchema.Type>();
 	const [assigningResourceId, setAssigningResourceIdFn] = useState<string>();
 	const [view, setViewFn] = useState<useEditorSfxManagerController.View>("all");
+	const [revealedResource, setRevealedResourceFn] = useState<{
+		readonly id: string;
+	}>();
+	const [draggedResourceId, setDraggedResourceIdFn] = useState<string>();
+	const allSfx = project.resources.filter(({ type }) => type === "sfx");
+	const revealResourceFn = (resourceId: string) => {
+		setViewFn("all");
+		audio.setQueryFn("");
+		setRevealedResourceFn({
+			id: resourceId,
+		});
+	};
 	const resourceIdByEvent = project.config.sfx?.events ?? {};
 	const assignedResourceIds = useMemo(
 		() => new Set(Object.values(resourceIdByEvent)),
@@ -97,14 +119,16 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		optimizationState.kind === "optimizing" && optimizationState.type === "sfx"
 			? optimizationState.progress
 			: undefined;
-	const toggleAssignmentFn = (event: SfxEventEnumSchema.Type, resourceId: string) => {
-		if (assignmentPending || optimizePending) return;
+	const assignResourceFn = (event: SfxEventEnumSchema.Type, resourceId: string | undefined) => {
+		if (assignmentPending || optimizePending || audio.importPending) return;
+		if (resourceId !== undefined && !allSfx.some(({ id }) => id === resourceId)) return;
+		if (resourceIdByEvent[event] === resourceId) return;
 		setAssigningEventFn(event);
 		setAssigningResourceIdFn(resourceId);
 		const events = {
 			...resourceIdByEvent,
 		};
-		if (events[event] === resourceId) delete events[event];
+		if (resourceId === undefined) delete events[event];
 		else events[event] = resourceId;
 		assignSfxFn({
 			config: {
@@ -157,7 +181,12 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		setVolumeFn: audio.setVolumeFn,
 		setViewFn,
 		sfx,
-		toggleAssignmentFn,
+		assignResourceFn,
+		allSfx,
+		revealedResource,
+		revealResourceFn,
+		draggedResourceId,
+		setDraggedResourceIdFn,
 		togglePlaybackFn: audio.togglePlaybackFn,
 		totalResourceCount: audio.totalResourceCount,
 		type: audio.type,

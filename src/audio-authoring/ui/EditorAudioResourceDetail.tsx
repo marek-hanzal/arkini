@@ -28,7 +28,7 @@ import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { Button, DangerButton, PrimaryButtonLink } from "~/ui/ui/Button";
-import { LinkButtonLink } from "~/ui/ui/LinkButton";
+import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 
 interface EditorAudioResourceDetailProps {
@@ -76,13 +76,14 @@ const EditorAudioPreview = ({
 			className="grid gap-3 rounded-xl border border-line p-4"
 		>
 			<div className="flex items-center gap-3">
-				<Button
+				<LinkButton
+					className="grid size-10 shrink-0 place-items-center text-foreground"
+					title={translator.textFn(preview.playing ? "Pause" : "Play")}
 					data-ui="EditorAudioPreviewToggle"
 					onClick={() => preview.togglePlaybackFn(resource.id)}
 				>
 					{preview.playing ? <Pause className="size-4" /> : <Play className="size-4" />}
-					<Tx label={preview.playing ? "Pause" : "Play"} />
-				</Button>
+				</LinkButton>
 				<input
 					className="min-w-0 flex-1"
 					type="range"

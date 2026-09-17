@@ -41,7 +41,7 @@ const SourceRow = ({
 	const itemDetail = useItemDetailControl();
 	return (
 		<article
-			className="ak-list-row border-b border-line px-3 py-4 last:border-b-0"
+			className="ak-list-row px-3 py-4"
 			data-ui="ItemSource"
 			data-owner-item-id={source.ownerItemId}
 			data-owner-definition-item-id={source.ownerDefinitionItemId}

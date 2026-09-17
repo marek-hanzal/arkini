@@ -61,7 +61,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 
 					<section className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain">
 						<Button
-							className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-4 rounded-xl p-4 text-left shadow-none"
+							className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-4 p-4 text-left"
 							cursorIntent={blocked ? "progress" : undefined}
 							disabled={blocked}
 							onClick={() => void actions.uploadFn()}

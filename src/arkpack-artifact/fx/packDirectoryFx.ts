@@ -99,7 +99,7 @@ const writeArkpackFx = Effect.fn("packDirectoryFx.writeArkpackFx")(
 					throw new Error(`Invalid Arkpack payload length ${payloadLength}.`);
 				const file = await open(target, "wx");
 				const contentHash = createHash("sha256");
-				const writeFx = async (bytes: Uint8Array, payload: boolean) => {
+				const writeFn = async (bytes: Uint8Array, payload: boolean) => {
 					let offset = 0;
 					while (offset < bytes.byteLength) {
 						const { bytesWritten } = await file.write(
@@ -113,9 +113,9 @@ const writeArkpackFx = Effect.fn("packDirectoryFx.writeArkpackFx")(
 					}
 					if (payload) contentHash.update(bytes);
 				};
-				const copyPayloadFileFx = async (source: string) => {
+				const copyPayloadFileFn = async (source: string) => {
 					for await (const chunk of createReadStream(source))
-						await writeFx(chunk as Buffer, true);
+						await writeFn(chunk as Buffer, true);
 				};
 				try {
 					const envelopeHeader = new Uint8Array(Magic.byteLength + 4);
@@ -125,13 +125,13 @@ const writeArkpackFx = Effect.fn("packDirectoryFx.writeArkpackFx")(
 						payloadLength,
 						true,
 					);
-					await writeFx(envelopeHeader, false);
+					await writeFn(envelopeHeader, false);
 					const payloadHeader = new Uint8Array(4);
 					new DataView(payloadHeader.buffer).setUint32(0, manifestLength, true);
-					await writeFx(payloadHeader, true);
-					await copyPayloadFileFx(manifestPath);
-					await copyPayloadFileFx(configPath);
-					for (const resource of resources) await copyPayloadFileFx(resource.path);
+					await writeFn(payloadHeader, true);
+					await copyPayloadFileFn(manifestPath);
+					await copyPayloadFileFn(configPath);
+					for (const resource of resources) await copyPayloadFileFn(resource.path);
 				} finally {
 					await file.close();
 				}

@@ -24,6 +24,8 @@ export const validatePngResourceFileFx = Effect.fn("validatePngResourceFileFx")(
 					width * height > PngResourceLimits.maxPixels
 				)
 					throw new Error(`Resource ${resourceId} exceeds the supported PNG dimensions.`);
+				// Metadata alone does not decode IDAT; stats forces pixel admission without returning a pixel buffer.
+				await sharp(path).stats();
 				return Number(file.size);
 			},
 			catch: (cause) =>

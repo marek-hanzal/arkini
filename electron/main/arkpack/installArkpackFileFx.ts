@@ -85,10 +85,7 @@ export const installArkpackFileFx = Effect.fn("installArkpackFileFx")(function* 
 				`Arkpack was addressed as package ${expectedPackageId}, but its config declares ${config.meta.id}.`,
 			),
 		);
-	const packageRoot = join(
-		installationsRoot,
-		encodeGameProjectFileStemFn(expectedPackageId).replaceAll("%2E", "."),
-	);
+	const packageRoot = join(installationsRoot, encodeGameProjectFileStemFn(expectedPackageId));
 	const target = join(packageRoot, layout.contentHash);
 	const existing = yield* readInstallationFx(target).pipe(
 		Effect.map((installation) =>

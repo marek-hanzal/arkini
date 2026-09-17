@@ -142,7 +142,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 						resources: installed.resources.map((resource) => ({
 							id: resource.id,
 							type: resource.type,
-							url: `arkini://app/game/resource?packageId=${encodeURIComponent(packageId)}&contentHash=${installed.contentHash}&resourceId=${encodeURIComponent(resource.id)}`,
+							url: `arkini://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${installed.contentHash}&resourceId=${encodeURIComponent(JSON.stringify(resource.id))}`,
 						})),
 					} satisfies ArkiniElectronApi.ArkpackLoadedFile;
 				});

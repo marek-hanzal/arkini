@@ -144,7 +144,10 @@ export const EditorAudioResourceManager = ({
 					disabled={controller.importPending || resourceMutationBlocked}
 					onChange={controller.onFilesChangeFn}
 				/>
-				<div className="min-h-0 overflow-y-auto overscroll-contain p-3">
+				<div
+					className="h-full min-h-0 overflow-y-auto overscroll-contain p-3"
+					data-ui={`${dataUiPrefix}Scroll`}
+				>
 					{errorMessage === undefined ? null : (
 						<p
 							className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"

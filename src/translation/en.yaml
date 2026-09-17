@@ -1171,6 +1171,9 @@ Items merged:
 Items stacked:
   value: Items stacked
   dynamic: true
+Job:
+  value: Job
+  dynamic: true
 Job aborted:
   value: Job aborted
   dynamic: true
@@ -1523,6 +1526,9 @@ Optional:
   value: Optional
 Optional explanation shown while this rule applies:
   value: Optional explanation shown while this rule applies
+Other:
+  value: Other
+  dynamic: true
 Output set:
   value: Output set
 Output set weight help:

@@ -13,6 +13,8 @@ const maximumBatchCues = 6;
 
 const cuePriority: Record<GameEventEnumSchema.Type, number> = {
 	[GameEventEnumSchema.enum.CurrentSpaceChanged]: 1,
+	[GameEventEnumSchema.enum.JobQueued]: 1,
+	[GameEventEnumSchema.enum.JobQueueCleared]: 2,
 	[GameEventEnumSchema.enum.JobStarted]: 2,
 	[GameEventEnumSchema.enum.JobCompleted]: 3,
 	[GameEventEnumSchema.enum.JobAborted]: 3,
@@ -47,6 +49,22 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue =>
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 			},
 			() => cueFn(GameEventEnumSchema.enum.CurrentSpaceChanged, 1),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.JobQueued,
+			},
+			() => cueFn(GameEventEnumSchema.enum.JobQueued, 1),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.JobQueueCleared,
+			},
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.JobQueueCleared,
+					strengthForQuantityFn(event.clearedRequestCount),
+				),
 		)
 		.with(
 			{

@@ -205,6 +205,8 @@
 			"type": "string",
 			"enum": [
 				"current-space:changed",
+				"job:queued",
+				"job-queue:cleared",
 				"job:started",
 				"job:completed",
 				"job:aborted",

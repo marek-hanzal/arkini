@@ -184,6 +184,7 @@ describe("createGameSessionFx / callback ordering", () => {
 		const unsubscribe = session.subscribeEventsFn((batch) => {
 			const jobEvents = batch.events.flatMap((event) =>
 				event.type === GameEventEnumSchema.enum.JobStarted ||
+				event.type === GameEventEnumSchema.enum.JobQueued ||
 				event.type === GameEventEnumSchema.enum.JobCompleted
 					? [
 							event.type,
@@ -192,7 +193,7 @@ describe("createGameSessionFx / callback ordering", () => {
 			);
 			if (jobEvents.length > 0) {
 				batches.push(jobEvents);
-				if (batches.length === 3)
+				if (batches.length === 4)
 					publishBatches?.(
 						batches.map((events) => [
 							...events,
@@ -230,6 +231,9 @@ describe("createGameSessionFx / callback ordering", () => {
 			expect(await batchesDelivered).toEqual([
 				[
 					"job:started",
+				],
+				[
+					"job:queued",
 				],
 				[
 					"job:completed",

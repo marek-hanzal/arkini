@@ -7,6 +7,7 @@ import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
@@ -125,6 +126,7 @@ describe("enqueueLineFx", () => {
 				return {
 					request,
 					runtime: yield* readRuntimeFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
 				};
 			}).pipe(
 				useGameFx({
@@ -140,6 +142,12 @@ describe("enqueueLineFx", () => {
 		expect(result.runtime.items.filter((item) => item.location.scope === "input")).toHaveLength(
 			2,
 		);
+		expect(result.transition.events).toContainEqual({
+			type: "job:queued",
+			requestId: result.request.id,
+			ownerItemId: props.ownerItemId,
+			lineId: props.lineId,
+		});
 	});
 
 	it("preserves interleaved cross-owner acceptance order in the canonical queue", () => {

@@ -22,6 +22,27 @@ const currentSpaceChangedEventSchema = z
 	})
 	.strict();
 
+const jobQueuedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"JobQueued",
+		]),
+		requestId: IdSchema,
+		ownerItemId: IdSchema,
+		lineId: IdSchema,
+	})
+	.strict();
+
+const jobQueueClearedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"JobQueueCleared",
+		]),
+		ownerItemId: IdSchema,
+		clearedRequestCount: PositiveIntegerSchema,
+	})
+	.strict();
+
 const jobStartedEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
@@ -264,6 +285,8 @@ const itemExplicitlyRemovedEventSchema = z
  */
 export const GameEventSchema = z.discriminatedUnion("type", [
 	currentSpaceChangedEventSchema,
+	jobQueuedEventSchema,
+	jobQueueClearedEventSchema,
 	jobStartedEventSchema,
 	jobCompletedEventSchema,
 	jobAbortedEventSchema,

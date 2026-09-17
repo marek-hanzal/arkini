@@ -21,6 +21,35 @@ const inputLocation = {
 };
 
 describe("readGameAudioCuesFn", () => {
+	it("projects accepted queue work and explicit queue clearing", () => {
+		expect(
+			readGameAudioCuesFn({
+				events: [
+					{
+						type: "job:queued",
+						requestId: "request:1",
+						ownerItemId: "runtime:producer",
+						lineId: "line:1",
+					},
+					{
+						type: "job-queue:cleared",
+						ownerItemId: "runtime:producer",
+						clearedRequestCount: 4,
+					},
+				],
+			}),
+		).toEqual([
+			{
+				event: GameEventEnumSchema.enum.JobQueued,
+				strength: 1,
+			},
+			{
+				event: GameEventEnumSchema.enum.JobQueueCleared,
+				strength: 3,
+			},
+		]);
+	});
+
 	it("projects every committed event and leaves silence to authored runtime assignment", () => {
 		expect(
 			readGameAudioCuesFn({

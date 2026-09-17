@@ -20,6 +20,16 @@ export const SfxEventPresentation = [
 		description: "When the player switches to another Board space.",
 	},
 	{
+		event: GameEventEnumSchema.enum.JobQueued,
+		label: "Job queued",
+		description: "When a production request is added to a queue.",
+	},
+	{
+		event: GameEventEnumSchema.enum.JobQueueCleared,
+		label: "Queue cleared",
+		description: "When the player clears an item's pending production queue.",
+	},
+	{
 		event: GameEventEnumSchema.enum.JobStarted,
 		label: "Job started",
 		description: "When a production job begins.",

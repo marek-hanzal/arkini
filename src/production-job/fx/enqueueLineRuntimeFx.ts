@@ -82,7 +82,15 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 		},
 	});
 	return {
-		events: isolation.events,
+		events: [
+			...isolation.events,
+			{
+				type: "job:queued",
+				requestId: request.id,
+				ownerItemId,
+				lineId,
+			},
+		],
 		request,
 		runtime: isolation.runtime,
 	} satisfies enqueueLineRuntimeFx.Result;

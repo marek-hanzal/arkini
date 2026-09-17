@@ -106,7 +106,13 @@ describe("Clock kill switch", () => {
 			expect(result.step.runtime.items.some((item) => item.id === "runtime:clock")).toBe(
 				true,
 			);
-			expect(result.step.events).toEqual([]);
+			expect(result.step.events).toEqual([
+				expect.objectContaining({
+					type: "job:queued",
+					ownerItemId: "runtime:clock",
+					lineId: "a",
+				}),
+			]);
 		} else {
 			expect(result.step.runtime.jobs).toEqual([]);
 			expect(result.step.runtime.jobQueue).toEqual([]);

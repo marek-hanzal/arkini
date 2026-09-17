@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -65,6 +66,7 @@ describe("clearItemJobQueueFx", () => {
 					after: yield* readRuntimeFx(),
 					before,
 					cleared,
+					transition: yield* (yield* CommittedTransitionsFx).read,
 				};
 			}).pipe(
 				useGameFx({
@@ -84,6 +86,11 @@ describe("clearItemJobQueueFx", () => {
 			"job:queued:other:first",
 			"job:queued:other:second",
 		]);
+		expect(result.transition.events).toContainEqual({
+			type: "job-queue:cleared",
+			ownerItemId: "runtime:forge:primary",
+			clearedRequestCount: 2,
+		});
 	});
 
 	it("re-enqueues cleared work with a fresh identity at the end of global accepted order", () => {

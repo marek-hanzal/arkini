@@ -4,6 +4,8 @@ import { z } from "zod";
 export const GameEventEnumSchema = z
 	.enum({
 		CurrentSpaceChanged: "current-space:changed",
+		JobQueued: "job:queued",
+		JobQueueCleared: "job-queue:cleared",
 		JobStarted: "job:started",
 		JobCompleted: "job:completed",
 		JobAborted: "job:aborted",

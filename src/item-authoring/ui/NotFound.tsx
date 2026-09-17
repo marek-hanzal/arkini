@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -9,6 +12,28 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 export const NotFound = ({ uid }: { readonly uid: string }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
+	useEffect(() => {
+		RendererRuntime.runSync(
+			writeDiagnosticRecordFx({
+				level: "warning",
+				category: [
+					"editor",
+					"item-save",
+				],
+				event: "item-detail-not-found",
+				data: {
+					projectId: project.projectId,
+					itemUid: uid,
+					visibleRevision: project.revision,
+					itemCount: Object.keys(project.config.items).length,
+					pathname: window.location.pathname,
+				},
+			}),
+		);
+	}, [
+		project,
+		uid,
+	]);
 	return (
 		<EditorSectionPage
 			header={

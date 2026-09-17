@@ -18,6 +18,20 @@ import {
 } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
+const diagnostics = vi.hoisted(() => ({
+	records: [] as Array<
+		import("~electron/contract/diagnostics/DiagnosticRecord").DiagnosticRecord
+	>,
+}));
+vi.mock("~/application-diagnostics/fx/writeDiagnosticRecordFx", () => ({
+	writeDiagnosticRecordFx: (
+		record: import("~electron/contract/diagnostics/DiagnosticRecord").DiagnosticRecord,
+	) =>
+		Effect.sync(() => {
+			diagnostics.records.push(record);
+		}),
+}));
+
 const registries: AtomRegistry.AtomRegistry[] = [];
 
 const createProject = (revision = 0): Project => ({
@@ -81,10 +95,72 @@ const createFixture = () => {
 };
 
 afterEach(() => {
+	diagnostics.records.length = 0;
 	for (const registry of registries.splice(0)) registry.dispose();
 });
 
 describe("saveFx", () => {
+	it("reports a committed item missing from the visible revision without changing save settlement", async () => {
+		const fixture = createFixture();
+		const projectAtom = EditorProjectAtom("project");
+		fixture.registry.mount(projectAtom);
+		fixture.registry.set(projectAtom, {
+			project: createProject(),
+		});
+		const item = {
+			...editorTestPayload.config.items.water,
+			id: "new-item",
+			uid: "new-uid",
+		};
+		fixture.upsertItemFx.mockImplementationOnce(() => {
+			const { resources: _resources, ...commit } = createProject(2);
+			return Effect.succeed({
+				...commit,
+				previousRevision: 1,
+				config: {
+					...commit.config,
+					items: {
+						...commit.config.items,
+						[item.id]: item,
+					},
+				},
+			});
+		});
+		const saved = await Effect.runPromise(
+			saveFx({
+				config: editorTestPayload.config,
+				expectedRevision: 1,
+				projectId: "project",
+				item,
+			}).pipe(
+				Effect.provideService(ProjectRepository, fixture.repository),
+				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
+			),
+		);
+		expect(saved).toEqual(item);
+		expect(
+			diagnostics.records.find((record) => record.event === "item-save-committed")?.data,
+		).toMatchObject({
+			previousRevision: 1,
+			committedRevision: 2,
+			committedItemUid: "new-uid",
+		});
+		expect(
+			diagnostics.records.find((record) => record.event === "item-save-published"),
+		).toMatchObject({
+			level: "warning",
+			data: {
+				itemUid: "new-uid",
+				committedRevision: 2,
+				visibleRevision: 0,
+				visibleItemId: null,
+			},
+		});
+	});
 	it("validates, commits and publishes one explicit item save", async () => {
 		const fixture = createFixture();
 		const resources = editorTestResources;
@@ -191,5 +267,10 @@ describe("saveFx", () => {
 			),
 		).rejects.toThrow("does not satisfy");
 		expect(fixture.upsertItemFx).not.toHaveBeenCalled();
+		expect(diagnostics.records.map((record) => record.event)).toEqual([
+			"item-save-started",
+			"item-save-failed",
+		]);
+		expect(diagnostics.records.at(-1)?.data?.cause).toContain("does not satisfy");
 	});
 });

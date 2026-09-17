@@ -52,7 +52,7 @@ export const ItemLineCommandPanel = ({
 				disabled={disabled || pendingEnqueue || !line.actions.enqueue.enabled}
 				onClick={enqueueFn}
 			>
-				{translator.textFn("Enqueue")}
+				{translator.textFn("Make")}
 			</PrimaryButton>
 		</div>
 	);

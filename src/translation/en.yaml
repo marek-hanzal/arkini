@@ -749,8 +749,6 @@ Enabled:
   value: Enabled
 End of section:
   value: End of section
-Enqueue:
-  value: Enqueue
 Enter a valid number.:
   value: Enter a valid number.
   dynamic: true
@@ -1277,6 +1275,8 @@ Main menu:
   value: Main menu
 Major:
   value: Major
+Make:
+  value: Make
 Managed:
   value: Managed
 Matches any positive board distance and excludes only Self.:

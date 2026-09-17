@@ -25,7 +25,8 @@ const OutputItem = <Item extends OutputProjection.Item>({
 	<div
 		className={twMerge(
 			"grid gap-1.5",
-			variant === "editor-tree" && eyebrow === undefined && "border-l-2 border-accent pl-24",
+			variant === "editor-tree" && "border-l-2 border-accent",
+			variant === "editor-tree" && eyebrow === undefined && "pl-24",
 		)}
 		data-ui="TileLineOutputItem"
 	>

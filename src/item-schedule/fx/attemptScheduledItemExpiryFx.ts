@@ -9,7 +9,6 @@ import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/fn/isExpectedPlacementDeliveryBlockFn";
-import { abortJobAfterMaterialExpiryFx } from "~/production-job/fx/abortJobAfterMaterialExpiryFx";
 
 interface AttemptScheduledItemExpiryProps {
 	itemId: IdSchema.Type;
@@ -76,23 +75,13 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 				origin: context.origin,
 				runtime: expiry.runtime,
 			});
-	let draft = release.runtime;
-	const events = [
-		...expiry.events,
-		...release.events,
-	];
-	if (!force && context.jobId !== undefined) {
-		const jobTransition = yield* abortJobAfterMaterialExpiryFx({
-			jobId: context.jobId,
-			runtime: draft,
-		});
-		draft = jobTransition.runtime;
-		events.push(...jobTransition.events);
-	}
 
 	return {
-		events,
-		runtime: draft,
+		events: [
+			...expiry.events,
+			...release.events,
+		],
+		runtime: release.runtime,
 	} satisfies CompleteScheduledItemExpiryTransitionResult;
 });
 

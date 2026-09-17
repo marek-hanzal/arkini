@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
-import { makeJobCompletionRandomFx } from "~/production-job/fx/makeJobCompletionRandomFx";
+import { makeJobSettlementRandomFx } from "~/production-job/fx/makeJobSettlementRandomFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
@@ -205,7 +205,7 @@ describe("job completion transition", () => {
 		} satisfies JobSchema.Type;
 		const readStream = (job: JobSchema.Type) =>
 			Effect.runSync(
-				makeJobCompletionRandomFx({
+				makeJobSettlementRandomFx({
 					job,
 					program: Effect.all([
 						Random.next,

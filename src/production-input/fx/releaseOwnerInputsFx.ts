@@ -1,3 +1,4 @@
+import { placeRuntimeItemBestEffortFx } from "~/item-placement/fx/placeRuntimeItemBestEffortFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { Effect, Option } from "effect";
 
@@ -14,6 +15,7 @@ export namespace releaseOwnerInputsFx {
 	export interface Props {
 		owner: RuntimeItemSchema.Type;
 		origin?: GridLocationSchema.Type;
+		overflow?: "discard";
 		runtime: RuntimeSchema.Type;
 	}
 
@@ -31,6 +33,7 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	owner,
 	origin,
 	runtime,
+	overflow,
 }: releaseOwnerInputsFx.Props) {
 	const bufferedItems = runtime.items.filter(
 		(item): item is InputRuntimeItemSchema.Type =>
@@ -63,12 +66,20 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	};
 
 	for (const bufferedItem of bufferedItems) {
-		const placement = yield* placeRuntimeItemFx({
-			itemId: bufferedItem.id,
-			origin: physicalOrigin,
-			originItemId: owner.id,
-			runtime: state.runtime,
-		});
+		const placement = yield* overflow === "discard"
+			? placeRuntimeItemBestEffortFx({
+					itemId: bufferedItem.id,
+					origin: physicalOrigin,
+					originItemId: owner.id,
+					runtime: state.runtime,
+					source: "buffer",
+				})
+			: placeRuntimeItemFx({
+					itemId: bufferedItem.id,
+					origin: physicalOrigin,
+					originItemId: owner.id,
+					runtime: state.runtime,
+				});
 		state = {
 			events: [
 				...state.events,

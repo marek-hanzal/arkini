@@ -1,3 +1,4 @@
+import { abortJobAfterMaterialExpiryFx } from "~/production-job/fx/abortJobAfterMaterialExpiryFx";
 import { forceRemoveRuntimeItemFx } from "~/game-runtime/fx/forceRemoveRuntimeItemFx";
 import { Effect, Random } from "effect";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
@@ -55,6 +56,21 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			quantity: item.quantity,
 		},
 	];
+	if (
+		removalMode !== "kill-switch" &&
+		(item.location.scope === "job" || item.location.scope === "reserved")
+	) {
+		const aborted = yield* abortJobAfterMaterialExpiryFx({
+			jobId: item.location.jobId,
+			runtime: draft,
+		}).pipe(
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(runtime),
+			}),
+		);
+		draft = aborted.runtime;
+		events.push(...aborted.events);
+	}
 	if (output !== undefined) {
 		const placed = yield* Effect.gen(function* () {
 			const resolved = yield* outputFx({

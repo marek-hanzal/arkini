@@ -94,6 +94,7 @@ const itemDiscardedEventSchema = z
 			"reservation",
 			"buffer",
 			"expiry-output",
+			"depletion-output",
 		]),
 		reason: z.enum([
 			"job-aborted",

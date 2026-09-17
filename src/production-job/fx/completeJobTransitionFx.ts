@@ -1,7 +1,7 @@
 import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { completeLineJobRuntimeFx } from "~/production-job/fx/completeLineJobRuntimeFx";
+import { settleJobRuntimeFx } from "~/production-job/fx/settleJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
@@ -9,7 +9,7 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
-import { makeJobCompletionRandomFx } from "~/production-job/fx/makeJobCompletionRandomFx";
+import { makeJobSettlementRandomFx } from "~/production-job/fx/makeJobSettlementRandomFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
@@ -93,11 +93,11 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 			runtime: completionRuntime,
 		});
 	}
-	const completion = yield* makeJobCompletionRandomFx({
+	const completion = yield* makeJobSettlementRandomFx({
 		job,
-		program: completeLineJobRuntimeFx({
+		program: settleJobRuntimeFx({
 			job,
-			line,
+			lineOutput: line.output,
 			owner: completionOwner,
 			reservations,
 			runtime: completionRuntime,

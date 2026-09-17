@@ -8,7 +8,6 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 
 export namespace readItemPhysicalContextFx {
 	export interface Result {
-		readonly jobId?: IdSchema.Type;
 		readonly origin: GridLocationSchema.Type;
 	}
 }
@@ -22,7 +21,6 @@ export const readItemPhysicalContextFx = Effect.fn("readItemPhysicalContextFx")(
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	let current = item;
-	let jobId: IdSchema.Type | undefined;
 	const seen = new Set<IdSchema.Type>();
 	while (!seen.has(current.id)) {
 		seen.add(current.id);
@@ -32,12 +30,10 @@ export const readItemPhysicalContextFx = Effect.fn("readItemPhysicalContextFx")(
 			case "inventory":
 			case "toolbar":
 				return {
-					jobId,
 					origin: location,
 				} satisfies readItemPhysicalContextFx.Result;
 			case "delivery":
 				return {
-					jobId,
 					origin: location.origin,
 				} satisfies readItemPhysicalContextFx.Result;
 			case "input":
@@ -48,7 +44,6 @@ export const readItemPhysicalContextFx = Effect.fn("readItemPhysicalContextFx")(
 				break;
 			case "job":
 			case "reserved": {
-				jobId ??= location.jobId;
 				const job = runtime.jobs.find((candidate) => candidate.id === location.jobId);
 				if (job === undefined)
 					return yield* Effect.die(

@@ -126,7 +126,6 @@ describe("readItemPhysicalContextFx", () => {
 		);
 
 		expect(context).toEqual({
-			jobId: expect.any(String),
 			origin: boardFn(0),
 		});
 	});

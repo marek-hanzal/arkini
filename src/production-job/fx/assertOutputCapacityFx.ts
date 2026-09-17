@@ -16,7 +16,7 @@ export namespace assertOutputCapacityFx {
 	}
 }
 
-/** Revalidates direct and bounded downstream output limits before start or queue admission. */
+/** Revalidates output limits and active reservations before start or queue admission. */
 export const assertOutputCapacityFx = Effect.fn("assertOutputCapacityFx")(function* ({
 	candidateId,
 	lineId,

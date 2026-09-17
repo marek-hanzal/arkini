@@ -23,7 +23,6 @@
 				"id": "apiary",
 				"title": "Apiary",
 				"description": "Bees bees bees",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

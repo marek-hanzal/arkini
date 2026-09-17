@@ -23,7 +23,6 @@
 				"id": "brewery",
 				"title": "Brewery",
 				"description": "So, it's time to brew a beer",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

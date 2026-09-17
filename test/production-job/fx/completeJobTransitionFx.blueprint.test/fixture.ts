@@ -14,7 +14,6 @@ export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 }: {
 	id: string;
 	itemId:
-		| "blueprint:capped"
 		| "blueprint:depletion-capped"
 		| "blueprint:depletion-random"
 		| "blueprint:depletion-self"
@@ -52,10 +51,3 @@ export const runBlueprint = <A, E>(
 			}),
 		),
 	);
-
-export const sourceLine = (lineId: string) => {
-	const source = blueprintConfig.items["producer:blueprint-source"];
-	const line = source.lines.find((candidate) => candidate.id === lineId);
-	if (line === undefined) throw new Error(`Missing source line ${lineId}.`);
-	return line;
-};

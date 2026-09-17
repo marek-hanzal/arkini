@@ -120,7 +120,6 @@ describe("readItemConnectionsFn", () => {
 					lines: [
 						{
 							...line,
-							ahead: true,
 						},
 					],
 				},

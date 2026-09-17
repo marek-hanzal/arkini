@@ -93,18 +93,6 @@ export namespace ItemDetailLinesProjection {
 				readonly maxCount: number;
 				readonly messageAfterTitle: string;
 				readonly message: string;
-		  }
-		| {
-				readonly kind: "downstream-output-capacity";
-				readonly intermediateItemId: string;
-				readonly intermediateItemTitle: string;
-				readonly itemId: string;
-				readonly itemTitle: string;
-				readonly liveQuantity: number;
-				readonly reservedQuantity: number;
-				readonly maxCount: number;
-				readonly messageAfterTitle: string;
-				readonly message: string;
 		  };
 
 	export type Availability =

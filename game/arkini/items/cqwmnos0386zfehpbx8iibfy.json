@@ -23,7 +23,6 @@
 				"id": "line:new-item:default",
 				"title": "New blueprint line",
 				"description": "Describe what this blueprint line consumes and produces.",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

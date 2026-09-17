@@ -92,10 +92,6 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 				runtime,
 			})
 		: undefined;
-	const directOutputBlock =
-		outputBlock?.kind === "direct-output-capacity" ? outputBlock : undefined;
-	const downstreamOutputBlock =
-		outputBlock?.kind === "downstream-output-capacity" ? outputBlock : undefined;
 	const input = yield* readItemDetailInputsFx({
 		configured: line.input,
 		lineId: line.id,
@@ -114,42 +110,30 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 					hint: readLineDisabledHintFn(line, resolution),
 				},
 			}
-		: directOutputBlock !== undefined
+		: outputBlock !== undefined
 			? {
 					kind: "unavailable",
 					reason: {
 						kind: "direct-output-capacity",
-						itemId: directOutputBlock.itemId,
-						liveQuantity: directOutputBlock.liveQuantity,
-						reservedQuantity: directOutputBlock.reservedQuantity,
-						maxCount: directOutputBlock.maxCount,
+						itemId: outputBlock.itemId,
+						liveQuantity: outputBlock.liveQuantity,
+						reservedQuantity: outputBlock.reservedQuantity,
+						maxCount: outputBlock.maxCount,
 					},
 				}
-			: downstreamOutputBlock !== undefined
+			: missingUnitsTarget?.kind === "units"
 				? {
 						kind: "unavailable",
 						reason: {
-							kind: "downstream-output-capacity",
-							intermediateItemId: downstreamOutputBlock.intermediateItemId,
-							itemId: downstreamOutputBlock.itemId,
-							liveQuantity: downstreamOutputBlock.liveQuantity,
-							reservedQuantity: downstreamOutputBlock.reservedQuantity,
-							maxCount: downstreamOutputBlock.maxCount,
+							kind: "units-target-missing",
+							selector: missingUnitsTarget.selector,
+							distance: missingUnitsTarget.distance,
 						},
 					}
-				: missingUnitsTarget?.kind === "units"
-					? {
-							kind: "unavailable",
-							reason: {
-								kind: "units-target-missing",
-								selector: missingUnitsTarget.selector,
-								distance: missingUnitsTarget.distance,
-							},
-						}
-					: {
-							kind: "available",
-							readiness: start.ready ? "ready" : allInputsReady ? "queue" : "inputs",
-						};
+				: {
+						kind: "available",
+						readiness: start.ready ? "ready" : allInputsReady ? "queue" : "inputs",
+					};
 	return {
 		lineId: line.id,
 		title: line.title,

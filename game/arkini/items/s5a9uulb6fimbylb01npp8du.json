@@ -23,7 +23,6 @@
 				"id": "Cow Farm",
 				"title": "Cow Farm",
 				"description": "Wanna cows?",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

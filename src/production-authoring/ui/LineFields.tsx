@@ -91,7 +91,6 @@ export const LineFields = withFieldGroupFn({
 							<div className="flex min-w-0 flex-wrap items-end gap-3">
 								<group.Subscribe
 									selector={(state) => ({
-										ahead: state.values.ahead === true,
 										clock: state.values.clock === true,
 										default: state.values.default,
 										enable: state.values.enable,
@@ -140,16 +139,6 @@ export const LineFields = withFieldGroupFn({
 														group.setFieldValue("enable", value),
 													selected: markers.enable,
 													value: "enabled",
-												},
-												{
-													description: (
-														<Mx label="Production line check ahead help" />
-													),
-													label: translator.textFn("Check ahead"),
-													onChangeFn: (value) =>
-														group.setFieldValue("ahead", value),
-													selected: markers.ahead,
-													value: "ahead",
 												},
 											]}
 										/>

@@ -23,7 +23,6 @@
 				"id": "sawmill",
 				"title": "Build Sawmill",
 				"description": "Let's build sawmill",
-				"ahead": true,
 				"default": true,
 				"show": true,
 				"enable": true,

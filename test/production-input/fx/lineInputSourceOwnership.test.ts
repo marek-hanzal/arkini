@@ -106,7 +106,6 @@ const config = GameConfigSchema.parse({
 
 			lines: [
 				{
-					ahead: true,
 					id: upgradeLineId,
 					title: "Construct",
 					description: "Consume one idle worker.",

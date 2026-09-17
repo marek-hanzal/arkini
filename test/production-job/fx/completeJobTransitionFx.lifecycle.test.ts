@@ -211,7 +211,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 			},
 			lines: [
 				{
-					ahead: true,
 					id: "line:blueprint:empty",
 					title: "Build nothing",
 					description: "Completes without output.",

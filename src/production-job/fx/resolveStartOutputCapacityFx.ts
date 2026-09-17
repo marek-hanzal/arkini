@@ -13,8 +13,8 @@ import { readOutputReservationFn } from "~/production-job/fn/readOutputReservati
 import { applyFinalUnitReservationFx } from "./applyFinalUnitReservationFx";
 import { clampOutputReservationFx } from "./clampOutputReservationFx";
 import { readPlannedOutputReservationFx } from "./readPlannedOutputReservationFx";
-import { resolveDirectOutputCapacityFx } from "./resolveDirectOutputCapacityFx";
-import { resolveOneHopOutputCapacityFx } from "./resolveOneHopOutputCapacityFx";
+import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
+import { resolveOutputCapacityFx } from "./resolveOutputCapacityFx";
 
 const readPendingOutputReservationFx = Effect.fn("readPendingOutputReservationFx")(function* ({
 	line,
@@ -48,28 +48,9 @@ export namespace resolveStartOutputCapacityFx {
 		readonly plan: LineRun.Plan | undefined;
 		readonly runtime: RuntimeSchema.Type;
 	}
-
-	export type Block =
-		| {
-				readonly kind: "direct-output-capacity";
-				readonly itemId: IdSchema.Type;
-				readonly liveQuantity: number;
-				readonly reservedQuantity: number;
-				readonly maxCount: number;
-				readonly excessQuantity: number;
-		  }
-		| {
-				readonly kind: "downstream-output-capacity";
-				readonly intermediateItemId: IdSchema.Type;
-				readonly itemId: IdSchema.Type;
-				readonly liveQuantity: number;
-				readonly reservedQuantity: number;
-				readonly maxCount: number;
-				readonly excessQuantity: number;
-		  };
 }
 
-/** Pure candidate reservation resolver shared by reads and every admission path. */
+/** Resolves candidate output plus active-job reservations for reads and admission. */
 export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacityFx")(function* ({
 	lineId,
 	ownerItemId,
@@ -96,30 +77,22 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 					plan,
 					runtime,
 				});
-	/*
-	 * Prefer the purpose-bound target violation over an intermediate
-	 * item's own cap so the player sees the limit that actually makes
-	 * another intermediate useless.
-	 */
-	const downstream = yield* resolveOneHopOutputCapacityFx({
-		line,
-		outputReservation,
+	const active = readReservedJobOutputQuantitiesFn({
 		runtime,
 	});
-	if (downstream !== undefined) {
-		return {
-			kind: "downstream-output-capacity",
-			...downstream,
-		} satisfies resolveStartOutputCapacityFx.Block;
+	const reserved = new Map(
+		[
+			...active,
+		].map(([itemId, reservation]) => [
+			itemId,
+			reservation.quantity,
+		]),
+	);
+	for (const [itemId, quantity] of outputReservation) {
+		reserved.set(itemId, (reserved.get(itemId) ?? 0) + quantity);
 	}
-	const direct = yield* resolveDirectOutputCapacityFx({
-		line,
-		outputReservation,
+	return yield* resolveOutputCapacityFx({
+		reserved,
 		runtime,
 	});
-	if (direct === undefined) return undefined;
-	return {
-		kind: "direct-output-capacity",
-		...direct,
-	} satisfies resolveStartOutputCapacityFx.Block;
 });

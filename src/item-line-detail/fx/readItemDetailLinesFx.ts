@@ -143,7 +143,10 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 		availability,
 		activeRuleHints: resolution.rules.flatMap((result, ruleIndex) => {
 			const hint = line.rules[ruleIndex]?.hint;
-			return result.active && hint !== undefined
+			return result.active &&
+				result.type !== RuleTypeSchema.enum.Enable &&
+				result.type !== RuleTypeSchema.enum.Show &&
+				hint !== undefined
 				? [
 						hint,
 					]

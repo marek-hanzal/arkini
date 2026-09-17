@@ -49,7 +49,7 @@ describe("readItemDetailLinesFx / rule projection", () => {
 			kind: "available",
 		});
 	});
-	it("keeps active hints and lets the first disable veto own disclosure even without a hint", () => {
+	it("hides satisfied requirements while preserving runtime effects and first-disable disclosure", () => {
 		const workshop = lineRunTestConfig.items.workshop;
 		const readHintedLines = (runtime: RuntimeSchema.Type, disableHint: string | undefined) => {
 			const hintedConfig = GameConfigSchema.parse({
@@ -101,7 +101,6 @@ describe("readItemDetailLinesFx / rule projection", () => {
 		);
 		if (active.kind !== "available") throw new Error("Expected active line hints.");
 		expect(active.line[0]?.activeRuleHints).toEqual([
-			"A permit is required.",
 			"A booster speeds up production.",
 		]);
 

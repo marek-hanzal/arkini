@@ -37,7 +37,7 @@ const readActiveRuleHintsFx = Effect.fn("readActiveOutputRuleHintsFx")(function*
 		Effect.map((results) =>
 			results.flatMap((result, ruleIndex) => {
 				const hint = rules[ruleIndex]?.hint;
-				return result.active && hint !== undefined
+				return result.type === "disable" && result.active && hint !== undefined
 					? [
 							hint,
 						]

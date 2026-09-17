@@ -204,9 +204,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 		expect(lines.line[0]?.output).toEqual([
 			{
 				weight: 1,
-				activeRuleHints: [
-					"This output set needs the workshop.",
-				],
+				activeRuleHints: [],
 				roll: [
 					{
 						kind: "guaranteed",
@@ -217,9 +215,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 									min: 3,
 									max: 5,
 								},
-								activeRuleHints: [
-									"The workshop provides seasoned timber.",
-								],
+								activeRuleHints: [],
 							},
 						],
 					},

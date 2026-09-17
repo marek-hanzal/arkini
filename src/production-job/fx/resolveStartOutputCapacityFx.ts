@@ -16,6 +16,44 @@ import { readPlannedOutputReservationFx } from "./readPlannedOutputReservationFx
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import { resolveOutputCapacityFx } from "./resolveOutputCapacityFx";
 
+const readActiveOutputReservationsFn = ({
+	plan,
+	runtime,
+}: {
+	readonly plan: LineRun.Plan | undefined;
+	readonly runtime: RuntimeSchema.Type;
+}) => {
+	if (plan === undefined)
+		return readReservedJobOutputQuantitiesFn({
+			runtime,
+		});
+	const costs = new Map<IdSchema.Type, number>();
+	for (const input of plan.input) {
+		if (input.units === undefined) continue;
+		costs.set(input.units.itemId, (costs.get(input.units.itemId) ?? 0) + input.units.cost);
+	}
+	const activeOwnerIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
+	// Project only deferred external depletion into the existing job's reservation.
+	// Its consumed material and owner-removal credit belong to that completion,
+	// independently of the candidate's output and completion order.
+	return readReservedJobOutputQuantitiesFn({
+		runtime: {
+			...runtime,
+			items: runtime.items.map((item) =>
+				item.id !== plan.ownerItemId &&
+				activeOwnerIds.has(item.id) &&
+				costs.has(item.id) &&
+				readItemRemainingUnitsFn(item) === costs.get(item.id)
+					? {
+							...item,
+							remainingUnits: 0,
+						}
+					: item,
+			),
+		},
+	});
+};
+
 const readPendingOutputReservationFx = Effect.fn("readPendingOutputReservationFx")(function* ({
 	line,
 	owner,
@@ -66,19 +104,32 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 		lineId,
 	});
 	if (line === undefined) return undefined;
-	const outputReservation =
+	const outputReservation: readPlannedOutputReservationFx.Result =
 		plan === undefined
-			? yield* readPendingOutputReservationFx({
-					line,
-					owner,
-				})
+			? {
+					quantities: yield* readPendingOutputReservationFx({
+						line,
+						owner,
+					}),
+					discardedItemIds: new Set(),
+				}
 			: yield* readPlannedOutputReservationFx({
 					line,
 					plan,
 					runtime,
 				});
-	const active = readReservedJobOutputQuantitiesFn({
-		runtime,
+	const capacityRuntime =
+		outputReservation.discardedItemIds.size === 0
+			? runtime
+			: {
+					...runtime,
+					items: runtime.items.filter(
+						(item) => !outputReservation.discardedItemIds.has(item.id),
+					),
+				};
+	const active = readActiveOutputReservationsFn({
+		plan,
+		runtime: capacityRuntime,
 	});
 	const reserved = new Map(
 		[
@@ -88,11 +139,11 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 			reservation.quantity,
 		]),
 	);
-	for (const [itemId, quantity] of outputReservation) {
+	for (const [itemId, quantity] of outputReservation.quantities) {
 		reserved.set(itemId, (reserved.get(itemId) ?? 0) + quantity);
 	}
 	return yield* resolveOutputCapacityFx({
 		reserved,
-		runtime,
+		runtime: capacityRuntime,
 	});
 });

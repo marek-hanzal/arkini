@@ -7,7 +7,7 @@ import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import { lineRunRuntime } from "~test/production-line/support/lineRunTestRuntime";
 
-it("short-circuits false action conditions but propagates an earlier query failure", () => {
+it("keeps rules inactive when a Board condition has no physical origin in either condition order", () => {
 	const origin = {
 		scope: "inventory",
 		position: {
@@ -63,18 +63,18 @@ it("short-circuits false action conditions but propagates an earlier query failu
 				type,
 				active: false,
 			});
-		const failed = readRule({
+		const unavailable = readRule({
 			type,
 			when: [
 				unavailableBoard,
 				missingPermit,
 			],
 		});
-		expect(Result.isFailure(failed)).toBe(true);
-		if (Result.isFailure(failed)) {
-			expect(failed.failure).toMatchObject({
-				_tag: "BoardQueryOriginUnavailableError",
-				origin,
+		expect(Result.isSuccess(unavailable)).toBe(true);
+		if (Result.isSuccess(unavailable)) {
+			expect(unavailable.success).toMatchObject({
+				type,
+				active: false,
 			});
 		}
 	}

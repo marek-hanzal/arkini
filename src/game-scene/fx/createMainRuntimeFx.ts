@@ -150,7 +150,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			game,
 			magneticField,
 			motion,
-			onAcceptedDropFn: () => replayCurrentTransitionFn(),
+			onSettledDropFn: () => replayCurrentTransitionFn(),
 			onDropFn,
 			surface,
 		});

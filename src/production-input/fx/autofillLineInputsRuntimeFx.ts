@@ -77,7 +77,6 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 
 	let deliveryRuntime = runtime;
 	const deliveryItemIds: IdSchema.Type[] = [];
-	const events: GameEventSchema.Type[] = [];
 	let scheduledQuantity = 0;
 	let skippedQuantity = 0;
 	for (const [sourceItemId, input] of allocationsBySourceItemId) {
@@ -128,7 +127,6 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 				...detached.runtime.items.slice(detached.insertionIndex),
 			],
 		} satisfies RuntimeSchema.Type;
-		events.push(...detached.events);
 		deliveryItemIds.push(delivery.id);
 		scheduledQuantity += input.reduce((total, allocation) => total + allocation.quantity, 0);
 	}
@@ -137,10 +135,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		runtime: deliveryRuntime,
 	});
 	return {
-		events: [
-			...events,
-			...isolation.events,
-		],
+		events: isolation.events,
 		result: {
 			deliveryItemIds,
 			scheduledQuantity,

@@ -75,7 +75,7 @@ describe("main drag controller: recovery", () => {
 		} as DropItemResult);
 		await flushMicrotasks();
 
-		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(mounted.onSettledDrop).not.toHaveBeenCalled();
 		expect(
 			mounted.animations.some(
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
@@ -100,7 +100,7 @@ describe("main drag controller: recovery", () => {
 				target: releaseTarget,
 			}),
 		);
-		expect(first.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(first.onSettledDrop).toHaveBeenCalledOnce();
 		expect(first.actor.dragging).toBe(false);
 		expect(first.actor.container.zIndex).toBe(0);
 
@@ -110,7 +110,7 @@ describe("main drag controller: recovery", () => {
 		Effect.runSync(second.dropSubmission.closeFx);
 		await flushMicrotasks();
 		expect(second.onDrop).toHaveBeenCalledOnce();
-		expect(second.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(second.onSettledDrop).not.toHaveBeenCalled();
 	});
 
 	it("settles a rejected release from its exact pose", async () => {
@@ -148,7 +148,7 @@ describe("main drag controller: recovery", () => {
 		expect(canonicalLayer.addChild).not.toHaveBeenCalled();
 		samplePoseAnimation(settleAnimation, 1);
 		settleAnimation.onCompleteFn?.();
-		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(mounted.onSettledDrop).toHaveBeenCalledOnce();
 		expect(canonicalLayer.addChild).toHaveBeenCalledOnce();
 		expect(canonicalLayer.addChild).toHaveBeenCalledWith(mounted.actor.container);
 		expect(mounted.actor.container.x).toBe(10);
@@ -205,7 +205,7 @@ describe("main drag controller: recovery", () => {
 	it("reports an accepted replay failure without misclassifying it as command failure", async () => {
 		const mounted = mountController();
 		const failure = new Error("replay failed");
-		mounted.onAcceptedDrop.mockImplementationOnce(() => {
+		mounted.onSettledDrop.mockImplementationOnce(() => {
 			throw failure;
 		});
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));

@@ -6,7 +6,7 @@ import { useEditorMusicManagerController } from "~/music-authoring/ui/useEditorM
 import type { Project } from "~/project-authoring/type/Project";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { Button } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 /** Renders Music-specific playlist selection over the shared audio library. */
@@ -43,8 +43,8 @@ export const EditorMusicManager = () => {
 				content={translator.textFn(inPlaylist ? "Remove from playlist" : "Add to playlist")}
 				placement="left"
 			>
-				<Button
-					className="size-10 min-h-10 shrink-0 p-0 data-[ui-selected=true]:border-accent/40 data-[ui-selected=true]:bg-accent/15 data-[ui-selected=true]:text-accent"
+				<LinkButton
+					className="grid size-10 shrink-0 place-items-center text-muted hover:text-muted data-[ui-selected=true]:text-accent data-[ui-selected=true]:hover:text-accent"
 					cursorIntent={togglingPlaylist ? "progress" : undefined}
 					disabled={controller.playlistPending}
 					onClick={(event) => {
@@ -64,7 +64,7 @@ export const EditorMusicManager = () => {
 					) : (
 						<ListMusic className="size-4" />
 					)}
-				</Button>
+				</LinkButton>
 			</Tooltip>
 		);
 	};

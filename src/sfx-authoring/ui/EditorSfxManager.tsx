@@ -6,6 +6,7 @@ import {
 	Pause,
 	Play,
 	Sparkles,
+	SearchX,
 	Trash2,
 } from "lucide-react";
 
@@ -19,6 +20,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { Status } from "~/ui/ui/Status";
 
 /** Renders the project SFX library over the shared audio authoring surface. */
 export const EditorSfxManager = () => {
@@ -135,6 +137,27 @@ const EditorSfxSlots = ({
 	const blocked =
 		controller.assignmentPending || controller.optimizePending || controller.importPending;
 	const canDrop = !blocked && controller.draggedResourceId !== undefined;
+	const visibleSlots = SfxEventPresentation.filter((option) => {
+		const assigned = controller.resourceIdByEvent[option.event] !== undefined;
+		return controller.view === "all" || (controller.view === "assigned" ? assigned : !assigned);
+	});
+	if (visibleSlots.length === 0)
+		return (
+			<Status
+				dataUi="EditorSfxSlotsEmpty"
+				icon={SearchX}
+				size="large"
+				variant="flat"
+				title={translator.textFn(
+					controller.view === "assigned" ? "No assigned slots" : "No unassigned slots",
+				)}
+				description={translator.textFn(
+					controller.view === "assigned"
+						? "No slots have a sound assigned. Switch to All and drag a sound onto a slot."
+						: "Every slot has a sound assigned. Switch to All to see them.",
+				)}
+			/>
+		);
 	return (
 		<div
 			className="grid gap-6"
@@ -146,134 +169,137 @@ const EditorSfxSlots = ({
 					"Job",
 					"Other",
 				] as const
-			).map((group) => (
-				<section
-					className="grid gap-3"
-					key={group}
-				>
-					<EditorFormSectionDivider title={translator.textFn(group)} />
-					<div className="ak-list grid gap-2">
-						{SfxEventPresentation.filter((option) => option.group === group).map(
-							(option) => {
-								const resourceId = controller.resourceIdByEvent[option.event];
-								const resource = controller.allSfx.find(
-									({ id }) => id === resourceId,
-								);
-								const playing =
-									resourceId !== undefined &&
-									controller.activeResourceId === resourceId &&
-									controller.playing;
-								const pending =
-									controller.assignmentPending &&
-									controller.assigningEvent === option.event;
-								return (
-									<div
-										key={option.event}
-										className="ak-list-row grid min-w-0 grid-cols-[minmax(0,1fr)_5.5rem] items-center gap-3 px-4 py-3 data-[ui-drop-target=true]:outline-2 data-[ui-drop-target=true]:-outline-offset-2 data-[ui-drop-target=true]:outline-accent"
-										{...readDataUiFn({
-											dataUi: "EditorSfxSlot",
-											state: {
-												assigned: resourceId !== undefined,
-												dropTarget:
-													canDrop && hoveredEvent === option.event,
-											},
-										})}
-										data-event={option.event}
-										onDragOver={(event) => {
-											if (!canDrop) return;
-											event.preventDefault();
-											event.dataTransfer.dropEffect = "copy";
-											setHoveredEventFn(option.event);
-										}}
-										onDragLeave={(event) => {
-											if (
-												!(event.relatedTarget instanceof Node) ||
-												!event.currentTarget.contains(event.relatedTarget)
-											)
+			)
+				.filter((group) => visibleSlots.some((option) => option.group === group))
+				.map((group) => (
+					<section
+						className="grid gap-3"
+						key={group}
+					>
+						<EditorFormSectionDivider title={translator.textFn(group)} />
+						<div className="ak-list grid gap-2">
+							{visibleSlots
+								.filter((option) => option.group === group)
+								.map((option) => {
+									const resourceId = controller.resourceIdByEvent[option.event];
+									const resource = controller.allSfx.find(
+										({ id }) => id === resourceId,
+									);
+									const playing =
+										resourceId !== undefined &&
+										controller.activeResourceId === resourceId &&
+										controller.playing;
+									const pending =
+										controller.assignmentPending &&
+										controller.assigningEvent === option.event;
+									return (
+										<div
+											key={option.event}
+											className="ak-list-row grid min-w-0 grid-cols-[minmax(0,1fr)_5.5rem] items-center gap-3 px-4 py-3 data-[ui-drop-target=true]:outline-2 data-[ui-drop-target=true]:-outline-offset-2 data-[ui-drop-target=true]:outline-accent"
+											{...readDataUiFn({
+												dataUi: "EditorSfxSlot",
+												state: {
+													assigned: resourceId !== undefined,
+													dropTarget:
+														canDrop && hoveredEvent === option.event,
+												},
+											})}
+											data-event={option.event}
+											onDragOver={(event) => {
+												if (!canDrop) return;
+												event.preventDefault();
+												event.dataTransfer.dropEffect = "copy";
+												setHoveredEventFn(option.event);
+											}}
+											onDragLeave={(event) => {
+												if (
+													!(event.relatedTarget instanceof Node) ||
+													!event.currentTarget.contains(
+														event.relatedTarget,
+													)
+												)
+													setHoveredEventFn(undefined);
+											}}
+											onDrop={(event) => {
+												event.preventDefault();
 												setHoveredEventFn(undefined);
-										}}
-										onDrop={(event) => {
-											event.preventDefault();
-											setHoveredEventFn(undefined);
-											if (canDrop)
-												controller.assignResourceFn(
-													option.event,
-													controller.draggedResourceId,
-												);
-											controller.setDraggedResourceIdFn(undefined);
-										}}
-									>
-										<div className="min-w-0">
-											<p className="font-semibold">
-												{translator.textFn(option.label)}
-											</p>
-											<p className="mt-0.5 text-xs text-muted">
-												{translator.textFn(option.description)}
-											</p>
-											{resourceId === undefined ? (
-												<p className="mt-2 h-5 text-sm leading-5 text-muted">
-													{translator.textFn("Unassigned")}
+												if (canDrop)
+													controller.assignResourceFn(
+														option.event,
+														controller.draggedResourceId,
+													);
+												controller.setDraggedResourceIdFn(undefined);
+											}}
+										>
+											<div className="min-w-0">
+												<p className="font-semibold">
+													{translator.textFn(option.label)}
 												</p>
-											) : (
-												<LinkButton
-													className="mt-2 flex h-5 w-fit max-w-full items-center gap-1 text-sm leading-5"
-													data-ui="EditorSfxReveal"
-													onClick={() =>
-														controller.revealResourceFn(resourceId)
-													}
-												>
-													<span className="truncate">
-														{resource?.name ?? resourceId}
-													</span>
-													<ChevronRight className="size-4 shrink-0" />
-												</LinkButton>
-											)}
-										</div>
-										<div className="flex items-center justify-end gap-2">
-											{pending ? (
-												<LoaderCircle className="size-4 animate-spin text-accent" />
-											) : null}
-											{resourceId === undefined ? null : (
-												<>
+												<p className="mt-0.5 text-xs text-muted">
+													{translator.textFn(option.description)}
+												</p>
+												{resourceId === undefined ? (
+													<p className="mt-2 h-5 text-sm leading-5 text-muted">
+														{translator.textFn("Unassigned")}
+													</p>
+												) : (
 													<LinkButton
-														className="grid size-9 shrink-0 place-items-center text-foreground"
-														data-ui="EditorSfxSlotPlayback"
-														title={translator.textFn(
-															playing ? "Pause" : "Play",
-														)}
+														className="mt-2 flex h-5 w-fit max-w-full items-center gap-1 text-sm leading-5"
+														data-ui="EditorSfxReveal"
 														onClick={() =>
-															controller.togglePlaybackFn(resourceId)
+															controller.revealResourceFn(resourceId)
 														}
 													>
-														{playing ? (
-															<Pause className="size-4" />
-														) : (
-															<Play className="size-4" />
-														)}
+														<span className="truncate">
+															{resource?.name ?? resourceId}
+														</span>
+														<ChevronRight className="size-4 shrink-0" />
 													</LinkButton>
-													<LinkButton
-														disabled={blocked}
-														data-ui="EditorSfxUnassign"
-														title={translator.textFn("Remove")}
-														onClick={() =>
-															controller.assignResourceFn(
-																option.event,
-																undefined,
-															)
-														}
-													>
-														<Trash2 className="size-4" />
-													</LinkButton>
-												</>
-											)}
+												)}
+											</div>
+											<div className="flex items-center justify-end gap-2">
+												{pending ? (
+													<LoaderCircle className="size-4 animate-spin text-accent" />
+												) : null}
+												{resourceId === undefined ? null : (
+													<>
+														<LinkButton
+															className="grid size-9 shrink-0 place-items-center text-foreground"
+															data-ui="EditorSfxSlotPlayback"
+															onClick={() =>
+																controller.togglePlaybackFn(
+																	resourceId,
+																)
+															}
+														>
+															{playing ? (
+																<Pause className="size-4" />
+															) : (
+																<Play className="size-4" />
+															)}
+														</LinkButton>
+														<LinkButton
+															disabled={blocked}
+															data-ui="EditorSfxUnassign"
+															title={translator.textFn("Remove")}
+															onClick={() =>
+																controller.assignResourceFn(
+																	option.event,
+																	undefined,
+																)
+															}
+														>
+															<Trash2 className="size-4" />
+														</LinkButton>
+													</>
+												)}
+											</div>
 										</div>
-									</div>
-								);
-							},
-						)}
-					</div>
-				</section>
-			))}
+									);
+								})}
+						</div>
+					</section>
+				))}
 		</div>
 	);
 };

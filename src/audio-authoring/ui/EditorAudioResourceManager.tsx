@@ -17,7 +17,6 @@ import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { Status } from "~/ui/ui/Status";
-import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface EditorAudioResourceManagerProps {
 	readonly controller: useEditorAudioResourceManagerController.Output;
@@ -164,7 +163,7 @@ export const EditorAudioResourceManager = ({
 					onChange={controller.onFilesChangeFn}
 				/>
 				<div
-					className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-3"
+					className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-3 pb-[50dvh]"
 					data-ui={`${dataUiPrefix}Scroll`}
 				>
 					{errorMessage === undefined ? null : (
@@ -208,10 +207,27 @@ export const EditorAudioResourceManager = ({
 												: undefined
 										}
 										draggable={onResourceDragStartFn !== undefined}
-										onDragStart={(event) =>
-											onResourceDragStartFn?.(event, resource.id)
-										}
-										onDragEnd={onResourceDragEndFn}
+										onDragStart={(event) => {
+											// Native drag captures the row before React can commit a state update.
+											Object.entries(
+												readDataUiFn({
+													dataUi: `${dataUiPrefix}Row`,
+													state: {
+														dragging: true,
+													},
+												}),
+											).forEach(([name, value]) =>
+												event.currentTarget.setAttribute(
+													name,
+													String(value),
+												),
+											);
+											onResourceDragStartFn?.(event, resource.id);
+										}}
+										onDragEnd={(event) => {
+											event.currentTarget.removeAttribute("data-ui-dragging");
+											onResourceDragEndFn?.();
+										}}
 										onClick={(event) => {
 											if (!music) return;
 											const bounds =
@@ -268,27 +284,20 @@ export const EditorAudioResourceManager = ({
 										</div>
 										<div className="relative z-10 flex items-center gap-3">
 											{renderResourceActionFn?.(resource)}
-											<Tooltip
-												content={translator.textFn(
-													playing ? "Pause" : "Play",
-												)}
-												placement="left"
+											<LinkButton
+												className="grid size-10 shrink-0 place-items-center text-foreground"
+												data-ui={`${dataUiPrefix}Playback`}
+												onClick={(event) => {
+													event.stopPropagation();
+													controller.togglePlaybackFn(resource.id);
+												}}
 											>
-												<LinkButton
-													className="grid size-10 shrink-0 place-items-center text-foreground"
-													data-ui={`${dataUiPrefix}Playback`}
-													onClick={(event) => {
-														event.stopPropagation();
-														controller.togglePlaybackFn(resource.id);
-													}}
-												>
-													{playing ? (
-														<Pause className="size-4" />
-													) : (
-														<Play className="size-4" />
-													)}
-												</LinkButton>
-											</Tooltip>
+												{playing ? (
+													<Pause className="size-4" />
+												) : (
+													<Play className="size-4" />
+												)}
+											</LinkButton>
 										</div>
 									</li>
 								);
@@ -298,7 +307,7 @@ export const EditorAudioResourceManager = ({
 				</div>
 				{sidePanel === undefined ? null : (
 					<div
-						className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain border-l border-control-border p-3"
+						className="h-full min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain border-l border-control-border p-3 pb-[50dvh]"
 						data-ui={`${dataUiPrefix}SidePanel`}
 					>
 						{sidePanel}

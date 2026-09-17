@@ -12,6 +12,7 @@ import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ButtonLink } from "~/ui/ui/Button";
 
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -101,9 +102,14 @@ export const EditorRecentProjects = ({
 					) : (
 						<div
 							key={candidate.project.projectId}
-							className="ak-list-row flex min-w-0 items-center"
+							className="ak-list-row ak-list-row-interactive flex min-w-0 items-center"
 							data-project-ownership={candidate.ownership}
-							data-ui="EditorRecentProject"
+							{...readDataUiFn({
+								dataUi: "EditorRecentProject",
+								state: {
+									enabled: !blocked,
+								},
+							})}
 						>
 							<ButtonLink
 								to="/editor/$projectId/editor/items/list"

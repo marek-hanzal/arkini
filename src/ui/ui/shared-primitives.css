@@ -37,9 +37,17 @@
 @media (hover: hover) and (pointer: fine) {
 	.ak-list-row-interactive:not(.ak-list-row-pending):not([data-ui-pending="true"]):not(
 		:disabled
-	):not([data-ui-disabled="true"]):not([data-ui-enabled="false"]):hover {
+	):not([data-ui-disabled="true"]):not([data-ui-enabled="false"]):not(
+		[data-ui-dragging="true"]
+	):hover {
 		background-color: color-mix(in srgb, var(--ak-foreground) 4%, transparent);
 	}
+}
+
+/* The native drag preview needs an opaque surface immediately at capture time. */
+.ak-list-row[data-ui-dragging="true"] {
+	background-color: var(--ak-surface);
+	transition: none;
 }
 
 /* The interactive row owns its pressed surface; a stretched route link only owns navigation. */

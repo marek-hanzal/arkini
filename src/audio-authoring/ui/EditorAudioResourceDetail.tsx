@@ -3,7 +3,16 @@ import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
-import { AudioLines, FileQuestion, Music2, Pause, Pencil, Play } from "lucide-react";
+import {
+	FileQuestion,
+	Pause,
+	Pencil,
+	Play,
+	ShieldAlert,
+	ShieldCheck,
+	Trash2,
+	X,
+} from "lucide-react";
 import { useMemo } from "react";
 
 import { useEditorAudioPreview } from "~/audio-authoring/ui/useEditorAudioPreview";
@@ -19,10 +28,10 @@ import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavig
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { EditorFormSectionPage } from "~/editor-control/ui/EditorFormSectionPage";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import type { Project } from "~/project-authoring/type/Project";
-import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
 import { SfxEventPresentation } from "~/sfx-authoring/constant/SfxEventPresentation";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -30,6 +39,8 @@ import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { Button, DangerButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
+import { Fact, FactList } from "~/ui/ui/FactList";
+import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 
 interface EditorAudioResourceDetailProps {
 	readonly resourceId: string;
@@ -69,102 +80,102 @@ const EditorAudioPreview = ({
 		resourceIds,
 		type,
 	});
-	const translator = useTranslator();
 	return (
-		<section
+		<div
 			data-ui="EditorAudioPreview"
-			className="grid gap-3 rounded-xl border border-line p-4"
+			className="flex h-9 items-center gap-3"
 		>
-			<div className="flex items-center gap-3">
+			{preview.playbackError === undefined ? null : (
+				<p
+					className="max-w-64 truncate text-xs text-danger"
+					title={preview.playbackError}
+				>
+					{preview.playbackError}
+				</p>
+			)}
+			<div
+				data-ui="EditorAudioPreviewSeek"
+				className="relative flex h-[75%] w-64 cursor-pointer items-center justify-end overflow-hidden bg-surface-raised"
+				onClick={(event) => {
+					const bounds = event.currentTarget.getBoundingClientRect();
+					preview.seekPlaybackFn(
+						resource.id,
+						(event.clientX - bounds.left) / bounds.width,
+					);
+				}}
+			>
+				<div
+					data-ui="EditorAudioPreviewProgress"
+					className="pointer-events-none absolute inset-y-0 left-0 bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
+					style={{
+						width: `${preview.playbackProgress * 100}%`,
+					}}
+				/>
 				<LinkButton
-					className="grid size-10 shrink-0 place-items-center text-foreground"
-					title={translator.textFn(preview.playing ? "Pause" : "Play")}
+					className="relative grid h-full w-9 shrink-0 place-items-center text-foreground"
 					data-ui="EditorAudioPreviewToggle"
-					onClick={() => preview.togglePlaybackFn(resource.id)}
+					onClick={(event) => {
+						event.stopPropagation();
+						preview.togglePlaybackFn(resource.id);
+					}}
 				>
 					{preview.playing ? <Pause className="size-4" /> : <Play className="size-4" />}
 				</LinkButton>
-				<input
-					className="min-w-0 flex-1"
-					type="range"
-					min={0}
-					max={1}
-					step={0.001}
-					value={preview.playbackProgress}
-					onChange={(event) =>
-						preview.seekPlaybackFn(resource.id, event.currentTarget.valueAsNumber)
-					}
-				/>
-				<label className="flex items-center gap-2 text-sm">
-					<Tx label="Volume" />
-					<input
-						className="w-16 rounded border border-control-border bg-surface p-2"
-						type="number"
-						min={0}
-						max={100}
-						value={preview.volume}
-						onChange={(event) =>
-							preview.setVolumeFn(event.currentTarget.valueAsNumber || 0)
-						}
-					/>
-				</label>
 			</div>
-			<p className="text-sm text-muted">
-				{translator.textFn(type === "music" ? "Music" : "SFX")} ·{" "}
-				{formatByteSizeFn(resource.size)}
-			</p>
-			{preview.playbackError === undefined ? null : (
-				<p className="text-sm text-danger">{preview.playbackError}</p>
-			)}
-		</section>
+		</div>
 	);
 };
 
-const EditorAudioResourceUsage = ({ resourceId }: { readonly resourceId: string }) => {
+const EditorAudioResourceUsage = ({
+	resourceId,
+	asFact = false,
+}: {
+	readonly resourceId: string;
+	readonly asFact?: boolean;
+}) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const notes = useProjectNotes(project.projectId);
 	const usages = readGameResourceUsagesFn(project.config).filter(
 		(usage) => usage.resourceId === resourceId,
 	);
-	const linkedNotes = notes.notes.filter((note) => note.resourceIds.includes(resourceId));
+	const usageLabels = usages.map((usage) =>
+		usage.resourceType === "sfx"
+			? translator.textFn(
+					SfxEventPresentation.find(({ event }) => event === usage.roleLabel)?.label ??
+						usage.roleLabel,
+				)
+			: translator.textFn("Playlist"),
+	);
+	if (asFact)
+		return (
+			<Fact
+				label={translator.textFn("Usage")}
+				value={
+					usageLabels.length === 0 ? translator.textFn("Unused") : usageLabels.join(", ")
+				}
+			/>
+		);
 	return (
 		<section
 			data-ui="EditorAudioResourceUsage"
 			className="grid gap-3"
 		>
-			<h2 className="text-lg font-semibold">
-				<Tx label="Usage" />
-			</h2>
+			<EditorFormSectionDivider title={translator.textFn("Usage")} />
 			{usages.length === 0 ? (
 				<p className="text-sm text-muted">
 					<Tx label="Unused" />
 				</p>
 			) : (
-				<ul className="grid gap-2">
-					{usages.map((usage) => (
+				<ul className="ak-list grid">
+					{usages.map((usage, index) => (
 						<li
-							className="rounded-lg border border-line p-3 text-sm"
+							className="ak-list-row p-3 text-sm"
 							key={usage.path.join(".")}
 						>
-							{usage.resourceType === "sfx"
-								? translator.textFn(
-										SfxEventPresentation.find(
-											({ event }) => event === usage.roleLabel,
-										)?.label ?? usage.roleLabel,
-									)
-								: translator.textFn("Playlist")}
+							{usageLabels[index]}
 						</li>
 					))}
 				</ul>
-			)}
-			<p className="text-sm text-muted">
-				{notes.loaded
-					? `${translator.textFn("Notes")}: ${linkedNotes.length}`
-					: translator.textFn("Loading…")}
-			</p>
-			{notes.error === undefined ? null : (
-				<p className="text-sm text-danger">{String(notes.error)}</p>
 			)}
 		</section>
 	);
@@ -229,6 +240,11 @@ const EditorAudioResourceDelete = ({
 	readonly resource: Project.Resource;
 	readonly type: "music" | "sfx";
 }) => {
+	const project = useEditorProject();
+	const translator = useTranslator();
+	const assigned = readGameResourceUsagesFn(project.config).some(
+		(usage) => usage.resourceId === resource.id,
+	);
 	const controller = useEditorAudioResourceDeleteController({
 		resourceId: resource.id,
 		type,
@@ -238,29 +254,50 @@ const EditorAudioResourceDelete = ({
 			data-ui="EditorAudioResourceDelete"
 			className="grid gap-6"
 		>
-			<EditorAudioResourceUsage resourceId={resource.id} />
-			<p className="text-sm text-muted">
-				<Tx label="Deleting audio removes the file, its metadata, assignments and Notes links. This cannot be undone." />
-			</p>
-			<div>
-				<DangerButton
-					data-ui="EditorAudioDeleteOpen"
-					onClick={controller.openFn}
-				>
-					<Tx label="Delete" />
-				</DangerButton>
-			</div>
+			<EditorFormSectionDivider title={translator.textFn("Delete audio")} />
+			<Status
+				dataUi="EditorAudioDeleteState"
+				size="large"
+				variant="flat"
+				icon={assigned ? ShieldAlert : ShieldCheck}
+				title={translator.textFn(
+					assigned ? "This audio is still in use" : "This audio can be deleted",
+				)}
+				description={translator.textFn(
+					assigned
+						? "Deleting this audio also removes the assignments listed below."
+						: "This audio is unused. Deleting it removes its file and metadata.",
+				)}
+				action={
+					<DangerButton
+						data-ui="EditorAudioDeleteOpen"
+						onClick={controller.openFn}
+					>
+						{translator.textFn(assigned ? "Force delete…" : "Delete")}
+					</DangerButton>
+				}
+			/>
+			{assigned ? <EditorAudioResourceUsage resourceId={resource.id} /> : null}
 			{controller.confirming ? (
 				<Overlay onCloseFn={controller.cancelFn}>
 					<div
 						data-ui="EditorAudioDeleteDialog"
-						className="grid w-full max-w-md gap-4 rounded-2xl border border-line-strong bg-surface-raised p-6 shadow-2xl"
+						className="grid w-full max-w-2xl gap-4 rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 					>
 						<h2 className="text-lg font-semibold">
-							<Tx label="Delete" /> {resource.name}?
+							{translator.textFn(assigned ? "Force delete audio?" : "Delete audio?")}
 						</h2>
-						<p className="text-sm text-muted">
-							<Tx label="Deleting audio removes the file, its metadata, assignments and Notes links. This cannot be undone." />
+						<p className="text-sm leading-6 text-muted">
+							<Tx label="Delete" />{" "}
+							<strong className="text-foreground">{resource.name}</strong>
+						</p>
+						{assigned ? (
+							<div className="max-h-52 overflow-y-auto overscroll-contain">
+								<EditorAudioResourceUsage resourceId={resource.id} />
+							</div>
+						) : null}
+						<p className="rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
+							<Tx label="Deleting audio removes its file, metadata and assignments. This cannot be undone." />
 						</p>
 						{controller.error === undefined ? null : (
 							<p className="text-sm text-danger">
@@ -269,21 +306,25 @@ const EditorAudioResourceDelete = ({
 									: String(controller.error)}
 							</p>
 						)}
-						<div className="flex justify-end gap-2">
-							<Button
+						<div className="mt-2 flex items-center justify-between gap-4">
+							<LinkButton
+								className="inline-flex items-center gap-1.5"
 								disabled={controller.deleting}
 								onClick={controller.cancelFn}
 							>
+								<X className="size-4" />
 								<Tx label="Cancel" />
-							</Button>
-							<DangerButton
+							</LinkButton>
+							<Button
+								className="gap-1.5"
 								disabled={controller.deleting}
 								data-ui="EditorAudioDeleteConfirm"
 								cursorIntent={controller.deleting ? "progress" : undefined}
 								onClick={() => void controller.confirmFn()}
 							>
-								<Tx label="Delete" />
-							</DangerButton>
+								<Trash2 className="size-4" />
+								{translator.textFn(assigned ? "Force delete" : "Delete")}
+							</Button>
 						</div>
 					</div>
 				</Overlay>
@@ -304,7 +345,6 @@ export const EditorAudioResourceDetail = ({
 	);
 	const translator = useTranslator();
 	const editRef = useEditorEditShortcut();
-	const Icon = type === "music" ? Music2 : AudioLines;
 	const to =
 		type === "music"
 			? "/editor/$projectId/music/$resourceId/$sectionId"
@@ -334,6 +374,7 @@ export const EditorAudioResourceDetail = ({
 		);
 	return (
 		<EditorSectionPage
+			contentClassName="mx-auto w-3/4"
 			header={
 				<EditorSectionNavigation
 					leading={
@@ -349,9 +390,11 @@ export const EditorAudioResourceDetail = ({
 						/>
 					}
 					title={
-						<h1 className="flex min-w-0 items-center gap-2 text-xl font-semibold">
-							<Icon className="size-6 shrink-0" />
-							<span className="truncate">{resource?.name ?? resourceId}</span>
+						<h1
+							className="truncate text-xl font-semibold"
+							data-ui="EditorAudioResourceIdentity"
+						>
+							{resource?.name ?? resourceId}
 						</h1>
 					}
 					action={
@@ -375,7 +418,15 @@ export const EditorAudioResourceDetail = ({
 			}
 			secondaryNavigation={
 				resource === undefined ? undefined : (
-					<EditorSectionBar>
+					<EditorSectionBar
+						actions={
+							<EditorAudioPreview
+								key={`${project.projectId}:${type}:${resource.id}`}
+								resource={resource}
+								type={type}
+							/>
+						}
+					>
 						{AudioDetailSections.map((tab) => (
 							<Tooltip
 								key={tab.id}
@@ -422,15 +473,58 @@ export const EditorAudioResourceDetail = ({
 			) : (
 				<div
 					data-ui="EditorAudioResourceView"
-					className="grid max-w-3xl gap-6"
+					className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
 				>
-					<p className="text-sm text-muted">ID: {resource.id}</p>
-					<EditorAudioPreview
-						key={`${project.projectId}:${type}:${resource.id}`}
-						resource={resource}
-						type={type}
+					<EditorFormSectionDivider
+						title={translator.textFn(
+							type === "music" ? "Music details" : "SFX details",
+						)}
 					/>
-					<EditorAudioResourceUsage resourceId={resourceId} />
+					<div className="grid grid-cols-2 items-start gap-[var(--ak-viewport-gap)]">
+						<section
+							className="grid min-w-0 gap-3"
+							data-ui="EditorAudioResourceMetadata"
+						>
+							<EditorFormSectionDivider
+								title={translator.textFn(type === "music" ? "Music" : "SFX")}
+								action={
+									<LinkButtonLink
+										className="inline-flex items-center gap-1.5"
+										to={to}
+										params={{
+											projectId: project.projectId,
+											resourceId,
+											sectionId: "edit",
+										}}
+									>
+										<Pencil className="size-4" />
+										<Tx label="Edit" />
+									</LinkButtonLink>
+								}
+							/>
+							<EditorRootCard dataUi="EditorAudioResourceMetadataCard">
+								<FactList>
+									<Fact
+										label={translator.textFn("Name")}
+										value={resource.name}
+									/>
+									<Fact
+										label={translator.textFn("Size")}
+										value={formatByteSizeFn(resource.size)}
+									/>
+									<Fact
+										label="ID"
+										mono
+										value={resource.id}
+									/>
+									<EditorAudioResourceUsage
+										resourceId={resourceId}
+										asFact
+									/>
+								</FactList>
+							</EditorRootCard>
+						</section>
+					</div>
 				</div>
 			)}
 		</EditorSectionPage>

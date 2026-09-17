@@ -267,9 +267,23 @@ describe("useEditorSfxManagerController", () => {
 				(button) => button.textContent === "Unused",
 			)!;
 			await act(async () => unused.click());
+			expect(document.querySelector('[data-event="job:started"]')).toBeNull();
+			expect(document.querySelector('[data-event="item:spawned"]')).toBeNull();
+			expect(document.querySelector('[data-event="item:discarded"]')).not.toBeNull();
+			const assigned = Array.from(document.querySelectorAll("button")).find(
+				(button) => button.textContent === "Assigned",
+			)!;
+			await act(async () => assigned.click());
+			expect(document.querySelectorAll('[data-ui="EditorSfxSlot"]')).toHaveLength(2);
+			expect(document.querySelector('[data-event="item:discarded"]')).toBeNull();
 			await act(async () =>
-				(slot.querySelector('[data-ui="EditorSfxReveal"]') as HTMLButtonElement).click(),
+				(
+					document.querySelector(
+						'[data-event="job:started"] [data-ui="EditorSfxReveal"]',
+					) as HTMLButtonElement
+				).click(),
 			);
+			expect(document.querySelector('[data-event="item:discarded"]')).not.toBeNull();
 			expect(
 				document.querySelector('[data-ui="EditorSfxRow"][data-ui-selected="true"]')
 					?.textContent,

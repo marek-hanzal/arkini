@@ -572,6 +572,10 @@ Delete artwork:
   value: Delete artwork
 Delete artwork?:
   value: Delete artwork?
+Delete audio:
+  value: Delete audio
+Delete audio?:
+  value: Delete audio?
 Delete item:
   value: Delete item
 Delete item irreversible warning:
@@ -580,8 +584,10 @@ Delete item?:
   value: Delete item?
 Deleted item artwork help:
   value: Artwork files stay in the project. Remove unused entries separately in **Artwork**.
-Deleting audio removes the file, its metadata, assignments and Notes links. This cannot be undone.:
-  value: Deleting audio removes the file, its metadata, assignments and Notes links. This cannot be undone.
+Deleting audio removes its file, metadata and assignments. This cannot be undone.:
+  value: Deleting audio removes its file, metadata and assignments. This cannot be undone.
+Deleting this audio also removes the assignments listed below.:
+  value: Deleting this audio also removes the assignments listed below.
 Depends on conditions:
   value: Depends on conditions
 Depletion output:
@@ -768,6 +774,8 @@ Estimate unreachable description:
   value: No complete path leads from the project’s **starting items** to this item with the current configuration.
 Every:
   value: Every
+Every slot has a sound assigned. Switch to All to see them.:
+  value: Every slot has a sound assigned. Switch to All to see them.
 Exact count:
   value: Exact count
 Exact count condition help:
@@ -806,6 +814,8 @@ Fix the highlighted fields before saving.:
   value: Fix the highlighted fields before saving.
 Force delete:
   value: Force delete
+Force delete audio?:
+  value: Force delete audio?
 Force delete item integrity warning:
   value: Force delete removes every use listed below. Check the damage before you continue.
 Force delete item?:
@@ -1228,8 +1238,6 @@ Loading MCP settings…:
   value: Loading MCP settings…
 Loading notes…:
   value: Loading notes…
-Loading…:
-  value: Loading…
 Local MCP:
   value: Local MCP
 Local drop:
@@ -1360,6 +1368,8 @@ Missing item marker:
   value: Missing item marker
 Music:
   value: Music
+Music details:
+  value: Music details
 Music help:
   value: |
     Build the music library for your game. Import songs, find them quickly, and preview how they sound before using them in the game.
@@ -1401,6 +1411,8 @@ No active job:
   value: No active job
 No artwork matches this search.:
   value: No artwork matches this search.
+No assigned slots:
+  value: No assigned slots
 No audio matches the current filters.:
   value: No audio matches the current filters.
 No authored item directly inputs or positively requires this item.:
@@ -1475,8 +1487,12 @@ No rules:
   value: No rules
 No saved item has this UID.:
   value: No saved item has this UID.
+No slots have a sound assigned. Switch to All and drag a sound onto a slot.:
+  value: No slots have a sound assigned. Switch to All and drag a sound onto a slot.
 No sound effects yet:
   value: No sound effects yet
+No unassigned slots:
+  value: No unassigned slots
 No visible lines match {query}.:
   value: No visible lines match {query}.
 None:
@@ -1562,16 +1578,12 @@ Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
   value: Paste ngrok authtoken
-Pause:
-  value: Pause
 Paused:
   value: Paused
 Pick random space:
   value: Pick random space
 Placement:
   value: Placement
-Play:
-  value: Play
 Player controls:
   value: Player controls
 Player hint:
@@ -1935,6 +1947,8 @@ Runtime multiplier:
   value: Time multiplier
 SFX:
   value: SFX
+SFX details:
+  value: SFX details
 SFX help:
   value: |
     Build the sound effects library for your game. Import sounds, find them quickly, and preview how they sound before assigning them to gameplay events.
@@ -2031,6 +2045,8 @@ Simple input type help:
     Other inputs on the same line or action must still be ready.
 Single item:
   value: Single item
+Size:
+  value: Size
 Slots:
   value: Slots
 Slowest first:
@@ -2127,6 +2143,12 @@ This artwork cannot be deleted yet:
   value: This artwork cannot be deleted yet
 This artwork is not used:
   value: This artwork is not used
+This audio can be deleted:
+  value: This audio can be deleted
+This audio is still in use:
+  value: This audio is still in use
+This audio is unused. Deleting it removes its file and metadata.:
+  value: This audio is unused. Deleting it removes its file and metadata.
 This item can be deleted:
   value: This item can be deleted
 This item cannot be deleted yet:
@@ -2335,6 +2357,8 @@ Write a note…:
   value: Write a note…
 added by invisible color cleanup:
   value: added by invisible color cleanup
+assigned:
+  value: assigned
 automatic-only:
   value: automatic-only
 available:

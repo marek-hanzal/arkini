@@ -115,7 +115,7 @@ export const ProductionLineDetail = ({
 							content={<Mx label="Authored production inputs summary help" />}
 						/>
 					</h4>
-					<div className="pt-2">
+					<div className="pt-3">
 						<ProductionLineInputs input={line.input} />
 					</div>
 				</section>

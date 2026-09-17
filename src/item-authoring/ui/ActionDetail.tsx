@@ -72,7 +72,7 @@ export const ActionDetail = ({
 						content={<Mx label="Authored production inputs summary help" />}
 					/>
 				</h4>
-				<div className="pt-2">
+				<div className="pt-3">
 					<ProductionLineInputs
 						emptyLabel={translator.textFn("No inputs")}
 						input={action.input}

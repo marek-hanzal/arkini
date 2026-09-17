@@ -9,47 +9,53 @@ import { UnitCostValue } from "~/production-input/ui/UnitCostValue";
 const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 	const translator = useTranslator();
 	const rowClassName =
-		"ak-line-input grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 rounded-xl bg-transparent px-3 py-2 text-sm";
+		"flex min-w-0 items-center justify-between gap-4 border-l-2 border-accent text-sm";
 	if (input.type === "simple")
 		return input.units === undefined ? null : (
-			<div className={rowClassName}>
+			<div
+				className={rowClassName}
+				data-ui="EditorProductionLineInput"
+			>
 				<p className="font-medium text-foreground">{translator.textFn("Owner units")}</p>
-				<p className="text-right text-sm text-muted">
+				<p className="shrink-0 text-right text-lg font-bold tabular-nums text-foreground">
 					<UnitCostValue unit={input.units} />
 				</p>
 			</div>
 		);
-	const description = (
-		<span className="block text-xs text-muted">
+	const eyebrow = (
+		<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
 			{input.type === "materials"
 				? input.mode === "consume"
 					? translator.textFn("Consumed")
 					: translator.textFn("Reserved")
 				: translator.textFn("Required units")}
-			{input.units === undefined ? null : (
-				<>
-					{" · "}
-					<UnitCostValue unit={input.units} />
-				</>
-			)}
 		</span>
 	);
+	const description =
+		input.units === undefined ? undefined : (
+			<span className="block text-xs text-muted">
+				<UnitCostValue unit={input.units} />
+			</span>
+		);
 	return (
-		<div className={rowClassName}>
-			<div className="min-w-0">
-				{input.type === "materials" ? (
-					<SelectorDetail
-						selector={input.selector}
-						description={description}
-					/>
-				) : (
-					<QueryDetail
-						query={input.query}
-						description={description}
-					/>
-				)}
-			</div>
-			<p className="text-right font-medium text-foreground">
+		<div
+			className={rowClassName}
+			data-ui="EditorProductionLineInput"
+		>
+			{input.type === "materials" ? (
+				<SelectorDetail
+					selector={input.selector}
+					eyebrow={eyebrow}
+					description={description}
+				/>
+			) : (
+				<QueryDetail
+					query={input.query}
+					eyebrow={eyebrow}
+					description={description}
+				/>
+			)}
+			<p className="shrink-0 text-right text-lg font-bold tabular-nums text-foreground">
 				{input.type === "materials" ? (
 					<>
 						×<QuantityValue quantity={input.quantity} /> <Tx label="Required" />
@@ -75,13 +81,16 @@ export const ProductionLineInputs = ({
 		(entry) => entry.type !== "simple" || entry.units !== undefined,
 	);
 	return (
-		<section className="min-w-0">
+		<section
+			className="min-w-0"
+			data-ui="EditorProductionLineInputs"
+		>
 			{visibleInput.length === 0 ? (
 				<p className="py-3 text-sm text-muted">
 					{emptyLabel ?? translator.textFn("No inputs")}
 				</p>
 			) : (
-				<div className="space-y-1">
+				<div className="flex flex-col gap-3">
 					{visibleInput.map((entry, index) => (
 						<LineInput
 							input={entry}

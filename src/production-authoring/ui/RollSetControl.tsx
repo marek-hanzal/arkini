@@ -535,21 +535,18 @@ const RollControl = ({
 								type: "guaranteed",
 							},
 							(roll) => (
-								<div className="grid gap-3">
-									<EditorFormBranchEnd />
-									<DropList
-										initialRuleIndex={initialRuleIndex}
-										initialWhenIndex={initialWhenIndex}
-										value={roll.drop}
-										initialDropIndex={initialDropIndex}
-										onChangeFn={(drop) =>
-											onChangeFn({
-												...roll,
-												drop: drop as typeof roll.drop,
-											})
-										}
-									/>
-								</div>
+								<DropList
+									initialRuleIndex={initialRuleIndex}
+									initialWhenIndex={initialWhenIndex}
+									value={roll.drop}
+									initialDropIndex={initialDropIndex}
+									onChangeFn={(drop) =>
+										onChangeFn({
+											...roll,
+											drop: drop as typeof roll.drop,
+										})
+									}
+								/>
 							),
 						)
 						.with(

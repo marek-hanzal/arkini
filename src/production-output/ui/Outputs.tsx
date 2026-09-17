@@ -25,12 +25,16 @@ const OutputItem = <Item extends OutputProjection.Item>({
 	<div
 		className={twMerge(
 			"grid gap-1.5",
-			variant === "editor-tree" && "border-l-2 border-accent",
 			variant === "editor-tree" && eyebrow === undefined && "pl-24",
 		)}
 		data-ui="TileLineOutputItem"
 	>
-		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
+		<div
+			className={twMerge(
+				"flex min-w-0 items-center justify-between gap-4 text-sm",
+				variant === "editor-tree" && "border-l-2 border-accent",
+			)}
+		>
 			{renderItemFn(item, eyebrow)}
 			<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
 				×<QuantityValue quantity={item.quantity} />
@@ -157,8 +161,8 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 						<div
 							key={`${index}:${option.weight}`}
 							className={twMerge(
-								"border-l border-line pl-3",
-								variant === "editor-tree" && "border-0 pl-0",
+								"pl-3",
+								variant === "editor-tree" && "pl-0",
 							)}
 						>
 							<p className="mb-1.5 text-xs text-muted">

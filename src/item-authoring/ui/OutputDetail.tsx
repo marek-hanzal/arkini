@@ -31,7 +31,7 @@ export const OutputDetail = ({
 			output={projectAuthoredOutputFn(output, items)}
 			renderItemDetailFn={(item) =>
 				item.rules.length === 0 ? null : (
-					<div className="ml-24 border-l-2 border-accent">
+					<div className="ml-24">
 						<RulesDetail rules={item.rules} />
 					</div>
 				)
@@ -45,7 +45,7 @@ export const OutputDetail = ({
 			)}
 			renderWeightedOptionDetailFn={(option) =>
 				option.rules === undefined || option.rules.length === 0 ? null : (
-					<div className="mb-3 border-l-2 border-accent">
+					<div className="mb-3">
 						<RulesDetail rules={option.rules} />
 					</div>
 				)

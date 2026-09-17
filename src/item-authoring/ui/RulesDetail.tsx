@@ -113,7 +113,7 @@ const WhenDetail = ({
 		)
 		.exhaustive();
 	return (
-		<li className="grid gap-1">
+		<li className="grid gap-1 border-l-2 border-accent">
 			{when.type === "limit" ? (
 				<SelectorDetail
 					eyebrow={eyebrow}

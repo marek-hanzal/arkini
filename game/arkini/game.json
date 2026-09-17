@@ -32,7 +32,6 @@
 			"unresolved-waltz",
 			"the-tavern-at-the-crossroads-1",
 			"open-vowels",
-			"dusty-plains",
 			"windswept-ambience",
 			"mystic-waltz",
 			"dust-and-silence",
@@ -60,7 +59,10 @@
 			"item-detail:closed": "mixkit-gate-latch-click-1924",
 			"item-detail:opened": "mixkit-single-classic-click-1116",
 			"job-queue:cleared": "mixkit-hard-horror-hit-drum-565",
-			"item:expired": "mixkit-deep-water-bubbles-1321"
+			"item:expired": "mixkit-deep-water-bubbles-1321",
+			"item:discarded": "b681gtair0i22okcvoweaviz",
+			"item:disappeared": "mixkit-heavy-sliding-door-1523",
+			"job:queued": "t4ps0gbfy3c4ybc1vkr1ij31"
 		}
 	},
 	"start": {

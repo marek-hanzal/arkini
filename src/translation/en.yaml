@@ -60,8 +60,6 @@ All:
   value: All
 Already optimized:
   value: Already optimized
-Alternative:
-  value: Alternative
 Alternative set:
   value: Alternative set
 An unexpected error prevented the build. Try again.:

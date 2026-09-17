@@ -71,9 +71,11 @@ const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => {
 export const RulesDetail = ({
 	rules,
 	description,
+	nested = false,
 }: {
 	readonly rules: readonly RuleSchema.Type[];
 	readonly description: ReactNode;
+	readonly nested?: boolean;
 }) => {
 	const translator = useTranslator();
 	return (
@@ -81,11 +83,18 @@ export const RulesDetail = ({
 			className="grid gap-3"
 			data-ui="EditorRulesDetail"
 		>
-			<EditorFormSectionDivider
-				title={translator.textFn("Rules")}
-				description={description}
-				variant="secondary"
-			/>
+			{nested ? (
+				<div className="flex items-center gap-1 text-xs font-medium text-muted">
+					<Tx label="Rules" />
+					<EditorInfoTooltip content={description} />
+				</div>
+			) : (
+				<EditorFormSectionDivider
+					title={translator.textFn("Rules")}
+					description={description}
+					variant="secondary"
+				/>
+			)}
 			{rules.length === 0 ? (
 				<p className="text-sm text-muted">
 					<Tx label="No rules" />

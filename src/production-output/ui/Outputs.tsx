@@ -211,20 +211,24 @@ export const Outputs = <Item extends OutputProjection.Item>({
 		{output.length === 0 ? (
 			<p className="py-3 text-sm text-muted">{emptyLabel}</p>
 		) : (
-			<div
-				className={
-					variant === "editor-tree" ? "flex flex-col gap-3" : "divide-y divide-line/60"
-				}
-			>
+			<div className="flex flex-col gap-6 pt-4">
 				{output.map((set, setIndex) => (
 					<div
 						key={`${setIndex}:${set.weight}`}
 						className="py-1"
 					>
-						<p className="pt-2 text-xs font-medium text-muted">
-							<Tx label="Alternative" /> {setIndex + 1} · <Tx label="Weight" />{" "}
-							{set.weight}
-						</p>
+						<header
+							className="mb-3 flex items-center gap-3"
+							data-ui="OutputSetHeading"
+						>
+							<h5 className="shrink-0 text-lg font-semibold text-foreground">
+								<Tx label="Output set" /> {setIndex + 1}
+							</h5>
+							<span className="min-w-0 flex-1 border-t border-line-strong" />
+							<span className="shrink-0 text-xs text-muted">
+								<Tx label="Weight" /> {set.weight}
+							</span>
+						</header>
 						<div
 							className={
 								variant === "editor-tree"

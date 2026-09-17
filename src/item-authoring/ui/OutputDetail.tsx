@@ -32,6 +32,7 @@ export const OutputDetail = ({
 			renderItemDetailFn={(item) =>
 				item.rules.length === 0 ? null : (
 					<RulesDetail
+						nested
 						rules={item.rules}
 						description={<Mx label="Authored drop rules summary help" />}
 					/>
@@ -55,6 +56,7 @@ export const OutputDetail = ({
 				option.rules === undefined || option.rules.length === 0 ? null : (
 					<div className="mb-3">
 						<RulesDetail
+							nested
 							rules={option.rules}
 							description={
 								<Mx label="Authored weighted candidate rules summary help" />

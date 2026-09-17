@@ -212,7 +212,7 @@ export const Outputs = <Item extends OutputProjection.Item>({
 		data-ui="Outputs"
 		data-variant={variant}
 	>
-		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+		<h4 className="pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
 			{title}
 		</h4>
 		{output.length === 0 ? (

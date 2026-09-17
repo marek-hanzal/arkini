@@ -121,69 +121,73 @@ export const Outputs = <Item extends OutputProjection.Item>({
 	readonly renderSetDetailFn?: (set: OutputProjection.Set<Item>) => ReactNode;
 	readonly title?: ReactNode;
 	readonly variant?: OutputsVariant;
-}) => (
-	<section
-		className="min-w-0"
-		data-ui="Outputs"
-		data-variant={variant}
-	>
-		<h4 className="pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-			{title}
-		</h4>
-		{output.length === 0 ? (
-			<p className="py-3 text-sm text-muted">{emptyLabel}</p>
-		) : (
-			<div className="flex flex-col gap-6">
-				{output.map((set, setIndex) => (
-					<div
-						key={`${setIndex}:${set.weight}`}
-						className="py-1"
-					>
-						<header
-							className="mb-3 flex items-center gap-3"
-							data-ui="OutputSetHeading"
-						>
-							<h5 className="shrink-0 text-lg font-semibold text-foreground">
-								<Tx label="Output set" /> {setIndex + 1}
-							</h5>
-							<span className="min-w-0 flex-1 border-t border-line-strong" />
-							{output.length > 1 ? (
-								<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
-									<Tx label="Weight" /> {set.weight}
-								</span>
-							) : null}
-						</header>
-						{renderSetDetailFn?.(set)}
-						{set.activeRuleHints.map((hint, index) => (
-							<p
-								className="mb-1.5 flex items-start gap-1.5 text-xs text-muted"
-								data-ui="TileLineOutputSetRuleHint"
-								key={`${hint}-${index}`}
-							>
-								<Info className="mt-px size-3.5 shrink-0 text-secondary-foreground" />
-								<span>{hint}</span>
-							</p>
-						))}
+}) => {
+	const totalWeight = output.reduce((total, set) => total + set.weight, 0);
+	return (
+		<section
+			className="min-w-0"
+			data-ui="Outputs"
+			data-variant={variant}
+		>
+			<h4 className="pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+				{title}
+			</h4>
+			{output.length === 0 ? (
+				<p className="py-3 text-sm text-muted">{emptyLabel}</p>
+			) : (
+				<div className="flex flex-col gap-6">
+					{output.map((set, setIndex) => (
 						<div
-							className={
-								variant === "editor-tree"
-									? "flex flex-col gap-3"
-									: "flex flex-col gap-1.5"
-							}
+							key={`${setIndex}:${set.weight}`}
+							className="py-1"
 						>
-							{set.roll.map((roll, rollIndex) => (
-								<OutputRoll
-									key={`${roll.kind}:${rollIndex}`}
-									roll={roll}
-									renderItemDetailFn={renderItemDetailFn}
-									renderItemFn={renderItemFn}
-									variant={variant}
-								/>
+							<header
+								className="mb-3 flex items-center gap-3"
+								data-ui="OutputSetHeading"
+							>
+								<h5 className="shrink-0 text-lg font-semibold text-foreground">
+									<Tx label="Output set" /> {setIndex + 1}
+								</h5>
+								<span className="min-w-0 flex-1 border-t border-line-strong" />
+								{output.length > 1 ? (
+									<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
+										<Tx label="Weight" /> {set.weight} ·{" "}
+										{Number(((set.weight / totalWeight) * 100).toFixed(1))} %
+									</span>
+								) : null}
+							</header>
+							{renderSetDetailFn?.(set)}
+							{set.activeRuleHints.map((hint, index) => (
+								<p
+									className="mb-1.5 flex items-start gap-1.5 text-xs text-muted"
+									data-ui="TileLineOutputSetRuleHint"
+									key={`${hint}-${index}`}
+								>
+									<Info className="mt-px size-3.5 shrink-0 text-secondary-foreground" />
+									<span>{hint}</span>
+								</p>
 							))}
+							<div
+								className={
+									variant === "editor-tree"
+										? "flex flex-col gap-3"
+										: "flex flex-col gap-1.5"
+								}
+							>
+								{set.roll.map((roll, rollIndex) => (
+									<OutputRoll
+										key={`${roll.kind}:${rollIndex}`}
+										roll={roll}
+										renderItemDetailFn={renderItemDetailFn}
+										renderItemFn={renderItemFn}
+										variant={variant}
+									/>
+								))}
+							</div>
 						</div>
-					</div>
-				))}
-			</div>
-		)}
-	</section>
-);
+					))}
+				</div>
+			)}
+		</section>
+	);
+};

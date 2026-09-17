@@ -256,9 +256,11 @@ const includeLimitedItemFn = (item: ItemSchema.Type) => item.maxCount !== undefi
 
 const WhenControl = ({
 	onChangeFn,
+	showBranchEnd,
 	value,
 }: {
 	readonly onChangeFn: (when: DraftWhen) => void;
+	readonly showBranchEnd: boolean;
 	readonly value: DraftWhen;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
@@ -351,7 +353,7 @@ const WhenControl = ({
 							})
 						}
 					/>
-					<EditorFormBranchEnd />
+					{showBranchEnd && <EditorFormBranchEnd />}
 				</>
 			) : (
 				<>
@@ -464,7 +466,7 @@ const WhenControl = ({
 							),
 						)
 						.exhaustive()}
-					<EditorFormBranchEnd />
+					{showBranchEnd && <EditorFormBranchEnd />}
 				</>
 			)}
 		</div>
@@ -637,6 +639,7 @@ const RuleControl = ({
 					>
 						{(whenIndex) => (
 							<WhenControl
+								showBranchEnd={ruleTarget !== "set"}
 								value={rule.when[whenIndex]}
 								onChangeFn={(next) =>
 									onChangeFn({

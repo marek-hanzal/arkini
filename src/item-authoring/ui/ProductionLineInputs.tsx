@@ -21,27 +21,35 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 				</p>
 			</div>
 		);
+	const description = (
+		<span className="block text-xs text-muted">
+			{input.type === "materials"
+				? input.mode === "consume"
+					? translator.textFn("Consumed")
+					: translator.textFn("Reserved")
+				: translator.textFn("Required units")}
+			{input.units === undefined ? null : (
+				<>
+					{" · "}
+					<UnitCostValue unit={input.units} />
+				</>
+			)}
+		</span>
+	);
 	return (
 		<div className={rowClassName}>
 			<div className="min-w-0">
 				{input.type === "materials" ? (
-					<SelectorDetail selector={input.selector} />
+					<SelectorDetail
+						selector={input.selector}
+						description={description}
+					/>
 				) : (
-					<QueryDetail query={input.query} />
+					<QueryDetail
+						query={input.query}
+						description={description}
+					/>
 				)}
-				<p className="mt-0.5 text-xs text-muted">
-					{input.type === "materials"
-						? input.mode === "consume"
-							? translator.textFn("Consumed")
-							: translator.textFn("Reserved")
-						: translator.textFn("Required units")}
-					{input.units === undefined ? null : (
-						<>
-							{" · "}
-							<UnitCostValue unit={input.units} />
-						</>
-					)}
-				</p>
 			</div>
 			<p className="text-right font-medium text-foreground">
 				{input.type === "materials" ? (

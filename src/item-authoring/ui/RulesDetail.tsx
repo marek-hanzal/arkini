@@ -10,56 +10,62 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import type { ReactNode } from "react";
 
-const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
-	<li className="grid gap-1">
-		<p className="font-medium">
-			{match(when)
-				.with(
-					{
-						type: "exists",
-					},
-					() => <Tx label="Exists" />,
-				)
-				.with(
-					{
-						type: "count",
-					},
-					(condition) => (
-						<>
-							<Tx label="Exact count" /> · {condition.count}
-						</>
-					),
-				)
-				.with(
-					{
-						type: "range",
-					},
-					(condition) => (
-						<>
-							<Tx label="Count range" /> · {condition.min}–{condition.max}
-						</>
-					),
-				)
-				.with(
-					{
-						type: "limit",
-					},
-					() => <Tx label="Limit" />,
-				)
-				.exhaustive()}
-		</p>
-		{when.type === "limit" ? (
-			<SelectorDetail
-				selector={{
-					type: "item",
-					itemId: when.itemId,
-				}}
-			/>
-		) : (
-			<QueryDetail query={when.query} />
-		)}
-	</li>
-);
+const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => {
+	const heading = match(when)
+		.with(
+			{
+				type: "exists",
+			},
+			() => <Tx label="Exists" />,
+		)
+		.with(
+			{
+				type: "count",
+			},
+			(condition) => (
+				<>
+					<Tx label="Exact count" /> · {condition.count}
+				</>
+			),
+		)
+		.with(
+			{
+				type: "range",
+			},
+			(condition) => (
+				<>
+					<Tx label="Count range" /> · {condition.min}–{condition.max}
+				</>
+			),
+		)
+		.with(
+			{
+				type: "limit",
+			},
+			() => <Tx label="Limit" />,
+		)
+		.exhaustive();
+	return (
+		<li className="grid gap-1">
+			{when.type === "limit" ? (
+				<>
+					<p className="font-medium">{heading}</p>
+					<SelectorDetail
+						selector={{
+							type: "item",
+							itemId: when.itemId,
+						}}
+					/>
+				</>
+			) : (
+				<QueryDetail
+					query={when.query}
+					heading={heading}
+				/>
+			)}
+		</li>
+	);
+};
 
 /** Shows authored conditions directly for line, action, clock, and selected-drop rules. */
 export const RulesDetail = ({

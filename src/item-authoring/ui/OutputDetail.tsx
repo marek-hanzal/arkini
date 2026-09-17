@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { OutputProjection } from "~/production-output/type/OutputProjection";
 import { projectAuthoredOutputFn } from "~/production-output/fn/projectAuthoredOutputFn";
 import { Outputs } from "~/production-output/ui/Outputs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -10,25 +9,6 @@ import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { Mx } from "~/translation/ui/Mx";
-
-const AuthoredOutputItemDetail = ({ item }: { readonly item: OutputProjection.AuthoredItem }) => {
-	return (
-		<div className="grid gap-2 text-xs text-muted">
-			<p>
-				<span className="font-medium uppercase tracking-[0.08em]">
-					<Tx label="Placement" />
-				</span>{" "}
-				· <Tx label={item.placement === "random" ? "Random" : "Drop"} />
-			</p>
-			{item.rules.length === 0 ? null : (
-				<RulesDetail
-					rules={item.rules}
-					description={<Mx label="Authored drop rules summary help" />}
-				/>
-			)}
-		</div>
-	);
-};
 
 /** Renders canonical authored output through the shared output presentation. */
 export const OutputDetail = ({
@@ -49,8 +29,28 @@ export const OutputDetail = ({
 		<Outputs
 			emptyLabel={emptyLabel ?? translator.textFn("No output configured.")}
 			output={projectAuthoredOutputFn(output, items)}
-			renderItemDetailFn={(item) => <AuthoredOutputItemDetail item={item} />}
-			renderItemFn={(item) => <DetailReference itemId={item.itemId} />}
+			renderItemDetailFn={(item) =>
+				item.rules.length === 0 ? null : (
+					<RulesDetail
+						rules={item.rules}
+						description={<Mx label="Authored drop rules summary help" />}
+					/>
+				)
+			}
+			renderItemFn={(item) => (
+				<DetailReference
+					itemId={item.itemId}
+					description={
+						<>
+							<span className="font-medium uppercase tracking-[0.08em]">
+								<Tx label="Placement" />
+							</span>
+							{" · "}
+							<Tx label={item.placement === "random" ? "Random" : "Drop"} />
+						</>
+					}
+				/>
+			)}
 			renderWeightedOptionDetailFn={(option) =>
 				option.rules === undefined || option.rules.length === 0 ? null : (
 					<div className="mb-3">

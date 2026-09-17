@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 import { Tx } from "~/translation/ui/Tx";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
@@ -9,25 +11,48 @@ import {
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 
 /** Presents one authored item query with its linked item, human scope, and board distance. */
-export const QueryDetail = ({ query }: { readonly query: QuerySchema.Type }) => (
-	<div className="grid min-w-0 gap-1">
-		<SelectorDetail selector={query.selector} />
-		<div className="flex flex-wrap items-center gap-1 text-xs text-muted">
-			<Tx label={QueryScopePresentation[query.scope].label} />
-			<EditorInfoTooltip
-				content={<Mx label={QueryScopePresentation[query.scope].description} />}
-			/>
-			{query.scope === "board" ? (
-				<>
-					{" "}
-					· <Tx label={BoardDistancePresentation[query.distance].label} />
+export const QueryDetail = ({
+	query,
+	heading,
+	description,
+}: {
+	readonly query: QuerySchema.Type;
+	readonly heading?: ReactNode;
+	readonly description?: ReactNode;
+}) => (
+	<SelectorDetail
+		selector={query.selector}
+		description={
+			<>
+				{description}
+				<span className="flex flex-wrap items-center gap-1 text-xs text-muted">
+					{heading === undefined ? null : (
+						<>
+							<span className="font-medium">{heading}</span>
+							<ArrowRight className="mx-1 size-4 shrink-0" />
+						</>
+					)}
+					<Tx label={QueryScopePresentation[query.scope].label} />
 					<EditorInfoTooltip
-						content={
-							<Mx label={BoardDistancePresentation[query.distance].description} />
-						}
+						content={<Mx label={QueryScopePresentation[query.scope].description} />}
 					/>
-				</>
-			) : null}
-		</div>
-	</div>
+					{query.scope === "board" ? (
+						<>
+							{" "}
+							· <Tx label={BoardDistancePresentation[query.distance].label} />
+							<EditorInfoTooltip
+								content={
+									<Mx
+										label={
+											BoardDistancePresentation[query.distance].description
+										}
+									/>
+								}
+							/>
+						</>
+					) : null}
+				</span>
+			</>
+		}
+	/>
 );

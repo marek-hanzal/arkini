@@ -33,23 +33,23 @@ export const UnitsItemLineInput = ({
 			state={input.availableUnits > 0 ? "available" : "empty"}
 			suppressSurface={suppressSurface}
 		>
-			<div className="min-w-0">
-				<ItemLineInputTitle
-					detail={input.detail}
-					disabled={disabled}
-					label={input.selector.label}
-				/>
-				<p className="mt-0.5 text-xs text-muted">
-					{translator.textFn("Board")} ·{" "}
-					{translator.textFn(BoardDistancePresentation[input.distance].label)}
-					{input.units === undefined ? null : (
-						<>
-							{" · "}
-							<UnitCostValue unit={input.units} />
-						</>
-					)}
-				</p>
-			</div>
+			<ItemLineInputTitle
+				detail={input.detail}
+				disabled={disabled}
+				label={input.selector.label}
+				description={
+					<span className="mt-0.5 block text-xs text-muted">
+						{translator.textFn("Board")} ·{" "}
+						{translator.textFn(BoardDistancePresentation[input.distance].label)}
+						{input.units === undefined ? null : (
+							<>
+								{" · "}
+								<UnitCostValue unit={input.units} />
+							</>
+						)}
+					</span>
+				}
+			/>
 			{stale ? null : (
 				<div className="text-right">
 					<AnimatePresence

@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
@@ -12,6 +12,7 @@ interface ItemReferenceButtonProps {
 		| "TileLineOutputDetailLink"
 		| "TileLineUnavailableDependencyLink";
 	readonly definitionItemId?: string;
+	readonly description?: ReactNode;
 	readonly disabled: boolean;
 	readonly label: string;
 	readonly runtimeItemId?: string;
@@ -23,6 +24,7 @@ export const ItemReferenceButton = ({
 	compositeUrl,
 	dataUi,
 	definitionItemId,
+	description,
 	disabled,
 	label,
 	runtimeItemId,
@@ -74,6 +76,7 @@ export const ItemReferenceButton = ({
 				artworkClassName="rounded-lg bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-enabled:group-hover:bg-accent/8 group-enabled:group-hover:ring-accent/35"
 				artworkImageClassName="p-0.5"
 				compositeUrl={compositeUrl}
+				description={description}
 				rootTag="span"
 				sourceUrl={sourceUrl}
 				title={label}

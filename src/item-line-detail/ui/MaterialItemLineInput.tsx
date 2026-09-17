@@ -122,22 +122,22 @@ export const MaterialItemLineInput = ({
 			state={readMaterialInputStateFn(input)}
 			suppressSurface={suppressSurface}
 		>
-			<div className="min-w-0">
-				<ItemLineInputTitle
-					detail={input.detail}
-					disabled={disabled}
-					label={label}
-				/>
-				<p className="mt-0.5 text-xs text-muted">
-					{input.mode === "consume" ? "Consumed" : "Reserved"}
-					{input.units === undefined ? null : (
-						<>
-							{" · "}
-							<UnitCostValue unit={input.units} />
-						</>
-					)}
-				</p>
-			</div>
+			<ItemLineInputTitle
+				detail={input.detail}
+				disabled={disabled}
+				label={label}
+				description={
+					<span className="mt-0.5 block text-xs text-muted">
+						{input.mode === "consume" ? "Consumed" : "Reserved"}
+						{input.units === undefined ? null : (
+							<>
+								{" · "}
+								<UnitCostValue unit={input.units} />
+							</>
+						)}
+					</span>
+				}
+			/>
 			{stale ? null : (
 				<div className="flex flex-col items-end text-right">
 					<div className="flex min-h-5 items-baseline justify-end gap-2">

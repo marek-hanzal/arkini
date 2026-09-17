@@ -40,21 +40,27 @@ export const ItemLineInputFrame = ({
 
 /** Renders the shared plain or navigable identity of a projected line input. */
 export const ItemLineInputTitle = ({
+	description,
 	detail,
 	disabled,
 	label,
 }: {
+	readonly description?: ReactNode;
 	readonly detail?: ItemDetailReference;
 	readonly disabled: boolean;
 	readonly label: string;
 }) =>
 	detail === undefined ? (
-		<p className="truncate font-medium text-foreground">{label}</p>
+		<div className="min-w-0">
+			<p className="truncate font-medium text-foreground">{label}</p>
+			{description}
+		</div>
 	) : (
 		<ItemReferenceButton
 			compositeUrl={detail.compositeUrl}
 			dataUi="TileLineInputDetailLink"
 			definitionItemId={detail.itemId}
+			description={description}
 			disabled={disabled}
 			label={label}
 			runtimeItemId={detail.detailItemId}

@@ -141,21 +141,21 @@ export const Outputs = <Item extends OutputProjection.Item>({
 							key={`${setIndex}:${set.weight}`}
 							className="py-1"
 						>
-							<header
-								className="mb-3 flex items-center gap-3"
-								data-ui="OutputSetHeading"
-							>
-								<h5 className="shrink-0 text-lg font-semibold text-foreground">
-									<Tx label="Output set" /> {setIndex + 1}
-								</h5>
-								<span className="min-w-0 flex-1 border-t border-line-strong" />
-								{output.length > 1 ? (
+							{output.length > 1 ? (
+								<header
+									className="mb-3 flex items-center gap-3"
+									data-ui="OutputSetHeading"
+								>
+									<h5 className="shrink-0 text-lg font-semibold text-foreground">
+										<Tx label="Output set" /> {setIndex + 1}
+									</h5>
+									<span className="min-w-0 flex-1 border-t border-line-strong" />
 									<span className="shrink-0 text-lg font-bold tabular-nums text-foreground">
 										<Tx label="Weight" /> {set.weight} ·{" "}
 										{Number(((set.weight / totalWeight) * 100).toFixed(1))} %
 									</span>
-								) : null}
-							</header>
+								</header>
+							) : null}
 							{renderSetDetailFn?.(set)}
 							{set.activeRuleHints.map((hint, index) => (
 								<p

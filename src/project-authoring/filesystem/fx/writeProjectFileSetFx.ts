@@ -40,6 +40,23 @@ export const writeProjectFileSetFx = Effect.fn("writeProjectFileSetFx")(
 			planFx.pipe(
 				Effect.flatMap((plan) =>
 					Effect.gen(function* () {
+						// Admit writes and removals together before touching a portable project.
+						// Otherwise a case/Unicode alias can delete the file just copied for a rename.
+						const targets = new Map<string, string>();
+						for (const target of [
+							...plan.writes.map((write) => write.target),
+							...(plan.deletes ?? []),
+						]) {
+							const key = target.normalize("NFD").toLowerCase();
+							const previous = targets.get(key);
+							if (previous !== undefined)
+								return yield* Effect.fail(
+									new Error(
+										`Editor file operations for ${JSON.stringify(previous)} and ${JSON.stringify(target)} collide.`,
+									),
+								);
+							targets.set(key, target);
+						}
 						for (const write of plan.writes)
 							yield* write.source === undefined
 								? filesystemWrite.replaceFileFx({

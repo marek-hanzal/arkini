@@ -476,6 +476,16 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		Effect.gen(function* () {
 			yield* assertDistinctResourceIdsFx(resources);
 			return yield* commitResourcesFx("upsert-resource", projectId, undefined, (state) => {
+				for (const resource of resources) {
+					const existing = state.project.resources.find(({ id }) => id === resource.id);
+					if (existing !== undefined && existing.type !== resource.type)
+						return Effect.fail(
+							errorFn(
+								"upsert-resource",
+								`Resource ${resource.id} already exists as ${existing.type}; it cannot be imported as ${resource.type}.`,
+							),
+						);
+				}
 				const ids = new Set(resources.map(({ id }) => id));
 				return Effect.succeed({
 					config: state.project.config,

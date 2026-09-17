@@ -23,10 +23,7 @@ const OutputItem = <Item extends OutputProjection.Item>({
 	readonly eyebrow?: ReactNode;
 }) => (
 	<div
-		className={twMerge(
-			"grid gap-1.5",
-			variant === "editor-tree" && eyebrow === undefined && "pl-24",
-		)}
+		className="grid gap-1.5"
 		data-ui="TileLineOutputItem"
 	>
 		<div
@@ -127,11 +124,13 @@ const OutputRoll = <Item extends OutputProjection.Item>({
 					data-ui="TileLineOutputRoll"
 					data-roll-kind="chance"
 				>
-					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						{Math.round(chance.chance * 100)}% <Tx label="chance" />
-					</p>
 					<OutputItems
 						items={chance.item}
+						eyebrow={
+							<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
+								{Math.round(chance.chance * 100)}% <Tx label="chance" />
+							</span>
+						}
 						renderItemDetailFn={renderItemDetailFn}
 						renderItemFn={renderItemFn}
 						variant={variant}

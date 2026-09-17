@@ -96,8 +96,8 @@ describe("Space item activation admission", () => {
 		expect(Result.isFailure(result.attempt)).toBe(true);
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
-				_tag: "BoardQueryOriginUnavailableError",
-				origin: toolbar(0),
+				_tag: "ItemActionUnavailableError",
+				itemId: "runtime:passive-zero-rule-portal",
 			});
 		}
 		expect(result.after).toEqual(result.before);

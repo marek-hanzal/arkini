@@ -29,7 +29,7 @@ describe("main drag controller: shortcuts", () => {
 			}),
 		);
 		expect(mounted.targetRedirects).toEqual([]);
-		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(mounted.onSettledDrop).toHaveBeenCalledOnce();
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
 			new Set(),
 		);
@@ -47,11 +47,11 @@ describe("main drag controller: shortcuts", () => {
 		mounted.keyboardTarget.emit(keyboard("i"));
 		await flushMicrotasks();
 		expect(mounted.onDrop).not.toHaveBeenCalled();
-		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(mounted.onSettledDrop).toHaveBeenCalledOnce();
 		expect(mounted.actor.dragging).toBe(false);
-		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).hiddenActorIds).toEqual(
-			new Set(),
-		);
+		expect(
+			Effect.runSync(mounted.dropPresentation.readSnapshotFx).hiddenActorRevisions,
+		).toEqual(new Map());
 	});
 
 	it("removes the held item through the Cheat command with d when this Game enabled cheats", async () => {

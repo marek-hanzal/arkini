@@ -6,6 +6,8 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const config = GameConfigSchema.parse({
 	resources: {
@@ -84,6 +86,64 @@ const placeItemFx = ({
 };
 
 describe("whenFx", () => {
+	it("treats Board conditions without a Board origin as false, not an empty zero-count query", () => {
+		for (const scope of [
+			"inventory",
+			"toolbar",
+		] as const) {
+			const query = {
+				scope: "board" as const,
+				distance: "close" as const,
+				selector: {
+					type: "item" as const,
+					itemId: "tree",
+				},
+			};
+			const conditions: WhenSchema.Type[] = [
+				{
+					type: "exists",
+					query,
+				},
+				{
+					type: "count",
+					count: 0,
+					query,
+				},
+				{
+					type: "range",
+					min: 0,
+					max: 1,
+					query,
+				},
+			];
+			const result = Effect.runSync(
+				Effect.forEach(conditions, (when) =>
+					whenFx({
+						origin: {
+							scope,
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+						when,
+					}),
+				).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Effect.die(
+							new Error("An unavailable Board origin must not read Runtime."),
+						),
+					}),
+				),
+			);
+			expect(result).toEqual([
+				false,
+				false,
+				false,
+			]);
+		}
+	});
+
 	it("evaluates exists, exact count, and inclusive range over query quantities", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

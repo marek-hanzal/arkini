@@ -19,6 +19,8 @@ Spatial mechanics—distance, placement, merge, unit targeting, and output—rem
 
 Configured storage scope is `board | inventory | toolbar | any`. Query reach is separate: `board` is the origin-space Board, `inventory` and `toolbar` are their global surfaces, `any` is the origin-space Board plus both passive surfaces, and `universe` is every Board plus both passive surfaces. `universe` is not a storage scope.
 
+A Board-relative condition requires a physical Board origin. From Inventory or Toolbar it evaluates false, including `count: 0` and ranges containing zero; it does not reinterpret passive coordinates or invent an empty Board query. This applies uniformly to action, line, Clock, and output rules. An unavailable Enable condition denies availability; an unavailable Disable condition casts no veto. Direct Board queries without a Board origin remain invalid.
+
 Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial unit count. An impure item has effective stack size `1`.
 
 When a Board operation first attaches state to a stacked identity, the original identity becomes quantity `1` and the pure remainder uses standard placement in the same atomic transition. Failure to place the remainder changes nothing. Generic stack/quantity operations accept only pure items.

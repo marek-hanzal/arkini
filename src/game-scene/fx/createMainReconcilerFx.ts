@@ -24,6 +24,7 @@ import { startActivityParticlesFx } from "~/tile-rendering/fx/startActivityParti
 import { stopActivityParticlesFx } from "~/tile-rendering/fx/stopActivityParticlesFx";
 import { lifecycleDurationMs, runActorLifecycleFx } from "~/tile-rendering/fx/runActorLifecycleFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
+import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
@@ -262,6 +263,27 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
+		const hiddenActorIds = new Set<string>();
+		for (const [actorId, revision] of dropSnapshot.hiddenActorRevisions) {
+			const canonical = actorStore.canonicalItems.get(actorId);
+			if (canonical === undefined || canonical.revision === revision) {
+				hiddenActorIds.add(actorId);
+				continue;
+			}
+			// An Inventory roundtrip can commit before its storage Promise settles. The
+			// newer Board identity owns visibility, including an earlier optimistic fade.
+			const actor = actorStore.actors.get(actorId);
+			if (
+				actor !== undefined &&
+				!dropSnapshot.pendingActorIds.has(actorId) &&
+				actor.lifecycleTargetAlpha === 0
+			) {
+				yield* restoreActorExitFx({
+					actor,
+					animator,
+				});
+			}
+		}
 		const deliveries = game.readOrThrowFn(
 			readTileDeliveriesFx({
 				game,
@@ -329,7 +351,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const motionSnapshot = yield* motion.readSnapshotFx;
 		const visibleItems = new Map(
 			nextItems.flatMap((item) => {
-				if (dropSnapshot.hiddenActorIds.has(item.id)) return [];
+				if (hiddenActorIds.has(item.id)) return [];
 				const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
 				return pose === null
 					? []
@@ -348,7 +370,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			actorIds: actorStore.actors.keys(),
 			deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
 			feedbackCues,
-			hiddenActorIds: dropSnapshot.hiddenActorIds,
+			hiddenActorIds,
 			inventoryActorIds,
 			motionRetainedActorIds: motionSnapshot.retainedActorIds,
 			pendingActorIds: dropSnapshot.pendingActorIds,
@@ -566,9 +588,9 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		for (const feedback of dropSnapshot.feedback) {
 			yield* dropPresentation.clearFeedbackFx(feedback.generation);
 		}
-		yield* dropPresentation.reconcileActorIdsFx({
+		yield* dropPresentation.reconcileActorsFx({
 			inventoryActorIds,
-			mainActorIds: new Set(nextItems.map((item) => item.id)),
+			mainItems: nextItems,
 		});
 		yield* magneticField.pruneFx;
 		yield* motion.syncPresentationFx;

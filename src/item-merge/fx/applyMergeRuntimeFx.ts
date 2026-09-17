@@ -15,6 +15,8 @@ import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import { spendActionUnitsFx } from "~/production-action/fx/spendActionUnitsFx";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { outputFx } from "~/production-output/fx/outputFx";
+import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
@@ -259,6 +261,33 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						runtime,
 						target,
 					});
+					// Replacement removes one target quantity; its remainder and active output
+					// reservations still own capacity while the replacement is admitted.
+					yield* assertPlacementMaxCountFx({
+						drop: {
+							itemId: resultItem.id,
+							placement: PlacementSchema.enum.Drop,
+							quantity: 1,
+						},
+						item: resultItem,
+						runtime: {
+							...runtime,
+							items: runtime.items.flatMap((item) => {
+								if (item.id !== target.id)
+									return [
+										item,
+									];
+								return item.quantity === 1
+									? []
+									: [
+											{
+												...item,
+												quantity: item.quantity - 1,
+											},
+										];
+							}),
+						},
+					});
 					const replacedTarget = yield* createRuntimeItemFx({
 						id: target.id,
 						item: resultItem,
@@ -365,12 +394,18 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		runtime,
 		source,
 	});
+	// Source depletion and input returns can stack into the target before its
+	// effect runs. Settle that current quantity without changing the query snapshot.
+	const currentTarget = yield* readBoardRuntimeItemByIdFx({
+		itemId: target.id,
+		runtime: sourceAction.runtime,
+	});
 	const targetEffect = yield* applyMergeTargetEffectFx({
 		actionId: `merge:${ruleIndex}:target`,
 		ownerItemId: source.id,
 		rule,
 		runtime: sourceAction.runtime,
-		target,
+		target: currentTarget,
 	});
 	let draft = yield* returnMergeSourceFx({
 		origin: target.location,
@@ -382,7 +417,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		...targetEffect.events,
 	];
 	const targetDisappeared =
-		rule.effect === TargetEffectSchema.enum.Remove && target.quantity === 1;
+		rule.effect === TargetEffectSchema.enum.Remove && currentTarget.quantity === 1;
 
 	if (rule.output === undefined) {
 		if (targetDisappeared) {

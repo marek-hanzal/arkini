@@ -10,6 +10,7 @@ import {
 	tearDownEditorProjectRouteTest,
 } from "~test/router/EditorProjectRouteLifecycle.test/createEditorProjectRouteHarness";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
+import { refreshEditorProjectFx } from "~/authoring-session/fx/refreshEditorProjectFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 
 beforeEach(setUpEditorProjectRouteTest);
@@ -91,4 +92,67 @@ describe("editor project route publication", () => {
 				type: "idle",
 			});
 	});
+});
+
+it("keeps the refreshed Board when cached route data has a higher revision", async () => {
+	const harness = await createEditorProjectRouteHarness();
+	await harness.router.load();
+	await expect.poll(() => harness.events).toContain("create-project-a-r1");
+	Effect.runSync(Deferred.succeed(harness.releaseProjectA, undefined));
+	const fresh = {
+		...harness.projectA,
+		revision: 0,
+		title: "Refreshed project",
+		config: {
+			...harness.projectA.config,
+			meta: {
+				...harness.projectA.config.meta,
+				title: "Refreshed project",
+			},
+		},
+	};
+	harness.setProject(fresh);
+	Object.assign(window.arkini.editor, {
+		refreshProjectFn: async () => ({
+			type: "success",
+			value: fresh,
+		}),
+	});
+	await harness.rendererRuntime.runPromise(
+		refreshEditorProjectFx({
+			projectId: fresh.projectId,
+			isNavigationPendingFn: () => false,
+		}),
+	);
+	const refreshed = await harness.rendererRuntime.runPromise(
+		SubscriptionRef.get(harness.owner.state),
+	);
+	expect(refreshed).toMatchObject({
+		type: "ready",
+		resource: {
+			game: {
+				projectRevision: 0,
+				config: fresh.config,
+			},
+		},
+	});
+	await harness.router.navigate({
+		to: "/editor/$projectId/project/detail/$sectionId",
+		params: {
+			projectId: fresh.projectId,
+			sectionId: "general",
+		},
+	});
+	await expect.poll(() => harness.syncRequests.at(-1)).toBe("project-a-r0");
+	expect(await harness.rendererRuntime.runPromise(SubscriptionRef.get(harness.owner.state))).toBe(
+		refreshed,
+	);
+	await harness.router.navigate({
+		to: "/editor/welcome",
+	});
+	await expect
+		.poll(() => harness.rendererRuntime.runPromise(SubscriptionRef.get(harness.owner.state)))
+		.toEqual({
+			type: "idle",
+		});
 });

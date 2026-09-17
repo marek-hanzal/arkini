@@ -257,7 +257,7 @@ export const mountController = ({
 	const magneticUpdates: Array<Parameters<MagneticField["updateFx"]>[0]> = [];
 	const targetRedirects: Array<Parameters<MotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
-	const onAcceptedDrop = vi.fn();
+	const onSettledDrop = vi.fn();
 	const reportCriticalFailureFn = vi.fn();
 	const beginInteractionHandoff = vi.fn((_actorId: string) => true);
 	const releasePointerCapture = vi.fn();
@@ -453,7 +453,7 @@ export const mountController = ({
 			game,
 			magneticField,
 			motion,
-			onAcceptedDropFn: onAcceptedDrop,
+			onSettledDropFn: onSettledDrop,
 			onDropFn: onDrop as never,
 			surface,
 		}),
@@ -537,7 +537,7 @@ export const mountController = ({
 		localActorReads,
 		magneticUpdates,
 		onActivate,
-		onAcceptedDrop,
+		onSettledDrop,
 		onDrop,
 		presentationWrites,
 		releasePointerCapture,

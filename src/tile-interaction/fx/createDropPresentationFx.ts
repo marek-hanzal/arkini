@@ -24,7 +24,7 @@ interface DropSnapshot {
 		readonly cues: ReadonlyArray<TileActorFeedbackCue>;
 		readonly generation: number;
 	}>;
-	readonly hiddenActorIds: ReadonlySet<string>;
+	readonly hiddenActorRevisions: ReadonlyMap<string, string>;
 	readonly landingActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly swaps: ReadonlyArray<{
@@ -46,9 +46,9 @@ export interface DropPresentation {
 	}) => Effect.Effect<void, never, never>;
 	readonly failFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly readSnapshotFx: Effect.Effect<DropSnapshot, never, never>;
-	readonly reconcileActorIdsFx: (props: {
+	readonly reconcileActorsFx: (props: {
 		readonly inventoryActorIds: ReadonlySet<string>;
-		readonly mainActorIds: ReadonlySet<string>;
+		readonly mainItems: ReadonlyArray<TileActorItem>;
 	}) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }
@@ -134,7 +134,7 @@ const readFeedbackCuesFn = (
 export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(() =>
 	Effect.sync((): DropPresentation => {
 		const feedback = new Map<number, PendingFeedback>();
-		const hiddenActorIds = new Set<string>();
+		const hiddenActorRevisions = new Map<string, string>();
 		const landingActorIds = new Set<string>();
 		let closed = false;
 		let nextGeneration = 0;
@@ -192,7 +192,10 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 						result.kind === DropItemResultKind.StoreInventory ||
 						(result.kind === DropItemResultKind.Stack && result.source.current === null)
 					) {
-						hiddenActorIds.add(result.source.itemId);
+						hiddenActorRevisions.set(
+							result.source.itemId,
+							result.source.previousRevision,
+						);
 					}
 					if (result.kind === DropItemResultKind.Move) {
 						landingActorIds.add(result.itemId);
@@ -211,7 +214,7 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 			readSnapshotFx: Effect.sync(
 				(): DropSnapshot => ({
 					feedback: Array.from(feedback.values()),
-					hiddenActorIds: new Set(hiddenActorIds),
+					hiddenActorRevisions: new Map(hiddenActorRevisions),
 					landingActorIds: new Set(landingActorIds),
 					pendingActorIds: new Set(
 						Array.from(pending.values(), ({ sourceActorId }) => sourceActorId),
@@ -219,14 +222,19 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 					swaps: Array.from(swaps.values()),
 				}),
 			),
-			reconcileActorIdsFx: Effect.fn("DropPresentation.reconcileActorIdsFx")(
-				({ inventoryActorIds, mainActorIds }) =>
+			reconcileActorsFx: Effect.fn("DropPresentation.reconcileActorsFx")(
+				({ inventoryActorIds, mainItems }) =>
 					Effect.sync(() => {
 						if (closed) return;
-						for (const actorId of hiddenActorIds) {
-							if (mainActorIds.has(actorId) && !inventoryActorIds.has(actorId))
+						for (const [actorId, revision] of hiddenActorRevisions) {
+							if (
+								mainItems.some(
+									(item) => item.id === actorId && item.revision === revision,
+								) &&
+								!inventoryActorIds.has(actorId)
+							)
 								continue;
-							hiddenActorIds.delete(actorId);
+							hiddenActorRevisions.delete(actorId);
 						}
 						landingActorIds.clear();
 					}),
@@ -234,7 +242,7 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;
-				hiddenActorIds.clear();
+				hiddenActorRevisions.clear();
 				landingActorIds.clear();
 				pending.clear();
 				swaps.clear();

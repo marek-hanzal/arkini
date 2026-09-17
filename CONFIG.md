@@ -91,6 +91,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 
 - every item requires finite `artwork.scale` from `0.25` through `1`; new Editor drafts explicitly start at `1`. This ratio scales the complete artwork canvas, including both default layers, inside an unchanged full tile. `1` fills the tile canvas; transparent PNG padding still affects visible subject size. The Artwork form previews the authored ratio against a tile frame. Board, Editor Board, Inventory and Toolbar share it; occupancy, storage, hit geometry, interaction reach, image resolution and transient container motion do not change;
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
+- Board-relative rule conditions require a physical Board origin and evaluate false from Inventory or Toolbar, including zero-count conditions. They remain valid authored conditions on movable items; Clock timers and expiry outputs use the same rule interpretation;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;

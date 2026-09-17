@@ -48,7 +48,7 @@ interface Props {
 	readonly game: GameEngine;
 	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
-	readonly onAcceptedDropFn: () => void;
+	readonly onSettledDropFn: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly surface: MainInteractionSurface;
 }
@@ -198,7 +198,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	game,
 	magneticField,
 	motion,
-	onAcceptedDropFn,
+	onSettledDropFn,
 	onDropFn,
 	surface,
 }: Props) {
@@ -341,17 +341,21 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								) {
 									restoreOptimisticRemovalFn(optimisticRemoval);
 								}
-								onAcceptedDropFn();
+								onSettledDropFn();
 								return;
 							}
 							if (optimisticRemoval !== null && removalStarted) {
 								restoreOptimisticRemovalFn(optimisticRemoval);
 							}
-							if (retainedSource !== null) {
+							if (
+								retainedSource !== null &&
+								actorStore.canonicalItems.has(sourceItem.id)
+							) {
 								settleActorFn(retainedSource, onReturnSettledFn);
 							} else {
 								onReturnSettledFn();
 							}
+							onSettledDropFn();
 						} catch (cause) {
 							game.reportCriticalFailureFn("game-presentation", cause);
 						}

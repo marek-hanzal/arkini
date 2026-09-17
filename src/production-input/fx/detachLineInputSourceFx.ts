@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -21,7 +19,6 @@ export namespace detachLineInputSourceFx {
 		  }
 		| {
 				readonly type: "detached";
-				readonly events: readonly GameEventSchema.Type[];
 				readonly insertionIndex: number;
 				readonly runtime: RuntimeSchema.Type;
 		  };
@@ -30,9 +27,10 @@ export namespace detachLineInputSourceFx {
 /**
  * Detaches one idle material source while atomically discarding its default-line intent.
  *
- * Active or queued work refuses detachment. Buffered inputs return through canonical placement,
- * and inbound deliveries reconcile against the released origin before the caller commits the
- * source elsewhere.
+ * Active or queued work refuses detachment. The source keeps its passive input subtree through
+ * delivery and storage; only consume-mode job start discards it. Returning that subtree here
+ * would also occupy the origin cell which the source's delivery must keep leased.
+ * Incoming deliveries turn home because their target is leaving the Board.
  */
 export const detachLineInputSourceFx = Effect.fn("detachLineInputSourceFx")(function* ({
 	runtime,
@@ -46,12 +44,6 @@ export const detachLineInputSourceFx = Effect.fn("detachLineInputSourceFx")(func
 		} satisfies detachLineInputSourceFx.Result;
 	}
 	const sourceIndex = runtime.items.findIndex((candidate) => candidate.id === source.id);
-	const followingItemIds = new Set(
-		runtime.items.slice(sourceIndex + 1).map((candidate) => candidate.id),
-	);
-	const precedingItemIds = new Set(
-		runtime.items.slice(0, sourceIndex).map((candidate) => candidate.id),
-	);
 
 	const withoutIdentityState = yield* discardRuntimeItemIdentityStateFx({
 		ownerItemIds: new Set([
@@ -59,13 +51,9 @@ export const detachLineInputSourceFx = Effect.fn("detachLineInputSourceFx")(func
 		]),
 		runtime,
 	});
-	const releasedInputs = yield* releaseOwnerInputsFx({
-		owner: source,
-		runtime: withoutIdentityState,
-	});
 	const detachedRuntime = {
-		...releasedInputs.runtime,
-		items: releasedInputs.runtime.items.filter((candidate) => candidate.id !== source.id),
+		...withoutIdentityState,
+		items: withoutIdentityState.items.filter((candidate) => candidate.id !== source.id),
 	} satisfies RuntimeSchema.Type;
 	const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 		returnFromByOwnerItemId: new Map([
@@ -76,19 +64,10 @@ export const detachLineInputSourceFx = Effect.fn("detachLineInputSourceFx")(func
 		]),
 		runtime: detachedRuntime,
 	});
-	const followingIndex = reconciledRuntime.items.findIndex((candidate) =>
-		followingItemIds.has(candidate.id),
-	);
-	const precedingIndex = reconciledRuntime.items.reduce(
-		(index, candidate, candidateIndex) =>
-			precedingItemIds.has(candidate.id) ? candidateIndex : index,
-		-1,
-	);
 
 	return {
 		type: "detached",
-		events: releasedInputs.events,
-		insertionIndex: followingIndex === -1 ? precedingIndex + 1 : followingIndex,
+		insertionIndex: sourceIndex,
 		runtime: reconciledRuntime,
 	} satisfies detachLineInputSourceFx.Result;
 });

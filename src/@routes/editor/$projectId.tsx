@@ -1,6 +1,8 @@
 import { Tx } from "~/translation/ui/Tx";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 
 import { releaseCurrentEditorBoardGameFx } from "~/editor-board/fx/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/editor-board/fx/syncEditorBoardGameFx";
@@ -15,7 +17,13 @@ import { ItemEstimateWarmup } from "~/estimate/ui/ItemEstimateWarmup";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
 	(project: Project | undefined) =>
-		project === undefined ? releaseCurrentEditorBoardGameFx : syncEditorBoardGameFx(project),
+		project === undefined
+			? releaseCurrentEditorBoardGameFx
+			: Effect.gen(function* () {
+					// Cached route data may precede a hard Refresh to a lower revision.
+					const current = yield* Atom.get(EditorProjectAtom(project.projectId));
+					yield* syncEditorBoardGameFx(current ?? project);
+				}),
 );
 
 /** Loads the canonical project before any editor tool mounts. */
@@ -34,7 +42,13 @@ export const Route = createFileRoute("/editor/$projectId")({
 			context.rendererRuntime.runPromise(
 				readProjectFx({
 					projectId: params.projectId,
-				}),
+				}).pipe(
+					Effect.tap((project) =>
+						Atom.set(EditorProjectAtom(project.projectId), {
+							project,
+						}),
+					),
+				),
 				{
 					signal: abortController.signal,
 				},

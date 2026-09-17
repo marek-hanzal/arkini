@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 import { ProjectPayloadSchema } from "~/project-authoring/schema/ProjectPayloadSchema";
@@ -40,24 +41,32 @@ export const importEditorResourcesFx = Effect.fn("importEditorResourcesFx")(func
 					props.file,
 				]
 			: props.files;
-	const result = yield* invokeProjectTransportFx({
-		callFn: () =>
-			window.arkini.editor.importResourcesFn({
-				files: files.map((file) => ({
-					name: file.name,
-					path: window.arkini.file.readPathFn(file),
-				})),
-				projectId: props.projectId,
-				source: props.source,
-				type: props.type,
+	const admission = yield* ProjectWriteAdmission;
+	return yield* admission.admitWriteFx(
+		"upsert-resource",
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				const result = yield* invokeProjectTransportFx({
+					callFn: () =>
+						window.arkini.editor.importResourcesFn({
+							files: files.map((file) => ({
+								name: file.name,
+								path: window.arkini.file.readPathFn(file),
+							})),
+							projectId: props.projectId,
+							source: props.source,
+							type: props.type,
+						}),
+					operation: "upsert-resource",
+					parseFn: (value) => resultSchema.parse(value),
+					requestMessage: `The selected ${props.type} could not be imported.`,
+					responseMessage: `The imported ${props.type} response is invalid.`,
+				});
+				yield* publishEditorProjectFx(props.projectId, {
+					project: result.project,
+				});
+				return result;
 			}),
-		operation: "upsert-resource",
-		parseFn: (value) => resultSchema.parse(value),
-		requestMessage: `The selected ${props.type} could not be imported.`,
-		responseMessage: `The imported ${props.type} response is invalid.`,
-	});
-	yield* publishEditorProjectFx(props.projectId, {
-		project: result.project,
-	});
-	return result;
+		),
+	);
 });

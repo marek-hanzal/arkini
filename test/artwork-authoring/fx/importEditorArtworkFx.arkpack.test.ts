@@ -7,6 +7,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
 import { importEditorArtworkFx } from "~/artwork-authoring/fx/importEditorArtworkFx";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
+import { createProjectWriteAdmissionFx } from "~/project-authoring/fx/createProjectWriteAdmissionFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 describe("Artwork Authoring importEditorArtworkFx from Arkpack", () => {
@@ -55,7 +57,13 @@ describe("Artwork Authoring importEditorArtworkFx from Arkpack", () => {
 				file: new File([], "source.arkpack"),
 				projectId: "target-project",
 				source: "arkpack",
-			}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
+			}).pipe(
+				Effect.provideService(AtomRegistry.AtomRegistry, registry),
+				Effect.provideService(
+					ProjectWriteAdmission,
+					Effect.runSync(createProjectWriteAdmissionFx),
+				),
+			),
 		);
 
 		expect(importResourcesFn).toHaveBeenCalledWith({

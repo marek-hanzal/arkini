@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
+import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useResourceUrls } from "~/authoring-session/ui/ResourceUrlSession";
@@ -23,23 +24,27 @@ import { importEditorResourcesFx } from "~/resource-authoring/fx/importEditorRes
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useFuseSearch } from "~/ui/ui/useFuseSearch";
 
-const importEditorAudioAtom = Atom.fn(
-	({
-		files,
-		projectId,
-		type,
-	}: {
-		readonly files: ReadonlyArray<File>;
-		readonly projectId: string;
-		readonly type: useEditorAudioResourceManagerController.ResourceType;
-	}) =>
-		importEditorResourcesFx({
-			files,
-			projectId,
-			source: "files",
-			type,
-		}),
-).pipe(Atom.withLabel("EditorAudioImport"), Atom.setIdleTTL(0));
+const importEditorAudioAtom = RendererRuntime.runSync(
+	Effect.map(ProjectWriteAdmission, (admission) =>
+		Atom.fn(
+			({
+				files,
+				projectId,
+				type,
+			}: {
+				readonly files: ReadonlyArray<File>;
+				readonly projectId: string;
+				readonly type: useEditorAudioResourceManagerController.ResourceType;
+			}) =>
+				importEditorResourcesFx({
+					files,
+					projectId,
+					source: "files",
+					type,
+				}).pipe(Effect.provideService(ProjectWriteAdmission, admission)),
+		).pipe(Atom.withLabel("EditorAudioImport"), Atom.setIdleTTL(0)),
+	),
+);
 
 const deleteEditorAudioAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>

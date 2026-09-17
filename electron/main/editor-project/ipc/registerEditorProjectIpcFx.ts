@@ -77,7 +77,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 				trustedRenderer,
 			});
 			const requestParser = yield* createEditorProjectRequestParserFx();
-			const sourceExports = yield* Semaphore.make(1);
+			const sourceTransfers = yield* Semaphore.make(1);
 			yield* Effect.sync(() => {
 				const runAuthorizedFn = <Value>(
 					event: IpcMainInvokeEvent,
@@ -112,25 +112,27 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handleFn(ArkiniElectronApi.channels.editorAwaitIdle, () =>
-					(ownership.type === "ready"
-						? ownership.repository.awaitIdleFx
-						: Effect.void
-					).pipe(
-						Effect.andThen(sourceExports.withPermits(1)(Effect.void)),
-						Effect.match({
-							onFailure: (error) => ({
-								type: "failure" as const,
-								error: {
-									operation: error.operation,
-									message: error.message,
-								},
+					sourceTransfers
+						.withPermits(1)(
+							ownership.type === "ready"
+								? ownership.repository.awaitIdleFx
+								: Effect.void,
+						)
+						.pipe(
+							Effect.match({
+								onFailure: (error) => ({
+									type: "failure" as const,
+									error: {
+										operation: error.operation,
+										message: error.message,
+									},
+								}),
+								onSuccess: () => ({
+									type: "success" as const,
+									value: undefined,
+								}),
 							}),
-							onSuccess: () => ({
-								type: "success" as const,
-								value: undefined,
-							}),
-						}),
-					),
+						),
 				);
 				handleFn(ArkiniElectronApi.channels.editorProjectBuild, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
@@ -238,7 +240,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 								window: readEditorWindowFx(event, "export-json-directory"),
 							}),
 							(repository, { projectId, window }) =>
-								sourceExports.withPermits(1)(
+								sourceTransfers.withPermits(1)(
 									exportEditorJsonDirectoryFx({
 										projectId,
 										repository,
@@ -451,10 +453,12 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							diagnostics,
 							requestParser.parseImportResourcesFx(candidate),
 							(repository, request) =>
-								importEditorResourceFilesFx({
-									repository,
-									request,
-								}),
+								sourceTransfers.withPermits(1)(
+									importEditorResourceFilesFx({
+										repository,
+										request,
+									}),
+								),
 						),
 				);
 				handleFn(

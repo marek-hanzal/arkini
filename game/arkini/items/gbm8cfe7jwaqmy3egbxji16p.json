@@ -71,6 +71,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "basecamp-on-fire"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "lit-base-camp"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "basecamp-on-fire"
 			}
 		],
 		"maxQueueSize": 1,

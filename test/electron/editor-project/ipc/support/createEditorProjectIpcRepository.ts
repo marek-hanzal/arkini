@@ -75,6 +75,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	),
 	deleteNoteFx: vi.fn(() => Effect.void),
 	deleteItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
+	saveResourceMetadataFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	deleteResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	optimizeResourcesFx: vi.fn(({ onProgressFn }) =>
 		Effect.sync(() =>

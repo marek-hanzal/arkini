@@ -8,6 +8,8 @@ import {
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
+import { readInitialAudioResourceNameFn } from "~/audio-authoring/fn/readInitialAudioResourceNameFn";
+import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
@@ -149,6 +151,20 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 			bytes: resource.bytes,
 		});
 		if (collision !== undefined) return yield* Effect.fail(collision);
+		if (resource.type === "music" || resource.type === "sfx") {
+			const metadataTarget = yield* paths.audioMetadataFileFx({
+				id: resource.id,
+				type: resource.type,
+			});
+			const metadata = AudioResourceMetadataSchema.parse({
+				name: readInitialAudioResourceNameFn(resource.id),
+			});
+			const metadataCollision = addUniqueTargetFn(resourceWrites, {
+				target: metadataTarget,
+				bytes: encodeJsonFn(metadata),
+			});
+			if (metadataCollision !== undefined) return yield* Effect.fail(metadataCollision);
+		}
 	}
 
 	return {

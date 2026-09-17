@@ -12,6 +12,12 @@ import {
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
 import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
+import {
+	musicOgg,
+	sfxOgg,
+	writeGameProjectFixtureFx,
+} from "~test/arkpack-artifact/fx/packDirectoryFx.test/gameProjectFixture";
 
 let harness: ProjectTestHarness;
 
@@ -30,6 +36,65 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project lifecycle", () => {
+	it("imports nameless packed audio as fresh paired metadata without changing IDs, references or bytes", async () => {
+		const repository = await harness.openRepository();
+		const imported = await Effect.runPromise(
+			Effect.gen(function* () {
+				const source = yield* writeGameProjectFixtureFx();
+				const packed = yield* packDirectoryFx({
+					input: source,
+				});
+				return yield* repository.importArkpackFileFx(packed.arkpack);
+			}).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
+		);
+		expect(imported.resources).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					id: "theme",
+					type: "music",
+					name: "Theme",
+				}),
+				expect.objectContaining({
+					id: "job-start",
+					type: "sfx",
+					name: "Job Start",
+				}),
+			]),
+		);
+		expect(imported.config.music?.playlist).toEqual([
+			"theme",
+		]);
+		expect(Object.values(imported.config.sfx?.events ?? {})).toContain("job-start");
+		const root = await Effect.runPromise(repository.readProjectRootFx(imported.projectId));
+		if (root === null) throw new Error("Imported project root missing.");
+		for (const [type, id, name, bytes] of [
+			[
+				"music",
+				"theme",
+				"Theme",
+				musicOgg,
+			],
+			[
+				"sfx",
+				"job-start",
+				"Job Start",
+				sfxOgg,
+			],
+		] as const) {
+			expect(JSON.parse(await readFile(join(root, type, `${id}.json`), "utf8"))).toEqual({
+				name,
+			});
+			expect(new Uint8Array(await readFile(join(root, type, `${id}.ogg`)))).toEqual(
+				Uint8Array.from(bytes),
+			);
+		}
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.readProjectFx(imported.projectId))).toEqual(
+			imported,
+		);
+	});
+
 	it("imports an Arkpack through the shared filesystem extraction pipeline", async () => {
 		const repository = await harness.openRepository();
 		const arkpackPath = join(harness.temporaryDirectory, "import.arkpack");

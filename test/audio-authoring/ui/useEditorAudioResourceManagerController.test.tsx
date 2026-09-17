@@ -6,7 +6,6 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
-	deleteResourceFn: vi.fn(),
 	importResourcesFn: vi.fn(),
 	setCall: 0,
 	valueCall: 0,
@@ -17,10 +16,9 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 	useAtomSet: () =>
 		[
 			state.importResourcesFn,
-			state.deleteResourceFn,
-		][state.setCall++ % 2],
+		][state.setCall++ % 1],
 	useAtomValue: () =>
-		state.valueCall++ % 3 === 0
+		state.valueCall++ % 2 === 1
 			? {
 					master: 80,
 					music: 100,
@@ -43,6 +41,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 			},
 			{
 				id: "job-start",
+				name: "Gentle bell",
 				size: 23,
 				type: "sfx",
 				version: "1",
@@ -107,7 +106,6 @@ const Probe = () => {
 };
 
 beforeEach(async () => {
-	state.deleteResourceFn.mockReset();
 	state.importResourcesFn.mockReset();
 	state.setCall = 0;
 	state.valueCall = 0;
@@ -128,7 +126,7 @@ afterEach(async () => {
 });
 
 describe("useEditorAudioResourceManagerController", () => {
-	it("owns SFX import, filtering, lazy preview and deletion", async () => {
+	it("owns SFX import, name filtering and lazy preview", async () => {
 		expect(controller?.resources.map(({ id }) => id)).toEqual([
 			"job-start",
 		]);
@@ -168,11 +166,11 @@ describe("useEditorAudioResourceManagerController", () => {
 		expect(AudioStub.instances[0]?.src).toContain("resourceId=job-start");
 		expect(AudioStub.instances[0]?.volume).toBeCloseTo(0.8);
 
-		await act(async () => controller?.deleteResourceFn("job-start"));
-		expect(state.deleteResourceFn).toHaveBeenCalledWith({
-			expectedRevision: 7,
-			projectId: "project-one",
-			resourceId: "job-start",
-		});
+		await act(async () => controller?.setQueryFn("Gentle bell"));
+		expect(controller?.resources.map(({ id }) => id)).toEqual([
+			"job-start",
+		]);
+		await act(async () => controller?.setQueryFn("opening"));
+		expect(controller?.resources).toEqual([]);
 	});
 });

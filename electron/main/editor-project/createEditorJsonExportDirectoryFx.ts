@@ -33,8 +33,16 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 			".ogg",
 		],
 		[
+			"music",
+			".json",
+		],
+		[
 			"sfx",
 			".ogg",
+		],
+		[
+			"sfx",
+			".json",
 		],
 		[
 			"notes",

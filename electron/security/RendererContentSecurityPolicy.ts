@@ -3,7 +3,6 @@ const commonDirectives = [
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' blob: data: arkini://app",
 	"font-src 'self' data:",
-	"media-src 'self' blob:",
 	"worker-src 'self' blob:",
 	"object-src 'none'",
 	"base-uri 'self'",
@@ -18,6 +17,7 @@ export const RendererContentSecurityPolicy = {
 		commonDirectives[0],
 		"script-src 'self'",
 		...commonDirectives.slice(1),
+		"media-src 'self' blob:",
 		"connect-src 'self' blob: data: arkini://app",
 	].join("; "),
 } as const;

@@ -9,6 +9,7 @@ export const deleteEditorResourceFx = Effect.fn("deleteEditorResourceFx")(functi
 	readonly expectedRevision: number;
 	readonly projectId: string;
 	readonly resourceId: string;
+	readonly onDeletedFn?: () => Promise<void>;
 }) {
 	const repository = yield* ProjectRepository;
 	const admission = yield* ProjectWriteAdmission;
@@ -17,10 +18,22 @@ export const deleteEditorResourceFx = Effect.fn("deleteEditorResourceFx")(functi
 		"delete-resource",
 		Effect.uninterruptible(
 			Effect.gen(function* () {
-				const project = yield* repository.deleteResourceFx(props);
-				yield* publishEditorProjectFx(props.projectId, {
-					project,
-				});
+				const { onDeletedFn, ...request } = props;
+				const project = yield* repository.deleteResourceFx(request);
+				// Depart before publication can unmount detail readers. Refresh owns navigation while draining this command.
+				yield* Effect.tryPromise({
+					try: () =>
+						admission.isNavigationBlockedFn()
+							? Promise.resolve()
+							: (onDeletedFn?.() ?? Promise.resolve()),
+					catch: (cause) => cause,
+				}).pipe(
+					Effect.ensuring(
+						publishEditorProjectFx(props.projectId, {
+							project,
+						}),
+					),
+				);
 				return project;
 			}),
 		),

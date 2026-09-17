@@ -38,7 +38,6 @@ export const expectNamedJsonSchemaGraph = (
 					anyOf: expect.any(Array),
 				}),
 	});
-	if (root === "union") expect(schema.anyOf).toHaveLength(2);
 	expect(schema.title).toEqual(expect.any(String));
 	expect(schema.description).toEqual(expect.any(String));
 

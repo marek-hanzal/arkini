@@ -15,6 +15,64 @@ import {
 } from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx game-project contract", () => {
+	it.effect("keeps the packed payload and content hash identical after audio names change", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const before = yield* packDirectoryFx({
+				input,
+			});
+			const beforeEnvelope = yield* decodeTestArkpackEnvelopeFx(
+				yield* fileSystem.readFile(before.arkpack),
+			);
+			for (const relative of [
+				"music/theme.json",
+				"sfx/job-start.json",
+			])
+				yield* fileSystem.writeFileString(
+					path.join(input, relative),
+					JSON.stringify({
+						name: "A completely different Editor name",
+					}),
+				);
+			const after = yield* packDirectoryFx({
+				input,
+			});
+			const afterEnvelope = yield* decodeTestArkpackEnvelopeFx(
+				yield* fileSystem.readFile(after.arkpack),
+			);
+			expect(afterEnvelope.payload).toEqual(beforeEnvelope.payload);
+			expect(after.contentHash).toBe(before.contentHash);
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
+	it.effect("rejects missing metadata even for Music excluded from the playlist", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			yield* fileSystem.remove(path.join(input, "music", "unused-theme.json"));
+			const result = yield* Effect.result(
+				packDirectoryFx({
+					input,
+				}),
+			);
+			expect(result).toMatchObject({
+				_tag: "Failure",
+				failure: {
+					_tag: "GameValidationError",
+					diagnostics: expect.arrayContaining([
+						expect.objectContaining({
+							issueCode: "audio-resource-metadata-missing",
+							source: expect.stringMatching(/unused-theme\.json$/),
+						}),
+					]),
+				},
+			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
 	it.effect("derives package identity from a portable game project", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
@@ -25,6 +83,8 @@ describe("packDirectoryFx game-project contract", () => {
 			const arkpack = yield* fileSystem.readFile(result.arkpack);
 			const envelope = yield* decodeTestArkpackEnvelopeFx(arkpack);
 			const payload = yield* decodeTestArkpackPayloadFx(envelope.payload);
+			// Editor sidecars must never become package JSON or raw body entries.
+			expect(new TextDecoder().decode(envelope.payload)).not.toContain("Editor-only");
 
 			expect(result).toMatchObject({
 				filename: "project-game.arkpack",

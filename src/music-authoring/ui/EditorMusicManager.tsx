@@ -42,7 +42,7 @@ export const EditorMusicManager = () => {
 				<Button
 					className="size-10 min-h-10 shrink-0 p-0 data-[ui-selected=true]:border-accent/40 data-[ui-selected=true]:bg-accent/15 data-[ui-selected=true]:text-accent"
 					cursorIntent={togglingPlaylist ? "progress" : undefined}
-					disabled={controller.playlistPending || controller.deletePending}
+					disabled={controller.playlistPending}
 					onClick={(event) => {
 						event.stopPropagation();
 						controller.togglePlaylistFn(resource.id);

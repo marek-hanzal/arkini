@@ -65,6 +65,7 @@ describe("filesystem Editor SFX optimization", () => {
 						id: "click",
 						path: source,
 						size: bytes.byteLength,
+						name: "Test audio",
 						type: "sfx",
 					},
 				],
@@ -96,6 +97,13 @@ describe("filesystem Editor SFX optimization", () => {
 			processedResourceCount: 1,
 		});
 		expect(result.project.revision).toBeGreaterThan(imported.revision);
+		expect(result.project.resources.find(({ id }) => id === "click")).toMatchObject({
+			id: "click",
+			name: "Test audio",
+		});
+		expect(JSON.parse(await readFile(join(root, "sfx", "click.json"), "utf8"))).toEqual({
+			name: "Test audio",
+		});
 		expect(await readFile(join(root, "sfx", "click.ogg"))).toEqual(
 			Buffer.concat([
 				bytes,

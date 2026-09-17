@@ -7,7 +7,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
 	assignSfxFn: vi.fn(),
-	deleteResourceFn: vi.fn(),
 	importSfxFn: vi.fn(),
 	optimizeResourcesFn: vi.fn(),
 	setCall: 0,
@@ -19,18 +18,17 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 	useAtomSet: () =>
 		[
 			state.importSfxFn,
-			state.deleteResourceFn,
 			state.assignSfxFn,
 			state.optimizeResourcesFn,
-		][state.setCall++ % 4],
+		][state.setCall++ % 3],
 	useAtomValue: () =>
-		state.valueCall++ % 5 === 0
+		state.valueCall++ % 4 === 1
 			? {
 					master: 100,
 					music: 10,
 					sfx: 5,
 				}
-			: state.valueCall % 5 === 0
+			: state.valueCall % 4 === 0
 				? {
 						kind: "idle",
 					}
@@ -98,7 +96,6 @@ const Probe = () => {
 
 beforeEach(async () => {
 	state.assignSfxFn.mockReset();
-	state.deleteResourceFn.mockReset();
 	state.importSfxFn.mockReset();
 	state.optimizeResourcesFn.mockReset();
 	state.setCall = 0;

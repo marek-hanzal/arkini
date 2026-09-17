@@ -7,6 +7,7 @@ export const UnusedEditorProjectRepository = {
 	createNoteFx: () => Effect.die("Unexpected editor note create."),
 	deleteNoteFx: () => Effect.die("Unexpected editor note delete."),
 	deleteProjectFx: () => Effect.die("Unexpected editor project deletion."),
+	saveResourceMetadataFx: () => Effect.die("Unexpected editor resource metadata write."),
 	deleteResourceFx: () => Effect.die("Unexpected editor resource deletion."),
 	optimizeResourcesFx: () => Effect.die("Unexpected editor resource optimization."),
 	listNotesFx: () => Effect.die("Unexpected editor note list."),
@@ -15,6 +16,7 @@ export const UnusedEditorProjectRepository = {
 	ProjectRepositoryService,
 	| "deleteProjectFx"
 	| "deleteResourceFx"
+	| "saveResourceMetadataFx"
 	| "optimizeResourcesFx"
 	| "createNoteFx"
 	| "deleteNoteFx"

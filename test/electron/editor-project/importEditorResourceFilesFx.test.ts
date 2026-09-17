@@ -70,14 +70,15 @@ describe("importEditorResourceFilesFx", () => {
 			),
 		).resolves.toMatchObject({
 			resourceIds: [
-				"opening-theme",
+				expect.any(String),
 			],
 		});
 		expect(repository.upsertResourceFilesFx).toHaveBeenCalledWith({
 			projectId: "project-one",
 			resources: [
 				expect.objectContaining({
-					id: "opening-theme",
+					id: expect.any(String),
+					name: "Opening Theme",
 					path: musicPath,
 					size: musicBytes.byteLength,
 					type: "music",
@@ -106,21 +107,44 @@ describe("importEditorResourceFilesFx", () => {
 			),
 		).resolves.toMatchObject({
 			resourceIds: [
-				"job-start",
+				expect.any(String),
 			],
 		});
 		expect(repository.upsertResourceFilesFx).toHaveBeenLastCalledWith({
 			projectId: "project-one",
 			resources: [
 				expect.objectContaining({
-					id: "job-start",
+					id: expect.any(String),
+					name: "Job Start",
 					path: sfxPath,
 					size: musicBytes.byteLength,
 					type: "sfx",
 				}),
 			],
 		});
-		expect(optimizeOggOpusResourceFileFxMock).toHaveBeenCalledTimes(2);
+		await Effect.runPromise(
+			importEditorResourceFilesFx({
+				repository,
+				request: {
+					files: [
+						{
+							name: "Opening Theme.ogg",
+							path: musicPath,
+						},
+					],
+					projectId: "project-one",
+					source: "files",
+					type: "music",
+				},
+			}),
+		);
+		expect(optimizeOggOpusResourceFileFxMock).toHaveBeenCalledTimes(3);
+		const importedIds = vi
+			.mocked(repository.upsertResourceFilesFx)
+			.mock.calls.map(([request]) => request.resources[0]?.id);
+		expect(new Set(importedIds).size).toBe(3);
+		expect(importedIds).not.toContain("opening-theme");
+		expect(importedIds).not.toContain("job-start");
 	});
 
 	it("accepts a non-square Image by native path while Artwork keeps its square contract", async () => {

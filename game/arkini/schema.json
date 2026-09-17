@@ -6,11 +6,14 @@
 		},
 		{
 			"$ref": "urn:arkini:schema:project#/$defs/ItemFileSchema"
+		},
+		{
+			"$ref": "urn:arkini:schema:project#/$defs/AudioResourceMetadataSchema"
 		}
 	],
 	"$id": "urn:arkini:schema:project",
 	"title": "Arkini project authoring schema",
-	"description": "A strict game.json root or one strict UID-owned item fragment.",
+	"description": "A strict game.json root, UID-owned item fragment, or Editor audio metadata file.",
 	"$defs": {
 		"GameFileSchema": {
 			"type": "object",
@@ -2043,6 +2046,20 @@
 				}
 			},
 			"description": "An ordinary item with optional production, Clock scheduling, or one immediate action."
+		},
+		"AudioResourceMetadataSchema": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"name"
+			],
+			"additionalProperties": false,
+			"description": "Editor-only display name for one Music or SFX resource."
 		}
 	}
 }

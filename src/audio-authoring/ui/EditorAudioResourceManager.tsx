@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AudioLines, LoaderCircle, Music2, Pause, Play, Plus, Trash2 } from "lucide-react";
+import { AudioLines, LoaderCircle, Music2, Pause, Play, Plus } from "lucide-react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -7,7 +7,7 @@ import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import type { useEditorAudioResourceManagerController } from "~/audio-authoring/ui/useEditorAudioResourceManagerController";
-import { readResourceNameFn } from "~/game-config-resource/fn/readResourceNameFn";
+import { Link } from "@tanstack/react-router";
 import type { Project } from "~/project-authoring/type/Project";
 import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -53,8 +53,7 @@ export const EditorAudioResourceManager = ({
 		? translator.textFn("No matching music")
 		: translator.textFn("No matching sound effects");
 	const dataUiPrefix = music ? "EditorMusic" : "EditorSfx";
-	const error =
-		controller.importError ?? controller.deleteError ?? extraError ?? controller.playbackError;
+	const error = controller.importError ?? extraError ?? controller.playbackError;
 	const errorMessage =
 		error === undefined ? undefined : error instanceof Error ? error.message : String(error);
 	const importButton = (
@@ -178,9 +177,7 @@ export const EditorAudioResourceManager = ({
 							{resources.map((resource) => {
 								const active = controller.activeResourceId === resource.id;
 								const playing = active && controller.playing;
-								const deleting =
-									controller.deletePending &&
-									controller.deletingResourceId === resource.id;
+
 								return (
 									<li
 										className="ak-list-row ak-list-row-interactive grid min-w-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-xl px-4 py-3"
@@ -196,7 +193,6 @@ export const EditorAudioResourceManager = ({
 										{...readDataUiFn({
 											dataUi: `${dataUiPrefix}Row`,
 											state: {
-												deleting,
 												playing,
 												state: active ? "active" : undefined,
 											},
@@ -215,11 +211,25 @@ export const EditorAudioResourceManager = ({
 											<Icon className="size-5" />
 										</div>
 										<div className="relative z-10 min-w-0">
-											<p className="truncate font-semibold">
-												{readResourceNameFn(resource.id)}
-											</p>
+											<Link
+												className="block truncate font-semibold hover:underline"
+												data-ui={`${dataUiPrefix}DetailLink`}
+												to={
+													music
+														? "/editor/$projectId/music/$resourceId/$sectionId"
+														: "/editor/$projectId/sfx/$resourceId/$sectionId"
+												}
+												params={{
+													projectId: project.projectId,
+													resourceId: resource.id,
+													sectionId: "view",
+												}}
+												onClick={(event) => event.stopPropagation()}
+											>
+												{resource.name}
+											</Link>
 											<p className="truncate text-xs text-muted">
-												{formatByteSizeFn(resource.size)}
+												{resource.id} · {formatByteSizeFn(resource.size)}
 											</p>
 										</div>
 										<div className="relative z-10 flex items-center gap-3">
@@ -233,7 +243,6 @@ export const EditorAudioResourceManager = ({
 												<Button
 													className="size-10 min-h-10 shrink-0 p-0"
 													data-ui={`${dataUiPrefix}Playback`}
-													disabled={controller.deletePending}
 													onClick={(event) => {
 														event.stopPropagation();
 														controller.togglePlaybackFn(resource.id);
@@ -243,30 +252,6 @@ export const EditorAudioResourceManager = ({
 														<Pause className="size-4" />
 													) : (
 														<Play className="size-4" />
-													)}
-												</Button>
-											</Tooltip>
-											<Tooltip
-												content={translator.textFn("Delete")}
-												placement="left"
-											>
-												<Button
-													className="size-10 min-h-10 shrink-0 p-0 text-danger"
-													cursorIntent={deleting ? "progress" : undefined}
-													data-ui={`${dataUiPrefix}Delete`}
-													disabled={
-														controller.deletePending ||
-														resourceMutationBlocked
-													}
-													onClick={(event) => {
-														event.stopPropagation();
-														controller.deleteResourceFn(resource.id);
-													}}
-												>
-													{deleting ? (
-														<LoaderCircle className="size-4 animate-spin" />
-													) : (
-														<Trash2 className="size-4" />
 													)}
 												</Button>
 											</Tooltip>

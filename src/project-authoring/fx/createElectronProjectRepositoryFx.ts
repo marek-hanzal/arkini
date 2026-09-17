@@ -119,6 +119,15 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					parseCommitFn,
 				),
 			),
+		saveResourceMetadataFx: (request) =>
+			writeFx(
+				"save-resource-metadata",
+				callFx(
+					"save-resource-metadata",
+					() => window.arkini.editor.saveResourceMetadataFn(request),
+					parseProjectFn,
+				),
+			),
 		deleteResourceFx: (request) =>
 			writeFx(
 				"delete-resource",

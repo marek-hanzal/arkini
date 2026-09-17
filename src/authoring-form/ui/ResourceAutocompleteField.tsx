@@ -79,7 +79,7 @@ export const ResourceReferenceControl = ({
 						(includeResourceFn?.(resource) ?? true),
 				)
 				.map((resource) => {
-					const label = readResourceNameFn(resource.id);
+					const label = resource.name ?? readResourceNameFn(resource.id);
 					return {
 						id: resource.id,
 						label,
@@ -98,6 +98,9 @@ export const ResourceReferenceControl = ({
 	);
 	return (
 		<EditorSearchCombobox
+			displaySelectedLabel={project.resources.some(
+				(resource) => resource.id === value && resource.name !== undefined,
+			)}
 			label={label}
 			description={description}
 			emptyLabel={emptyLabel}

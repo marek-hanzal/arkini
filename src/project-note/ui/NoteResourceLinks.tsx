@@ -75,6 +75,26 @@ export const NoteResourceLinks = ({
 									/>
 									<span className="truncate">{resourceId}</span>
 								</ButtonLink>
+							) : resource?.type === "music" || resource?.type === "sfx" ? (
+								<ButtonLink
+									to={
+										resource.type === "music"
+											? "/editor/$projectId/music/$resourceId/$sectionId"
+											: "/editor/$projectId/sfx/$resourceId/$sectionId"
+									}
+									params={{
+										projectId: project.projectId,
+										resourceId,
+										sectionId: "view",
+									}}
+									className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
+								>
+									<EditorResourceThumbnail
+										resourceId={resourceId}
+										size="sm"
+									/>
+									<span className="truncate">{resource.name ?? resourceId}</span>
+								</ButtonLink>
 							) : (
 								<span
 									className="px-2 text-sm text-muted"

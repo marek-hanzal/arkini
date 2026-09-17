@@ -137,6 +137,11 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDelete, projectId),
 		deleteItemFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, request),
+		saveResourceMetadataFn: (request) =>
+			ipcRenderer.invoke(
+				ArkiniElectronApi.channels.editorProjectSaveResourceMetadata,
+				request,
+			),
 		deleteResourceFn: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteResource, request),
 		exportJsonDirectoryFn: (projectId) =>

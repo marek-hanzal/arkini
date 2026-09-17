@@ -16,6 +16,7 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 	const path = yield* Path.Path;
 	const root = path.resolve(input);
 	const json: Array<string> = [];
+	const audioMetadata: Array<string> = [];
 	const resources: Array<{
 		readonly path: string;
 		readonly type: ResourceTypeSchema.Type;
@@ -49,6 +50,8 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 		const directory = path.join(root, type);
 		if (!(yield* fileSystem.exists(directory))) continue;
 		for (const file of yield* fileSystem.readDirectory(directory)) {
+			if ((type === "music" || type === "sfx") && file.endsWith(".json"))
+				audioMetadata.push(path.join(directory, file));
 			if (file.endsWith(extension))
 				resources.push({
 					path: path.join(directory, file),
@@ -59,6 +62,7 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 	return {
 		root,
 		json: json.sort(),
+		audioMetadata: audioMetadata.sort(),
 		resources: resources.sort((left, right) => left.path.localeCompare(right.path)),
 	} as const;
 });

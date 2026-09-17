@@ -1,3 +1,4 @@
+import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
 import { isDeepStrictEqual } from "node:util";
 import { Effect, FileSystem } from "effect";
 
@@ -140,6 +141,37 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				const target = yield* paths.resourceFileFx(resource);
 				yield* admitTargetFx(target);
 				const oldTarget = old === undefined ? undefined : yield* paths.resourceFileFx(old);
+				const metadataTarget =
+					resource.type === "music" || resource.type === "sfx"
+						? yield* paths.audioMetadataFileFx({
+								id: resource.id,
+								type: resource.type,
+							})
+						: undefined;
+				const oldMetadataTarget =
+					old?.type === "music" || old?.type === "sfx"
+						? yield* paths.audioMetadataFileFx({
+								id: old.id,
+								type: old.type,
+							})
+						: undefined;
+				if (oldMetadataTarget !== undefined && oldMetadataTarget !== metadataTarget)
+					deletes.add(oldMetadataTarget);
+				if (metadataTarget !== undefined) {
+					yield* admitTargetFx(metadataTarget);
+					const metadata = yield* Effect.try(() =>
+						AudioResourceMetadataSchema.parse({
+							name: resource.name,
+						}),
+					);
+					if (oldMetadataTarget !== metadataTarget || old?.name !== metadata.name) {
+						writes.push({
+							target: metadataTarget,
+							bytes: encodeJsonFn(metadata),
+						});
+						changedResources.add(resource.id);
+					}
+				}
 				let source = resourceFiles.get(resource.id);
 				if (oldTarget !== undefined && oldTarget !== target) {
 					deletes.add(oldTarget);
@@ -160,6 +192,13 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 			}
 			for (const resource of previousResources.values()) {
 				deletes.add(yield* paths.resourceFileFx(resource));
+				if (resource.type === "music" || resource.type === "sfx")
+					deletes.add(
+						yield* paths.audioMetadataFileFx({
+							id: resource.id,
+							type: resource.type,
+						}),
+					);
 			}
 			for (const note of noteUpdates) {
 				writes.push({

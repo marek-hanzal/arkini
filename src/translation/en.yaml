@@ -113,6 +113,8 @@ Assigned:
   value: Assigned
 Assigned here:
   value: Assigned here
+Audio not found:
+  value: Audio not found
 Authored Clock expiry output summary help:
   value: |
     Runs once when **Lifetime** reaches zero.
@@ -582,6 +584,8 @@ Delete item?:
   value: Delete item?
 Deleted item artwork help:
   value: Artwork files stay in the project. Remove unused entries separately in **Artwork**.
+Deleting audio removes the file, its metadata, assignments and Notes links. This cannot be undone.:
+  value: Deleting audio removes the file, its metadata, assignments and Notes links. This cannot be undone.
 Depends on conditions:
   value: Depends on conditions
 Depletion output:
@@ -1228,6 +1232,8 @@ Loading MCP settings…:
   value: Loading MCP settings…
 Loading notes…:
   value: Loading notes…
+Loading…:
+  value: Loading…
 Local MCP:
   value: Local MCP
 Local drop:
@@ -2363,6 +2369,8 @@ limit:
   value: limit
 managed:
   value: managed
+music:
+  value: music
 negligible:
   value: negligible
 ngrok tunnel:

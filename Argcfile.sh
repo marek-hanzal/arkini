@@ -33,7 +33,8 @@ arkpack-fingerprint() {
 		find src shared electron scripts -type f ! -name _route.ts -print0 || return $?
 		find game/arkini/items -type f -name '*.json' -print0 || return $?
 		find game/arkini/artwork game/arkini/image -type f -name '*.png' -print0 || return $?
-		find game/arkini/music game/arkini/sfx -type f -name '*.ogg' -print0 || return $?
+		# Audio metadata is validated source even though names never enter the Arkpack.
+		find game/arkini/music game/arkini/sfx -type f \( -name '*.ogg' -o -name '*.json' \) -print0 || return $?
 		printf '%s\0' game/arkini/game.json game/arkini/schema.json \
 			Argcfile.sh mise.toml package.json package-lock.json electron.vite.config.ts tsconfig*.json
 	} | LC_ALL=C coreutils sort -z | xargs -0 coreutils sha256sum --binary --zero |

@@ -2,6 +2,7 @@ import {
 	ProjectResourceFileReplacementSchema,
 	ProjectResourceReplacementSchema,
 } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
+import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
@@ -33,6 +34,7 @@ type Operations = Pick<
 	ProjectRepositoryService,
 	| "deleteItemFx"
 	| "deleteResourceFx"
+	| "saveResourceMetadataFx"
 	| "replaceConfigFx"
 	| "optimizeResourcesFx"
 	| "replaceResourceFx"
@@ -471,13 +473,38 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			readonly type: ProjectResourceSchema.Type["type"];
 			readonly path: string;
 			readonly size: number;
+			readonly name?: string;
 		}>;
 	}) =>
 		Effect.gen(function* () {
 			yield* assertDistinctResourceIdsFx(resources);
+			for (const resource of resources)
+				if (resource.type === "music" || resource.type === "sfx")
+					yield* Effect.try({
+						try: () =>
+							AudioResourceMetadataSchema.parse({
+								name: resource.name,
+							}),
+						catch: (cause) =>
+							errorFn(
+								"upsert-resource",
+								`Audio resource ${resource.id} has invalid metadata.`,
+								cause,
+							),
+					});
 			return yield* commitResourcesFx("upsert-resource", projectId, undefined, (state) => {
 				for (const resource of resources) {
 					const existing = state.project.resources.find(({ id }) => id === resource.id);
+					if (
+						existing !== undefined &&
+						(resource.type === "music" || resource.type === "sfx")
+					)
+						return Effect.fail(
+							errorFn(
+								"upsert-resource",
+								`Resource ID ${resource.id} already exists.`,
+							),
+						);
 					if (existing !== undefined && existing.type !== resource.type)
 						return Effect.fail(
 							errorFn(
@@ -491,10 +518,15 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					config: state.project.config,
 					resources: [
 						...state.project.resources.filter(({ id }) => !ids.has(id)),
-						...resources.map(({ id, type, size }) => ({
+						...resources.map(({ id, type, size, name }) => ({
 							id,
 							type,
 							size,
+							...(type === "music" || type === "sfx"
+								? {
+										name,
+									}
+								: {}),
 							version: "pending",
 						})),
 					],
@@ -687,6 +719,60 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				),
 			);
 
+	const saveResourceMetadataFx: Operations["saveResourceMetadataFx"] = ({
+		projectId,
+		expectedRevision,
+		resourceId,
+		name,
+	}) =>
+		commitResourcesFx("save-resource-metadata", projectId, expectedRevision, (state) =>
+			Effect.gen(function* () {
+				const resource = state.project.resources.find(({ id }) => id === resourceId);
+				if (resource === undefined)
+					return yield* Effect.fail(
+						errorFn("save-resource-metadata", `Resource ${resourceId} does not exist.`),
+					);
+				if (resource.type !== "music" && resource.type !== "sfx")
+					return yield* Effect.fail(
+						errorFn(
+							"save-resource-metadata",
+							"Only Music and SFX resources have editable names.",
+						),
+					);
+				const metadata = yield* Effect.try({
+					try: () =>
+						AudioResourceMetadataSchema.parse({
+							name,
+						}),
+					catch: (cause) =>
+						errorFn(
+							"save-resource-metadata",
+							"The audio resource name is invalid.",
+							cause,
+						),
+				});
+				return {
+					config: state.project.config,
+					resources: state.project.resources.map((entry) =>
+						entry.id === resourceId
+							? {
+									...entry,
+									name: metadata.name,
+								}
+							: entry,
+					),
+				};
+			}),
+		).pipe(
+			Effect.mapError((cause) =>
+				errorFn(
+					"save-resource-metadata",
+					`Resource ${resourceId} metadata could not be saved in project ${projectId}.`,
+					cause,
+				),
+			),
+		);
+
 	const deleteResourceFx: Operations["deleteResourceFx"] = ({
 		expectedRevision,
 		projectId,
@@ -805,6 +891,19 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							errorFn("replace-resource", `Resource ${currentId} does not exist.`),
 						);
 					if (
+						(previousResource.type === "music" ||
+							previousResource.type === "sfx" ||
+							resource.type === "music" ||
+							resource.type === "sfx") &&
+						(resource.id !== currentId || resource.type !== previousResource.type)
+					)
+						return Effect.fail(
+							errorFn(
+								"replace-resource",
+								"Audio replacement must preserve its resource ID and type.",
+							),
+						);
+					if (
 						resource.id !== currentId &&
 						state.project.resources.some(({ id }) => id === resource.id)
 					)
@@ -825,6 +924,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 									? fileResource.data.size
 									: previousResource.size,
 								version: previousResource.version,
+								...(resource.type === "music" || resource.type === "sfx"
+									? {
+											name: previousResource.name,
+										}
+									: {}),
 							},
 						],
 						resourceFileWrites: !fileResource.success
@@ -855,6 +959,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	return {
 		deleteItemFx,
 		deleteResourceFx,
+		saveResourceMetadataFx,
 		optimizeResourcesFx,
 		replaceConfigFx,
 		replaceResourceFx,

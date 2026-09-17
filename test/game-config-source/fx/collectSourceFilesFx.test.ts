@@ -30,9 +30,12 @@ describe("collectSourceFilesFx", () => {
 				"image/hero.png",
 				"image/nested/ignored.png",
 				"music/theme.ogg",
+				"music/theme.json",
+				"music/nested/ignored.json",
 				"music/ignored.OGG",
 				"music/nested/ignored.ogg",
 				"sfx/job-start.ogg",
+				"sfx/job-start.json",
 				"sfx/ignored.mp3",
 				"assets/obsolete.png",
 				"resources/obsolete.png",
@@ -48,7 +51,10 @@ describe("collectSourceFilesFx", () => {
 				collectSourceFilesFx({
 					input: directory,
 				}).pipe(
-					Effect.map(({ json, resources }) => ({
+					Effect.map(({ json, resources, audioMetadata }) => ({
+						audioMetadata: audioMetadata.map((file) =>
+							path.relative(directory, file).split(path.sep).join("/"),
+						),
 						json: json.map((file) =>
 							path.relative(directory, file).split(path.sep).join("/"),
 						),
@@ -62,6 +68,10 @@ describe("collectSourceFilesFx", () => {
 			const result = yield* collectRelative(project);
 
 			expect(result).toEqual({
+				audioMetadata: [
+					"music/theme.json",
+					"sfx/job-start.json",
+				],
 				json: [
 					"game.json",
 					"items/kept.json",

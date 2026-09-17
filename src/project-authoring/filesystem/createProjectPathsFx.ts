@@ -24,7 +24,7 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
 		directory: string,
 		resourceId: string,
-		extension: ".ogg" | ".png",
+		extension: ".ogg" | ".png" | ".json",
 	) {
 		if (
 			path.basename(resourceId) !== resourceId ||
@@ -73,6 +73,8 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		artworkFileFx: (resourceId) => readResourceFileFx(artwork, resourceId, ".png"),
 		imageFileFx: (resourceId) => readResourceFileFx(image, resourceId, ".png"),
 		resourceFileFx,
+		audioMetadataFileFx: ({ id, type }) =>
+			readResourceFileFx(type === "music" ? music : sfx, id, ".json"),
 		noteFileFx: (noteId) =>
 			Effect.succeed(path.join(notes, `${encodeGameProjectFileStemFn(noteId)}.json`)),
 	} satisfies ProjectPaths;

@@ -46,6 +46,11 @@ const config = GameConfigSchema.parse({
 			"theme",
 		],
 	},
+	sfx: {
+		events: {
+			"job:started": "job-start",
+		},
+	},
 	start: {
 		currentSpace: 0,
 		board: [],
@@ -159,6 +164,29 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	yield* fileSystem.writeFile(path.join(musicDirectory, "theme.ogg"), musicOgg);
 	yield* fileSystem.writeFile(path.join(musicDirectory, "unused-theme.ogg"), musicOgg);
 	yield* fileSystem.writeFile(path.join(sfxDirectory, "job-start.ogg"), sfxOgg);
+	for (const [directory, id, name] of [
+		[
+			musicDirectory,
+			"theme",
+			"Editor-only Dusty Plains",
+		],
+		[
+			musicDirectory,
+			"unused-theme",
+			"Editor-only Quiet Shore",
+		],
+		[
+			sfxDirectory,
+			"job-start",
+			"Editor-only Workshop Bell",
+		],
+	] as const)
+		yield* fileSystem.writeFileString(
+			path.join(directory, `${id}.json`),
+			JSON.stringify({
+				name,
+			}),
+		);
 	const squareArtworkPng = yield* Effect.promise(() =>
 		sharp(assetPng)
 			.resize(512, 512, {

@@ -51,6 +51,7 @@ Use the smallest non-derivable payload:
 | `game.json` | `$schema`, structured output `version`, and complete non-item config; `meta.id` is package identity. |
 | `items/<uid>.json` | `$schema` plus direct `item`; path owns UID, item owns gameplay ID. |
 | `artwork/<id>.png`, `image/<id>.png`, `music/<id>.ogg`, `sfx/<id>.ogg` | Typed root owns semantic Resource type, filename owns ID, and extension owns encoding. |
+| `music/<id>.json`, `sfx/<id>.json` | Editor-only `{ name }`; paired filename owns the same stable resource ID as the audio body. Portable project exports retain names; Arkpacks omit them. |
 | `notes/<noteId>.json` | Markdown content, optional unique immutable `itemUids` and canonical `resourceIds`, and ordering/freshness timestamps; path owns note ID. |
 
 The Editor installation catalog stores discovery roots, managed/external ownership, and timestamps only. It never copies canonical project identity or mutable project fields.

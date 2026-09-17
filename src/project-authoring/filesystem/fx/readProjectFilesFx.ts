@@ -12,6 +12,7 @@ import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProje
 import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 import type { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import { createProjectPathsFx } from "../createProjectPathsFx";
+import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
 
 const parseJsonFx = <Value>(file: string, parseFn: (candidate: unknown) => Value, label: string) =>
 	Effect.gen(function* () {
@@ -124,6 +125,21 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	const descriptors = yield* readResourceDescriptorsFx({
 		input: paths.root,
 	});
+	const sourceFiles = yield* collectSourceFilesFx({
+		input: paths.root,
+	});
+	const audioPaths = new Set(
+		descriptors
+			.filter(({ type }) => type === "music" || type === "sfx")
+			.map(({ path }) => path),
+	);
+	for (const metadataPath of sourceFiles.audioMetadata) {
+		const audioPath = `${metadataPath.slice(0, -5)}.ogg`;
+		if (!audioPaths.has(audioPath))
+			return yield* Effect.fail(
+				new Error(`Audio metadata ${metadataPath} requires its paired file ${audioPath}.`),
+			);
+	}
 	const resourceIds = new Set<string>();
 	for (const descriptor of descriptors) {
 		if (resourceIds.has(descriptor.id)) {

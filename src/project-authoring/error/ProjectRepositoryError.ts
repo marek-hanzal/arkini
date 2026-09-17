@@ -26,6 +26,7 @@ export type ProjectRepositoryOperation =
 	| "replace-resource"
 	| "refresh-project"
 	| "save-project-build"
+	| "save-resource-metadata"
 	| "upsert-item"
 	| "upsert-resource"
 	| "update-note";

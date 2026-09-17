@@ -166,6 +166,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		refreshProjectFx: (projectId) => provideFx(repository.refreshProjectFx(projectId)),
 		listProjectsFx: provideFx(repository.listProjectsFx),
 		deleteItemFx: (props) => provideFx(repository.deleteItemFx(props)),
+		saveResourceMetadataFx: (props) => provideFx(repository.saveResourceMetadataFx(props)),
 		deleteResourceFx: (props) => provideFx(repository.deleteResourceFx(props)),
 		optimizeResourcesFx: (props) => provideFx(repository.optimizeResourcesFx(props)),
 		replaceConfigFx: (props) => provideFx(repository.replaceConfigFx(props)),

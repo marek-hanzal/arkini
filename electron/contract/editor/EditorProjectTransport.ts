@@ -30,6 +30,7 @@ export namespace EditorProjectTransport {
 		| "replace-config"
 		| "replace-resource"
 		| "save-project-build"
+		| "save-resource-metadata"
 		| "upsert-item"
 		| "upsert-resource"
 		| "update-note";
@@ -87,6 +88,7 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface Resource {
+		readonly name?: string;
 		readonly id: string;
 		readonly type: "artwork" | "image" | "music" | "sfx";
 		readonly size: number;
@@ -186,6 +188,13 @@ export namespace EditorProjectTransport {
 		readonly itemUid: string;
 		readonly expectedRevision: number;
 		readonly force: boolean;
+	}
+
+	export interface SaveResourceMetadataRequest {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly resourceId: string;
+		readonly name: string;
 	}
 
 	export interface DeleteResourceRequest {

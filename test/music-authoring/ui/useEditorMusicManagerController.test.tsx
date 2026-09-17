@@ -6,7 +6,6 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
-	deleteResourceFn: vi.fn(),
 	importMusicFn: vi.fn(),
 	playlistMusicFn: vi.fn(),
 	setCall: 0,
@@ -18,11 +17,10 @@ vi.mock("@effect/atom-react", async (importOriginal) => ({
 	useAtomSet: () =>
 		[
 			state.importMusicFn,
-			state.deleteResourceFn,
 			state.playlistMusicFn,
-		][state.setCall++ % 3],
+		][state.setCall++ % 2],
 	useAtomValue: () =>
-		state.valueCall++ % 4 === 0
+		state.valueCall++ % 3 === 1
 			? {
 					master: 80,
 					music: 100,
@@ -117,7 +115,6 @@ const Probe = () => {
 };
 
 beforeEach(async () => {
-	state.deleteResourceFn.mockReset();
 	state.importMusicFn.mockReset();
 	state.playlistMusicFn.mockReset();
 	state.setCall = 0;
@@ -180,7 +177,7 @@ describe("useEditorMusicManagerController", () => {
 		expect(controller?.music).toEqual([]);
 	});
 
-	it("tracks playback, seeks through the active row, and deletes the resource", async () => {
+	it("tracks playback, seeks through the active row, and disposes on departure", async () => {
 		await act(async () => controller?.togglePlaybackFn("battle-march"));
 		const audio = AudioStub.instances[0];
 		if (audio === undefined) throw new Error("Expected a Music preview audio element.");
@@ -194,14 +191,10 @@ describe("useEditorMusicManagerController", () => {
 		expect(audio.currentTime).toBe(90);
 		expect(controller?.playbackProgress).toBe(0.75);
 
-		await act(async () => controller?.deleteResourceFn("battle-march"));
-		expect(state.deleteResourceFn).toHaveBeenCalledWith({
-			expectedRevision: 7,
-			projectId: "project-one",
-			resourceId: "battle-march",
-		});
+		await act(async () => root?.unmount());
+		root = undefined;
 		expect(audio.pause).toHaveBeenCalledOnce();
-		expect(controller?.activeResourceId).toBeUndefined();
+		expect(audio.removeAttribute).toHaveBeenCalledWith("src");
 	});
 
 	it("toggles one Music resource in the authored random playlist", async () => {

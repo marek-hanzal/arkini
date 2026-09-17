@@ -345,6 +345,12 @@ describe("registerEditorProjectIpcFx", () => {
 		await invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, upsertItemRequest);
 		await invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, deleteItemRequest);
 		await invoke(ArkiniElectronApi.channels.editorProjectDeleteResource, deleteResourceRequest);
+		const metadataRequest = {
+			...deleteResourceRequest,
+			name: "Dusty Plains",
+		};
+		await invoke(ArkiniElectronApi.channels.editorProjectSaveResourceMetadata, metadataRequest);
+		expect(repository.saveResourceMetadataFx).toHaveBeenCalledWith(metadataRequest);
 		await invoke(
 			ArkiniElectronApi.channels.editorProjectOptimizeResources,
 			optimizeResourcesRequest,

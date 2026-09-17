@@ -16,6 +16,9 @@ describe("RendererContentSecurityPolicy", () => {
 
 		expect(policy).toContain("script-src 'self' 'nonce-arkini-test-nonce'");
 		expect(policy).toContain("connect-src 'self' blob: data: ws://127.0.0.1:4040/");
+		expect(policy.split("; ").find((directive) => directive.startsWith("media-src "))).toBe(
+			"media-src 'self' blob: arkini://app",
+		);
 		expect(policy).not.toContain("unsafe-eval");
 		expect(policy).not.toContain("script-src 'self' 'unsafe-inline'");
 		expect(policy).not.toContain("ws://localhost:4040");
@@ -30,5 +33,10 @@ describe("RendererContentSecurityPolicy", () => {
 		expect(RendererContentSecurityPolicy.production).not.toContain("nonce-");
 		expect(RendererContentSecurityPolicy.production).not.toContain("ws:");
 		expect(RendererContentSecurityPolicy.production).not.toContain("unsafe-eval");
+		expect(
+			RendererContentSecurityPolicy.production
+				.split("; ")
+				.find((directive) => directive.startsWith("media-src ")),
+		).toBe("media-src 'self' blob:");
 	});
 });

@@ -118,8 +118,7 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		});
 	};
 	const onOptimizeFn = () => {
-		if (optimizePending || audio.importPending || audio.deletePending || assignmentPending)
-			return;
+		if (optimizePending || audio.importPending || assignmentPending) return;
 		const resourceIds = project.resources
 			.filter(({ type }) => type === "sfx")
 			.map(({ id }) => id);
@@ -138,10 +137,6 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		assigningResourceId,
 		assignmentError,
 		assignmentPending,
-		deleteError: audio.deleteError,
-		deletePending: audio.deletePending,
-		deleteResourceFn: audio.deleteResourceFn,
-		deletingResourceId: audio.deletingResourceId,
 		filesInputRef: audio.filesInputRef,
 		importError: audio.importError,
 		importPending: audio.importPending,

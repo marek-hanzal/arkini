@@ -20,6 +20,28 @@ afterEach(async () => {
 });
 
 describe("filesystem Editor project current tree", () => {
+	it("rejects orphaned audio metadata instead of silently dropping it on reopen", async () => {
+		const harness = await createProjectFilesHarness();
+		openHarnesses.push(harness);
+		await harness.write({
+			arkpack: parseVersionFn(editorTestPayload.version),
+			marker: {
+				arkini: ArkiniAppVersion,
+				revision: 1,
+			},
+			config: editorTestPayload.config,
+			resources: editorTestPayload.resources,
+		});
+		await mkdir(join(harness.root, "music"));
+		await writeFile(
+			join(harness.root, "music", "orphan.json"),
+			JSON.stringify({
+				name: "Dusty Plains",
+			}),
+		);
+		await expect(harness.read()).rejects.toThrow("requires its paired file");
+	});
+
 	it("round-trips and republishes the complete authoritative current tree", async () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
@@ -74,6 +96,9 @@ describe("filesystem Editor project current tree", () => {
 				},
 				{
 					$ref: "urn:arkini:schema:project#/$defs/ItemFileSchema",
+				},
+				{
+					$ref: "urn:arkini:schema:project#/$defs/AudioResourceMetadataSchema",
 				},
 			],
 			$defs: {

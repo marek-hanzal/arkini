@@ -17,5 +17,7 @@ export const createRendererDevelopmentContentSecurityPolicyFn = ({
 		RendererContentSecurityPolicy.commonDirectives[0],
 		`script-src 'self' 'nonce-${nonce}'`,
 		...RendererContentSecurityPolicy.commonDirectives.slice(1),
+		// Native audio stays on the app protocol while Vite owns the development document origin.
+		"media-src 'self' blob: arkini://app",
 		`connect-src 'self' blob: data: ${developmentUrl.webSocketEndpoint} arkini://app`,
 	].join("; ");

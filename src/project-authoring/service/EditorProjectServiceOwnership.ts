@@ -26,6 +26,7 @@ export interface OwnedEditorProjectRepository
 			readonly type: ResourceTypeSchema.Type;
 			readonly path: string;
 			readonly size: number;
+			readonly name?: string;
 		}>;
 	}) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly readResourceLocationFx: (props: {

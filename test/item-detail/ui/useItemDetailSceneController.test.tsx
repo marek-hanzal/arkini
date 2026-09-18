@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { act } from "react";
+import { Effect } from "effect";
 import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
 import type { GameTransition } from "~/game-session/type/GameSession";
@@ -25,6 +26,56 @@ vi.mock("~/game-presentation/ui/useRuntimeSelector", () => ({
 		selectorFn(state.runtime),
 }));
 
+it("disables Make across all lines when the owner's queue fills and enables it when capacity returns", async () => {
+	state.runtime = lineRunRuntime({});
+	const owner = state.runtime.items[0];
+	state.game = {
+		readFn: Effect.runSyncExit,
+		getResourceUrlFn: (id: string) => id,
+		subscribeTransitionsFn: () => () => {},
+	};
+	let output: useItemDetailSceneController.Output | undefined;
+	const Probe = () => {
+		output = useItemDetailSceneController({
+			target: {
+				kind: "runtime",
+				itemId: owner.id,
+				tab: "lines",
+				origin: null,
+			},
+		});
+		return null;
+	};
+	const root = createRoot(document.createElement("div"));
+	try {
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.canMake).toBe(true);
+		state.runtime = {
+			...state.runtime,
+			jobQueue: Array.from(
+				{
+					length: owner.item.maxQueueSize!,
+				},
+				(_, index) => ({
+					id: `request:${index}`,
+					ownerItemId: owner.id,
+					lineId: owner.item.lines[0].id,
+				}),
+			),
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.canMake).toBe(false);
+		state.runtime = {
+			...state.runtime,
+			jobQueue: state.runtime.jobQueue.slice(1),
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.canMake).toBe(true);
+	} finally {
+		await act(async () => root.unmount());
+	}
+});
+
 it("retains the terminal commit across batched updates and detaches when the target changes", async () => {
 	const base = lineRunRuntime({});
 	const owner = {
@@ -45,6 +96,7 @@ it("retains the terminal commit across batched updates and detaches when the tar
 	};
 	const listeners = new Set<(transition: GameTransition) => void>();
 	state.game = {
+		readFn: Effect.runSyncExit,
 		getResourceUrlFn: (id: string) => id,
 		subscribeTransitionsFn: (listenerFn: (transition: GameTransition) => void) => {
 			listeners.add(listenerFn);

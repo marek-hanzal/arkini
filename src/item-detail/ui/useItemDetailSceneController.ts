@@ -1,4 +1,4 @@
-import { Equal } from "effect";
+import { Equal, Exit } from "effect";
 import { useCallback, useLayoutEffect, useState } from "react";
 
 import { readItemDetailRemovalFn } from "~/item-detail-read/fn/readItemDetailRemovalFn";
@@ -9,13 +9,19 @@ import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
+import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 
 export namespace useItemDetailSceneController {
 	export interface Props {
 		readonly target: ItemDetailTarget;
 	}
 	export interface Detail
-		extends Pick<ItemSchema.Type, "description" | "scope" | "maxStackSize" | "maxCount"> {
+		extends Pick<
+			ItemSchema.Type,
+			"description" | "scope" | "maxStackSize" | "maxCount" | "lines"
+		> {
+		readonly canMake: boolean;
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
@@ -70,7 +76,25 @@ export const useItemDetailSceneController = ({
 					: undefined;
 			const item = kind === "definition" ? game.config.items[itemId] : runtimeItem?.item;
 			if (item === undefined) return undefined;
+			let canMake = false;
+			if (
+				runtimeItem?.location.scope === "board" &&
+				finalSnapshot === undefined &&
+				item.lines.length > 0 &&
+				canControlItemProductionFn(item)
+			) {
+				const queue = game.readFn(
+					resolveJobQueueFx({
+						runtime,
+						owner: runtimeItem,
+					}),
+				);
+				if (Exit.isFailure(queue)) throw queue.cause;
+				canMake = queue.value.available;
+			}
 			return {
+				lines: item.lines,
+				canMake,
 				title: item.title,
 				sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),
 				compositeUrl:

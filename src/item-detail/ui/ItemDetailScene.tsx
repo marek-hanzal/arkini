@@ -1,6 +1,7 @@
 import { ItemDetailHeader } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { ItemInfo } from "~/item-detail/ui/ItemInfo";
+import { ItemLines } from "~/item-detail/ui/ItemLines";
 import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -69,6 +70,14 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 			>
 				{target.tab === "info" && controller.detail !== undefined ? (
 					<ItemInfo detail={controller.detail} />
+				) : null}
+				{target.tab === "lines" && controller.detail !== undefined ? (
+					<ItemLines
+						key={`${target.kind}:${target.itemId}`}
+						lines={controller.detail.lines}
+						ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
+						disabled={disabled || controller.stale || !controller.detail.canMake}
+					/>
 				) : null}
 			</div>
 		</div>

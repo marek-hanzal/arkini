@@ -14,7 +14,7 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
-			"amount": 8,
+			"amount": 10,
 			"output": {
 				"set": [
 					{

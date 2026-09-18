@@ -21,14 +21,17 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	const closeItemDetailFn = useCloseItemDetail();
 	const translator = useTranslator();
 	const status = controller.stale ? translator.textFn("Gone") : undefined;
-	const navigation = (
+	// Queue capacity is projected from authored lines, independently of rule visibility.
+	const hasProduction = controller.detail?.queueSize !== undefined;
+	const tab = hasProduction ? target.tab : "info";
+	const navigation = hasProduction ? (
 		<ItemDetailTabs
-			active={target.tab}
+			active={tab}
 			disabled={disabled}
 			retained={controller.stale}
 			target={target}
 		/>
-	);
+	) : undefined;
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
@@ -67,12 +70,12 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						stale: controller.stale,
 					},
 				})}
-				data-tab={target.tab}
+				data-tab={tab}
 			>
-				{target.tab === "info" && controller.detail !== undefined ? (
+				{tab === "info" && controller.detail !== undefined ? (
 					<ItemInfo detail={controller.detail} />
 				) : null}
-				{target.tab === "queue" && controller.detail !== undefined ? (
+				{tab === "queue" && controller.detail !== undefined ? (
 					<ItemQueue
 						key={`${target.kind}:${target.itemId}`}
 						ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
@@ -80,7 +83,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						disabled={disabled || controller.stale}
 					/>
 				) : null}
-				{target.tab === "lines" && controller.detail !== undefined ? (
+				{tab === "lines" && controller.detail !== undefined ? (
 					<ItemLines
 						key={`${target.kind}:${target.itemId}`}
 						lines={controller.detail.lines}

@@ -5,6 +5,7 @@ import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readItemLineInputsFx } from "~/item-detail-read/fx/readItemLineInputsFx";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { Tooltip } from "~/ui/ui/Tooltip";
@@ -15,6 +16,7 @@ export const ItemLineInputs = ({
 	line,
 }: Omit<readItemLineInputsFx.Props, "runtime">) => {
 	const game = useGameEngine();
+	const translator = useTranslator();
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) => {
 			const result = game.readFn(
@@ -50,10 +52,26 @@ export const ItemLineInputs = ({
 						: input.available
 							? 1
 							: 0;
+				const status = input.committed
+					? translator.textFn("In use for this job.")
+					: input.filled > 0
+						? input.filled >= input.quantity.min
+							? translator.textFn("Ready for this job.")
+							: input.available
+								? translator.textFn("Partly ready. More is available.")
+								: translator.textFn("Partly ready. You'll need to find more.")
+						: input.available
+							? translator.textFn("Available for this job.")
+							: translator.textFn("None available right now.");
 				return (
 					<Tooltip
 						key={input.inputIndex}
-						content={item.title}
+						content={
+							<span className="block max-w-64">
+								<strong className="block font-bold">{item.title}</strong>
+								<span className="block">{status}</span>
+							</span>
+						}
 					>
 						<span
 							className="relative block"

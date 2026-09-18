@@ -257,6 +257,8 @@ Authtoken:
   value: Authtoken
 Automatic only:
   value: Automatic only
+Available for this job.:
+  value: Available for this job.
 Avatar:
   value: Avatar
 Avatar {index}:
@@ -836,6 +838,8 @@ Importing SFX…:
   value: Importing SFX…
 Importing music…:
   value: Importing music…
+In use for this job.:
+  value: In use for this job.
 Indeterminate:
   value: Indeterminate
 Initial board → item {index}:
@@ -1461,6 +1465,8 @@ No unassigned slots:
   value: No unassigned slots
 None:
   value: None
+None available right now.:
+  value: None available right now.
 Notes:
   value: Notes
 Notes empty description:
@@ -1545,6 +1551,10 @@ Paid by:
   value: Paid by
 Partial:
   value: Incomplete
+Partly ready. More is available.:
+  value: Partly ready. More is available.
+Partly ready. You'll need to find more.:
+  value: Partly ready. You'll need to find more.
 Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
@@ -1754,6 +1764,8 @@ Random drop placement help:
     Useful when output should spread around instead of appearing beside its producer.
 Reading image…:
   value: Reading image…
+Ready for this job.:
+  value: Ready for this job.
 Recent projects:
   value: Recent projects
 Recent projects could not be refreshed.:

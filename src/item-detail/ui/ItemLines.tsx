@@ -1,7 +1,7 @@
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
-import { Factory, ListPlus, Star, X } from "lucide-react";
+import { Factory, Info, ListPlus, Star, X } from "lucide-react";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -47,6 +47,7 @@ interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
 	readonly makeDisabled: boolean;
 	readonly ruleDisabled: boolean;
+	readonly blockingHints: readonly string[];
 	readonly status?: readItemLineStatusesFn.Status;
 }
 
@@ -118,7 +119,14 @@ const ItemLineProgressBackdrop = ({
 	);
 };
 
-const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLineProps) => {
+const ItemLine = ({
+	line,
+	makeDisabled,
+	ruleDisabled,
+	blockingHints,
+	status,
+	...props
+}: ItemLineProps) => {
 	const game = useGameEngine();
 	const present = useIsPresent();
 	const disabled = props.disabled || !present;
@@ -273,6 +281,27 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 						) : null}
 					</div>
 				</div>
+				<AnimatePresence initial={false}>
+					{ruleDisabled && blockingHints.length > 0 ? (
+						<motion.div
+							{...linePresenceMotion}
+							className="overflow-hidden"
+							data-ui="ItemLineBlockingHints"
+						>
+							<div className="mt-3 grid gap-2 text-sm">
+								{blockingHints.map((hint) => (
+									<p
+										key={hint}
+										className="flex items-start gap-2"
+									>
+										<Info className="mt-0.5 size-4 shrink-0" />
+										<span className="whitespace-pre-wrap">{hint}</span>
+									</p>
+								))}
+							</div>
+						</motion.div>
+					) : null}
+				</AnimatePresence>
 			</article>
 		</motion.div>
 	);
@@ -281,12 +310,14 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 export const ItemLines = ({
 	lines,
 	disabledLineIds,
+	lineBlockingHints,
 	ownerItemId,
 	disabled,
 	makeDisabled,
 }: {
 	readonly lines: readonly LineSchema.Type[];
 	readonly disabledLineIds: readonly string[];
+	readonly lineBlockingHints: Readonly<Record<string, readonly string[]>>;
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
 	readonly makeDisabled: boolean;
@@ -304,6 +335,7 @@ export const ItemLines = ({
 						key={`line:${line.id}`}
 						line={line}
 						ruleDisabled={disabledLineIds.includes(line.id)}
+						blockingHints={lineBlockingHints[line.id] ?? []}
 						lineId={line.id}
 						ownerItemId={ownerItemId}
 						disabled={disabled}

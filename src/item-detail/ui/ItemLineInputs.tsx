@@ -48,13 +48,7 @@ export const ItemLineInputs = ({
 			{inputs.map((input) => {
 				const item = game.config.items[input.itemId];
 				const total = input.quantity.max;
-				const colorFraction = input.committed
-					? 1
-					: input.filled > 0
-						? input.filled / total
-						: input.available
-							? 1
-							: 0;
+				const colorFraction = input.committed ? 1 : input.filled / total;
 				const status = input.committed
 					? translator.textFn("In use for this job.")
 					: input.filled > 0
@@ -85,12 +79,11 @@ export const ItemLineInputs = ({
 							data-input-index={input.inputIndex}
 						>
 							<span
-								className="block transition-opacity duration-300 ease-out data-[ui-available-only=true]:opacity-40 data-[ui-idle=true]:data-[ui-available-only=false]:opacity-60"
+								className="block transition-opacity duration-300 ease-out data-[ui-dimmed=true]:opacity-45"
 								{...readDataUiFn({
 									dataUi: "ItemLineInput",
 									state: {
-										availableOnly: input.filled === 0 && input.available,
-										idle,
+										dimmed: idle || input.filled === 0,
 									},
 								})}
 							>

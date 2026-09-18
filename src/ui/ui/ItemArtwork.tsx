@@ -33,20 +33,11 @@ export const ItemArtwork = ({
 	const layered = compositeUrl !== undefined;
 	const depleted = 1 - Math.max(0, Math.min(1, colorFraction ?? 1));
 	const boundary = depleted === 0 ? -8 : depleted === 1 ? 108 : depleted * 100;
-	const sharedImageClassName =
-		"absolute object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)]";
-	return (
-		<span
-			className={twMerge(
-				`relative isolate block shrink-0 ${artworkSizeClassName[size]}`,
-				className,
-			)}
-			data-ui={dataUi}
-		>
+	const sharedImageClassName = "absolute object-contain";
+	const artwork = (
+		<>
 			<img
-				className={`${sharedImageClassName} ${
-					layered ? "top-0 left-0 size-3/4" : "inset-0 size-full"
-				} ${imageClassName}`}
+				className={`${sharedImageClassName} ${layered ? "top-0 left-0 size-3/4" : "inset-0 size-full"} ${imageClassName}`}
 				src={sourceUrl}
 				alt=""
 				draggable={false}
@@ -59,20 +50,52 @@ export const ItemArtwork = ({
 					draggable={false}
 				/>
 			)}
-			{colorFraction !== undefined ? (
-				<motion.span
-					className="pointer-events-none absolute inset-0 z-20 backdrop-grayscale"
-					initial={false}
-					animate={{
-						// Keep the composed filter mounted at both endpoints so the feather can move continuously.
-						maskImage: `linear-gradient(to bottom, black ${boundary - 8}%, transparent ${boundary + 8}%)`,
-					}}
-					transition={{
-						duration: 0.3,
-						ease: "easeOut",
-					}}
-				/>
-			) : null}
+		</>
+	);
+	return (
+		<span
+			className={twMerge(
+				`relative isolate block shrink-0 ${artworkSizeClassName[size]}`,
+				className,
+			)}
+			data-ui={dataUi}
+		>
+			<span className="absolute inset-0 isolate drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)]">
+				{colorFraction === undefined ? (
+					artwork
+				) : (
+					<>
+						{/* Complementary masks add premultiplied color and alpha without doubling translucent pixels.
+                        Shadow belongs to the artwork composition, outside both masks and inside any caller frame. */}
+						<motion.span
+							className="absolute inset-0 grayscale"
+							initial={false}
+							animate={{
+								maskImage: `linear-gradient(to bottom, black ${boundary - 8}%, transparent ${boundary + 8}%)`,
+							}}
+							transition={{
+								duration: 0.3,
+								ease: "easeOut",
+							}}
+						>
+							{artwork}
+						</motion.span>
+						<motion.span
+							className="pointer-events-none absolute inset-0 z-20 mix-blend-plus-lighter"
+							initial={false}
+							animate={{
+								maskImage: `linear-gradient(to bottom, transparent ${boundary - 8}%, black ${boundary + 8}%)`,
+							}}
+							transition={{
+								duration: 0.3,
+								ease: "easeOut",
+							}}
+						>
+							{artwork}
+						</motion.span>
+					</>
+				)}
+			</span>
 		</span>
 	);
 };

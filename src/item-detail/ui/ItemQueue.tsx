@@ -237,7 +237,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 								status={
 									<span className="text-foreground">
 										{match(active.status)
-											.with("running", () => translator.textFn("Running"))
+											.with("running", () => null)
 											.with("paused", () => translator.textFn("Paused"))
 											.with("awaiting-output", () =>
 												translator.textFn("Waiting for space"),
@@ -245,7 +245,6 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 											.exhaustive()}
 										{active.status === "running" ? (
 											<span className="inline-block min-w-[6ch] text-right tabular-nums">
-												·{" "}
 												{formatDurationFn(active.remainingMs, "countdown")}
 											</span>
 										) : null}

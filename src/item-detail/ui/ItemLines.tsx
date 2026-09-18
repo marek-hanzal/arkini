@@ -152,7 +152,7 @@ const ItemLine = ({
 		.with("idle", () => null)
 		.with("waiting-inputs", () => translator.textFn("Waiting for materials"))
 		.with("waiting-start", () => translator.textFn("Waiting to start"))
-		.with("running", () => translator.textFn("Running"))
+		.with("running", () => null)
 		.with("paused", () => translator.textFn("Paused"))
 		.with("awaiting-output", () => translator.textFn("Waiting for space"))
 		.with("queued", () => translator.textFn("Queued"))
@@ -221,21 +221,17 @@ const ItemLine = ({
 				}
 				status={
 					<>
-						{statusLabel !== null ? (
+						{statusLabel !== null || state === "running" ? (
 							<p
 								className="shrink-0 text-foreground"
 								data-ui="ItemLineStatus"
 							>
 								{statusLabel}
 								{state === "running" ? (
-									<>
-										{" "}
-										·{" "}
-										<ItemLineCountdown
-											ownerItemId={props.ownerItemId}
-											lineId={line.id}
-										/>
-									</>
+									<ItemLineCountdown
+										ownerItemId={props.ownerItemId}
+										lineId={line.id}
+									/>
 								) : null}
 								{state === "queued"
 									? ` ${status?.queued ?? 0}`

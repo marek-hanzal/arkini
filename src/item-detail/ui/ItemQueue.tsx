@@ -76,7 +76,7 @@ const QueuedLine = ({
 	);
 };
 
-/** Keeps active work in a fixed slot and lists accepted requests in canonical queue order. */
+/** Keeps current production compact above accepted requests in canonical queue order. */
 export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) => {
 	const translator = useTranslator();
 	const game = useGameEngine();
@@ -114,6 +114,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 	const { queue, lines } = useRuntimeSelector(game, selectorFn, Equal.equals);
 	const active = queue.kind === "available" ? queue.active[0] : undefined;
 	const requests = queue.kind === "available" ? queue.request : [];
+	const occupied = requests.length + (queue.kind === "available" ? queue.active.length : 0);
 	const activeLine = lines.find((line) => line.id === active?.lineId);
 	if (queueSize === undefined)
 		return (
@@ -124,38 +125,39 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 				variant="flat"
 			/>
 		);
+	const capacity = queue.kind === "available" ? queue.capacity : queueSize;
 	return (
 		<section
 			className="flex h-full min-h-0 flex-col px-3"
 			data-ui="ItemQueue"
 		>
-			<header className="flex shrink-0 items-center gap-6 py-4 text-sm">
+			<header className="flex shrink-0 items-center gap-6 py-3 text-sm">
 				<span className="text-muted">
-					{translator.textFn("Queue size")}:{" "}
-					<strong className="text-foreground">{queueSize}</strong>
+					{translator.textFn("Queue")}:{" "}
+					<strong className="text-foreground tabular-nums">
+						{occupied === 0
+							? translator.textFn("Empty")
+							: occupied >= capacity
+								? translator.textFn("Full")
+								: `${occupied}/${capacity}`}
+					</strong>
 				</span>
 				{requests.length > 0 ? (
-					<>
-						<span className="text-muted">
-							{translator.textFn("Queued items")}:{" "}
-							<strong className="text-foreground">{requests.length}</strong>
-						</span>
-						<LinkButton
-							className="ml-auto inline-flex items-center gap-2"
-							disabled={clear.disabled}
-							onClick={clear.clearFn}
-						>
-							<ListX className="size-4" />
-							{translator.textFn("Clear queue")}
-						</LinkButton>
-					</>
+					<LinkButton
+						className="ml-auto inline-flex items-center gap-2"
+						disabled={clear.disabled}
+						onClick={clear.clearFn}
+					>
+						<ListX className="size-4" />
+						{translator.textFn("Clear queue")}
+					</LinkButton>
 				) : null}
 			</header>
 			<section
-				className="flex h-52 shrink-0 flex-col border-y border-line py-4"
+				className="flex min-h-0 max-h-[40%] shrink-0 flex-col border-y border-line py-3"
 				data-ui="ItemQueueActive"
 			>
-				<h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted">
+				<h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">
 					{translator.textFn("Current production")}
 				</h2>
 				{active !== undefined && activeLine !== undefined ? (
@@ -189,7 +191,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 						/>
 					</div>
 				) : (
-					<div className="flex flex-1 items-center justify-center gap-2 text-muted">
+					<div className="flex items-center gap-2 text-sm text-muted">
 						<Pause className="size-5" />
 						{translator.textFn("Nothing is being made right now.")}
 					</div>

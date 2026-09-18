@@ -707,6 +707,8 @@ Editor unsaved changes description:
   value: "**Save** your changes before leaving, or **Discard** them to return to the saved version. Choose **Cancel** to keep editing."
 Editor welcome:
   value: Editor welcome
+Empty:
+  value: Empty
 Enable:
   value: Enable
 Enable Units on this item before selecting Self.:
@@ -795,6 +797,8 @@ Force delete…:
   value: Force delete…
 From Arkpack:
   value: From Arkpack
+Full:
+  value: Full
 Game limit:
   value: Game limit
 General:
@@ -1763,14 +1767,12 @@ Query scope Universe help:
     Searches Inventory, Toolbar and every Board Space in the game.
 
     Use it when the current Space is too small a world.
+Queue:
+  value: Queue
 Queue capacity:
   value: Queue capacity
-Queue size:
-  value: Queue size
 Queued:
   value: Queued
-Queued items:
-  value: Queued items
 Random:
   value: Random
 Random drop placement help:

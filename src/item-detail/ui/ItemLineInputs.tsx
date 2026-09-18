@@ -12,7 +12,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
-/** Compact material slots; delivery availability never counts as material already in the job. */
+/** Shared input thumbnails; unit payers stay in place while material slots support delivery and withdrawal. */
 export const ItemLineInputs = ({
 	ownerItemId,
 	line,
@@ -65,7 +65,9 @@ export const ItemLineInputs = ({
 					input.filled === 0 && input.availableQuantity === 0 && !input.committed;
 				const colorFraction = input.committed ? 1 : input.filled / total;
 				const status = input.committed
-					? translator.textFn("In use for this job.")
+					? input.type === "units"
+						? translator.textFn("Units already spent for this job.")
+						: translator.textFn("In use for this job.")
 					: input.filled > 0
 						? input.filled >= input.quantity.min
 							? translator.textFn("Ready for this job.")
@@ -92,10 +94,14 @@ export const ItemLineInputs = ({
 										{translator.textFn("Click to bring this here.")}
 									</span>
 								) : null}
-								<span className="block">
-									{translator.textFn("Available")}:{" "}
-									<strong className="font-bold">{input.availableQuantity}</strong>
-								</span>
+								{input.type === "materials" ? (
+									<span className="block">
+										{translator.textFn("Available")}:{" "}
+										<strong className="font-bold">
+											{input.availableQuantity}
+										</strong>
+									</span>
+								) : null}
 							</span>
 						}
 					>

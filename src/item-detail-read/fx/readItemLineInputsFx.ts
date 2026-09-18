@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
@@ -25,12 +26,13 @@ export namespace readItemLineInputsFx {
 	}
 
 	export interface Input {
+		readonly type: "materials" | "units";
 		readonly inputIndex: number;
 		readonly itemId: IdSchema.Type;
 		readonly quantity: MaterialSchema.Type["quantity"];
 		readonly filled: number;
 		readonly available: boolean;
-		/** Obtainable stock plus this slot's incoming deliveries, excluding already filled material. */
+		/** For materials, obtainable stock plus this slot's incoming deliveries, excluding already filled material. */
 		readonly availableQuantity: number;
 		readonly committed: boolean;
 		readonly canWithdraw: boolean;
@@ -44,7 +46,7 @@ export namespace readItemLineInputsFx {
 	}
 }
 
-/** Keeps local fill separate from obtainable material and attributes active roots to their exact job slot. */
+/** Projects material ownership and in-place unit readiness without duplicating production admission. */
 export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* ({
 	ownerItemId,
 	line,
@@ -84,8 +86,40 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			runtime.jobQueue.find(
 				(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 			)?.id === work.id);
+	// Resolve the whole line so several inputs cannot claim the same remaining units.
+	const unitReadiness =
+		job === undefined &&
+		owner?.location.scope === "board" &&
+		liveLine?.input.some((input) => input.type === "units")
+			? yield* resolveLineRunFx({
+					ownerItemId: owner.id,
+					lineId: line.id,
+					runtime,
+				})
+			: undefined;
 	const inputs: readItemLineInputsFx.Input[] = [];
 	for (const [inputIndex, input] of (liveLine ?? line).input.entries()) {
+		if (input.type === "units") {
+			// Active jobs have already paid their unit costs, even if that exhausted the payer.
+			const committed = job !== undefined;
+			const available = unitReadiness?.input[inputIndex]?.resolution.ready ?? false;
+			inputs.push({
+				type: "units",
+				inputIndex,
+				itemId: input.query.selector.itemId,
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+				filled: available || committed ? 1 : 0,
+				available,
+				availableQuantity: available ? 1 : 0,
+				committed,
+				canWithdraw: false,
+				canAutofill: false,
+			});
+			continue;
+		}
 		if (input.type !== "materials") continue;
 		let filled = 0;
 		let committed = false;
@@ -159,6 +193,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				0,
 			) + incoming.reduce((total, claim) => total + claim.quantity, 0);
 		inputs.push({
+			type: "materials",
 			inputIndex,
 			itemId: input.selector.itemId,
 			quantity: input.quantity,

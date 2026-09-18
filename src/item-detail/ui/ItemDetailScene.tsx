@@ -76,7 +76,8 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						key={`${target.kind}:${target.itemId}`}
 						lines={controller.detail.lines}
 						ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
-						disabled={disabled || controller.stale || !controller.detail.canMake}
+						disabled={disabled || controller.stale}
+						makeDisabled={!controller.detail.canMake}
 					/>
 				) : null}
 			</div>

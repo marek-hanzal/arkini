@@ -808,6 +808,8 @@ Highest demand first:
   value: Highest demand first
 Hint:
   value: Hint
+Idle:
+  value: Idle
 Image:
   value: Image
 Images:
@@ -1545,6 +1547,8 @@ Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
   value: Paste ngrok authtoken
+Paused:
+  value: Paused
 Pick random space:
   value: Pick random space
 Player controls:
@@ -1737,6 +1741,8 @@ Query scope Universe help:
     Use it when the current Space is too small a world.
 Queue capacity:
   value: Queue capacity
+Queued:
+  value: Queued
 Random:
   value: Random
 Random drop placement help:
@@ -1881,6 +1887,8 @@ Rule type:
   value: Rule type
 Rules:
   value: Rules
+Running:
+  value: Running
 Runtime:
   value: Production time
 Runtime (seconds):
@@ -2192,6 +2200,12 @@ Visible:
   value: Visible
 Volume:
   value: Volume
+Waiting for input:
+  value: Waiting for input
+Waiting for space:
+  value: Waiting for space
+Waiting to start:
+  value: Waiting to start
 Weight:
   value: Weight
 When a new item is created.:

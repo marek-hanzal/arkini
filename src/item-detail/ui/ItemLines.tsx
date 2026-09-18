@@ -81,6 +81,49 @@ const ItemLineCountdown = ({
 	);
 };
 
+/** Progress follows the live job's captured duration, independently of debounced status. */
+const ItemLineBackdrop = ({
+	ownerItemId,
+	lineId,
+	artworkId,
+}: {
+	readonly ownerItemId?: IdSchema.Type;
+	readonly lineId: IdSchema.Type;
+	readonly artworkId: IdSchema.Type;
+}) => {
+	const game = useGameEngine();
+	const selectorFn = useCallback(
+		(runtime: RuntimeSchema.Type) => {
+			const job = runtime.jobs.find(
+				(job) => job.ownerItemId === ownerItemId && job.lineId === lineId,
+			);
+			return job === undefined
+				? 0
+				: job.durationMs === 0
+					? 1
+					: 1 - job.remainingMs / job.durationMs;
+		},
+		[
+			ownerItemId,
+			lineId,
+		],
+	);
+	const progress = useRuntimeSelector(game, selectorFn);
+	return (
+		<div
+			className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-[42%] -translate-x-1/2 opacity-45 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_72%)]"
+			data-ui="ItemLineBackdrop"
+		>
+			<ItemArtwork
+				className="size-full"
+				imageClassName="object-cover"
+				sourceUrl={game.getResourceUrlFn(artworkId)}
+				colorFraction={progress}
+			/>
+		</div>
+	);
+};
+
 const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLineProps) => {
 	const game = useGameEngine();
 	const present = useIsPresent();
@@ -135,12 +178,10 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 				data-line-id={line.id}
 			>
 				{line.artwork === undefined ? null : (
-					<img
-						className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 h-full w-[42%] -translate-x-1/2 object-cover opacity-70 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_72%)]"
-						data-ui="ItemLineBackdrop"
-						src={game.getResourceUrlFn(line.artwork)}
-						alt=""
-						draggable={false}
+					<ItemLineBackdrop
+						ownerItemId={props.ownerItemId}
+						lineId={line.id}
+						artworkId={line.artwork}
 					/>
 				)}
 				<div className="flex items-center gap-3">

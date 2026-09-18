@@ -37,14 +37,22 @@ export const ItemArtwork = ({
 	const artwork = (
 		<>
 			<img
-				className={`${sharedImageClassName} ${layered ? "top-0 left-0 size-3/4" : "inset-0 size-full"} ${imageClassName}`}
+				className={twMerge(
+					sharedImageClassName,
+					layered ? "top-0 left-0 size-3/4" : "inset-0 size-full",
+					imageClassName,
+				)}
 				src={sourceUrl}
 				alt=""
 				draggable={false}
 			/>
 			{compositeUrl === undefined ? null : (
 				<img
-					className={`${sharedImageClassName} right-0 bottom-0 z-10 size-3/4 ${imageClassName}`}
+					className={twMerge(
+						sharedImageClassName,
+						"right-0 bottom-0 z-10 size-3/4",
+						imageClassName,
+					)}
 					src={compositeUrl}
 					alt=""
 					draggable={false}

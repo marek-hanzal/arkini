@@ -47,7 +47,7 @@ const QueuedLine = ({
 	});
 	return (
 		<li
-			className="relative isolate flex gap-4 py-4"
+			className="relative isolate flex min-h-48 items-center gap-4 py-4"
 			data-ui="ItemQueueRequest"
 			data-request-id={requestId}
 		>

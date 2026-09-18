@@ -143,6 +143,15 @@
 											},
 											"placement": "drop",
 											"rules": []
+										},
+										{
+											"itemId": "knife",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										}
 									]
 								}

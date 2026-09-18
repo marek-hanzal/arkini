@@ -1,19 +1,19 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "b3s2zbbcu7fggst61pzd762l",
-		"id": "hunter",
-		"title": "Hunter",
-		"description": "Hunt",
+		"uid": "o8sabovband91umj6szmhzza",
+		"id": "jack-o-lantern",
+		"title": "Jack O Lantern",
+		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"hunter"
+				"jack-o-lantern"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"maxQueueSize": 6,
+		"maxQueueSize": 1,
 		"lines": []
 	}
 }

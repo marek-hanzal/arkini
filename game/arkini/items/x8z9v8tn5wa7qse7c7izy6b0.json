@@ -41,21 +41,6 @@
 						}
 					},
 					{
-						"units": {
-							"cost": 1,
-							"from": "target"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "inkwell"
-							},
-							"scope": "board",
-							"distance": "far"
-						}
-					},
-					{
 						"type": "materials",
 						"selector": {
 							"type": "item",
@@ -145,21 +130,6 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						}
-					},
-					{
-						"units": {
-							"cost": 1,
-							"from": "target"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "inkwell"
-							},
-							"scope": "board",
-							"distance": "far"
 						}
 					},
 					{
@@ -392,21 +362,6 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
-						}
-					},
-					{
-						"units": {
-							"cost": 1,
-							"from": "target"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "inkwell"
-							},
-							"scope": "board",
-							"distance": "far"
 						}
 					},
 					{

@@ -762,8 +762,6 @@ Exists condition help:
     Use it when the exact amount does not matter.
 Exit:
   value: Exit
-Expired:
-  value: Expired
 Expiry mode:
   value: When time runs out
 Expiry output:
@@ -807,6 +805,8 @@ General PNG images keep their original dimensions.:
   value: General PNG images keep their original dimensions.
 Global playlist:
   value: Global playlist
+Gone:
+  value: Gone
 Guaranteed:
   value: Guaranteed
 Guaranteed roll type help:
@@ -1440,8 +1440,6 @@ No items match this search.:
   value: No items match this search.
 No items yet:
   value: No items yet
-No longer here:
-  value: No longer here
 No matches found.:
   value: No matches found.
 No matching items:

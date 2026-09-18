@@ -7,6 +7,7 @@ import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Tx } from "~/translation/ui/Tx";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemDetailSceneProps extends useItemDetailSceneController.Props {
 	readonly disabled: boolean;
@@ -19,13 +20,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	});
 	const closeItemDetailFn = useCloseItemDetail();
 	const translator = useTranslator();
-	const status = !controller.stale
-		? undefined
-		: controller.removalReason === "depleted"
-			? translator.textFn("Depleted")
-			: controller.removalReason === "expired"
-				? translator.textFn("Expired")
-				: translator.textFn("No longer here");
+	const status = controller.stale ? translator.textFn("Gone") : undefined;
 	const navigation = (
 		<ItemDetailTabs
 			active={target.tab}
@@ -65,8 +60,13 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				</header>
 			)}
 			<div
-				className="min-h-0 flex-1 overflow-auto [container-type:size] data-[tab=queue]:overflow-hidden"
-				data-ui="ItemDetailPanel"
+				className="min-h-0 flex-1 overflow-auto [container-type:size] transition-opacity duration-300 data-[tab=queue]:overflow-hidden data-[ui-stale=true]:opacity-45"
+				{...readDataUiFn({
+					dataUi: "ItemDetailPanel",
+					state: {
+						stale: controller.stale,
+					},
+				})}
 				data-tab={target.tab}
 			>
 				{target.tab === "info" && controller.detail !== undefined ? (

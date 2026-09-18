@@ -501,7 +501,7 @@
 				"artwork": "explorer",
 				"description": "Draw plans for an explorer's camp.",
 				"default": false,
-				"show": true,
+				"show": false,
 				"enable": true,
 				"runtimeMs": 30000,
 				"input": [
@@ -554,7 +554,33 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "lumer-camp"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stonemason-camp"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
 			},
 			{
 				"id": "hunter-blueprint",
@@ -562,7 +588,7 @@
 				"artwork": "hunter",
 				"description": "Draw plans for a hunter's camp.",
 				"default": false,
-				"show": true,
+				"show": false,
 				"enable": true,
 				"runtimeMs": 30000,
 				"input": [
@@ -615,7 +641,33 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "lumer-camp"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stonemason-camp"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
 			}
 		]
 	}

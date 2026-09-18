@@ -12,6 +12,7 @@ import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { ItemLineBackdrop } from "~/item-detail/ui/ItemLineBackdrop";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -240,21 +241,28 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 						variant="flat"
 					/>
 				) : (
-					<ol className="divide-y divide-line">
-						{requests.map((request, index) => {
-							const line = lines.find((candidate) => candidate.id === request.lineId);
-							return line === undefined ? null : (
-								<QueuedLine
-									key={request.requestId}
-									ownerItemId={ownerItemId}
-									line={line}
-									requestId={request.requestId}
-									position={index + 1}
-									disabled={disabled}
-								/>
-							);
-						})}
-					</ol>
+					<>
+						<ol className="shrink-0 divide-y divide-line">
+							{requests.map((request, index) => {
+								const line = lines.find(
+									(candidate) => candidate.id === request.lineId,
+								);
+								return line === undefined ? null : (
+									<QueuedLine
+										key={request.requestId}
+										ownerItemId={ownerItemId}
+										line={line}
+										requestId={request.requestId}
+										position={index + 1}
+										disabled={disabled}
+									/>
+								);
+							})}
+						</ol>
+						<div className="shrink-0 pb-[50cqh]">
+							<SectionEnd />
+						</div>
+					</>
 				)}
 			</div>
 		</section>

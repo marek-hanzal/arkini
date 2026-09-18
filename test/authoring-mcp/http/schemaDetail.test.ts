@@ -61,6 +61,34 @@ describe("editor MCP authoring schema registry", () => {
 				},
 			},
 		});
+		expect(
+			await readSchemaDetail("urn:arkini:schema:mcp:replace-item-line-input"),
+		).toMatchObject({
+			properties: {
+				line: {
+					$ref: "ReplacementLineSchema",
+				},
+			},
+			required: [
+				"itemId",
+				"lineId",
+				"revision",
+				"line",
+			],
+		});
+		expect(await readSchemaDetail("ReplacementLineSchema")).toMatchObject({
+			required: expect.arrayContaining([
+				"id",
+				"title",
+				"description",
+				"default",
+				"show",
+				"enable",
+				"runtimeMs",
+				"input",
+				"rules",
+			]),
+		});
 		expect(await readSchemaDetail("ItemPatchSchema")).toMatchObject({
 			minProperties: 1,
 			type: "object",
@@ -162,6 +190,7 @@ describe("editor MCP authoring schema registry", () => {
 		const pending = [
 			"urn:arkini:schema:mcp:create-item-input",
 			"urn:arkini:schema:mcp:edit-item-input",
+			"urn:arkini:schema:mcp:replace-item-line-input",
 			"urn:arkini:schema:mcp:edit-project-input",
 		];
 		const visited = new Set<string>();
@@ -198,6 +227,7 @@ describe("editor MCP authoring schema registry", () => {
 				"action.RuleSchema",
 				"MergeSchema",
 				"ArtworkSchema",
+				"ReplacementLineSchema",
 				"item.CompositionSchema",
 				"StartSchema",
 				"start.BoardItemSchema",

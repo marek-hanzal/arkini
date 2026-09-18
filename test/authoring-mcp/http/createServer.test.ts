@@ -32,6 +32,7 @@ describe("editor MCP server", () => {
 			"schema_detail",
 			"create_item",
 			"edit_item",
+			"replace_item_line",
 			"project_config",
 			"edit_project",
 			"edit_project_layout",
@@ -53,6 +54,7 @@ describe("editor MCP server", () => {
 			"delete_note",
 			"item_detail",
 			"item_config",
+			"item_line_config",
 			"item_input",
 			"item_output",
 			"item_estimate",
@@ -82,6 +84,7 @@ describe("editor MCP server", () => {
 		const jsonInputToolNames = new Set([
 			"create_item",
 			"edit_item",
+			"replace_item_line",
 			"edit_project",
 		]);
 		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {
@@ -117,6 +120,14 @@ describe("editor MCP server", () => {
 				return inputSchema.$id;
 			});
 		expect(new Set(schemaIds).size).toBe(schemaIds.length);
+		expect(
+			tools.tools.find(({ name }) => name === "validate_project")?.inputSchema.properties,
+		).toMatchObject({
+			includeWarnings: {
+				default: true,
+				type: "boolean",
+			},
+		});
 		expect(
 			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
 		).toMatchObject({

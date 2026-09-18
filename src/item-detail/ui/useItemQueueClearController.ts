@@ -1,16 +1,12 @@
-import { useAtom } from "@effect/atom-react";
 import { Equal } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
-import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
-import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
+import { useItemQueueClearCommand } from "./useItemQueueClearCommand";
 
 export namespace useItemQueueClearController {
 	export interface Props {
@@ -50,22 +46,14 @@ export const useItemQueueClearController = ({
 		],
 	);
 	const state = useRuntimeSelector(game, selectorFn, Equal.equals);
-	const commandAtom = useMemo(
-		() => Atom.fn((props: clearItemJobQueueFx.Props) => game.runFx(clearItemJobQueueFx(props))),
-		[
-			game,
-			ownerItemId,
-		],
-	);
-	const [result, clearQueueFn] = useAtom(commandAtom);
-	RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
-	const unavailable = disabled || !state.controllable || state.queued === 0 || result.waiting;
+	const command = useItemQueueClearCommand(ownerItemId);
+	const unavailable = disabled || !state.controllable || state.queued === 0 || command.waiting;
 	return {
 		queued: state.queued,
 		disabled: unavailable,
 		clearFn: () => {
 			if (unavailable || ownerItemId === undefined) return;
-			clearQueueFn({
+			command.clearQueueFn({
 				ownerItemId,
 			});
 		},

@@ -42,11 +42,19 @@ const ProjectConfigInputSchema = z.object({}).strict().meta({
 	description: "The project configuration read tool accepts no arguments.",
 });
 
-const ValidateProjectInputSchema = z.object({}).strict().meta({
-	$id: "urn:arkini:schema:mcp:validate-project-input",
-	title: "Validate project tool input",
-	description: "The project validation tool accepts no arguments.",
-});
+const ValidateProjectInputSchema = z
+	.object({
+		includeWarnings: z
+			.boolean()
+			.default(true)
+			.describe("Whether warning diagnostics should be included in the result."),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:validate-project-input",
+		title: "Validate project tool input",
+		description: "Controls whether project validation includes warning diagnostics.",
+	});
 
 const RenameItemInputSchema = z
 	.object({
@@ -318,10 +326,17 @@ export const registerGameplayDesignToolsFn = ({
 		"validate_project",
 		{
 			description:
-				"Validate the canonical saved project with the same completed-game semantic and resource-reference rules used by the editor build path. Returns readable diagnostics; it does not re-decode stored PNG bytes.",
+				"Validate the canonical saved project with the same completed-game semantic and resource-reference rules used by the editor build path. Set includeWarnings to false to return only errors. Returns readable diagnostics; it does not re-decode stored PNG bytes.",
 			inputSchema: ValidateProjectInputSchema,
 		},
-		async () => runToolFn(readProjectFx().pipe(Effect.flatMap(readProjectValidationTextFx))),
+		async ({ includeWarnings }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) =>
+						readProjectValidationTextFx(project, includeWarnings),
+					),
+				),
+			),
 	);
 	server.registerTool(
 		"rename_item",

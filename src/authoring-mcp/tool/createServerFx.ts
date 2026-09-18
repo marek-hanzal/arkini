@@ -12,10 +12,12 @@ import { ArtworkCollectionInputSchema } from "./ArtworkCollectionInputSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchema } from "./CreateItemInputSchema";
 import { EditItemInputSchema } from "./EditItemInputSchema";
+import { ReplaceItemLineInputSchema } from "./ReplaceItemLineInputSchema";
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
+import { replaceItemLineFx } from "./replaceItemLineFx";
 import { readArtworkCollectionTextFn } from "./fn/readArtworkCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
@@ -61,6 +63,18 @@ const ItemConfigInputSchema = z
 		$id: "urn:arkini:schema:mcp:item-config-input",
 		title: "Item configuration tool input",
 		description: "The identity of the item whose canonical configuration is requested.",
+	});
+
+const ItemLineConfigInputSchema = z
+	.object({
+		itemId: IdSchema.describe("The exact item ID returned by item_collection."),
+		lineId: IdSchema.describe("The exact line ID returned by item_config."),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:item-line-config-input",
+		title: "Item line configuration tool input",
+		description: "The item and production-line identities whose canonical config is requested.",
 	});
 
 const itemRelationInputSchema = (role: "input" | "output") =>
@@ -197,6 +211,37 @@ const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")((project: Project
 	}),
 );
 
+const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
+	(project: Project, itemId: string, lineId: string) =>
+		Effect.gen(function* () {
+			const item = project.config.items[itemId];
+			if (item === undefined)
+				return yield* Effect.fail(
+					new Error(`Item ${itemId} does not exist in the open project.`),
+				);
+			const matchingLines = item.lines.filter(({ id }) => id === lineId);
+			if (matchingLines.length === 0)
+				return yield* Effect.fail(
+					new Error(`Line ${lineId} does not exist on item ${itemId}.`),
+				);
+			if (matchingLines.length > 1)
+				return yield* Effect.fail(
+					new Error(
+						`Line ${lineId} is ambiguous on item ${itemId}; fix its duplicate line IDs before reading it.`,
+					),
+				);
+			return JSON.stringify(
+				{
+					revision: project.revision,
+					itemId,
+					line: matchingLines[0],
+				},
+				null,
+				2,
+			);
+		}),
+);
+
 const readCurrentProjectFx = (
 	repository: ProjectRepositoryService,
 	readProjectContextFn: () => string | undefined,
@@ -324,6 +369,33 @@ const createServerFn = (
 				),
 		);
 	}
+	{
+		const schemaId = resolveSchemaId(ReplaceItemLineInputSchema);
+		server.registerTool(
+			"replace_item_line",
+			{
+				description: `Replace one existing production line atomically without resending the item's other lines. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Read item_line_config first and copy its revision. The replacement line is complete: all base values are required, omitted optional values are removed, and its ID must match the target line ID.`,
+				inputSchema: JsonToolInputSchema,
+			},
+			async ({ input }) =>
+				runToolFn(
+					parseToolInputJsonFx(input, ReplaceItemLineInputSchema).pipe(
+						Effect.flatMap((decodedInput) =>
+							readProjectFx().pipe(
+								Effect.flatMap((project) =>
+									replaceItemLineFx({
+										input: decodedInput,
+										notifyProjectChangedFn,
+										project,
+										repository,
+									}),
+								),
+							),
+						),
+					),
+				),
+		);
+	}
 	registerGameplayDesignToolsFn({
 		notifyProjectChangedFn,
 		readProjectFx,
@@ -413,13 +485,27 @@ const createServerFn = (
 		"item_config",
 		{
 			description:
-				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the edit request.",
+				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the write request. Use item_line_config for one production line.",
 			inputSchema: ItemConfigInputSchema,
 		},
 		async ({ itemId }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemConfigTextFx(project, itemId)),
+				),
+			),
+	);
+	server.registerTool(
+		"item_line_config",
+		{
+			description:
+				"Read the complete canonical JSON configuration of one production line and its project revision. Use this immediately before replace_item_line and copy the revision and every unchanged line value into the replacement request.",
+			inputSchema: ItemLineConfigInputSchema,
+		},
+		async ({ itemId, lineId }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => readItemLineConfigTextFx(project, itemId, lineId)),
 				),
 			),
 	);

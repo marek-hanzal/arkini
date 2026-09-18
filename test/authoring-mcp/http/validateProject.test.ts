@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
+import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
@@ -35,7 +36,14 @@ describe("editor MCP project validation", () => {
 						],
 					},
 				},
-				resources: editorTestPayload.resources,
+				resources: [
+					...editorTestPayload.resources,
+					{
+						id: "unused-artwork",
+						type: "artwork",
+						bytes: createTestPngBytes(),
+					},
+				],
 			}),
 		);
 		ownership.setProjectContextFn("invalid-project");
@@ -53,6 +61,21 @@ describe("editor MCP project validation", () => {
 		expect(text.text).toContain("Errors:");
 		expect(text.text).toContain("Path: start.board.0.itemId");
 		expect(text.text).toContain("Initial board references missing item missing-item.");
+		expect(text.text).toContain("[warning]");
 		expect(() => JSON.parse(text.text)).toThrow();
+
+		const errorsOnly = await client.callTool({
+			name: "validate_project",
+			arguments: {
+				includeWarnings: false,
+			},
+		});
+		const errorsOnlyText = errorsOnly.content[0];
+		if (errorsOnlyText?.type !== "text") throw new Error("Missing validation text.");
+		expect(errorsOnlyText.text).toContain("Errors:");
+		expect(errorsOnlyText.text).toContain("Warnings: 1 (suppressed)");
+		expect(errorsOnlyText.text).toContain("[error]");
+		expect(errorsOnlyText.text).not.toContain("[warning]");
+		expect(errorsOnlyText.text).not.toContain("unused-artwork");
 	});
 });

@@ -7,6 +7,7 @@ import { validateGameResourcesFn } from "~/game-config-validation/fn/validateGam
 /** Prints canonical saved-project semantic and resource-reference diagnostics. */
 export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextFx")(function* (
 	project: Project,
+	includeWarnings = true,
 ) {
 	const source = `editor:${project.projectId}`;
 	const provenance = {
@@ -37,14 +38,17 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 	];
 	const errors = diagnostics.filter(({ severity }) => severity === "error").length;
 	const warnings = diagnostics.length - errors;
+	const visibleDiagnostics = includeWarnings
+		? diagnostics
+		: diagnostics.filter(({ severity }) => severity === "error");
 	const lines = [
 		"Project validation",
 		`Project ID: ${project.projectId}`,
 		`Revision: ${project.revision}`,
 		`Errors: ${errors}`,
-		`Warnings: ${warnings}`,
+		`Warnings: ${warnings}${includeWarnings ? "" : " (suppressed)"}`,
 	];
-	for (const diagnostic of diagnostics) {
+	for (const diagnostic of visibleDiagnostics) {
 		lines.push(
 			`- [${diagnostic.severity}] ${diagnostic.code}`,
 			`  Path: ${diagnostic.path.join(".")}`,
@@ -52,6 +56,7 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 		);
 		if (diagnostic.source !== undefined) lines.push(`  Source: ${diagnostic.source}`);
 	}
-	if (diagnostics.length === 0) lines.push("No diagnostics.");
+	if (visibleDiagnostics.length === 0)
+		lines.push(includeWarnings ? "No diagnostics." : "No errors.");
 	return lines.join("\n");
 });

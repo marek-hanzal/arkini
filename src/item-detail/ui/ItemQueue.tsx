@@ -14,7 +14,6 @@ import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { ItemLineBackdrop } from "~/item-detail/ui/ItemLineBackdrop";
 import { ItemProductionRow } from "~/item-detail/ui/ItemProductionRow";
-import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -314,7 +313,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 									</AnimatePresence>
 								</ol>
 								<div className="shrink-0 pb-[50cqh]">
-									<div className="flex justify-end py-3">
+									<div className="flex justify-center py-3">
 										<LinkButton
 											className="inline-flex items-center gap-2 text-sm"
 											disabled={clear.disabled}
@@ -324,7 +323,6 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 											{translator.textFn("Clear queue")}
 										</LinkButton>
 									</div>
-									<SectionEnd />
 								</div>
 							</>
 						)}

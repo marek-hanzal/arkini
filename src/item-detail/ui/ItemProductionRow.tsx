@@ -30,7 +30,7 @@ export const ItemProductionRow = ({
 	const game = useGameEngine();
 	return (
 		<article
-			className="group/production-row relative isolate flex min-h-48 flex-col justify-center py-11 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45 data-[ui-reserved=true]:h-full data-[ui-reserved=true]:min-h-0 data-[ui-reserved=true]:py-4"
+			className="group/production-row relative isolate flex min-h-48 flex-col justify-center py-[6.875rem] transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45 data-[ui-reserved=true]:h-full data-[ui-reserved=true]:min-h-0 data-[ui-reserved=true]:py-4"
 			{...readDataUiFn({
 				dataUi: "ItemProductionRow",
 				state: {

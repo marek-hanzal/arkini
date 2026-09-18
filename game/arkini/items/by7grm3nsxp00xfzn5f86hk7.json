@@ -1,15 +1,16 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "uoratu4uyxa3lg0eom8ubjcy",
-		"id": "sawmill-blueprint",
-		"title": "Sawmill Blueprint",
-		"description": "What about some stuff sawing other stuff?",
+		"uid": "by7grm3nsxp00xfzn5f86hk7",
+		"id": "stoneworks-blueprint",
+		"title": "Stoneworks Blueprint",
+		"draft": false,
+		"description": "Turn rough stone into something a builder can pretend is civilized.",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",
-				"sawmill"
+				"stoneworks"
 			]
 		},
 		"scope": "any",
@@ -20,9 +21,9 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "sawmill",
-				"title": "Build Sawmill",
-				"description": "Let's build sawmill",
+				"id": "stoneworks",
+				"title": "Build Stoneworks",
+				"description": "Build a Stoneworks.",
 				"default": true,
 				"show": true,
 				"enable": true,
@@ -37,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sawmill-blueprint"
+								"itemId": "stoneworks-blueprint"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -51,8 +52,8 @@
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 4,
-							"max": 4
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -63,8 +64,8 @@
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 3,
-							"max": 3
+							"min": 4,
+							"max": 4
 						}
 					}
 				],
@@ -78,7 +79,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sawmill",
+											"itemId": "stoneworks",
 											"quantity": {
 												"min": 1,
 												"max": 1

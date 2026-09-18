@@ -1,7 +1,8 @@
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { Equal, Exit } from "effect";
 import { Factory, Inbox, ListOrdered, ListX, X } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, type ReactNode } from "react";
+import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { match } from "ts-pattern";
 
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
@@ -20,6 +21,37 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
+
+const queueFadeMotion = {
+	initial: {
+		opacity: 0,
+	},
+	animate: {
+		opacity: 1,
+	},
+	exit: {
+		opacity: 0,
+	},
+	transition: {
+		duration: 0.2,
+		ease: "easeInOut" as const,
+	},
+};
+
+/** Outgoing content stays visible only for its fade, never as an actionable stale job. */
+const ItemQueuePresence = ({ children }: { readonly children: ReactNode }) => {
+	const present = useIsPresent();
+	return (
+		<motion.div
+			{...queueFadeMotion}
+			className="flex h-full flex-1 shrink-0 flex-col"
+			data-ui="ItemQueuePresence"
+			inert={!present}
+		>
+			{children}
+		</motion.div>
+	);
+};
 
 interface ItemQueueProps extends useItemQueueClearController.Props {
 	readonly queueSize?: number;
@@ -40,6 +72,7 @@ const QueuedLine = ({
 }) => {
 	const translator = useTranslator();
 	const game = useGameEngine();
+	const present = useIsPresent();
 	const cancel = useItemLineCancelController({
 		ownerItemId,
 		lineId: line.id,
@@ -47,7 +80,25 @@ const QueuedLine = ({
 		disabled,
 	});
 	return (
-		<li
+		<motion.li
+			initial={{
+				opacity: 0,
+				height: 0,
+			}}
+			animate={{
+				opacity: 1,
+				height: "auto",
+			}}
+			exit={{
+				opacity: 0,
+				height: 0,
+			}}
+			transition={{
+				duration: 0.25,
+				ease: "easeInOut",
+			}}
+			className="overflow-hidden"
+			inert={!present}
 			data-ui="ItemQueueRequest"
 			data-request-id={requestId}
 		>
@@ -82,7 +133,7 @@ const QueuedLine = ({
 					/>
 				}
 			/>
-		</li>
+		</motion.li>
 	);
 };
 
@@ -167,102 +218,121 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 				className="h-48 shrink-0 border-y border-line"
 				data-ui="ItemQueueActive"
 			>
-				{active !== undefined && activeLine !== undefined ? (
-					<ItemProductionRow
-						line={activeLine}
-						reserved
-						backdrop={
-							activeLine.artwork === undefined ? null : (
-								<ItemLineBackdrop
-									sourceUrl={game.getResourceUrlFn(activeLine.artwork)}
-									progress={
-										active.durationMs === 0
-											? 1
-											: 1 - active.remainingMs / active.durationMs
-									}
-								/>
-							)
-						}
-						actions={
-							<ItemJobCancel
-								ownerItemId={ownerItemId}
-								jobId={active.jobId}
-								lineId={active.lineId}
-								disabled={disabled}
-							/>
-						}
-						inputs={
-							<ItemLineInputs
-								ownerItemId={ownerItemId}
+				<AnimatePresence
+					initial={false}
+					mode="wait"
+				>
+					<ItemQueuePresence key={active?.jobId ?? "empty"}>
+						{active !== undefined && activeLine !== undefined ? (
+							<ItemProductionRow
 								line={activeLine}
-								idle={false}
-								disabled={disabled}
-								work={{
-									kind: "active",
-									id: active.jobId,
-								}}
-							/>
-						}
-						status={
-							<span className="text-foreground">
-								{match(active.status)
-									.with("running", () => translator.textFn("Running"))
-									.with("paused", () => translator.textFn("Paused"))
-									.with("awaiting-output", () =>
-										translator.textFn("Waiting for space"),
+								reserved
+								backdrop={
+									activeLine.artwork === undefined ? null : (
+										<ItemLineBackdrop
+											sourceUrl={game.getResourceUrlFn(activeLine.artwork)}
+											progress={
+												active.durationMs === 0
+													? 1
+													: 1 - active.remainingMs / active.durationMs
+											}
+										/>
 									)
-									.exhaustive()}
-								{active.status === "running" ? (
-									<span className="inline-block min-w-[6ch] text-right tabular-nums">
-										· {formatDurationFn(active.remainingMs, "countdown")}
+								}
+								actions={
+									<ItemJobCancel
+										ownerItemId={ownerItemId}
+										jobId={active.jobId}
+										lineId={active.lineId}
+										disabled={disabled}
+									/>
+								}
+								inputs={
+									<ItemLineInputs
+										ownerItemId={ownerItemId}
+										line={activeLine}
+										idle={false}
+										disabled={disabled}
+										work={{
+											kind: "active",
+											id: active.jobId,
+										}}
+									/>
+								}
+								status={
+									<span className="text-foreground">
+										{match(active.status)
+											.with("running", () => translator.textFn("Running"))
+											.with("paused", () => translator.textFn("Paused"))
+											.with("awaiting-output", () =>
+												translator.textFn("Waiting for space"),
+											)
+											.exhaustive()}
+										{active.status === "running" ? (
+											<span className="inline-block min-w-[6ch] text-right tabular-nums">
+												·{" "}
+												{formatDurationFn(active.remainingMs, "countdown")}
+											</span>
+										) : null}
 									</span>
-								) : null}
-							</span>
-						}
-					/>
-				) : (
-					<div className="flex h-full items-center justify-center gap-2 text-accent">
-						<Inbox className="size-5" />
-						{translator.textFn("Nothing is being made right now.")}
-					</div>
-				)}
+								}
+							/>
+						) : (
+							<div className="flex h-full items-center justify-center gap-2 text-accent">
+								<Inbox className="size-5" />
+								{translator.textFn("Nothing is being made right now.")}
+							</div>
+						)}
+					</ItemQueuePresence>
+				</AnimatePresence>
 			</section>
 			<div
 				className="flex min-h-0 flex-1 flex-col overflow-auto"
 				data-ui="ItemQueuePending"
 			>
-				{requests.length === 0 ? (
-					<Status
-						icon={ListOrdered}
-						title={translator.textFn("Your queue is empty.")}
-						description={translator.textFn("Choose something to make in Lines.")}
-						size="large"
-						variant="flat"
-					/>
-				) : (
-					<>
-						<ol className="shrink-0 divide-y divide-line">
-							{requests.map((request, index) => {
-								const line = lines.find(
-									(candidate) => candidate.id === request.lineId,
-								);
-								return line === undefined ? null : (
-									<QueuedLine
-										key={request.requestId}
-										ownerItemId={ownerItemId}
-										line={line}
-										requestId={request.requestId}
-										position={index + 1}
-										disabled={disabled}
-									/>
-								);
-							})}
-						</ol>
-						<div className="shrink-0 pb-[50cqh]">
-							<SectionEnd />
-						</div>
-					</>
-				)}
+				<AnimatePresence
+					initial={false}
+					mode="wait"
+				>
+					<ItemQueuePresence key={requests.length === 0 ? "empty" : "requests"}>
+						{requests.length === 0 ? (
+							<Status
+								icon={ListOrdered}
+								title={translator.textFn("Your queue is empty.")}
+								description={translator.textFn(
+									"Choose something to make in Lines.",
+								)}
+								size="large"
+								variant="flat"
+							/>
+						) : (
+							<>
+								<ol className="shrink-0 divide-y divide-line">
+									<AnimatePresence initial={false}>
+										{requests.map((request, index) => {
+											const line = lines.find(
+												(candidate) => candidate.id === request.lineId,
+											);
+											return line === undefined ? null : (
+												<QueuedLine
+													key={request.requestId}
+													ownerItemId={ownerItemId}
+													line={line}
+													requestId={request.requestId}
+													position={index + 1}
+													disabled={disabled}
+												/>
+											);
+										})}
+									</AnimatePresence>
+								</ol>
+								<div className="shrink-0 pb-[50cqh]">
+									<SectionEnd />
+								</div>
+							</>
+						)}
+					</ItemQueuePresence>
+				</AnimatePresence>
 			</div>
 		</section>
 	);

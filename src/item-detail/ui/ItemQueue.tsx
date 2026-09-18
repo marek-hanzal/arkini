@@ -1,6 +1,6 @@
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { Equal, Exit } from "effect";
-import { Factory, ListOrdered, ListX, Pause, X } from "lucide-react";
+import { Factory, Inbox, ListOrdered, ListX, X } from "lucide-react";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -222,7 +222,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 					/>
 				) : (
 					<div className="flex h-full items-center justify-center gap-2 text-accent">
-						<Pause className="size-5" />
+						<Inbox className="size-5" />
 						{translator.textFn("Nothing is being made right now.")}
 					</div>
 				)}

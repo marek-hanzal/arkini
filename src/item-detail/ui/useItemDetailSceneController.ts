@@ -11,6 +11,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
+import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
@@ -25,6 +26,7 @@ export namespace useItemDetailSceneController {
 			"description" | "scope" | "maxStackSize" | "maxCount" | "lines"
 		> {
 		readonly canMake: boolean;
+		readonly queueSize?: number;
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
@@ -120,6 +122,9 @@ export const useItemDetailSceneController = ({
 			}
 			return {
 				lines: lines.value,
+				queueSize: readItemQueueSizeFn({
+					item,
+				}),
 				canMake,
 				title: item.title,
 				sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),

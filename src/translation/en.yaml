@@ -386,6 +386,8 @@ Clear interval:
   value: Clear interval
 Clear lifetime:
   value: Clear lifetime
+Clear queue:
+  value: Clear queue
 Clock:
   value: Clock
 Clock expiry:
@@ -1753,8 +1755,12 @@ Query scope Universe help:
     Use it when the current Space is too small a world.
 Queue capacity:
   value: Queue capacity
+Queue size:
+  value: Queue size
 Queued:
   value: Queued
+Queued items:
+  value: Queued items
 Random:
   value: Random
 Random drop placement help:
@@ -2116,6 +2122,8 @@ This item doesn't use units.:
 This item has no inputs:
   value: This item has no inputs
   dynamic: true
+This item has nothing to make.:
+  value: This item has nothing to make.
 This item is unreachable.:
   value: This item is unreachable.
 This item produces nothing:

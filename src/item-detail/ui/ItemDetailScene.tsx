@@ -69,7 +69,12 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				data-tab={target.tab}
 			>
 				{target.tab === "info" && controller.detail !== undefined ? (
-					<ItemInfo detail={controller.detail} />
+					<ItemInfo
+						key={`${target.kind}:${target.itemId}`}
+						detail={controller.detail}
+						ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
+						disabled={disabled || controller.stale}
+					/>
 				) : null}
 				{target.tab === "lines" && controller.detail !== undefined ? (
 					<ItemLines

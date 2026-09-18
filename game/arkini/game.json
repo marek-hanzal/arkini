@@ -7,6 +7,7 @@
 	"meta": {
 		"id": "arkini",
 		"title": "Arkini",
+		"introduction": "# Good luck!\n\nArkini is a sandbox. Things react to what you do. Items can spoil, animals can get sick, resources can be wasted, and some mistakes are very real.\n\nExperiment. Pay attention. If something looks like a bad idea, it probably is.\n\nThat doesn't mean you shouldn't try it.\n\n**The game won't always save you from yourself.**",
 		"board": {
 			"width": 17,
 			"height": 11

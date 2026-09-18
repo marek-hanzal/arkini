@@ -129,6 +129,7 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 				<ItemLineInputs
 					ownerItemId={props.ownerItemId}
 					line={line}
+					idle={state === "idle"}
 				/>
 				<p
 					className="mt-3 ml-auto shrink-0 text-sm text-foreground data-[ui-idle=true]:text-muted"

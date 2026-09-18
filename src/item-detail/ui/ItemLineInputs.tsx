@@ -14,7 +14,10 @@ import { Tooltip } from "~/ui/ui/Tooltip";
 export const ItemLineInputs = ({
 	ownerItemId,
 	line,
-}: Omit<readItemLineInputsFx.Props, "runtime">) => {
+	idle,
+}: Omit<readItemLineInputsFx.Props, "runtime"> & {
+	readonly idle: boolean;
+}) => {
 	const game = useGameEngine();
 	const translator = useTranslator();
 	const selectorFn = useCallback(
@@ -78,11 +81,12 @@ export const ItemLineInputs = ({
 							data-input-index={input.inputIndex}
 						>
 							<span
-								className="block transition-opacity duration-300 ease-out data-[ui-available-only=true]:opacity-40"
+								className="block transition-opacity duration-300 ease-out data-[ui-available-only=true]:opacity-40 data-[ui-idle=true]:data-[ui-available-only=false]:opacity-60"
 								{...readDataUiFn({
 									dataUi: "ItemLineInput",
 									state: {
 										availableOnly: input.filled === 0 && input.available,
+										idle,
 									},
 								})}
 							>

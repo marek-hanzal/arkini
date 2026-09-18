@@ -1,33 +1,47 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "k09s8288fyyq6zhmho5xp9wm",
-		"id": "townhall-t1",
-		"title": "Townhall I",
-		"description": "Better village management, really.",
-		"music": "do3ht3r9ylfqeyv8dpvqyxsd",
+		"uid": "j54ldb5jngob3doi7jqmue5g",
+		"id": "bakery-blueprint",
+		"title": "Bakery Blueprint",
+		"draft": false,
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"townhall-t1"
+				"blueprint",
+				"bakery"
 			]
 		},
 		"scope": "any",
-		"maxCount": 1,
-		"maxStackSize": 1,
-		"maxQueueSize": 4,
+		"maxStackSize": 4,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "bakery-blueprint",
-				"title": "Bakery Blueprint",
-				"description": "Bakery needs some plans",
-				"default": false,
+				"id": "bakery",
+				"title": "Bakery",
+				"description": "Wanna some crispy bread or something?",
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
 				"input": [
 					{
-						"type": "simple"
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bakery-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
 					}
 				],
 				"output": {
@@ -40,7 +54,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "bakery-blueprint",
+											"itemId": "bakery",
 											"quantity": {
 												"min": 1,
 												"max": 1

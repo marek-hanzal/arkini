@@ -12,7 +12,6 @@ interface ItemProductionRowProps {
 	readonly status?: ReactNode;
 	readonly backdrop?: ReactNode;
 	readonly footer?: ReactNode;
-	readonly position?: number;
 	readonly ruleDisabled?: boolean;
 	readonly reserved?: boolean;
 }
@@ -25,7 +24,6 @@ export const ItemProductionRow = ({
 	status,
 	backdrop,
 	footer,
-	position,
 	ruleDisabled = false,
 	reserved = false,
 }: ItemProductionRowProps) => {
@@ -45,11 +43,6 @@ export const ItemProductionRow = ({
 			{backdrop}
 			<div className="min-h-0 group-data-[ui-reserved=true]/production-row:overflow-auto">
 				<div className="flex items-center gap-3">
-					{position === undefined ? null : (
-						<span className="w-6 shrink-0 text-lg tabular-nums text-muted">
-							{position}
-						</span>
-					)}
 					{line.artwork === undefined ? null : (
 						<ItemArtwork
 							className="size-10"

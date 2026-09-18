@@ -61,13 +61,11 @@ const QueuedLine = ({
 	ownerItemId,
 	line,
 	requestId,
-	position,
 	disabled,
 }: {
 	readonly ownerItemId?: IdSchema.Type;
 	readonly line: LineSchema.Type;
 	readonly requestId: IdSchema.Type;
-	readonly position: number;
 	readonly disabled: boolean;
 }) => {
 	const translator = useTranslator();
@@ -104,7 +102,6 @@ const QueuedLine = ({
 		>
 			<ItemProductionRow
 				line={line}
-				position={position}
 				backdrop={
 					line.artwork === undefined ? null : (
 						<ItemLineBackdrop sourceUrl={game.getResourceUrlFn(line.artwork)} />
@@ -309,7 +306,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 							<>
 								<ol className="shrink-0 divide-y divide-line">
 									<AnimatePresence initial={false}>
-										{requests.map((request, index) => {
+										{requests.map((request) => {
 											const line = lines.find(
 												(candidate) => candidate.id === request.lineId,
 											);
@@ -319,7 +316,6 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 													ownerItemId={ownerItemId}
 													line={line}
 													requestId={request.requestId}
-													position={index + 1}
 													disabled={disabled}
 												/>
 											);

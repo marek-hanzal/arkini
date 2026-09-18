@@ -1,4 +1,4 @@
-import { Factory, ListPlus, Star, StarOff } from "lucide-react";
+import { Factory, ListPlus, Star } from "lucide-react";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -69,7 +69,6 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 		disabled: props.disabled,
 	});
 	const translator = useTranslator();
-	const DefaultIcon = defaultController.selected ? Star : StarOff;
 	const state = status?.state ?? "idle";
 	const statusLabel = match(state)
 		.with("idle", () => translator.textFn("Idle"))
@@ -105,7 +104,7 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 							},
 						})}
 					>
-						<DefaultIcon className="size-5" />
+						<Star className="size-5" />
 						{translator.textFn("Default")}
 					</LinkButton>
 					<LinkButton

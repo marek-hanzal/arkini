@@ -172,11 +172,11 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 	},
 });
 
-export const invalidMergeResultScopeConfig = GameConfigSchema.parse({
+export const inventoryMergeResultScopeConfig = GameConfigSchema.parse({
 	...replaceMergeConfig,
 	meta: {
 		...replaceMergeConfig.meta,
-		id: "game:drop-item-invalid-merge-result-scope",
+		id: "game:drop-item-inventory-merge-result-scope",
 	},
 	items: {
 		...replaceMergeConfig.items,

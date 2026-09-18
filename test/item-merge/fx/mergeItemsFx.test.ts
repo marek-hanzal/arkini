@@ -34,11 +34,13 @@ const makeState = ({
 		},
 	},
 	targetQuantity = 1,
+	resultQuantity,
 }: {
 	sourceLocation?: StateSchema.Type["items"][number]["location"];
 	sourceQuantity?: number;
 	targetLocation?: StateSchema.Type["items"][number]["location"];
 	targetQuantity?: number;
+	resultQuantity?: number;
 } = {}) =>
 	({
 		cheats: {
@@ -60,6 +62,23 @@ const makeState = ({
 				location: targetLocation,
 				quantity: targetQuantity,
 			},
+			...(resultQuantity === undefined
+				? []
+				: [
+						{
+							id: "runtime:result",
+							itemId: "result",
+							location: {
+								scope: "board" as const,
+								space: 0,
+								position: {
+									x: 2,
+									y: 0,
+								},
+							},
+							quantity: resultQuantity,
+						},
+					]),
 		],
 		jobQueue: [],
 		jobs: [],
@@ -285,6 +304,64 @@ describe("mergeItemsFx", () => {
 		expect(targetRemainder?.location).not.toEqual(
 			result.before.items.find((item) => item.id === "runtime:target")?.location,
 		);
+	});
+
+	it("stacks a pure replacement result before spawning another stack", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: {
+							target: {
+								type: "item",
+								itemId: "target",
+							},
+							action: "use",
+							effect: "replace",
+							result: "result",
+						},
+					}),
+					state: makeState({
+						resultQuantity: 8,
+						targetQuantity: 2,
+					}),
+				}),
+			),
+		);
+
+		expect(result.after.items.find((item) => item.id === "runtime:result")).toMatchObject({
+			item: {
+				id: "result",
+			},
+			quantity: 9,
+		});
+		expect(result.after.items.filter((item) => item.item.id === "result")).toHaveLength(1);
+		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
+		expect(
+			result.after.items
+				.filter((item) => item.item.id === "target")
+				.reduce((quantity, item) => quantity + item.quantity, 0),
+		).toBe(1);
+		expect(result.transition.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemStacked,
+			itemId: "runtime:result",
+			canonicalItemId: "result",
+			originItemId: "runtime:target",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 2,
+					y: 0,
+				},
+			},
+			previousQuantity: 8,
+			quantity: 9,
+		});
+		expect(result.transition.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemRemoved,
+			snapshot: result.before.items.find((item) => item.id === "runtime:target"),
+		});
 	});
 
 	it("spends one real source unit for a Spend merge", () => {

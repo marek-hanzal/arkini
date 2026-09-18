@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -11,7 +11,7 @@ import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import {
 	config,
 	emptyLocation,
-	invalidMergeResultScopeConfig,
+	inventoryMergeResultScopeConfig,
 	mergeConfig,
 	occupiedLocation,
 	run,
@@ -199,7 +199,7 @@ describe("readDropItemPreviewFx / preview", () => {
 			kind: DropItemResultKind.Swap,
 		});
 	});
-	it("surfaces authored merge invariant failures instead of reporting a product rejection", () => {
+	it("places a replacement through its authored storage scope", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -214,30 +214,46 @@ describe("readDropItemPreviewFx / preview", () => {
 					location: occupiedLocation,
 					quantity: 1,
 				});
-				return yield* Effect.result(
-					dropItemFx({
-						sourceItemId: source.id,
-						sourceRevision: source.revision,
-						sourceLocation,
-						target: {
-							kind: "slot",
-							location: occupiedLocation,
-							occupant: {
-								itemId: target.id,
-								revision: target.revision,
-							},
+				const outcome = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation,
+					target: {
+						kind: "slot",
+						location: occupiedLocation,
+						occupant: {
+							itemId: target.id,
+							revision: target.revision,
 						},
-					}),
-				);
+					},
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
 			}),
-			invalidMergeResultScopeConfig,
+			inventoryMergeResultScopeConfig,
 		);
 
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "RuntimeInvalidError",
-			});
-		}
+		expect(result.outcome).toMatchObject({
+			kind: DropItemResultKind.Merge,
+			effect: "replace",
+			resultCanonicalItemId: "mud",
+			target: {
+				itemId: "runtime:stone",
+				current: {
+					itemId: "runtime:stone",
+					canonicalItemId: "mud",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				},
+			},
+		});
+		expect(result.runtime.items.some((item) => item.id === "runtime:water")).toBe(false);
 	});
 });

@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
@@ -15,7 +15,6 @@ import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import { spendActionUnitsFx } from "~/production-action/fx/spendActionUnitsFx";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { outputFx } from "~/production-output/fx/outputFx";
-import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
@@ -26,6 +25,7 @@ import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntime
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -269,33 +269,6 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						runtime,
 						target,
 					});
-					// Replacement removes one target quantity; its remainder and active output
-					// reservations still own capacity while the replacement is admitted.
-					yield* assertPlacementMaxCountFx({
-						drop: {
-							itemId: resultItem.id,
-							placement: PlacementSchema.enum.Drop,
-							quantity: 1,
-						},
-						item: resultItem,
-						runtime: {
-							...runtime,
-							items: runtime.items.flatMap((item) => {
-								if (item.id !== target.id)
-									return [
-										item,
-									];
-								return item.quantity === 1
-									? []
-									: [
-											{
-												...item,
-												quantity: item.quantity - 1,
-											},
-										];
-							}),
-						},
-					});
 					const replacement = yield* createRuntimeItemFx({
 						id: target.id,
 						item: resultItem,
@@ -303,20 +276,85 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						quantity: 1,
 						...replacementUnits,
 					});
-					// Replacement retains the target identity, including its random-stream cursor.
-					const replacedTarget = {
+					const replacementWithSequence = {
 						...replacement,
 						mergeSequence: target.mergeSequence,
 					};
-					const replacedRuntime = {
+					const detachedRuntime = {
 						...runtime,
-						items: runtime.items.map((item) =>
-							item.id === target.id ? replacedTarget : item,
-						),
+						items: runtime.items.filter((item) => item.id !== target.id),
 					} satisfies RuntimeSchema.Type;
+					const replacementIsPure = isItemPureFn({
+						item: replacementWithSequence,
+						runtime: detachedRuntime,
+					});
+					const occupiedResultLocations = replacementIsPure
+						? undefined
+						: detachedRuntime.items.flatMap((item) => {
+								if (item.item.id !== resultItem.id) return [];
+								const gridItem = Option.getOrUndefined(
+									narrowGridRuntimeItemFn(item),
+								);
+								return gridItem === undefined
+									? []
+									: [
+											gridItem.location,
+										];
+							});
+					const replacementDrop = {
+						itemId: resultItem.id,
+						placement: PlacementSchema.enum.Drop,
+						quantity: 1,
+					} as const;
+					const [replacementOutputPlacement, plannedReplacementRuntime] =
+						yield* applyOutputPlacementFx({
+							excludedLocations: occupiedResultLocations,
+							origin: target.location,
+							output: {
+								drop: [
+									replacementDrop,
+								],
+							},
+							runtime: detachedRuntime,
+						});
+					const replacementPlacement = replacementOutputPlacement.drop[0]?.placement;
+					if (replacementPlacement === undefined) {
+						return yield* Effect.die(
+							new Error("Merge replacement placement was empty."),
+						);
+					}
+					const replacementSpawn = replacementPlacement.spawn[0];
+					const replacedRuntime =
+						replacementSpawn === undefined
+							? plannedReplacementRuntime
+							: ({
+									...plannedReplacementRuntime,
+									items: plannedReplacementRuntime.items.map((item) =>
+										item.id === replacementSpawn.id
+											? {
+													...replacementWithSequence,
+													location: replacementSpawn.location,
+												}
+											: item,
+									),
+								} satisfies RuntimeSchema.Type);
+					const replacementPlacementEvents = (yield* readOutputPlacementItemEventsFx({
+						originItemId: target.id,
+						placement: replacementOutputPlacement,
+					})).filter((event) => event.type === GameEventEnumSchema.enum.ItemStacked);
+					const replacementEvents: GameEventSchema.Type[] =
+						replacementPlacement.stack.length === 0
+							? replacementPlacementEvents
+							: [
+									{
+										type: GameEventEnumSchema.enum.ItemRemoved,
+										snapshot: target,
+									},
+									...replacementPlacementEvents,
+								];
 					if (target.quantity === 1) {
 						return {
-							events: [],
+							events: replacementEvents,
 							runtime: replacedRuntime,
 						};
 					}
@@ -340,6 +378,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 					});
 					return {
 						events: [
+							...replacementEvents,
 							{
 								type: GameEventEnumSchema.enum.ItemSplit,
 								itemId: target.id,

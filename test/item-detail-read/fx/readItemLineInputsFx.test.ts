@@ -346,3 +346,104 @@ it("counts all obtainable stock beyond one job capacity without including other 
 		availableQuantity: 16,
 	});
 });
+
+it("isolates active material and gives shared buffers only to the first same-line request", () => {
+	const job = {
+		id: "active",
+		ownerItemId: owner.id,
+		lineId: line.id,
+		durationMs: 1000,
+		remainingMs: 500,
+	};
+	const committed = {
+		...water,
+		id: "committed",
+		quantity: 3,
+		location: {
+			scope: "reserved",
+			jobId: job.id,
+			inputIndex: 0,
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const free = {
+		...water,
+		id: "free",
+		quantity: 5,
+		location: {
+			scope: "inventory",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const runtime = {
+		...base,
+		jobs: [
+			job,
+		],
+		items: [
+			owner,
+			water,
+			committed,
+			free,
+		],
+		jobQueue: [
+			{
+				id: "first",
+				ownerItemId: owner.id,
+				lineId: line.id,
+			},
+			{
+				id: "other",
+				ownerItemId: "other-owner",
+				lineId: line.id,
+			},
+			{
+				id: "second",
+				ownerItemId: owner.id,
+				lineId: line.id,
+			},
+		],
+	};
+	const readWorkFn = (kind: "active" | "queued", id: string, snapshot = runtime) =>
+		Effect.runSync(
+			readItemLineInputsFx({
+				ownerItemId: owner.id,
+				line,
+				runtime: snapshot,
+				work: {
+					kind,
+					id,
+				},
+			}),
+		)[0];
+	expect(readWorkFn("active", "active")).toMatchObject({
+		filled: 3,
+		committed: true,
+		availableQuantity: 5,
+	});
+	expect(readWorkFn("queued", "first")).toMatchObject({
+		filled: 2,
+		committed: false,
+	});
+	expect(readWorkFn("queued", "second")).toMatchObject({
+		filled: 0,
+		committed: false,
+		available: true,
+		availableQuantity: 5,
+	});
+	expect(readWorkFn("active", "missing")).toMatchObject({
+		filled: 0,
+		committed: false,
+	});
+	expect(
+		readWorkFn("queued", "second", {
+			...runtime,
+			jobQueue: runtime.jobQueue.slice(1),
+		}),
+	).toMatchObject({
+		filled: 2,
+		committed: false,
+	});
+});

@@ -7,7 +7,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
 
-import { useItemInfoQueueController } from "~/item-detail/ui/useItemInfoQueueController";
+import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 
 (
 	globalThis as {
@@ -68,9 +68,9 @@ it("clears the visible owner's pending queue and blocks empty, stale and missing
 		runFx: (effect: Effect.Effect<void>) => effect,
 	};
 	state.clearFx.mockReturnValue(Effect.void);
-	let output: useItemInfoQueueController.Output | undefined;
-	const Probe = (props: useItemInfoQueueController.Props) => {
-		output = useItemInfoQueueController(props);
+	let output: useItemQueueClearController.Output | undefined;
+	const Probe = (props: useItemQueueClearController.Props) => {
+		output = useItemQueueClearController(props);
 		return null;
 	};
 	const root = createRoot(document.createElement("div"));

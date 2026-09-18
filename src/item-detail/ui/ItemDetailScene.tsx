@@ -1,5 +1,6 @@
 import { ItemDetailHeader } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
+import { ItemQueue } from "~/item-detail/ui/ItemQueue";
 import { ItemInfo } from "~/item-detail/ui/ItemInfo";
 import { ItemLines } from "~/item-detail/ui/ItemLines";
 import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
@@ -64,15 +65,18 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				</header>
 			)}
 			<div
-				className="min-h-0 flex-1 overflow-auto"
+				className="min-h-0 flex-1 overflow-auto data-[tab=queue]:overflow-hidden"
 				data-ui="ItemDetailPanel"
 				data-tab={target.tab}
 			>
 				{target.tab === "info" && controller.detail !== undefined ? (
-					<ItemInfo
+					<ItemInfo detail={controller.detail} />
+				) : null}
+				{target.tab === "queue" && controller.detail !== undefined ? (
+					<ItemQueue
 						key={`${target.kind}:${target.itemId}`}
-						detail={controller.detail}
 						ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
+						queueSize={controller.detail.queueSize}
 						disabled={disabled || controller.stale}
 					/>
 				) : null}

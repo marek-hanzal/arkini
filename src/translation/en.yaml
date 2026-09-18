@@ -382,6 +382,8 @@ Choose a valid value.:
   dynamic: true
 Choose an existing .arkpack file:
   value: Create a project from an .arkpack file
+Choose something to make in Lines.:
+  value: Choose something to make in Lines.
 Clear:
   value: Clear
 Clear interval:
@@ -521,6 +523,8 @@ Create project help:
     Example: `my-fantasy-game`. Renaming it later creates a different game for existing saves.
 Create the first item to start authoring this game.:
   value: Create the first item to start authoring this game.
+Current production:
+  value: Current production
 Custom:
   value: Custom
 "Cycle on route {routeId}: {factIds}.":
@@ -1486,6 +1490,8 @@ Notes help:
     Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Arkpack builds.
 Notes unavailable:
   value: Notes are unavailable.
+Nothing is being made right now.:
+  value: Nothing is being made right now.
 Nothing produces this item:
   value: Nothing produces this item
   dynamic: true
@@ -2295,6 +2301,8 @@ With note:
   value: With note
 Write a note…:
   value: Write a note…
+Your queue is empty.:
+  value: Your queue is empty.
 added by invisible color cleanup:
   value: added by invisible color cleanup
 assigned:

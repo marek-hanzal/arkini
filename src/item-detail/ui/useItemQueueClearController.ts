@@ -12,7 +12,7 @@ import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
-export namespace useItemInfoQueueController {
+export namespace useItemQueueClearController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
 		readonly disabled: boolean;
@@ -25,10 +25,10 @@ export namespace useItemInfoQueueController {
 }
 
 /** Clears only this live owner's pending requests; active jobs remain engine-owned. */
-export const useItemInfoQueueController = ({
+export const useItemQueueClearController = ({
 	ownerItemId,
 	disabled,
-}: useItemInfoQueueController.Props): useItemInfoQueueController.Output => {
+}: useItemQueueClearController.Props): useItemQueueClearController.Output => {
 	const game = useGameEngine();
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) => {

@@ -14,6 +14,10 @@ export namespace readItemLineInputsFx {
 		readonly ownerItemId?: IdSchema.Type;
 		readonly line: LineSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
+		readonly work?: {
+			readonly kind: "active" | "queued";
+			readonly id: IdSchema.Type;
+		};
 	}
 
 	export interface Input {
@@ -33,11 +37,12 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 	ownerItemId,
 	line,
 	runtime,
+	work,
 }: readItemLineInputsFx.Props) {
 	const owner = runtime.items.find((item) => item.id === ownerItemId);
 	const liveLine = owner?.item.lines.find((candidate) => candidate.id === line.id);
 	const plan =
-		owner?.location.scope === "board" && liveLine !== undefined
+		work === undefined && owner?.location.scope === "board" && liveLine !== undefined
 			? yield* planLineInputAutofillFx({
 					ownerItemId: owner.id,
 					lineId: line.id,
@@ -55,8 +60,18 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				})
 			: [];
 	const job = runtime.jobs.find(
-		(candidate) => candidate.ownerItemId === ownerItemId && candidate.lineId === line.id,
+		(candidate) =>
+			candidate.ownerItemId === ownerItemId &&
+			candidate.lineId === line.id &&
+			(work === undefined || (work.kind === "active" && candidate.id === work.id)),
 	);
+	// Line buffers serve the earliest pending request, not every duplicate or its active predecessor.
+	const ownsBuffer =
+		work === undefined ||
+		(work.kind === "queued" &&
+			runtime.jobQueue.find(
+				(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
+			)?.id === work.id);
 	const inputs: readItemLineInputsFx.Input[] = [];
 	for (const [inputIndex, input] of (liveLine ?? line).input.entries()) {
 		if (input.type !== "materials") continue;
@@ -65,6 +80,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 		for (const item of runtime.items) {
 			const location = item.location;
 			if (
+				ownsBuffer &&
 				location.scope === "input" &&
 				location.ownerItemId === ownerItemId &&
 				location.lineId === line.id &&
@@ -82,7 +98,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			}
 		}
 		const incoming =
-			ownerItemId === undefined
+			ownerItemId === undefined || !ownsBuffer
 				? []
 				: readLineInputDeliveryClaimsFn({
 						ownerItemId,
@@ -90,27 +106,30 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 						inputIndex,
 						runtime,
 					});
+		const availableQuantity =
+			sources.reduce(
+				(total, source) =>
+					total +
+					(matchesItemSelectorFn({
+						item: source.item,
+						selector: input.selector,
+					})
+						? source.quantity
+						: 0),
+				0,
+			) + incoming.reduce((total, claim) => total + claim.quantity, 0);
 		inputs.push({
 			inputIndex,
 			itemId: input.selector.itemId,
 			quantity: input.quantity,
 			filled,
 			committed,
-			availableQuantity:
-				sources.reduce(
-					(total, source) =>
-						total +
-						(matchesItemSelectorFn({
-							item: source.item,
-							selector: input.selector,
-						})
-							? source.quantity
-							: 0),
-					0,
-				) + incoming.reduce((total, claim) => total + claim.quantity, 0),
+			availableQuantity,
 			available:
-				incoming.length > 0 ||
-				(plan?.entry.some((entry) => entry.inputIndex === inputIndex) ?? false),
+				work === undefined
+					? incoming.length > 0 ||
+						(plan?.entry.some((entry) => entry.inputIndex === inputIndex) ?? false)
+					: availableQuantity > 0,
 		});
 	}
 	return inputs;

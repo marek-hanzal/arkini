@@ -57,24 +57,6 @@
 										{
 											"itemId": "paper",
 											"quantity": {
-												"min": 4,
-												"max": 4
-											},
-											"placement": "drop",
-											"rules": []
-										},
-										{
-											"itemId": "wood",
-											"quantity": {
-												"min": 8,
-												"max": 8
-											},
-											"placement": "drop",
-											"rules": []
-										},
-										{
-											"itemId": "stone",
-											"quantity": {
 												"min": 10,
 												"max": 10
 											},
@@ -122,6 +104,42 @@
 											"quantity": {
 												"min": 4,
 												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "axe",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "pickaxe",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "inkwell",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "goose-quill",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

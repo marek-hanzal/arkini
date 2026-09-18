@@ -13,6 +13,9 @@
 		},
 		"scope": "any",
 		"maxStackSize": 4,
+		"units": {
+			"amount": 8
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

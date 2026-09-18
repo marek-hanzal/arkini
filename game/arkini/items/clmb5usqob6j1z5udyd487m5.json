@@ -18,6 +18,7 @@
 			{
 				"id": "stone",
 				"title": "Stone",
+				"artwork": "stone",
 				"description": "Get the stone from stone deposit.",
 				"default": true,
 				"show": true,

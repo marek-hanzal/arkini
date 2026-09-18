@@ -32,7 +32,7 @@
 						"type": "materials",
 						"selector": {
 							"type": "item",
-							"itemId": "wood"
+							"itemId": "paper"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -41,12 +41,27 @@
 						}
 					},
 					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "inkwell"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
+					},
+					{
 						"type": "materials",
 						"selector": {
 							"type": "item",
-							"itemId": "paper"
+							"itemId": "goose-quill"
 						},
-						"mode": "consume",
+						"mode": "reserve",
 						"quantity": {
 							"min": 1,
 							"max": 1

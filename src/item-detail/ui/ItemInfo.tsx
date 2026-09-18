@@ -38,42 +38,48 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 						</p>
 					) : null}
 
-					<FactList columns={1}>
-						<Fact
-							label={translator.textFn("Where you can keep it")}
-							value={
-								detail.scope === "any"
-									? translator.textFn("Board, inventory and toolbar")
-									: translator.textFn(`Item storage scope - ${detail.scope}`)
-							}
-						/>
-						<Fact
-							label={translator.textFn("Items per stack")}
-							value={
-								detail.maxStackSize === 1
-									? translator.textFn("Single item")
-									: detail.maxStackSize
-							}
-						/>
-						<Fact
-							label={translator.textFn("Maximum in the game")}
-							value={
-								detail.maxCount === undefined
-									? translator.textFn("Unlimited")
-									: detail.maxCount
-							}
-						/>
-						<Fact
-							label={translator.textFn("Units remaining")}
-							value={
-								detail.units === undefined
-									? translator.textFn("This item doesn't use units.")
-									: detail.units.remaining === 0
-										? translator.textFn("Depleted")
-										: `${detail.units.remaining}/${detail.units.total}`
-							}
-						/>
-					</FactList>
+					<div className="grid grid-cols-2 items-start gap-8">
+						<FactList columns={1}>
+							<Fact
+								label={translator.textFn("Where you can keep it")}
+								value={
+									detail.scope === "any"
+										? translator.textFn("Board, inventory and toolbar")
+										: translator.textFn(`Item storage scope - ${detail.scope}`)
+								}
+							/>
+							<Fact
+								label={translator.textFn("Items per stack")}
+								value={
+									detail.maxStackSize === 1
+										? translator.textFn("Single item")
+										: detail.maxStackSize
+								}
+							/>
+						</FactList>
+						<FactList columns={1}>
+							<Fact
+								label={translator.textFn("Maximum in the game")}
+								value={
+									detail.maxCount === undefined
+										? translator.textFn("Unlimited")
+										: detail.maxCount === 1
+											? translator.textFn("Unique item")
+											: detail.maxCount
+								}
+							/>
+							<Fact
+								label={translator.textFn("Units remaining")}
+								value={
+									detail.units === undefined
+										? translator.textFn("This item doesn't use units.")
+										: detail.units.remaining === 0
+											? translator.textFn("Depleted")
+											: `${detail.units.remaining}/${detail.units.total}`
+								}
+							/>
+						</FactList>
+					</div>
 				</div>
 			</div>
 		</section>

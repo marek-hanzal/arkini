@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
+import { readLineInputAutofillSourcesFn } from "~/production-input/fn/readLineInputAutofillSourcesFn";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
@@ -20,6 +22,8 @@ export namespace readItemLineInputsFx {
 		readonly quantity: MaterialSchema.Type["quantity"];
 		readonly filled: number;
 		readonly available: boolean;
+		/** Obtainable stock plus this slot's incoming deliveries, excluding already filled material. */
+		readonly availableQuantity: number;
 		readonly committed: boolean;
 	}
 }
@@ -40,6 +44,16 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 					runtime,
 				})
 			: undefined;
+	const sources =
+		owner?.location.scope === "board"
+			? readLineInputAutofillSourcesFn({
+					owner: {
+						...owner,
+						location: owner.location,
+					},
+					runtime,
+				})
+			: [];
 	const job = runtime.jobs.find(
 		(candidate) => candidate.ownerItemId === ownerItemId && candidate.lineId === line.id,
 	);
@@ -82,6 +96,18 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			quantity: input.quantity,
 			filled,
 			committed,
+			availableQuantity:
+				sources.reduce(
+					(total, source) =>
+						total +
+						(matchesItemSelectorFn({
+							item: source.item,
+							selector: input.selector,
+						})
+							? source.quantity
+							: 0),
+					0,
+				) + incoming.reduce((total, claim) => total + claim.quantity, 0),
 			available:
 				incoming.length > 0 ||
 				(plan?.entry.some((entry) => entry.inputIndex === inputIndex) ?? false),

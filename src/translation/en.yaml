@@ -257,6 +257,8 @@ Authtoken:
   value: Authtoken
 Automatic only:
   value: Automatic only
+Available:
+  value: Available
 Available for this job.:
   value: Available for this job.
 Avatar:

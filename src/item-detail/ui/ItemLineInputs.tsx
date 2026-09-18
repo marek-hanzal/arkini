@@ -73,6 +73,10 @@ export const ItemLineInputs = ({
 							<span className="block max-w-64">
 								<strong className="block font-bold">{item.title}</strong>
 								<span className="block">{status}</span>
+								<span className="block">
+									{translator.textFn("Available")}:{" "}
+									<strong className="font-bold">{input.availableQuantity}</strong>
+								</span>
 							</span>
 						}
 					>

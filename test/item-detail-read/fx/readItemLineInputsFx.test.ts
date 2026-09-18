@@ -38,6 +38,7 @@ it("separates obtainable material from the exact slot's stored fill and does not
 			inputIndex: 0,
 			filled: 0,
 			available: false,
+			availableQuantity: 0,
 			committed: false,
 		},
 	]);
@@ -62,10 +63,12 @@ it("separates obtainable material from the exact slot's stored fill and does not
 	).toMatchObject({
 		filled: 0,
 		available: true,
+		availableQuantity: 2,
 	});
 	expect(readFn(base)[0]).toMatchObject({
 		filled: 2,
 		available: false,
+		availableQuantity: 0,
 	});
 	const anotherOwner = {
 		...water,
@@ -98,6 +101,7 @@ it("separates obtainable material from the exact slot's stored fill and does not
 	).toMatchObject({
 		filled: 0,
 		available: false,
+		availableQuantity: 0,
 	});
 	const otherSpace = {
 		...source,
@@ -160,6 +164,7 @@ it("keeps travelling material available but unfilled until canonical input settl
 	).toMatchObject({
 		filled: 0,
 		available: true,
+		availableQuantity: 2,
 		committed: false,
 	});
 	expect(readFn(base)[0]).toMatchObject({
@@ -255,6 +260,7 @@ it.each([
 		).toMatchObject({
 			filled: 0,
 			available: false,
+			availableQuantity: 0,
 		});
 	},
 );
@@ -270,6 +276,73 @@ it("projects authored slots without runtime ownership for definition details", (
 	expect(rows[0]).toMatchObject({
 		filled: 0,
 		available: false,
+		availableQuantity: 0,
 		committed: false,
+	});
+});
+
+it("counts all obtainable stock beyond one job capacity without including other spaces or claimed material", () => {
+	const source = {
+		...water,
+		id: "free-water",
+		quantity: 12,
+		location: {
+			scope: "inventory",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const toolbar = {
+		...source,
+		id: "toolbar-water",
+		quantity: 4,
+		location: {
+			scope: "toolbar",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const far = {
+		...source,
+		id: "far-water",
+		quantity: 100,
+		location: {
+			scope: "board",
+			space: 1,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const claimed = {
+		...source,
+		id: "claimed-water",
+		quantity: 100,
+		location: {
+			scope: "reserved",
+			jobId: "other-job",
+			inputIndex: 0,
+		},
+	} satisfies RuntimeItemSchema.Type;
+	expect(
+		readFn({
+			...base,
+			items: [
+				owner,
+				water,
+				source,
+				toolbar,
+				far,
+				claimed,
+			],
+		})[0],
+	).toMatchObject({
+		filled: 2,
+		availableQuantity: 16,
 	});
 });

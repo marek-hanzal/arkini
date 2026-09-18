@@ -1,15 +1,14 @@
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
-import { isLineInputAutofillSourceLocationFn } from "~/production-input/fn/isLineInputAutofillSourceLocationFn";
+import { readLineInputAutofillSourcesFn } from "~/production-input/fn/readLineInputAutofillSourcesFn";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
@@ -97,28 +96,12 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		lineId,
 		runtime,
 	});
-	// Pending work owns the source identity even before a Job starts.
-	const busyOwnerItemIds = new Set([
-		...runtime.jobs.map((job) => job.ownerItemId),
-		...runtime.jobQueue.map((request) => request.ownerItemId),
-	]);
-
-	const candidates: GridRuntimeItemSchema.Type[] = [];
-	for (const candidate of runtime.items) {
-		const gridCandidate = Option.getOrUndefined(narrowGridRuntimeItemFn(candidate));
-		if (
-			gridCandidate === undefined ||
-			gridCandidate.id === owner.id ||
-			busyOwnerItemIds.has(gridCandidate.id) ||
-			!isLineInputAutofillSourceLocationFn({
-				location: gridCandidate.location,
-				ownerSpace: owner.location.space,
-			})
-		) {
-			continue;
-		}
-		candidates.push(gridCandidate);
-	}
+	const candidates = [
+		...readLineInputAutofillSourcesFn({
+			owner,
+			runtime,
+		}),
+	];
 	candidates.sort(compareCandidatesFn(owner));
 	const eligibleCandidateItems = candidates.map((candidate) => candidate.item);
 	const remainingByItemId = new Map(

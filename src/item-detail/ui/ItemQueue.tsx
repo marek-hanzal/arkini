@@ -189,30 +189,8 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 			className="flex h-full min-h-0 flex-col pl-3"
 			data-ui="ItemQueue"
 		>
-			<header className="flex shrink-0 items-center gap-6 py-3 text-sm">
-				<span className="text-muted">
-					{translator.textFn("Queue")}:{" "}
-					<strong className="text-foreground tabular-nums">
-						{occupied === 0
-							? translator.textFn("Empty")
-							: occupied >= capacity
-								? translator.textFn("Full")
-								: `${occupied}/${capacity}`}
-					</strong>
-				</span>
-				{requests.length > 0 ? (
-					<LinkButton
-						className="ml-auto inline-flex items-center gap-2"
-						disabled={clear.disabled}
-						onClick={clear.clearFn}
-					>
-						<ListX className="size-4" />
-						{translator.textFn("Clear queue")}
-					</LinkButton>
-				) : null}
-			</header>
 			<section
-				className="h-48 shrink-0 border-y border-line"
+				className="h-48 shrink-0 border-b border-line"
 				data-ui="ItemQueueActive"
 			>
 				<AnimatePresence
@@ -275,10 +253,24 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 								}
 							/>
 						) : (
-							<div className="flex h-full items-center justify-center gap-2 text-accent">
-								<Inbox className="size-5" />
-								{translator.textFn("Nothing is being made right now.")}
-							</div>
+							<Status
+								icon={Inbox}
+								iconTone="primary"
+								title={
+									<span className="text-accent">
+										{translator.textFn("Nothing is being made right now.")}
+									</span>
+								}
+								description={
+									<>
+										{translator.textFn("Available slots")}:{" "}
+										<strong className="tabular-nums">
+											{Math.max(0, capacity - occupied)}
+										</strong>
+									</>
+								}
+								variant="flat"
+							/>
 						)}
 					</ItemQueuePresence>
 				</AnimatePresence>
@@ -323,6 +315,16 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 									</AnimatePresence>
 								</ol>
 								<div className="shrink-0 pb-[50cqh]">
+									<div className="flex justify-end py-3">
+										<LinkButton
+											className="inline-flex items-center gap-2 text-sm"
+											disabled={clear.disabled}
+											onClick={clear.clearFn}
+										>
+											<ListX className="size-4" />
+											{translator.textFn("Clear queue")}
+										</LinkButton>
+									</div>
 									<SectionEnd />
 								</div>
 							</>

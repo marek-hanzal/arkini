@@ -3,6 +3,7 @@ import { Factory, ListPlus } from "lucide-react";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { useItemLineMakeController } from "~/item-detail/ui/useItemLineMakeController";
+import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -38,6 +39,10 @@ const ItemLine = ({ line, ...props }: ItemLineProps) => {
 			{line.description ? (
 				<p className="mt-2 whitespace-pre-wrap text-muted">{line.description}</p>
 			) : null}
+			<ItemLineInputs
+				ownerItemId={props.ownerItemId}
+				line={line}
+			/>
 		</article>
 	);
 };

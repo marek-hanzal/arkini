@@ -24,20 +24,8 @@ export const ItemInfo = ({ detail }: { readonly detail: useItemDetailSceneContro
 						className="size-full"
 						sourceUrl={detail.sourceUrl}
 						compositeUrl={detail.compositeUrl}
+						colorFraction={1 - depleted}
 					/>
-					{depleted > 0 ? (
-						<span
-							className="pointer-events-none absolute inset-0 z-20 backdrop-grayscale"
-							data-ui="ItemInfoDepletion"
-							style={{
-								// Feather the filter, not the artwork; one image keeps translucent edges intact.
-								maskImage:
-									depleted === 1
-										? undefined
-										: `linear-gradient(to bottom, black ${depleted * 100 - 8}%, transparent ${depleted * 100 + 8}%)`,
-							}}
-						/>
-					) : null}
 				</div>
 				<div className="grid min-w-0 gap-8">
 					{detail.description ? (

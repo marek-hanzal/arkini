@@ -15,6 +15,8 @@ export interface ItemArtworkProps {
 	readonly imageClassName?: string;
 	readonly size?: keyof typeof artworkSizeClassName;
 	readonly sourceUrl: string;
+	/** Fraction of the artwork revealed in color from the bottom, with a feathered boundary. */
+	readonly colorFraction?: number;
 }
 
 /** Renders the canonical single or top-left-to-bottom-right composite item artwork. */
@@ -25,13 +27,18 @@ export const ItemArtwork = ({
 	imageClassName = "",
 	size = "sm",
 	sourceUrl,
+	colorFraction = 1,
 }: ItemArtworkProps) => {
 	const layered = compositeUrl !== undefined;
+	const depleted = 1 - Math.max(0, Math.min(1, colorFraction));
 	const sharedImageClassName =
 		"absolute object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)]";
 	return (
 		<span
-			className={twMerge(`relative block shrink-0 ${artworkSizeClassName[size]}`, className)}
+			className={twMerge(
+				`relative isolate block shrink-0 ${artworkSizeClassName[size]}`,
+				className,
+			)}
 			data-ui={dataUi}
 		>
 			<img
@@ -50,6 +57,18 @@ export const ItemArtwork = ({
 					draggable={false}
 				/>
 			)}
+			{depleted > 0 ? (
+				<span
+					className="pointer-events-none absolute inset-0 z-20 backdrop-grayscale"
+					style={{
+						// Filter one composed artwork so translucent edges and composite layers stay aligned.
+						maskImage:
+							depleted === 1
+								? undefined
+								: `linear-gradient(to bottom, black ${depleted * 100 - 8}%, transparent ${depleted * 100 + 8}%)`,
+					}}
+				/>
+			) : null}
 		</span>
 	);
 };

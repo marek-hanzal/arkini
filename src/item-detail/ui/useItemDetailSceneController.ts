@@ -7,6 +7,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 
 export namespace useItemDetailSceneController {
 	export interface Props {
@@ -17,6 +18,10 @@ export namespace useItemDetailSceneController {
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
+		readonly units?: {
+			readonly remaining: number;
+			readonly total: number;
+		};
 	}
 	export interface Output {
 		readonly detail?: Detail;
@@ -32,10 +37,11 @@ export const useItemDetailSceneController = ({
 	const { kind, itemId } = target;
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailSceneController.Detail | undefined => {
-			const item =
-				kind === "definition"
-					? game.config.items[itemId]
-					: runtime.items.find((candidate) => candidate.id === itemId)?.item;
+			const runtimeItem =
+				kind === "runtime"
+					? runtime.items.find((candidate) => candidate.id === itemId)
+					: undefined;
+			const item = kind === "definition" ? game.config.items[itemId] : runtimeItem?.item;
 			if (item === undefined) return undefined;
 			return {
 				title: item.title,
@@ -48,6 +54,17 @@ export const useItemDetailSceneController = ({
 				scope: item.scope,
 				maxStackSize: item.maxStackSize,
 				maxCount: item.maxCount,
+				units:
+					item.units === undefined
+						? undefined
+						: {
+								remaining:
+									runtimeItem === undefined
+										? item.units.amount
+										: (readItemRemainingUnitsFn(runtimeItem) ??
+											item.units.amount),
+								total: item.units.amount,
+							},
 			};
 		},
 		[

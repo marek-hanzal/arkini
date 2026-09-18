@@ -49,6 +49,14 @@ export const ItemInfo = ({ detail }: { readonly detail: useItemDetailSceneContro
 									: detail.maxCount
 							}
 						/>
+						<Fact
+							label={translator.textFn("Units remaining")}
+							value={
+								detail.units === undefined
+									? translator.textFn("This item doesn't use units.")
+									: `${detail.units.remaining}/${detail.units.total}`
+							}
+						/>
 					</FactList>
 				</div>
 			</div>

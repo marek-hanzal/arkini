@@ -23,6 +23,9 @@ export const LineSchema = z
 		 * Human-readable title of this product line.
 		 */
 		title: TitleSchema.describe("The human-readable title of this product line."),
+		artwork: IdSchema.optional().describe(
+			"Optional Artwork resource ID shown beside the production line title.",
+		),
 		/**
 		 * Human-readable explanation of this product line's purpose.
 		 */

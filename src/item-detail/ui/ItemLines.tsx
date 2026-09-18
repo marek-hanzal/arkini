@@ -20,6 +20,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
+import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 
 interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
@@ -60,6 +61,7 @@ const ItemLineCountdown = ({
 };
 
 const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
+	const game = useGameEngine();
 	const controller = useItemLineMakeController({
 		ownerItemId: props.ownerItemId,
 		lineId: props.lineId,
@@ -99,6 +101,12 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 			data-line-id={line.id}
 		>
 			<div className="flex items-center gap-3">
+				{line.artwork === undefined ? null : (
+					<ItemArtwork
+						className="size-10"
+						sourceUrl={game.getResourceUrlFn(line.artwork)}
+					/>
+				)}
 				<h3 className="min-w-0 text-lg font-semibold">{line.title}</h3>
 				<span className="shrink-0 text-muted">· {formatDurationFn(line.runtimeMs)}</span>
 				<div className="ml-auto flex shrink-0 items-center gap-8">

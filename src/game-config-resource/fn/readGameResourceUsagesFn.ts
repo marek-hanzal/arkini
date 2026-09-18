@@ -148,6 +148,25 @@ export const readGameResourceUsagesFn = (
 				],
 			});
 		});
+		item.lines.forEach((line, index) => {
+			if (line.artwork === undefined) return;
+			usages.push({
+				resourceId: line.artwork,
+				resourceType: "artwork",
+				owner: "item",
+				ownerId: itemId,
+				ownerUid: item.uid,
+				ownerLabel: item.title,
+				roleLabel: `Production line artwork: ${line.title}`,
+				path: [
+					"items",
+					itemId,
+					"lines",
+					index,
+					"artwork",
+				],
+			});
+		});
 	}
 	return usages;
 };

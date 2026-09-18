@@ -1,9 +1,52 @@
 import { describe, expect, it } from "vitest";
 
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 
 describe("readGameResourceUsagesFn", () => {
+	it("counts artwork used only by a production line as an item resource reference", () => {
+		const config = GameConfigSchema.parse({
+			...editorTestConfig,
+			items: {
+				water: {
+					...editorTestConfig.items.water,
+					lines: [
+						{
+							id: "gather",
+							title: "Gather",
+							description: "Gather water",
+							artwork: "line-art",
+							runtimeMs: 0,
+							input: [
+								{
+									type: "simple",
+								},
+							],
+							rules: [],
+						},
+					],
+				},
+			},
+		});
+		expect(readGameResourceUsagesFn(config)).toContainEqual(
+			expect.objectContaining({
+				resourceId: "line-art",
+				resourceType: "artwork",
+				owner: "item",
+				ownerId: "water",
+				ownerUid: "water",
+				path: [
+					"items",
+					"water",
+					"lines",
+					0,
+					"artwork",
+				],
+			}),
+		);
+	});
+
 	it("projects project and item references with stable owner facts", () => {
 		expect(readGameResourceUsagesFn(editorTestConfig)).toEqual([
 			{

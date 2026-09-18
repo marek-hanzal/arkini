@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { LineSchema } from "~/production-line/schema/LineSchema";
 import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
@@ -23,6 +24,33 @@ describe("renameGameResourceFx", () => {
 				water: {
 					...editorTestPayload.config.items.water,
 					music: "hero",
+					lines: [
+						LineSchema.parse({
+							id: "gather",
+							title: "Gather",
+							description: "Gather water",
+							artwork: "hero",
+							runtimeMs: 0,
+							input: [
+								{
+									type: "simple",
+								},
+							],
+							rules: [],
+						}),
+						LineSchema.parse({
+							id: "other",
+							title: "Other",
+							description: "Other work",
+							runtimeMs: 0,
+							input: [
+								{
+									type: "simple",
+								},
+							],
+							rules: [],
+						}),
+					],
 					artwork: {
 						scale: 0.8,
 						default: [
@@ -54,6 +82,9 @@ describe("renameGameResourceFx", () => {
 			"cover",
 			"item-water",
 		]);
+		expect(renamed.items.water?.lines[0]?.artwork).toBe("cover");
+		expect(renamed.items.water?.lines[1]).not.toHaveProperty("artwork");
+		expect(config.items.water.lines[0]?.artwork).toBe("hero");
 		expect(renamed.items.water?.id).toBe("water");
 	});
 });

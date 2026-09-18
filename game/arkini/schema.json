@@ -1550,6 +1550,10 @@
 					"description": "The human-readable title of this product line.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"artwork": {
+					"description": "Optional Artwork resource ID shown beside the production line title.",
+					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
+				},
 				"description": {
 					"description": "The human-readable explanation of this product line's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"

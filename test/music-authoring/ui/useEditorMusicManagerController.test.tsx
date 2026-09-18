@@ -42,6 +42,7 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 								uid: "tavern-uid",
 								title: "Tavern",
 								music: state.detailMusic,
+								lines: [],
 								artwork: {
 									default: [],
 								},

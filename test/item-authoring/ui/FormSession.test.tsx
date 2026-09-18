@@ -93,6 +93,21 @@ vi.mock("~/item-authoring/ui/useItemByUid", () => ({
 }));
 
 vi.mock("~/authoring-form/ui/ResourceAutocompleteField", () => ({
+	ResourceReferenceControl: ({
+		label,
+		value,
+		onChangeFn,
+	}: {
+		readonly label: string;
+		readonly value: string;
+		readonly onChangeFn: (value: string) => void;
+	}) =>
+		createElement("input", {
+			"data-resource-label": label,
+			value,
+			onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+				onChangeFn(event.target.value),
+		}),
 	ResourceAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));
@@ -1284,6 +1299,45 @@ describe("item section form session", () => {
 				}),
 			}),
 		);
+	});
+
+	it("saves and clears optional line artwork without changing the owning item's artwork", async () => {
+		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
+			state.persisted = item;
+			(state.project as Project).config.items[item.id] = item;
+			return item;
+		});
+		const common = {
+			...createProducerItem({
+				id: item.id,
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.id] = common;
+		const { container, renderSection } = await render(<ProductionSection />);
+		const artwork = container.querySelector<HTMLInputElement>(
+			'input[data-resource-label="Artwork"]',
+		);
+		if (artwork === null) throw new Error("Missing line artwork control.");
+		await changeInput(artwork, "line-artwork");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].artwork).toBe("line-artwork");
+		expect(state.saveItem.mock.lastCall?.[0].item.artwork).toEqual(common.artwork);
+		await renderSection(<ProductionSection />);
+		const savedArtwork = container.querySelector<HTMLInputElement>(
+			'input[data-resource-label="Artwork"]',
+		);
+		if (savedArtwork === null) throw new Error("Missing saved line artwork control.");
+		await changeInput(savedArtwork, "");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(
+			JSON.parse(JSON.stringify(state.saveItem.mock.lastCall?.[0].item)).lines[0],
+		).not.toHaveProperty("artwork");
 	});
 
 	it("duplicates a complete production line with a fresh non-selected identity", async () => {

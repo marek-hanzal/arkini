@@ -13,6 +13,7 @@ import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
 import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 import { Mx } from "~/translation/ui/Mx";
+import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
 
 const LineFlag = ({
 	checked,
@@ -70,6 +71,12 @@ export const ProductionLineDetail = ({
 			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-2">
+						{line.artwork === undefined ? null : (
+							<EditorResourceThumbnail
+								resourceId={line.artwork}
+								size="sm"
+							/>
+						)}
 						<h3 className="text-lg font-semibold leading-tight text-foreground">
 							<LineEditLink
 								dataUi="EditorProductionLineDetailEditLink"

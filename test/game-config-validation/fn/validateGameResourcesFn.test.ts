@@ -19,6 +19,74 @@ const projectImageIds = new Set(Object.values(startTestConfig.resources));
 const readResourceTypeFn = (id: string) => (projectImageIds.has(id) ? "image" : "artwork");
 
 describe("validateGameResourcesFn", () => {
+	it("validates optional production line artwork with exact item and line provenance", () => {
+		const [itemId, item] = Object.entries(startTestConfig.items)[0]!;
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			items: {
+				...startTestConfig.items,
+				[itemId]: {
+					...item,
+					lines: [
+						{
+							id: "gather",
+							title: "Gather",
+							description: "Gather resources",
+							artwork: "line-art",
+							runtimeMs: 0,
+							input: [
+								{
+									type: "simple",
+								},
+							],
+							rules: [],
+						},
+					],
+				},
+			},
+		});
+		for (const type of [
+			undefined,
+			"image",
+			"artwork",
+		] as const) {
+			const diagnostics = validateGameResourcesFn({
+				config,
+				provenance,
+				resources:
+					type === undefined
+						? []
+						: [
+								{
+									id: "line-art",
+									path: `${type}/line-art.png`,
+									type,
+								},
+							],
+			}).filter(
+				(diagnostic) => "resourceId" in diagnostic && diagnostic.resourceId === "line-art",
+			);
+			if (type === "artwork") expect(diagnostics).toEqual([]);
+			else
+				expect(diagnostics).toEqual([
+					expect.objectContaining({
+						code:
+							type === undefined
+								? DiagnosticCodeEnumSchema.enum.ResourceMissing
+								: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
+						path: [
+							"items",
+							itemId,
+							"lines",
+							0,
+							"artwork",
+						],
+						source: `${itemId}.json`,
+					}),
+				]);
+		}
+	});
+
 	it("validates item detail music against Music sources with item provenance", () => {
 		const [itemId, item] = Object.entries(startTestConfig.items)[0]!;
 		const config = {

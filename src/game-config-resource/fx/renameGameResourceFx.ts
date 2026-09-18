@@ -24,6 +24,14 @@ export const renameGameResourceFx = Effect.fn("renameGameResourceFx")(function* 
 			id,
 			{
 				...item,
+				lines: item.lines.map((line) =>
+					line.artwork === undefined
+						? line
+						: {
+								...line,
+								artwork: renameFn(line.artwork),
+							},
+				),
 				...(item.music === undefined
 					? {}
 					: {

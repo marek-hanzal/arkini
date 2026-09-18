@@ -13,6 +13,7 @@ import { InputsControl } from "~/production-authoring/ui/InputsControl";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { EditorBooleanToggleGroup } from "~/editor-control/ui/EditorBooleanToggleGroup";
+import { ResourceReferenceControl } from "~/authoring-form/ui/ResourceAutocompleteField";
 
 const defaultLine: LineSchema.Type = {
 	id: "",
@@ -145,6 +146,24 @@ export const LineFields = withFieldGroupFn({
 									)}
 								</group.Subscribe>
 							</div>
+							<group.AppField name="artwork">
+								{(field) => (
+									<ResourceReferenceControl
+										label={translator.textFn("Artwork")}
+										emptyLabel={translator.textFn(
+											"No artwork matches this search.",
+										)}
+										resourceType="artwork"
+										optional
+										value={field.state.value ?? ""}
+										error={readEditorFieldErrorFn(field.state.meta.errors)}
+										onBlurFn={field.handleBlur}
+										onChangeFn={(value) =>
+											field.handleChange(value || undefined)
+										}
+									/>
+								)}
+							</group.AppField>
 						</div>
 						<group.AppField name="description">
 							{(field) => (

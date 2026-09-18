@@ -120,6 +120,8 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 
 Do not repeat field catalogs in prose or weaken a schema to silence malformed data. Change the owning schema/behavior together and regenerate the project schema.
 
+Production lines may optionally reference one Artwork resource through `line.artwork`. The Editor provides an optional Artwork selector; Game Lines and the Editor production detail show the selected image beside the line title. An omitted reference renders no image or placeholder. The reference participates in typed resource validation, usage/deletion checks and resource rename; it has no effect on production behavior. Existing item files need no update.
+
 Item artwork currently uses its authored default composition and scale throughout runtime. Progress-based artwork selection is deferred to [issue #725](https://github.com/marek-hanzal/arkini/issues/725).
 
 ## Validation

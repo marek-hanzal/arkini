@@ -60,7 +60,7 @@ export const ItemLineInputs = ({
 							data-input-index={input.inputIndex}
 						>
 							<span
-								className="block data-[ui-available-only=true]:opacity-40"
+								className="block transition-opacity duration-300 ease-out data-[ui-available-only=true]:opacity-40"
 								{...readDataUiFn({
 									dataUi: "ItemLineInput",
 									state: {

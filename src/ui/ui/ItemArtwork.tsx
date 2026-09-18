@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { twMerge } from "tailwind-merge";
 
 const artworkSizeClassName = {
@@ -27,10 +28,11 @@ export const ItemArtwork = ({
 	imageClassName = "",
 	size = "sm",
 	sourceUrl,
-	colorFraction = 1,
+	colorFraction,
 }: ItemArtworkProps) => {
 	const layered = compositeUrl !== undefined;
-	const depleted = 1 - Math.max(0, Math.min(1, colorFraction));
+	const depleted = 1 - Math.max(0, Math.min(1, colorFraction ?? 1));
+	const boundary = depleted === 0 ? -8 : depleted === 1 ? 108 : depleted * 100;
 	const sharedImageClassName =
 		"absolute object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)]";
 	return (
@@ -57,15 +59,17 @@ export const ItemArtwork = ({
 					draggable={false}
 				/>
 			)}
-			{depleted > 0 ? (
-				<span
+			{colorFraction !== undefined ? (
+				<motion.span
 					className="pointer-events-none absolute inset-0 z-20 backdrop-grayscale"
-					style={{
-						// Filter one composed artwork so translucent edges and composite layers stay aligned.
-						maskImage:
-							depleted === 1
-								? undefined
-								: `linear-gradient(to bottom, black ${depleted * 100 - 8}%, transparent ${depleted * 100 + 8}%)`,
+					initial={false}
+					animate={{
+						// Keep the composed filter mounted at both endpoints so the feather can move continuously.
+						maskImage: `linear-gradient(to bottom, black ${boundary - 8}%, transparent ${boundary + 8}%)`,
+					}}
+					transition={{
+						duration: 0.3,
+						ease: "easeOut",
 					}}
 				/>
 			) : null}

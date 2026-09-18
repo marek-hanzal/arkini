@@ -11,13 +11,12 @@ import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueue
 import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { ItemLineBackdrop } from "~/item-detail/ui/ItemLineBackdrop";
-import { ItemArtwork } from "~/ui/ui/ItemArtwork";
+import { ItemProductionRow } from "~/item-detail/ui/ItemProductionRow";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 
@@ -48,49 +47,45 @@ const QueuedLine = ({
 	});
 	return (
 		<li
-			className="relative isolate flex min-h-48 items-center gap-4 py-4"
 			data-ui="ItemQueueRequest"
 			data-request-id={requestId}
 		>
-			{line.artwork === undefined ? null : (
-				<ItemLineBackdrop sourceUrl={game.getResourceUrlFn(line.artwork)} />
-			)}
-			<span className="w-6 shrink-0 text-lg tabular-nums text-muted">{position}</span>
-			<div className="min-w-0 flex-1">
-				<div className="flex items-center gap-3">
-					{line.artwork === undefined ? null : (
-						<ItemArtwork
-							className="size-10"
-							sourceUrl={game.getResourceUrlFn(line.artwork)}
-						/>
-					)}
-					<h3 className="text-lg font-semibold">{line.title}</h3>
-					<span className="text-muted">· {formatDurationFn(line.runtimeMs)}</span>
+			<ItemProductionRow
+				line={line}
+				position={position}
+				backdrop={
+					line.artwork === undefined ? null : (
+						<ItemLineBackdrop sourceUrl={game.getResourceUrlFn(line.artwork)} />
+					)
+				}
+				actions={
 					<LinkButton
-						className="ml-auto inline-flex shrink-0 items-center gap-2 text-sm"
+						className="inline-flex shrink-0 items-center gap-2 text-sm"
 						disabled={cancel.disabled}
 						onClick={cancel.cancelFn}
 					>
 						<X className="size-4" />
 						{translator.textFn("Cancel")}
 					</LinkButton>
-				</div>
-				<ItemLineInputs
-					ownerItemId={ownerItemId}
-					line={line}
-					idle={false}
-					disabled={disabled}
-					work={{
-						kind: "queued",
-						id: requestId,
-					}}
-				/>
-			</div>
+				}
+				inputs={
+					<ItemLineInputs
+						ownerItemId={ownerItemId}
+						line={line}
+						idle={false}
+						disabled={disabled}
+						work={{
+							kind: "queued",
+							id: requestId,
+						}}
+					/>
+				}
+			/>
 		</li>
 	);
 };
 
-/** Keeps current production compact above accepted requests in canonical queue order. */
+/** Reserves current production above accepted requests in canonical queue order. */
 export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) => {
 	const translator = useTranslator();
 	const game = useGameEngine();
@@ -168,28 +163,47 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 				) : null}
 			</header>
 			<section
-				className="relative isolate flex h-48 shrink-0 flex-col justify-center border-y border-line py-4"
+				className="h-48 shrink-0 border-y border-line"
 				data-ui="ItemQueueActive"
 			>
-				{active !== undefined && activeLine?.artwork !== undefined ? (
-					<ItemLineBackdrop
-						sourceUrl={game.getResourceUrlFn(activeLine.artwork)}
-						progress={
-							active.durationMs === 0 ? 1 : 1 - active.remainingMs / active.durationMs
-						}
-					/>
-				) : null}
 				{active !== undefined && activeLine !== undefined ? (
-					<div className="min-h-0 overflow-auto">
-						<div className="flex items-center gap-3">
-							{activeLine.artwork === undefined ? null : (
-								<ItemArtwork
-									className="size-10"
+					<ItemProductionRow
+						line={activeLine}
+						reserved
+						backdrop={
+							activeLine.artwork === undefined ? null : (
+								<ItemLineBackdrop
 									sourceUrl={game.getResourceUrlFn(activeLine.artwork)}
+									progress={
+										active.durationMs === 0
+											? 1
+											: 1 - active.remainingMs / active.durationMs
+									}
 								/>
-							)}
-							<h3 className="text-lg font-semibold">{active.title}</h3>
-							<span className="ml-auto text-sm">
+							)
+						}
+						actions={
+							<ItemJobCancel
+								ownerItemId={ownerItemId}
+								jobId={active.jobId}
+								lineId={active.lineId}
+								disabled={disabled}
+							/>
+						}
+						inputs={
+							<ItemLineInputs
+								ownerItemId={ownerItemId}
+								line={activeLine}
+								idle={false}
+								disabled={disabled}
+								work={{
+									kind: "active",
+									id: active.jobId,
+								}}
+							/>
+						}
+						status={
+							<span className="text-foreground">
 								{match(active.status)
 									.with("running", () => translator.textFn("Running"))
 									.with("paused", () => translator.textFn("Paused"))
@@ -203,24 +217,8 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 									</span>
 								) : null}
 							</span>
-							<ItemJobCancel
-								ownerItemId={ownerItemId}
-								jobId={active.jobId}
-								lineId={active.lineId}
-								disabled={disabled}
-							/>
-						</div>
-						<ItemLineInputs
-							ownerItemId={ownerItemId}
-							line={activeLine}
-							idle={false}
-							disabled={disabled}
-							work={{
-								kind: "active",
-								id: active.jobId,
-							}}
-						/>
-					</div>
+						}
+					/>
 				) : (
 					<div className="flex h-full items-center justify-center gap-2 text-accent">
 						<Pause className="size-5" />

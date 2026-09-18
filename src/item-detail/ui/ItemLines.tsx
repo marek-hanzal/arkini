@@ -19,10 +19,9 @@ import { useItemLinesStatus } from "~/item-detail/ui/useItemLinesStatus";
 import type { readItemLineStatusesFn } from "~/item-detail-read/fn/readItemLineStatusesFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
-import { ItemArtwork } from "~/ui/ui/ItemArtwork";
+import { ItemProductionRow } from "~/item-detail/ui/ItemProductionRow";
 
 const linePresenceMotion = {
 	initial: {
@@ -127,7 +126,6 @@ const ItemLine = ({
 	status,
 	...props
 }: ItemLineProps) => {
-	const game = useGameEngine();
 	const present = useIsPresent();
 	const disabled = props.disabled || !present;
 	const controller = useItemLineMakeController({
@@ -169,35 +167,20 @@ const ItemLine = ({
 			data-ui="ItemLinePresence"
 			inert={!present}
 		>
-			<article
-				className="relative isolate py-11 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45"
-				{...readDataUiFn({
-					dataUi: "ItemLine",
-					state: {
-						ruleDisabled,
-					},
-				})}
-				data-line-id={line.id}
-			>
-				{line.artwork === undefined ? null : (
-					<ItemLineProgressBackdrop
-						ownerItemId={props.ownerItemId}
-						lineId={line.id}
-						artworkId={line.artwork}
-					/>
-				)}
-				<div className="flex items-center gap-3">
-					{line.artwork === undefined ? null : (
-						<ItemArtwork
-							className="size-10"
-							sourceUrl={game.getResourceUrlFn(line.artwork)}
+			<ItemProductionRow
+				line={line}
+				ruleDisabled={ruleDisabled}
+				backdrop={
+					line.artwork === undefined ? null : (
+						<ItemLineProgressBackdrop
+							ownerItemId={props.ownerItemId}
+							lineId={line.id}
+							artworkId={line.artwork}
 						/>
-					)}
-					<h3 className="min-w-0 text-lg font-semibold">{line.title}</h3>
-					<span className="shrink-0 text-muted">
-						· {formatDurationFn(line.runtimeMs)}
-					</span>
-					<div className="ml-auto flex shrink-0 items-center gap-8">
+					)
+				}
+				actions={
+					<>
 						<LinkButton
 							className="inline-flex items-center gap-2 text-muted data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
 							disabled={defaultController.disabled}
@@ -225,19 +208,18 @@ const ItemLine = ({
 							<ListPlus className="size-5" />
 							{translator.textFn("Make")}
 						</LinkButton>
-					</div>
-				</div>
-				{line.description ? (
-					<p className="mt-2 whitespace-pre-wrap text-muted">{line.description}</p>
-				) : null}
-				<div className="flex items-end justify-between gap-6">
+					</>
+				}
+				inputs={
 					<ItemLineInputs
 						ownerItemId={props.ownerItemId}
 						line={line}
 						idle={state === "idle"}
 						disabled={disabled}
 					/>
-					<div className="mt-3 ml-auto flex min-h-5 shrink-0 items-center gap-5 text-sm">
+				}
+				status={
+					<>
 						{statusLabel !== null ? (
 							<p
 								className="shrink-0 text-foreground"
@@ -279,30 +261,32 @@ const ItemLine = ({
 								{translator.textFn("Cancel")}
 							</LinkButton>
 						) : null}
-					</div>
-				</div>
-				<AnimatePresence initial={false}>
-					{ruleDisabled && blockingHints.length > 0 ? (
-						<motion.div
-							{...linePresenceMotion}
-							className="overflow-hidden"
-							data-ui="ItemLineBlockingHints"
-						>
-							<div className="mt-3 grid gap-2 text-sm">
-								{blockingHints.map((hint) => (
-									<p
-										key={hint}
-										className="flex items-start gap-2"
-									>
-										<Info className="mt-0.5 size-4 shrink-0" />
-										<span className="whitespace-pre-wrap">{hint}</span>
-									</p>
-								))}
-							</div>
-						</motion.div>
-					) : null}
-				</AnimatePresence>
-			</article>
+					</>
+				}
+				footer={
+					<AnimatePresence initial={false}>
+						{ruleDisabled && blockingHints.length > 0 ? (
+							<motion.div
+								{...linePresenceMotion}
+								className="overflow-hidden"
+								data-ui="ItemLineBlockingHints"
+							>
+								<div className="mt-3 grid gap-2 text-sm">
+									{blockingHints.map((hint) => (
+										<p
+											key={hint}
+											className="flex items-start gap-2"
+										>
+											<Info className="mt-0.5 size-4 shrink-0" />
+											<span className="whitespace-pre-wrap">{hint}</span>
+										</p>
+									))}
+								</div>
+							</motion.div>
+						) : null}
+					</AnimatePresence>
+				}
+			/>
 		</motion.div>
 	);
 };

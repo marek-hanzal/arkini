@@ -115,14 +115,15 @@ export const ItemDetailProvider = ({
 		({
 			itemId,
 			origin = null,
-			tab = "info",
+			tab,
 		}: Parameters<ItemDetailControl["openItemDefinitionDetailFx"]>[0]) =>
 			Effect.suspend(() => {
-				if (game.config.items[itemId] === undefined) return Effect.succeed(false);
+				const item = game.config.items[itemId];
+				if (item === undefined) return Effect.succeed(false);
 				return openTargetFx({
 					kind: "definition",
 					itemId,
-					tab,
+					tab: tab ?? (item.lines.length > 0 ? "lines" : "info"),
 					origin: controller.readOriginFn(origin),
 				});
 			}),

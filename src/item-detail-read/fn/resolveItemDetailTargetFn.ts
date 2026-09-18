@@ -35,6 +35,13 @@ export const resolveItemDetailTargetFn = ({
 	return {
 		kind: "available",
 		itemId: item.id,
-		tab: requestedTab ?? ItemDetailTabEnumSchema.enum.Info,
+		tab:
+			requestedTab ??
+			(runtime.jobs.some((job) => job.ownerItemId === item.id) ||
+			runtime.jobQueue.some((request) => request.ownerItemId === item.id)
+				? ItemDetailTabEnumSchema.enum.Queue
+				: item.item.lines.length > 0
+					? ItemDetailTabEnumSchema.enum.Lines
+					: ItemDetailTabEnumSchema.enum.Info),
 	};
 };

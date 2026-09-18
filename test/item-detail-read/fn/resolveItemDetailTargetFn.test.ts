@@ -7,7 +7,7 @@ import {
 } from "~test/production-line/support/lineRunTestRuntime";
 
 describe("resolveItemDetailTargetFn", () => {
-	it("defaults line owners to Info and keeps every requested detail section available", () => {
+	it("defaults line owners to Lines and keeps every requested detail section available", () => {
 		const runtime = lineRunRuntime({});
 		expect(
 			resolveItemDetailTargetFn({
@@ -17,7 +17,7 @@ describe("resolveItemDetailTargetFn", () => {
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
-			tab: "info",
+			tab: "lines",
 		});
 		for (const requestedTab of [
 			"lines",
@@ -34,6 +34,75 @@ describe("resolveItemDetailTargetFn", () => {
 				tab: requestedTab,
 			});
 		}
+	});
+
+	it("prioritizes this owner's active or queued work without overriding an explicit tab", () => {
+		const base = lineRunRuntime({});
+		const request = {
+			id: "request:workshop",
+			ownerItemId: "runtime:workshop",
+			lineId: "line:workshop:build",
+		};
+		const job = {
+			...request,
+			id: "job:workshop",
+			durationMs: 1000,
+			remainingMs: 500,
+		};
+		for (const runtime of [
+			{
+				...base,
+				jobs: [
+					job,
+				],
+			},
+			{
+				...base,
+				jobQueue: [
+					request,
+				],
+			},
+		]) {
+			expect(
+				resolveItemDetailTargetFn({
+					itemId: request.ownerItemId,
+					runtime,
+				}),
+			).toMatchObject({
+				tab: "queue",
+			});
+			expect(
+				resolveItemDetailTargetFn({
+					itemId: request.ownerItemId,
+					runtime,
+					requestedTab: "lines",
+				}),
+			).toMatchObject({
+				tab: "lines",
+			});
+		}
+		expect(
+			resolveItemDetailTargetFn({
+				itemId: request.ownerItemId,
+				runtime: {
+					...base,
+					jobs: [
+						{
+							...job,
+							ownerItemId: "runtime:other",
+						},
+					],
+					jobQueue: [
+						{
+							...request,
+							ownerItemId: "runtime:other",
+						},
+					],
+				},
+			}),
+		).toMatchObject({
+			tab: "lines",
+		});
 	});
 
 	it("defaults ordinary runtime items to Info and rejects missing targets", () => {

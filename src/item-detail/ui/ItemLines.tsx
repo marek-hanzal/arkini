@@ -1,4 +1,4 @@
-import { Factory, ListPlus, Star } from "lucide-react";
+import { Factory, ListPlus, Star, X } from "lucide-react";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -10,6 +10,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { useItemLineMakeController } from "~/item-detail/ui/useItemLineMakeController";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { useItemLineDefaultController } from "~/item-detail/ui/useItemLineDefaultController";
+import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemLinesStatus } from "~/item-detail/ui/useItemLinesStatus";
 import type { readItemLineStatusesFn } from "~/item-detail-read/fn/readItemLineStatusesFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -68,11 +69,17 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 		authoredDefault: line.default,
 		disabled: props.disabled,
 	});
+	const cancelController = useItemLineCancelController({
+		ownerItemId: props.ownerItemId,
+		lineId: line.id,
+		requestId: status?.requestId,
+		disabled: props.disabled,
+	});
 	const translator = useTranslator();
 	const state = status?.state ?? "idle";
 	const statusLabel = match(state)
 		.with("idle", () => translator.textFn("Idle"))
-		.with("waiting-inputs", () => translator.textFn("Waiting for input"))
+		.with("waiting-inputs", () => translator.textFn("Waiting for materials"))
 		.with("waiting-start", () => translator.textFn("Waiting to start"))
 		.with("running", () => translator.textFn("Running"))
 		.with("paused", () => translator.textFn("Paused"))
@@ -131,32 +138,44 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 					line={line}
 					idle={state === "idle"}
 				/>
-				<p
-					className="mt-3 ml-auto shrink-0 text-sm text-foreground data-[ui-idle=true]:text-muted"
-					{...readDataUiFn({
-						dataUi: "ItemLineStatus",
-						state: {
-							idle: state === "idle",
-						},
-					})}
-				>
-					{statusLabel}
-					{state === "running" ? (
-						<>
-							{" "}
-							·{" "}
-							<ItemLineCountdown
-								ownerItemId={props.ownerItemId}
-								lineId={line.id}
-							/>
-						</>
+				<div className="mt-3 ml-auto flex shrink-0 items-center gap-5 text-sm">
+					<p
+						className="shrink-0 text-foreground data-[ui-idle=true]:text-muted"
+						{...readDataUiFn({
+							dataUi: "ItemLineStatus",
+							state: {
+								idle: state === "idle",
+							},
+						})}
+					>
+						{statusLabel}
+						{state === "running" ? (
+							<>
+								{" "}
+								·{" "}
+								<ItemLineCountdown
+									ownerItemId={props.ownerItemId}
+									lineId={line.id}
+								/>
+							</>
+						) : null}
+						{state === "queued"
+							? ` ${status?.queued ?? 0}`
+							: extra > 0
+								? ` (+${extra})`
+								: ""}
+					</p>
+					{status?.requestId !== undefined ? (
+						<LinkButton
+							className="inline-flex items-center gap-2"
+							disabled={cancelController.disabled}
+							onClick={cancelController.cancelFn}
+						>
+							<X className="size-4" />
+							{translator.textFn("Cancel")}
+						</LinkButton>
 					) : null}
-					{state === "queued"
-						? ` ${status?.queued ?? 0}`
-						: extra > 0
-							? ` (+${extra})`
-							: ""}
-				</p>
+				</div>
 			</div>
 		</article>
 	);

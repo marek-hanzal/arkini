@@ -243,3 +243,84 @@ describe("clearItemJobQueueFx", () => {
 		).toEqual(result.prepared.tool.location);
 	});
 });
+
+it("cancels only the requested identity and stale or foreign requests cannot cancel subsequent work", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const before = yield* readRuntimeFx();
+			const props = {
+				ownerItemId: "runtime:forge:primary",
+				requestId: "job:queued:first",
+			};
+			yield* clearItemJobQueueFx(props);
+			const after = yield* readRuntimeFx();
+			yield* clearItemJobQueueFx(props);
+			yield* clearItemJobQueueFx({
+				...props,
+				requestId: "job:queued:other:first",
+			});
+			return {
+				before,
+				after,
+				repeated: yield* readRuntimeFx(),
+			};
+		}).pipe(
+			useGameFx({
+				config: clearItemJobQueueConfig,
+				state: clearItemJobQueueState,
+			}),
+		),
+	);
+	expect(result.after.jobQueue).toEqual(
+		result.before.jobQueue.filter((request) => request.id !== "job:queued:first"),
+	);
+	expect(result.after.jobs).toEqual(result.before.jobs);
+	expect(result.repeated).toBe(result.after);
+});
+
+it("keeps shared line material until its final queued request is cancelled", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const prepared = yield* prepareBlockedReserveQueueFx();
+			const second = yield* enqueueLineFx({
+				ownerItemId: prepared.owner.id,
+				lineId: "line:forge:run",
+			});
+			yield* runTickRuntimeByFx({
+				elapsedMs: 100,
+			});
+			const before = yield* readRuntimeFx();
+			yield* clearItemJobQueueFx({
+				ownerItemId: prepared.owner.id,
+				requestId: prepared.request.id,
+			});
+			const retained = yield* readRuntimeFx();
+			yield* clearItemJobQueueFx({
+				ownerItemId: prepared.owner.id,
+				requestId: second.id,
+			});
+			return {
+				before,
+				retained,
+				after: yield* readRuntimeFx(),
+				prepared,
+				second,
+			};
+		}).pipe(
+			useGameFx({
+				config: createJobTestConfig(3),
+			}),
+		),
+	);
+	expect(result.retained.items).toEqual(result.before.items);
+	expect(result.retained.jobQueue.map((request) => request.id)).toEqual([
+		result.second.id,
+	]);
+	expect(result.after.jobQueue).toEqual([]);
+	expect(
+		result.after.items.find((item) => item.id === result.prepared.tool.id)?.location,
+	).toMatchObject({
+		scope: "delivery",
+		phase: "returning",
+	});
+});

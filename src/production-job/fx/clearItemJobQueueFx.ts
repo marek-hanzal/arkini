@@ -14,12 +14,15 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace clearItemJobQueueFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
+		/** When provided, removes only this exact pending request; a stale identity is a no-op. */
+		requestId?: IdSchema.Type;
 	}
 }
 
 /** Removes one owner's pending work and returns its unused line-input material atomically. */
 export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 	ownerItemId,
+	requestId,
 }: clearItemJobQueueFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
@@ -33,7 +36,9 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 			});
 
 			const clearedRequests = runtime.jobQueue.filter(
-				(request) => request.ownerItemId === ownerItemId,
+				(request) =>
+					request.ownerItemId === ownerItemId &&
+					(requestId === undefined || request.id === requestId),
 			);
 			if (clearedRequests.length === 0) {
 				return [
@@ -42,10 +47,26 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 				] as const;
 			}
 
-			const clearedLineIds = new Set(clearedRequests.map((request) => request.lineId));
+			const clearedIds = new Set(clearedRequests.map((request) => request.id));
+			const remainingRequests = runtime.jobQueue.filter(
+				(request) => !clearedIds.has(request.id),
+			);
+			// Buffers belong to the line, so another pending request still needs them.
+			const clearedLineIds = new Set(
+				clearedRequests
+					.filter(
+						(request) =>
+							!remainingRequests.some(
+								(remaining) =>
+									remaining.ownerItemId === ownerItemId &&
+									remaining.lineId === request.lineId,
+							),
+					)
+					.map((request) => request.lineId),
+			);
 			let nextRuntime = {
 				...runtime,
-				jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== ownerItemId),
+				jobQueue: remainingRequests,
 			} satisfies RuntimeSchema.Type;
 			const bufferedItems = Array.getSomes(
 				runtime.items.map(narrowInputRuntimeItemFn),

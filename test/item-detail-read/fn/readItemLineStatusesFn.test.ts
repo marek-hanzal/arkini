@@ -37,11 +37,13 @@ it("counts only each line's pending requests and keeps the active state ahead of
 			lineId: "a",
 			state: "running",
 			queued: 2,
+			requestId: undefined,
 		},
 		{
 			lineId: "b",
 			state: "queued",
 			queued: 3,
+			requestId: "request:1",
 		},
 	];
 	expect(readItemLineStatusesFn(queue)).toEqual(expected);
@@ -70,6 +72,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 		lineId: "a",
 		state: "awaiting-output",
 		queued: 2,
+		requestId: undefined,
 	});
 });
 
@@ -106,11 +109,13 @@ it("distinguishes missing input from other start blockers without claiming that 
 			lineId: "a",
 			state: "waiting-inputs",
 			queued: 2,
+			requestId: "first",
 		},
 		{
 			lineId: "b",
 			state: "waiting-start",
 			queued: 1,
+			requestId: "third",
 		},
 	]);
 	expect(

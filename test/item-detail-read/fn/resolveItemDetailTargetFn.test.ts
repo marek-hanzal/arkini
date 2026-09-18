@@ -23,7 +23,6 @@ describe("resolveItemDetailTargetFn", () => {
 			"lines",
 			"queue",
 			"info",
-			"clock",
 		] as const) {
 			expect(
 				resolveItemDetailTargetFn({

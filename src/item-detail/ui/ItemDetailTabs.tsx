@@ -1,5 +1,5 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
-import { Clock, Factory, Info, ListOrdered, type LucideIcon } from "lucide-react";
+import { Factory, Info, ListOrdered, type LucideIcon } from "lucide-react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
@@ -29,12 +29,6 @@ const tabOptions = [
 		icon: ListOrdered,
 		shortcut: "q",
 		value: "queue",
-	},
-	{
-		label: "Clock",
-		icon: Clock,
-		shortcut: "c",
-		value: "clock",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly label: string;

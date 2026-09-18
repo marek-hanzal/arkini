@@ -9,7 +9,7 @@ export const ItemLineBackdrop = ({
 	readonly progress?: number;
 }) => (
 	<div
-		className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-[42%] -translate-x-1/2 opacity-45 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_72%)]"
+		className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-[42%] -translate-x-1/2 opacity-[0.225] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_72%)]"
 		data-ui="ItemLineBackdrop"
 	>
 		<ItemArtwork

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { readLineBlockingHintsFn } from "~/item-detail-read/fn/readLineBlockingHintsFn";
+import { readLineBlockingHintFn } from "~/item-detail-read/fn/readLineBlockingHintFn";
 import { RuleSchema } from "~/production-line/schema/RuleSchema";
 
 const ruleFn = (type: "enable" | "disable" | "show", hint?: string) =>
@@ -20,7 +20,7 @@ const ruleFn = (type: "enable" | "disable" | "show", hint?: string) =>
 		],
 	});
 
-it("explains only failed enable gates and active disable vetoes, preserving authored rule identity", () => {
+it("explains the first failed gate or active veto in authored order", () => {
 	const line = {
 		enable: true,
 		rules: [
@@ -31,7 +31,7 @@ it("explains only failed enable gates and active disable vetoes, preserving auth
 		],
 	};
 	expect(
-		readLineBlockingHintsFn({
+		readLineBlockingHintFn({
 			line,
 			rules: [
 				{
@@ -52,12 +52,9 @@ it("explains only failed enable gates and active disable vetoes, preserving auth
 				},
 			],
 		}),
-	).toEqual([
-		"Needs a tree",
-		"Blocked",
-	]);
+	).toBe("Needs a tree");
 	expect(
-		readLineBlockingHintsFn({
+		readLineBlockingHintFn({
 			line,
 			rules: [
 				{
@@ -78,17 +75,17 @@ it("explains only failed enable gates and active disable vetoes, preserving auth
 				},
 			],
 		}),
-	).toEqual([]);
+	).toBeUndefined();
 });
 
-it("keeps silent blockers silent instead of borrowing a hint from a non-blocking rule", () => {
+it("keeps the first blocker silent even when a later blocker has a hint", () => {
 	expect(
-		readLineBlockingHintsFn({
+		readLineBlockingHintFn({
 			line: {
 				enable: true,
 				rules: [
 					ruleFn("enable"),
-					ruleFn("disable", "Not the reason"),
+					ruleFn("disable", "Later blocker"),
 				],
 			},
 			rules: [
@@ -98,18 +95,18 @@ it("keeps silent blockers silent instead of borrowing a hint from a non-blocking
 				},
 				{
 					type: "disable",
-					active: false,
+					active: true,
 				},
 			],
 		}),
-	).toEqual([]);
+	).toBeUndefined();
 	expect(
-		readLineBlockingHintsFn({
+		readLineBlockingHintFn({
 			line: {
 				enable: false,
 				rules: [],
 			},
 			rules: [],
 		}),
-	).toEqual([]);
+	).toBeUndefined();
 });

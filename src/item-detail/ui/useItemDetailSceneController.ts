@@ -16,7 +16,7 @@ import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
-import { readLineBlockingHintsFn } from "~/item-detail-read/fn/readLineBlockingHintsFn";
+import { readLineBlockingHintFn } from "~/item-detail-read/fn/readLineBlockingHintFn";
 
 export namespace useItemDetailSceneController {
 	export interface Props {
@@ -29,7 +29,7 @@ export namespace useItemDetailSceneController {
 		> {
 		readonly canMake: boolean;
 		readonly disabledLineIds: readonly string[];
-		readonly lineBlockingHints: Readonly<Record<string, readonly string[]>>;
+		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
 		readonly queueSize?: number;
 		readonly title: string;
 		readonly sourceUrl: string;
@@ -93,7 +93,7 @@ export const useItemDetailSceneController = ({
 							line,
 							visible: line.show,
 							enabled: line.enable,
-							blockingHints: [] as readonly string[],
+							blockingHint: undefined,
 						});
 					return lineRulesFx({
 						origin: runtimeItem.location,
@@ -101,7 +101,7 @@ export const useItemDetailSceneController = ({
 					}).pipe(
 						Effect.map((rules) => ({
 							line,
-							blockingHints: readLineBlockingHintsFn({
+							blockingHint: readLineBlockingHintFn({
 								line,
 								rules,
 							}),
@@ -144,7 +144,7 @@ export const useItemDetailSceneController = ({
 				lineBlockingHints: Object.fromEntries(
 					visibleLines.map((state) => [
 						state.line.id,
-						state.blockingHints,
+						state.blockingHint,
 					]),
 				),
 				disabledLineIds: visibleLines

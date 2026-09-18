@@ -47,7 +47,7 @@ interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
 	readonly makeDisabled: boolean;
 	readonly ruleDisabled: boolean;
-	readonly blockingHints: readonly string[];
+	readonly blockingHint?: string;
 	readonly status?: readItemLineStatusesFn.Status;
 }
 
@@ -123,7 +123,7 @@ const ItemLine = ({
 	line,
 	makeDisabled,
 	ruleDisabled,
-	blockingHints,
+	blockingHint,
 	status,
 	...props
 }: ItemLineProps) => {
@@ -265,24 +265,21 @@ const ItemLine = ({
 					</>
 				}
 				footer={
-					<AnimatePresence initial={false}>
-						{ruleDisabled && blockingHints.length > 0 ? (
+					<AnimatePresence
+						initial={false}
+						mode="wait"
+					>
+						{ruleDisabled && blockingHint !== undefined ? (
 							<motion.div
+								key={blockingHint}
 								{...linePresenceMotion}
 								className="overflow-hidden"
 								data-ui="ItemLineBlockingHints"
 							>
-								<div className="mt-3 grid gap-2 text-sm">
-									{blockingHints.map((hint) => (
-										<p
-											key={hint}
-											className="flex items-start gap-2"
-										>
-											<Info className="mt-0.5 size-4 shrink-0" />
-											<span className="whitespace-pre-wrap">{hint}</span>
-										</p>
-									))}
-								</div>
+								<p className="mt-3 flex items-start gap-2 text-sm text-accent">
+									<Info className="mt-0.5 size-4 shrink-0" />
+									<span className="whitespace-pre-wrap">{blockingHint}</span>
+								</p>
 							</motion.div>
 						) : null}
 					</AnimatePresence>
@@ -302,7 +299,7 @@ export const ItemLines = ({
 }: {
 	readonly lines: readonly LineSchema.Type[];
 	readonly disabledLineIds: readonly string[];
-	readonly lineBlockingHints: Readonly<Record<string, readonly string[]>>;
+	readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
 	readonly makeDisabled: boolean;
@@ -320,7 +317,7 @@ export const ItemLines = ({
 						key={`line:${line.id}`}
 						line={line}
 						ruleDisabled={disabledLineIds.includes(line.id)}
-						blockingHints={lineBlockingHints[line.id] ?? []}
+						blockingHint={lineBlockingHints[line.id]}
 						lineId={line.id}
 						ownerItemId={ownerItemId}
 						disabled={disabled}

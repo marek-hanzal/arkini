@@ -39,6 +39,7 @@ export namespace readItemLineInputsFx {
 		readonly clock?: {
 			readonly kind: "expiry" | "cycle";
 			readonly remainingMs: number;
+			readonly durationMs: number;
 		};
 	}
 }
@@ -113,8 +114,11 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			const remaining =
 				item.schedule?.remainingDurationMs ?? item.schedule?.remainingIntervalMs;
 			const kind = item.schedule?.remainingDurationMs === undefined ? "cycle" : "expiry";
+			const duration =
+				kind === "expiry" ? item.item.clock?.durationMs : item.item.clock?.intervalMs;
 			if (
 				remaining !== undefined &&
+				duration !== undefined &&
 				(yield* resolveItemScheduleEnabledFx({
 					item,
 					runtime,
@@ -128,6 +132,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 					clock = {
 						kind,
 						remainingMs: remaining,
+						durationMs: duration,
 					};
 				}
 			}

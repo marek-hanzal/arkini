@@ -465,14 +465,19 @@ it("isolates active material and gives shared buffers only to the first same-lin
 });
 
 it("reads the soonest running lifetime only from physical roots in this slot", () => {
-	const timed = (id: string, remainingMs: number, enabled = true): RuntimeItemSchema.Type => ({
+	const timed = (
+		id: string,
+		remainingMs: number,
+		enabled = true,
+		durationMs = 12000,
+	): RuntimeItemSchema.Type => ({
 		...water,
 		id,
 		quantity: 1,
 		item: {
 			...water.item,
 			clock: {
-				durationMs: 12000,
+				durationMs,
 				enable: enabled,
 				rules: [],
 			},
@@ -483,7 +488,7 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 	});
 	const roots = [
 		timed("later", 8000),
-		timed("sooner", 3200),
+		timed("sooner", 3200, true, 6000),
 		timed("paused", 100, false),
 	];
 	const snapshot = {
@@ -499,6 +504,7 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 		clock: {
 			kind: "expiry",
 			remainingMs: 3200,
+			durationMs: 6000,
 		},
 	});
 	const aged = {
@@ -573,6 +579,7 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 		clock: {
 			kind: "expiry",
 			remainingMs: 3200,
+			durationMs: 6000,
 		},
 	});
 });
@@ -604,6 +611,7 @@ it("shows interval-only Clock phase from stored material without borrowing an un
 	).toEqual({
 		kind: "cycle",
 		remainingMs: 4200,
+		durationMs: 10000,
 	});
 	expect(
 		readFn({

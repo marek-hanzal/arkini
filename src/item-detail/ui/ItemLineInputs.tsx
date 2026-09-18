@@ -1,5 +1,4 @@
-import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { Clock, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useItemLineInputController } from "~/item-detail/ui/useItemLineInputController";
 import { Equal, Exit } from "effect";
 import { useCallback } from "react";
@@ -93,17 +92,6 @@ export const ItemLineInputs = ({
 										{translator.textFn("Click to bring this here.")}
 									</span>
 								) : null}
-								{input.clock !== undefined ? (
-									<span className="block">
-										{input.clock.kind === "expiry"
-											? translator.textFn("Time until the next one expires")
-											: translator.textFn("Time until the next cycle")}
-										:{" "}
-										<strong>
-											{formatDurationFn(input.clock.remainingMs, "countdown")}
-										</strong>
-									</span>
-								) : null}
 								<span className="block">
 									{translator.textFn("Available")}:{" "}
 									<strong className="font-bold">{input.availableQuantity}</strong>
@@ -148,10 +136,7 @@ export const ItemLineInputs = ({
 								/>
 							</span>
 							{input.clock !== undefined ? (
-								<span className="absolute -top-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold tabular-nums text-foreground shadow-sm">
-									<Clock className="size-3" />
-									{formatDurationFn(input.clock.remainingMs, "countdown")}
-								</span>
+								<ItemLineInputClock clock={input.clock} />
 							) : null}
 							{total > 1 ? (
 								<span className="pointer-events-none absolute -right-1 -bottom-1 z-30 rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
@@ -177,5 +162,46 @@ export const ItemLineInputs = ({
 				);
 			})}
 		</div>
+	);
+};
+
+/** Mirrors the Board clock's track and hands without exposing an exact countdown. */
+const ItemLineInputClock = ({
+	clock,
+}: {
+	readonly clock: NonNullable<readItemLineInputsFx.Input["clock"]>;
+}) => {
+	const progress = Math.max(0, Math.min(1, 1 - clock.remainingMs / clock.durationMs));
+	return (
+		<svg
+			data-ui="ItemLineInputClock"
+			className="pointer-events-none absolute -top-1 -left-1 z-30 size-6 rounded-full bg-overlay/70 text-overlay-foreground"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth={1.6}
+		>
+			<circle
+				cx={12}
+				cy={12}
+				r={9}
+				opacity={0.2}
+			/>
+			<circle
+				cx={12}
+				cy={12}
+				r={9}
+				pathLength={100}
+				strokeDasharray={100}
+				strokeDashoffset={(1 - progress) * 100}
+				transform="rotate(-90 12 12)"
+				className="transition-[stroke-dashoffset] duration-100 ease-linear"
+			/>
+			<path
+				d="M12 7.5 V12 l3.15 1.8"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
 	);
 };

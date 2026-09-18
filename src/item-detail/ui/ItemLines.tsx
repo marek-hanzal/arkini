@@ -80,7 +80,7 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 	const translator = useTranslator();
 	const state = status?.state ?? "idle";
 	const statusLabel = match(state)
-		.with("idle", () => translator.textFn("Idle"))
+		.with("idle", () => null)
 		.with("waiting-inputs", () => translator.textFn("Waiting for materials"))
 		.with("waiting-start", () => translator.textFn("Waiting to start"))
 		.with("running", () => translator.textFn("Running"))
@@ -141,33 +141,30 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 					idle={state === "idle"}
 					disabled={props.disabled}
 				/>
-				<div className="mt-3 ml-auto flex shrink-0 items-center gap-5 text-sm">
-					<p
-						className="shrink-0 text-foreground data-[ui-idle=true]:text-muted"
-						{...readDataUiFn({
-							dataUi: "ItemLineStatus",
-							state: {
-								idle: state === "idle",
-							},
-						})}
-					>
-						{statusLabel}
-						{state === "running" ? (
-							<>
-								{" "}
-								·{" "}
-								<ItemLineCountdown
-									ownerItemId={props.ownerItemId}
-									lineId={line.id}
-								/>
-							</>
-						) : null}
-						{state === "queued"
-							? ` ${status?.queued ?? 0}`
-							: extra > 0
-								? ` (+${extra})`
-								: ""}
-					</p>
+				<div className="mt-3 ml-auto flex min-h-5 shrink-0 items-center gap-5 text-sm">
+					{statusLabel !== null ? (
+						<p
+							className="shrink-0 text-foreground"
+							data-ui="ItemLineStatus"
+						>
+							{statusLabel}
+							{state === "running" ? (
+								<>
+									{" "}
+									·{" "}
+									<ItemLineCountdown
+										ownerItemId={props.ownerItemId}
+										lineId={line.id}
+									/>
+								</>
+							) : null}
+							{state === "queued"
+								? ` ${status?.queued ?? 0}`
+								: extra > 0
+									? ` (+${extra})`
+									: ""}
+						</p>
+					) : null}
 					{status?.jobId !== undefined ? (
 						<ItemJobCancel
 							ownerItemId={props.ownerItemId}

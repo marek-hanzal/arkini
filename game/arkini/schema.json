@@ -110,6 +110,10 @@
 					"description": "The human-readable title of this game.",
 					"$ref": "urn:arkini:schema:project#/$defs/TitleSchema"
 				},
+				"introduction": {
+					"description": "Optional Markdown shown before starting a game without a save.",
+					"type": "string"
+				},
 				"board": {
 					"description": "The size of the board on which items are placed.",
 					"$ref": "urn:arkini:schema:project#/$defs/grid.SizeSchema"

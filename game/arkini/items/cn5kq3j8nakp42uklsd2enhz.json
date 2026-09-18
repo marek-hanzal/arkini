@@ -40,6 +40,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "firewood"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "stone-deposit"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "stone-excalixe"
 			}
 		],
 		"maxQueueSize": 1,

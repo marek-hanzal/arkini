@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "m5mszx67xwvasx9gjf92ejym",
+		"id": "stone-excalixe",
+		"title": "Stone Excalixe",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"stone-excalixe"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

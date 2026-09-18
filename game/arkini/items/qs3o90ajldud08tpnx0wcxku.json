@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "qs3o90ajldud08tpnx0wcxku",
+		"id": "stone-excalibur",
+		"title": "Stone Excalibur",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"stone-excalibur"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

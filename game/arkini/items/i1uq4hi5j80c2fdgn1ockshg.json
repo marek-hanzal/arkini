@@ -166,6 +166,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "british-shorthair-kitten-on-sword"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "stone-deposit"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "stone-excalibur"
 			}
 		],
 		"maxQueueSize": 1,

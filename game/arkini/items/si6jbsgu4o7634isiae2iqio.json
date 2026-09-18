@@ -1,0 +1,48 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "si6jbsgu4o7634isiae2iqio",
+		"id": "carved-pumpkin",
+		"title": "Carved Pumpkin",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"carved-pumpkin"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-carved-pumpkin",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

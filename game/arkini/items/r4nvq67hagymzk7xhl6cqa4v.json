@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "r4nvq67hagymzk7xhl6cqa4v",
+		"id": "paper-pulp-bucket",
+		"title": "Paper Pulp Bucket",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"paper-pulp-bucket"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

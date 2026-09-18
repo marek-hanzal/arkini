@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "z7wnlhv495tvujpj3vpose01",
+		"id": "paper-drying-rack",
+		"title": "Paper Drying Rack",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"paper-drying-rack"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

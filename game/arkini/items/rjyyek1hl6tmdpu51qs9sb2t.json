@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "rjyyek1hl6tmdpu51qs9sb2t",
+		"id": "wet-paper-drying-rack",
+		"title": "Wet Paper Drying Rack",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"wet-paper-drying-rack"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

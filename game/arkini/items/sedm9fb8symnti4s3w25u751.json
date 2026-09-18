@@ -40,6 +40,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "basecamp-on-fire"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "carved-pumpkin"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "lit-carved-pumpkin"
 			}
 		],
 		"clock": {

@@ -295,6 +295,8 @@ Board editing help:
     Use **Space** to switch between Spaces 0–31. Changes stay with the selected Space, even before you save.
 Board placement:
   value: Where to place
+Board, inventory and toolbar:
+  value: Board, inventory and toolbar
 Build:
   value: Build
 Build blocked by validation:
@@ -1141,6 +1143,8 @@ Items:
 Items merged:
   value: Items merged
   dynamic: true
+Items per stack:
+  value: Items per stack
 Items stacked:
   value: Items stacked
   dynamic: true
@@ -1261,6 +1265,8 @@ Maximum count:
   value: Maximum count
 Maximum global count:
   value: Maximum global count
+Maximum in the game:
+  value: Maximum in the game
 Maximum stack size:
   value: Maximum stack size
 Merge:
@@ -2231,6 +2237,8 @@ When the player switches to another Board space.:
 When two items swap places.:
   value: When two items swap places.
   dynamic: true
+Where you can keep it:
+  value: Where you can keep it
 Width:
   value: Width
 With note:

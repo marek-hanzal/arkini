@@ -1,5 +1,6 @@
 import { ItemDetailHeader } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
+import { ItemInfo } from "~/item-detail/ui/ItemInfo";
 import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { Tx } from "~/translation/ui/Tx";
@@ -8,7 +9,7 @@ interface ItemDetailSceneProps extends useItemDetailSceneController.Props {
 	readonly disabled: boolean;
 }
 
-/** The detail shell deliberately has no capability panels during the UI rebuild. */
+/** Composes the shared item frame and its player-facing sections. */
 export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	const controller = useItemDetailSceneController({
 		target,
@@ -27,10 +28,10 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 			className="flex min-h-0 flex-1 flex-col"
 			data-ui="ItemDetailScene"
 		>
-			{controller.identity !== undefined ? (
+			{controller.detail !== undefined ? (
 				<ItemDetailHeader
 					disabled={disabled}
-					identity={controller.identity}
+					identity={controller.detail}
 					navigation={navigation}
 					stale={controller.stale}
 				/>
@@ -53,10 +54,14 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				</header>
 			)}
 			<div
-				className="min-h-0 flex-1"
+				className="min-h-0 flex-1 overflow-auto"
 				data-ui="ItemDetailPanel"
 				data-tab={target.tab}
-			/>
+			>
+				{target.tab === "info" && controller.detail !== undefined ? (
+					<ItemInfo detail={controller.detail} />
+				) : null}
+			</div>
 		</div>
 	);
 };

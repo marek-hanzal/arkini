@@ -3,7 +3,7 @@ import { useCallback } from "react";
 
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";
-import { readItemDetailIdentityFx } from "~/item-detail-read/fx/readItemDetailIdentityFx";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -12,51 +12,42 @@ export namespace useItemDetailSceneController {
 	export interface Props {
 		readonly target: ItemDetailTarget;
 	}
-	export interface Identity {
+	export interface Detail
+		extends Pick<ItemSchema.Type, "description" | "scope" | "maxStackSize" | "maxCount"> {
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
 	}
 	export interface Output {
-		readonly identity?: Identity;
+		readonly detail?: Detail;
 		readonly stale: boolean;
 	}
 }
 
-/** Reads only identity; each future panel owns its own gameplay projection. */
+/** Keeps identity and basic authored facts together for the exact visible item. */
 export const useItemDetailSceneController = ({
 	target,
 }: useItemDetailSceneController.Props): useItemDetailSceneController.Output => {
 	const game = useGameEngine();
 	const { kind, itemId } = target;
 	const selectorFn = useCallback(
-		(runtime: RuntimeSchema.Type): useItemDetailSceneController.Identity | undefined => {
-			if (kind === "definition") {
-				const item = game.config.items[itemId];
-				if (item === undefined) return undefined;
-				return {
-					title: item.title,
-					sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),
-					compositeUrl:
-						item.artwork.default[1] === undefined
-							? undefined
-							: game.getResourceUrlFn(item.artwork.default[1]),
-				};
-			}
-			const identity = game.readOrThrowFn(
-				readItemDetailIdentityFx({
-					itemId,
-					runtime,
-				}),
-			);
-			if (identity.kind === "unavailable") return undefined;
+		(runtime: RuntimeSchema.Type): useItemDetailSceneController.Detail | undefined => {
+			const item =
+				kind === "definition"
+					? game.config.items[itemId]
+					: runtime.items.find((candidate) => candidate.id === itemId)?.item;
+			if (item === undefined) return undefined;
 			return {
-				title: identity.title,
-				sourceUrl: game.getResourceUrlFn(identity.sourceResourceIds[0]),
+				title: item.title,
+				sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),
 				compositeUrl:
-					identity.sourceResourceIds[1] === undefined
+					item.artwork.default[1] === undefined
 						? undefined
-						: game.getResourceUrlFn(identity.sourceResourceIds[1]),
+						: game.getResourceUrlFn(item.artwork.default[1]),
+				description: item.description,
+				scope: item.scope,
+				maxStackSize: item.maxStackSize,
+				maxCount: item.maxCount,
 			};
 		},
 		[
@@ -65,14 +56,14 @@ export const useItemDetailSceneController = ({
 			itemId,
 		],
 	);
-	const identity = useRuntimeSelector(game, selectorFn, Equal.equals);
+	const detail = useRuntimeSelector(game, selectorFn, Equal.equals);
 	const retained = useRetainedItemDetailProjection({
-		available: identity !== undefined,
+		available: detail !== undefined,
 		targetKey: `${kind}:${itemId}`,
-		value: identity,
+		value: detail,
 	});
 	return {
-		identity: retained.value,
+		detail: retained.value,
 		stale: retained.stale,
 	};
 };

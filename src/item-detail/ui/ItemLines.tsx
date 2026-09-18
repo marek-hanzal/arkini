@@ -125,7 +125,7 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 			inert={!present}
 		>
 			<article
-				className="py-5 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45"
+				className="relative isolate py-5 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45"
 				{...readDataUiFn({
 					dataUi: "ItemLine",
 					state: {
@@ -134,6 +134,15 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 				})}
 				data-line-id={line.id}
 			>
+				{line.artwork === undefined ? null : (
+					<img
+						className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 h-full w-[42%] -translate-x-1/2 object-cover opacity-70 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_72%)]"
+						data-ui="ItemLineBackdrop"
+						src={game.getResourceUrlFn(line.artwork)}
+						alt=""
+						draggable={false}
+					/>
+				)}
 				<div className="flex items-center gap-3">
 					{line.artwork === undefined ? null : (
 						<ItemArtwork

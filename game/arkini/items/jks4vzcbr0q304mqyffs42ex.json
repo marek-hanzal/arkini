@@ -20,6 +20,7 @@
 				"title": "New producer line",
 				"description": "Describe what this producer line consumes and produces.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 18000,

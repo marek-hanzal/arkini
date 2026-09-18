@@ -20,6 +20,7 @@
 				"title": "Flour",
 				"description": "Flour is the base",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

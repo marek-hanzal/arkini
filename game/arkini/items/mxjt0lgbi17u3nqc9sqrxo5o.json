@@ -25,6 +25,7 @@
 				"artwork": "brewery",
 				"description": "So, it's time to brew a beer",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 0,

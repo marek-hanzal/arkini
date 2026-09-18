@@ -51,6 +51,7 @@
 				"title": "Treasure",
 				"description": "Generates some treasure, because you wish it",
 				"clock": true,
+				"clockWeight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,

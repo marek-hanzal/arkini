@@ -20,6 +20,7 @@ export const createLineFn = (
 		title,
 		description,
 		default: lines.length === 0,
+		clockWeight: 1,
 		show: true,
 		enable: true,
 		runtimeMs: 30_000,

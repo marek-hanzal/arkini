@@ -5,6 +5,7 @@ import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
 	createLine,
@@ -21,6 +22,7 @@ const createClockGraph = async ({
 	runtimeMs = 300,
 	once = false,
 	passive = false,
+	additionalLines = [],
 }: {
 	durationMs?: number;
 	enable?: boolean;
@@ -28,6 +30,7 @@ const createClockGraph = async ({
 	runtimeMs?: number;
 	once?: boolean;
 	passive?: boolean;
+	additionalLines?: ReadonlyArray<LineSchema.Type>;
 } = {}) => {
 	const clock = ItemSchema.parse({
 		...createProducerItem({
@@ -57,6 +60,7 @@ const createClockGraph = async ({
 								},
 							]),
 						}),
+						...additionalLines,
 					],
 		}),
 
@@ -254,6 +258,117 @@ describe("Clock authored acquisition boundaries", () => {
 				({ metadata }) => metadata.kind === "line-output" && metadata.lineId === "default",
 			)?.durationMs,
 		).toBe(300);
+	});
+
+	it("excludes permanently disabled Clock lines from the automatic pool", async () => {
+		const graph = await createClockGraph({
+			additionalLines: [
+				{
+					...createLine({
+						id: "disabled",
+						clock: true,
+					}),
+					clockWeight: 999,
+					enable: false,
+				},
+			],
+		});
+		expect(
+			estimateRequestsFn({
+				graph,
+				requests: [
+					{
+						factId: "target",
+						quantity: 2,
+					},
+				],
+			})[0],
+		).toMatchObject({
+			status: "complete",
+			durationMs: 2000,
+		});
+	});
+
+	it.each([
+		"target",
+		"other",
+	])("does not assign independent timing to weighted Clock output %s", async (itemId) => {
+		const graph = await createClockGraph({
+			additionalLines: [
+				{
+					...createLine({
+						id: "competing",
+						clock: true,
+						output: createOutput([
+							{
+								itemId,
+							},
+						]),
+					}),
+					clockWeight: 3,
+					show: false,
+				},
+			],
+		});
+		expect(
+			estimateRequestsFn({
+				graph,
+				requests: [
+					{
+						factId: "target",
+					},
+				],
+			})[0],
+		).toMatchObject({
+			status: "partial",
+			diagnostics: expect.arrayContaining([
+				expect.objectContaining({
+					kind: "weighted-clock-pool-unsupported",
+				}),
+			]),
+		});
+	});
+
+	it("keeps conditional weighted eligibility indeterminate rather than inventing fixed odds", async () => {
+		const graph = await createClockGraph({
+			additionalLines: [
+				{
+					...createLine({
+						id: "competing",
+						clock: true,
+					}),
+					clockWeight: 3,
+					rules: [
+						{
+							type: "disable",
+							when: [
+								{
+									type: "limit",
+									itemId: "target",
+								},
+							],
+						},
+					],
+				},
+			],
+		});
+		expect(
+			estimateRequestsFn({
+				graph,
+				requests: [
+					{
+						factId: "target",
+					},
+				],
+			})[0],
+		).toMatchObject({
+			status: "partial",
+			diagnostics: expect.arrayContaining([
+				expect.objectContaining({
+					kind: "weighted-clock-pool-unsupported",
+				}),
+			]),
+		});
 	});
 
 	it("retains production runtime when it exceeds cadence and permits interactive manual lines with the timer disabled", async () => {

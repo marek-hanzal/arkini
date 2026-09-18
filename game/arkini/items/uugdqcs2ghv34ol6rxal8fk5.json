@@ -23,6 +23,7 @@
 				"title": "Search Stone Deposit",
 				"description": "Describe what this producer line consumes and produces.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 5000,

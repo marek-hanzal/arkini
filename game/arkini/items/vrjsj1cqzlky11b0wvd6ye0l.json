@@ -21,6 +21,7 @@
 				"artwork": "wood",
 				"description": "Get the wood from a tree. Find the tree. No tree, no wood. Really.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 6000,

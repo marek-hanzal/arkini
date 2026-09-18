@@ -97,7 +97,7 @@ export type AcquisitionRouteMetadata =
 
 export interface AcquisitionRoute {
 	/** Authored lifecycle restrictions retained for static analysis without hiding Flow relations. */
-	readonly executionConstraint?: "unavailable" | "finite-owner-lifetime";
+	readonly executionConstraint?: "unavailable" | "finite-owner-lifetime" | "weighted-clock-pool";
 	/** Optimistic action cadence; owner startup and runtime queue delays remain outside the model. */
 	readonly minimumActionIntervalMs?: number;
 	readonly unitUses?: ReadonlyArray<{

@@ -81,7 +81,7 @@ clear pending owner queue
 
 A queued request owns no time, material, units or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
-Scheduled owners use the same selected-line reader and one-intent admission. `Common.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally in loose-kill mode, while kill-switch cancels it. Player-control admission is separate from autonomous work and shared by production commands and their projections.
+Scheduled owners filter their selected Clock pool by line rules, draw by `clockWeight`, then use ordinary one-intent admission. `Item.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally in loose-kill mode, while kill-switch cancels it. Player-control admission is separate from autonomous work and shared by production commands and their projections.
 
 ## Important invariants
 
@@ -116,3 +116,5 @@ Usually not affected:
 Changes to persisted Job/Input/Delivery schemas, Game Events or Item placement cross those defaults and require following the exact consumers.
 
 Clock kill-switch uses [`forceRemoveRuntimeItemFx`](../game-runtime/fx/forceRemoveRuntimeItemFx.ts), the general atomic removal path. It cancels all owner intent and active work, discards consumed inputs without unit refunds or line output, and returns reservations before buffers and expiry Output. Ordinary completion retains all-or-nothing placement. Forced removal alone permits logged capacity overflow; parent-job reconciliation uses that same policy when the removed root was committed material. Successful completions at the expiry boundary still win.
+
+Clock selection uses [`readClockLinesFn.ts`](fn/readClockLinesFn.ts) for authored markers or an exact owner override. [`selectClockLineFx.ts`](../item-schedule/fx/selectClockLineFx.ts) evaluates line rules before weighted selection; [`advanceItemSchedulesFx.ts`](../item-schedule/fx/advanceItemSchedulesFx.ts) owns the saved pulse cursor and one ordinary admission attempt. This changes neither Default selection nor accepted request identity.

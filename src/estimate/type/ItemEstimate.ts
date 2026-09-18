@@ -6,6 +6,10 @@ import type {
 
 export type ItemEstimateDiagnostic =
 	| {
+			readonly kind: "weighted-clock-pool-unsupported";
+			readonly routeId: string;
+	  }
+	| {
 			readonly kind: "finite-owner-lifetime-unsupported";
 			readonly routeId: string;
 	  }

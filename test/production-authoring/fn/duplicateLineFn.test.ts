@@ -4,7 +4,7 @@ import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { duplicateLineFn } from "~/production-authoring/fn/duplicateLineFn";
 
 describe("duplicateLineFn", () => {
-	it("deeply copies a line with a fresh identity and no exclusive selections", () => {
+	it("deeply copies a line with a fresh identity and Default cleared and Clock participation retained", () => {
 		const source = {
 			...createLineFn([], "Copper Ore", "Mines copper ore."),
 			clock: true,
@@ -24,7 +24,6 @@ describe("duplicateLineFn", () => {
 		expect(duplicate).toEqual({
 			...source,
 			id: "copper-ore-3",
-			clock: false,
 			default: false,
 		});
 		expect(duplicate).not.toBe(source);

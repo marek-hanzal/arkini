@@ -23,13 +23,17 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					selection: "clock",
 					ownerItemId,
-					lineId: "b",
+					lineIds: [
+						"b",
+					],
 				});
 				const second = yield* tickClockFx(200);
 				yield* setLineSelectionFx({
 					selection: "clock",
 					ownerItemId,
-					lineId: "a",
+					lineIds: [
+						"a",
+					],
 				});
 				const third = yield* tickClockFx(300);
 				return {
@@ -216,7 +220,7 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					ownerItemId,
 					selection: "clock",
-					lineId: null,
+					lineIds: [],
 				});
 				const silent = yield* tickClockFx(300);
 				const hydrated = yield* fromStateFx({
@@ -227,7 +231,9 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					ownerItemId,
 					selection: "clock",
-					lineId: "b",
+					lineIds: [
+						"b",
+					],
 				});
 				yield* setLineSelectionFx({
 					ownerItemId,
@@ -251,7 +257,8 @@ describe("Clock schedule boundaries", () => {
 			),
 		);
 		expect(result.silent.items[0].schedule).toEqual({
-			lineId: null,
+			lineIds: [],
+			pulseSequence: 1,
 			remainingIntervalMs: 100,
 			remainingDurationMs: 600,
 		});
@@ -261,7 +268,10 @@ describe("Clock schedule boundaries", () => {
 		expect(result.hydrated.defaultLineByOwnerItemId[ownerItemId]).toBe("b");
 		expect(result.selected.defaultLineByOwnerItemId[ownerItemId]).toBe("a");
 		expect(result.selected.items[0].schedule).toEqual({
-			lineId: "b",
+			lineIds: [
+				"b",
+			],
+			pulseSequence: 2,
 			remainingIntervalMs: 250,
 			remainingDurationMs: 500,
 		});

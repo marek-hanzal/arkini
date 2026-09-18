@@ -133,6 +133,7 @@ describe("Clock lifetime boundaries", () => {
 				resultStep.runtime.items.find((item) => item.id === "material")?.schedule,
 			).toEqual({
 				remainingIntervalMs: 100,
+				pulseSequence: 1,
 				remainingDurationMs: 500,
 			});
 			expect(resultStep.dispatched).toBe(true);

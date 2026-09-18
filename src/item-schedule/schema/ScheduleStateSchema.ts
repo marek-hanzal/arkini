@@ -6,7 +6,8 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 /** Save-backed phase and lifetime; zero lifetime closes admission while production drains. */
 export const ScheduleStateSchema = z
 	.object({
-		lineId: IdSchema.nullable().optional(),
+		lineIds: z.array(IdSchema).optional(),
+		pulseSequence: z.number().int().nonnegative().optional(),
 		remainingIntervalMs: PositiveIntegerSchema.optional(),
 		remainingDurationMs: TimeSchema.optional(),
 	})

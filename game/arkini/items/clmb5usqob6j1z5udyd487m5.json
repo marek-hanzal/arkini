@@ -21,6 +21,7 @@
 				"artwork": "stone",
 				"description": "Get the stone from stone deposit.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 10000,

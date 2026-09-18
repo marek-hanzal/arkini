@@ -47,6 +47,7 @@
 				"title": "Cotton",
 				"description": "Cotton",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 24000,

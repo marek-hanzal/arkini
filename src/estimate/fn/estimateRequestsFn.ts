@@ -20,6 +20,7 @@ const maximumDiagnostics = 8;
 const isPartialDiagnosticFn = (diagnostic: ItemEstimateDiagnostic) =>
 	diagnostic.kind === "joint-output-accounting-unsupported" ||
 	diagnostic.kind === "finite-owner-lifetime-unsupported" ||
+	diagnostic.kind === "weighted-clock-pool-unsupported" ||
 	diagnostic.kind === "quantity-limit-exceeded" ||
 	diagnostic.kind === "witness-search-exhausted";
 

@@ -146,6 +146,63 @@ describe("root-owned interaction chains", () => {
 		).toBe(true);
 	});
 
+	it("retains every weighted Clock alternative without claiming simultaneous guaranteed outcomes", () => {
+		const items = catalogFn(
+			itemFn("source", {
+				clock: {
+					intervalMs: 1000,
+					enable: true,
+					rules: [],
+				},
+				lines: [
+					{
+						...lineFn("first", true, outputFn("one")),
+						clockWeight: 1,
+					},
+					{
+						...lineFn("second", true, outputFn("two")),
+						clockWeight: 3,
+						show: false,
+					},
+					lineFn("manual", false, outputFn("ignored")),
+				],
+			}),
+			itemFn("one"),
+			itemFn("two"),
+		);
+		const { chains } = readItemChainsFn(items, "source");
+		expect(
+			chains[0].steps.map(({ lineId, clockWeight }) => ({
+				lineId,
+				clockWeight,
+			})),
+		).toEqual([
+			{
+				lineId: "first",
+				clockWeight: 1,
+			},
+			{
+				lineId: "second",
+				clockWeight: 3,
+			},
+		]);
+		expect(new Set(chains[0].steps.map(({ path }) => path)).size).toBe(2);
+		expect(chains[0].outcomes.filter(({ periodic }) => periodic)).toEqual([
+			{
+				itemId: "one",
+				stop: "final",
+				periodic: true,
+				conditional: true,
+			},
+			{
+				itemId: "two",
+				stop: "final",
+				periodic: true,
+				conditional: true,
+			},
+		]);
+	});
+
 	it("retains early side drops while following the bear's last timed state", () => {
 		const items = catalogFn(
 			itemFn("bear", {

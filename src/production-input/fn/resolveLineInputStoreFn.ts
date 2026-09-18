@@ -56,7 +56,6 @@ export const resolveLineInputStoreFn = ({
 	const effectiveDefaultLine =
 		requestedLineId === undefined
 			? readEffectiveLineFn({
-					selection: "default",
 					ownerItemId: boardOwner.id,
 					ownerItem: narrowedLineOwnerItem,
 					runtime,

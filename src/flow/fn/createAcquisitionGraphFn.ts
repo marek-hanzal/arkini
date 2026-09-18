@@ -182,7 +182,16 @@ const readLineExecutionConstraintFn = (
 			(!clock.enable && !clock.rules.some(({ type }) => type === "enable")))
 	)
 		return "unavailable";
-	return clock.durationMs === undefined ? undefined : "finite-owner-lifetime";
+	if (clock.durationMs !== undefined) return "finite-owner-lifetime";
+	const pool = owner.lines.filter(
+		(candidate) =>
+			candidate.clock &&
+			(candidate.enable || candidate.rules.some(({ type }) => type === "enable")),
+	);
+	// Competing lines share one pulse. Per-line cadence cannot preserve shared
+	// outputs or cross-line co-products, even when eligibility never changes.
+	if (owner.control === "automatic-only" && pool.length > 1) return "weighted-clock-pool";
+	return undefined;
 };
 
 const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescriptor) => {

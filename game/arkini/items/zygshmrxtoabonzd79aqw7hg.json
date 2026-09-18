@@ -25,6 +25,7 @@
 				"artwork": "dairy",
 				"description": "Build a Dairy",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

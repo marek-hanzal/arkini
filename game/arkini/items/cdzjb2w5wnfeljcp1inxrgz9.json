@@ -28,6 +28,7 @@
 				"title": "Plague",
 				"description": "You want to stop this. Really",
 				"clock": true,
+				"clockWeight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,

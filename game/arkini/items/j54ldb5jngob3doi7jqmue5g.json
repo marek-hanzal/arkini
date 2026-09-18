@@ -25,6 +25,7 @@
 				"artwork": "bakery",
 				"description": "Wanna some crispy bread or something?",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

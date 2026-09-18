@@ -25,6 +25,7 @@
 				"artwork": "cow-farm",
 				"description": "Wanna cows?",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

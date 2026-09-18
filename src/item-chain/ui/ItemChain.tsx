@@ -270,12 +270,13 @@ const ChainStep = ({ step }: { readonly step: readItemChainsFn.Step }) => {
 				)}
 				{step.timeMs === undefined ? null : (
 					<span>
-						{translator.textFn(step.kind === "pulse" ? "Every" : "After")}{" "}
+						{translator.textFn(step.kind === "pulse" ? "Clock interval" : "After")}{" "}
 						{durationFn(step.timeMs)}
 					</span>
 				)}
 				{step.kind !== "pulse" ? null : (
 					<span className="text-muted">
+						{translator.textFn("Weight")}: {step.clockWeight} ·{" "}
 						{translator.textFn("Line duration")}: {durationFn(step.runtimeMs ?? 0)} ·{" "}
 						{step.lifetimeMs === undefined
 							? translator.textFn("No finite lifetime")

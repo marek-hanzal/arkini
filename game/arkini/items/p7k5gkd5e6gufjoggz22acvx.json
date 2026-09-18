@@ -20,6 +20,7 @@
 				"title": "Process Toxic Waste",
 				"description": "You should get rid of that ugly thing",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 60000,

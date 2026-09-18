@@ -49,7 +49,6 @@ export const useItemLineDefaultController = ({
 						ownerItemId: owner.id,
 						ownerItem: owner.item,
 						runtime,
-						selection: "default",
 					})?.id === lineId,
 				controllable:
 					owner.location.scope === "board" && canControlItemProductionFn(owner.item),

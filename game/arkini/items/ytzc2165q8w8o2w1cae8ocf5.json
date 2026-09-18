@@ -47,6 +47,7 @@
 				"title": "Cocoa Pod",
 				"description": "Chocolate is calling you!",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 32000,

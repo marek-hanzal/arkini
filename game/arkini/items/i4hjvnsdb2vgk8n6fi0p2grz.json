@@ -26,6 +26,7 @@
 				"artwork": "lumber-camp",
 				"description": "Build a new lumber-camp",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 12000,

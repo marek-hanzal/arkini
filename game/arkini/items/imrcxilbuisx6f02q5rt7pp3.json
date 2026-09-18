@@ -47,6 +47,7 @@
 				"title": "Grain",
 				"description": "Get some grain. You can eat it if you want.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 24000,

@@ -90,7 +90,7 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 		"Source: consume",
 		"Target: replace",
 		"Clock line: Pulse line [clock-line]",
-		"Every: 5 s",
+		"Clock interval: 5 s",
 		"Line duration: 2 s",
 		"Lifetime: 30 s",
 		"Disabled by default: yes",

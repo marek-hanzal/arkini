@@ -25,6 +25,7 @@
 				"artwork": "sawmill",
 				"description": "Let's build sawmill",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

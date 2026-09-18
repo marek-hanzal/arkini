@@ -1375,7 +1375,7 @@ describe("item section form session", () => {
 			{
 				...source,
 				id: "copper-ore-2",
-				clock: false,
+				clock: true,
 				default: false,
 			},
 		]);
@@ -1451,7 +1451,7 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("selects Default and Clock exclusively across sibling lines through the saved form", async () => {
+	it("keeps Default exclusive and independent Clock lines through the saved form", async () => {
 		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
 			state.persisted = item;
 			(state.project as Project).config.items[item.id] = item;
@@ -1508,9 +1508,20 @@ describe("item section form session", () => {
 			},
 			{
 				default: false,
-				clock: false,
+				clock: true,
 			},
 		]);
+		const weight = container.querySelector<HTMLInputElement>(
+			'input[name="lines[0].clockWeight"]',
+		);
+		if (weight === null) throw new Error("Missing Clock weight field.");
+		await changeInput(weight, "7");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].clockWeight).toBe(7);
+		await renderSection(<ProductionSection />);
+
 		expect(await toggle("Default")).toMatchObject([
 			{
 				default: false,
@@ -1518,7 +1529,7 @@ describe("item section form session", () => {
 			},
 			{
 				default: false,
-				clock: false,
+				clock: true,
 			},
 		]);
 		expect(await toggle("Clock")).toMatchObject([
@@ -1528,7 +1539,7 @@ describe("item section form session", () => {
 			},
 			{
 				default: false,
-				clock: false,
+				clock: true,
 			},
 		]);
 	});

@@ -12,19 +12,32 @@ import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace setLineSelectionFx {
-	export interface Props {
+	export type Props = {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type | null;
-		readonly selection: "default" | "clock";
-	}
+	} & (
+		| {
+				readonly selection: "default";
+				readonly lineId: IdSchema.Type | null;
+		  }
+		| {
+				readonly selection: "clock";
+				readonly lineIds: readonly IdSchema.Type[];
+		  }
+	);
 }
 
 /** Changes one independent line role atomically, preserving schedule phase and accepted work. */
-export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* ({
-	ownerItemId,
-	lineId,
-	selection,
-}: setLineSelectionFx.Props) {
+export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
+	props: setLineSelectionFx.Props,
+) {
+	const { ownerItemId, selection } = props;
+	const lineIds =
+		props.selection === "clock"
+			? [
+					...new Set(props.lineIds),
+				]
+			: [];
+	const lineId = props.selection === "default" ? props.lineId : null;
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			yield* assertItemProductionPlayerControlFx({
@@ -47,11 +60,20 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* ({
 					}),
 				);
 			const lines = ownerItem === undefined ? undefined : ownerItem.lines;
-			if (lineId !== null && lines?.some((line) => line.id === lineId) !== true) {
+			const invalidLineId = (
+				selection === "clock"
+					? lineIds
+					: lineId === null
+						? []
+						: [
+								lineId,
+							]
+			).find((id) => lines?.some((line) => line.id === id) !== true);
+			if (invalidLineId !== undefined) {
 				return yield* Effect.fail(
 					new LineNotFoundError({
 						itemId: ownerItemId,
-						lineId,
+						lineId: invalidLineId,
 					}),
 				);
 			}
@@ -72,14 +94,16 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* ({
 					? Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
 						? runtime.defaultLineByOwnerItemId[ownerItemId]
 						: undefined
-					: schedule?.lineId;
-			if (current === lineId)
+					: schedule?.lineIds;
+			if (
+				selection === "default"
+					? current === lineId
+					: Array.isArray(current) &&
+						current.length === lineIds.length &&
+						current.every((id, index) => id === lineIds[index])
+			)
 				return [
-					{
-						ownerItemId,
-						lineId,
-						selection,
-					},
+					props,
 					runtime,
 				] as const;
 			const revision = selection === "clock" ? yield* createRevisionFx() : owner.revision;
@@ -101,7 +125,7 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* ({
 											revision,
 											schedule: {
 												...schedule,
-												lineId,
+												lineIds,
 											},
 										}
 									: item,
@@ -113,11 +137,7 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* ({
 				runtime: selectedRuntime,
 			});
 			return [
-				{
-					ownerItemId,
-					lineId,
-					selection,
-				},
+				props,
 				isolation.runtime,
 				isolation.events,
 			] as const;

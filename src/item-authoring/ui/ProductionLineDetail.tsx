@@ -94,7 +94,11 @@ export const ProductionLineDetail = ({
 						/>
 						<LineFlag
 							checked={line.clock === true}
-							label={<Tx label="Clock" />}
+							label={
+								<>
+									<Tx label="Clock" /> · {line.clockWeight}
+								</>
+							}
 							description={<Mx label="Authored production Clock marker help" />}
 						/>
 						<LineFlag

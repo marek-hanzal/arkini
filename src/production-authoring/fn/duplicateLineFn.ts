@@ -8,13 +8,12 @@ const readDuplicateIdFn = (lines: ReadonlyArray<LineSchema.Type>, lineId: string
 	return `${lineId}-${suffix}`;
 };
 
-/** Copies one complete line while clearing owner-exclusive selections and assigning a fresh ID. */
+/** Copies one complete line while clearing the owner-exclusive Default selection and assigning a fresh ID. */
 export const duplicateLineFn = (
 	lines: ReadonlyArray<LineSchema.Type>,
 	line: LineSchema.Type,
 ): LineSchema.Type => ({
 	...structuredClone(line),
 	id: readDuplicateIdFn(lines, line.id),
-	clock: false,
 	default: false,
 });

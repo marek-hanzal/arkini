@@ -112,7 +112,7 @@ Authored Clock expiry output summary help:
     It uses the same sets, rolls, drops and placement rules as any other output.
 Authored Clock interval summary help:
   value: |
-    How often the Clock tries its selected production line.
+    How often the Clock selects one eligible weighted production line.
 
     **None** means no repeating production. Lifetime can still expire.
 Authored Clock kill-switch summary help:
@@ -206,7 +206,7 @@ Authored player controls summary help:
     **Automatic only** leaves production to the game.
 Authored production Clock marker help:
   value: |
-    The line attempted on every Clock interval.
+    This line participates in weighted selection at each Clock interval, after its availability rules pass.
 Authored production Default marker help:
   value: |
     The line initially selected for manual production.
@@ -410,9 +410,11 @@ Clock expiry output help:
     Runs once when **Lifetime** reaches zero.
 
     With **Wait for output**, the item stays until this output fits. With **Stop immediately**, anything that cannot fit is lost.
+Clock interval:
+  value: Clock interval
 Clock interval help:
   value: |
-    How often the Clock tries its selected production line while the item is on a Board.
+    How often the Clock selects one eligible weighted production line while the item is on a Board.
 
     Failed rules or a full queue skip that attempt. Leave empty for Lifetime only.
 Clock kill-switch help:
@@ -448,6 +450,13 @@ Clock status help:
     - **Disabled:** it waits until an Enable rule turns it on.
 
     Rules are checked after this setting. Changing it keeps the timers and output.
+Clock weight:
+  value: Clock weight
+Clock weight help:
+  value: |
+    Relative chance of selecting this line among enabled Clock lines after their rules are evaluated.
+
+    Use a whole number from 1 to 999. A weight of 3 is three times as likely as a weight of 1. If no line is eligible, the interval does nothing; a failed queue attempt does not select another line.
 Close:
   value: Close
   dynamic: true
@@ -747,8 +756,6 @@ Estimate loading description:
   value: Finding a route from the starting items and calculating what it needs.
 Estimate unreachable description:
   value: No complete path leads from the project’s **starting items** to this item with the current configuration.
-Every:
-  value: Every
 Every slot has a sound assigned. Switch to All to see them.:
   value: Every slot has a sound assigned. Switch to All to see them.
 Exact count:
@@ -1106,7 +1113,7 @@ Item production help:
     Production contains the jobs this item can perform.
 
     - **Default** is the initial line for manual production.
-    - **Clock** is the line tried at every Clock interval.
+    - **Clock** marks lines for weighted selection at every Clock interval. Line rules filter the pool before one line is selected.
     - All lines share one queue; the active job counts toward its size.
     - A failed Clock attempt is skipped, not saved for later.
     - **Interactive** shows player controls; **Automatic only** leaves production to the game.
@@ -1213,6 +1220,8 @@ Limit condition help:
     An item without a maximum never satisfies this condition. Use **Disable + Limit** to stop a line or skip a drop while the limit is reached.
 Line ID:
   value: Line ID
+Line behavior:
+  value: Line behavior
 Line description:
   value: Line description
 Line duration:
@@ -1642,14 +1651,14 @@ Production line:
   value: Production line
 Production line Clock help:
   value: |
-    The line tried on every Clock interval.
+    Includes this line in the weighted pool tried on every Clock interval.
 
-    Only one line may hold this role. It is separate from **Default** and changing it does not restart the Clock.
+    Line rules are evaluated before selection; only enabled lines enter the pool. Visibility does not affect selection. Changing the pool does not restart the Clock.
 Production line default help:
   value: |
     The initial line selected for manual production.
 
-    Only one line may hold this role. It is separate from the **Clock** line.
+    Only one line may hold this role. It is separate from the **Clock** pool.
 Production line enabled help:
   value: |
     Whether this line starts enabled.

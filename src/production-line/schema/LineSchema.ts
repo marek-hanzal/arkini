@@ -36,7 +36,16 @@ export const LineSchema = z
 			.boolean()
 			.optional()
 			.describe(
-				"Whether this is the authored line selected for Clock impulses, independently of Default.",
+				"Whether this line participates in weighted Clock selection, independently of Default.",
+			),
+		clockWeight: z
+			.number()
+			.int()
+			.min(1)
+			.max(999)
+			.default(1)
+			.describe(
+				"Relative Clock selection weight among lines allowed by their evaluated rules.",
 			),
 		/**
 		 * Whether this line is the authored fallback default for its owning item.

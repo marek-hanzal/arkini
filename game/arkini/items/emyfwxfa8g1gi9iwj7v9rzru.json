@@ -20,6 +20,7 @@
 				"title": "Forest",
 				"description": "Keeps care of forest so you'll get one",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 60000,

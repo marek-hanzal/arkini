@@ -20,6 +20,7 @@
 				"title": "Compost",
 				"description": "Stuff flowers wanna eat",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 32000,

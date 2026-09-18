@@ -10,7 +10,7 @@ export const ItemScheduleSchema = z
 		intervalMs: TimeSchema.min(100)
 			.optional()
 			.describe(
-				"Optional active milliseconds between attempts to enqueue the effective Clock line; omission creates no pulses.",
+				"Optional active milliseconds between weighted selections from rule-enabled Clock lines for ordinary queue admission; omission creates no pulses.",
 			),
 		durationMs: TimeSchema.min(100)
 			.optional()

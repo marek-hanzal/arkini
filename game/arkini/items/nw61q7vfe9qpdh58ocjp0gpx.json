@@ -25,6 +25,7 @@
 				"artwork": "foundation-chest",
 				"description": "Hele you'll get everything you need to get started with the game.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 6000,

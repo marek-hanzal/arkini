@@ -72,7 +72,6 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
 		const defaultLine = readEffectiveLineFn({
-			selection: "default",
 			ownerItemId: item.id,
 			ownerItem: lineOwnerItem,
 			runtime,

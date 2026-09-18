@@ -50,6 +50,7 @@
 				"title": "Make a Wish",
 				"description": "Milky way",
 				"clock": true,
+				"clockWeight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,

@@ -1,6 +1,6 @@
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
-/** Selects at most one sibling for one marker without changing the other marker. */
+/** Keeps Default exclusive while allowing independent Clock participation. */
 export const setLineMarkerFn = (
 	lines: ReadonlyArray<LineSchema.Type>,
 	index: number,
@@ -13,7 +13,7 @@ export const setLineMarkerFn = (
 					...line,
 					[marker]: value,
 				}
-			: value && line[marker] === true
+			: marker === "default" && value && line.default === true
 				? {
 						...line,
 						[marker]: false,

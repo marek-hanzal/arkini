@@ -25,6 +25,7 @@
 				"artwork": "vegetable-garden",
 				"description": "Build a new vegetable garden",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

@@ -7,8 +7,7 @@ export namespace readEffectiveLineFn {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
 		readonly ownerItem: ItemSchema.Type;
-		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId" | "items">;
-		readonly selection: "default" | "clock";
+		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId">;
 	}
 
 	export type Result = LineSchema.Type | undefined;
@@ -24,17 +23,13 @@ export const readEffectiveLineFn = ({
 	ownerItemId,
 	ownerItem,
 	runtime,
-	selection,
 }: readEffectiveLineFn.Props) => {
 	const lines = ownerItem.lines;
-	const override =
-		selection === "default"
-			? Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
-				? runtime.defaultLineByOwnerItemId[ownerItemId]
-				: undefined
-			: runtime.items.find((item) => item.id === ownerItemId)?.schedule?.lineId;
+	const override = Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
+		? runtime.defaultLineByOwnerItemId[ownerItemId]
+		: undefined;
 	if (override !== undefined) {
 		return override === null ? undefined : lines.find((line) => line.id === override);
 	}
-	return lines.find((line) => line[selection]);
+	return lines.find((line) => line.default);
 };

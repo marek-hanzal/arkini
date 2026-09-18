@@ -20,6 +20,7 @@
 				"title": "Stone Block",
 				"description": "You'll get better stone from simple good old stone boulder.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 10000,

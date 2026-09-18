@@ -20,6 +20,7 @@
 				"title": "New stash line",
 				"description": "Describe what this stash line consumes and produces.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 0,

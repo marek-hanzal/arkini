@@ -5,6 +5,7 @@ import { LineSchema } from "~/production-line/schema/LineSchema";
 
 const replacementLine = LineSchema.extend({
 	default: LineSchema.shape.default.removeDefault(),
+	clockWeight: LineSchema.shape.clockWeight.removeDefault(),
 	show: LineSchema.shape.show.removeDefault(),
 	enable: LineSchema.shape.enable.removeDefault(),
 }).meta({

@@ -20,6 +20,7 @@
 				"title": "Corn",
 				"description": "Automatic corn production",
 				"clock": true,
+				"clockWeight": 1,
 				"default": true,
 				"show": false,
 				"enable": true,

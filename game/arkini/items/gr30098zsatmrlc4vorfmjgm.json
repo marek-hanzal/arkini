@@ -26,6 +26,7 @@
 				"artwork": "grain-farm",
 				"description": "Soon there will be some farming simulator available...",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

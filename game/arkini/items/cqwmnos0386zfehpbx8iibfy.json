@@ -25,6 +25,7 @@
 				"artwork": "house-t1",
 				"description": "A beautiful simple house, but you'll like it!",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 42000,

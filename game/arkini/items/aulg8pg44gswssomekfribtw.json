@@ -26,6 +26,7 @@
 				"artwork": "hunter",
 				"description": "Build a hunter's camp from wood and stone.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

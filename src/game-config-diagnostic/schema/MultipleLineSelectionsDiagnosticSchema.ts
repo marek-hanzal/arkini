@@ -17,10 +17,7 @@ export const MultipleLineSelectionsDiagnosticSchema = z
 			"Error",
 		]),
 		ownerItemId: IdSchema,
-		selection: z.enum([
-			"default",
-			"clock",
-		]),
+		selection: z.literal("default"),
 		lineIds: z.tuple([
 			IdSchema,
 			IdSchema,
@@ -33,8 +30,7 @@ export const MultipleLineSelectionsDiagnosticSchema = z
 	.strict()
 	.meta({
 		id: "MultipleLineSelectionsDiagnosticSchema",
-		description:
-			"Two product lines owned by one item are both marked for the same authored selection.",
+		description: "Two product lines owned by one item are both marked as the authored Default.",
 	});
 
 export type MultipleLineSelectionsDiagnosticSchema = typeof MultipleLineSelectionsDiagnosticSchema;

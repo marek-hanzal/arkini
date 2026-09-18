@@ -34,7 +34,11 @@ export const checkRuntimeItemSchedulesFn = (
 					state.remainingDurationMs > config.durationMs
 		)
 			reason = "invalid-lifetime";
-		else if (state.lineId != null && !item.item.lines.some((line) => line.id === state.lineId))
+		else if (
+			state.lineIds !== undefined &&
+			(new Set(state.lineIds).size !== state.lineIds.length ||
+				state.lineIds.some((id) => !item.item.lines.some((line) => line.id === id)))
+		)
 			reason = "invalid-line";
 		if (reason !== undefined)
 			issues.push({

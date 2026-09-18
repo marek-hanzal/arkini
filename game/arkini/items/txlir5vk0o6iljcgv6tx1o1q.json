@@ -20,6 +20,7 @@
 				"title": "Vegetables",
 				"description": "It's bio. It's yummi bio",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 26000,

@@ -23,6 +23,7 @@
 				"title": "Well",
 				"description": "Find a new well",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

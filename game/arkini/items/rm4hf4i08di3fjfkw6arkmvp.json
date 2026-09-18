@@ -26,6 +26,7 @@
 				"artwork": "carpenter",
 				"description": "Build a carpenter's workshop from planks and stone blocks.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

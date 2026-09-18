@@ -20,6 +20,7 @@
 				"title": "Cheese",
 				"description": "Make a yummi cheese",
 				"default": false,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 42000,

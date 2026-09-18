@@ -103,7 +103,6 @@ describe("validateItemLineIdsFn", () => {
 
 	it.each([
 		"default",
-		"clock",
 	] as const)(
 		"rejects two authored %s selections with both line identities",
 		async (selection) => {
@@ -152,6 +151,33 @@ describe("validateItemLineIdsFn", () => {
 			]);
 		},
 	);
+
+	it("accepts multiple weighted Clock lines", async () => {
+		const owner = createProducerItem({
+			id: "producer:sawmill",
+			lines: [
+				{
+					...createLine({
+						id: "line:plank",
+						clock: true,
+					}),
+					clockWeight: 1,
+				},
+				{
+					...createLine({
+						id: "line:beam",
+						clock: true,
+					}),
+					clockWeight: 3,
+				},
+			],
+		});
+		expect(
+			await selectionDiagnostics({
+				[owner.id]: owner,
+			}),
+		).toEqual([]);
+	});
 
 	it("reports the authored-default conflict independently from duplicate line identity", async () => {
 		const owner = createProducerItem({

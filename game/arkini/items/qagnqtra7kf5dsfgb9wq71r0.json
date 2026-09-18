@@ -51,6 +51,7 @@
 				"title": "Tearing",
 				"description": "Tearing the pillow",
 				"clock": true,
+				"clockWeight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,

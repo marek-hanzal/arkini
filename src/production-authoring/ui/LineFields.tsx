@@ -6,6 +6,7 @@ import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTit
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
+import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { Mx } from "~/translation/ui/Mx";
@@ -20,6 +21,7 @@ const defaultLine: LineSchema.Type = {
 	title: "",
 	description: "",
 	default: false,
+	clockWeight: 1,
 	show: true,
 	enable: true,
 	runtimeMs: 0,
@@ -89,7 +91,7 @@ export const LineFields = withFieldGroupFn({
 									/>
 								)}
 							</group.AppField>
-							<div className="flex min-w-0 flex-wrap items-end gap-3">
+							<div className="flex min-w-0 items-end justify-between gap-3">
 								<group.Subscribe
 									selector={(state) => ({
 										clock: state.values.clock === true,
@@ -99,51 +101,78 @@ export const LineFields = withFieldGroupFn({
 									})}
 								>
 									{(markers) => (
-										<EditorBooleanToggleGroup
-											options={[
-												{
-													description: (
-														<Mx label="Production line default help" />
-													),
-													label: translator.textFn("Default"),
-													onChangeFn: (value) =>
-														onMarkerChangeFn("default", value),
-													selected: markers.default,
-													value: "default",
-												},
-												{
-													description: (
-														<Mx label="Production line Clock help" />
-													),
-													label: translator.textFn("Clock"),
-													onChangeFn: (value) =>
-														onMarkerChangeFn("clock", value),
-													selected: markers.clock,
-													value: "clock",
-												},
-												{
-													description: (
-														<Mx label="Production line visibility help" />
-													),
-													label: translator.textFn("Visible"),
-													onChangeFn: (value) =>
-														group.setFieldValue("show", value),
-													selected: markers.show,
-													value: "visible",
-												},
-												{
-													description: (
-														<Mx label="Production line enabled help" />
-													),
-													label: translator.textFn("Enabled"),
-													onChangeFn: (value) =>
-														group.setFieldValue("enable", value),
-													selected: markers.enable,
-													value: "enabled",
-												},
-											]}
-										/>
+										<EditorValueField
+											as="div"
+											label={translator.textFn("Line behavior")}
+										>
+											<EditorBooleanToggleGroup
+												options={[
+													{
+														description: (
+															<Mx label="Production line default help" />
+														),
+														label: translator.textFn("Default"),
+														onChangeFn: (value) =>
+															onMarkerChangeFn("default", value),
+														selected: markers.default,
+														value: "default",
+													},
+													{
+														description: (
+															<Mx label="Production line Clock help" />
+														),
+														label: translator.textFn("Clock"),
+														onChangeFn: (value) =>
+															onMarkerChangeFn("clock", value),
+														selected: markers.clock,
+														value: "clock",
+													},
+													{
+														description: (
+															<Mx label="Production line visibility help" />
+														),
+														label: translator.textFn("Visible"),
+														onChangeFn: (value) =>
+															group.setFieldValue("show", value),
+														selected: markers.show,
+														value: "visible",
+													},
+													{
+														description: (
+															<Mx label="Production line enabled help" />
+														),
+														label: translator.textFn("Enabled"),
+														onChangeFn: (value) =>
+															group.setFieldValue("enable", value),
+														selected: markers.enable,
+														value: "enabled",
+													},
+												]}
+											/>
+										</EditorValueField>
 									)}
+								</group.Subscribe>
+								<group.Subscribe selector={(state) => state.values.clock === true}>
+									{(clock) =>
+										clock ? (
+											<div className="w-32 shrink-0">
+												<group.AppField name="clockWeight">
+													{(field) => (
+														<field.NumberField
+															label={translator.textFn(
+																"Clock weight",
+															)}
+															description={
+																<Mx label="Clock weight help" />
+															}
+															min={1}
+															max={999}
+														/>
+													)}
+												</group.AppField>
+											</div>
+										) : null
+									}
 								</group.Subscribe>
 							</div>
 							<group.AppField name="artwork">

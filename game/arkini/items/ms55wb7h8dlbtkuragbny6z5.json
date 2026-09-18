@@ -20,6 +20,7 @@
 				"title": "Book - Tier 1",
 				"description": "You can order a book",
 				"default": false,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

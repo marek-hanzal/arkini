@@ -3,7 +3,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
-import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
+import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
@@ -43,18 +43,14 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 				: state.remainingIntervalMs - elapsed;
 		const expired =
 			state.remainingDurationMs !== undefined && state.remainingDurationMs <= elapsed;
-		if (
-			phase !== undefined &&
-			phase <= 0 &&
-			!(expired && config.expiryMode === "kill-switch")
-		) {
-			// Only expected admission rejection consumes the pulse without state, randomness or delivery side effects.
+		const pulse =
+			phase !== undefined && phase <= 0 && !(expired && config.expiryMode === "kill-switch");
+		if (pulse) {
+			// A rejected choice consumes this pulse; never retry another line or mutate accepted work.
 			const attempt = yield* Effect.gen(function* () {
-				const line = readEffectiveLineFn({
-					ownerItemId: item.id,
-					ownerItem: item.item,
+				const line = yield* selectClockLineFx({
+					item,
 					runtime: draft,
-					selection: "clock",
 				});
 				if (line === undefined) return undefined;
 				return yield* enqueueLineRuntimeFx({
@@ -86,6 +82,9 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 							...candidate,
 							schedule: {
 								...state,
+								pulseSequence: pulse
+									? (state.pulseSequence ?? 0) + 1
+									: state.pulseSequence,
 								remainingIntervalMs:
 									phase !== undefined &&
 									phase <= 0 &&

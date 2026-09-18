@@ -26,6 +26,7 @@
 				"artwork": "explorer",
 				"description": "Build an explorer's camp from wood and stone.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

@@ -1,3 +1,4 @@
+import { readClockLinesFn } from "~/production-line/fn/readClockLinesFn";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option } from "effect";
@@ -46,14 +47,14 @@ const readLineDisabledHintFn = (
 const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
 	activeJob,
 	defaultLineId,
-	clockLineId,
+	clockLineIds,
 	line,
 	ownerItemId,
 	runtime,
 }: {
 	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
 	readonly defaultLineId: IdSchema.Type | undefined;
-	readonly clockLineId: IdSchema.Type | undefined;
+	readonly clockLineIds: readonly IdSchema.Type[];
 	readonly line: LineSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
@@ -157,7 +158,7 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 			owner.schedule === undefined
 				? undefined
 				: {
-						selected: line.id === clockLineId,
+						selected: clockLineIds.includes(line.id),
 						canChange: canControl && isItemProductionAdmissionOpenFn(owner),
 					},
 		queuedRequestCount: runtime.jobQueue.filter(
@@ -264,17 +265,14 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 
 	const lines = ownerItem.lines;
 	const defaultLineId = readEffectiveLineFn({
-		selection: "default",
 		ownerItemId: owner.id,
 		ownerItem,
 		runtime,
 	})?.id;
-	const clockLineId = readEffectiveLineFn({
-		ownerItemId: owner.id,
-		ownerItem,
-		runtime,
-		selection: "clock",
-	})?.id;
+	const clockLineIds = readClockLinesFn({
+		item: ownerItem,
+		schedule: owner.schedule,
+	}).map((line) => line.id);
 	const projected: ItemDetailLines.Line[] = [];
 
 	for (const line of lines) {
@@ -298,7 +296,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		const boardLine = yield* readBoardItemDetailLineFx({
 			activeJob,
 			defaultLineId,
-			clockLineId,
+			clockLineIds,
 			line,
 			ownerItemId: owner.id,
 			runtime,

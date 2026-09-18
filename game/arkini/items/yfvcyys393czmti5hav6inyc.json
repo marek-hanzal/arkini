@@ -24,6 +24,7 @@
 				"title": "Iron Ore",
 				"description": "Get the ore",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 28000,

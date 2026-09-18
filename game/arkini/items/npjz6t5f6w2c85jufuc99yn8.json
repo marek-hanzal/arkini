@@ -25,6 +25,7 @@
 				"title": "Milk",
 				"description": "Milk",
 				"clock": true,
+				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

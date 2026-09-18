@@ -32,7 +32,6 @@ export const readDefaultLineQueueTargetFx = Effect.fn("readDefaultLineQueueTarge
 		);
 	}
 	const line = readEffectiveLineFn({
-		selection: "default",
 		ownerItemId,
 		ownerItem,
 		runtime,

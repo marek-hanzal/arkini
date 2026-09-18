@@ -47,6 +47,7 @@
 				"title": "Water",
 				"description": "Get some water for you infrastructure. Fresh, from deepness of earth!",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 6000,

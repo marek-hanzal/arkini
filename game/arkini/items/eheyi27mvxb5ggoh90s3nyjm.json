@@ -26,6 +26,7 @@
 				"artwork": "townhall-t1",
 				"description": "Longer wait, bigger gain!",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 120000,

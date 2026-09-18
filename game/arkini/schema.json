@@ -1246,7 +1246,7 @@
 			"type": "object",
 			"properties": {
 				"intervalMs": {
-					"description": "Optional active milliseconds between attempts to enqueue the effective Clock line; omission creates no pulses.",
+					"description": "Optional active milliseconds between weighted selections from rule-enabled Clock lines for ordinary queue admission; omission creates no pulses.",
 					"minimum": 100,
 					"$ref": "urn:arkini:schema:project#/$defs/TimeSchema"
 				},
@@ -1564,8 +1564,15 @@
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
 				},
 				"clock": {
-					"description": "Whether this is the authored line selected for Clock impulses, independently of Default.",
+					"description": "Whether this line participates in weighted Clock selection, independently of Default.",
 					"type": "boolean"
+				},
+				"clockWeight": {
+					"default": 1,
+					"description": "Relative Clock selection weight among lines allowed by their evaluated rules.",
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 999
 				},
 				"default": {
 					"default": false,
@@ -1615,6 +1622,7 @@
 				"id",
 				"title",
 				"description",
+				"clockWeight",
 				"default",
 				"show",
 				"enable",

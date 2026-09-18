@@ -24,6 +24,7 @@
 				"title": "Grow a tree",
 				"description": "Newborn tree.",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

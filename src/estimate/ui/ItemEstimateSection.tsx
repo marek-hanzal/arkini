@@ -27,6 +27,10 @@ const formatQuantityFn = (quantity: number) =>
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic, textFn: (key: string) => string) => {
 	switch (diagnostic.kind) {
+		case "weighted-clock-pool-unsupported":
+			return textFn(
+				"{routeId} depends on weighted Clock alternatives whose shared pulse timing static Estimate cannot resolve.",
+			).replace("{routeId}", diagnostic.routeId);
 		case "finite-owner-lifetime-unsupported":
 			return textFn(
 				"{routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.",

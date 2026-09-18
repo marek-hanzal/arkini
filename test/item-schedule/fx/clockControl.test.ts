@@ -196,7 +196,7 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 			const pulse = yield* tickClockFx(400);
 			yield* setLineSelectionFx({
 				selection: "clock",
-				lineId: null,
+				lineIds: [],
 				ownerItemId: owner.id,
 			});
 			const drained = yield* tickClockFx(400);
@@ -238,7 +238,7 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 	expect(result.drained.jobs).toHaveLength(0);
 	expect(result.drained.jobQueue).toHaveLength(0);
 	expect(result.drained.items[0].schedule).toMatchObject({
-		lineId: null,
+		lineIds: [],
 		remainingIntervalMs: 100,
 		remainingDurationMs: 1100,
 	});
@@ -249,7 +249,7 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 		},
 	]);
 	expect(result.manualWhilePaused.items[0].schedule).toMatchObject({
-		lineId: null,
+		lineIds: [],
 		remainingIntervalMs: 500,
 		remainingDurationMs: 1000,
 	});

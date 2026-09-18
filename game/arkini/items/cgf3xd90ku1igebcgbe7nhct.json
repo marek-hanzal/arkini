@@ -20,6 +20,7 @@
 				"title": "Grain Field",
 				"description": "We need a field, Huston!",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 24000,

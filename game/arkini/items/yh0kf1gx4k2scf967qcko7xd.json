@@ -51,6 +51,7 @@
 				"title": "Make a Wish",
 				"description": "What do you think this will produce?",
 				"clock": true,
+				"clockWeight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,

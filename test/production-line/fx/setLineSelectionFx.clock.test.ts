@@ -1,3 +1,4 @@
+import { readClockLinesFn } from "~/production-line/fn/readClockLinesFn";
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -64,19 +65,19 @@ describe("independent Clock line selection", () => {
 						ownerItemId: owner.id,
 						ownerItem: owner.item,
 						runtime: before,
-						selection: "default",
 					})?.id,
-					clock: readEffectiveLineFn({
-						ownerItemId: owner.id,
-						ownerItem: owner.item,
-						runtime: before,
-						selection: "clock",
-					})?.id,
+					clock: readClockLinesFn({
+						item: owner.item,
+						schedule: owner.schedule,
+					}).map((line) => line.id),
 				};
 				yield* setLineSelectionFx({
 					ownerItemId: owner.id,
 					selection: "clock",
-					lineId: "manual",
+					lineIds: [
+						"manual",
+						"pulse",
+					],
 				});
 				const selected = yield* readRuntimeFx();
 				yield* setLineSelectionFx({
@@ -87,7 +88,7 @@ describe("independent Clock line selection", () => {
 				yield* setLineSelectionFx({
 					ownerItemId: owner.id,
 					selection: "clock",
-					lineId: null,
+					lineIds: [],
 				});
 				const cleared = yield* readRuntimeFx();
 				const restored = yield* fromStateFx({
@@ -95,11 +96,9 @@ describe("independent Clock line selection", () => {
 						runtime: cleared,
 					}),
 				});
-				const clock = readEffectiveLineFn({
-					ownerItemId: owner.id,
-					ownerItem: owner.item,
-					runtime: restored,
-					selection: "clock",
+				const clock = readClockLinesFn({
+					item: owner.item,
+					schedule: restored.items[0].schedule,
 				});
 				return {
 					authored,
@@ -118,11 +117,16 @@ describe("independent Clock line selection", () => {
 
 		expect(result.authored).toEqual({
 			default: "manual",
-			clock: "pulse",
+			clock: [
+				"pulse",
+			],
 		});
 		expect(result.selected.items[0].schedule).toEqual({
 			...result.before.items[0].schedule,
-			lineId: "manual",
+			lineIds: [
+				"manual",
+				"pulse",
+			],
 		});
 		expect(result.selected.defaultLineByOwnerItemId).toEqual({});
 		expect(result.cleared.defaultLineByOwnerItemId).toEqual({
@@ -130,9 +134,9 @@ describe("independent Clock line selection", () => {
 		});
 		expect(result.restored.items[0].schedule).toEqual({
 			...result.before.items[0].schedule,
-			lineId: null,
+			lineIds: [],
 		});
-		expect(result.clock).toBeUndefined();
+		expect(result.clock).toEqual([]);
 	});
 
 	it("rejects a foreign selected line atomically", () => {
@@ -143,7 +147,9 @@ describe("independent Clock line selection", () => {
 				const rejected = yield* setLineSelectionFx({
 					ownerItemId: "owner",
 					selection: "clock",
-					lineId: "foreign",
+					lineIds: [
+						"foreign",
+					],
 				}).pipe(Effect.result);
 				return {
 					before,

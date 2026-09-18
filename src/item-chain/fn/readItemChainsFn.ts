@@ -32,6 +32,7 @@ export namespace readItemChainsFn {
 		readonly mergeIndex?: number;
 		readonly lineId?: string;
 		readonly lineTitle?: string;
+		readonly clockWeight?: number;
 		readonly timeMs?: number;
 		readonly lifetimeMs?: number;
 		readonly runtimeMs?: number;
@@ -175,37 +176,46 @@ export const readItemChainsFn = (
 		const clock = item.clock;
 		if (clock === undefined) return [];
 		const steps: readItemChainsFn.Step[] = [];
-		const line = item.lines.find((candidate) => candidate.clock);
+		const lines = item.lines.filter((candidate) => candidate.clock);
 		if (
 			clock.intervalMs !== undefined &&
-			line !== undefined &&
 			(clock.durationMs === undefined || clock.intervalMs <= clock.durationMs)
 		) {
-			const nextPath = `${path}/pulse`;
-			const before = omitted;
-			const branches = outputFn(line.output, nextPath, depth + 1, ancestors);
-			steps.push({
-				path: nextPath,
-				kind: "pulse",
-				ownerId: item.id,
-				lineId: line.id,
-				lineTitle: line.title,
-				timeMs: clock.intervalMs,
-				lifetimeMs: clock.durationMs,
-				runtimeMs: line.runtimeMs,
-				conditional:
-					clock.rules.length > 0 ||
-					line.rules.length > 0 ||
-					line.input.some(
+			for (const [lineIndex, line] of lines.entries()) {
+				if (remaining <= 0) {
+					truncated = true;
+					omitted++;
+					break;
+				}
+				remaining--;
+				const nextPath = `${path}/pulse/${lineIndex}`;
+				const before = omitted;
+				const branches = outputFn(line.output, nextPath, depth + 1, ancestors);
+				steps.push({
+					path: nextPath,
+					kind: "pulse",
+					ownerId: item.id,
+					lineId: line.id,
+					lineTitle: line.title,
+					clockWeight: line.clockWeight,
+					timeMs: clock.intervalMs,
+					lifetimeMs: clock.durationMs,
+					runtimeMs: line.runtimeMs,
+					conditional:
+						clock.rules.length > 0 ||
+						lines.length > 1 ||
+						line.rules.length > 0 ||
+						line.input.some(
+							(input) => input.type !== "simple" || input.units !== undefined,
+						),
+					disabled: !clock.enable || !line.enable,
+					inputCount: line.input.filter(
 						(input) => input.type !== "simple" || input.units !== undefined,
-					),
-				disabled: !clock.enable || !line.enable,
-				inputCount: line.input.filter(
-					(input) => input.type !== "simple" || input.units !== undefined,
-				).length,
-				branches,
-				incomplete: omitted > before,
-			});
+					).length,
+					branches,
+					incomplete: omitted > before,
+				});
+			}
 		}
 		if (clock.durationMs !== undefined) {
 			const nextPath = `${path}/expiry`;

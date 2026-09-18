@@ -20,6 +20,7 @@
 				"title": "Animal Feed",
 				"description": "All the animals needs to eat",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

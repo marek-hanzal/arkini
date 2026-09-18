@@ -25,6 +25,7 @@
 				"artwork": "apiary",
 				"description": "Bees bees bees",
 				"default": true,
+				"clockWeight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

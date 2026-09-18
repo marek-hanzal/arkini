@@ -53,10 +53,11 @@ const stepLinesFn = (project: Project, step: readItemChainsFn.Step, indent: stri
 		lines.push(`${indent}  Drop onto: ${itemReferenceFn(project, step.targetId)}`);
 	if (step.timeMs !== undefined)
 		lines.push(
-			`${indent}  ${step.kind === "pulse" ? "Every" : "After"}: ${durationFn(step.timeMs)}`,
+			`${indent}  ${step.kind === "pulse" ? "Clock interval" : "After"}: ${durationFn(step.timeMs)}`,
 		);
 	if (step.kind === "pulse") {
 		lines.push(
+			`${indent}  Clock weight: ${step.clockWeight}; line rules determine eligibility before weighted selection.`,
 			`${indent}  Line duration: ${durationFn(step.runtimeMs ?? 0)}`,
 			`${indent}  Lifetime: ${step.lifetimeMs === undefined ? "No finite lifetime" : durationFn(step.lifetimeMs)}`,
 			`${indent}  Repeated output: shown once per admitted run; owner remains until expiry. Inputs, queueing and placement may delay or prevent production.`,
@@ -97,7 +98,7 @@ export const readItemChainTextFx = Effect.fn("readItemChainTextFx")(function* (
 		`Project revision: ${project.revision}`,
 		"Scope: the root item's own directional merges and Clock; after the first operation, only Clock expiry and Clock-selected line outputs continue. Reverse merges, intermediate merges and production input acquisition are not traversed.",
 		"Limits: the same default depth of 5 operations as Item → Chain, cycle detection and 400-expansion safety budget. Depth/loop/ongoing states are not final items.",
-		"Interpretation: authored possibilities, not runtime simulation. Times and quantities belong to individual operations. Periodic outputs are shown once per admitted run; quantities are not cumulative yields. One eligible output set is selected by weight. Guaranteed groups and chance groups run within that set; a chance group emits all its drops together when successful. Disabled defaults and runtime conditions can prevent outcomes.",
+		"Interpretation: authored possibilities, not runtime simulation. Times and quantities belong to individual operations. Periodic outputs are shown once per admitted run; quantities are not cumulative yields. Each Clock interval selects one eligible Clock line by clockWeight after evaluating line rules; the live pool and its probabilities are not evaluated here. One eligible output set is selected by weight. Guaranteed groups and chance groups run within that set; a chance group emits all its drops together when successful. Disabled defaults and runtime conditions can prevent outcomes.",
 		`Truncated by safety limit: ${result.truncated ? "yes; some branches omitted" : "no"}`,
 	];
 	if (result.chains.length === 0)

@@ -486,6 +486,39 @@
 				},
 				"effect": "replace",
 				"result": "carved-pumpkin"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "paper-drying-rack"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "paper",
+											"quantity": {
+												"min": 4,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "empty-paper-drying-rack"
 			}
 		],
 		"maxQueueSize": 1,

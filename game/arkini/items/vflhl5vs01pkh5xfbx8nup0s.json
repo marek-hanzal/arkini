@@ -1,0 +1,30 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "vflhl5vs01pkh5xfbx8nup0s",
+		"id": "wood-fibers",
+		"title": "Wood Fibers",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"wood-fibers"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bucket-with-water"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "paper-pulp-bucket"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -14,6 +14,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace autofillLineInputsRuntimeFx {
 	export interface Props {
+		readonly inputIndex?: number;
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
@@ -34,9 +35,11 @@ export namespace autofillLineInputsRuntimeFx {
 export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeFx")(function* ({
 	ownerItemId,
 	lineId,
+	inputIndex,
 	runtime,
 }: autofillLineInputsRuntimeFx.Props) {
 	const plan = yield* planLineInputAutofillFx({
+		inputIndex,
 		ownerItemId,
 		lineId,
 		runtime,

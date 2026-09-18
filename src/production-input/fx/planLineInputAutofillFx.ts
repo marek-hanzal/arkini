@@ -17,6 +17,8 @@ import { TypeSchema } from "~/production-input/schema/TypeSchema";
 export namespace planLineInputAutofillFx {
 	export interface Props {
 		readonly includeIncomingDeliveries?: boolean;
+		/** Omission plans the whole line; a target allocates only this material slot. */
+		readonly inputIndex?: number;
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
@@ -87,6 +89,7 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
  */
 export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(function* ({
 	includeIncomingDeliveries = true,
+	inputIndex: targetInputIndex,
 	ownerItemId,
 	lineId,
 	runtime,
@@ -123,6 +126,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	}[] = [];
 
 	for (const [inputIndex, input] of line.input.entries()) {
+		if (targetInputIndex !== undefined && inputIndex !== targetInputIndex) continue;
 		if (input.type !== TypeSchema.enum.Materials) continue;
 
 		const storedItems = runtime.items.filter(

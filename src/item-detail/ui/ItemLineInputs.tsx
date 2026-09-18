@@ -1,5 +1,5 @@
 import { Clock } from "lucide-react";
-import { useItemLineWithdrawController } from "~/item-detail/ui/useItemLineWithdrawController";
+import { useItemLineInputController } from "~/item-detail/ui/useItemLineInputController";
 import { Equal, Exit } from "effect";
 import { useCallback } from "react";
 
@@ -25,7 +25,7 @@ export const ItemLineInputs = ({
 }) => {
 	const game = useGameEngine();
 	const translator = useTranslator();
-	const withdraw = useItemLineWithdrawController({
+	const controller = useItemLineInputController({
 		ownerItemId,
 		lineId: line.id,
 		disabled,
@@ -85,6 +85,11 @@ export const ItemLineInputs = ({
 										{translator.textFn("Click to take one back.")}
 									</span>
 								) : null}
+								{input.canAutofill && !disabled ? (
+									<span className="block">
+										{translator.textFn("Click to bring this here.")}
+									</span>
+								) : null}
 								{input.clock !== undefined ? (
 									<span className="block">
 										{input.clock.kind === "expiry"
@@ -108,8 +113,17 @@ export const ItemLineInputs = ({
 					>
 						<button
 							type="button"
-							disabled={disabled || withdraw.pending || !input.canWithdraw}
-							onClick={() => withdraw.withdrawFn(input.inputIndex)}
+							disabled={
+								disabled ||
+								controller.pending ||
+								(!input.canWithdraw && !input.canAutofill)
+							}
+							onClick={() =>
+								controller.activateFn(
+									input.inputIndex,
+									input.canWithdraw ? "withdraw" : "autofill",
+								)
+							}
 							className="relative block cursor-pointer disabled:cursor-default"
 							data-input-index={input.inputIndex}
 						>

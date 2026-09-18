@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
@@ -32,6 +34,7 @@ export namespace readItemLineInputsFx {
 		readonly availableQuantity: number;
 		readonly committed: boolean;
 		readonly canWithdraw: boolean;
+		readonly canAutofill: boolean;
 		/** Earliest running expiry, or the next cycle for Clock without a finite lifetime. */
 		readonly clock?: {
 			readonly kind: "expiry" | "cycle";
@@ -156,6 +159,25 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			quantity: input.quantity,
 			filled,
 			committed,
+			canAutofill:
+				ownsBuffer &&
+				filled === 0 &&
+				owner?.location.scope === "board" &&
+				liveLine !== undefined &&
+				canControlItemProductionFn(owner.item) &&
+				isItemProductionAdmissionOpenFn(owner) &&
+				!isLineInputClosedFn({
+					ownerItemId: owner.id,
+					lineId: line.id,
+					runtime,
+				}) &&
+				incoming.reduce((total, claim) => total + claim.quantity, 0) < input.quantity.max &&
+				sources.some((source) =>
+					matchesItemSelectorFn({
+						item: source.item,
+						selector: input.selector,
+					}),
+				),
 			canWithdraw:
 				buffered > 0 &&
 				!committed &&

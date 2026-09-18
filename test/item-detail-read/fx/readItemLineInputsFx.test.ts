@@ -65,10 +65,12 @@ it("separates obtainable material from the exact slot's stored fill and does not
 		filled: 0,
 		available: true,
 		availableQuantity: 2,
+		canAutofill: true,
 	});
 	expect(readFn(base)[0]).toMatchObject({
 		filled: 2,
 		available: false,
+		canAutofill: false,
 		availableQuantity: 0,
 	});
 	const anotherOwner = {
@@ -420,6 +422,7 @@ it("isolates active material and gives shared buffers only to the first same-lin
 			}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig)),
 		)[0];
 	expect(readWorkFn("active", "active")).toMatchObject({
+		canAutofill: false,
 		filled: 3,
 		committed: true,
 		availableQuantity: 5,
@@ -429,12 +432,14 @@ it("isolates active material and gives shared buffers only to the first same-lin
 		committed: false,
 	});
 	expect(readWorkFn("queued", "second")).toMatchObject({
+		canAutofill: false,
 		filled: 0,
 		committed: false,
 		available: true,
 		availableQuantity: 5,
 	});
 	expect(readWorkFn("active", "missing")).toMatchObject({
+		canAutofill: false,
 		filled: 0,
 		committed: false,
 	});
@@ -447,6 +452,16 @@ it("isolates active material and gives shared buffers only to the first same-lin
 		filled: 2,
 		committed: false,
 	});
+	const empty = {
+		...runtime,
+		jobs: [],
+		items: [
+			owner,
+			free,
+		],
+	};
+	expect(readWorkFn("queued", "first", empty).canAutofill).toBe(true);
+	expect(readWorkFn("queued", "second", empty).canAutofill).toBe(false);
 });
 
 it("reads the soonest running lifetime only from physical roots in this slot", () => {

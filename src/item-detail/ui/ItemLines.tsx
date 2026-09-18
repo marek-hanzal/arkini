@@ -125,7 +125,7 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 			inert={!present}
 		>
 			<article
-				className="relative isolate py-5 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45"
+				className="relative isolate py-11 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45"
 				{...readDataUiFn({
 					dataUi: "ItemLine",
 					state: {

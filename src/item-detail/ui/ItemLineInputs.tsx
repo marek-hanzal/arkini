@@ -155,27 +155,24 @@ export const ItemLineInputs = ({
 									{(Math.max(0, input.clock.remainingMs) / 1000).toFixed(1)} s
 								</span>
 							) : null}
-							<span className="pointer-events-none absolute -right-1 -bottom-1 z-30 flex items-center">
-								{total > 1 ? (
-									<span className="rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
-										{input.filled}/{total}
-									</span>
-								) : null}
-								<span
-									className="grid h-4 w-0 scale-75 place-items-center overflow-hidden rounded-full bg-surface text-danger opacity-0 shadow-sm transition-[width,margin,opacity,scale] duration-300 ease-out data-[ui-unavailable=true]:w-4 data-[ui-unavailable=true]:scale-100 data-[ui-unavailable=true]:opacity-100 data-[ui-separated=true]:ml-1"
-									{...readDataUiFn({
-										dataUi: "ItemLineInputUnavailable",
-										state: {
-											unavailable,
-											separated: unavailable && total > 1,
-										},
-									})}
-								>
-									<X
-										className="size-3"
-										strokeWidth={3}
-									/>
+							{total > 1 ? (
+								<span className="pointer-events-none absolute -right-1 -bottom-1 z-30 rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
+									{input.filled}/{total}
 								</span>
+							) : null}
+							<span
+								className="pointer-events-none absolute -top-1 -right-1 z-30 grid size-5 scale-75 place-items-center text-danger opacity-0 transition-[opacity,scale] duration-300 ease-out data-[ui-unavailable=true]:scale-100 data-[ui-unavailable=true]:opacity-100"
+								{...readDataUiFn({
+									dataUi: "ItemLineInputUnavailable",
+									state: {
+										unavailable,
+									},
+								})}
+							>
+								<X
+									className="size-5"
+									strokeWidth={3}
+								/>
 							</span>
 						</button>
 					</Tooltip>

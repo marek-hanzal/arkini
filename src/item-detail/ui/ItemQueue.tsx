@@ -167,7 +167,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 				) : null}
 			</header>
 			<section
-				className="relative isolate flex min-h-0 max-h-[40%] shrink-0 flex-col border-y border-line py-3"
+				className="relative isolate flex h-48 shrink-0 flex-col justify-center border-y border-line py-4"
 				data-ui="ItemQueueActive"
 			>
 				{active !== undefined && activeLine?.artwork !== undefined ? (
@@ -178,9 +178,6 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 						}
 					/>
 				) : null}
-				<h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">
-					{translator.textFn("Current production")}
-				</h2>
 				{active !== undefined && activeLine !== undefined ? (
 					<div className="min-h-0 overflow-auto">
 						<div className="flex items-center gap-3">
@@ -224,7 +221,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 						/>
 					</div>
 				) : (
-					<div className="flex items-center gap-2 text-sm text-muted">
+					<div className="flex h-full items-center justify-center gap-2 text-accent">
 						<Pause className="size-5" />
 						{translator.textFn("Nothing is being made right now.")}
 					</div>

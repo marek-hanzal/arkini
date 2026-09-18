@@ -527,8 +527,6 @@ Create project help:
     Example: `my-fantasy-game`. Renaming it later creates a different game for existing saves.
 Create the first item to start authoring this game.:
   value: Create the first item to start authoring this game.
-Current production:
-  value: Current production
 Custom:
   value: Custom
 "Cycle on route {routeId}: {factIds}.":

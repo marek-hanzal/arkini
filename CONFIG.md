@@ -107,7 +107,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - canonical Item validation rejects simultaneous `action` and nonempty `lines`. Editor capability switches clear the opposing capability in one form update with advance help; JSON and MCP reject conflicting data without silently deleting authored fields;
 - line input is passive; Enqueue and Tick own execution;
 - material selectors may name any canonical item, including Clock identities whose interval and lifetime continue advancing in input and job storage while their Clock rules permit time;
-- positive extra material capacity is supported for item lines;
+- each material input stores at most its authored `quantity.max`; there is no extra input capacity;
 - `units` defines a finite supply inside each item instance (health, resource stock, or uses), separately from stack `quantity`: passive and manually operated resources use ordinary items; scheduled production adds Item.clock;
 - `self` unit costs use the line owner, while `target` is valid only for a units input and its deterministic Board payer (including an owner with units selected at self distance);
 - outputs author ordinary `drop` or `random` Board strategy; there is no hidden replacement-output mode. Every output set owns explicit `rules`: set rules filter the pool before weights are summed, while individual drop rules remain post-selection gates and never cause a replacement draw. An output selects one available set; its rolls are Guaranteed or Chance groups, never nested weighted draws;

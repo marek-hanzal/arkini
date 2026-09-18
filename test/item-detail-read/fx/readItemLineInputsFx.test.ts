@@ -1,3 +1,4 @@
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 
@@ -23,7 +24,7 @@ const readFn = (runtime: RuntimeSchema.Type) =>
 			ownerItemId: owner.id,
 			line,
 			runtime,
-		}),
+		}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig)),
 	);
 
 it("separates obtainable material from the exact slot's stored fill and does not count other owners or lines", () => {
@@ -270,7 +271,7 @@ it("projects authored slots without runtime ownership for definition details", (
 		readItemLineInputsFx({
 			line: lineRunTestConfig.items.workshop.lines[0],
 			runtime: base,
-		}),
+		}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig)),
 	);
 	expect(rows).toHaveLength(1);
 	expect(rows[0]).toMatchObject({
@@ -416,7 +417,7 @@ it("isolates active material and gives shared buffers only to the first same-lin
 					kind,
 					id,
 				},
-			}),
+			}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig)),
 		)[0];
 	expect(readWorkFn("active", "active")).toMatchObject({
 		filled: 3,
@@ -446,4 +447,165 @@ it("isolates active material and gives shared buffers only to the first same-lin
 		filled: 2,
 		committed: false,
 	});
+});
+
+it("reads the soonest running lifetime only from physical roots in this slot", () => {
+	const timed = (id: string, remainingMs: number, enabled = true): RuntimeItemSchema.Type => ({
+		...water,
+		id,
+		quantity: 1,
+		item: {
+			...water.item,
+			clock: {
+				durationMs: 12000,
+				enable: enabled,
+				rules: [],
+			},
+		},
+		schedule: {
+			remainingDurationMs: remainingMs,
+		},
+	});
+	const roots = [
+		timed("later", 8000),
+		timed("sooner", 3200),
+		timed("paused", 100, false),
+	];
+	const snapshot = {
+		...base,
+		items: [
+			owner,
+			...roots,
+		],
+	};
+	expect(readFn(snapshot)[0]).toMatchObject({
+		filled: 3,
+		canWithdraw: true,
+		clock: {
+			kind: "expiry",
+			remainingMs: 3200,
+		},
+	});
+	const aged = {
+		...snapshot,
+		items: [
+			owner,
+			roots[0],
+			{
+				...roots[1],
+				schedule: {
+					remainingDurationMs: 3100,
+				},
+			},
+		],
+	};
+	expect(readFn(aged)[0].clock?.remainingMs).toBe(3100);
+	const outside = {
+		...roots[1],
+		location: {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
+	};
+	expect(
+		readFn({
+			...base,
+			items: [
+				owner,
+				outside,
+			],
+		})[0],
+	).toMatchObject({
+		filled: 0,
+		canWithdraw: false,
+		clock: undefined,
+	});
+	const job = {
+		id: "timed-job",
+		ownerItemId: owner.id,
+		lineId: line.id,
+		durationMs: 1000,
+		remainingMs: 500,
+		output: {
+			drop: [],
+		},
+	};
+	const active = {
+		...roots[1],
+		location: {
+			scope: "job" as const,
+			jobId: job.id,
+			inputIndex: 0,
+		},
+	};
+	expect(
+		readFn({
+			...base,
+			jobs: [
+				job,
+			],
+			items: [
+				owner,
+				active,
+			],
+		})[0],
+	).toMatchObject({
+		committed: true,
+		canWithdraw: false,
+		clock: {
+			kind: "expiry",
+			remainingMs: 3200,
+		},
+	});
+});
+
+it("shows interval-only Clock phase from stored material without borrowing an unfilled source's clock", () => {
+	const item: RuntimeItemSchema.Type = {
+		...water,
+		quantity: 1,
+		item: {
+			...water.item,
+			clock: {
+				intervalMs: 10000,
+				enable: true,
+				rules: [],
+			},
+		},
+		schedule: {
+			remainingIntervalMs: 4200,
+		},
+	};
+	expect(
+		readFn({
+			...base,
+			items: [
+				owner,
+				item,
+			],
+		})[0].clock,
+	).toEqual({
+		kind: "cycle",
+		remainingMs: 4200,
+	});
+	expect(
+		readFn({
+			...base,
+			items: [
+				owner,
+				{
+					...item,
+					item: {
+						...item.item,
+						clock: {
+							...item.item.clock!,
+							enable: false,
+						},
+					},
+				},
+			],
+		})[0].clock,
+	).toBeUndefined();
 });

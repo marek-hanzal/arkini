@@ -392,6 +392,8 @@ Clear lifetime:
   value: Clear lifetime
 Clear queue:
   value: Clear queue
+Click to take one back.:
+  value: Click to take one back.
 Clock:
   value: Clock
 Clock expiry:
@@ -2141,6 +2143,10 @@ This item produces nothing:
   value: "This will also:"
 Time:
   value: Time
+Time until the next cycle:
+  value: Time until the next cycle
+Time until the next one expires:
+  value: Time until the next one expires
 Timer:
   value: Timer
 Title:

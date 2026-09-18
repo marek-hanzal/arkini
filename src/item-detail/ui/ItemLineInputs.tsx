@@ -1,3 +1,5 @@
+import { Clock } from "lucide-react";
+import { useItemLineWithdrawController } from "~/item-detail/ui/useItemLineWithdrawController";
 import { Equal, Exit } from "effect";
 import { useCallback } from "react";
 
@@ -16,11 +18,18 @@ export const ItemLineInputs = ({
 	line,
 	idle,
 	work,
+	disabled,
 }: Omit<readItemLineInputsFx.Props, "runtime"> & {
 	readonly idle: boolean;
+	readonly disabled: boolean;
 }) => {
 	const game = useGameEngine();
 	const translator = useTranslator();
+	const withdraw = useItemLineWithdrawController({
+		ownerItemId,
+		lineId: line.id,
+		disabled,
+	});
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) => {
 			const result = game.readFn(
@@ -71,6 +80,25 @@ export const ItemLineInputs = ({
 							<span className="block max-w-64">
 								<strong className="block font-bold">{item.title}</strong>
 								<span className="block">{status}</span>
+								{input.canWithdraw && !disabled ? (
+									<span className="block">
+										{translator.textFn("Click to take one back.")}
+									</span>
+								) : null}
+								{input.clock !== undefined ? (
+									<span className="block">
+										{input.clock.kind === "expiry"
+											? translator.textFn("Time until the next one expires")
+											: translator.textFn("Time until the next cycle")}
+										:{" "}
+										<strong>
+											{(Math.max(0, input.clock.remainingMs) / 1000).toFixed(
+												1,
+											)}{" "}
+											s
+										</strong>
+									</span>
+								) : null}
 								<span className="block">
 									{translator.textFn("Available")}:{" "}
 									<strong className="font-bold">{input.availableQuantity}</strong>
@@ -78,8 +106,11 @@ export const ItemLineInputs = ({
 							</span>
 						}
 					>
-						<span
-							className="relative block"
+						<button
+							type="button"
+							disabled={disabled || withdraw.pending || !input.canWithdraw}
+							onClick={() => withdraw.withdrawFn(input.inputIndex)}
+							className="relative block cursor-pointer disabled:cursor-default"
 							data-input-index={input.inputIndex}
 						>
 							<span
@@ -102,12 +133,18 @@ export const ItemLineInputs = ({
 									colorFraction={colorFraction}
 								/>
 							</span>
+							{input.clock !== undefined ? (
+								<span className="absolute -top-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold tabular-nums text-foreground shadow-sm">
+									<Clock className="size-3" />
+									{(Math.max(0, input.clock.remainingMs) / 1000).toFixed(1)} s
+								</span>
+							) : null}
 							{total > 1 ? (
 								<span className="absolute -right-1 -bottom-1 z-30 rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
 									{input.filled}/{total}
 								</span>
 							) : null}
-						</span>
+						</button>
 					</Tooltip>
 				);
 			})}

@@ -137,6 +137,7 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 					ownerItemId={props.ownerItemId}
 					line={line}
 					idle={state === "idle"}
+					disabled={props.disabled}
 				/>
 				<div className="mt-3 ml-auto flex shrink-0 items-center gap-5 text-sm">
 					<p

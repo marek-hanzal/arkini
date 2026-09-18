@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
+import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 import { readLineInputAutofillSourcesFn } from "~/production-input/fn/readLineInputAutofillSourcesFn";
@@ -29,6 +31,12 @@ export namespace readItemLineInputsFx {
 		/** Obtainable stock plus this slot's incoming deliveries, excluding already filled material. */
 		readonly availableQuantity: number;
 		readonly committed: boolean;
+		readonly canWithdraw: boolean;
+		/** Earliest running expiry, or the next cycle for Clock without a finite lifetime. */
+		readonly clock?: {
+			readonly kind: "expiry" | "cycle";
+			readonly remainingMs: number;
+		};
 	}
 }
 
@@ -77,6 +85,8 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 		if (input.type !== "materials") continue;
 		let filled = 0;
 		let committed = false;
+		let buffered = 0;
+		let clock: readItemLineInputsFx.Input["clock"];
 		for (const item of runtime.items) {
 			const location = item.location;
 			if (
@@ -87,6 +97,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				location.inputIndex === inputIndex
 			) {
 				filled += item.quantity;
+				buffered += item.quantity;
 			} else if (
 				(location.scope === "job" || location.scope === "reserved") &&
 				job !== undefined &&
@@ -95,6 +106,27 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			) {
 				filled += item.quantity;
 				committed = true;
+			} else continue;
+			const remaining =
+				item.schedule?.remainingDurationMs ?? item.schedule?.remainingIntervalMs;
+			const kind = item.schedule?.remainingDurationMs === undefined ? "cycle" : "expiry";
+			if (
+				remaining !== undefined &&
+				(yield* resolveItemScheduleEnabledFx({
+					item,
+					runtime,
+				}))
+			) {
+				if (
+					clock === undefined ||
+					(kind === "expiry" && clock.kind === "cycle") ||
+					(kind === clock.kind && remaining < clock.remainingMs)
+				) {
+					clock = {
+						kind,
+						remainingMs: remaining,
+					};
+				}
 			}
 		}
 		const incoming =
@@ -124,6 +156,12 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			quantity: input.quantity,
 			filled,
 			committed,
+			canWithdraw:
+				buffered > 0 &&
+				!committed &&
+				owner?.location.scope === "board" &&
+				canControlItemProductionFn(owner.item),
+			clock,
 			availableQuantity,
 			available:
 				work === undefined

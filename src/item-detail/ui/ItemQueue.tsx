@@ -65,6 +65,7 @@ const QueuedLine = ({
 					ownerItemId={ownerItemId}
 					line={line}
 					idle={false}
+					disabled={disabled}
 					work={{
 						kind: "queued",
 						id: requestId,
@@ -180,6 +181,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 							ownerItemId={ownerItemId}
 							line={activeLine}
 							idle={false}
+							disabled={disabled}
 							work={{
 								kind: "active",
 								id: active.jobId,

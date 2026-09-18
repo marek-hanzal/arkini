@@ -26,7 +26,7 @@
 				"description": "Longer wait, bigger gain!",
 				"default": true,
 				"show": true,
-				"enable": true,
+				"enable": false,
 				"runtimeMs": 120000,
 				"input": [
 					{
@@ -55,6 +55,42 @@
 							"scope": "board",
 							"distance": "self"
 						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "wood"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "firewood"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						}
 					}
 				],
 				"output": {
@@ -81,7 +117,24 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"hint": "You need a campire to catch a warmth of fire",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "campfire-burning"
+									},
+									"scope": "any"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
 			}
 		]
 	}

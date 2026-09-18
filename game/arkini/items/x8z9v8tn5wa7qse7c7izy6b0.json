@@ -16,7 +16,7 @@
 		"scope": "board",
 		"maxCount": 1,
 		"maxStackSize": 1,
-		"maxQueueSize": 2,
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "lumber-camp-blueprint",
@@ -246,36 +246,39 @@
 						"type": "materials",
 						"selector": {
 							"type": "item",
-							"itemId": "stone"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 6,
-							"max": 6
-						}
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "wood"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 6,
-							"max": 6
-						}
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
 							"itemId": "paper"
 						},
 						"mode": "consume",
 						"quantity": {
 							"min": 2,
 							"max": 2
+						}
+					},
+					{
+						"units": {
+							"cost": 2,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "inkwell"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "goose-quill"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -350,113 +353,22 @@
 							}
 						],
 						"type": "hide"
-					}
-				]
-			},
-			{
-				"id": "well-blueprint",
-				"title": "Well Blueprint",
-				"artwork": "well",
-				"description": "It's time to construct a well.",
-				"default": false,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 12000,
-				"input": [
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "paper"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
 					},
 					{
-						"units": {
-							"cost": 1,
-							"from": "target"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "inkwell"
-							},
-							"scope": "board",
-							"distance": "far"
-						}
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "goose-quill"
-						},
-						"mode": "reserve",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "well-blueprint",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": [
-					{
+						"hint": "People needs a house to live",
 						"when": [
 							{
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "well-blueprint"
+										"itemId": "house-t1"
 									},
 									"scope": "any"
 								},
 								"type": "exists"
 							}
 						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "well"
-									},
-									"scope": "any"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "hide"
+						"type": "enable"
 					}
 				]
 			},

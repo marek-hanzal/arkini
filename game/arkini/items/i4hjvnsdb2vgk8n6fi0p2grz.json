@@ -44,6 +44,18 @@
 							"scope": "board",
 							"distance": "self"
 						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "wood"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						}
 					}
 				],
 				"output": {

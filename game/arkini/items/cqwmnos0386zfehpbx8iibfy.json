@@ -20,13 +20,14 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "line:new-item:default",
-				"title": "New blueprint line",
-				"description": "Describe what this blueprint line consumes and produces.",
+				"id": "house---tier-1",
+				"title": "House - Tier 1",
+				"artwork": "house-t1",
+				"description": "A beautiful simple house, but you'll like it!",
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 0,
+				"runtimeMs": 42000,
 				"input": [
 					{
 						"units": {
@@ -41,6 +42,42 @@
 							},
 							"scope": "board",
 							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 6,
+							"max": 6
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "wood"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "campfire"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
 						}
 					}
 				],

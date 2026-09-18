@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "bpm5udeivrvd39122nmndehq",
+		"id": "grim-reaper",
+		"title": "Grim Reaper",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"grim-reaper"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

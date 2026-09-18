@@ -1,15 +1,16 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "mxjt0lgbi17u3nqc9sqrxo5o",
-		"id": "brewery-blueprint",
-		"title": "Brewery Blueprint",
-		"description": "We want beer! We want beer!",
+		"uid": "rm4hf4i08di3fjfkw6arkmvp",
+		"id": "carpenter-blueprint",
+		"title": "Carpenter Blueprint",
+		"draft": false,
+		"description": "Plans for a workshop that turns planks into useful wooden containers.",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",
-				"brewery"
+				"carpenter"
 			]
 		},
 		"scope": "any",
@@ -20,14 +21,14 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "brewery",
-				"title": "Brewery",
-				"artwork": "brewery",
-				"description": "So, it's time to brew a beer",
+				"id": "carpenter",
+				"title": "Build Carpenter",
+				"artwork": "carpenter",
+				"description": "Build a carpenter's workshop from planks and stone blocks.",
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 0,
+				"runtimeMs": 30000,
 				"input": [
 					{
 						"units": {
@@ -38,10 +39,34 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "brewery-blueprint"
+								"itemId": "carpenter-blueprint"
 							},
 							"scope": "board",
 							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "planks"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "stone-block"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -55,7 +80,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "brewery",
+											"itemId": "carpenter",
 											"quantity": {
 												"min": 1,
 												"max": 1

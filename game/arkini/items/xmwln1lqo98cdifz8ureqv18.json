@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xmwln1lqo98cdifz8ureqv18",
+		"id": "builders-yard",
+		"title": "Builders Yard",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"builders-yard"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

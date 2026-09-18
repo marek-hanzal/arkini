@@ -1,0 +1,119 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "yc0am9mudbeggwjs6dzusk3j",
+		"id": "carpenter",
+		"title": "Carpenter",
+		"draft": false,
+		"description": "Craft wooden buckets and crates from planks.",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"carpenter"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "empty-bucket",
+				"title": "Empty Bucket",
+				"artwork": "empty-bucket",
+				"description": "Make a wooden bucket for carrying water and other liquids.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "planks"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "empty-crate",
+				"title": "Empty Crate",
+				"artwork": "empty-crate",
+				"description": "Build a wooden crate for packing goods.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 20000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "planks"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-crate",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

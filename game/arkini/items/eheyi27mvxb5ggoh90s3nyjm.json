@@ -23,6 +23,7 @@
 			{
 				"id": "townhall-t1",
 				"title": "Townhall I",
+				"artwork": "townhall-t1",
 				"description": "Longer wait, bigger gain!",
 				"default": true,
 				"show": true,

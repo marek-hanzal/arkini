@@ -22,6 +22,7 @@
 			{
 				"id": "sawmill",
 				"title": "Build Sawmill",
+				"artwork": "sawmill",
 				"description": "Let's build sawmill",
 				"default": true,
 				"show": true,

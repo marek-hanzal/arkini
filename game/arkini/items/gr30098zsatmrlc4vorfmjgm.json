@@ -23,6 +23,7 @@
 			{
 				"id": "grain-farm",
 				"title": "Grain Farm",
+				"artwork": "grain-farm",
 				"description": "Soon there will be some farming simulator available...",
 				"default": true,
 				"show": true,

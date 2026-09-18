@@ -79,6 +79,48 @@
 				},
 				"effect": "replace",
 				"result": "empty-flax-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "spoiled-raw-game-meat",
+											"quantity": {
+												"min": 2,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "grim-reaper"
 			}
 		],
 		"maxQueueSize": 1,

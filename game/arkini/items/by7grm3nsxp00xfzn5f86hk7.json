@@ -23,6 +23,7 @@
 			{
 				"id": "stoneworks",
 				"title": "Build Stoneworks",
+				"artwork": "stoneworks",
 				"description": "Build a Stoneworks.",
 				"default": true,
 				"show": true,

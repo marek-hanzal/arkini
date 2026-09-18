@@ -22,6 +22,7 @@
 			{
 				"id": "apiary",
 				"title": "Apiary",
+				"artwork": "apiary",
 				"description": "Bees bees bees",
 				"default": true,
 				"show": true,
@@ -54,7 +55,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "paper",
+											"itemId": "apiary",
 											"quantity": {
 												"min": 1,
 												"max": 1

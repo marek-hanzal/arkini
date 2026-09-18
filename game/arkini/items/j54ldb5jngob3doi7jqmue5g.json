@@ -22,6 +22,7 @@
 			{
 				"id": "bakery",
 				"title": "Bakery",
+				"artwork": "bakery",
 				"description": "Wanna some crispy bread or something?",
 				"default": true,
 				"show": true,

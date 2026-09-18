@@ -22,6 +22,7 @@
 			{
 				"id": "Cow Farm",
 				"title": "Cow Farm",
+				"artwork": "cow-farm",
 				"description": "Wanna cows?",
 				"default": true,
 				"show": true,

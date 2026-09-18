@@ -22,6 +22,7 @@
 			{
 				"id": "vegetable-garden",
 				"title": "Vegetable Garden",
+				"artwork": "vegetable-garden",
 				"description": "Build a new vegetable garden",
 				"default": true,
 				"show": true,

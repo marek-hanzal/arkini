@@ -35,7 +35,7 @@ Used by:
 Important invariants:
 
 - Every write resolves live facts, plans from one pinned snapshot, validates the complete candidate, then publishes once.
-- Runtime and events become visible in the same `CommittedTransition`; events are never a second store.
+- Runtime and events become visible in the same `CommittedTransition`; events are never a second store. Successful removal operations emit `item:removed` with the complete terminal `RuntimeItem` snapshot. The snapshot follows the unpublished draft through the normal result/event flow, so abandoned plans and rejected commits publish nothing. Presentation may retain the exact removed instance while its detail stays open; it never reconstructs terminal state from earlier renders or uses retained data as gameplay authority.
 - Nested `RuntimeFx` reads inside a write default to the pinned pre-transition snapshot passed to the update. Explicit-snapshot operations scope nested reads to their own immutable input, so successive Tick lifecycle operations see earlier results without exposing their partially built candidates.
 - Failure, interruption and an unchanged event-free result publish nothing.
 

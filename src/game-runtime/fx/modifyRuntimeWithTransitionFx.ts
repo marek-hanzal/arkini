@@ -30,6 +30,25 @@ interface RuntimeModification<Value> {
 	readonly transition: CommittedTransitionSchema.Type | null;
 }
 
+/** Temporary detach/reinsert operations are not committed removals; the last capture wins. */
+const readCommittedEventsFn = (
+	runtime: RuntimeSchema.Type,
+	events: readonly GameEventSchema.Type[],
+): GameEventSchema.Type[] => {
+	const survivingIds = new Set(runtime.items.map((item) => item.id));
+	const capturedIds = new Set<string>();
+	const result: GameEventSchema.Type[] = [];
+	for (let index = events.length - 1; index >= 0; index--) {
+		const event = events[index];
+		if (event.type === "item:removed") {
+			if (survivingIds.has(event.snapshot.id) || capturedIds.has(event.snapshot.id)) continue;
+			capturedIds.add(event.snapshot.id);
+		}
+		result.push(event);
+	}
+	return result.reverse();
+};
+
 /** Mutates the serialized runtime and returns the exact optional transition from the same lock. */
 export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransitionFx")(function* <
 	Result,
@@ -50,15 +69,14 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 				});
 			}),
 			Effect.map(([result, nextRuntime, emittedEvents = []]) => {
-				const changed = nextRuntime !== transition.runtime || emittedEvents.length > 0;
+				const events = readCommittedEventsFn(nextRuntime, emittedEvents);
+				const changed = nextRuntime !== transition.runtime || events.length > 0;
 				const nextTransition = changed
 					? {
 							sequence: transition.sequence + 1,
 							previousRuntime: transition.runtime,
 							runtime: nextRuntime,
-							events: [
-								...emittedEvents,
-							],
+							events,
 						}
 					: transition;
 

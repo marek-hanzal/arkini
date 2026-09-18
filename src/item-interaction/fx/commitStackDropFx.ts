@@ -55,18 +55,22 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 								quantity: sourceRemainingQuantity,
 							} satisfies RuntimeItemSchema.Type,
 						});
-			const sourceRuntime =
+			const sourceRemoval =
 				sourceAfter === undefined
 					? yield* removeRuntimeItemIdentityFx({
 							item: resolution.source,
 							runtime,
 						})
-					: ({
-							...runtime,
-							items: runtime.items.map((item) =>
-								item.id === props.sourceItemId ? sourceAfter : item,
-							),
-						} satisfies RuntimeSchema.Type);
+					: {
+							events: [],
+							runtime: {
+								...runtime,
+								items: runtime.items.map((item) =>
+									item.id === props.sourceItemId ? sourceAfter : item,
+								),
+							} satisfies RuntimeSchema.Type,
+						};
+			const sourceRuntime = sourceRemoval.runtime;
 			const targetAfter = yield* reviseRuntimeItemFx({
 				item: {
 					...resolution.target,
@@ -91,6 +95,7 @@ const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDrop
 						item.id === props.targetItemId ? targetAfter : item,
 					),
 				} satisfies RuntimeSchema.Type,
+				sourceRemoval.events,
 			] as const;
 		}),
 	);

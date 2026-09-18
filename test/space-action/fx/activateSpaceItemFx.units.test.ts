@@ -143,6 +143,7 @@ describe("Space item unit settlement", () => {
 		expect(authored.transition?.events.map((event) => event.type)).toEqual([
 			"item:depleted",
 			"item:disappeared",
+			"item:removed",
 			"current-space:changed",
 		]);
 		expect(authored.transition?.sequence).toBeLessThan(authored.latestTransition.sequence);

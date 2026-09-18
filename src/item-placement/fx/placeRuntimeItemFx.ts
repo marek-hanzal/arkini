@@ -218,7 +218,12 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			plan,
 			runtime: detachedRuntime,
 		});
-		const events: GameEventSchema.Type[] = [];
+		const events: GameEventSchema.Type[] = [
+			{
+				type: "item:removed",
+				snapshot: item,
+			},
+		];
 		for (const stack of placement.stack) {
 			const stackedItem = Option.getOrUndefined(narrowGridRuntimeItemFn(stack.item));
 			if (stackedItem === undefined) {

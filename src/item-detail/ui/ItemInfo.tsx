@@ -75,7 +75,9 @@ export const ItemInfo = ({ detail }: { readonly detail: useItemDetailSceneContro
 							value={
 								detail.units === undefined
 									? translator.textFn("This item doesn't use units.")
-									: `${detail.units.remaining}/${detail.units.total}`
+									: detail.units.remaining === 0
+										? translator.textFn("Depleted")
+										: `${detail.units.remaining}/${detail.units.total}`
 							}
 						/>
 					</FactList>

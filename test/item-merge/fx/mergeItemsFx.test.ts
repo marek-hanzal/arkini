@@ -193,6 +193,7 @@ describe("mergeItemsFx", () => {
 				effect === "remove"
 					? [
 							GameEventEnumSchema.enum.ItemMerged,
+							GameEventEnumSchema.enum.ItemRemoved,
 							GameEventEnumSchema.enum.ItemDisappeared,
 						]
 					: [
@@ -380,6 +381,14 @@ describe("mergeItemsFx", () => {
 				resultingQuantity: 0,
 			},
 			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: {
+					...result.before.items.find((item) => item.id === "runtime:source"),
+					remainingUnits: 0,
+					revision: expect.any(String),
+				},
+			},
+			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: output.id,
 				canonicalItemId: "output",
@@ -452,6 +461,14 @@ describe("mergeItemsFx", () => {
 					?.location,
 				previousQuantity: 1,
 				resultingQuantity: 0,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: {
+					...result.before.items.find((item) => item.id === "runtime:target"),
+					remainingUnits: 0,
+					revision: expect.any(String),
+				},
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,

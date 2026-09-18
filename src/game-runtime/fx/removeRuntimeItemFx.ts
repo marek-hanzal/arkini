@@ -32,7 +32,10 @@ export const removeRuntimeItemFx = Effect.fn("removeRuntimeItemFx")(function* ({
 	});
 
 	return {
-		events: releasedInputs.events,
-		runtime: removedRuntime,
+		events: [
+			...releasedInputs.events,
+			...removedRuntime.events,
+		],
+		runtime: removedRuntime.runtime,
 	} satisfies RemoveRuntimeItemResult;
 });

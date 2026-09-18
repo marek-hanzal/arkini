@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -43,8 +44,17 @@ export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwned
 			ownerItemIds: owned.ownerItemIds,
 			runtime: withoutOwnedItems,
 		});
-		return yield* reconcileOutboundDeliveriesRuntimeFx({
+		const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 			runtime: withoutIdentityState,
 		});
+		return {
+			runtime: reconciledRuntime,
+			events: owned.inputItems.map(
+				(snapshot): GameEventSchema.Type => ({
+					type: "item:removed",
+					snapshot,
+				}),
+			),
+		};
 	},
 );

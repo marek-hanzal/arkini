@@ -5,13 +5,14 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameAudioCue } from "~/game-audio/type/GameAudioCue";
 
 type GameEvent = GameEventBatchSchema.Type["events"][number];
+type AudibleGameEvent = Exclude<GameEventEnumSchema.Type, "item:removed">;
 type GameEventAudioCue = GameAudioCue & {
-	readonly event: GameEventEnumSchema.Type;
+	readonly event: AudibleGameEvent;
 };
 
 const maximumBatchCues = 6;
 
-const cuePriority: Record<GameEventEnumSchema.Type, number> = {
+const cuePriority: Record<AudibleGameEvent, number> = {
 	[GameEventEnumSchema.enum.CurrentSpaceChanged]: 1,
 	[GameEventEnumSchema.enum.JobQueued]: 1,
 	[GameEventEnumSchema.enum.JobQueueCleared]: 2,
@@ -39,13 +40,19 @@ const clampStrengthFn = (strength: number) => Math.min(3, Math.max(1, strength))
 const strengthForQuantityFn = (quantity: number) =>
 	clampStrengthFn(1 + Math.log2(Math.max(1, quantity)));
 
-const cueFn = (event: GameEventEnumSchema.Type, strength: number): GameEventAudioCue => ({
+const cueFn = (event: AudibleGameEvent, strength: number): GameEventAudioCue => ({
 	event,
 	strength: clampStrengthFn(strength),
 });
 
-const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue =>
+const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue | undefined =>
 	match(event)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+			},
+			() => undefined,
+		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
@@ -217,6 +224,7 @@ const coalesceCuesFn = (events: ReadonlyArray<GameEvent>): ReadonlyArray<GameEve
 
 	for (const event of events) {
 		const next = readGameAudioCueFn(event);
+		if (next === undefined) continue;
 		const existingIndex = indexByEvent.get(next.event);
 		if (existingIndex === undefined) {
 			indexByEvent.set(next.event, cues.length);

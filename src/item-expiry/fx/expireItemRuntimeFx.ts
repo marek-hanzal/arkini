@@ -37,13 +37,10 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 					origin,
 					runtime,
 				})
-			: {
-					runtime: yield* removeRuntimeItemIdentityFx({
-						item,
-						runtime,
-					}),
-					events: [],
-				};
+			: yield* removeRuntimeItemIdentityFx({
+					item,
+					runtime,
+				});
 	let draft = removal.runtime;
 	let replacementPlaced = false;
 	const events: GameEventSchema.Type[] = [

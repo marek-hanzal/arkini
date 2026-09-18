@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
@@ -49,8 +50,17 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 					],
 				])
 			: undefined;
-	return yield* reconcileOutboundDeliveriesRuntimeFx({
+	const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 		returnFromByOwnerItemId,
 		runtime: removedRuntime,
 	});
+	return {
+		runtime: reconciledRuntime,
+		events: [
+			{
+				type: "item:removed",
+				snapshot: item,
+			} satisfies GameEventSchema.Type,
+		],
+	};
 });

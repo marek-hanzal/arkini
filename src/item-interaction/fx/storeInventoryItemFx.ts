@@ -1,4 +1,5 @@
 import { Data, Effect, Option } from "effect";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -59,6 +60,12 @@ const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(fun
 		});
 		return {
 			current: null,
+			events: [
+				{
+					type: "item:removed",
+					snapshot: item,
+				} satisfies GameEventSchema.Type,
+			],
 			runtime: nextRuntime,
 		} as const;
 	}
@@ -70,6 +77,7 @@ const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(fun
 	});
 	return {
 		current: revisedItem,
+		events: [],
 		runtime: {
 			...runtime,
 			items: runtime.items.map((candidate) =>
@@ -195,6 +203,7 @@ const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 							}),
 				} satisfies StoreItemInInventoryResult,
 				stored.runtime,
+				stored.events,
 			] as const;
 		}),
 	);

@@ -546,6 +546,8 @@ Deleting this audio also removes the assignments listed below.:
   value: Deleting this audio also removes the assignments listed below.
 Depends on conditions:
   value: Depends on conditions
+Depleted:
+  value: Depleted
 Depletion output:
   value: Depletion output
 Depletion output help:
@@ -746,6 +748,8 @@ Exists condition help:
     Use it when the exact amount does not matter.
 Exit:
   value: Exit
+Expired:
+  value: Expired
 Expiry mode:
   value: When time runs out
 Expiry output:
@@ -1414,6 +1418,8 @@ No items match this search.:
   value: No items match this search.
 No items yet:
   value: No items yet
+No longer here:
+  value: No longer here
 No matches found.:
   value: No matches found.
 No matching items:

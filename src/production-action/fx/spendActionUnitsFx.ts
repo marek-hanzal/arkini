@@ -109,6 +109,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 
 	const resultingQuantity = item.quantity - 1;
 	let draft: RuntimeSchema.Type;
+	let removalEvents: readonly GameEventSchema.Type[] = [];
 	if (resultingQuantity > 0) {
 		const remainingStack = yield* reviseRuntimeItemFx({
 			item: {
@@ -123,10 +124,18 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 			),
 		};
 	} else {
-		draft = yield* removeRuntimeItemIdentityFx({
-			item,
+		const depletedItem = yield* reviseRuntimeItemFx({
+			item: {
+				...item,
+				remainingUnits: nextRemainingUnits,
+			},
+		});
+		const removed = yield* removeRuntimeItemIdentityFx({
+			item: depletedItem,
 			runtime,
 		});
+		draft = removed.runtime;
+		removalEvents = removed.events;
 	}
 
 	let placement: applyOutputPlacementFx.Result = {
@@ -192,6 +201,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 						} satisfies GameEventSchema.Type,
 					]
 				: []),
+			...removalEvents,
 			...placementEvents,
 			...releasedInputEvents,
 		],

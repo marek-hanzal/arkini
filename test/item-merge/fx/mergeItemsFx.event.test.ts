@@ -122,6 +122,10 @@ describe("mergeItemsFx events", () => {
 			});
 			expect(published.batch.events).toEqual([
 				event,
+				{
+					type: GameEventEnumSchema.enum.ItemRemoved,
+					snapshot: source,
+				},
 			]);
 			expect(
 				published.runtime.items.find((item) => item.id === "runtime:target")?.item.id,
@@ -311,6 +315,10 @@ describe("mergeItemsFx events", () => {
 
 			expect(published.batch.events).toEqual([
 				event,
+				{
+					type: GameEventEnumSchema.enum.ItemRemoved,
+					snapshot: source,
+				},
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: output.id,

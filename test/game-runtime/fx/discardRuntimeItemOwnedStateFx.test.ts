@@ -64,11 +64,17 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			}),
 		);
 
-		expect(result.items).toEqual([
+		expect(result.events).toEqual([
+			{
+				type: "item:removed",
+				snapshot: passiveChild,
+			},
+		]);
+		expect(result.runtime.items).toEqual([
 			root,
 		]);
-		expect(result.jobQueue).toEqual([]);
-		expect(result.defaultLineByOwnerItemId).toEqual({
+		expect(result.runtime.jobQueue).toEqual([]);
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({
 			"runtime:unrelated": "line:unrelated",
 		});
 	});

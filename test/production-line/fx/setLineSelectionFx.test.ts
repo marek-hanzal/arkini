@@ -398,8 +398,8 @@ describe("setLineSelectionFx", () => {
 			),
 		);
 
-		expect(result.items).toEqual([]);
-		expect(result.defaultLineByOwnerItemId).toEqual({});
+		expect(result.runtime.items).toEqual([]);
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 	});
 	it("atomically isolates one exact stacked owner before selecting its default", () => {
 		const result = Effect.runSync(

@@ -23,6 +23,7 @@ export const GameEventEnumSchema = z
 		ItemUnitSpent: "item:unit-spent",
 		ItemDepleted: "item:depleted",
 		ItemDisappeared: "item:disappeared",
+		ItemRemoved: "item:removed",
 	})
 	.meta({
 		id: "GameEventEnumSchema",

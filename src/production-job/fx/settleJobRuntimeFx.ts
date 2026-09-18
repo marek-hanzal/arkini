@@ -52,10 +52,12 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			...draft,
 			jobQueue: draft.jobQueue.filter((request) => request.ownerItemId !== context.owner.id),
 		};
-		draft = yield* removeRuntimeItemIdentityFx({
+		const removed = yield* removeRuntimeItemIdentityFx({
 			item: context.owner,
 			runtime: withoutDepletedOwnerQueue,
 		});
+		draft = removed.runtime;
+		events.push(...removed.events);
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDepleted,
 			itemId: context.owner.id,

@@ -66,10 +66,12 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		draft = discarded.runtime;
 		events.push(...discarded.events);
 	}
-	draft = yield* removeRuntimeItemIdentityFx({
+	const removed = yield* removeRuntimeItemIdentityFx({
 		item,
 		runtime: draft,
 	});
+	draft = removed.runtime;
+	events.push(...removed.events);
 	for (const reservation of reservations) {
 		const placed = yield* placeRuntimeItemBestEffortFx({
 			itemId: reservation.id,

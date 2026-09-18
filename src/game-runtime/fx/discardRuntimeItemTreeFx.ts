@@ -48,23 +48,27 @@ export const discardRuntimeItemTreeFx = Effect.fn("discardRuntimeItemTreeFx")(fu
 	});
 	const removed = yield* removeRuntimeItemIdentityFx({
 		item,
-		runtime: detached,
+		runtime: detached.runtime,
 	});
 	return {
-		runtime: removed,
+		runtime: removed.runtime,
 		events: [
-			item,
-			...owned.inputItems,
-		].map(
-			(lost): DiscardEvent => ({
-				type: "item:discarded",
-				ownerItemId,
-				itemId: lost.id,
-				canonicalItemId: lost.item.id,
-				quantity: lost.quantity,
-				source,
-				reason,
-			}),
-		),
+			...detached.events,
+			...removed.events,
+			...[
+				item,
+				...owned.inputItems,
+			].map(
+				(lost): DiscardEvent => ({
+					type: "item:discarded",
+					ownerItemId,
+					itemId: lost.id,
+					canonicalItemId: lost.item.id,
+					quantity: lost.quantity,
+					source,
+					reason,
+				}),
+			),
+		],
 	} satisfies discardRuntimeItemTreeFx.Result;
 });

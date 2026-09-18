@@ -78,6 +78,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	}
 
 	let draft: RuntimeSchema.Type;
+	const events: GameEventSchema.Type[] = [];
 	if (source.quantity > 1) {
 		const remainingSource = yield* reviseRuntimeItemFx({
 			item: {
@@ -96,15 +97,20 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 						ownerItemId: source.id,
 						runtime,
 					})
-				: runtime;
-		draft = yield* removeRuntimeItemIdentityFx({
+				: {
+						runtime,
+						events: [],
+					};
+		const removed = yield* removeRuntimeItemIdentityFx({
 			item: source,
-			runtime: withoutOwnedState,
+			runtime: withoutOwnedState.runtime,
 		});
+		draft = removed.runtime;
+		events.push(...withoutOwnedState.events, ...removed.events);
 	}
 
 	return {
-		events: [],
+		events,
 		returnDrop:
 			action === SourceActionSchema.enum.Use
 				? {

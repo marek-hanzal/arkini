@@ -1,6 +1,7 @@
 import { Equal } from "effect";
-import { useCallback } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 
+import { readItemDetailRemovalFn } from "~/item-detail-read/fn/readItemDetailRemovalFn";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -26,6 +27,7 @@ export namespace useItemDetailSceneController {
 	export interface Output {
 		readonly detail?: Detail;
 		readonly stale: boolean;
+		readonly removalReason?: readItemDetailRemovalFn.Snapshot["reason"];
 	}
 }
 
@@ -35,11 +37,36 @@ export const useItemDetailSceneController = ({
 }: useItemDetailSceneController.Props): useItemDetailSceneController.Output => {
 	const game = useGameEngine();
 	const { kind, itemId } = target;
+	const [removal, setRemoval] = useState<{
+		readonly itemId: string;
+		readonly snapshot: readItemDetailRemovalFn.Snapshot;
+	}>();
+	useLayoutEffect(() => {
+		if (kind !== "runtime") return;
+		// Observe every commit, even when React batches several runtime renders together.
+		return game.subscribeTransitionsFn((transition) => {
+			const snapshot = readItemDetailRemovalFn(transition, itemId);
+			if (snapshot !== undefined)
+				setRemoval({
+					itemId,
+					snapshot,
+				});
+			else if (transition.runtime.items.some((item) => item.id === itemId))
+				setRemoval(undefined);
+		});
+	}, [
+		game,
+		kind,
+		itemId,
+	]);
+	const finalSnapshot =
+		kind === "runtime" && removal?.itemId === itemId ? removal.snapshot : undefined;
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailSceneController.Detail | undefined => {
 			const runtimeItem =
 				kind === "runtime"
-					? runtime.items.find((candidate) => candidate.id === itemId)
+					? (runtime.items.find((candidate) => candidate.id === itemId) ??
+						finalSnapshot?.snapshot)
 					: undefined;
 			const item = kind === "definition" ? game.config.items[itemId] : runtimeItem?.item;
 			if (item === undefined) return undefined;
@@ -71,6 +98,7 @@ export const useItemDetailSceneController = ({
 			game,
 			kind,
 			itemId,
+			finalSnapshot,
 		],
 	);
 	const detail = useRuntimeSelector(game, selectorFn, Equal.equals);
@@ -81,6 +109,7 @@ export const useItemDetailSceneController = ({
 	});
 	return {
 		detail: retained.value,
-		stale: retained.stale,
+		stale: finalSnapshot !== undefined || retained.stale,
+		removalReason: finalSnapshot?.reason,
 	};
 };

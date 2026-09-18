@@ -278,6 +278,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				},
 				quantity: 1,
 			},
+			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: result.before.items.find((item) => item.id === boardOwner.id),
+			},
 		]);
 	});
 
@@ -336,6 +340,12 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				quantity: boardOwner.quantity,
 			},
 			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: result.before.items.find(
+					(item) => item.id === "runtime:buffered-material",
+				),
+			},
+			{
 				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: "runtime:material-stack",
 				canonicalItemId: "material",
@@ -350,6 +360,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				},
 				previousQuantity: 2,
 				quantity: 5,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: result.before.items.find((item) => item.id === boardOwner.id),
 			},
 		]);
 	});

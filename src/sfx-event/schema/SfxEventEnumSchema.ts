@@ -6,7 +6,9 @@ import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationS
 /** Every committed gameplay or explicit presentation event assignable to one SFX resource. */
 export const SfxEventEnumSchema = z
 	.enum({
-		...GameEventEnumSchema.enum,
+		...GameEventEnumSchema.exclude([
+			"ItemRemoved",
+		]).enum,
 		...PresentationSfxEventEnumSchema.enum,
 	})
 	.meta({

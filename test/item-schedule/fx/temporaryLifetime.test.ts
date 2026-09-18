@@ -119,6 +119,16 @@ describe("temporary item lifetime", () => {
 		expect(result.sixth.runtime.items).toEqual([]);
 		expect(result.sixth.events).toEqual([
 			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: {
+					...result.spawned,
+					schedule: {
+						...result.spawned.schedule,
+						remainingDurationMs: 0,
+					},
+				},
+			},
+			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:temporary",
 				canonicalItemId: "temporaryPlain",
@@ -172,6 +182,7 @@ describe("temporary item lifetime", () => {
 
 		expect(result.runtime.items.some((item) => item.id === result.temporary.id)).toBe(false);
 		expect(result.transition.events.map((event) => event.type)).toEqual([
+			GameEventEnumSchema.enum.ItemRemoved,
 			GameEventEnumSchema.enum.ItemExpired,
 			GameEventEnumSchema.enum.ItemDisappeared,
 		]);
@@ -316,6 +327,16 @@ describe("temporary item lifetime", () => {
 		);
 
 		expect(result.expiry.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemRemoved,
+				snapshot: {
+					...result.temporary,
+					schedule: {
+						...result.temporary.schedule,
+						remainingDurationMs: 0,
+					},
+				},
+			},
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: result.temporary.id,

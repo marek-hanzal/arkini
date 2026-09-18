@@ -15,12 +15,12 @@ export const ItemDetailHeader = ({
 	disabled,
 	identity,
 	navigation,
-	stale,
+	status,
 }: {
 	readonly disabled: boolean;
 	readonly identity: ItemDetailHeaderIdentity;
 	readonly navigation?: ReactNode;
-	readonly stale: boolean;
+	readonly status?: string;
 }) => {
 	const closeItemDetailFn = useCloseItemDetail();
 	const identityNode = (
@@ -28,19 +28,10 @@ export const ItemDetailHeader = ({
 			artworkDataUi="ItemDetailHeaderArtwork"
 			className="flex-1"
 			compositeUrl={identity.compositeUrl}
-			description={
-				<>
-					{stale ? (
-						<p className="mt-1 text-xs font-medium text-warning">
-							This item no longer exists. Showing the last known detail.
-						</p>
-					) : null}
-					{navigation}
-				</>
-			}
+			description={navigation}
 			size="lg"
 			sourceUrl={identity.sourceUrl}
-			title={identity.title}
+			title={status === undefined ? identity.title : `${identity.title} · ${status}`}
 			titleClassName="truncate text-lg font-semibold leading-tight"
 			titleTag="h2"
 		/>

@@ -3,6 +3,7 @@ import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { ItemInfo } from "~/item-detail/ui/ItemInfo";
 import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
+import { useTranslator } from "~/translation/ui/useTranslator";
 import { Tx } from "~/translation/ui/Tx";
 
 interface ItemDetailSceneProps extends useItemDetailSceneController.Props {
@@ -15,6 +16,14 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 		target,
 	});
 	const closeItemDetailFn = useCloseItemDetail();
+	const translator = useTranslator();
+	const status = !controller.stale
+		? undefined
+		: controller.removalReason === "depleted"
+			? translator.textFn("Depleted")
+			: controller.removalReason === "expired"
+				? translator.textFn("Expired")
+				: translator.textFn("No longer here");
 	const navigation = (
 		<ItemDetailTabs
 			active={target.tab}
@@ -33,7 +42,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 					disabled={disabled}
 					identity={controller.detail}
 					navigation={navigation}
-					stale={controller.stale}
+					status={status}
 				/>
 			) : (
 				<header className="flex items-center justify-between border-b border-line pb-3">

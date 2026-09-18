@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
@@ -305,6 +306,16 @@ const itemDisappearedEventSchema = z
 	})
 	.strict();
 
+const itemRemovedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"ItemRemoved",
+		]),
+		/** Exact terminal instance value captured by the removal operation, not the previous commit. */
+		snapshot: RuntimeItemSchema,
+	})
+	.strict();
+
 /**
  * Exact semantic facts emitted by successful engine commits.
  *
@@ -313,6 +324,7 @@ const itemDisappearedEventSchema = z
  * never encode choreography into the authoritative event vocabulary.
  */
 export const GameEventSchema = z.discriminatedUnion("type", [
+	itemRemovedEventSchema,
 	currentSpaceChangedEventSchema,
 	jobQueuedEventSchema,
 	jobQueueClearedEventSchema,

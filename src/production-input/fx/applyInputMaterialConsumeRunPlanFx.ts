@@ -89,6 +89,7 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 							],
 							events: [
 								...state.events,
+								...discardedRuntime.events,
 								{
 									type: GameEventEnumSchema.enum.ItemConsumed,
 									sourceItemId: item.id,
@@ -100,8 +101,8 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 								} satisfies GameEventSchema.Type,
 							],
 							runtime: {
-								...discardedRuntime,
-								items: discardedRuntime.items.map((candidate) =>
+								...discardedRuntime.runtime,
+								items: discardedRuntime.runtime.items.map((candidate) =>
 									candidate.id === item.id ? consumedItem : candidate,
 								),
 							} satisfies RuntimeSchema.Type,

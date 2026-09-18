@@ -1,4 +1,5 @@
 import { Array, Effect, Option } from "effect";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { settleJobRuntimeFx } from "~/production-job/fx/settleJobRuntimeFx";
@@ -87,11 +88,14 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		...runtime,
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
 	} satisfies RuntimeSchema.Type;
+	const removalEvents: GameEventSchema.Type[] = [];
 	for (const consumedItem of consumedItems) {
-		completionRuntime = yield* removeRuntimeItemIdentityFx({
+		const removed = yield* removeRuntimeItemIdentityFx({
 			item: consumedItem,
 			runtime: completionRuntime,
 		});
+		completionRuntime = removed.runtime;
+		removalEvents.push(...removed.events);
 	}
 	const completion = yield* makeJobSettlementRandomFx({
 		job,
@@ -108,7 +112,10 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		),
 	});
 	return {
-		events: completion.events,
+		events: [
+			...removalEvents,
+			...completion.events,
+		],
 		runtime: completion.runtime,
 	};
 });

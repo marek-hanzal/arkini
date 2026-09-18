@@ -1,4 +1,4 @@
-import { Equal, Exit } from "effect";
+import { Effect, Equal, Exit } from "effect";
 import { useCallback, useLayoutEffect, useState } from "react";
 
 import { readItemDetailRemovalFn } from "~/item-detail-read/fn/readItemDetailRemovalFn";
@@ -8,9 +8,12 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
+import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
+import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 
 export namespace useItemDetailSceneController {
 	export interface Props {
@@ -76,6 +79,29 @@ export const useItemDetailSceneController = ({
 					: undefined;
 			const item = kind === "definition" ? game.config.items[itemId] : runtimeItem?.item;
 			if (item === undefined) return undefined;
+			const lines = game.readFn(
+				Effect.filter(item.lines, (line) => {
+					// Only a live Board owner supplies a physical origin for visibility rules.
+					if (runtimeItem?.location.scope !== "board" || finalSnapshot !== undefined)
+						return Effect.succeed(line.show);
+					return lineRulesFx({
+						origin: runtimeItem.location,
+						rules: line.rules,
+					}).pipe(
+						Effect.map((rules) =>
+							resolveLineShowFn({
+								line,
+								rules,
+							}),
+						),
+					);
+				}).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Effect.succeed(runtime),
+					}),
+				),
+			);
+			if (Exit.isFailure(lines)) throw lines.cause;
 			let canMake = false;
 			if (
 				runtimeItem?.location.scope === "board" &&
@@ -93,7 +119,7 @@ export const useItemDetailSceneController = ({
 				canMake = queue.value.available;
 			}
 			return {
-				lines: item.lines,
+				lines: lines.value,
 				canMake,
 				title: item.title,
 				sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),

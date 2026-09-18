@@ -175,3 +175,71 @@ it("retains the terminal commit across batched updates and detaches when the tar
 	}
 	expect(listeners.size).toBe(0);
 });
+
+it("updates displayed lines from live Show/Hide rules without treating disabled production as hidden", async () => {
+	const hidden = lineRunRuntime({});
+	const visible = lineRunRuntime({
+		permit: true,
+	});
+	const vetoed = lineRunRuntime({
+		permit: true,
+		blocker: true,
+	});
+	const ownerId = hidden.items[0].id;
+	const lineId = hidden.items[0].item.lines[0].id;
+	state.runtime = hidden;
+	state.game = {
+		readFn: Effect.runSyncExit,
+		getResourceUrlFn: (id: string) => id,
+		subscribeTransitionsFn: () => () => {},
+	};
+	let output: useItemDetailSceneController.Output | undefined;
+	const Probe = () => {
+		output = useItemDetailSceneController({
+			target: {
+				kind: "runtime",
+				itemId: ownerId,
+				tab: "lines",
+				origin: null,
+			},
+		});
+		return null;
+	};
+	const root = createRoot(document.createElement("div"));
+	try {
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.lines).toEqual([]);
+		state.runtime = visible;
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.lines.map((line) => line.id)).toEqual([
+			lineId,
+		]);
+		state.runtime = vetoed;
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.lines).toEqual([]);
+		state.runtime = {
+			...hidden,
+			items: hidden.items.map((item) =>
+				item.id !== ownerId
+					? item
+					: {
+							...item,
+							item: {
+								...item.item,
+								lines: item.item.lines.map((line) => ({
+									...line,
+									show: true,
+									enable: false,
+								})),
+							},
+						},
+			),
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.lines.map((line) => line.id)).toEqual([
+			lineId,
+		]);
+	} finally {
+		await act(async () => root.unmount());
+	}
+});

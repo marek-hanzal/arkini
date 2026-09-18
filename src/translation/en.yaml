@@ -1482,6 +1482,8 @@ Nothing produces this item:
 Nothing requires this item:
   value: Nothing requires this item
   dynamic: true
+Nothing to make right now.:
+  value: Nothing to make right now.
 Open:
   value: Open
 Open artwork:
@@ -2097,8 +2099,6 @@ This item can be deleted:
   value: This item can be deleted
 This item cannot be deleted yet:
   value: This item cannot be deleted yet
-This item doesn't make anything.:
-  value: This item doesn't make anything.
 This item doesn't use units.:
   value: This item doesn't use units.
 This item has no inputs:

@@ -178,7 +178,7 @@ export const ItemLines = ({
 		return (
 			<Status
 				icon={Factory}
-				title={translator.textFn("This item doesn't make anything.")}
+				title={translator.textFn("Nothing to make right now.")}
 				variant="flat"
 				size="large"
 			/>

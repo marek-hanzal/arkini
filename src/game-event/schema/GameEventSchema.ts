@@ -23,6 +23,17 @@ const currentSpaceChangedEventSchema = z
 	})
 	.strict();
 
+const lineInputAutofillStartedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"LineInputAutofillStarted",
+		]),
+		ownerItemId: IdSchema,
+		lineId: IdSchema,
+		scheduledQuantity: PositiveIntegerSchema,
+	})
+	.strict();
+
 const jobQueuedEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
@@ -328,6 +339,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	itemRemovedEventSchema,
 	currentSpaceChangedEventSchema,
 	jobQueuedEventSchema,
+	lineInputAutofillStartedEventSchema,
 	jobQueueClearedEventSchema,
 	jobStartedEventSchema,
 	jobCompletedEventSchema,

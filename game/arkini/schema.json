@@ -209,6 +209,7 @@
 			"enum": [
 				"current-space:changed",
 				"job:queued",
+				"line-input:autofill-started",
 				"job-queue:cleared",
 				"job:started",
 				"job:completed",

@@ -5,6 +5,7 @@ export const GameEventEnumSchema = z
 	.enum({
 		CurrentSpaceChanged: "current-space:changed",
 		JobQueued: "job:queued",
+		LineInputAutofillStarted: "line-input:autofill-started",
 		JobQueueCleared: "job-queue:cleared",
 		JobStarted: "job:started",
 		JobCompleted: "job:completed",

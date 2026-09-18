@@ -3,6 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readDeliveryTravelDurationMsFn } from "~/production-delivery/fn/readDeliveryTravelDurationMsFn";
 import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPhaseEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
@@ -137,8 +138,20 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		ownerItemId,
 		runtime: deliveryRuntime,
 	});
+	// Delivery admission is the fact; arrival emits its own input-storage event later.
+	const events: GameEventSchema.Type[] = [
+		...isolation.events,
+	];
+	if (scheduledQuantity > 0) {
+		events.push({
+			type: GameEventEnumSchema.enum.LineInputAutofillStarted,
+			ownerItemId,
+			lineId,
+			scheduledQuantity,
+		});
+	}
 	return {
-		events: isolation.events,
+		events,
 		result: {
 			deliveryItemIds,
 			scheduledQuantity,

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { expect, it } from "vitest";
 import { autofillLineInputFx } from "~/production-input/fx/autofillLineInputFx";
 import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
@@ -60,6 +61,10 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnOwnerFx();
+			const transitions = yield* CommittedTransitionsFx;
+			const beforeEmpty = yield* transitions.read;
+			expect(yield* autofillLineInputFx(target)).toBe(0);
+			expect((yield* transitions.read).sequence).toBe(beforeEmpty.sequence);
 			yield* spawnWaterFx(7);
 			expect(yield* autofillLineInputFx(target)).toBe(3);
 			const delivering = yield* readRuntimeFx();

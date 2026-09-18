@@ -255,12 +255,17 @@ Authored queue capacity summary help:
     The active job counts too.
 Authtoken:
   value: Authtoken
+Autofill started:
+  value: Autofill started
+  dynamic: true
 Automatic only:
   value: Automatic only
 Available:
   value: Available
 Available for this job.:
   value: Available for this job.
+Available slots:
+  value: Available slots
 Avatar:
   value: Avatar
 Avatar {index}:
@@ -707,8 +712,6 @@ Editor unsaved changes description:
   value: "**Save** your changes before leaving, or **Discard** them to return to the saved version. Choose **Cancel** to keep editing."
 Editor welcome:
   value: Editor welcome
-Empty:
-  value: Empty
 Enable:
   value: Enable
 Enable Units on this item before selecting Self.:
@@ -795,8 +798,6 @@ Force delete…:
   value: Force delete…
 From Arkpack:
   value: From Arkpack
-Full:
-  value: Full
 Game limit:
   value: Game limit
 General:
@@ -1763,8 +1764,6 @@ Query scope Universe help:
     Searches Inventory, Toolbar and every Board Space in the game.
 
     Use it when the current Space is too small a world.
-Queue:
-  value: Queue
 Queue capacity:
   value: Queue capacity
 Queued:
@@ -1915,8 +1914,6 @@ Rule type:
   value: Rule type
 Rules:
   value: Rules
-Running:
-  value: Running
 Runtime:
   value: Production time
 Runtime (seconds):
@@ -2143,10 +2140,6 @@ This item produces nothing:
   value: "This will also:"
 Time:
   value: Time
-Time until the next cycle:
-  value: Time until the next cycle
-Time until the next one expires:
-  value: Time until the next one expires
 Timer:
   value: Timer
 Title:
@@ -2181,6 +2174,8 @@ Unit spent:
 Units:
   value: Units
   dynamic: true
+Units already spent for this job.:
+  value: Units already spent for this job.
 Units input:
   value: Units input
 Units input type help:
@@ -2244,6 +2239,9 @@ Waiting to start:
   value: Waiting to start
 Weight:
   value: Weight
+When Autofill starts bringing materials to a production line.:
+  value: When Autofill starts bringing materials to a production line.
+  dynamic: true
 When a new item is created.:
   value: When a new item is created.
   dynamic: true

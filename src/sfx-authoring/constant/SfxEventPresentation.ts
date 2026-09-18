@@ -5,6 +5,12 @@ import type { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 /** User-facing descriptions for every exact Game interaction assignable to SFX. */
 export const SfxEventPresentation = [
 	{
+		event: GameEventEnumSchema.enum.LineInputAutofillStarted,
+		group: "Job",
+		label: "Autofill started",
+		description: "When Autofill starts bringing materials to a production line.",
+	},
+	{
 		event: GameEventEnumSchema.enum.ItemSwapped,
 		group: "Item",
 		label: "Items swapped",

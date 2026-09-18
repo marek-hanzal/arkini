@@ -15,6 +15,7 @@ const maximumBatchCues = 6;
 const cuePriority: Record<AudibleGameEvent, number> = {
 	[GameEventEnumSchema.enum.CurrentSpaceChanged]: 1,
 	[GameEventEnumSchema.enum.JobQueued]: 1,
+	[GameEventEnumSchema.enum.LineInputAutofillStarted]: 2,
 	[GameEventEnumSchema.enum.JobQueueCleared]: 2,
 	[GameEventEnumSchema.enum.JobStarted]: 2,
 	[GameEventEnumSchema.enum.JobCompleted]: 3,
@@ -58,6 +59,16 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue | undefined =>
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 			},
 			() => cueFn(GameEventEnumSchema.enum.CurrentSpaceChanged, 1),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.LineInputAutofillStarted,
+			},
+			(event) =>
+				cueFn(
+					GameEventEnumSchema.enum.LineInputAutofillStarted,
+					strengthForQuantityFn(event.scheduledQuantity),
+				),
 		)
 		.with(
 			{

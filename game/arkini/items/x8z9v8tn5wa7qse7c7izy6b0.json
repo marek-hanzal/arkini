@@ -339,6 +339,38 @@
 							}
 						],
 						"type": "enable"
+					},
+					{
+						"hint": "Build an Explorer first.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "explorer"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
+					{
+						"hint": "Build a Hunter first.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "hunter"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
 					}
 				]
 			},

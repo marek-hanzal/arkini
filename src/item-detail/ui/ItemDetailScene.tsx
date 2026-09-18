@@ -60,7 +60,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				</header>
 			)}
 			<div
-				className="min-h-0 flex-1 overflow-auto [container-type:size] transition-opacity duration-300 data-[tab=queue]:overflow-hidden data-[ui-stale=true]:opacity-45"
+				className="min-h-0 flex-1 overflow-hidden [container-type:size] transition-opacity duration-300 data-[tab=info]:overflow-auto data-[tab=lines]:overflow-auto data-[ui-stale=true]:opacity-45"
 				{...readDataUiFn({
 					dataUi: "ItemDetailPanel",
 					state: {

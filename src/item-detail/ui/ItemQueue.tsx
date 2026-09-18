@@ -141,7 +141,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 	const capacity = queue.kind === "available" ? queue.capacity : queueSize;
 	return (
 		<section
-			className="flex h-full min-h-0 flex-col px-3"
+			className="flex h-full min-h-0 flex-col pl-3"
 			data-ui="ItemQueue"
 		>
 			<header className="flex shrink-0 items-center gap-6 py-3 text-sm">

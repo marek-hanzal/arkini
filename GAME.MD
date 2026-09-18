@@ -64,7 +64,7 @@ durationMs
 remainingMs
 ```
 
-Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. There is no player cancellation command for an active job; expiry of committed material and cheat-only forced owner removal are engine-owned abort paths.
+Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. Players may cancel one exact active job on an interactive owner. Cancellation consumes committed material without refunds or line output, returns reservations through ordinary placement, and preserves pending intent unless owner depletion removes the owner. Failed placement rolls the cancellation back; a stale job identity is a no-op. Material expiry and cheat-only forced owner removal also use the shared abort settlement.
 
 Items with `clock` are identity-bound and non-stackable, and may author any storage scope. A finite lifetime persists `schedule.remainingDurationMs`, initialized from `clock.durationMs`. Enabled identities present at both step boundaries age by that step in every location scope. Moving an identity between scopes neither pauses nor resets its schedule. Job output created in the current step starts at full duration.
 
@@ -108,7 +108,7 @@ Units are an item capability available to every item: passive and manually opera
 
 An item may author finite `units.amount` and optional depletion output. Missing live `remainingUnits` means the fresh full amount and remains pure. Input costs spend units from either the line owner (`self`) or the deterministic Board target of a units input (`target`). Queueing pays nothing.
 
-Start reserves unit budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound unit state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers with queued work are skipped when the aggregated cost would fully deplete them. Eligible idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes or is aborted by material expiry.
+Start reserves unit budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound unit state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers with queued work are skipped when the aggregated cost would fully deplete them. Eligible idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes or is aborted.
 
 Completion removes the ready job and consumed roots in one candidate, keeps reserved roots live, then applies this order:
 
@@ -166,6 +166,6 @@ Serializable State contains items, deliveries, jobs, queues, current space, and 
 
 Presentation may trail canonical Runtime and may redirect, shorten, collapse, or skip choreography. It never determines readiness, validity, placement, queue/job state, Tick progress, save, or event publication; a new subscriber never receives old events merely because another surface is still animating them.
 
-Do not add player-driven job cancellation or queue reordering, wall-clock job timestamps, reverse reservation history, partial output, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.
+Do not add queue reordering, wall-clock job timestamps, reverse reservation history, partial output, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.
 
 Production artwork uses the same activity effect for every running job owner. Every owner with an active job uses the same occupied opacity, including jobs waiting for completion placement; passive items retain their normal opacity.

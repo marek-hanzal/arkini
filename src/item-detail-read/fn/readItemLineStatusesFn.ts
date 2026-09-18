@@ -13,6 +13,7 @@ export namespace readItemLineStatusesFn {
 			| "awaiting-output"
 			| "queued";
 		readonly queued: number;
+		readonly jobId?: IdSchema.Type;
 		readonly requestId?: IdSchema.Type;
 	}
 }
@@ -46,6 +47,11 @@ export const readItemLineStatusesFn = (
 			lineId,
 			state,
 			queued: requests.length,
+			...(active === undefined
+				? {}
+				: {
+						jobId: active.jobId,
+					}),
 			requestId: active === undefined ? first?.requestId : undefined,
 		};
 	});

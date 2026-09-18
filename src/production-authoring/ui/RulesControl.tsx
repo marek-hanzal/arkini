@@ -11,7 +11,7 @@ import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import {
 	BoardDistancePresentation,
 	QueryScopePresentation,
@@ -353,7 +353,7 @@ const WhenControl = ({
 							})
 						}
 					/>
-					{showBranchEnd && <EditorFormBranchEnd />}
+					{showBranchEnd && <SectionEnd />}
 				</>
 			) : (
 				<>
@@ -466,7 +466,7 @@ const WhenControl = ({
 							),
 						)
 						.exhaustive()}
-					{showBranchEnd && <EditorFormBranchEnd />}
+					{showBranchEnd && <SectionEnd />}
 				</>
 			)}
 		</div>

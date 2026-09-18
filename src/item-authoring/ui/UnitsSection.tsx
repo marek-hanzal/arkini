@@ -3,7 +3,7 @@ import { BatteryCharging } from "lucide-react";
 
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -44,7 +44,7 @@ export const UnitsSection = () => {
 										/>
 									)}
 								</form.AppField>
-								<EditorFormBranchEnd />
+								<SectionEnd />
 							</EditorFormCard>
 							<EditorFormSection
 								description={<Mx label="Depletion output help" />}

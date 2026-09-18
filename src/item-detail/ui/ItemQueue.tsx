@@ -8,6 +8,7 @@ import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
+import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
@@ -178,6 +179,12 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 									</span>
 								) : null}
 							</span>
+							<ItemJobCancel
+								ownerItemId={ownerItemId}
+								jobId={active.jobId}
+								lineId={active.lineId}
+								disabled={disabled}
+							/>
 						</div>
 						<ItemLineInputs
 							ownerItemId={ownerItemId}

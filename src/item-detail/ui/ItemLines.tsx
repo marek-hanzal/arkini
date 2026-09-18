@@ -1,3 +1,5 @@
+import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { Factory, ListPlus, Star, X } from "lucide-react";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
@@ -166,6 +168,14 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 								? ` (+${extra})`
 								: ""}
 					</p>
+					{status?.jobId !== undefined ? (
+						<ItemJobCancel
+							ownerItemId={props.ownerItemId}
+							jobId={status.jobId}
+							lineId={line.id}
+							disabled={props.disabled}
+						/>
+					) : null}
 					{status?.requestId !== undefined ? (
 						<LinkButton
 							className="inline-flex items-center gap-2"
@@ -206,20 +216,23 @@ export const ItemLines = ({
 		);
 	return (
 		<section
-			className="divide-y divide-line px-3"
+			className="px-3 pb-[50cqh]"
 			data-ui="ItemLines"
 		>
-			{lines.map((line) => (
-				<ItemLine
-					key={line.id}
-					line={line}
-					lineId={line.id}
-					ownerItemId={ownerItemId}
-					disabled={disabled}
-					makeDisabled={makeDisabled}
-					status={statuses.find((status) => status.lineId === line.id)}
-				/>
-			))}
+			<div className="divide-y divide-line">
+				{lines.map((line) => (
+					<ItemLine
+						key={line.id}
+						line={line}
+						lineId={line.id}
+						ownerItemId={ownerItemId}
+						disabled={disabled}
+						makeDisabled={makeDisabled}
+						status={statuses.find((status) => status.lineId === line.id)}
+					/>
+				))}
+			</div>
+			<SectionEnd />
 		</section>
 	);
 };

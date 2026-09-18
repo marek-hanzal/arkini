@@ -2,7 +2,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { useStore } from "@tanstack/react-form";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -59,7 +59,7 @@ export const ProjectInventorySection = () => {
 						width={width}
 					/>
 				</div>
-				<EditorFormBranchEnd />
+				<SectionEnd />
 			</EditorFormCard>
 			<EditorFormSection title={translator.textFn("Initial inventory")}>
 				<ProjectStartGrid

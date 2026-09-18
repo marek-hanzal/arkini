@@ -3,7 +3,7 @@ import { Mx } from "~/translation/ui/Mx";
 import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
@@ -84,7 +84,7 @@ export const ProjectImagesSection = ({
 													/>
 												)}
 											</form.AppField>
-											<EditorFormBranchEnd />
+											<SectionEnd />
 										</div>
 									)}
 								</EditorCollectionSelector>

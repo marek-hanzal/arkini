@@ -2084,6 +2084,8 @@ Stop Local MCP:
   value: Stop Local MCP
 Stop Remote MCP:
   value: Stop Remote MCP
+Stop this job. Materials already used won't be returned.:
+  value: Stop this job. Materials already used won't be returned.
 Storage:
   value: Storage
 Storage scope:

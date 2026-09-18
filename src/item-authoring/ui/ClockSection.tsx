@@ -7,7 +7,7 @@ import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -93,7 +93,7 @@ const ClockFields = () => {
 						}
 					/>
 				</div>
-				<EditorFormBranchEnd />
+				<SectionEnd />
 			</EditorFormCard>
 			<EditorFormSection
 				title={translator.textFn("Rules")}

@@ -65,7 +65,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				</header>
 			)}
 			<div
-				className="min-h-0 flex-1 overflow-auto data-[tab=queue]:overflow-hidden"
+				className="min-h-0 flex-1 overflow-auto [container-type:size] data-[tab=queue]:overflow-hidden"
 				data-ui="ItemDetailPanel"
 				data-tab={target.tab}
 			>

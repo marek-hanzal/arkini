@@ -13,7 +13,7 @@ import {
 	type DraftRoll,
 } from "~/production-authoring/fn/readDraftRollDropsFn";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
@@ -114,7 +114,7 @@ const DropControl = ({
 					}
 				/>
 			</div>
-			<EditorFormBranchEnd />
+			<SectionEnd />
 			<RulesControl
 				initialRuleIndex={initialRuleIndex}
 				initialWhenIndex={initialWhenIndex}

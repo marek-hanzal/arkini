@@ -36,6 +36,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 		{
 			lineId: "a",
 			state: "running",
+			jobId: "job",
 			queued: 2,
 			requestId: undefined,
 		},
@@ -71,6 +72,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 	).toEqual({
 		lineId: "a",
 		state: "awaiting-output",
+		jobId: "job",
 		queued: 2,
 		requestId: undefined,
 	});

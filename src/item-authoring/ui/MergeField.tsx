@@ -2,7 +2,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { OutputControl } from "~/production-authoring/ui/OutputControl";
@@ -148,7 +148,7 @@ export const MergeField = ({
 						/>
 					)}
 				</article>
-				<EditorFormBranchEnd />
+				<SectionEnd />
 			</EditorFormCard>
 			<EditorFormSection
 				description={<Mx label="Merge output help" />}

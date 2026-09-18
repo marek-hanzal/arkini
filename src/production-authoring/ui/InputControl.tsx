@@ -6,7 +6,7 @@ import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -425,7 +425,7 @@ export const InputControl = ({
 					},
 				)
 				.exhaustive()}
-			<EditorFormBranchEnd />
+			<SectionEnd />
 		</article>
 	);
 };

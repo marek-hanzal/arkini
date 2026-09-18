@@ -14,9 +14,10 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 
 import { settleJobRuntimeFx } from "./settleJobRuntimeFx";
 
-export namespace abortJobAfterMaterialExpiryFx {
+export namespace abortJobRuntimeFx {
 	export interface Props {
 		readonly jobId: IdSchema.Type;
+		readonly reason: "material-expired" | "player-cancelled";
 		readonly overflow?: "discard";
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -27,12 +28,13 @@ export namespace abortJobAfterMaterialExpiryFx {
 	}
 }
 
-/** Aborts work whose committed material expired, consuming work and returning reservations. */
-export const abortJobAfterMaterialExpiryFx = Effect.fn("abortJobAfterMaterialExpiryFx")(function* ({
+/** Aborts exact work, consuming its material and returning reservations through ordinary settlement. */
+export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 	jobId,
+	reason,
 	runtime,
 	overflow,
-}: abortJobAfterMaterialExpiryFx.Props) {
+}: abortJobRuntimeFx.Props) {
 	const job = runtime.jobs.find((candidate) => candidate.id === jobId);
 	if (job === undefined) return yield* Effect.die(new Error(`Job ${jobId} is missing.`));
 	const runtimeOwner = yield* readRuntimeItemByIdFx({
@@ -63,7 +65,7 @@ export const abortJobAfterMaterialExpiryFx = Effect.fn("abortJobAfterMaterialExp
 			jobId: job.id,
 			ownerItemId: owner.id,
 			lineId: job.lineId,
-			reason: "material-expired",
+			reason,
 		},
 	];
 	for (const consumedItem of consumedItems) {
@@ -93,5 +95,5 @@ export const abortJobAfterMaterialExpiryFx = Effect.fn("abortJobAfterMaterialExp
 			...released.events,
 		],
 		runtime: released.runtime,
-	} satisfies abortJobAfterMaterialExpiryFx.Result;
+	} satisfies abortJobRuntimeFx.Result;
 });

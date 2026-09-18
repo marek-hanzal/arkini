@@ -5,7 +5,7 @@ import type { InputSchema as ActionInputSchema } from "~/production-action/schem
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { EditorFormBranchEnd } from "~/editor-control/ui/EditorFormBranchEnd";
+import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
@@ -86,7 +86,7 @@ export const ActionSection = () => {
 										}
 									/>
 								</div>
-								<EditorFormBranchEnd />
+								<SectionEnd />
 							</EditorFormCard>
 							<EditorFormSection
 								title={
@@ -141,7 +141,7 @@ export const ActionSection = () => {
 														</div>
 													)}
 												</form.AppField>
-												<EditorFormBranchEnd />
+												<SectionEnd />
 											</EditorFormCard>
 										),
 									)

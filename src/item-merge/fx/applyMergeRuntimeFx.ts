@@ -155,7 +155,9 @@ const resolveMergeReplacementUnitsFx = Effect.fn("resolveMergeReplacementUnitsFx
 
 	const targetCapacity = target.item.units?.amount;
 	const resultCapacity = resultItem.units?.amount;
-	if (targetCapacity === undefined || resultCapacity === undefined || target.quantity !== 1) {
+	// A unitless replacement ends the old supply; only finite results inherit spent units.
+	if (resultCapacity === undefined) return {};
+	if (targetCapacity === undefined || target.quantity !== 1) {
 		return yield* Effect.fail(
 			new ItemStatefulError({
 				itemId: target.id,

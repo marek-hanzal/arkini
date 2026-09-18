@@ -768,43 +768,75 @@ describe("mergeItemsFx participant lifecycle", () => {
 		});
 	});
 
-	it("rejects a replacement with units when the result cannot carry its wear", () => {
-		const config = createLifecycleConfig({
-			effect: "replace",
-			targetUnits: 18,
-		});
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				boardItem("source", 0),
-				{
-					...boardItem("target", 1),
-					remainingUnits: 5,
+	it.each([
+		{
+			resultUnits: undefined,
+			succeeds: true,
+		},
+		{
+			resultUnits: 12,
+			succeeds: false,
+		},
+	])(
+		"replaces a worn target with a unitless result but rejects exhausted finite results: $resultUnits",
+		({ resultUnits, succeeds }) => {
+			const config = createLifecycleConfig({
+				effect: "replace",
+				targetUnits: 18,
+				resultUnits,
+			});
+			const state = {
+				cheats: {
+					enabled: false,
+					everEnabled: false,
+					speedUpGameplay: false,
 				},
-			],
-			jobQueue: [],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const result = Effect.runSync(
-			attemptMergeFx().pipe(
-				useGameFx({
-					config,
-					state,
-				}),
-			),
-		);
+				currentSpace: 0,
+				items: [
+					boardItem("source", 0),
+					{
+						...boardItem("target", 1),
+						remainingUnits: 5,
+					},
+				],
+				jobQueue: [],
+				jobs: [],
+			} satisfies StateSchema.Type;
+			const result = Effect.runSync(
+				attemptMergeFx().pipe(
+					useGameFx({
+						config,
+						state,
+					}),
+				),
+			);
 
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure._tag).toBe("ItemStatefulError");
-		}
-		expect(result.after).toEqual(result.before);
-	});
+			if (succeeds) {
+				expect(Result.isSuccess(result.attempt)).toBe(true);
+				expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
+				const replacement = result.after.items.find((item) => item.id === "runtime:target");
+				expect(replacement).toMatchObject({
+					item: {
+						id: "result",
+					},
+					location: {
+						scope: "board",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+				});
+				expect(replacement?.remainingUnits).toBeUndefined();
+				return;
+			}
+			expect(Result.isFailure(result.attempt)).toBe(true);
+			if (Result.isFailure(result.attempt)) {
+				expect(result.attempt.failure._tag).toBe("ItemStatefulError");
+			}
+			expect(result.after).toEqual(result.before);
+		},
+	);
 
 	it("rejects replacing stateful targets but remove releases buffered inputs", () => {
 		for (const effect of [

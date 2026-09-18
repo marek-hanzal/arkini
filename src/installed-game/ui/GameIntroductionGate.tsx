@@ -20,7 +20,7 @@ export const GameIntroductionGate = ({ game, children }: GameIntroductionGatePro
 	return (
 		<Overlay onCloseFn={() => undefined}>
 			<section
-				className="flex h-[75vh] w-[75vw] min-h-0 flex-col gap-6 rounded-lg border border-line bg-canvas p-6 shadow-2xl"
+				className="flex h-[75vh] w-[37.5vw] min-h-0 flex-col gap-6 rounded-lg border border-line bg-canvas p-6 shadow-2xl"
 				data-ui="GameIntroduction"
 			>
 				<div className="min-h-0 flex-1 overflow-y-auto pr-3">

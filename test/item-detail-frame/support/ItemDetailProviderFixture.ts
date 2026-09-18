@@ -33,11 +33,7 @@ vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 			: {
 					itemId,
 					kind: "available",
-					tab: requestedTab ?? "lines",
-					tabs: [
-						"lines",
-						"info",
-					],
+					tab: requestedTab ?? "info",
 				},
 }));
 
@@ -71,11 +67,6 @@ export const close = (
 	control: ItemDetailControl,
 	props?: Parameters<ItemDetailControl["closeFx"]>[0],
 ) => Effect.runPromise(control.closeFx(props));
-
-export const runPendingAction = (
-	control: ItemDetailControl,
-	props: Parameters<ItemDetailControl["runPendingActionFn"]>[0],
-) => control.runPendingActionFn(props);
 
 afterEach(async () => {
 	await act(async () => {

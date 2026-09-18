@@ -1,6 +1,4 @@
 import { Deferred, Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
-import { match } from "ts-pattern";
 
 import type {
 	CloseItemDetailProps,
@@ -17,9 +15,7 @@ interface ItemDetailController {
 	readonly getSnapshotFn: () => ItemDetailState;
 	readonly subscribeFn: (listenerFn: () => void) => () => void;
 	readonly readOriginFn: (origin: HTMLElement | null) => HTMLElement | null;
-	readonly readOutcomeScopeFn: () => string | undefined;
 	readonly openTargetFx: (target: ItemDetailTarget) => Effect.Effect<boolean, never, never>;
-	readonly closeAtom: Atom.AtomResultFn<CloseItemDetailProps | undefined, void, never>;
 	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void, never, never>;
 	readonly completeEnterFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly completeExitFx: (generation: number) => Effect.Effect<void, never, never>;
@@ -30,49 +26,14 @@ const closedState = {
 	phase: "closed",
 } as const satisfies ItemDetailState;
 
-const actionOutcomeScopeFn = (state: ItemDetailState, outcomeEpoch: number) =>
-	match(state)
-		.with(
-			{
-				phase: "entering",
-			},
-			{
-				phase: "open",
-			},
-			({ target }) => `${outcomeEpoch}\u0000${target.kind}\u0000${target.itemId}`,
-		)
-		.with(
-			{
-				phase: "closed",
-			},
-			{
-				phase: "exiting",
-			},
-			() => undefined,
-		)
-		.exhaustive();
-
-const sameActionOutcomeTargetFn = (left: ItemDetailTarget, right: ItemDetailTarget) =>
-	left.kind === right.kind && left.itemId === right.itemId;
-
 const sameTargetFn = (left: ItemDetailTarget, right: ItemDetailTarget) =>
-	sameActionOutcomeTargetFn(left, right) &&
-	left.tab === right.tab &&
-	(left.kind !== "runtime" ||
-		right.kind !== "runtime" ||
-		left.linesSearchQuery === right.linesSearchQuery);
+	left.kind === right.kind && left.itemId === right.itemId && left.tab === right.tab;
 
 /**
  * Creates the non-React Item Detail state owner. Motion reports generation-keyed
  * enter/exit completion back here; callers awaiting close therefore finish only
  * after the visible modal has left or a superseding open intent has explicitly
  * taken ownership of that exit.
- *
- * Pending commands own only their exact command key. Repeated clicks on that
- * key coalesce until its engine command settles, while distinct commands remain
- * independent. Closing or switching the modal never waits for command
- * settlement; a late failure is published only while its exact admitting
- * target visit still owns the visible detail.
  */
 export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Generator<
 	never,
@@ -82,7 +43,6 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	const listeners = new Set<() => void>();
 	let state: ItemDetailState = closedState;
 	let nextGeneration = 0;
-	let outcomeEpoch = 0;
 	let exitCompletion: ExitCompletion | undefined;
 
 	const publishFn = (next: ItemDetailState) => {
@@ -106,7 +66,6 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	);
 
 	const enterFn = (target: ItemDetailTarget) => {
-		outcomeEpoch += 1;
 		publishFn({
 			phase: "entering",
 			target,
@@ -126,7 +85,6 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 					return enterFn(target);
 				}
 				if (sameTargetFn(current.target, target)) return true;
-				if (!sameActionOutcomeTargetFn(current.target, target)) outcomeEpoch += 1;
 				publishFn({
 					...current,
 					target,
@@ -168,10 +126,6 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 			}),
 	);
 
-	const closeAtom = Atom.fn((props: CloseItemDetailProps | undefined) => closeFx(props), {
-		concurrent: true,
-	}).pipe(Atom.setIdleTTL(0));
-
 	const completeEnterFx = Effect.fn("ItemDetailController.completeEnterFx")(
 		(generation: number) =>
 			Effect.sync(() => {
@@ -202,9 +156,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 		},
 		// References opened from inside Detail restore focus to the original scene actor.
 		readOriginFn: (origin) => (state.phase === "closed" ? origin : state.target.origin),
-		readOutcomeScopeFn: () => actionOutcomeScopeFn(state, outcomeEpoch),
 		openTargetFx,
-		closeAtom,
 		closeFx,
 		completeEnterFx,
 		completeExitFx,
@@ -212,7 +164,6 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 			yield* resolveExitCompletionFx();
 			state = closedState;
 			nextGeneration = 0;
-			outcomeEpoch = 0;
 		}),
 	};
 });

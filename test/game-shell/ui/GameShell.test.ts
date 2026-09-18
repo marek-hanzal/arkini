@@ -25,11 +25,7 @@ vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 	}) => ({
 		itemId,
 		kind: "available",
-		tab: requestedTab ?? "lines",
-		tabs: [
-			"lines",
-			"info",
-		],
+		tab: requestedTab ?? "info",
 	}),
 }));
 
@@ -160,7 +156,7 @@ const renderShell = async () => {
 };
 
 describe("Playable Game shell overlay precedence", () => {
-	it("yields Item Detail to Game Menu without cancelling admitted work", async () => {
+	it("yields Item Detail to Game Menu without returning focus to the Board", async () => {
 		const { readGameMenu, readItemDetail } = await renderShell();
 		await act(async () => {
 			Effect.runSync(
@@ -176,17 +172,7 @@ describe("Playable Game shell overlay precedence", () => {
 			Effect.runSync(readItemDetail().completeEnterFx(entering.generation)),
 		);
 
-		let completeRun: (() => void) | undefined;
-		const run = new Promise<void>((resolve) => {
-			completeRun = resolve;
-		});
 		await act(async () => {
-			readItemDetail().runPendingActionFn({
-				action: "enqueue",
-				failureMessage: "Start failed.",
-				key: "line:runtime:first",
-				run: Effect.promise(() => run),
-			});
 			readGameMenu().openFn();
 			await Promise.resolve();
 		});
@@ -196,12 +182,5 @@ describe("Playable Game shell overlay precedence", () => {
 			phase: "exiting",
 			restoreFocus: false,
 		});
-		expect(readItemDetail().readPendingActionFn("line:runtime:first")).toBe("enqueue");
-
-		await act(async () => completeRun?.());
-		await vi.waitFor(() =>
-			expect(readItemDetail().readPendingActionFn("line:runtime:first")).toBeNull(),
-		);
-		expect(readItemDetail().state.phase).toBe("exiting");
 	});
 });

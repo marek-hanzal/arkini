@@ -1,9 +1,7 @@
 import { motion } from "motion/react";
-import { match } from "ts-pattern";
 
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
-import { DefinitionItemDetailScene } from "~/item-detail/ui/DefinitionItemDetailScene";
-import { RuntimeItemDetailScene } from "~/item-detail/ui/RuntimeItemDetailScene";
+import { ItemDetailScene } from "~/item-detail/ui/ItemDetailScene";
 import { useItemDetailFocus } from "~/item-detail/ui/useItemDetailFocus";
 import { itemDetailTransition, useItemDetailMotion } from "~/item-detail/ui/useItemDetailMotion";
 
@@ -52,30 +50,10 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 				transition={itemDetailTransition}
 				onAnimationComplete={motionState.completeMotionPhaseFn}
 			>
-				{match(state.target)
-					.with(
-						{
-							kind: "runtime",
-						},
-						(target) => (
-							<RuntimeItemDetailScene
-								disabled={disabled}
-								target={target}
-							/>
-						),
-					)
-					.with(
-						{
-							kind: "definition",
-						},
-						(target) => (
-							<DefinitionItemDetailScene
-								disabled={disabled}
-								target={target}
-							/>
-						),
-					)
-					.exhaustive()}
+				<ItemDetailScene
+					disabled={disabled}
+					target={state.target}
+				/>
 			</motion.div>
 		</motion.div>
 	);

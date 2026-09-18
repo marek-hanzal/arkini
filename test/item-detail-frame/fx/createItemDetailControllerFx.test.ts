@@ -8,77 +8,21 @@ import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailContro
 
 const runtimeTarget = ({
 	itemId = "runtime:first",
-	linesSearchQuery,
 	tab = "lines",
 	origin = null,
 }: {
 	readonly itemId?: string;
-	readonly linesSearchQuery?: string;
 	readonly tab?: "info" | "lines" | "queue";
 	readonly origin?: HTMLElement | null;
 } = {}) =>
 	({
 		kind: "runtime",
 		itemId,
-		linesSearchQuery,
 		tab,
 		origin,
 	}) satisfies ItemDetailTarget;
 
 describe("Item Detail frame controller", () => {
-	it("allocates a fresh command outcome scope for A to B to A target visits", () => {
-		const controller = Effect.runSync(createItemDetailControllerFx());
-		Effect.runSync(controller.openTargetFx(runtimeTarget()));
-		const firstScope = controller.readOutcomeScopeFn();
-		Effect.runSync(
-			controller.openTargetFx(
-				runtimeTarget({
-					itemId: "runtime:second",
-				}),
-			),
-		);
-		const secondScope = controller.readOutcomeScopeFn();
-		Effect.runSync(controller.openTargetFx(runtimeTarget()));
-		const revisitedScope = controller.readOutcomeScopeFn();
-
-		expect(firstScope).toBeDefined();
-		expect(secondScope).toBeDefined();
-		expect(revisitedScope).toBeDefined();
-		expect(secondScope).not.toBe(firstScope);
-		expect(revisitedScope).not.toBe(firstScope);
-		expect(revisitedScope).not.toBe(secondScope);
-	});
-
-	it("treats a changed Lines query as a distinct intent for the same target", () => {
-		const controller = Effect.runSync(createItemDetailControllerFx());
-		Effect.runSync(
-			controller.openTargetFx(
-				runtimeTarget({
-					linesSearchQuery: "Water",
-				}),
-			),
-		);
-		const entering = controller.getSnapshotFn();
-		if (entering.phase !== "entering") throw new Error("Expected entering state.");
-		Effect.runSync(controller.completeEnterFx(entering.generation));
-
-		Effect.runSync(
-			controller.openTargetFx(
-				runtimeTarget({
-					linesSearchQuery: "Stone",
-				}),
-			),
-		);
-
-		expect(controller.getSnapshotFn()).toMatchObject({
-			generation: entering.generation,
-			phase: "open",
-			target: {
-				linesSearchQuery: "Stone",
-			},
-		});
-	});
-
 	it("owns origin retention and generation-safe close settlement", async () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		const listener = vi.fn();

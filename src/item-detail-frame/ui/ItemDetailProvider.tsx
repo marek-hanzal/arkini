@@ -12,11 +12,7 @@ import {
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { resolveItemDetailTargetFn } from "~/item-detail-read/fn/resolveItemDetailTargetFn";
-import type {
-	ItemDetailTarget,
-	RunItemDetailPendingActionProps,
-} from "~/item-detail-frame/type/ItemDetailControl";
-import { createItemDetailCommandAtom } from "~/item-detail-frame/atom/createItemDetailCommandAtom";
+import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { createItemDetailControllerFx } from "~/item-detail-frame/fx/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/item-detail-frame/context/ItemDetailContext";
@@ -27,8 +23,8 @@ import { useItemDetailMusic } from "~/item-detail-frame/ui/useItemDetailMusic";
 import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
 /**
- * Game-shell owner for one exact Item Detail target, modal lifecycle and
- * command-presentation settlement. Engine-backed resolvers remain authoritative for
+ * Game-shell owner for one exact Item Detail target and modal lifecycle.
+ * Engine-backed resolvers remain authoritative for
  * target availability; the fixed presentation tabs do not retain or manufacture
  * gameplay facts when a runtime item or configured definition disappears.
  *
@@ -83,25 +79,6 @@ export const ItemDetailProvider = ({
 			closeFx,
 		],
 	);
-	const commandAtom = useMemo(
-		() =>
-			createItemDetailCommandAtom({
-				game,
-				readOutcomeScopeFn: controller.readOutcomeScopeFn,
-			}),
-		[
-			controller,
-			game,
-		],
-	);
-	const [commandState, writeCommandFn] = useAtom(commandAtom);
-	const runPendingActionFn = useCallback(
-		<Result, Failure>(command: RunItemDetailPendingActionProps<Result, Failure>) =>
-			writeCommandFn(command),
-		[
-			writeCommandFn,
-		],
-	);
 	const [closeResult, closeFn] = useAtom(closeAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(closeResult));
 	const snapshot = useSyncExternalStore(
@@ -111,24 +88,8 @@ export const ItemDetailProvider = ({
 	);
 	useItemDetailMusic(game, snapshot);
 
-	useEffect(() => {
-		writeCommandFn({
-			kind: "scope-changed",
-			outcomeScope: controller.readOutcomeScopeFn(),
-		});
-	}, [
-		controller,
-		snapshot,
-		writeCommandFn,
-	]);
-
 	const openItemDetailFx = useCallback(
-		({
-			itemId,
-			linesSearchQuery,
-			tab,
-			origin = null,
-		}: Parameters<ItemDetailControl["openItemDetailFx"]>[0]) =>
+		({ itemId, tab, origin = null }: Parameters<ItemDetailControl["openItemDetailFx"]>[0]) =>
 			Effect.suspend(() => {
 				const runtime = game.getSnapshotFn();
 				const resolved = resolveItemDetailTargetFn({
@@ -141,10 +102,6 @@ export const ItemDetailProvider = ({
 					kind: "runtime",
 					itemId: resolved.itemId,
 					tab: resolved.tab,
-					linesSearchQuery:
-						resolved.tab === "lines"
-							? linesSearchQuery?.trim() || undefined
-							: undefined,
 					origin: controller.readOriginFn(origin),
 				});
 			}),
@@ -194,12 +151,6 @@ export const ItemDetailProvider = ({
 				return controller.openTargetFx({
 					...current.target,
 					tab,
-					...(current.target.kind === "runtime"
-						? {
-								linesSearchQuery:
-									tab === "lines" ? current.target.linesSearchQuery : undefined,
-							}
-						: {}),
 				});
 			}),
 		[
@@ -236,14 +187,6 @@ export const ItemDetailProvider = ({
 	const control = useMemo<ItemDetailControl>(
 		() => ({
 			state: snapshot,
-			readActionErrorFn: (key) => {
-				const error = commandState.actionErrors.get(key);
-				return error !== undefined && error.outcomeScope === controller.readOutcomeScopeFn()
-					? error.message
-					: null;
-			},
-			readPendingActionFn: (key) => commandState.pendingActions.get(key)?.action ?? null,
-			runPendingActionFn,
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
 			selectRetainedItemDetailTabFx,
@@ -256,10 +199,8 @@ export const ItemDetailProvider = ({
 			closeAtom,
 			closeFx,
 			controller,
-			commandState,
 			openItemDefinitionDetailFx,
 			openItemDetailFx,
-			runPendingActionFn,
 			selectRetainedItemDetailTabFx,
 			snapshot,
 		],

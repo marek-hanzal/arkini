@@ -1,9 +1,6 @@
-import { Option } from "effect";
-
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 
 export namespace resolveItemDetailTargetFn {
 	export interface Props {
@@ -35,12 +32,9 @@ export const resolveItemDetailTargetFn = ({
 }: resolveItemDetailTargetFn.Props): resolveItemDetailTargetFn.Result => {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined) return unavailable;
-	const defaultTab = Option.isSome(narrowLineOwnerItemFn(item.item))
-		? ItemDetailTabEnumSchema.enum.Lines
-		: ItemDetailTabEnumSchema.enum.Info;
 	return {
 		kind: "available",
 		itemId: item.id,
-		tab: requestedTab ?? defaultTab,
+		tab: requestedTab ?? ItemDetailTabEnumSchema.enum.Info,
 	};
 };

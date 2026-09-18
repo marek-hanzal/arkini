@@ -12,6 +12,11 @@ import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 
 const tabOptions = [
 	{
+		label: "Info",
+		shortcut: "i",
+		value: "info",
+	},
+	{
 		label: "Lines",
 		shortcut: "l",
 		value: "lines",
@@ -22,9 +27,9 @@ const tabOptions = [
 		value: "queue",
 	},
 	{
-		label: "Info",
-		shortcut: "i",
-		value: "info",
+		label: "Clock",
+		shortcut: "c",
+		value: "clock",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly label: string;
@@ -32,28 +37,9 @@ const tabOptions = [
 	readonly value: ItemDetailTabEnumSchema.Type;
 }>;
 
-const BadgeCount = ({
-	count,
-	dataUi,
-	label,
-}: {
-	readonly count: number;
-	readonly dataUi: string;
-	readonly label?: string;
-}) => (
-	<span
-		className="min-w-5 rounded-full bg-warning/20 px-1.5 py-0.5 text-center text-[0.6875rem] font-semibold tabular-nums text-foreground"
-		data-ui={dataUi}
-	>
-		{label === undefined ? count : `${label}${count > 1 ? ` ×${count}` : ""}`}
-	</span>
-);
-
 interface ItemDetailTabsProps {
 	readonly active: ItemDetailTabEnumSchema.Type;
 	readonly disabled: boolean;
-	readonly lineCount?: number;
-	readonly queueCount?: number;
 	readonly retained?: boolean;
 	readonly target: ItemDetailTarget;
 }
@@ -61,8 +47,6 @@ interface ItemDetailTabsProps {
 export const ItemDetailTabs = ({
 	active,
 	disabled,
-	lineCount,
-	queueCount,
 	retained = false,
 	target,
 }: ItemDetailTabsProps) => {
@@ -118,18 +102,6 @@ export const ItemDetailTabs = ({
 							onClick={() => selectTabFn(tab)}
 						>
 							{option.label}
-							{tab === "lines" && lineCount !== undefined ? (
-								<BadgeCount
-									count={lineCount}
-									dataUi="ItemDetailTabCount"
-								/>
-							) : null}
-							{tab === "queue" && queueCount !== undefined && queueCount > 0 ? (
-								<BadgeCount
-									count={queueCount}
-									dataUi="ItemDetailQueueTabCount"
-								/>
-							) : null}
 						</LinkButton>
 					</Tooltip>
 				);

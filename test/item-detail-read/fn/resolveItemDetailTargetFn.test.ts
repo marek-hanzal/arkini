@@ -7,7 +7,7 @@ import {
 } from "~test/production-line/support/lineRunTestRuntime";
 
 describe("resolveItemDetailTargetFn", () => {
-	it("defaults line owners to Lines and keeps every requested detail section available", () => {
+	it("defaults line owners to Info and keeps every requested detail section available", () => {
 		const runtime = lineRunRuntime({});
 		expect(
 			resolveItemDetailTargetFn({
@@ -17,12 +17,13 @@ describe("resolveItemDetailTargetFn", () => {
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
-			tab: "lines",
+			tab: "info",
 		});
 		for (const requestedTab of [
 			"lines",
 			"queue",
 			"info",
+			"clock",
 		] as const) {
 			expect(
 				resolveItemDetailTargetFn({

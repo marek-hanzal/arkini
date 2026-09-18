@@ -382,8 +382,6 @@ Clear interval:
   value: Clear interval
 Clear lifetime:
   value: Clear lifetime
-Clear queue:
-  value: Clear queue
 Clock:
   value: Clock
 Clock expiry:
@@ -462,8 +460,6 @@ Consume material mode help:
     Use it for ingredients and components.
 Consumed:
   value: Consumed
-Control:
-  value: Control
 Copied:
   value: Copied
 Copy Clock section help:
@@ -517,8 +513,6 @@ Create project help:
     Example: `my-fantasy-game`. Renaming it later creates a different game for existing saves.
 Create the first item to start authoring this game.:
   value: Create the first item to start authoring this game.
-Current stack:
-  value: Current stack
 Custom:
   value: Custom
 "Cycle on route {routeId}: {factIds}.":
@@ -766,8 +760,6 @@ Fastest first:
 Final item:
   value: Final item
   dynamic: true
-Finishing accepted work:
-  value: Finishing started jobs
 Fix the highlighted fields before saving.:
   value: Fix the highlighted fields before saving.
 Force delete:
@@ -878,8 +870,6 @@ Input type:
 Inputs:
   value: Inputs
   dynamic: true
-Inputs available:
-  value: Inputs available
 Install:
   value: Install
 Installed as:
@@ -983,8 +973,6 @@ Item delete help:
 Item depleted:
   value: Item depleted
   dynamic: true
-Item detail is unavailable.:
-  value: Item detail is unavailable.
 Item detail music help:
   value: |
     Choose music to set the mood while the player explores this item's detail. Use **Play** to listen before choosing.
@@ -1185,8 +1173,6 @@ Lifetime:
   value: Lifetime
 Lifetime (seconds):
   value: Lifetime (seconds)
-Lifetime remaining:
-  value: Lifetime remaining
 Limit:
   value: Limit
 Limit condition help:
@@ -1198,14 +1184,10 @@ Line ID:
   value: Line ID
 Line description:
   value: Line description
-Line detail is unavailable.:
-  value: Line detail is unavailable.
 Line duration:
   value: Line duration
 Line inputs:
   value: Line inputs
-Line selection could not be changed.:
-  value: Line selection could not be changed.
 Line title:
   value: Line title
 Link item:
@@ -1225,16 +1207,12 @@ Local drop placement help:
     Places output beside the item that produced it, filling compatible stacks and nearby empty cells first.
 Local server:
   value: Local server
-Location:
-  value: Location
 Loose-kill:
   value: Wait for output
 Main menu:
   value: Main menu
 Major:
   value: Major
-Make:
-  value: Make
 Managed:
   value: Managed
 Matches any positive board distance and excludes only Self.:
@@ -1377,8 +1355,6 @@ New project:
   value: New project
 New version:
   value: New version
-Next pulse:
-  value: Next attempt
 No About avatars configured.:
   value: No About avatars configured.
 No Clock configured:
@@ -1387,8 +1363,6 @@ No Units configured:
   value: No Units configured
 No action configured:
   value: No action configured
-No active job:
-  value: No active job
 No artwork matches this search.:
   value: No artwork matches this search.
 No assigned slots:
@@ -1442,8 +1416,6 @@ No matching music:
   value: No matching music
 No matching sound effects:
   value: No matching sound effects
-No material input required.:
-  value: No material input required.
 No merges for this item:
   value: No merges for this item
 No music yet:
@@ -1459,8 +1431,6 @@ No output configured.:
   value: No output configured.
 No outputs:
   value: No outputs
-No product line is currently visible.:
-  value: No product line is currently visible.
 No resources match this search.:
   value: No resources match this search.
 No rules:
@@ -1473,12 +1443,8 @@ No sound effects yet:
   value: No sound effects yet
 No unassigned slots:
   value: No unassigned slots
-No visible lines match {query}.:
-  value: No visible lines match {query}.
 None:
   value: None
-None available:
-  value: None available
 Notes:
   value: Notes
 Notes empty description:
@@ -1494,16 +1460,12 @@ Notes help:
     Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Arkpack builds.
 Notes unavailable:
   value: Notes are unavailable.
-Nothing is currently scheduled to run.:
-  value: Nothing is currently scheduled to run.
 Nothing produces this item:
   value: Nothing produces this item
   dynamic: true
 Nothing requires this item:
   value: Nothing requires this item
   dynamic: true
-Once:
-  value: Once
 Open:
   value: Open
 Open artwork:
@@ -1555,10 +1517,6 @@ Outputs:
   value: Outputs
 Overlay artwork:
   value: Overlay artwork
-Owned:
-  value: Owned
-Owner unit:
-  value: Unit from this item
 Owner units:
   value: Units from this item
 PNG files:
@@ -1573,8 +1531,6 @@ Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
   value: Paste ngrok authtoken
-Paused:
-  value: Paused
 Pick random space:
   value: Pick random space
 Player controls:
@@ -1767,18 +1723,6 @@ Query scope Universe help:
     Use it when the current Space is too small a world.
 Queue capacity:
   value: Queue capacity
-Queue detail is unavailable.:
-  value: Queue detail is unavailable.
-Queue is empty:
-  value: Queue is empty
-Queue is unavailable because this item no longer exists.:
-  value: Queue is unavailable because this item no longer exists.
-"Queued #{position}":
-  value: "Queued #{position}"
-Queued for automatic start when the required inputs become available.:
-  value: Queued for automatic start when the required inputs become available.
-Queued work will start as soon as its requirements are met.:
-  value: Queued work will start as soon as its requirements are met.
 Random:
   value: Random
 Random drop placement help:
@@ -1879,8 +1823,6 @@ Required units:
   value: Required units
 Requirements:
   value: Requirements
-Requires:
-  value: Requires
 Reserve:
   value: Reserve
 Reserve material mode help:
@@ -1925,8 +1867,6 @@ Rule type:
   value: Rule type
 Rules:
   value: Rules
-Running:
-  value: Running
 Runtime:
   value: Production time
 Runtime (seconds):
@@ -1962,8 +1902,6 @@ Save as…:
   value: Save as…
 Saving…:
   value: Saving…
-Schedule:
-  value: Schedule
 Search:
   value: Search
 Search SFX…:
@@ -1974,8 +1912,6 @@ Search item title or ID…:
   value: Search item title or ID…
 Search item title, ID or type…:
   value: Search item title, ID or type…
-Search lines…:
-  value: Search lines…
 Search music…:
   value: Search music…
 Searches matching items on the current board at the selected distance from the action owner.:
@@ -2014,8 +1950,6 @@ Self unit cost help:
     The item stays in place. At zero Units, it depletes and may create its depletion output.
 Self-paid units input:
   value: Self-paid units input
-Set clock:
-  value: Set clock
 Set rules:
   value: Set rules
 Settings:
@@ -2214,8 +2148,6 @@ Unreachable:
   value: Unreachable
 Unsaved changes:
   value: Unsaved changes
-Unset clock:
-  value: Unset clock
 Unused:
   value: Unused
 Update:
@@ -2240,14 +2172,6 @@ Visible:
   value: Visible
 Volume:
   value: Volume
-Waiting for active job:
-  value: Waiting for active job
-Waiting for inputs · one unit missing:
-  value: Waiting for inputs · one unit missing
-Waiting for inputs · {quantity} units missing:
-  value: Waiting for inputs · {quantity} units missing
-Waiting for runtime conditions:
-  value: Waiting for rules
 Weight:
   value: Weight
 When a new item is created.:
@@ -2311,8 +2235,6 @@ Width:
   value: Width
 With note:
   value: With note
-Withdraw:
-  value: Withdraw
 Write a note…:
   value: Write a note…
 added by invisible color cleanup:
@@ -2321,8 +2243,6 @@ assigned:
   value: assigned
 automatic-only:
   value: automatic-only
-available:
-  value: available
 blocking error:
   value: error
 blocking errors:
@@ -2361,8 +2281,6 @@ ngrok tunnel:
   value: ngrok tunnel
 partial:
   value: partial
-paused:
-  value: paused
 pulse:
   value: pulse
 random:
@@ -2381,22 +2299,16 @@ saved:
   value: saved
 self:
   value: self
-some:
-  value: some
 space:
   value: space
 spend:
   value: spend
 starting:
   value: starting
-unit available:
-  value: unit available
 unit from owner:
   value: unit from this item
 unit from target:
   value: unit from target
-units available:
-  value: units available
 units from owner:
   value: units from this item
 units from target:
@@ -2418,8 +2330,6 @@ warnings:
 "{factId} × {quantity} has no complete acquisition route.":
   value: No complete route can create {quantity} × {factId}.
   dynamic: true
-"{quantity} available":
-  value: "{quantity} available"
 "{routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.":
   value: "{routeId} depends on an expiring item with unfinished production, so Estimate cannot calculate it safely."
   dynamic: true
@@ -2429,5 +2339,3 @@ warnings:
 "{routeId} exceeds the bounded joint-output accounting state space.":
   value: Estimate found too many combined output possibilities in {routeId} to calculate them safely.
   dynamic: true
-"{used} / {capacity} queue slots used":
-  value: "{used} / {capacity} queue slots used"

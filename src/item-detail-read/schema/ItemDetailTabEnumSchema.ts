@@ -3,9 +3,10 @@ import { z } from "zod";
 /** Fixed player-facing sections exposed by every Item Detail target. */
 export const ItemDetailTabEnumSchema = z
 	.enum({
+		Info: "info",
 		Lines: "lines",
 		Queue: "queue",
-		Info: "info",
+		Clock: "clock",
 	})
 	.meta({
 		id: "ItemDetailTabEnumSchema",

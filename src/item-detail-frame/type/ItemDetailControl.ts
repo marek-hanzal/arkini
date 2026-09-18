@@ -3,26 +3,11 @@ import type * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 
-export type ItemDetailPendingAction =
-	| "autofill"
-	| "clear-queue"
-	| "selection"
-	| "enqueue"
-	| "withdraw";
-
-export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unknown> {
-	readonly key: string;
-	readonly action: ItemDetailPendingAction;
-	readonly failureMessage: string;
-	readonly run: Effect.Effect<Result, Failure, never>;
-}
-
 export type ItemDetailTarget =
 	| {
 			readonly kind: "runtime";
 			readonly itemId: string;
 			readonly tab: ItemDetailTabEnumSchema.Type;
-			readonly linesSearchQuery?: string;
 			readonly origin: HTMLElement | null;
 	  }
 	| {
@@ -60,7 +45,6 @@ export interface CloseItemDetailProps {
 interface OpenItemDetailProps {
 	readonly itemId: string;
 	readonly tab?: ItemDetailTabEnumSchema.Type;
-	readonly linesSearchQuery?: string;
 	readonly origin?: HTMLElement | null;
 }
 
@@ -76,14 +60,9 @@ interface SelectRetainedItemDetailTabProps {
 	readonly tab: ItemDetailTabEnumSchema.Type;
 }
 
-/** Canvas-local owner for one exact capability-tabbed Item Detail modal. */
+/** Canvas-local owner for one exact tabbed Item Detail modal. */
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
-	readonly readActionErrorFn: (key: string) => string | null;
-	readonly readPendingActionFn: (key: string) => ItemDetailPendingAction | null;
-	readonly runPendingActionFn: <Result, Failure>(
-		props: RunItemDetailPendingActionProps<Result, Failure>,
-	) => void;
 	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean, never, never>;
 	readonly openItemDefinitionDetailFx: (
 		props: OpenItemDefinitionDetailProps,

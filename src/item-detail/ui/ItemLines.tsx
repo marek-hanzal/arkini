@@ -5,7 +5,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { useItemLineMakeController } from "~/item-detail/ui/useItemLineMakeController";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { PrimaryButton } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 
 interface ItemLineProps extends useItemLineMakeController.Props {
@@ -24,8 +24,8 @@ const ItemLine = ({ line, ...props }: ItemLineProps) => {
 			<div className="flex items-center gap-3">
 				<h3 className="min-w-0 text-lg font-semibold">{line.title}</h3>
 				<span className="shrink-0 text-muted">· {formatDurationFn(line.runtimeMs)}</span>
-				<PrimaryButton
-					className="ml-auto shrink-0 gap-2"
+				<LinkButton
+					className="ml-auto inline-flex shrink-0 items-center gap-2"
 					disabled={
 						props.disabled || controller.pending || props.ownerItemId === undefined
 					}
@@ -33,7 +33,7 @@ const ItemLine = ({ line, ...props }: ItemLineProps) => {
 				>
 					<ListPlus className="size-5" />
 					{translator.textFn("Make")}
-				</PrimaryButton>
+				</LinkButton>
 			</div>
 			{line.description ? (
 				<p className="mt-2 whitespace-pre-wrap text-muted">{line.description}</p>

@@ -15,6 +15,7 @@ import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
+import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 
 export namespace useItemDetailSceneController {
 	export interface Props {
@@ -26,6 +27,7 @@ export namespace useItemDetailSceneController {
 			"description" | "scope" | "maxStackSize" | "maxCount" | "lines"
 		> {
 		readonly canMake: boolean;
+		readonly disabledLineIds: readonly string[];
 		readonly queueSize?: number;
 		readonly title: string;
 		readonly sourceUrl: string;
@@ -81,21 +83,30 @@ export const useItemDetailSceneController = ({
 					: undefined;
 			const item = kind === "definition" ? game.config.items[itemId] : runtimeItem?.item;
 			if (item === undefined) return undefined;
-			const lines = game.readFn(
-				Effect.filter(item.lines, (line) => {
+			const lineStates = game.readFn(
+				Effect.forEach(item.lines, (line) => {
 					// Only a live Board owner supplies a physical origin for visibility rules.
 					if (runtimeItem?.location.scope !== "board" || finalSnapshot !== undefined)
-						return Effect.succeed(line.show);
+						return Effect.succeed({
+							line,
+							visible: line.show,
+							enabled: line.enable,
+						});
 					return lineRulesFx({
 						origin: runtimeItem.location,
 						rules: line.rules,
 					}).pipe(
-						Effect.map((rules) =>
-							resolveLineShowFn({
+						Effect.map((rules) => ({
+							line,
+							visible: resolveLineShowFn({
 								line,
 								rules,
 							}),
-						),
+							enabled: resolveLineEnableFn({
+								line,
+								rules,
+							}),
+						})),
 					);
 				}).pipe(
 					Effect.provideService(RuntimeFx, {
@@ -103,7 +114,8 @@ export const useItemDetailSceneController = ({
 					}),
 				),
 			);
-			if (Exit.isFailure(lines)) throw lines.cause;
+			if (Exit.isFailure(lineStates)) throw lineStates.cause;
+			const visibleLines = lineStates.value.filter((state) => state.visible);
 			let canMake = false;
 			if (
 				runtimeItem?.location.scope === "board" &&
@@ -121,7 +133,10 @@ export const useItemDetailSceneController = ({
 				canMake = queue.value.available;
 			}
 			return {
-				lines: lines.value,
+				lines: visibleLines.map((state) => state.line),
+				disabledLineIds: visibleLines
+					.filter((state) => !state.enabled)
+					.map((state) => state.line.id),
 				queueSize: readItemQueueSizeFn({
 					item,
 				}),

@@ -217,28 +217,56 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 		state.runtime = vetoed;
 		await act(async () => root.render(<Probe />));
 		expect(output?.detail?.lines).toEqual([]);
-		state.runtime = {
-			...hidden,
-			items: hidden.items.map((item) =>
-				item.id !== ownerId
-					? item
-					: {
-							...item,
-							item: {
-								...item.item,
-								lines: item.item.lines.map((line) => ({
-									...line,
-									show: true,
-									enable: false,
-								})),
+		for (const [runtime, disabled] of [
+			[
+				hidden,
+				true,
+			],
+			[
+				visible,
+				false,
+			],
+			[
+				vetoed,
+				true,
+			],
+			[
+				visible,
+				false,
+			],
+		] as const) {
+			state.runtime = {
+				...runtime,
+				items: runtime.items.map((item) =>
+					item.id !== ownerId
+						? item
+						: {
+								...item,
+								item: {
+									...item.item,
+									lines: item.item.lines.map((line) => ({
+										...line,
+										show: true,
+										rules: line.rules.filter(
+											(rule) => rule.type !== "show" && rule.type !== "hide",
+										),
+									})),
+								},
 							},
-						},
-			),
-		};
-		await act(async () => root.render(<Probe />));
-		expect(output?.detail?.lines.map((line) => line.id)).toEqual([
-			lineId,
-		]);
+				),
+			};
+			await act(async () => root.render(<Probe />));
+			expect(output?.detail?.lines.map((line) => line.id)).toEqual([
+				lineId,
+			]);
+			expect(output?.detail?.disabledLineIds).toEqual(
+				disabled
+					? [
+							lineId,
+						]
+					: [],
+			);
+		}
 	} finally {
 		await act(async () => root.unmount());
 	}

@@ -1,3 +1,4 @@
+import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { Factory, ListPlus, Star, X } from "lucide-react";
@@ -22,9 +23,29 @@ import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 
+const linePresenceMotion = {
+	initial: {
+		height: 0,
+		opacity: 0,
+	},
+	animate: {
+		height: "auto",
+		opacity: 1,
+	},
+	exit: {
+		height: 0,
+		opacity: 0,
+	},
+	transition: {
+		duration: 0.3,
+		ease: "easeInOut" as const,
+	},
+};
+
 interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
 	readonly makeDisabled: boolean;
+	readonly ruleDisabled: boolean;
 	readonly status?: readItemLineStatusesFn.Status;
 }
 
@@ -60,24 +81,26 @@ const ItemLineCountdown = ({
 	);
 };
 
-const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
+const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLineProps) => {
 	const game = useGameEngine();
+	const present = useIsPresent();
+	const disabled = props.disabled || !present;
 	const controller = useItemLineMakeController({
 		ownerItemId: props.ownerItemId,
 		lineId: props.lineId,
-		disabled: props.disabled || makeDisabled,
+		disabled: disabled || makeDisabled,
 	});
 	const defaultController = useItemLineDefaultController({
 		ownerItemId: props.ownerItemId,
 		lineId: props.lineId,
 		authoredDefault: line.default,
-		disabled: props.disabled,
+		disabled,
 	});
 	const cancelController = useItemLineCancelController({
 		ownerItemId: props.ownerItemId,
 		lineId: line.id,
 		requestId: status?.requestId,
-		disabled: props.disabled,
+		disabled,
 	});
 	const translator = useTranslator();
 	const state = status?.state ?? "idle";
@@ -95,140 +118,148 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 			? Math.max(0, (status?.queued ?? 0) - 1)
 			: (status?.queued ?? 0);
 	return (
-		<article
-			className="py-5"
-			data-ui="ItemLine"
-			data-line-id={line.id}
+		<motion.div
+			{...linePresenceMotion}
+			className="-mx-3 overflow-hidden border-t border-line px-3 first:border-t-0"
+			data-ui="ItemLinePresence"
+			inert={!present}
 		>
-			<div className="flex items-center gap-3">
-				{line.artwork === undefined ? null : (
-					<ItemArtwork
-						className="size-10"
-						sourceUrl={game.getResourceUrlFn(line.artwork)}
-					/>
-				)}
-				<h3 className="min-w-0 text-lg font-semibold">{line.title}</h3>
-				<span className="shrink-0 text-muted">· {formatDurationFn(line.runtimeMs)}</span>
-				<div className="ml-auto flex shrink-0 items-center gap-8">
-					<LinkButton
-						className="inline-flex items-center gap-2 text-muted data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
-						disabled={defaultController.disabled}
-						onClick={defaultController.toggleFn}
-						{...readDataUiFn({
-							dataUi: "ItemLineDefault",
-							state: {
-								selected: defaultController.selected,
-							},
-						})}
-					>
-						<Star className="size-5" />
-						{translator.textFn("Default")}
-					</LinkButton>
-					<LinkButton
-						className="inline-flex shrink-0 items-center gap-2"
-						disabled={
-							props.disabled ||
-							makeDisabled ||
-							controller.pending ||
-							props.ownerItemId === undefined
-						}
-						onClick={controller.makeFn}
-					>
-						<ListPlus className="size-5" />
-						{translator.textFn("Make")}
-					</LinkButton>
-				</div>
-			</div>
-			{line.description ? (
-				<p className="mt-2 whitespace-pre-wrap text-muted">{line.description}</p>
-			) : null}
-			<div className="flex items-end justify-between gap-6">
-				<ItemLineInputs
-					ownerItemId={props.ownerItemId}
-					line={line}
-					idle={state === "idle"}
-					disabled={props.disabled}
-				/>
-				<div className="mt-3 ml-auto flex min-h-5 shrink-0 items-center gap-5 text-sm">
-					{statusLabel !== null ? (
-						<p
-							className="shrink-0 text-foreground"
-							data-ui="ItemLineStatus"
-						>
-							{statusLabel}
-							{state === "running" ? (
-								<>
-									{" "}
-									·{" "}
-									<ItemLineCountdown
-										ownerItemId={props.ownerItemId}
-										lineId={line.id}
-									/>
-								</>
-							) : null}
-							{state === "queued"
-								? ` ${status?.queued ?? 0}`
-								: extra > 0
-									? ` (+${extra})`
-									: ""}
-						</p>
-					) : null}
-					{status?.jobId !== undefined ? (
-						<ItemJobCancel
-							ownerItemId={props.ownerItemId}
-							jobId={status.jobId}
-							lineId={line.id}
-							disabled={props.disabled}
+			<article
+				className="py-5 transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45"
+				{...readDataUiFn({
+					dataUi: "ItemLine",
+					state: {
+						ruleDisabled,
+					},
+				})}
+				data-line-id={line.id}
+			>
+				<div className="flex items-center gap-3">
+					{line.artwork === undefined ? null : (
+						<ItemArtwork
+							className="size-10"
+							sourceUrl={game.getResourceUrlFn(line.artwork)}
 						/>
-					) : null}
-					{status?.requestId !== undefined ? (
+					)}
+					<h3 className="min-w-0 text-lg font-semibold">{line.title}</h3>
+					<span className="shrink-0 text-muted">
+						· {formatDurationFn(line.runtimeMs)}
+					</span>
+					<div className="ml-auto flex shrink-0 items-center gap-8">
 						<LinkButton
-							className="inline-flex items-center gap-2"
-							disabled={cancelController.disabled}
-							onClick={cancelController.cancelFn}
+							className="inline-flex items-center gap-2 text-muted data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
+							disabled={defaultController.disabled}
+							onClick={defaultController.toggleFn}
+							{...readDataUiFn({
+								dataUi: "ItemLineDefault",
+								state: {
+									selected: defaultController.selected,
+								},
+							})}
 						>
-							<X className="size-4" />
-							{translator.textFn("Cancel")}
+							<Star className="size-5" />
+							{translator.textFn("Default")}
 						</LinkButton>
-					) : null}
+						<LinkButton
+							className="inline-flex shrink-0 items-center gap-2"
+							disabled={
+								disabled ||
+								makeDisabled ||
+								controller.pending ||
+								props.ownerItemId === undefined
+							}
+							onClick={controller.makeFn}
+						>
+							<ListPlus className="size-5" />
+							{translator.textFn("Make")}
+						</LinkButton>
+					</div>
 				</div>
-			</div>
-		</article>
+				{line.description ? (
+					<p className="mt-2 whitespace-pre-wrap text-muted">{line.description}</p>
+				) : null}
+				<div className="flex items-end justify-between gap-6">
+					<ItemLineInputs
+						ownerItemId={props.ownerItemId}
+						line={line}
+						idle={state === "idle"}
+						disabled={disabled}
+					/>
+					<div className="mt-3 ml-auto flex min-h-5 shrink-0 items-center gap-5 text-sm">
+						{statusLabel !== null ? (
+							<p
+								className="shrink-0 text-foreground"
+								data-ui="ItemLineStatus"
+							>
+								{statusLabel}
+								{state === "running" ? (
+									<>
+										{" "}
+										·{" "}
+										<ItemLineCountdown
+											ownerItemId={props.ownerItemId}
+											lineId={line.id}
+										/>
+									</>
+								) : null}
+								{state === "queued"
+									? ` ${status?.queued ?? 0}`
+									: extra > 0
+										? ` (+${extra})`
+										: ""}
+							</p>
+						) : null}
+						{status?.jobId !== undefined ? (
+							<ItemJobCancel
+								ownerItemId={props.ownerItemId}
+								jobId={status.jobId}
+								lineId={line.id}
+								disabled={disabled}
+							/>
+						) : null}
+						{status?.requestId !== undefined ? (
+							<LinkButton
+								className="inline-flex items-center gap-2"
+								disabled={cancelController.disabled}
+								onClick={cancelController.cancelFn}
+							>
+								<X className="size-4" />
+								{translator.textFn("Cancel")}
+							</LinkButton>
+						) : null}
+					</div>
+				</div>
+			</article>
+		</motion.div>
 	);
 };
 
 export const ItemLines = ({
 	lines,
+	disabledLineIds,
 	ownerItemId,
 	disabled,
 	makeDisabled,
 }: {
 	readonly lines: readonly LineSchema.Type[];
+	readonly disabledLineIds: readonly string[];
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
 	readonly makeDisabled: boolean;
 }) => {
 	const translator = useTranslator();
 	const statuses = useItemLinesStatus(ownerItemId);
-	if (lines.length === 0)
-		return (
-			<Status
-				icon={Factory}
-				title={translator.textFn("Nothing to make right now.")}
-				variant="flat"
-				size="large"
-			/>
-		);
 	return (
 		<section
-			className="px-3 pb-[50cqh]"
+			className="px-3"
 			data-ui="ItemLines"
 		>
-			<div className="divide-y divide-line">
+			<AnimatePresence initial={false}>
 				{lines.map((line) => (
 					<ItemLine
-						key={line.id}
+						key={`line:${line.id}`}
 						line={line}
+						ruleDisabled={disabledLineIds.includes(line.id)}
 						lineId={line.id}
 						ownerItemId={ownerItemId}
 						disabled={disabled}
@@ -236,8 +267,31 @@ export const ItemLines = ({
 						status={statuses.find((status) => status.lineId === line.id)}
 					/>
 				))}
-			</div>
-			<SectionEnd />
+				{lines.length === 0 ? (
+					<motion.div
+						key="empty"
+						{...linePresenceMotion}
+						className="overflow-hidden"
+					>
+						<Status
+							icon={Factory}
+							title={translator.textFn("Nothing to make right now.")}
+							variant="flat"
+							size="large"
+						/>
+					</motion.div>
+				) : (
+					<motion.div
+						key="end"
+						{...linePresenceMotion}
+						className="overflow-hidden"
+					>
+						<div className="pb-[50cqh]">
+							<SectionEnd />
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</section>
 	);
 };

@@ -23,6 +23,7 @@
 			{
 				"id": "lumber-camp",
 				"title": "Lumber Camp",
+				"artwork": "lumber-camp",
 				"description": "Build a new lumber-camp",
 				"default": true,
 				"show": true,

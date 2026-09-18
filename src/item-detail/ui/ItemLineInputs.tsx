@@ -1,3 +1,4 @@
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { Clock, X } from "lucide-react";
 import { useItemLineInputController } from "~/item-detail/ui/useItemLineInputController";
 import { Equal, Exit } from "effect";
@@ -99,10 +100,7 @@ export const ItemLineInputs = ({
 											: translator.textFn("Time until the next cycle")}
 										:{" "}
 										<strong>
-											{(Math.max(0, input.clock.remainingMs) / 1000).toFixed(
-												1,
-											)}{" "}
-											s
+											{formatDurationFn(input.clock.remainingMs, "countdown")}
 										</strong>
 									</span>
 								) : null}
@@ -152,7 +150,7 @@ export const ItemLineInputs = ({
 							{input.clock !== undefined ? (
 								<span className="absolute -top-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold tabular-nums text-foreground shadow-sm">
 									<Clock className="size-3" />
-									{(Math.max(0, input.clock.remainingMs) / 1000).toFixed(1)} s
+									{formatDurationFn(input.clock.remainingMs, "countdown")}
 								</span>
 							) : null}
 							{total > 1 ? (

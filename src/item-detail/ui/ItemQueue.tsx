@@ -1,3 +1,4 @@
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { Equal, Exit } from "effect";
 import { Factory, ListOrdered, ListX, Pause, X } from "lucide-react";
 import { useCallback } from "react";
@@ -213,7 +214,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 									.exhaustive()}
 								{active.status === "running" ? (
 									<span className="inline-block min-w-[6ch] text-right tabular-nums">
-										· {(Math.max(0, active.remainingMs) / 1000).toFixed(1)} s
+										· {formatDurationFn(active.remainingMs, "countdown")}
 									</span>
 								) : null}
 							</span>

@@ -1,3 +1,4 @@
+import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
@@ -64,20 +65,20 @@ const ItemLineCountdown = ({
 			const job = runtime.jobs.find(
 				(job) => job.ownerItemId === ownerItemId && job.lineId === lineId,
 			);
-			return (Math.max(0, job?.remainingMs ?? 0) / 1000).toFixed(1);
+			return formatDurationFn(job?.remainingMs ?? 0, "countdown");
 		},
 		[
 			ownerItemId,
 			lineId,
 		],
 	);
-	const seconds = useRuntimeSelector(game, selectorFn);
+	const remaining = useRuntimeSelector(game, selectorFn);
 	return (
 		<span
 			className="inline-block min-w-[6ch] text-right tabular-nums"
 			data-ui="ItemLineCountdown"
 		>
-			{seconds} s
+			{remaining}
 		</span>
 	);
 };

@@ -23,7 +23,7 @@ export const ItemConnectionRow = ({
 			data-ui="EditorItemConnectionsRow"
 		>
 			<EditorItemThumbnail
-				className="pointer-events-none rounded-lg border-0 bg-[var(--ak-editor-background)] ring-1 ring-control-border/60"
+				className="pointer-events-none rounded-lg bg-[var(--ak-editor-background)]"
 				imageClassName="p-0.5"
 				resourceIds={item.artwork.default}
 				size="sm"

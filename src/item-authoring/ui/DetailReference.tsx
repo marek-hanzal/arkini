@@ -45,7 +45,7 @@ export const DetailReference = ({
 			className={`group min-h-0 min-w-0 justify-start gap-3 border-0 bg-transparent p-0 text-left shadow-none hover:bg-transparent${stretched ? " flex-1 before:absolute before:inset-0 before:content-['']" : ""}`}
 		>
 			<EditorItemThumbnail
-				className="rounded-lg border-0 bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-hover:bg-accent/8 group-hover:ring-accent/35"
+				className="rounded-lg bg-surface/45 transition-colors group-hover:bg-accent/8"
 				imageClassName="p-0.5"
 				resourceIds={item.artwork.default}
 				size="sm"

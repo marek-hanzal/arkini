@@ -25,7 +25,7 @@ export const EditorResourceThumbnail = ({
 	return (
 		<span
 			data-ui="EditorResourceThumbnail"
-			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg border border-control-border bg-canvas/70`}
+			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg bg-canvas/70`}
 		>
 			{audio ? (
 				<AudioLines className="size-5 text-muted" />

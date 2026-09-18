@@ -24,7 +24,7 @@ const EditorItemSelectedThumbnail = ({
 	resourceIds,
 }: Pick<EditorItemThumbnailProps, "className" | "resourceIds">) => (
 	<EditorItemThumbnail
-		className={twMerge("rounded-lg border-control-border", className)}
+		className={twMerge("rounded-lg", className)}
 		resourceIds={resourceIds}
 		size="input"
 	/>
@@ -73,7 +73,7 @@ export const EditorItemThumbnail = ({
 		return (
 			<ItemArtwork
 				className={twMerge(
-					`${thumbnailSizeClassName[size]} overflow-hidden rounded-xl border border-control-border bg-canvas/70`,
+					`${thumbnailSizeClassName[size]} overflow-hidden rounded-xl bg-canvas/70`,
 					className,
 				)}
 				compositeUrl={foregroundUrl}
@@ -87,7 +87,7 @@ export const EditorItemThumbnail = ({
 	return (
 		<div
 			className={twMerge(
-				`relative grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-xl border border-control-border bg-canvas/70`,
+				`relative grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-xl bg-canvas/70`,
 				className,
 			)}
 			data-ui="EditorItemThumbnail"

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { GraphDetailSchema } from "./GraphDetailSchema";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
@@ -148,11 +149,80 @@ const formatEstimateFn = (
 	].join("\n");
 };
 
+/** Diagnostics are bounded by the estimator, so they cannot establish a total rejected-route count. */
+const formatSummaryFn = (
+	project: Project,
+	target: Project["config"]["items"][string],
+	estimate: ItemEstimate,
+) => {
+	const diagnostic = estimate.diagnostics[0];
+	const reason =
+		diagnostic === undefined
+			? "No complete acquisition route"
+			: diagnostic.kind === "witness-search-exhausted"
+				? `${diagnostic.routeId} exhausted the bounded witness search (${diagnostic.maximumStates} states)`
+				: diagnosticTextFn(diagnostic);
+	const reasons = new Map<string, number>();
+	const routes = new Set<string>();
+	for (const diagnostic of estimate.diagnostics) {
+		reasons.set(diagnostic.kind, (reasons.get(diagnostic.kind) ?? 0) + 1);
+		if ("routeId" in diagnostic && diagnostic.routeId !== undefined)
+			routes.add(diagnostic.routeId);
+	}
+	return [
+		"Item estimate",
+		`Item ID: ${target.id}`,
+		`Title: ${target.title}`,
+		`Quantity: ${formatNumberFn(estimate.quantity)}`,
+		"Detail: summary",
+		`Status: ${estimate.status}`,
+		"Method: authored dependency graph, optimistic parallel critical path",
+		...(estimate.obtainable
+			? [
+					`Approximate optimistic parallel duration: ${estimate.durationMs / 1_000} s`,
+					`Selected route: ${estimate.route.routeId}`,
+					`Approximate action runs: ${formatNumberFn(estimate.route.actionRuns)}`,
+					`Approximate output samples: ${formatNumberFn(estimate.route.outputRuns)}`,
+					...amountLinesFn(
+						project,
+						"Consumed requirements",
+						estimate.requirementSummary.consumed,
+					),
+					...amountLinesFn(
+						project,
+						"One-time requirements",
+						estimate.requirementSummary.oneTime,
+					),
+					...amountLinesFn(
+						project,
+						"Ongoing requirements",
+						estimate.requirementSummary.ongoing,
+					),
+				]
+			: [
+					"Duration and selected route: unresolved; no stable complete totals",
+					`Reason: ${reason}`,
+				]),
+		`Rejected alternative diagnostics (reported): ${estimate.diagnostics.length}; distinct diagnosed routes: ${routes.size}`,
+		`Reasons: ${
+			[
+				...reasons,
+			]
+				.map(([kind, count]) => `${kind} x${count}`)
+				.join(", ") || "none reported"
+		}`,
+		`Cycles: ${reasons.has("cycle") ? "encountered" : "none reported"}`,
+		"Diagnostics are bounded; total rejected alternatives and unreported cycles are unknown.",
+		`Limitations: ${estimate.limitations.map(limitationTextFn).join("; ") || "none"}`,
+	].join("\n");
+};
+
 /** Computes and formats one approximate static item estimate for MCP. */
 export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(function* (
 	project: Project,
 	itemId: string,
 	quantity: number,
+	detail: GraphDetailSchema.Type = "full",
 ) {
 	const target = project.config.items[itemId];
 	if (target === undefined)
@@ -167,5 +237,7 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 			},
 		],
 	})[0]!;
-	return formatEstimateFn(project, target, estimate);
+	return detail === "summary"
+		? formatSummaryFn(project, target, estimate)
+		: formatEstimateFn(project, target, estimate);
 });

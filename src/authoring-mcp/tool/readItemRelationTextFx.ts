@@ -1,4 +1,6 @@
 import { Effect, Order } from "effect";
+import type { GraphDetailSchema } from "./GraphDetailSchema";
+import { readRelationOperationSummaryFn } from "./fn/readRelationOperationSummaryFn";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
@@ -190,7 +192,9 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 		itemId,
 		level,
 		role,
+		detail = "full",
 	}: {
+		readonly detail?: GraphDetailSchema.Type;
 		readonly itemId: string;
 		readonly level: number;
 		readonly role: ItemOriginRelationRole;
@@ -231,6 +235,53 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 		});
 	}
 	const direction = role === "output" ? "output" : "input";
+	if (detail === "summary") {
+		const byLevel = new Map<number, number>();
+		const byKind = new Map<string, number>();
+		const routesById = new Map(
+			graph.routes.map((route) => [
+				route.id,
+				route,
+			]),
+		);
+		const operations: string[] = [];
+		for (const group of groups.values()) {
+			const source = group.relations[0]!.source;
+			byLevel.set(group.level, (byLevel.get(group.level) ?? 0) + 1);
+			byKind.set(source.kind, (byKind.get(source.kind) ?? 0) + 1);
+			operations.push(
+				`- Level ${group.level}: ${source.kind} "${source.label}" | ${itemReferenceFn(project, source.ownerItemId)}`,
+				...readRelationOperationSummaryFn(
+					project,
+					source,
+					source.routeIds.flatMap((id) => {
+						const route = routesById.get(id);
+						return route === undefined
+							? []
+							: [
+									route,
+								];
+					}),
+				),
+			);
+		}
+		return [
+			`Item ${direction}`,
+			`Item ID: ${item.id}`,
+			`Title: ${item.title}`,
+			`Level: ${level}`,
+			"Detail: summary",
+			...(groups.size === 0
+				? []
+				: [
+						"Sets: weighted eligible alternatives; chance: per roll within set. Rules are unevaluated; enable rules require all, disable rules veto. Placement defaults to drop.",
+					]),
+			...operations,
+			`Operations: ${groups.size}`,
+			`By level: ${Array.from(byLevel, ([depth, count]) => `L${depth}=${count}`).join(", ") || "none"}`,
+			`By kind: ${Array.from(byKind, ([kind, count]) => `${kind}=${count}`).join(", ") || "none"}`,
+		].join("\n");
+	}
 	return [
 		`Item ${direction}`,
 		`Item ID: ${item.id}`,

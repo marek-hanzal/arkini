@@ -9,6 +9,7 @@ import type { ProjectRepositoryService } from "~/project-authoring/service/Proje
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ArtworkCollectionInputSchema } from "./ArtworkCollectionInputSchema";
+import { GraphDetailSchema } from "./GraphDetailSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchema } from "./CreateItemInputSchema";
 import { EditItemInputSchema } from "./EditItemInputSchema";
@@ -81,6 +82,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 	z
 		.object({
 			itemId: IdSchema.describe("The exact root item ID returned by item_collection."),
+			detail: GraphDetailSchema.default("full"),
 			level: z
 				.number()
 				.int()
@@ -111,6 +113,7 @@ const ItemEstimateInputSchema = z
 	.object({
 		itemId: IdSchema.describe("The exact target item ID returned by item_collection."),
 		quantity: ItemEstimateQuantitySchema.default(1),
+		detail: GraphDetailSchema.default("full"),
 	})
 	.strict()
 	.meta({
@@ -519,17 +522,18 @@ const createServerFn = (
 			{
 				description:
 					role === "input"
-						? "Read where one item is used as an input. Level 1 returns every operation that directly uses it; higher levels repeat input lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs."
-						: "Read where one item is produced as an output. Level 1 returns every operation that directly produces it; higher levels repeat output lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs.",
+						? "Read where one item is used as an input. Level 1 returns every operation that directly uses it; higher levels repeat input lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs. Use detail=summary for compact operations with authored gates and output odds; omitted detail or full retains detailed dependency witnesses."
+						: "Read where one item is produced as an output. Level 1 returns every operation that directly produces it; higher levels repeat output lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs. Use detail=summary for compact operations with authored gates and output odds; omitted detail or full retains detailed dependency witnesses.",
 				inputSchema: itemRelationInputSchema(role),
 			},
-			async ({ itemId, level }) =>
+			async ({ itemId, level, detail }) =>
 				runToolFn(
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
 							readItemRelationTextFx(project, {
 								itemId,
 								level,
+								detail,
 								role,
 							}),
 						),
@@ -541,13 +545,15 @@ const createServerFn = (
 		"item_estimate",
 		{
 			description:
-				"Approximate one item against the authored dependency graph. The estimator uses bounded per-output and correlated joint-output distributions to compute expected first-hitting time, ranks complete quantity-aware routes with stable route-ID ties, and times the selected-fact witness as an optimistic parallel critical path. Demand uses the larger of additive consumption and each selected route's simultaneous consumed-plus-reusable need; finite authored roots and jointly selected co-products are shared. Unsupported bounded state space returns partial. Runtime rule truth, concrete item identity packing, placement, renewable capacity, and engine execution are not simulated.",
+				"Approximate one item against the authored dependency graph. The estimator uses bounded per-output and correlated joint-output distributions to compute expected first-hitting time, ranks complete quantity-aware routes with stable route-ID ties, and times the selected-fact witness as an optimistic parallel critical path. Demand uses the larger of additive consumption and each selected route's simultaneous consumed-plus-reusable need; finite authored roots and jointly selected co-products are shared. Unsupported bounded state space returns partial. Runtime rule truth, concrete item identity packing, placement, renewable capacity, and engine execution are not simulated. Use detail=summary for totals and every requirement without the selected fact DAG; omitted detail or full retains the full diagnostic presentation.",
 			inputSchema: ItemEstimateInputSchema,
 		},
-		async ({ itemId, quantity }) =>
+		async ({ itemId, quantity, detail }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemEstimateTextFx(project, itemId, quantity)),
+					Effect.flatMap((project) =>
+						readItemEstimateTextFx(project, itemId, quantity, detail),
+					),
 				),
 			),
 	);

@@ -293,6 +293,48 @@ describe("editor MCP server", () => {
 				itemId: "tool",
 			},
 		});
+		for (const name of [
+			"item_input",
+			"item_output",
+			"item_estimate",
+		]) {
+			const argumentsBase = {
+				itemId: "tool",
+			};
+			const defaultResult = await client.callTool({
+				name,
+				arguments: argumentsBase,
+			});
+			const fullResult = await client.callTool({
+				name,
+				arguments: {
+					...argumentsBase,
+					detail: "full",
+				},
+			});
+			const summaryResult = await client.callTool({
+				name,
+				arguments: {
+					...argumentsBase,
+					detail: "summary",
+				},
+			});
+			expect(fullResult).toEqual(defaultResult);
+			expect(summaryResult.isError).not.toBe(true);
+			expect(summaryResult.content).toMatchObject([
+				{
+					text: expect.stringContaining("Detail: summary"),
+				},
+			]);
+			const invalidResult = await client.callTool({
+				name,
+				arguments: {
+					...argumentsBase,
+					detail: "brief",
+				},
+			});
+			expect(invalidResult.isError).toBe(true);
+		}
 		const missingEstimate = await client.callTool({
 			name: "item_estimate",
 			arguments: {

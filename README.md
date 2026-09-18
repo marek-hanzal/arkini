@@ -72,6 +72,8 @@ argc mcp-inspect
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 
+MCP `item_input`, `item_output`, and `item_estimate` accept optional `detail: "summary" | "full"`. Omitted detail preserves the full response. Relation summaries retain every discovered operation and traversal level, compact authored inputs, output sets/roll chances, and gates without repeated dependency witnesses. Estimate summaries retain the selected result and all requirement groups without the selected fact DAG. Diagnostic counts describe only the estimator's bounded reported evidence, not a complete count of rejected alternatives. Both modes use the same analysis; summary reduces presentation size without imposing a result limit.
+
 The installed macOS CLI can list Editor projects and run one project's configured MCP server without opening the Editor:
 
 ```bash

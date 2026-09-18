@@ -36,6 +36,7 @@ const ProjectFormPathLabelBySegment = {
 	quantity: "Quantity",
 	start: "Initial layout",
 	title: "Title",
+	introduction: "Introduction",
 	toolbar: "Toolbar",
 	toolbarSize: "Toolbar slots",
 	width: "Width",
@@ -110,6 +111,7 @@ const createProjectConfigFn = (
 		meta: {
 			...project.config.meta,
 			title: value.title,
+			introduction: value.introduction.trim().length > 0 ? value.introduction : undefined,
 			board: value.board,
 			inventory: value.inventory,
 			toolbarSize: value.toolbarSize,
@@ -124,6 +126,7 @@ const createProjectConfigFn = (
 
 const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormSchema.Type => ({
 	title: project.config.meta.title,
+	introduction: project.config.meta.introduction ?? "",
 	hero: project.config.resources.hero,
 	avatars: ProjectAvatarKeys.flatMap((key) => {
 		const resourceId = project.config.resources[key];

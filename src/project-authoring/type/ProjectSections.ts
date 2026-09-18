@@ -4,6 +4,7 @@ export const ProjectSectionIds = [
 	"board",
 	"toolbar",
 	"inventory",
+	"introduction",
 ] as const;
 
 export type ProjectSectionId = (typeof ProjectSectionIds)[number];
@@ -39,5 +40,10 @@ export const ProjectSections = [
 		id: "inventory",
 		label: "Inventory",
 		shortcut: "n",
+	},
+	{
+		id: "introduction",
+		label: "Introduction",
+		shortcut: "r",
 	},
 ] as const satisfies ReadonlyArray<ProjectSectionDescriptor>;

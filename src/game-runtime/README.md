@@ -79,6 +79,8 @@ GameConfig or State
 
 Runtime commits are immediate. Tick, persistence, diagnostics, audio and Pixi observe committed facts and may lag without becoming truth.
 
+Installed Game may defer its initial `startFx` behind an authored first-game introduction. That pending session has an empty Runtime and suppresses durable writes; Continue drains the empty Tick cursor, initializes the world and opens save admission in one joined command. This is installed-package bootstrap policy, not a second Runtime or a general pause mode.
+
 Ordinary session shutdown order is:
 
 ```text

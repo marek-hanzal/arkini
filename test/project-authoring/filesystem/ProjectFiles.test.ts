@@ -51,7 +51,13 @@ describe("filesystem Editor project current tree", () => {
 				arkini: ArkiniAppVersion,
 				revision: 1,
 			},
-			config: editorTestPayload.config,
+			config: {
+				...editorTestPayload.config,
+				meta: {
+					...editorTestPayload.config.meta,
+					introduction: "# Welcome\n\nA **new** world.\n\n- Explore",
+				},
+			},
 			resources: editorTestPayload.resources,
 		} as const;
 

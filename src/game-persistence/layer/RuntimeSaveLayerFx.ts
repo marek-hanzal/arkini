@@ -9,6 +9,7 @@ import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 
 interface Props<Error = unknown> {
 	debounceMs?: number;
+	isEnabledFn?: () => boolean;
 	onFatalErrorFn?: (cause: Cause.Cause<Error>) => void;
 	saveFx: (state: StateSchema.Type) => Effect.Effect<void, Error, never>;
 }
@@ -22,6 +23,7 @@ interface Props<Error = unknown> {
  */
 export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
+	isEnabledFn = () => true,
 	onFatalErrorFn = () => undefined,
 	saveFx,
 }: Props<Error>) =>
@@ -36,20 +38,24 @@ export const RuntimeSaveLayerFx = <Error>({
 
 			const flush = saveMutex.withPermits(1)(
 				Effect.uninterruptible(
-					Effect.all([
-						runtimeFx.read,
-						Ref.get(lastSaved),
-					]).pipe(
-						Effect.flatMap(([runtime, saved]) =>
-							runtime === saved
-								? Effect.void
-								: saveFx(
-										fromRuntimeFn({
-											runtime,
-										}),
-									).pipe(Effect.andThen(Ref.set(lastSaved, runtime))),
-						),
-					),
+					Effect.suspend(() => {
+						// Skipped admission must never acknowledge an unwritten snapshot.
+						if (!isEnabledFn()) return Effect.void;
+						return Effect.all([
+							runtimeFx.read,
+							Ref.get(lastSaved),
+						]).pipe(
+							Effect.flatMap(([runtime, saved]) =>
+								runtime === saved
+									? Effect.void
+									: saveFx(
+											fromRuntimeFn({
+												runtime,
+											}),
+										).pipe(Effect.andThen(Ref.set(lastSaved, runtime))),
+							),
+						);
+					}),
 				),
 			);
 

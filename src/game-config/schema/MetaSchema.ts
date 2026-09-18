@@ -18,6 +18,10 @@ export const MetaSchema = z
 		 * Human-readable title of this game.
 		 */
 		title: TitleSchema.describe("The human-readable title of this game."),
+		introduction: z
+			.string()
+			.optional()
+			.describe("Optional Markdown shown before starting a game without a save."),
 		/**
 		 * Size of the board on which board items are placed.
 		 */

@@ -4,6 +4,12 @@ import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 
 export const ProjectSectionHelp: Record<ProjectSectionId, EditorPageHelpContent> = {
+	introduction: {
+		title: <Tx label="Introduction" />,
+		content: (
+			<Mx label="Write a Markdown welcome for new players. It appears before a new game starts and is skipped when a save exists. Leave it empty to start immediately." />
+		),
+	},
 	general: {
 		title: <Tx label="Project" />,
 		content: <Mx label="Project general help" />,

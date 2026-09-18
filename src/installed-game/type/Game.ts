@@ -1,3 +1,4 @@
+import type { Effect } from "effect";
 import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
@@ -10,6 +11,11 @@ export interface Game extends PlayableGame {
 	readonly arkpack: ArkpackDescriptor;
 	/** Stable filesystem save identity owned by this live game. */
 	readonly saveKey: GameSaveStorage.Key;
+	/** Pending first-game welcome; stays acknowledged across scene remounts in this session. */
+	readonly introduction?: {
+		readonly readFn: () => string | undefined;
+		readonly continueFx: Effect.Effect<void, unknown, never>;
+	};
 }
 
 /** Installed-package resource used by routes and durable lifecycle operations. */

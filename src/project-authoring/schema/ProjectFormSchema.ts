@@ -44,6 +44,7 @@ const ProjectStartInventoryItemSchema = InventoryItemSchema.extend({
 export const ProjectFormBaseSchema = z
 	.object({
 		title: TitleSchema,
+		introduction: z.string(),
 		hero: IdSchema,
 		avatars: z.array(IdSchema).max(ProjectAvatarKeys.length),
 		board: EditorProjectSizeSchema,

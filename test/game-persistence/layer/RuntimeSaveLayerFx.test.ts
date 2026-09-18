@@ -30,6 +30,49 @@ const emitCompletedEventFx = (jobId: string) =>
 	);
 
 describe("RuntimeSaveLayerFx", () => {
+	it.effect("does not deduplicate a snapshot skipped while saving is disabled", () => {
+		let enabled = false;
+		const saves: StateSchema.Type[] = [];
+		const core = GameRuntimeLayerFx({
+			config: createJobTestConfig(),
+		});
+		const save = RuntimeSaveLayerFx({
+			debounceMs: 15,
+			isEnabledFn: () => enabled,
+			saveFx: (state) =>
+				Effect.sync(() => {
+					saves.push(state);
+				}),
+		}).pipe(Layer.provide(core));
+
+		return Effect.gen(function* () {
+			const runtimeSave = yield* RuntimeSaveFx;
+			yield* spawnItemFx({
+				id: "runtime:save:admission",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			});
+			yield* TestClock.adjust(15);
+			yield* runtimeSave.flush;
+			expect(saves).toHaveLength(0);
+
+			enabled = true;
+			yield* runtimeSave.flush;
+			expect(saves).toHaveLength(1);
+			expect(saves[0]?.items).toHaveLength(1);
+			yield* runtimeSave.flush;
+			expect(saves).toHaveLength(1);
+			yield* runtimeSave.discard;
+		}).pipe(Effect.provide(Layer.merge(core, save)));
+	});
+
 	it("preserves an exact mixed autosave Cause", async () => {
 		const mixedCause = Cause.combine(
 			Cause.fail(new Error("save typed failure")),

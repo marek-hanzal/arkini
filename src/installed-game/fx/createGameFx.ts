@@ -1,5 +1,6 @@
 import { GameplaySpeedUpMultiplier } from "~/game-cheat/constant/GameplaySpeedUpMultiplier";
-import { Effect } from "effect";
+import { Effect, Semaphore } from "effect";
+import { TickFx } from "~/game-tick/service/TickFx";
 import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
 import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
 import type { Game } from "~/installed-game/type/Game";
@@ -8,6 +9,7 @@ import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
+import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
@@ -79,6 +81,9 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		}
 		state = saved.state;
 	}
+	const introduction = state === undefined ? loaded.payload.config.meta.introduction : undefined;
+	let introductionPending = (introduction?.trim().length ?? 0) > 0;
+	const introductionMutex = yield* Semaphore.make(1);
 	const session = yield* createGameSessionFx({
 		speedUpMultiplier: GameplaySpeedUpMultiplier,
 		config: loaded.payload.config,
@@ -88,6 +93,8 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					state,
 				}),
 		save: {
+			// An unacknowledged welcome is not a started game, including on native close.
+			isEnabledFn: () => !introductionPending,
 			writeFx: (nextState) =>
 				saveStorage.writeFx(
 					saveKey,
@@ -130,7 +137,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			releaseFx: Effect.sync(() => urls.clear()),
 		};
 		const liveResourceUrls = resourceUrls;
-		if (state === undefined) {
+		if (state === undefined && !introductionPending) {
 			// A restored save is already started; only a new state receives the initial command.
 			yield* session.runFx(startFx());
 		}
@@ -162,6 +169,30 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				Effect.andThen(liveResourceUrls.releaseFx),
 			),
 			saveKey,
+			...(introductionPending
+				? {
+						introduction: {
+							readFn: () => (introductionPending ? introduction : undefined),
+							continueFx: session.runFx(
+								introductionMutex.withPermits(1)(
+									Effect.uninterruptible(
+										Effect.gen(function* () {
+											if (!introductionPending) return;
+											// Drain time spent reading (or asleep) before any initial items can age.
+											const tick = yield* TickFx;
+											yield* tick.advanceRuntime;
+											yield* startFx();
+											// Keep save admission in the same joined command lifetime as world creation.
+											introductionPending = false;
+											const save = yield* RuntimeSaveFx;
+											yield* save.flush;
+										}),
+									),
+								),
+							),
+						},
+					}
+				: {}),
 			getResourceUrlFn: liveResourceUrls.getFn,
 		} satisfies Game;
 	}).pipe(Effect.onError(() => discardFailedBootstrapFx));

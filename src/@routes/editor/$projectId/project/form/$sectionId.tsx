@@ -1,3 +1,4 @@
+import { ProjectIntroductionSection } from "~/project-authoring/ui/ProjectIntroductionSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ProjectBoardSection } from "~/project-authoring/ui/ProjectBoardSection";
@@ -24,6 +25,8 @@ export const Route = createFileRoute("/editor/$projectId/project/form/$sectionId
 		const { sectionId } = Route.useParams();
 		const { avatar } = Route.useSearch();
 		switch (sectionId as ProjectSectionId) {
+			case "introduction":
+				return <ProjectIntroductionSection />;
 			case "general":
 				return <ProjectGeneralSection />;
 			case "images":

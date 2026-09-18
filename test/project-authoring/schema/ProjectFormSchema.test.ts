@@ -60,6 +60,7 @@ const createInventoryProject = () =>
 
 const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 	title: project.config.meta.title,
+	introduction: project.config.meta.introduction ?? "",
 	hero: project.config.resources.hero,
 	avatars: [],
 	board: project.config.meta.board,

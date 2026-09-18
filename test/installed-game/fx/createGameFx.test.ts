@@ -20,7 +20,7 @@ const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEff
 		runRendererEffectFn: Effect.runSync,
 	});
 
-const createStorages = async (version = "1.0") => {
+const createStorages = async (version = "1.0", introduction?: string) => {
 	const file: ArkpackStorage.LoadedFile = {
 		packageId: testArkpackConfig.meta.id,
 		filename: "test.arkpack",
@@ -28,7 +28,13 @@ const createStorages = async (version = "1.0") => {
 		title: testArkpackConfig.meta.title,
 		version,
 		arkini: ArkiniAppVersion,
-		config: testArkpackConfig,
+		config: {
+			...testArkpackConfig,
+			meta: {
+				...testArkpackConfig.meta,
+				introduction,
+			},
+		},
 		resources: [
 			{
 				id: "hero",
@@ -144,6 +150,66 @@ describe("createGameFx", () => {
 		} finally {
 			await Effect.runPromise(restored.disposeFx);
 		}
+	});
+
+	it("keeps a welcome unsaved until Continue, starts once and skips it when restoring", async () => {
+		const content = "# Welcome\n\nBuild **something**.\n\n- Have fun";
+		const storages = await createStorages("1.0", content);
+		const loadFn = () =>
+			Effect.runPromise(
+				createGameFx({
+					packageId: storages.packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
+				}),
+			);
+		const abandoned = await loadFn();
+		expect(abandoned.introduction?.readFn()).toBe(content);
+		expect(abandoned.getSnapshotFn().items).toEqual([]);
+		await Effect.runPromise(abandoned.flushSaveFx);
+		expect(storages.readSaved()).toBeNull();
+		await Effect.runPromise(abandoned.disposeFx);
+		expect(storages.readSaved()).toBeNull();
+
+		const game = await loadFn();
+		try {
+			expect(game.introduction?.readFn()).toBe(content);
+			const introduction = game.introduction!;
+			await Promise.all([
+				Effect.runPromise(introduction.continueFx),
+				Effect.runPromise(introduction.continueFx),
+			]);
+			expect(introduction.readFn()).toBeUndefined();
+			expect(game.getSnapshotFn().items).toHaveLength(1);
+			expect(storages.readSaved()).not.toBeNull();
+		} finally {
+			await Effect.runPromise(game.disposeFx);
+		}
+		const restored = await loadFn();
+		try {
+			expect(restored.introduction).toBeUndefined();
+			expect(restored.getSnapshotFn().items).toHaveLength(1);
+		} finally {
+			await Effect.runPromise(restored.disposeFx);
+		}
+	});
+
+	it("starts immediately when the authored introduction contains only whitespace", async () => {
+		const storages = await createStorages("1.0", " \n\t");
+		const game = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		try {
+			expect(game.introduction).toBeUndefined();
+			expect(game.getSnapshotFn().items).toHaveLength(1);
+		} finally {
+			await Effect.runPromise(game.disposeFx);
+		}
+		expect(storages.readSaved()).not.toBeNull();
 	});
 
 	it("restores an older compatible minor save and stamps the current arkpack version", async () => {

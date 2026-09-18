@@ -479,6 +479,8 @@ Consume material mode help:
     Use it for ingredients and components.
 Consumed:
   value: Consumed
+Continue:
+  value: Continue
 Copied:
   value: Copied
 Copy Clock section help:
@@ -907,6 +909,8 @@ Interval:
   value: Interval
 Interval (seconds):
   value: Interval (seconds)
+Introduction:
+  value: Introduction
 Inventory:
   value: Inventory
   dynamic: true
@@ -1427,6 +1431,8 @@ No images match this search.:
   value: No images match this search.
 No inputs:
   value: No inputs
+No introduction. New games start immediately.:
+  value: No introduction. New games start immediately.
 No item selected:
   value: No item selected
 No item with Units enabled matches this search.:
@@ -2305,8 +2311,12 @@ Width:
   value: Width
 With note:
   value: With note
+Write a Markdown welcome for new players. It appears before a new game starts and is skipped when a save exists. Leave it empty to start immediately.:
+  value: Write a Markdown welcome for new players. It appears before a new game starts and is skipped when a save exists. Leave it empty to start immediately.
 Write a note…:
   value: Write a note…
+Write a welcome in Markdown…:
+  value: Write a welcome in Markdown…
 Your queue is empty.:
   value: Your queue is empty.
 added by invisible color cleanup:

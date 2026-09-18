@@ -2,6 +2,8 @@
 
 This document owns the portable project layout, compiler flow, and author-facing semantic boundaries. [`src/game-value`](src/game-value) owns the foundational immutable scalar language; [`src/game-config-source`](src/game-config-source) owns exact source files, source schemas, and the generated `schema.json`; [`src/game-config`](src/game-config) owns the completed config aggregate; [`src/sfx-event`](src/sfx-event) owns the exact SFX event vocabulary spanning committed gameplay and explicit presentation interactions; [`src/game-config-validation`](src/game-config-validation) owns semantic validation; [`src/game-config-compiler`](src/game-config-compiler) owns canonical compilation; [`GAME.MD`](GAME.MD) owns runtime interpretation.
 
+Project View/Edit includes an **Introduction** section. Optional `game.json.meta.introduction` stores the author's Markdown as packaged game content, separately from Editor Notes. The form starts with 20 lines and grows with its text; View renders Markdown. Empty or whitespace-only text disables the introduction.
+
 ## Canonical project
 
 A project is one directly versionable directory:

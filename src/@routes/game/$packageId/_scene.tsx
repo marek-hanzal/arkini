@@ -1,3 +1,5 @@
+import { GameIntroductionGate } from "~/installed-game/ui/GameIntroductionGate";
+import { usePackageGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
@@ -10,11 +12,19 @@ import { GameShell } from "~/game-shell/ui/GameShell";
  * Action and Cheats routes intentionally sit outside this shell.
  */
 export const Route = createFileRoute("/game/$packageId/_scene")({
-	component: () => (
-		<PlayableGameResources>
-			<GameShell>
-				<Outlet />
-			</GameShell>
-		</PlayableGameResources>
-	),
+	component: () => {
+		const game = usePackageGameEngine();
+		return (
+			<GameIntroductionGate
+				key={game.diagnosticSessionId}
+				game={game}
+			>
+				<PlayableGameResources>
+					<GameShell>
+						<Outlet />
+					</GameShell>
+				</PlayableGameResources>
+			</GameIntroductionGate>
+		);
+	},
 });

@@ -39,6 +39,7 @@ export namespace createGameSessionFx {
 		speedUpMultiplier?: number;
 		save?: {
 			debounceMs?: number;
+			isEnabledFn?: () => boolean;
 			writeFx: (state: StateSchema.Type) => Effect.Effect<void, SaveError, never>;
 		};
 	}
@@ -193,6 +194,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							})
 						: RuntimeSaveLayerFx({
 								debounceMs: save.debounceMs,
+								isEnabledFn: save.isEnabledFn,
 								onFatalErrorFn: (cause) => failStopFn("autosave", cause),
 								saveFx: save.writeFx,
 							}).pipe(Layer.provide(sessionLayer));

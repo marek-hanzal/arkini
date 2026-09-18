@@ -8,6 +8,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 		kind: "available",
 		itemId: "owner",
 		capacity: 8,
+		used: 6,
 		canClearQueue: true,
 		active: [
 			{
@@ -83,6 +84,7 @@ it("distinguishes missing input from other start blockers without claiming that 
 		kind: "available",
 		itemId: "owner",
 		capacity: 4,
+		used: 3,
 		canClearQueue: true,
 		active: [],
 		request: [

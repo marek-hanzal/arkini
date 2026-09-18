@@ -171,7 +171,6 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 	const { queue, lines } = useRuntimeSelector(game, selectorFn, Equal.equals);
 	const active = queue.kind === "available" ? queue.active[0] : undefined;
 	const requests = queue.kind === "available" ? queue.request : [];
-	const occupied = requests.length + (queue.kind === "available" ? queue.active.length : 0);
 	const activeLine = lines.find((line) => line.id === active?.lineId);
 	if (queueSize === undefined)
 		return (
@@ -183,6 +182,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 			/>
 		);
 	const capacity = queue.kind === "available" ? queue.capacity : queueSize;
+	const used = queue.kind === "available" ? queue.used : 0;
 	return (
 		<section
 			className="flex h-full min-h-0 flex-col pl-3"
@@ -263,7 +263,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 									<>
 										{translator.textFn("Available slots")}:{" "}
 										<strong className="tabular-nums">
-											{Math.max(0, capacity - occupied)}
+											{Math.max(0, capacity - used)}
 										</strong>
 									</>
 								}

@@ -1,6 +1,8 @@
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { Effect, Option, Result } from "effect";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
@@ -11,6 +13,9 @@ import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineI
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
+import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
+import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
+import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 
 interface ItemDetailQueueRequest {
 	readonly requestId: IdSchema.Type;
@@ -42,6 +47,7 @@ export namespace readItemDetailQueueFx {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly capacity: number;
+				readonly used: number;
 				readonly canClearQueue: boolean;
 				readonly active: readonly ItemDetailQueueActiveJob[];
 				readonly request: readonly ItemDetailQueueRequest[];
@@ -60,6 +66,47 @@ const readPrimaryOutputItemIdFn = (line: LineSchema.Type | undefined) => {
 	if (roll === undefined) return undefined;
 	return roll.drop[0]?.itemId;
 };
+
+const readVisibleWorkLineIdsFx = Effect.fn("readVisibleWorkLineIdsFx")(function* ({
+	lineOwner,
+	owner,
+	runtime,
+	workLineIds,
+}: {
+	readonly lineOwner: ItemSchema.Type;
+	readonly owner: RuntimeSchema.Type["items"][number];
+	readonly runtime: RuntimeSchema.Type;
+	readonly workLineIds: ReadonlySet<IdSchema.Type>;
+}) {
+	const visibleLineIds = new Set<IdSchema.Type>();
+	for (const line of lineOwner.lines) {
+		if (!workLineIds.has(line.id)) continue;
+		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
+			if (line.show) visibleLineIds.add(line.id);
+			continue;
+		}
+		const visibilityRules = line.rules.filter(
+			(rule) =>
+				rule.type === RuleTypeSchema.enum.Show || rule.type === RuleTypeSchema.enum.Hide,
+		);
+		const rules = yield* lineRulesFx({
+			origin: owner.location,
+			rules: visibilityRules,
+		}).pipe(
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(runtime),
+			}),
+		);
+		if (
+			resolveLineShowFn({
+				line,
+				rules,
+			})
+		)
+			visibleLineIds.add(line.id);
+	}
+	return visibleLineIds;
+});
 
 /** Projects active and queued line work for one exact line owner. */
 export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function* ({
@@ -80,8 +127,19 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 			line,
 		]),
 	);
+	const allActive = runtime.jobs.filter((job) => job.ownerItemId === owner.id);
+	const allRequests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
+	const visibleWorkLineIds = yield* readVisibleWorkLineIdsFx({
+		lineOwner: lineOwner.value,
+		owner,
+		runtime,
+		workLineIds: new Set([
+			...allActive.map((job) => job.lineId),
+			...allRequests.map((request) => request.lineId),
+		]),
+	});
 	const active = yield* Effect.forEach(
-		runtime.jobs.filter((job) => job.ownerItemId === owner.id),
+		allActive.filter((job) => visibleWorkLineIds.has(job.lineId)),
 		(job) =>
 			resolveActiveJobStatusFx({
 				job,
@@ -106,14 +164,14 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 				}),
 			),
 	);
-	const requests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
+	const requests = allRequests.filter((request) => visibleWorkLineIds.has(request.lineId));
 	const projectedRequests = yield* Effect.forEach(requests, (request) =>
 		Effect.gen(function* () {
 			let status: ItemDetailQueueRequest["status"] =
-				active.length > 0 ? "blocked-active" : "blocked-condition";
+				allActive.length > 0 ? "blocked-active" : "blocked-condition";
 			let missingQuantity: number | undefined;
 			if (
-				active.length === 0 &&
+				allActive.length === 0 &&
 				owner.location.scope === LocationScopeEnumSchema.enum.Board
 			) {
 				const start = yield* resolveLineStartFx({
@@ -174,6 +232,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 		kind: "available",
 		itemId: owner.id,
 		capacity,
+		used: allActive.length + allRequests.length,
 		canClearQueue: canControlItemProductionFn(owner.item),
 		active,
 		request: projectedRequests,

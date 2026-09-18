@@ -64,6 +64,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 2,
+			used: 2,
 			canClearQueue: true,
 			active: [
 				{
@@ -180,6 +181,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 1,
+			used: 1,
 			canClearQueue: true,
 			active: [],
 			request: [
@@ -206,6 +208,35 @@ describe("readItemDetailQueue", () => {
 			}),
 		).toEqual({
 			kind: "unavailable",
+		});
+	});
+
+	it("omits active and queued work for a currently hidden line without freeing its slots", () => {
+		const base = queuedRuntime(lineRunRuntime({}));
+		const runtime = {
+			...base,
+			jobs: [
+				{
+					id: "job:hidden",
+					ownerItemId: "runtime:workshop",
+					lineId: "line:workshop:build",
+					durationMs: 1_000,
+					remainingMs: 600,
+				},
+			],
+		} satisfies RuntimeSchema.Type;
+
+		expect(
+			readQueue({
+				itemId: "runtime:workshop",
+				runtime,
+			}),
+		).toMatchObject({
+			kind: "available",
+			capacity: 2,
+			used: 2,
+			active: [],
+			request: [],
 		});
 	});
 

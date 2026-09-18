@@ -94,7 +94,7 @@ const ItemLine = ({ line, makeDisabled, status, ...props }: ItemLineProps) => {
 				<span className="shrink-0 text-muted">· {formatDurationFn(line.runtimeMs)}</span>
 				<div className="ml-auto flex shrink-0 items-center gap-8">
 					<LinkButton
-						className="inline-flex items-center gap-2 text-muted data-[ui-selected=true]:text-accent"
+						className="inline-flex items-center gap-2 text-muted data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
 						disabled={defaultController.disabled}
 						onClick={defaultController.toggleFn}
 						{...readDataUiFn({

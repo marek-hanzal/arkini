@@ -70,7 +70,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 							}}
 						>
 							<div
-								className="grid w-full max-w-lg gap-4 rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+								className="grid w-full max-w-lg gap-4 rounded-2xl border border-line-strong bg-modal p-6 text-foreground shadow-2xl"
 								data-ui="ItemSectionCopyDialog"
 							>
 								<h2 className="text-lg font-semibold">

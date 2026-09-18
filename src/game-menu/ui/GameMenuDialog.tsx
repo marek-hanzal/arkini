@@ -48,7 +48,7 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 		>
 			<motion.div
 				ref={focus.overlayRef}
-				className="max-h-full w-full max-w-sm cursor-default overflow-y-auto rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-2xl outline-none"
+				className="max-h-full w-full max-w-sm cursor-default overflow-y-auto rounded-2xl border border-line-strong bg-modal p-[var(--ak-panel-padding)] text-foreground shadow-2xl outline-none"
 				data-ui="GameMenu"
 				style={{
 					viewTransitionName: gameMenuDialogViewTransitionName,

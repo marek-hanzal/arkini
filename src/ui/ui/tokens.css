@@ -2,6 +2,7 @@
 	--color-canvas: var(--ak-canvas);
 	--color-surface: var(--ak-surface);
 	--color-surface-raised: var(--ak-surface-raised);
+	--color-modal: var(--ak-modal);
 	--color-selection: var(--ak-selection);
 	--color-selection-hover: var(--ak-selection-hover);
 	--color-foreground: var(--ak-foreground);
@@ -46,6 +47,7 @@
 	--ak-canvas: light-dark(#fbf8ff, #090711);
 	--ak-surface: light-dark(#fffaff, #151020);
 	--ak-surface-raised: light-dark(#f3eafd, #231730);
+	--ak-modal: light-dark(#ffffff, #151020);
 	--ak-selection: light-dark(#f3edf9, #302139);
 	--ak-selection-hover: light-dark(#eae0f4, #3b2948);
 	--ak-editor-background: light-dark(#ffffff, #151020);

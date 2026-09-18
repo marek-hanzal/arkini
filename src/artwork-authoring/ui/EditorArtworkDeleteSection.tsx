@@ -38,7 +38,7 @@ const EditorArtworkDeleteDialog = ({
 		}}
 	>
 		<div
-			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+			className="w-full max-w-md rounded-2xl border border-line-strong bg-modal p-6 text-foreground shadow-2xl"
 			data-ui="EditorArtworkDeleteDialog"
 		>
 			<h2 className="text-lg font-semibold">

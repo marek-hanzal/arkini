@@ -92,7 +92,7 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 			}}
 		>
 			<div
-				className="mx-auto grid w-[57rem] max-w-full gap-3 rounded-2xl border border-line-strong bg-surface-raised p-4 text-foreground shadow-2xl"
+				className="mx-auto grid w-[57rem] max-w-full gap-3 rounded-2xl border border-line-strong bg-modal p-4 text-foreground shadow-2xl"
 				data-ui={props.dataUi}
 				onKeyDown={controller.onKeyDownFn}
 			>

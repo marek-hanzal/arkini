@@ -32,7 +32,7 @@ export const Cheats = ({
 				dataUi="GameSceneBackdrop"
 			/>
 			<section
-				className="relative z-10 grid w-[34rem] max-w-full gap-6 rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] shadow-2xl"
+				className="relative z-10 grid w-[34rem] max-w-full gap-6 rounded-2xl border border-line-strong bg-modal p-[var(--ak-panel-padding)] shadow-2xl"
 				data-ui="Cheats"
 			>
 				<header className="grid gap-2">

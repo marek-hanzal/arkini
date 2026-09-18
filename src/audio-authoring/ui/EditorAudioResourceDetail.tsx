@@ -238,7 +238,7 @@ const EditorAudioResourceDelete = ({
 				<Overlay onCloseFn={controller.cancelFn}>
 					<div
 						data-ui="EditorAudioDeleteDialog"
-						className="grid w-full max-w-2xl gap-4 rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+						className="grid w-full max-w-2xl gap-4 rounded-2xl border border-line-strong bg-modal p-6 text-foreground shadow-2xl"
 					>
 						<h2 className="text-lg font-semibold">
 							{translator.textFn(assigned ? "Force delete audio?" : "Delete audio?")}

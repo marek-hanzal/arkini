@@ -27,7 +27,7 @@ export const ProjectDeleteDialog = ({
 }: ProjectDeleteDialogProps) => (
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
-			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+			className="w-full max-w-md rounded-2xl border border-line-strong bg-modal p-6 text-foreground shadow-2xl"
 			data-project-ownership={ownership}
 			data-ui="EditorProjectDeleteDialog"
 		>

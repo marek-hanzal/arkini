@@ -10,6 +10,8 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
+import { ItemLineBackdrop } from "~/item-detail/ui/ItemLineBackdrop";
+import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemQueueClearController } from "~/item-detail/ui/useItemQueueClearController";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -36,6 +38,7 @@ const QueuedLine = ({
 	readonly disabled: boolean;
 }) => {
 	const translator = useTranslator();
+	const game = useGameEngine();
 	const cancel = useItemLineCancelController({
 		ownerItemId,
 		lineId: line.id,
@@ -44,13 +47,22 @@ const QueuedLine = ({
 	});
 	return (
 		<li
-			className="flex gap-4 py-4"
+			className="relative isolate flex gap-4 py-4"
 			data-ui="ItemQueueRequest"
 			data-request-id={requestId}
 		>
+			{line.artwork === undefined ? null : (
+				<ItemLineBackdrop sourceUrl={game.getResourceUrlFn(line.artwork)} />
+			)}
 			<span className="w-6 shrink-0 text-lg tabular-nums text-muted">{position}</span>
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center gap-3">
+					{line.artwork === undefined ? null : (
+						<ItemArtwork
+							className="size-10"
+							sourceUrl={game.getResourceUrlFn(line.artwork)}
+						/>
+					)}
 					<h3 className="text-lg font-semibold">{line.title}</h3>
 					<span className="text-muted">· {formatDurationFn(line.runtimeMs)}</span>
 					<LinkButton
@@ -155,15 +167,29 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 				) : null}
 			</header>
 			<section
-				className="flex min-h-0 max-h-[40%] shrink-0 flex-col border-y border-line py-3"
+				className="relative isolate flex min-h-0 max-h-[40%] shrink-0 flex-col border-y border-line py-3"
 				data-ui="ItemQueueActive"
 			>
+				{active !== undefined && activeLine?.artwork !== undefined ? (
+					<ItemLineBackdrop
+						sourceUrl={game.getResourceUrlFn(activeLine.artwork)}
+						progress={
+							active.durationMs === 0 ? 1 : 1 - active.remainingMs / active.durationMs
+						}
+					/>
+				) : null}
 				<h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">
 					{translator.textFn("Current production")}
 				</h2>
 				{active !== undefined && activeLine !== undefined ? (
 					<div className="min-h-0 overflow-auto">
 						<div className="flex items-center gap-3">
+							{activeLine.artwork === undefined ? null : (
+								<ItemArtwork
+									className="size-10"
+									sourceUrl={game.getResourceUrlFn(activeLine.artwork)}
+								/>
+							)}
 							<h3 className="text-lg font-semibold">{active.title}</h3>
 							<span className="ml-auto text-sm">
 								{match(active.status)

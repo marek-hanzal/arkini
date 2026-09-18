@@ -12,6 +12,7 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { useItemLineMakeController } from "~/item-detail/ui/useItemLineMakeController";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
+import { ItemLineBackdrop } from "~/item-detail/ui/ItemLineBackdrop";
 import { useItemLineDefaultController } from "~/item-detail/ui/useItemLineDefaultController";
 import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemLinesStatus } from "~/item-detail/ui/useItemLinesStatus";
@@ -82,7 +83,7 @@ const ItemLineCountdown = ({
 };
 
 /** Progress follows the live job's captured duration, independently of debounced status. */
-const ItemLineBackdrop = ({
+const ItemLineProgressBackdrop = ({
 	ownerItemId,
 	lineId,
 	artworkId,
@@ -110,17 +111,10 @@ const ItemLineBackdrop = ({
 	);
 	const progress = useRuntimeSelector(game, selectorFn);
 	return (
-		<div
-			className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-[42%] -translate-x-1/2 opacity-45 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_72%)]"
-			data-ui="ItemLineBackdrop"
-		>
-			<ItemArtwork
-				className="size-full"
-				imageClassName="object-cover"
-				sourceUrl={game.getResourceUrlFn(artworkId)}
-				colorFraction={progress}
-			/>
-		</div>
+		<ItemLineBackdrop
+			sourceUrl={game.getResourceUrlFn(artworkId)}
+			progress={progress}
+		/>
 	);
 };
 
@@ -178,7 +172,7 @@ const ItemLine = ({ line, makeDisabled, ruleDisabled, status, ...props }: ItemLi
 				data-line-id={line.id}
 			>
 				{line.artwork === undefined ? null : (
-					<ItemLineBackdrop
+					<ItemLineProgressBackdrop
 						ownerItemId={props.ownerItemId}
 						lineId={line.id}
 						artworkId={line.artwork}

@@ -205,7 +205,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 				)}
 			</section>
 			<div
-				className="min-h-0 flex-1 overflow-auto"
+				className="flex min-h-0 flex-1 flex-col overflow-auto"
 				data-ui="ItemQueuePending"
 			>
 				{requests.length === 0 ? (
@@ -213,6 +213,7 @@ export const ItemQueue = ({ ownerItemId, queueSize, disabled }: ItemQueueProps) 
 						icon={ListOrdered}
 						title={translator.textFn("Your queue is empty.")}
 						description={translator.textFn("Choose something to make in Lines.")}
+						size="large"
 						variant="flat"
 					/>
 				) : (

@@ -164,6 +164,7 @@ const ItemLine = ({
 	return (
 		<motion.div
 			{...linePresenceMotion}
+			layout="position"
 			className="-mx-3 overflow-hidden border-t border-line px-3 first:border-t-0"
 			data-ui="ItemLinePresence"
 			inert={!present}

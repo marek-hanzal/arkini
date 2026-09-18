@@ -244,28 +244,77 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 								...item,
 								item: {
 									...item.item,
-									lines: item.item.lines.map((line) => ({
-										...line,
-										show: true,
-										rules: line.rules.filter(
-											(rule) => rule.type !== "show" && rule.type !== "hide",
-										),
-									})),
+									lines: item.item.lines.flatMap((line) => [
+										{
+											...line,
+											id: "disabled-first",
+											show: true,
+											enable: false,
+											rules: [],
+										},
+										{
+											...line,
+											show: true,
+											rules: line.rules.filter(
+												(rule) =>
+													rule.type !== "show" && rule.type !== "hide",
+											),
+										},
+										{
+											...line,
+											id: "enabled-first",
+											show: true,
+											enable: true,
+											rules: [],
+										},
+										{
+											...line,
+											id: "enabled-second",
+											show: true,
+											enable: true,
+											rules: [],
+										},
+									]),
 								},
 							},
 				),
 			};
 			await act(async () => root.render(<Probe />));
-			expect(output?.detail?.lines.map((line) => line.id)).toEqual([
-				lineId,
-			]);
+			expect(output?.detail?.lines.map((line) => line.id)).toEqual(
+				disabled
+					? [
+							"enabled-first",
+							"enabled-second",
+							"disabled-first",
+							lineId,
+						]
+					: [
+							lineId,
+							"enabled-first",
+							"enabled-second",
+							"disabled-first",
+						],
+			);
 			expect(output?.detail?.disabledLineIds).toEqual(
 				disabled
 					? [
+							"disabled-first",
 							lineId,
 						]
-					: [],
+					: [
+							"disabled-first",
+						],
 			);
+			expect(
+				state.runtime.items
+					.find((item) => item.id === ownerId)
+					?.item.lines.map((line) => line.id),
+			).toEqual([
+				"disabled-first",
+				lineId,
+				"enabled-first",
+				"enabled-second",
+			]);
 		}
 	} finally {
 		await act(async () => root.unmount());

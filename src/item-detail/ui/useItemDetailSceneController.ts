@@ -122,7 +122,9 @@ export const useItemDetailSceneController = ({
 				),
 			);
 			if (Exit.isFailure(lineStates)) throw lineStates.cause;
-			const visibleLines = lineStates.value.filter((state) => state.visible);
+			const visibleLines = lineStates.value
+				.filter((state) => state.visible)
+				.sort((a, b) => Number(b.enabled) - Number(a.enabled));
 			let canMake = false;
 			if (
 				runtimeItem?.location.scope === "board" &&

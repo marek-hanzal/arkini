@@ -22,6 +22,7 @@
 			{
 				"id": "founder-chest",
 				"title": "Get the initial loot",
+				"artwork": "foundation-chest",
 				"description": "Hele you'll get everything you need to get started with the game.",
 				"default": true,
 				"show": true,

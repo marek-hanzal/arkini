@@ -21,6 +21,7 @@
 			{
 				"id": "lumber-camp-blueprint",
 				"title": "Lumber Camp Blueprint",
+				"artwork": "lumber-camp",
 				"description": "If you need wood, here you go.",
 				"default": false,
 				"show": true,
@@ -112,6 +113,7 @@
 			{
 				"id": "stonemason-camp-blueprint",
 				"title": "Stonemason Camp Blueprint",
+				"artwork": "stonemason-camp",
 				"description": "Stone time!",
 				"default": false,
 				"show": true,
@@ -203,6 +205,7 @@
 			{
 				"id": "townhall-t1-blueprint",
 				"title": "Townhall I Blueprint",
+				"artwork": "townhall-t1",
 				"description": "Time to get better stuff, here you go!",
 				"default": false,
 				"show": true,
@@ -323,6 +326,7 @@
 			{
 				"id": "well-blueprint",
 				"title": "Well Blueprint",
+				"artwork": "well",
 				"description": "It's time to construct a well.",
 				"default": false,
 				"show": true,
@@ -402,6 +406,7 @@
 			{
 				"id": "house-t1-blueprint",
 				"title": "House - Tier 1 Blueprint",
+				"artwork": "house-t1",
 				"description": "House blueprint",
 				"default": false,
 				"show": true,
@@ -450,6 +455,7 @@
 			{
 				"id": "campfire",
 				"title": "Campfire",
+				"artwork": "campfire",
 				"description": "You can cook something",
 				"default": false,
 				"show": true,

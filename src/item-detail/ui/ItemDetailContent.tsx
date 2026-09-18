@@ -6,9 +6,7 @@ import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailContro
 import type { ItemDetailQueueProjection } from "~/item-detail/fx/projectItemDetailQueueFx";
 import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";
 import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
-import { ItemSourcesTab } from "~/item-detail/ui/ItemSourcesTab";
 import type { useDefinitionItemDetailSceneController } from "~/item-detail/ui/useDefinitionItemDetailSceneController";
-import type { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
 import { itemDetailTransition } from "~/item-detail/ui/useItemDetailMotion";
 import type { useRuntimeItemDetailSceneController } from "~/item-detail/ui/useRuntimeItemDetailSceneController";
 import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
@@ -24,7 +22,6 @@ interface RuntimeItemDetailContentProps {
 	readonly lines?: useRuntimeItemDetailSceneController.Output["lines"];
 	readonly queue?: ItemDetailQueueProjection;
 	readonly queueStale: boolean;
-	readonly sources?: useItemDetailNavigationController.SourcesProjection;
 	readonly stale: boolean;
 	readonly target: Extract<
 		ItemDetailTarget,
@@ -43,7 +40,6 @@ interface DefinitionItemDetailContentProps {
 		}
 	>;
 	readonly disabled: boolean;
-	readonly sources: useItemDetailNavigationController.SourcesProjection;
 	readonly target: Extract<
 		ItemDetailTarget,
 		{
@@ -183,31 +179,6 @@ const ItemQueueContent = ({
 	);
 };
 
-const ItemSourcesContent = ({
-	disabled,
-	sources,
-	stale = false,
-}: {
-	readonly disabled: boolean;
-	readonly sources?: useItemDetailNavigationController.SourcesProjection;
-	readonly stale?: boolean;
-}) => {
-	if (sources?.kind !== "available" || sources.source.length === 0) {
-		return (
-			<div className="grid flex-1 place-items-center text-sm text-muted">
-				<Tx label="Source detail is unavailable." />
-			</div>
-		);
-	}
-	return (
-		<ItemSourcesTab
-			disabled={disabled}
-			sources={sources}
-			stale={stale}
-		/>
-	);
-};
-
 const RuntimeItemDetailContent = ({
 	disabled,
 	identity,
@@ -216,7 +187,6 @@ const RuntimeItemDetailContent = ({
 	lines,
 	queue,
 	queueStale,
-	sources,
 	stale,
 	tab,
 }: Omit<RuntimeItemDetailContentProps, "kind" | "target"> & {
@@ -244,13 +214,6 @@ const RuntimeItemDetailContent = ({
 				disabled={disabled}
 				queue={queue}
 				stale={stale || queueStale}
-			/>
-		))
-		.with("sources", () => (
-			<ItemSourcesContent
-				disabled={disabled}
-				sources={sources}
-				stale={stale}
 			/>
 		))
 		.exhaustive();
@@ -282,7 +245,6 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 				lines={props.lines}
 				queue={props.queue}
 				queueStale={props.queueStale}
-				sources={props.sources}
 				stale={props.stale}
 				tab={props.target.tab}
 			/>
@@ -309,11 +271,14 @@ export const ItemDetailContent = (props: ItemDetailContentProps) => (
 							}),
 				}}
 			/>
+		) : props.target.tab === "lines" ? (
+			<div className="grid flex-1 place-items-center text-sm text-muted">
+				<Tx label="Line detail is unavailable." />
+			</div>
 		) : (
-			<ItemSourcesContent
-				disabled={props.disabled}
-				sources={props.sources}
-			/>
+			<div className="grid flex-1 place-items-center text-sm text-muted">
+				<Tx label="Queue detail is unavailable." />
+			</div>
 		)}
 	</motion.div>
 );

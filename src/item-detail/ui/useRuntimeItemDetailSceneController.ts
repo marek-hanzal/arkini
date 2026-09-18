@@ -1,19 +1,16 @@
 import { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { Equal } from "effect";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
-import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
 import { readItemDetailIdentityFx } from "~/item-detail-read/fx/readItemDetailIdentityFx";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
-import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";
 import {
 	type ItemDetailQueueProjection,
 	projectItemDetailQueueFx,
 } from "~/item-detail/fx/projectItemDetailQueueFx";
-import { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { useItemDetailLines } from "~/item-line-detail/ui/useItemDetailLines";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
@@ -61,9 +58,7 @@ export namespace useRuntimeItemDetailSceneController {
 		readonly queue?: ItemDetailQueueProjection;
 		readonly queueCount?: number;
 		readonly queueStale: boolean;
-		readonly sources?: useItemDetailNavigationController.SourcesProjection;
 		readonly stale: boolean;
-		readonly tabs: useItemDetailNavigationController.Output["tabs"];
 	}
 }
 
@@ -153,27 +148,15 @@ const useItemDetailQueue = (itemId: IdSchema.Type): ItemDetailQueueProjection =>
 export const useRuntimeItemDetailSceneController = ({
 	target,
 }: useRuntimeItemDetailSceneController.Props): useRuntimeItemDetailSceneController.Output => {
-	const itemDetail = useItemDetailControl();
 	const liveIdentity = useItemDetailIdentity(target.itemId);
 	const liveInfo = useItemDetailInfo(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
 	const liveQueue = useItemDetailQueue(target.itemId);
-	const navigation = useItemDetailNavigationController({
-		target: {
-			kind: "runtime",
-			itemId: target.itemId,
-		},
-	});
 	const targetKey = `runtime:${target.itemId}`;
 	const retainedIdentity = useRetainedItemDetailProjection({
 		available: liveIdentity.kind === "available",
 		targetKey,
 		value: liveIdentity,
-	});
-	const retainedTabs = useRetainedItemDetailProjection({
-		available: navigation.tabs.length > 0,
-		targetKey,
-		value: navigation.tabs,
 	});
 	const retainedInfo = useRetainedItemDetailProjection({
 		available: liveInfo.kind === "available",
@@ -190,28 +173,6 @@ export const useRuntimeItemDetailSceneController = ({
 		targetKey,
 		value: liveQueue,
 	});
-	const retainedSources = useRetainedItemDetailProjection({
-		available: navigation.sources.kind === "available",
-		targetKey,
-		value: navigation.sources,
-	});
-	const tabs = retainedTabs.value ?? [];
-	const stale = retainedIdentity.stale || retainedTabs.stale;
-
-	useEffect(() => {
-		if (stale || navigation.tabs.includes(target.tab)) return;
-		RendererRuntime.runSync(
-			itemDetail.openItemDetailFx({
-				itemId: target.itemId,
-			}),
-		);
-	}, [
-		itemDetail,
-		navigation.tabs,
-		stale,
-		target.itemId,
-		target.tab,
-	]);
 
 	return {
 		identity: retainedIdentity.value,
@@ -222,8 +183,6 @@ export const useRuntimeItemDetailSceneController = ({
 		queue: retainedQueue.value,
 		queueCount: liveQueue.kind === "available" ? liveQueue.request.length : undefined,
 		queueStale: retainedQueue.stale,
-		sources: retainedSources.value,
-		stale,
-		tabs,
+		stale: retainedIdentity.stale,
 	};
 };

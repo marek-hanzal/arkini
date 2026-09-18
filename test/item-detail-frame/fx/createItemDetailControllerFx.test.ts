@@ -14,7 +14,7 @@ const runtimeTarget = ({
 }: {
 	readonly itemId?: string;
 	readonly linesSearchQuery?: string;
-	readonly tab?: "info" | "lines" | "queue" | "sources";
+	readonly tab?: "info" | "lines" | "queue";
 	readonly origin?: HTMLElement | null;
 } = {}) =>
 	({

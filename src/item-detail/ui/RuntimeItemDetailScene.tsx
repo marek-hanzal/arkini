@@ -14,6 +14,16 @@ export const RuntimeItemDetailScene = ({ disabled, target }: RuntimeItemDetailSc
 		target,
 	});
 	const closeItemDetailFn = useCloseItemDetail();
+	const navigation = (
+		<ItemDetailTabs
+			active={target.tab}
+			disabled={disabled}
+			lineCount={controller.stale ? undefined : controller.lineCount}
+			queueCount={controller.stale ? undefined : controller.queueCount}
+			retained={controller.stale}
+			target={target}
+		/>
+	);
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
@@ -24,31 +34,26 @@ export const RuntimeItemDetailScene = ({ disabled, target }: RuntimeItemDetailSc
 				<ItemDetailHeader
 					disabled={disabled}
 					identity={controller.identity}
+					navigation={navigation}
 					stale={controller.stale}
 				/>
 			) : (
-				<header className="flex items-center justify-between border-b border-line pb-3">
-					<h2 className="text-lg font-semibold">
-						<Tx label="Item unavailable" />
-					</h2>
-					<button
-						type="button"
-						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-						onClick={() => closeItemDetailFn()}
-					>
-						×
-					</button>
-				</header>
+				<>
+					<header className="flex items-center justify-between border-b border-line pb-3">
+						<h2 className="text-lg font-semibold">
+							<Tx label="Item unavailable" />
+						</h2>
+						<button
+							type="button"
+							className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
+							onClick={() => closeItemDetailFn()}
+						>
+							×
+						</button>
+					</header>
+					{navigation}
+				</>
 			)}
-			<ItemDetailTabs
-				active={target.tab}
-				disabled={disabled}
-				lineCount={controller.stale ? undefined : controller.lineCount}
-				queueCount={controller.stale ? undefined : controller.queueCount}
-				stale={controller.stale}
-				tabs={controller.tabs}
-				target={target}
-			/>
 			<div
 				className="flex min-h-0 flex-1 overflow-hidden pt-4"
 				data-stale={controller.stale ? "true" : "false"}
@@ -62,7 +67,6 @@ export const RuntimeItemDetailScene = ({ disabled, target }: RuntimeItemDetailSc
 					lines={controller.lines}
 					queue={controller.queue}
 					queueStale={controller.queueStale}
-					sources={controller.sources}
 					stale={controller.stale}
 					target={target}
 				/>

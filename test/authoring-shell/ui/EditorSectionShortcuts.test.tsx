@@ -5,9 +5,9 @@ import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
 
 import { EditorSectionShortcutNavigation } from "~/authoring-shell/ui/EditorSectionBar";
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
 import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { Overlay } from "~/ui/ui/Overlay";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 
 (
 	globalThis as {
@@ -206,7 +206,7 @@ it("keeps unavailable choices unregistered and nested Shift keys separate from p
 	const parentFn = vi.fn();
 	const nestedFn = vi.fn();
 	const Harness = ({ enabled }: { readonly enabled: boolean }) => {
-		useEditorSectionShortcuts({
+		useSectionShortcuts({
 			options: [
 				{
 					shortcut: "t",
@@ -214,7 +214,7 @@ it("keeps unavailable choices unregistered and nested Shift keys separate from p
 			],
 			onSelectFn: parentFn,
 		});
-		useEditorSectionShortcuts({
+		useSectionShortcuts({
 			enabled,
 			options: [
 				{

@@ -1,7 +1,7 @@
 import { useHotkeys } from "@tanstack/react-hotkeys";
 
-/** Registers only the mounted page's choices; navigation and draft policy stay with the caller. */
-export const useEditorSectionShortcuts = <
+/** Registers only the mounted surface's local section choices. */
+export const useSectionShortcuts = <
 	Option extends {
 		readonly shortcut?: string;
 		readonly shift?: boolean;

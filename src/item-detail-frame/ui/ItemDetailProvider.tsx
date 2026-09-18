@@ -12,9 +12,6 @@ import {
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { resolveItemDetailTargetFn } from "~/item-detail-read/fn/resolveItemDetailTargetFn";
-import { readItemDetailTabsFn } from "~/item-detail-read/fn/readItemDetailTabsFn";
-import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
-import { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type {
 	ItemDetailTarget,
 	RunItemDetailPendingActionProps,
@@ -32,8 +29,8 @@ import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationS
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and
  * command-presentation settlement. Engine-backed resolvers remain authoritative for
- * target availability and allowed tabs; this provider must not retain or
- * manufacture gameplay facts when a runtime item disappears.
+ * target availability; the fixed presentation tabs do not retain or manufacture
+ * gameplay facts when a runtime item or configured definition disappears.
  *
  * Gesture semantics are decided by the invoking surface: right click opens
  * Detail and suppresses the immediate primary action. The provider receives only
@@ -134,20 +131,10 @@ export const ItemDetailProvider = ({
 		}: Parameters<ItemDetailControl["openItemDetailFx"]>[0]) =>
 			Effect.suspend(() => {
 				const runtime = game.getSnapshotFn();
-				const sources = game.readOrThrowFn(
-					readItemDetailSourcesFx({
-						target: {
-							kind: "runtime",
-							itemId,
-						},
-						runtime,
-					}),
-				);
 				const resolved = resolveItemDetailTargetFn({
 					itemId,
 					requestedTab: tab,
 					runtime,
-					sources,
 				});
 				if (resolved.kind === "unavailable") return Effect.succeed(false);
 				return openTargetFx({
@@ -171,36 +158,14 @@ export const ItemDetailProvider = ({
 		({
 			itemId,
 			origin = null,
-			tab,
+			tab = "info",
 		}: Parameters<ItemDetailControl["openItemDefinitionDetailFx"]>[0]) =>
 			Effect.suspend(() => {
-				const runtime = game.getSnapshotFn();
-				const sources = game.readOrThrowFn(
-					readItemDetailSourcesFx({
-						target: {
-							kind: "definition",
-							itemId,
-						},
-						runtime,
-					}),
-				);
-				if (sources.kind === "unavailable") return Effect.succeed(false);
-				const tabs = readItemDetailTabsFn({
-					target: {
-						kind: "definition",
-					},
-					sources,
-				});
-				const resolvedTab =
-					tab !== undefined && tabs.includes(tab)
-						? tab
-						: tabs.includes(ItemDetailTabEnumSchema.enum.Sources)
-							? ItemDetailTabEnumSchema.enum.Sources
-							: ItemDetailTabEnumSchema.enum.Info;
+				if (game.config.items[itemId] === undefined) return Effect.succeed(false);
 				return openTargetFx({
 					kind: "definition",
-					itemId: sources.targetDefinitionItemId,
-					tab: resolvedTab,
+					itemId,
+					tab,
 					origin: controller.readOriginFn(origin),
 				});
 			}),
@@ -211,13 +176,17 @@ export const ItemDetailProvider = ({
 	);
 
 	const selectRetainedItemDetailTabFx = useCallback(
-		({ itemId, tab }: Parameters<ItemDetailControl["selectRetainedItemDetailTabFx"]>[0]) =>
+		({
+			kind,
+			itemId,
+			tab,
+		}: Parameters<ItemDetailControl["selectRetainedItemDetailTabFx"]>[0]) =>
 			Effect.suspend(() => {
 				const current = controller.getSnapshotFn();
 				if (
 					current.phase === "closed" ||
 					current.phase === "exiting" ||
-					current.target.kind !== "runtime" ||
+					current.target.kind !== kind ||
 					current.target.itemId !== itemId
 				) {
 					return Effect.succeed(false);
@@ -225,7 +194,12 @@ export const ItemDetailProvider = ({
 				return controller.openTargetFx({
 					...current.target,
 					tab,
-					linesSearchQuery: tab === "lines" ? current.target.linesSearchQuery : undefined,
+					...(current.target.kind === "runtime"
+						? {
+								linesSearchQuery:
+									tab === "lines" ? current.target.linesSearchQuery : undefined,
+							}
+						: {}),
 				});
 			}),
 		[

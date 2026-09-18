@@ -1,4 +1,4 @@
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { useRouter } from "@tanstack/react-router";
 
 import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
@@ -23,7 +23,7 @@ export const useEditorArtworkDetailSectionShortcuts = ({
 	resourceId,
 }: useEditorArtworkDetailSectionShortcuts.Props) => {
 	const router = useRouter();
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		enabled,
 		options: EditorArtworkDetailSections,
 		onSelectFn: (section) => {

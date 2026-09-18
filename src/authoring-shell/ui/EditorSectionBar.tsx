@@ -1,14 +1,12 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import type { PropsWithChildren, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { LinkButton } from "~/ui/ui/LinkButton";
-
-export const editorSectionLinkClassName =
-	"inline-flex shrink-0 items-center px-4 py-2 text-sm font-medium text-muted no-underline hover:bg-accent/10 hover:text-accent hover:no-underline data-[ui-selected=true]:bg-accent/10 data-[ui-selected=true]:text-accent";
 
 interface EditorSectionShortcutNavigationProps<Value extends string> {
 	readonly dataUi: string;
@@ -29,7 +27,7 @@ export const EditorSectionShortcutNavigation = <Value extends string>({
 	options,
 	value,
 }: EditorSectionShortcutNavigationProps<Value>) => {
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		options,
 		onSelectFn: (option) => onChangeFn(option.value),
 	});
@@ -46,7 +44,7 @@ export const EditorSectionShortcutNavigation = <Value extends string>({
 						placement="bottom"
 					>
 						<LinkButton
-							className={`${editorSectionLinkClassName} gap-1.5`}
+							className={`${sectionLinkClassName} gap-1.5`}
 							onClick={() => onChangeFn(option.value)}
 							{...readDataUiFn({
 								dataUi,

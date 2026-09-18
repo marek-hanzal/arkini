@@ -1,17 +1,15 @@
 import { z } from "zod";
 
-/** Finite player-facing tabs that one runtime or configured definition may expose. */
+/** Fixed player-facing sections exposed by every Item Detail target. */
 export const ItemDetailTabEnumSchema = z
 	.enum({
-		Info: "info",
 		Lines: "lines",
 		Queue: "queue",
-		Sources: "sources",
+		Info: "info",
 	})
 	.meta({
 		id: "ItemDetailTabEnumSchema",
-		description:
-			"The finite player-facing tabs available in Item Detail for one runtime or configured definition.",
+		description: "The fixed player-facing sections available in every Item Detail.",
 	});
 
 export type ItemDetailTabEnumSchema = typeof ItemDetailTabEnumSchema;

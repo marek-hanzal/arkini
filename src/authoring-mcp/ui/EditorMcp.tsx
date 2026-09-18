@@ -1,7 +1,7 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { Tooltip } from "~/ui/ui/Tooltip";
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
@@ -10,15 +10,13 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import {
-	editorSectionLinkClassName,
-	EditorSectionBar,
-} from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useCopyButtonController } from "~/ui/ui/useCopyButtonController";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServer } from "./EditorMcpServer";
 import { EditorMcpSettings } from "./EditorMcpSettings";
@@ -30,7 +28,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 	const translator = useTranslator();
 	const project = useEditorProject();
 	const navigateFn = useNavigate();
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		options: EditorMcpSections,
 		onSelectFn: (candidate) => {
 			void navigateFn({
@@ -135,7 +133,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 									activeProps={{
 										"data-ui-selected": true,
 									}}
-									className={editorSectionLinkClassName}
+									className={sectionLinkClassName}
 								>
 									{translator.textFn(candidate.label)}
 								</LinkButtonLink>

@@ -1,9 +1,9 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { Tooltip } from "~/ui/ui/Tooltip";
-import { editorSectionLinkClassName } from "~/authoring-shell/ui/EditorSectionBar";
 import type { SectionDescriptor } from "~/item-authoring/type/Section";
 
 const activeProps = {
@@ -77,7 +77,7 @@ export const SectionLink = ({
 			}}
 			activeProps={activeProps}
 			inactiveProps={inactiveProps}
-			className={editorSectionLinkClassName}
+			className={sectionLinkClassName}
 		>
 			{label}
 		</LinkButtonLink>

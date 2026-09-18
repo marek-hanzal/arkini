@@ -1,4 +1,4 @@
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { useNavigate } from "@tanstack/react-router";
 
 import { ProjectSections } from "~/project-authoring/type/ProjectSections";
@@ -16,7 +16,7 @@ export const useProjectSectionShortcuts = ({
 	destination = "detail",
 }: useProjectSectionShortcuts.Props) => {
 	const navigateFn = useNavigate();
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		options: ProjectSections,
 		onSelectFn: (section) => {
 			void navigateFn({

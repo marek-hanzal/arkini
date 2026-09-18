@@ -10,10 +10,7 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
-import {
-	editorSectionLinkClassName,
-	EditorSectionBar,
-} from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useEditorArtworkById } from "~/artwork-authoring/ui/useEditorArtworkById";
 import { readResourceNameFn } from "~/game-config-resource/fn/readResourceNameFn";
@@ -23,6 +20,7 @@ import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Status } from "~/ui/ui/Status";
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import {
 	EditorArtworkDetailSections,
@@ -71,7 +69,7 @@ const EditorArtworkDetailTab = ({
 				inactiveProps={{
 					"data-ui-selected": false,
 				}}
-				className={editorSectionLinkClassName}
+				className={sectionLinkClassName}
 			>
 				{label}
 			</LinkButtonLink>

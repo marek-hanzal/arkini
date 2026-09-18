@@ -1,12 +1,9 @@
 import type { readItemDetailScheduleFx } from "~/item-detail-read/fx/readItemDetailScheduleFx";
 import { Equal } from "effect";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
-import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
-import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { useItemDetailNavigationController } from "~/item-detail/ui/useItemDetailNavigationController";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
@@ -49,8 +46,6 @@ export namespace useDefinitionItemDetailSceneController {
 
 	export interface Output {
 		readonly definition: DefinitionProjection;
-		readonly sources: useItemDetailNavigationController.SourcesProjection;
-		readonly tabs: useItemDetailNavigationController.Output["tabs"];
 	}
 }
 
@@ -110,36 +105,9 @@ const useItemDefinitionDetail = (
 	return useRuntimeSelector(game, selectorFn, Equal.equals);
 };
 
-/** Projects one definition scene and repairs a tab that its current source graph no longer admits. */
+/** Projects the configured item facts shown by one definition detail scene. */
 export const useDefinitionItemDetailSceneController = ({
 	target,
-}: useDefinitionItemDetailSceneController.Props): useDefinitionItemDetailSceneController.Output => {
-	const definition = useItemDefinitionDetail(target.itemId);
-	const navigation = useItemDetailNavigationController({
-		target: {
-			kind: "definition",
-			itemId: target.itemId,
-		},
-	});
-	const itemDetail = useItemDetailControl();
-
-	useEffect(() => {
-		if (navigation.tabs.includes(target.tab)) return;
-		RendererRuntime.runSync(
-			itemDetail.openItemDefinitionDetailFx({
-				itemId: target.itemId,
-			}),
-		);
-	}, [
-		itemDetail,
-		navigation.tabs,
-		target.itemId,
-		target.tab,
-	]);
-
-	return {
-		definition,
-		sources: navigation.sources,
-		tabs: navigation.tabs,
-	};
-};
+}: useDefinitionItemDetailSceneController.Props): useDefinitionItemDetailSceneController.Output => ({
+	definition: useItemDefinitionDetail(target.itemId),
+});

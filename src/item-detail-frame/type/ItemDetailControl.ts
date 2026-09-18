@@ -28,7 +28,7 @@ export type ItemDetailTarget =
 	| {
 			readonly kind: "definition";
 			readonly itemId: string;
-			readonly tab: Extract<ItemDetailTabEnumSchema.Type, "info" | "sources">;
+			readonly tab: ItemDetailTabEnumSchema.Type;
 			readonly origin: HTMLElement | null;
 	  };
 
@@ -66,11 +66,12 @@ interface OpenItemDetailProps {
 
 interface OpenItemDefinitionDetailProps {
 	readonly itemId: string;
-	readonly tab?: Extract<ItemDetailTabEnumSchema.Type, "info" | "sources">;
+	readonly tab?: ItemDetailTabEnumSchema.Type;
 	readonly origin?: HTMLElement | null;
 }
 
 interface SelectRetainedItemDetailTabProps {
+	readonly kind: ItemDetailTarget["kind"];
 	readonly itemId: string;
 	readonly tab: ItemDetailTabEnumSchema.Type;
 }
@@ -88,8 +89,9 @@ export interface ItemDetailControl {
 		props: OpenItemDefinitionDetailProps,
 	) => Effect.Effect<boolean, never, never>;
 	/**
-	 * Changes only the presentation tab of the exact retained runtime target.
-	 * It never resolves or grants gameplay authority to a disappeared item.
+	 * Changes only the presentation tab of the exact retained target.
+	 * It never resolves or grants gameplay authority to a disappeared runtime item
+	 * or removed definition.
 	 */
 	readonly selectRetainedItemDetailTabFx: (
 		props: SelectRetainedItemDetailTabProps,

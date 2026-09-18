@@ -3,7 +3,7 @@ import { Overlay } from "~/ui/ui/Overlay";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { Tooltip } from "~/ui/ui/Tooltip";
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { FileQuestion, Pencil, ShieldAlert, ShieldCheck, Trash2, X } from "lucide-react";
 import { useMemo } from "react";
 
@@ -12,10 +12,7 @@ import { useEditorAudioResourceEditController } from "~/audio-authoring/ui/useEd
 import { useEditorAudioResourceDeleteController } from "~/audio-authoring/ui/useEditorAudioResourceDeleteController";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import {
-	EditorSectionBar,
-	editorSectionLinkClassName,
-} from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
@@ -28,6 +25,7 @@ import { SfxEventPresentation } from "~/sfx-authoring/constant/SfxEventPresentat
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { Button, DangerButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
@@ -308,7 +306,7 @@ export const EditorAudioResourceDetail = ({
 			? "/editor/$projectId/music/$resourceId/$sectionId"
 			: "/editor/$projectId/sfx/$resourceId/$sectionId";
 	const navigateFn = useNavigate();
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		enabled: resource !== undefined && section !== "edit",
 		options: AudioDetailSections,
 		onSelectFn: (tab) => {
@@ -400,7 +398,7 @@ export const EditorAudioResourceDetail = ({
 										resourceId,
 										sectionId: tab.id,
 									}}
-									className={editorSectionLinkClassName}
+									className={sectionLinkClassName}
 									activeProps={{
 										"data-ui-selected": true,
 									}}

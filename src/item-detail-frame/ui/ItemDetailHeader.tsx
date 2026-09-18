@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
@@ -13,23 +14,29 @@ interface ItemDetailHeaderIdentity {
 export const ItemDetailHeader = ({
 	disabled,
 	identity,
+	navigation,
 	stale,
 }: {
 	readonly disabled: boolean;
 	readonly identity: ItemDetailHeaderIdentity;
+	readonly navigation?: ReactNode;
 	readonly stale: boolean;
 }) => {
 	const closeItemDetailFn = useCloseItemDetail();
 	const identityNode = (
 		<ItemIdentity
 			artworkDataUi="ItemDetailHeaderArtwork"
+			className="flex-1"
 			compositeUrl={identity.compositeUrl}
 			description={
-				stale ? (
-					<p className="mt-1 text-xs font-medium text-warning">
-						This item no longer exists. Showing the last known detail.
-					</p>
-				) : null
+				<>
+					{stale ? (
+						<p className="mt-1 text-xs font-medium text-warning">
+							This item no longer exists. Showing the last known detail.
+						</p>
+					) : null}
+					{navigation}
+				</>
 			}
 			size="lg"
 			sourceUrl={identity.sourceUrl}

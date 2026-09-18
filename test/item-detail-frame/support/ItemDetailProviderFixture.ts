@@ -18,10 +18,6 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-vi.mock("~/item-detail-read/fx/readItemDetailSourcesFx", () => ({
-	readItemDetailSourcesFx: (props: unknown) => props,
-}));
-
 vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 	resolveItemDetailTargetFn: ({
 		itemId,
@@ -57,16 +53,7 @@ const providerGame = {
 	},
 	getSnapshotFn: () => ({}),
 	id: "game:item-detail-provider",
-	readOrThrowFn: (request: {
-		readonly target?: {
-			readonly kind?: string;
-		};
-	}) =>
-		request.target?.kind === "definition"
-			? {
-					kind: "unavailable",
-				}
-			: request,
+	readOrThrowFn: <Value>(request: Value) => request,
 } as unknown as GameEngine;
 
 export const openItemDetail = (

@@ -16,18 +16,30 @@ export const DefinitionItemDetailScene = ({ disabled, target }: DefinitionItemDe
 	const closeItemDetailFn = useCloseItemDetail();
 	if (controller.definition.kind === "unavailable") {
 		return (
-			<header className="flex items-center justify-between border-b border-line pb-3">
-				<h2 className="text-lg font-semibold">
-					<Tx label="Item unavailable" />
-				</h2>
-				<button
-					type="button"
-					className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-					onClick={() => closeItemDetailFn()}
-				>
-					×
-				</button>
-			</header>
+			<div
+				className="flex min-h-0 flex-1 flex-col"
+				data-ui="ItemDetailContentScene"
+				data-stale="true"
+			>
+				<header className="flex items-center justify-between border-b border-line pb-3">
+					<h2 className="text-lg font-semibold">
+						<Tx label="Item unavailable" />
+					</h2>
+					<button
+						type="button"
+						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
+						onClick={() => closeItemDetailFn()}
+					>
+						×
+					</button>
+				</header>
+				<ItemDetailTabs
+					active={target.tab}
+					disabled={disabled}
+					retained
+					target={target}
+				/>
+			</div>
 		);
 	}
 
@@ -44,20 +56,20 @@ export const DefinitionItemDetailScene = ({ disabled, target }: DefinitionItemDe
 					sourceUrl: controller.definition.sourceUrl,
 					compositeUrl: controller.definition.compositeUrl,
 				}}
+				navigation={
+					<ItemDetailTabs
+						active={target.tab}
+						disabled={disabled}
+						target={target}
+					/>
+				}
 				stale={false}
-			/>
-			<ItemDetailTabs
-				active={target.tab}
-				disabled={disabled}
-				tabs={controller.tabs}
-				target={target}
 			/>
 			<div className="flex min-h-0 flex-1 overflow-hidden pt-4">
 				<ItemDetailContent
 					kind="definition"
 					definition={controller.definition}
 					disabled={disabled}
-					sources={controller.sources}
 					target={target}
 				/>
 			</div>

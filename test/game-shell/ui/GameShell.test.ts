@@ -15,10 +15,6 @@ import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailContr
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 
-vi.mock("~/item-detail-read/fx/readItemDetailSourcesFx", () => ({
-	readItemDetailSourcesFx: (props: unknown) => props,
-}));
-
 vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 	resolveItemDetailTargetFn: ({
 		itemId,

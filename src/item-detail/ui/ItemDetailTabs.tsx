@@ -1,16 +1,36 @@
+import { formatForDisplay } from "@tanstack/react-hotkeys";
+
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
-import { selectableClassName } from "~/ui/constant/SelectableStateClassName";
+import { LinkButton } from "~/ui/ui/LinkButton";
+import { Tooltip } from "~/ui/ui/Tooltip";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 
-const tabLabel = {
-	info: "Info",
-	lines: "Lines",
-	queue: "Queue",
-	sources: "Sources",
-} as const satisfies Record<ItemDetailTabEnumSchema.Type, string>;
+const tabOptions = [
+	{
+		label: "Lines",
+		shortcut: "l",
+		value: "lines",
+	},
+	{
+		label: "Queue",
+		shortcut: "q",
+		value: "queue",
+	},
+	{
+		label: "Info",
+		shortcut: "i",
+		value: "info",
+	},
+] as const satisfies ReadonlyArray<{
+	readonly label: string;
+	readonly shortcut: string;
+	readonly value: ItemDetailTabEnumSchema.Type;
+}>;
 
 const BadgeCount = ({
 	count,
@@ -34,8 +54,7 @@ interface ItemDetailTabsProps {
 	readonly disabled: boolean;
 	readonly lineCount?: number;
 	readonly queueCount?: number;
-	readonly stale?: boolean;
-	readonly tabs: readonly ItemDetailTabEnumSchema.Type[];
+	readonly retained?: boolean;
 	readonly target: ItemDetailTarget;
 }
 
@@ -44,63 +63,77 @@ export const ItemDetailTabs = ({
 	disabled,
 	lineCount,
 	queueCount,
-	stale = false,
-	tabs,
+	retained = false,
 	target,
 }: ItemDetailTabsProps) => {
 	const itemDetail = useItemDetailControl();
+	const selectTabFn = (tab: ItemDetailTabEnumSchema.Type) =>
+		RendererRuntime.runSync(
+			retained
+				? itemDetail.selectRetainedItemDetailTabFx({
+						kind: target.kind,
+						itemId: target.itemId,
+						tab,
+					})
+				: target.kind === "runtime"
+					? itemDetail.openItemDetailFx({
+							itemId: target.itemId,
+							tab,
+						})
+					: itemDetail.openItemDefinitionDetailFx({
+							itemId: target.itemId,
+							tab,
+						}),
+		);
+	useSectionShortcuts({
+		enabled: !disabled,
+		onSelectFn: (option) => selectTabFn(option.value),
+		options: tabOptions,
+	});
 	return (
 		<nav
-			className="flex min-w-0 gap-2 overflow-x-auto py-2"
+			className="mt-1 flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain"
 			data-ui="ItemDetailTabs"
 		>
-			{tabs.map((tab) => (
-				<button
-					key={tab}
-					type="button"
-					className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed ${selectableClassName}`}
-					disabled={disabled}
-					data-tab={tab}
-					{...readDataUiFn({
-						dataUi: "ItemDetailTab",
-						state: {
-							selected: tab === active,
-						},
-					})}
-					onClick={() =>
-						RendererRuntime.runSync(
-							target.kind === "runtime"
-								? stale
-									? itemDetail.selectRetainedItemDetailTabFx({
-											itemId: target.itemId,
-											tab,
-										})
-									: itemDetail.openItemDetailFx({
-											itemId: target.itemId,
-											tab,
-										})
-								: itemDetail.openItemDefinitionDetailFx({
-										itemId: target.itemId,
-										tab: tab === "sources" ? tab : "info",
-									}),
-						)
-					}
-				>
-					{tabLabel[tab]}
-					{tab === "lines" && lineCount !== undefined ? (
-						<BadgeCount
-							count={lineCount}
-							dataUi="ItemDetailTabCount"
-						/>
-					) : null}
-					{tab === "queue" && queueCount !== undefined && queueCount > 0 ? (
-						<BadgeCount
-							count={queueCount}
-							dataUi="ItemDetailQueueTabCount"
-						/>
-					) : null}
-				</button>
-			))}
+			{tabOptions.map((option) => {
+				const tab = option.value;
+				return (
+					<Tooltip
+						key={tab}
+						content={`${option.label} · ${formatForDisplay({
+							key: option.shortcut,
+						})}`}
+						placement="bottom"
+					>
+						<LinkButton
+							className={`${sectionLinkClassName} gap-1.5`}
+							disabled={disabled}
+							data-tab={tab}
+							{...readDataUiFn({
+								dataUi: "ItemDetailTab",
+								state: {
+									selected: tab === active,
+								},
+							})}
+							onClick={() => selectTabFn(tab)}
+						>
+							{option.label}
+							{tab === "lines" && lineCount !== undefined ? (
+								<BadgeCount
+									count={lineCount}
+									dataUi="ItemDetailTabCount"
+								/>
+							) : null}
+							{tab === "queue" && queueCount !== undefined && queueCount > 0 ? (
+								<BadgeCount
+									count={queueCount}
+									dataUi="ItemDetailQueueTabCount"
+								/>
+							) : null}
+						</LinkButton>
+					</Tooltip>
+				);
+			})}
 		</nav>
 	);
 };

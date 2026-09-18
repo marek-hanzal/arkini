@@ -1,9 +1,8 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { Tooltip } from "~/ui/ui/Tooltip";
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import {
-	editorSectionLinkClassName,
 	EditorSectionBar,
 	EditorSectionShortcutNavigation,
 } from "~/authoring-shell/ui/EditorSectionBar";
@@ -23,6 +22,7 @@ import {
 	TriangleAlert,
 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
@@ -71,7 +71,7 @@ export const List = ({
 			notes.notes,
 		],
 	);
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		options: [
 			{
 				shortcut: "d",
@@ -303,7 +303,7 @@ export const List = ({
 						placement="bottom"
 					>
 						<LinkButton
-							className={`${editorSectionLinkClassName} gap-1.5`}
+							className={`${sectionLinkClassName} gap-1.5`}
 							onClick={() => onDraftChangeFn(!draft)}
 							{...readDataUiFn({
 								dataUi: "EditorItemDraftFilter",

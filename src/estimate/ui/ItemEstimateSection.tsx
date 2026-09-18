@@ -4,7 +4,7 @@ import { Tx } from "~/translation/ui/Tx";
 import { TriangleAlert, Unlink } from "lucide-react";
 import { useState } from "react";
 
-import { useEditorSectionShortcuts } from "~/authoring-shell/ui/useEditorSectionShortcuts";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -163,7 +163,7 @@ export const ItemEstimateSection = ({
 			shift: true,
 		},
 	] as const;
-	useEditorSectionShortcuts({
+	useSectionShortcuts({
 		enabled: previewItemUid === undefined,
 		options: sortOptions,
 		onSelectFn: (option) => setSortFn(option.value),

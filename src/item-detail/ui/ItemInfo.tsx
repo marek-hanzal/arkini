@@ -6,18 +6,39 @@ import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 /** The player's basic item facts, without authoring controls or resource identifiers. */
 export const ItemInfo = ({ detail }: { readonly detail: useItemDetailSceneController.Detail }) => {
 	const translator = useTranslator();
+	const depleted =
+		detail.units === undefined
+			? 0
+			: Math.max(0, Math.min(1, 1 - detail.units.remaining / detail.units.total));
 	return (
 		<section
 			className="flex min-h-full items-center justify-center p-6"
 			data-ui="ItemInfo"
 		>
 			<div className="grid w-full max-w-5xl grid-cols-2 items-center gap-12">
-				<ItemArtwork
-					className="aspect-square size-auto w-full max-w-md justify-self-center"
-					sourceUrl={detail.sourceUrl}
-					compositeUrl={detail.compositeUrl}
-					dataUi="ItemInfoArtwork"
-				/>
+				<div
+					className="relative isolate aspect-square w-full max-w-md justify-self-center"
+					data-ui="ItemInfoArtwork"
+				>
+					<ItemArtwork
+						className="size-full"
+						sourceUrl={detail.sourceUrl}
+						compositeUrl={detail.compositeUrl}
+					/>
+					{depleted > 0 ? (
+						<span
+							className="pointer-events-none absolute inset-0 z-20 backdrop-grayscale"
+							data-ui="ItemInfoDepletion"
+							style={{
+								// Feather the filter, not the artwork; one image keeps translucent edges intact.
+								maskImage:
+									depleted === 1
+										? undefined
+										: `linear-gradient(to bottom, black ${depleted * 100 - 8}%, transparent ${depleted * 100 + 8}%)`,
+							}}
+						/>
+					) : null}
+				</div>
 				<div className="grid min-w-0 gap-8">
 					{detail.description ? (
 						<p className="whitespace-pre-wrap text-base leading-relaxed text-foreground">

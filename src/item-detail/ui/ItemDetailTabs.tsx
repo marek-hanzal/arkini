@@ -1,4 +1,5 @@
 import { formatForDisplay } from "@tanstack/react-hotkeys";
+import { Clock, Factory, Info, ListOrdered, type LucideIcon } from "lucide-react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
@@ -13,26 +14,31 @@ import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 const tabOptions = [
 	{
 		label: "Info",
+		icon: Info,
 		shortcut: "i",
 		value: "info",
 	},
 	{
 		label: "Lines",
+		icon: Factory,
 		shortcut: "l",
 		value: "lines",
 	},
 	{
 		label: "Queue",
+		icon: ListOrdered,
 		shortcut: "q",
 		value: "queue",
 	},
 	{
 		label: "Clock",
+		icon: Clock,
 		shortcut: "c",
 		value: "clock",
 	},
 ] as const satisfies ReadonlyArray<{
 	readonly label: string;
+	readonly icon: LucideIcon;
 	readonly shortcut: string;
 	readonly value: ItemDetailTabEnumSchema.Type;
 }>;
@@ -81,6 +87,7 @@ export const ItemDetailTabs = ({
 		>
 			{tabOptions.map((option) => {
 				const tab = option.value;
+				const Icon = option.icon;
 				return (
 					<Tooltip
 						key={tab}
@@ -101,6 +108,7 @@ export const ItemDetailTabs = ({
 							})}
 							onClick={() => selectTabFn(tab)}
 						>
+							<Icon className="size-4 shrink-0" />
 							{option.label}
 						</LinkButton>
 					</Tooltip>

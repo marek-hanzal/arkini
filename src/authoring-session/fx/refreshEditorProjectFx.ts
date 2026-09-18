@@ -1,3 +1,5 @@
+import { writeApplicationLogFx } from "~/application-diagnostics/fx/writeApplicationLogFx";
+import { formatApplicationDiagnosticTextFn } from "~/application-diagnostics/fn/formatApplicationDiagnosticTextFn";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
@@ -37,41 +39,90 @@ const acquireProjectRefreshFx = (isNavigationPendingFn: () => boolean) =>
 	);
 
 /** Hard-replaces the mounted project with its authoritative Editor-folder state. */
-export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
-	({ isNavigationPendingFn, projectId }: refreshEditorProjectFx.Props) =>
-		Effect.acquireUseRelease(
-			acquireProjectRefreshFx(isNavigationPendingFn),
-			() =>
-				Effect.gen(function* () {
-					const repository = yield* ProjectRepository;
-					const unsavedChanges = yield* EditorUnsavedChanges;
-					yield* repository.awaitIdleFx;
-					const current = yield* Atom.get(EditorProjectAtom(projectId));
-					return yield* Effect.uninterruptible(
-						Effect.gen(function* () {
-							yield* releaseCurrentEditorBoardGameFx;
-							const fresh = yield* requestRefreshFx(projectId).pipe(
-								Effect.tapError(() =>
-									current === undefined
-										? Effect.void
-										: syncEditorBoardGameFx(current).pipe(Effect.ignore),
-								),
+export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(function* ({
+	isNavigationPendingFn,
+	projectId,
+}: refreshEditorProjectFx.Props) {
+	const before = yield* Atom.get(EditorProjectAtom(projectId));
+	let stage = "admission";
+	let refreshedRevision: number | undefined;
+	yield* writeApplicationLogFx({
+		level: "info",
+		message: "Editor refresh started",
+		body: JSON.stringify({
+			projectId,
+			revision: before?.revision,
+		}),
+	});
+	return yield* Effect.acquireUseRelease(
+		acquireProjectRefreshFx(isNavigationPendingFn),
+		() =>
+			Effect.gen(function* () {
+				const repository = yield* ProjectRepository;
+				const unsavedChanges = yield* EditorUnsavedChanges;
+				stage = "await-idle";
+				yield* repository.awaitIdleFx;
+				const current = yield* Atom.get(EditorProjectAtom(projectId));
+				return yield* Effect.uninterruptible(
+					Effect.gen(function* () {
+						stage = "release-board";
+						yield* releaseCurrentEditorBoardGameFx;
+						stage = "read-disk";
+						const fresh = yield* requestRefreshFx(projectId).pipe(
+							Effect.tapError(() =>
+								current === undefined
+									? Effect.void
+									: syncEditorBoardGameFx(current).pipe(Effect.ignore),
+							),
+						);
+						refreshedRevision = fresh.revision;
+						stage = "replace-drafts";
+						yield* Effect.sync(() => unsavedChanges.discardAllFn());
+						if (fresh.projectId === projectId) {
+							stage = "publish-project";
+							yield* publishEditorProjectFx(projectId, {
+								replacement: fresh,
+							});
+							stage = "sync-board";
+							yield* syncEditorBoardGameFx(fresh);
+							stage = "replace-ui";
+							yield* Atom.update(
+								EditorProjectReplacementEpochAtom(projectId),
+								(epoch) => epoch + 1,
 							);
-							yield* Effect.sync(() => unsavedChanges.discardAllFn());
-							if (fresh.projectId === projectId) {
-								yield* publishEditorProjectFx(projectId, {
-									replacement: fresh,
-								});
-								yield* syncEditorBoardGameFx(fresh);
-								yield* Atom.update(
-									EditorProjectReplacementEpochAtom(projectId),
-									(epoch) => epoch + 1,
-								);
-							}
-							return fresh;
-						}),
-					);
+						}
+						return fresh;
+					}),
+				);
+			}),
+		(releaseFx) => releaseFx,
+	).pipe(
+		Effect.tap((fresh) =>
+			writeApplicationLogFx({
+				level: "info",
+				message: "Editor refresh completed",
+				body: JSON.stringify({
+					projectId,
+					previousRevision: before?.revision,
+					refreshedProjectId: fresh.projectId,
+					revision: fresh.revision,
 				}),
-			(releaseFx) => releaseFx,
+			}),
 		),
-);
+		Effect.onError((cause) =>
+			writeApplicationLogFx({
+				level: "error",
+				message: "Editor refresh failed",
+				body: formatApplicationDiagnosticTextFn({
+					value: {
+						projectId,
+						previousRevision: before?.revision,
+						refreshedRevision,
+						stage,
+						cause,
+					},
+				}),
+			}),
+		),
+	);
+});

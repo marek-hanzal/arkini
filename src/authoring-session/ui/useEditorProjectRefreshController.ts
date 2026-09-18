@@ -48,6 +48,7 @@ export namespace useEditorProjectRefreshController {
 
 	export interface Output {
 		readonly disabled: boolean;
+		readonly error: unknown;
 		readonly pending: boolean;
 		readonly refreshFn: () => void;
 		readonly tooltip: string;
@@ -91,6 +92,7 @@ export const useEditorProjectRefreshController = ({
 
 	return {
 		disabled,
+		error,
 		pending,
 		refreshFn,
 		tooltip:

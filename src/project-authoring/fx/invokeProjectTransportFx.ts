@@ -78,6 +78,11 @@ export const invokeProjectTransportFx = <Value, Output>({
 				try: () =>
 					new ProjectRepositoryError({
 						operation: result.error.operation,
+						...(result.error.reason === "revision-conflict"
+							? {
+									reason: result.error.reason,
+								}
+							: {}),
 						message: result.error.message,
 						...(result.error.diagnostics === undefined
 							? {}

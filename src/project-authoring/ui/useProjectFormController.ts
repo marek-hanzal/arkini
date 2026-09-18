@@ -166,14 +166,14 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 	},
 });
 
-const saveProjectConfigCommandAtom = RendererRuntime.runSync(
+const createSaveProjectConfigCommandAtomFn = RendererRuntime.runSync(
 	Effect.map(
 		Effect.all([
 			ProjectRepository,
 			ProjectWriteAdmission,
 		]),
 		([repository, admission]) =>
-			Atom.family((projectId: string) =>
+			(projectId: string) =>
 				Atom.fn((props: Omit<saveProjectConfigFx.Props, "projectId">) =>
 					saveProjectConfigFx({
 						...props,
@@ -183,7 +183,6 @@ const saveProjectConfigCommandAtom = RendererRuntime.runSync(
 						Effect.provideService(ProjectWriteAdmission, admission),
 					),
 				).pipe(Atom.setIdleTTL(0)),
-			),
 	),
 );
 
@@ -226,7 +225,13 @@ export const useProjectFormController = ({
 			project,
 		],
 	);
-	const saveConfigAtom = saveProjectConfigCommandAtom(project.projectId);
+	// A replacement form owns fresh command state; durable writes keep their own lifetime.
+	const saveConfigAtom = useMemo(
+		() => createSaveProjectConfigCommandAtomFn(project.projectId),
+		[
+			project.projectId,
+		],
+	);
 	const saveResult = useAtomValue(saveConfigAtom);
 	const saveConfigFn = useAtomSet(saveConfigAtom, {
 		mode: "promise",

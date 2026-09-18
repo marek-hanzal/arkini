@@ -26,14 +26,14 @@ import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useE
 import { readEditorFormValidationMessageFn as readSharedValidationMessageFn } from "~/editor-control/fn/readEditorFormValidationMessageFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-const saveCommandAtom = RendererRuntime.runSync(
+const createSaveCommandAtomFn = RendererRuntime.runSync(
 	Effect.map(
 		Effect.all([
 			ProjectRepository,
 			ProjectWriteAdmission,
 		]),
 		([repository, admission]) =>
-			Atom.family((projectId: string) =>
+			(projectId: string) =>
 				Atom.fn((props: Omit<saveFx.Props, "projectId">) =>
 					saveFx({
 						...props,
@@ -43,7 +43,6 @@ const saveCommandAtom = RendererRuntime.runSync(
 						Effect.provideService(ProjectWriteAdmission, admission),
 					),
 				).pipe(Atom.setIdleTTL(0)),
-			),
 	),
 );
 
@@ -133,7 +132,13 @@ export const useFormController = ({
 			project,
 		],
 	);
-	const saveItemAtom = saveCommandAtom(project.projectId);
+	// A replacement form owns fresh command state; durable writes keep their own lifetime.
+	const saveItemAtom = useMemo(
+		() => createSaveCommandAtomFn(project.projectId),
+		[
+			project.projectId,
+		],
+	);
 	const saveItemResult = useAtomValue(saveItemAtom);
 	const saveItemFn = useAtomSet(saveItemAtom, {
 		mode: "promise",

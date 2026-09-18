@@ -597,6 +597,52 @@ describe("registerEditorProjectIpcFx", () => {
 		},
 	);
 
+	it("preserves conflict recovery identity across IPC and logs revision transitions without config", async () => {
+		const repository = createEditorProjectIpcRepository();
+		register({
+			type: "ready",
+			repository,
+		});
+		const request = {
+			projectId: "project-one",
+			expectedRevision: 0,
+			config: editorTestPayload.config,
+		};
+		await invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request);
+		const record = writeApplicationLog.mock.calls.find(
+			([entry]) => entry.message === "Editor operation completed: replace-config",
+		)?.[0];
+		expect(JSON.parse(record.body)).toEqual({
+			source: "editor-ipc",
+			request: {
+				projectId: "project-one",
+				expectedRevision: 0,
+			},
+			result: {
+				projectId: "project-one",
+				previousRevision: 0,
+				revision: 1,
+			},
+		});
+		vi.spyOn(repository, "replaceConfigFx").mockReturnValueOnce(
+			Effect.fail(
+				new ProjectRepositoryError({
+					operation: "replace-config",
+					reason: "revision-conflict",
+					message: "Detailed revision conflict.",
+				}),
+			),
+		);
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				reason: "revision-conflict",
+			},
+		});
+	});
+
 	it("publishes stable failures, unavailable status, and owns handler cleanup", async () => {
 		const repository = {
 			...createEditorProjectIpcRepository(),

@@ -71,10 +71,11 @@ const assertExpectedRevisionFx = (
 	return state.project.revision === expectedRevision
 		? Effect.void
 		: Effect.fail(
-				errorFn(
+				new ProjectRepositoryError({
 					operation,
-					`Editor project ${state.project.projectId} changed from revision ${expectedRevision} to ${state.project.revision} before this write could commit.`,
-				),
+					reason: "revision-conflict",
+					message: `Editor project ${state.project.projectId} changed from revision ${expectedRevision} to ${state.project.revision} before this write could commit.`,
+				}),
 			);
 };
 

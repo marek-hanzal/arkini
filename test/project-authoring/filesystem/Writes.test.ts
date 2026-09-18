@@ -266,7 +266,12 @@ describe("filesystem Editor project writes", () => {
 					},
 				}),
 			),
-		).rejects.toThrow(`changed from revision ${compatible.revision} to ${itemCommit.revision}`);
+		).rejects.toMatchObject({
+			reason: "revision-conflict",
+			message: expect.stringContaining(
+				`changed from revision ${compatible.revision} to ${itemCommit.revision}`,
+			),
+		});
 
 		const resourceBytes = createTestPngBytes();
 		const resourcePath = join(harness.temporaryDirectory, "new-artwork.png");

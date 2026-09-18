@@ -21,6 +21,11 @@ const toTransportFailureFn = (
 	type: "failure",
 	error: {
 		operation: error.operation,
+		...(error.reason === undefined
+			? {}
+			: {
+					reason: error.reason,
+				}),
 		message: error.message,
 		...(error.diagnostics === undefined
 			? {}
@@ -69,6 +74,57 @@ const reportFailureFx = (
 			Effect.as(toTransportFailureFn(error)),
 		);
 
+// Deliberately whitelist identities and revision tokens, never authored content or resource bodies.
+const readRevisionContextFn = (value: unknown) => {
+	if (typeof value === "string")
+		return {
+			projectId: value,
+		};
+	if (typeof value !== "object" || value === null) return {};
+	const context: Record<string, string | number> = {};
+	for (const key of [
+		"projectId",
+		"expectedRevision",
+		"previousRevision",
+		"revision",
+		"uid",
+		"resourceId",
+	] as const) {
+		if (!(key in value)) continue;
+		const field = Reflect.get(value, key);
+		if (typeof field === "string" || typeof field === "number") context[key] = field;
+	}
+	return context;
+};
+
+const reportSuccessFx = (
+	diagnostics: DiagnosticLog,
+	operation: EditorProjectTransport.Operation,
+	request: unknown,
+	value: unknown,
+) => {
+	const result =
+		typeof value === "object" && value !== null && "project" in value ? value.project : value;
+	const resultContext = readRevisionContextFn(result);
+	if (
+		operation === "read-project" ||
+		operation === "read-project-build" ||
+		resultContext.revision === undefined
+	)
+		return Effect.void;
+	return diagnostics
+		.writeApplicationFx({
+			level: "info",
+			message: `Editor operation completed: ${operation}`,
+			body: JSON.stringify({
+				source: "editor-ipc",
+				request: readRevisionContextFn(request),
+				result: resultContext,
+			}),
+		})
+		.pipe(Effect.catch(() => Effect.void));
+};
+
 /** Admits and runs one editor-project operation, then exposes its stable transport envelope. */
 export const executeEditorProjectRepositoryFx = <Request, Value>(
 	operation: EditorProjectTransport.Operation,
@@ -99,10 +155,12 @@ export const executeEditorProjectRepositoryFx = <Request, Value>(
 						onFailure: (error) =>
 							reportFailureFx(diagnostics, "repository execution", error),
 						onSuccess: (value) =>
-							Effect.succeed({
-								type: "success" as const,
-								value,
-							}),
+							reportSuccessFx(diagnostics, operation, request, value).pipe(
+								Effect.as({
+									type: "success" as const,
+									value,
+								}),
+							),
 					}),
 				);
 			},

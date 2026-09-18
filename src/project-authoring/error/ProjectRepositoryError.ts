@@ -34,6 +34,7 @@ export type ProjectRepositoryOperation =
 /** One canonical editor-project repository operation failed. */
 export class ProjectRepositoryError extends Data.TaggedError("EditorProjectRepositoryError")<{
 	readonly operation: ProjectRepositoryOperation;
+	readonly reason?: "revision-conflict";
 	readonly message: string;
 	readonly diagnostics?: GameDiagnosticsSchema.Type;
 	readonly cause?: unknown;

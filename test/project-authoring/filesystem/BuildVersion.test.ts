@@ -114,6 +114,7 @@ describe("filesystem build version metadata", () => {
 			),
 		).rejects.toMatchObject({
 			operation: "save-build-version",
+			reason: "revision-conflict",
 		});
 		await Effect.runPromise(
 			repository.saveBuildVersionFx({

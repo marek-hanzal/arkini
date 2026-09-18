@@ -113,6 +113,10 @@ Project Write Admission rejects replacement during an already pending route tran
 
 An identity rename first resolves the current draft leave decision, then holds the same admission authority from its revision-pinned write through navigation to the new project ID. This excludes replacement and unrelated navigation; ordinary writes keep repository revision checks. Only the rename's terminal route bypasses the navigation guard while its lease is live. Failure releases admission and remains visible in the rename dialog.
 
+Project and Item save command state belongs to the mounted form, so explicit Refresh clears rejected-save errors together with the draft. Revision conflicts carry a typed `revision-conflict` transport reason; form banners offer the same hard Refresh as the sidebar. A failed disk refresh keeps the draft; Refresh failures are exposed in that banner.
+
+Application diagnostics record successful IPC revision transitions (operation, project, expected/previous/result revision), MCP invalidation reads, and renderer Refresh start/completion/failure with its last stage. These records contain identities and revision tokens, never authored config or resource bodies.
+
 External authored JSON and resource catalog changes are ignored while mounted. Requested image and audio bodies come directly from their registered disk paths; already mounted resource/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Output version and Build admission

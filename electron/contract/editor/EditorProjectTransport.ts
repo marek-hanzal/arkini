@@ -45,6 +45,7 @@ export namespace EditorProjectTransport {
 		  };
 
 	export interface Failure {
+		readonly reason?: "revision-conflict";
 		readonly operation: Operation;
 		readonly message: string;
 		readonly diagnostics?: Array<unknown>;

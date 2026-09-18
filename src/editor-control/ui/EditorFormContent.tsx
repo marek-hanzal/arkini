@@ -1,3 +1,4 @@
+import { EditorFormError } from "~/authoring-session/ui/EditorFormError";
 import type { PropsWithChildren } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -26,11 +27,7 @@ export const EditorFormContent = ({
 	>
 		{rootCard ? (
 			<EditorFormCard>
-				{error === undefined ? null : (
-					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-						{error instanceof Error ? error.message : String(error)}
-					</p>
-				)}
+				<EditorFormError error={error} />
 				{children}
 			</EditorFormCard>
 		) : (
@@ -43,11 +40,7 @@ export const EditorFormContent = ({
 					},
 				})}
 			>
-				{error === undefined ? null : (
-					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-						{error instanceof Error ? error.message : String(error)}
-					</p>
-				)}
+				<EditorFormError error={error} />
 				{children}
 			</div>
 		)}

@@ -2111,6 +2111,8 @@ Target unit cost help:
     - **Cost:** Units removed each time the action or job starts.
 
     The payer stays in place. At zero Units, it depletes normally.
+The project changed. Refresh and try again.:
+  value: The project changed. Refresh and try again.
 This Item ID is already in use.:
   value: This Item ID is already in use.
   dynamic: true

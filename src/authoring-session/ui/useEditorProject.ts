@@ -1,3 +1,4 @@
+import { writeApplicationLogFx } from "~/application-diagnostics/fx/writeApplicationLogFx";
 import { useAtom } from "@effect/atom-react";
 import { Effect } from "effect";
 import {
@@ -64,7 +65,18 @@ export const EditorProjectProvider = ({
 			void RendererRuntime.runPromise(
 				readProjectFx({
 					projectId,
-				}),
+				}).pipe(
+					Effect.tap((fresh) =>
+						writeApplicationLogFx({
+							level: "info",
+							message: "Editor project changed through MCP",
+							body: JSON.stringify({
+								projectId,
+								revision: fresh.revision,
+							}),
+						}),
+					),
+				),
 			)
 				.then((fresh) => {
 					if (!mounted) return;

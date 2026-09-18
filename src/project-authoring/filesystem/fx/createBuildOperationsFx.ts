@@ -101,10 +101,11 @@ const assertRevisionFx = (
 	state.project.revision === expectedRevision
 		? Effect.void
 		: Effect.fail(
-				createBuildErrorFn(
+				new ProjectRepositoryError({
 					operation,
-					`Editor project ${state.project.projectId} changed from revision ${expectedRevision} to ${state.project.revision}.`,
-				),
+					reason: "revision-conflict",
+					message: `Editor project ${state.project.projectId} changed from revision ${expectedRevision} to ${state.project.revision}.`,
+				}),
 			);
 
 export namespace createBuildOperationsFx {

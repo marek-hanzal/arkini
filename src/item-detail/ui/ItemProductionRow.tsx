@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
-import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 
 interface ItemProductionRowProps {
 	readonly line: LineSchema.Type;
@@ -27,7 +25,6 @@ export const ItemProductionRow = ({
 	ruleDisabled = false,
 	reserved = false,
 }: ItemProductionRowProps) => {
-	const game = useGameEngine();
 	return (
 		<article
 			className="group/production-row relative isolate flex min-h-48 flex-col justify-center py-[6.875rem] transition-opacity duration-300 data-[ui-rule-disabled=true]:opacity-45 data-[ui-reserved=true]:h-full data-[ui-reserved=true]:min-h-0 data-[ui-reserved=true]:justify-start data-[ui-reserved=true]:overflow-auto data-[ui-reserved=true]:py-4"
@@ -43,12 +40,6 @@ export const ItemProductionRow = ({
 			{backdrop}
 			<div className="min-h-0 group-data-[ui-reserved=true]/production-row:my-auto group-data-[ui-reserved=true]/production-row:shrink-0">
 				<div className="flex items-center gap-3">
-					{line.artwork === undefined ? null : (
-						<ItemArtwork
-							className="size-10"
-							sourceUrl={game.getResourceUrlFn(line.artwork)}
-						/>
-					)}
 					<h3 className="min-w-0 text-lg font-semibold">{line.title}</h3>
 					<span className="shrink-0 text-muted">
 						· {formatDurationFn(line.runtimeMs)}

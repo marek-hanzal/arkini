@@ -10,7 +10,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"spoiled-grain-seeds"
+				"spoiled-grain-seed"
 			]
 		},
 		"scope": "any",

@@ -2,14 +2,14 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ibo1e4dph36ymqv8xlvac7x3",
-		"id": "spoiled-pumpkin-seeds",
-		"title": "Spoiled Pumpkin Seeds",
-		"ui": "simple",
+		"id": "spoiled-pumpkin-seed",
+		"title": "Spoiled Pumpkin Seed",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"spoiled-pumpkin-seeds"
+				"spoiled-pumpkin-seed"
 			]
 		},
 		"scope": "any",

@@ -4,12 +4,14 @@
 		"uid": "o2skwmlh3wggmy9qyjjhkm3e",
 		"id": "sack-with-corn-kernels",
 		"title": "Sack With Corn Kernels",
+		"draft": false,
+		"description": "A sack of corn kernels, marked with the crop they are meant to grow.",
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sack-with-corn-kernels"
+				"sack-with-seeds",
+				"corn"
 			]
 		},
 		"scope": "board",
@@ -50,7 +52,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

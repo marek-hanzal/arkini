@@ -4,8 +4,9 @@
 		"uid": "yx0dq3pl2qg9blgw7itacuke",
 		"id": "corn-kernels",
 		"title": "Corn Kernels",
+		"draft": false,
+		"description": "Fresh corn kernels. Plant them, cook them, or pack them into a seed sack before they spoil.",
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

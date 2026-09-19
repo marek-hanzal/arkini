@@ -10,7 +10,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"spoiled-cotton-seeds"
+				"spoiled-cotton-seed"
 			]
 		},
 		"scope": "any",

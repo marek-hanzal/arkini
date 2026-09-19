@@ -10,11 +10,22 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"flax-seeds"
+				"flax-seed"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-flax-seed"
+			}
+		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,

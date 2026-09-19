@@ -10,11 +10,22 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"grain-seeds"
+				"grain-seed"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-grain-seed"
+			}
+		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,

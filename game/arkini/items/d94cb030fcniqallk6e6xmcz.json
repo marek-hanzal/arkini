@@ -1,33 +1,23 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "gfzjzpvbuiim4xvsdjbmgmad",
-		"id": "cotton-seed",
-		"title": "Cotton Seed",
+		"uid": "d94cb030fcniqallk6e6xmcz",
+		"id": "sack-with-sunflower-seed",
+		"title": "Sack With Sunflower Seed",
 		"draft": false,
-		"description": "Loose cotton seed. Plant it before it spoils.",
+		"description": "A sack of sunflower seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"cotton-seed"
+				"sack-with-seeds",
+				"sunflower"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-sack"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sack-with-cotton-seed"
-			}
-		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -40,7 +30,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-cotton-seed",
+										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,18 +2,29 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "n3yuyf1v3wij23civy92sid5",
-		"id": "sunflower-seeds",
-		"title": "Sunflower Seeds",
-		"ui": "simple",
+		"id": "sunflower-seed",
+		"title": "Sunflower Seed",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sunflower-seeds"
+				"sunflower-seed"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-sunflower-seed"
+			}
+		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,
@@ -28,7 +39,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-sunflower-seeds",
+										"itemId": "spoiled-sunflower-seed",
 										"quantity": {
 											"min": 1,
 											"max": 1

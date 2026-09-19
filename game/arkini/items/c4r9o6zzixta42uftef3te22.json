@@ -2,14 +2,14 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c4r9o6zzixta42uftef3te22",
-		"id": "spoiled-sunflower-seeds",
-		"title": "Spoiled Sunflower Seeds",
-		"ui": "simple",
+		"id": "spoiled-sunflower-seed",
+		"title": "Spoiled Sunflower Seed",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"spoiled-sunflower-seeds"
+				"spoiled-sunflower-seed"
 			]
 		},
 		"scope": "any",

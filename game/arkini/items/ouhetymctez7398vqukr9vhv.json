@@ -1,0 +1,51 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ouhetymctez7398vqukr9vhv",
+		"id": "sack-with-vegetable-seed",
+		"title": "Sack With Vegetable Seed",
+		"draft": false,
+		"description": "A sack of vegetable seed, marked with the produce it is meant to grow.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"sack-with-seeds",
+				"vegetable-crate"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 900000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-sack",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

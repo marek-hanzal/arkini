@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "f00b34tuq72hhd676i2qzucv",
+		"id": "spoiled-vegetable-seed",
+		"title": "Spoiled Vegetable Seed",
+		"draft": false,
+		"description": "Vegetable seeds that spoiled before they ever reached the soil.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-vegetable-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

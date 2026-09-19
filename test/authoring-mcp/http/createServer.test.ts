@@ -35,6 +35,7 @@ describe("editor MCP server", () => {
 			"create_item_line",
 			"replace_item_line",
 			"delete_item_line",
+			"item_line_order",
 			"project_config",
 			"edit_project",
 			"edit_project_layout",

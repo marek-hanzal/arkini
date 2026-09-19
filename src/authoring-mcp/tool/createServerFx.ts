@@ -20,6 +20,9 @@ import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
+import { orderLinesFx } from "~/item-authoring/fx/orderLinesFx";
+import { ItemLineOrderInputSchema } from "./ItemLineOrderInputSchema";
+import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 import { mutateItemLineFx } from "./mutateItemLineFx";
 import { readArtworkCollectionTextFn } from "./fn/readArtworkCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
@@ -495,6 +498,33 @@ const createServerFn = (
 			},
 		);
 	}
+
+	server.registerTool(
+		"item_line_order",
+		{
+			description:
+				"Reorder an item's existing production lines. Supply every line ID exactly once in the desired order and the revision from item_config or item_configs. Missing, unknown or duplicate IDs are rejected without changing the project. Only order changes; line values and all other item fields are preserved.",
+			inputSchema: ItemLineOrderInputSchema,
+		},
+		async (input) =>
+			runToolFn(
+				Effect.gen(function* () {
+					const project = yield* readProjectFx();
+					const { commit } = yield* orderLinesFx({
+						...input,
+						project,
+						repository,
+					});
+					yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
+					return [
+						"Reordered item lines.",
+						`Item ID: ${input.itemId}`,
+						`Line IDs: ${input.lineIds.join(", ")}`,
+						`Revision: ${commit.revision}`,
+					].join("\n");
+				}),
+			),
+	);
 
 	registerGameplayDesignToolsFn({
 		notifyProjectChangedFn,

@@ -4,8 +4,8 @@
 		"uid": "tgz6nz84fwhbcyq5k02qcx2i",
 		"id": "goose",
 		"title": "Goose",
-		"ui": "simple",
 		"description": "Beloved lifestock",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,9 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"merge": [
 			{
 				"target": {
@@ -26,35 +29,331 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"intervalMs": 30000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Idle",
+				"description": "The goose watches everything suspiciously.",
+				"clock": true,
+				"clockWeight": 20,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
 					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "goose",
+				"description": "Wanders somewhere else.",
+				"clock": true,
+				"clockWeight": 8,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "goose",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "get-hungry",
+				"title": "Get Hungry",
+				"description": "The goose gets hungry.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hungry-goose",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "get-sick",
+				"title": "Get Sick",
+				"description": "The goose may become sick.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-goose",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "disease-exposure",
+				"title": "Disease Exposure",
+				"artwork": "disease",
+				"description": "Nearby disease increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 8,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-goose",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
 							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "hungry-goose",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "disease"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
 							}
-						]
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "plague-exposure",
+				"title": "Plague Exposure",
+				"artwork": "plague",
+				"description": "Nearby plague increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 16,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-goose",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "plague"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
 					}
 				]
 			}
-		},
-		"maxQueueSize": 1,
-		"lines": []
+		]
 	}
 }

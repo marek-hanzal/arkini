@@ -1,3 +1,4 @@
+import { GameplaySpeedUpMultiplier } from "~/game-cheat/constant/GameplaySpeedUpMultiplier";
 import { TickFx } from "~/game-tick/service/TickFx";
 import type { TickPerformance } from "~/game-tick/type/TickPerformance";
 import { Effect, Result } from "effect";
@@ -97,7 +98,7 @@ describe("Speed up", () => {
 				});
 				yield* startLineFx(startProps);
 				yield* runTickRuntimeByFx({
-					elapsedMs: 4,
+					elapsedMs: 1,
 				});
 				const before = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
@@ -110,14 +111,14 @@ describe("Speed up", () => {
 				const delayed = yield* readRuntimeFx();
 				expect(samples).toHaveLength(1);
 				expect(samples[0]).toMatchObject({
-					windowMs: 9005,
+					windowMs: 9002,
 					wakes: 3,
 					advances: 2,
 					failedAdvances: 0,
 					simulationBudgetMs: 200,
-					droppedWallMs: 8995,
+					droppedWallMs: 8998,
 					maxWakeGapMs: 9000,
-					speedMultiplier: 20,
+					speedMultiplier: GameplaySpeedUpMultiplier,
 				});
 				unsubscribeFn();
 				yield* runTickRuntimeByFx({
@@ -145,7 +146,7 @@ describe("Speed up", () => {
 			}).pipe(
 				useGameFx({
 					config: createJobTestConfig(),
-					speedUpMultiplier: 20,
+					speedUpMultiplier: GameplaySpeedUpMultiplier,
 				}),
 			),
 		);

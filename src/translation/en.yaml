@@ -681,7 +681,7 @@ Editor Board help:
     Editor Board runs the **saved project** as a real game. Use it to try production, merges, Units and placement together. Nothing you do here edits the project.
 
     - `Cmd+P` (`Ctrl+P` on Windows and Linux) finds and spawns Board items.
-    - **Default** uses normal timing; **Speed up** runs at ×20.
+    - **Default** uses normal timing; **Speed up** accelerates the simulation.
     - **Reset** throws away this play session and starts again from the saved layout.
 
     The live Board is temporary and has no saved scenarios.

@@ -73,7 +73,7 @@
 				"id": "field",
 				"title": "Prepare Flower Field",
 				"artwork": "empty-flower-field",
-				"description": "Prepare a new flower field for planting.",
+				"description": "Prepare a stone-lined flower field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -81,7 +81,19 @@
 				"runtimeMs": 24000,
 				"input": [
 					{
-						"type": "simple"
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "stone"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
 					}
 				],
 				"output": {

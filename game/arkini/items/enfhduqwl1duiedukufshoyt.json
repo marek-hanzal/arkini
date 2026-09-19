@@ -4,8 +4,8 @@
 		"uid": "enfhduqwl1duiedukufshoyt",
 		"id": "apiary",
 		"title": "Apiary",
-		"ui": "default",
 		"description": "Bees",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -19,9 +19,9 @@
 			{
 				"id": "Honeycomb",
 				"title": "Honeycomb",
-				"description": "It's sweet, but needs more work",
-				"default": true,
+				"description": "Produce honeycomb when a beehive and a flowering field are within reach. Each harvest spends one unit of nectar from the field.",
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,
@@ -35,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beehive"
+								"itemId": "flower-field"
 							},
 							"scope": "board",
 							"distance": "close"
@@ -68,13 +68,30 @@
 				},
 				"rules": [
 					{
-						"hint": "You need beehive",
+						"hint": "A beehive must be within reach.",
 						"when": [
 							{
 								"query": {
 									"selector": {
 										"type": "item",
 										"itemId": "beehive"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
+					{
+						"hint": "A flowering field must be within reach.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flower-field"
 									},
 									"scope": "board",
 									"distance": "close"
@@ -90,8 +107,8 @@
 				"id": "beehive",
 				"title": "Beehive",
 				"description": "Build a new beehive",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 23999,
@@ -99,11 +116,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -114,11 +131,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "planks"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -129,11 +146,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

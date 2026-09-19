@@ -946,6 +946,8 @@ Item ID help:
     The stable name used by production, merges, rules, Board layouts and MCP.
 
     Renaming it updates project links when you **Save**. Keep it short, for example `healing-kit`. Text outside Arkini cannot be updated.
+Item UID:
+  value: Item UID
 Item action empty title:
   value: Let a click open Inventory or move to another space.
 Item action help:

@@ -47,7 +47,9 @@ export const ItemProductionRow = ({
 					<div className="ml-auto flex shrink-0 items-center gap-8">{actions}</div>
 				</div>
 				{line.description ? (
-					<p className="mt-2 whitespace-pre-wrap text-muted">{line.description}</p>
+					<p className="mt-2 w-fit max-w-full rounded-lg bg-surface/50 px-3 py-2 whitespace-pre-wrap text-muted">
+						{line.description}
+					</p>
 				) : null}
 				<div className="flex items-end justify-between gap-6">
 					{inputs}

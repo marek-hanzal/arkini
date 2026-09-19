@@ -2,6 +2,7 @@ import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection"
 import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { CopyButton } from "~/ui/ui/CopyButton";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
@@ -80,8 +81,32 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 										: item.maxCount
 								}
 							/>
+							<Fact
+								label={translator.textFn("Item ID")}
+								mono
+								value={
+									<div className="flex items-center gap-2">
+										<span className="min-w-0">{item.id}</span>
+										<CopyButton value={item.id} />
+									</div>
+								}
+							/>
 						</FactList>
-						<EditorMusicSelection resourceId={item.music} />
+						<div className="grid min-w-0 grid-cols-2 items-start gap-x-8">
+							<EditorMusicSelection resourceId={item.music} />
+							<FactList columns={1}>
+								<Fact
+									label={translator.textFn("Item UID")}
+									mono
+									value={
+										<div className="flex items-center gap-2">
+											<span className="min-w-0">{item.uid}</span>
+											<CopyButton value={item.uid} />
+										</div>
+									}
+								/>
+							</FactList>
+						</div>
 						{item.description === undefined ? null : (
 							<FactList columns={1}>
 								<Fact

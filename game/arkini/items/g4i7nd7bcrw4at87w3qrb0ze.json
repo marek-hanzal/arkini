@@ -1,15 +1,16 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "cgf3xd90ku1igebcgbe7nhct",
-		"id": "grain-farm",
-		"title": "Grain Farm",
-		"description": "Some food? Basic stuff here!",
+		"uid": "g4i7nd7bcrw4at87w3qrb0ze",
+		"id": "cacao-farm",
+		"title": "Cacao Farm",
+		"draft": false,
+		"description": "Operates nearby cacao groves and prepares new growing plots.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"grain-farm"
+				"cacao-farm"
 			]
 		},
 		"scope": "any",
@@ -18,13 +19,13 @@
 		"lines": [
 			{
 				"id": "harvest",
-				"title": "Grain",
-				"description": "Harvest loose grain from a nearby planted field.",
+				"title": "Cacao Pod",
+				"description": "Harvest cacao pods from a nearby planted grove.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 24000,
+				"runtimeMs": 32000,
 				"input": [
 					{
 						"units": {
@@ -35,7 +36,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grain-field"
+								"itemId": "cacao-grove"
 							},
 							"scope": "board",
 							"distance": "close"
@@ -52,10 +53,10 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grain",
+											"itemId": "cacao-pod",
 											"quantity": {
 												"min": 1,
-												"max": 1
+												"max": 3
 											},
 											"placement": "drop",
 											"rules": []
@@ -66,31 +67,13 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "toxic-waste"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "runtime:multiplier",
-						"multiplier": 1.98
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "field",
-				"title": "Prepare Grain Field",
-				"artwork": "empty-grain-field",
-				"description": "Prepare a new grain field for planting.",
+				"title": "Prepare Cacao Grove",
+				"artwork": "empty-cacao-grove",
+				"description": "Prepare a new empty cacao grove.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -111,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "empty-grain-field",
+											"itemId": "empty-cacao-grove",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -129,9 +112,9 @@
 			},
 			{
 				"id": "blueprint",
-				"title": "Grain Farm Blueprint",
+				"title": "Cacao Farm Blueprint",
 				"artwork": "blueprint",
-				"description": "Sketch plans for another Grain Farm.",
+				"description": "Sketch plans for another Cacao Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -164,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grain-farm-blueprint",
+											"itemId": "cacao-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

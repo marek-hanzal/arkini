@@ -5,7 +5,7 @@
 		"id": "cacao-seed",
 		"title": "Cacao Seed",
 		"draft": false,
-		"description": "Loose cacao seed. Pack it for storage before it spoils; planting needs a prepared grove.",
+		"description": "Loose cacao seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -24,6 +24,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-cacao-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-cacao-grove"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cacao-grove"
 			}
 		],
 		"clock": {

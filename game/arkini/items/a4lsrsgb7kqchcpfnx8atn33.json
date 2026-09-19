@@ -176,6 +176,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "fertilized-vegetable-garden"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cacao-grove"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-cacao-grove"
 			}
 		],
 		"maxQueueSize": 1,

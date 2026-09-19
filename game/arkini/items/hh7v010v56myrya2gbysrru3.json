@@ -4,7 +4,7 @@
 		"uid": "hh7v010v56myrya2gbysrru3",
 		"id": "grain",
 		"title": "Grain",
-		"description": "A handful of future bread, beer, feed, and agricultural bureaucracy. For now, mostly a promise that fields are coming.",
+		"description": "Loose harvested grain. Use it directly where appropriate or pack it into an empty sack for storage and transport.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -14,6 +14,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 12,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-grain"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

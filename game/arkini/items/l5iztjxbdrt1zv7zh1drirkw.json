@@ -4,7 +4,7 @@
 		"uid": "l5iztjxbdrt1zv7zh1drirkw",
 		"id": "gardener",
 		"title": "Gardener",
-		"description": "Sells crop seed as fields become available. Loose seed is cheap and fragile; bagged seed lasts longer.",
+		"description": "Sells loose crop seed as the corresponding farms become available. Players can pack seed into sacks for longer storage.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
@@ -1179,6 +1179,75 @@
 									"selector": {
 										"type": "item",
 										"itemId": "coffee-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "cacao-seed",
+				"title": "Cacao Seed",
+				"artwork": "cacao-seed",
+				"description": "Buy loose cacao planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cacao-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cacao-farm"
 									},
 									"scope": "universe"
 								},

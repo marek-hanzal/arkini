@@ -4,8 +4,8 @@
 		"uid": "yqu4itfme4lohxp6bxbito07",
 		"id": "composting-workshop",
 		"title": "Composting Workshop",
+		"description": "Turns organic waste, including spoiled raw meat, into compost for agriculture.",
 		"ui": "default",
-		"description": "Clean things up",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,14 +14,14 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"maxQueueSize": 1,
+		"maxQueueSize": 4,
 		"lines": [
 			{
 				"id": "compost",
 				"title": "Compost",
-				"description": "Stuff flowers wanna eat",
-				"default": true,
+				"description": "Turn a fixed batch of Bio-Waste into Compost.",
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 32000,
@@ -29,16 +29,16 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "bio-waste"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 1,
-							"max": 4
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -55,7 +55,113 @@
 											"itemId": "compost",
 											"quantity": {
 												"min": 1,
-												"max": 2
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "spoiled-raw-game-meat",
+				"title": "Compost Spoiled Meat",
+				"artwork": "spoiled-raw-game-meat",
+				"description": "Turn spoiled raw meat into compost instead of leaving it as a dead-end pile of regret.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 45000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "spoiled-raw-game-meat"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "compost",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "blueprint",
+				"title": "Composting Workshop Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Composting Workshop.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "composting-workshop-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

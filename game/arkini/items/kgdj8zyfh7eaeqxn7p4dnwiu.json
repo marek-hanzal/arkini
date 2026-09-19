@@ -1,21 +1,22 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "gqddpemvp2i958ns5cgoyoty",
-		"id": "meal",
-		"title": "Meal",
-		"description": "A simple hot meal. Feed it to a household before it cools, spoils, and becomes somebody else's compost problem.",
+		"uid": "kgdj8zyfh7eaeqxn7p4dnwiu",
+		"id": "fertilized-cacao-grove",
+		"title": "Fertilized Cacao Grove",
+		"draft": false,
+		"description": "Ready for cacao seed.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"meal"
+				"fertilized-cacao-grove"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 180000,
+			"durationMs": 300000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -28,7 +29,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "bio-waste",
+										"itemId": "empty-cacao-grove",
 										"quantity": {
 											"min": 1,
 											"max": 1

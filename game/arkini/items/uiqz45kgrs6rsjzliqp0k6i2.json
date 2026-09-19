@@ -19,6 +19,105 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
+				"id": "composting-workshop-blueprint",
+				"title": "Composting Workshop Blueprint",
+				"artwork": "composting-workshop",
+				"description": "Discover plans for a Composting Workshop. Agriculture starts with having somewhere useful to put the mess.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "composting-workshop-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "composting-workshop-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "composting-workshop"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
 				"id": "growers-guild-blueprint",
 				"title": "Growers Guild Blueprint",
 				"artwork": "growers-guild",
@@ -26,7 +125,7 @@
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
-				"enable": true,
+				"enable": false,
 				"runtimeMs": 30000,
 				"input": [
 					{
@@ -91,6 +190,21 @@
 								"query": {
 									"selector": {
 										"type": "item",
+										"itemId": "composting-workshop"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
 										"itemId": "growers-guild-blueprint"
 									},
 									"scope": "universe"
@@ -125,7 +239,7 @@
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
-				"enable": true,
+				"enable": false,
 				"runtimeMs": 30000,
 				"input": [
 					{
@@ -184,6 +298,21 @@
 					]
 				},
 				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "composting-workshop"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
 					{
 						"when": [
 							{

@@ -1,6 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
+import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
@@ -123,19 +124,21 @@ const runQuery = ({
 const readIds = (items: ReadonlyArray<RuntimeItemSchema.Type>) => items.map(({ id }) => id);
 
 describe("queryFx", () => {
-	it("uses exact Chebyshev rings within the origin board space", () => {
+	it("combines Close and Near without Self or other Spaces and preserves exact rings and Far", () => {
 		const snapshot = runtime({
 			items: [
 				board("origin", 0, 0),
 				board("close", 0, 1),
+				board("close-diagonal", 0, 1, 1),
 				board("near", 0, 2),
+				board("near-diagonal", 0, 2, 2),
 				board("far", 0, 3),
 				board("other-space", 1, 1),
 			],
 		});
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const query = (distance: "self" | "close" | "near" | "far") =>
+				const query = (distance: DistanceSchema.Type) =>
 					runQuery({
 						query: {
 							distance,
@@ -147,6 +150,7 @@ describe("queryFx", () => {
 				return {
 					self: yield* query("self"),
 					close: yield* query("close"),
+					nearClose: yield* query("near-close"),
 					near: yield* query("near"),
 					far: yield* query("far"),
 				};
@@ -158,13 +162,23 @@ describe("queryFx", () => {
 		]);
 		expect(readIds(result.close)).toEqual([
 			"close",
+			"close-diagonal",
+		]);
+		expect(readIds(result.nearClose)).toEqual([
+			"close",
+			"close-diagonal",
+			"near",
+			"near-diagonal",
 		]);
 		expect(readIds(result.near)).toEqual([
 			"near",
+			"near-diagonal",
 		]);
 		expect(readIds(result.far)).toEqual([
 			"close",
+			"close-diagonal",
 			"near",
+			"near-diagonal",
 			"far",
 		]);
 	});

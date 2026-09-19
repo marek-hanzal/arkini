@@ -1,19 +1,18 @@
 import { z } from "zod";
 
-/**
- * Discriminates the board distance used by future distance-based rules.
- */
+/** Authored Chebyshev reach within the query origin Board. */
 export const DistanceSchema = z
 	.enum({
 		Self: "self",
 		Close: "close",
+		NearClose: "near-close",
 		Near: "near",
 		Far: "far",
 	})
 	.meta({
 		id: "DistanceSchema",
 		description:
-			"The source cell itself, an exact close or near Chebyshev distance, or any positive far distance.",
+			"Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance.",
 	});
 
 export type DistanceSchema = typeof DistanceSchema;

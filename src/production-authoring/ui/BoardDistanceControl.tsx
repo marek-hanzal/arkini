@@ -14,6 +14,10 @@ const boardDistanceOptions = [
 		value: "close",
 	},
 	{
+		...BoardDistancePresentation["near-close"],
+		value: "near-close",
+	},
+	{
 		...BoardDistancePresentation.near,
 		value: "near",
 	},
@@ -51,6 +55,8 @@ export const BoardDistanceControl = ({
 						<Mx label="Board distance Self help" />
 					) : option.value === "close" ? (
 						<Mx label="Board distance Close help" />
+					) : option.value === "near-close" ? (
+						<Mx label="Board distance Near-Close help" />
 					) : option.value === "near" ? (
 						<Mx label="Board distance Near help" />
 					) : (

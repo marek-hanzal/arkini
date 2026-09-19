@@ -287,6 +287,9 @@ Board distance Far help:
 Board distance Near help:
   value: |
     Exactly **2 cells** from the starting item, including diagonals.
+Board distance Near-Close help:
+  value: |
+    **1 or 2 cells** from the starting item, including diagonals. The starting item and anything farther away are excluded.
 Board distance Self help:
   value: |
     Only the item running this action or production line.
@@ -1255,6 +1258,9 @@ Managed:
 Matches any positive board distance and excludes only Self.:
   value: Matches anything else on the current Board. This item is excluded.
   dynamic: true
+Matches items 1 or 2 cells away, including diagonals, but excludes Self.:
+  value: Matches items 1 or 2 cells away, including diagonals, but excludes Self.
+  dynamic: true
 Matches items exactly 1 cell away, including diagonals.:
   value: Matches items exactly 1 cell away, including diagonals.
   dynamic: true
@@ -1387,6 +1393,9 @@ Name:
   value: Name
 Near:
   value: Near
+  dynamic: true
+Near-Close:
+  value: Near-Close
   dynamic: true
 New item:
   value: New item

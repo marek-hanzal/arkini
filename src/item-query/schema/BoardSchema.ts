@@ -20,11 +20,11 @@ export const BoardSchema = z
 		/**
 		 * Chebyshev distance rule from the query origin to a matching item.
 		 *
-		 * `self` matches the origin, `close` exactly distance one, `near` exactly
-		 * distance two, and `far` every positive distance.
+		 * `self` matches the origin, `close` exactly distance one, `near-close`
+		 * distances one or two, `near` exactly two, and `far` every positive distance.
 		 */
 		distance: DistanceSchema.describe(
-			"The origin itself, an exact close or near Chebyshev distance, or any positive far distance.",
+			"Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance.",
 		),
 	})
 	.strict()

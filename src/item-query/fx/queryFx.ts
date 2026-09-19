@@ -45,6 +45,7 @@ const matchesDistanceFn = ({
 	return match(distance)
 		.with(DistanceSchema.enum.Self, () => value === 0)
 		.with(DistanceSchema.enum.Close, () => value === 1)
+		.with(DistanceSchema.enum.NearClose, () => value > 0 && value <= 2)
 		.with(DistanceSchema.enum.Near, () => value === 2)
 		.with(DistanceSchema.enum.Far, () => value > 0)
 		.exhaustive();

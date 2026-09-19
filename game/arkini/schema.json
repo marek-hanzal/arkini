@@ -680,7 +680,6 @@
 					"description": "Identifies this query as a board-only query."
 				},
 				"distance": {
-					"description": "The origin itself, an exact close or near Chebyshev distance, or any positive far distance.",
 					"$ref": "urn:arkini:schema:project#/$defs/DistanceSchema"
 				}
 			},
@@ -716,10 +715,11 @@
 			"enum": [
 				"self",
 				"close",
+				"near-close",
 				"near",
 				"far"
 			],
-			"description": "The source cell itself, an exact close or near Chebyshev distance, or any positive far distance."
+			"description": "Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance."
 		},
 		"query.InventorySchema": {
 			"type": "object",

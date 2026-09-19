@@ -223,9 +223,10 @@ describe("InputControl", () => {
 		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).not.toBeNull();
 	});
 
-	it("renders Units unit controls with Target as the direct default", async () => {
+	it("edits target query reach while keeping Target as the default unit payer", async () => {
 		const { container, root } = createContainer();
-		await renderInput(root, withoutUnitsUnitsInput);
+		const onChangeFn = vi.fn();
+		await renderInput(root, withoutUnitsUnitsInput, onChangeFn);
 
 		const unitCost = container.querySelector('[data-ui="EditorInputUnitCost"]');
 		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
@@ -239,17 +240,28 @@ describe("InputControl", () => {
 			"target",
 			"self",
 		]);
-		expect(readChoiceValues(boardDistance)).toEqual([
-			"self",
-			"close",
-			"near",
-			"far",
-		]);
+
 		expect(
 			paidBy.querySelector('[data-ui-value="target"]')?.getAttribute("data-ui-selected"),
 		).toBe("true");
 		expect(unitCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).not.toBeNull();
 		expect(unitCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("1");
+		const nearClose = boardDistance.querySelector<HTMLButtonElement>(
+			'[data-ui-value="near-close"]',
+		);
+		if (nearClose === null) throw new Error("Expected Near-Close query control.");
+		await act(async () => nearClose.click());
+		expect(onChangeFn).toHaveBeenLastCalledWith({
+			...withoutUnitsUnitsInput,
+			units: {
+				cost: 1,
+				from: "target",
+			},
+			query: {
+				...withoutUnitsUnitsInput.query,
+				distance: "near-close",
+			},
+		});
 	});
 
 	it("locks target unit Cost until an item is selected and caps it at that item's units", async () => {

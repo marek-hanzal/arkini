@@ -4,16 +4,44 @@
 		"uid": "cuao33ea066g975ysq1nu9fe",
 		"id": "flower-field",
 		"title": "Flower Field",
-		"ui": "simple",
+		"draft": false,
 		"description": "Floweers",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"flower-field"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 20,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-flower-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

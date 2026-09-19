@@ -24,6 +24,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-cotton-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-cotton-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cotton-field"
 			}
 		],
 		"clock": {

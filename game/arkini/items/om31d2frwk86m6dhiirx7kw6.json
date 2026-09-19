@@ -4,6 +4,7 @@
 		"uid": "om31d2frwk86m6dhiirx7kw6",
 		"id": "corn-field",
 		"title": "Corn Field",
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -11,8 +12,35 @@
 				"corn-field"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 12,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-corn-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

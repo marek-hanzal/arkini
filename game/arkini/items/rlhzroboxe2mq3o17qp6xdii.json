@@ -24,6 +24,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-flax-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-flax-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "flax-field"
 			}
 		],
 		"clock": {

@@ -1,41 +1,23 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "n3yuyf1v3wij23civy92sid5",
-		"id": "sunflower-seed",
-		"title": "Sunflower Seed",
-		"draft": true,
+		"uid": "v2km8u6xi14n09jlunmpsudo",
+		"id": "sack-with-fruit-seed",
+		"title": "Sack With Fruit Seed",
+		"draft": false,
+		"description": "A sack of fruit seed, marked with the fruit it is meant to grow.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sunflower-seed"
+				"sack-with-seeds",
+				"fruit-crate"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-sack"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sack-with-sunflower-seed"
-			},
-			{
-				"target": {
-					"type": "item",
-					"itemId": "fertilized-sunflower-field"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sunflower-field"
-			}
-		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -48,7 +30,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-sunflower-seed",
+										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,
 											"max": 1

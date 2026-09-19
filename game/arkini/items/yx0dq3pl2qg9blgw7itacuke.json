@@ -33,6 +33,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-corn-kernels"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-corn-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "corn-field"
 			}
 		],
 		"clock": {

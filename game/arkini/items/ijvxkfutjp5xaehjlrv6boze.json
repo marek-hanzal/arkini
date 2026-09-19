@@ -1,15 +1,16 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "cgf3xd90ku1igebcgbe7nhct",
-		"id": "grain-farm",
-		"title": "Grain Farm",
-		"description": "Some food? Basic stuff here!",
+		"uid": "ijvxkfutjp5xaehjlrv6boze",
+		"id": "cotton-farm",
+		"title": "Cotton Farm",
+		"draft": false,
+		"description": "Operates nearby cotton fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"grain-farm"
+				"cotton-farm"
 			]
 		},
 		"scope": "any",
@@ -18,8 +19,8 @@
 		"lines": [
 			{
 				"id": "harvest",
-				"title": "Grain",
-				"description": "Harvest grain from a nearby planted field.",
+				"title": "Cotton",
+				"description": "Harvest cotton from a nearby planted field.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
@@ -35,7 +36,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grain-field"
+								"itemId": "cotton-field"
 							},
 							"scope": "board",
 							"distance": "close"
@@ -52,10 +53,10 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-grain",
+											"itemId": "cotton",
 											"quantity": {
 												"min": 1,
-												"max": 2
+												"max": 3
 											},
 											"placement": "drop",
 											"rules": []
@@ -66,30 +67,12 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "toxic-waste"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "runtime:multiplier",
-						"multiplier": 1.98
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "seed",
-				"title": "Grain Seed",
-				"description": "Prepare loose grain seed for planting or other uses.",
+				"title": "Cotton Seed",
+				"description": "Prepare loose cotton seed for planting or other uses.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -110,7 +93,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grain-seed",
+											"itemId": "cotton-seed",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -128,8 +111,8 @@
 			},
 			{
 				"id": "seed-sack",
-				"title": "Grain Seed Sack",
-				"description": "Pack grain seed into an empty sack for longer storage.",
+				"title": "Cotton Seed Sack",
+				"description": "Pack cotton seed into an empty sack for longer storage.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -162,7 +145,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-grain-seed",
+											"itemId": "sack-with-cotton-seed",
 											"quantity": {
 												"min": 1,
 												"max": 1

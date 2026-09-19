@@ -14,26 +14,6 @@
 		},
 		"scope": "any",
 		"maxStackSize": 12,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "fertilized-grain-field"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "grain-field"
-			},
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-sack"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sack-with-grain-seed"
-			}
-		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

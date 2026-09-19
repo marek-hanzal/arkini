@@ -1,21 +1,33 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "mo6iqg558290ccffucwkccv3",
-		"id": "green-coffee-beans",
-		"title": "Green Coffee Beans",
+		"uid": "rt5kdthl4xt8l0i7eawdrz2p",
+		"id": "fruit-seed",
+		"title": "Fruit Seed",
+		"draft": false,
+		"description": "Loose fruit seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
-		"description": "Still needs some care before it will be a coffee you know",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"green-coffee-beans"
+				"fruit-seed"
 			]
 		},
-		"scope": "board",
+		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-fruit-seed"
+			}
+		],
 		"clock": {
-			"durationMs": 1200000,
+			"durationMs": 300000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -28,7 +40,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "bio-waste",
+										"itemId": "spoiled-fruit-seed",
 										"quantity": {
 											"min": 1,
 											"max": 1

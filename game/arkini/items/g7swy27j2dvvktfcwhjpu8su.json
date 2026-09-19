@@ -1,15 +1,16 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "cgf3xd90ku1igebcgbe7nhct",
-		"id": "grain-farm",
-		"title": "Grain Farm",
-		"description": "Some food? Basic stuff here!",
+		"uid": "g7swy27j2dvvktfcwhjpu8su",
+		"id": "flower-farm",
+		"title": "Flower Farm",
+		"draft": false,
+		"description": "Operates nearby flower fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"grain-farm"
+				"flower-farm"
 			]
 		},
 		"scope": "any",
@@ -18,13 +19,13 @@
 		"lines": [
 			{
 				"id": "harvest",
-				"title": "Grain",
-				"description": "Harvest grain from a nearby planted field.",
+				"title": "Flowers",
+				"description": "Harvest flowers from a nearby planted field.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 24000,
+				"runtimeMs": 28000,
 				"input": [
 					{
 						"units": {
@@ -35,7 +36,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grain-field"
+								"itemId": "flower-field"
 							},
 							"scope": "board",
 							"distance": "close"
@@ -52,7 +53,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-grain",
+											"itemId": "flowers",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -66,30 +67,12 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "toxic-waste"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "runtime:multiplier",
-						"multiplier": 1.98
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "seed",
-				"title": "Grain Seed",
-				"description": "Prepare loose grain seed for planting or other uses.",
+				"title": "Flower Seed",
+				"description": "Prepare loose flower seed for planting or other uses.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -110,7 +93,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grain-seed",
+											"itemId": "flower-seed",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -128,8 +111,8 @@
 			},
 			{
 				"id": "seed-sack",
-				"title": "Grain Seed Sack",
-				"description": "Pack grain seed into an empty sack for longer storage.",
+				"title": "Flower Seed Sack",
+				"description": "Pack flower seed into an empty sack for longer storage.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -162,7 +145,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-grain-seed",
+											"itemId": "sack-with-flower-seed",
 											"quantity": {
 												"min": 1,
 												"max": 1

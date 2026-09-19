@@ -4,15 +4,16 @@
 		"uid": "imrcxilbuisx6f02q5rt7pp3",
 		"id": "grain-field",
 		"title": "Grain Field",
+		"draft": false,
 		"description": "A field. Of grain.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"grain-field"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 16,
@@ -41,93 +42,7 @@
 				]
 			}
 		},
-		"maxQueueSize": 4,
-		"lines": [
-			{
-				"id": "grain",
-				"title": "Grain",
-				"description": "Get some grain. You can eat it if you want.",
-				"clockWeight": 1,
-				"default": true,
-				"show": true,
-				"enable": false,
-				"runtimeMs": 24000,
-				"input": [
-					{
-						"units": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "grain-field"
-							},
-							"scope": "board",
-							"distance": "self"
-						}
-					},
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "bucket-with-water"
-							},
-							"scope": "any"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						}
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "sack-with-grain",
-											"quantity": {
-												"min": 2,
-												"max": 4
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": [
-					{
-						"hint": "If you want running field, it must be next to the farm.",
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "grain-farm"
-									},
-									"scope": "board",
-									"distance": "close"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
-			}
-		]
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

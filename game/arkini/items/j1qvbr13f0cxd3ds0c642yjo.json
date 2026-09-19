@@ -4,16 +4,43 @@
 		"uid": "j1qvbr13f0cxd3ds0c642yjo",
 		"id": "sunflower-field",
 		"title": "Sunflower Field",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"sunflower-field"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 16,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-sunflower-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

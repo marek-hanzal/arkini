@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ee74rbkuwr57op86md3fmxx9",
+		"id": "spoiled-flower-seed",
+		"title": "Spoiled Flower Seed",
+		"draft": false,
+		"description": "Flower seed that spoiled before it ever reached the soil.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-flower-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

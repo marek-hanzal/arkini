@@ -4,16 +4,44 @@
 		"uid": "mp2maik3tk3jwvt78hwfjw9x",
 		"id": "flax-field",
 		"title": "Flax Field",
-		"ui": "simple",
+		"draft": false,
 		"description": "Flax field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"flax-field"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 20,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-flax-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

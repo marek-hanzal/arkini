@@ -1,17 +1,17 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "o2skwmlh3wggmy9qyjjhkm3e",
-		"id": "sack-with-corn-kernels",
-		"title": "Sack With Corn Kernels",
+		"uid": "n3lc68he05ibgson6xw1asjr",
+		"id": "sack-with-grass-seed",
+		"title": "Sack With Grass Seed",
 		"draft": false,
-		"description": "A sack of corn kernels, marked with the crop they are meant to grow.",
+		"description": "A sack of grass seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-seeds",
-				"corn"
+				"cut-grass"
 			]
 		},
 		"scope": "board",
@@ -20,40 +20,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
-				},
-				"action": "consume",
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "burned-sack-with-corn-kernels",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"effect": "replace",
-				"result": "campfire-extinguished"
-			},
-			{
-				"target": {
-					"type": "item",
-					"itemId": "fertilized-corn-field"
+					"itemId": "fertilized-grass-field"
 				},
 				"action": "consume",
 				"output": {
@@ -81,7 +48,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corn-field"
+				"result": "grass-field"
 			}
 		],
 		"clock": {

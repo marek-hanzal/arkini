@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "nl86ut5kjaf2m0mxf3hpl6d3",
+		"id": "spoiled-herb-seed",
+		"title": "Spoiled Herb Seed",
+		"draft": false,
+		"description": "Herb seed that spoiled before it ever reached the soil.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-herb-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

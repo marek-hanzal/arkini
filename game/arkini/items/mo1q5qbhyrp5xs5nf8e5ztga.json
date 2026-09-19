@@ -23,6 +23,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-rapeseed-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-rapeseed-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "rapeseed-field"
 			}
 		],
 		"clock": {

@@ -405,7 +405,7 @@
 								"itemId": "beagle"
 							},
 							"scope": "board",
-							"distance": "far"
+							"distance": "near-close"
 						}
 					},
 					{
@@ -458,7 +458,7 @@
 										"itemId": "beagle"
 									},
 									"scope": "board",
-									"distance": "far"
+									"distance": "near-close"
 								},
 								"type": "exists"
 							}

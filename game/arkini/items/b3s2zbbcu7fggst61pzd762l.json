@@ -14,7 +14,390 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"clock": {
+			"intervalMs": 30000,
+			"enable": true,
+			"rules": []
+		},
 		"maxQueueSize": 6,
-		"lines": []
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Idle",
+				"description": "No suitable hunt is taken this time.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "hunt-fawn",
+				"title": "Hunt Fawn",
+				"artwork": "fawn",
+				"description": "Hunt fawn and bring back generic hunted game.",
+				"clock": true,
+				"clockWeight": 5,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "fawn"
+							},
+							"scope": "board",
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hunted-game",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "fawn"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "hunt-wild-boar",
+				"title": "Hunt Wild Boar",
+				"artwork": "wild-boar",
+				"description": "Hunt wild-boar and bring back generic hunted game.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wild-boar"
+							},
+							"scope": "board",
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hunted-game",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wild-boar"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "hunt-shorn-wild-boar",
+				"title": "Hunt Shorn Wild Boar",
+				"artwork": "shorn-wild-boar",
+				"description": "Hunt shorn-wild-boar and bring back generic hunted game.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "shorn-wild-boar"
+							},
+							"scope": "board",
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hunted-game",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "shorn-wild-boar"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "hunt-wolf",
+				"title": "Hunt Wolf",
+				"artwork": "wolf",
+				"description": "Hunt wolf and bring back generic hunted game.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hunted-game",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "hunt-bear",
+				"title": "Hunt Bear",
+				"artwork": "bear",
+				"description": "Hunt bear and bring back generic hunted game.",
+				"clock": true,
+				"clockWeight": 2,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bear"
+							},
+							"scope": "board",
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hunted-game",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "bear"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
 	}
 }

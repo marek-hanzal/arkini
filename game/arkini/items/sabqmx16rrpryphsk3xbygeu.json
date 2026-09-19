@@ -513,11 +513,12 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "hay"
-							}
+							},
+							"scope": "board",
+							"distance": "near-close"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -575,7 +576,7 @@
 										"itemId": "hay"
 									},
 									"scope": "board",
-									"distance": "far"
+									"distance": "near-close"
 								},
 								"type": "exists"
 							}
@@ -599,11 +600,12 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "cut-grass"
-							}
+							},
+							"scope": "board",
+							"distance": "near-close"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -661,7 +663,7 @@
 										"itemId": "cut-grass"
 									},
 									"scope": "board",
-									"distance": "far"
+									"distance": "near-close"
 								},
 								"type": "exists"
 							}

@@ -414,7 +414,7 @@
 								"itemId": "british-shorthair"
 							},
 							"scope": "board",
-							"distance": "far"
+							"distance": "near-close"
 						}
 					},
 					{
@@ -467,7 +467,7 @@
 										"itemId": "british-shorthair"
 									},
 									"scope": "board",
-									"distance": "far"
+									"distance": "near-close"
 								},
 								"type": "exists"
 							}

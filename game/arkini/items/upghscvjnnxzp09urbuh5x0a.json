@@ -462,7 +462,7 @@
 								"itemId": "beagle-puppy"
 							},
 							"scope": "board",
-							"distance": "far"
+							"distance": "near-close"
 						}
 					},
 					{
@@ -515,7 +515,7 @@
 										"itemId": "beagle-puppy"
 									},
 									"scope": "board",
-									"distance": "far"
+									"distance": "near-close"
 								},
 								"type": "exists"
 							}

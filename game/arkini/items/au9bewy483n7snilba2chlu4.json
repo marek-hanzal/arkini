@@ -4,7 +4,7 @@
 		"uid": "au9bewy483n7snilba2chlu4",
 		"id": "well-fed-cow",
 		"title": "Well Fed Cow",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

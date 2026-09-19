@@ -4,7 +4,7 @@
 		"uid": "bttupkw06zzxn8xuvb4d27uu",
 		"id": "hay",
 		"title": "Hay",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

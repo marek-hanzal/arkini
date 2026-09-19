@@ -4,7 +4,7 @@
 		"uid": "mo1q5qbhyrp5xs5nf8e5ztga",
 		"id": "rapeseed-seed",
 		"title": "Rapeseed Seed",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

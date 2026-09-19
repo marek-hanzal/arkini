@@ -4,7 +4,7 @@
 		"uid": "nk9t46yrhwek7h4u2cin27ip",
 		"id": "hungry-chicken",
 		"title": "Hungry Chicken",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

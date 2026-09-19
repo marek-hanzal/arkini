@@ -4,7 +4,7 @@
 		"uid": "zpb9k34bv9tafe0k3jg5pgdn",
 		"id": "hungry-cow",
 		"title": "Hungry Cow",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

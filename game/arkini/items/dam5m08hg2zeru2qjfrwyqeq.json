@@ -4,7 +4,7 @@
 		"uid": "dam5m08hg2zeru2qjfrwyqeq",
 		"id": "sick-pig",
 		"title": "Sick Pig",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

@@ -4,8 +4,8 @@
 		"uid": "m0quqq3gbmugylp39ced2zco",
 		"id": "corn",
 		"title": "Corn",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -4,8 +4,8 @@
 		"uid": "atcdihdj87zfj52oagbqxcri",
 		"id": "empty-herb-garden",
 		"title": "Empty Herb Garden",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -4,8 +4,8 @@
 		"uid": "n198za79imdvj0gms3hj78ep",
 		"id": "fertilized-herb-garden",
 		"title": "Fertilized Herb Garden",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

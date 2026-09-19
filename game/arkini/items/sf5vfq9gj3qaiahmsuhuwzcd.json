@@ -4,7 +4,7 @@
 		"uid": "sf5vfq9gj3qaiahmsuhuwzcd",
 		"id": "well-fed-sheep",
 		"title": "Well Fed Sheep",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

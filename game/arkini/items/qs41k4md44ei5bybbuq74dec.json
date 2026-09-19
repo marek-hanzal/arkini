@@ -4,7 +4,7 @@
 		"uid": "qs41k4md44ei5bybbuq74dec",
 		"id": "hungry-goose",
 		"title": "Hungry Goose",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

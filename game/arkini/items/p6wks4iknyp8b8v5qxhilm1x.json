@@ -4,8 +4,8 @@
 		"uid": "p6wks4iknyp8b8v5qxhilm1x",
 		"id": "empty-grass-field",
 		"title": "Empty Grass Field",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

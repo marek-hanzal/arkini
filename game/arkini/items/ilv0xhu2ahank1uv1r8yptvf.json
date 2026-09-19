@@ -4,8 +4,8 @@
 		"uid": "ilv0xhu2ahank1uv1r8yptvf",
 		"id": "herbs",
 		"title": "Herbs",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

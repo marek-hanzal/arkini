@@ -4,7 +4,7 @@
 		"uid": "szv3267zbloo4b16d4jmv5ay",
 		"id": "spoiled-rapeseed-seed",
 		"title": "Spoiled Rapeseed Seed",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

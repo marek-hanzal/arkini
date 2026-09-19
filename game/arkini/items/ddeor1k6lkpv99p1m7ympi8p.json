@@ -4,8 +4,8 @@
 		"uid": "ddeor1k6lkpv99p1m7ympi8p",
 		"id": "pumpkin",
 		"title": "Pumpkin",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

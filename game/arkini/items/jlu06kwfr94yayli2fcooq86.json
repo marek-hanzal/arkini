@@ -4,7 +4,7 @@
 		"uid": "jlu06kwfr94yayli2fcooq86",
 		"id": "sick-sheep",
 		"title": "Sick Sheep",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

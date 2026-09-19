@@ -4,7 +4,7 @@
 		"uid": "mj7bg5up2xlr0wvy9hfb9zb6",
 		"id": "well-fed-chicken",
 		"title": "Well Fed Chicken",
-		"draft": true,
+		"draft": false,
 		"description": "A very satisfied chicken.",
 		"ui": "simple",
 		"artwork": {

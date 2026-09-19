@@ -4,8 +4,8 @@
 		"uid": "pfpwon1x53qp5sgf1usb0zck",
 		"id": "fertilized-rapeseed-field",
 		"title": "Fertilized Rapeseed Field",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -4,7 +4,7 @@
 		"uid": "iod02z80dgxlbkm3inzi84gp",
 		"id": "sick-chicken",
 		"title": "Sick Chicken",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

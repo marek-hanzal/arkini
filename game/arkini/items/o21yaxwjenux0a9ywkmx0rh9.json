@@ -4,7 +4,7 @@
 		"uid": "o21yaxwjenux0a9ywkmx0rh9",
 		"id": "cut-grass",
 		"title": "Cut Grass",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,

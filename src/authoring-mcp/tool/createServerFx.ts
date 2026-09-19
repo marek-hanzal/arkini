@@ -201,6 +201,15 @@ const ItemEstimateInputSchema = z
 
 const SchemaDetailInputSchema = z
 	.object({
+		resolveDepth: z
+			.number()
+			.int()
+			.min(0)
+			.max(256)
+			.default(0)
+			.describe(
+				"Registered $ref expansion depth, 0–256. Zero preserves references; cycles and references at the depth limit remain unresolved.",
+			),
 		id: z
 			.string()
 			.min(1)
@@ -487,7 +496,7 @@ const createServerFn = (
 		},
 		{
 			instructions:
-				"Every project tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail and resolve each returned $ref through schema_detail again. Create and edit tools persist canonical saved editor state.",
+				"Every project tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail with optional resolveDepth (0–256) to inline registered references. Remaining $refs can be read through schema_detail again. Create and edit tools persist canonical saved editor state.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
@@ -495,10 +504,10 @@ const createServerFn = (
 		"schema_detail",
 		{
 			description:
-				"Read one JSON Schema by its exact case-sensitive Zod registry ID. A returned $ref is another exact ID that can be read through schema_detail. This tool does not require an open project.",
+				"Read one JSON Schema by its exact case-sensitive Zod registry ID. Optional resolveDepth (integer 0–256, default 0) expands that many registered $ref edges, independently in each branch. Cycles, unknown references and references at the depth limit remain as $ref. Local fragment references in embedded schemas retain their original resource ID. Depth limits nesting, not total response size. This tool does not require an open project.",
 			inputSchema: SchemaDetailInputSchema,
 		},
-		async ({ id }) => runToolFn(readSchemaDetailTextFx(id)),
+		async ({ id, resolveDepth }) => runToolFn(readSchemaDetailTextFx(id, resolveDepth)),
 	);
 	{
 		const schemaId = resolveSchemaId(CreateItemInputSchema);

@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Dye Seed",
-				"description": "Prepare loose dye plant seed.",
+				"id": "field",
+				"title": "Prepare Dye Field",
+				"artwork": "empty-dye-field",
+				"description": "Prepare a new dye field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "dye-seed",
+											"itemId": "empty-dye-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Dye Plant Seed Sack",
-				"description": "Pack dye plant seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Dye Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Dye Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-dye-seed",
+											"itemId": "dye-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

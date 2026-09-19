@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "lidli1atre8yu8ew4avdkcf2",
+		"id": "empty-fruit-garden",
+		"title": "Empty Fruit Garden",
+		"draft": false,
+		"description": "Ready for another fruit-growing cycle.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"empty-fruit-garden"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,79 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "c4bsq41uru5j76864rm4emkm",
+		"id": "herders-guild-blueprint",
+		"title": "Herders Guild Blueprint",
+		"draft": false,
+		"description": "Plans for Herders Guild.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"herders-guild"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "herders-guild",
+				"title": "Build Herders Guild",
+				"artwork": "herders-guild",
+				"description": "Build Herders Guild.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 45000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "herders-guild-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "herders-guild",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Flax Seed",
-				"description": "Prepare loose flax seed for planting or other uses.",
+				"id": "field",
+				"title": "Prepare Flax Field",
+				"artwork": "empty-flax-field",
+				"description": "Prepare a new flax field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "flax-seed",
+											"itemId": "empty-flax-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Flax Seed Sack",
-				"description": "Pack flax seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Flax Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Flax Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-flax-seed",
+											"itemId": "flax-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

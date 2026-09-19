@@ -24,6 +24,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-fruit-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-fruit-garden"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fruit-garden"
 			}
 		],
 		"clock": {

@@ -1,0 +1,48 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "umbaslum2ylw4w0bysyhocou",
+		"id": "pumpkin-field",
+		"title": "Pumpkin Field",
+		"draft": false,
+		"description": "A planted pumpkin field.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"pumpkin-field"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 12,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-pumpkin-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

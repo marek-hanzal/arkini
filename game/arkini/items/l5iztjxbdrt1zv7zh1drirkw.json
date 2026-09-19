@@ -4,7 +4,7 @@
 		"uid": "l5iztjxbdrt1zv7zh1drirkw",
 		"id": "gardener",
 		"title": "Gardener",
-		"description": "Source of various seeds.",
+		"description": "Sells crop seed as fields become available. Loose seed is cheap and fragile; bagged seed lasts longer.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
@@ -17,17 +17,30 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "empty-corn-field",
-				"title": "Empty Corn Field",
-				"description": "Empty field ready to grow some corn",
+				"id": "grain-seed",
+				"title": "Grain Seed",
+				"artwork": "grain-seed",
+				"description": "Buy loose grain planting seed.",
 				"clockWeight": 1,
 				"default": false,
-				"show": true,
+				"show": false,
 				"enable": true,
-				"runtimeMs": 32000,
+				"runtimeMs": 18000,
 				"input": [
 					{
-						"type": "simple"
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
 					}
 				],
 				"output": {
@@ -40,7 +53,1249 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "empty-corn-field",
+											"itemId": "grain-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "corn-seed",
+				"title": "Corn Kernels",
+				"artwork": "corn-kernels",
+				"description": "Buy loose corn planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "corn-kernels",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "corn-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "vegetable-seed",
+				"title": "Vegetable Seed",
+				"artwork": "vegetable-seed",
+				"description": "Buy loose vegetable planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "vegetable-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "vegetable-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "fruit-seed",
+				"title": "Fruit Seed",
+				"artwork": "fruit-seed",
+				"description": "Buy loose fruit planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "fruit-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "fruit-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "cotton-seed",
+				"title": "Cotton Seed",
+				"artwork": "cotton-seed",
+				"description": "Buy loose cotton planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cotton-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "flax-seed",
+				"title": "Flax Seed",
+				"artwork": "flax-seed",
+				"description": "Buy loose flax planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "flax-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "grass-seed",
+				"title": "Grass Seed",
+				"artwork": "grass-seed",
+				"description": "Buy loose grass planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grass-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grass-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "herb-seed",
+				"title": "Herb Seed",
+				"artwork": "herb-seed",
+				"description": "Buy loose herb planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "herb-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "herbalist"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "flower-seed",
+				"title": "Flower Seed",
+				"artwork": "flower-seed",
+				"description": "Buy loose flower planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "flower-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "pumpkin-seed",
+				"title": "Pumpkin Seed",
+				"artwork": "pumpkin-seed",
+				"description": "Buy loose pumpkin planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "pumpkin-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "pumpkin-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "grape-seed",
+				"title": "Grape Seed",
+				"artwork": "grape-seed",
+				"description": "Buy loose grape planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grape-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grape-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "hop-seed",
+				"title": "Hop Seed",
+				"artwork": "hop-seed",
+				"description": "Buy loose hop planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hop-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "hop-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "rapeseed-seed",
+				"title": "Rapeseed Seed",
+				"artwork": "rapeseed-seed",
+				"description": "Buy loose rapeseed planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "rapeseed-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "sunflower-seed",
+				"title": "Sunflower Seed",
+				"artwork": "sunflower-seed",
+				"description": "Buy loose sunflower planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sunflower-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "sugar-beet-seed",
+				"title": "Sugar Beet Seed",
+				"artwork": "sugar-beet-seed",
+				"description": "Buy loose sugar beet planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sugar-beet-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sugar-beet-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "sugar-cane-seed",
+				"title": "Sugar Cane Seed",
+				"artwork": "sugar-cane-seed",
+				"description": "Buy loose sugar cane planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sugar-cane-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sugar-cane-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "coffee-seed",
+				"title": "Coffee Seed",
+				"artwork": "coffee-seed",
+				"description": "Buy loose coffee planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "coffee-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "coffee-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "dye-seed",
+				"title": "Dye Plant Seed",
+				"artwork": "dye-seed",
+				"description": "Buy loose dye plant planting seed.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "coin"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "dye-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "dye-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					}
+				]
+			},
+			{
+				"id": "blueprint",
+				"title": "Gardener Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Gardener.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "gardener-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

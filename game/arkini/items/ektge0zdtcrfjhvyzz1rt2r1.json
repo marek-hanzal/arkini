@@ -24,6 +24,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-vegetable-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-vegetable-garden"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "vegetable-garden"
 			}
 		],
 		"clock": {

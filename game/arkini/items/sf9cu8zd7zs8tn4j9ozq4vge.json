@@ -1,0 +1,79 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "sf9cu8zd7zs8tn4j9ozq4vge",
+		"id": "sugar-beet-farm-blueprint",
+		"title": "Sugar Beet Farm Blueprint",
+		"draft": false,
+		"description": "Plans for Sugar Beet Farm.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"sugar-beet-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "sugar-beet-farm",
+				"title": "Build Sugar Beet Farm",
+				"artwork": "sugar-beet-farm",
+				"description": "Build Sugar Beet Farm.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sugar-beet-farm-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sugar-beet-farm",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

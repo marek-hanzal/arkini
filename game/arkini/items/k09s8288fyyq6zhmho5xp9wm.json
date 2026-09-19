@@ -440,130 +440,6 @@
 				]
 			},
 			{
-				"id": "architect-t1-blueprint",
-				"title": "Architect - Tier 1 Blueprint",
-				"artwork": "architect-t1",
-				"description": "Draw plans for a small architect's office. The Townhall discovers buildings; the Architect handles repeat business.",
-				"clockWeight": 1,
-				"default": false,
-				"show": false,
-				"enable": true,
-				"runtimeMs": 30000,
-				"input": [
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "goose-quill"
-							},
-							"scope": "any"
-						},
-						"mode": "reserve",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
-					},
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "paper"
-							},
-							"scope": "any"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "architect-t1-blueprint",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "sawmill"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "stoneworks"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "show"
-					},
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "architect-t1-blueprint"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "architect-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "hide"
-					}
-				]
-			},
-			{
 				"id": "charcoal-kiln-blueprint",
 				"title": "Charcoal Kiln Blueprint",
 				"artwork": "charcoal-kiln",
@@ -924,16 +800,6 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "architect-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
 										"itemId": "charcoal-kiln"
 									},
 									"scope": "universe"
@@ -1139,22 +1005,6 @@
 									"selector": {
 										"type": "item",
 										"itemId": "carpenter"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					},
-					{
-						"hint": "Build Architect - Tier 1 first.",
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "architect-t1"
 									},
 									"scope": "universe"
 								},

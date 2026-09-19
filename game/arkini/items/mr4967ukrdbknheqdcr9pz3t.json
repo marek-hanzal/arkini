@@ -1,0 +1,50 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "mr4967ukrdbknheqdcr9pz3t",
+		"id": "fertilized-pumpkin-field",
+		"title": "Fertilized Pumpkin Field",
+		"draft": false,
+		"description": "Ready for pumpkin seed.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"fertilized-pumpkin-field"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-pumpkin-field",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

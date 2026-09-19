@@ -16,7 +16,206 @@
 		"scope": "any",
 		"maxCount": 1,
 		"maxStackSize": 1,
-		"maxQueueSize": 1,
-		"lines": []
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "growers-guild-blueprint",
+				"title": "Growers Guild Blueprint",
+				"artwork": "growers-guild",
+				"description": "Discover plans for Growers Guild.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "growers-guild-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "growers-guild-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "growers-guild"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "herders-guild-blueprint",
+				"title": "Herders Guild Blueprint",
+				"artwork": "herders-guild",
+				"description": "Discover plans for Herders Guild.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "herders-guild-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "herders-guild-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "herders-guild"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			}
+		]
 	}
 }

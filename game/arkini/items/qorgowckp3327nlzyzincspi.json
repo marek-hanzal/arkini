@@ -1,0 +1,320 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "qorgowckp3327nlzyzincspi",
+		"id": "herders-guild",
+		"title": "Herders Guild",
+		"draft": false,
+		"description": "The livestock guild for discovering animal-feed infrastructure and animal farms.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"herders-guild"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "animal-feed-workshop-blueprint",
+				"title": "Animal Feed Workshop Blueprint",
+				"artwork": "animal-feed-workshop",
+				"description": "Draw plans for Animal Feed Workshop.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "animal-feed-workshop-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "animal-feed-workshop-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "animal-feed-workshop"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "pig-farm-blueprint",
+				"title": "Pig Farm Blueprint",
+				"artwork": "pig-farm",
+				"description": "Draw plans for Pig Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "pig-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "pig-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "pig-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "cow-farm-blueprint",
+				"title": "Cow Farm Blueprint",
+				"artwork": "cow-farm",
+				"description": "Draw plans for Cow Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cow-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cow-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cow-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			}
+		]
+	}
+}

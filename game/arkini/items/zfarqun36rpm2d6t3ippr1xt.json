@@ -1,0 +1,79 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zfarqun36rpm2d6t3ippr1xt",
+		"id": "corn-farm-blueprint",
+		"title": "Corn Farm Blueprint",
+		"draft": false,
+		"description": "Plans for Corn Farm.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"corn-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "corn-farm",
+				"title": "Build Corn Farm",
+				"artwork": "corn-farm",
+				"description": "Build Corn Farm.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "corn-farm-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "corn-farm",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

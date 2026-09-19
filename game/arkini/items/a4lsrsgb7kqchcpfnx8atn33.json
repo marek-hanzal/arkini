@@ -4,8 +4,8 @@
 		"uid": "a4lsrsgb7kqchcpfnx8atn33",
 		"id": "compost",
 		"title": "Compost",
-		"ui": "simple",
 		"description": "Nice thing, flowers would like it.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -41,6 +41,141 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "fertilized-cotton-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-corn-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-corn-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-flax-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-flax-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-grass-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-grass-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-herb-garden"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-herb-garden"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-flower-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-flower-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-pumpkin-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-pumpkin-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-hop-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-hop-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-rapeseed-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-rapeseed-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sunflower-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-sunflower-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sugar-beet-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-sugar-beet-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sugar-cane-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-sugar-cane-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-coffee-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-coffee-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-dye-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-dye-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-fruit-garden"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-fruit-garden"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-vegetable-garden"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "fertilized-vegetable-garden"
 			}
 		],
 		"maxQueueSize": 1,

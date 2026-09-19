@@ -2,15 +2,15 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aoqo8935jr33r2xgqjtmo660",
-		"id": "vegetable-garden-blueprint",
-		"title": "Vegetable Garden Blueprint",
+		"id": "vegetable-farm-blueprint",
+		"title": "Vegetable Farm Blueprint",
+		"description": "Plans for Vegetable Farm.",
 		"ui": "default",
-		"description": "Good stuff to eat",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",
-				"vegetable-garden"
+				"vegetable-farm"
 			]
 		},
 		"scope": "any",
@@ -21,12 +21,12 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "vegetable-garden",
-				"title": "Vegetable Garden",
-				"artwork": "vegetable-garden",
-				"description": "Build a new vegetable garden",
-				"default": true,
+				"id": "vegetable-farm",
+				"title": "Build Vegetable Farm",
+				"artwork": "vegetable-farm",
+				"description": "Build Vegetable Farm.",
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -40,7 +40,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "vegetable-garden-blueprint"
+								"itemId": "vegetable-farm-blueprint"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -57,7 +57,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "vegetable-garden",
+											"itemId": "vegetable-farm",
 											"quantity": {
 												"min": 1,
 												"max": 1

@@ -1,0 +1,79 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "vba70pptod750ervwycoud48",
+		"id": "rapeseed-farm-blueprint",
+		"title": "Rapeseed Farm Blueprint",
+		"draft": false,
+		"description": "Plans for Rapeseed Farm.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"rapeseed-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "rapeseed-farm",
+				"title": "Build Rapeseed Farm",
+				"artwork": "rapeseed-farm",
+				"description": "Build Rapeseed Farm.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "rapeseed-farm-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "rapeseed-farm",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

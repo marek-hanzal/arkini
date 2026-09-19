@@ -1,0 +1,79 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "uefgic1o7ybhswej9m178vw5",
+		"id": "sunflower-farm-blueprint",
+		"title": "Sunflower Farm Blueprint",
+		"draft": false,
+		"description": "Plans for Sunflower Farm.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"sunflower-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "sunflower-farm",
+				"title": "Build Sunflower Farm",
+				"artwork": "sunflower-farm",
+				"description": "Build Sunflower Farm.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sunflower-farm-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sunflower-farm",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

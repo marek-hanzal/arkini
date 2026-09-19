@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Grass Seed",
-				"description": "Prepare loose grass seed for planting or other uses.",
+				"id": "field",
+				"title": "Prepare Grass Field",
+				"artwork": "empty-grass-field",
+				"description": "Prepare a new grass field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grass-seed",
+											"itemId": "empty-grass-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Grass Seed Sack",
-				"description": "Pack grass seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Grass Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Grass Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-grass-seed",
+											"itemId": "grass-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

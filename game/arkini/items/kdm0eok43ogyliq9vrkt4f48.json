@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Hop Seed",
-				"description": "Prepare loose hop seed.",
+				"id": "field",
+				"title": "Prepare Hop Field",
+				"artwork": "empty-hop-field",
+				"description": "Prepare a new hop field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "hop-seed",
+											"itemId": "empty-hop-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Hop Seed Sack",
-				"description": "Pack hop seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Hop Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Hop Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-hop-seed",
+											"itemId": "hop-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

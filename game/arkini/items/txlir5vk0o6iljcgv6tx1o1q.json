@@ -4,70 +4,44 @@
 		"uid": "txlir5vk0o6iljcgv6tx1o1q",
 		"id": "vegetable-garden",
 		"title": "Vegetable Garden",
-		"description": "Grows some vegetables",
-		"ui": "default",
+		"description": "A planted vegetable garden harvested by a nearby Vegetable Farm.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"vegetable-garden"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
-		"maxQueueSize": 4,
-		"lines": [
-			{
-				"id": "vegetables",
-				"title": "Vegetables",
-				"description": "It's bio. It's yummi bio",
-				"clockWeight": 1,
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 26000,
-				"input": [
+		"units": {
+			"amount": 24,
+			"output": {
+				"set": [
 					{
-						"type": "materials",
-						"query": {
-							"scope": "any",
-							"selector": {
-								"type": "item",
-								"itemId": "bucket-with-water"
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-vegetable-garden",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
 							}
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						}
+						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "vegetable-crate",
-											"quantity": {
-												"min": 1,
-												"max": 2
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": []
+				]
 			}
-		]
+		},
+		"maxQueueSize": 1,
+		"lines": []
 	}
 }

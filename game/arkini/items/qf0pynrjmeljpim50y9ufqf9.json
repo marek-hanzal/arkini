@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Sugar Beet Seed",
-				"description": "Prepare loose sugar beet seed.",
+				"id": "field",
+				"title": "Prepare Sugar Beet Field",
+				"artwork": "empty-sugar-beet-field",
+				"description": "Prepare a new sugar beet field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sugar-beet-seed",
+											"itemId": "empty-sugar-beet-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Sugar Beet Seed Sack",
-				"description": "Pack sugar beet seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Sugar Beet Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Sugar Beet Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-sugar-beet-seed",
+											"itemId": "sugar-beet-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

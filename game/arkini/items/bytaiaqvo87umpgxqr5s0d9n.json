@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Rapeseed Seed",
-				"description": "Prepare loose rapeseed seed for planting or other uses.",
+				"id": "field",
+				"title": "Prepare Rapeseed Field",
+				"artwork": "empty-rapeseed-field",
+				"description": "Prepare a new rapeseed field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "rapeseed-seed",
+											"itemId": "empty-rapeseed-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Rapeseed Seed Sack",
-				"description": "Pack rapeseed seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Rapeseed Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Rapeseed Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-rapeseed-seed",
+											"itemId": "rapeseed-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

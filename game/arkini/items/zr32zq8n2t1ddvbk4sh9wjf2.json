@@ -4,7 +4,7 @@
 		"uid": "zr32zq8n2t1ddvbk4sh9wjf2",
 		"id": "pumpkin-seed",
 		"title": "Pumpkin Seed",
-		"draft": true,
+		"draft": false,
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -23,6 +23,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "sack-with-pumpkin-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-pumpkin-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "pumpkin-field"
 			}
 		],
 		"clock": {

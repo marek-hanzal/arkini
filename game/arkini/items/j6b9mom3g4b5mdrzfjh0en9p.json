@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "j6b9mom3g4b5mdrzfjh0en9p",
+		"id": "empty-vegetable-garden",
+		"title": "Empty Vegetable Garden",
+		"draft": false,
+		"description": "Ready for another vegetable-growing cycle.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"empty-vegetable-garden"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

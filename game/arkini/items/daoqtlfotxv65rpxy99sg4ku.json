@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "daoqtlfotxv65rpxy99sg4ku",
+		"id": "empty-pumpkin-field",
+		"title": "Empty Pumpkin Field",
+		"draft": false,
+		"description": "Ready for another pumpkin cycle.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"empty-pumpkin-field"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

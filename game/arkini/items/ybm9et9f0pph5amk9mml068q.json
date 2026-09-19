@@ -1,0 +1,168 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ybm9et9f0pph5amk9mml068q",
+		"id": "vegetable-farm",
+		"title": "Vegetable Farm",
+		"draft": false,
+		"description": "Operates nearby vegetable garden and prepares new growing plots.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"vegetable-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "harvest",
+				"title": "Vegetable",
+				"description": "Harvest produce from a nearby planted vegetable garden.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 26000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "vegetable-garden"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "vegetable-crate",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "field",
+				"title": "Prepare Vegetable Garden",
+				"artwork": "empty-vegetable-garden",
+				"description": "Prepare a new empty growing plot.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-vegetable-garden",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "blueprint",
+				"title": "Vegetable Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Vegetable Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "vegetable-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

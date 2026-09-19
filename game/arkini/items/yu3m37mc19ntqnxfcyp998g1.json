@@ -70,14 +70,15 @@
 				"rules": []
 			},
 			{
-				"id": "seed",
-				"title": "Sugar Cane Seed",
-				"description": "Prepare loose sugar cane seed.",
+				"id": "field",
+				"title": "Prepare Sugar Cane Field",
+				"artwork": "empty-sugar-cane-field",
+				"description": "Prepare a new sugar cane field for planting.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 18000,
+				"runtimeMs": 24000,
 				"input": [
 					{
 						"type": "simple"
@@ -93,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sugar-cane-seed",
+											"itemId": "empty-sugar-cane-field",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,21 +111,22 @@
 				"rules": []
 			},
 			{
-				"id": "seed-sack",
-				"title": "Sugar Cane Seed Sack",
-				"description": "Pack sugar cane seed into an empty sack for longer storage.",
+				"id": "blueprint",
+				"title": "Sugar Cane Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Sugar Cane Farm.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 22000,
+				"runtimeMs": 15000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-sack"
+								"itemId": "paper"
 							},
 							"scope": "any"
 						},
@@ -145,7 +147,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sack-with-sugar-cane-seed",
+											"itemId": "sugar-cane-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

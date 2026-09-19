@@ -1,0 +1,168 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "avzrwr1i9lmmjqc6i8cgxxsq",
+		"id": "fruit-farm",
+		"title": "Fruit Farm",
+		"draft": false,
+		"description": "Operates nearby fruit garden and prepares new growing plots.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"fruit-farm"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "harvest",
+				"title": "Fruit",
+				"description": "Harvest produce from a nearby planted fruit garden.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "fruit-garden"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "fruit-crate",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "field",
+				"title": "Prepare Fruit Garden",
+				"artwork": "empty-fruit-garden",
+				"description": "Prepare a new empty growing plot.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-fruit-garden",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "blueprint",
+				"title": "Fruit Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Fruit Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "fruit-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

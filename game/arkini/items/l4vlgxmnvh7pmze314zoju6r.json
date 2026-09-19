@@ -1,0 +1,2369 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "l4vlgxmnvh7pmze314zoju6r",
+		"id": "growers-guild",
+		"title": "Growers Guild",
+		"draft": false,
+		"description": "The agricultural guild. Basic crops come first; diversified farming follows grain, and specialty crops open after established fiber or oil farming.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"growers-guild"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 6,
+		"lines": [
+			{
+				"id": "gardener-blueprint",
+				"title": "Gardener Blueprint",
+				"artwork": "gardener",
+				"description": "Draw plans for Gardener.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "gardener-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "gardener-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "gardener"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "grain-farm-blueprint",
+				"title": "Grain Farm Blueprint",
+				"artwork": "grain-farm",
+				"description": "Draw plans for Grain Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grain-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "grass-farm-blueprint",
+				"title": "Grass Farm Blueprint",
+				"artwork": "grass-farm",
+				"description": "Draw plans for Grass Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grass-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grass-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grass-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "corn-farm-blueprint",
+				"title": "Corn Farm Blueprint",
+				"artwork": "corn-farm",
+				"description": "Draw plans for Corn Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "corn-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "corn-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "corn-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "vegetable-farm-blueprint",
+				"title": "Vegetable Farm Blueprint",
+				"artwork": "vegetable-farm",
+				"description": "Draw plans for Vegetable Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "vegetable-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "vegetable-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "vegetable-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "fruit-farm-blueprint",
+				"title": "Fruit Farm Blueprint",
+				"artwork": "fruit-farm",
+				"description": "Draw plans for Fruit Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "fruit-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "fruit-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "fruit-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "herbalist-blueprint",
+				"title": "Herbalist Blueprint",
+				"artwork": "herbalist",
+				"description": "Draw plans for Herbalist.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "herbalist-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "herbalist-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "herbalist"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "flower-farm-blueprint",
+				"title": "Flower Farm Blueprint",
+				"artwork": "flower-farm",
+				"description": "Draw plans for Flower Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "flower-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flower-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "pumpkin-farm-blueprint",
+				"title": "Pumpkin Farm Blueprint",
+				"artwork": "pumpkin-farm",
+				"description": "Draw plans for Pumpkin Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "pumpkin-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "pumpkin-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "pumpkin-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "flax-farm-blueprint",
+				"title": "Flax Farm Blueprint",
+				"artwork": "flax-farm",
+				"description": "Draw plans for Flax Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "flax-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "cotton-farm-blueprint",
+				"title": "Cotton Farm Blueprint",
+				"artwork": "cotton-farm",
+				"description": "Draw plans for Cotton Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cotton-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "rapeseed-farm-blueprint",
+				"title": "Rapeseed Farm Blueprint",
+				"artwork": "rapeseed-farm",
+				"description": "Draw plans for Rapeseed Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "rapeseed-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "sunflower-farm-blueprint",
+				"title": "Sunflower Farm Blueprint",
+				"artwork": "sunflower-farm",
+				"description": "Draw plans for Sunflower Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sunflower-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "grape-farm-blueprint",
+				"title": "Grape Farm Blueprint",
+				"artwork": "grape-farm",
+				"description": "Draw plans for Grape Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "grape-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grape-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grape-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "hop-farm-blueprint",
+				"title": "Hop Farm Blueprint",
+				"artwork": "hop-farm",
+				"description": "Draw plans for Hop Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hop-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "hop-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "hop-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "sugar-beet-farm-blueprint",
+				"title": "Sugar Beet Farm Blueprint",
+				"artwork": "sugar-beet-farm",
+				"description": "Draw plans for Sugar Beet Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sugar-beet-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sugar-beet-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sugar-beet-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "sugar-cane-farm-blueprint",
+				"title": "Sugar Cane Farm Blueprint",
+				"artwork": "sugar-cane-farm",
+				"description": "Draw plans for Sugar Cane Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sugar-cane-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sugar-cane-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sugar-cane-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "coffee-farm-blueprint",
+				"title": "Coffee Farm Blueprint",
+				"artwork": "coffee-farm",
+				"description": "Draw plans for Coffee Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "coffee-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "coffee-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "coffee-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "dye-farm-blueprint",
+				"title": "Dye Farm Blueprint",
+				"artwork": "dye-farm",
+				"description": "Draw plans for Dye Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "dye-farm-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "flax-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "rapeseed-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sunflower-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "dye-farm-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "dye-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			}
+		]
+	}
+}

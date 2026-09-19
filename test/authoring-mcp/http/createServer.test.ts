@@ -32,7 +32,9 @@ describe("editor MCP server", () => {
 			"schema_detail",
 			"create_item",
 			"edit_item",
+			"create_item_line",
 			"replace_item_line",
+			"delete_item_line",
 			"project_config",
 			"edit_project",
 			"edit_project_layout",
@@ -84,7 +86,9 @@ describe("editor MCP server", () => {
 		const jsonInputToolNames = new Set([
 			"create_item",
 			"edit_item",
+			"create_item_line",
 			"replace_item_line",
+			"delete_item_line",
 			"edit_project",
 		]);
 		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {

@@ -83,7 +83,7 @@ The disposable `game/arkini/build/arkini.arkpack.cache` contains the source fing
 
 All exact IDs use [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/IdSchema.ts); prefixes are human naming conventions, not new value schemas. References are explicit and are never derived from filenames or title conventions.
 
-There is one Item schema, without an item-type discriminator. Authoring uses `create_item`, `edit_item`, and the exact-line `replace_item_line`; item files live directly in `items/`.
+There is one Item schema, without an item-type discriminator. Authoring uses `create_item`, `edit_item`, and the exact-line `create_item_line`, `replace_item_line`, and `delete_item_line`; item files live directly in `items/`. Line writes require the project revision from a preceding read, preserve unrelated item values and line order, and use the same repository revision checks. Create appends a complete line and rejects an existing ID; replace and delete reject missing or ambiguous IDs.
 
 Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item UID and its path.
 

@@ -1,0 +1,241 @@
+import { Effect, Result } from "effect";
+import { afterEach, expect, it, vi } from "vitest";
+
+import { mutateItemLineFx } from "~/authoring-mcp/tool/mutateItemLineFx";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
+import {
+	cleanupMcpHarnesses,
+	connectMcpClient,
+	createMcpHarness,
+	jsonToolInputFn,
+} from "./support/createMcpHarness";
+
+afterEach(cleanupMcpHarnesses);
+
+const setupFn = async () => {
+	const notifyFn = vi.fn();
+	const { ownership, port, repository } = await createMcpHarness(Effect.runPromise, notifyFn);
+	const config = createJobTestConfig();
+	const projectId = "line-mutations";
+	await Effect.runPromise(
+		repository.createProjectFx({
+			version: {
+				major: 1,
+				minor: 0,
+			},
+			config: {
+				...config,
+				meta: {
+					...config.meta,
+					id: projectId,
+				},
+			},
+			resources: [],
+		}),
+	);
+	ownership.setProjectContextFn(projectId);
+	await Effect.runPromise(ownership.startLocalFx);
+	const client = await connectMcpClient(port);
+	const readFn = async () => {
+		const project = await Effect.runPromise(repository.readProjectFx(projectId));
+		if (project === null) throw new Error("Missing fixture project");
+		return project;
+	};
+	return {
+		client,
+		repository,
+		notifyFn,
+		readFn,
+		projectId,
+	};
+};
+
+it("appends and deletes exact lines without losing other item fields, rejecting invalid identity and incomplete input", async () => {
+	const { client, repository, notifyFn, readFn, projectId } = await setupFn();
+	const before = await readFn();
+	const first = before.config.items.forge.lines[0]!;
+	const added = {
+		...first,
+		id: "second-line",
+		title: "Second line",
+	};
+	const callFn = (name: string, input: object) =>
+		client.callTool({
+			name,
+			arguments: jsonToolInputFn(input),
+		});
+	const created = await callFn("create_item_line", {
+		itemId: "forge",
+		revision: before.revision,
+		line: added,
+	});
+	expect(created.isError).not.toBe(true);
+	const afterCreate = await readFn();
+	expect(afterCreate.config.items).toEqual({
+		...before.config.items,
+		forge: {
+			...before.config.items.forge,
+			lines: [
+				first,
+				added,
+			],
+		},
+	});
+	expect(created.content[0]).toMatchObject({
+		text: expect.stringContaining(`Revision: ${afterCreate.revision}`),
+	});
+	for (const input of [
+		{
+			itemId: "forge",
+			revision: afterCreate.revision,
+			line: added,
+		},
+		{
+			itemId: "forge",
+			revision: before.revision,
+			line: {
+				...added,
+				id: "stale",
+			},
+		},
+		{
+			itemId: "forge",
+			revision: afterCreate.revision,
+			line: {
+				...added,
+				id: "incomplete",
+				enable: undefined,
+			},
+		},
+		{
+			itemId: "missing",
+			revision: afterCreate.revision,
+			line: added,
+		},
+	])
+		expect((await callFn("create_item_line", input)).isError).toBe(true);
+	for (const input of [
+		{
+			itemId: "forge",
+			revision: afterCreate.revision,
+			lineId: "missing",
+		},
+		{
+			itemId: "forge",
+			revision: before.revision,
+			lineId: first.id,
+		},
+	])
+		expect((await callFn("delete_item_line", input)).isError).toBe(true);
+	expect((await readFn()).revision).toBe(afterCreate.revision);
+	expect(notifyFn).toHaveBeenCalledTimes(1);
+
+	const deleted = await callFn("delete_item_line", {
+		itemId: "forge",
+		revision: afterCreate.revision,
+		lineId: first.id,
+	});
+	expect(deleted.isError).not.toBe(true);
+	const afterDelete = await readFn();
+	expect(afterDelete.config.items).toEqual({
+		...before.config.items,
+		forge: {
+			...before.config.items.forge,
+			lines: [
+				added,
+			],
+		},
+	});
+	expect(deleted.content[0]).toMatchObject({
+		text: expect.stringContaining(`Revision: ${afterDelete.revision}`),
+	});
+	expect(notifyFn).toHaveBeenCalledTimes(2);
+	const ambiguous = await Effect.runPromise(
+		repository.upsertItemFx({
+			projectId,
+			expectedRevision: afterDelete.revision,
+			item: {
+				...afterDelete.config.items.forge,
+				lines: [
+					added,
+					added,
+				],
+			},
+		}),
+	);
+	expect(
+		(
+			await callFn("delete_item_line", {
+				itemId: "forge",
+				revision: ambiguous.revision,
+				lineId: added.id,
+			})
+		).isError,
+	).toBe(true);
+	expect((await readFn()).revision).toBe(ambiguous.revision);
+	expect(notifyFn).toHaveBeenCalledTimes(2);
+});
+
+it("rejects all line writes when another save wins after the MCP snapshot was read", async () => {
+	const { repository, notifyFn, readFn, projectId } = await setupFn();
+	const snapshot = await readFn();
+	const first = snapshot.config.items.forge.lines[0]!;
+	await Effect.runPromise(
+		repository.upsertItemFx({
+			projectId,
+			expectedRevision: snapshot.revision,
+			item: {
+				...snapshot.config.items.forge,
+				title: "Concurrent author edit",
+			},
+		}),
+	);
+	const winner = await readFn();
+	const commands: mutateItemLineFx.Command[] = [
+		{
+			operation: "create",
+			itemId: "forge",
+			revision: snapshot.revision,
+			line: {
+				...first,
+				id: "new-line",
+			},
+		},
+		{
+			operation: "replace",
+			itemId: "forge",
+			revision: snapshot.revision,
+			lineId: first.id,
+			line: {
+				...first,
+				title: "Stale line",
+			},
+		},
+		{
+			operation: "delete",
+			itemId: "forge",
+			revision: snapshot.revision,
+			lineId: first.id,
+		},
+	];
+	for (const input of commands) {
+		const result = await Effect.runPromise(
+			mutateItemLineFx({
+				input,
+				project: snapshot,
+				repository,
+				notifyProjectChangedFn: notifyFn,
+			}).pipe(Effect.result),
+		);
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result))
+			expect(result.failure).toMatchObject({
+				_tag: "EditorProjectRepositoryError",
+				reason: "revision-conflict",
+				operation: "upsert-item",
+			});
+	}
+	expect((await readFn()).config).toEqual(winner.config);
+	expect((await readFn()).revision).toBe(winner.revision);
+	expect(notifyFn).not.toHaveBeenCalled();
+});

@@ -13,12 +13,14 @@ import { GraphDetailSchema } from "./GraphDetailSchema";
 import { EstimateInputSchema } from "./EstimateInputSchema";
 import { CreateItemInputSchema } from "./CreateItemInputSchema";
 import { EditItemInputSchema } from "./EditItemInputSchema";
+import { CreateItemLineInputSchema } from "./CreateItemLineInputSchema";
+import { DeleteItemLineInputSchema } from "./DeleteItemLineInputSchema";
 import { ReplaceItemLineInputSchema } from "./ReplaceItemLineInputSchema";
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
-import { replaceItemLineFx } from "./replaceItemLineFx";
+import { mutateItemLineFx } from "./mutateItemLineFx";
 import { readArtworkCollectionTextFn } from "./fn/readArtworkCollectionTextFn";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
@@ -382,22 +384,63 @@ const createServerFn = (
 				),
 		);
 	}
-	{
-		const schemaId = resolveSchemaId(ReplaceItemLineInputSchema);
+	const lineTools = [
+		{
+			name: "create_item_line",
+			schema: CreateItemLineInputSchema,
+			description:
+				"Append one complete production line without resending the item's other lines. Read item_config first and copy its revision. Every canonical base value is required. An existing line ID is rejected.",
+			decodeFx: (input: string) =>
+				parseToolInputJsonFx(input, CreateItemLineInputSchema).pipe(
+					Effect.map((decoded) => ({
+						...decoded,
+						operation: "create" as const,
+					})),
+				),
+		},
+		{
+			name: "replace_item_line",
+			schema: ReplaceItemLineInputSchema,
+			description:
+				"Replace one existing production line without resending the item's other lines. Read item_line_config first and copy its revision. All base values are required, omitted optional values are removed, and the line ID must match the target. Its position is preserved.",
+			decodeFx: (input: string) =>
+				parseToolInputJsonFx(input, ReplaceItemLineInputSchema).pipe(
+					Effect.map((decoded) => ({
+						...decoded,
+						operation: "replace" as const,
+					})),
+				),
+		},
+		{
+			name: "delete_item_line",
+			schema: DeleteItemLineInputSchema,
+			description:
+				"Delete exactly one production line. Read item_line_config first and copy its revision. Missing or ambiguous line IDs are rejected; all other item values and line order are preserved.",
+			decodeFx: (input: string) =>
+				parseToolInputJsonFx(input, DeleteItemLineInputSchema).pipe(
+					Effect.map((decoded) => ({
+						...decoded,
+						operation: "delete" as const,
+					})),
+				),
+		},
+	];
+	for (const { name, schema, description, decodeFx } of lineTools) {
 		server.registerTool(
-			"replace_item_line",
+			name,
 			{
-				description: `Replace one existing production line atomically without resending the item's other lines. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Read item_line_config first and copy its revision. The replacement line is complete: all base values are required, omitted optional values are removed, and its ID must match the target line ID.`,
+				description: `${description} Pass input as a serialized JSON object matching schema ${JSON.stringify(resolveSchemaId(schema))}; retrieve it and each returned $ref through schema_detail.`,
 				inputSchema: JsonToolInputSchema,
 			},
-			async ({ input }) =>
-				runToolFn(
-					parseToolInputJsonFx(input, ReplaceItemLineInputSchema).pipe(
-						Effect.flatMap((decodedInput) =>
+			async ({ input }) => {
+				const commandFx: Effect.Effect<mutateItemLineFx.Command, unknown> = decodeFx(input);
+				return runToolFn(
+					commandFx.pipe(
+						Effect.flatMap((command) =>
 							readProjectFx().pipe(
 								Effect.flatMap((project) =>
-									replaceItemLineFx({
-										input: decodedInput,
+									mutateItemLineFx({
+										input: command,
 										notifyProjectChangedFn,
 										project,
 										repository,
@@ -406,9 +449,11 @@ const createServerFn = (
 							),
 						),
 					),
-				),
+				);
+			},
 		);
 	}
+
 	registerGameplayDesignToolsFn({
 		notifyProjectChangedFn,
 		readProjectFx,

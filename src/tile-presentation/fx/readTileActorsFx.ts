@@ -23,7 +23,7 @@ const readQueueBadgeCountFn = ({
 	readonly runtime: RuntimeSchema.Type;
 }) => {
 	const count =
-		runtime.jobs.filter((job) => job.ownerItemId === ownerItemId).length +
+		runtime.jobs.filter((job) => job.ownerItemId === ownerItemId && job.durationMs > 0).length +
 		runtime.jobQueue.filter((request) => request.ownerItemId === ownerItemId).length;
 	return count > 0 ? count : undefined;
 };

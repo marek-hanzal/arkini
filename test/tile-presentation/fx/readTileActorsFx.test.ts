@@ -53,7 +53,7 @@ describe("readTileActorsFx", () => {
 		});
 	});
 
-	it("hides instant-job progress and waiting cursor without hiding a timed job at completion", () => {
+	it("hides instant-job indicators without hiding units or a timed job at completion", () => {
 		const runtime = createTileActorRuntime({
 			active: true,
 		});
@@ -67,7 +67,8 @@ describe("readTileActorsFx", () => {
 		});
 		expect(instant?.progressRatio).toBeUndefined();
 		expect(instant?.running).toBe(false);
-		expect(instant?.badgeKind).toBe("queue");
+		expect(instant?.badgeKind).toBe("units");
+		expect(instant?.badgeCount).toBe(1);
 		const completed = readMainActor({
 			...runtime,
 			jobs: runtime.jobs.map((job) => ({
@@ -76,6 +77,7 @@ describe("readTileActorsFx", () => {
 			})),
 		});
 		expect(completed?.progressRatio).toBe(1);
+		expect(completed?.badgeKind).toBe("queue");
 	});
 
 	it("projects remaining units for an idle finite item", () => {

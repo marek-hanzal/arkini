@@ -4,8 +4,8 @@
 		"uid": "pz69k9ntwrqmycwiv4ocuij1",
 		"id": "laboratory-glassware",
 		"title": "Laboratory Glassware",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

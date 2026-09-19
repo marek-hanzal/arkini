@@ -86,6 +86,92 @@
 				"rules": []
 			},
 			{
+				"id": "eggs",
+				"title": "Eggs",
+				"artwork": "eggs",
+				"description": "Collect eggs from a nearby populated coop. A basket keeps them together; loose grain seed keeps the chickens cooperative.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "empty-basket"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "grain-seed"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "eggs",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "A populated chicken coop must be within reach.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "chicken-coop"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
 				"id": "empty-chicken-coop",
 				"title": "Prepare Chicken Coop",
 				"artwork": "empty-chicken-coop",

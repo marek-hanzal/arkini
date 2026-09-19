@@ -124,6 +124,59 @@
 				"rules": []
 			},
 			{
+				"id": "empty-basket",
+				"title": "Empty Basket",
+				"artwork": "empty-basket",
+				"description": "Weave a simple basket from processed wood fibers for eggs, bread, and other loose goods.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 12000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wood-fibers"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-basket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
 				"id": "empty-paper-drying-rack",
 				"title": "Paper Drying Rack",
 				"artwork": "empty-paper-drying-rack",

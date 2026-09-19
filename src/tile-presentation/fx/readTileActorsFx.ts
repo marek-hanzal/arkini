@@ -39,7 +39,7 @@ const readProgressRatioFn = ({
 }) => {
 	if (activeJob !== undefined)
 		return activeJob.durationMs <= 0
-			? 1
+			? undefined
 			: clampRatioFn(1 - activeJob.remainingMs / activeJob.durationMs);
 	const durationMs = readItemScheduleFn(item.item)?.durationMs;
 	if (durationMs === undefined) return undefined;
@@ -139,7 +139,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					: {
 							jobStatus: activeJobStatus,
 						}),
-				running,
+				running: running && activeJob !== undefined && activeJob.durationMs > 0,
 				...(clockPulse === undefined
 					? {}
 					: {

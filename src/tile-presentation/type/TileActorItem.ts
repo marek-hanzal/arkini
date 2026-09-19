@@ -18,6 +18,7 @@ export interface TileActorItem extends TileActorVisual {
 		readonly remainingMs: number;
 		readonly enabled: boolean;
 	};
+	/** Waiting-cursor presentation; instant jobs keep their status without flashing a wait. */
 	readonly running: boolean;
 	readonly activityEffect: boolean;
 	readonly primaryAction: readRuntimeItemPrimaryActionFx.Result;

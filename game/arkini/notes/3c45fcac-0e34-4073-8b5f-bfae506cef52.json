@@ -83,7 +83,6 @@
 		"copper-mine",
 		"iron-mine",
 		"mining-portal",
-		"seed",
 		"sack-with-seeds",
 		"coffee-plant",
 		"rapeseed-seed",
@@ -93,5 +92,5 @@
 		"sugar-beet"
 	],
 	"createdAtMs": 1789831953056,
-	"updatedAtMs": 1789835726913
+	"updatedAtMs": 1789835978851
 }

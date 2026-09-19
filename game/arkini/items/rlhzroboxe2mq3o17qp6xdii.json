@@ -1,0 +1,50 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "rlhzroboxe2mq3o17qp6xdii",
+		"id": "flax-seed",
+		"title": "Flax Seed",
+		"draft": false,
+		"description": "Loose flax seed. Plant it before it spoils.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"flax-seeds"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-flax-seed",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

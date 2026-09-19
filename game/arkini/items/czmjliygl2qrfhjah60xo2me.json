@@ -15,31 +15,7 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
-			"amount": 10,
-			"output": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "tree-seed",
-										"quantity": {
-											"min": 1,
-											"max": 2
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"amount": 10
 		},
 		"maxQueueSize": 1,
 		"lines": []

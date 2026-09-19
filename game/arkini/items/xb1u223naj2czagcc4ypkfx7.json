@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "xb1u223naj2czagcc4ypkfx7",
+		"id": "spoiled-flax-seed",
+		"title": "Spoiled Flax Seed",
+		"draft": false,
+		"description": "Flax seed that has spoiled before it could reach the field.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-flax-seeds"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

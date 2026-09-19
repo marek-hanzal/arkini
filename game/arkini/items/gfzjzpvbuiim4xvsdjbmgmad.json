@@ -1,0 +1,50 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "gfzjzpvbuiim4xvsdjbmgmad",
+		"id": "cotton-seed",
+		"title": "Cotton Seed",
+		"draft": false,
+		"description": "Loose cotton seed. Plant it before it spoils.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"cotton-seeds"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-cotton-seed",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

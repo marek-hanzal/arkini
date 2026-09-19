@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "e9isofzq1pdttuyovij2uz7d",
+		"id": "spoiled-cotton-seed",
+		"title": "Spoiled Cotton Seed",
+		"draft": false,
+		"description": "Cotton seed that has spoiled before it could become anything useful.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-cotton-seeds"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

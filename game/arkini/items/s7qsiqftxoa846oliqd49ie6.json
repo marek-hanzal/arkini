@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "s7qsiqftxoa846oliqd49ie6",
+		"id": "spoiled-grain-seed",
+		"title": "Spoiled Grain Seed",
+		"draft": false,
+		"description": "Grain seed that waited too long and is no longer fit for planting.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-grain-seeds"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

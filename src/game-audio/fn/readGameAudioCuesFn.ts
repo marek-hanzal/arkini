@@ -47,6 +47,16 @@ const cueFn = (event: AudibleGameEvent, strength: number): GameEventAudioCue => 
 	strength: clampStrengthFn(strength),
 });
 
+const readJobAudioCueFn = (
+	event: {
+		readonly type: AudibleGameEvent;
+		readonly canonicalItemId: string;
+	},
+	items: GameConfigSchema.Type["items"],
+	strength: number,
+): GameEventAudioCue | undefined =>
+	items[event.canonicalItemId]?.ui === "simple" ? undefined : cueFn(event.type, strength);
+
 const readGameAudioCueFn = (
 	event: GameEvent,
 	items: GameConfigSchema.Type["items"],
@@ -69,47 +79,38 @@ const readGameAudioCueFn = (
 				type: GameEventEnumSchema.enum.LineInputAutofillStarted,
 			},
 			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.LineInputAutofillStarted,
-					strengthForQuantityFn(event.scheduledQuantity),
-				),
+				readJobAudioCueFn(event, items, strengthForQuantityFn(event.scheduledQuantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobQueued,
 			},
-			(event) =>
-				items[event.canonicalItemId]?.ui === "simple"
-					? undefined
-					: cueFn(GameEventEnumSchema.enum.JobQueued, 1),
+			(event) => readJobAudioCueFn(event, items, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobQueueCleared,
 			},
 			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.JobQueueCleared,
-					strengthForQuantityFn(event.clearedRequestCount),
-				),
+				readJobAudioCueFn(event, items, strengthForQuantityFn(event.clearedRequestCount)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobStarted,
 			},
-			() => cueFn(GameEventEnumSchema.enum.JobStarted, 1),
+			(event) => readJobAudioCueFn(event, items, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobCompleted,
 			},
-			() => cueFn(GameEventEnumSchema.enum.JobCompleted, 2),
+			(event) => readJobAudioCueFn(event, items, 2),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobAborted,
 			},
-			() => cueFn(GameEventEnumSchema.enum.JobAborted, 2),
+			(event) => readJobAudioCueFn(event, items, 2),
 		)
 		.with(
 			{

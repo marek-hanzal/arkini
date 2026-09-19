@@ -29,6 +29,7 @@ const lineInputAutofillStartedEventSchema = z
 			"LineInputAutofillStarted",
 		]),
 		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
 		lineId: IdSchema,
 		scheduledQuantity: PositiveIntegerSchema,
 	})
@@ -52,6 +53,7 @@ const jobQueueClearedEventSchema = z
 			"JobQueueCleared",
 		]),
 		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
 		clearedRequestCount: PositiveIntegerSchema,
 	})
 	.strict();
@@ -63,6 +65,7 @@ const jobStartedEventSchema = z
 		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
 		lineId: IdSchema,
 	})
 	.strict();
@@ -74,6 +77,7 @@ const jobCompletedEventSchema = z
 		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
 		lineId: IdSchema,
 	})
 	.strict();
@@ -85,6 +89,7 @@ const jobAbortedEventSchema = z
 		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
 		lineId: IdSchema,
 		reason: z.enum([
 			"owner-removed",

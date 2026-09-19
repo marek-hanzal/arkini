@@ -1,3 +1,4 @@
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
@@ -56,6 +57,10 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 		runtime,
 	});
 	if (attempt.type !== "started") return attempt;
+	const owner = yield* readRuntimeItemByIdFx({
+		itemId: attempt.job.ownerItemId,
+		runtime,
+	});
 
 	return {
 		type: "started",
@@ -64,6 +69,7 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 				type: GameEventEnumSchema.enum.JobStarted,
 				jobId: attempt.job.id,
 				ownerItemId: attempt.job.ownerItemId,
+				canonicalItemId: owner.item.id,
 				lineId: attempt.job.lineId,
 			} satisfies GameEventSchema.Type,
 			...attempt.events,
@@ -165,11 +171,16 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 			runtime: draft,
 		});
 		if (completion.type === "blocked") continue;
+		const completedOwner = yield* readRuntimeItemByIdFx({
+			itemId: liveJob.ownerItemId,
+			runtime: draft,
+		});
 		draft = completion.runtime;
 		events.push({
 			type: GameEventEnumSchema.enum.JobCompleted,
 			jobId: liveJob.id,
 			ownerItemId: liveJob.ownerItemId,
+			canonicalItemId: completedOwner.item.id,
 			lineId: liveJob.lineId,
 		});
 		events.push(...completion.events);

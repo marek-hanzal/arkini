@@ -64,6 +64,7 @@ describe("autofillLineInputsFx transition", () => {
 				expect(committed[0]?.events).toEqual([
 					{
 						type: "line-input:autofill-started",
+						canonicalItemId: "workshop",
 						ownerItemId: "runtime:workshop",
 						lineId: "line:workshop:build",
 						scheduledQuantity: 3,

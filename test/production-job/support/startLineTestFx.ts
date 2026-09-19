@@ -1,3 +1,4 @@
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -37,6 +38,10 @@ export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 					}),
 				);
 			}
+			const owner = yield* readRuntimeItemByIdFx({
+				itemId: ownerItemId,
+				runtime,
+			});
 			const [job, nextRuntime, itemEvents] = yield* startLineRuntimeFx({
 				ownerItemId,
 				lineId,
@@ -51,6 +56,7 @@ export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 				[
 					{
 						type: GameEventEnumSchema.enum.JobStarted,
+						canonicalItemId: owner.item.id,
 						jobId: job.id,
 						ownerItemId: job.ownerItemId,
 						lineId: job.lineId,

@@ -78,6 +78,7 @@ describe("Game fatal-state diagnostics", () => {
 			events: [
 				{
 					type: "job:started",
+					canonicalItemId: ownerDefinition.id,
 					jobId: "job:last",
 					ownerItemId,
 					lineId: "line:finite:work",
@@ -183,6 +184,7 @@ describe("Game fatal-state diagnostics", () => {
 					events: [
 						{
 							type: "job:started",
+							canonicalItemId: ownerDefinition.id,
 							jobId: "job:last",
 							ownerItemId,
 						},

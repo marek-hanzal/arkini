@@ -39,6 +39,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 					expect.arrayContaining([
 						expect.objectContaining({
 							type: "job:aborted",
+							canonicalItemId: owner.item.id,
 							jobId: "job",
 							ownerItemId: owner.id,
 							reason: "owner-removed",

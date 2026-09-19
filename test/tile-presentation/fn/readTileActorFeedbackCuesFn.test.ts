@@ -33,6 +33,7 @@ describe("readTileActorFeedbackCuesFn", () => {
 				},
 				{
 					type: "job:started",
+					canonicalItemId: "lumberjack",
 					jobId: "job:lumberjack",
 					ownerItemId: "runtime:lumberjack",
 					lineId: "line:lumberjack",
@@ -156,6 +157,7 @@ describe("readTileActorFeedbackCuesFn", () => {
 			events: [
 				{
 					type: "job:started",
+					canonicalItemId: "free-producer",
 					jobId: "job:free",
 					ownerItemId: "runtime:free-producer",
 					lineId: "line:free",

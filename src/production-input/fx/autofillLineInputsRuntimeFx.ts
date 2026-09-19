@@ -1,3 +1,4 @@
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -143,9 +144,14 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		...isolation.events,
 	];
 	if (scheduledQuantity > 0) {
+		const owner = yield* readRuntimeItemByIdFx({
+			itemId: ownerItemId,
+			runtime,
+		});
 		events.push({
 			type: GameEventEnumSchema.enum.LineInputAutofillStarted,
 			ownerItemId,
+			canonicalItemId: owner.item.id,
 			lineId,
 			scheduledQuantity,
 		});

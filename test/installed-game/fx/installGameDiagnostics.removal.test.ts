@@ -39,6 +39,7 @@ it("logs every committed removal loss beyond the history cap with owner, source,
 	const events: GameEventSchema.Type[] = [
 		{
 			type: "job:aborted",
+			canonicalItemId: "forge",
 			jobId: "job:work",
 			ownerItemId: "runtime:forge",
 			lineId: "line:work",

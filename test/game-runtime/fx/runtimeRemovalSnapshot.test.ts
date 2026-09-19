@@ -14,7 +14,7 @@ import {
 } from "~test/item-schedule/fx/clockSchedule.test/fixture";
 import { useGameFx } from "~test/support/useGameFx";
 
-const configFn = () =>
+const configFn = (runtimeMs = 1000) =>
 	createClockConfig({
 		units: {
 			amount: 1,
@@ -37,7 +37,7 @@ const configFn = () =>
 						},
 					],
 				}),
-				runtimeMs: 1000,
+				runtimeMs,
 			},
 		],
 	});
@@ -164,6 +164,13 @@ describe("committed runtime removal snapshots", () => {
 		expect(result.transition.events).toContainEqual(
 			expect.objectContaining({
 				type: "job:started",
+				canonicalItemId: result.initial.item.id,
+			}),
+		);
+		expect(result.transition.events).toContainEqual(
+			expect.objectContaining({
+				type: "job:aborted",
+				canonicalItemId: result.initial.item.id,
 			}),
 		);
 		expect(result.transition.events).toContainEqual(
@@ -183,6 +190,37 @@ describe("committed runtime removal snapshots", () => {
 			},
 		});
 		expect(removal?.snapshot.revision).not.toBe(result.initial.revision);
+	});
+
+	it("retains job completion identity when settlement removes the depleted owner", () => {
+		const step = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnClockItemFx();
+				const runtime = yield* readRuntimeFx();
+				return yield* advanceRuntimeStepFx({
+					...runtime,
+					jobQueue: [
+						{
+							id: "queued:work",
+							ownerItemId: owner.id,
+							lineId: "work",
+						},
+					],
+				});
+			}).pipe(
+				useGameFx({
+					config: configFn(0),
+				}),
+			),
+		);
+		expect(step.runtime.items).toEqual([]);
+		expect(step.events).toContainEqual(
+			expect.objectContaining({
+				type: "job:completed",
+				ownerItemId: "runtime:clock",
+				canonicalItemId: "clock",
+			}),
+		);
 	});
 
 	it.each([

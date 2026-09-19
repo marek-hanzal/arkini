@@ -61,6 +61,7 @@ describe("readGameAudioCuesFn", () => {
 						},
 						{
 							type: "job-queue:cleared",
+							canonicalItemId: "producer",
 							ownerItemId: "runtime:producer",
 							clearedRequestCount: 4,
 						},
@@ -80,20 +81,86 @@ describe("readGameAudioCuesFn", () => {
 		]);
 	});
 
-	it("keeps simple-item scheduling silent without suppressing its lifecycle cues", () => {
-		const queued = {
-			type: "job:queued" as const,
-			requestId: "request:simple",
-			ownerItemId: "runtime:simple",
-			canonicalItemId: "simple",
+	it("silences the simple-item job family before coalescing mixed-owner cues", () => {
+		const owner = {
+			ownerItemId: "runtime:producer",
+			canonicalItemId: "producer",
+		};
+		const job = {
+			...owner,
+			jobId: "job:1",
 			lineId: "line:1",
 		};
+		const batch = {
+			events: [
+				{
+					...owner,
+					type: "job:queued",
+					requestId: "request:1",
+					lineId: "line:1",
+				},
+				{
+					...job,
+					type: "job:started",
+				},
+				{
+					...owner,
+					type: "line-input:autofill-started",
+					lineId: "line:1",
+					scheduledQuantity: 2,
+				},
+				{
+					...job,
+					type: "job:completed",
+				},
+				{
+					...job,
+					type: "job:aborted",
+					reason: "owner-removed",
+				},
+				{
+					...owner,
+					type: "job-queue:cleared",
+					clearedRequestCount: 2,
+				},
+			],
+		} satisfies GameEventBatchSchema.Type;
+		const simpleEvents = batch.events.map((event) => ({
+			...event,
+			canonicalItemId: "simple",
+			ownerItemId: "runtime:simple",
+		}));
+		const expected = [
+			{
+				event: GameEventEnumSchema.enum.JobQueued,
+				strength: 1,
+			},
+			{
+				event: GameEventEnumSchema.enum.JobStarted,
+				strength: 1,
+			},
+			{
+				event: GameEventEnumSchema.enum.LineInputAutofillStarted,
+				strength: 2,
+			},
+			{
+				event: GameEventEnumSchema.enum.JobCompleted,
+				strength: 2,
+			},
+			{
+				event: GameEventEnumSchema.enum.JobAborted,
+				strength: 2,
+			},
+			{
+				event: GameEventEnumSchema.enum.JobQueueCleared,
+				strength: 2,
+			},
+		];
+		expect(readGameAudioCuesFn(batch, items)).toEqual(expected);
 		expect(
 			readGameAudioCuesFn(
 				{
-					events: [
-						queued,
-					],
+					events: simpleEvents,
 				},
 				items,
 			),
@@ -102,64 +169,13 @@ describe("readGameAudioCuesFn", () => {
 			readGameAudioCuesFn(
 				{
 					events: [
-						queued,
-						{
-							type: "job:started",
-							jobId: "job:simple",
-							ownerItemId: queued.ownerItemId,
-							lineId: queued.lineId,
-						},
-						{
-							type: "job:completed",
-							jobId: "job:simple",
-							ownerItemId: queued.ownerItemId,
-							lineId: queued.lineId,
-						},
+						...simpleEvents,
+						...batch.events,
 					],
 				},
 				items,
 			),
-		).toEqual([
-			{
-				event: GameEventEnumSchema.enum.JobStarted,
-				strength: 1,
-			},
-			{
-				event: GameEventEnumSchema.enum.JobCompleted,
-				strength: 2,
-			},
-		]);
-	});
-
-	it("ignores simple scheduling before coalescing a mixed batch", () => {
-		expect(
-			readGameAudioCuesFn(
-				{
-					events: [
-						{
-							type: "job:queued",
-							requestId: "request:simple",
-							ownerItemId: "runtime:simple",
-							canonicalItemId: "simple",
-							lineId: "line:1",
-						},
-						{
-							type: "job:queued",
-							requestId: "request:default",
-							ownerItemId: "runtime:producer",
-							canonicalItemId: "producer",
-							lineId: "line:1",
-						},
-					],
-				},
-				items,
-			),
-		).toEqual([
-			{
-				event: GameEventEnumSchema.enum.JobQueued,
-				strength: 1,
-			},
-		]);
+		).toEqual(expected);
 	});
 
 	it("projects every committed event and leaves silence to authored runtime assignment", () => {
@@ -169,6 +185,7 @@ describe("readGameAudioCuesFn", () => {
 					events: [
 						{
 							type: "job:aborted",
+							canonicalItemId: "producer",
 							jobId: "job:1",
 							ownerItemId: "runtime:producer",
 							lineId: "line:1",
@@ -202,6 +219,7 @@ describe("readGameAudioCuesFn", () => {
 			events: [
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
+					canonicalItemId: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",
@@ -269,6 +287,7 @@ describe("readGameAudioCuesFn", () => {
 				},
 				{
 					type: GameEventEnumSchema.enum.JobStarted,
+					canonicalItemId: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",
@@ -310,6 +329,7 @@ describe("readGameAudioCuesFn", () => {
 				},
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
+					canonicalItemId: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",

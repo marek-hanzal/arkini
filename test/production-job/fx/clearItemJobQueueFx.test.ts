@@ -88,6 +88,7 @@ describe("clearItemJobQueueFx", () => {
 		]);
 		expect(result.transition.events).toContainEqual({
 			type: "job-queue:cleared",
+			canonicalItemId: "forge",
 			ownerItemId: "runtime:forge:primary",
 			clearedRequestCount: 2,
 		});

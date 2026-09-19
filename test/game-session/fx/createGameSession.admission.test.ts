@@ -110,6 +110,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 							[
 								{
 									type: GameEventEnumSchema.enum.JobCompleted,
+									canonicalItemId: "owner",
 									jobId: "job:event:planned",
 									ownerItemId: "owner:event:planned",
 									lineId: "line:event:planned",

@@ -154,6 +154,7 @@ describe("kill-switch material expiry", () => {
 		expect(transition.events).toContainEqual(
 			expect.objectContaining({
 				type: GameEventEnumSchema.enum.JobAborted,
+				canonicalItemId: "owner",
 				ownerItemId: "owner",
 				reason: "material-expired",
 			}),

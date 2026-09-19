@@ -21,6 +21,7 @@ export const emitCompletedEventFx = (jobId: string) =>
 			[
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
+					canonicalItemId: "owner",
 					jobId,
 					ownerItemId: "owner:listener",
 					lineId: "line:listener",

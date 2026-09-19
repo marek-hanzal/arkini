@@ -60,6 +60,7 @@ it("cancels exact active work without refunding consumed material or cancelling 
 			const transition = yield* (yield* CommittedTransitionsFx).read;
 			expect(transition.events).toContainEqual({
 				type: "job:aborted",
+				canonicalItemId: owner.item.id,
 				jobId: job.id,
 				ownerItemId: owner.id,
 				lineId: job.lineId,

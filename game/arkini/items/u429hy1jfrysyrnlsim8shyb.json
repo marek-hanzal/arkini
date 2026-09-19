@@ -1,0 +1,24 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "u429hy1jfrysyrnlsim8shyb",
+		"id": "empty-beehive",
+		"title": "Empty Beehive",
+		"draft": false,
+		"description": "The hive structure is still sound, but the colony is gone. Apiary can repopulate it with a fresh bunch of flowers.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"empty-beehive"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -19,13 +19,28 @@
 			{
 				"id": "Honeycomb",
 				"title": "Honeycomb",
-				"description": "Produce honeycomb when a beehive and a flowering field are within reach. Each harvest spends one unit of nectar from the field.",
+				"description": "Produce honeycomb when an active beehive and flowering field are within reach. Each batch consumes one unit from both.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,
 				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "beehive"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					},
 					{
 						"units": {
 							"cost": 1,
@@ -149,6 +164,74 @@
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "beehive",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "restore-beehive",
+				"title": "Restore Beehive",
+				"artwork": "beehive",
+				"description": "Use a fresh bunch of flowers to repopulate a nearby empty hive.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 20000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "empty-beehive"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "flowers"
 							},
 							"scope": "any"
 						},

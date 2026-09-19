@@ -4,8 +4,8 @@
 		"uid": "vrrlriluo0tlef50wpl5q2bt",
 		"id": "beehive",
 		"title": "Beehive",
+		"description": "An active colony supplying honey production. Each Honeycomb job consumes one hive unit; once exhausted, the structure remains as an Empty Beehive.",
 		"ui": "simple",
-		"description": "Honey producers",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,31 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
-			"amount": 24
+			"amount": 24,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-beehive",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
 		},
 		"maxQueueSize": 1,
 		"lines": []

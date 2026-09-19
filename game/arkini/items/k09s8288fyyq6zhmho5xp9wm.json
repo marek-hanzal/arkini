@@ -4,8 +4,8 @@
 		"uid": "k09s8288fyyq6zhmho5xp9wm",
 		"id": "townhall-t1",
 		"title": "Townhall I",
+		"description": "The first proper civic upgrade. More blueprints, more organization, and the beginning of paperwork as infrastructure.",
 		"ui": "default",
-		"description": "Better village management, really.",
 		"music": "do3ht3r9ylfqeyv8dpvqyxsd",
 		"artwork": {
 			"scale": 1,
@@ -23,8 +23,8 @@
 				"title": "Well Blueprint",
 				"artwork": "well",
 				"description": "Water is highly needed resource, believe me",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -32,11 +32,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -47,11 +47,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -84,15 +84,46 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "well-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "well"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
 			},
 			{
 				"id": "sawmill-blueprint",
 				"title": "Sawmill Blueprint",
 				"artwork": "sawmill",
 				"description": "Sawmill blueprint",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -100,11 +131,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -115,11 +146,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -152,15 +183,46 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sawmill-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sawmill"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
 			},
 			{
 				"id": "stoneworks-blueprint",
 				"title": "Stoneworks Blueprint",
 				"artwork": "stoneworks",
 				"description": "Draw plans for a workshop that turns rough stone into proper building blocks.",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -168,11 +230,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -183,11 +245,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -220,27 +282,58 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stoneworks-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stoneworks"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
 			},
 			{
 				"id": "carpenter-blueprint",
 				"title": "Carpenter Blueprint",
 				"artwork": "carpenter",
-				"description": "Draw plans for a workshop that crafts wooden buckets and crates.",
-				"default": false,
+				"description": "Draw plans for a workshop that turns processed wood into practical tools, containers, and papermaking gear.",
 				"clockWeight": 1,
-				"show": true,
+				"default": false,
+				"show": false,
 				"enable": true,
 				"runtimeMs": 30000,
 				"input": [
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -251,11 +344,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -288,7 +381,559 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sawmill"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stoneworks"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "carpenter-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "carpenter"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "architect-t1-blueprint",
+				"title": "Architect - Tier 1 Blueprint",
+				"artwork": "architect-t1",
+				"description": "Draw plans for a small architect's office. The Townhall discovers buildings; the Architect handles repeat business.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "architect-t1-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sawmill"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stoneworks"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "architect-t1-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "architect-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "charcoal-kiln-blueprint",
+				"title": "Charcoal Kiln Blueprint",
+				"artwork": "charcoal-kiln",
+				"description": "Draw plans for a kiln that turns Firewood into the first proper industrial fuel.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "charcoal-kiln-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sawmill"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stoneworks"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "charcoal-kiln-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "charcoal-kiln"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "waste-incinerator-blueprint",
+				"title": "Waste Incinerator Blueprint",
+				"artwork": "waste-incinerator",
+				"description": "Draw plans for a facility that burns accumulated Waste using Charcoal. Cleaner ground, dirtier air.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "waste-incinerator-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "charcoal-kiln"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "waste-incinerator-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "waste-incinerator"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
+				"id": "school-t1-blueprint",
+				"title": "School - Tier 1 Blueprint",
+				"artwork": "school-t1",
+				"description": "Draw plans for the settlement's first school. Once people are fed and materials are processed, somebody can finally start teaching.",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "school-t1-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sawmill"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "stoneworks"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "house-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "school-t1-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "school-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
 			}
 		]
 	}

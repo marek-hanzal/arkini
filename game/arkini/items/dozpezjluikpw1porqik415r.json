@@ -4,8 +4,8 @@
 		"uid": "dozpezjluikpw1porqik415r",
 		"id": "forest-portal",
 		"title": "Forest Portal",
+		"description": "A shortcut to the greener, wilder part of the world. Trees are guaranteed. Everything else is negotiable.",
 		"ui": "simple",
-		"description": "Gives you an access to the Forest Land",
 		"artwork": {
 			"scale": 1,
 			"default": [

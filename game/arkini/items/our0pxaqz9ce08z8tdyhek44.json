@@ -4,8 +4,8 @@
 		"uid": "our0pxaqz9ce08z8tdyhek44",
 		"id": "campfire",
 		"title": "Campfire",
+		"description": "A pile of stone and firewood waiting for a spark. Useful for warmth, cooking, and several bad ideas.",
 		"ui": "simple",
-		"description": "Do you like marshmallows?",
 		"artwork": {
 			"scale": 1,
 			"default": [

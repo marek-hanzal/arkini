@@ -4,8 +4,8 @@
 		"uid": "gepmb31cvdse7u75q4i4p4ek",
 		"id": "empty-lantern",
 		"title": "Empty Lantern",
+		"description": "A sturdy little shell waiting for a light source. Safer than waving a naked flame around, which is apparently progress.",
 		"ui": "simple",
-		"description": "Just an unlit lanter. Needs something to make it work",
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -1,0 +1,115 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ftnfkoxukanqeu8tjkah1z8k",
+		"id": "townhall-t1-supply-chest",
+		"title": "Townhall I Supply Chest",
+		"draft": true,
+		"description": "A small welcome package for the next stage of civilization. Most of its contents will make more sense slightly later, which is half the point.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"treasure-chest-t1"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "open-supplies",
+				"title": "Open the Townhall Supplies",
+				"artwork": "treasure-chest-t1",
+				"description": "Unpack a few samples of what the settlement will soon learn to produce, understand, employ, and inevitably run out of.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 6000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "townhall-t1-supply-chest"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "construction-set-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "grain-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "book-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "knowledge-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "labor-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

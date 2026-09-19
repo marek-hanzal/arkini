@@ -4,8 +4,8 @@
 		"uid": "ixw46s78kqk56j0h4utwgw5e",
 		"id": "pickaxe",
 		"title": "Pickaxe",
+		"description": "For persuading stone deposits that they were never meant to stay whole. Rocks remain unconvinced but eventually cooperate.",
 		"ui": "simple",
-		"description": "Miners, go deep!",
 		"artwork": {
 			"scale": 1,
 			"default": [

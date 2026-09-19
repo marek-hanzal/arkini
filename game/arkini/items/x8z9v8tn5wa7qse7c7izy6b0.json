@@ -4,9 +4,9 @@
 		"uid": "x8z9v8tn5wa7qse7c7izy6b0",
 		"id": "base-camp",
 		"title": "Base Camp",
-		"ui": "default",
 		"draft": false,
-		"description": "This is the start of your journey. Here you can build more stuff as you progress!",
+		"description": "Home, for a generous definition of home. Sketch your first blueprints here, build the basics, and try to turn a campsite into something that looks intentional.",
+		"ui": "default",
 		"music": "do3ht3r9ylfqeyv8dpvqyxsd",
 		"artwork": {
 			"scale": 1,
@@ -23,9 +23,9 @@
 				"id": "lumber-camp-blueprint",
 				"title": "Lumber Camp Blueprint",
 				"artwork": "lumber-camp",
-				"description": "If you need wood, here you go.",
-				"default": false,
+				"description": "Sketch a place dedicated to turning nearby trees into a steady supply of wood. Civilization rarely begins elegantly, but it often begins with lumber.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 8000,
@@ -33,11 +33,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -48,11 +48,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -122,9 +122,9 @@
 				"id": "stonemason-camp-blueprint",
 				"title": "Stonemason Camp Blueprint",
 				"artwork": "stonemason-camp",
-				"description": "Stone time!",
-				"default": false,
+				"description": "Draw plans for a rough stone-working camp. Heavy rocks become much more useful once somebody agrees where to put them.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 10000,
@@ -132,11 +132,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -147,11 +147,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -221,9 +221,9 @@
 				"id": "townhall-t1-blueprint",
 				"title": "Townhall I Blueprint",
 				"artwork": "townhall-t1",
-				"description": "Time to get better stuff, here you go!",
-				"default": false,
+				"description": "The campsite is starting to look suspiciously permanent. Put the settlement on paper and give all this chaos an address.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,
@@ -231,11 +231,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -261,11 +261,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -300,7 +300,7 @@
 				},
 				"rules": [
 					{
-						"hint": "You need lumber camp",
+						"hint": "Build a Lumber Camp first.",
 						"when": [
 							{
 								"query": {
@@ -316,7 +316,7 @@
 						"type": "enable"
 					},
 					{
-						"hint": "You need stonemaseon.",
+						"hint": "Build a Stonemason Camp first.",
 						"when": [
 							{
 								"query": {
@@ -347,7 +347,7 @@
 						"type": "hide"
 					},
 					{
-						"hint": "People needs a house to live",
+						"hint": "Build a House first.",
 						"when": [
 							{
 								"query": {
@@ -400,9 +400,9 @@
 				"id": "house-t1-blueprint",
 				"title": "House - Tier 1 Blueprint",
 				"artwork": "house-t1",
-				"description": "House blueprint",
-				"default": false,
+				"description": "Four walls, a roof, and the radical idea that people should not sleep next to the wood pile forever.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 120000,
@@ -410,11 +410,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -425,11 +425,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -499,9 +499,9 @@
 				"id": "campfire",
 				"title": "Campfire",
 				"artwork": "campfire",
-				"description": "You can cook something",
-				"default": false,
+				"description": "A proper camp needs somewhere warm to gather, cook, and accidentally test the flammability of nearby objects.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 24000,
@@ -509,11 +509,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "firewood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -524,11 +524,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -567,9 +567,9 @@
 				"id": "explorer-blueprint",
 				"title": "Explorer Blueprint",
 				"artwork": "explorer",
-				"description": "Draw plans for an explorer's camp.",
-				"default": false,
+				"description": "Plans for someone whose job is to walk into the forest and return with tracks, wildlife, stories, or occasionally problems.",
 				"clockWeight": 1,
+				"default": false,
 				"show": false,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -577,11 +577,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -592,11 +592,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -691,9 +691,9 @@
 				"id": "hunter-blueprint",
 				"title": "Hunter Blueprint",
 				"artwork": "hunter",
-				"description": "Draw plans for a hunter's camp.",
-				"default": false,
+				"description": "Plans for someone who solves wildlife opportunities with considerably less diplomacy. Efficient, messy, useful.",
 				"clockWeight": 1,
+				"default": false,
 				"show": false,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -701,11 +701,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "paper"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -716,11 +716,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "goose-quill"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "reserve",
 						"quantity": {

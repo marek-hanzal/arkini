@@ -4,8 +4,8 @@
 		"uid": "xaijv8bc7ljbonqgp1vzcxcc",
 		"id": "hunted-game",
 		"title": "Hunted Game",
-		"ui": "default",
 		"description": "Some raw hunted stuff you shall process",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -51,9 +51,9 @@
 			{
 				"id": "game",
 				"title": "game",
-				"description": "Something that was inside an animal before",
-				"default": true,
+				"description": "Process the catch into meat, bones, a proper steak, and useful animal fat.",
 				"clockWeight": 1,
+				"default": true,
 				"show": false,
 				"enable": true,
 				"runtimeMs": 10000,
@@ -97,6 +97,24 @@
 											"quantity": {
 												"min": 2,
 												"max": 6
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-steak",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "cutting-board-with-animal-fat",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

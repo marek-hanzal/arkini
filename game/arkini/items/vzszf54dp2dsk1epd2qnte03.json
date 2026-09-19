@@ -4,8 +4,8 @@
 		"uid": "vzszf54dp2dsk1epd2qnte03",
 		"id": "sawmill",
 		"title": "Sawmill",
-		"ui": "default",
 		"description": "You want to advance in your journey? Sawmill is your friend!",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -20,8 +20,8 @@
 				"id": "planks",
 				"title": "Planks",
 				"description": "This will get you nicer piece of wood.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 10000,
@@ -29,11 +29,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -56,6 +56,59 @@
 											"quantity": {
 												"min": 2,
 												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "wood-fibers",
+				"title": "Wood Fibers",
+				"artwork": "wood-fibers",
+				"description": "Process wood into fibers suitable for making paper pulp.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wood"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "wood-fibers",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

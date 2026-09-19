@@ -4,8 +4,8 @@
 		"uid": "r37rbdbf8ntc3tt56yv1549n",
 		"id": "house-t1",
 		"title": "House - Tier 1",
+		"description": "Four walls, a roof, and enough dignity to stop calling every sleeping arrangement a campsite.",
 		"ui": "default",
-		"description": "Simple good old house.",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -20,8 +20,8 @@
 				"id": "coin",
 				"title": "Coin",
 				"description": "Get some coins, you'll need them.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 180000,
@@ -59,6 +59,68 @@
 											"quantity": {
 												"min": 1,
 												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "labor-t1",
+				"title": "Labor - Tier 1",
+				"artwork": "labor-t1",
+				"description": "Serve a cooked steak to the household and free up ordinary skilled hands for useful work. Someone still has to wash the pan.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "copper-pan-with-cooked-steak"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "labor-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "dirty-copper-pan",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

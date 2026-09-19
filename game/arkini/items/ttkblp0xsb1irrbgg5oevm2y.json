@@ -4,8 +4,8 @@
 		"uid": "ttkblp0xsb1irrbgg5oevm2y",
 		"id": "paper",
 		"title": "Paper",
+		"description": "Civilization runs on wood, stone, and paperwork. Mostly paperwork. Blueprints, notes, and better ideas all need somewhere to be written.",
 		"ui": "simple",
-		"description": "If you want to persist your knowledge or get better stuff, paper is the way to go!",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,40 @@
 		},
 		"scope": "any",
 		"maxStackSize": 16,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "paper-shredded",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

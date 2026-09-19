@@ -4,8 +4,8 @@
 		"uid": "d7nii81w82pbs6y3cvfyprox",
 		"id": "unlit-candle",
 		"title": "Unlit Candle",
+		"description": "Wax, wick, potential. Currently excellent at not illuminating anything. Fire usually improves the situation.",
 		"ui": "simple",
-		"description": "Just a candle. It does not emit any light.",
 		"artwork": {
 			"scale": 1,
 			"default": [

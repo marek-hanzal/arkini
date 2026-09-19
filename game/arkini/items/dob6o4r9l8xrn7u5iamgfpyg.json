@@ -1,0 +1,90 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "dob6o4r9l8xrn7u5iamgfpyg",
+		"id": "school-t1",
+		"title": "School - Tier 1",
+		"draft": false,
+		"description": "A modest place for turning spare time, paper, and willing hands into useful knowledge. Civilization has discovered homework.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"school-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "knowledge-t1",
+				"title": "Basic Education",
+				"artwork": "knowledge-t1",
+				"description": "Spend time, labor, and paper teaching the settlement something worth remembering.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 90000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "labor-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "knowledge-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

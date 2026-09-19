@@ -4,8 +4,8 @@
 		"uid": "cqwmnos0386zfehpbx8iibfy",
 		"id": "house-t1-blueprint",
 		"title": "House - Tier 1 Blueprint",
+		"description": "Proof on paper that four walls and a roof are somehow a major technological milestone.",
 		"ui": "default",
-		"description": "People should live somewhere",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -25,8 +25,8 @@
 				"title": "House - Tier 1",
 				"artwork": "house-t1",
 				"description": "A beautiful simple house, but you'll like it!",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 42000,
@@ -49,11 +49,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -64,11 +64,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -79,11 +79,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "campfire"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

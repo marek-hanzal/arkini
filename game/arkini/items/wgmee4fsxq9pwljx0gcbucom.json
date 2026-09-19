@@ -4,8 +4,8 @@
 		"uid": "wgmee4fsxq9pwljx0gcbucom",
 		"id": "sick-cow",
 		"title": "Sick Cow",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,6 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
+			"intervalMs": 30000,
 			"durationMs": 300000,
 			"enable": true,
 			"rules": [],
@@ -53,6 +54,66 @@
 			}
 		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Idle",
+				"description": "The sick animal rests and does nothing this time.",
+				"clock": true,
+				"clockWeight": 9,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "spread-disease",
+				"title": "Spread Disease",
+				"artwork": "disease",
+				"description": "The sick animal may contaminate its immediate surroundings.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "disease",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

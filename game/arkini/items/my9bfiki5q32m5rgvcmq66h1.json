@@ -4,8 +4,8 @@
 		"uid": "my9bfiki5q32m5rgvcmq66h1",
 		"id": "soapy-scrubbing-brush",
 		"title": "Soapy Scrubbing Brush",
-		"ui": "simple",
 		"description": "Make things clean again",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -80,6 +80,39 @@
 				},
 				"effect": "replace",
 				"result": "pig"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "dirty-copper-pan"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "dirty-scrubbing-brush",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "copper-pan"
 			}
 		],
 		"maxQueueSize": 1,

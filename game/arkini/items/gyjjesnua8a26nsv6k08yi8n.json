@@ -4,8 +4,8 @@
 		"uid": "gyjjesnua8a26nsv6k08yi8n",
 		"id": "butcher",
 		"title": "Butcher",
-		"ui": "default",
 		"draft": true,
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -20,8 +20,8 @@
 				"id": "pig",
 				"title": "Pig",
 				"description": "Some yummi stuff from a pig",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -29,11 +29,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "pig"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -44,11 +44,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "cutting-board"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -76,7 +76,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "animal-fat",
+											"itemId": "cutting-board-with-animal-fat",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -96,8 +96,8 @@
 				"id": "sausage",
 				"title": "Sausage",
 				"description": "Yummi sausage",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -105,11 +105,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "raw-game-meat"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

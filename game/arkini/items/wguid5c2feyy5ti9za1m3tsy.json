@@ -4,8 +4,8 @@
 		"uid": "wguid5c2feyy5ti9za1m3tsy",
 		"id": "knife",
 		"title": "Knife",
+		"description": "Small, sharp, and alarmingly versatile. If something looks sliceable, Arkini is unlikely to stop you.",
 		"ui": "simple",
-		"description": "Sharp.",
 		"artwork": {
 			"scale": 1,
 			"default": [

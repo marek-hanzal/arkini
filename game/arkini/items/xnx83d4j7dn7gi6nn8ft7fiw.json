@@ -4,8 +4,8 @@
 		"uid": "xnx83d4j7dn7gi6nn8ft7fiw",
 		"id": "raw-game-meat",
 		"title": "Raw Game Meat",
+		"description": "Fresh game meat. Useful, perishable, and destined for animals, sausages, or some more deliberate cooking.",
 		"ui": "simple",
-		"description": "Needs more processing",
 		"artwork": {
 			"scale": 1,
 			"default": [

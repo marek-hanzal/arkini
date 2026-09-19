@@ -4,8 +4,8 @@
 		"uid": "b1z61l4bbwdtc75nt189hzze",
 		"id": "stone",
 		"title": "Stone",
+		"description": "Heavy, stubborn, useful. Civilization likes to pretend stone becomes architecture through planning rather than lifting.",
 		"ui": "simple",
-		"description": "Finally, you've found a stone. Now you can use it for various interesting things!",
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -1,0 +1,58 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "tiw3nvs3r424k5xdvo41od4t",
+		"id": "haunted-empty-bed---tier-1",
+		"title": "Haunted Empty Bed - Tier 1",
+		"draft": true,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"haunted-empty-bed-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 30000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "ghost",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "random",
+										"rules": []
+									},
+									{
+										"itemId": "empty-bed-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

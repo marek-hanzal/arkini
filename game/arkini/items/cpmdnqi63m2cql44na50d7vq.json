@@ -4,8 +4,8 @@
 		"uid": "cpmdnqi63m2cql44na50d7vq",
 		"id": "scissors",
 		"title": "Scissors",
+		"description": "For wool, paper, bristles, and several things that absolutely did not ask for a haircut.",
 		"ui": "simple",
-		"description": "Sharp. Keep children away",
 		"artwork": {
 			"scale": 1,
 			"default": [

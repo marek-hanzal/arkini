@@ -4,8 +4,8 @@
 		"uid": "nh9tf1n52h19igah115s36jk",
 		"id": "air-pollution",
 		"title": "Air Pollution",
+		"description": "A cloud of airborne filth looking for somewhere else to be. It drifts across the board and eventually disperses on its own.",
 		"ui": "simple",
-		"description": "Ugly thing, it will disappear by itself, but you can also clear it by yourself.",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,12 +14,99 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"clock": {
-			"durationMs": 300000,
+			"intervalMs": 60000,
 			"enable": true,
 			"rules": []
 		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "drift",
+				"title": "Drift",
+				"artwork": "air-pollution",
+				"description": "The pollution cloud drifts elsewhere.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "air-pollution"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "air-pollution",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "disperse",
+				"title": "Disperse",
+				"description": "The pollution thins out and disappears.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "air-pollution"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"rules": []
+			}
+		]
 	}
 }

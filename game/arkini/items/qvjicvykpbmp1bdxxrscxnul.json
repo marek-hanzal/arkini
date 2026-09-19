@@ -4,8 +4,8 @@
 		"uid": "qvjicvykpbmp1bdxxrscxnul",
 		"id": "axe",
 		"title": "Axe",
+		"description": "A convincing argument against trees. Civilization has to start somewhere, and apparently it starts with deforestation.",
 		"ui": "simple",
-		"description": "Chop something down?",
 		"artwork": {
 			"scale": 1,
 			"default": [

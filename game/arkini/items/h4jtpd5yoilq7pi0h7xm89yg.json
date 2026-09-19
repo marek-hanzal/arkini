@@ -4,8 +4,8 @@
 		"uid": "h4jtpd5yoilq7pi0h7xm89yg",
 		"id": "goose-quill",
 		"title": "Goose Quill",
+		"description": "A reusable writing tool with excellent handwriting potential and a goose somewhere filing a complaint.",
 		"ui": "simple",
-		"description": "Time for school",
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -4,8 +4,8 @@
 		"uid": "bqf3op5bndkaqfgpap7lj7kq",
 		"id": "resource-research",
 		"title": "Resource research",
+		"description": "A suspiciously useful bit of knowledge about where more resources might be hiding. Use it when the world starts looking disappointingly empty.",
 		"ui": "simple",
-		"description": "A magical item, which may find new resources!",
 		"artwork": {
 			"scale": 1,
 			"default": [

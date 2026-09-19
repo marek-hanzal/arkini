@@ -4,8 +4,8 @@
 		"uid": "gqddpemvp2i958ns5cgoyoty",
 		"id": "meal",
 		"title": "Meal",
+		"description": "A simple hot meal. Feed it to a household before it cools, spoils, and becomes somebody else's compost problem.",
 		"ui": "simple",
-		"description": "Gimme!",
 		"artwork": {
 			"scale": 1,
 			"default": [

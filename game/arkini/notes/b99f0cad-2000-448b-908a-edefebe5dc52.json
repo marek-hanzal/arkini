@@ -1,0 +1,30 @@
+{
+	"content": "# Waste, Bio-Waste & Charcoal\n\n## Základní rozdělení\n\nTyhle tři systémy zůstávají oddělené:\n\n1. **Charcoal** = záměrně vyráběné palivo / zdroj tepla.\n2. **Waste** = problém, který řeší spalovna.\n3. **Bio-Waste** = organická surovina pro compost a farming.\n\nNechceme univerzální budovu, která smaže všechny druhy bordelu jedním receptem.\n\n## Charcoal — implementováno\n\nItem:\n- `charcoal`\n\nBudova:\n- `charcoal-kiln`\n\nBlueprint:\n- `charcoal-kiln-blueprint`\n\nProdukce:\n- **Firewood ×2 -> Charcoal ×1**\n- runtime **35 s**\n- **20 %** šance na Air Pollution ×1\n- **35 %** šance na Loose Ash ×1\n\nCharcoal Kiln se v Townhall I objeví až po postavení:\n- Sawmill\n- Stoneworks\n\nStavba Charcoal Kiln:\n- Planks ×2\n- Stone Block ×3\n- runtime 45 s\n\nPo postavení umí Architect T1 objednávat další blueprint za Paper ×1.\n\nCharcoal je první zpracované palivo před Coal.\n\n## Waste Incinerator — implementováno\n\nItem:\n- `waste-incinerator`\n\nBlueprint:\n- `waste-incinerator-blueprint`\n\nBlueprint se v Townhall I ukáže až po postavení Charcoal Kiln.\n\nStavba:\n- Planks ×3\n- Stone Block ×4\n- runtime 60 s\n\nPo postavení umí Architect T1 objednávat další blueprint za Paper ×1.\n\nAktuální spalování:\n- Charcoal ×1\n- Waste ×1–4\n- runtime 40 s\n- Air Pollution ×2–4\n- 50 % šance na Loose Ash ×1\n\nSpalovna tedy není delete button: pevný odpad zmizí, ale vzniká znečištění ovzduší a někdy popel.\n\n## Air Pollution\n\nAktuálně:\n- jednou za 60 s losuje Clock;\n- váha 4: přesune se jinam po boardu;\n- váha 1: rozptýlí se a zmizí.\n\nPollution je pohyblivý problém, ne statický timer.\n\n## Bio-Waste\n\nItem:\n- `bio-waste`\n\nBudova:\n- `composting-workshop`\n\nSoučasný recept:\n- **Bio-Waste ×1–4 -> Compost ×1–2**\n- runtime **32 s**\n\nPravidlo:\n- **Waste -> spalovna**\n- **Bio-Waste -> compost / zemědělství**\n\nSpalování Bio-Waste může někdy existovat jako neefektivní nouzový fallback, ale nesmí zničit smysl organické větve.\n\n## Později\n\nCharcoal má být další vstup pro high-heat výrobu:\n- Foundry\n- Blacksmith / Smithing\n- další raný průmysl\n\nCoal má později představovat další technologický krok, ne jen přejmenované Charcoal.\n\nLoose Ash / Ash mohou pokračovat do chemistry, např. Lye / Soap.\n\n## TH1 progression\n\nAktuální směr:\n1. Sawmill + Stoneworks\n2. Charcoal Kiln\n3. Waste Incinerator\n4. Composting Workshop / farming\n5. Foundry s Charcoal jako raným palivem\n\nKnowledge/Labor zatím nepoužívat jako gate pro Kiln/Incinerator. Tyhle systémy musí být dostupné dřív, než se z waste stane tvrdý ekonomický problém.\n\nConstruction Set T1 z TH1 teaser chesty zatím nepoužívat jako povinný jednorázový gate, dokud není opakovatelně vyráběný.",
+	"itemUids": [
+		"adwkzsf6f7sy2mtg0rpi09wr",
+		"l70n80ujrm55lpl6z2n4hcty",
+		"tacmmsi662wvdnoz6i21n1wp",
+		"nh9tf1n52h19igah115s36jk",
+		"yqu4itfme4lohxp6bxbito07",
+		"kpjqlrmcoc2c503wp1kr0m6v",
+		"kww8lkn8pkgrwpx7afo8pwv2",
+		"cf5wj8sin5bzx02srb49u1sg",
+		"h1fch6nyd1nyzp03ffkjmtlh",
+		"wxg5ic5fq27jq6hhu1953ruq"
+	],
+	"resourceIds": [
+		"waste",
+		"bio-waste",
+		"waste-incinerator",
+		"air-pollution",
+		"faith-waste-incinerator",
+		"magic-waste-incinerator",
+		"steam-waste-incinerator",
+		"charcoal",
+		"charcoal-kiln",
+		"compost",
+		"composting-workshop"
+	],
+	"createdAtMs": 1789822885418,
+	"updatedAtMs": 1789827392381
+}

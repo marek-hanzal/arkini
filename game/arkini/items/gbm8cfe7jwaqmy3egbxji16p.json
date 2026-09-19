@@ -4,9 +4,9 @@
 		"uid": "gbm8cfe7jwaqmy3egbxji16p",
 		"id": "flint-and-steel",
 		"title": "Flint And Steel",
-		"ui": "simple",
 		"draft": false,
-		"description": "Can make a fire. Be carefull. Don't use it next to the flammable objects. You've been warned.",
+		"description": "A tiny machine for turning friction into poor decisions. Makes fire. Keep it away from anything you would prefer to remain unburned.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

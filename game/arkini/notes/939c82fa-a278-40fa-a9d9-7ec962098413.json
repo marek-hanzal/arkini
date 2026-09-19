@@ -1,0 +1,18 @@
+{
+	"content": "# Townhall supply chests\n\nTownhall upgrades may award a small **era teaser chest**.\n\nPurpose:\n- preview systems and resources that are about to become relevant;\n- provide a tiny bootstrap sample without replacing their real production chains;\n- create curiosity instead of explaining every upcoming mechanic in UI text.\n\n## Implemented: Townhall I\n\nItem: `townhall-t1-supply-chest`\nArtwork: `treasure-chest-t1`\n\nContents:\n- Construction Set - Tier 1 ×1\n- Grain Seed ×1\n- Book - Tier 1 ×1\n- Knowledge - Tier 1 ×1\n- Labor - Tier 1 ×1\n\nThe chest is emitted together with Townhall I when the Base Camp is upgraded.\n\n## Future pattern\n\nPrepared artwork already exists:\n- `treasure-chest-t2`\n- `treasure-chest-t3`\n- `treasure-chest-t4`\n- `treasure-chest-t5`\n- `treasure-chest-t6`\n\nFuture Townhall-tier chests should stay small and curated. They are **samples / teasers**, not compensation packs or shortcuts around the economy.",
+	"itemUids": [
+		"ftnfkoxukanqeu8tjkah1z8k",
+		"eheyi27mvxb5ggoh90s3nyjm",
+		"k09s8288fyyq6zhmho5xp9wm"
+	],
+	"resourceIds": [
+		"treasure-chest-t1",
+		"treasure-chest-t2",
+		"treasure-chest-t3",
+		"treasure-chest-t4",
+		"treasure-chest-t5",
+		"treasure-chest-t6"
+	],
+	"createdAtMs": 1789822750706,
+	"updatedAtMs": 1789822750706
+}

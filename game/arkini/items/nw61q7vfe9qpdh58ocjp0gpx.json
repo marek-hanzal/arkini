@@ -4,8 +4,8 @@
 		"uid": "nw61q7vfe9qpdh58ocjp0gpx",
 		"id": "foundation-chest",
 		"title": "Foundation Chest",
+		"description": "A suspiciously convenient box of everything a fledgling settlement needs to make its first mistakes. Open carefully; some of this stuff is harder to replace than it looks.",
 		"ui": "default",
-		"description": "Initial stuff",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -22,11 +22,11 @@
 		"lines": [
 			{
 				"id": "founder-chest",
-				"title": "Get the initial loot",
+				"title": "Open the Foundation Chest",
 				"artwork": "foundation-chest",
-				"description": "Hele you'll get everything you need to get started with the game.",
-				"default": true,
+				"description": "Unpack the carefully chosen pile of tools, paper, light, and other things future-you will be annoyed to discover were important.",
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 6000,
@@ -157,6 +157,24 @@
 										},
 										{
 											"itemId": "scissors",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "copper-pan",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-cauldron",
 											"quantity": {
 												"min": 1,
 												"max": 1

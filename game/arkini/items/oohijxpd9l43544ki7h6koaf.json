@@ -4,8 +4,8 @@
 		"uid": "oohijxpd9l43544ki7h6koaf",
 		"id": "explorer",
 		"title": "Explorer",
+		"description": "Point them at a nearby forest and, eventually, something interesting will come back. Sometimes it has teeth.",
 		"ui": "default",
-		"description": "He will find something. Eventually",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -21,8 +21,8 @@
 				"title": "Explore Forest",
 				"artwork": "forest",
 				"description": "Search the nearby forest for wildlife. You may find something. Or nothing.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,

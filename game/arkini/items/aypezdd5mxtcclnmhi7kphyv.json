@@ -4,8 +4,8 @@
 		"uid": "aypezdd5mxtcclnmhi7kphyv",
 		"id": "inkwell",
 		"title": "Inkwell",
+		"description": "Civilization becomes official the moment somebody starts wasting ink on plans. Limited supply, surprisingly important.",
 		"ui": "simple",
-		"description": "Write something nice",
 		"artwork": {
 			"scale": 1,
 			"default": [

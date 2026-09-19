@@ -4,8 +4,8 @@
 		"uid": "kwkucgj71atfynrxw5sugzpe",
 		"id": "wood",
 		"title": "Wood",
+		"description": "Freshly liberated from a tree. Basic, versatile, and destined to become almost everything before metal starts showing off.",
 		"ui": "simple",
-		"description": "Raw wood, so you can be creative with it to make new nice things.",
 		"artwork": {
 			"scale": 1,
 			"default": [

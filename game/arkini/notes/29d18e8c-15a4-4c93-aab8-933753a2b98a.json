@@ -1,7 +1,12 @@
 {
-	"content": "Hrad sam muze sbirat duchy (clock)? - co s nima?",
-	"itemUids": [],
-	"resourceIds": [],
+	"content": "# Haunted Castle, Ghosts & Ectoplasm\n\n## Základní směr\n\nChceme zachovat **duchovní výrobní větev** jako vedlejší systém, který se mechanicky liší od běžného dřevo/kámen/kov progressionu.\n\nExistuje:\n- `ghost`\n- `grim-reaper`\n- artwork `haunted-castle`\n\nNeexistuje zatím:\n- item Haunted Castle\n- item / artwork Ectoplasm\n\n## Ghost dnes\n\nGhost je stochastic Clock entita:\n- každých 5 s losuje chování;\n- většinou zůstane na místě;\n- občas se přesune náhodně po boardu.\n\n`Lit Carved Pumpkin` může Ghosta spotřebovat pouze z **near-close**, takže duchové už nejsou globální teleportující resource.\n\nGrim Reaper může Ghosty vytvářet.\n\n## Haunted Castle\n\nHaunted Castle má být budoucí **ghost-catcher / duchovní výrobní budova**.\n\nPreferovaný směr:\n- pracuje jen s Ghosty v rozumné lokální vzdálenosti, ne cross-board;\n- přes Clock může Ghosta zachytit / spotřebovat;\n- chycený Ghost se stane vstupem do další výrobní větve;\n- Castle může mít vlastní stochastic chování nebo malou minihru místo obyčejné statické production line.\n\nNechceme z něj jen obyčejný převodník `Ghost -> loot`; má působit jako zvláštní duchovní infrastruktura.\n\n## Ectoplasm\n\nNový plánovaný resource:\n- `ectoplasm`\n\nPrimární zdroj:\n- Haunted Castle z chycených Ghostů.\n\nDesign role:\n- samostatná vzácnější výrobní větev;\n- materiál pro neobvyklé / spirituální / pozdější vzácné recepty;\n- může fungovat jako spojovací resource mezi ghost gameplayem a dalšími systémy.\n\nMožný charakter produkce:\n- běžný Ghost -> malé množství Ectoplasmy;\n- vzácnější stochastic outcome -> extra Ectoplasm nebo jiný vzácný duchovní materiál;\n- přesné výstupy a použití zatím nejsou rozhodnuté.\n\n## Důležité pravidlo\n\nDuchovní systém má být **lokální a boardový** stejně jako ostatní emergentní systémy:\n- Ghost fyzicky putuje po boardu;\n- Castle reaguje na Ghosty ve svém okolí;\n- žádné automatické vysávání duchů odkudkoliv z univerza.\n\nCíl je vytvořit z Ghostů skutečný pohyblivý resource, který je zároveň trochu problém, trochu příležitost a trochu naprosto neseriózní průmyslová surovina. 👻",
+	"itemUids": [
+		"ynro5iy60hlzcb1q3kd1an8l",
+		"bpm5udeivrvd39122nmndehq"
+	],
+	"resourceIds": [
+		"haunted-castle"
+	],
 	"createdAtMs": 1789771120170,
-	"updatedAtMs": 1789771120170
+	"updatedAtMs": 1789825670402
 }

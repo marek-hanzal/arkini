@@ -4,8 +4,8 @@
 		"uid": "hds0v0xcckj5gcyzuwv8ujg8",
 		"id": "stone-deposit",
 		"title": "Stone deposit",
+		"description": "A generous lump of stone waiting to become walls, tools, and several regrettably heavy projects. Bring the right tool and start removing geology.",
 		"ui": "simple",
-		"description": "So, next to the wood, we also need some stone to build the prospering civilization. Here you go, you're welcome!",
 		"artwork": {
 			"scale": 1,
 			"default": [

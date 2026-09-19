@@ -1,0 +1,58 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "inm21cafxarakspk26baeduh",
+		"id": "haunted-bed-beer",
+		"title": "Haunted Bed Beer",
+		"draft": true,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"haunted-bed-beer"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 180000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "bed-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "ghost",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "random",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

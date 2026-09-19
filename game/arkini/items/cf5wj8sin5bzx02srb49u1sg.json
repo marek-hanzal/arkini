@@ -1,0 +1,105 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "cf5wj8sin5bzx02srb49u1sg",
+		"id": "charcoal-kiln",
+		"title": "Charcoal Kiln",
+		"draft": false,
+		"description": "A hot, smoky little machine for turning ordinary firewood into the fuel early industry actually wants.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"charcoal-kiln"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "charcoal",
+				"title": "Make Charcoal",
+				"artwork": "charcoal",
+				"description": "Slow-burn firewood into a denser fuel. Cleaner than throwing logs at every furnace, still not exactly a spa treatment for the air.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 35000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "firewood"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "charcoal",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.2,
+									"drop": [
+										{
+											"itemId": "air-pollution",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "loose-ash",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

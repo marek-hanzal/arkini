@@ -4,8 +4,8 @@
 		"uid": "ynro5iy60hlzcb1q3kd1an8l",
 		"id": "ghost",
 		"title": "Ghost",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,36 +14,98 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"clock": {
-			"durationMs": 5000,
-			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "ghost",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "random",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
+		"units": {
+			"amount": 1
+		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-bed-t1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "haunted-empty-bed---tier-1"
 			}
+		],
+		"clock": {
+			"intervalMs": 5000,
+			"enable": true,
+			"rules": []
 		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Linger",
+				"description": "The ghost hangs around, being unsettling but otherwise unproductive.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "ghost",
+				"description": "The ghost drifts somewhere else on the board.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "ghost"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "ghost",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

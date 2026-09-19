@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "j0u4yvzqrle5wc7ce76ufbvr",
+		"id": "paper-shredded",
+		"title": "Shredded Paper",
+		"draft": false,
+		"description": "Formerly useful paperwork, now professionally redesigned by a dog. Still technically paper, just much less ambitious.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"paper-shredded"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 16,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

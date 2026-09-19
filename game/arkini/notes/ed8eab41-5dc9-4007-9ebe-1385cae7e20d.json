@@ -1,11 +1,17 @@
 {
-	"content": "Beagle + Quest/Order Paper → Shredded Order\n\nPes mi snedl domaci ukol :D",
+	"content": "# Beagle vs. papírování\n\n## Hotovo: obyčejný Paper\n\nBeaglovi lze dát obyčejný `Paper`.\n\nVýsledek:\n- Paper se spotřebuje,\n- Beagle zůstane,\n- vznikne `Shredded Paper` (`paper-shredded`).\n\nArtwork:\n- `paper-shredded`\n\nTohle je obyčejný easter egg / interakce bez dalšího speciálního lifecycle.\n\n## Později: Quest a Order\n\nQuest a Order budou mít vlastní specifičtější setup a lifecycle, takže je zatím **neimplementovat jako obyčejný Paper clone**.\n\nPřipravené artworky:\n- `quest`\n- `quest-shredded`\n- `order`\n- `order-shredded`\n\nBudoucí směr:\n- Beagle může roztrhat Quest / Order;\n- roztrhaná varianta má respektovat význam původního gameplay objektu;\n- „pes mi snědl domácí úkol“ zůstává schválený tón. 😄",
 	"itemUids": [
-		"upghscvjnnxzp09urbuh5x0a"
+		"upghscvjnnxzp09urbuh5x0a",
+		"ttkblp0xsb1irrbgg5oevm2y",
+		"j0u4yvzqrle5wc7ce76ufbvr"
 	],
 	"resourceIds": [
-		"quest"
+		"paper-shredded",
+		"quest",
+		"quest-shredded",
+		"order",
+		"order-shredded"
 	],
 	"createdAtMs": 1789313515546,
-	"updatedAtMs": 1789313515546
+	"updatedAtMs": 1789826607858
 }

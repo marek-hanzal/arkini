@@ -1,0 +1,35 @@
+{
+	"content": "# Školství, Knowledge & Labor\n\n## Základní model\n\n- **Knowledge** vyjadřuje, jak pokročilé znalosti osada má.\n- **Labor** vyjadřuje, jak kvalifikovanou pracovní sílu má osada k dispozici.\n- Vyšší tiery nejsou jen „víc tokenů“, ale vyšší úroveň schopností.\n- **Knowledge T4** = mistrovská úroveň znalostí.\n- **Labor T4** = mistr oboru / výjimečně schopný specialista. Token nemusí být globálně unikátní.\n\n## Labor\n\nLabor produkují **Houses**.\n\nPevné pravidlo:\n- Labor se externě nepovyšuje.\n- Žádné recepty typu `Labor T1 + Coin -> Labor T2`.\n- Tier Laboru je přímo svázaný s tierem House.\n- House T1 produkuje Labor T1, vyšší House odpovídající vyšší tier.\n\n### Implementovaný T1 loop\n\n`Hunter -> Hunted Game -> Raw Steak -> Copper Pan -> Copper Pan With Raw Steak -> Burning Campfire -> Copper Pan With Cooked Steak -> House T1 -> Labor T1 + Dirty Copper Pan`\n\nKonkrétně:\n- Hunted Game při zpracování dává mimo jiné Raw Steak.\n- Foundation Chest obsahuje jednu Copper Pan jako bootstrap.\n- Raw Steak + Copper Pan -> Copper Pan With Raw Steak.\n- Copper Pan With Raw Steak + Burning Campfire -> Copper Pan With Cooked Steak.\n- House T1 spotřebuje Copper Pan With Cooked Steak a za 60 s vytvoří Labor T1 + Dirty Copper Pan.\n- Soapy Scrubbing Brush vyčistí Dirty Copper Pan zpět na Copper Pan a sám skončí jako Dirty Scrubbing Brush.\n\nTím je Labor T1 napojený na lov, ruční vaření, bydlení i cleaning loop.\n\n### Meal\n\n`meal` je zastaralý/legacy item a jeho artwork se bude odstraňovat.\nNemá být používán jako součást nového Labor progressionu.\n\nVyšší Houses mohou později vyžadovat lepší:\n- jídlo,\n- pití,\n- peníze / Arkini měnu.\n\n## Knowledge\n\nKnowledge produkují **Schools**.\n\n### Implementováno: School T1\n\nItem:\n- `school-t1`\n\nBlueprint:\n- `school-t1-blueprint`\n\nSchool blueprint se v Townhall I objeví po:\n- Sawmill\n- Stoneworks\n- House T1\n\nStavba School T1:\n- Planks ×4\n- Stone Block ×3\n- Labor T1 ×1\n- runtime 60 s\n\nProdukce School T1:\n- Paper ×1\n- Labor T1 ×1\n- runtime 90 s\n- výstup Knowledge T1 ×1\n\nPo postavení školy umí Architect T1 objednat další blueprint za Paper ×1 a respektuje limit cílové budovy.\n\n## Books & Scriptorium\n\nExistující itemy:\n- `book-t1` .. `book-t4`\n- `scriptorium`\n\nScriptorium už produkuje Book T1.\n\nPravidlo:\n- **School T1 knihu nepotřebuje.**\n- Books budou explicitní požadavky až pro vyšší School tiery / University / pokročilejší Knowledge.\n- Vyšší Book tiery mají vyžadovat lepší psací infrastrukturu a materiály.\n\nPřipravené path-specific Scriptorium artworky:\n- `faith-paper-scriptorium`\n- `magic-scriptorium`\n- `steam-paper-scriptorium`\n\nTy patří až do **Choose the Path**.\n\n## Blueprinty a práce\n\nPokročilé / větší blueprinty mohou vyžadovat:\n- určitý Knowledge tier,\n- určitý Labor tier,\n- nebo obojí.\n\nSchool T1 je první konkrétní stavba, jejíž výstavba už spotřebovává Labor T1.\n\nKomplexita budov tak může růst přes schopnosti společnosti, ne jen přes větší hromady Wood / Stone / Paper.\n\n## Další směr\n\n1. Přivést Scriptorium do normální TH1 discovery větve.\n2. Knihy použít až při přechodu na vyšší vzdělání, ne jako bootstrap School T1.\n3. Začít Knowledge/Labor používat na několik dalších zjevně pokročilejších staveb.\n4. University a vysoké Book/Knowledge tiery nechat na pozdější progression.",
+	"itemUids": [
+		"r37rbdbf8ntc3tt56yv1549n",
+		"ms55wb7h8dlbtkuragbny6z5",
+		"inkvbfkqv4zu96xz2eiiu4dw",
+		"yjpg011j6ltn534wgnbidtvj",
+		"cjijyjzndv1nxzxxyx3wmgq5",
+		"g820vf0ok9a9ei29wu10dd99",
+		"ejcs57zv68bas7jmizm7286p",
+		"dgvhgu1xkv6m4igfdb2wnwxh",
+		"w1icsk6chjx802whummot9pd",
+		"c6evvzu0ea2xj1e7se8kgxqi",
+		"dob6o4r9l8xrn7u5iamgfpyg",
+		"uzg588l4bvievzp120kv9mpc",
+		"xaijv8bc7ljbonqgp1vzcxcc",
+		"yf53q9esw3j2x0tvnf2df5mo",
+		"ap6ydtxwahg5cyki9g43shdo",
+		"kgxsxcqbi8ylj89t2og2cv7s",
+		"u01lk6hlpgr9j5w0agm446x5",
+		"g5xkc3f2hw5xr6iipq2wf9lj",
+		"my9bfiki5q32m5rgvcmq66h1"
+	],
+	"resourceIds": [
+		"school-t1",
+		"school-t2",
+		"school-t3",
+		"university",
+		"faith-paper-scriptorium",
+		"magic-scriptorium",
+		"steam-paper-scriptorium"
+	],
+	"createdAtMs": 1789822498317,
+	"updatedAtMs": 1789828253968
+}

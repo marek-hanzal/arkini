@@ -4,8 +4,8 @@
 		"uid": "vrjsj1cqzlky11b0wvd6ye0l",
 		"id": "lumer-camp",
 		"title": "Lumber camp",
+		"description": "A rough little operation for turning trees into a steady supply of wood and firewood. Not elegant, but neither is freezing.",
 		"ui": "default",
-		"description": "That place you get wood from. You need this one.",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -21,8 +21,8 @@
 				"title": "Chop the wood from a tree",
 				"artwork": "wood",
 				"description": "Get the wood from a tree. Find the tree. No tree, no wood. Really.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 6000,
@@ -92,8 +92,8 @@
 				"title": "Firewood",
 				"artwork": "firewood",
 				"description": "Split wood into firewood.",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 6000,
@@ -101,11 +101,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

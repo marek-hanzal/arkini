@@ -4,8 +4,8 @@
 		"uid": "f5o2vqdxqh3zhg05fyd1xf1m",
 		"id": "cow",
 		"title": "Cow",
-		"ui": "simple",
 		"description": "Booo!",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -61,7 +61,7 @@
 												"itemId": "plague"
 											},
 											"scope": "board",
-											"distance": "far"
+											"distance": "near-close"
 										},
 										"type": "exists"
 									}
@@ -98,7 +98,7 @@
 												"itemId": "disease"
 											},
 											"scope": "board",
-											"distance": "far"
+											"distance": "near-close"
 										},
 										"type": "exists"
 									}

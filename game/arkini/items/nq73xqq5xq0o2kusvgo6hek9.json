@@ -4,8 +4,8 @@
 		"uid": "nq73xqq5xq0o2kusvgo6hek9",
 		"id": "campfire-burning",
 		"title": "Campfire Burning",
+		"description": "Warm, bright, and temporary. Good for cooking and morale; less good for nearby things with ambitious flammability.",
 		"ui": "simple",
-		"description": "Warm place",
 		"artwork": {
 			"scale": 1,
 			"default": [

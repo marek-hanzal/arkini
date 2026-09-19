@@ -4,9 +4,9 @@
 		"uid": "aulg8pg44gswssomekfribtw",
 		"id": "hunter-blueprint",
 		"title": "Hunter Blueprint",
-		"ui": "default",
 		"draft": false,
-		"description": "Plans for a simple hunter's camp.",
+		"description": "Plans for a hunter's post. Wildlife management, interpreted aggressively.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -26,8 +26,8 @@
 				"title": "Build Hunter",
 				"artwork": "hunter",
 				"description": "Build a hunter's camp from wood and stone.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -50,11 +50,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -65,11 +65,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

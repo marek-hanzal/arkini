@@ -4,9 +4,9 @@
 		"uid": "i4hjvnsdb2vgk8n6fi0p2grz",
 		"id": "lumber-camp-blueprint",
 		"title": "Lumber Camp Blueprint",
-		"ui": "default",
 		"draft": false,
-		"description": "If you need a new one, here we go.",
+		"description": "Plans for a camp dedicated to turning nearby trees into a reliable supply of wood. Forestry, with fewer meetings.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -26,8 +26,8 @@
 				"title": "Lumber Camp",
 				"artwork": "lumber-camp",
 				"description": "Build a new lumber-camp",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 12000,
@@ -50,11 +50,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

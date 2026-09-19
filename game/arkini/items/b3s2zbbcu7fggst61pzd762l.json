@@ -4,8 +4,8 @@
 		"uid": "b3s2zbbcu7fggst61pzd762l",
 		"id": "hunter",
 		"title": "Hunter",
-		"ui": "simple",
 		"description": "Hunt",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

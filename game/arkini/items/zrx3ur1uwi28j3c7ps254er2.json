@@ -1,32 +1,23 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "zr32zq8n2t1ddvbk4sh9wjf2",
-		"id": "pumpkin-seed",
-		"title": "Pumpkin Seed",
-		"draft": true,
+		"uid": "zrx3ur1uwi28j3c7ps254er2",
+		"id": "sack-with-sugar-beet-seed",
+		"title": "Sack With Sugar Beet Seed",
+		"draft": false,
+		"description": "A sack of sugar beet seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"pumpkin-seed"
+				"sack-with-seeds",
+				"sugar-beet"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-sack"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sack-with-pumpkin-seed"
-			}
-		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -39,7 +30,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-pumpkin-seeds",
+										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,
 											"max": 1

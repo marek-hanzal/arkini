@@ -1,15 +1,17 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "w3fg6ipiqqjliictt3fx7scn",
-		"id": "sack-with-sunflower-seeds",
-		"title": "Sack With Sunflower Seeds",
+		"uid": "xxwklwezina4c0ejukf5fcpz",
+		"id": "sack-with-grain-seed",
+		"title": "Sack With Grain Seed",
+		"draft": false,
+		"description": "A sack of grain seed. The grain shown on the sack is considerably easier to identify than the individual seeds.",
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sack-with-sunflower-seeds"
+				"sack-with-seeds",
+				"grain"
 			]
 		},
 		"scope": "board",

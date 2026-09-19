@@ -4,8 +4,8 @@
 		"uid": "l5iztjxbdrt1zv7zh1drirkw",
 		"id": "gardener",
 		"title": "Gardener",
-		"ui": "default",
 		"description": "Source of various seeds.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -20,8 +20,8 @@
 				"id": "empty-corn-field",
 				"title": "Empty Corn Field",
 				"description": "Empty field ready to grow some corn",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 32000,
@@ -60,8 +60,8 @@
 				"id": "grain-seed",
 				"title": "Grain Seed",
 				"description": "Grain seed",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 24000,
@@ -80,7 +80,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grain-seed",
+											"itemId": "grain",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -98,10 +98,10 @@
 			},
 			{
 				"id": "grape-seed",
-				"title": "Grape Seed",
-				"description": "Grapes. Wine?",
-				"default": false,
+				"title": "Grape Seed Sack",
+				"description": "Prepare a sack of grape seed for planting.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 32000,
@@ -120,7 +120,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grape-seed",
+											"itemId": "sack-with-grape-seed",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -138,10 +138,10 @@
 			},
 			{
 				"id": "coffee-seed",
-				"title": "Coffee Seed",
-				"description": "Coffee?",
-				"default": false,
+				"title": "Coffee Seed Sack",
+				"description": "Prepare a sack of coffee seed for planting.",
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -149,11 +149,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "bucket-with-water"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -172,7 +172,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "coffee-seed",
+											"itemId": "sack-with-coffee-seed",
 											"quantity": {
 												"min": 1,
 												"max": 2

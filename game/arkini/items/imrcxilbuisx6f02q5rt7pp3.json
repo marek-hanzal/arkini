@@ -4,8 +4,8 @@
 		"uid": "imrcxilbuisx6f02q5rt7pp3",
 		"id": "grain-field",
 		"title": "Grain Field",
-		"ui": "default",
 		"description": "A field. Of grain.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -47,8 +47,8 @@
 				"id": "grain",
 				"title": "Grain",
 				"description": "Get some grain. You can eat it if you want.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 24000,
@@ -71,11 +71,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "bucket-with-water"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -94,7 +94,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "grain",
+											"itemId": "sack-with-grain",
 											"quantity": {
 												"min": 2,
 												"max": 4

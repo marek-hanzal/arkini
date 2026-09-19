@@ -67,7 +67,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "grain-seed",
+											"itemId": "grain",
 											"quantity": {
 												"min": 1,
 												"max": 1

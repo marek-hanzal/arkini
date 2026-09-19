@@ -2,14 +2,14 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "szv3267zbloo4b16d4jmv5ay",
-		"id": "spoiled-rapeseed-seeds",
-		"title": "Spoiled Rapeseed Seeds",
-		"ui": "simple",
+		"id": "spoiled-rapeseed-seed",
+		"title": "Spoiled Rapeseed Seed",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"spoiled-rapeseed-seeds"
+				"spoiled-rapeseed-seed"
 			]
 		},
 		"scope": "any",

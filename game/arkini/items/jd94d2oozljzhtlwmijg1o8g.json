@@ -4,8 +4,8 @@
 		"uid": "jd94d2oozljzhtlwmijg1o8g",
 		"id": "cow-farm",
 		"title": "Cow Farm",
-		"ui": "default",
 		"description": "Something related to milk? Come here!",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -20,8 +20,8 @@
 				"id": "cow",
 				"title": "Cow",
 				"description": "Grow a cow for you!",
-				"default": false,
 				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 24000,
@@ -29,11 +29,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
-								"itemId": "grain"
-							}
+								"itemId": "sack-with-grain"
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -44,11 +44,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "bucket-with-water"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

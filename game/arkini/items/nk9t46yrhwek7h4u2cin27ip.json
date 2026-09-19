@@ -293,7 +293,7 @@
 			{
 				"id": "eat-grain",
 				"title": "Find Food",
-				"artwork": "grain",
+				"artwork": "sack-with-grain",
 				"description": "The hungry animal finds something suitable to eat.",
 				"clock": true,
 				"clockWeight": 12,
@@ -307,7 +307,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grain"
+								"itemId": "sack-with-grain"
 							},
 							"scope": "board",
 							"distance": "near-close"
@@ -365,7 +365,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "grain"
+										"itemId": "sack-with-grain"
 									},
 									"scope": "board",
 									"distance": "near-close"

@@ -1,32 +1,23 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "zr32zq8n2t1ddvbk4sh9wjf2",
-		"id": "pumpkin-seed",
-		"title": "Pumpkin Seed",
-		"draft": true,
+		"uid": "t8ein7cobnouj8bb2hek6jhy",
+		"id": "sack-with-tree-seed",
+		"title": "Sack With Tree Seed",
+		"draft": false,
+		"description": "A sack of tree seed, marked with the rather optimistic picture of what it may eventually become.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"pumpkin-seed"
+				"sack-with-seeds",
+				"tree"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
-		"merge": [
-			{
-				"target": {
-					"type": "item",
-					"itemId": "empty-sack"
-				},
-				"action": "consume",
-				"effect": "replace",
-				"result": "sack-with-pumpkin-seed"
-			}
-		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -39,7 +30,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-pumpkin-seeds",
+										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,
 											"max": 1

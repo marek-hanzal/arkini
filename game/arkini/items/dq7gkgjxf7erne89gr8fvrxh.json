@@ -1,15 +1,17 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "m7ahmqdqe6umsblphso0e1ps",
-		"id": "sack-with-rapeseed-seeds",
-		"title": "Sack With Rapeseed Seeds",
+		"uid": "dq7gkgjxf7erne89gr8fvrxh",
+		"id": "sack-with-rapeseed-seed",
+		"title": "Sack With Rapeseed Seed",
+		"draft": false,
+		"description": "A sack of rapeseed seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sack-with-rapeseed-seeds"
+				"sack-with-seeds",
+				"rapeseed"
 			]
 		},
 		"scope": "board",

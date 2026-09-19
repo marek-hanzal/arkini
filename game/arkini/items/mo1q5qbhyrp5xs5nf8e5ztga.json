@@ -2,18 +2,29 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mo1q5qbhyrp5xs5nf8e5ztga",
-		"id": "rapeseed-seeds",
-		"title": "Rapeseed Seeds",
-		"ui": "simple",
+		"id": "rapeseed-seed",
+		"title": "Rapeseed Seed",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"rapeseed-seeds"
+				"rapeseed-seed"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-rapeseed-seed"
+			}
+		],
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,
@@ -28,7 +39,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "spoiled-rapeseed-seeds",
+										"itemId": "spoiled-rapeseed-seed",
 										"quantity": {
 											"min": 1,
 											"max": 1

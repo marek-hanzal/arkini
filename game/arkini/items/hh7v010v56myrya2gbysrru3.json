@@ -2,14 +2,13 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hh7v010v56myrya2gbysrru3",
-		"id": "grain-seed",
-		"title": "Grain Seed",
+		"id": "grain",
+		"title": "Grain",
 		"description": "A handful of future bread, beer, feed, and agricultural bureaucracy. For now, mostly a promise that fields are coming.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"seed",
 				"grain"
 			]
 		},
@@ -24,6 +23,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "grain-field"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-grain-seed"
 			}
 		],
 		"maxQueueSize": 1,

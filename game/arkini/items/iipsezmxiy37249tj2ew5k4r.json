@@ -4,8 +4,8 @@
 		"uid": "iipsezmxiy37249tj2ew5k4r",
 		"id": "tree-seed",
 		"title": "Tree Seed",
+		"description": "Loose tree seed. Plant it directly or pack it into a seed sack for storage.",
 		"ui": "default",
-		"description": "More trees, tree lovers!",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -18,14 +18,25 @@
 		"units": {
 			"amount": 1
 		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-tree-seed"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "tree",
 				"title": "Grow a tree",
 				"description": "Newborn tree.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -33,11 +44,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "bucket-with-water"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

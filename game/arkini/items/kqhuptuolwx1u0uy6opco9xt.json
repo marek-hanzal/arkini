@@ -4,8 +4,8 @@
 		"uid": "kqhuptuolwx1u0uy6opco9xt",
 		"id": "fighting-british-shorthairs",
 		"title": "Fighting British Shorthairs",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -20,6 +20,26 @@
 			"rules": [],
 			"onExpire": {
 				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "british-shorthair-shorn",
+										"quantity": {
+											"min": 2,
+											"max": 2
+										},
+										"placement": "random",
+										"rules": []
+									}
+								]
+							}
+						]
+					},
 					{
 						"weight": 1,
 						"rules": [],

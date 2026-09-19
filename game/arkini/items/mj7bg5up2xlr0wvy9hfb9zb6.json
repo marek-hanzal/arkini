@@ -1,18 +1,19 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "ozodhesinelkfcb414r390d2",
-		"id": "hungry-pig",
-		"title": "Hungry Pig",
+		"uid": "mj7bg5up2xlr0wvy9hfb9zb6",
+		"id": "well-fed-chicken",
+		"title": "Well Fed Chicken",
 		"draft": true,
+		"description": "A very satisfied chicken.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"hungry-pig"
+				"well-fed-chicken"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -27,9 +28,9 @@
 			{
 				"id": "idle",
 				"title": "Idle",
-				"description": "The hungry pig conserves energy.",
+				"description": "The well fed chicken rests.",
 				"clock": true,
-				"clockWeight": 28,
+				"clockWeight": 16,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -44,10 +45,10 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "hungry-pig",
+				"artwork": "well-fed-chicken",
 				"description": "Wanders somewhere else.",
 				"clock": true,
-				"clockWeight": 2,
+				"clockWeight": 9,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -62,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-pig"
+								"itemId": "well-fed-chicken"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -79,7 +80,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "hungry-pig",
+											"itemId": "well-fed-chicken",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -96,11 +97,11 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
-				"title": "Get Sick",
-				"description": "Hunger may make the pig sick.",
+				"id": "digest",
+				"title": "Digest",
+				"description": "Eventually the meal is processed.",
 				"clock": true,
-				"clockWeight": 4,
+				"clockWeight": 6,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -115,7 +116,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-pig"
+								"itemId": "well-fed-chicken"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -132,7 +133,69 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sick-pig",
+											"itemId": "chicken",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "get-sick",
+				"title": "Get Sick",
+				"description": "The chicken may become sick.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "well-fed-chicken"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-chicken",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -154,7 +217,7 @@
 				"artwork": "disease",
 				"description": "Nearby disease increases the chance of illness.",
 				"clock": true,
-				"clockWeight": 10,
+				"clockWeight": 8,
 				"default": false,
 				"show": false,
 				"enable": false,
@@ -169,7 +232,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-pig"
+								"itemId": "well-fed-chicken"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -186,7 +249,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sick-pig",
+											"itemId": "sick-chicken",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -225,7 +288,7 @@
 				"artwork": "plague",
 				"description": "Nearby plague increases the chance of illness.",
 				"clock": true,
-				"clockWeight": 20,
+				"clockWeight": 16,
 				"default": false,
 				"show": false,
 				"enable": false,
@@ -240,7 +303,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-pig"
+								"itemId": "well-fed-chicken"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -257,7 +320,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "sick-pig",
+											"itemId": "sick-chicken",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -282,88 +345,6 @@
 									},
 									"scope": "board",
 									"distance": "near-close"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
-			},
-			{
-				"id": "eat-vegetables",
-				"title": "Find Food",
-				"description": "The hungry animal finds something suitable to eat.",
-				"clock": true,
-				"clockWeight": 12,
-				"default": false,
-				"show": false,
-				"enable": false,
-				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "vegetable-crate"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
-					},
-					{
-						"units": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "hungry-pig"
-							},
-							"scope": "board",
-							"distance": "self"
-						}
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "pig",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "vegetable-crate"
-									},
-									"scope": "board",
-									"distance": "far"
 								},
 								"type": "exists"
 							}

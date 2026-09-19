@@ -4,8 +4,8 @@
 		"uid": "g820g0sxzhyuon040x3j5qje",
 		"id": "grain",
 		"title": "Grain",
-		"ui": "simple",
 		"description": "All you can eat!",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,26 @@
 		},
 		"scope": "any",
 		"maxStackSize": 12,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "chicken"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "well-fed-chicken"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "hungry-chicken"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "chicken"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

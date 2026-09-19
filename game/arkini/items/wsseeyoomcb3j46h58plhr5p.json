@@ -2,10 +2,10 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wsseeyoomcb3j46h58plhr5p",
-		"id": "vegetables",
-		"title": "Vegetables",
-		"ui": "simple",
+		"id": "vegetable-crate",
+		"title": "Vegetable Crate",
 		"description": "Fresh vegetables you want to eat",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

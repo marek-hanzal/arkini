@@ -4,8 +4,8 @@
 		"uid": "kz6q5qvcmt55jnipynl1q0so",
 		"id": "hungry-beagle-puppy",
 		"title": "Hungry Beagle Puppy",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,36 +14,282 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"clock": {
-			"durationMs": 300000,
+			"intervalMs": 30000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Idle",
+				"description": "The hungry puppy slows down.",
+				"clock": true,
+				"clockWeight": 22,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
 					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "hungry-beagle-puppy",
+				"description": "Wanders somewhere else.",
+				"clock": true,
+				"clockWeight": 5,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-beagle-puppy"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hungry-beagle-puppy",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "get-sick",
+				"title": "Get Sick",
+				"description": "Hunger may make the puppy sick.",
+				"clock": true,
+				"clockWeight": 5,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-beagle-puppy"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-beagle-puppy",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "disease-exposure",
+				"title": "Disease Exposure",
+				"artwork": "disease",
+				"description": "Nearby disease increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 12,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-beagle-puppy"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-beagle-puppy",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
 							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "sick-beagle-puppy",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "disease"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
 							}
-						]
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "plague-exposure",
+				"title": "Plague Exposure",
+				"artwork": "plague",
+				"description": "Nearby plague increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 24,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-beagle-puppy"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-beagle-puppy",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "plague"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
 					}
 				]
 			}
-		},
-		"maxQueueSize": 1,
-		"lines": []
+		]
 	}
 }

@@ -19,33 +19,8 @@
 		},
 		"clock": {
 			"intervalMs": 30000,
-			"durationMs": 300000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "sick-sheep",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"rules": []
 		},
 		"maxQueueSize": 1,
 		"lines": [
@@ -70,7 +45,7 @@
 				"id": "wander",
 				"title": "Wander",
 				"artwork": "hungry-sheep",
-				"description": "The hungry sheep slowly wanders somewhere else.",
+				"description": "Wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 1,
 				"default": false,
@@ -121,10 +96,205 @@
 				"rules": []
 			},
 			{
+				"id": "get-sick",
+				"title": "Get Sick",
+				"description": "Hunger may make the sheep sick.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-sheep"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-sheep",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "disease-exposure",
+				"title": "Disease Exposure",
+				"artwork": "disease",
+				"description": "Nearby disease increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 10,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-sheep"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-sheep",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "disease"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "plague-exposure",
+				"title": "Plague Exposure",
+				"artwork": "plague",
+				"description": "Nearby plague increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 20,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hungry-sheep"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-sheep",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "plague"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
 				"id": "wolf-attack-near",
 				"title": "Wolf Attack",
 				"artwork": "wolf",
-				"description": "A wolf two tiles away may attack the weakened sheep.",
+				"description": "A wolf two tiles away may attack.",
 				"clock": true,
 				"clockWeight": 10,
 				"default": false,
@@ -228,7 +398,7 @@
 				"id": "wolf-attack-close",
 				"title": "Wolf Attack",
 				"artwork": "wolf",
-				"description": "A nearby wolf has a good chance to catch the weakened sheep.",
+				"description": "A wolf right next to the sheep may attack.",
 				"clock": true,
 				"clockWeight": 30,
 				"default": false,

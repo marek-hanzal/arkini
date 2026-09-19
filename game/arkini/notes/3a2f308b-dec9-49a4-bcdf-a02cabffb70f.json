@@ -1,0 +1,11 @@
+{
+	"content": "## Armed Beagle wildlife behavior\n\nFuture idea: armed Beagle variants can use weighted hidden Clock lines to automatically attack hostile wildlife. Keep it systemic: eligibility by nearby wildlife query/rules, weighted target choice, zero-runtime attack jobs where appropriate. This should feel like emergent autonomous protection, not a separate combat-AI subsystem.\n\nDo this after the basic Hunter / wildlife loop is settled.",
+	"itemUids": [
+		"rsuelogiw40sc1p2sxa2ptik",
+		"z8gv8nfkz0iatnszvpol3duk",
+		"i7unvc2otmcnyzljh9spq33d"
+	],
+	"resourceIds": [],
+	"createdAtMs": 1789779853967,
+	"updatedAtMs": 1789779853967
+}

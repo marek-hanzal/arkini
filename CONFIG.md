@@ -85,6 +85,10 @@ All exact IDs use [`src/game-value/schema/IdSchema.ts`](src/game-value/schema/Id
 
 There is one Item schema, without an item-type discriminator. Authoring uses `create_item`, `edit_item`, and the exact-line `create_item_line`, `replace_item_line`, and `delete_item_line`; item files live directly in `items/`. Line writes require the project revision from a preceding read, preserve unrelated item values, and use the same repository revision checks. Create appends a complete line and rejects an existing ID; replace and delete preserve the remaining line order and reject missing or ambiguous IDs. `item_line_order` accepts a revision-pinned exact permutation of every existing line ID and changes only their order; incomplete lists, unknown IDs, duplicate requested IDs and ambiguous existing IDs are rejected before any write.
 
+`edit_item_lines` batches 1–20 create/replace/delete operations across items using one snapshot and expected project revision. Each item/line pair may appear once. It shares exact-line mutation rules with the single-line tools, validates completed items before one best-effort repository commit, and publishes one revision and notification. Invalid operations or stale revision reject the whole batch before writing; persistence retains the existing best-effort file-plan contract.
+
+MCP `item_detail` includes the project revision for lightweight authoring reads. `item_lines` returns ordered authored line identities and behavior flags, while `item_line_configs` returns canonical configs for up to 50 unique item/line pairs from one snapshot. Batch line reads preserve first-request order, deduplicate pairs, and explicitly report missing items, missing lines and ambiguous line IDs.
+
 Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item UID and its path.
 
 The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests, and artifacts derive or verify it rather than copying a competing identity.

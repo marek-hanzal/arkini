@@ -35,6 +35,7 @@ describe("editor MCP server", () => {
 			"create_item_line",
 			"replace_item_line",
 			"delete_item_line",
+			"edit_item_lines",
 			"item_line_order",
 			"project_config",
 			"edit_project",
@@ -58,6 +59,8 @@ describe("editor MCP server", () => {
 			"item_detail",
 			"item_config",
 			"item_configs",
+			"item_lines",
+			"item_line_configs",
 			"item_line_config",
 			"item_input",
 			"item_output",
@@ -91,6 +94,7 @@ describe("editor MCP server", () => {
 			"create_item_line",
 			"replace_item_line",
 			"delete_item_line",
+			"edit_item_lines",
 			"edit_project",
 		]);
 		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {

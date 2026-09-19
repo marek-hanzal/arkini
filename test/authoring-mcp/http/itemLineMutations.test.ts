@@ -232,7 +232,7 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 			expect(result.failure).toMatchObject({
 				_tag: "EditorProjectRepositoryError",
 				reason: "revision-conflict",
-				operation: "upsert-item",
+				operation: "replace-config",
 			});
 	}
 	expect((await readFn()).config).toEqual(winner.config);

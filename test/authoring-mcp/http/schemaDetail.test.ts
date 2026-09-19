@@ -229,6 +229,7 @@ describe("editor MCP authoring schema registry", () => {
 			"urn:arkini:schema:mcp:create-item-line-input",
 			"urn:arkini:schema:mcp:replace-item-line-input",
 			"urn:arkini:schema:mcp:delete-item-line-input",
+			"urn:arkini:schema:mcp:edit-item-lines-input",
 			"urn:arkini:schema:mcp:edit-project-input",
 		];
 		const visited = new Set<string>();

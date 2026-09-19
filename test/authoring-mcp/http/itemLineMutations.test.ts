@@ -239,3 +239,62 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 	expect((await readFn()).revision).toBe(winner.revision);
 	expect(notifyFn).not.toHaveBeenCalled();
 });
+
+it("admits omitted non-Clock weights but rejects missing Clock weights before either line write", async () => {
+	const { client, readFn, notifyFn } = await setupFn();
+	for (const name of [
+		"create_item_line",
+		"replace_item_line",
+	]) {
+		for (const clock of [
+			undefined,
+			false,
+			true,
+		]) {
+			const before = await readFn();
+			const first = before.config.items.forge.lines[0]!;
+			const line = {
+				...first,
+				id: name === "create_item_line" ? `clock-${String(clock)}` : first.id,
+				clock,
+				clockWeight: undefined,
+			};
+			const input = {
+				itemId: "forge",
+				revision: before.revision,
+				...(name === "replace_item_line"
+					? {
+							lineId: first.id,
+						}
+					: {}),
+				line,
+			};
+			const notifications = notifyFn.mock.calls.length;
+			const result = await client.callTool({
+				name,
+				arguments: jsonToolInputFn(input),
+			});
+			if (clock === true) {
+				expect(result.isError).toBe(true);
+				expect((await readFn()).revision).toBe(before.revision);
+				expect(notifyFn).toHaveBeenCalledTimes(notifications);
+				const explicit = await client.callTool({
+					name,
+					arguments: jsonToolInputFn({
+						...input,
+						line: {
+							...line,
+							clockWeight: 1,
+						},
+					}),
+				});
+				expect(explicit.isError).not.toBe(true);
+			} else expect(result.isError).not.toBe(true);
+			const saved = (await readFn()).config.items.forge.lines.find(
+				({ id }) => id === line.id,
+			);
+			expect(saved?.clockWeight).toBe(1);
+			expect(saved?.clock).toBe(clock);
+		}
+	}
+});

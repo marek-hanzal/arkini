@@ -76,19 +76,55 @@ describe("editor MCP authoring schema registry", () => {
 				"line",
 			],
 		});
-		expect(await readSchemaDetail("CompleteItemLineSchema")).toMatchObject({
-			required: expect.arrayContaining([
-				"id",
-				"title",
-				"description",
-				"default",
-				"show",
-				"enable",
-				"runtimeMs",
-				"input",
-				"rules",
-			]),
+		const completeLineSchema = await readSchemaDetail("CompleteItemLineSchema");
+		expect(completeLineSchema).toMatchObject({
+			oneOf: [
+				{
+					properties: {
+						clock: {
+							const: false,
+						},
+						clockWeight: {
+							default: 1,
+						},
+					},
+				},
+				{
+					properties: {
+						clock: {
+							const: true,
+						},
+					},
+					required: expect.arrayContaining([
+						"clock",
+						"clockWeight",
+					]),
+				},
+			],
 		});
+		const variants = completeLineSchema.oneOf as Array<{
+			required: string[];
+			properties: {
+				clockWeight: object;
+			};
+		}>;
+		expect(variants[0]!.required).not.toContain("clockWeight");
+		expect(variants[1]!.properties.clockWeight).not.toHaveProperty("default");
+		for (const variant of variants)
+			expect(variant.required).toEqual(
+				expect.arrayContaining([
+					"id",
+					"title",
+					"description",
+					"default",
+					"show",
+					"enable",
+					"runtimeMs",
+					"input",
+					"rules",
+				]),
+			);
+
 		expect(await readSchemaDetail("ItemPatchSchema")).toMatchObject({
 			minProperties: 1,
 			type: "object",
@@ -255,6 +291,40 @@ describe("editor MCP authoring schema registry", () => {
 				),
 				schemaUri(id),
 			);
+		const validateLine = ajv.getSchema(schemaUri("CompleteItemLineSchema"));
+		if (validateLine === undefined) throw new Error("Missing public line schema.");
+		const lineWithoutWeight = {
+			...createLine({}),
+			clockWeight: undefined,
+		};
+		expect(validateLine(lineWithoutWeight), JSON.stringify(validateLine.errors)).toBe(true);
+		expect(
+			validateLine({
+				...lineWithoutWeight,
+				clock: false,
+			}),
+		).toBe(true);
+		expect(
+			validateLine({
+				...lineWithoutWeight,
+				clock: true,
+			}),
+		).toBe(false);
+		expect(
+			validateLine({
+				...lineWithoutWeight,
+				clock: true,
+				clockWeight: 1,
+			}),
+		).toBe(true);
+		expect(
+			validateLine({
+				...lineWithoutWeight,
+				clock: false,
+				clockWeight: 7,
+			}),
+		).toBe(true);
+
 		const validateCreate = ajv.getSchema(schemaUri("urn:arkini:schema:mcp:create-item-input"));
 		const validatePatch = ajv.getSchema(schemaUri("ItemPatchSchema"));
 		if (validateCreate === undefined || validatePatch === undefined)

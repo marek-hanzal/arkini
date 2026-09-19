@@ -6,9 +6,12 @@ import { runtimeInputTestItem } from "~test/production-input/support/inputTestIt
 
 const input = MaterialSchema.parse({
 	type: "materials",
-	selector: {
-		type: "item",
-		itemId: "item:water",
+	query: {
+		scope: "any",
+		selector: {
+			type: "item",
+			itemId: "item:water",
+		},
 	},
 	quantity: {
 		min: 3,

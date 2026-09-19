@@ -1,13 +1,14 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
-import { isLineInputAutofillSourceLocationFn } from "~/production-input/fn/isLineInputAutofillSourceLocationFn";
+import { matchesQueryLocationFn } from "~/item-query/fn/matchesQueryLocationFn";
+import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
-import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 
 interface MaterialAutofillAvailability {
 	readonly availableQuantity: number;
@@ -28,13 +29,18 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 )(function* ({
 	ownerItemId,
 	runtime,
-	selector,
+	query,
 }: {
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
-	readonly selector: SelectorSchema.Type;
+	readonly query: QuerySchema.Type;
 }) {
 	const owner = runtime.items.find((candidate) => candidate.id === ownerItemId);
+	const origin =
+		owner === undefined
+			? undefined
+			: Option.getOrUndefined(narrowGridRuntimeItemFn(owner))?.location;
+	const selector = query.selector;
 	const space =
 		owner?.location.scope === LocationScopeEnumSchema.enum.Board
 			? owner.location.space
@@ -58,9 +64,11 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 
 		if (candidate.location.scope === LocationScopeEnumSchema.enum.Delivery) {
 			if (
-				!isLineInputAutofillSourceLocationFn({
+				!matchesQueryLocationFn({
 					location: candidate.location.origin,
-					ownerSpace: space,
+					origin,
+					query,
+					currentSpace: runtime.currentSpace,
 				})
 			) {
 				continue;
@@ -81,9 +89,11 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 			(candidate.location.scope !== LocationScopeEnumSchema.enum.Board &&
 				candidate.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
 				candidate.location.scope !== LocationScopeEnumSchema.enum.Toolbar) ||
-			!isLineInputAutofillSourceLocationFn({
+			!matchesQueryLocationFn({
 				location: candidate.location,
-				ownerSpace: space,
+				origin,
+				query,
+				currentSpace: runtime.currentSpace,
 			})
 		) {
 			continue;

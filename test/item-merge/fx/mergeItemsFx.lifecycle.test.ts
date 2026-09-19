@@ -53,9 +53,12 @@ const producerItem = ({
 			input: [
 				{
 					type: "materials" as const,
-					selector: {
-						type: "item" as const,
-						itemId: selectorItemId,
+					query: {
+						scope: "any" as const,
+						selector: {
+							type: "item" as const,
+							itemId: selectorItemId,
+						},
 					},
 					quantity: {
 						min: 1,

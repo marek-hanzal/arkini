@@ -20,7 +20,7 @@ const readInputItemIdFn = (input: LineInputSchema.Type | ActionInputSchema.Type)
 		case "simple":
 			return undefined;
 		case "materials":
-			return input.selector.itemId;
+			return input.query.selector.itemId;
 		case "units":
 			return input.query.selector.itemId;
 	}

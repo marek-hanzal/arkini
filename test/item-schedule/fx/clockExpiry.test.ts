@@ -25,9 +25,12 @@ const materialLine = createLine({
 	input: [
 		{
 			type: "materials",
-			selector: {
-				type: "item",
-				itemId: "permit",
+			query: {
+				scope: "any",
+				selector: {
+					type: "item",
+					itemId: "permit",
+				},
 			},
 			mode: "consume",
 			quantity: {

@@ -127,9 +127,12 @@ describe("committed material expiry settlement", () => {
 		config.items.owner!.units!.output = undefined;
 		config.items.owner!.lines[0]!.input.push({
 			type: "materials",
-			selector: {
-				type: "item",
-				itemId: "blocker",
+			query: {
+				scope: "any",
+				selector: {
+					type: "item",
+					itemId: "blocker",
+				},
 			},
 			mode: "reserve",
 			quantity: {

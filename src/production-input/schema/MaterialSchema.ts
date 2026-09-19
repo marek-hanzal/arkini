@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
+import { QuerySchema } from "~/item-query/schema/QuerySchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
@@ -27,7 +27,9 @@ export const MaterialSchema = z
 		/**
 		 * Canonical item accepted by this input.
 		 */
-		selector: SelectorSchema.describe("The canonical item accepted by this input."),
+		query: QuerySchema.describe(
+			"The required item and the search scope used by automatic material delivery. Manual delivery uses only the selector.",
+		),
 		/**
 		 * Whether this input is consumed or temporarily reserved by the line.
 		 *

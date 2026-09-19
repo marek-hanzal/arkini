@@ -55,9 +55,12 @@ export const createRelationTraversalProject = () => {
 						max: 1,
 						min: 1,
 					},
-					selector: {
-						itemId: inputItemId,
-						type: "item" as const,
+					query: {
+						scope: "any" as const,
+						selector: {
+							itemId: inputItemId,
+							type: "item" as const,
+						},
 					},
 					type: "materials" as const,
 				},

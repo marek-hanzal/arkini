@@ -164,7 +164,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 		if (
 			!matchesItemSelectorFn({
 				item: item.item,
-				selector: input.selector,
+				selector: input.query.selector,
 			})
 		) {
 			materialInputIssues.push({

@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "inkwell"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "inkwell"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -40,9 +43,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "goose-quill"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {

@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "grain"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "grain"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -40,9 +43,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "bucket-with-water"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "bucket-with-water"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

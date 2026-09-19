@@ -56,9 +56,12 @@ const config = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "temporary",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "temporary",
+								},
 							},
 							quantity: {
 								min: 1,

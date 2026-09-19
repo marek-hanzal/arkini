@@ -69,7 +69,7 @@ const readLineOperationInputsFn = (line: LineSchema.Type) =>
 			case "materials":
 				return [
 					{
-						factId: input.selector.itemId,
+						factId: input.query.selector.itemId,
 						quantity: input.quantity,
 					},
 				];
@@ -110,7 +110,7 @@ const readLineDescriptorFn = (
 	for (const input of line.input) {
 		if (input.type === "materials")
 			requirements.push({
-				factId: input.selector.itemId,
+				factId: input.query.selector.itemId,
 				quantity: input.quantity.min,
 				source: "material-input",
 				usage: input.mode === "consume" ? "consume" : "ongoing",

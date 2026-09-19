@@ -86,9 +86,12 @@ const config = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: fuelItemId,
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: fuelItemId,
+								},
 							},
 							quantity: {
 								min: 1,
@@ -113,9 +116,12 @@ const config = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: workerItemId,
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: workerItemId,
+								},
 							},
 							quantity: {
 								min: 1,
@@ -270,9 +276,12 @@ describe("line input source ownership", () => {
 				const availability = yield* readItemDetailMaterialAutofillAvailabilityFx({
 					ownerItemId: upgradeOwnerItemId,
 					runtime: before,
-					selector: {
-						type: "item",
-						itemId: workerItemId,
+					query: {
+						scope: "any",
+						selector: {
+							type: "item",
+							itemId: workerItemId,
+						},
 					},
 				});
 				const autofill = yield* autofillLineInputsFx({

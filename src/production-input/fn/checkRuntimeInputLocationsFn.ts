@@ -91,7 +91,7 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 
 		const matches = matchesItemSelectorFn({
 			item: item.item,
-			selector: input.selector,
+			selector: input.query.selector,
 		});
 		if (!matches) {
 			selectorIssues.push({

@@ -158,9 +158,12 @@ describe("InputControl", () => {
 					min: 5,
 					max: 10,
 				},
-				selector: {
-					type: "item",
-					itemId: "stone",
+				query: {
+					scope: "any",
+					selector: {
+						type: "item",
+						itemId: "stone",
+					},
 				},
 			},
 			onChangeFn,
@@ -212,9 +215,12 @@ describe("InputControl", () => {
 				min: 1,
 				max: 1,
 			},
-			selector: {
-				type: "item",
-				itemId: "stone",
+			query: {
+				scope: "any",
+				selector: {
+					type: "item",
+					itemId: "stone",
+				},
 			},
 		});
 		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).toBeNull();

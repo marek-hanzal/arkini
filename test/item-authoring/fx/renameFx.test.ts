@@ -136,9 +136,12 @@ describe("renameFx", () => {
 								{
 									mode: "consume",
 									type: "materials",
-									selector: {
-										type: "item",
-										itemId: "water",
+									query: {
+										scope: "any",
+										selector: {
+											type: "item",
+											itemId: "water",
+										},
 									},
 									quantity: {
 										min: 1,

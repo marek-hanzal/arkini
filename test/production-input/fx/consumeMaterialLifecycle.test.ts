@@ -27,9 +27,12 @@ const base = (id: string) => ({
 
 const materialInput = (itemId: string) => ({
 	type: "materials" as const,
-	selector: {
-		type: "item" as const,
-		itemId,
+	query: {
+		scope: "any" as const,
+		selector: {
+			type: "item" as const,
+			itemId,
+		},
 	},
 	quantity: {
 		min: 1,

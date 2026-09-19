@@ -304,9 +304,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "raw-game-meat"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "raw-game-meat"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

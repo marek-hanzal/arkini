@@ -13,7 +13,7 @@ export const readCapabilityRelatedTermsFn = (
 		for (const input of capability.input) {
 			switch (input.type) {
 				case "materials":
-					ids.add(input.selector.itemId);
+					ids.add(input.query.selector.itemId);
 					break;
 				case "units":
 					ids.add(input.query.selector.itemId);

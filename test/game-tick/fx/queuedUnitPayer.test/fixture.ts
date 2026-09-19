@@ -45,9 +45,12 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 						{
 							type: "materials",
 							mode: "consume",
-							selector: {
-								type: "item",
-								itemId: "absent",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "absent",
+								},
 							},
 							quantity: {
 								min: 1,

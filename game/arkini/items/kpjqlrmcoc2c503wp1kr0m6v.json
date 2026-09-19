@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "iron-ore"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "iron-ore"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -77,9 +80,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "copper-ore"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "copper-ore"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

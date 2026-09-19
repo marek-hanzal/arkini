@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "pig"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "pig"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -40,9 +43,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "cutting-board"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "cutting-board"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -98,9 +104,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "raw-game-meat"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "raw-game-meat"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

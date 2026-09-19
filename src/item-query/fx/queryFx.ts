@@ -1,14 +1,11 @@
 import { Array, Effect } from "effect";
-import { match } from "ts-pattern";
+import { matchesQueryLocationFn } from "~/item-query/fn/matchesQueryLocationFn";
 
-import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
-import type { PositionSchema } from "~/item-location/schema/PositionSchema";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/item-query/error/BoardQueryOriginUnavailableError";
 import { ScopeSchema } from "~/item-query/schema/ScopeSchema";
-import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -31,26 +28,6 @@ const queryItemsFn = ({
 	return items.filter((item) => selectedItemIds.has(item.item.id));
 };
 
-const matchesDistanceFn = ({
-	distance,
-	item,
-	origin,
-}: {
-	readonly distance: DistanceSchema.Type;
-	readonly item: PositionSchema.Type;
-	readonly origin: PositionSchema.Type;
-}) => {
-	const value = Math.max(Math.abs(item.x - origin.x), Math.abs(item.y - origin.y));
-
-	return match(distance)
-		.with(DistanceSchema.enum.Self, () => value === 0)
-		.with(DistanceSchema.enum.Close, () => value === 1)
-		.with(DistanceSchema.enum.NearClose, () => value > 0 && value <= 2)
-		.with(DistanceSchema.enum.Near, () => value === 2)
-		.with(DistanceSchema.enum.Far, () => value > 0)
-		.exhaustive();
-};
-
 interface Props {
 	readonly origin: GridLocationSchema.Type;
 	readonly query: QuerySchema.Type;
@@ -66,52 +43,18 @@ export const queryFx = Effect.fn("queryFx")(function* ({ origin, query }: Props)
 				}),
 			);
 		}
-
-		const runtime = yield* readRuntimeFx();
-		const selected = Array.getSomes(
-			queryItemsFn({
-				items: Array.getSomes(runtime.items.map(narrowBoardRuntimeItemFn)).filter(
-					(item) => item.location.space === origin.space,
-				),
-				selector: query.selector,
-			}).map(narrowBoardRuntimeItemFn),
-		);
-
-		return selected.filter((item) =>
-			matchesDistanceFn({
-				distance: query.distance,
-				item: item.location.position,
-				origin: origin.position,
-			}),
-		);
 	}
 
 	const runtime = yield* readRuntimeFx();
 	const gridItems = Array.getSomes(runtime.items.map(narrowGridRuntimeItemFn));
-	const items = match(query.scope)
-		.with(ScopeSchema.enum.Inventory, () =>
-			gridItems.filter(
-				(item) => item.location.scope === LocationScopeEnumSchema.enum.Inventory,
-			),
-		)
-		.with(ScopeSchema.enum.Toolbar, () =>
-			gridItems.filter(
-				(item) => item.location.scope === LocationScopeEnumSchema.enum.Toolbar,
-			),
-		)
-		.with(ScopeSchema.enum.Any, () => {
-			const space =
-				origin.scope === LocationScopeEnumSchema.enum.Board
-					? origin.space
-					: runtime.currentSpace;
-			return gridItems.filter(
-				(item) =>
-					item.location.scope !== LocationScopeEnumSchema.enum.Board ||
-					item.location.space === space,
-			);
-		})
-		.with(ScopeSchema.enum.Universe, () => gridItems)
-		.exhaustive();
+	const items = gridItems.filter((item) =>
+		matchesQueryLocationFn({
+			location: item.location,
+			origin,
+			query,
+			currentSpace: runtime.currentSpace,
+		}),
+	);
 
 	return queryItemsFn({
 		items,

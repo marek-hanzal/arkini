@@ -24,9 +24,12 @@ export const queueConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "tool",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "tool",
+								},
 							},
 							quantity: {
 								min: 2,
@@ -57,9 +60,12 @@ export const queueConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "water",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "water",
+								},
 							},
 							quantity: {
 								min: 1,

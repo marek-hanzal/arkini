@@ -69,9 +69,12 @@ const inputBeforeStackConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "producer",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "producer",
+								},
 							},
 							quantity: {
 								min: 1,

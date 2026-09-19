@@ -3,7 +3,6 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { QuantityValue } from "~/item-definition/ui/QuantityValue";
 import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
-import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { UnitCostValue } from "~/production-input/ui/UnitCostValue";
 
 const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
@@ -42,19 +41,11 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 			className={rowClassName}
 			data-ui="EditorProductionLineInput"
 		>
-			{input.type === "materials" ? (
-				<SelectorDetail
-					selector={input.selector}
-					eyebrow={eyebrow}
-					description={description}
-				/>
-			) : (
-				<QueryDetail
-					query={input.query}
-					eyebrow={eyebrow}
-					description={description}
-				/>
-			)}
+			<QueryDetail
+				query={input.query}
+				eyebrow={eyebrow}
+				description={description}
+			/>
 			<p className="shrink-0 text-right text-lg font-bold tabular-nums text-foreground">
 				{input.type === "materials" ? (
 					<>

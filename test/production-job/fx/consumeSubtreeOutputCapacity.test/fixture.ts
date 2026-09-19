@@ -10,9 +10,12 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 
 const materialFn = (itemId: string, quantity: number, mode: "consume" | "reserve" = "consume") => ({
 	type: "materials",
-	selector: {
-		type: "item",
-		itemId,
+	query: {
+		scope: "any",
+		selector: {
+			type: "item",
+			itemId,
+		},
 	},
 	mode,
 	quantity: {

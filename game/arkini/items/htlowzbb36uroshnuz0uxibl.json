@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "sand"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "sand"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -40,9 +43,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "coal"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "coal"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -89,9 +95,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "sand"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "sand"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -101,9 +110,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "coal"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "coal"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -113,9 +125,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "dye"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "dye"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

@@ -14,7 +14,10 @@ import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/Diagno
 const materials = (selector: SelectorSchema.Type) => [
 	{
 		type: "materials" as const,
-		selector,
+		query: {
+			scope: "any" as const,
+			selector,
+		},
 		quantity: {
 			min: 1,
 			max: 1,

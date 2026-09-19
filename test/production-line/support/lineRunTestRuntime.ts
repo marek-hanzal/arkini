@@ -71,9 +71,12 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "water",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "water",
+								},
 							},
 							quantity: {
 								min: 3,

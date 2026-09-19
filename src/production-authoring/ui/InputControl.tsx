@@ -3,6 +3,7 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 import { match } from "ts-pattern";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
+import { QueryScopeControl } from "~/production-authoring/ui/QueryScopeControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -190,17 +191,20 @@ const MaterialInputControl = ({
 				variant="secondary"
 			/>
 			<SelectorControl
-				error={readEditorFormValidationErrorFn(issues, "selector")}
+				error={readEditorFormValidationErrorFn(issues, "query", "selector")}
 				labelVisible={false}
-				value={input.selector}
+				value={input.query.selector}
 				onChangeFn={(selector) =>
 					onChangeFn({
 						...input,
-						selector,
+						query: {
+							...input.query,
+							selector,
+						},
 					})
 				}
 			/>
-			<div className="grid gap-3 sm:grid-cols-2">
+			<div className="grid grid-cols-2 gap-3">
 				<QuantityFields
 					minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
 					maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
@@ -214,6 +218,30 @@ const MaterialInputControl = ({
 						})
 					}
 				/>
+			</div>
+			<div className="flex min-w-0 items-start justify-between gap-3">
+				<QueryScopeControl
+					error={readEditorFormValidationErrorFn(issues, "query", "scope")}
+					value={input.query}
+					onChangeFn={(query) =>
+						onChangeFn({
+							...input,
+							query,
+						})
+					}
+				/>
+				{input.query.scope === "board" ? (
+					<BoardDistanceControl
+						error={readEditorFormValidationErrorFn(issues, "query", "distance")}
+						value={input.query}
+						onChangeFn={(query) =>
+							onChangeFn({
+								...input,
+								query,
+							})
+						}
+					/>
+				) : null}
 			</div>
 		</div>
 	);

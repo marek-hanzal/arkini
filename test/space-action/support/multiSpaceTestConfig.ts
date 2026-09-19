@@ -162,9 +162,12 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "log",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "log",
+								},
 							},
 							quantity: {
 								min: 1,

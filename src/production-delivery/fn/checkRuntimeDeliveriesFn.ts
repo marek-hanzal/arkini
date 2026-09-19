@@ -88,7 +88,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 			if (
 				!matchesItemSelectorFn({
 					item: current.item,
-					selector: input.selector,
+					selector: input.query.selector,
 				})
 			) {
 				issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.SelectorMismatch));

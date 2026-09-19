@@ -100,9 +100,12 @@ describe("root-owned interaction chains", () => {
 			input: [
 				{
 					type: "materials",
-					selector: {
-						type: "item",
-						itemId: "input",
+					query: {
+						scope: "any",
+						selector: {
+							type: "item",
+							itemId: "input",
+						},
 					},
 					quantity: {
 						min: 1,

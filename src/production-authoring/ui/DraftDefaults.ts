@@ -53,10 +53,7 @@ export const DraftDefaults = {
 		},
 		materials: {
 			type: "materials",
-			selector: {
-				type: "item",
-				itemId: "",
-			},
+			query,
 			mode: "consume",
 			quantity: {
 				min: 1,

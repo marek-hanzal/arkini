@@ -17,9 +17,12 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 	const forge = base.items.forge;
 	const material = {
 		type: "materials",
-		selector: {
-			type: "item",
-			itemId: "water",
+		query: {
+			scope: "any",
+			selector: {
+				type: "item",
+				itemId: "water",
+			},
 		},
 		quantity: {
 			min: 2,
@@ -116,9 +119,12 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 								? [
 										{
 											type: "materials",
-											selector: {
-												type: "item",
-												itemId: "tool",
+											query: {
+												scope: "any",
+												selector: {
+													type: "item",
+													itemId: "tool",
+												},
 											},
 											quantity: {
 												min: 1,

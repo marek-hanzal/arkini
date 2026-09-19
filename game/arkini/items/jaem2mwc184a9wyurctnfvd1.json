@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "bucket-with-water"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "bucket-with-water"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -40,9 +43,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "flour"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "flour"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -52,9 +58,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "empty-basket"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "empty-basket"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

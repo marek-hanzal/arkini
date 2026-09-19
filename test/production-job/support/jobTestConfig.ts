@@ -61,9 +61,12 @@ export const createJobTestConfig = (
 						input: [
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "water",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "water",
+									},
 								},
 								quantity: {
 									min: 3,
@@ -73,9 +76,12 @@ export const createJobTestConfig = (
 							},
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "tool",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "tool",
+									},
 								},
 								quantity: {
 									min: 1,

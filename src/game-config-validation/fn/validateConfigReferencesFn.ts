@@ -182,11 +182,12 @@ const validateLineReferencesFn = ({
 			? []
 			: validateSelectorReferenceFn({
 					config,
-					selector: input.selector,
+					selector: input.query.selector,
 					path: [
 						...path,
 						"input",
 						inputIndex,
+						"query",
 						"selector",
 					],
 					source,

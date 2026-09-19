@@ -34,9 +34,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "grain"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "grain"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -46,9 +49,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "clay-jug"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "clay-jug"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

@@ -31,9 +31,12 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 						input: [
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "workshop",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "workshop",
+									},
 								},
 								quantity: {
 									min: 2,
@@ -78,9 +81,12 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 			const availability = yield* readItemDetailMaterialAutofillAvailabilityFx({
 				ownerItemId: "receiver",
 				runtime: blocked,
-				selector: {
-					type: "item",
-					itemId: "workshop",
+				query: {
+					scope: "any",
+					selector: {
+						type: "item",
+						itemId: "workshop",
+					},
 				},
 			});
 			expect(availability.availableQuantity).toBe(0);

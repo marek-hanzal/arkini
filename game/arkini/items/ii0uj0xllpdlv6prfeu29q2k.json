@@ -33,9 +33,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "lumer-camp"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "lumer-camp"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -45,9 +48,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "sawmill"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "sawmill"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

@@ -48,9 +48,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "resource-research"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "resource-research"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -60,9 +63,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "stone"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "stone"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -72,9 +78,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "wood"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "wood"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -84,9 +93,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "empty-bucket"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "empty-bucket"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "toxic-waste"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "toxic-waste"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

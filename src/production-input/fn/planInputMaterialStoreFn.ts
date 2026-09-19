@@ -32,7 +32,7 @@ export const planInputMaterialStoreFn = ({
 		items: [
 			item.item,
 		],
-		selector: input.selector,
+		selector: input.query.selector,
 	});
 	if (matches.length === 0) {
 		return undefined;

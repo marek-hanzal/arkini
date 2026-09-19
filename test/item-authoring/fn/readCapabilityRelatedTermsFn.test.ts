@@ -22,9 +22,12 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 		input: [
 			{
 				type: "materials",
-				selector: {
-					type: "item",
-					itemId: "water",
+				query: {
+					scope: "any",
+					selector: {
+						type: "item",
+						itemId: "water",
+					},
 				},
 				mode: "consume",
 				quantity: {

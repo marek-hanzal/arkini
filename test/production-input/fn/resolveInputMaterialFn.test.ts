@@ -5,9 +5,12 @@ import { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 
 const fixedInput = MaterialSchema.parse({
 	type: "materials",
-	selector: {
-		type: "item",
-		itemId: "item:water",
+	query: {
+		scope: "any",
+		selector: {
+			type: "item",
+			itemId: "item:water",
+		},
 	},
 	quantity: {
 		min: 3,
@@ -56,9 +59,12 @@ describe("resolveInputMaterialFn", () => {
 	it("uses the stored quantity inside one accepted range", () => {
 		const input = MaterialSchema.parse({
 			type: "materials",
-			selector: {
-				type: "item",
-				itemId: "item:fuel",
+			query: {
+				scope: "any",
+				selector: {
+					type: "item",
+					itemId: "item:fuel",
+				},
 			},
 			mode: "reserve",
 			quantity: {

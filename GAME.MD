@@ -91,7 +91,9 @@ Forced removal retains ordinary storage eligibility, stack and global quantity l
 
 ## Material ownership
 
-Material input uses one exact canonical item selector and one of two modes:
+Material input requires a `query` containing the exact canonical item selector and the Autofill search scope. `any` searches the owner's Board space, Inventory and Toolbar; `universe` also searches other Board spaces. Board-only queries use the existing Chebyshev distance choices. Automatic source selection and displayed availability apply this query independently for each input, while preserving shared quantity allocation and excluding the owner and busy producers. Manual delivery checks the selector and capacity, without restricting its source location. Already admitted deliveries and buffered material remain accepted when the owner moves.
+
+Material ownership uses one of two modes:
 
 - `consume`: the material stays intact while stored; start discards its passive owned subtree, moves only the inaccessible root into `job` scope, and completion destroys it permanently. Conversion is not unit depletion and emits no depletion output.
 - `reserve`: start moves the same live instance into `reserved` scope. Completion relocates it from the owner's current Board origin. Pure material may normalize into ordinary stacks/identities; impure material preserves exact identity and needs one exclusive cell.

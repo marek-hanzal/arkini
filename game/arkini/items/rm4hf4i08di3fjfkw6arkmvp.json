@@ -49,9 +49,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "planks"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -61,9 +64,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "stone-block"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "stone-block"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

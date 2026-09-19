@@ -78,9 +78,12 @@ const blueprintItem = ({
 									from: "self" as const,
 									cost: 1,
 								},
-								selector: {
-									type: "item" as const,
-									itemId: "item:tool",
+								query: {
+									scope: "any" as const,
+									selector: {
+										type: "item" as const,
+										itemId: "item:tool",
+									},
 								},
 								mode: "reserve" as const,
 								quantity: {
@@ -424,9 +427,12 @@ export const blueprintConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "item:shared",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "item:shared",
+								},
 							},
 							quantity: {
 								min: 1,
@@ -462,9 +468,12 @@ export const blueprintConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "item:target",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "item:target",
+								},
 							},
 							quantity: {
 								min: 1,

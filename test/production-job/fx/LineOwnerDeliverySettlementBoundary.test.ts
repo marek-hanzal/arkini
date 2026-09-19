@@ -38,9 +38,12 @@ const makeLine = (lineId: string) => ({
 	input: [
 		{
 			type: "materials" as const,
-			selector: {
-				type: "item" as const,
-				itemId: "material",
+			query: {
+				scope: "any" as const,
+				selector: {
+					type: "item" as const,
+					itemId: "material",
+				},
 			},
 			quantity: {
 				min: 2,

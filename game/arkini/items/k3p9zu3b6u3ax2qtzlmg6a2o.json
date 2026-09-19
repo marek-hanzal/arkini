@@ -29,9 +29,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "order-corn"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "order-corn"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -41,9 +44,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "bucket-with-water"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "bucket-with-water"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

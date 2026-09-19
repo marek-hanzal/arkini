@@ -45,7 +45,7 @@ vi.mock("~/production-authoring/ui/InputControl", () => ({
 	InputControl: ({ input }: { input: InputSchema.Type }) => (
 		<output data-input>
 			{input.type === "materials"
-				? input.selector.itemId
+				? input.query.selector.itemId
 				: input.type === "units"
 					? input.query.selector.itemId
 					: "simple"}
@@ -95,9 +95,12 @@ it.each([
 							min: 1,
 							max: 1,
 						},
-						selector: {
-							type: "item",
-							itemId,
+						query: {
+							scope: "any",
+							selector: {
+								type: "item",
+								itemId,
+							},
 						},
 					}
 				: {
@@ -205,9 +208,12 @@ it("duplicates the selected root input with its complete nested configuration", 
 				min: 2,
 				max: 4,
 			},
-			selector: {
-				type: "item",
-				itemId: "ore",
+			query: {
+				scope: "any",
+				selector: {
+					type: "item",
+					itemId: "ore",
+				},
 			},
 		},
 	];

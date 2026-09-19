@@ -169,9 +169,12 @@ export const createSummaryProject = () => {
 							input: [
 								{
 									type: "materials",
-									selector: {
-										type: "item",
-										itemId: "mill",
+									query: {
+										scope: "any",
+										selector: {
+											type: "item",
+											itemId: "mill",
+										},
 									},
 									mode: "consume",
 									quantity: {

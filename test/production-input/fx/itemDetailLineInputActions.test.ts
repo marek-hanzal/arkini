@@ -35,9 +35,12 @@ const twoInputTestConfig = GameConfigSchema.parse({
 					line.input[0],
 					{
 						type: "materials",
-						selector: {
-							type: "item",
-							itemId: "stone",
+						query: {
+							scope: "any",
+							selector: {
+								type: "item",
+								itemId: "stone",
+							},
 						},
 						quantity: {
 							min: 2,
@@ -76,9 +79,12 @@ const rangeInputTestConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "materials",
-						selector: {
-							type: "item",
-							itemId: "water",
+						query: {
+							scope: "any",
+							selector: {
+								type: "item",
+								itemId: "water",
+							},
 						},
 						quantity: {
 							min: 1,
@@ -102,9 +108,12 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "materials",
-						selector: {
-							type: "item",
-							itemId: "water",
+						query: {
+							scope: "any",
+							selector: {
+								type: "item",
+								itemId: "water",
+							},
 						},
 						quantity: {
 							min: 1,
@@ -113,9 +122,12 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 					},
 					{
 						type: "materials",
-						selector: {
-							type: "item",
-							itemId: "water",
+						query: {
+							scope: "any",
+							selector: {
+								type: "item",
+								itemId: "water",
+							},
 						},
 						quantity: {
 							min: 2,

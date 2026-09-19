@@ -93,9 +93,12 @@ const lifecycleConfig = GameConfigSchema.parse({
 								from: "self",
 								cost: 1,
 							},
-							selector: {
-								type: "item",
-								itemId: "item:material",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "item:material",
+								},
 							},
 							quantity: {
 								min: 1,
@@ -114,9 +117,12 @@ const lifecycleConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "item:material",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "item:material",
+								},
 							},
 							quantity: {
 								min: 1,

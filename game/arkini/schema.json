@@ -1661,9 +1661,9 @@
 					],
 					"description": "Identifies this input as a directly delivered material item."
 				},
-				"selector": {
-					"description": "The canonical item accepted by this input.",
-					"$ref": "urn:arkini:schema:project#/$defs/SelectorSchema"
+				"query": {
+					"description": "The required item and the search scope used by automatic material delivery. Manual delivery uses only the selector.",
+					"$ref": "urn:arkini:schema:project#/$defs/QuerySchema"
 				},
 				"mode": {
 					"default": "consume",
@@ -1677,7 +1677,7 @@
 			},
 			"required": [
 				"type",
-				"selector",
+				"query",
 				"mode",
 				"quantity"
 			],

@@ -20,10 +20,10 @@ export const readOutputReservationFn = (line: LineSchema.Type) => {
 		}
 		const reservedQuantity = Math.max(
 			0,
-			(quantities.get(input.selector.itemId) ?? 0) - input.quantity.min,
+			(quantities.get(input.query.selector.itemId) ?? 0) - input.quantity.min,
 		);
-		if (reservedQuantity === 0) quantities.delete(input.selector.itemId);
-		else quantities.set(input.selector.itemId, reservedQuantity);
+		if (reservedQuantity === 0) quantities.delete(input.query.selector.itemId);
+		else quantities.set(input.query.selector.itemId, reservedQuantity);
 	}
 	return quantities;
 };

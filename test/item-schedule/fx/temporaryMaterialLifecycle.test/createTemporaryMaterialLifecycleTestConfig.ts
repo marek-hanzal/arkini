@@ -73,9 +73,12 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 						input: [
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "temporary",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "temporary",
+									},
 								},
 								quantity: {
 									min: 1,

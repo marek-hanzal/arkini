@@ -37,9 +37,12 @@ const configFn = () => {
 						...line.input,
 						{
 							type: "materials" as const,
-							selector: {
-								type: "item" as const,
-								itemId: "blocker",
+							query: {
+								scope: "any" as const,
+								selector: {
+									type: "item" as const,
+									itemId: "blocker",
+								},
 							},
 							mode: "reserve" as const,
 							quantity: {

@@ -36,9 +36,12 @@ const configFn = (mode: "reserve" | "consume") => {
 							{
 								type: "materials",
 								mode,
-								selector: {
-									type: "item",
-									itemId: "workshop",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "workshop",
+									},
 								},
 								quantity: {
 									min: 1,

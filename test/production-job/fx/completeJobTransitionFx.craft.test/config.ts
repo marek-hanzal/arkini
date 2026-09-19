@@ -98,9 +98,12 @@ const craftItem = ({
 										max: 1,
 										min: 1,
 									},
-									selector: {
-										itemId: inputItemId,
-										type: "item",
+									query: {
+										scope: "any",
+										selector: {
+											itemId: inputItemId,
+											type: "item",
+										},
 									},
 									type: "materials",
 								},

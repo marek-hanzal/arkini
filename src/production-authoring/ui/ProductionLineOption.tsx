@@ -14,8 +14,6 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 	for (const input of line.input) {
 		switch (input.type) {
 			case "materials":
-				inputs.add(input.selector.itemId);
-				break;
 			case "units":
 				inputs.add(input.query.selector.itemId);
 				break;

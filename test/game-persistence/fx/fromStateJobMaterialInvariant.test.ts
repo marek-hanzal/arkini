@@ -77,7 +77,7 @@ describe("fromStateFx job material invariants", () => {
 		const worker = spentConfig.items.forge;
 		const reservedInput = worker.lines[0].input[1];
 		if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
-		reservedInput.selector = {
+		reservedInput.query.selector = {
 			type: "item",
 			itemId: "forge",
 		};

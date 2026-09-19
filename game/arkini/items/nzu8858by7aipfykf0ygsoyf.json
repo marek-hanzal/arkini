@@ -64,9 +64,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "ghost"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "ghost"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

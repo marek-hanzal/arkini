@@ -512,9 +512,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "hay"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "hay"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -595,9 +598,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "cut-grass"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "cut-grass"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

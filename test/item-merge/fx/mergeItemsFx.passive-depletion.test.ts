@@ -60,9 +60,12 @@ const runDepletion = (scope: "board" | "inventory" | "toolbar", blockReturn = fa
 						input: [
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "output",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "output",
+									},
 								},
 								quantity: {
 									min: 1,

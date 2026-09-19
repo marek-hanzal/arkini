@@ -5,7 +5,6 @@ import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProd
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 
-import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 import { readLineInputAutofillSourcesFn } from "~/production-input/fn/readLineInputAutofillSourcesFn";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -63,16 +62,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 					runtime,
 				})
 			: undefined;
-	const sources =
-		owner?.location.scope === "board"
-			? readLineInputAutofillSourcesFn({
-					owner: {
-						...owner,
-						location: owner.location,
-					},
-					runtime,
-				})
-			: [];
+
 	const job = runtime.jobs.find(
 		(candidate) =>
 			candidate.ownerItemId === ownerItemId &&
@@ -180,22 +170,25 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 						inputIndex,
 						runtime,
 					});
-		const availableQuantity =
-			sources.reduce(
-				(total, source) =>
-					total +
-					(matchesItemSelectorFn({
-						item: source.item,
-						selector: input.selector,
+		const sources =
+			owner?.location.scope === "board"
+				? readLineInputAutofillSourcesFn({
+						owner: {
+							...owner,
+							location: owner.location,
+						},
+						runtime,
+						query: input.query,
 					})
-						? source.quantity
-						: 0),
-				0,
-			) + incoming.reduce((total, claim) => total + claim.quantity, 0);
+				: [];
+		const availableQuantity =
+			sources.reduce((total, source) => total + source.quantity, 0) +
+			incoming.reduce((total, claim) => total + claim.quantity, 0);
+
 		inputs.push({
 			type: "materials",
 			inputIndex,
-			itemId: input.selector.itemId,
+			itemId: input.query.selector.itemId,
 			quantity: input.quantity,
 			filled,
 			committed,
@@ -212,12 +205,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 					runtime,
 				}) &&
 				incoming.reduce((total, claim) => total + claim.quantity, 0) < input.quantity.max &&
-				sources.some((source) =>
-					matchesItemSelectorFn({
-						item: source.item,
-						selector: input.selector,
-					}),
-				),
+				sources.length > 0,
 			canWithdraw:
 				buffered > 0 &&
 				!committed &&

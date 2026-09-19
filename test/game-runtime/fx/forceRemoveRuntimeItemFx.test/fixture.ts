@@ -35,9 +35,12 @@ export const fixtureFn = (width = 2) => {
 						input: [
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "holder",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "holder",
+									},
 								},
 								quantity: {
 									min: 1,
@@ -54,9 +57,12 @@ export const fixtureFn = (width = 2) => {
 						input: [
 							{
 								type: "materials",
-								selector: {
-									type: "item",
-									itemId: "water",
+								query: {
+									scope: "any",
+									selector: {
+										type: "item",
+										itemId: "water",
+									},
 								},
 								quantity: {
 									min: 1,

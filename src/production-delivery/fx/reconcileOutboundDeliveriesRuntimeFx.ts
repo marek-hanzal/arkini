@@ -77,7 +77,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 					input.type !== TypeSchema.enum.Materials ||
 					!matchesItemSelectorFn({
 						item: current.item,
-						selector: input.selector,
+						selector: input.query.selector,
 					}) ||
 					isLineInputClosedFn({
 						ownerItemId: owner.id,

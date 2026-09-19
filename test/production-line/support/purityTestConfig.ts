@@ -59,9 +59,12 @@ export const purityTestConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "material",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "material",
+								},
 							},
 							quantity: {
 								min: 1,
@@ -92,9 +95,12 @@ export const purityTestConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
-							selector: {
-								type: "item",
-								itemId: "material",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "material",
+								},
 							},
 							quantity: {
 								min: 1,

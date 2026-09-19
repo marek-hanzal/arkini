@@ -117,9 +117,12 @@ const stashItem = ({
 						from: "self" as const,
 						cost: 1,
 					},
-					selector: {
-						type: "item" as const,
-						itemId: "item:key",
+					query: {
+						scope: "any" as const,
+						selector: {
+							type: "item" as const,
+							itemId: "item:key",
+						},
 					},
 					quantity: value(1),
 				},

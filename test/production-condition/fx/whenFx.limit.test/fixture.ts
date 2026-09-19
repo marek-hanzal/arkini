@@ -29,9 +29,12 @@ const disableRule = {
 const materialFn = (mode: "consume" | "reserve") => ({
 	type: "materials",
 	mode,
-	selector: {
-		type: "item",
-		itemId: "token",
+	query: {
+		scope: "any",
+		selector: {
+			type: "item",
+			itemId: "token",
+		},
 	},
 	quantity: {
 		min: 1,

@@ -120,15 +120,15 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							yield* readItemDetailMaterialAutofillAvailabilityFx({
 								ownerItemId,
 								runtime,
-								selector: materialInput.selector,
+								query: materialInput.query,
 							});
-						const selectorKey = `item:${materialInput.selector.itemId}`;
+						const selectorKey = `item:${materialInput.query.selector.itemId}`;
 						const unitKey = readItemDetailUnitKeyFn(materialInput.units);
 						const key = `${inputIndex}:${selectorKey}:${materialInput.mode}:${unitKey}`;
 						materials.set(key, {
 							kind: "materials",
 							inputIndex,
-							selector: materialInput.selector,
+							selector: materialInput.query.selector,
 							mode: materialInput.mode,
 							required,
 							storedQuantity,

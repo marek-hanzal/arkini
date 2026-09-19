@@ -34,9 +34,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "base-camp"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "base-camp"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -61,9 +64,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "wood"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "wood"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -73,9 +79,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "stone"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "stone"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -85,9 +94,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "firewood"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "firewood"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

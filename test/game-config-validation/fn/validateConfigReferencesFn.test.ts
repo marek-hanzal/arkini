@@ -115,9 +115,12 @@ describe("completed config reference validation", () => {
 				input: [
 					{
 						type: "materials" as const,
-						selector: {
-							type: "item" as const,
-							itemId: "item:missing-input",
+						query: {
+							scope: "any" as const,
+							selector: {
+								type: "item" as const,
+								itemId: "item:missing-input",
+							},
 						},
 						quantity: {
 							min: 1,

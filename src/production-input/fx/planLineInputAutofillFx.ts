@@ -11,7 +11,6 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
 export namespace planLineInputAutofillFx {
@@ -47,15 +46,19 @@ const candidateRankFn = ({
 	return {
 		scope:
 			candidate.location.scope === LocationScopeEnumSchema.enum.Board
-				? 0
+				? candidate.location.space === owner.location.space
+					? 0
+					: 3
 				: candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar
 					? 1
 					: 2,
 		distance:
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board
+			candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
+			candidate.location.space === owner.location.space
 				? Math.abs(candidate.location.position.x - owner.location.position.x) +
 					Math.abs(candidate.location.position.y - owner.location.position.y)
 				: 0,
+		space: candidate.location.scope === "board" ? candidate.location.space : 0,
 		position: candidate.location.position.y * 10_000 + candidate.location.position.x,
 	};
 };
@@ -74,6 +77,7 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 		return (
 			leftRank.scope - rightRank.scope ||
 			leftRank.distance - rightRank.distance ||
+			leftRank.space - rightRank.space ||
 			leftRank.position - rightRank.position ||
 			left.id.localeCompare(right.id)
 		);
@@ -83,7 +87,8 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Sources prefer the owner's board space by distance, then Toolbar and Inventory slot order.
+ * Each input applies its query. Sources prefer the owner's board space by distance, then Toolbar,
+ * Inventory and other board spaces in stable slot order.
  * Required minima are allocated across every slot before compatible range inputs receive optional
  * top-ups toward their maximum. The planner does not mutate runtime truth itself.
  */
@@ -99,27 +104,14 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		lineId,
 		runtime,
 	});
-	const candidates = [
-		...readLineInputAutofillSourcesFn({
-			owner,
-			runtime,
-		}),
-	];
-	candidates.sort(compareCandidatesFn(owner));
-	const eligibleCandidateItems = candidates.map((candidate) => candidate.item);
-	const remainingByItemId = new Map(
-		candidates.map((candidate) => [
-			candidate.id,
-			candidate.quantity,
-		]),
-	);
+	const candidatesById = new Map<string, GridRuntimeItemSchema.Type>();
 	const entries: planLineInputAutofillFx.Entry[] = [];
 	const entryIndexByKey = new Map<string, number>();
 	const slots: {
 		readonly closed: boolean;
 		readonly input: MaterialSchema.Type;
 		readonly inputIndex: number;
-		readonly matchingCanonicalItemIds: ReadonlySet<IdSchema.Type>;
+		readonly matchingRuntimeItemIds: ReadonlySet<IdSchema.Type>;
 		readonly maxQuantity: number;
 		readonly minQuantity: number;
 		plannedQuantity: number;
@@ -155,20 +147,33 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			lineId,
 			runtime,
 		});
-		const matchingItems = selectItemsFn({
-			items: eligibleCandidateItems,
-			selector: input.selector,
+		const matchingItems = readLineInputAutofillSourcesFn({
+			owner,
+			runtime,
+			query: input.query,
 		});
+		for (const candidate of matchingItems) candidatesById.set(candidate.id, candidate);
+
 		slots.push({
 			closed,
 			input,
 			inputIndex,
-			matchingCanonicalItemIds: new Set(matchingItems.map((item) => item.id)),
+			matchingRuntimeItemIds: new Set(matchingItems.map((item) => item.id)),
 			maxQuantity: initialResolution.required.max,
 			minQuantity: initialResolution.required.min,
 			plannedQuantity,
 		});
 	}
+
+	const candidates = [
+		...candidatesById.values(),
+	].sort(compareCandidatesFn(owner));
+	const remainingByItemId = new Map(
+		candidates.map((candidate) => [
+			candidate.id,
+			candidate.quantity,
+		]),
+	);
 
 	const allocateToFn = (slot: (typeof slots)[number], targetQuantity: number) => {
 		let requestedQuantity = Math.max(0, targetQuantity - slot.plannedQuantity);
@@ -177,7 +182,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			const remainingQuantity = remainingByItemId.get(candidate.id) ?? 0;
 			if (remainingQuantity === 0) continue;
 
-			if (!slot.matchingCanonicalItemIds.has(candidate.item.id)) continue;
+			if (!slot.matchingRuntimeItemIds.has(candidate.id)) continue;
 			const quantity = Math.min(remainingQuantity, requestedQuantity);
 			if (quantity === 0) continue;
 
@@ -205,8 +210,12 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		}
 	};
 
-	// Preserve line readiness first when multiple compatible slots compete for one source.
-	for (const slot of slots) {
+	// Exact selectors and query reaches form nested or disjoint source sets for one owner.
+	// Fill narrower sets first so a broad input cannot strand an otherwise satisfiable minimum.
+	const requiredSlots = [
+		...slots,
+	].sort((left, right) => left.matchingRuntimeItemIds.size - right.matchingRuntimeItemIds.size);
+	for (const slot of requiredSlots) {
 		if (!slot.closed) allocateToFn(slot, slot.minQuantity);
 	}
 	const remainingMissingQuantity = slots.reduce(

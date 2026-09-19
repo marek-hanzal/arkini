@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "clay-jug-with-milk"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "clay-jug-with-milk"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

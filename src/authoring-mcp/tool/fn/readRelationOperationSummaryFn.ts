@@ -76,7 +76,7 @@ const lineLinesFn = (
 					case "simple":
 						return `simple${units}`;
 					case "materials":
-						return `${itemFn(project, input.selector.itemId)} x${quantityFn(input.quantity)} ${input.mode}${units}`;
+						return `${queryFn(project, input.query)} x${quantityFn(input.quantity)} ${input.mode}${units}`;
 					case "units":
 						return `${queryFn(project, input.query)} x1 units${units}`;
 				}

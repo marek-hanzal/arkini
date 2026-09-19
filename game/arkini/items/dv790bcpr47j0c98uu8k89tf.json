@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "stone"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "stone"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

@@ -11,9 +11,12 @@ const itemBase = (id: string, scope: "any" | "board" = "any") => ({
 
 const materialInput = (quantity: number) => ({
 	type: "materials",
-	selector: {
-		type: "item",
-		itemId: "material",
+	query: {
+		scope: "any",
+		selector: {
+			type: "item",
+			itemId: "material",
+		},
 	},
 	quantity: {
 		min: quantity,

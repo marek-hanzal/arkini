@@ -46,9 +46,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "resource-research"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "resource-research"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -110,9 +113,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "resource-research"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "resource-research"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {

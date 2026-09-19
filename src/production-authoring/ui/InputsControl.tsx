@@ -79,7 +79,7 @@ export const InputsControl = ({
 					const input = value[index];
 					if (input.type === "materials")
 						return `${translator.textFn("Material input")} ${index + 1} — ${readItemLabelFn(
-							input.selector.itemId,
+							input.query.selector.itemId,
 							translator.textFn("No item selected"),
 						)}`;
 					if (input.type === "units" && input.units?.from === "self")
@@ -95,7 +95,7 @@ export const InputsControl = ({
 					const input = value[index];
 					if (input.type === "materials")
 						return [
-							input.selector.itemId,
+							input.query.selector.itemId,
 						];
 					if (input.type === "units") {
 						const itemId = input.query.selector.itemId;
@@ -129,7 +129,7 @@ export const InputsControl = ({
 									size="md"
 									className="rounded-md"
 									resourceIds={
-										project.config.items[input.selector.itemId]?.artwork
+										project.config.items[input.query.selector.itemId]?.artwork
 											.default ?? [
 											"",
 										]

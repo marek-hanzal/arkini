@@ -303,9 +303,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "vegetable-crate"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "vegetable-crate"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

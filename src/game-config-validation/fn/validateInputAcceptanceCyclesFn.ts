@@ -28,12 +28,12 @@ const collectMaterialInputEdgesFn = ({
 			for (const [inputIndex, input] of line.input.entries()) {
 				if (
 					input.type !== TypeSchema.enum.Materials ||
-					config.items[input.selector.itemId] === undefined
+					config.items[input.query.selector.itemId] === undefined
 				)
 					continue;
 				edges.push({
 					ownerItemId,
-					acceptedItemId: input.selector.itemId,
+					acceptedItemId: input.query.selector.itemId,
 					path: [
 						...path,
 						"input",

@@ -31,9 +31,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "goose-quill"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -43,9 +46,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "paper"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -93,9 +99,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "goose-quill"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -105,9 +114,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "paper"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -155,9 +167,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "goose-quill"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -167,9 +182,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "paper"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -217,9 +235,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "goose-quill"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							}
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -229,9 +250,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "paper"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

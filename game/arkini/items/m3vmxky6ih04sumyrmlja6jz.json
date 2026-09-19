@@ -28,9 +28,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "herbs"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "herbs"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -40,9 +43,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "empty-jar"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "empty-jar"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -89,9 +95,12 @@
 				"input": [
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "herbs"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "herbs"
+							}
 						},
 						"mode": "consume",
 						"quantity": {
@@ -101,9 +110,12 @@
 					},
 					{
 						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "empty-jar"
+						"query": {
+							"scope": "any",
+							"selector": {
+								"type": "item",
+								"itemId": "empty-jar"
+							}
 						},
 						"mode": "consume",
 						"quantity": {

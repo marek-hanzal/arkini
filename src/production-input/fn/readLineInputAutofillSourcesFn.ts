@@ -4,15 +4,19 @@ import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeI
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
-import { isLineInputAutofillSourceLocationFn } from "~/production-input/fn/isLineInputAutofillSourceLocationFn";
+import { matchesQueryLocationFn } from "~/item-query/fn/matchesQueryLocationFn";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 
 /** Shared source eligibility for automatic delivery and the player's available stock count. */
 export const readLineInputAutofillSourcesFn = ({
 	owner,
 	runtime,
+	query,
 }: {
 	readonly owner: BoardRuntimeItemSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
+	readonly query: QuerySchema.Type;
 }): readonly GridRuntimeItemSchema.Type[] => {
 	// Pending work already owns its producer identity before a Job starts.
 	const busyOwnerItemIds = new Set([
@@ -26,9 +30,15 @@ export const readLineInputAutofillSourcesFn = ({
 			candidate === undefined ||
 			candidate.id === owner.id ||
 			busyOwnerItemIds.has(candidate.id) ||
-			!isLineInputAutofillSourceLocationFn({
+			!matchesItemSelectorFn({
+				item: candidate.item,
+				selector: query.selector,
+			}) ||
+			!matchesQueryLocationFn({
 				location: candidate.location,
-				ownerSpace: owner.location.space,
+				origin: owner.location,
+				query,
+				currentSpace: runtime.currentSpace,
 			})
 		)
 			continue;

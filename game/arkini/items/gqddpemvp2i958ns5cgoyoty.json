@@ -4,6 +4,7 @@
 		"uid": "gqddpemvp2i958ns5cgoyoty",
 		"id": "meal",
 		"title": "Meal",
+		"ui": "simple",
 		"description": "Gimme!",
 		"artwork": {
 			"scale": 1,

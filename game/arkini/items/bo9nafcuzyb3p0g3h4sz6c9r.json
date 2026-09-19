@@ -4,6 +4,7 @@
 		"uid": "bo9nafcuzyb3p0g3h4sz6c9r",
 		"id": "cauldron-with-boiling-beeswax",
 		"title": "Cauldron With Boiling Beeswax",
+		"ui": "simple",
 		"description": "Boiling beeswax. It could be useful, but keep it warm",
 		"artwork": {
 			"scale": 1,

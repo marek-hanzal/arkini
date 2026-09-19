@@ -4,6 +4,7 @@
 		"uid": "jx5gnntoo4aj7rxf3eq32lun",
 		"id": "pig",
 		"title": "Pig",
+		"ui": "simple",
 		"description": "Have some spare mug?",
 		"artwork": {
 			"scale": 1,

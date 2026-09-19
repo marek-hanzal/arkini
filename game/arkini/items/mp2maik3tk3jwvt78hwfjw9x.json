@@ -4,6 +4,7 @@
 		"uid": "mp2maik3tk3jwvt78hwfjw9x",
 		"id": "flax-field",
 		"title": "Flax Field",
+		"ui": "simple",
 		"description": "Flax field",
 		"artwork": {
 			"scale": 1,

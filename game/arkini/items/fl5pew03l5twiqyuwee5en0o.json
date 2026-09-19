@@ -4,6 +4,7 @@
 		"uid": "fl5pew03l5twiqyuwee5en0o",
 		"id": "wool-cloth",
 		"title": "Wool Cloth",
+		"ui": "simple",
 		"description": "It's warm",
 		"artwork": {
 			"scale": 1,

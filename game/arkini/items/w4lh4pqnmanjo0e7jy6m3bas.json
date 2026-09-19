@@ -4,6 +4,7 @@
 		"uid": "w4lh4pqnmanjo0e7jy6m3bas",
 		"id": "beagle-puppy-tearing-pillow-with-coins",
 		"title": "Beagle Puppy Tearing Pillow With Coins",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -43,7 +44,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

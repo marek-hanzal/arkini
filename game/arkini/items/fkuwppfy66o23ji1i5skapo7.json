@@ -4,6 +4,7 @@
 		"uid": "fkuwppfy66o23ji1i5skapo7",
 		"id": "rum-bottle",
 		"title": "Rum Bottle",
+		"ui": "simple",
 		"description": "It has one special ability",
 		"artwork": {
 			"scale": 1,

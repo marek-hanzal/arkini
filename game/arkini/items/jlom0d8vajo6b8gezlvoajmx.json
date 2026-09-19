@@ -4,6 +4,7 @@
 		"uid": "jlom0d8vajo6b8gezlvoajmx",
 		"id": "healing-kit",
 		"title": "Healing Kit",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

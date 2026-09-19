@@ -4,6 +4,7 @@
 		"uid": "rvgihky3ismzedb2rwxwysq9",
 		"id": "mouse",
 		"title": "Mouse",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

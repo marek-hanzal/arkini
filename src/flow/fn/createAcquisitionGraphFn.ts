@@ -155,7 +155,7 @@ const readLineDescriptorFn = (
 				anyOf: [],
 			},
 			availability,
-			owner.clock !== undefined && owner.control === "automatic-only"
+			owner.clock !== undefined && owner.ui === "simple"
 				? readAcquisitionAvailabilityRequirementsFn({
 						items: config.items,
 						rules: owner.clock.rules,
@@ -174,9 +174,9 @@ const readLineExecutionConstraintFn = (
 	line: LineSchema.Type,
 ): AcquisitionRoute["executionConstraint"] => {
 	const clock = owner.clock;
-	if (clock === undefined) return owner.control === "automatic-only" ? "unavailable" : undefined;
+	if (clock === undefined) return owner.ui === "simple" ? "unavailable" : undefined;
 	if (
-		owner.control === "automatic-only" &&
+		owner.ui === "simple" &&
 		(clock.intervalMs === undefined ||
 			!line.clock ||
 			(!clock.enable && !clock.rules.some(({ type }) => type === "enable")))
@@ -190,7 +190,7 @@ const readLineExecutionConstraintFn = (
 	);
 	// Competing lines share one pulse. Per-line cadence cannot preserve shared
 	// outputs or cross-line co-products, even when eligibility never changes.
-	if (owner.control === "automatic-only" && pool.length > 1) return "weighted-clock-pool";
+	if (owner.ui === "simple" && pool.length > 1) return "weighted-clock-pool";
 	return undefined;
 };
 
@@ -216,7 +216,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	}
 	const executionConstraint = readLineExecutionConstraintFn(descriptor.owner, descriptor.line);
 	const minimumActionIntervalMs =
-		descriptor.owner.clock !== undefined && descriptor.owner.control === "automatic-only"
+		descriptor.owner.clock !== undefined && descriptor.owner.ui === "simple"
 			? descriptor.owner.clock.intervalMs
 			: undefined;
 	const execution = {

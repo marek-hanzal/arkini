@@ -4,6 +4,7 @@
 		"uid": "emyfwxfa8g1gi9iwj7v9rzru",
 		"id": "forester",
 		"title": "Forester",
+		"ui": "default",
 		"description": "Finds forests. Or trees. Or both",
 		"artwork": {
 			"scale": 1,

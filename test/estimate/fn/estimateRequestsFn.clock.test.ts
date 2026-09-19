@@ -18,7 +18,7 @@ import {
 const createClockGraph = async ({
 	durationMs,
 	enable = true,
-	control = "automatic-only",
+	ui = "simple",
 	runtimeMs = 300,
 	once = false,
 	passive = false,
@@ -26,7 +26,7 @@ const createClockGraph = async ({
 }: {
 	durationMs?: number;
 	enable?: boolean;
-	control?: "automatic-only" | "interactive";
+	ui?: "simple" | "default";
 	runtimeMs?: number;
 	once?: boolean;
 	passive?: boolean;
@@ -66,7 +66,7 @@ const createClockGraph = async ({
 
 		scope: "board",
 		maxStackSize: 1,
-		control,
+		ui,
 		clock: {
 			intervalMs: once ? undefined : 1000,
 			durationMs,
@@ -406,7 +406,7 @@ describe("Clock authored acquisition boundaries", () => {
 		});
 		const interactive = await createClockGraph({
 			enable: false,
-			control: "interactive",
+			ui: "default",
 		});
 		expect(
 			estimateRequestsFn({

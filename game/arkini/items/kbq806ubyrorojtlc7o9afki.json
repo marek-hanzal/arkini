@@ -4,6 +4,7 @@
 		"uid": "kbq806ubyrorojtlc7o9afki",
 		"id": "flour",
 		"title": "Flour",
+		"ui": "simple",
 		"description": "Bread?",
 		"artwork": {
 			"scale": 1,

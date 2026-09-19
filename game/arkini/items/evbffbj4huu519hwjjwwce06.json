@@ -4,6 +4,7 @@
 		"uid": "evbffbj4huu519hwjjwwce06",
 		"id": "wine-barrel",
 		"title": "Wine Barrel",
+		"ui": "simple",
 		"description": "Over age of 18",
 		"artwork": {
 			"scale": 1,

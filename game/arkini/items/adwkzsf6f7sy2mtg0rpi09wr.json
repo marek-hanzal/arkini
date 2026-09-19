@@ -4,6 +4,7 @@
 		"uid": "adwkzsf6f7sy2mtg0rpi09wr",
 		"id": "waste",
 		"title": "Waste",
+		"ui": "simple",
 		"description": "Not a useful stuff. You should get rid of it.",
 		"artwork": {
 			"scale": 1,

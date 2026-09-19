@@ -119,16 +119,6 @@ export const LineFields = withFieldGroupFn({
 													},
 													{
 														description: (
-															<Mx label="Production line Clock help" />
-														),
-														label: translator.textFn("Clock"),
-														onChangeFn: (value) =>
-															onMarkerChangeFn("clock", value),
-														selected: markers.clock,
-														value: "clock",
-													},
-													{
-														description: (
 															<Mx label="Production line visibility help" />
 														),
 														label: translator.textFn("Visible"),
@@ -146,6 +136,16 @@ export const LineFields = withFieldGroupFn({
 															group.setFieldValue("enable", value),
 														selected: markers.enable,
 														value: "enabled",
+													},
+													{
+														description: (
+															<Mx label="Production line Clock help" />
+														),
+														label: translator.textFn("Clock"),
+														onChangeFn: (value) =>
+															onMarkerChangeFn("clock", value),
+														selected: markers.clock,
+														value: "clock",
 													},
 												]}
 											/>

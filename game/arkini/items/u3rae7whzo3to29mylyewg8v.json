@@ -4,6 +4,7 @@
 		"uid": "u3rae7whzo3to29mylyewg8v",
 		"id": "farmland-portal",
 		"title": "Farmland Portal",
+		"ui": "simple",
 		"description": "Farmland",
 		"artwork": {
 			"scale": 1,

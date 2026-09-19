@@ -4,6 +4,7 @@
 		"uid": "i5fpduh7s05jm3hautorgz5k",
 		"id": "bow-and-arrows",
 		"title": "Bow And Arrows",
+		"ui": "simple",
 		"description": "You can hunt stuff yourself",
 		"artwork": {
 			"scale": 1,

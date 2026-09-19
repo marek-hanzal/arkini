@@ -4,6 +4,7 @@
 		"uid": "xue30oaxm08atgyr1sqxlej3",
 		"id": "clay-camp",
 		"title": "Clay Camp",
+		"ui": "default",
 		"description": "Gives you a clay",
 		"artwork": {
 			"scale": 1,

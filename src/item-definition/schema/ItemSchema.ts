@@ -51,6 +51,15 @@ export const ItemSchema = z
 		description: DescriptionSchema.optional().describe(
 			"The optional human-readable explanation of this item's purpose.",
 		),
+		ui: z
+			.enum([
+				"simple",
+				"default",
+			])
+			.default("default")
+			.describe(
+				"Item interface and player production control: simple shows only information and leaves production to the game; default enables manual production and always shows all sections, even without production lines.",
+			),
 		music: IdSchema.optional().describe(
 			"Music resource requested while this item detail is open; omission keeps the global playlist.",
 		),
@@ -98,13 +107,6 @@ export const ItemSchema = z
 				"The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
 			),
 		clock: ItemScheduleSchema.optional(),
-		control: z
-			.enum([
-				"automatic-only",
-				"interactive",
-			])
-			.optional()
-			.describe("Player production control; omission means interactive."),
 		action: ActionSchema.optional().describe(
 			"An optional immediate action; mutually exclusive with production lines.",
 		),

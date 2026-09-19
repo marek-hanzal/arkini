@@ -4,6 +4,7 @@
 		"uid": "jk63xgwdyfiaoeoq9q7tn8s1",
 		"id": "shorn-sheep",
 		"title": "Shorn Sheep",
+		"ui": "simple",
 		"description": "No wool",
 		"artwork": {
 			"scale": 1,

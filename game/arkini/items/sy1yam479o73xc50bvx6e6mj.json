@@ -4,6 +4,7 @@
 		"uid": "sy1yam479o73xc50bvx6e6mj",
 		"id": "industrial-chemicals",
 		"title": "Industrial Chemicals",
+		"ui": "simple",
 		"description": "Be careful, it may go kaboom",
 		"artwork": {
 			"scale": 1,

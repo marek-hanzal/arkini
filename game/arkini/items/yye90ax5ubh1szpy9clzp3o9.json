@@ -4,6 +4,7 @@
 		"uid": "yye90ax5ubh1szpy9clzp3o9",
 		"id": "stone-block",
 		"title": "Stone Block",
+		"ui": "simple",
 		"description": "It's squarish.",
 		"artwork": {
 			"scale": 1,

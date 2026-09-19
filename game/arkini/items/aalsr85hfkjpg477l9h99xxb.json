@@ -4,6 +4,7 @@
 		"uid": "aalsr85hfkjpg477l9h99xxb",
 		"id": "fawn",
 		"title": "Fawn",
+		"ui": "simple",
 		"description": "It's cute, isn't it?",
 		"artwork": {
 			"scale": 1,
@@ -24,6 +25,36 @@
 				"result": "dynamite-fed-fawn"
 			}
 		],
+		"clock": {
+			"durationMs": 90000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "chance",
+								"chance": 0.35,
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

@@ -4,6 +4,7 @@
 		"uid": "lfxtap8427k9e4nn6uwjgxyo",
 		"id": "wolf",
 		"title": "Wolf",
+		"ui": "simple",
 		"description": "He is dangerous. But he may walk away",
 		"artwork": {
 			"scale": 1,
@@ -57,6 +58,36 @@
 				"result": "wolf-in-sheeps-clothing"
 			}
 		],
+		"clock": {
+			"durationMs": 180000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "chance",
+								"chance": 0.45,
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

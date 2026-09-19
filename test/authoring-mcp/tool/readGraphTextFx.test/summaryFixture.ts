@@ -251,7 +251,7 @@ export const createConditionalSummaryProject = () => {
 				water: {
 					...base.config.items.water,
 					maxStackSize: 1,
-					control: "automatic-only",
+					ui: "simple",
 					clock: {
 						durationMs: 5000,
 						intervalMs: 1000,

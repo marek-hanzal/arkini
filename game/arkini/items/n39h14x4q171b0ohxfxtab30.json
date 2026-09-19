@@ -4,6 +4,7 @@
 		"uid": "n39h14x4q171b0ohxfxtab30",
 		"id": "wool",
 		"title": "Wool",
+		"ui": "simple",
 		"description": "Winter is comming",
 		"artwork": {
 			"scale": 1,

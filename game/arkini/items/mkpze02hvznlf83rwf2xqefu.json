@@ -4,6 +4,7 @@
 		"uid": "mkpze02hvznlf83rwf2xqefu",
 		"id": "honeycomb",
 		"title": "Honeycomb",
+		"ui": "simple",
 		"description": "Sweet stuff",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "fn1c807rr3m75hnrkdc3ik92",
 		"id": "scythe",
 		"title": "Scythe",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "oo3wuqjngg5i21vwt4m5nz0s",
 		"id": "toilet-biowaste",
 		"title": "Toilet Biowaste",
+		"ui": "simple",
 		"description": "Disgusting",
 		"artwork": {
 			"scale": 1,

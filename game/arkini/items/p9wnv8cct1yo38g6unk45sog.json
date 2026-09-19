@@ -4,6 +4,7 @@
 		"uid": "p9wnv8cct1yo38g6unk45sog",
 		"id": "steel-armor",
 		"title": "Steel Armor",
+		"ui": "simple",
 		"description": "You may be a bit better protected",
 		"artwork": {
 			"scale": 1,

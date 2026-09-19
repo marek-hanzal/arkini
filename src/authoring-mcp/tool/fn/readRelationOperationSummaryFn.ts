@@ -82,12 +82,12 @@ const lineLinesFn = (
 					`  Gates: enabled=${line.enable}; visible=${line.show}${rulesFn(project, line.rules)}`,
 				]
 			: []),
-		...(owner?.clock?.durationMs !== undefined && owner.control !== "automatic-only"
+		...(owner?.clock?.durationMs !== undefined && owner.ui !== "simple"
 			? [
 					`  Owner lifetime: ${owner.clock.durationMs / 1000} s`,
 				]
 			: []),
-		...(owner?.control === "automatic-only"
+		...(owner?.ui === "simple"
 			? [
 					`  Automatic only: Clock enabled=${owner.clock?.enable ?? false}; interval=${owner.clock?.intervalMs ?? "none"} ms; lifetime=${owner.clock?.durationMs ?? "unbounded"} ms; Clock line=${line.clock === true}${rulesFn(project, owner.clock?.rules ?? [])}`,
 				]

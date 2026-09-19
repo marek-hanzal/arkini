@@ -4,6 +4,7 @@
 		"uid": "kpjqlrmcoc2c503wp1kr0m6v",
 		"id": "foundry",
 		"title": "Foundry",
+		"ui": "default",
 		"description": "Industrial",
 		"artwork": {
 			"scale": 1,

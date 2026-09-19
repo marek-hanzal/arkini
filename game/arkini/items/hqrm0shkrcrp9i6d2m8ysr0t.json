@@ -4,6 +4,7 @@
 		"uid": "hqrm0shkrcrp9i6d2m8ysr0t",
 		"id": "sugar-beet-field",
 		"title": "Sugar Beet Field",
+		"ui": "simple",
 		"description": "Here you go",
 		"artwork": {
 			"scale": 1,

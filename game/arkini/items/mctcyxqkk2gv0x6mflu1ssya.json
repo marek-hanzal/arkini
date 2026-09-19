@@ -4,6 +4,7 @@
 		"uid": "mctcyxqkk2gv0x6mflu1ssya",
 		"id": "empty-grape-field",
 		"title": "Empty Grape Field",
+		"ui": "simple",
 		"description": "Ready for another grape cycle.",
 		"artwork": {
 			"scale": 1,

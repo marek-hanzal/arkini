@@ -4,6 +4,7 @@
 		"uid": "huxn6bqwibau9kkoqkk1e5zx",
 		"id": "dairy",
 		"title": "Dairy",
+		"ui": "default",
 		"description": "What is the smell here...? Ah, tasty cheese!",
 		"artwork": {
 			"scale": 1,

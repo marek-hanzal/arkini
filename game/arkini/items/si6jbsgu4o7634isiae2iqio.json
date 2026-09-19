@@ -4,6 +4,7 @@
 		"uid": "si6jbsgu4o7634isiae2iqio",
 		"id": "carved-pumpkin",
 		"title": "Carved Pumpkin",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

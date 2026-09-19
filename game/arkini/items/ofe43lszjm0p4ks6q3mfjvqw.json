@@ -4,6 +4,7 @@
 		"uid": "ofe43lszjm0p4ks6q3mfjvqw",
 		"id": "treasure-chest-t3",
 		"title": "Treasure Chest - Tier 3",
+		"ui": "default",
 		"description": "Quite interesting things inside",
 		"artwork": {
 			"scale": 1,

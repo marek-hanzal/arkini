@@ -4,6 +4,7 @@
 		"uid": "y9cwptcb1jtevcufgotv1kqs",
 		"id": "cotton-thread",
 		"title": "Cotton Thread",
+		"ui": "simple",
 		"description": "Cotton thread",
 		"artwork": {
 			"scale": 1,

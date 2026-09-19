@@ -4,6 +4,7 @@
 		"uid": "pyqkr19xx29kdqd3lwxcq6b8",
 		"id": "house-of-engineers",
 		"title": "House Of Engineers",
+		"ui": "simple",
 		"description": "Your mechanical journey starts here",
 		"artwork": {
 			"scale": 1,

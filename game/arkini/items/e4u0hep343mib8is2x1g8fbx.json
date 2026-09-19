@@ -4,6 +4,7 @@
 		"uid": "e4u0hep343mib8is2x1g8fbx",
 		"id": "coffee-plant",
 		"title": "Coffee Plant",
+		"ui": "simple",
 		"description": "You need caffeine",
 		"artwork": {
 			"scale": 1,

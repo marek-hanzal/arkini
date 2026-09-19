@@ -4,6 +4,7 @@
 		"uid": "bdqyyzlbpwlsyt8i156e3ngm",
 		"id": "well-with-beer",
 		"title": "Well With Beer",
+		"ui": "simple",
 		"description": "Source of beer, if you want",
 		"artwork": {
 			"scale": 1,

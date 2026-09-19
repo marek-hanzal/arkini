@@ -4,6 +4,7 @@
 		"uid": "bqry0ngea4bhamfkgncovhgr",
 		"id": "clay-bowl",
 		"title": "Clay Bowl",
+		"ui": "simple",
 		"description": "Just a bowl",
 		"artwork": {
 			"scale": 1,

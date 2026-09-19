@@ -4,6 +4,7 @@
 		"uid": "ysdkouxd4qpd0ztziy07k2ss",
 		"id": "copper-bathtub",
 		"title": "Copper Bathtub",
+		"ui": "simple",
 		"description": "You may bath yourself",
 		"artwork": {
 			"scale": 1,

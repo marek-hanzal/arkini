@@ -158,6 +158,7 @@ import {
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const item: ItemSchema.Type = {
 	maxQueueSize: 1,
+	ui: "default",
 	lines: [],
 
 	uid: "q12cmsx5ussy30wyjiea8yaw",
@@ -311,6 +312,25 @@ const completeFirstProductionLine = async (container: HTMLElement) => {
 };
 
 describe("item section form session", () => {
+	it("saves an explicit simple interface from the identity section", async () => {
+		const { container } = await render(<IdentitySection />);
+		const simple = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Simple",
+		);
+		if (simple === undefined) throw new Error("Missing interface choice");
+		await act(async () => simple.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem).toHaveBeenCalledWith(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					ui: "simple",
+				}),
+			}),
+		);
+	});
+
 	it("renders artwork on direct Clock entry and follows unsaved overlay changes", async () => {
 		state.project = {
 			...(state.project as Project),
@@ -1869,6 +1889,7 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 		uid: "source-uid",
 		id: "source",
 		title: "Source",
+		ui: "simple",
 		scope: "board",
 		clock: {
 			durationMs: 300000,
@@ -1882,13 +1903,17 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 	});
 	expect(session?.isDirty).toBe(true);
 	expect(session?.form.state.values.clock).toEqual(source.clock);
+	expect(session?.form.state.values.ui).toBe("default");
 	expect(session?.form.state.values.description).toBe("Keep my other edit");
 	expect(state.saveItem).not.toHaveBeenCalled();
 	await act(async () => session?.discardFn());
 	expect(session?.form.state.values.clock).toBeUndefined();
 	expect(session?.form.state.values.description).toBe(item.description);
 	expect(session?.isDirty).toBe(false);
-	await act(async () => session?.copySectionFn(source, "clock"));
+	await act(async () => {
+		session?.copySectionFn(source, "identity");
+		session?.copySectionFn(source, "clock");
+	});
 	state.saveItem.mockImplementation(async ({ item: saved }: { item: ItemSchema.Type }) => saved);
 	await act(async () => {
 		expect(await session?.saveFn()).toBe(true);
@@ -1898,9 +1923,10 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 			item: expect.objectContaining({
 				id: item.id,
 				uid: item.uid,
-				title: item.title,
+				title: source.title,
+				ui: "simple",
 				clock: source.clock,
-				scope: "any",
+				scope: "board",
 				maxStackSize: 1,
 			}),
 		}),

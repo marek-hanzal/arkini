@@ -1,3 +1,4 @@
+import { ItemInterfaceField } from "~/item-authoring/ui/ItemInterfaceField";
 import { Clock } from "lucide-react";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -51,27 +52,30 @@ const ClockFields = () => {
 							/>
 						)}
 					</form.AppField>
-					<form.AppField name="clock.enable">
-						{(field) => (
-							<EditorChoiceControl
-								description={<Mx label="Clock status help" />}
-								label={translator.textFn("Status")}
-								options={[
-									{
-										label: translator.textFn("Enabled"),
-										value: "enabled",
-									},
-									{
-										label: translator.textFn("Disabled"),
-										value: "disabled",
-									},
-								]}
-								required={false}
-								value={field.state.value ? "enabled" : "disabled"}
-								onChangeFn={(value) => field.handleChange(value === "enabled")}
-							/>
-						)}
-					</form.AppField>
+					<div className="flex items-start justify-between gap-4">
+						<form.AppField name="clock.enable">
+							{(field) => (
+								<EditorChoiceControl
+									description={<Mx label="Clock status help" />}
+									label={translator.textFn("Status")}
+									options={[
+										{
+											label: translator.textFn("Enabled"),
+											value: "enabled",
+										},
+										{
+											label: translator.textFn("Disabled"),
+											value: "disabled",
+										},
+									]}
+									required={false}
+									value={field.state.value ? "enabled" : "disabled"}
+									onChangeFn={(value) => field.handleChange(value === "enabled")}
+								/>
+							)}
+						</form.AppField>
+						<ItemInterfaceField />
+					</div>
 					<EditorChoiceControl
 						disabled={clock.durationMs === undefined}
 						label={translator.textFn("Expiry mode")}

@@ -4,6 +4,7 @@
 		"uid": "ecjzsaixdj6tc96f20xp4uxz",
 		"id": "coffee-field",
 		"title": "Coffee Field",
+		"ui": "simple",
 		"description": "Coffee",
 		"artwork": {
 			"scale": 1,

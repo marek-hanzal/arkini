@@ -6,5 +6,5 @@ export class ItemProductionControlUnavailableError extends Data.TaggedError(
 	"ItemProductionControlUnavailableError",
 )<{
 	readonly ownerItemId: IdSchema.Type;
-	readonly reason: "automatic-only" | "not-scheduled" | "expired";
+	readonly reason: "simple" | "not-scheduled" | "expired";
 }> {}

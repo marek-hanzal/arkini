@@ -4,6 +4,7 @@
 		"uid": "s2nit67s0y8655wk3pvom2qo",
 		"id": "wild-boar",
 		"title": "Wild Boar",
+		"ui": "simple",
 		"description": "An animal",
 		"artwork": {
 			"scale": 1,
@@ -13,6 +14,36 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 120000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "chance",
+								"chance": 0.6,
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 1,
+											"max": 2
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

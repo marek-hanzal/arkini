@@ -4,6 +4,7 @@
 		"uid": "sabqmx16rrpryphsk3xbygeu",
 		"id": "hungry-sheep",
 		"title": "Hungry Sheep",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -42,7 +43,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": []
 	}

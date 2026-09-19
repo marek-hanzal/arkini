@@ -1,5 +1,6 @@
+import { ItemInterfaceField } from "~/item-authoring/ui/ItemInterfaceField";
 import { Mx } from "~/translation/ui/Mx";
-import { EditorChoiceControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
+import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
 import { useStore } from "@tanstack/react-form";
@@ -77,26 +78,7 @@ export const IdentitySection = () => {
 								/>
 							)}
 						</form.AppField>
-						<form.AppField name="control">
-							{(field) => (
-								<EditorChoiceControl
-									value={field.state.value ?? "interactive"}
-									onChangeFn={field.handleChange}
-									label={translator.textFn("Player controls")}
-									description={<Mx label="Item player controls help" />}
-									options={[
-										{
-											label: translator.textFn("Interactive"),
-											value: "interactive",
-										},
-										{
-											label: translator.textFn("Automatic only"),
-											value: "automatic-only",
-										},
-									]}
-								/>
-							)}
-						</form.AppField>
+						<ItemInterfaceField />
 					</div>
 					<div className="grid grid-cols-2 gap-4">
 						<form.AppField name="maxStackSize">

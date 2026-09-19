@@ -4,6 +4,7 @@
 		"uid": "gknt8tkntf6cx7a4vb5jre1j",
 		"id": "dirty-cauldron",
 		"title": "Dirty Cauldron",
+		"ui": "simple",
 		"description": "You should clean it up",
 		"artwork": {
 			"scale": 1,

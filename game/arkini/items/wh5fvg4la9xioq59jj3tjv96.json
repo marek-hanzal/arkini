@@ -4,6 +4,7 @@
 		"uid": "wh5fvg4la9xioq59jj3tjv96",
 		"id": "sheep",
 		"title": "Sheep",
+		"ui": "simple",
 		"description": "Shaun the Sheep!",
 		"artwork": {
 			"scale": 1,
@@ -13,6 +14,9 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"merge": [
 			{
 				"target": {
@@ -20,11 +24,45 @@
 					"itemId": "wolf"
 				},
 				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
 				"effect": "replace",
 				"result": "well-fed-wolf"
 			}
 		],
 		"clock": {
+			"intervalMs": 30000,
 			"durationMs": 300000,
 			"enable": true,
 			"rules": [],
@@ -53,8 +91,92 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "wolf-attack",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A nearby wolf may decide the sheep looks like dinner.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "wolf"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sheep"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

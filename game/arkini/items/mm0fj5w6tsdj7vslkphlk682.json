@@ -4,6 +4,7 @@
 		"uid": "mm0fj5w6tsdj7vslkphlk682",
 		"id": "filter-bank-depleted",
 		"title": "Filter Bank Depleted",
+		"ui": "simple",
 		"description": "Job is done. Now throw it away or recycle it.",
 		"artwork": {
 			"scale": 1,

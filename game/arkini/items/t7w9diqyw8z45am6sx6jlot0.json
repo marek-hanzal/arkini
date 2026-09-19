@@ -4,6 +4,7 @@
 		"uid": "t7w9diqyw8z45am6sx6jlot0",
 		"id": "civilian-clothes",
 		"title": "Civilian Clothes",
+		"ui": "simple",
 		"description": "Common clothes",
 		"artwork": {
 			"scale": 1,

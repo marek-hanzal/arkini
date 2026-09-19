@@ -4,6 +4,7 @@
 		"uid": "jaw4snt90jfd4fc8pyh128xy",
 		"id": "mana-reservoir",
 		"title": "Mana Reservoir",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

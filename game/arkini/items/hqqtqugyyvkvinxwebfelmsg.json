@@ -4,6 +4,7 @@
 		"uid": "hqqtqugyyvkvinxwebfelmsg",
 		"id": "diamond",
 		"title": "Diamond",
+		"ui": "simple",
 		"description": "You're incredibly rich!",
 		"artwork": {
 			"scale": 1,

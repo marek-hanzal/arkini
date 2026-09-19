@@ -4,6 +4,7 @@
 		"uid": "vcceh6gomf1xsmww1z0juf2n",
 		"id": "cauldron-with-beer",
 		"title": "Cauldron With Beer",
+		"ui": "simple",
 		"description": "Beer. In cauldron. A lot of beer",
 		"artwork": {
 			"scale": 1,

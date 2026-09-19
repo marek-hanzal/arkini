@@ -4,6 +4,7 @@
 		"uid": "jks4vzcbr0q304mqyffs42ex",
 		"id": "wire-processing",
 		"title": "Wire Processing",
+		"ui": "default",
 		"description": "It's time for some electricity",
 		"artwork": {
 			"scale": 1,

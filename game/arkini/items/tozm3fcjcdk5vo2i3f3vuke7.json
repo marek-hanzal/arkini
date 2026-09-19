@@ -4,6 +4,7 @@
 		"uid": "tozm3fcjcdk5vo2i3f3vuke7",
 		"id": "faith",
 		"title": "Faith",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

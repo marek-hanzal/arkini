@@ -4,6 +4,7 @@
 		"uid": "b1z61l4bbwdtc75nt189hzze",
 		"id": "stone",
 		"title": "Stone",
+		"ui": "simple",
 		"description": "Finally, you've found a stone. Now you can use it for various interesting things!",
 		"artwork": {
 			"scale": 1,

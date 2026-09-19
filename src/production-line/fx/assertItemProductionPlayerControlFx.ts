@@ -22,7 +22,7 @@ export const assertItemProductionPlayerControlFx = Effect.fn("assertItemProducti
 			return yield* Effect.fail(
 				new ItemProductionControlUnavailableError({
 					ownerItemId,
-					reason: "automatic-only",
+					reason: "simple",
 				}),
 			);
 	},

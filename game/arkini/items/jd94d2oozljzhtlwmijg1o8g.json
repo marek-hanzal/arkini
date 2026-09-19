@@ -4,6 +4,7 @@
 		"uid": "jd94d2oozljzhtlwmijg1o8g",
 		"id": "cow-farm",
 		"title": "Cow Farm",
+		"ui": "default",
 		"description": "Something related to milk? Come here!",
 		"artwork": {
 			"scale": 1,

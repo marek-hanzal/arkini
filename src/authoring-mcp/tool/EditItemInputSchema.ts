@@ -16,7 +16,7 @@ const itemPatch = z
 		merge: ItemSchema.shape.merge.nullable(),
 		action: ItemSchema.shape.action.nullable(),
 		clock: ItemSchema.shape.clock.nullable(),
-		control: ItemSchema.shape.control,
+		ui: ItemSchema.shape.ui.removeDefault().optional(),
 		lines: ItemSchema.shape.lines.removeDefault().optional(),
 		maxQueueSize: ItemSchema.shape.maxQueueSize.removeDefault().optional(),
 	})

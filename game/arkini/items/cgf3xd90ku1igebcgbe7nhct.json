@@ -4,6 +4,7 @@
 		"uid": "cgf3xd90ku1igebcgbe7nhct",
 		"id": "grain-farm",
 		"title": "Grain Farm",
+		"ui": "default",
 		"description": "Some food? Basic stuff here!",
 		"artwork": {
 			"scale": 1,

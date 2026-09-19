@@ -4,6 +4,7 @@
 		"uid": "l06x4o9newr2la5ohyqmxipx",
 		"id": "furniture",
 		"title": "Furniture",
+		"ui": "simple",
 		"description": "Some furniture to the house",
 		"artwork": {
 			"scale": 1,

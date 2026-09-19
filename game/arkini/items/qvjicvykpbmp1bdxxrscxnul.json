@@ -4,6 +4,7 @@
 		"uid": "qvjicvykpbmp1bdxxrscxnul",
 		"id": "axe",
 		"title": "Axe",
+		"ui": "simple",
 		"description": "Chop something down?",
 		"artwork": {
 			"scale": 1,

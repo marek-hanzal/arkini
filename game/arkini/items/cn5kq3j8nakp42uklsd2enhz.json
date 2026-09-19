@@ -4,6 +4,7 @@
 		"uid": "cn5kq3j8nakp42uklsd2enhz",
 		"id": "battle-axe",
 		"title": "Battle Axe",
+		"ui": "simple",
 		"description": "Slice through things",
 		"artwork": {
 			"scale": 1,

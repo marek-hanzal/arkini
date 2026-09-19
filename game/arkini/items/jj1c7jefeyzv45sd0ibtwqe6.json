@@ -4,6 +4,7 @@
 		"uid": "jj1c7jefeyzv45sd0ibtwqe6",
 		"id": "cauldron-with-soap",
 		"title": "Cauldron With Soap",
+		"ui": "simple",
 		"description": "I can smell a fresh soap",
 		"artwork": {
 			"scale": 1,

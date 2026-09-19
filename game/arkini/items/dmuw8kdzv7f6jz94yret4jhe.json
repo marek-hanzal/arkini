@@ -4,6 +4,7 @@
 		"uid": "dmuw8kdzv7f6jz94yret4jhe",
 		"id": "stonemason-camp-blueprint",
 		"title": "Stonemason Camp Blueprint",
+		"ui": "default",
 		"description": "Stone Access: Granted!",
 		"artwork": {
 			"scale": 1,

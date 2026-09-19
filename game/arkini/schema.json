@@ -1895,6 +1895,15 @@
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:arkini:schema:project#/$defs/DescriptionSchema"
 				},
+				"ui": {
+					"default": "default",
+					"description": "Item interface and player production control: simple shows only information and leaves production to the game; default enables manual production and always shows all sections, even without production lines.",
+					"type": "string",
+					"enum": [
+						"simple",
+						"default"
+					]
+				},
 				"music": {
 					"description": "Music resource requested while this item detail is open; omission keeps the global playlist.",
 					"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
@@ -1935,14 +1944,6 @@
 				"clock": {
 					"$ref": "urn:arkini:schema:project#/$defs/ItemScheduleSchema"
 				},
-				"control": {
-					"description": "Player production control; omission means interactive.",
-					"type": "string",
-					"enum": [
-						"automatic-only",
-						"interactive"
-					]
-				},
 				"action": {
 					"description": "An optional immediate action; mutually exclusive with production lines.",
 					"$ref": "urn:arkini:schema:project#/$defs/itemAction.ActionSchema"
@@ -1965,6 +1966,7 @@
 				"uid",
 				"id",
 				"title",
+				"ui",
 				"artwork",
 				"scope",
 				"maxStackSize",

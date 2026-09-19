@@ -4,6 +4,7 @@
 		"uid": "prt6rkka0at1honkbw36rnd3",
 		"id": "foundry-extinguished",
 		"title": "Foundry Extinguished",
+		"ui": "simple",
 		"description": "We're offline",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "lbyiwjest0kicpb3c1w5pen9",
 		"id": "bear",
 		"title": "Bear",
+		"ui": "simple",
 		"description": "A bit scary, but he will eventually go to otehr business",
 		"artwork": {
 			"scale": 1,
@@ -65,6 +66,36 @@
 				"result": "bear-eating-honey"
 			}
 		],
+		"clock": {
+			"durationMs": 240000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "chance",
+								"chance": 0.75,
+								"drop": [
+									{
+										"itemId": "bio-waste",
+										"quantity": {
+											"min": 2,
+											"max": 3
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

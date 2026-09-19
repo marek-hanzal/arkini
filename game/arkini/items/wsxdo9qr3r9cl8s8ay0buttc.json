@@ -4,6 +4,7 @@
 		"uid": "wsxdo9qr3r9cl8s8ay0buttc",
 		"id": "beer-mug",
 		"title": "Beer Bug",
+		"ui": "simple",
 		"description": "Good cold beer, ach!",
 		"artwork": {
 			"scale": 1,

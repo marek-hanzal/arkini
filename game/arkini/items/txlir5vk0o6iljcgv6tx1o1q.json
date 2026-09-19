@@ -4,6 +4,7 @@
 		"uid": "txlir5vk0o6iljcgv6tx1o1q",
 		"id": "vegetable-garden",
 		"title": "Vegetable Garden",
+		"ui": "default",
 		"description": "Grows some vegetables",
 		"artwork": {
 			"scale": 1,

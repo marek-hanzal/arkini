@@ -4,6 +4,7 @@
 		"uid": "y63jhc0ywt148z65dcwxulhu",
 		"id": "toilet-golem",
 		"title": "Toilet Golem",
+		"ui": "simple",
 		"description": "This is real danger",
 		"artwork": {
 			"scale": 1,

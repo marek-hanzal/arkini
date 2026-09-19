@@ -4,6 +4,7 @@
 		"uid": "a1sp9de8ih2tgztk1h1w397w",
 		"id": "cauldron-with-milk",
 		"title": "Cauldron With Milk",
+		"ui": "simple",
 		"description": "A lot of milk",
 		"artwork": {
 			"scale": 1,

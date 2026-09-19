@@ -4,6 +4,7 @@
 		"uid": "htlowzbb36uroshnuz0uxibl",
 		"id": "glassworks",
 		"title": "Glassworks",
+		"ui": "default",
 		"description": "Be careful, it's a bit britle",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "p21ekiw1otjy1iitpborymkq",
 		"id": "empty-flower-field",
 		"title": "Empty Flower Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

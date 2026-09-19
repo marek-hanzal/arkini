@@ -4,6 +4,7 @@
 		"uid": "jx4fawgqrdrwvt7d5afims1l",
 		"id": "dynamite-sticks",
 		"title": "Dynamite Sticks",
+		"ui": "simple",
 		"description": "Boom",
 		"artwork": {
 			"scale": 1,

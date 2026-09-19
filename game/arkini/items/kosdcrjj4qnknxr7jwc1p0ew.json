@@ -4,6 +4,7 @@
 		"uid": "kosdcrjj4qnknxr7jwc1p0ew",
 		"id": "bed-milk",
 		"title": "Bed Milk",
+		"ui": "simple",
 		"description": "Milk everywhere.",
 		"artwork": {
 			"scale": 1,

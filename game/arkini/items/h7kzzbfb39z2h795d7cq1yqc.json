@@ -4,6 +4,7 @@
 		"uid": "h7kzzbfb39z2h795d7cq1yqc",
 		"id": "apiary-blueprint",
 		"title": "Apiary Blueprint",
+		"ui": "default",
 		"description": "Bees",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "ndjrqhmuzcn1k6qo8xmpqslp",
 		"id": "beeswax",
 		"title": "Beeswax",
+		"ui": "simple",
 		"description": "Candles are created using this",
 		"artwork": {
 			"scale": 1,

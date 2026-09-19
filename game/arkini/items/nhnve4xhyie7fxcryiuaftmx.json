@@ -4,6 +4,7 @@
 		"uid": "nhnve4xhyie7fxcryiuaftmx",
 		"id": "treasure-chest-t5",
 		"title": "Treasure Chest - Tier 5",
+		"ui": "default",
 		"description": "Quite luxury stuff",
 		"artwork": {
 			"scale": 1,

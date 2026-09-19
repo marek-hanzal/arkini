@@ -4,6 +4,7 @@
 		"uid": "g820vf0ok9a9ei29wu10dd99",
 		"id": "knowledge-t4",
 		"title": "Knowledge - Tier 4",
+		"ui": "simple",
 		"description": "Master knowledge of the topic",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "fd26fuvxrqjzoib5sy4lo04u",
 		"id": "mining-portal",
 		"title": "Mining Portal",
+		"ui": "simple",
 		"description": "Transfer you to the mining-land",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "pci17eu02ys7g99t7cmhbey9",
 		"id": "coal-deposit",
 		"title": "Coal Deposit",
+		"ui": "simple",
 		"description": "Industrial times starts here",
 		"artwork": {
 			"scale": 1,

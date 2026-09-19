@@ -4,6 +4,7 @@
 		"uid": "ezgt6azowldg68m4m0j3wwy8",
 		"id": "filter-bank",
 		"title": "Filter Bank",
+		"ui": "simple",
 		"description": "Air filter used by air-purifier to make... air clean",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "v67fm181mw3z03k6dyrq65ct",
 		"id": "yarn",
 		"title": "Yarn",
+		"ui": "simple",
 		"description": "Tangled.",
 		"artwork": {
 			"scale": 1,

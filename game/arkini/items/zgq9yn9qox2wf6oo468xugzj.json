@@ -4,6 +4,7 @@
 		"uid": "zgq9yn9qox2wf6oo468xugzj",
 		"id": "inventory",
 		"title": "Inventory",
+		"ui": "simple",
 		"description": "Here you have all the clutter you don't want on the board. Yaay!",
 		"artwork": {
 			"scale": 1,

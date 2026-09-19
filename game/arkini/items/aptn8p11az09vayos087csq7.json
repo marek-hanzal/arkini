@@ -4,6 +4,7 @@
 		"uid": "aptn8p11az09vayos087csq7",
 		"id": "brickworks",
 		"title": "Brickworks",
+		"ui": "default",
 		"description": "Do bricks",
 		"artwork": {
 			"scale": 1,

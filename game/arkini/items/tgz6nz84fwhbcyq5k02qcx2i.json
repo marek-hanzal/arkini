@@ -4,6 +4,7 @@
 		"uid": "tgz6nz84fwhbcyq5k02qcx2i",
 		"id": "goose",
 		"title": "Goose",
+		"ui": "simple",
 		"description": "Beloved lifestock",
 		"artwork": {
 			"scale": 1,
@@ -53,7 +54,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": []
 	}

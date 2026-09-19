@@ -4,6 +4,7 @@
 		"uid": "pwa7i4khtnmvijdvtfgdzyhj",
 		"id": "dye",
 		"title": "Dye",
+		"ui": "simple",
 		"description": "Wanna color something?",
 		"artwork": {
 			"scale": 1,

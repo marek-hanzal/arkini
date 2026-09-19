@@ -4,6 +4,7 @@
 		"uid": "fenhlvaj45ssocm5r935nqli",
 		"id": "campfire-extinguished",
 		"title": "Campfire Extinguished",
+		"ui": "simple",
 		"description": "No more light here",
 		"artwork": {
 			"scale": 1,

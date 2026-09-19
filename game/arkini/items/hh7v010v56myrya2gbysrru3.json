@@ -4,6 +4,7 @@
 		"uid": "hh7v010v56myrya2gbysrru3",
 		"id": "grain-seed",
 		"title": "Grain Seed",
+		"ui": "simple",
 		"description": "Bio",
 		"artwork": {
 			"scale": 1,

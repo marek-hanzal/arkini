@@ -4,6 +4,7 @@
 		"uid": "bi89dksa0k5at0g2z2277own",
 		"id": "dye-workshop-washed",
 		"title": "Dye Workshop Washed",
+		"ui": "simple",
 		"description": "You washed it out",
 		"artwork": {
 			"scale": 1,

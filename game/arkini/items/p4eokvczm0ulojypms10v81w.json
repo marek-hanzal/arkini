@@ -4,6 +4,7 @@
 		"uid": "p4eokvczm0ulojypms10v81w",
 		"id": "empty-beer-barrel",
 		"title": "Empty Beer Barrel",
+		"ui": "simple",
 		"description": "Nothing inside.",
 		"artwork": {
 			"scale": 1,

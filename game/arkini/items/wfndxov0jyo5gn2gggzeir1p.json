@@ -4,6 +4,7 @@
 		"uid": "wfndxov0jyo5gn2gggzeir1p",
 		"id": "empty-mine",
 		"title": "Empty Mine",
+		"ui": "default",
 		"description": "You need some new resources?",
 		"artwork": {
 			"scale": 1,

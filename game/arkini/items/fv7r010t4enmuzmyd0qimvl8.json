@@ -4,6 +4,7 @@
 		"uid": "fv7r010t4enmuzmyd0qimvl8",
 		"id": "gem-mine",
 		"title": "Gem Mine",
+		"ui": "default",
 		"description": "If you wanna be rich, go into the depths",
 		"artwork": {
 			"scale": 1,

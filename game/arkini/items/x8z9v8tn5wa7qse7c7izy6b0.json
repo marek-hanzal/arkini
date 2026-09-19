@@ -4,6 +4,7 @@
 		"uid": "x8z9v8tn5wa7qse7c7izy6b0",
 		"id": "base-camp",
 		"title": "Base Camp",
+		"ui": "default",
 		"draft": false,
 		"description": "This is the start of your journey. Here you can build more stuff as you progress!",
 		"music": "do3ht3r9ylfqeyv8dpvqyxsd",
@@ -617,6 +618,36 @@
 							}
 						],
 						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "explorer-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "explorer"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
 					}
 				]
 			},
@@ -705,6 +736,36 @@
 							}
 						],
 						"type": "show"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "hunter-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "hunter"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
 					}
 				]
 			}

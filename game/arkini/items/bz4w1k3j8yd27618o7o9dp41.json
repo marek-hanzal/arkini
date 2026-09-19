@@ -4,6 +4,7 @@
 		"uid": "bz4w1k3j8yd27618o7o9dp41",
 		"id": "sack-with-water",
 		"title": "Sack With Water",
+		"ui": "simple",
 		"description": "It's wet",
 		"artwork": {
 			"scale": 1,

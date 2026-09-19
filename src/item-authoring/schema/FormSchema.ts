@@ -21,7 +21,6 @@ export type FormValues = Omit<
 	};
 	readonly description: string;
 	readonly clock?: ItemScheduleSchema.Type;
-	readonly control?: "automatic-only" | "interactive";
 	readonly action?: ActionSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;

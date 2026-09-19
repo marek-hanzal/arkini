@@ -4,6 +4,7 @@
 		"uid": "ecihjakbzjlagfsrswt4cdji",
 		"id": "toilet",
 		"title": "Toilet",
+		"ui": "simple",
 		"description": "Universal bio remover",
 		"artwork": {
 			"scale": 1,

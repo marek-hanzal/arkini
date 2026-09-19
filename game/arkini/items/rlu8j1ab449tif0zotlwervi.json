@@ -4,6 +4,7 @@
 		"uid": "rlu8j1ab449tif0zotlwervi",
 		"id": "broken-toilet",
 		"title": "Broken Toilet",
+		"ui": "simple",
 		"description": "It does not work anymore",
 		"artwork": {
 			"scale": 1,

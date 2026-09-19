@@ -4,6 +4,7 @@
 		"uid": "e65gc6c7vad2myus9kn7gl7x",
 		"id": "lantern",
 		"title": "Lantern",
+		"ui": "simple",
 		"description": "Better light source",
 		"artwork": {
 			"scale": 1,

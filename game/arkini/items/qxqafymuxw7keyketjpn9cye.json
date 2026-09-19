@@ -4,6 +4,7 @@
 		"uid": "qxqafymuxw7keyketjpn9cye",
 		"id": "feather",
 		"title": "Feather",
+		"ui": "simple",
 		"description": "Piece of arrow. Or piece of writing tool",
 		"artwork": {
 			"scale": 1,

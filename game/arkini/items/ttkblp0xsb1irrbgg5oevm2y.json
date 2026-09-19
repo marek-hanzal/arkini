@@ -4,6 +4,7 @@
 		"uid": "ttkblp0xsb1irrbgg5oevm2y",
 		"id": "paper",
 		"title": "Paper",
+		"ui": "simple",
 		"description": "If you want to persist your knowledge or get better stuff, paper is the way to go!",
 		"artwork": {
 			"scale": 1,

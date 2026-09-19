@@ -4,6 +4,7 @@
 		"uid": "tacmmsi662wvdnoz6i21n1wp",
 		"id": "waste-incinerator",
 		"title": "Waste Incinerator",
+		"ui": "default",
 		"description": "De-waste-izator",
 		"artwork": {
 			"scale": 1,

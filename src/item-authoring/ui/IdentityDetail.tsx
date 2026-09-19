@@ -49,12 +49,10 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					<div className="grid content-start gap-5">
 						<FactList>
 							<DetailFact
-								label={translator.textFn("Player controls")}
-								description={<Mx label="Authored player controls summary help" />}
+								label={translator.textFn("Item interface")}
+								description={<Mx label="Item interface help" />}
 								value={translator.textFn(
-									item.control === "automatic-only"
-										? "Automatic only"
-										: "Interactive",
+									item.ui === "simple" ? "Simple" : "Default",
 								)}
 							/>
 							<DetailFact

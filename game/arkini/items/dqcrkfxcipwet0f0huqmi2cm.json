@@ -4,6 +4,7 @@
 		"uid": "dqcrkfxcipwet0f0huqmi2cm",
 		"id": "bubble",
 		"title": "Bubble",
+		"ui": "simple",
 		"description": "Bubble. No use for it",
 		"artwork": {
 			"scale": 1,

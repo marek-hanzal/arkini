@@ -4,6 +4,7 @@
 		"uid": "ap6ydtxwahg5cyki9g43shdo",
 		"id": "copper-pan",
 		"title": "Copper Pan",
+		"ui": "simple",
 		"description": "Wanna cook something?",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "xaijv8bc7ljbonqgp1vzcxcc",
 		"id": "hunted-game",
 		"title": "Hunted Game",
+		"ui": "default",
 		"description": "Some raw hunted stuff you shall process",
 		"artwork": {
 			"scale": 1,
@@ -13,6 +14,9 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"clock": {
 			"durationMs": 600000,
 			"enable": true,
@@ -43,6 +47,68 @@
 			}
 		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "game",
+				"title": "game",
+				"description": "Something that was inside an animal before",
+				"default": true,
+				"clockWeight": 1,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "hunted-game"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 2,
+												"max": 6
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

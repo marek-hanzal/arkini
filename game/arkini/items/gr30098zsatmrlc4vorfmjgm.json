@@ -4,6 +4,7 @@
 		"uid": "gr30098zsatmrlc4vorfmjgm",
 		"id": "grain-farm-blueprint",
 		"title": "Grain Farm Blueprint",
+		"ui": "default",
 		"draft": false,
 		"description": "Blueprint for Grain Farm. Usual boring stuff.",
 		"artwork": {

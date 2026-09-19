@@ -4,6 +4,7 @@
 		"uid": "nzu8858by7aipfykf0ygsoyf",
 		"id": "lit-carved-pumpkin",
 		"title": "Lit Carved Pumpkin",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -47,7 +48,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

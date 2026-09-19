@@ -4,6 +4,7 @@
 		"uid": "yh0kf1gx4k2scf967qcko7xd",
 		"id": "wishing-well-with-beer",
 		"title": "Wishing Well With Beer",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -43,7 +44,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

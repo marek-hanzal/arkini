@@ -4,6 +4,7 @@
 		"uid": "p7by927p0a8sqxebscar9lik",
 		"id": "hammer",
 		"title": "Hammer",
+		"ui": "simple",
 		"description": "Can break something",
 		"artwork": {
 			"scale": 1,

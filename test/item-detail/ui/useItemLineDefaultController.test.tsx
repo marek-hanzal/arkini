@@ -42,7 +42,7 @@ it("toggles the exact owner's effective default independently of a full queue an
 					scope: "board",
 				},
 				item: {
-					control: "interactive",
+					ui: "default",
 					maxQueueSize: 1,
 					lines: [
 						{

@@ -4,6 +4,7 @@
 		"uid": "om31d2frwk86m6dhiirx7kw6",
 		"id": "corn-field",
 		"title": "Corn Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

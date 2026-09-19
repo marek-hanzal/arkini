@@ -4,6 +4,7 @@
 		"uid": "laqx08cmv2c9mqs5qz5tv8yj",
 		"id": "amethyst",
 		"title": "Amethyst",
+		"ui": "simple",
 		"description": "A colorful stone",
 		"artwork": {
 			"scale": 1,

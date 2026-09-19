@@ -4,6 +4,7 @@
 		"uid": "l70n80ujrm55lpl6z2n4hcty",
 		"id": "bio-waste",
 		"title": "Bio-Waste",
+		"ui": "simple",
 		"description": "Stuff produced by life. From the other side.",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "am8ireo4m4ntdnh40wxpmpnk",
 		"id": "mana",
 		"title": "Mana",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -4,6 +4,7 @@
 		"uid": "ixw46s78kqk56j0h4utwgw5e",
 		"id": "pickaxe",
 		"title": "Pickaxe",
+		"ui": "simple",
 		"description": "Miners, go deep!",
 		"artwork": {
 			"scale": 1,

@@ -25,7 +25,7 @@ export namespace useItemDetailSceneController {
 	export interface Detail
 		extends Pick<
 			ItemSchema.Type,
-			"description" | "scope" | "maxStackSize" | "maxCount" | "lines"
+			"description" | "scope" | "maxStackSize" | "maxCount" | "lines" | "ui"
 		> {
 		readonly canMake: boolean;
 		readonly disabledLineIds: readonly string[];
@@ -156,6 +156,7 @@ export const useItemDetailSceneController = ({
 					item,
 				}),
 				canMake,
+				ui: item.ui,
 				title: item.title,
 				sourceUrl: game.getResourceUrlFn(item.artwork.default[0]),
 				compositeUrl:

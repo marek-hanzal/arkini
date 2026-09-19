@@ -42,7 +42,7 @@ it("clears the visible owner's pending queue and blocks empty, stale and missing
 					scope: "board",
 				},
 				item: {
-					control: "interactive",
+					ui: "default",
 				},
 			},
 		],

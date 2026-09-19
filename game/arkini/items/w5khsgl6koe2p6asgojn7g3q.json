@@ -4,6 +4,7 @@
 		"uid": "w5khsgl6koe2p6asgojn7g3q",
 		"id": "pot",
 		"title": "Pot",
+		"ui": "simple",
 		"description": "You can put something in there",
 		"artwork": {
 			"scale": 1,

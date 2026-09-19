@@ -4,6 +4,7 @@
 		"uid": "gepmb31cvdse7u75q4i4p4ek",
 		"id": "empty-lantern",
 		"title": "Empty Lantern",
+		"ui": "simple",
 		"description": "Just an unlit lanter. Needs something to make it work",
 		"artwork": {
 			"scale": 1,

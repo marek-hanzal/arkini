@@ -4,6 +4,7 @@
 		"uid": "fbj07pw11dg44pnvdqwgm1dw",
 		"id": "bed-wine",
 		"title": "Bed Wine",
+		"ui": "simple",
 		"description": "Don't lick it",
 		"artwork": {
 			"scale": 1,

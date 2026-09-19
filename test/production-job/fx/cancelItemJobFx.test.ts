@@ -206,7 +206,7 @@ it("enforces player control and does not refund units spent at start", () => {
 			...config.items,
 			forge: {
 				...config.items.forge,
-				control: "automatic-only",
+				ui: "simple",
 			},
 		},
 	});

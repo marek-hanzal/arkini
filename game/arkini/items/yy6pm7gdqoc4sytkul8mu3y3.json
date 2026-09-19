@@ -4,6 +4,7 @@
 		"uid": "yy6pm7gdqoc4sytkul8mu3y3",
 		"id": "windmill",
 		"title": "Windmill",
+		"ui": "default",
 		"description": "Mill some flour",
 		"artwork": {
 			"scale": 1,

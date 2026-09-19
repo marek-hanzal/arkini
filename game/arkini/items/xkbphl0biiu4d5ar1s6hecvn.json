@@ -4,6 +4,7 @@
 		"uid": "xkbphl0biiu4d5ar1s6hecvn",
 		"id": "basecamp-on-fire",
 		"title": "Basecamp on Fire",
+		"ui": "simple",
 		"draft": false,
 		"artwork": {
 			"scale": 1,
@@ -80,7 +81,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

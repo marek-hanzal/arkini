@@ -41,7 +41,7 @@ const seededConfig = GameConfigSchema.parse({
 			clock: {
 				intervalMs: 1000,
 			},
-			control: "automatic-only",
+			ui: "simple",
 			lines: productionLines,
 		},
 	},

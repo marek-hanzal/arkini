@@ -4,6 +4,7 @@
 		"uid": "v5d2dioqv0zxgjlr6wo2vgeh",
 		"id": "animal-bones",
 		"title": "Animal Bones",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

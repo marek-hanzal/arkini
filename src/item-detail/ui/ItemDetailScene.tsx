@@ -21,10 +21,9 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	const closeItemDetailFn = useCloseItemDetail();
 	const translator = useTranslator();
 	const status = controller.stale ? translator.textFn("Gone") : undefined;
-	// Queue capacity is projected from authored lines, independently of rule visibility.
-	const hasProduction = controller.detail?.queueSize !== undefined;
-	const tab = hasProduction ? target.tab : "info";
-	const navigation = hasProduction ? (
+	const fullInterface = controller.detail?.ui === "default";
+	const tab = fullInterface ? target.tab : "info";
+	const navigation = fullInterface ? (
 		<ItemDetailTabs
 			active={tab}
 			disabled={disabled}

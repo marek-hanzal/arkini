@@ -4,6 +4,7 @@
 		"uid": "hap8h04cn4l4c60avf2b7il2",
 		"id": "empty-sugar-beet-field",
 		"title": "Empty Sugar Beet Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -4,6 +4,7 @@
 		"uid": "x0ehwt5wmhhdzg5s6915oioh",
 		"id": "empty-bottle",
 		"title": "Empty Bottle",
+		"ui": "simple",
 		"description": "A bottle",
 		"artwork": {
 			"scale": 1,

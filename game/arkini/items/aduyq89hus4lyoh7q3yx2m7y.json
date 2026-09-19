@@ -4,6 +4,7 @@
 		"uid": "aduyq89hus4lyoh7q3yx2m7y",
 		"id": "empty-honeycomb",
 		"title": "Empty Honeycomb",
+		"ui": "simple",
 		"description": "So you want to make some candles?",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "cdzjb2w5wnfeljcp1inxrgz9",
 		"id": "plague",
 		"title": "Plague",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -20,7 +21,6 @@
 			"enable": true,
 			"rules": []
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

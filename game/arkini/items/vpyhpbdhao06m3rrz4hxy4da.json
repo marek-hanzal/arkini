@@ -4,6 +4,7 @@
 		"uid": "vpyhpbdhao06m3rrz4hxy4da",
 		"id": "popcorn",
 		"title": "Popcorn",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

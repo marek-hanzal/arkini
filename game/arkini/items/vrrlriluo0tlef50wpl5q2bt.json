@@ -4,6 +4,7 @@
 		"uid": "vrrlriluo0tlef50wpl5q2bt",
 		"id": "beehive",
 		"title": "Beehive",
+		"ui": "simple",
 		"description": "Honey producers",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "hlhjwuirteft3l82uxiqrrnh",
 		"id": "empty-corn-field",
 		"title": "Empty Corn Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

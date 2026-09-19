@@ -4,6 +4,7 @@
 		"uid": "nh9tf1n52h19igah115s36jk",
 		"id": "air-pollution",
 		"title": "Air Pollution",
+		"ui": "simple",
 		"description": "Ugly thing, it will disappear by itself, but you can also clear it by yourself.",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "f5o2vqdxqh3zhg05fyd1xf1m",
 		"id": "cow",
 		"title": "Cow",
+		"ui": "simple",
 		"description": "Booo!",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "j9ni85pox4gjt7uu3ud04kkj",
 		"id": "bow",
 		"title": "Bow",
+		"ui": "simple",
 		"description": "Bow. Hunt something",
 		"artwork": {
 			"scale": 1,

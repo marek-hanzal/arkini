@@ -4,6 +4,7 @@
 		"uid": "kwkucgj71atfynrxw5sugzpe",
 		"id": "wood",
 		"title": "Wood",
+		"ui": "simple",
 		"description": "Raw wood, so you can be creative with it to make new nice things.",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "my9bfiki5q32m5rgvcmq66h1",
 		"id": "soapy-scrubbing-brush",
 		"title": "Soapy Scrubbing Brush",
+		"ui": "simple",
 		"description": "Make things clean again",
 		"artwork": {
 			"scale": 1,

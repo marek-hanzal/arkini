@@ -4,6 +4,7 @@
 		"uid": "r37rbdbf8ntc3tt56yv1549n",
 		"id": "house-t1",
 		"title": "House - Tier 1",
+		"ui": "default",
 		"description": "Simple good old house.",
 		"artwork": {
 			"scale": 1,

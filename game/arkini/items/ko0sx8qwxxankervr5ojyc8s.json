@@ -4,6 +4,7 @@
 		"uid": "ko0sx8qwxxankervr5ojyc8s",
 		"id": "arrowheads",
 		"title": "Arrowheads",
+		"ui": "simple",
 		"description": "Arrow. Oh, just a tip",
 		"artwork": {
 			"scale": 1,

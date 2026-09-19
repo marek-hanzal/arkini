@@ -4,6 +4,7 @@
 		"uid": "h0b9l3d36yl5whfxcfx1v6a0",
 		"id": "piggy-bank",
 		"title": "Piggy Bank",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

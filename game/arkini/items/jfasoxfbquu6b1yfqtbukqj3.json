@@ -4,6 +4,7 @@
 		"uid": "jfasoxfbquu6b1yfqtbukqj3",
 		"id": "pottery",
 		"title": "Pottery",
+		"ui": "simple",
 		"description": "Tavern may need this",
 		"artwork": {
 			"scale": 1,

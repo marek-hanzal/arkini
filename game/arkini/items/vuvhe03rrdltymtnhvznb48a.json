@@ -4,6 +4,7 @@
 		"uid": "vuvhe03rrdltymtnhvznb48a",
 		"id": "clay-vase",
 		"title": "Clay Vase",
+		"ui": "simple",
 		"description": "Something could be put inside.",
 		"artwork": {
 			"scale": 1,

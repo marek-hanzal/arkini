@@ -4,6 +4,7 @@
 		"uid": "wmo7luagikin3s157v4xk8wx",
 		"id": "empty-hop-field",
 		"title": "Empty Hop Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

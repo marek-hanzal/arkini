@@ -4,6 +4,7 @@
 		"uid": "ysaolec07mflq4jonylq9h6v",
 		"id": "spoiled-wine-barrel",
 		"title": "Spoiled Wine Barrel",
+		"ui": "simple",
 		"description": "Too much archived vine",
 		"artwork": {
 			"scale": 1,

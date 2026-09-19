@@ -4,6 +4,7 @@
 		"uid": "ilfa6qy345vmj82d0lfgi0fo",
 		"id": "empty-dye-field",
 		"title": "Empty Dye Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

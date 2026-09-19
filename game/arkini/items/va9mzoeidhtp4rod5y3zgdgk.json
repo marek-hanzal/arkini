@@ -4,6 +4,7 @@
 		"uid": "va9mzoeidhtp4rod5y3zgdgk",
 		"id": "blasting-machine",
 		"title": "Blasting Machine",
+		"ui": "simple",
 		"description": "This will make kaboom if connected properly",
 		"artwork": {
 			"scale": 1,

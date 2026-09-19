@@ -4,6 +4,7 @@
 		"uid": "cqwmnos0386zfehpbx8iibfy",
 		"id": "house-t1-blueprint",
 		"title": "House - Tier 1 Blueprint",
+		"ui": "default",
 		"description": "People should live somewhere",
 		"artwork": {
 			"scale": 1,

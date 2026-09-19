@@ -4,6 +4,7 @@
 		"uid": "xtxotfa57m3amgzqzscmaa0h",
 		"id": "explorer-blueprint",
 		"title": "Explorer Blueprint",
+		"ui": "default",
 		"draft": false,
 		"description": "Plans for a simple explorer's camp.",
 		"artwork": {

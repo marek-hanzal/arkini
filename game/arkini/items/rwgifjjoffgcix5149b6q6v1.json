@@ -4,6 +4,7 @@
 		"uid": "rwgifjjoffgcix5149b6q6v1",
 		"id": "firewood",
 		"title": "Firewood",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

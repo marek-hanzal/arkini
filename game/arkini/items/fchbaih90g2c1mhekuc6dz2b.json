@@ -4,6 +4,7 @@
 		"uid": "fchbaih90g2c1mhekuc6dz2b",
 		"id": "gold-ingot",
 		"title": "Gold Ingot",
+		"ui": "simple",
 		"description": "Shiny shiny",
 		"artwork": {
 			"scale": 1,

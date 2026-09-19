@@ -4,6 +4,7 @@
 		"uid": "oh4b7a0sm9bzhbwmlasap3ci",
 		"id": "chopped-fruit",
 		"title": "Chopped Fruit",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

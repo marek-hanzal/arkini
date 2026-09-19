@@ -7,7 +7,7 @@ import {
 } from "~test/production-line/support/lineRunTestRuntime";
 
 describe("resolveItemDetailTargetFn", () => {
-	it("defaults line owners to Lines and keeps every requested detail section available", () => {
+	it("defaults full interfaces to Lines and keeps every requested detail section available", () => {
 		const runtime = lineRunRuntime({});
 		expect(
 			resolveItemDetailTargetFn({
@@ -36,7 +36,7 @@ describe("resolveItemDetailTargetFn", () => {
 		}
 	});
 
-	it("prioritizes this owner's active or queued work without overriding an explicit tab", () => {
+	it("opens Lines even with active or queued work", () => {
 		const base = lineRunRuntime({});
 		const request = {
 			id: "request:workshop",
@@ -69,7 +69,7 @@ describe("resolveItemDetailTargetFn", () => {
 					runtime,
 				}),
 			).toMatchObject({
-				tab: "queue",
+				tab: "lines",
 			});
 			expect(
 				resolveItemDetailTargetFn({
@@ -105,7 +105,7 @@ describe("resolveItemDetailTargetFn", () => {
 		});
 	});
 
-	it("defaults ordinary runtime items to Info and rejects missing targets", () => {
+	it("opens Lines for a default item without lines and rejects missing targets", () => {
 		const runtime = lineRunRuntime({});
 		const ordinaryRuntime = {
 			...runtime,
@@ -124,7 +124,7 @@ describe("resolveItemDetailTargetFn", () => {
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
-			tab: "info",
+			tab: "lines",
 		});
 		expect(
 			resolveItemDetailTargetFn({
@@ -134,5 +134,33 @@ describe("resolveItemDetailTargetFn", () => {
 		).toEqual({
 			kind: "unavailable",
 		});
+	});
+	it("keeps simple items on Info even when a production section is requested", () => {
+		const source = lineRunRuntime({});
+		const runtime = {
+			...source,
+			items: source.items.map((item) => ({
+				...item,
+				item: {
+					...item.item,
+					ui: "simple" as const,
+				},
+			})),
+		};
+		for (const requestedTab of [
+			undefined,
+			"lines",
+			"queue",
+		] as const) {
+			expect(
+				resolveItemDetailTargetFn({
+					itemId: "runtime:workshop",
+					runtime,
+					requestedTab,
+				}),
+			).toMatchObject({
+				tab: "info",
+			});
+		}
 	});
 });

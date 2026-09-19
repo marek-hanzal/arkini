@@ -4,6 +4,7 @@
 		"uid": "uugdqcs2ghv34ol6rxal8fk5",
 		"id": "stone-deposit-deplated",
 		"title": "Once upon a time, here was stone",
+		"ui": "default",
 		"description": "Stone is no longer here, but you can use some tools to find a new deposit!",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "j6yw3lcs1v7er66t6lzsjed2",
 		"id": "water-jar",
 		"title": "Water Jar",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

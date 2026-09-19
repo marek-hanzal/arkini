@@ -4,6 +4,7 @@
 		"uid": "cl9t76unhn41sy76zel9ygoj",
 		"id": "cocoa-beans",
 		"title": "Cocoa Beans",
+		"ui": "simple",
 		"description": "Fresh cocoa beans",
 		"artwork": {
 			"scale": 1,

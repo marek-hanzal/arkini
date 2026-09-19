@@ -4,6 +4,7 @@
 		"uid": "x2vm1uc63ibkyo338dhe35w3",
 		"id": "wine-bath",
 		"title": "Wine Bath",
+		"ui": "simple",
 		"description": "Why not?",
 		"artwork": {
 			"scale": 1,

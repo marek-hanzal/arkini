@@ -4,6 +4,7 @@
 		"uid": "axpgheijxv8sypvu52ux6sxy",
 		"id": "gear-t1",
 		"title": "Gear - Tier 1",
+		"ui": "simple",
 		"description": "Simple gear for simple machines",
 		"artwork": {
 			"scale": 1,

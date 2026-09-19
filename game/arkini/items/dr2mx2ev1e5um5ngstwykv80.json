@@ -4,6 +4,7 @@
 		"uid": "dr2mx2ev1e5um5ngstwykv80",
 		"id": "cotton-cloth",
 		"title": "Cotton Cloth",
+		"ui": "simple",
 		"description": "Cotton cloth",
 		"artwork": {
 			"scale": 1,

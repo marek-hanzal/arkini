@@ -4,6 +4,7 @@
 		"uid": "mroh4s4rsygi6qlncjqbqu2k",
 		"id": "empty-sack",
 		"title": "Empty Sack",
+		"ui": "simple",
 		"description": "You can put things inside",
 		"artwork": {
 			"scale": 1,

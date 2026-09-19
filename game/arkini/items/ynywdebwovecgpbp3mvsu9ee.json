@@ -4,6 +4,7 @@
 		"uid": "ynywdebwovecgpbp3mvsu9ee",
 		"id": "wishing-well-with-coffee",
 		"title": "Wishing Well With Coffee",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -43,7 +44,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

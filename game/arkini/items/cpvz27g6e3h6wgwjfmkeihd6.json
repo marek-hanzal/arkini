@@ -4,6 +4,7 @@
 		"uid": "cpvz27g6e3h6wgwjfmkeihd6",
 		"id": "spoiled-jar",
 		"title": "Spoiled Jar",
+		"ui": "simple",
 		"description": "Maybe you don't want have this stored in the shelf. It may also walk away by itself",
 		"artwork": {
 			"scale": 1,

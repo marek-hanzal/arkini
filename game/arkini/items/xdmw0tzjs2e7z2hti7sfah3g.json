@@ -4,6 +4,7 @@
 		"uid": "xdmw0tzjs2e7z2hti7sfah3g",
 		"id": "paper-boat",
 		"title": "Paper Boat",
+		"ui": "simple",
 		"description": "Just a boat",
 		"artwork": {
 			"scale": 1,

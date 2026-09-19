@@ -4,6 +4,7 @@
 		"uid": "oy7hz2unlgoos52f57q9tstx",
 		"id": "milk-mug",
 		"title": "Milk Mug",
+		"ui": "simple",
 		"description": "Innocent mug of milk. Or foam on top of beer you can mask",
 		"artwork": {
 			"scale": 1,

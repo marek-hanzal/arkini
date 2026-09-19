@@ -4,6 +4,7 @@
 		"uid": "w61ftom9lbm4m70y9oagapuu",
 		"id": "dirty-scrubbing-brush",
 		"title": "Dirty Scrubbing Brush",
+		"ui": "simple",
 		"description": "No longer is able to clean up things",
 		"artwork": {
 			"scale": 1,

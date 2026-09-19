@@ -4,6 +4,7 @@
 		"uid": "j1qvbr13f0cxd3ds0c642yjo",
 		"id": "sunflower-field",
 		"title": "Sunflower Field",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

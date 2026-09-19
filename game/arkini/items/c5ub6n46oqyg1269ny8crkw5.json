@@ -4,6 +4,7 @@
 		"uid": "c5ub6n46oqyg1269ny8crkw5",
 		"id": "mana-vessel",
 		"title": "Mana Vessel",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

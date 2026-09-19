@@ -4,6 +4,7 @@
 		"uid": "jaem2mwc184a9wyurctnfvd1",
 		"id": "bakery",
 		"title": "Bakery",
+		"ui": "default",
 		"description": "Bake a thing. Yummi thing",
 		"artwork": {
 			"scale": 1,

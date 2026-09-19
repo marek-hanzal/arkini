@@ -4,6 +4,7 @@
 		"uid": "d7nii81w82pbs6y3cvfyprox",
 		"id": "unlit-candle",
 		"title": "Unlit Candle",
+		"ui": "simple",
 		"description": "Just a candle. It does not emit any light.",
 		"artwork": {
 			"scale": 1,

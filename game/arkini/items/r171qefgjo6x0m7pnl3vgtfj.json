@@ -4,6 +4,7 @@
 		"uid": "r171qefgjo6x0m7pnl3vgtfj",
 		"id": "empty-well",
 		"title": "Empty Well",
+		"ui": "default",
 		"description": "No more water. Yay.",
 		"artwork": {
 			"scale": 1,

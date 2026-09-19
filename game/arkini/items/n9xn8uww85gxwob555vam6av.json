@@ -4,6 +4,7 @@
 		"uid": "n9xn8uww85gxwob555vam6av",
 		"id": "coffee-tankard",
 		"title": "Coffee Tankard",
+		"ui": "simple",
 		"description": "Americano",
 		"artwork": {
 			"scale": 1,

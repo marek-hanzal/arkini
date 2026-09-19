@@ -4,6 +4,7 @@
 		"uid": "gsowtc0rzpubbqkaam67fz85",
 		"id": "mage-lodge",
 		"title": "Mage Lodge",
+		"ui": "simple",
 		"description": "Your way of magic starts here",
 		"artwork": {
 			"scale": 1,

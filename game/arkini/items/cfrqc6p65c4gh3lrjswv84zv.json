@@ -4,6 +4,7 @@
 		"uid": "cfrqc6p65c4gh3lrjswv84zv",
 		"id": "cutting-board",
 		"title": "Cutting Board",
+		"ui": "simple",
 		"description": "Not a skate. Just a board",
 		"artwork": {
 			"scale": 1,

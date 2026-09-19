@@ -4,6 +4,7 @@
 		"uid": "g8oi8iw4hidud9t24h8lv0p4",
 		"id": "animal-fat",
 		"title": "Animal Fat",
+		"ui": "simple",
 		"description": "Fat",
 		"artwork": {
 			"scale": 1,

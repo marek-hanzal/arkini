@@ -4,6 +4,7 @@
 		"uid": "ii0uj0xllpdlv6prfeu29q2k",
 		"id": "magic-sawmill-blueprint",
 		"title": "Magic Sawmill Blueprint",
+		"ui": "default",
 		"description": "Can you smell fresh wood... and magic?",
 		"artwork": {
 			"scale": 1,

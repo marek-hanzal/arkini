@@ -42,7 +42,7 @@ it("binds cancellation to the displayed request and disables it when that identi
 					scope: "board",
 				},
 				item: {
-					control: "interactive",
+					ui: "default",
 				},
 			},
 		],

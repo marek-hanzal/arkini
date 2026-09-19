@@ -4,6 +4,7 @@
 		"uid": "sy01gwgqbum87oa96usrv67x",
 		"id": "cotton-field",
 		"title": "Cotton Field",
+		"ui": "default",
 		"description": "Grows cotton",
 		"artwork": {
 			"scale": 1,

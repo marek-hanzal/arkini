@@ -4,6 +4,7 @@
 		"uid": "zp57lxcpee2yoxpvhrwvp9pq",
 		"id": "air-purifier",
 		"title": "Air Purifier",
+		"ui": "default",
 		"description": "Fresh air",
 		"artwork": {
 			"scale": 1,

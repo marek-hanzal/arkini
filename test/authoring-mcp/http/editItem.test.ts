@@ -19,7 +19,10 @@ describe("editor MCP item editing", () => {
 			Effect.runPromise,
 			notifyProjectChanged,
 		);
-		const water = editorTestPayload.config.items.water;
+		const water = {
+			...editorTestPayload.config.items.water,
+			ui: "simple" as const,
+		};
 		const producer = {
 			...createDraftFn({
 				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",

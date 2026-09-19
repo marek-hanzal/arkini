@@ -4,6 +4,7 @@
 		"uid": "cpmdnqi63m2cql44na50d7vq",
 		"id": "scissors",
 		"title": "Scissors",
+		"ui": "simple",
 		"description": "Sharp. Keep children away",
 		"artwork": {
 			"scale": 1,

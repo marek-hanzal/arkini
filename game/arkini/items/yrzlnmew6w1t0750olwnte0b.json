@@ -4,6 +4,7 @@
 		"uid": "yrzlnmew6w1t0750olwnte0b",
 		"id": "fruit-crate",
 		"title": "Fruit Crate",
+		"ui": "simple",
 		"description": "Yammy",
 		"artwork": {
 			"scale": 1,

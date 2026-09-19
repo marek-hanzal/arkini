@@ -4,6 +4,7 @@
 		"uid": "c43ij1yu1c9lfbhjc7gbc7dd",
 		"id": "soap",
 		"title": "Soap",
+		"ui": "simple",
 		"description": "You can clean yourself",
 		"artwork": {
 			"scale": 1,

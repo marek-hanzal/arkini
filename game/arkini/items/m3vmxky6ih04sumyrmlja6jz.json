@@ -4,6 +4,7 @@
 		"uid": "m3vmxky6ih04sumyrmlja6jz",
 		"id": "herbalist",
 		"title": "Herbalist",
+		"ui": "default",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "i1uq4hi5j80c2fdgn1ockshg",
 		"id": "sword",
 		"title": "Sword",
+		"ui": "simple",
 		"description": "Just a sword. You can cut a bread using it",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "s1wctb1su03hgfe6gzekwmqq",
 		"id": "pancake",
 		"title": "Pancake",
+		"ui": "simple",
 		"description": "You can make it better",
 		"artwork": {
 			"scale": 1,

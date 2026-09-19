@@ -4,6 +4,7 @@
 		"uid": "xanrcjfqo4hgvajlrwx5tz1j",
 		"id": "book-t4",
 		"title": "Book - Tier 4",
+		"ui": "simple",
 		"description": "You wan to read this one. Or write. Or both.",
 		"artwork": {
 			"scale": 1,

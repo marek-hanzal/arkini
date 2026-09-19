@@ -177,7 +177,7 @@ export const useFormController = ({
 			if (current.title !== next.title) form.setFieldValue("title", next.title);
 			if (current.description !== next.description)
 				form.setFieldValue("description", next.description);
-			if (current.control !== next.control) form.setFieldValue("control", next.control);
+			if (current.ui !== next.ui) form.setFieldValue("ui", next.ui);
 			if (current.scope !== next.scope) form.setFieldValue("scope", next.scope);
 			if (current.maxStackSize !== next.maxStackSize)
 				form.setFieldValue("maxStackSize", next.maxStackSize);

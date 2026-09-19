@@ -4,6 +4,7 @@
 		"uid": "eheyi27mvxb5ggoh90s3nyjm",
 		"id": "townhall-t1-blueprint",
 		"title": "Townhall I blueprint",
+		"ui": "default",
 		"description": "So it's time for upgrade?",
 		"artwork": {
 			"scale": 1,

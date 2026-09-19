@@ -4,6 +4,7 @@
 		"uid": "isr1iw451e8km1lo7pejzjht",
 		"id": "building-ruins",
 		"title": "Building Ruins",
+		"ui": "simple",
 		"description": "If you destroy a building - here you go",
 		"artwork": {
 			"scale": 1,

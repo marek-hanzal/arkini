@@ -4,6 +4,7 @@
 		"uid": "jqlpx0bdgoca771jlxmqoniy",
 		"id": "leather",
 		"title": "Leather",
+		"ui": "simple",
 		"description": "Hide is hidden. This is nice quality leather.",
 		"artwork": {
 			"scale": 1,

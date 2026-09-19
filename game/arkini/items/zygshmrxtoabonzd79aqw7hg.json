@@ -4,6 +4,7 @@
 		"uid": "zygshmrxtoabonzd79aqw7hg",
 		"id": "dairy-blueprint",
 		"title": "Dairy Blueprint",
+		"ui": "default",
 		"description": "Cheese!",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "q5m849uvic9mi5aqcb41pzle",
 		"id": "bedding",
 		"title": "Bedding",
+		"ui": "simple",
 		"description": "Sleep well",
 		"artwork": {
 			"scale": 1,

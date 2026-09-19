@@ -4,6 +4,7 @@
 		"uid": "ynro5iy60hlzcb1q3kd1an8l",
 		"id": "ghost",
 		"title": "Ghost",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

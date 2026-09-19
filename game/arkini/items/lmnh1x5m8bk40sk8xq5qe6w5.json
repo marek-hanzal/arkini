@@ -4,6 +4,7 @@
 		"uid": "lmnh1x5m8bk40sk8xq5qe6w5",
 		"id": "rapeseed-field",
 		"title": "Rapeseed Field",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

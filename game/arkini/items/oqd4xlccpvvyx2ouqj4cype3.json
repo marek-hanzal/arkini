@@ -4,6 +4,7 @@
 		"uid": "oqd4xlccpvvyx2ouqj4cype3",
 		"id": "grape-seed",
 		"title": "Grape Seed",
+		"ui": "simple",
 		"description": "Wine Time!",
 		"artwork": {
 			"scale": 1,

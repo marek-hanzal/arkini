@@ -4,6 +4,7 @@
 		"uid": "un9w2bebyhy98wbi2nu22naz",
 		"id": "dynamite",
 		"title": "Dynamite",
+		"ui": "simple",
 		"description": "Kaboom. You should be extremely careful as this may literally destroy your progress.",
 		"artwork": {
 			"scale": 1,

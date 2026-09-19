@@ -4,6 +4,7 @@
 		"uid": "p0deotdhek90rtgdkz7rb9c4",
 		"id": "bread-basket",
 		"title": "Bread Basket",
+		"ui": "simple",
 		"description": "Some fresh bread and stuff",
 		"artwork": {
 			"scale": 1,

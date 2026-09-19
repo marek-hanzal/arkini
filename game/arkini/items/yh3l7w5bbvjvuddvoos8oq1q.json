@@ -4,6 +4,7 @@
 		"uid": "yh3l7w5bbvjvuddvoos8oq1q",
 		"id": "key-t1",
 		"title": "Key - Tier 1",
+		"ui": "simple",
 		"description": "May unlock something",
 		"artwork": {
 			"scale": 1,

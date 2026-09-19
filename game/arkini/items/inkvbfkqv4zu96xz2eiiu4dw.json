@@ -4,6 +4,7 @@
 		"uid": "inkvbfkqv4zu96xz2eiiu4dw",
 		"id": "knowledge-t1",
 		"title": "Knowledge - Tier 1",
+		"ui": "simple",
 		"description": "Some knowledge",
 		"artwork": {
 			"scale": 1,

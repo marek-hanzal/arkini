@@ -4,6 +4,7 @@
 		"uid": "ixi03ht38pjk4k17tpympvmp",
 		"id": "raw-ruby",
 		"title": "Raw Ruby",
+		"ui": "simple",
 		"description": "Baby ruby",
 		"artwork": {
 			"scale": 1,

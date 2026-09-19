@@ -4,6 +4,7 @@
 		"uid": "nw60xpkc8pbay8tkriirlyw2",
 		"id": "empty-mug",
 		"title": "Empty Mug",
+		"ui": "simple",
 		"description": "You can put something in there",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "ubo4ux37gz2ya3qfsj78a9oq",
 		"id": "clutter",
 		"title": "Clutter",
+		"ui": "simple",
 		"description": "Just broken stuff. You should take care of you clutter.",
 		"artwork": {
 			"scale": 1,

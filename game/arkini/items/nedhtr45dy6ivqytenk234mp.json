@@ -4,6 +4,7 @@
 		"uid": "nedhtr45dy6ivqytenk234mp",
 		"id": "coffee-seed",
 		"title": "Coffee Seed",
+		"ui": "simple",
 		"description": "Grow your caffeine",
 		"artwork": {
 			"scale": 1,

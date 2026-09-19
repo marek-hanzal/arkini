@@ -4,6 +4,7 @@
 		"uid": "upghscvjnnxzp09urbuh5x0a",
 		"id": "beagle",
 		"title": "Beagle",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

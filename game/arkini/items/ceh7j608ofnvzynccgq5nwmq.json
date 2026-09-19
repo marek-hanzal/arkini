@@ -4,6 +4,7 @@
 		"uid": "ceh7j608ofnvzynccgq5nwmq",
 		"id": "dye-field",
 		"title": "Dye Field",
+		"ui": "simple",
 		"description": "Dye field. Da colors",
 		"artwork": {
 			"scale": 1,

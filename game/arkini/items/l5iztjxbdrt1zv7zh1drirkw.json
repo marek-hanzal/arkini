@@ -4,6 +4,7 @@
 		"uid": "l5iztjxbdrt1zv7zh1drirkw",
 		"id": "gardener",
 		"title": "Gardener",
+		"ui": "default",
 		"description": "Source of various seeds.",
 		"artwork": {
 			"scale": 1,

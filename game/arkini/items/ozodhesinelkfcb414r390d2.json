@@ -4,6 +4,7 @@
 		"uid": "ozodhesinelkfcb414r390d2",
 		"id": "hungry-pig",
 		"title": "Hungry Pig",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -42,7 +43,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": []
 	}

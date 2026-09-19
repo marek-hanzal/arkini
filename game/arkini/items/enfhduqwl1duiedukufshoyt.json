@@ -4,6 +4,7 @@
 		"uid": "enfhduqwl1duiedukufshoyt",
 		"id": "apiary",
 		"title": "Apiary",
+		"ui": "default",
 		"description": "Bees",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "ebepo6ezk56mp0419gksd5hz",
 		"id": "spoiled-sack",
 		"title": "Spoiled Sack",
+		"ui": "simple",
 		"description": "Things have life-times. This one is over",
 		"artwork": {
 			"scale": 1,

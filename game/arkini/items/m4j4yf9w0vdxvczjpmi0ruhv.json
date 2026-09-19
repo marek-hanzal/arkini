@@ -4,6 +4,7 @@
 		"uid": "m4j4yf9w0vdxvczjpmi0ruhv",
 		"id": "copper-mine",
 		"title": "Copper Mine",
+		"ui": "default",
 		"description": "Source of the raw copper",
 		"music": "tmx2vzxypupe94xva967y0bo",
 		"artwork": {

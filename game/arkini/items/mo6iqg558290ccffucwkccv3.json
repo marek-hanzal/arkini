@@ -4,6 +4,7 @@
 		"uid": "mo6iqg558290ccffucwkccv3",
 		"id": "green-coffee-beans",
 		"title": "Green Coffee Beans",
+		"ui": "simple",
 		"description": "Still needs some care before it will be a coffee you know",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "wh01db4tsschuz3nf4xfr0pi",
 		"id": "beer-barrel",
 		"title": "Beer Barrel",
+		"ui": "simple",
 		"description": "Beer source",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "our0pxaqz9ce08z8tdyhek44",
 		"id": "campfire",
 		"title": "Campfire",
+		"ui": "simple",
 		"description": "Do you like marshmallows?",
 		"artwork": {
 			"scale": 1,

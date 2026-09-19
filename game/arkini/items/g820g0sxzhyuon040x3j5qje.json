@@ -4,6 +4,7 @@
 		"uid": "g820g0sxzhyuon040x3j5qje",
 		"id": "grain",
 		"title": "Grain",
+		"ui": "simple",
 		"description": "All you can eat!",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "ou19vzfm8kr9itlu8lxz1nhi",
 		"id": "spoiled-steak",
 		"title": "Spoiled Steak",
+		"ui": "simple",
 		"description": "Piece of cow, maybe?",
 		"artwork": {
 			"scale": 1,

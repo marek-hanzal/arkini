@@ -4,6 +4,7 @@
 		"uid": "aypezdd5mxtcclnmhi7kphyv",
 		"id": "inkwell",
 		"title": "Inkwell",
+		"ui": "simple",
 		"description": "Write something nice",
 		"artwork": {
 			"scale": 1,

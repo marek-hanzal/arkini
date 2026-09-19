@@ -13,6 +13,7 @@ const item = (id: string, title: string): ItemSchema.Type => ({
 	scope: "any",
 	maxStackSize: 1,
 	maxQueueSize: 1,
+	ui: "default",
 	lines: [],
 
 	description: `${title} description`,

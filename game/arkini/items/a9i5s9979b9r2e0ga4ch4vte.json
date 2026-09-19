@@ -4,6 +4,7 @@
 		"uid": "a9i5s9979b9r2e0ga4ch4vte",
 		"id": "roasted-coffee-bag",
 		"title": "Roasted Coffee Bag",
+		"ui": "simple",
 		"description": "Now you can open your coffee shop!",
 		"artwork": {
 			"scale": 1,

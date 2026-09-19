@@ -4,6 +4,7 @@
 		"uid": "im6k8omuik7imr85cq0bc750",
 		"id": "scrubbing-brush",
 		"title": "Scrubbing Brush",
+		"ui": "simple",
 		"description": "Dirty things? It's my job!",
 		"artwork": {
 			"scale": 1,

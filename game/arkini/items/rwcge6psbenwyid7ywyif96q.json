@@ -4,6 +4,7 @@
 		"uid": "rwcge6psbenwyid7ywyif96q",
 		"id": "roof-tiles",
 		"title": "Roof Tiles",
+		"ui": "simple",
 		"description": "This thing should be put on top of buildings.",
 		"artwork": {
 			"scale": 1,

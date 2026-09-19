@@ -4,6 +4,7 @@
 		"uid": "imrcxilbuisx6f02q5rt7pp3",
 		"id": "grain-field",
 		"title": "Grain Field",
+		"ui": "default",
 		"description": "A field. Of grain.",
 		"artwork": {
 			"scale": 1,

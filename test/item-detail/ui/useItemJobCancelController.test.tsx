@@ -42,7 +42,7 @@ it("binds cancellation to the displayed job and disables it when that identity i
 					scope: "board",
 				},
 				item: {
-					control: "interactive",
+					ui: "default",
 				},
 			},
 		],

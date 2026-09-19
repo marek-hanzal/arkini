@@ -4,6 +4,7 @@
 		"uid": "zmwriqm945einhxbj2lcwa2h",
 		"id": "hops",
 		"title": "Hops",
+		"ui": "simple",
 		"description": "Core ingredient for a beer.",
 		"artwork": {
 			"scale": 1,

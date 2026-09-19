@@ -4,6 +4,7 @@
 		"uid": "k36yguaozfwge6mst4p46h7s",
 		"id": "steel",
 		"title": "Steel",
+		"ui": "simple",
 		"description": "Steel stuff.",
 		"artwork": {
 			"scale": 1,

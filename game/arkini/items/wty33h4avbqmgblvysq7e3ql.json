@@ -4,6 +4,7 @@
 		"uid": "wty33h4avbqmgblvysq7e3ql",
 		"id": "flowers",
 		"title": "Flowers",
+		"ui": "simple",
 		"description": "Flowers",
 		"artwork": {
 			"scale": 1,

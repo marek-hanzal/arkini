@@ -4,6 +4,7 @@
 		"uid": "yn9hgjb16vyih5d7xkb386rd",
 		"id": "beer-bath",
 		"title": "Beer Bath",
+		"ui": "simple",
 		"description": "Beer bath",
 		"artwork": {
 			"scale": 1,

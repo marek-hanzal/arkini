@@ -4,6 +4,7 @@
 		"uid": "prjfkn0sxpy76c9bomvwjxl8",
 		"id": "coin-stack",
 		"title": "Coin Stack",
+		"ui": "simple",
 		"description": "Quite valuable thing, keep an eye on them!",
 		"artwork": {
 			"scale": 1,

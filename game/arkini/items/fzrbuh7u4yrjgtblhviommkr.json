@@ -4,6 +4,7 @@
 		"uid": "fzrbuh7u4yrjgtblhviommkr",
 		"id": "rum-barrel",
 		"title": "Rum Barrel",
+		"ui": "simple",
 		"description": "A lot of fun inside",
 		"artwork": {
 			"scale": 1,

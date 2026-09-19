@@ -123,7 +123,7 @@ export const ItemDetailProvider = ({
 				return openTargetFx({
 					kind: "definition",
 					itemId,
-					tab: tab ?? (item.lines.length > 0 ? "lines" : "info"),
+					tab: item.ui === "simple" ? "info" : (tab ?? "lines"),
 					origin: controller.readOriginFn(origin),
 				});
 			}),

@@ -4,6 +4,7 @@
 		"uid": "xmwln1lqo98cdifz8ureqv18",
 		"id": "builders-yard",
 		"title": "Builders Yard",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

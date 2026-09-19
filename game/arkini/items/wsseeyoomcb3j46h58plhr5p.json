@@ -4,6 +4,7 @@
 		"uid": "wsseeyoomcb3j46h58plhr5p",
 		"id": "vegetables",
 		"title": "Vegetables",
+		"ui": "simple",
 		"description": "Fresh vegetables you want to eat",
 		"artwork": {
 			"scale": 1,

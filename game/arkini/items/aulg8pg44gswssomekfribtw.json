@@ -4,6 +4,7 @@
 		"uid": "aulg8pg44gswssomekfribtw",
 		"id": "hunter-blueprint",
 		"title": "Hunter Blueprint",
+		"ui": "default",
 		"draft": false,
 		"description": "Plans for a simple hunter's camp.",
 		"artwork": {

@@ -4,6 +4,7 @@
 		"uid": "ooiwjpnx0wgz8wnhvgp342hj",
 		"id": "book-t1",
 		"title": "Book - Tier 1",
+		"ui": "simple",
 		"description": "Just a book. It could be empty. Or has some poem. Or whatever.",
 		"artwork": {
 			"scale": 1,

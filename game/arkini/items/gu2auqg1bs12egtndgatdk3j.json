@@ -4,6 +4,7 @@
 		"uid": "gu2auqg1bs12egtndgatdk3j",
 		"id": "faith-paper-scriptorium",
 		"title": "Faith Paper Scriptorium",
+		"ui": "simple",
 		"description": "Somebody bless papers and books!",
 		"artwork": {
 			"scale": 1,

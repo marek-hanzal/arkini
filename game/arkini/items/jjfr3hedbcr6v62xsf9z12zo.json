@@ -4,6 +4,7 @@
 		"uid": "jjfr3hedbcr6v62xsf9z12zo",
 		"id": "cauldron-with-water",
 		"title": "Cauldron With Water",
+		"ui": "simple",
 		"description": "Water is good",
 		"artwork": {
 			"scale": 1,

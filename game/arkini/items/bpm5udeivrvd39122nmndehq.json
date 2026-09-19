@@ -4,6 +4,7 @@
 		"uid": "bpm5udeivrvd39122nmndehq",
 		"id": "grim-reaper",
 		"title": "Grim Reaper",
+		"ui": "default",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

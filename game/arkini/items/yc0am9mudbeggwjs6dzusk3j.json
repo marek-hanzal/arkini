@@ -4,6 +4,7 @@
 		"uid": "yc0am9mudbeggwjs6dzusk3j",
 		"id": "carpenter",
 		"title": "Carpenter",
+		"ui": "default",
 		"draft": false,
 		"description": "Craft wooden buckets and crates from planks.",
 		"artwork": {

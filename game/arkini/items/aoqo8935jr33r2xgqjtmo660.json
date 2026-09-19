@@ -4,6 +4,7 @@
 		"uid": "aoqo8935jr33r2xgqjtmo660",
 		"id": "vegetable-garden-blueprint",
 		"title": "Vegetable Garden Blueprint",
+		"ui": "default",
 		"description": "Good stuff to eat",
 		"artwork": {
 			"scale": 1,

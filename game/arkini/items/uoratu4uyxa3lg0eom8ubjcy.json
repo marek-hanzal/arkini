@@ -4,6 +4,7 @@
 		"uid": "uoratu4uyxa3lg0eom8ubjcy",
 		"id": "sawmill-blueprint",
 		"title": "Sawmill Blueprint",
+		"ui": "default",
 		"description": "What about some stuff sawing other stuff?",
 		"artwork": {
 			"scale": 1,

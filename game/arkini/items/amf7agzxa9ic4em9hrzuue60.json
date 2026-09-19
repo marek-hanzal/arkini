@@ -4,6 +4,7 @@
 		"uid": "amf7agzxa9ic4em9hrzuue60",
 		"id": "empty-wine-barrel",
 		"title": "Empty Wine Barrel",
+		"ui": "simple",
 		"description": "Wanna more",
 		"artwork": {
 			"scale": 1,

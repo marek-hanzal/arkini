@@ -4,6 +4,7 @@
 		"uid": "ilbwt5g7ougy6iu73pgiw7py",
 		"id": "homeland-portal",
 		"title": "Homeland Portal",
+		"ui": "simple",
 		"description": "Somebody calls home!",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "bsm7hrvufre2fiexr4o0eo4q",
 		"id": "burning-oven",
 		"title": "Burning Oven",
+		"ui": "simple",
 		"description": "It's hot",
 		"artwork": {
 			"scale": 1,

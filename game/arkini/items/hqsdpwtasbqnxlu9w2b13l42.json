@@ -4,6 +4,7 @@
 		"uid": "hqsdpwtasbqnxlu9w2b13l42",
 		"id": "molasses-jar",
 		"title": "Molasses Jar",
+		"ui": "simple",
 		"description": "Rum time",
 		"artwork": {
 			"scale": 1,

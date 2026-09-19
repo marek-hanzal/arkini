@@ -4,6 +4,7 @@
 		"uid": "xrdeluarbzrl0z2uimh88olz",
 		"id": "bandage-satchel",
 		"title": "Bandage Satchel",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

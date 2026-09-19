@@ -4,6 +4,7 @@
 		"uid": "iz7g7a4t9cusl70zjj99xq89",
 		"id": "fertilized-grain-field",
 		"title": "Fertilized Grain Field",
+		"ui": "simple",
 		"description": "Ready for grain seed.",
 		"artwork": {
 			"scale": 1,

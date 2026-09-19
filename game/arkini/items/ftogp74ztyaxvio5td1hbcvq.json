@@ -4,6 +4,7 @@
 		"uid": "ftogp74ztyaxvio5td1hbcvq",
 		"id": "fertilized-dye-field",
 		"title": "Fertilized Dye Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

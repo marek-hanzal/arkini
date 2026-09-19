@@ -4,6 +4,7 @@
 		"uid": "wqtuyj3u8pj257xlkwb7qahq",
 		"id": "sugar-beet",
 		"title": "Sugar Beet",
+		"ui": "simple",
 		"description": "If you want sugar, start here",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "i4y31g4ivr6cetcs6zbgy2vf",
 		"id": "bubble-reservoir",
 		"title": "Bubble Reservoir",
+		"ui": "simple",
 		"description": "Bubble world",
 		"artwork": {
 			"scale": 1,

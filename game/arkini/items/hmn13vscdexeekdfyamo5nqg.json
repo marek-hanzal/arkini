@@ -4,6 +4,7 @@
 		"uid": "hmn13vscdexeekdfyamo5nqg",
 		"id": "bread-slices",
 		"title": "Bread Slices",
+		"ui": "simple",
 		"description": "Yammi slices",
 		"artwork": {
 			"scale": 1,

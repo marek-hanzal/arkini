@@ -4,6 +4,7 @@
 		"uid": "dozpezjluikpw1porqik415r",
 		"id": "forest-portal",
 		"title": "Forest Portal",
+		"ui": "simple",
 		"description": "Gives you an access to the Forest Land",
 		"artwork": {
 			"scale": 1,

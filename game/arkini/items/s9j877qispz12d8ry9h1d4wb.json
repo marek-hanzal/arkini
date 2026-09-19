@@ -4,6 +4,7 @@
 		"uid": "s9j877qispz12d8ry9h1d4wb",
 		"id": "bucket-with-water",
 		"title": "Bucket with Water",
+		"ui": "simple",
 		"description": "Everybody needs to drink.",
 		"artwork": {
 			"scale": 1,

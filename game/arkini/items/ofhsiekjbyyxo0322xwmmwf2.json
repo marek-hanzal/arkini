@@ -4,6 +4,7 @@
 		"uid": "ofhsiekjbyyxo0322xwmmwf2",
 		"id": "wishing-well",
 		"title": "Wishing Well",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -43,7 +44,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

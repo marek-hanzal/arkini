@@ -4,6 +4,7 @@
 		"uid": "wguid5c2feyy5ti9za1m3tsy",
 		"id": "knife",
 		"title": "Knife",
+		"ui": "simple",
 		"description": "Sharp.",
 		"artwork": {
 			"scale": 1,

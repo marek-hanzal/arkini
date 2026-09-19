@@ -192,7 +192,7 @@ it("rejects a fill click once its line has started, preserving committed materia
 	);
 });
 
-it("rejects automatic-only ownership and invalid slots before moving any source", () => {
+it("rejects simple UI ownership and invalid slots before moving any source", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnOwnerFx();
@@ -210,7 +210,7 @@ it("rejects automatic-only ownership and invalid slots before moving any source"
 						...config.items,
 						workshop: {
 							...config.items.workshop,
-							control: "automatic-only",
+							ui: "simple",
 						},
 					},
 				}),

@@ -4,6 +4,7 @@
 		"uid": "ztot5uzdz4gezwru8mjf6o58",
 		"id": "cacao-pod",
 		"title": "Cacao Pod",
+		"ui": "simple",
 		"description": "You shall Cocoa!",
 		"artwork": {
 			"scale": 1,

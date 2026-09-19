@@ -4,6 +4,7 @@
 		"uid": "sbje5sv1rl25l4uddi0kds2x",
 		"id": "order",
 		"title": "Order",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

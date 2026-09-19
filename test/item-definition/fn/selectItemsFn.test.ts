@@ -5,6 +5,7 @@ import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 
 const item = {
 	maxQueueSize: 1,
+	ui: "default",
 	lines: [],
 
 	uid: "tree",

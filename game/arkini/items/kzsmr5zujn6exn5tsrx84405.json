@@ -4,6 +4,7 @@
 		"uid": "kzsmr5zujn6exn5tsrx84405",
 		"id": "sapphire",
 		"title": "Sapphire",
+		"ui": "simple",
 		"description": "You're rich now!",
 		"artwork": {
 			"scale": 1,

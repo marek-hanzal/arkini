@@ -4,6 +4,7 @@
 		"uid": "yqu4itfme4lohxp6bxbito07",
 		"id": "composting-workshop",
 		"title": "Composting Workshop",
+		"ui": "default",
 		"description": "Clean things up",
 		"artwork": {
 			"scale": 1,

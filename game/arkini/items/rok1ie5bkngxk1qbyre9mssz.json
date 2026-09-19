@@ -4,6 +4,7 @@
 		"uid": "rok1ie5bkngxk1qbyre9mssz",
 		"id": "fire",
 		"title": "Fire",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

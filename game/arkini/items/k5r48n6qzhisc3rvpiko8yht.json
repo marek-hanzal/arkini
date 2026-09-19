@@ -4,6 +4,7 @@
 		"uid": "k5r48n6qzhisc3rvpiko8yht",
 		"id": "boar-bristles",
 		"title": "Boar Bristles",
+		"ui": "simple",
 		"description": "Core item for making other things clean",
 		"artwork": {
 			"scale": 1,

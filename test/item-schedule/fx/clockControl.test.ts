@@ -12,9 +12,9 @@ import {
 import { useGameFx } from "~test/support/useGameFx";
 import { createClockConfig, spawnClockItemFx, tickClockFx } from "./clockSchedule.test/fixture";
 
-it("rejects player production commands atomically for automatic-only owners while autonomous admission succeeds", () => {
+it("rejects player production commands atomically for simple UI owners while autonomous admission succeeds", () => {
 	const config = createClockConfig({
-		control: "automatic-only",
+		ui: "simple",
 		lines: [
 			{
 				...createLine({
@@ -90,7 +90,7 @@ it("rejects player production commands atomically for automatic-only owners whil
 		_tag: "Failure",
 		failure: {
 			_tag: "ItemProductionControlUnavailableError",
-			reason: "automatic-only",
+			reason: "simple",
 			ownerItemId: "runtime:clock",
 		},
 	});
@@ -98,7 +98,7 @@ it("rejects player production commands atomically for automatic-only owners whil
 		_tag: "Failure",
 		failure: {
 			_tag: "ItemProductionControlUnavailableError",
-			reason: "automatic-only",
+			reason: "simple",
 			ownerItemId: "runtime:clock",
 		},
 	});

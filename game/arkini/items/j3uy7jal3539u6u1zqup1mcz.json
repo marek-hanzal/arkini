@@ -4,6 +4,7 @@
 		"uid": "j3uy7jal3539u6u1zqup1mcz",
 		"id": "arrows",
 		"title": "Arrows",
+		"ui": "simple",
 		"description": "Quill",
 		"artwork": {
 			"scale": 1,

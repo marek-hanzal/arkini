@@ -4,6 +4,7 @@
 		"uid": "ms55wb7h8dlbtkuragbny6z5",
 		"id": "scriptorium",
 		"title": "Scriptorium",
+		"ui": "default",
 		"description": "Book maker",
 		"artwork": {
 			"scale": 1,

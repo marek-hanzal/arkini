@@ -4,6 +4,7 @@
 		"uid": "cb9s36hu9rogsoifm2aef25u",
 		"id": "well-with-coffee",
 		"title": "Well With Coffee",
+		"ui": "simple",
 		"description": "Source of coffee. Try it out",
 		"artwork": {
 			"scale": 1,

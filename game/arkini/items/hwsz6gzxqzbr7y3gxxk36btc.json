@@ -4,6 +4,7 @@
 		"uid": "hwsz6gzxqzbr7y3gxxk36btc",
 		"id": "sand-deposit",
 		"title": "Sand Deposit",
+		"ui": "simple",
 		"description": "Sandman.",
 		"artwork": {
 			"scale": 1,

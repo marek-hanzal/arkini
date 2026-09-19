@@ -4,6 +4,7 @@
 		"uid": "ts8r14q70r8durrmu6c3o7vs",
 		"id": "bubble-maker",
 		"title": "Bubble Maker",
+		"ui": "default",
 		"description": "Make some bubbles",
 		"artwork": {
 			"scale": 1,

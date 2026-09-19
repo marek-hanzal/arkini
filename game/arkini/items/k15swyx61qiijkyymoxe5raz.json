@@ -4,6 +4,7 @@
 		"uid": "k15swyx61qiijkyymoxe5raz",
 		"id": "raw-diamond",
 		"title": "Raw Diamond",
+		"ui": "simple",
 		"description": "It's raw",
 		"artwork": {
 			"scale": 1,

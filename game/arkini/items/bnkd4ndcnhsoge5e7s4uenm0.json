@@ -4,6 +4,7 @@
 		"uid": "bnkd4ndcnhsoge5e7s4uenm0",
 		"id": "grass-field",
 		"title": "Grass Field",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

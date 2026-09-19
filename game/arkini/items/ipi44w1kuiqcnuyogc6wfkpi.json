@@ -4,6 +4,7 @@
 		"uid": "ipi44w1kuiqcnuyogc6wfkpi",
 		"id": "pig-farm",
 		"title": "Pig Farm",
+		"ui": "default",
 		"description": "Pig generator",
 		"artwork": {
 			"scale": 1,

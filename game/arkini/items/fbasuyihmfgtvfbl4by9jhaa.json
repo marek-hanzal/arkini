@@ -4,6 +4,7 @@
 		"uid": "fbasuyihmfgtvfbl4by9jhaa",
 		"id": "rapeseed",
 		"title": "Rapeseed",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

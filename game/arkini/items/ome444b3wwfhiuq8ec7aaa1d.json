@@ -4,6 +4,7 @@
 		"uid": "ome444b3wwfhiuq8ec7aaa1d",
 		"id": "arkini-banknote",
 		"title": "Arkini Banknote",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,

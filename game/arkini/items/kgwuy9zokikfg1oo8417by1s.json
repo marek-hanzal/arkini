@@ -4,6 +4,7 @@
 		"uid": "kgwuy9zokikfg1oo8417by1s",
 		"id": "corruption",
 		"title": "Corruption",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -48,7 +49,6 @@
 			"enable": true,
 			"rules": []
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

@@ -4,6 +4,7 @@
 		"uid": "yjpg011j6ltn534wgnbidtvj",
 		"id": "knowledge-t2",
 		"title": "Knowledge - Tier 2",
+		"ui": "simple",
 		"description": "A bit better knowledge of something... interesting",
 		"artwork": {
 			"scale": 1,

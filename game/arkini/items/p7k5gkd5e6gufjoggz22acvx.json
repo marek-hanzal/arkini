@@ -4,6 +4,7 @@
 		"uid": "p7k5gkd5e6gufjoggz22acvx",
 		"id": "toxic-waste-purifier",
 		"title": "Toxic Waste Purifier",
+		"ui": "default",
 		"description": "Throw those ugly chemicals into the river... oh, filter it out in pure nature way",
 		"artwork": {
 			"scale": 1,

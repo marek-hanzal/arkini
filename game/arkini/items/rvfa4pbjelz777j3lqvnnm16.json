@@ -4,6 +4,7 @@
 		"uid": "rvfa4pbjelz777j3lqvnnm16",
 		"id": "confectionery",
 		"title": "Confectionery",
+		"ui": "default",
 		"description": "Yummies are available here",
 		"artwork": {
 			"scale": 1,

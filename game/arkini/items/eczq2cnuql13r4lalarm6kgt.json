@@ -4,6 +4,7 @@
 		"uid": "eczq2cnuql13r4lalarm6kgt",
 		"id": "eggs",
 		"title": "Eggs",
+		"ui": "simple",
 		"description": "Some eggs you may cook.",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "yavusev0awaai6zqfvvgyv1y",
 		"id": "chocolate",
 		"title": "Chocolate",
+		"ui": "simple",
 		"description": "Good chocolate",
 		"artwork": {
 			"scale": 1,

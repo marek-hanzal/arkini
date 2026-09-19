@@ -4,6 +4,7 @@
 		"uid": "y6ja0hctgvcufgkqbx0n634d",
 		"id": "gear-t3",
 		"title": "Gear - Tier 3",
+		"ui": "simple",
 		"description": "For a bit more complex machines",
 		"artwork": {
 			"scale": 1,

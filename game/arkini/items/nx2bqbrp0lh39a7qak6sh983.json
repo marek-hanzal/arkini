@@ -4,6 +4,7 @@
 		"uid": "nx2bqbrp0lh39a7qak6sh983",
 		"id": "cooked-steak",
 		"title": "Cooked Steak",
+		"ui": "simple",
 		"description": "Yammy",
 		"artwork": {
 			"scale": 1,

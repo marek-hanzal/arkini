@@ -4,6 +4,7 @@
 		"uid": "xx2gqafu2hfas7hj6vl8k8qc",
 		"id": "well-blueprint",
 		"title": "Well Blueprint",
+		"ui": "default",
 		"description": "Wanna some well?",
 		"artwork": {
 			"scale": 1,

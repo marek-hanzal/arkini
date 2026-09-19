@@ -4,6 +4,7 @@
 		"uid": "i767otw53htcjcc2y9zrw6it",
 		"id": "chicken",
 		"title": "Chicken",
+		"ui": "simple",
 		"description": "Kwooo... kwo, kwo!",
 		"artwork": {
 			"scale": 1,
@@ -53,7 +54,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": []
 	}

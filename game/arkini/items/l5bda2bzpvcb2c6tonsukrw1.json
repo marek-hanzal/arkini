@@ -4,6 +4,7 @@
 		"uid": "l5bda2bzpvcb2c6tonsukrw1",
 		"id": "spoiled-fruit-crate",
 		"title": "Spoiled Fruit Crate",
+		"ui": "simple",
 		"description": "Ugly thing",
 		"artwork": {
 			"scale": 1,

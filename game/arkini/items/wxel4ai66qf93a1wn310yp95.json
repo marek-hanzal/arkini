@@ -4,6 +4,7 @@
 		"uid": "wxel4ai66qf93a1wn310yp95",
 		"id": "fruit-garden",
 		"title": "Fruit Garden",
+		"ui": "default",
 		"description": "I see an apple there, Adam",
 		"artwork": {
 			"scale": 1,

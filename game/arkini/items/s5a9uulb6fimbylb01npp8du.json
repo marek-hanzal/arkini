@@ -4,6 +4,7 @@
 		"uid": "s5a9uulb6fimbylb01npp8du",
 		"id": "cow-farm-blueprint",
 		"title": "Cow Farm Blueprint",
+		"ui": "default",
 		"description": "It's time for some boos!",
 		"artwork": {
 			"scale": 1,

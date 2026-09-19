@@ -4,6 +4,7 @@
 		"uid": "v57kyyd3onui8me4gpj1mpn0",
 		"id": "earth-deposit-deplated",
 		"title": "Deplated Earth Deposit",
+		"ui": "default",
 		"description": "You can find a new one to mine!",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "qagnqtra7kf5dsfgb9wq71r0",
 		"id": "beagle-puppy-tearing-pillow",
 		"title": "Beagle Puppy Tearing Pillow",
+		"ui": "simple",
 		"draft": true,
 		"artwork": {
 			"scale": 1,
@@ -43,7 +44,6 @@
 				]
 			}
 		},
-		"control": "automatic-only",
 		"maxQueueSize": 1,
 		"lines": [
 			{

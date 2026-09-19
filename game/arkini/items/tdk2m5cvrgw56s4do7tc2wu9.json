@@ -4,6 +4,7 @@
 		"uid": "tdk2m5cvrgw56s4do7tc2wu9",
 		"id": "dye-workshop",
 		"title": "Dye Workshop",
+		"ui": "default",
 		"description": "Produces colors",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "w3x58j053qf9fgq90wqqtylq",
 		"id": "empty-jar",
 		"title": "Empty Jar",
+		"ui": "simple",
 		"description": "Ready to be filled",
 		"artwork": {
 			"scale": 1,

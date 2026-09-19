@@ -4,6 +4,7 @@
 		"uid": "a4lsrsgb7kqchcpfnx8atn33",
 		"id": "compost",
 		"title": "Compost",
+		"ui": "simple",
 		"description": "Nice thing, flowers would like it.",
 		"artwork": {
 			"scale": 1,

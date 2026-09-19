@@ -4,6 +4,7 @@
 		"uid": "ixlmt68f8h58octhzbt7jpkk",
 		"id": "empty-sugar-cane-field",
 		"title": "Empty Sugar Cane Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

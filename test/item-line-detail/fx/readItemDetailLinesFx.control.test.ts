@@ -11,7 +11,7 @@ import {
 	readLines,
 } from "../support/readItemDetailLinesFxFixture";
 
-const readControlledOwner = (control: ItemSchema.Type["control"], remainingDurationMs = 300) => {
+const readControlledOwner = (ui: ItemSchema.Type["ui"], remainingDurationMs = 300) => {
 	const item = ItemSchema.parse({
 		...lineRunTestConfig.items.workshop,
 
@@ -21,7 +21,7 @@ const readControlledOwner = (control: ItemSchema.Type["control"], remainingDurat
 			intervalMs: 100,
 			durationMs: 300,
 		},
-		control,
+		ui,
 	});
 	const base = lineRunRuntime({
 		permit: true,
@@ -62,9 +62,9 @@ const readControlledOwner = (control: ItemSchema.Type["control"], remainingDurat
 	};
 };
 
-describe("Item Detail production control", () => {
+describe("Item Detail production ui", () => {
 	it("keeps automatic production inspectable while its manual actions remain closed", () => {
-		const automatic = readControlledOwner("automatic-only");
+		const automatic = readControlledOwner("simple");
 		expect(automatic.lines).toMatchObject({
 			kind: "available",
 			line: [
@@ -97,7 +97,7 @@ describe("Item Detail production control", () => {
 			canClearQueue: false,
 		});
 
-		const interactive = readControlledOwner("interactive");
+		const interactive = readControlledOwner("default");
 		expect(interactive.lines).toMatchObject({
 			line: [
 				{
@@ -124,7 +124,7 @@ describe("Item Detail production control", () => {
 			canClearQueue: true,
 		});
 
-		const draining = readControlledOwner("interactive", 0);
+		const draining = readControlledOwner("default", 0);
 		expect(draining.lines).toMatchObject({
 			line: [
 				{

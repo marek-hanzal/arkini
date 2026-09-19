@@ -4,6 +4,7 @@
 		"uid": "xyq6bdlue0g54tn2zmmo44k6",
 		"id": "coin-chest",
 		"title": "Coin Chest",
+		"ui": "simple",
 		"description": "Most valuable thing of coins you can get. Take care of them!",
 		"artwork": {
 			"scale": 1,

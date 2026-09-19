@@ -4,6 +4,7 @@
 		"uid": "lknmzmrbwrl2401n3vozrgbs",
 		"id": "shield",
 		"title": "Shield",
+		"ui": "simple",
 		"description": "It may protect you",
 		"artwork": {
 			"scale": 1,

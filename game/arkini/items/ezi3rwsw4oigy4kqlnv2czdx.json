@@ -4,6 +4,7 @@
 		"uid": "ezi3rwsw4oigy4kqlnv2czdx",
 		"id": "gold-ore",
 		"title": "Gold Ore",
+		"ui": "simple",
 		"description": "Wanna be goldish?",
 		"artwork": {
 			"scale": 1,

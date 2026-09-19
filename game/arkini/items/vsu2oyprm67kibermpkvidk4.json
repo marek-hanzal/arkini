@@ -4,6 +4,7 @@
 		"uid": "vsu2oyprm67kibermpkvidk4",
 		"id": "roasted-coffee-beans",
 		"title": "Roasted Coffee Beans",
+		"ui": "simple",
 		"description": "Time for a good cup of coffee",
 		"artwork": {
 			"scale": 1,

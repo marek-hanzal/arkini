@@ -4,6 +4,7 @@
 		"uid": "fs7g7flliyj78y8bw6t3djrt",
 		"id": "well",
 		"title": "Well",
+		"ui": "default",
 		"description": "Source of water. This one is full.",
 		"artwork": {
 			"scale": 1,

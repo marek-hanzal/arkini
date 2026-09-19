@@ -4,6 +4,7 @@
 		"uid": "y7p0xa3nu9tvculm2xybfm4w",
 		"id": "explosive-compound",
 		"title": "Explosive Compound",
+		"ui": "simple",
 		"description": "Kaboom in the bottle",
 		"artwork": {
 			"scale": 1,

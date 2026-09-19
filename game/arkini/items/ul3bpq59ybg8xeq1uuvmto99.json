@@ -4,6 +4,7 @@
 		"uid": "ul3bpq59ybg8xeq1uuvmto99",
 		"id": "water-mug",
 		"title": "Water Mug",
+		"ui": "simple",
 		"description": "A mug. With a water. Really?!",
 		"artwork": {
 			"scale": 1,

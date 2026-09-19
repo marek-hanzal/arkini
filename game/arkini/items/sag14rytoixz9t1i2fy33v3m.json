@@ -4,6 +4,7 @@
 		"uid": "sag14rytoixz9t1i2fy33v3m",
 		"id": "emerald",
 		"title": "Emerald",
+		"ui": "simple",
 		"description": "Esm...emerald",
 		"artwork": {
 			"scale": 1,

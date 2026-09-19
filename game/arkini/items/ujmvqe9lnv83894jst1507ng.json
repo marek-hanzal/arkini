@@ -4,6 +4,7 @@
 		"uid": "ujmvqe9lnv83894jst1507ng",
 		"id": "toxic-filter",
 		"title": "Toxic Filter",
+		"ui": "simple",
 		"description": "Your waste, my business",
 		"artwork": {
 			"scale": 1,

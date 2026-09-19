@@ -4,6 +4,7 @@
 		"uid": "ytzc2165q8w8o2w1cae8ocf5",
 		"id": "cacao-grove",
 		"title": "Cacao Grove",
+		"ui": "default",
 		"description": "You can harvest some good stuff",
 		"artwork": {
 			"scale": 1,

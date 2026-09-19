@@ -4,6 +4,7 @@
 		"uid": "pektmrtnnwg2te0zso1ezkwc",
 		"id": "empty-oven",
 		"title": "Empty Oven",
+		"ui": "simple",
 		"description": "Heat source",
 		"artwork": {
 			"scale": 1,

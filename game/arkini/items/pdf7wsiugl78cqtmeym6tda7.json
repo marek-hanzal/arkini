@@ -4,6 +4,7 @@
 		"uid": "pdf7wsiugl78cqtmeym6tda7",
 		"id": "silenced-bow",
 		"title": "Silenced Bow",
+		"ui": "simple",
 		"description": "It makes less noise",
 		"artwork": {
 			"scale": 1,

@@ -4,6 +4,7 @@
 		"uid": "d4mmhk9g8snlzkeb7bnc2are",
 		"id": "gear-t2",
 		"title": "Gear - Tier 2",
+		"ui": "simple",
 		"description": "Better gears",
 		"artwork": {
 			"scale": 1,

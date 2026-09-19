@@ -4,6 +4,7 @@
 		"uid": "woaodxe7380pvd5iyrpf0egs",
 		"id": "fertilized-flax-field",
 		"title": "Fertilized Flax Field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -71,7 +71,7 @@ export const createClockConfig = (
 				scope: "board",
 				maxStackSize: 1,
 				maxQueueSize: 3,
-				control: "interactive",
+				ui: "default",
 				...overrides,
 				clock: {
 					intervalMs: 250,

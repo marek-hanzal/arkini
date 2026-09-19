@@ -4,6 +4,7 @@
 		"uid": "mxjt0lgbi17u3nqc9sqrxo5o",
 		"id": "brewery-blueprint",
 		"title": "Brewery Blueprint",
+		"ui": "default",
 		"description": "We want beer! We want beer!",
 		"artwork": {
 			"scale": 1,

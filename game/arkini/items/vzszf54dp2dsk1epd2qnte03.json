@@ -4,6 +4,7 @@
 		"uid": "vzszf54dp2dsk1epd2qnte03",
 		"id": "sawmill",
 		"title": "Sawmill",
+		"ui": "default",
 		"description": "You want to advance in your journey? Sawmill is your friend!",
 		"artwork": {
 			"scale": 1,

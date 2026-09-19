@@ -4,6 +4,7 @@
 		"uid": "o119fbjvkgci3q5bylh0mr4b",
 		"id": "sand",
 		"title": "Sand",
+		"ui": "simple",
 		"description": "Sand",
 		"artwork": {
 			"scale": 1,

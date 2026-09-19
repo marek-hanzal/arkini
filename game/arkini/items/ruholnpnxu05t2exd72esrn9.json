@@ -4,6 +4,7 @@
 		"uid": "ruholnpnxu05t2exd72esrn9",
 		"id": "clay-mug",
 		"title": "Clay Mug",
+		"ui": "simple",
 		"description": "Wanna some coffee?",
 		"artwork": {
 			"scale": 1,

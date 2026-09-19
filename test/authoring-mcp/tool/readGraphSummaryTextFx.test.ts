@@ -16,6 +16,42 @@ import {
 afterEach(() => vi.restoreAllMocks());
 
 describe("compact MCP graph responses", () => {
+	it("preserves authored Clock weights for both full-interface and automatic-only owners", () => {
+		const base = createGraphProject();
+		for (const ui of [
+			"default",
+			"simple",
+		] as const) {
+			const project = {
+				...base,
+				config: {
+					...base.config,
+					items: {
+						...base.config.items,
+						forge: {
+							...base.config.items.forge,
+							ui,
+							lines: base.config.items.forge.lines.map((line) => ({
+								...line,
+								clock: true,
+								clockWeight: 7,
+							})),
+						},
+					},
+				},
+			};
+			const summary = Effect.runSync(
+				readItemRelationTextFx(project, {
+					itemId: "ingot",
+					level: 1,
+					role: "output",
+					detail: "summary",
+				}),
+			);
+			expect(summary).toContain("Clock weight: 7");
+		}
+	});
+
 	it.each([
 		"input",
 		"output",

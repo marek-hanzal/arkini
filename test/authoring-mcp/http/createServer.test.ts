@@ -56,6 +56,7 @@ describe("editor MCP server", () => {
 			"delete_note",
 			"item_detail",
 			"item_config",
+			"item_configs",
 			"item_line_config",
 			"item_input",
 			"item_output",

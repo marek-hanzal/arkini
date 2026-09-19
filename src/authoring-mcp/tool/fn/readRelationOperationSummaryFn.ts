@@ -61,6 +61,11 @@ const lineLinesFn = (
 	const owner = project.config.items[ownerId];
 	return [
 		`  Line: ${includeOwner ? `${itemFn(project, ownerId)} / ${line.title} ` : ""}[${line.id}]; Runtime: ${line.runtimeMs / 1_000} s`,
+		...(line.clock === true
+			? [
+					`  Clock weight: ${line.clockWeight}`,
+				]
+			: []),
 		`  Inputs: ${line.input
 			.map((input) => {
 				const units =

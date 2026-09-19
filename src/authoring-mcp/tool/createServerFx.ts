@@ -80,6 +80,23 @@ const ItemLineConfigInputSchema = z
 		description: "The item and production-line identities whose canonical config is requested.",
 	});
 
+const ItemConfigsInputSchema = z
+	.object({
+		itemIds: z
+			.array(IdSchema)
+			.min(1)
+			.refine((itemIds) => new Set(itemIds).size <= 50, "Request at most 50 unique item IDs.")
+			.describe(
+				"Up to 50 unique item IDs; duplicate IDs are read only once, in request order.",
+			),
+	})
+	.strict()
+	.meta({
+		$id: "urn:arkini:schema:mcp:item-configs-input",
+		title: "Item configurations tool input",
+		description: "Read canonical item configurations from one project snapshot and revision.",
+	});
+
 const itemRelationInputSchema = (role: "input" | "output") =>
 	z
 		.object({
@@ -191,6 +208,7 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 			`ID: ${item.id}`,
 			`UID: ${item.uid}`,
 			`Draft: ${readDraftFn(item)}`,
+			`UI: ${item.ui}`,
 			...(item.description === undefined
 				? []
 				: [
@@ -256,6 +274,30 @@ const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
 			);
 		}),
 );
+
+const readItemConfigsTextFn = (project: Project, itemIds: ReadonlyArray<string>) => {
+	const uniqueItemIds = [
+		...new Set(itemIds),
+	];
+	return JSON.stringify(
+		{
+			revision: project.revision,
+			items: uniqueItemIds.flatMap((itemId) => {
+				const item = project.config.items[itemId];
+				return item === undefined
+					? []
+					: [
+							item,
+						];
+			}),
+			missingItemIds: uniqueItemIds.filter(
+				(itemId) => project.config.items[itemId] === undefined,
+			),
+		},
+		null,
+		2,
+	);
+};
 
 const readCurrentProjectFx = (
 	repository: ProjectRepositoryService,
@@ -529,7 +571,7 @@ const createServerFn = (
 		"item_detail",
 		{
 			description:
-				"Read the simplified identity, Editor draft status, and storage detail of one item in the open project.",
+				"Read the simplified identity, Editor draft status, UI mode, and storage detail of one item in the open project.",
 			inputSchema: ItemDetailInputSchema,
 		},
 		async ({ id }) =>
@@ -550,6 +592,23 @@ const createServerFn = (
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readItemConfigTextFx(project, itemId)),
+				),
+			),
+	);
+	server.registerTool(
+		"item_configs",
+		{
+			description:
+				"Read complete canonical JSON configurations for up to 50 unique item IDs from one project snapshot. Returns revision, items in first-request order, and missingItemIds. Duplicate IDs appear once. Copy revision into subsequent write requests.",
+			inputSchema: ItemConfigsInputSchema,
+			annotations: {
+				readOnlyHint: true,
+			},
+		},
+		async ({ itemIds }) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.map((project) => readItemConfigsTextFn(project, itemIds)),
 				),
 			),
 	);

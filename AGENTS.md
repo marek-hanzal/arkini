@@ -43,7 +43,7 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 
 - The fast style test is: **rounded, playful, bright, hand-built, and readable**. Prefer plump volumes, gently bowed rooflines, chunky beams, soft corners, and slight asymmetry. The object may be imperfect, but it must still look stable and intentionally constructed.
 - Keep midtones cheerful and saturated while retaining real shading. More wealth or a higher tier may look cleaner and richer, never automatically darker, colder, sharper, or more sterile.
-- Give every production building one unmistakable functional anchor and at most a few large supporting props. Function must read before ornament at 96–128 px.
+- Give every production building one unmistakable functional anchor and at most a few large supporting props. Function must read before ornament.
 - Building and field bases use lively, uneven terrain: fluffy grass tufts, small dirt interruptions, varied stones, and a few colorful flowers. Avoid flat lawns, perfect rectangles, uniform borders, repeated copy-paste vegetation, and tiny decorative clutter.
 - Preserve logical material colors and construction. Cuteness comes from volume, proportion, color, and controlled irregularity—not faces on objects, impossible supports, random machinery, or chaotic silhouettes.
 
@@ -57,7 +57,7 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 
 - Default world assets to an isometric three-quarter view with orthographic or very weak perspective, about 45° rotation and a 30–35° top-down angle. Point the principal or front face down-right and light it from the upper-left.
 - Place one complete object in the center of the square canvas with no cropping and about 8–12% free space. Keep the center of mass stable and avoid dramatic tilt or wide-angle distortion.
-- Make the asset unmistakable at 96–128 px through one strong primary silhouette, a few large secondary volumes, and a limited number of clear functional details. Avoid ornamental noise, repeated tiny decorations, thin wires, fragile projections, unreadable micro-detail, and construction that makes no functional sense.
+- Make the asset unmistakable through one strong primary silhouette, a few large secondary volumes, and a limited number of clear functional details. Avoid ornamental noise, repeated tiny decorations, thin wires, fragile projections, unreadable micro-detail, and construction that makes no functional sense.
 - Create cuteness through shape, volume, and proportions; do not automatically add faces to inanimate objects.
 - A building may use only a small compact terrain base that anchors its footprint. Standalone items, tools, and resources have no terrain base by default.
 
@@ -76,7 +76,7 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 - Generate and show the native-alpha candidate first. If native alpha failed, show the fallback keyed candidate instead. Do not write either candidate into [`game/arkini/assets`](game/arkini/assets) until the user explicitly approves it with an instruction such as `ulozit`, `prepsat`, or equivalent.
 - On approval, preserve a clean native-alpha source and limit processing to demonstrated defects such as negligible alpha noise; do not re-key or re-extract its background. For a fallback keyed source, remove the key into a true alpha channel. Protect legitimate foreground greens; remove the edge-connected key field plus keyed regions visible through real openings such as handles, arches, windows, and gaps. Preserve smooth antialiased edges and eliminate green fringe instead of merely making the exact center color transparent.
 - Translucent subjects such as glass need explicit inspection: preserve their rim, highlights, body, and foot while clearing the key visible through them. Never leave the key as an opaque fill inside a transparent object.
-- Inspect the finished PNG over both a dark-plum background and a warm light background. Check the complete silhouette, thin projections, holes, terrain fringe, and absence of detached shadows or key-colored pixels. Also inspect it once at 96–128 px for gameplay readability.
+- Inspect the finished PNG over both a dark-plum background and a warm light background. Check the complete silhouette, thin projections, holes, terrain fringe, and absence of detached shadows or key-colored pixels.
 - Save the approved PNG under a semantic kebab-case name in [`game/arkini/assets`](game/arkini/assets). Before reporting success, reopen the saved file and verify the requested subject, exact path, dimensions, sRGBA/alpha presence, transparent corners, and Git status. When replacing an asset, verify that the intended existing path was actually overwritten.
 
 ### Iteration and tiers

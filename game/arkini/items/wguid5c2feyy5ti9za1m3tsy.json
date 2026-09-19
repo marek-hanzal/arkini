@@ -520,6 +520,15 @@
 				},
 				"effect": "replace",
 				"result": "empty-paper-drying-rack"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "feather"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "quill"
 			}
 		],
 		"maxQueueSize": 1,

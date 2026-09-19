@@ -34,7 +34,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "goose-quill"
+								"itemId": "quill"
 							},
 							"scope": "any"
 						},
@@ -133,7 +133,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "goose-quill"
+								"itemId": "quill"
 							},
 							"scope": "any"
 						},
@@ -247,7 +247,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "goose-quill"
+								"itemId": "quill"
 							},
 							"scope": "any"
 						},
@@ -361,7 +361,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "goose-quill"
+								"itemId": "quill"
 							},
 							"scope": "any"
 						},

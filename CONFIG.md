@@ -91,6 +91,8 @@ MCP `item_detail` includes the project revision for lightweight authoring reads.
 
 Item `uid` is immutable filesystem identity generated at creation and survives authored-ID renames, import/export and Arkpack rebuilds. Item `id` is the readable gameplay identity referenced by config. Validation rejects duplicate IDs/UIDs and disagreement between item UID and its path.
 
+MCP `rename_item` selects the current `itemId` and accepts optional `title` and `id` (at least one required). `title` changes only the item. Optional `artwork: true` requires `id` and exactly one existing Artwork in `artwork.default`; it renames that resource to the supplied ID, updating every exact resource reference and linked Note. A target resource-ID collision rejects the entire operation. Item/config and optional PNG/Note changes share one revision-guarded repository write under the project lock with atomic individual file replacements; item UID remains stable. There is no aggregate rollback: an I/O failure may leave a partial tree.
+
 The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests, and artifacts derive or verify it rather than copying a competing identity.
 
 Renaming `meta.id` creates a different game namespace: existing installed saves remain associated with the old package ID. The Editor preserves output version settings, current source and Notes.

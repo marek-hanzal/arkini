@@ -141,7 +141,7 @@ describe("editor MCP note item links", () => {
 			name: "rename_item",
 			arguments: {
 				itemId: "clay",
-				newItemId: "potters-clay",
+				id: "potters-clay",
 				revision: project.revision,
 			},
 		});

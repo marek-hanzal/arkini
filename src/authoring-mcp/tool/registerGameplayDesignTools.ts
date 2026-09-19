@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
+import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { StartLocationSchema } from "~/game-start/schema/StartLocationSchema";
@@ -59,14 +60,22 @@ const ValidateProjectInputSchema = z
 const RenameItemInputSchema = z
 	.object({
 		itemId: IdSchema.describe("The current exact item ID."),
-		newItemId: IdSchema.describe("The new globally unique item ID."),
+		id: IdSchema.optional().describe("The replacement unique item ID."),
+		title: TitleSchema.optional(),
+		artwork: z
+			.boolean()
+			.optional()
+			.describe(
+				"Also rename the sole default Artwork to the supplied id. Requires id; ambiguous compositions fail.",
+			),
 		revision: RevisionSchema.optional(),
 	})
 	.strict()
 	.meta({
 		$id: "urn:arkini:schema:mcp:rename-item-input",
 		title: "Rename item tool input",
-		description: "The current and replacement item IDs with an optional revision guard.",
+		description:
+			"An item title and/or ID rename with optional Artwork synchronization and revision guard.",
 	});
 
 const ItemDeleteImpactInputSchema = z
@@ -342,16 +351,18 @@ export const registerGameplayDesignToolsFn = ({
 		"rename_item",
 		{
 			description:
-				"Rename one canonical item ID and every exact item reference in one revision-guarded project write. The item UID, line IDs, resource IDs, type, and all other fields remain unchanged. An optional revision copied from item_config rejects stale edits.",
+				"Rename an item title and/or ID. Supply at least one of title or id. With artwork: true, id is required and the single artwork.default resource is renamed to that ID, including all resource and Note references. Missing or multiple default artworks and resource ID collisions fail before writing. The item UID is preserved. Uses one revision-guarded, locked best-effort project write; I/O failures have no aggregate rollback.",
 			inputSchema: RenameItemInputSchema,
 		},
-		async ({ itemId, newItemId, revision }) =>
+		async ({ itemId, id, title, artwork, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						renameItemFx({
 							itemId,
-							newItemId,
+							id,
+							title,
+							artwork,
 							notifyProjectChangedFn,
 							project,
 							repository,

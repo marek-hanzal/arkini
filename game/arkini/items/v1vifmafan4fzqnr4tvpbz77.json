@@ -1,17 +1,17 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "a87hnmxy7vhb0n64ldemdjhp",
-		"id": "goose-farm-blueprint",
-		"title": "Goose Farm Blueprint",
+		"uid": "v1vifmafan4fzqnr4tvpbz77",
+		"id": "school-t2-blueprint",
+		"title": "School - Tier 2 Blueprint",
 		"draft": false,
-		"description": "Plans for Goose Farm.",
+		"description": "Plans for an advanced school. Better education now needs better labor to build the place first.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"blueprint",
-				"goose-farm"
+				"school-t2"
 			]
 		},
 		"scope": "any",
@@ -22,15 +22,15 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "goose-farm",
-				"title": "Build Goose Farm",
-				"artwork": "goose-farm",
-				"description": "Build Goose Farm.",
+				"id": "school-t2",
+				"title": "Build School - Tier 2",
+				"artwork": "school-t2",
+				"description": "Build a Tier 2 school using processed materials and Tier 2 labor.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 30000,
+				"runtimeMs": 120000,
 				"input": [
 					{
 						"units": {
@@ -41,7 +41,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "goose-farm-blueprint"
+								"itemId": "school-t2-blueprint"
 							},
 							"scope": "board",
 							"distance": "self"
@@ -58,8 +58,8 @@
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 3,
-							"max": 3
+							"min": 5,
+							"max": 5
 						}
 					},
 					{
@@ -73,8 +73,8 @@
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 2,
-							"max": 2
+							"min": 5,
+							"max": 5
 						}
 					},
 					{
@@ -82,7 +82,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemId": "labor-t2"
 							},
 							"scope": "any"
 						},
@@ -103,7 +103,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "goose-farm",
+											"itemId": "school-t2",
 											"quantity": {
 												"min": 1,
 												"max": 1

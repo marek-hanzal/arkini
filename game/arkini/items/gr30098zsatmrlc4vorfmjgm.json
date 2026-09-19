@@ -4,9 +4,9 @@
 		"uid": "gr30098zsatmrlc4vorfmjgm",
 		"id": "grain-farm-blueprint",
 		"title": "Grain Farm Blueprint",
-		"ui": "default",
 		"draft": false,
 		"description": "Blueprint for Grain Farm. Usual boring stuff.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -26,8 +26,8 @@
 				"title": "Grain Farm",
 				"artwork": "grain-farm",
 				"description": "Soon there will be some farming simulator available...",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -45,6 +45,51 @@
 							},
 							"scope": "board",
 							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "stone-block"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "labor-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
 						}
 					}
 				],

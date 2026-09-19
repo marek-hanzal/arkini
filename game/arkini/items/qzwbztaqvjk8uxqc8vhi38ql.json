@@ -1,88 +1,39 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "a87hnmxy7vhb0n64ldemdjhp",
-		"id": "goose-farm-blueprint",
-		"title": "Goose Farm Blueprint",
+		"uid": "qzwbztaqvjk8uxqc8vhi38ql",
+		"id": "school-t2",
+		"title": "School - Tier 2",
 		"draft": false,
-		"description": "Plans for Goose Farm.",
+		"description": "An advanced school that turns experienced labor and established knowledge into Tier 2 knowledge.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"goose-farm"
+				"school-t2"
 			]
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"units": {
-			"amount": 1
-		},
-		"maxQueueSize": 1,
+		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "goose-farm",
-				"title": "Build Goose Farm",
-				"artwork": "goose-farm",
-				"description": "Build Goose Farm.",
+				"id": "knowledge-t2",
+				"title": "Advanced Education",
+				"artwork": "knowledge-t2",
+				"description": "Build on established knowledge using Tier 2 labor and paper to produce more advanced understanding.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,
-				"runtimeMs": 30000,
+				"runtimeMs": 120000,
 				"input": [
 					{
-						"units": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "units",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "goose-farm-blueprint"
-							},
-							"scope": "board",
-							"distance": "self"
-						}
-					},
-					{
 						"type": "materials",
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
-							},
-							"scope": "any"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						}
-					},
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "stone-block"
-							},
-							"scope": "any"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						}
-					},
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "labor-t1"
+								"itemId": "labor-t2"
 							},
 							"scope": "any"
 						},
@@ -90,6 +41,36 @@
 						"quantity": {
 							"min": 1,
 							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "knowledge-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -103,7 +84,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "goose-farm",
+											"itemId": "knowledge-t2",
 											"quantity": {
 												"min": 1,
 												"max": 1

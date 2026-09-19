@@ -1,0 +1,75 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "pn9804e3in9odnt9vkpt3lnd",
+		"id": "house-t2",
+		"title": "House - Tier 2",
+		"draft": false,
+		"description": "A larger, better organized household capable of turning several ordinary hands into higher-tier labor.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"house-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 4,
+		"lines": [
+			{
+				"id": "labor-t2",
+				"title": "Labor - Tier 2",
+				"artwork": "labor-t2",
+				"description": "Coordinate several units of basic labor into a smaller amount of more capable Tier 2 labor.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 90000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "labor-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "labor-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

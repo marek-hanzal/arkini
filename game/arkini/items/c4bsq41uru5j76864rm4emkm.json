@@ -46,6 +46,51 @@
 							"scope": "board",
 							"distance": "self"
 						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 5,
+							"max": 5
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "stone-block"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "labor-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
 					}
 				],
 				"output": {

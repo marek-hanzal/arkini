@@ -4,8 +4,8 @@
 		"uid": "h7kzzbfb39z2h795d7cq1yqc",
 		"id": "apiary-blueprint",
 		"title": "Apiary Blueprint",
-		"ui": "default",
 		"description": "Bees",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -25,8 +25,8 @@
 				"title": "Apiary",
 				"artwork": "apiary",
 				"description": "Bees bees bees",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -44,6 +44,51 @@
 							},
 							"scope": "board",
 							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "stone-block"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "labor-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
 						}
 					}
 				],

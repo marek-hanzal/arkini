@@ -1,0 +1,39 @@
+{
+	"content": "# TH1 Soap & Cleaning minihra\n\n## Bootstrap\n\n`Empty Cauldron` je teaser/bootstrap item z **Townhall I Supply Chest**. Není ve Foundation Chest.\n\nCarpenter umí vyrábět:\n- Cutting Board\n- Scrubbing Brush\n- Empty Bucket\n\nHunter / Hunted Game dodává:\n- Animal Fat\n- Raw Steak\n- další maso / kosti\n\n## Lye\n\nCelý lye krok je ruční a boardový:\n\n`Empty Cauldron + Bucket With Water -> Cauldron With Water + Empty Bucket`\n\n`Cauldron With Water + Burning Campfire -> Cauldron With Boiling Water`\n\n`Empty Sack + Loose Ash -> Ash`\n\nLoose Ash je neuklizený popel na boardu a před chemickým použitím se musí nejdřív sebrat do pytle.\n\n`Ash + Cauldron With Boiling Water -> Cauldron With Lye + Empty Sack`\n\nPytel se po vysypání popela vrací a může se použít znovu.\n\nFoundation Chest obsahuje **Empty Sack ×1** jako bootstrap sběru popela.\n\nLoose Ash tedy dostává další smysl mimo odpad:\n- Campfire\n- Charcoal Kiln\n- Waste Incinerator\n- další ohnivé systémy\n\n## Soap\n\n`Animal Fat + Cutting Board -> Cutting Board With Animal Fat`\n\nStandalone Animal Fat nejde přímo do lye.\n\n`Cutting Board With Animal Fat + Cauldron With Lye -> Cauldron With Soap + Dirty Cutting Board`\n\nFresh fat i board varianta se mohou zkazit do odpovídajících spoiled variant.\n\n## Soapy water\n\n`Cauldron With Soap` má **4 units**.\n\n`Empty Bucket + Cauldron With Soap -> Bucket With Soapy Water`\n- odebere 1 unit z cauldronu;\n- po poslední unit se cauldron změní na Dirty Cauldron.\n\n`Scrubbing Brush + Bucket With Soapy Water -> Soapy Scrubbing Brush + Empty Bucket`\n\nStará přímá zkratka Brush -> Cauldron With Soap se nepoužívá.\n\n## Cleaning\n\nSoapy Scrubbing Brush je aktivní cleaning nástroj.\n\nAktuálně umí čistit mimo jiné:\n- Dirty Copper Pan -> Copper Pan\n- Dirty Pig -> Pig\n- Toilet With Bio-Waste -> Toilet\n\nPo čištění vzniká Dirty Scrubbing Brush.\n\nCleaning coverage se může postupně rozšiřovat na další dirty itemy bez změny základní mechaniky.\n\n## Designový princip\n\nMýdlo je early TH1 ruční chemická minihra. Hráč musí fyzicky:\n1. ohřát vodu,\n2. sebrat Loose Ash do Empty Sack a vzniklý Ash zpracovat v horké vodě na lye,\n3. připravit Animal Fat na Cutting Board,\n4. vyrobit Soap,\n5. nabrat Soapy Water do bucketu,\n6. namočit brush,\n7. až potom čistit.\n\nŽádné craft UI a žádná abstraktní cleaning měna.",
+	"itemUids": [
+		"oj9o0nu1zp9g79f1jqx11g9l",
+		"jjfr3hedbcr6v62xsf9z12zo",
+		"aaj5jhmv6a2wsjg74yryd28r",
+		"zbfthcb97l53c67f18x015wz",
+		"ppl5spzpzxthy5178h8u3l1a",
+		"cfrqc6p65c4gh3lrjswv84zv",
+		"g8oi8iw4hidud9t24h8lv0p4",
+		"jj1c7jefeyzv45sd0ibtwqe6",
+		"ylpym7xm011uctpvbofzbhya",
+		"im6k8omuik7imr85cq0bc750",
+		"my9bfiki5q32m5rgvcmq66h1",
+		"w61ftom9lbm4m70y9oagapuu",
+		"rp06r6pjrhyhxxkujos2r1md",
+		"ftnfkoxukanqeu8tjkah1z8k",
+		"hhq1jyc6purkrnzfh6bqsk51",
+		"mroh4s4rsygi6qlncjqbqu2k"
+	],
+	"resourceIds": [
+		"empty-cauldron",
+		"cauldron-with-water",
+		"cauldron-with-boiling-water",
+		"cauldron-with-lye",
+		"animal-fat",
+		"cutting-board-with-animal-fat",
+		"cauldron-with-soap",
+		"bucket-with-soapy-water",
+		"scrubbing-brush",
+		"soapy-scrubbing-brush",
+		"dirty-scrubbing-brush",
+		"loose-ash",
+		"ash",
+		"empty-sack"
+	],
+	"createdAtMs": 1789830259371,
+	"updatedAtMs": 1789830542398
+}

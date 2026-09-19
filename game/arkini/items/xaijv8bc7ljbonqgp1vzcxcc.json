@@ -111,7 +111,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "cutting-board-with-animal-fat",
+											"itemId": "animal-fat",
 											"quantity": {
 												"min": 1,
 												"max": 1

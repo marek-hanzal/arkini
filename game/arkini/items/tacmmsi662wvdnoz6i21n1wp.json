@@ -97,6 +97,88 @@
 					]
 				},
 				"rules": []
+			},
+			{
+				"id": "burn-bio-waste",
+				"title": "Burn Bio-Waste",
+				"description": "Burn organic waste with Charcoal when composting is still somebody else's future problem.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 40000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "charcoal"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bio-waste"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 4
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "air-pollution",
+											"quantity": {
+												"min": 2,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.5,
+									"drop": [
+										{
+											"itemId": "loose-ash",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
 			}
 		]
 	}

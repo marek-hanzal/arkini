@@ -4,8 +4,8 @@
 		"uid": "s9j877qispz12d8ry9h1d4wb",
 		"id": "bucket-with-water",
 		"title": "Bucket with Water",
-		"ui": "simple",
 		"description": "Everybody needs to drink.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -139,6 +139,39 @@
 				},
 				"effect": "replace",
 				"result": "empty-well-with-water-bucket"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cauldron"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "cauldron-with-water"
 			}
 		],
 		"maxQueueSize": 1,

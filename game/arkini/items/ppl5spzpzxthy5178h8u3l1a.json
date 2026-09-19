@@ -1,21 +1,33 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "bsm7hrvufre2fiexr4o0eo4q",
-		"id": "burning-oven",
-		"title": "Burning Oven",
-		"description": "It's hot",
+		"uid": "ppl5spzpzxthy5178h8u3l1a",
+		"id": "animal-fat",
+		"title": "Animal Fat",
+		"draft": false,
+		"description": "Fresh animal fat. Useful for early chemistry, less useful if you leave it lying around for too long.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"burning-oven"
+				"animal-fat"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "cutting-board"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cutting-board-with-animal-fat"
+			}
+		],
 		"clock": {
-			"durationMs": 900000,
+			"durationMs": 600000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {
@@ -28,19 +40,10 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "oven-with-ash",
+										"itemId": "spoiled-animal-fat",
 										"quantity": {
 											"min": 1,
 											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									},
-									{
-										"itemId": "loose-ash",
-										"quantity": {
-											"min": 1,
-											"max": 2
 										},
 										"placement": "drop",
 										"rules": []

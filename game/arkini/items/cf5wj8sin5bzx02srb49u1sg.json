@@ -21,7 +21,7 @@
 				"id": "charcoal",
 				"title": "Make Charcoal",
 				"artwork": "charcoal",
-				"description": "Slow-burn firewood into a denser fuel. Cleaner than throwing logs at every furnace, still not exactly a spa treatment for the air.",
+				"description": "Pack the kiln with firewood, add wood fibers as tinder, and use nearby Flint & Steel to get the slow burn started.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
@@ -41,6 +41,36 @@
 						"quantity": {
 							"min": 2,
 							"max": 2
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wood-fibers"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "flint-and-steel"
+							},
+							"scope": "board",
+							"distance": "near-close"
 						}
 					}
 				],

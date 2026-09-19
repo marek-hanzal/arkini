@@ -1,0 +1,172 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "spkn18pn248fe91tsk0xlvkc",
+		"id": "townhall-t2-blueprint",
+		"title": "Townhall II Blueprint",
+		"draft": false,
+		"description": "Plans for taking the settlement beyond its first civic age. Better materials help, but this upgrade finally needs people who know what they are doing.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"blueprint",
+				"townhall-t2"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "townhall-t2",
+				"title": "Build Townhall II",
+				"artwork": "townhall-t2",
+				"description": "Upgrade the settlement using processed materials, available labor, and enough knowledge to avoid calling it a bigger shed.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 180000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "townhall-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "townhall-t2-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 6,
+							"max": 6
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "stone-block"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 6,
+							"max": 6
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "labor-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "knowledge-t1"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "townhall-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "Build the School before upgrading the settlement.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "school-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
+	}
+}

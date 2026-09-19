@@ -93,7 +93,9 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 			(batch: GameEventBatchSchema.Type, get) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(get.result(audioAtom)),
-					Effect.flatMap((audio) => audio.playFx(readGameAudioCuesFn(batch))),
+					Effect.flatMap((audio) =>
+						audio.playFx(readGameAudioCuesFn(batch, game.config.items)),
+					),
 					Effect.catchCause((cause) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void

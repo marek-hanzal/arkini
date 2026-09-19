@@ -24,6 +24,9 @@ import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationS
 const eventState = vi.hoisted(() => ({
 	game: {
 		id: "game:first",
+		config: {
+			items: {},
+		},
 	},
 	listener: null as ((batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) | null,
 }));
@@ -182,6 +185,9 @@ afterEach(async () => {
 	for (const registry of registries.splice(0)) registry.dispose();
 	eventState.game = {
 		id: "game:first",
+		config: {
+			items: {},
+		},
 	};
 	eventState.listener = null;
 	document.body.replaceChildren();
@@ -306,6 +312,9 @@ describe("GameAudio", () => {
 
 		eventState.game = {
 			id: "game:second",
+			config: {
+				items: {},
+			},
 		};
 		await act(async () => render());
 
@@ -336,6 +345,9 @@ describe("GameAudio", () => {
 
 		eventState.game = {
 			id: "game:second",
+			config: {
+				items: {},
+			},
 		};
 		await act(async () => render());
 		await vi.waitFor(() => expect(first.close).toHaveBeenCalledOnce());
@@ -397,6 +409,9 @@ describe("GameAudio", () => {
 
 		eventState.game = {
 			id: "game:abandoned",
+			config: {
+				items: {},
+			},
 		};
 		await act(async () => {
 			startTransition(() => {
@@ -552,6 +567,9 @@ describe("GameAudio", () => {
 
 		eventState.game = {
 			id: "game:second",
+			config: {
+				items: {},
+			},
 		};
 		await act(async () => render());
 		await vi.waitFor(() => {

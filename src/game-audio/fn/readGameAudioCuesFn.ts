@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameAudioCue } from "~/game-audio/type/GameAudioCue";
 
 type GameEvent = GameEventBatchSchema.Type["events"][number];
@@ -46,7 +47,10 @@ const cueFn = (event: AudibleGameEvent, strength: number): GameEventAudioCue => 
 	strength: clampStrengthFn(strength),
 });
 
-const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue | undefined =>
+const readGameAudioCueFn = (
+	event: GameEvent,
+	items: GameConfigSchema.Type["items"],
+): GameEventAudioCue | undefined =>
 	match(event)
 		.with(
 			{
@@ -74,7 +78,10 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue | undefined =>
 			{
 				type: GameEventEnumSchema.enum.JobQueued,
 			},
-			() => cueFn(GameEventEnumSchema.enum.JobQueued, 1),
+			(event) =>
+				items[event.canonicalItemId]?.ui === "simple"
+					? undefined
+					: cueFn(GameEventEnumSchema.enum.JobQueued, 1),
 		)
 		.with(
 			{
@@ -229,12 +236,15 @@ const readGameAudioCueFn = (event: GameEvent): GameEventAudioCue | undefined =>
 		)
 		.exhaustive();
 
-const coalesceCuesFn = (events: ReadonlyArray<GameEvent>): ReadonlyArray<GameEventAudioCue> => {
+const coalesceCuesFn = (
+	events: ReadonlyArray<GameEvent>,
+	items: GameConfigSchema.Type["items"],
+): ReadonlyArray<GameEventAudioCue> => {
 	const cues: Array<GameEventAudioCue> = [];
 	const indexByEvent = new Map<GameEventEnumSchema.Type, number>();
 
 	for (const event of events) {
-		const next = readGameAudioCueFn(event);
+		const next = readGameAudioCueFn(event, items);
 		if (next === undefined) continue;
 		const existingIndex = indexByEvent.get(next.event);
 		if (existingIndex === undefined) {
@@ -256,8 +266,9 @@ const coalesceCuesFn = (events: ReadonlyArray<GameEvent>): ReadonlyArray<GameEve
 /** Projects one committed event batch into a small, readable set of audio intentions. */
 export const readGameAudioCuesFn = (
 	batch: GameEventBatchSchema.Type,
+	items: GameConfigSchema.Type["items"],
 ): ReadonlyArray<GameAudioCue> => {
-	const cues = coalesceCuesFn(batch.events);
+	const cues = coalesceCuesFn(batch.events, items);
 	if (cues.length <= maximumBatchCues) return cues;
 
 	const ranked = cues

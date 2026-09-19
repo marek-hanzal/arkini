@@ -9,6 +9,7 @@ import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnq
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
+import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -38,8 +39,11 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	ownerItemId,
 	runtime,
 }: enqueueLineRuntimeFx.Props) {
-	const owner = runtime.items.find((item) => item.id === ownerItemId);
-	if (owner !== undefined && !isItemProductionAdmissionOpenFn(owner))
+	const owner = yield* readRuntimeItemByIdFx({
+		itemId: ownerItemId,
+		runtime,
+	});
+	if (!isItemProductionAdmissionOpenFn(owner))
 		return yield* Effect.fail(
 			new LineRunUnavailableError({
 				ownerItemId,
@@ -88,6 +92,7 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 				type: "job:queued",
 				requestId: request.id,
 				ownerItemId,
+				canonicalItemId: owner.item.id,
 				lineId,
 			},
 		],

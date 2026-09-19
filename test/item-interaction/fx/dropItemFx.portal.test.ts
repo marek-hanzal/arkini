@@ -166,9 +166,12 @@ describe("dropItemFx / portal direction", () => {
 		]);
 		expect(GameEventSchema.safeParse(result.transition.events[0]).success).toBe(true);
 		expect(
-			readGameAudioCuesFn({
-				events: result.transition.events,
-			}),
+			readGameAudioCuesFn(
+				{
+					events: result.transition.events,
+				},
+				{},
+			),
 		).toEqual([
 			{
 				event: "item:portal-transferred",

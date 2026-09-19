@@ -41,6 +41,7 @@ const jobQueuedEventSchema = z
 		]),
 		requestId: IdSchema,
 		ownerItemId: IdSchema,
+		canonicalItemId: IdSchema,
 		lineId: IdSchema,
 	})
 	.strict();

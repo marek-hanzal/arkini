@@ -243,7 +243,7 @@ describe("dropItemFx / move storage and swap", () => {
 				targetLocation: occupiedLocation,
 			},
 		]);
-		expect(readGameAudioCuesFn(result.transition)).toEqual([
+		expect(readGameAudioCuesFn(result.transition, {})).toEqual([
 			{
 				event: GameEventEnumSchema.enum.ItemSwapped,
 				strength: 1,

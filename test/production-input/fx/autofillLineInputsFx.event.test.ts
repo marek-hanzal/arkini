@@ -69,7 +69,7 @@ describe("autofillLineInputsFx transition", () => {
 						scheduledQuantity: 3,
 					},
 				]);
-				expect(readGameAudioCuesFn(committed[0]!)).toEqual([
+				expect(readGameAudioCuesFn(committed[0]!, {})).toEqual([
 					{
 						event: "line-input:autofill-started",
 						strength: 1 + Math.log2(3),

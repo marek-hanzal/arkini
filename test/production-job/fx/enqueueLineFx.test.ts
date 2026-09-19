@@ -145,6 +145,7 @@ describe("enqueueLineFx", () => {
 		expect(result.transition.events).toContainEqual({
 			type: "job:queued",
 			requestId: result.request.id,
+			canonicalItemId: "forge",
 			ownerItemId: props.ownerItemId,
 			lineId: props.lineId,
 		});

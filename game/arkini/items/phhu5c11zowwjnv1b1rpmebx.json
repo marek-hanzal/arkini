@@ -1,22 +1,22 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "ecjzsaixdj6tc96f20xp4uxz",
-		"id": "coffee-field",
-		"title": "Coffee Field",
+		"uid": "phhu5c11zowwjnv1b1rpmebx",
+		"id": "hop-field",
+		"title": "Hop Field",
 		"draft": false,
-		"description": "Coffee",
+		"description": "A planted hop field ready to be worked by a nearby Hop Farm.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"coffee-field"
+				"hop-field"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
-			"amount": 16,
+			"amount": 24,
 			"output": {
 				"set": [
 					{
@@ -27,7 +27,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "empty-coffee-field",
+										"itemId": "empty-hop-field",
 										"quantity": {
 											"min": 1,
 											"max": 1

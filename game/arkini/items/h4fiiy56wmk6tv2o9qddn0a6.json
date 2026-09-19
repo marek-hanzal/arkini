@@ -1,17 +1,17 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "zrx3ur1uwi28j3c7ps254er2",
-		"id": "sack-with-sugar-beet-seed",
-		"title": "Sack With Sugar Beet Seed",
+		"uid": "h4fiiy56wmk6tv2o9qddn0a6",
+		"id": "sack-with-sugar-cane-seed",
+		"title": "Sack With Sugar Cane Seed",
 		"draft": false,
-		"description": "A sack of sugar beet seed, marked with the crop it is meant to grow.",
+		"description": "A sack of sugar cane seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"sack-with-seeds",
-				"sugar-beet"
+				"sugar-cane"
 			]
 		},
 		"scope": "board",
@@ -20,7 +20,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-sugar-beet-field"
+					"itemId": "fertilized-sugar-cane-field"
 				},
 				"action": "consume",
 				"output": {
@@ -48,7 +48,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "sugar-beet-field"
+				"result": "sugar-cane-field"
 			}
 		],
 		"clock": {

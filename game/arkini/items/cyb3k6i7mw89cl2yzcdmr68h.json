@@ -1,0 +1,70 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "cyb3k6i7mw89cl2yzcdmr68h",
+		"id": "hop-seed",
+		"title": "Hop Seed",
+		"draft": false,
+		"description": "Loose hop seed. Plant it or pack it into a sack before it spoils.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"hop-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-hop-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-hop-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "hop-field"
+			}
+		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-hop-seed",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

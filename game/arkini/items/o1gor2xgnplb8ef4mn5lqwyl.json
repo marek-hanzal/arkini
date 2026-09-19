@@ -4,15 +4,16 @@
 		"uid": "o1gor2xgnplb8ef4mn5lqwyl",
 		"id": "grape-field",
 		"title": "Grape Field",
-		"ui": "simple",
+		"draft": false,
 		"description": "Grape field",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"grape-field"
 			]
 		},
-		"scope": "any",
+		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 32,

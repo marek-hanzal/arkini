@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "oi9idnevu2gj5ztj77zvdu0p",
+		"id": "spoiled-hop-seed",
+		"title": "Spoiled Hop Seed",
+		"draft": false,
+		"description": "Hop seed that spoiled before it ever reached the soil.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-hop-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

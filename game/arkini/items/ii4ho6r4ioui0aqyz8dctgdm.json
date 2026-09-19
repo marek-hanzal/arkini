@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ii4ho6r4ioui0aqyz8dctgdm",
+		"id": "spoiled-coffee-seed",
+		"title": "Spoiled Coffee Seed",
+		"draft": false,
+		"description": "Coffee seed that spoiled before it ever reached the soil.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-coffee-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

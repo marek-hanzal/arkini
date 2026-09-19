@@ -1,0 +1,70 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ld7ruv60530ce3ckgm7xt9v5",
+		"id": "sugar-beet-seed",
+		"title": "Sugar Beet Seed",
+		"draft": false,
+		"description": "Loose sugar beet seed. Plant it or pack it into a sack before it spoils.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"sugar-beet-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-sugar-beet-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-sugar-beet-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sugar-beet-field"
+			}
+		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-sugar-beet-seed",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

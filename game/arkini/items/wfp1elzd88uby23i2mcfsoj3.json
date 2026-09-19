@@ -1,23 +1,26 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "ecjzsaixdj6tc96f20xp4uxz",
-		"id": "coffee-field",
-		"title": "Coffee Field",
+		"uid": "wfp1elzd88uby23i2mcfsoj3",
+		"id": "sack-with-cacao-seed",
+		"title": "Sack With Cacao Seed",
 		"draft": false,
-		"description": "Coffee",
+		"description": "A sack of cacao seed, marked with the pod it is meant to grow.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"coffee-field"
+				"sack-with-seeds",
+				"cacao-pod"
 			]
 		},
 		"scope": "board",
 		"maxStackSize": 1,
-		"units": {
-			"amount": 16,
-			"output": {
+		"clock": {
+			"durationMs": 900000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
 				"set": [
 					{
 						"weight": 1,
@@ -27,7 +30,7 @@
 								"type": "guaranteed",
 								"drop": [
 									{
-										"itemId": "empty-coffee-field",
+										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,
 											"max": 1

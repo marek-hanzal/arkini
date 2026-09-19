@@ -1,0 +1,70 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "qaf7ddmbr73lh9bwpaq7k6rv",
+		"id": "dye-seed",
+		"title": "Dye Seed",
+		"draft": false,
+		"description": "Loose dye plant seed. Plant it or pack it into a sack before it spoils.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"dye-seed"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "sack-with-dye-seed"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "fertilized-dye-field"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "dye-field"
+			}
+		],
+		"clock": {
+			"durationMs": 300000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-dye-seed",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -380,6 +380,92 @@
 						"type": "enable"
 					}
 				]
+			},
+			{
+				"id": "cuddle-beagle",
+				"title": "Cuddle Beagle",
+				"artwork": "beagle-cuddling-puppy",
+				"description": "The puppy decides to cuddle with an adult beagle.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "beagle"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "beagle-puppy"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "beagle-cuddling-puppy",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "beagle"
+									},
+									"scope": "board",
+									"distance": "far"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
 			}
 		]
 	}

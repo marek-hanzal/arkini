@@ -100,13 +100,23 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 const ItemChainInputSchema = z
 	.object({
 		itemId: IdSchema.describe("The exact starting item ID returned by item_collection."),
+		detail: GraphDetailSchema.default("full").describe(
+			"Summary keeps starting operations, their immediate branches and all outcome states; full includes the complete bounded Details tree.",
+		),
+		maxDepth: z
+			.number()
+			.int()
+			.min(1)
+			.max(12)
+			.default(5)
+			.describe("Maximum operation depth; defaults to 5, matching Item → Chain."),
 	})
 	.strict()
 	.meta({
 		$id: "urn:arkini:schema:mcp:item-chain-input",
 		title: "Item Chain tool input",
 		description:
-			"The starting item for the Editor Chain projection; uses its fixed default depth.",
+			"The starting item, detail level and bounded traversal depth for the Chain projection.",
 	});
 
 const ItemEstimateInputSchema = z
@@ -561,16 +571,18 @@ const createServerFn = (
 		"item_chain",
 		{
 			description:
-				"Explore what one item can turn into through its own directional merges and Clock. Returns the same bounded projection as Item → Chain, as readable text with all results and the complete Details tree: intermediate items, operation owners, merge/line identities, per-operation times and quantities, weighted output sets, guaranteed and chance groups, conditions and termination states. Uses the Editor default depth of 5; no depth argument. Only the root's merges initiate interaction; subsequent steps follow Clock expiry and Clock-selected line outputs. Reverse/intermediate merges, other production lines and production input acquisition are excluded. No-Clock items terminate branches. This is authored possibility analysis, not runtime simulation or accumulated periodic yield. Use item_input/item_output for general relations and item_estimate for acquisition planning.",
+				"Explore what one item can turn into through its own directional merges and Clock. Returns the same bounded projection as Item → Chain, as readable text. Summary keeps starting operations, their immediate branches and all outcome states; full (default) includes the complete Details tree: intermediate items, operation owners, merge/line identities, per-operation times and quantities, weighted output sets, guaranteed and chance groups, conditions and termination states. maxDepth defaults to 5 (the Editor default), with a range of 1–12. Cycle detection and the 400-expansion safety budget apply to both detail levels. Only the root's merges initiate interaction; subsequent steps follow Clock expiry and Clock-selected line outputs. Reverse/intermediate merges, other production lines and production input acquisition are excluded. No-Clock items terminate branches. This is authored possibility analysis, not runtime simulation or accumulated periodic yield. Use item_input/item_output for general relations and item_estimate for acquisition planning.",
 			inputSchema: ItemChainInputSchema,
 			annotations: {
 				readOnlyHint: true,
 			},
 		},
-		async ({ itemId }) =>
+		async ({ itemId, detail, maxDepth }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemChainTextFx(project, itemId)),
+					Effect.flatMap((project) =>
+						readItemChainTextFx(project, itemId, detail, maxDepth),
+					),
 				),
 			),
 	);

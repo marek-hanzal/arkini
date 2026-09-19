@@ -1,0 +1,408 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "akdfqjm4paxik6tsi93zurih",
+		"id": "farmers-market",
+		"title": "Farmers Market",
+		"draft": false,
+		"description": "A trade hub where outside demand turns local agricultural surplus into contracts, imports, and occasional valuables.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"crop-market"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"clock": {
+			"intervalMs": 90000,
+			"enable": true,
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "idle",
+				"title": "No New Contract",
+				"description": "No useful trade offer arrives this time. As more trade categories unlock, the market naturally becomes busier.",
+				"clock": true,
+				"clockWeight": 32,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "quest-grain-t1",
+				"title": "Grain Tier 1",
+				"artwork": "grain",
+				"description": "A possible grain tier 1 contract arrives from outside the settlement.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-grain-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "grain-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "quest-vegetables-t1",
+				"title": "Vegetables Tier 1",
+				"artwork": "vegetable-crate",
+				"description": "A possible vegetables tier 1 contract arrives from outside the settlement.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-vegetables-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "vegetable-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "quest-fruit-t1",
+				"title": "Fruit Tier 1",
+				"artwork": "fruit-crate",
+				"description": "A possible fruit tier 1 contract arrives from outside the settlement.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-fruit-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "fruit-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "quest-wool-t1",
+				"title": "Wool Tier 1",
+				"artwork": "wool",
+				"description": "A possible wool tier 1 contract arrives from outside the settlement.",
+				"clock": true,
+				"clockWeight": 3,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-wool-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sheep-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "quest-pumpkin-t1",
+				"title": "Pumpkin Tier 1",
+				"artwork": "pumpkin",
+				"description": "A possible pumpkin tier 1 contract arrives from outside the settlement.",
+				"clock": true,
+				"clockWeight": 2,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-pumpkin-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "pumpkin-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "quest-wool-t2",
+				"title": "Wool Tier 2",
+				"artwork": "wool",
+				"description": "A possible wool tier 2 contract arrives from outside the settlement.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-wool-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "sheep-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "cotton-farm"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
+	}
+}

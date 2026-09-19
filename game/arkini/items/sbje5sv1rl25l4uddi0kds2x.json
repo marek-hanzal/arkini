@@ -4,8 +4,8 @@
 		"uid": "sbje5sv1rl25l4uddi0kds2x",
 		"id": "order",
 		"title": "Order",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,40 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "order-shredded",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

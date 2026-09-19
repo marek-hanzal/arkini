@@ -1,0 +1,48 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ovdqj7txazzmjzi4kiq764sm",
+		"id": "chicken-coop",
+		"title": "Chicken Coop",
+		"draft": false,
+		"description": "A populated enclosure holding animals that can be released one at a time.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"chicken-coop"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 12,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-chicken-coop",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

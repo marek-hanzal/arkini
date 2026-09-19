@@ -1,0 +1,194 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "i9yx4ix89kachdhflod81b7r",
+		"id": "quest-fruit-t1",
+		"title": "Quest - Fruit - Tier 1",
+		"draft": false,
+		"description": "A simple fruit contract from somebody willing to pay rather than grow their own trees.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"quest",
+				"fruit-crate"
+			]
+		},
+		"scope": "board",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-shredded",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bucket-with-water"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "wet-quest"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "campfire-burning"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "burning-quest",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "complete",
+				"title": "Complete Contract",
+				"artwork": "fruit-crate",
+				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "quest-fruit-t1"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "fruit-crate"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "coin",
+											"quantity": {
+												"min": 5,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

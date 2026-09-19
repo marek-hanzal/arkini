@@ -1,0 +1,26 @@
+{
+	"content": "# Farmers Market — quest contracts\n\n## Role\n\nFarmers Market is not a fixed exchange table and not a generic currency converter.\n\nIt periodically creates authored trade-contract items. Each contract is a real board item with its own requirements, reward and tier.\n\nMarket:\n- item: `farmers-market`\n- artwork: `crop-market`\n- `ui: simple`\n- Clock interval: 90 s\n- Clock uses weighted hidden lines plus a deliberately strong idle result. The current idle weight is 32, so early trade is sparse and the market naturally becomes busier as more quest categories unlock.\n- Existing Quest items do not globally disable generation of other quests. Multiple unresolved quests may accumulate on the board; disposal and recycling are part of the system rather than a global spawn lock.\n- Quest families enter the random pool only after the relevant farm infrastructure exists. These local unlock rules stay attached only to their own quest line; adding a new quest does not require editing every existing quest line.\n\nThe blueprint is discovered in Growers Guild after `grain-farm` exists.\n\n## Quest convention\n\nCanonical naming:\n- `quest-<primary>-t<tier>`\n- title: `Quest - <Primary> - Tier <N>`\n\nArtwork is composite:\n- base `quest`\n- primary requested item as overlay\n\nQuest:\n- `ui: default`\n- lives on board\n- owns 1 unit\n- completion line consumes that self-unit plus requested goods\n- completion emits the authored reward\n- tier is explicit in ID/title so later pools and balancing can scale independently\n\nA quest may request secondary materials, but the artwork continues to communicate the primary requested item.\n\n## Initial quest pool\n\n- Grain T1: 6x Grain -> 4x Coin\n- Vegetables T1: 2x Vegetable Crate -> 1x Sack With Salt\n- Fruit T1: 2x Fruit Crate -> 5x Coin\n- Wool T1: 2x Wool -> 1x Unlit Candle + 2x Coin\n- Pumpkin T1: 3x Pumpkin -> 1x Sack With Salt + 2x Coin\n- Wool T2: 5x Wool + 2x Cotton -> 1x Diamond\n\nThese are authored contracts, not a universal exchange-rate table.\n\n## Rejecting / recycling a quest\n\nEvery authored Quest owns the same local discard interactions, so Beagle itself does not need one merge entry per quest.\n\n### Beagle\n\n`Quest + Beagle -> Shredded Quest`\n\n- Quest is consumed.\n- Beagle is kept.\n- output: `quest-shredded`\n\n`quest-shredded + Campfire Burning -> Loose Ash` is instant.\n\n### Fire\n\n`Quest + Campfire Burning -> Burning Quest`\n\n- campfire is kept;\n- `burning-quest` burns for 10 s;\n- then becomes `loose-ash`.\n\n### Water / paper recycling\n\n`Quest + Bucket With Water -> Wet Quest + Empty Bucket`\n\nThe contract is destroyed as a contract, but the paper remains reusable.\n\nA second wash converts it into the existing paper-making intermediate:\n\n`Wet Quest + Bucket With Water -> Paper Pulp Bucket`\n\nThe second bucket becomes the pulp bucket, so no Empty Bucket is returned from that step.\n\n## Reward direction\n\nRewards may include:\n- Coins\n- Diamonds\n- imported materials such as Salt\n- useful items from the near future\n- deliberately annoying manual crafts such as Unlit Candle\n\nThe point is variety and useful external trade, not a single universal market currency.",
+	"itemUids": [
+		"akdfqjm4paxik6tsi93zurih",
+		"il5apu6wibw3i27yqdp0uwi6",
+		"dd4q4ss6mjh85tvkw2tc39fv",
+		"slildyuf8kpe4iwvtbbryctc",
+		"aa4ej7xbvxbi5twq6a8wbj5f",
+		"prnytwj1gcbuu2bikd4pkxqb",
+		"gjo9f51k3xuq7kjkbng1p7n5",
+		"hqy2lvzpaqrmdfy3uchet5lk",
+		"i9yx4ix89kachdhflod81b7r",
+		"a7501nhp6qdlp81jh6gpab2r",
+		"kewkd0arcrwr3ajn1w04kvmw",
+		"gmys7a2t78foxskdeoxdnmos"
+	],
+	"resourceIds": [
+		"crop-market",
+		"quest",
+		"quest-shredded",
+		"wet-quest",
+		"sack-with-salt"
+	],
+	"createdAtMs": 1789853826215,
+	"updatedAtMs": 1789854396677
+}

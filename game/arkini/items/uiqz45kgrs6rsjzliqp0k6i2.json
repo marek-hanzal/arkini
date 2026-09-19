@@ -232,10 +232,124 @@
 				]
 			},
 			{
+				"id": "animal-feed-workshop-blueprint",
+				"title": "Animal Feed Workshop Blueprint",
+				"artwork": "animal-feed-workshop",
+				"description": "Discover plans for an Animal Feed Workshop after establishing the Growers Guild.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "goose-quill"
+							},
+							"scope": "any"
+						},
+						"mode": "reserve",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "animal-feed-workshop-blueprint",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "growers-guild"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "animal-feed-workshop-blueprint"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					},
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "animal-feed-workshop"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "hide"
+					}
+				]
+			},
+			{
 				"id": "herders-guild-blueprint",
 				"title": "Herders Guild Blueprint",
 				"artwork": "herders-guild",
-				"description": "Discover plans for Herders Guild.",
+				"description": "Discover plans for Herders Guild after establishing animal-feed production.",
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
@@ -304,7 +418,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "composting-workshop"
+										"itemId": "animal-feed-workshop"
 									},
 									"scope": "universe"
 								},

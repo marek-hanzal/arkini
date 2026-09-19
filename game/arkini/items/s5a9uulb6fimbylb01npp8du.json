@@ -4,8 +4,9 @@
 		"uid": "s5a9uulb6fimbylb01npp8du",
 		"id": "cow-farm-blueprint",
 		"title": "Cow Farm Blueprint",
+		"draft": false,
+		"description": "Plans for Cow Farm.",
 		"ui": "default",
-		"description": "It's time for some boos!",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -21,18 +22,30 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "Cow Farm",
-				"title": "Cow Farm",
+				"id": "cow-farm",
+				"title": "Build Cow Farm",
 				"artwork": "cow-farm",
-				"description": "Wanna cows?",
-				"default": true,
+				"description": "Build Cow Farm.",
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
 				"input": [
 					{
-						"type": "simple"
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow-farm-blueprint"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
 					}
 				],
 				"output": {

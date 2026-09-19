@@ -1,0 +1,32 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "lxg8p8zb8msiduu6e2zrzmkq",
+		"id": "order-shredded",
+		"title": "Shredded Order",
+		"draft": false,
+		"description": "An order that has been reduced to paperwork confetti. Still perfectly suitable for pulp.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"order-shredded"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bucket-with-water"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "paper-pulp-bucket"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

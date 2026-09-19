@@ -4,7 +4,7 @@
 		"uid": "bfmcl2hvc9wou6td0lnv6c4e",
 		"id": "animal-feed-workshop",
 		"title": "Animal Feed Workshop",
-		"draft": true,
+		"draft": false,
 		"ui": "default",
 		"artwork": {
 			"scale": 1,

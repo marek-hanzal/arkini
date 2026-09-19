@@ -18,6 +18,24 @@
 			{
 				"target": {
 					"type": "item",
+					"itemId": "cow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "well-fed-cow"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "hungry-cow"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "cow"
+			},
+			{
+				"target": {
+					"type": "item",
 					"itemId": "goose"
 				},
 				"action": "consume",

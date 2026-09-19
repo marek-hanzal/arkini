@@ -2,10 +2,10 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f8viltfd5w0tygzc09vz5jy5",
-		"id": "sugar",
-		"title": "Sugar",
-		"ui": "simple",
+		"id": "sack-with-sugar",
+		"title": "Sack With Sugar",
 		"description": "Pure sweetness",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

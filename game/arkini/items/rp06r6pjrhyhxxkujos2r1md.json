@@ -4,7 +4,7 @@
 		"uid": "rp06r6pjrhyhxxkujos2r1md",
 		"id": "loose-ash",
 		"title": "Loose Ash",
-		"draft": true,
+		"draft": false,
 		"description": "Loose ash scattered around after burning. Collect it into a sack before using it for anything civilized.",
 		"ui": "simple",
 		"artwork": {
@@ -15,6 +15,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-sack"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "ash"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

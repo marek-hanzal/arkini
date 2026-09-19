@@ -4,8 +4,8 @@
 		"uid": "h7zz7e9ctriltk57q1bazfmu",
 		"id": "recovering-cow",
 		"title": "Recovering Cow",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,36 +14,543 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"clock": {
-			"durationMs": 300000,
+			"intervalMs": 30000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Idle",
+				"description": "The cow is recovering.",
+				"clock": true,
+				"clockWeight": 24,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
 					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "recovering-cow",
+				"description": "Wanders somewhere else.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "recovering-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "recover",
+				"title": "Recover",
+				"description": "The cow recovers.",
+				"clock": true,
+				"clockWeight": 5,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "relapse",
+				"title": "Relapse",
+				"description": "Recovery may fail.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "disease-relapse",
+				"title": "Disease Relapse",
+				"artwork": "disease",
+				"description": "Nearby disease increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 6,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
 							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "cow",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "disease"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
 							}
-						]
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "plague-relapse",
+				"title": "Plague Relapse",
+				"artwork": "plague",
+				"description": "Nearby plague increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 12,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "plague"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "wolf-attack-near",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf two tiles away may attack.",
+				"clock": true,
+				"clockWeight": 2,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "near"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "near"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "wolf-attack-close",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf right next to the cow may attack.",
+				"clock": true,
+				"clockWeight": 6,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "recovering-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
 					}
 				]
 			}
-		},
-		"maxQueueSize": 1,
-		"lines": []
+		]
 	}
 }

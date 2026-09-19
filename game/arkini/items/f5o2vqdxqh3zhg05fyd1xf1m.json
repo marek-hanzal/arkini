@@ -4,7 +4,7 @@
 		"uid": "f5o2vqdxqh3zhg05fyd1xf1m",
 		"id": "cow",
 		"title": "Cow",
-		"description": "Booo!",
+		"description": "Large, mostly calm livestock. It wanders, gets hungry, can fall ill, and has opinions about nearby wolves.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -14,119 +14,543 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"clock": {
-			"durationMs": 300000,
+			"intervalMs": 30000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
+			"rules": []
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "idle",
+				"title": "Idle",
+				"description": "The cow keeps doing cow things.",
+				"clock": true,
+				"clockWeight": 28,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
 					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "cow",
+				"description": "Wanders somewhere else.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "get-hungry",
+				"title": "Get Hungry",
+				"description": "The cow starts feeling hungry.",
+				"clock": true,
+				"clockWeight": 2,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "hungry-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "get-sick",
+				"title": "Get Sick",
+				"description": "The cow may become sick.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "disease-exposure",
+				"title": "Disease Exposure",
+				"artwork": "disease",
+				"description": "Nearby disease increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 8,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
 							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "hungry-cow",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "disease"
 									},
-									{
-										"itemId": "bio-waste",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					},
-					{
-						"weight": 2,
-						"rules": [
-							{
-								"when": [
-									{
-										"query": {
-											"selector": {
-												"type": "item",
-												"itemId": "plague"
-											},
-											"scope": "board",
-											"distance": "near-close"
-										},
-										"type": "exists"
-									}
-								],
-								"type": "enable"
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
 							}
 						],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "sick-cow",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					},
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "plague-exposure",
+				"title": "Plague Exposure",
+				"artwork": "plague",
+				"description": "Nearby plague increases the chance of illness.",
+				"clock": true,
+				"clockWeight": 16,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
 					{
-						"weight": 2,
-						"rules": [
-							{
-								"when": [
-									{
-										"query": {
-											"selector": {
-												"type": "item",
-												"itemId": "disease"
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
-											"scope": "board",
-											"distance": "near-close"
-										},
-										"type": "exists"
-									}
-								],
-								"type": "enable"
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "plague"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
 							}
 						],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "sick-cow",
-										"quantity": {
-											"min": 1,
-											"max": 1
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "wolf-attack-near",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf two tiles away may attack.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "near"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "near"
+								},
+								"type": "exists"
 							}
-						]
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "wolf-attack-close",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf right next to the cow may attack.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
 					}
 				]
 			}
-		},
-		"maxQueueSize": 1,
-		"lines": []
+		]
 	}
 }

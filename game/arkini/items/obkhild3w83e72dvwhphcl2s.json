@@ -1,0 +1,117 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "obkhild3w83e72dvwhphcl2s",
+		"id": "empty-goose-pen",
+		"title": "Empty Goose Pen",
+		"draft": false,
+		"description": "An empty enclosure waiting for the next group of animals to arrive.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"empty-goose-pen"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "stock",
+				"title": "Stock Goose Pen",
+				"artwork": "goose-pen",
+				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "empty-goose-pen"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "animal-feed"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bucket-with-water"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "goose-pen",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

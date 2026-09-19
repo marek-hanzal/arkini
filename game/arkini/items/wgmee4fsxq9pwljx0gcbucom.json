@@ -14,53 +14,22 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"clock": {
 			"intervalMs": 30000,
-			"durationMs": 300000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "spoiled-raw-game-meat",
-										"quantity": {
-											"min": 2,
-											"max": 4
-										},
-										"placement": "drop",
-										"rules": []
-									},
-									{
-										"itemId": "spoiled-animal-bones",
-										"quantity": {
-											"min": 1,
-											"max": 2
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"rules": []
 		},
 		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "idle",
 				"title": "Idle",
-				"description": "The sick animal rests and does nothing this time.",
+				"description": "The sick cow barely moves.",
 				"clock": true,
-				"clockWeight": 9,
+				"clockWeight": 32,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -73,12 +42,336 @@
 				"rules": []
 			},
 			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "sick-cow",
+				"description": "Wanders somewhere else.",
+				"clock": true,
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sick-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sick-cow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "die",
+				"title": "Die",
+				"description": "The animal may not survive its condition.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sick-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "spoiled-raw-game-meat",
+											"quantity": {
+												"min": 4,
+												"max": 6
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "spoiled-animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "wolf-attack-near",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf two tiles away may attack.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "near"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sick-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "near"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "wolf-attack-close",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf right next to the cow may attack.",
+				"clock": true,
+				"clockWeight": 10,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sick-cow"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 3,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
 				"id": "spread-disease",
 				"title": "Spread Disease",
 				"artwork": "disease",
 				"description": "The sick animal may contaminate its immediate surroundings.",
 				"clock": true,
-				"clockWeight": 1,
+				"clockWeight": 4,
 				"default": false,
 				"show": false,
 				"enable": true,

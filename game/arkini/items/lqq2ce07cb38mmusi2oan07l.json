@@ -1,0 +1,48 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "lqq2ce07cb38mmusi2oan07l",
+		"id": "goose-pen",
+		"title": "Goose Pen",
+		"draft": false,
+		"description": "A populated enclosure holding animals that can be released one at a time.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"goose-pen"
+			]
+		},
+		"scope": "board",
+		"maxStackSize": 1,
+		"units": {
+			"amount": 8,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-goose-pen",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

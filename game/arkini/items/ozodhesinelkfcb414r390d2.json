@@ -293,7 +293,8 @@
 			{
 				"id": "eat-vegetables",
 				"title": "Find Food",
-				"description": "The hungry animal finds something suitable to eat.",
+				"artwork": "vegetable-crate",
+				"description": "The hungry pig finds a nearby crate of vegetables, eats it, and leaves the empty crate behind.",
 				"clock": true,
 				"clockWeight": 12,
 				"default": false,
@@ -344,6 +345,15 @@
 									"drop": [
 										{
 											"itemId": "pig",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-crate",
 											"quantity": {
 												"min": 1,
 												"max": 1

@@ -4,8 +4,8 @@
 		"uid": "ipi44w1kuiqcnuyogc6wfkpi",
 		"id": "pig-farm",
 		"title": "Pig Farm",
+		"description": "Manages nearby pig pens, prepares empty ones, and releases pigs over time.",
 		"ui": "default",
-		"description": "Pig generator",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,33 +14,19 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"maxQueueSize": 6,
+		"maxQueueSize": 4,
 		"lines": [
 			{
 				"id": "pig",
 				"title": "Pig",
-				"description": "Some pigs here",
-				"default": true,
+				"artwork": "pig",
+				"description": "Feed and water a pig before releasing it from a nearby populated pen.",
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
-				"enable": false,
-				"runtimeMs": 24000,
+				"enable": true,
+				"runtimeMs": 30000,
 				"input": [
-					{
-						"type": "materials",
-						"query": {
-							"scope": "any",
-							"selector": {
-								"type": "item",
-								"itemId": "bucket-with-water"
-							}
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 4,
-							"max": 4
-						}
-					},
 					{
 						"units": {
 							"cost": 1,
@@ -55,85 +41,30 @@
 							"scope": "board",
 							"distance": "close"
 						}
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "pig",
-											"quantity": {
-												"min": 1,
-												"max": 2
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": [
-					{
-						"hint": "If you want pig, you need pig pen",
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "pig-pen"
-									},
-									"scope": "board",
-									"distance": "close"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
-			},
-			{
-				"id": "pig-pen",
-				"title": "Pig Pen",
-				"description": "Build a new pig pen",
-				"default": false,
-				"clockWeight": 1,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 24000,
-				"input": [
+					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
-							}
+								"itemId": "grain"
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
-							"min": 2,
-							"max": 2
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
-							}
+								"itemId": "bucket-with-water"
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -152,7 +83,122 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "pig-pen",
+											"itemId": "pig",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "empty-pig-pen",
+				"title": "Prepare Pig Pen",
+				"artwork": "empty-pig-pen",
+				"description": "Prepare a new empty enclosure using 2 planks.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-pig-pen",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "blueprint",
+				"title": "Pig Farm Blueprint",
+				"artwork": "blueprint",
+				"description": "Sketch plans for another Pig Farm.",
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "paper"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "pig-farm-blueprint",
 											"quantity": {
 												"min": 1,
 												"max": 1

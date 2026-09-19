@@ -4,8 +4,8 @@
 		"uid": "e2pone4zse5ngt9nass0nzfy",
 		"id": "animal-feed",
 		"title": "Animal Feed",
+		"draft": false,
 		"ui": "simple",
-		"draft": true,
 		"artwork": {
 			"scale": 1,
 			"default": [

@@ -1,0 +1,194 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "hqy2lvzpaqrmdfy3uchet5lk",
+		"id": "quest-vegetables-t1",
+		"title": "Quest - Vegetables - Tier 1",
+		"draft": false,
+		"description": "A merchant wants fresh vegetables packed and ready to move.",
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"quest",
+				"vegetable-crate"
+			]
+		},
+		"scope": "board",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "beagle"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "quest-shredded",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "bucket-with-water"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "wet-quest"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "campfire-burning"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "burning-quest",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "complete",
+				"title": "Complete Contract",
+				"artwork": "vegetable-crate",
+				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "quest-vegetables-t1"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "vegetable-crate"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sack-with-salt",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

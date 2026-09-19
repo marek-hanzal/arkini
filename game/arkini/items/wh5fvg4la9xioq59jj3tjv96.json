@@ -4,8 +4,8 @@
 		"uid": "wh5fvg4la9xioq59jj3tjv96",
 		"id": "sheep",
 		"title": "Sheep",
-		"ui": "simple",
 		"description": "Shaun the Sheep!",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -94,10 +94,27 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "wolf-attack",
-				"title": "Wolf Attack",
-				"artwork": "wolf",
-				"description": "A nearby wolf may decide the sheep looks like dinner.",
+				"id": "idle",
+				"title": "Idle",
+				"description": "The sheep keeps doing sheep things.",
+				"clock": true,
+				"clockWeight": 19,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"rules": []
+			},
+			{
+				"id": "wander",
+				"title": "Wander",
+				"artwork": "sheep",
+				"description": "The sheep wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 1,
 				"default": false,
@@ -106,15 +123,72 @@
 				"runtimeMs": 0,
 				"input": [
 					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "wolf"
+						"units": {
+							"cost": 1,
+							"from": "self"
 						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sheep"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "sheep",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "wolf-attack-near",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf two tiles away may attack the sheep.",
+				"clock": true,
+				"clockWeight": 4,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "near"
 						}
 					},
 					{
@@ -175,7 +249,128 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "near"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "wolf-attack-close",
+				"title": "Wolf Attack",
+				"artwork": "wolf",
+				"description": "A wolf right next to the sheep may attack.",
+				"clock": true,
+				"clockWeight": 12,
+				"default": false,
+				"show": false,
+				"enable": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wolf"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sheep"
+							},
+							"scope": "board",
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "well-fed-wolf",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "animal-bones",
+											"quantity": {
+												"min": 2,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "raw-game-meat",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "wolf"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
 			}
 		]
 	}

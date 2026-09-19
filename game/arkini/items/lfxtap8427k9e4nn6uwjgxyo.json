@@ -4,8 +4,8 @@
 		"uid": "lfxtap8427k9e4nn6uwjgxyo",
 		"id": "wolf",
 		"title": "Wolf",
-		"ui": "simple",
 		"description": "He is dangerous. But he may walk away",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,9 @@
 		},
 		"scope": "board",
 		"maxStackSize": 1,
+		"units": {
+			"amount": 1
+		},
 		"merge": [
 			{
 				"target": {

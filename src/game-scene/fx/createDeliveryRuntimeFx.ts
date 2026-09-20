@@ -9,6 +9,7 @@ import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
+import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startRemainderFeedbackFx } from "~/tile-rendering/fx/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
@@ -169,6 +170,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		yield* startRemainderFeedbackFx({
 			actor: active.actor,
 			animator,
+			shouldRevealFn: () => !closed && activeByItemId.get(delivery.item.id) === active,
 			onHiddenFx: Effect.gen(function* () {
 				if (
 					closed ||
@@ -239,6 +241,16 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					active.actor.container.visible = true;
 					yield* application.frames.invalidateFx;
 					activeByItemId.delete(itemId);
+					if (
+						active.stage === "exiting" ||
+						active.stage === "contact-fade-out" ||
+						active.stage === "contact-fade-in"
+					) {
+						yield* restoreActorExitFx({
+							actor: active.actor,
+							animator,
+						});
+					}
 					yield* drag.attachActorFx(active.actor);
 					continue;
 				}
@@ -267,6 +279,21 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 				const from = yield* surface.readLocationPoseFx(delivery.from);
 				const to = yield* surface.readLocationPoseFx(delivery.to);
 				let active = activeByItemId.get(delivery.item.id);
+				if (active?.stage === "exiting") {
+					// Replace ownership before cancelling the exit: its cancellation also destroys.
+					active = {
+						actor: active.actor,
+						delivery,
+						generation: delivery.generation,
+						stage: "awaiting-travel-geometry",
+						target: null,
+					};
+					activeByItemId.set(delivery.item.id, active);
+					yield* restoreActorExitFx({
+						actor: active.actor,
+						animator,
+					});
+				}
 				const generationChanged =
 					active === undefined || active.generation !== delivery.generation;
 				if (from === null || to === null) {

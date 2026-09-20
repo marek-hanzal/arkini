@@ -79,6 +79,7 @@ vi.mock("~/tile-rendering/fx/createTileActorFx", async () => {
 				item,
 				lifecycleLayer,
 				lifecycleDurationMs: 0,
+				lifecycleAnimateScale: true,
 				lifecycleTransitionStarted: false,
 				lifecycleIntentGeneration: 0,
 				lifecycleNotBeforeMs: 0,
@@ -234,6 +235,7 @@ export const createActor = (id: string): PixiTileActor => {
 		item,
 		lifecycleLayer,
 		lifecycleDurationMs: 0,
+		lifecycleAnimateScale: true,
 		lifecycleTransitionStarted: false,
 		lifecycleIntentGeneration: 0,
 		lifecycleNotBeforeMs: 0,
@@ -283,6 +285,7 @@ export const createActorStore = ({
 	readonly exitingActors?: Set<PixiTileActor>;
 } = {}): MainActorStore => ({
 	actors,
+	exitingActors,
 	canonicalItems,
 	closeFx: Effect.void,
 	deleteActorFx: (actorId) =>

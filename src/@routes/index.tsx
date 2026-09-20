@@ -37,14 +37,9 @@ export const Route = createFileRoute("/")({
 		return match(lifecycle.view)
 			.with(
 				{
-					kind: "black",
+					kind: "loading",
 				},
-				() => (
-					<main
-						className="size-full cursor-wait bg-black"
-						data-ui="StartupBlackWait"
-					/>
-				),
+				() => <main data-ui="StartupLoading" />,
 			)
 			.with(
 				{

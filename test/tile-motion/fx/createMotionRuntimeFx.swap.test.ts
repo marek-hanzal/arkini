@@ -45,11 +45,11 @@ describe("swap travel", () => {
 			new Map([
 				[
 					target.item.id,
-					"handoff",
+					"blocked",
 				],
 				[
 					source.item.id,
-					"handoff",
+					"blocked",
 				],
 			]),
 		);

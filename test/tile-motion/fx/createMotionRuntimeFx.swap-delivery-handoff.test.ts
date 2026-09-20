@@ -17,7 +17,6 @@ import type { AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
 for (const phase of [
 	"active",
 	"pending",
-	"detached",
 	"both",
 ] as const) {
 	it(`releases ${phase} swap ownership before delivery takes the live actor`, () => {
@@ -90,8 +89,8 @@ for (const phase of [
 		receiver.container.position.set(400, 40);
 		harness.actors.set(receiver.item.id, receiver);
 		harness.canonicalItems.set(receiver.item.id, receiver.item);
-		const deliveryActor = phase === "detached" ? harness.source : harness.target;
-		const counterpart = phase === "detached" ? harness.target : harness.source;
+		const deliveryActor = harness.target;
+		const counterpart = harness.source;
 		const blocker = {
 			kind: "spawn" as const,
 			actorId: harness.source.item.id,
@@ -116,16 +115,6 @@ for (const phase of [
 		);
 		Effect.runSync(motion.startFx);
 		for (const tween of tweens) if (tween.active) tween.props.onUpdateFn(0.4);
-		if (phase === "detached") {
-			expect(Effect.runSync(motion.beginInteractionHandoffFx(harness.target.item.id))).toBe(
-				true,
-			);
-			expect(Effect.runSync(motion.readSnapshotFx).retainedActorIds).toEqual(
-				new Set([
-					harness.source.item.id,
-				]),
-			);
-		}
 		const livePose = {
 			x: deliveryActor.container.x,
 			y: deliveryActor.container.y,

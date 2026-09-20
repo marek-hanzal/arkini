@@ -162,7 +162,7 @@ export const mountController = ({
 	targetItems = [],
 }: {
 	readonly cheatsEnabled?: boolean;
-	readonly interactionClaimByActorId?: ReadonlyMap<string, "activation-only" | "handoff">;
+	readonly interactionClaimByActorId?: ReadonlyMap<string, "blocked">;
 	readonly targetItems?: ReadonlyArray<TileActorItem>;
 } = {}) => {
 	previewState.kind = "move";
@@ -240,7 +240,7 @@ export const mountController = ({
 	const onActivate = vi.fn();
 	const onSettledDrop = vi.fn();
 	const reportCriticalFailureFn = vi.fn();
-	const beginInteractionHandoff = vi.fn((_actorId: string) => true);
+	const isPoseActive = vi.fn(() => false);
 	const releasePointerCapture = vi.fn();
 	const dropPresentation = Effect.runSync(createDropPresentationFx());
 	const onDrop = vi.fn(() =>
@@ -258,6 +258,7 @@ export const mountController = ({
 	const actorStore = {
 		actors,
 		canonicalItems,
+		exitingActors: new Set(),
 		closeFx: Effect.void,
 		deleteActorFx: (actorId) =>
 			Effect.sync(() => {
@@ -308,7 +309,8 @@ export const mountController = ({
 				cancelAnimation(ownerKey);
 			}),
 		closeFx: Effect.void,
-		isChannelActiveFx: () => Effect.succeed(false),
+		isChannelActiveFx: (_actor, channel) =>
+			Effect.sync(() => channel === "pose" && isPoseActive()),
 		setFx: (write) =>
 			Effect.sync(() => {
 				presentationWrites.push(write);
@@ -343,7 +345,6 @@ export const mountController = ({
 		runFx: (effect: Effect.Effect<unknown, unknown>) => effect,
 	} as never;
 	const motion = {
-		beginInteractionHandoffFx: (actorId) => Effect.sync(() => beginInteractionHandoff(actorId)),
 		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
@@ -474,7 +475,7 @@ export const mountController = ({
 		actors,
 		animations,
 		animateActor,
-		beginInteractionHandoff,
+		isPoseActive,
 		beginOriginGhost,
 		canonicalItems,
 		cancelAnimation,

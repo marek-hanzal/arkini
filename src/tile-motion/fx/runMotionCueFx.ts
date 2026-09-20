@@ -28,8 +28,6 @@ export namespace runMotionCueFx {
 		readonly isCueActiveFn: () => boolean;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
-		readonly onSwapLegSettledFn: (actorId: string) => void;
-		readonly onSwapLegStartedFn: (actorId: string) => void;
 		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
 		readonly onInputRemainderRevealedFn: () => void;
 		readonly readPaletteFn: () => PixiScenePalette;
@@ -79,8 +77,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	isCueActiveFn,
 	onActorSettledFn,
 	onCompleteFn,
-	onSwapLegSettledFn,
-	onSwapLegStartedFn,
 	onPayloadCreatedFn,
 	onInputRemainderRevealedFn,
 	readPaletteFn,
@@ -200,8 +196,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cueKey,
 									delayMs,
 									onCompleteFn,
-									onSwapLegSettledFn,
-									onSwapLegStartedFn,
 									origin,
 									surface,
 									target,

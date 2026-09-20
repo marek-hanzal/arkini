@@ -9,6 +9,7 @@ import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
+import { prepareActorBirthFx } from "~/tile-rendering/fx/prepareActorBirthFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
@@ -118,6 +119,13 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 			scale: origin.size / Math.max(1, payload.size),
 			x: origin.x,
 			y: origin.y,
+		});
+		yield* prepareActorBirthFx({
+			actor: payload,
+			actorStore,
+			animator,
+			pose: origin,
+			transientActorLayer: surface.transientActorLayer,
 		});
 		yield* startActorEnterFx({
 			actor: payload,

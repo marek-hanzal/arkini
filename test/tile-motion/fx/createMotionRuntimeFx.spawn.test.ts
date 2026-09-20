@@ -8,6 +8,11 @@ import { finalizeMotionActorsFx } from "~/tile-motion/fx/finalizeMotionActorsFx"
 
 import {
 	createActorMap,
+	createMotionHarness,
+	createItem,
+	firstBoardLocation,
+	secondBoardLocation,
+	readPoseAnimation,
 	createActorStore,
 	createApplication,
 	createSurface,
@@ -21,6 +26,102 @@ import {
 } from "./createMotionRuntimeFx.test/fixture";
 
 describe("spawn lifecycle", () => {
+	it("settles a completed spawn toward the latest canonical location without a successor cue", () => {
+		const actor = createActor("runtime:relocated-spawn");
+		actor.item = createItem(actor.item.id, firstBoardLocation);
+		const canonicalItems = new Map([
+			[
+				actor.item.id,
+				actor.item,
+			],
+		]);
+		const { runtime, animations, settledActors } = createMotionHarness({
+			actors: createActorMap(actor),
+			canonicalItems,
+		});
+		Effect.runSync(
+			runtime.enqueueFx([
+				{
+					kind: "spawn",
+					actorId: actor.item.id,
+					originActorId: "runtime:producer",
+					originLocation: secondBoardLocation,
+					targetLocation: firstBoardLocation,
+					sequence: 50,
+					eventIndex: 0,
+					staggerIndex: 0,
+				},
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const travel = readPoseAnimation(animations, actor);
+		canonicalItems.set(actor.item.id, createItem(actor.item.id, secondBoardLocation));
+		samplePoseAnimation(travel, 1);
+		travel.onCompleteFn?.();
+		const settling = animations.find(
+			(entry) =>
+				entry.channel === "pose" &&
+				entry.ownerKey === `motion-finalize:${actor.instanceId}`,
+		);
+		if (settling?.channel !== "pose") throw new Error("Expected canonical pose recovery.");
+		expect(actor.container.x).toBe(firstBoardLocation.position.x * 100);
+		expect(settledActors).not.toContain(actor);
+		samplePoseAnimation(settling, 1);
+		settling.onCompleteFn?.();
+		expect(actor.container.x).toBe(secondBoardLocation.position.x * 100);
+		expect(settledActors).toContain(actor);
+		Effect.runSync(runtime.closeFx);
+	});
+
+	it.each([
+		"dragging",
+		"new-pose",
+	] as const)("does not steal %s ownership when a retained producer is released", (ownership) => {
+		const actor = createActor("runtime:held-producer");
+		actor.dragging = ownership === "dragging";
+		actor.container.position.set(135, 47);
+		const animations: ActorAnimation[] = [];
+		const animator = createRecordingAnimator({
+			animations,
+		});
+		Effect.runSync(
+			finalizeMotionActorsFx({
+				actorIds: new Set([
+					actor.item.id,
+				]),
+				actorStore: createActorStore({
+					actors: createActorMap(actor),
+					canonicalItems: new Map([
+						[
+							actor.item.id,
+							actor.item,
+						],
+					]),
+				}),
+				animator: {
+					...animator,
+					isChannelActiveFx: () => Effect.succeed(ownership === "new-pose"),
+				},
+				application: createApplication(),
+				onActorSettledFn: () => {},
+				readPaletteFn: () => palette,
+				stillClaimedActorIds: new Set(),
+				surface: createSurface({
+					readLocationPose: () => ({
+						layer: actor.container,
+						x: 200,
+						y: 40,
+						size: 80,
+					}),
+				}),
+				textures: {} as never,
+			}),
+		);
+		expect(animations).toEqual([]);
+		expect(actor.container.x).toBe(135);
+		expect(actor.container.y).toBe(47);
+	});
+
 	it.each([
 		{
 			acquired: false,

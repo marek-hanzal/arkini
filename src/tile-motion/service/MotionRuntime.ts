@@ -4,8 +4,8 @@ import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
 import type { MotionRedirect } from "~/tile-motion/type/MotionTarget";
 
-/** Presentation ownership of dragging; ordinary click activation always remains available. */
-export type InteractionClaim = "activation-only" | "handoff";
+/** Moving actors block pointer interaction until landing. */
+export type InteractionClaim = "blocked";
 
 export interface MotionSnapshot {
 	readonly interactionClaimByActorId: ReadonlyMap<string, InteractionClaim>;
@@ -28,8 +28,6 @@ export interface MotionRuntime {
 	readonly handoffDeliveriesFx: (
 		actorIds: ReadonlySet<string>,
 	) => Effect.Effect<void, never, never>;
-	/** Releases interruptible spawn or swap ownership at its live pose for direct interaction. */
-	readonly beginInteractionHandoffFx: (actorId: string) => Effect.Effect<boolean, never, never>;
 	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void, never, never>;
 	/** Transfers trailing presentation payloads when their original receiver is consumed. */
 	readonly redirectTargetFx: (redirect: MotionRedirect) => Effect.Effect<void, never, never>;

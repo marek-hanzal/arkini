@@ -26,8 +26,6 @@ export namespace runSwapMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly onCompleteFn: () => void;
-		readonly onSwapLegSettledFn: (actorId: string) => void;
-		readonly onSwapLegStartedFn: (actorId: string) => void;
 		readonly origin: ActorPose;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -42,8 +40,6 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	onCompleteFn,
-	onSwapLegSettledFn,
-	onSwapLegStartedFn,
 	origin,
 	surface,
 	target,
@@ -106,7 +102,6 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 			target: leg.target,
 			targetLocation: leg.targetLocation,
 		});
-		onSwapLegStartedFn(leg.actor.item.id);
 		yield* animator.animateFx({
 			actor: leg.actor,
 			channel: "pose",
@@ -129,7 +124,6 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 						const settledTarget = currentTarget ?? leg.target;
 						settledTarget.layer.addChild(leg.actor.container);
 					}
-					onSwapLegSettledFn(leg.actor.item.id);
 					if (pendingActorIds.size === 0) onCompleteFn();
 				};
 				if (!poseSampler.needsCompletionSettleFn()) {

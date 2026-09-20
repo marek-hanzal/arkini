@@ -254,6 +254,7 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		lifecycleTargetAlpha: 1,
 		lifecycleNotBeforeMs: 0,
 		lifecycleDurationMs: 0,
+		lifecycleAnimateScale: true,
 		dragging: false,
 		dragOffsetX: 0,
 		dragOffsetY: 0,
@@ -280,6 +281,7 @@ export const createActorStore = (actor: PixiTileActor) => {
 		canonicalItems,
 		store: {
 			actors,
+			exitingActors,
 			canonicalItems,
 			closeFx: Effect.void,
 			deleteActorFx: (actorId: string) =>
@@ -438,7 +440,6 @@ export const createDrag = () => {
 
 export const createMotion = () =>
 	({
-		beginInteractionHandoffFx: () => Effect.succeed(false),
 		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,

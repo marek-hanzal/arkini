@@ -5,6 +5,7 @@ import type { TileSpawnMotionCue } from "~/tile-presentation/type/TileMotionCue"
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
+import { prepareActorBirthFx } from "~/tile-rendering/fx/prepareActorBirthFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
@@ -49,6 +50,13 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 		scale: origin.size / Math.max(1, actor.size),
 		x: origin.x,
 		y: origin.y,
+	});
+	yield* prepareActorBirthFx({
+		actor,
+		actorStore,
+		animator,
+		pose: origin,
+		transientActorLayer: surface.transientActorLayer,
 	});
 	yield* startActorEnterFx({
 		actor,

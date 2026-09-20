@@ -122,8 +122,6 @@ describe("direct input remainder", () => {
 				onPayloadCreatedFn: (actor) => {
 					transients.push(actor);
 				},
-				onSwapLegSettledFn: vi.fn(),
-				onSwapLegStartedFn: vi.fn(),
 				readPaletteFn: () => palette,
 				readSourceSurvivesFn: () => true,
 				readTargetRouteFn: (actorId, location) => ({

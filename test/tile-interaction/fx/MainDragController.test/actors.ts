@@ -103,6 +103,7 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		item: actorItem,
 		lifecycleLayer,
 		lifecycleDurationMs: 0,
+		lifecycleAnimateScale: true,
 		lifecycleTransitionStarted: false,
 		lifecycleIntentGeneration: 0,
 		lifecycleNotBeforeMs: 0,

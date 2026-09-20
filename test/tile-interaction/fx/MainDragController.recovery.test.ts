@@ -190,11 +190,18 @@ describe("main drag controller: recovery", () => {
 		expect(afterResize.scale).toBeCloseTo(1.25);
 		expect(afterResize.x).toBeCloseTo(115.5);
 		expect(afterResize.y).toBeCloseTo(60);
+		// The last target arrives after the penultimate frame; there is no interpolation frame left.
+		mounted.setActorPose({
+			layer: mounted.transientActorLayer,
+			size: 160,
+			x: 240,
+			y: 120,
+		});
 		const destination = samplePoseAnimation(settleAnimation, 1);
 		expect(destination).toEqual({
-			scale: 1.5,
-			x: 200,
-			y: 100,
+			scale: 2,
+			x: 240,
+			y: 120,
 		});
 		settleAnimation.onCompleteFn?.();
 		expect(mounted.actor.container).toMatchObject({

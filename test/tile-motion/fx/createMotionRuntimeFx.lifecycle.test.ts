@@ -13,7 +13,7 @@ import {
 
 describe("motion runtime lifecycle", () => {
 	it("deduplicates completed cues and ignores duplicate leg completion", () => {
-		const { animations, cue, runtime } = createSwapHarness();
+		const { animations, cue, runtime, source, target } = createSwapHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -21,6 +21,8 @@ describe("motion runtime lifecycle", () => {
 		);
 		Effect.runSync(runtime.startFx);
 
+		samplePoseAnimation(readPoseAnimation(animations, source), 1);
+		samplePoseAnimation(readPoseAnimation(animations, target), 1);
 		animations[0]?.onCompleteFn?.();
 		animations[0]?.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
@@ -37,7 +39,7 @@ describe("motion runtime lifecycle", () => {
 		expect(animations).toHaveLength(2);
 	});
 
-	it("keeps overlapping spawn and swap ownership explicitly handoff-capable", () => {
+	it("keeps overlapping spawn and swap ownership blocked until landing", () => {
 		const { cue, runtime, target } = createSwapHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
@@ -57,7 +59,7 @@ describe("motion runtime lifecycle", () => {
 
 		expect(
 			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.get(target.item.id),
-		).toBe("handoff");
+		).toBe("blocked");
 	});
 
 	it("clears claims on close and ignores late swap completion callbacks", () => {

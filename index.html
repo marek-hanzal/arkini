@@ -5,9 +5,37 @@
 		<base href="/" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Arkini</title>
+		<!-- Shared with the startup route so feedback paints before the renderer bundle loads. -->
+		<style>
+			[data-ui="StartupLoading"] {
+				position: fixed;
+				inset: 0;
+				display: grid;
+				place-items: center;
+				background: #000;
+				cursor: wait;
+			}
+
+			[data-ui="StartupLoading"]::after {
+				content: "";
+				width: 36px;
+				height: 36px;
+				box-sizing: border-box;
+				border: 3px solid #f05bb830;
+				border-top-color: #f05bb8;
+				border-radius: 50%;
+				animation: startup-loading-spin 900ms linear infinite;
+			}
+
+			@keyframes startup-loading-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+		</style>
 	</head>
 	<body style="background:#000">
-		<div id="root"></div>
+		<div id="root"><main data-ui="StartupLoading"></main></div>
 		<script type="module" src="/src/main.tsx"></script>
 	</body>
 </html>

@@ -5,6 +5,7 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
 export interface MainActorStore {
 	readonly actors: ReadonlyMap<string, PixiTileActor>;
+	readonly exitingActors: ReadonlySet<PixiTileActor>;
 	readonly canonicalItems: ReadonlyMap<string, TileActorItem>;
 	readonly deleteActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null, never, never>;
 	readonly destroyExitingActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;

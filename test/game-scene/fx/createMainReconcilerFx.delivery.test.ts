@@ -67,7 +67,7 @@ describe("main reconciliation / delivery retention", () => {
 				interactionClaimByActorId: new Map([
 					[
 						previous.id,
-						"activation-only" as const,
+						"blocked" as const,
 					],
 				]),
 				retainedActorIds: new Set([

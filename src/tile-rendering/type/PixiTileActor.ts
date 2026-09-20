@@ -24,6 +24,7 @@ export interface PixiTileActor {
 	lifecycleTargetAlpha: number;
 	lifecycleNotBeforeMs: number;
 	lifecycleDurationMs: number;
+	lifecycleAnimateScale: boolean;
 	dragging: boolean;
 	dragOffsetX: number;
 	dragOffsetY: number;

@@ -474,6 +474,7 @@ vi.mock("~/tile-rendering/fx/createTileActorFx", async () => {
 					instanceId: `test-inventory:${item.id}`,
 					item,
 					lifecycleDurationMs: 0,
+					lifecycleAnimateScale: true,
 					lifecycleTransitionStarted: false,
 					lifecycleIntentGeneration: 0,
 					lifecycleNotBeforeMs: 0,

@@ -6,6 +6,7 @@ export namespace startActorExitFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly animator: ActorAnimator;
+		readonly animateScale?: boolean;
 		readonly durationMs?: number;
 		readonly onCancelFn?: () => void;
 		readonly onCompleteFn?: () => void;

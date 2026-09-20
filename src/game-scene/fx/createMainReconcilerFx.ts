@@ -22,7 +22,8 @@ import { feedbackDurationMs } from "~/tile-rendering/fx/runActivityParticlesFx";
 import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 import { startActivityParticlesFx } from "~/tile-rendering/fx/startActivityParticlesFx";
 import { stopActivityParticlesFx } from "~/tile-rendering/fx/stopActivityParticlesFx";
-import { lifecycleDurationMs, runActorLifecycleFx } from "~/tile-rendering/fx/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
+import { prepareActorBirthFx } from "~/tile-rendering/fx/prepareActorBirthFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
@@ -434,10 +435,12 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					y: spawnOrigin?.y ?? pose.y,
 				});
 				if (presentCommittedEffects) {
-					yield* runActorLifecycleFx({
+					yield* prepareActorBirthFx({
 						actor: created,
+						actorStore,
 						animator,
-						kind: "prepare-enter",
+						pose: spawnOrigin ?? pose,
+						transientActorLayer: surface.transientActorLayer,
 					});
 				}
 				yield* drag.attachActorFx(created);

@@ -1,5 +1,8 @@
 import { Effect } from "effect";
 
+import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
+import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
+
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -72,6 +75,7 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 				actor,
 				animator,
 				durationMs: remainingExitMs,
+				animateScale: actor.lifecycleTargetAlpha !== 0 || actor.lifecycleAnimateScale,
 				onCompleteFn: () => {
 					RendererRuntime.runSync(animator.cancelActorFx(actor));
 					RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
@@ -79,6 +83,8 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 			});
 			continue;
 		}
+		// A producer may still be dragged or have a newer pose writer when its output finishes.
+		if (actor.dragging || (yield* animator.isChannelActiveFx(actor, "pose"))) continue;
 		const displayedSize = actor.size * actor.container.scale.x;
 		pose.layer.addChild(actor.container);
 		yield* updateTileActorFx({
@@ -97,6 +103,51 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 			x: actor.container.x,
 			y: actor.container.y,
 		});
-		onActorSettledFn(actor);
+		yield* chaseTargetFx({
+			actor,
+			animator,
+			durationMs: readSettleDurationMsFn({
+				fromX: actor.container.x,
+				fromY: actor.container.y,
+				tileSize: pose.size,
+				toX: pose.x,
+				toY: pose.y,
+			}),
+			fallbackTarget: pose,
+			ownerKey: `motion-finalize:${actor.instanceId}`,
+			readLiveTargetFn: () => {
+				const latest = actorStore.canonicalItems.get(actorId);
+				const latestPose =
+					latest === undefined
+						? null
+						: RendererRuntime.runSync(surface.readActorPoseFx(latest));
+				return latestPose === null
+					? null
+					: {
+							x: latestPose.x,
+							y: latestPose.y,
+							scale: latestPose.size / Math.max(1, actor.size),
+						};
+			},
+			shouldSettleFn: () => actor.dragging || !actorStore.canonicalItems.has(actorId),
+			onSettledFn: () => {
+				if (
+					actor.dragging ||
+					actor.container.destroyed ||
+					actorStore.actors.get(actorId) !== actor
+				)
+					return;
+				const latest = actorStore.canonicalItems.get(actorId);
+				const latestPose =
+					latest === undefined
+						? null
+						: RendererRuntime.runSync(surface.readActorPoseFx(latest));
+				if (latestPose === null) return;
+				latestPose.layer.addChild(actor.container);
+				onActorSettledFn(actor);
+			},
+			surface,
+			targetLocation: canonical.location,
+		});
 	}
 });

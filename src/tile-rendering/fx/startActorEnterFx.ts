@@ -6,6 +6,7 @@ export namespace startActorEnterFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly animator: ActorAnimator;
+		readonly animateScale?: boolean;
 		readonly delayMs?: number;
 		readonly durationMs?: number;
 	}

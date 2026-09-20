@@ -44,9 +44,13 @@ The concrete module graph remains acyclic. These edge labels describe why the to
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
 
-Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn/input/swap cues and detached swap legs through `MotionRuntime.handoffDeliveriesFx`. The real actor keeps its live pose; input-only payloads are destroyed, and released producers/receivers and remaining cue lanes settle normally. A superseded swap releases both writers and settles its other grid actor from the live pose. Cancelling the pose writer alone does not release cue ownership.
+Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn/input/swap cues through `MotionRuntime.handoffDeliveriesFx`. The real actor keeps its live pose; input-only payloads are destroyed, and released producers/receivers and remaining cue lanes settle normally. A superseded swap releases both writers and settles its other grid actor from the live pose. Cancelling the pose writer alone does not release cue ownership.
 
-Pointer takeover of a spawn also releases its origin claim. Once no remaining cue retains that origin, Motion finalizes it against the current canonical state; canceling the later drag needs no new Runtime transition to remove an already consumed source.
+Input contact hides the consumed stack before updating its remainder. Reveal and return travel then run together; the source stays exclusively claimed until both finish, while the receiver's lane can dispatch output. Canonical disappearance retires the remainder instead of bringing it back.
+
+A delivery reappearing during its exit replaces the old exit ownership before cancellation. Canonical settlement also restores any unfinished contact fade; obsolete completion callbacks cannot remove or hide the surviving actor.
+
+Moving items cannot be clicked or dragged until they land. Pointer admission and release both check current motion ownership and pose animation, so an item that starts moving after pointer-down cannot be activated from stale gesture state. Once the last cue releases an actor, any remaining positional correction targets its latest canonical location without interrupting another pose owner.
 
 ## Interaction
 
@@ -65,6 +69,7 @@ Pointer takeover of a spawn also releases its origin claim. Once no remaining cu
 - Root pose, grab offset, lifecycle, crowd, particles, and visual revision remain independent channels. Tuning belongs in implementation, not this contract.
 - `TileActorVisual.artworkScale` projects the required authored `artwork.scale` once. Retained faces, layers, badges, progress and activity geometry use it on Board, Inventory and Toolbar, including Editor Board. Every crossfade slot keeps its own revision's ratio. The slot anchor, hit area and placement geometry remain full-size; transient actor/container motion still settles to its own neutral scale.
 - Actor stores follow exact runtime identities within their canvas. Pure canonical placement may normalize identity; presentation never assumes continuity from intent.
+- Birth scale is allowed only over visually empty artwork space. Main arrivals and produced payloads inspect rendered artwork at their birth pose, including exiting actors and transient payloads; occupied births fade in at full size and freeze any overlapping outgoing scale. Canonical occupancy alone cannot choose this feedback.
 - A removed output producer starts its exit with output dispatch, including output into its own slot; output travel and artwork readiness never delay that exit. Its retained actor supplies origin geometry until queued outputs release their claims. An explicitly projected consumed stack instead keeps its physical source as the travelling payload.
 - Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
 - Board Clock rings project the canonical interval phase and Clock enable/rules independently of jobs and queue admission. They have no pointer interaction; the existing job/lifetime bar retains its precedence. Exhausted finite Clocks have no upcoming pulse ring.

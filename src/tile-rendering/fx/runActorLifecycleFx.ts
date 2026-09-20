@@ -17,6 +17,7 @@ export namespace runActorLifecycleFx {
 	export type Action =
 		| (LifecycleProps & {
 				readonly kind: "prepare-enter";
+				readonly animateScale?: boolean;
 		  })
 		| (LifecycleProps & {
 				readonly kind: "resume-enter";
@@ -25,10 +26,12 @@ export namespace runActorLifecycleFx {
 				readonly delayMs?: number;
 				readonly durationMs?: number;
 				readonly kind: "start-enter";
+				readonly animateScale?: boolean;
 		  })
 		| (LifecycleProps & {
 				readonly durationMs?: number;
 				readonly kind: "start-exit";
+				readonly animateScale?: boolean;
 				readonly onCancelFn?: () => void;
 				readonly onCompleteFn?: () => void;
 		  })
@@ -46,6 +49,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 	if (actor.container.destroyed) return;
 
 	const animateFx = ({
+		animateScale = true,
 		delayMs = 0,
 		durationMs,
 		onCancelFn,
@@ -53,6 +57,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 		toAlpha,
 		toScale,
 	}: {
+		readonly animateScale?: boolean;
 		readonly delayMs?: number;
 		readonly durationMs: number;
 		readonly onCancelFn?: () => void;
@@ -61,14 +66,18 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 		readonly toScale: number;
 	}): Effect.Effect<void, never, never> =>
 		Effect.gen(function* () {
-			// Register scale first so the opacity completion observes the same final lifecycle frame.
-			yield* animator.animateFx({
-				actor,
-				channel: "lifecycle-scale",
-				delayMs,
-				durationMs,
-				toScale,
-			});
+			// Fade-only replacements preserve the live scale and supersede any older scale intent.
+			if (animateScale) {
+				yield* animator.animateFx({
+					actor,
+					channel: "lifecycle-scale",
+					delayMs,
+					durationMs,
+					toScale,
+				});
+			} else {
+				yield* animator.cancelChannelFx(actor, "lifecycle-scale");
+			}
 			yield* animator.animateFx({
 				actor,
 				channel: "lifecycle-opacity",
@@ -95,6 +104,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			actor.lifecycleTransitionStarted = true;
 			RendererRuntime.runSync(
 				animateFx({
+					animateScale: actor.lifecycleAnimateScale,
 					delayMs: Math.max(0, actor.lifecycleNotBeforeMs - performance.now()),
 					durationMs: actor.lifecycleDurationMs,
 					toAlpha: 1,
@@ -114,10 +124,11 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 
 	switch (action.kind) {
 		case "prepare-enter": {
+			actor.lifecycleAnimateScale = action.animateScale ?? true;
 			yield* animator.setFx({
 				actor,
 				channel: "lifecycle-scale",
-				scale: lifecycleReducedScale,
+				scale: actor.lifecycleAnimateScale ? lifecycleReducedScale : 1,
 			});
 			yield* animator.setFx({
 				actor,
@@ -131,6 +142,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			return;
 		}
 		case "start-enter": {
+			actor.lifecycleAnimateScale = action.animateScale ?? actor.lifecycleAnimateScale;
 			const delayMs = action.delayMs ?? 0;
 			const durationMs = action.durationMs ?? lifecycleDurationMs;
 			actor.lifecycleIntentGeneration += 1;
@@ -141,7 +153,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			yield* animator.setFx({
 				actor,
 				channel: "lifecycle-scale",
-				scale: lifecycleReducedScale,
+				scale: actor.lifecycleAnimateScale ? lifecycleReducedScale : 1,
 			});
 			yield* animator.setFx({
 				actor,
@@ -152,6 +164,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			return;
 		}
 		case "start-exit": {
+			actor.lifecycleAnimateScale = action.animateScale ?? true;
 			const durationMs = action.durationMs ?? lifecycleDurationMs;
 			actor.lifecycleIntentGeneration += 1;
 			actor.lifecycleTargetAlpha = 0;
@@ -159,6 +172,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			actor.lifecycleNotBeforeMs = performance.now();
 			actor.lifecycleDurationMs = durationMs;
 			yield* animateFx({
+				animateScale: action.animateScale,
 				durationMs,
 				onCancelFn: action.onCancelFn,
 				onCompleteFn: action.onCompleteFn,

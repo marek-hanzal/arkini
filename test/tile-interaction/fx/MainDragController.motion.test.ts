@@ -9,147 +9,81 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: motion", () => {
-	it("allows click activation without taking transform ownership during canonical motion", async () => {
-		const mounted = mountController({
-			interactionClaimByActorId: new Map([
-				[
-					item.id,
-					"handoff",
-				],
-			]),
-		});
-
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(13, 23));
-		mounted.stage.emit("pointerup", pointer(13, 23));
-		await flushMicrotasks();
-
-		expect(mounted.onActivate).toHaveBeenCalledWith(item, "primary", expect.anything());
-		expect(mounted.onDrop).not.toHaveBeenCalled();
-		expect(mounted.cancelAnimation).toHaveBeenCalledExactlyOnceWith(
-			`activity-particles:${mounted.actor.instanceId}`,
-		);
-		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-		expect(mounted.finishCursorGrab).not.toHaveBeenCalled();
-		expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
-		expect(mounted.actor.container.x).toBe(10);
-		expect(mounted.actor.container.y).toBe(20);
-		expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
-	});
-
-	it("supersedes canonical motion at drag threshold without jumping from the live pose", async () => {
-		const mounted = mountController({
-			interactionClaimByActorId: new Map([
-				[
-					item.id,
-					"handoff",
-				],
-			]),
-		});
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.actor.container.x = 42;
-		mounted.actor.container.y = 34;
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.flushFrame();
-
-		expect(mounted.beginInteractionHandoff).toHaveBeenCalledWith(item.id);
-		expect(mounted.actor.dragging).toBe(true);
-		expect(mounted.actor.container.x).toBe(42);
-		expect(mounted.actor.container.y).toBe(34);
-		expect(mounted.startCursorGrab).toHaveBeenCalledExactlyOnceWith(mounted.actor, {
-			x: 30,
-			y: 20,
-		});
-
-		mounted.stage.emit("pointerup", pointer(30, 20));
-		await flushMicrotasks();
-		expect(mounted.onActivate).not.toHaveBeenCalled();
-		expect(mounted.onDrop).toHaveBeenCalledOnce();
-	});
-
-	it("does not reinterpret a failed motion handoff drag as a click", async () => {
-		const claims = new Map<string, "activation-only" | "handoff">([
-			[
-				item.id,
-				"handoff",
-			],
-		]);
-		const mounted = mountController({
-			interactionClaimByActorId: claims,
-		});
-		mounted.beginInteractionHandoff.mockReturnValueOnce(false);
-
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		claims.set(item.id, "activation-only");
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.stage.emit("pointerup", pointer(30, 20));
-		await flushMicrotasks();
-
-		expect(mounted.onActivate).not.toHaveBeenCalled();
-		expect(mounted.onDrop).not.toHaveBeenCalled();
-		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-	});
-
 	it.each([
-		"spawn",
-		"swap",
+		"cue",
+		"pose",
 	] as const)(
-		"does not promote an exiting actor when %s completes between press and drag threshold",
-		async () => {
-			const claims = new Map<string, "activation-only" | "handoff">([
-				[
-					item.id,
-					"handoff",
-				],
-			]);
+		"blocks clicks and drags while %s motion owns the item, then admits a new gesture after landing",
+		async (kind) => {
+			const claims = new Map<string, "blocked">();
+			if (kind === "cue") claims.set(item.id, "blocked");
 			const mounted = mountController({
 				interactionClaimByActorId: claims,
 			});
-			mounted.beginInteractionHandoff.mockReturnValueOnce(false);
+			mounted.isPoseActive.mockReturnValue(kind === "pose");
 
 			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-			claims.delete(item.id);
-			mounted.actors.delete(item.id);
-			mounted.canonicalItems.delete(item.id);
+			mounted.stage.emit("pointerup", pointer(10, 20));
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 			mounted.stage.emit("globalpointermove", pointer(30, 20));
 			mounted.stage.emit("pointerup", pointer(30, 20));
 			await flushMicrotasks();
-
-			expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
-			expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
-			expect(mounted.actor.dragging).toBe(false);
-			expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
-			expect(mounted.startCursorGrab).not.toHaveBeenCalled();
 			expect(mounted.onActivate).not.toHaveBeenCalled();
 			expect(mounted.onDrop).not.toHaveBeenCalled();
+			expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+			expect(mounted.cancelAnimation).not.toHaveBeenCalled();
+
+			claims.clear();
+			mounted.isPoseActive.mockReturnValue(false);
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+			mounted.stage.emit("pointerup", pointer(10, 20));
+			await flushMicrotasks();
+			expect(mounted.onActivate).toHaveBeenCalledOnce();
 		},
 	);
 
-	it("leaves an active motion cue intact when its canonical actor disappears after press", async () => {
-		const claims = new Map<string, "activation-only" | "handoff">([
+	it.each([
+		false,
+		true,
+	])(
+		"discards a pressed gesture if canonical motion starts before release (drag: %s)",
+		async (drag) => {
+			const mounted = mountController();
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+			mounted.isPoseActive.mockReturnValue(true);
+			mounted.stage.emit("pointerup", pointer(drag ? 30 : 10, 20));
+			await flushMicrotasks();
+			expect(mounted.onActivate).not.toHaveBeenCalled();
+			expect(mounted.onDrop).not.toHaveBeenCalled();
+			expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+			expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
+		},
+	);
+
+	it("does not submit a manual drop onto a receiver still in flight", async () => {
+		const receiver = {
+			...item,
+			id: "runtime:flying-receiver",
+		};
+		const claims = new Map<string, "blocked">([
 			[
-				item.id,
-				"handoff",
+				receiver.id,
+				"blocked",
 			],
 		]);
 		const mounted = mountController({
 			interactionClaimByActorId: claims,
+			targetItems: [
+				receiver,
+			],
 		});
-
+		mounted.setOccupant(receiver);
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.canonicalItems.delete(item.id);
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
 		mounted.stage.emit("pointerup", pointer(30, 20));
 		await flushMicrotasks();
-
-		expect(mounted.actors.get(item.id)).toBe(mounted.actor);
-		expect(claims.get(item.id)).toBe("handoff");
-		expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
-		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
-		expect(mounted.actor.dragging).toBe(false);
-		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-		expect(mounted.onActivate).not.toHaveBeenCalled();
 		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.actor.dragging).toBe(false);
 	});
 
 	it("activates the latest projected item and immediately admits another click", async () => {

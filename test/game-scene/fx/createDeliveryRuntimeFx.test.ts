@@ -75,159 +75,221 @@ const item = {
 
 describe("delivery runtime", () => {
 	it.each([
-		true,
-		false,
-	])("fades settled deliveries (travel completed: %s)", (travelCompleted) => {
-		const firstItem = {
-			...item,
-			id: "runtime:returning-water",
-			revision: "revision:returning-water",
-		};
-		const secondItem = {
-			...item,
-			id: "runtime:returning-stone",
-			itemId: "stone",
-			revision: "revision:returning-stone",
-			sourceUrl: "resource:stone",
-			title: "Stone",
-		};
-		const createActor = (deliveryItem: typeof firstItem) => {
-			const container = new Container();
-			container.position.set(0, 0);
-			return {
-				container,
-				instanceId: `actor:${deliveryItem.id}`,
-				item: deliveryItem,
-				lifecycleDurationMs: 0,
-				lifecycleTransitionStarted: false,
-				lifecycleIntentGeneration: 0,
-				lifecycleNotBeforeMs: 0,
-				lifecycleTargetAlpha: 1,
-				onPointerDown: null,
-				size: 80,
-			} as unknown as PixiTileActor;
-		};
-		const firstActor = createActor(firstItem);
-		const secondActor = createActor(secondItem);
-		const actors = new Map([
-			[
-				firstItem.id,
-				firstActor,
-			],
-			[
-				secondItem.id,
-				secondActor,
-			],
-		]);
-		const animations: ActorAnimation[] = [];
-		const destroyed: string[] = [];
-		const animator = {
-			animateFx: (animation: ActorAnimation) =>
-				Effect.sync(() => {
-					animations.push(animation);
+		{
+			travelCompleted: true,
+			recovery: "none",
+		},
+		{
+			travelCompleted: false,
+			recovery: "none",
+		},
+		{
+			travelCompleted: false,
+			recovery: "delivery",
+		},
+		{
+			travelCompleted: false,
+			recovery: "grid",
+		},
+	])(
+		"settles delivery exits (travel completed: $travelCompleted, recovery: $recovery)",
+		({ travelCompleted, recovery }) => {
+			const firstItem = {
+				...item,
+				id: "runtime:returning-water",
+				revision: "revision:returning-water",
+			};
+			const secondItem = {
+				...item,
+				id: "runtime:returning-stone",
+				itemId: "stone",
+				revision: "revision:returning-stone",
+				sourceUrl: "resource:stone",
+				title: "Stone",
+			};
+			const createActor = (deliveryItem: typeof firstItem) => {
+				const container = new Container();
+				container.position.set(0, 0);
+				return {
+					container,
+					instanceId: `actor:${deliveryItem.id}`,
+					item: deliveryItem,
+					lifecycleDurationMs: 0,
+					lifecycleAnimateScale: true,
+					lifecycleTransitionStarted: false,
+					lifecycleIntentGeneration: 0,
+					lifecycleNotBeforeMs: 0,
+					lifecycleTargetAlpha: 1,
+					onPointerDown: null,
+					size: 80,
+				} as unknown as PixiTileActor;
+			};
+			const firstActor = createActor(firstItem);
+			const secondActor = createActor(secondItem);
+			const actors = new Map([
+				[
+					firstItem.id,
+					firstActor,
+				],
+				[
+					secondItem.id,
+					secondActor,
+				],
+			]);
+			const animations: ActorAnimation[] = [];
+			const canonicalItems = new Map<string, typeof item>();
+			const activeAnimations = new Map<string, ActorAnimation>();
+			const destroyed: string[] = [];
+			const animator = {
+				animateFx: (animation: ActorAnimation) =>
+					Effect.sync(() => {
+						const key = `${animation.actor.item.id}:${animation.channel}`;
+						activeAnimations.get(key)?.onCancelFn?.();
+						activeAnimations.set(key, animation);
+						animations.push(animation);
+					}),
+				cancelActorFx: () => Effect.void,
+				cancelChannelFx: () => Effect.void,
+				cancelFx: () => Effect.void,
+				closeFx: Effect.void,
+				isChannelActiveFx: () => Effect.succeed(false),
+				setFx: () => Effect.void,
+			} satisfies ActorAnimator;
+			const runtime = Effect.runSync(
+				createDeliveryRuntimeFx({
+					actorStore: {
+						actors,
+						canonicalItems,
+						destroyExitingActorFx: (actor: PixiTileActor) =>
+							Effect.sync(() => {
+								destroyed.push(actor.item.id);
+								actor.container.destroy();
+							}),
+						releaseActorFx: (actorId: string) =>
+							Effect.sync(() => {
+								const actor = actors.get(actorId) ?? null;
+								actors.delete(actorId);
+								return actor;
+							}),
+					} as unknown as MainActorStore,
+					animator,
+					application: {
+						frames: {
+							invalidateFx: Effect.void,
+						},
+					} as never,
+					drag: {
+						attachActorFx: () => Effect.void,
+						detachActorFx: () => Effect.void,
+					} as unknown as MainDragController,
+					particleTextures: {} as never,
+					readPaletteFn: () => ({}) as never,
+					surface: {
+						readLocationPoseFx: (location: typeof origin) =>
+							Effect.succeed({
+								layer: new Container(),
+								size: 80,
+								x: location.position.x * 100,
+								y: 0,
+							}),
+						transientActorLayer: new Container(),
+					} as unknown as MainSurface,
+					textures: {} as never,
 				}),
-			cancelActorFx: () => Effect.void,
-			cancelChannelFx: () => Effect.void,
-			cancelFx: () => Effect.void,
-			closeFx: Effect.void,
-			isChannelActiveFx: () => Effect.succeed(false),
-			setFx: () => Effect.void,
-		} satisfies ActorAnimator;
-		const runtime = Effect.runSync(
-			createDeliveryRuntimeFx({
-				actorStore: {
-					actors,
-					canonicalItems: new Map(),
-					destroyExitingActorFx: (actor: PixiTileActor) =>
-						Effect.sync(() => {
-							destroyed.push(actor.item.id);
-							actor.container.destroy();
-						}),
-					releaseActorFx: (actorId: string) =>
-						Effect.sync(() => {
-							const actor = actors.get(actorId) ?? null;
-							actors.delete(actorId);
-							return actor;
-						}),
-				} as unknown as MainActorStore,
-				animator,
-				application: {
-					frames: {
-						invalidateFx: Effect.void,
-					},
-				} as never,
-				drag: {
-					attachActorFx: () => Effect.void,
-					detachActorFx: () => Effect.void,
-				} as unknown as MainDragController,
-				particleTextures: {} as never,
-				readPaletteFn: () => ({}) as never,
-				surface: {
-					readLocationPoseFx: (location: typeof origin) =>
-						Effect.succeed({
-							layer: new Container(),
-							size: 80,
-							x: location.position.x * 100,
-							y: 0,
-						}),
-					transientActorLayer: new Container(),
-				} as unknown as MainSurface,
-				textures: {} as never,
-			}),
-		);
-		const deliveries = [
-			{
-				from: target,
-				generation: 1,
-				remainingDurationMs: 500,
-				item: firstItem,
-				phase: travelCompleted ? "returning" : "outbound",
-				to: origin,
-			},
-			{
-				from: target,
-				generation: 1,
-				remainingDurationMs: 500,
-				item: secondItem,
-				phase: travelCompleted ? "returning" : "outbound",
-				to: origin,
-			},
-		] satisfies TileDelivery[];
+			);
+			const deliveries = [
+				{
+					from: target,
+					generation: 1,
+					remainingDurationMs: 500,
+					item: firstItem,
+					phase: travelCompleted ? "returning" : "outbound",
+					to: origin,
+				},
+				{
+					from: target,
+					generation: 1,
+					remainingDurationMs: 500,
+					item: secondItem,
+					phase: travelCompleted ? "returning" : "outbound",
+					to: origin,
+				},
+			] satisfies TileDelivery[];
 
-		Effect.runSync(runtime.syncFx(deliveries));
-		const travels = animations.filter((animation) => animation.channel === "pose");
-		expect(travels).toHaveLength(2);
-		if (travelCompleted) {
-			for (const travel of travels) {
-				travel.onCompleteFn?.();
+			Effect.runSync(runtime.syncFx(deliveries));
+			const travels = animations.filter((animation) => animation.channel === "pose");
+			expect(travels).toHaveLength(2);
+			if (travelCompleted) {
+				for (const travel of travels) {
+					travel.onCompleteFn?.();
+				}
 			}
-		}
 
-		Effect.runSync(runtime.syncFx([]));
-		const fades = animations.filter(
-			(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 0,
-		);
-		expect(fades).toHaveLength(2);
-		expect(destroyed).toEqual([]);
-		expect(actors.size).toBe(2);
-		Effect.runSync(runtime.syncFx([]));
-		expect(destroyed).toEqual([]);
-		expect(
-			animations.filter((animation) => animation.channel === "lifecycle-opacity"),
-		).toHaveLength(2);
+			Effect.runSync(runtime.syncFx([]));
+			const fades = animations.filter(
+				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 0,
+			);
+			expect(fades).toHaveLength(2);
+			expect(destroyed).toEqual([]);
+			expect(actors.size).toBe(2);
+			Effect.runSync(runtime.syncFx([]));
+			expect(destroyed).toEqual([]);
+			expect(
+				animations.filter((animation) => animation.channel === "lifecycle-opacity"),
+			).toHaveLength(2);
 
-		for (const fade of fades) {
-			fade.onCompleteFn?.();
-		}
-		expect(destroyed).toEqual([
-			firstItem.id,
-			secondItem.id,
-		]);
-		expect(actors.size).toBe(0);
-		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(new Set());
-	});
+			if (recovery !== "none") {
+				if (recovery === "grid") {
+					canonicalItems.set(firstItem.id, firstItem);
+					canonicalItems.set(secondItem.id, secondItem);
+				}
+				Effect.runSync(runtime.syncFx(recovery === "delivery" ? deliveries : []));
+				expect(destroyed).toEqual([]);
+				expect(firstActor.lifecycleTargetAlpha).toBe(1);
+				expect(secondActor.lifecycleTargetAlpha).toBe(1);
+				expect(
+					animations.filter(
+						(animation) =>
+							animation.channel === "lifecycle-scale" && animation.toScale === 1,
+					),
+				).toHaveLength(2);
+				// Late completions from superseded exits cannot release the revived actors.
+				for (const fade of fades) fade.onCompleteFn?.();
+				expect(actors.size).toBe(2);
+				expect(destroyed).toEqual([]);
+				expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(
+					recovery === "delivery"
+						? new Set([
+								firstItem.id,
+								secondItem.id,
+							])
+						: new Set(),
+				);
+				if (recovery === "delivery") {
+					expect(
+						animations.filter((animation) => animation.channel === "pose"),
+					).toHaveLength(4);
+				}
+				return;
+			}
 
-	it("adopts one actor and follows canonical generation changes without submitting gameplay", () => {
+			for (const fade of fades) {
+				fade.onCompleteFn?.();
+			}
+			expect(destroyed).toEqual([
+				firstItem.id,
+				secondItem.id,
+			]);
+			expect(actors.size).toBe(0);
+			expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(new Set());
+		},
+	);
+
+	it.each([
+		"none",
+		"contact-fade-out",
+		"contact-fade-in",
+	])("adopts one actor through canonical changes (grid settlement: %s)", (settleDuring) => {
 		const container = new Container();
 		container.position.set(200, 0);
 		const actor = {
@@ -416,6 +478,23 @@ describe("delivery runtime", () => {
 			toAlpha: 0,
 		});
 		expect(actor.item.quantity).toBe(7);
+		if (settleDuring !== "none") {
+			const fadeOut = animations[2];
+			if (settleDuring === "contact-fade-in") fadeOut?.onCompleteFn?.();
+			const previousAnimationCount = animations.length;
+			Effect.runSync(runtime.syncFx([]));
+			expect(attachActorFx).toHaveBeenCalledWith(actor);
+			expect(actor.lifecycleTargetAlpha).toBe(1);
+			expect(animations.at(-1)).toMatchObject({
+				channel: "lifecycle-opacity",
+				toAlpha: 1,
+			});
+			expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(new Set());
+			// A late hidden callback cannot revive the obsolete delivery or overwrite restoration.
+			fadeOut?.onCompleteFn?.();
+			expect(animations).toHaveLength(previousAnimationCount + 2);
+			return;
+		}
 		geometryAvailable = false;
 		Effect.runSync(
 			runtime.syncFx([

@@ -77,30 +77,6 @@ const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	onCompleteFn();
 });
 
-const flashInputRemainderFx = Effect.fn("flashInputRemainderFx")(function* ({
-	animator,
-	cueKey,
-	onCompleteFn,
-	onRemainderRevealedFn,
-	source,
-}: {
-	readonly animator: ActorAnimator;
-	readonly cueKey: string;
-	readonly onCompleteFn: () => void;
-	readonly onRemainderRevealedFn: () => void;
-	readonly source: PixiTileActor;
-}) {
-	const ownerKey = `motion:${cueKey}:consume`;
-	yield* startRemainderFeedbackFx({
-		actor: source,
-		animator,
-		onCancelFn: onCompleteFn,
-		onHiddenFx: Effect.sync(onRemainderRevealedFn),
-		onRevealedFn: onCompleteFn,
-		ownerKey,
-	});
-});
-
 const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	actorStore,
 	animator,
@@ -129,6 +105,10 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 		fallbackTarget: sourceHome,
 		onSettledFn: () => {
 			if (!isCueActiveFn()) return;
+			if (!actorStore.canonicalItems.has(source.item.id)) {
+				onCompleteFn();
+				return;
+			}
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					const latestHome =
@@ -240,30 +220,76 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 			);
 			if (sourceSurvivesFn()) {
 				if (sourceHome !== null) {
+					let finished = false;
+					let revealed = false;
+					let returned = false;
+					const finishFn = () => {
+						if (finished || !isCueActiveFn()) return;
+						if (!sourceSurvivesFn()) {
+							finished = true;
+							RendererRuntime.runSync(
+								finishConsumedStackFx({
+									actorStore,
+									animator,
+									onActorSettledFn,
+									onCompleteFn,
+									source,
+								}),
+							);
+						} else if (revealed && returned) {
+							finished = true;
+							onCompleteFn();
+						}
+					};
+					let returnStarted = false;
+					const startReturnFn = () => {
+						if (finished || returnStarted || !isCueActiveFn()) return;
+						returnStarted = true;
+						RendererRuntime.runSync(
+							returnInputRemainderFx({
+								isCueActiveFn,
+								actorStore,
+								animator,
+								cue,
+								cueKey,
+								onCompleteFn: () => {
+									returned = true;
+									finishFn();
+								},
+								source,
+								sourceHome,
+								surface,
+							}),
+						);
+					};
 					RendererRuntime.runSync(
-						flashInputRemainderFx({
+						startRemainderFeedbackFx({
+							actor: source,
 							animator,
-							cueKey,
-							onCompleteFn: () => {
+							ownerKey: `motion:${cueKey}:consume`,
+							onHiddenFx: Effect.sync(() => {
 								if (!isCueActiveFn()) return;
-								RendererRuntime.runSync(
-									returnInputRemainderFx({
-										isCueActiveFn,
-										actorStore,
-										animator,
-										cue,
-										cueKey,
-										onCompleteFn,
-										source,
-										sourceHome,
-										surface,
-									}),
-								);
+								if (sourceSurvivesFn()) onRemainderRevealedFn();
+								else finishFn();
+							}),
+							shouldRevealFn: () => !finished && isCueActiveFn(),
+							onRevealStartedFn: startReturnFn,
+							onCancelFn: () => {
+								revealed = true;
+								if (
+									!finished &&
+									!returnStarted &&
+									isCueActiveFn() &&
+									sourceSurvivesFn()
+								) {
+									onRemainderRevealedFn();
+									startReturnFn();
+								}
+								finishFn();
 							},
-							source,
-							onRemainderRevealedFn: () => {
-								if (!isCueActiveFn()) return;
-								onRemainderRevealedFn();
+							onRevealedFn: () => {
+								revealed = true;
+								finishFn();
 							},
 						}),
 					);

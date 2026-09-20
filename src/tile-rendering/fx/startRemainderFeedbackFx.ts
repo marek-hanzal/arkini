@@ -9,7 +9,7 @@ const remainderFadeInDurationMs = 375;
 
 /**
  * Hides a delivered stack, lets canonical remainder presentation change at alpha zero, then
- * reveals it before the caller starts its return journey.
+ * reveals it. The caller may start independent return travel when reveal begins.
  */
 export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(function* ({
 	actor,
@@ -17,6 +17,8 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 	onCancelFn,
 	onHiddenFx,
 	onRevealedFn,
+	onRevealStartedFn,
+	shouldRevealFn,
 	ownerKey,
 }: {
 	readonly actor: PixiTileActor;
@@ -24,6 +26,8 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 	readonly onCancelFn?: () => void;
 	readonly onHiddenFx: Effect.Effect<void, never, never>;
 	readonly onRevealedFn: () => void;
+	readonly onRevealStartedFn?: () => void;
+	readonly shouldRevealFn?: () => boolean;
 	readonly ownerKey: string;
 }) {
 	yield* animator.animateFx({
@@ -37,6 +41,7 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					yield* onHiddenFx;
+					if (actor.container.destroyed || shouldRevealFn?.() === false) return;
 					yield* animator.animateFx({
 						actor,
 						channel: "lifecycle-opacity",
@@ -46,6 +51,7 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 						onCompleteFn: onRevealedFn,
 						toAlpha: 1,
 					});
+					onRevealStartedFn?.();
 				}),
 			);
 		},

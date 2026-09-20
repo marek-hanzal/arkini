@@ -191,6 +191,7 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				lifecycleTargetAlpha: 1,
 				lifecycleNotBeforeMs: 0,
 				lifecycleDurationMs: 0,
+				lifecycleAnimateScale: true,
 				dragging: false,
 				dragOffsetX: 0,
 				dragOffsetY: 0,

@@ -10,7 +10,8 @@ import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { destroyActorVisualFx } from "~/tile-rendering/fx/destroyActorVisualFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimation, ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
-import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
+import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
+import { lifecycleDurationMs, runActorLifecycleFx } from "~/tile-rendering/fx/runActorLifecycleFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
@@ -410,74 +411,125 @@ describe("texture readiness", () => {
 		},
 	);
 
-	it("keeps a spawn fade intent durable when its original visual is superseded", async () => {
-		const { resolves, textures } = createControlledTextures();
-		const { actor, frames } = createActor({
+	it.each([
+		true,
+		false,
+	])(
+		"keeps enter scale policy durable when its original visual is superseded (scale: %s)",
+		async (animateScale) => {
+			const { resolves, textures } = createControlledTextures();
+			const { actor, frames } = createActor({
+				textures,
+			});
+			const originalVisual = actor.currentVisual;
+			const { animations, animator } = createAnimator();
+			const nextTexture = new Texture();
+			actor.container.alpha = 0;
+
+			Effect.runSync(
+				runActorLifecycleFx({
+					actor,
+					animator,
+					kind: "prepare-enter",
+					animateScale,
+				}),
+			);
+			Effect.runSync(
+				startActorEnterFx({
+					actor,
+					animator,
+				}),
+			);
+			expect(actor.container.alpha).toBe(0);
+			expect(actor.lifecycleLayer.scale.x).toBe(animateScale ? 0.8 : 1);
+			expect(animations).toEqual([]);
+
+			Effect.runSync(
+				updateTileActorFx({
+					actor,
+					animator,
+					frames,
+					item: createItem({
+						revision: "revision:next",
+						sourceUrl: "resource:next",
+					}),
+					palette,
+					size: 80,
+					textures,
+				}),
+			);
+			await vi.waitFor(() => {
+				expect(resolves.has("resource:next")).toBe(true);
+			});
+			resolves.get("resource:next")?.(nextTexture);
+
+			await vi.waitFor(() => {
+				expect(animations.some(({ channel }) => channel === "lifecycle-opacity")).toBe(
+					true,
+				);
+				expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true);
+			});
+			const lifecycleFade = animations.find(({ channel }) => channel === "lifecycle-opacity");
+			const lifecycleScale = animations.find(({ channel }) => channel === "lifecycle-scale");
+			const visualMix = animations.find(({ channel }) => channel === "visual-mix");
+			expect(actor.currentVisual).toBe(originalVisual);
+			visualMix?.onCompleteFn?.();
+			expect(originalVisual.container.destroyed).toBe(true);
+			expect(actor.lifecycleTargetAlpha).toBe(1);
+			expect(actor.lifecycleTransitionStarted).toBe(true);
+			expect(lifecycleFade).toMatchObject({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: lifecycleDurationMs,
+				toAlpha: 1,
+			});
+			if (animateScale) {
+				expect(lifecycleScale).toMatchObject({
+					actor,
+					channel: "lifecycle-scale",
+					durationMs: lifecycleDurationMs,
+					toScale: 1,
+				});
+			} else {
+				expect(lifecycleScale).toBeUndefined();
+				expect(actor.lifecycleLayer.scale.x).toBe(1);
+			}
+
+			actor.container.destroy({
+				children: true,
+			});
+			nextTexture.destroy();
+		},
+	);
+
+	it("cancels an older lifecycle scale when exiting by crossfade only", () => {
+		const { textures } = createControlledTextures();
+		const { actor } = createActor({
 			textures,
 		});
-		const originalVisual = actor.currentVisual;
 		const { animations, animator } = createAnimator();
-		const nextTexture = new Texture();
-		actor.container.alpha = 0;
-
+		const cancelChannelFx = vi.fn(animator.cancelChannelFx);
+		actor.lifecycleLayer.scale.set(0.93);
 		Effect.runSync(
-			startActorEnterFx({
+			startActorExitFx({
 				actor,
-				animator,
+				animator: {
+					...animator,
+					cancelChannelFx,
+				},
+				animateScale: false,
 			}),
 		);
-		expect(actor.container.alpha).toBe(0);
-		expect(actor.lifecycleLayer.scale.x).toBeLessThan(1);
-		expect(animations).toEqual([]);
-
-		Effect.runSync(
-			updateTileActorFx({
-				actor,
-				animator,
-				frames,
-				item: createItem({
-					revision: "revision:next",
-					sourceUrl: "resource:next",
-				}),
-				palette,
-				size: 80,
-				textures,
-			}),
-		);
-		await vi.waitFor(() => {
-			expect(resolves.has("resource:next")).toBe(true);
-		});
-		resolves.get("resource:next")?.(nextTexture);
-
-		await vi.waitFor(() => {
-			expect(animations.some(({ channel }) => channel === "lifecycle-opacity")).toBe(true);
-			expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true);
-		});
-		const lifecycleFade = animations.find(({ channel }) => channel === "lifecycle-opacity");
-		const lifecycleScale = animations.find(({ channel }) => channel === "lifecycle-scale");
-		const visualMix = animations.find(({ channel }) => channel === "visual-mix");
-		expect(actor.currentVisual).toBe(originalVisual);
-		visualMix?.onCompleteFn?.();
-		expect(originalVisual.container.destroyed).toBe(true);
-		expect(actor.lifecycleTargetAlpha).toBe(1);
-		expect(actor.lifecycleTransitionStarted).toBe(true);
-		expect(lifecycleFade).toMatchObject({
-			actor,
+		expect(cancelChannelFx).toHaveBeenCalledWith(actor, "lifecycle-scale");
+		expect(animations).toHaveLength(1);
+		expect(animations[0]).toMatchObject({
 			channel: "lifecycle-opacity",
-			durationMs: lifecycleDurationMs,
-			toAlpha: 1,
+			toAlpha: 0,
 		});
-		expect(lifecycleScale).toMatchObject({
-			actor,
-			channel: "lifecycle-scale",
-			durationMs: lifecycleDurationMs,
-			toScale: 1,
-		});
-
+		expect(actor.lifecycleLayer.scale.x).toBe(0.93);
 		actor.container.destroy({
 			children: true,
 		});
-		nextTexture.destroy();
 	});
 
 	it("publishes primary and composite textures atomically for one visual generation", async () => {

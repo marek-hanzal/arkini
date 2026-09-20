@@ -2,11 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type {
-	TileMotionCue,
-	TileSpawnMotionCue,
-	TileSwapMotionCue,
-} from "~/tile-presentation/type/TileMotionCue";
+import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
@@ -21,7 +17,6 @@ import type {
 } from "~/tile-motion/service/MotionRuntime";
 import { finalizeMotionActorsFx } from "~/tile-motion/fx/finalizeMotionActorsFx";
 import { runMotionCueFx } from "~/tile-motion/fx/runMotionCueFx";
-import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import { syncMotionPresentationFx } from "~/tile-motion/fx/syncMotionPresentationFx";
 import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
 import type { MotionRedirect, TargetRoute } from "~/tile-motion/type/MotionTarget";
@@ -50,7 +45,7 @@ const emptyMotionLanes = {
 const maximumRememberedCueKeys = 256;
 const maximumRememberedTargetRedirects = 256;
 
-/** Projects drag ownership without turning presentation work into a click lock. */
+/** Moving actors remain unavailable until their cue settles. */
 const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
 	const claims = new Map<string, InteractionClaim>();
 	for (const cue of cues) {
@@ -60,7 +55,7 @@ const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
 					kind: "spawn",
 				},
 				(spawn) => {
-					claims.set(spawn.actorId, "handoff");
+					claims.set(spawn.actorId, "blocked");
 				},
 			)
 			.with(
@@ -74,7 +69,7 @@ const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
 					kind: "input",
 				},
 				(input) => {
-					claims.set(input.sourceActorId, "activation-only");
+					claims.set(input.sourceActorId, "blocked");
 				},
 			)
 			.with(
@@ -86,7 +81,7 @@ const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
 						swap.actorId,
 						swap.counterpartActorId,
 					]) {
-						claims.set(actorId, "handoff");
+						claims.set(actorId, "blocked");
 					}
 				},
 			)
@@ -261,21 +256,13 @@ const readMotionAnimationKeysFn = ({ cue, cueKey }: { cue: TileMotionCue; cueKey
 		)
 		.exhaustive();
 
-interface DetachedSwapLeg {
-	readonly actorId: string;
-	readonly cueKey: string;
-	readonly ownerKey: string;
-}
-
 interface CueLifecycle {
-	readonly activeSwapLegActorIds: Set<string>;
 	inputRemainderRevealed: boolean;
 	payloadActor: PixiTileActor | null;
 	started: boolean;
 }
 
 const createCueLifecycleFn = (): CueLifecycle => ({
-	activeSwapLegActorIds: new Set(),
 	inputRemainderRevealed: false,
 	payloadActor: null,
 	started: false,
@@ -301,7 +288,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	let motionLanes: updateTileMotionLanesFn.State = emptyMotionLanes;
 	const knownCueKeys = new Set<string>();
 	const cueLifecycleByKey = new Map<string, CueLifecycle>();
-	const detachedSwapLegByActorId = new Map<string, DetachedSwapLeg>();
 	const targetRedirectByActorId = new Map<string, MotionRedirect>();
 
 	const readCueKeyFn = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
@@ -346,16 +332,10 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		};
 	};
 
-	const readCurrentInteractionClaimsFn = () => {
-		const claims = readInteractionClaimsFn(readCuesFn());
-		for (const actorId of detachedSwapLegByActorId.keys()) {
-			claims.set(actorId, "handoff");
-		}
-		return claims;
-	};
+	const readCurrentInteractionClaimsFn = () => readInteractionClaimsFn(readCuesFn());
 
 	const readRetainedActorIdsFn = () => {
-		const actorIds = new Set(detachedSwapLegByActorId.keys());
+		const actorIds = new Set<string>();
 		for (const cue of readCuesFn()) {
 			for (const actorId of readTileMotionActorClaimsFn(cue)) {
 				actorIds.add(actorId);
@@ -364,9 +344,8 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		return actorIds;
 	};
 
-	const readCurrentQuantityPresentationFn = () => {
-		const cues = readCuesFn();
-		const revealedInputCueKeys = new Set(
+	const readRevealedInputCueKeysFn = () =>
+		new Set(
 			[
 				...cueLifecycleByKey.entries(),
 			].flatMap(([cueKey, lifecycle]) =>
@@ -377,6 +356,10 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					: [],
 			),
 		);
+
+	const readCurrentQuantityPresentationFn = () => {
+		const cues = readCuesFn();
+		const revealedInputCueKeys = readRevealedInputCueKeysFn();
 		return readQuantityPresentationFn({
 			cues,
 			resolvedTargetActorIdByCueKey: new Map(
@@ -410,15 +393,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		);
 	};
 
-	const releaseDetachedCueLifecycleIfSettledFn = (cueKey: string) => {
-		const lifecycle = cueLifecycleByKey.get(cueKey);
-		if (lifecycle === undefined || lifecycle.activeSwapLegActorIds.size > 0) return;
-		const hasDetachedLeg = [
-			...detachedSwapLegByActorId.values(),
-		].some((detached) => detached.cueKey === cueKey);
-		if (!hasDetachedLeg) cueLifecycleByKey.delete(cueKey);
-	};
-
 	function completeCue(cue: TileMotionCue) {
 		const cueKey = readCueKeyFn(cue);
 		const lifecycle = cueLifecycleByKey.get(cueKey);
@@ -429,21 +403,14 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			RendererRuntime.runSync(animator.cancelActorFx(payload));
 			RendererRuntime.runSync(destroyTileActorFx(payload));
 		}
-		motionLanes =
-			detachedSwapLegByActorId.size > 0
-				? {
-						active: motionLanes.active.filter(
-							(activeCue) => readCueKeyFn(activeCue) !== readCueKeyFn(cue),
-						),
-						pending: motionLanes.pending,
-					}
-				: updateTileMotionLanesFn({
-						action: {
-							cue,
-							type: "complete",
-						},
-						state: motionLanes,
-					});
+		motionLanes = updateTileMotionLanesFn({
+			releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
+			action: {
+				cue,
+				type: "complete",
+			},
+			state: motionLanes,
+		});
 		const stillClaimedActorIds = readRetainedActorIdsFn();
 		RendererRuntime.runSync(
 			finalizeMotionActorsFx({
@@ -474,47 +441,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				);
 			}
 		}
-		if (detachedSwapLegByActorId.size === 0) startCues();
-	}
-
-	function startSwapLeg(cueKey: string, actorId: string) {
-		const lifecycle = cueLifecycleByKey.get(cueKey);
-		if (closed || lifecycle?.started !== true) return;
-		lifecycle.activeSwapLegActorIds.add(actorId);
-	}
-
-	function settleSwapLeg(cueKey: string, actorId: string) {
-		const lifecycle = cueLifecycleByKey.get(cueKey);
-		if (closed || lifecycle === undefined) return;
-		lifecycle.activeSwapLegActorIds.delete(actorId);
-		const detached = detachedSwapLegByActorId.get(actorId);
-		if (detached?.cueKey !== cueKey) return;
-		detachedSwapLegByActorId.delete(actorId);
-		releaseDetachedCueLifecycleIfSettledFn(cueKey);
-		RendererRuntime.runSync(
-			finalizeMotionActorsFx({
-				actorIds: new Set([
-					actorId,
-				]),
-				actorStore,
-				animator,
-				application,
-				onActorSettledFn,
-				readPaletteFn,
-				stillClaimedActorIds: readRetainedActorIdsFn(),
-				surface,
-				textures,
-			}),
-		);
-		if (detachedSwapLegByActorId.size > 0) return;
-		motionLanes = updateTileMotionLanesFn({
-			action: {
-				cues: [],
-				type: "enqueue",
-			},
-			state: motionLanes,
-		});
-		syncPresentationFn();
 		startCues();
 	}
 
@@ -532,12 +458,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				isCueActiveFn: () => !closed && cueLifecycleByKey.get(cueKey)?.started === true,
 				onActorSettledFn,
 				onCompleteFn: () => completeCue(cue),
-				onSwapLegSettledFn: (actorId) => {
-					settleSwapLeg(cueKey, actorId);
-				},
-				onSwapLegStartedFn: (actorId) => {
-					startSwapLeg(cueKey, actorId);
-				},
 				onPayloadCreatedFn: (actor) => {
 					const lifecycle = cueLifecycleByKey.get(cueKey);
 					if (lifecycle !== undefined) lifecycle.payloadActor = actor;
@@ -546,7 +466,17 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					const lifecycle = cueLifecycleByKey.get(cueKey);
 					if (lifecycle === undefined) return;
 					lifecycle.inputRemainderRevealed = true;
+					// Contact releases the receiver; only the source remains claimed during its return.
+					motionLanes = updateTileMotionLanesFn({
+						action: {
+							cues: [],
+							type: "enqueue",
+						},
+						state: motionLanes,
+						releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
+					});
 					syncPresentationFn();
+					startCues();
 				},
 				readPaletteFn,
 				readSourceSurvivesFn,
@@ -567,76 +497,11 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		}
 	}
 
-	const settleReleasedActorFx = (actorId: string) =>
-		Effect.gen(function* () {
-			const actor = actorStore.actors.get(actorId);
-			const canonical = actorStore.canonicalItems.get(actorId);
-			if (actor === undefined || canonical === undefined || actor.container.destroyed) return;
-			const target = yield* surface.readActorPoseFx(canonical);
-			if (target === null) return;
-			yield* chaseTargetFx({
-				actor,
-				animator,
-				fallbackTarget: target,
-				onSettledFn: () => {
-					if (actor.container.destroyed) return;
-					const latest = actorStore.canonicalItems.get(actorId);
-					if (latest === undefined) return;
-					const latestPose = RendererRuntime.runSync(surface.readActorPoseFx(latest));
-					latestPose?.layer.addChild(actor.container);
-				},
-				ownerKey: `motion-handoff-settle:${actor.instanceId}`,
-				surface,
-				targetLocation: canonical.location,
-			});
-		});
-
-	const isInterruptibleCueForActorFn = (
-		cue: TileMotionCue,
-		actorId: string,
-	): cue is TileSpawnMotionCue | TileSwapMotionCue =>
-		match(cue)
-			.with(
-				{
-					kind: "spawn",
-				},
-				(spawn) => spawn.actorId === actorId,
-			)
-			.with(
-				{
-					kind: "stack",
-				},
-				() => false,
-			)
-			.with(
-				{
-					kind: "input",
-				},
-				() => false,
-			)
-			.with(
-				{
-					kind: "swap",
-				},
-				(swap) => swap.actorId === actorId || swap.counterpartActorId === actorId,
-			)
-			.exhaustive();
-
 	return {
 		handoffDeliveriesFx: Effect.fn("MotionRuntime.handoffDeliveriesFx")(function* (
 			actorIds: ReadonlySet<string>,
 		) {
 			if (closed) return;
-			let releasedDetachedLeg = false;
-			for (const actorId of actorIds) {
-				const detached = detachedSwapLegByActorId.get(actorId);
-				if (detached === undefined) continue;
-				detachedSwapLegByActorId.delete(actorId);
-				cueLifecycleByKey.get(detached.cueKey)?.activeSwapLegActorIds.delete(actorId);
-				releaseDetachedCueLifecycleIfSettledFn(detached.cueKey);
-				yield* animator.cancelFx(detached.ownerKey);
-				releasedDetachedLeg = true;
-			}
 			const superseded = readCuesFn().filter(
 				(cue) =>
 					(cue.kind === "spawn" && actorIds.has(cue.actorId)) ||
@@ -644,10 +509,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					(cue.kind === "swap" &&
 						(actorIds.has(cue.actorId) || actorIds.has(cue.counterpartActorId))),
 			);
-			if (superseded.length === 0 && !releasedDetachedLeg) return;
+			if (superseded.length === 0) return;
 			const keys = new Set(superseded.map(readCueKeyFn));
 			const releasedActorIds = new Set<string>();
-			const releasedSwapActorIds = new Set<string>();
 			for (const cue of superseded) {
 				const key = readCueKeyFn(cue);
 				const lifecycle = cueLifecycleByKey.get(key);
@@ -687,22 +551,20 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				for (const actorId of readTileMotionActorClaimsFn(cue)) {
 					if (actorIds.has(actorId)) continue;
 					releasedActorIds.add(actorId);
-					if (cue.kind === "swap") releasedSwapActorIds.add(actorId);
 				}
 			}
 			motionLanes = {
 				active: motionLanes.active.filter((cue) => !keys.has(readCueKeyFn(cue))),
 				pending: motionLanes.pending.filter((cue) => !keys.has(readCueKeyFn(cue))),
 			};
-			if (detachedSwapLegByActorId.size === 0) {
-				motionLanes = updateTileMotionLanesFn({
-					action: {
-						type: "enqueue",
-						cues: [],
-					},
-					state: motionLanes,
-				});
-			}
+			motionLanes = updateTileMotionLanesFn({
+				releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
+				action: {
+					type: "enqueue",
+					cues: [],
+				},
+				state: motionLanes,
+			});
 			yield* finalizeMotionActorsFx({
 				actorIds: releasedActorIds,
 				actorStore,
@@ -714,185 +576,8 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				surface,
 				textures,
 			});
-			// Both swap writers were retired; its remaining grid actor settles from its live pose.
-			const stillClaimedActorIds = readRetainedActorIdsFn();
-			for (const actorId of releasedSwapActorIds) {
-				if (!stillClaimedActorIds.has(actorId)) yield* settleReleasedActorFx(actorId);
-			}
 			// Reconciliation finishes the delivery takeover before startFx starts successors.
 		}),
-		beginInteractionHandoffFx: Effect.fn("MotionRuntime.beginInteractionHandoffFx")((actorId) =>
-			Effect.gen(function* () {
-				if (closed) return false;
-				const detached = detachedSwapLegByActorId.get(actorId);
-				const handedOffDetached = detached !== undefined;
-				if (detached !== undefined) {
-					yield* animator.cancelFx(detached.ownerKey);
-					detachedSwapLegByActorId.delete(actorId);
-					const lifecycle = cueLifecycleByKey.get(detached.cueKey);
-					lifecycle?.activeSwapLegActorIds.delete(actorId);
-					releaseDetachedCueLifecycleIfSettledFn(detached.cueKey);
-				}
-				const cues = readCuesFn();
-				const superseded = cues.filter(
-					(cue): cue is TileSpawnMotionCue | TileSwapMotionCue =>
-						isInterruptibleCueForActorFn(cue, actorId),
-				);
-				if (superseded.length === 0) {
-					if (!handedOffDetached) return false;
-					if (detachedSwapLegByActorId.size === 0) {
-						motionLanes = updateTileMotionLanesFn({
-							action: {
-								cues: [],
-								type: "enqueue",
-							},
-							state: motionLanes,
-						});
-						syncPresentationFn();
-						startCues();
-					}
-					return true;
-				}
-				const supersededCueKeys = new Set(superseded.map(readCueKeyFn));
-				const hasBlockingClaim = cues.some(
-					(cue) =>
-						!supersededCueKeys.has(readCueKeyFn(cue)) &&
-						readTileMotionActorClaimsFn(cue).has(actorId),
-				);
-				if (hasBlockingClaim) return false;
-
-				const activeCounterpartIds = new Set<string>();
-				const completedCounterpartIds = new Set<string>();
-				const pendingCounterpartIds = new Set<string>();
-				const activeSpawnActorIds = new Set<string>();
-				const pendingSpawnActorIds = new Set<string>();
-				const releasedSpawnOriginIds = new Set<string>();
-				for (const cue of superseded) {
-					const cueKey = readCueKeyFn(cue);
-					const lifecycle = cueLifecycleByKey.get(cueKey);
-					const started = lifecycle?.started === true;
-					if (lifecycle !== undefined) lifecycle.started = false;
-					yield* match(cue)
-						.with(
-							{
-								kind: "spawn",
-							},
-							(spawn) =>
-								Effect.gen(function* () {
-									releasedSpawnOriginIds.add(spawn.originActorId);
-									if (!started) {
-										pendingSpawnActorIds.add(spawn.actorId);
-										return;
-									}
-									activeSpawnActorIds.add(spawn.actorId);
-									yield* animator.cancelFx(`motion:${cueKey}`);
-								}),
-						)
-						.with(
-							{
-								kind: "swap",
-							},
-							(swap) =>
-								Effect.gen(function* () {
-									const counterpartId =
-										swap.actorId === actorId
-											? swap.counterpartActorId
-											: swap.actorId;
-									if (!started) {
-										pendingCounterpartIds.add(counterpartId);
-										return;
-									}
-									yield* animator.cancelFx(`motion:${cueKey}:${actorId}`);
-									const activeActorIds = lifecycle?.activeSwapLegActorIds;
-									activeActorIds?.delete(actorId);
-									if (activeActorIds?.has(counterpartId)) {
-										activeCounterpartIds.add(counterpartId);
-										detachedSwapLegByActorId.set(counterpartId, {
-											actorId: counterpartId,
-											cueKey,
-											ownerKey: `motion:${cueKey}:${counterpartId}`,
-										});
-									} else {
-										completedCounterpartIds.add(counterpartId);
-									}
-								}),
-						)
-						.exhaustive();
-					if (lifecycle !== undefined) lifecycle.payloadActor = null;
-				}
-				const filteredMotionLanes = {
-					active: motionLanes.active.filter(
-						(cue) => !supersededCueKeys.has(readCueKeyFn(cue)),
-					),
-					pending: motionLanes.pending.filter(
-						(cue) => !supersededCueKeys.has(readCueKeyFn(cue)),
-					),
-				};
-				motionLanes =
-					detachedSwapLegByActorId.size > 0
-						? filteredMotionLanes
-						: updateTileMotionLanesFn({
-								action: {
-									cues: [],
-									type: "enqueue",
-								},
-								state: filteredMotionLanes,
-							});
-				for (const cueKey of supersededCueKeys) {
-					releaseDetachedCueLifecycleIfSettledFn(cueKey);
-				}
-
-				const stillClaimedActorIds = readRetainedActorIdsFn();
-				const settleActorIds = new Set(
-					[
-						...pendingCounterpartIds,
-						...completedCounterpartIds,
-					].filter(
-						(counterpartId) =>
-							counterpartId !== actorId &&
-							!activeCounterpartIds.has(counterpartId) &&
-							!stillClaimedActorIds.has(counterpartId),
-					),
-				);
-				// Handoff retires the spawn origin's retention too, even when no later
-				// canonical transition arrives to remove a depleted producer.
-				const releasedActorIds = new Set([
-					...settleActorIds,
-					...releasedSpawnOriginIds,
-				]);
-				releasedActorIds.delete(actorId);
-				if (releasedActorIds.size > 0) {
-					yield* finalizeMotionActorsFx({
-						actorIds: releasedActorIds,
-						actorStore,
-						animator,
-						application,
-						onActorSettledFn,
-						readPaletteFn,
-						stillClaimedActorIds,
-						surface,
-						textures,
-					});
-					yield* Effect.forEach(settleActorIds, settleReleasedActorFx, {
-						discard: true,
-					});
-				}
-				for (const pendingSpawnActorId of pendingSpawnActorIds) {
-					if (activeSpawnActorIds.has(pendingSpawnActorId)) continue;
-					const pendingSpawnActor = actorStore.actors.get(pendingSpawnActorId);
-					if (pendingSpawnActor === undefined || pendingSpawnActor.container.destroyed) {
-						continue;
-					}
-					yield* startActorEnterFx({
-						actor: pendingSpawnActor,
-						animator,
-					});
-				}
-				syncPresentationFn();
-				if (detachedSwapLegByActorId.size === 0) startCues();
-				return true;
-			}),
-		),
 		enqueueFx: Effect.fn("MotionRuntime.enqueueFx")((cues) =>
 			Effect.sync(() => {
 				if (closed || cues.length === 0) return;
@@ -905,22 +590,14 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				});
 				retainNewestCueKeysFn();
 				if (uniqueCues.length === 0) return;
-				motionLanes =
-					detachedSwapLegByActorId.size > 0
-						? {
-								active: motionLanes.active,
-								pending: [
-									...motionLanes.pending,
-									...uniqueCues,
-								],
-							}
-						: updateTileMotionLanesFn({
-								action: {
-									cues: uniqueCues,
-									type: "enqueue",
-								},
-								state: motionLanes,
-							});
+				motionLanes = updateTileMotionLanesFn({
+					releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
+					action: {
+						cues: uniqueCues,
+						type: "enqueue",
+					},
+					state: motionLanes,
+				});
 			}),
 		),
 		redirectTargetFx: Effect.fn("MotionRuntime.redirectTargetFx")((redirect) =>
@@ -968,9 +645,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					yield* animator.cancelFx(animationKey);
 				}
 			}
-			for (const detached of detachedSwapLegByActorId.values()) {
-				yield* animator.cancelFx(detached.ownerKey);
-			}
 			for (const { payloadActor } of cueLifecycleByKey.values()) {
 				if (payloadActor === null) continue;
 				yield* animator.cancelActorFx(payloadActor);
@@ -979,7 +653,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			cueLifecycleByKey.clear();
-			detachedSwapLegByActorId.clear();
 			targetRedirectByActorId.clear();
 		}),
 	} satisfies MotionRuntime;

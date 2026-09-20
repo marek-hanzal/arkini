@@ -103,7 +103,7 @@ describe("input remainder travel", () => {
 			interactionClaimByActorId: new Map([
 				[
 					source.item.id,
-					"activation-only",
+					"blocked",
 				],
 			]),
 			retainedActorIds: new Set([
@@ -245,6 +245,155 @@ describe("input remainder travel", () => {
 					animation.actor === owner && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
+		Effect.runSync(runtime.closeFx);
+	});
+
+	it.each([
+		"hidden",
+		"revealing",
+	])("retires a remainder removed while %s", (phase) => {
+		const source = createActor("runtime:input-source");
+		const owner = createActor("runtime:input-owner");
+		source.item = {
+			...createItem(source.item.id, firstBoardLocation),
+			quantity: 7,
+		};
+		owner.item = createItem(owner.item.id, secondBoardLocation);
+		source.container.position.set(100, 40);
+		owner.container.position.set(200, 40);
+		const actors = createActorMap(source, owner);
+		const canonicalItems = createItemMap(
+			{
+				...source.item,
+				quantity: 2,
+			},
+			owner.item,
+		);
+		const { animations, runtime } = createMotionHarness({
+			actors,
+			canonicalItems,
+		});
+		Effect.runSync(
+			runtime.enqueueFx([
+				inputCue({
+					previousQuantity: 7,
+					resultingQuantity: 2,
+					sequence: 40,
+				}),
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const arrival = animations.find(
+			(animation) => animation.actor === source && animation.channel === "pose",
+		);
+		if (arrival?.channel !== "pose") throw new Error("Expected arrival");
+		samplePoseAnimation(arrival, 1);
+		arrival.onCompleteFn?.();
+		const fadeOut = animations.find(
+			(animation) =>
+				animation.actor === source &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		if (!fadeOut) throw new Error("Expected consumption fade");
+		if (phase === "hidden") canonicalItems.delete(source.item.id);
+		fadeOut.onCompleteFn?.();
+		if (phase === "revealing") {
+			// Return starts with reveal, not after it. Neither callback may revive a deleted source.
+			const returning = animations
+				.filter((animation) => animation.actor === source && animation.channel === "pose")
+				.at(-1);
+			expect(returning).not.toBe(arrival);
+			const fadeIn = animations.find(
+				(animation) =>
+					animation.actor === source &&
+					animation.channel === "lifecycle-opacity" &&
+					animation.toAlpha === 1,
+			);
+			if (!fadeIn) throw new Error("Expected reveal");
+			canonicalItems.delete(source.item.id);
+			fadeIn.onCompleteFn?.();
+			returning?.onCompleteFn?.();
+		} else {
+			expect(
+				animations.filter(
+					(animation) => animation.actor === source && animation.channel === "pose",
+				),
+			).toHaveLength(1);
+		}
+		expect(source.container.destroyed).toBe(true);
+		expect(actors.has(source.item.id)).toBe(false);
+		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds.size).toBe(0);
+		Effect.runSync(runtime.closeFx);
+	});
+
+	it.each([
+		false,
+		true,
+	])("settles remainder ownership when fade-out cancellation is %s", (cancelFadeOut) => {
+		const source = createActor("runtime:input-source");
+		const owner = createActor("runtime:input-owner");
+		source.item = {
+			...createItem(source.item.id, firstBoardLocation),
+			quantity: 7,
+		};
+		owner.item = createItem(owner.item.id, secondBoardLocation);
+		source.container.position.set(100, 40);
+		owner.container.position.set(200, 40);
+		const { animations, runtime } = createMotionHarness({
+			actors: createActorMap(source, owner),
+			canonicalItems: createItemMap(
+				{
+					...source.item,
+					quantity: 2,
+				},
+				owner.item,
+			),
+		});
+		Effect.runSync(
+			runtime.enqueueFx([
+				inputCue({
+					previousQuantity: 7,
+					resultingQuantity: 2,
+					sequence: 40,
+				}),
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const arrival = animations.find(
+			(animation) => animation.actor === source && animation.channel === "pose",
+		);
+		if (arrival?.channel !== "pose") throw new Error("Expected arrival");
+		samplePoseAnimation(arrival, 1);
+		arrival.onCompleteFn?.();
+		const fadeOut = animations.find(
+			(animation) =>
+				animation.actor === source &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		(cancelFadeOut ? fadeOut?.onCancelFn : fadeOut?.onCompleteFn)?.();
+		const returning = animations
+			.filter((animation) => animation.actor === source && animation.channel === "pose")
+			.at(-1);
+		if (returning?.channel !== "pose" || returning === arrival)
+			throw new Error("Expected concurrent return");
+		samplePoseAnimation(returning, 1);
+		returning.onCompleteFn?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds.has(source.item.id)).toBe(
+			!cancelFadeOut,
+		);
+		const fadeIn = animations.find(
+			(animation) =>
+				animation.actor === source &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 1,
+		);
+		fadeIn?.onCompleteFn?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds.has(source.item.id)).toBe(
+			false,
+		);
+		expect(source.container.destroyed).toBe(false);
 		Effect.runSync(runtime.closeFx);
 	});
 

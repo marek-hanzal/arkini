@@ -4,7 +4,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
-import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
+import { animateRetargetablePoseFx } from "~/tile-rendering/fx/animateRetargetablePoseFx";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 
@@ -42,24 +42,13 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 		toX: pose.x,
 		toY: pose.y,
 	});
-	const readPoseFn = yield* createRetargetablePoseSamplerFx({
-		from: {
-			scale: actor.container.scale.x,
-			x: actor.container.x,
-			y: actor.container.y,
-		},
-		readTargetFn: () => {
-			const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
-			return {
-				scale: latest.size / Math.max(1, actor.size),
-				x: latest.x,
-				y: latest.y,
-			};
-		},
-	});
-	yield* animator.animateFx({
+	const readTargetFn = () => RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+	yield* animateRetargetablePoseFx({
 		actor,
-		channel: "pose",
+		animator,
+		target: pose,
+		readTargetFn,
+		readSizeFn: () => readTargetFn().size,
 		curve: {
 			bounce: 0.14,
 			kind: "spring",
@@ -72,6 +61,5 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 			}
 			onCompleteFn?.();
 		},
-		readPoseFn,
 	});
 });

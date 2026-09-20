@@ -53,7 +53,7 @@ afterEach(async () => {
 });
 
 describe("StartupSplash", () => {
-	it("keeps the visible startup surface black until the splash is ready", async () => {
+	it("keeps startup loading until the splash is ready before starting its minimum display time", async () => {
 		let resolveBootstrapFn!: (result: typeof readyResult) => void;
 		const bootstrap = new Promise<typeof readyResult>((resolve) => {
 			resolveBootstrapFn = resolve;
@@ -66,11 +66,11 @@ describe("StartupSplash", () => {
 		);
 		roots.push(harness.root);
 		registries.push(harness.registry);
-		expect(harness.container.querySelector('[data-ui="StartupBlackWait"]')).not.toBeNull();
+		expect(harness.container.querySelector('[data-ui="StartupLoading"]')).not.toBeNull();
 		await act(async () => harness.resolveVisible(performance.now()));
 
 		await act(async () => vi.advanceTimersByTime(10_000));
-		expect(harness.container.querySelector('[data-ui="StartupBlackWait"]')).not.toBeNull();
+		expect(harness.container.querySelector('[data-ui="StartupLoading"]')).not.toBeNull();
 		expect(harness.router.state.location.pathname).toBe("/");
 
 		await act(async () => resolveBootstrapFn(readyResult));

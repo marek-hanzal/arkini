@@ -26,6 +26,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 
 		return {
 			actors,
+			exitingActors,
 			canonicalItems,
 			deleteActorFx: Effect.fn("MainActorStore.deleteActorFx")((actorId) =>
 				Effect.sync(() => {

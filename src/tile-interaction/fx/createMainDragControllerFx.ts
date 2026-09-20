@@ -19,7 +19,10 @@ import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx
 import type { DropSubmission } from "~/tile-interaction/fx/createDropSubmissionFx";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
+import type {
+	MainInteractionSurface,
+	MainInteractionTargetFacts,
+} from "~/tile-interaction/type/MainInteractionSurface";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import type { DragOriginGhosts } from "~/tile-interaction/type/DragOriginGhosts";
 
@@ -66,11 +69,6 @@ interface ActiveDragBase extends createMainDragPreviewFx.State {
 	lastPointerY: number;
 }
 
-interface MotionHandoffGesture extends ActiveDragBase {
-	readonly mode: "motion-handoff";
-	readonly phase: "pressed";
-}
-
 interface ActivationOnlyGesture extends ActiveDragBase {
 	readonly mode: "activation-only";
 	readonly phase: "pressed";
@@ -81,7 +79,7 @@ interface MovableGesture extends ActiveDragBase {
 	phase: "dragging" | "pressed";
 }
 
-type ActiveDrag = ActivationOnlyGesture | MotionHandoffGesture | MovableGesture;
+type ActiveDrag = ActivationOnlyGesture | MovableGesture;
 const removeCheatItemFx = Effect.fn("createMainDragControllerFx.removeCheatItemFx")(
 	({ game, sourceItem }: { readonly game: GameEngine; readonly sourceItem: TileActorItem }) =>
 		game
@@ -136,6 +134,17 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		frames: application.frames,
 		onApplyFn: (sample) => applyPointerMoveSafelyFn(sample),
 	});
+
+	const isMovingFn = (actor: PixiTileActor) =>
+		RendererRuntime.runSync(motion.readSnapshotFx).interactionClaimByActorId.get(
+			actor.item.id,
+		) === "blocked" || RendererRuntime.runSync(animator.isChannelActiveFx(actor, "pose"));
+
+	const isTargetMovingFn = (facts: MainInteractionTargetFacts) => {
+		if (facts.occupant === null) return false;
+		const actor = actorStore.actors.get(facts.occupant.id);
+		return actor !== undefined && isMovingFn(actor);
+	};
 
 	const settleActorFn = (actor: PixiTileActor) => {
 		RendererRuntime.runSync(
@@ -208,61 +217,22 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		};
 		const pointer = readPointerOffsetFn(event, activeDrag);
 		if (pointer === null) return;
-		let { drag } = pointer;
+		const { drag } = pointer;
 		const { offsetX, offsetY } = pointer;
-		let cursorGrabPointer = {
+		const cursorGrabPointer = {
 			x: drag.pressX,
 			y: drag.pressY,
 		};
+		if (drag.phase === "pressed" && isMovingFn(drag.actor)) {
+			activeDrag = null;
+			releaseDragPointerFn(drag.pointerId);
+			return;
+		}
 		if (drag.phase === "pressed" && !thresholdCrossed) return;
 		if (drag.phase === "pressed" && drag.mode === "activation-only") {
 			activeDrag = null;
 			releaseDragPointerFn(drag.pointerId);
 			return;
-		}
-		if (drag.phase === "pressed" && drag.mode === "motion-handoff") {
-			const actorStillCanonicalBeforeHandoff =
-				actorStore.actors.get(drag.sourceItem.id) === drag.actor &&
-				actorStore.canonicalItems.has(drag.sourceItem.id) &&
-				!drag.actor.container.destroyed;
-			if (!actorStillCanonicalBeforeHandoff) {
-				activeDrag = null;
-				releaseDragPointerFn(drag.pointerId);
-				return;
-			}
-			const handedOff = RendererRuntime.runSync(
-				motion.beginInteractionHandoffFx(drag.sourceItem.id),
-			);
-			const remainingClaim = RendererRuntime.runSync(
-				motion.readSnapshotFx,
-			).interactionClaimByActorId.get(drag.sourceItem.id);
-			const actorStillCanonicalAfterHandoff =
-				actorStore.actors.get(drag.sourceItem.id) === drag.actor &&
-				actorStore.canonicalItems.has(drag.sourceItem.id) &&
-				!drag.actor.container.destroyed;
-			if (
-				!actorStillCanonicalAfterHandoff ||
-				(!handedOff && remainingClaim !== undefined) ||
-				remainingClaim === "activation-only"
-			) {
-				activeDrag = null;
-				releaseDragPointerFn(drag.pointerId);
-				return;
-			}
-			drag = {
-				...drag,
-				mode: "drag",
-				phase: "pressed",
-				startX: drag.actor.container.x - offsetX,
-				startY: drag.actor.container.y - offsetY,
-			};
-			activeDrag = drag;
-			// The actor kept moving after the press. Its rebased pose stays at the live handoff
-			// frame, so the grab spring must meet the current pointer rather than the old press.
-			cursorGrabPointer = {
-				x: sample.x,
-				y: sample.y,
-			};
 		}
 		if (drag.phase === "pressed") {
 			drag.phase = "dragging";
@@ -287,7 +257,17 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				y: drag.startY + offsetY,
 			}),
 		);
-		const targetFacts = RendererRuntime.runSync(surface.readTargetFactsFx(sample.x, sample.y));
+		const facts = RendererRuntime.runSync(surface.readTargetFactsFx(sample.x, sample.y));
+		const targetFacts: MainInteractionTargetFacts = isTargetMovingFn(facts)
+			? {
+					commandTarget: {
+						kind: "unsupported",
+					},
+					occupant: null,
+					stableKey: `moving:${facts.stableKey}`,
+					target: null,
+				}
+			: facts;
 		const sourceItem = RendererRuntime.runSync(
 			dragPreview.previewTargetFx({
 				drag,
@@ -390,8 +370,9 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
-					const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
-					if (currentItem === undefined) return;
+					const latestActor = actorStore.actors.get(drag.sourceItem.id);
+					if (latestActor === undefined || isMovingFn(latestActor)) return;
+					const currentItem = latestActor.item;
 					return onActivateFn(currentItem, drag.activationIntent, application.app.canvas);
 				})
 				.catch((cause) => {
@@ -404,6 +385,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			const targetFacts = RendererRuntime.runSync(
 				surface.readTargetFactsFx(point.x, point.y),
 			);
+			if (isTargetMovingFn(targetFacts)) {
+				cancelDragFn(drag);
+				return;
+			}
 			// Canonical state may have changed beneath a held pointer while the target
 			// coordinates stayed stable. Freeze fresh release-time preview facts.
 			const sourceItem = RendererRuntime.runSync(
@@ -538,18 +523,11 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					running: actor.item.running,
 				});
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
-					const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
-					const motionClaim = motionSnapshot.interactionClaimByActorId.get(actor.item.id);
-					const needsMotionHandoff = motionClaim === "handoff";
-					const gestureMode =
-						event.button === 2 || motionClaim === "activation-only"
-							? "activation-only"
-							: needsMotionHandoff
-								? "motion-handoff"
-								: "drag";
+					const gestureMode = event.button === 2 ? "activation-only" : "drag";
 					if (
 						closed ||
 						interactionBlocked ||
+						isMovingFn(actor) ||
 						activeDrag !== null ||
 						RendererRuntime.runSync(dropSubmission.isPendingActorFx(actor.item.id)) ||
 						!event.isPrimary ||

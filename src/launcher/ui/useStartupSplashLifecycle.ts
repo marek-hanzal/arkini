@@ -31,7 +31,7 @@ type StartupSplashContent =
 
 type StartupSplashView =
 	| {
-			readonly kind: "black";
+			readonly kind: "loading";
 	  }
 	| {
 			readonly kind: "failure";
@@ -227,7 +227,7 @@ export const useStartupSplashLifecycle = () => {
 		};
 	} else {
 		view = {
-			kind: "black",
+			kind: "loading",
 		};
 	}
 

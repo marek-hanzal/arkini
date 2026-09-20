@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "kzwt0gkhs7reqg7vt0xumgv6",
+		"id": "spoiled-grain",
+		"title": "Spoiled Grain",
+		"draft": false,
+		"description": "Loose grain that sat around long enough to become considerably less useful.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-grain"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 12,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -4,8 +4,8 @@
 		"uid": "gowelydmmo177puaatmcboii",
 		"id": "clay-jug-with-milk",
 		"title": "Clay Jug With Milk",
-		"ui": "simple",
 		"description": "More milk",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -50,7 +50,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

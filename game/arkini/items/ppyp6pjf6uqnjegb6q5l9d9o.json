@@ -4,8 +4,8 @@
 		"uid": "ppyp6pjf6uqnjegb6q5l9d9o",
 		"id": "cotton",
 		"title": "Cotton",
-		"ui": "simple",
 		"description": "Fluffy",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 3600000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

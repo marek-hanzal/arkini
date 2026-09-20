@@ -13,7 +13,7 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 12,
+		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {
@@ -25,6 +25,35 @@
 				"result": "sack-with-grain"
 			}
 		],
+		"clock": {
+			"durationMs": 3600000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-grain",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
 		"maxQueueSize": 1,
 		"lines": []
 	}

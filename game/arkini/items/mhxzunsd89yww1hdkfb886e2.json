@@ -14,7 +14,6 @@
 			]
 		},
 		"scope": "any",
-		"maxCount": 1,
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": [
@@ -96,15 +95,6 @@
 									"scope": "universe"
 								},
 								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "lumer-camp"
 							}
 						],
 						"type": "hide"
@@ -192,15 +182,6 @@
 							}
 						],
 						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "stonemason-camp"
-							}
-						],
-						"type": "hide"
 					}
 				]
 			},
@@ -282,15 +263,6 @@
 									"scope": "universe"
 								},
 								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "house-t1"
 							}
 						],
 						"type": "hide"
@@ -378,15 +350,6 @@
 							}
 						],
 						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "explorer"
-							}
-						],
-						"type": "hide"
 					}
 				]
 			},
@@ -468,15 +431,6 @@
 									"scope": "universe"
 								},
 								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "hunter"
 							}
 						],
 						"type": "hide"
@@ -564,15 +518,6 @@
 							}
 						],
 						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "well"
-							}
-						],
-						"type": "hide"
 					}
 				]
 			},
@@ -654,15 +599,6 @@
 									"scope": "universe"
 								},
 								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "sawmill"
 							}
 						],
 						"type": "hide"
@@ -750,15 +686,6 @@
 							}
 						],
 						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "stoneworks"
-							}
-						],
-						"type": "hide"
 					}
 				]
 			},
@@ -840,15 +767,6 @@
 									"scope": "universe"
 								},
 								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "carpenter"
 							}
 						],
 						"type": "hide"
@@ -936,15 +854,6 @@
 							}
 						],
 						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "charcoal-kiln"
-							}
-						],
-						"type": "hide"
 					}
 				]
 			},
@@ -1029,15 +938,6 @@
 							}
 						],
 						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "waste-incinerator"
-							}
-						],
-						"type": "hide"
 					}
 				]
 			},
@@ -1119,15 +1019,6 @@
 									"scope": "universe"
 								},
 								"type": "exists"
-							}
-						],
-						"type": "hide"
-					},
-					{
-						"when": [
-							{
-								"type": "limit",
-								"itemId": "school-t1"
 							}
 						],
 						"type": "hide"

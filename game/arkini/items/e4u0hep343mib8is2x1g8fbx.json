@@ -4,8 +4,8 @@
 		"uid": "e4u0hep343mib8is2x1g8fbx",
 		"id": "coffee-plant",
 		"title": "Coffee Plant",
-		"ui": "simple",
 		"description": "You need caffeine",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

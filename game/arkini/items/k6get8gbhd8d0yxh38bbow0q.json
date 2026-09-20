@@ -4,8 +4,8 @@
 		"uid": "k6get8gbhd8d0yxh38bbow0q",
 		"id": "clay-bowl-with-milk",
 		"title": "Clay Bowl With Milk",
-		"ui": "simple",
 		"description": "Milk",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -83,7 +83,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

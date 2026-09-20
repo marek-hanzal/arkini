@@ -4,8 +4,8 @@
 		"uid": "yf53q9esw3j2x0tvnf2df5mo",
 		"id": "raw-steak",
 		"title": "Raw Steak",
-		"ui": "simple",
 		"description": "It's soooo tasty",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -26,7 +26,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

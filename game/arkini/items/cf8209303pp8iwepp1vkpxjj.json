@@ -4,8 +4,8 @@
 		"uid": "cf8209303pp8iwepp1vkpxjj",
 		"id": "clay-mug-with-milk",
 		"title": "Clay Mug With Milk",
-		"ui": "simple",
 		"description": "A mini-milk",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

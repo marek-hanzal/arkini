@@ -4,8 +4,8 @@
 		"uid": "fn1c807rr3m75hnrkdc3ik92",
 		"id": "scythe",
 		"title": "Scythe",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -120,6 +120,15 @@
 						}
 					]
 				},
+				"effect": "replace",
+				"result": "grim-reaper"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "luxury-clothes"
+				},
+				"action": "consume",
 				"effect": "replace",
 				"result": "grim-reaper"
 			}

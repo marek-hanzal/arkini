@@ -4,8 +4,8 @@
 		"uid": "wty33h4avbqmgblvysq7e3ql",
 		"id": "flowers",
 		"title": "Flowers",
-		"ui": "simple",
 		"description": "Flowers",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -26,7 +26,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 900000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

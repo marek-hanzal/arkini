@@ -4,8 +4,8 @@
 		"uid": "vflhl5vs01pkh5xfbx8nup0s",
 		"id": "wood-fibers",
 		"title": "Wood Fibers",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -13,7 +13,7 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 1,
+		"maxStackSize": 10,
 		"merge": [
 			{
 				"target": {

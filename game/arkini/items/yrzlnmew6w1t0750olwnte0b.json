@@ -4,8 +4,8 @@
 		"uid": "yrzlnmew6w1t0750olwnte0b",
 		"id": "fruit-crate",
 		"title": "Fruit Crate",
-		"ui": "simple",
 		"description": "Yammy",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -50,7 +50,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 600000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

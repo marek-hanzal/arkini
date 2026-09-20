@@ -1,0 +1,21 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "yxr9pjr3yta4glco91dmv9xg",
+		"id": "spoiled-grapes",
+		"title": "Spoiled Grapes",
+		"draft": false,
+		"description": "Grapes that missed their chance to become something useful and chose decay instead.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"spoiled-grapes"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

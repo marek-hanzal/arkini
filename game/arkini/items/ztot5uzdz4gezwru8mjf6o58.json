@@ -4,8 +4,8 @@
 		"uid": "ztot5uzdz4gezwru8mjf6o58",
 		"id": "cacao-pod",
 		"title": "Cacao Pod",
-		"ui": "simple",
 		"description": "You shall Cocoa!",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

@@ -4,8 +4,8 @@
 		"uid": "otxagqoj8czp1houud3rbqvb",
 		"id": "raw-chicken",
 		"title": "Raw Chicken",
-		"ui": "simple",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 180000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

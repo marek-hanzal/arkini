@@ -14,7 +14,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

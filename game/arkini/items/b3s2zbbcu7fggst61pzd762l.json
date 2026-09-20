@@ -4,8 +4,8 @@
 		"uid": "b3s2zbbcu7fggst61pzd762l",
 		"id": "hunter",
 		"title": "Hunter",
-		"description": "Wildlife goes in, Hunted Game comes out. Subtlety was never part of the job description.",
-		"ui": "simple",
+		"description": "A manual hunting post. Choose the animal, provide the appropriate hunting tool, and decide exactly when wildlife becomes inventory.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,41 +14,19 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"clock": {
-			"intervalMs": 90000,
-			"enable": true,
-			"rules": []
-		},
-		"maxQueueSize": 1,
+		"maxQueueSize": 3,
 		"lines": [
-			{
-				"id": "idle",
-				"title": "Idle",
-				"description": "No suitable hunt is taken this time.",
-				"clock": true,
-				"clockWeight": 3,
-				"default": false,
-				"show": false,
-				"enable": true,
-				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
-				"rules": []
-			},
 			{
 				"id": "hunt-fawn",
 				"title": "Hunt Fawn",
 				"artwork": "fawn",
-				"description": "Hunt fawn and bring back generic hunted game.",
-				"clock": true,
-				"clockWeight": 5,
-				"default": false,
-				"show": false,
-				"enable": false,
-				"runtimeMs": 0,
+				"description": "Send the Hunter after a fawn with a Knife. The knife comes back dirty; the catch comes back as Hunted Game.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
 				"input": [
 					{
 						"type": "materials",
@@ -65,6 +43,21 @@
 							"min": 1,
 							"max": 1
 						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "knife"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
 					}
 				],
 				"output": {
@@ -84,6 +77,15 @@
 											},
 											"placement": "drop",
 											"rules": []
+										},
+										{
+											"itemId": "dirty-knife",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
 										}
 									]
 								}
@@ -91,36 +93,19 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "fawn"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "hunt-wild-boar",
 				"title": "Hunt Wild Boar",
 				"artwork": "wild-boar",
-				"description": "Hunt wild-boar and bring back generic hunted game.",
-				"clock": true,
-				"clockWeight": 4,
+				"description": "Send the Hunter after a wild boar with Bow And Arrows. One arrow use is spent on the hunt.",
+				"clock": false,
+				"clockWeight": 1,
 				"default": false,
-				"show": false,
-				"enable": false,
-				"runtimeMs": 0,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 45000,
 				"input": [
 					{
 						"type": "materials",
@@ -137,6 +122,21 @@
 							"min": 1,
 							"max": 1
 						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bow-and-arrows"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
 					}
 				],
 				"output": {
@@ -163,36 +163,19 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "wild-boar"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "hunt-shorn-wild-boar",
 				"title": "Hunt Shorn Wild Boar",
 				"artwork": "shorn-wild-boar",
-				"description": "Hunt shorn-wild-boar and bring back generic hunted game.",
-				"clock": true,
-				"clockWeight": 4,
+				"description": "Send the Hunter after a shorn wild boar with Bow And Arrows. One arrow use is spent on the hunt.",
+				"clock": false,
+				"clockWeight": 1,
 				"default": false,
-				"show": false,
-				"enable": false,
-				"runtimeMs": 0,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 40000,
 				"input": [
 					{
 						"type": "materials",
@@ -209,6 +192,21 @@
 							"min": 1,
 							"max": 1
 						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bow-and-arrows"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
 					}
 				],
 				"output": {
@@ -235,36 +233,19 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "shorn-wild-boar"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "hunt-wolf",
 				"title": "Hunt Wolf",
 				"artwork": "wolf",
-				"description": "Hunt wolf and bring back generic hunted game.",
-				"clock": true,
-				"clockWeight": 3,
+				"description": "Send the Hunter after a wolf with Bow And Arrows. One arrow use is spent on the hunt.",
+				"clock": false,
+				"clockWeight": 1,
 				"default": false,
-				"show": false,
-				"enable": false,
-				"runtimeMs": 0,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 60000,
 				"input": [
 					{
 						"type": "materials",
@@ -281,6 +262,21 @@
 							"min": 1,
 							"max": 1
 						}
+					},
+					{
+						"units": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bow-and-arrows"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
 					}
 				],
 				"output": {
@@ -307,36 +303,19 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "wolf"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
+				"rules": []
 			},
 			{
 				"id": "hunt-bear",
 				"title": "Hunt Bear",
 				"artwork": "bear",
-				"description": "Hunt bear and bring back generic hunted game.",
-				"clock": true,
-				"clockWeight": 2,
+				"description": "Send the Hunter after a bear with Bow And Arrows. Bears are not economical targets; the hunt spends two arrow uses.",
+				"clock": false,
+				"clockWeight": 1,
 				"default": false,
-				"show": false,
-				"enable": false,
-				"runtimeMs": 0,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 90000,
 				"input": [
 					{
 						"type": "materials",
@@ -353,6 +332,21 @@
 							"min": 1,
 							"max": 1
 						}
+					},
+					{
+						"units": {
+							"cost": 2,
+							"from": "target"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bow-and-arrows"
+							},
+							"scope": "board",
+							"distance": "far"
+						}
 					}
 				],
 				"output": {
@@ -379,24 +373,7 @@
 						}
 					]
 				},
-				"rules": [
-					{
-						"when": [
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "bear"
-									},
-									"scope": "board",
-									"distance": "far"
-								},
-								"type": "exists"
-							}
-						],
-						"type": "enable"
-					}
-				]
+				"rules": []
 			}
 		]
 	}

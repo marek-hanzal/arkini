@@ -4,8 +4,8 @@
 		"uid": "eczq2cnuql13r4lalarm6kgt",
 		"id": "eggs",
 		"title": "Eggs",
-		"ui": "simple",
 		"description": "Some eggs you may cook.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

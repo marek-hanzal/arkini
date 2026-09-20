@@ -13,7 +13,6 @@
 			]
 		},
 		"scope": "toolbar",
-		"maxCount": 1,
 		"maxStackSize": 1,
 		"action": {
 			"input": [],

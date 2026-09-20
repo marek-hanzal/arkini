@@ -116,9 +116,33 @@
 			}
 		],
 		"clock": {
-			"durationMs": 600000,
+			"durationMs": 1800000,
 			"enable": true,
-			"rules": []
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-vegetable-crate",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
 		},
 		"maxQueueSize": 1,
 		"lines": []

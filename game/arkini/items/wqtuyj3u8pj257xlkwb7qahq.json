@@ -4,8 +4,8 @@
 		"uid": "wqtuyj3u8pj257xlkwb7qahq",
 		"id": "sugar-beet",
 		"title": "Sugar Beet",
-		"ui": "simple",
 		"description": "If you want sugar, start here",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 600000,
+			"durationMs": 2700000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

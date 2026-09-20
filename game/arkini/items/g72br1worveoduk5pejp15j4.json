@@ -4,8 +4,8 @@
 		"uid": "g72br1worveoduk5pejp15j4",
 		"id": "dye-plants",
 		"title": "Dye Plants",
-		"ui": "simple",
 		"description": "Colors everywhere",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 1800000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

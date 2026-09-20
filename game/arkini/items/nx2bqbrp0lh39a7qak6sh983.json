@@ -4,8 +4,8 @@
 		"uid": "nx2bqbrp0lh39a7qak6sh983",
 		"id": "cooked-steak",
 		"title": "Cooked Steak",
-		"ui": "simple",
 		"description": "Yammy",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -15,7 +15,7 @@
 		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 1200000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

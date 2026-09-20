@@ -85,7 +85,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 3600000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

@@ -4,8 +4,8 @@
 		"uid": "oy7hz2unlgoos52f57q9tstx",
 		"id": "milk-mug",
 		"title": "Milk Mug",
-		"ui": "simple",
 		"description": "Innocent mug of milk. Or foam on top of beer you can mask",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -50,7 +50,7 @@
 			}
 		],
 		"clock": {
-			"durationMs": 300000,
+			"durationMs": 900000,
 			"enable": true,
 			"rules": [],
 			"onExpire": {

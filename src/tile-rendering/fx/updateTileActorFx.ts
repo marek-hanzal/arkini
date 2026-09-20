@@ -78,6 +78,8 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	actor.size = size;
 	actor.lifecycleLayer.position.set(size / 2, size / 2);
 	actor.lifecycleLayer.pivot.set(size / 2, size / 2);
+	actor.visualLayer.position.set(size / 2, size / 2);
+	actor.visualLayer.pivot.set(size / 2, size / 2);
 	actor.container.hitArea = {
 		contains: (x: number, y: number) => x >= 0 && x <= size && y >= 0 && y <= size,
 	};

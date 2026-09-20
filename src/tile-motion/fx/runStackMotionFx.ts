@@ -69,7 +69,8 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 		onCompleteFn();
 		return;
 	}
-	const candidateSource = actorStore.actors.get(cue.originActorId);
+	const candidateSource =
+		cue.sourceActorId === undefined ? undefined : actorStore.actors.get(cue.sourceActorId);
 	const source =
 		candidateSource?.item.itemId === cue.canonicalItemId &&
 		!actorStore.canonicalItems.has(cue.originActorId)

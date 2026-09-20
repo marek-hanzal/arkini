@@ -5,7 +5,6 @@ import type { TileSpawnMotionCue } from "~/tile-presentation/type/TileMotionCue"
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
-import { whenVisualReadyFx } from "~/tile-rendering/fx/whenVisualReadyFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
@@ -20,8 +19,6 @@ export namespace runSpawnMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly onCompleteFn: () => void;
-		readonly isCueActiveFn: () => boolean;
-		readonly onRevealFn: () => void;
 		readonly origin: ActorPose;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -29,7 +26,7 @@ export namespace runSpawnMotionFx {
 }
 
 /** Starts one canonical spawn actor from its resolved origin into the target surface pose. */
-const startSpawnFx = Effect.fn("runSpawnMotionFx.startSpawnFx")(function* ({
+export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 	actorStore,
 	animator,
 	cue,
@@ -110,39 +107,4 @@ const startSpawnFx = Effect.fn("runSpawnMotionFx.startSpawnFx")(function* ({
 		},
 		readPoseFn: poseSampler.readPoseFn,
 	});
-});
-
-/** A same-slot successor waits for usable artwork before it starts the source exit and its own enter. */
-export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* (
-	props: runSpawnMotionFx.Props,
-) {
-	if (props.cue.revealAtOriginExit !== true) return yield* startSpawnFx(props);
-	const actor = props.actorStore.actors.get(props.cue.actorId);
-	if (actor === undefined) {
-		props.onCompleteFn();
-		return;
-	}
-	let revealed = false;
-	const revealFn = () => {
-		if (revealed || actor.container.destroyed || !props.isCueActiveFn()) return;
-		revealed = true;
-		props.onRevealFn();
-		const target =
-			RendererRuntime.runSync(props.surface.readLocationPoseFx(props.cue.targetLocation)) ??
-			props.target;
-		RendererRuntime.runSync(
-			startSpawnFx({
-				...props,
-				origin: target,
-				target,
-			}),
-		);
-	};
-	for (const visual of actor.visuals)
-		yield* whenVisualReadyFx({
-			visual,
-			// A superseded/failed visual degrades to ordinary enter rather than holding the batch forever.
-			onCancelFn: revealFn,
-			onReadyFn: revealFn,
-		});
 });

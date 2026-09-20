@@ -117,6 +117,8 @@ describe("detached swap lifecycle", () => {
 	it("finalizes a detached swap counterpart that loses its canonical item before settlement", () => {
 		const { actors, animations, canonicalItems, cue, exitingActors, runtime, source, target } =
 			createSwapHarness();
+		source.container.alpha = 1;
+		source.lifecycleTargetAlpha = 1;
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -149,6 +151,8 @@ describe("detached swap lifecycle", () => {
 	it("finalizes an already-settled counterpart when the other swap leg is handed off", () => {
 		const { actors, animations, canonicalItems, cue, exitingActors, runtime, source, target } =
 			createSwapHarness();
+		source.container.alpha = 1;
+		source.lifecycleTargetAlpha = 1;
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,

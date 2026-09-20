@@ -6,6 +6,7 @@ import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import { runInputMotionFx } from "~/tile-motion/fx/runInputMotionFx";
@@ -27,7 +28,6 @@ export namespace runMotionCueFx {
 		readonly isCueActiveFn: () => boolean;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
-		readonly onSpawnRevealFn: () => void;
 		readonly onSwapLegSettledFn: (actorId: string) => void;
 		readonly onSwapLegStartedFn: (actorId: string) => void;
 		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
@@ -79,7 +79,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	isCueActiveFn,
 	onActorSettledFn,
 	onCompleteFn,
-	onSpawnRevealFn,
 	onSwapLegSettledFn,
 	onSwapLegStartedFn,
 	onPayloadCreatedFn,
@@ -97,6 +96,22 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 		originLocation: cue.originLocation,
 		surface,
 	});
+	// Removed producers retain their origin geometry for queued outputs, not their visibility.
+	// A consumed stack is different: its original actor is the travelling payload.
+	if (
+		originActor !== null &&
+		!actorStore.canonicalItems.has(originActor.item.id) &&
+		originActor.lifecycleTargetAlpha !== 0 &&
+		(cue.kind === "spawn" ||
+			(cue.kind === "stack" && cue.sourceActorId !== originActor.item.id))
+	) {
+		originActor.container.eventMode = "none";
+		originActor.container.cursor = "default";
+		yield* startActorExitFx({
+			actor: originActor,
+			animator,
+		});
+	}
 	return yield* match({
 		origin,
 		target,
@@ -119,12 +134,10 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									actorStore,
 									animator,
 									cue: spawn,
-									isCueActiveFn,
-									onRevealFn: onSpawnRevealFn,
 									cueKey,
-									delayMs: spawn.revealAtOriginExit ? 0 : delayMs,
+									delayMs,
 									onCompleteFn,
-									origin: spawn.revealAtOriginExit ? target : origin,
+									origin,
 									surface,
 									target,
 								}),

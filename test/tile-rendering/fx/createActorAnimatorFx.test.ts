@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -90,6 +91,7 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 			x: 10,
 			y: 20,
 		},
+		visualLayer: new Container(),
 		crowdLayer: {
 			alpha: 1,
 		},
@@ -210,6 +212,93 @@ describe("actor animator", () => {
 		expect(actor.activityParticles.particles[0]?.particle.alpha).toBeCloseTo(0.5);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
+	});
+
+	it("reverses drop feedback from live progress without interrupting other visual channels", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+		const incoming = new Container({
+			alpha: 0,
+		});
+		const outgoing = new Container();
+
+		for (const animation of [
+			{
+				channel: "pose",
+				toX: 100,
+				toY: 200,
+				toScale: 1,
+			},
+			{
+				channel: "lifecycle-scale",
+				toScale: 0.6,
+			},
+			{
+				channel: "lifecycle-opacity",
+				toAlpha: 0.4,
+			},
+			{
+				channel: "crowd-opacity",
+				toCrowdAlpha: 0.5,
+			},
+			{
+				channel: "visual-mix",
+				incoming,
+				outgoing,
+			},
+			{
+				channel: "drop-target",
+				toFactor: 0.8,
+			},
+		] as const) {
+			Effect.runSync(
+				animator.animateFx({
+					actor,
+					durationMs: 180,
+					...animation,
+				}),
+			);
+		}
+		for (const tween of tweens) tween.update(0.5);
+		expect(actor.visualLayer.scale.x).toBeCloseTo(0.9);
+		expect(actor.visualLayer.alpha).toBeCloseTo(0.9);
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "drop-target",
+				durationMs: 180,
+				toFactor: 1,
+			}),
+		);
+		for (const tween of tweens.slice(0, 5)) {
+			expect(tween.stop).not.toHaveBeenCalled();
+			tween.update(1);
+		}
+		expect(tweens[5]?.stop).toHaveBeenCalledOnce();
+		tweens[5]?.update(1);
+		tweens[6]?.update(0.5);
+		expect(actor.visualLayer.scale.x).toBeCloseTo(0.95);
+		expect(actor.visualLayer.alpha).toBeCloseTo(0.95);
+		expect(actor.container.x).toBe(100);
+		expect(actor.container.y).toBe(200);
+		expect(actor.container.scale.x).toBe(1);
+		expect(actor.container.alpha).toBeCloseTo(0.4);
+		expect(actor.lifecycleLayer.scale.x).toBeCloseTo(0.6);
+		expect(actor.crowdLayer.alpha).toBeCloseTo(0.5);
+		expect(incoming.alpha).toBe(1);
+		expect(outgoing.alpha).toBe(0);
+
+		Effect.runSync(
+			animator.setFx({
+				actor,
+				channel: "drop-target",
+				factor: 1,
+			}),
+		);
+		expect(tweens[6]?.stop).toHaveBeenCalledOnce();
+		expect(actor.visualLayer.scale.x).toBe(1);
+		expect(actor.visualLayer.alpha).toBe(1);
 	});
 
 	it("keeps lifecycle scale independent from canonical pose scale", () => {

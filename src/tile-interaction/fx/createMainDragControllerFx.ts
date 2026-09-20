@@ -128,6 +128,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 
 	const dragPreview = yield* createMainDragPreviewFx({
 		actorStore,
+		animator,
 		game,
 		surface,
 	});
@@ -156,6 +157,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const cancelDragFn = (drag: ActiveDrag) => {
+		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
 		releaseDragPointerFn(drag.pointerId);
@@ -171,6 +173,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const detachActorFn = (actor: PixiTileActor) => {
+		RendererRuntime.runSync(dragPreview.detachTargetFx(actor));
 		if (actor.onPointerDownFn !== null) {
 			actor.container.off("pointerdown", actor.onPointerDownFn);
 			actor.onPointerDownFn = null;
@@ -182,6 +185,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		const drag = activeDrag;
 		activeDrag = null;
+		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		releaseDragPointerFn(drag.pointerId);
 		if (drag.mode !== "drag") {
 			actor.container.cursor = "default";
@@ -414,6 +418,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				return;
 			}
 			activeDrag = null;
+			RendererRuntime.runSync(dragPreview.clearTargetFx);
 			RendererRuntime.runSync(
 				dropSubmission.submitFx({
 					actor: drag.actor,
@@ -471,6 +476,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		releaseDragPointerFn(drag.pointerId);
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
+		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		RendererRuntime.runSync(dropSubmission.submitFx(submission));
 	};
 

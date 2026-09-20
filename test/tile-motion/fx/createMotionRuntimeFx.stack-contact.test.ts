@@ -45,6 +45,44 @@ describe("motion stack contact", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
+	it("fades a removed producer while its same-type output travels as an independent stack payload", () => {
+		const { actors, animations, cue, runtime } = createStackHarness();
+		const producer = createActor(cue.originActorId);
+		producer.item = {
+			...producer.item,
+			itemId: cue.canonicalItemId,
+		};
+		producer.container.alpha = 1;
+		producer.lifecycleTargetAlpha = 1;
+		actors.set(producer.item.id, producer);
+		try {
+			Effect.runSync(
+				runtime.enqueueFx([
+					cue,
+				]),
+			);
+			Effect.runSync(runtime.startFx);
+			const travel = animations.find(
+				(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+			);
+			expect(travel).toBeDefined();
+			expect(travel?.actor).not.toBe(producer);
+			expect(animations).toContainEqual(
+				expect.objectContaining({
+					actor: producer,
+					channel: "lifecycle-opacity",
+					toAlpha: 0,
+				}),
+			);
+			expect(producer.container.destroyed).toBe(false);
+			expect(
+				Effect.runSync(runtime.readSnapshotFx).retainedActorIds.has(producer.item.id),
+			).toBe(true);
+		} finally {
+			Effect.runSync(runtime.closeFx);
+		}
+	});
+
 	it("travels continuously to live stack contact before vanish", () => {
 		const { animations, cue, runtime, target } = createStackHarness();
 		Effect.runSync(
@@ -125,7 +163,10 @@ describe("motion stack contact", () => {
 
 		Effect.runSync(
 			runtime.enqueueFx([
-				cue,
+				{
+					...cue,
+					sourceActorId: source.item.id,
+				},
 			]),
 		);
 		Effect.runSync(runtime.startFx);

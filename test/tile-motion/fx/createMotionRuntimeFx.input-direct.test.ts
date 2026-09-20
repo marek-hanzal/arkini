@@ -111,7 +111,6 @@ describe("direct input remainder", () => {
 				cueKey: "42:0",
 				onActorSettledFn: () => {},
 				onCompleteFn: completed,
-				onSpawnRevealFn: () => {},
 				onInputRemainderRevealedFn: () => {
 					source.item = {
 						...source.item,

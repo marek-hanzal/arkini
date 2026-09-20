@@ -29,9 +29,9 @@ it("exits a depleted spawn origin when the player grabs its final output then ca
 	expect(cues).toHaveLength(1);
 	const cue = cues[0];
 	if (cue?.kind !== "spawn") throw new Error("Expected a depletion spawn.");
-	expect(cue.revealAtOriginExit).toBeUndefined();
 	expect(transition.runtime.items.some((item) => item.id === cue.originActorId)).toBe(false);
 	const source = createActor(cue.originActorId);
+	source.lifecycleTargetAlpha = 1;
 	source.item = {
 		...source.item,
 		location: cue.originLocation,
@@ -65,9 +65,12 @@ it("exits a depleted spawn origin when the player grabs its final output then ca
 		animations.at(-1)?.onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds.size).toBe(0);
 		expect(exitingActors.has(source)).toBe(true);
-		const exit = animations.find(
-			(animation) => animation.actor === source && animation.channel === "lifecycle-opacity",
-		);
+		const exit = animations
+			.filter(
+				(animation) =>
+					animation.actor === source && animation.channel === "lifecycle-opacity",
+			)
+			.at(-1);
 		exit?.onCompleteFn?.();
 		expect(source.container.destroyed).toBe(true);
 		expect(actorStore.actors.has(source.item.id)).toBe(false);
@@ -79,6 +82,8 @@ it("exits a depleted spawn origin when the player grabs its final output then ca
 
 it("retains a shared spawn origin until the last child's handoff releases its claim", () => {
 	const source = createActor("source");
+	source.lifecycleTargetAlpha = 1;
+	source.container.alpha = 1;
 	const first = createActor("first");
 	const second = createActor("second");
 	first.item = {
@@ -120,7 +125,8 @@ it("retains a shared spawn origin until the last child's handoff releases its cl
 		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds.has(source.item.id)).toBe(
 			true,
 		);
-		expect(exitingActors.has(source)).toBe(false);
+		expect(source.lifecycleTargetAlpha).toBe(0);
+		expect(source.container.destroyed).toBe(false);
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(first.item.id))).toBe(true);
 		expect(exitingActors.has(source)).toBe(true);
 		expect(
@@ -128,7 +134,7 @@ it("retains a shared spawn origin until the last child's handoff releases its cl
 				(animation) =>
 					animation.actor === source && animation.channel === "lifecycle-opacity",
 			),
-		).toHaveLength(1);
+		).toHaveLength(2);
 	} finally {
 		Effect.runSync(runtime.closeFx);
 	}

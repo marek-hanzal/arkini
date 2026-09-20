@@ -532,29 +532,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				isCueActiveFn: () => !closed && cueLifecycleByKey.get(cueKey)?.started === true,
 				onActorSettledFn,
 				onCompleteFn: () => completeCue(cue),
-				onSpawnRevealFn: () => {
-					if (
-						cue.kind === "spawn" &&
-						cue.revealAtOriginExit === true &&
-						!actorStore.canonicalItems.has(cue.originActorId)
-					) {
-						RendererRuntime.runSync(
-							finalizeMotionActorsFx({
-								actorIds: new Set([
-									cue.originActorId,
-								]),
-								actorStore,
-								animator,
-								application,
-								onActorSettledFn,
-								readPaletteFn,
-								stillClaimedActorIds: new Set(),
-								surface,
-								textures,
-							}),
-						);
-					}
-				},
 				onSwapLegSettledFn: (actorId) => {
 					settleSwapLeg(cueKey, actorId);
 				},

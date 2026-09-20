@@ -6,14 +6,14 @@ import { createRoot } from "react-dom/client";
 import { expect, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import type { EditorBoardGameResource } from "~/editor-board/service/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/editor-board/atom/EditorBoardGameResourceOwnerAtom";
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/testGameRead";
@@ -32,18 +32,18 @@ export const createGame = ({
 	readonly createdPackageId?: string;
 	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
 } = {}): Game => ({
-	arkpack: {
+	serapack: {
 		packageId: createdPackageId,
 		contentHash: "content-route-load",
-		title: testArkpackConfig.meta.title,
+		title: testSerapackConfig.meta.title,
 		version: "1.0",
-		arkini: ArkiniAppVersion,
+		serakki: SerakkiAppVersion,
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
@@ -167,7 +167,7 @@ export const setUpGameLoadRouteTest = () => {
 		configurable: true,
 		value: vi.fn(),
 	});
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			lifecycle: {
@@ -178,7 +178,7 @@ export const setUpGameLoadRouteTest = () => {
 				readFn: vi.fn(() => Promise.resolve(null)),
 				writeFn: vi.fn(() => Promise.resolve()),
 			},
-		} as unknown as ArkiniElectronApi.Api,
+		} as unknown as SerakkiElectronApi.Api,
 	});
 };
 

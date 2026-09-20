@@ -5,19 +5,19 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, PlatformError } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
-import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
-import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
+import { createTestSerapack } from "~test/serapack-support/fx/createTestSerapack";
+import { packDirectoryFx } from "~/serapack-artifact/fx/packDirectoryFx";
 import {
 	musicOgg,
 	sfxOgg,
 	writeGameProjectFixtureFx,
-} from "~test/arkpack-artifact/fx/packDirectoryFx.test/gameProjectFixture";
+} from "~test/serapack-artifact/fx/packDirectoryFx.test/gameProjectFixture";
 
 let harness: ProjectTestHarness;
 
@@ -30,7 +30,7 @@ const realPath = (root: string) =>
 	);
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-fs-project-");
+	harness = await createProjectTestHarness("serakki-fs-project-");
 });
 
 afterEach(async () => harness.close());
@@ -44,7 +44,7 @@ describe("filesystem Editor project lifecycle", () => {
 				const packed = yield* packDirectoryFx({
 					input: source,
 				});
-				return yield* repository.importArkpackFileFx(packed.arkpack);
+				return yield* repository.importSerapackFileFx(packed.serapack);
 			}).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
 		);
 		expect(imported.resources).toEqual(
@@ -95,12 +95,12 @@ describe("filesystem Editor project lifecycle", () => {
 		);
 	});
 
-	it("imports an Arkpack through the shared filesystem extraction pipeline", async () => {
+	it("imports an Serapack through the shared filesystem extraction pipeline", async () => {
 		const repository = await harness.openRepository();
-		const arkpackPath = join(harness.temporaryDirectory, "import.arkpack");
-		await writeFile(arkpackPath, createTestArkpack());
+		const serapackPath = join(harness.temporaryDirectory, "import.serapack");
+		await writeFile(serapackPath, createTestSerapack());
 
-		const imported = await Effect.runPromise(repository.importArkpackFileFx(arkpackPath));
+		const imported = await Effect.runPromise(repository.importSerapackFileFx(serapackPath));
 
 		expect(imported).toMatchObject({
 			projectId: "game:test",
@@ -231,7 +231,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(root).toContain(harness.projectsRoot);
 		expect(root).toContain("managed.%ED%A0%80-");
 		expect(JSON.parse(await readFile(join(root ?? "", "project.json"), "utf8"))).toMatchObject({
-			arkini: ArkiniAppVersion,
+			serakki: SerakkiAppVersion,
 			revision: expect.any(Number),
 		});
 		expect(JSON.parse(await readFile(join(root ?? "", "game.json"), "utf8"))).toMatchObject({

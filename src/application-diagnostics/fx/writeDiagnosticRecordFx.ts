@@ -7,13 +7,13 @@ let warnedAboutDiagnosticFailure = false;
 const reportDiagnosticFailureFn = (cause: unknown) => {
 	if (warnedAboutDiagnosticFailure) return;
 	warnedAboutDiagnosticFailure = true;
-	console.warn("Arkini diagnostics are unavailable.", cause);
+	console.warn("Serakki diagnostics are unavailable.", cause);
 };
 
 /** Fire-and-forget renderer edge. Logger failures are deliberately isolated from gameplay. */
 export const writeDiagnosticRecordFx = Effect.fnUntraced(function* (record: DiagnosticRecord) {
 	try {
-		const diagnostics = window.arkini?.diagnostics;
+		const diagnostics = window.serakki?.diagnostics;
 		if (diagnostics === undefined) return;
 		void diagnostics.writeFn(record).catch(reportDiagnosticFailureFn);
 	} catch (cause) {

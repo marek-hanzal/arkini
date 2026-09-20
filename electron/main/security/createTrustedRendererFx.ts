@@ -40,7 +40,7 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 			}
 			return yield* Effect.try({
 				try: (): TrustedRenderer => {
-					const trustedOrigin = new URL(developmentRendererUrl ?? "arkini://app/");
+					const trustedOrigin = new URL(developmentRendererUrl ?? "serakki://app/");
 					const trustedWebContents = new Map<number, WebContents>();
 					const isTrustedUrlFn = (candidate: string) => {
 						try {
@@ -53,7 +53,7 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 								);
 							}
 							return (
-								parsed.protocol === "arkini:" &&
+								parsed.protocol === "serakki:" &&
 								parsed.hostname === "app" &&
 								parsed.port === "" &&
 								parsed.origin === trustedOrigin.origin
@@ -78,7 +78,7 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							if (isTrustedIpcSenderFn(event)) return;
 							return yield* Effect.fail(
 								new ElectronMainError({
-									operation: "authorize privileged IPC from the Arkini renderer",
+									operation: "authorize privileged IPC from the Serakki renderer",
 									cause: {
 										senderId: event.sender.id,
 										senderFrameUrl: event.senderFrame?.url ?? null,
@@ -189,7 +189,7 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 			Effect.mapError(
 				(cause) =>
 					new ElectronMainError({
-						operation: "configure the trusted Arkini renderer origin",
+						operation: "configure the trusted Serakki renderer origin",
 						cause,
 					}),
 			),

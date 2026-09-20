@@ -90,6 +90,10 @@ describe("job completion transition", () => {
 	});
 
 	it("reports exact spawned output identities from the committed completion", () => {
+		const config = createRandomCompletionConfig();
+		// Keep this identity proof independent of whether the seeded roll can stack outputs.
+		config.items.outputA.maxStackSize = 1;
+		config.items.outputB.maxStackSize = 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();
@@ -106,7 +110,7 @@ describe("job completion transition", () => {
 				);
 			}).pipe(
 				useGameFx({
-					config: createRandomCompletionConfig(),
+					config,
 				}),
 			),
 		);

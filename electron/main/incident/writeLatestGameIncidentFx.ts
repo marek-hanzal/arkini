@@ -4,36 +4,36 @@ import { join } from "node:path";
 
 import type { GameIncidentWrite } from "~electron/contract/incident/GameIncidentWrite";
 import { GameIncidentFiles } from "~shared/GameIncidentMetadata";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
-import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
+import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackArtifactNameFn";
+import { readSerapackFileLayoutFx } from "~/serapack-artifact/fx/readSerapackFileLayoutFx";
 
 export namespace writeLatestGameIncidentFx {
 	export interface Props {
-		readonly bundledArkpacksRoot: string;
+		readonly bundledSerapacksRoot: string;
 		readonly incidentsRoot: string;
 		readonly incident: GameIncidentWrite;
-		readonly userArkpacksRoot: string;
+		readonly userSerapacksRoot: string;
 	}
 }
 
 /** Overwrites the one disposable failed-session environment exposed to local tooling. */
 export const writeLatestGameIncidentFx = Effect.fn("writeLatestGameIncidentFx")(
 	({
-		bundledArkpacksRoot,
+		bundledSerapacksRoot,
 		incidentsRoot,
 		incident,
-		userArkpacksRoot,
+		userSerapacksRoot,
 	}: writeLatestGameIncidentFx.Props) =>
 		Effect.gen(function* () {
-			const arkpackPath = join(
-				incident.arkpack.source === "bundled" ? bundledArkpacksRoot : userArkpacksRoot,
-				readArkpackArtifactNameFn(incident.arkpack.packageId),
+			const serapackPath = join(
+				incident.serapack.source === "bundled" ? bundledSerapacksRoot : userSerapacksRoot,
+				readSerapackArtifactNameFn(incident.serapack.packageId),
 			);
-			const layout = yield* readArkpackFileLayoutFx(arkpackPath);
-			if (layout.contentHash !== incident.arkpack.contentHash)
+			const layout = yield* readSerapackFileLayoutFx(serapackPath);
+			if (layout.contentHash !== incident.serapack.contentHash)
 				return yield* Effect.fail(
 					new Error(
-						"The installed Arkpack changed before its incident could be archived.",
+						"The installed Serapack changed before its incident could be archived.",
 					),
 				);
 			yield* Effect.tryPromise({
@@ -45,7 +45,7 @@ export const writeLatestGameIncidentFx = Effect.fn("writeLatestGameIncidentFx")(
 					await rm(join(directory, "diagnostics.jsonl"), {
 						force: true,
 					});
-					await copyFile(arkpackPath, join(directory, GameIncidentFiles.arkpack));
+					await copyFile(serapackPath, join(directory, GameIncidentFiles.serapack));
 					await writeFile(join(directory, GameIncidentFiles.save), incident.saveBytes);
 					await writeFile(
 						join(directory, GameIncidentFiles.incident),

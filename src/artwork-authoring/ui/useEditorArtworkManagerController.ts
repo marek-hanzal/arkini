@@ -24,7 +24,7 @@ export namespace useEditorArtworkManagerController {
 	}
 
 	export interface Output {
-		readonly arkpackInputRef: RefObject<HTMLInputElement | null>;
+		readonly serapackInputRef: RefObject<HTMLInputElement | null>;
 		readonly catalogState?: CatalogState;
 		readonly filesInputRef: RefObject<HTMLInputElement | null>;
 		readonly importError?: unknown;
@@ -32,9 +32,9 @@ export namespace useEditorArtworkManagerController {
 		readonly notesLoading: boolean;
 		readonly notesError?: unknown;
 		readonly importedCount?: number;
-		readonly onArkpackChangeFn: ChangeEventHandler<HTMLInputElement>;
+		readonly onSerapackChangeFn: ChangeEventHandler<HTMLInputElement>;
 		readonly onFilesChangeFn: ChangeEventHandler<HTMLInputElement>;
-		readonly openArkpackImportFn: () => void;
+		readonly openSerapackImportFn: () => void;
 		readonly openFilesImportFn: () => void;
 		readonly onOptimizationDismissFn: () => void;
 		readonly onOptimizeFn: () => void;
@@ -50,7 +50,7 @@ type ImportEditorArtworkProps =
 	| {
 			readonly file: File;
 			readonly projectId: string;
-			readonly source: "arkpack";
+			readonly source: "serapack";
 	  }
 	| {
 			readonly files: ReadonlyArray<File>;
@@ -76,7 +76,7 @@ export const useEditorArtworkManagerController = ({
 		filter,
 		query,
 	});
-	const arkpackInputRef = useRef<HTMLInputElement>(null);
+	const serapackInputRef = useRef<HTMLInputElement>(null);
 	const filesInputRef = useRef<HTMLInputElement>(null);
 	const result = useAtomValue(importEditorArtworkCommandAtom);
 	const importResourcesFn = useAtomSet(importEditorArtworkCommandAtom);
@@ -109,20 +109,20 @@ export const useEditorArtworkManagerController = ({
 			: filter === "unused" && query.trim() === ""
 				? "unused-empty"
 				: "no-matches";
-	const openArkpackImportFn = () => {
-		arkpackInputRef.current?.click();
+	const openSerapackImportFn = () => {
+		serapackInputRef.current?.click();
 	};
 	const openFilesImportFn = () => {
 		filesInputRef.current?.click();
 	};
-	const onArkpackChangeFn: ChangeEventHandler<HTMLInputElement> = (event) => {
+	const onSerapackChangeFn: ChangeEventHandler<HTMLInputElement> = (event) => {
 		const file = event.currentTarget.files?.[0];
 		event.currentTarget.value = "";
 		if (file === undefined) return;
 		importResourcesFn({
 			file,
 			projectId: library.projectId,
-			source: "arkpack",
+			source: "serapack",
 		});
 	};
 	const onFilesChangeFn: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -151,7 +151,7 @@ export const useEditorArtworkManagerController = ({
 	};
 
 	return {
-		arkpackInputRef,
+		serapackInputRef,
 		catalogState,
 		filesInputRef,
 		importError,
@@ -159,11 +159,11 @@ export const useEditorArtworkManagerController = ({
 		notesLoading: library.notesLoading,
 		notesError: library.notesError,
 		importedCount,
-		onArkpackChangeFn,
+		onSerapackChangeFn,
 		onFilesChangeFn,
 		onOptimizationDismissFn,
 		onOptimizeFn,
-		openArkpackImportFn,
+		openSerapackImportFn,
 		openFilesImportFn,
 		optimization,
 		optimizationProgress,

@@ -7,7 +7,7 @@ export const notifyProjectChangedFx = Effect.fn("notifyProjectChangedFx")(
 			Effect.catchCause((cause) =>
 				Effect.sync(() =>
 					console.error(
-						"Arkini editor could not announce an MCP project mutation.",
+						"Serakki editor could not announce an MCP project mutation.",
 						cause,
 					),
 				),

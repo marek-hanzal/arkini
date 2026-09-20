@@ -5,7 +5,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { renderRendererFx } from "~/application-shell/ui/renderRendererFx";
 
 (
@@ -20,7 +20,7 @@ const writeApplicationLog = vi.fn(() => Promise.resolve());
 beforeEach(() => {
 	vi.spyOn(console, "error").mockImplementation(() => undefined);
 	writeApplicationLog.mockClear();
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			diagnostics: {
@@ -28,7 +28,7 @@ beforeEach(() => {
 				writeFn: () => Promise.resolve(),
 				writeApplicationFn: writeApplicationLog,
 			},
-		} as unknown as ArkiniElectronApi.Api,
+		} as unknown as SerakkiElectronApi.Api,
 	});
 });
 

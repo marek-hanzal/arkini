@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * The single scalar contract for every exact identity in Arkini.
+ * The single scalar contract for every exact identity in Serakki.
  *
  * Domain meaning belongs to the field name and its owning schema. Reference,
  * uniqueness and lifecycle rules are enforced by the relevant compiler or
@@ -9,7 +9,7 @@ import { z } from "zod";
  */
 export const IdSchema = z.string().min(1, "ID is required.").meta({
 	id: "IdSchema",
-	description: "A non-empty exact identity used across Arkini.",
+	description: "A non-empty exact identity used across Serakki.",
 });
 
 export type IdSchema = typeof IdSchema;

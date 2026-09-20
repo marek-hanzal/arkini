@@ -36,7 +36,7 @@ const readNodeFileSystem = () =>
 	Effect.runPromise(FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)));
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-filesystem-write-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-filesystem-write-"));
 });
 
 afterEach(async () => {
@@ -287,7 +287,7 @@ describe("FilesystemWrite", () => {
 		await Effect.runPromise(Fiber.await(nested.fiber));
 	});
 	it("rejects external and non-file targets without recursive cleanup", async () => {
-		const outside = await mkdtemp(join(tmpdir(), "arkini-filesystem-external-"));
+		const outside = await mkdtemp(join(tmpdir(), "serakki-filesystem-external-"));
 		const outsideFile = join(outside, "outside.json");
 		const directory = join(root, "owned-directory");
 		const child = join(directory, "preserved.json");

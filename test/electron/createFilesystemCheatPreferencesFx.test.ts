@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemCheatPreferencesFx } from "~electron/main/cheat/createFilesystemCheatPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
+const preferenceDirectory = () => join(root, "serakki", "game", "preferences");
 const currentPath = () => join(preferenceDirectory(), "cheats.available.json");
 
 const createPreferences = () =>
@@ -18,7 +18,7 @@ const createPreferences = () =>
 	);
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-cheats-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-cheats-"));
 });
 
 afterEach(async () => {

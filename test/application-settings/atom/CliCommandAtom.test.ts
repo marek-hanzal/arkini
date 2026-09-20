@@ -11,7 +11,7 @@ let registry: AtomRegistry.AtomRegistry | undefined;
 afterEach(() => {
 	registry?.dispose();
 	registry = undefined;
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("Settings CLI command", () => {
@@ -22,7 +22,7 @@ describe("Settings CLI command", () => {
 				commandPath: "/tmp/serakki-cli",
 			}),
 		);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				cli: {
@@ -69,7 +69,7 @@ describe("Settings CLI command", () => {
 				commandPath: "/tmp/serakki-cli",
 			}),
 		);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				cli: {

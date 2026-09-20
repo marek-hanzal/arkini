@@ -17,7 +17,7 @@ describe("createElectronGameSaveStorageFx", () => {
 		const exit = await Effect.runPromiseExit(
 			storage.writeFx(
 				{
-					packageId: "arkini",
+					packageId: "serakki",
 				},
 				new Uint8Array([
 					1,

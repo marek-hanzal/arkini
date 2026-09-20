@@ -3,7 +3,7 @@ import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
@@ -24,9 +24,9 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
-			arkpack: parseVersionFn(editorTestPayload.version),
+			serapack: parseVersionFn(editorTestPayload.version),
 			marker: {
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				revision: 1,
 			},
 			config: editorTestPayload.config,
@@ -46,9 +46,9 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		const initial = {
-			arkpack: parseVersionFn(editorTestPayload.version),
+			serapack: parseVersionFn(editorTestPayload.version),
 			marker: {
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				revision: 1,
 			},
 			config: {
@@ -91,27 +91,27 @@ describe("filesystem Editor project current tree", () => {
 		};
 		await expectCurrentTreeFn(canonicalInitial);
 		expect(JSON.parse(await readFile(join(harness.root, "project.json"), "utf8"))).toEqual({
-			arkini: ArkiniAppVersion,
+			serakki: SerakkiAppVersion,
 			revision: initial.marker.revision,
 		});
 		const schema = JSON.parse(await readFile(join(harness.root, "schema.json"), "utf8"));
 		expect(schema).toMatchObject({
 			anyOf: [
 				{
-					$ref: "urn:arkini:schema:project#/$defs/GameFileSchema",
+					$ref: "urn:serakki:schema:project#/$defs/GameFileSchema",
 				},
 				{
-					$ref: "urn:arkini:schema:project#/$defs/ItemFileSchema",
+					$ref: "urn:serakki:schema:project#/$defs/ItemFileSchema",
 				},
 				{
-					$ref: "urn:arkini:schema:project#/$defs/AudioResourceMetadataSchema",
+					$ref: "urn:serakki:schema:project#/$defs/AudioResourceMetadataSchema",
 				},
 			],
 			$defs: {
 				GameFileSchema: {
 					properties: {
 						version: {
-							$ref: "urn:arkini:schema:project#/$defs/VersionPartsSchema",
+							$ref: "urn:serakki:schema:project#/$defs/VersionPartsSchema",
 						},
 					},
 					type: "object",
@@ -119,7 +119,7 @@ describe("filesystem Editor project current tree", () => {
 				ItemFileSchema: {
 					properties: {
 						item: {
-							$ref: "urn:arkini:schema:project#/$defs/ItemSchema",
+							$ref: "urn:serakki:schema:project#/$defs/ItemSchema",
 						},
 					},
 					type: "object",
@@ -153,7 +153,7 @@ describe("filesystem Editor project current tree", () => {
 		await expectCurrentTreeFn(repaired);
 
 		const next = {
-			arkpack: repaired.arkpack,
+			serapack: repaired.serapack,
 			marker: {
 				...repaired.marker,
 				revision: 3,
@@ -204,9 +204,9 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
-			arkpack: parseVersionFn(editorTestPayload.version),
+			serapack: parseVersionFn(editorTestPayload.version),
 			marker: {
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				revision: 1,
 			},
 			config: editorTestPayload.config,
@@ -221,37 +221,37 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
-			arkpack: parseVersionFn(editorTestPayload.version),
+			serapack: parseVersionFn(editorTestPayload.version),
 			marker: {
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				revision: 1,
 			},
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
 		});
 		const markerPath = join(harness.root, "project.json");
-		const major = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+		const major = SerakkiAppVersion.slice(0, SerakkiAppVersion.indexOf("."));
 		await writeFile(
 			markerPath,
 			`${JSON.stringify({
-				arkini: `${major}.999.999`,
+				serakki: `${major}.999.999`,
 				revision: 1,
 			})}\n`,
 		);
 		await expect(harness.read()).resolves.toMatchObject({
 			marker: {
-				arkini: `${major}.999.999`,
+				serakki: `${major}.999.999`,
 				revision: 1,
 			},
 		});
 
 		const incompatible = `${JSON.stringify({
-			arkini: `${Number(major) + 1}.0.0`,
+			serakki: `${Number(major) + 1}.0.0`,
 			revision: 1,
 		})}\n`;
 		await writeFile(markerPath, incompatible);
 		await expect(harness.read()).rejects.toMatchObject({
-			_tag: "ArkiniVersionIncompatibleError",
+			_tag: "SerakkiVersionIncompatibleError",
 			artifact: "Editor project",
 		});
 		await expect(readFile(markerPath, "utf8")).resolves.toBe(incompatible);

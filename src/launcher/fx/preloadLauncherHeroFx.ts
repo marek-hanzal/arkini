@@ -22,13 +22,13 @@ export const preloadLauncherHeroFx = Effect.fn("preloadLauncherHeroFx")(
 					resumeFn(
 						image.naturalWidth > 0
 							? Effect.void
-							: Effect.fail(new Error("Arkini Hero artwork failed to load.")),
+							: Effect.fail(new Error("Serakki Hero artwork failed to load.")),
 					);
 				};
 				const onErrorFn = () => {
 					image.removeEventListener("load", onLoadFn);
 					image.removeEventListener("error", onErrorFn);
-					resumeFn(Effect.fail(new Error("Arkini Hero artwork failed to load.")));
+					resumeFn(Effect.fail(new Error("Serakki Hero artwork failed to load.")));
 				};
 				image.addEventListener("load", onLoadFn, {
 					once: true,

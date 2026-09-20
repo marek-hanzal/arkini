@@ -5,7 +5,7 @@ import { AppearanceThemeError } from "~/application-settings/error/AppearanceThe
 /** Reads the Electron-owned appearance preference and validates the preload boundary. */
 export const readAppearanceThemeFx = Effect.fn("readAppearanceThemeFx")(() =>
 	Effect.tryPromise({
-		try: async () => AppearanceThemeSchema.parse(await window.arkini.appearance.readFn()),
+		try: async () => AppearanceThemeSchema.parse(await window.serakki.appearance.readFn()),
 		catch: (cause) =>
 			new AppearanceThemeError({
 				operation: "read",

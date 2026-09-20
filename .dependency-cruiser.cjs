@@ -1,7 +1,7 @@
 const activeCodePattern = "^(?:src|electron|shared|scripts)(?:/|$)";
 const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)";
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
-const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
+const applicationEntrypointPattern = "^src/(?:main|createSerakkiRouterFx|_route)[.]tsx?$";
 const fnOperationPattern = "^src/[^\\n]*(?:/fn/|Fn[.]tsx?$)";
 const fxOperationPattern = "^src/[^\\n]*(?:/fx/|Fx[.]tsx?$)";
 const uiModulePattern = "^src/(?:ui|[^\\n]*/ui)(?:/|$)";
@@ -35,7 +35,7 @@ module.exports = {
 				orphan: true,
 				pathNot: [
 					applicationEntrypointPattern,
-					"^src/arkini-cli/arkini[.]ts$",
+					"^src/serakki-cli/serakki[.]ts$",
 					"^electron/(?:main|preload)/index[.]ts$",
 					"^electron/builder/beforeBuild[.]mjs$",
 					"^scripts/[^/]+[.]ts$",
@@ -71,7 +71,7 @@ module.exports = {
 		{
 			name: "game-version-does-not-import-application-version",
 			comment:
-				"Project-owned gameplay compatibility does not depend on Arkini application releases.",
+				"Project-owned gameplay compatibility does not depend on Serakki application releases.",
 			severity: "error",
 			from: {
 				path: "^src/game-version(?:/|$)",
@@ -236,7 +236,7 @@ module.exports = {
 		{
 			name: "playable-game-stays-package-independent",
 			comment:
-				"Package-independent live Game capabilities provide behavior to installed-game bootstrap and lifecycle without importing Arkpack/save ownership.",
+				"Package-independent live Game capabilities provide behavior to installed-game bootstrap and lifecycle without importing Serapack/save ownership.",
 			severity: "error",
 			from: {
 				path: "^src/playable-game(?:/|$)",
@@ -324,7 +324,7 @@ module.exports = {
 		{
 			name: "active-code-does-not-import-unpacked-game-resources",
 			comment:
-				"Application code consumes authored Game resources only through validated Arkpacks.",
+				"Application code consumes authored Game resources only through validated Serapacks.",
 			severity: "error",
 			from: {
 				path: "^(?:src|electron)(?:/|$)",

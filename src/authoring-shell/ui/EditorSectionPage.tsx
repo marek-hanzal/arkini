@@ -36,7 +36,7 @@ export const EditorSectionPage = ({
 		<div
 			className="ak-editor-page-header shrink-0"
 			style={{
-				viewTransitionName: "arkini-editor-section-navigation",
+				viewTransitionName: "serakki-editor-section-navigation",
 			}}
 		>
 			<div className="grid h-16 items-center px-3">{header}</div>

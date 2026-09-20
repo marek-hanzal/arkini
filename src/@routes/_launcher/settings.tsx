@@ -102,7 +102,7 @@ export const Route = createFileRoute("/_launcher/settings")({
 							className="min-h-0 overflow-y-auto"
 							data-ui="SettingsContent"
 							style={{
-								viewTransitionName: "arkini-settings-content",
+								viewTransitionName: "serakki-settings-content",
 							}}
 						>
 							<Outlet />

@@ -108,7 +108,7 @@ it.each([
 			value: saved,
 		};
 	});
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		editor: {
 			deleteResourceFn: deleteFn,
 			deleteItemFn: deleteFn,

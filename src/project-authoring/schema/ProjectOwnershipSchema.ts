@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Declares whether Arkini or the user owns the project directory lifecycle. */
+/** Declares whether Serakki or the user owns the project directory lifecycle. */
 export const ProjectOwnershipSchema = z
 	.enum({
 		Managed: "managed",

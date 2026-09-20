@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
-import { readArkiniVersionIncompatibilityFn } from "~/application-version/fn/readArkiniVersionIncompatibilityFn";
+import { readSerakkiVersionIncompatibilityFn } from "~/application-version/fn/readSerakkiVersionIncompatibilityFn";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { gameSourceSchemaDiagnosticsFn } from "~/game-config-source/fn/gameSourceSchemaDiagnosticsFn";
@@ -18,9 +18,9 @@ export const readGameProjectManifestFx = Effect.fn("readGameProjectManifestFx")(
 		validateFn: (json) => {
 			const parsed = GameProjectManifestSchema.safeParse(json);
 			if (!parsed.success) return gameSourceSchemaDiagnosticsFn(path, parsed.error);
-			const incompatibility = readArkiniVersionIncompatibilityFn(
+			const incompatibility = readSerakkiVersionIncompatibilityFn(
 				"Editor project",
-				parsed.data.arkini,
+				parsed.data.serakki,
 			);
 			return incompatibility === undefined
 				? []
@@ -29,11 +29,11 @@ export const readGameProjectManifestFx = Effect.fn("readGameProjectManifestFx")(
 							code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [
-								"arkini",
+								"serakki",
 							],
 							source: path,
 							message: incompatibility.message,
-							issueCode: "arkini-version-incompatible",
+							issueCode: "serakki-version-incompatible",
 						},
 					];
 		},

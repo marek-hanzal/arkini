@@ -2,7 +2,7 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import type { DiagnosticLog } from "~electron/main/diagnostics/createDiagnosticLogFx";
 import { registerEditorProjectIpcFx } from "~electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
@@ -36,7 +36,7 @@ vi.mock("electron", () => electron.module);
 
 const event = {
 	senderFrame: {
-		url: "arkini://app/editor/project-one/notes",
+		url: "serakki://app/editor/project-one/notes",
 	},
 } as IpcMainInvokeEvent;
 const trustedRenderer: TrustedRenderer = {
@@ -46,7 +46,7 @@ const trustedRenderer: TrustedRenderer = {
 	registerWindowFx: () => Effect.void,
 };
 const diagnostics = {
-	directoryPath: "/tmp/arkini-diagnostics",
+	directoryPath: "/tmp/serakki-diagnostics",
 	writeFx: () => Effect.void,
 	writeApplicationFx: () => Effect.void,
 	openDirectoryFx: Effect.void,
@@ -83,7 +83,7 @@ describe("editor project-note IPC", () => {
 		};
 
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorNoteList, key.projectId),
+			invoke(SerakkiElectronApi.channels.editorNoteList, key.projectId),
 		).resolves.toEqual({
 			type: "success",
 			value: [
@@ -91,7 +91,7 @@ describe("editor project-note IPC", () => {
 			],
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorNoteCreate, {
+			invoke(SerakkiElectronApi.channels.editorNoteCreate, {
 				projectId: key.projectId,
 				content: "  New note  ",
 				itemUids: [
@@ -110,7 +110,7 @@ describe("editor project-note IPC", () => {
 			},
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorNoteUpdate, {
+			invoke(SerakkiElectronApi.channels.editorNoteUpdate, {
 				...key,
 				content: "Updated note",
 				itemUids: [
@@ -130,7 +130,7 @@ describe("editor project-note IPC", () => {
 				resourceIds: [],
 			},
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorNoteDelete, key)).resolves.toEqual({
+		await expect(invoke(SerakkiElectronApi.channels.editorNoteDelete, key)).resolves.toEqual({
 			type: "success",
 			value: undefined,
 		});
@@ -168,7 +168,7 @@ describe("editor project-note IPC", () => {
 		);
 
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorNoteCreate, {
+			invoke(SerakkiElectronApi.channels.editorNoteCreate, {
 				projectId: "project-one",
 				content: "   ",
 				itemUids: [],

@@ -1,8 +1,8 @@
 import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
+import { SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";
 import { readAppearanceAccentFx } from "~/application-settings/fx/readAppearanceAccentFx";
@@ -70,9 +70,9 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 	if (config === undefined) {
 		return Effect.fail(new Error("Launcher startup is not configured."));
 	}
-	const catalog = get(ArkpackCatalogOwnerAtom);
+	const catalog = get(SerapackCatalogOwnerAtom);
 	if (catalog === undefined) {
-		return Effect.fail(new Error("Arkpack catalog is not configured."));
+		return Effect.fail(new Error("Serapack catalog is not configured."));
 	}
 
 	const appearanceFx = Effect.all(
@@ -96,7 +96,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 		Effect.flatMap((state) =>
 			state.type === "ready"
 				? Effect.void
-				: Effect.fail(new Error("Arkpack catalog did not publish a ready snapshot.")),
+				: Effect.fail(new Error("Serapack catalog did not publish a ready snapshot.")),
 		),
 	);
 	const lifecycleReadyFx =
@@ -121,7 +121,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 	).pipe(
 		Effect.map(({ appearance, cheatsAvailable, sound, windowMode }) => ({
 			appearance,
-			defaultPackageId: ArkiniDefaultPackageId,
+			defaultPackageId: SerakkiDefaultPackageId,
 			cheatsAvailable,
 			sound,
 			windowMode,

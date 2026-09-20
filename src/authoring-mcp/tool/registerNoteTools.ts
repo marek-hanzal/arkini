@@ -40,7 +40,7 @@ const NoteCollectionInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:note-collection-input",
+		$id: "urn:serakki:schema:mcp:note-collection-input",
 		title: "Note collection tool input",
 		description:
 			"Item and resource filtering, pagination and full-content search for the project note collection.",
@@ -52,7 +52,7 @@ const NoteDetailInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:note-detail-input",
+		$id: "urn:serakki:schema:mcp:note-detail-input",
 		title: "Note detail tool input",
 		description: "The identity of the complete project note to read.",
 	});
@@ -69,7 +69,7 @@ const CreateNoteInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:create-note-input",
+		$id: "urn:serakki:schema:mcp:create-note-input",
 		title: "Create note tool input",
 		description: "The complete content, item and resource relationships of a new project note.",
 	});
@@ -95,13 +95,13 @@ const EditNoteInputSchema = noteMutationSchema
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:edit-note-input",
+		$id: "urn:serakki:schema:mcp:edit-note-input",
 		title: "Edit note tool input",
 		description: "A freshness-guarded complete project note replacement.",
 	});
 
 const DeleteNoteInputSchema = noteMutationSchema.meta({
-	$id: "urn:arkini:schema:mcp:delete-note-input",
+	$id: "urn:serakki:schema:mcp:delete-note-input",
 	title: "Delete note tool input",
 	description: "A freshness-guarded project note deletion.",
 });
@@ -246,7 +246,7 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and resource links. Linked items include their current authored IDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Arkpacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and resource links. Linked items include their current authored IDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Serapacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
@@ -296,7 +296,7 @@ export const registerNoteToolsFn = ({
 		"create_note",
 		{
 			description:
-				"Create and persist one Markdown note in the open project. Notes remain outside Arkpacks.",
+				"Create and persist one Markdown note in the open project. Notes remain outside Serapacks.",
 			inputSchema: CreateNoteInputSchema,
 		},
 		async ({ content, itemUids, resourceIds }) =>

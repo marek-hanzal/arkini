@@ -22,7 +22,7 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
 
 export const setUpEditorProjectRouteTest = () => {
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor: {
@@ -44,7 +44,7 @@ export const setUpEditorProjectRouteTest = () => {
 
 export const tearDownEditorProjectRouteTest = async () => {
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 };
 
 const createProject = (projectId: string, revision = 1): Project => ({

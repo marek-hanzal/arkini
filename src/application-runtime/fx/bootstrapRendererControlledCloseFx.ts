@@ -1,7 +1,7 @@
 import { Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
@@ -20,7 +20,7 @@ interface ExitRouter {
 
 interface Props {
 	readonly lifecycle: Pick<
-		Window["arkini"]["lifecycle"],
+		Window["serakki"]["lifecycle"],
 		"onBeforeCloseFn" | "onBeforeCloseReadyFn"
 	>;
 	readonly rendererRuntime: typeof RendererRuntime;
@@ -67,7 +67,9 @@ export const bootstrapRendererControlledCloseFx = Effect.fn("bootstrapRendererCo
 				await rendererRuntime.runPromise(
 					Effect.flatMap(ProjectRepository, (repository) => repository.awaitIdleFx),
 				);
-				const catalog = await rendererRuntime.runPromise(Atom.get(ArkpackCatalogOwnerAtom));
+				const catalog = await rendererRuntime.runPromise(
+					Atom.get(SerapackCatalogOwnerAtom),
+				);
 				if (catalog !== undefined) await rendererRuntime.runPromise(catalog.awaitIdleFx);
 			};
 
@@ -96,7 +98,7 @@ export const bootstrapRendererControlledCloseFx = Effect.fn("bootstrapRendererCo
 				await router.navigate({
 					to: "/game/$packageId/action/exit",
 					params: {
-						packageId: resource.game.arkpack.packageId,
+						packageId: resource.game.serapack.packageId,
 					},
 					replace: true,
 				});

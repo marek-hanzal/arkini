@@ -5,8 +5,8 @@ import { Effect, SubscriptionRef } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
@@ -15,7 +15,7 @@ import { LauncherHeroUrlAtom } from "~/launcher/atom/LauncherHeroUrlAtom";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { retryLauncherStartupAtom } from "~/launcher/atom/retryLauncherStartupAtom";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 
 const harness = vi.hoisted(() => ({
 	lastPackageId: "package:last" as string | null,
@@ -49,8 +49,8 @@ vi.mock("~/window-mode/fx/readWindowModeFx", () => ({
 vi.mock("~/installed-game/fx/readLastPackageIdFx", () => ({
 	readLastPackageIdFx: () => Effect.succeed(harness.lastPackageId),
 }));
-vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
-	loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>
+vi.mock("~/serapack-catalog/fx/loadSerapackFx", () => ({
+	loadSerapackFx: ({ packageId }: { readonly packageId: string }) =>
 		Effect.suspend(() => {
 			harness.loadedPackageIds.push(packageId);
 			if (harness.loadFailure !== undefined) return Effect.fail(harness.loadFailure);
@@ -59,12 +59,12 @@ vi.mock("~/arkpack-catalog/fx/loadArkpackFx", () => ({
 					packageId,
 				},
 				payload: {
-					config: testArkpackConfig,
+					config: testSerapackConfig,
 					resources: [
 						{
 							id: "hero",
 							type: "image",
-							url: "arkini://test/hero",
+							url: "serakki://test/hero",
 						},
 					],
 				},
@@ -91,22 +91,22 @@ vi.mock("~/launcher/fx/preloadLauncherHeroFx", () => ({
 }));
 
 const builtIn = {
-	packageId: "arkini",
+	packageId: "serakki",
 	contentHash: "a".repeat(64),
-	title: "Arkini",
+	title: "Serakki",
 	version: "1.0",
-	arkini: "1.0",
+	serakki: "1.0",
 	provenance: {
 		type: "official" as const,
 	},
 	source: "bundled" as const,
 };
-const catalog: ArkpackCatalog = {
+const catalog: SerapackCatalog = {
 	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
-		SubscriptionRef.make<ArkpackCatalog.State>({
+		SubscriptionRef.make<SerapackCatalog.State>({
 			type: "ready",
-			arkpacks: [
+			serapacks: [
 				builtIn,
 			],
 		}),
@@ -140,11 +140,11 @@ describe("LauncherHeroAtom", () => {
 			defaultIdleTTL: 400,
 			scheduleTask,
 		});
-		const loadingCatalog: ArkpackCatalog = {
+		const loadingCatalog: SerapackCatalog = {
 			...catalog,
 			refreshFx: Effect.never,
 		};
-		registry.set(ArkpackCatalogOwnerAtom, loadingCatalog);
+		registry.set(SerapackCatalogOwnerAtom, loadingCatalog);
 		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
@@ -165,7 +165,7 @@ describe("LauncherHeroAtom", () => {
 			defaultIdleTTL: 400,
 			scheduleTask,
 		});
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
@@ -180,9 +180,9 @@ describe("LauncherHeroAtom", () => {
 			"package:last",
 		]);
 		expect(harness.preloadedUrls).toEqual([
-			"arkini://test/hero",
+			"serakki://test/hero",
 		]);
-		expect(registry.get(LauncherHeroUrlAtom)).toBe("arkini://test/hero");
+		expect(registry.get(LauncherHeroUrlAtom)).toBe("serakki://test/hero");
 
 		harness.loadFailure = new Error("package removed");
 		registry.set(retryLauncherStartupAtom, undefined);
@@ -192,7 +192,7 @@ describe("LauncherHeroAtom", () => {
 			expect(registry.get(LauncherHeroUrlAtom)).toBe("/hero.png");
 		});
 		expect(harness.preloadedUrls).toEqual([
-			"arkini://test/hero",
+			"serakki://test/hero",
 			"/hero.png",
 		]);
 
@@ -206,7 +206,7 @@ describe("LauncherHeroAtom", () => {
 		});
 		harness.loadFailure = new Error("package removed");
 		const createObjectUrl = vi.spyOn(URL, "createObjectURL");
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
@@ -235,7 +235,7 @@ describe("LauncherHeroAtom", () => {
 		harness.preloadPromise = new Promise<void>((resolve) => {
 			resolvePreload = resolve;
 		});
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
@@ -243,7 +243,7 @@ describe("LauncherHeroAtom", () => {
 		registry.mount(LauncherStartupAtom);
 		await vi.waitFor(() =>
 			expect(harness.preloadedUrls).toEqual([
-				"arkini://test/hero",
+				"serakki://test/hero",
 			]),
 		);
 

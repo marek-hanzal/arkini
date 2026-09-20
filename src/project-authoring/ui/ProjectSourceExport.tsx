@@ -11,7 +11,7 @@ import { LinkButton } from "~/ui/ui/LinkButton";
 const exportProjectSourceAtom = Atom.family((projectId: string) =>
 	Atom.fn(() =>
 		invokeProjectTransportFx({
-			callFn: () => window.arkini.editor.exportJsonDirectoryFn(projectId),
+			callFn: () => window.serakki.editor.exportJsonDirectoryFn(projectId),
 			operation: "export-json-directory",
 			parseFn: (value) => (value === null ? null : EditorSourceExportSchema.parse(value)),
 			requestMessage: "The editor JSON export request failed.",

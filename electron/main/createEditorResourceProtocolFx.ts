@@ -2,7 +2,7 @@ import { net } from "electron";
 import { pathToFileURL } from "node:url";
 import { Effect, FileSystem, Path } from "effect";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
-import { ArkiniProtocolError } from "../protocol/ArkiniProtocolError";
+import { SerakkiProtocolError } from "../protocol/SerakkiProtocolError";
 import { readByteRangeFn } from "../protocol/readByteRangeFn";
 import { readResourceContentTypeFn } from "~/game-config-resource/fn/readResourceContentTypeFn";
 
@@ -18,7 +18,7 @@ export namespace createEditorResourceProtocolFx {
 }
 
 const unavailableFn = () =>
-	new ArkiniProtocolError({
+	new SerakkiProtocolError({
 		status: 404,
 		message: "Editor resource was not found.",
 	});
@@ -53,7 +53,7 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					const resourceId = url.searchParams.get("resourceId");
 					const version = url.searchParams.get("version");
 					if (
-						url.protocol !== "arkini:" ||
+						url.protocol !== "serakki:" ||
 						url.host !== "app" ||
 						url.pathname !== "/editor/resource" ||
 						url.username !== "" ||
@@ -139,12 +139,12 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					Effect.catch((error) =>
 						Effect.succeed(
 							new Response(
-								error instanceof ArkiniProtocolError
+								error instanceof SerakkiProtocolError
 									? error.message
 									: "Editor resource was not found.",
 								{
 									status:
-										error instanceof ArkiniProtocolError ? error.status : 404,
+										error instanceof SerakkiProtocolError ? error.status : 404,
 								},
 							),
 						),

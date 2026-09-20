@@ -42,7 +42,7 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 						navigateFn({
 							to: "/game/$packageId/board",
 							params: {
-								packageId: game.arkpack.packageId,
+								packageId: game.serapack.packageId,
 							},
 							replace: true,
 						}),
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 				}).pipe(Effect.asVoid);
 			},
 			[
-				game.arkpack.packageId,
+				game.serapack.packageId,
 				navigateFn,
 				router,
 			],

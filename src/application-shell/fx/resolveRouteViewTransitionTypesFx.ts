@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 type VisualRouteId =
 	| "about"
 	| "action"
-	| "arkpacks"
+	| "serapacks"
 	| "board"
 	| "cheats"
 	| "editor"
@@ -46,7 +46,7 @@ const resolveVisualRouteIdFn = (pathname: string): VisualRouteId => {
 	if (pathname === "/main-menu") return "main-menu";
 	if (settingsPattern.test(pathname)) return "settings";
 	if (pathname === "/about") return "about";
-	if (pathname === "/arkpacks") return "arkpacks";
+	if (pathname === "/serapacks") return "serapacks";
 	if (editorWelcomePattern.test(pathname)) return "editor-welcome";
 	if (editorProjectPattern.test(pathname)) return "editor";
 	if (gameBoardPattern.test(pathname)) return "board";
@@ -116,11 +116,11 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 			const types =
 				pair === sceneRelationship
 					? [
-							"arkini-route",
+							"serakki-route",
 							sceneRelationship,
 						]
 					: [
-							"arkini-route",
+							"serakki-route",
 							sceneRelationship,
 							pair,
 						];

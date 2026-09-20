@@ -31,7 +31,7 @@ const renderFn = async (value: string) => {
 beforeEach(() => {
 	vi.useFakeTimers();
 	writeTextFn.mockReset().mockResolvedValue(undefined);
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		clipboard: {
 			writeTextFn,
 		},

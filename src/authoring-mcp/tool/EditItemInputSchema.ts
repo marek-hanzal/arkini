@@ -45,8 +45,8 @@ export const EditItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "urn:arkini:schema:mcp:edit-item-input",
-		$id: "urn:arkini:schema:mcp:edit-item-input",
+		id: "urn:serakki:schema:mcp:edit-item-input",
+		$id: "urn:serakki:schema:mcp:edit-item-input",
 		title: "Edit item tool input",
 		description: "Identity, revision, and replacement patch for one item.",
 	});

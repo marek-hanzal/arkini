@@ -4,8 +4,8 @@ import { Cause, Effect, Exit } from "effect";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
-import { bootstrapArkpackCatalogFx } from "~/arkpack-catalog/fx/bootstrapArkpackCatalogFx";
+import { SerakkiWindowTitle } from "~shared/SerakkiAppMetadata";
+import { bootstrapSerapackCatalogFx } from "~/serapack-catalog/fx/bootstrapSerapackCatalogFx";
 import { bootstrapRendererLifecycleFx } from "~/application-runtime/fx/bootstrapRendererLifecycleFx";
 import { bootstrapRendererControlledCloseFx } from "~/application-runtime/fx/bootstrapRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
@@ -13,7 +13,7 @@ import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomReg
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
 import { renderRendererFx } from "~/application-shell/ui/renderRendererFx";
-import { createArkiniRouterFx } from "~/createArkiniRouterFx";
+import { createSerakkiRouterFx } from "~/createSerakkiRouterFx";
 import { bootstrapLauncherFx } from "~/launcher/fx/bootstrapLauncherFx";
 import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
 import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEditorServiceStatusFx";
@@ -28,7 +28,7 @@ const readRendererRootFx = Effect.sync(() => {
 });
 
 const forceCloseUnrenderableRendererFx = Effect.sync(() =>
-	window.arkini.lifecycle.forceCloseFn(),
+	window.serakki.lifecycle.forceCloseFn(),
 ).pipe(
 	Effect.catchCause((cause) =>
 		Effect.sync(() => {
@@ -47,29 +47,29 @@ export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(() =>
 		const root = yield* Effect.sync(() => createRoot(rootElement));
 
 		yield* renderRendererFx({
-			onCloseFn: () => window.arkini.lifecycle.forceCloseFn(),
+			onCloseFn: () => window.serakki.lifecycle.forceCloseFn(),
 			root,
 			viewFx: Effect.gen(function* () {
 				const translation = yield* bootstrapTranslationFx({
-					readPreferredLanguagesFn: window.arkini.localization.readPreferredLanguagesFn,
+					readPreferredLanguagesFn: window.serakki.localization.readPreferredLanguagesFn,
 				});
-				document.title = ArkiniWindowTitle;
+				document.title = SerakkiWindowTitle;
 				document.documentElement.lang = translation.locale;
 
-				yield* bootstrapArkpackCatalogFx();
+				yield* bootstrapSerapackCatalogFx();
 				yield* refreshEditorServiceStatusFx.pipe(Effect.forkDetach);
 				yield* installRendererNativeDragGuardFx({
 					root: rootElement,
 				});
-				yield* bootstrapRendererLifecycleFx(window.arkini.lifecycle);
+				yield* bootstrapRendererLifecycleFx(window.serakki.lifecycle);
 				yield* bootstrapWindowModeSyncFx();
 				yield* bootstrapLauncherFx();
 
-				const router = yield* createArkiniRouterFx({
+				const router = yield* createSerakkiRouterFx({
 					rendererRuntime: RendererRuntime,
 				});
 				yield* bootstrapRendererControlledCloseFx({
-					lifecycle: window.arkini.lifecycle,
+					lifecycle: window.serakki.lifecycle,
 					rendererRuntime: RendererRuntime,
 					router,
 				});

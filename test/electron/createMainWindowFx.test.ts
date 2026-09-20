@@ -3,8 +3,8 @@ import { ipcMain, Menu } from "electron";
 import { EventEmitter } from "node:events";
 import { Cause, Effect, Exit, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiWindowTitle } from "~shared/SerakkiAppMetadata";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { createMainWindowFx } from "~electron/main/createMainWindowFx";
 import { ElectronMainError } from "~electron/main/ElectronMainError";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
@@ -24,7 +24,7 @@ vi.mock("electron", async () => {
 	class TestWebContents extends EventEmitter {
 		readonly id = 17;
 		readonly mainFrame = {
-			url: "arkini://app/",
+			url: "serakki://app/",
 		};
 		private destroyed = false;
 		readonly openDevTools = vi.fn();
@@ -169,7 +169,7 @@ describe("createMainWindowFx", () => {
 			readonly show: ReturnType<typeof vi.fn>;
 			readonly webContents: WebContents;
 		};
-		expect(window.options.title).toBe(ArkiniWindowTitle);
+		expect(window.options.title).toBe(SerakkiWindowTitle);
 		expect(window.options.backgroundColor).toBe("#000000");
 		expect(window.options.fullscreen).toBe(false);
 		expect(window.options.fullscreenable).toBe(true);
@@ -181,12 +181,12 @@ describe("createMainWindowFx", () => {
 		expect(trustedWindowRemoved).toHaveBeenCalledOnce();
 		expect(
 			(ipcMain as unknown as EventEmitter).listenerCount(
-				ArkiniElectronApi.channels.requestClose,
+				SerakkiElectronApi.channels.requestClose,
 			),
 		).toBe(0);
 		expect(
 			(ipcMain as unknown as EventEmitter).listenerCount(
-				ArkiniElectronApi.channels.forceClose,
+				SerakkiElectronApi.channels.forceClose,
 			),
 		).toBe(0);
 		expect(window.listenerCount("ready-to-show")).toBe(0);
@@ -267,7 +267,7 @@ describe("createMainWindowFx", () => {
 		});
 		expect(preventResize).toHaveBeenCalledOnce();
 		expect(window.webContents.send).toHaveBeenCalledWith(
-			ArkiniElectronApi.channels.windowVisible,
+			SerakkiElectronApi.channels.windowVisible,
 		);
 		expect(window.show.mock.invocationCallOrder[0]).toBeLessThan(
 			(window.webContents.send as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0] ?? 0,

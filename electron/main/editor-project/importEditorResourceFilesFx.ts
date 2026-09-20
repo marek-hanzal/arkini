@@ -6,7 +6,7 @@ import { readInitialAudioResourceNameFn } from "~/audio-authoring/fn/readInitial
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
-import { extractArkpackFileFx } from "~/arkpack-admission/fx/extractArkpackFileFx";
+import { extractSerapackFileFx } from "~/serapack-admission/fx/extractSerapackFileFx";
 import { readImportedResourceIdFn } from "~/game-config-resource/fn/readImportedResourceIdFn";
 import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
@@ -114,7 +114,7 @@ export const importEditorResourceFilesFx = Effect.fn("importEditorResourceFilesF
 			};
 		}
 		const temporaryRoot = yield* Effect.tryPromise({
-			try: () => mkdtemp(join(tmpdir(), "arkini-audio-import-")),
+			try: () => mkdtemp(join(tmpdir(), "serakki-audio-import-")),
 			catch: (cause) => failFn("Audio import could not create temporary output.", cause),
 		});
 		return yield* Effect.gen(function* () {
@@ -144,23 +144,23 @@ export const importEditorResourceFilesFx = Effect.fn("importEditorResourceFilesF
 	}
 
 	if (request.files.length !== 1)
-		return yield* Effect.fail(failFn("Select one Arkpack to import."));
+		return yield* Effect.fail(failFn("Select one Serapack to import."));
 	const file = request.files[0];
-	if (!file.name.toLowerCase().endsWith(".arkpack"))
-		return yield* Effect.fail(failFn("Choose a .arkpack file."));
+	if (!file.name.toLowerCase().endsWith(".serapack"))
+		return yield* Effect.fail(failFn("Choose a .serapack file."));
 	const temporaryRoot = yield* Effect.tryPromise({
-		try: () => mkdtemp(join(tmpdir(), "arkini-resource-import-")),
-		catch: (cause) => failFn("The Arkpack could not be unpacked.", cause),
+		try: () => mkdtemp(join(tmpdir(), "serakki-resource-import-")),
+		catch: (cause) => failFn("The Serapack could not be unpacked.", cause),
 	});
 	return yield* Effect.gen(function* () {
-		const arkpack = yield* extractArkpackFileFx({
-			arkpackPath: file.path,
+		const serapack = yield* extractSerapackFileFx({
+			serapackPath: file.path,
 			outputRoot: temporaryRoot,
 		});
-		const resources = arkpack.resources.filter(({ type }) => type === request.type);
+		const resources = serapack.resources.filter(({ type }) => type === request.type);
 		if (resources.length === 0)
 			return yield* Effect.fail(
-				failFn(`The selected Arkpack does not contain any ${request.type}.`),
+				failFn(`The selected Serapack does not contain any ${request.type}.`),
 			);
 		const project = yield* repository.upsertResourceFilesFx({
 			projectId: request.projectId,
@@ -184,7 +184,7 @@ export const importEditorResourceFilesFx = Effect.fn("importEditorResourceFilesF
 		Effect.mapError((cause) =>
 			cause instanceof ProjectRepositoryError
 				? cause
-				: failFn("The selected Arkpack is invalid.", cause),
+				: failFn("The selected Serapack is invalid.", cause),
 		),
 		Effect.ensuring(
 			Effect.promise(() =>

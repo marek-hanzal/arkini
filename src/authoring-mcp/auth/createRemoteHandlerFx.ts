@@ -169,7 +169,7 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 					const secret = readFormValueFn(request.body, "secret") ?? "";
 					try {
 						if (await runPromiseFn(storage.verifySecretFx(secret))) {
-							Reflect.set(request, "arkiniMcpUser", "arkini-owner");
+							Reflect.set(request, "serakkiMcpUser", "serakki-owner");
 							nextFn();
 							return;
 						}
@@ -186,7 +186,7 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 				authenticateHandler({
 					provider,
 					getUser: (request) => {
-						const user = Reflect.get(request, "arkiniMcpUser");
+						const user = Reflect.get(request, "serakkiMcpUser");
 						return typeof user === "string" ? user : "";
 					},
 				}),

@@ -32,7 +32,7 @@ export const useEditorMcpOverviewController = (): useEditorMcpOverviewController
 		dispatchFn({
 			type: "read",
 		});
-		return window.arkini.editorMcp.onOverviewChangedFn((candidate) => {
+		return window.serakki.editorMcp.onOverviewChangedFn((candidate) => {
 			const parsed = parseEditorMcpOverviewFn(candidate);
 			if (!parsed.success) return;
 			dispatchFn({

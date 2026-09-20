@@ -47,7 +47,7 @@ interface EditorArtworkManagerProps extends useEditorArtworkManagerController.Pr
 }
 
 interface EditorArtworkImportMenuProps {
-	readonly onImportArkpackFn: () => void;
+	readonly onImportSerapackFn: () => void;
 	readonly onImportFilesFn: () => void;
 	readonly pending: boolean;
 }
@@ -87,7 +87,7 @@ const artworkFilters = [
 const artworkCatalogStatuses = {
 	empty: {
 		dataUi: "EditorArtworkEmpty",
-		description: "Import artwork from an arkpack or select PNG files to start the library.",
+		description: "Import artwork from an serapack or select PNG files to start the library.",
 		icon: Images,
 		title: "No artwork yet",
 	},
@@ -114,7 +114,7 @@ const artworkCatalogStatuses = {
 >;
 
 const EditorArtworkImportMenu = ({
-	onImportArkpackFn,
+	onImportSerapackFn,
 	onImportFilesFn,
 	pending,
 }: EditorArtworkImportMenuProps) => {
@@ -142,7 +142,7 @@ const EditorArtworkImportMenu = ({
 					cursorIntent={pending ? "progress" : undefined}
 					data-ui="EditorArtworkImport"
 					disabled={pending}
-					onClick={onImportArkpackFn}
+					onClick={onImportSerapackFn}
 				>
 					<PackageOpen className="size-4" />
 					<Tx label="Import artwork" />
@@ -169,16 +169,16 @@ const EditorArtworkImportMenu = ({
 					>
 						<Button
 							className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
-							data-ui="EditorArtworkImportArkpackOption"
-							onClick={() => runImportFn(onImportArkpackFn)}
+							data-ui="EditorArtworkImportSerapackOption"
+							onClick={() => runImportFn(onImportSerapackFn)}
 						>
 							<PackageOpen className="size-5 shrink-0 text-accent" />
 							<span>
 								<span className="block font-semibold">
-									<Tx label="From Arkpack" />
+									<Tx label="From Serapack" />
 								</span>
 								<span className="mt-0.5 block text-xs font-normal leading-4 text-muted">
-									<Tx label="Artwork Arkpack import summary" />
+									<Tx label="Artwork Serapack import summary" />
 								</span>
 							</span>
 						</Button>
@@ -403,7 +403,7 @@ export const EditorArtworkManager = (props: EditorArtworkManagerProps) => {
 					);
 	const importButton = (
 		<EditorArtworkImportMenu
-			onImportArkpackFn={controller.openArkpackImportFn}
+			onImportSerapackFn={controller.openSerapackImportFn}
 			onImportFilesFn={controller.openFilesImportFn}
 			pending={busy}
 		/>
@@ -421,13 +421,13 @@ export const EditorArtworkManager = (props: EditorArtworkManagerProps) => {
 						to="/editor/$projectId/editor/items/list"
 					/>
 					<input
-						ref={controller.arkpackInputRef}
+						ref={controller.serapackInputRef}
 						type="file"
-						accept=".arkpack"
+						accept=".serapack"
 						className="hidden"
-						data-ui="EditorArtworkArkpackInput"
+						data-ui="EditorArtworkSerapackInput"
 						disabled={busy}
-						onChange={controller.onArkpackChangeFn}
+						onChange={controller.onSerapackChangeFn}
 					/>
 					<input
 						ref={controller.filesInputRef}

@@ -2,8 +2,8 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { createFileRoute } from "@tanstack/react-router";
 import { Download, PackageCheck, PackagePlus } from "lucide-react";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackArtifactNameFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 		const artifactSummary =
 			controller.artifact === undefined
 				? undefined
-				: `${readArkpackArtifactNameFn(controller.artifact.projectId)} · ${formatByteSizeFn(controller.artifact.size)} · v${controller.artifact.version} · Serakki ${ArkiniAppVersion} · Community`;
+				: `${readSerapackArtifactNameFn(controller.artifact.projectId)} · ${formatByteSizeFn(controller.artifact.size)} · v${controller.artifact.version} · Serakki ${SerakkiAppVersion} · Community`;
 
 		return (
 			<EditorSectionPage

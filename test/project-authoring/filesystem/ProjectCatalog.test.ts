@@ -18,7 +18,7 @@ const realPath = (root: string) =>
 	);
 
 const createCatalogPath = async () => {
-	const root = await mkdtemp(join(tmpdir(), "arkini-project-catalog-"));
+	const root = await mkdtemp(join(tmpdir(), "serakki-project-catalog-"));
 	temporaryDirectories.push(root);
 	const catalogPath = join(root, "user-data", "projects.json");
 	await mkdir(dirname(catalogPath), {

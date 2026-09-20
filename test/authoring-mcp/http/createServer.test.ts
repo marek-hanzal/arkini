@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { createEditorMcpOwnershipFx } from "~/authoring-mcp/http/createEditorMcpOwnershipFx";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
@@ -25,7 +25,7 @@ describe("editor MCP server", () => {
 		expect(client.getProtocolEra()).toBe("modern");
 		expect(client.getServerVersion()).toMatchObject({
 			name: "serakki-editor",
-			version: ArkiniAppVersion,
+			version: SerakkiAppVersion,
 		});
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
@@ -99,7 +99,7 @@ describe("editor MCP server", () => {
 		]);
 		for (const tool of tools.tools.filter(({ name }) => jsonInputToolNames.has(name))) {
 			expectNamedJsonSchemaGraph(tool.inputSchema, {
-				id: "urn:arkini:schema:mcp:json-tool-input",
+				id: "urn:serakki:schema:mcp:json-tool-input",
 			});
 			expect(tool.inputSchema).toMatchObject({
 				additionalProperties: false,
@@ -114,7 +114,7 @@ describe("editor MCP server", () => {
 				],
 			});
 			expect(tool.description).toContain(
-				`"urn:arkini:schema:mcp:${tool.name.replaceAll("_", "-")}-input"`,
+				`"urn:serakki:schema:mcp:${tool.name.replaceAll("_", "-")}-input"`,
 			);
 		}
 		const schemaIds = tools.tools
@@ -122,8 +122,8 @@ describe("editor MCP server", () => {
 			.map(({ inputSchema, name }) => {
 				const expectedId =
 					name === "item_input" || name === "item_output"
-						? `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-relation`
-						: `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-input`;
+						? `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-relation`
+						: `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-input`;
 				expectNamedJsonSchemaGraph(inputSchema, {
 					id: expectedId,
 				});

@@ -3,14 +3,14 @@ import { Effect } from "effect";
 import { expect, it } from "vitest";
 
 import { importEditorResourceFilesFx } from "~electron/main/editor-project/importEditorResourceFilesFx";
-import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
+import { packDirectoryFx } from "~/serapack-artifact/fx/packDirectoryFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 import { createProjectTestHarness } from "./support/createProjectTestHarness";
 
-it("creates nonempty metadata for separator-only IDs through project creation and both Arkpack imports", async () => {
-	const sourceHarness = await createProjectTestHarness("arkini-audio-name-source-");
-	const targetHarness = await createProjectTestHarness("arkini-audio-name-target-");
+it("creates nonempty metadata for separator-only IDs through project creation and both Serapack imports", async () => {
+	const sourceHarness = await createProjectTestHarness("serakki-audio-name-source-");
+	const targetHarness = await createProjectTestHarness("serakki-audio-name-target-");
 	try {
 		const sourceRepository = await sourceHarness.openRepository();
 		const sourceProject = await Effect.runPromise(
@@ -59,7 +59,7 @@ it("creates nonempty metadata for separator-only IDs through project creation an
 		);
 		const targetRepository = await targetHarness.openRepository();
 		const importedProject = await Effect.runPromise(
-			targetRepository.importArkpackFileFx(packed.arkpack),
+			targetRepository.importSerapackFileFx(packed.serapack),
 		);
 		expect(importedProject.resources.find(({ id }) => id === "---")).toMatchObject({
 			name: "---",
@@ -76,12 +76,12 @@ it("creates nonempty metadata for separator-only IDs through project creation an
 				repository: targetRepository,
 				request: {
 					projectId: resourceTarget.projectId,
-					source: "arkpack",
+					source: "serapack",
 					type: "sfx",
 					files: [
 						{
-							name: "source.arkpack",
-							path: packed.arkpack,
+							name: "source.serapack",
+							path: packed.serapack,
 						},
 					],
 				},

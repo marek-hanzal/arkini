@@ -8,7 +8,7 @@ export const GameLeaveDestinationSchema = z.discriminatedUnion("destination", [
 		.strict(),
 	z
 		.object({
-			destination: z.literal("arkpacks"),
+			destination: z.literal("serapacks"),
 		})
 		.strict(),
 	z

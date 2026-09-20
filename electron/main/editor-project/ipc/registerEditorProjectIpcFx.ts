@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect, Semaphore } from "effect";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
@@ -14,7 +14,7 @@ import { saveEditorProjectBuildFx } from "../saveEditorProjectBuildFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackArtifactNameFn";
 import { join } from "node:path";
 import { access } from "node:fs/promises";
 import { importEditorResourceFilesFx } from "../importEditorResourceFilesFx";
@@ -26,7 +26,7 @@ const readEditorWindowFx = (
 	operation:
 		| "export-json-directory"
 		| "import-json-directory"
-		| "import-arkpack"
+		| "import-serapack"
 		| "optimize-resources"
 		| "save-project-build",
 ) =>
@@ -47,22 +47,22 @@ let registered = false;
 
 export namespace registerEditorProjectIpcFx {
 	export interface Props {
-		readonly bundledArkpacksRoot?: string;
+		readonly bundledSerapacksRoot?: string;
 		readonly diagnostics: DiagnosticLog;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly ownership: EditorProjectServiceOwnership;
-		readonly userArkpacksRoot?: string;
+		readonly userSerapacksRoot?: string;
 	}
 }
 
 /** Registers editor-only IPC even when Editor persistence is unavailable. */
 export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx")(
 	({
-		bundledArkpacksRoot = "",
+		bundledSerapacksRoot = "",
 		diagnostics,
 		trustedRenderer,
 		ownership,
-		userArkpacksRoot = "",
+		userSerapacksRoot = "",
 	}: registerEditorProjectIpcFx.Props) =>
 		Effect.gen(function* () {
 			const shouldRegister = yield* Effect.sync(() => {
@@ -99,7 +99,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						runAuthorizedFn(event, runFx(event, candidate)),
 					);
 
-				handleFn(ArkiniElectronApi.channels.editorStatus, () =>
+				handleFn(SerakkiElectronApi.channels.editorStatus, () =>
 					Effect.succeed(
 						ownership.type === "ready"
 							? ({
@@ -111,7 +111,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 								} as const),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorAwaitIdle, () =>
+				handleFn(SerakkiElectronApi.channels.editorAwaitIdle, () =>
 					sourceTransfers
 						.withPermits(1)(
 							ownership.type === "ready"
@@ -134,7 +134,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}),
 						),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectBuild, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectBuild, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"build-project",
 						ownership,
@@ -143,7 +143,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.buildProjectFx(request),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"save-project-build",
 						ownership,
@@ -160,7 +160,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectList, () =>
+				handleFn(SerakkiElectronApi.channels.editorProjectList, () =>
 					executeEditorProjectRepositoryFx(
 						"list-projects",
 						ownership,
@@ -169,7 +169,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository) => repository.listProjectsFx,
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectRead, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectRead, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"read-project",
 						ownership,
@@ -178,7 +178,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.readProjectFx(projectId),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectRefresh, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectRefresh, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"refresh-project",
 						ownership,
@@ -187,7 +187,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.refreshProjectFx(projectId),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectCreate, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectCreate, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"create-project",
 						ownership,
@@ -209,7 +209,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectDismissInvalid,
+					SerakkiElectronApi.channels.editorProjectDismissInvalid,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"dismiss-invalid-project",
@@ -219,7 +219,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, root) => repository.dismissInvalidProjectFx(root),
 						),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectDelete, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectDelete, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"delete-project",
 						ownership,
@@ -229,7 +229,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+					SerakkiElectronApi.channels.editorProjectExportJsonDirectory,
 					(event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"export-json-directory",
@@ -249,7 +249,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 								),
 						),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectImportJsonDirectory, (event) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectImportJsonDirectory, (event) =>
 					executeEditorProjectRepositoryFx(
 						"import-json-directory",
 						ownership,
@@ -262,12 +262,12 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectImportArkpack, (event) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectImportSerapack, (event) =>
 					executeEditorProjectRepositoryFx(
-						"import-arkpack",
+						"import-serapack",
 						ownership,
 						diagnostics,
-						readEditorWindowFx(event, "import-arkpack"),
+						readEditorWindowFx(event, "import-serapack"),
 						(repository, window) =>
 							Effect.tryPromise({
 								try: () =>
@@ -277,25 +277,25 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 										],
 										filters: [
 											{
-												name: "Arkpack",
+												name: "Serapack",
 												extensions: [
-													"arkpack",
+													"serapack",
 												],
 											},
 										],
 									}),
 								catch: (cause) =>
 									new ProjectRepositoryError({
-										operation: "import-arkpack",
-										message: "The Arkpack picker could not be opened.",
+										operation: "import-serapack",
+										message: "The Serapack picker could not be opened.",
 										cause,
 									}),
 							}).pipe(
 								Effect.flatMap((selection) => {
-									const arkpackPath = selection.filePaths[0];
-									if (selection.canceled || arkpackPath === undefined)
+									const serapackPath = selection.filePaths[0];
+									if (selection.canceled || serapackPath === undefined)
 										return Effect.succeed(null);
-									return repository.importArkpackFileFx(arkpackPath).pipe(
+									return repository.importSerapackFileFx(serapackPath).pipe(
 										Effect.map((project) => ({
 											projectId: project.projectId,
 											title: project.title,
@@ -309,17 +309,17 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
+					SerakkiElectronApi.channels.editorProjectImportInstalledSerapack,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
-							"import-arkpack",
+							"import-serapack",
 							ownership,
 							diagnostics,
 							requestParser.parseProjectIdFx(candidate),
 							(repository, packageId) => {
-								const filename = readArkpackArtifactNameFn(packageId);
-								const userPath = join(userArkpacksRoot, filename);
-								const bundledPath = join(bundledArkpacksRoot, filename);
+								const filename = readSerapackArtifactNameFn(packageId);
+								const userPath = join(userSerapacksRoot, filename);
+								const bundledPath = join(bundledSerapacksRoot, filename);
 								return Effect.tryPromise({
 									try: async () => {
 										try {
@@ -332,12 +332,12 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 									},
 									catch: (cause) =>
 										new ProjectRepositoryError({
-											operation: "import-arkpack",
-											message: `Arkpack ${packageId} is not installed.`,
+											operation: "import-serapack",
+											message: `Serapack ${packageId} is not installed.`,
 											cause,
 										}),
 								}).pipe(
-									Effect.flatMap(repository.importArkpackFileFx),
+									Effect.flatMap(repository.importSerapackFileFx),
 									Effect.map((project) => ({
 										projectId: project.projectId,
 										title: project.title,
@@ -350,7 +350,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectOpenDirectory,
+					SerakkiElectronApi.channels.editorProjectOpenDirectory,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"open-project-directory",
@@ -365,7 +365,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectOptimizeResources,
+					SerakkiElectronApi.channels.editorProjectOptimizeResources,
 					(event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"optimize-resources",
@@ -381,7 +381,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 									onProgressFn: (progress) => {
 										if (window.isDestroyed()) return;
 										window.webContents.send(
-											ArkiniElectronApi.channels
+											SerakkiElectronApi.channels
 												.editorProjectOptimizeResourcesProgress,
 											{
 												expectedRevision: request.expectedRevision,
@@ -394,7 +394,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectReplaceConfig,
+					SerakkiElectronApi.channels.editorProjectReplaceConfig,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"replace-config",
@@ -405,7 +405,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectReplaceResource,
+					SerakkiElectronApi.channels.editorProjectReplaceResource,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"replace-resource",
@@ -415,7 +415,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, request) => repository.replaceResourceFx(request),
 						),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectUpsertItem, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectUpsertItem, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"upsert-item",
 						ownership,
@@ -424,7 +424,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, request) => repository.upsertItemFx(request),
 					),
 				);
-				handleFn(ArkiniElectronApi.channels.editorProjectDeleteItem, (_event, candidate) =>
+				handleFn(SerakkiElectronApi.channels.editorProjectDeleteItem, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"delete-item",
 						ownership,
@@ -434,7 +434,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectSaveResourceMetadata,
+					SerakkiElectronApi.channels.editorProjectSaveResourceMetadata,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"save-resource-metadata",
@@ -445,7 +445,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectDeleteResource,
+					SerakkiElectronApi.channels.editorProjectDeleteResource,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"delete-resource",
@@ -456,7 +456,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectImportResources,
+					SerakkiElectronApi.channels.editorProjectImportResources,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"upsert-resource",
@@ -473,7 +473,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				handleFn(
-					ArkiniElectronApi.channels.editorProjectBuildVersionSave,
+					SerakkiElectronApi.channels.editorProjectBuildVersionSave,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
 							"save-build-version",
@@ -484,30 +484,30 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						),
 				);
 				const channels = [
-					ArkiniElectronApi.channels.editorStatus,
-					ArkiniElectronApi.channels.editorAwaitIdle,
-					ArkiniElectronApi.channels.editorProjectBuild,
-					ArkiniElectronApi.channels.editorProjectBuildVersionSave,
-					ArkiniElectronApi.channels.editorProjectBuildSave,
-					ArkiniElectronApi.channels.editorProjectCreate,
-					ArkiniElectronApi.channels.editorProjectDismissInvalid,
-					ArkiniElectronApi.channels.editorProjectDelete,
-					ArkiniElectronApi.channels.editorProjectDeleteItem,
-					ArkiniElectronApi.channels.editorProjectDeleteResource,
-					ArkiniElectronApi.channels.editorProjectSaveResourceMetadata,
-					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
-					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
-					ArkiniElectronApi.channels.editorProjectImportArkpack,
-					ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
-					ArkiniElectronApi.channels.editorProjectImportResources,
-					ArkiniElectronApi.channels.editorProjectList,
-					ArkiniElectronApi.channels.editorProjectOpenDirectory,
-					ArkiniElectronApi.channels.editorProjectOptimizeResources,
-					ArkiniElectronApi.channels.editorProjectRead,
-					ArkiniElectronApi.channels.editorProjectRefresh,
-					ArkiniElectronApi.channels.editorProjectReplaceConfig,
-					ArkiniElectronApi.channels.editorProjectReplaceResource,
-					ArkiniElectronApi.channels.editorProjectUpsertItem,
+					SerakkiElectronApi.channels.editorStatus,
+					SerakkiElectronApi.channels.editorAwaitIdle,
+					SerakkiElectronApi.channels.editorProjectBuild,
+					SerakkiElectronApi.channels.editorProjectBuildVersionSave,
+					SerakkiElectronApi.channels.editorProjectBuildSave,
+					SerakkiElectronApi.channels.editorProjectCreate,
+					SerakkiElectronApi.channels.editorProjectDismissInvalid,
+					SerakkiElectronApi.channels.editorProjectDelete,
+					SerakkiElectronApi.channels.editorProjectDeleteItem,
+					SerakkiElectronApi.channels.editorProjectDeleteResource,
+					SerakkiElectronApi.channels.editorProjectSaveResourceMetadata,
+					SerakkiElectronApi.channels.editorProjectExportJsonDirectory,
+					SerakkiElectronApi.channels.editorProjectImportJsonDirectory,
+					SerakkiElectronApi.channels.editorProjectImportSerapack,
+					SerakkiElectronApi.channels.editorProjectImportInstalledSerapack,
+					SerakkiElectronApi.channels.editorProjectImportResources,
+					SerakkiElectronApi.channels.editorProjectList,
+					SerakkiElectronApi.channels.editorProjectOpenDirectory,
+					SerakkiElectronApi.channels.editorProjectOptimizeResources,
+					SerakkiElectronApi.channels.editorProjectRead,
+					SerakkiElectronApi.channels.editorProjectRefresh,
+					SerakkiElectronApi.channels.editorProjectReplaceConfig,
+					SerakkiElectronApi.channels.editorProjectReplaceResource,
+					SerakkiElectronApi.channels.editorProjectUpsertItem,
 					...noteChannels,
 				];
 				app.once("will-quit", () => {

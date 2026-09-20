@@ -2,12 +2,12 @@
 
 set -euo pipefail
 
-if [[ "${ARKINI_MISE_ACTIVE:-}" != "1" ]]; then
+if [[ "${SERAKKI_MISE_ACTIVE:-}" != "1" ]]; then
 	if ! command -v mise >/dev/null 2>&1; then
 		echo "Serakki repository commands require mise: https://mise.jdx.dev" >&2
 		exit 127
 	fi
-	export ARKINI_MISE_ACTIVE=1
+	export SERAKKI_MISE_ACTIVE=1
 	exec mise exec -- bash "$0" "$@"
 fi
 
@@ -26,16 +26,16 @@ build_desktop() {
 }
 
 # @cmd Print the canonical SHA-256 key for the repository game build
-arkpack-fingerprint() {
+serapack-fingerprint() {
 	# Hash paths as well as bytes; Notes, Git state and generated builds are excluded.
 	# Builder sources are deliberately conservative instead of maintaining an import graph.
 	{
 		find src shared electron scripts -type f ! -name _route.ts -print0 || return $?
-		find game/arkini/items -type f -name '*.json' -print0 || return $?
-		find game/arkini/artwork game/arkini/image -type f -name '*.png' -print0 || return $?
-		# Audio metadata is validated source even though names never enter the Arkpack.
-		find game/arkini/music game/arkini/sfx -type f \( -name '*.ogg' -o -name '*.json' \) -print0 || return $?
-		printf '%s\0' game/arkini/game.json game/arkini/schema.json \
+		find game/serakki/items -type f -name '*.json' -print0 || return $?
+		find game/serakki/artwork game/serakki/image -type f -name '*.png' -print0 || return $?
+		# Audio metadata is validated source even though names never enter the Serapack.
+		find game/serakki/music game/serakki/sfx -type f \( -name '*.ogg' -o -name '*.json' \) -print0 || return $?
+		printf '%s\0' game/serakki/game.json game/serakki/schema.json \
 			Argcfile.sh mise.toml package.json package-lock.json electron.vite.config.ts tsconfig*.json
 	} | LC_ALL=C coreutils sort -z | xargs -0 coreutils sha256sum --binary --zero |
 		{
@@ -44,7 +44,7 @@ arkpack-fingerprint() {
 			# The Editor revision is not build content; preserve every other manifest field.
 			node --input-type=module -e '
 				import { readFileSync } from "node:fs";
-				const marker = JSON.parse(readFileSync("game/arkini/project.json", "utf8"));
+				const marker = JSON.parse(readFileSync("game/serakki/project.json", "utf8"));
 				if (Number.isSafeInteger(marker.revision) && marker.revision >= 0) marker.revision = 0;
 				process.stdout.write(JSON.stringify(marker));
 			' || return $?
@@ -52,62 +52,62 @@ arkpack-fingerprint() {
 		coreutils sha256sum | coreutils cut -d ' ' -f 1
 }
 
-install_game_arkpack() {
+install_game_serapack() {
 	local source source_dir target verdict fingerprint cache record
 	local -a pack_arguments
-	target=game/arkini/build/arkini.arkpack
+	target=game/serakki/build/serakki.serapack
 	cache=$target.cache
-	pack_arguments=(game pack ./game/arkini)
+	pack_arguments=(game pack ./game/serakki)
 	if [[ "${1:-}" == "--silent" ]]; then
 		pack_arguments+=(--silent)
 	fi
-	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" ]]; then
-		fingerprint=$(arkpack-fingerprint) || return $?
+	if [[ -z "${SERAKKI_PREBUILT_SERAPACK:-}" ]]; then
+		fingerprint=$(serapack-fingerprint) || return $?
 		record=
 		if [[ -f "$target" ]]; then
 			record=$(printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target") || return $?
 		fi
-		if [[ "${ARKINI_RELEASE_SIGN:-}" != 1 && -f "$cache" && -n "$record" &&
-			! -e game/arkini/editor.lock &&
+		if [[ "${SERAKKI_RELEASE_SIGN:-}" != 1 && -f "$cache" && -n "$record" &&
+			! -e game/serakki/editor.lock &&
 			"$record" == "$(cat "$cache")" ]]; then
-			echo "Arkpack unchanged; reusing $target."
+			echo "Serapack unchanged; reusing $target."
 		else
 			node .out/desktop/build/main/cli/serakki.js "${pack_arguments[@]}" || return $?
 		fi
 	else
-		source_dir=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd) || return $?
-		source=$source_dir/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
+		source_dir=$(cd -- "$(dirname -- "$SERAKKI_PREBUILT_SERAPACK")" && pwd) || return $?
+		source=$source_dir/$(basename -- "$SERAKKI_PREBUILT_SERAPACK")
 		if [[ ! -f "$source" ]]; then
-			echo "Prebuilt Arkpack does not exist: $source" >&2
+			echo "Prebuilt Serapack does not exist: $source" >&2
 			return 1
 		fi
-		rm -rf game/arkini/build || return $?
-		mkdir -p game/arkini/build || return $?
+		rm -rf game/serakki/build || return $?
+		mkdir -p game/serakki/build || return $?
 		cp "$source" "$target" || return $?
 	fi
-	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
-	node .out/desktop/build/main/cli/serakki.js arkpack verify "$target" |
+	verdict=${SERAKKI_EXPECTED_PROVENANCE:-community}
+	node .out/desktop/build/main/cli/serakki.js serapack verify "$target" |
 		grep -Fx "{\"type\":\"$verdict\"}" || return $?
-	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" && "${ARKINI_RELEASE_SIGN:-}" != 1 ]]; then
+	if [[ -z "${SERAKKI_PREBUILT_SERAPACK:-}" && "${SERAKKI_RELEASE_SIGN:-}" != 1 ]]; then
 		{ printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target"; } > "$cache" || return $?
 	fi
 }
 
-install_preview_game_arkpack() {
-	local arkpack_exit_code target
-	target=game/arkini/build/arkini.arkpack
-	if install_game_arkpack; then
+install_preview_game_serapack() {
+	local serapack_exit_code target
+	target=game/serakki/build/serakki.serapack
+	if install_game_serapack; then
 		return
 	else
-		arkpack_exit_code=$?
+		serapack_exit_code=$?
 	fi
-	echo "Arkpack build failed with exit code $arkpack_exit_code; continuing application preview." >&2
+	echo "Serapack build failed with exit code $serapack_exit_code; continuing application preview." >&2
 	if [[ -f "$target" ]]; then
-		echo "Using the last successfully built Arkpack: $target" >&2
+		echo "Using the last successfully built Serapack: $target" >&2
 		return
 	fi
-	mkdir -p game/arkini/build
-	echo "No previously built Arkpack is available; continuing without a bundled game." >&2
+	mkdir -p game/serakki/build
+	echo "No previously built Serapack is available; continuing without a bundled game." >&2
 }
 
 format_check() {
@@ -135,12 +135,12 @@ package_macos_artifacts() {
 		--mac \
 		--arm64 \
 		--publish never
-	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
+	cp game/serakki/build/serakki.serapack .out/desktop/release/serakki.serapack
 	"$packaged_cli" --version | grep -F "$version"
-	cmp game/arkini/build/arkini.arkpack \
-		.out/desktop/release/mac-arm64/Serakki.app/Contents/Resources/game/arkini.arkpack
-	"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
-		grep -Fx "{\"type\":\"${ARKINI_EXPECTED_PROVENANCE:-community}\"}"
+	cmp game/serakki/build/serakki.serapack \
+		.out/desktop/release/mac-arm64/Serakki.app/Contents/Resources/game/serakki.serapack
+	"$packaged_cli" serapack verify game/serakki/build/serakki.serapack |
+		grep -Fx "{\"type\":\"${SERAKKI_EXPECTED_PROVENANCE:-community}\"}"
 	"$packaged_cli" editor mcp --help | grep -F -- "--remote"
 	"$packaged_cli" game replay --help | grep -F -- "--until-fatal"
 	"$packaged_cli" diagnostics slice --help | grep -F -- "--session-id"
@@ -157,8 +157,8 @@ package_windows_artifacts() {
 		--win \
 		--x64 \
 		--publish never
-	cmp game/arkini/build/arkini.arkpack \
-		.out/desktop/release/win-unpacked/resources/game/arkini.arkpack
+	cmp game/serakki/build/serakki.serapack \
+		.out/desktop/release/win-unpacked/resources/game/serakki.serapack
 }
 
 package_linux_artifacts() {
@@ -173,8 +173,8 @@ package_linux_artifacts() {
 		--linux AppImage \
 		"--$architecture" \
 		--publish never
-	cmp game/arkini/build/arkini.arkpack \
-		".out/desktop/release/$unpacked/resources/game/arkini.arkpack"
+	cmp game/serakki/build/serakki.serapack \
+		".out/desktop/release/$unpacked/resources/game/serakki.serapack"
 }
 
 # @cmd Install exact JavaScript dependencies from the lockfile
@@ -196,7 +196,7 @@ remove() {
 
 # @cmd Refresh the offline Sigstore trusted-root snapshot through TUF
 signing:update-trusted-root() {
-	tsx scripts/updateArkpackTrustedRoot.ts
+	tsx scripts/updateSerapackTrustedRoot.ts
 }
 
 # @cmd Build and verify the offline Linux x64 npm cache for LLM environments
@@ -251,7 +251,7 @@ llm:cache() {
 		rm -f "$cache_dir/_update-notifier-last-checked"
 
 		lock_hash=$(shasum -a 256 "$root_dir/package-lock.json" | awk '{print substr($1, 1, 12)}')
-		archive="$root_dir/arkini-npm-cache-linux-x64-$lock_hash.tgz"
+		archive="$root_dir/serakki-npm-cache-linux-x64-$lock_hash.tgz"
 		rm -f "$archive"
 		tar -C "$root_dir" -czf "$archive" .npm-cache
 		archive_hash=$(shasum -a 256 "$archive" | awk '{print $1}')
@@ -265,7 +265,7 @@ llm:cache() {
 
 # @cmd Regenerate the portable game-project JSON Schema
 game:schema() {
-	tsx src/arkini-cli/arkini.ts game schema --output game/arkini/schema.json
+	tsx src/serakki-cli/serakki.ts game schema --output game/serakki/schema.json
 }
 
 # @cmd Synchronize application translations and remove dead static keys
@@ -301,12 +301,12 @@ version() {
 	version_backup=$(mktemp -d)
 	cp -p package.json "$version_backup/package.json"
 	cp -p package-lock.json "$version_backup/package-lock.json"
-	cp -p game/arkini/project.json "$version_backup/project.json"
+	cp -p game/serakki/project.json "$version_backup/project.json"
 	if ! npm version --allow-same-version --no-git-tag-version "$argc_version"; then
 		cp -p "$version_backup/package.json" package.json
 		cp -p "$version_backup/package-lock.json" package-lock.json
-		cp -p "$version_backup/project.json" game/arkini/project.json
-		rm -f game/arkini/project.json.version.pending
+		cp -p "$version_backup/project.json" game/serakki/project.json
+		rm -f game/serakki/project.json.version.pending
 		rm -R "$version_backup"
 		return 1
 	fi
@@ -318,17 +318,17 @@ version() {
 			packageLock.version !== packageManifest.version ||
 			packageLock.packages?.[""]?.version !== packageManifest.version
 		) throw new Error("package-lock.json does not match package.json after versioning.");
-		const path = "game/arkini/project.json";
+		const path = "game/serakki/project.json";
 		const pending = `${path}.version.pending`;
 		const project = JSON.parse(await readFile(path, "utf8"));
-		project.arkini = packageManifest.version;
+		project.serakki = packageManifest.version;
 		await writeFile(pending, `${JSON.stringify(project, undefined, "\t")}\n`);
 		await rename(pending, path);
 	'; then
 		cp -p "$version_backup/package.json" package.json
 		cp -p "$version_backup/package-lock.json" package-lock.json
-		cp -p "$version_backup/project.json" game/arkini/project.json
-		rm -f game/arkini/project.json.version.pending
+		cp -p "$version_backup/project.json" game/serakki/project.json
+		rm -f game/serakki/project.json.version.pending
 		rm -R "$version_backup"
 		return 1
 	fi
@@ -342,7 +342,7 @@ dev() {
 
 # @cmd Start development with the loopback Chromium control endpoint
 dev-control() {
-	ARKINI_DEV_CONTROL=1 electron-vite dev
+	SERAKKI_DEV_CONTROL=1 electron-vite dev
 }
 
 # @cmd Inspect the editor MCP endpoint
@@ -353,26 +353,26 @@ mcp-inspect() {
 		--transport http
 }
 
-# @cmd Build Electron and verify the bundled game Arkpack
+# @cmd Build Electron and verify the bundled game Serapack
 build() {
 	build_desktop
-	install_game_arkpack
+	install_game_serapack
 }
 
 # @cmd Open the unpacked macOS arm64 application
 # @flag --build Force a rebuild before opening the application
-# @flag --skip-arkpack Skip bundled game Arkpack packing and verification
+# @flag --skip-serapack Skip bundled game Serapack packing and verification
 preview-macos() {
 	local application
 	application=.out/desktop/release/mac-arm64/Serakki.app
 	if [[ "${argc_build:-0}" == 1 || ! -d "$application" ]]; then
 		clean_desktop
 		build_desktop
-		if [[ "${argc_skip_arkpack:-0}" == 1 ]]; then
-			echo "Skipping bundled game Arkpack packing and verification (--skip-arkpack)."
-			mkdir -p game/arkini/build
+		if [[ "${argc_skip_serapack:-0}" == 1 ]]; then
+			echo "Skipping bundled game Serapack packing and verification (--skip-serapack)."
+			mkdir -p game/serakki/build
 		else
-			install_preview_game_arkpack
+			install_preview_game_serapack
 		fi
 		electron-builder \
 			--config electron-builder.yml \
@@ -405,7 +405,7 @@ preview-cli() {
 package-macos() {
 	clean_desktop
 	build_desktop
-	install_game_arkpack
+	install_game_serapack
 	package_macos_artifacts
 }
 
@@ -413,7 +413,7 @@ package-macos() {
 package-windows() {
 	clean_desktop
 	build_desktop
-	install_game_arkpack
+	install_game_serapack
 	package_windows_artifacts
 }
 
@@ -421,7 +421,7 @@ package-windows() {
 package-linux() {
 	clean_desktop
 	build_desktop
-	install_game_arkpack
+	install_game_serapack
 	package_linux_artifacts x64
 }
 
@@ -429,7 +429,7 @@ package-linux() {
 package-linux-arm64() {
 	clean_desktop
 	build_desktop
-	install_game_arkpack
+	install_game_serapack
 	package_linux_artifacts arm64
 }
 
@@ -474,27 +474,27 @@ platform-check() {
 		test/game-persistence/fx/createFilesystemGameSaveFilesFx.test.ts \
 		test/electron \
 		test/project-authoring/filesystem \
-		test/arkpack-artifact \
-		test/scripts/arkpackBuild.test.ts \
-		test/arkini-cli/command/ArkiniCli.test.ts \
+		test/serapack-artifact \
+		test/scripts/serapackBuild.test.ts \
+		test/serakki-cli/command/SerakkiCli.test.ts \
 		test/game-config-source \
 		test/game-config-compiler/fx/readGameSourceFilesFx.test.ts
 }
 
 # @cmd Run the complete repository gate
-# @flag --skip-arkpack Skip bundled game Arkpack packing and verification
-# @flag --silent Suppress bundled game warning diagnostics during Arkpack packing
+# @flag --skip-serapack Skip bundled game Serapack packing and verification
+# @flag --silent Suppress bundled game warning diagnostics during Serapack packing
 check() {
 	format_check
 	translations:check
 	typecheck
 	build_desktop
-	if [[ "${argc_skip_arkpack:-0}" == 1 ]]; then
-		echo "Skipping bundled game Arkpack packing and verification (--skip-arkpack)."
+	if [[ "${argc_skip_serapack:-0}" == 1 ]]; then
+		echo "Skipping bundled game Serapack packing and verification (--skip-serapack)."
 	elif [[ "${argc_silent:-0}" == 1 ]]; then
-		install_game_arkpack --silent
+		install_game_serapack --silent
 	else
-		install_game_arkpack
+		install_game_serapack
 	fi
 	dependency_check
 	copy_paste_check

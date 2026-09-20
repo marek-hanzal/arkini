@@ -5,7 +5,7 @@ import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandida
 import type { ProjectDescriptor } from "~/project-authoring/schema/ProjectDescriptorSchema";
 import type { ProjectOwnershipSchema } from "~/project-authoring/schema/ProjectOwnershipSchema";
 import { useEffect, useState } from "react";
-import { EditorArkpackImportButton } from "~/project-authoring/ui/EditorArkpackImportButton";
+import { EditorSerapackImportButton } from "~/project-authoring/ui/EditorSerapackImportButton";
 import { BackButton } from "~/ui/ui/BackButton";
 import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
@@ -67,10 +67,10 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 				</header>
 
 				<section className="grid gap-3 sm:grid-cols-3">
-					<EditorArkpackImportButton
+					<EditorSerapackImportButton
 						blocked={actions.blocked}
-						pending={actions.active === "import-arkpack"}
-						onFileFn={actions.importArkpackFileFn}
+						pending={actions.active === "import-serapack"}
+						onFileFn={actions.importSerapackFileFn}
 					/>
 					<Button
 						disabled={actions.blocked}

@@ -39,7 +39,7 @@ export const createOwnership = (localReady = false): ServerOwnership => {
 	let projectContext: string | undefined;
 	const overview = {
 		port: 32_310,
-		remotePassword: "arkini_mcp_fixture",
+		remotePassword: "serakki_mcp_fixture",
 		local: localReady
 			? {
 					type: "ready" as const,

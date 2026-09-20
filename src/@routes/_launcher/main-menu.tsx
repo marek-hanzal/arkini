@@ -3,8 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import { ArkiniAppVersion, ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
-import { useArkpacks } from "~/arkpack-selector/ui/useArkpacks";
+import { SerakkiAppVersion, SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
+import { useSerapacks } from "~/serapack-selector/ui/useSerapacks";
 import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
@@ -13,7 +13,7 @@ import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/_launcher/main-menu")({
 	component: () => {
-		const { state: catalogState } = useArkpacks();
+		const { state: catalogState } = useSerapacks();
 		const startup = useAtomValue(LauncherStartupAtom);
 		const [exitState, requestExitFn] = useAtom(MainMenuExitCommandAtom);
 		const editorStatus = useAtomValue(EditorServiceStatusAtom);
@@ -21,9 +21,11 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 		const defaultPackageAvailable =
 			AsyncResult.isSuccess(startup) &&
 			!startup.waiting &&
-			startup.value.defaultPackageId === ArkiniDefaultPackageId &&
+			startup.value.defaultPackageId === SerakkiDefaultPackageId &&
 			catalogState.type === "ready" &&
-			catalogState.arkpacks.some((arkpack) => arkpack.packageId === ArkiniDefaultPackageId);
+			catalogState.serapacks.some(
+				(serapack) => serapack.packageId === SerakkiDefaultPackageId,
+			);
 		const playUnavailable =
 			catalogState.type === "failed" ||
 			(AsyncResult.isFailure(startup) && !startup.waiting) ||
@@ -40,7 +42,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 							to="/action/load-game/$packageId"
 							preload={false}
 							params={{
-								packageId: ArkiniDefaultPackageId,
+								packageId: SerakkiDefaultPackageId,
 							}}
 							className="rounded-xl"
 						>
@@ -56,10 +58,10 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						</PrimaryButton>
 					)}
 					<ButtonLink
-						to="/arkpacks"
+						to="/serapacks"
 						className="rounded-xl"
 					>
-						Arkpacks
+						Serapacks
 					</ButtonLink>
 					{editorStatus.type === "ready" ? (
 						<ButtonLink
@@ -104,9 +106,9 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 					</Button>
 					<p
 						className="pt-1 text-center text-xs text-subtle"
-						data-ui="ArkiniAppVersion"
+						data-ui="SerakkiAppVersion"
 					>
-						v{ArkiniAppVersion}
+						v{SerakkiAppVersion}
 					</p>
 					{catalogState.type === "failed" ? (
 						<p className="text-center text-sm text-danger">

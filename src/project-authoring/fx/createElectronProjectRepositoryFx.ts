@@ -64,7 +64,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 	return {
 		awaitIdleFx: callFx(
 			"await-idle",
-			() => window.arkini.editor.awaitIdleFn(),
+			() => window.serakki.editor.awaitIdleFn(),
 			() => undefined,
 		),
 		createProjectFx: (request) =>
@@ -72,7 +72,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"create-project",
 				callFx(
 					"create-project",
-					() => window.arkini.editor.createProjectFn(request.config.meta.id),
+					() => window.serakki.editor.createProjectFn(request.config.meta.id),
 					parseProjectFn,
 				),
 			),
@@ -81,7 +81,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-project",
 				callFx(
 					"delete-project",
-					() => window.arkini.editor.deleteProjectFn(projectId),
+					() => window.serakki.editor.deleteProjectFn(projectId),
 					() => undefined,
 				),
 			),
@@ -90,7 +90,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"create-note",
 				callFx(
 					"create-note",
-					() => window.arkini.editor.createNoteFn(request),
+					() => window.serakki.editor.createNoteFn(request),
 					(value) => {
 						const note = NoteSchema.parse(value);
 						if (note.projectId !== request.projectId)
@@ -106,7 +106,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-note",
 				callFx(
 					"delete-note",
-					() => window.arkini.editor.deleteNoteFn(request),
+					() => window.serakki.editor.deleteNoteFn(request),
 					() => undefined,
 				),
 			),
@@ -115,7 +115,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-item",
 				callFx(
 					"delete-item",
-					() => window.arkini.editor.deleteItemFn(request),
+					() => window.serakki.editor.deleteItemFn(request),
 					parseCommitFn,
 				),
 			),
@@ -124,7 +124,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"save-resource-metadata",
 				callFx(
 					"save-resource-metadata",
-					() => window.arkini.editor.saveResourceMetadataFn(request),
+					() => window.serakki.editor.saveResourceMetadataFn(request),
 					parseProjectFn,
 				),
 			),
@@ -133,13 +133,13 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"delete-resource",
 				callFx(
 					"delete-resource",
-					() => window.arkini.editor.deleteResourceFn(request),
+					() => window.serakki.editor.deleteResourceFn(request),
 					parseProjectFn,
 				),
 			),
 		listProjectsFx: callFx(
 			"list-projects",
-			() => window.arkini.editor.listProjectsFn(),
+			() => window.serakki.editor.listProjectsFn(),
 			(value) => ProjectCandidateSchema.array().parse(value),
 		),
 		optimizeResourcesFx: ({ onProgressFn, ...request }) =>
@@ -149,7 +149,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					Effect.sync(() =>
 						onProgressFn === undefined
 							? undefined
-							: window.arkini.editor.onOptimizeResourcesProgressFn((progress) => {
+							: window.serakki.editor.onOptimizeResourcesProgressFn((progress) => {
 									const parsed =
 										optimizeResourcesProgressSchema.safeParse(progress);
 									if (!parsed.success) return;
@@ -168,7 +168,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 					() =>
 						callFx(
 							"optimize-resources",
-							() => window.arkini.editor.optimizeResourcesFn(request),
+							() => window.serakki.editor.optimizeResourcesFn(request),
 							(value) => optimizeResourcesResultSchema.parse(value),
 						),
 					(unsubscribeFn) => Effect.sync(() => unsubscribeFn?.()),
@@ -177,7 +177,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 		listNotesFx: (projectId) =>
 			callFx(
 				"list-notes",
-				() => window.arkini.editor.listNotesFn(projectId),
+				() => window.serakki.editor.listNotesFn(projectId),
 				(value) => {
 					const notes = NoteSchema.array().parse(value);
 					if (notes.some((note) => note.projectId !== projectId))
@@ -188,7 +188,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 		readProjectFx: (projectId) =>
 			callFx(
 				"read-project",
-				() => window.arkini.editor.readProjectFn(projectId),
+				() => window.serakki.editor.readProjectFn(projectId),
 				(value) => (value === null ? null : parseProjectFn(value)),
 			),
 		replaceConfigFx: (request) =>
@@ -196,7 +196,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"replace-config",
 				callFx(
 					"replace-config",
-					() => window.arkini.editor.replaceConfigFn(request),
+					() => window.serakki.editor.replaceConfigFn(request),
 					parseCommitFn,
 				),
 			),
@@ -205,7 +205,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"replace-resource",
 				callFx(
 					"replace-resource",
-					() => window.arkini.editor.replaceResourceFn(request),
+					() => window.serakki.editor.replaceResourceFn(request),
 					parseProjectFn,
 				),
 			),
@@ -214,7 +214,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"upsert-item",
 				callFx(
 					"upsert-item",
-					() => window.arkini.editor.upsertItemFn(request),
+					() => window.serakki.editor.upsertItemFn(request),
 					parseCommitFn,
 				),
 			),
@@ -223,7 +223,7 @@ export const createElectronProjectRepositoryFx = Effect.gen(function* () {
 				"update-note",
 				callFx(
 					"update-note",
-					() => window.arkini.editor.updateNoteFn(request),
+					() => window.serakki.editor.updateNoteFn(request),
 					(value) => {
 						const note = NoteSchema.parse(value);
 						if (note.projectId !== request.projectId || note.noteId !== request.noteId)

@@ -7,12 +7,12 @@ class GameSaveStorageError extends Data.TaggedError("GameSaveStorageError")<{
 }> {}
 
 interface Props {
-	readonly api?: Window["arkini"]["save"];
+	readonly api?: Window["serakki"]["save"];
 }
 
 /** Adapts the typed preload Promise transport once into an Effect-native save capability. */
 export const createElectronGameSaveStorageFx = Effect.fn("createElectronGameSaveStorageFx")(
-	({ api = window.arkini.save }: Props = {}) =>
+	({ api = window.serakki.save }: Props = {}) =>
 		Effect.succeed({
 			readFx: Effect.fn("GameSaveStorage.readFx")((key: GameSaveStorage.Key) =>
 				Effect.tryPromise({

@@ -1,0 +1,20 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "ome444b3wwfhiuq8ec7aaa1d",
+		"id": "serakki-banknote",
+		"title": "Serakki Banknote",
+		"ui": "simple",
+		"draft": true,
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"serakki-banknote"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

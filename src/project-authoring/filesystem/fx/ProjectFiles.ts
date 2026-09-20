@@ -5,7 +5,7 @@ import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchem
 
 /** Complete source payload for initial project creation or import, including resource bodies. */
 export interface ProjectFiles {
-	readonly arkpack: VersionPartsSchema.Type;
+	readonly serapack: VersionPartsSchema.Type;
 	readonly marker: GameProjectManifestSchema.Type;
 	readonly config: GameConfigSchema.Type;
 	readonly resources: ReadonlyArray<ResourceSchema.Type>;

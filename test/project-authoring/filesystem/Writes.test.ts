@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
+import { createTestPngBytes } from "~test/serapack-support/fn/createTestPngBytes";
 import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 import {
 	createProjectTestHarness,
@@ -17,7 +17,7 @@ import {
 let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-fs-writes-");
+	harness = await createProjectTestHarness("serakki-fs-writes-");
 });
 
 afterEach(async () => harness.close());

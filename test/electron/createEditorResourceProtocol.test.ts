@@ -61,7 +61,7 @@ const requestFn = (url: string, init?: RequestInit) =>
 	Effect.runPromise(protocol.handleRequestFx(new Request(url, init)));
 
 beforeEach(async () => {
-	root = await realpath(await mkdtemp(join(tmpdir(), "arkini-resource-protocol-")));
+	root = await realpath(await mkdtemp(join(tmpdir(), "serakki-resource-protocol-")));
 	await mkdir(join(root, "artwork"));
 	await mkdir(join(root, "music"));
 	netFetch.mockReset();
@@ -92,7 +92,7 @@ beforeEach(async () => {
 				Effect.succeed(
 					projectId === "project" ? (locations.get(resourceId) ?? null) : null,
 				),
-			isTrustedUrlFn: (url) => url === "arkini://app" || url === "http://127.0.0.1:4040",
+			isTrustedUrlFn: (url) => url === "serakki://app" || url === "http://127.0.0.1:4040",
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 });

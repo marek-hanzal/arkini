@@ -7,12 +7,12 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,
@@ -42,18 +42,18 @@ const deferred = () => {
 };
 
 const createGame = (disposeFx: Game["disposeFx"]): Game => ({
-	arkpack: {
+	serapack: {
 		packageId,
 		contentHash: "content-exit",
-		title: testArkpackConfig.meta.title,
+		title: testSerapackConfig.meta.title,
 		version: "1.0",
-		arkini: ArkiniAppVersion,
+		serakki: SerakkiAppVersion,
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	disposeFx,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,

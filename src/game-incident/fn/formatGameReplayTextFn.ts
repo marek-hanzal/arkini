@@ -12,11 +12,11 @@ export const formatGameReplayTextFn = (report: GameReplayReport): string => {
 			? `Fatal failure reproduced after ${report.elapsedMs} ms.`
 			: `No fatal failure was observed during the bounded ${report.elapsedMs} ms replay.`;
 	return [
-		"# Arkini game replay",
+		"# Serakki game replay",
 		"",
 		result,
 		"",
-		`- Arkini application: ${report.applicationVersion}`,
+		`- Serakki application: ${report.applicationVersion}`,
 		`- Package: ${report.packageId}`,
 		`- Content hash: ${report.contentHash}`,
 		`- Game version: ${report.gameVersion}`,

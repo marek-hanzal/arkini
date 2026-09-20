@@ -13,8 +13,8 @@ export const DeleteItemLineInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "urn:arkini:schema:mcp:delete-item-line-input",
-		$id: "urn:arkini:schema:mcp:delete-item-line-input",
+		id: "urn:serakki:schema:mcp:delete-item-line-input",
+		$id: "urn:serakki:schema:mcp:delete-item-line-input",
 		title: "Delete item line tool input",
 		description:
 			"Remove exactly one existing production line; reject missing or ambiguous line IDs.",

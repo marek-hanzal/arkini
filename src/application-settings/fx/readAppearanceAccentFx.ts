@@ -6,7 +6,7 @@ import { AppearanceAccentError } from "~/application-settings/error/AppearanceAc
 export const readAppearanceAccentFx = Effect.fn("readAppearanceAccentFx")(() =>
 	Effect.tryPromise({
 		try: async () =>
-			AppearanceAccentSchema.parse(await window.arkini.appearance.readAccentFn()),
+			AppearanceAccentSchema.parse(await window.serakki.appearance.readAccentFn()),
 		catch: (cause) =>
 			new AppearanceAccentError({
 				operation: "read",

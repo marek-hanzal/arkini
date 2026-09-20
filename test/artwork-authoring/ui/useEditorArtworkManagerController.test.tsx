@@ -91,12 +91,12 @@ afterEach(async () => {
 });
 
 describe("useEditorArtworkManagerController", () => {
-	it("admits arkpack and PNG imports with their exact command payloads", () => {
-		const arkpack = new File(
+	it("admits serapack and PNG imports with their exact command payloads", () => {
+		const serapack = new File(
 			[
 				Uint8Array.of(1),
 			],
-			"source.arkpack",
+			"source.serapack",
 		);
 		const png = new File(
 			[
@@ -108,9 +108,9 @@ describe("useEditorArtworkManagerController", () => {
 			},
 		);
 
-		controller?.onArkpackChangeFn(
+		controller?.onSerapackChangeFn(
 			changeEvent([
-				arkpack,
+				serapack,
 			]),
 		);
 		controller?.onFilesChangeFn(
@@ -120,9 +120,9 @@ describe("useEditorArtworkManagerController", () => {
 		);
 
 		expect(state.importArtwork).toHaveBeenNthCalledWith(1, {
-			file: arkpack,
+			file: serapack,
 			projectId: "editor-test",
-			source: "arkpack",
+			source: "serapack",
 		});
 		expect(state.importArtwork).toHaveBeenNthCalledWith(2, {
 			files: [

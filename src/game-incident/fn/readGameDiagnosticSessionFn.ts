@@ -79,7 +79,7 @@ export const readGameDiagnosticSessionFn = ({
 			packageId: started.data.packageId,
 			contentHash: started.data.contentHash,
 			gameVersion: started.data.gameVersion,
-			arkiniVersion: started.data.arkini,
+			serakkiVersion: started.data.serakki,
 			restored: started.data.restored,
 			startedAt: started.data.startedAt,
 		},

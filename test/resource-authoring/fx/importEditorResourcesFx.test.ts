@@ -52,7 +52,7 @@ describe("native resource import settlement", () => {
 			admission.acquireReplacementFx("refresh-project", () => false),
 		);
 		const importResourcesFn = vi.fn(async () => response);
-		vi.stubGlobal("arkini", {
+		vi.stubGlobal("serakki", {
 			editor: {
 				importResourcesFn,
 			},
@@ -89,7 +89,7 @@ describe("native resource import settlement", () => {
 		const started = new Promise<void>((resolve) => {
 			markStarted = resolve;
 		});
-		vi.stubGlobal("arkini", {
+		vi.stubGlobal("serakki", {
 			editor: {
 				importResourcesFn: () => {
 					markStarted();

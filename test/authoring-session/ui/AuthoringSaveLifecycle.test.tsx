@@ -83,7 +83,7 @@ const createFixture = async (kind: "item" | "project") => {
 		finishSave = resolve;
 	});
 	const write = vi.fn(() => response);
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		editor: {
 			upsertItemFn: write,
 			replaceConfigFn: write,

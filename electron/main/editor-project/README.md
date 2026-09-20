@@ -13,12 +13,12 @@ One GUI Electron main or Node CLI process owns the physical Editor project repos
 | Renderer repository proxy and response validation | `src/project-authoring` | [`../../../src/project-authoring/fx/createElectronProjectRepositoryFx.ts`](../../../src/project-authoring/fx/createElectronProjectRepositoryFx.ts) |
 | Filesystem repository composition | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Discovery, create/open/refresh/delete | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createLifecycleOperationsFx.ts) |
-| Streamed Arkpack import | `src/arkpack-admission` + `src/project-authoring/filesystem` | [`../../../src/arkpack-admission/fx/extractArkpackFileFx.ts`](../../../src/arkpack-admission/fx/extractArkpackFileFx.ts), [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
+| Streamed Serapack import | `src/serapack-admission` + `src/project-authoring/filesystem` | [`../../../src/serapack-admission/fx/extractSerapackFileFx.ts`](../../../src/serapack-admission/fx/extractSerapackFileFx.ts), [`../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts`](../../../src/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx.ts) |
 | Config, Item and Resource commits | `src/project-authoring/filesystem` | [`../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts`](../../../src/project-authoring/filesystem/fx/createCommitOperationsFx.ts) |
 | Notes and Build | Their `src/*` contracts plus Project Authoring filesystem operations | `src/project-authoring/filesystem/fx/create*OperationsFx.ts` |
 | Ordered current-tree writes | `src/project-authoring/filesystem` + mechanical `filesystem-write` | [`../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectFileSetFx.ts) |
 | IPC authorization and dispatch | `electron/main/editor-project` | [`ipc/registerEditorProjectIpcFx.ts`](ipc/registerEditorProjectIpcFx.ts) |
-| CLI MCP lifecycle | `src/arkini-cli` | [`../../../src/arkini-cli/command/EditorMcpCommand.ts`](../../../src/arkini-cli/command/EditorMcpCommand.ts) |
+| CLI MCP lifecycle | `src/serakki-cli` | [`../../../src/serakki-cli/command/EditorMcpCommand.ts`](../../../src/serakki-cli/command/EditorMcpCommand.ts) |
 | Mounted renderer projection and replacement guard | `src/authoring-session` | [`../../../src/authoring-session/fx/refreshEditorProjectFx.ts`](../../../src/authoring-session/fx/refreshEditorProjectFx.ts) |
 
 The filesystem repository implements product capabilities; it does not own their schemas or renderer presentation. Renderer code sees no managed project path, file handle, native object or mutable repository state. A browser-selected Resource contributes only its native source path so Electron main can stream or copy it without an IPC byte payload.
@@ -34,7 +34,7 @@ This island has deliberate cross-process and lifecycle coupling:
 - `project-authoring ↔ project-note` and authoring products cross at exact repository or presentation contracts. No root is a generic Editor superdomain.
 - `filesystem-write` stays mechanical and imports none of its product consumers. The Editor repository supplies path ownership, file sets, serialization and error meaning.
 - MCP calls the same Project Repository capabilities and revision checks. It never owns a second project store or bypass mutation path.
-- Arkpack import is selected in Electron main, stream-extracted through the shared admission owner, and published as one managed portable project. Archive and resource bytes never cross renderer IPC.
+- Serapack import is selected in Electron main, stream-extracted through the shared admission owner, and published as one managed portable project. Archive and resource bytes never cross renderer IPC.
 - `serakki-cli editor mcp <projectId>` selects one catalog project and composes the same Node-compatible filesystem MCP storage, HTTP server, tools and optional ngrok tunnel as the GUI Editor without starting Electron.
 
 The top-level domain graph is cyclic; the process authority is not. Physical mutation terminates in this filesystem repository.
@@ -50,7 +50,7 @@ One process-lifetime repository owns:
 
 The catalog never copies canonical project identity or mutable project fields. `game.json.meta.id` remains project/package identity. Invalid catalog entries stay independently visible with their concrete error until explicitly dismissed by exact root. Dismissal preserves files and persists in the catalog so managed discovery does not restore the row. Explicitly reopening a repaired folder clears dismissal and retains its catalog ownership.
 
-Managed roots may be deleted only by explicit managed-project deletion. External roots are edited in place; deletion only unregisters them. Arkini writes only allowlisted owned paths and preserves `.git` plus unrelated files.
+Managed roots may be deleted only by explicit managed-project deletion. External roots are edited in place; deletion only unregisters them. Serakki writes only allowlisted owned paths and preserves `.git` plus unrelated files.
 
 ## Current-tree writes
 
@@ -73,7 +73,7 @@ Project projections carry resource ID, semantic type, byte size and a filesystem
 
 [`../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts`](../../../src/project-authoring/filesystem/fx/writeProjectChangesFx.ts) owns those deltas; `writeProjectFilesFx` remains the complete initial create/import writer. Both use the same ordered write owner and Note reconciliation.
 
-[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image and audio consumers, including Editor Board and Music preview. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Audio byte ranges are forwarded to the native file request. Unrequested resources are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build validates typed resources and streams their bodies into Arkpack, filtering Music to the explicit global playlist.
+[`../../main/createEditorResourceProtocolFx.ts`](../../main/createEditorResourceProtocolFx.ts) serves requested versioned Resource URLs to image and audio consumers, including Editor Board and Music preview. It admits the URL against the registered resource, checks the contained path and streams the native file response without retaining its body in Electron main. Audio byte ranges are forwarded to the native file request. Unrequested resources are not opened; ordinary saves do not touch them. Replacement changes only that resource's URL. Build validates typed resources and streams their bodies into Serapack, filtering Music to the explicit global playlist.
 
 ## Renderer replacement flow
 
@@ -90,7 +90,7 @@ capture expected revision
 
 Item and Project saves, and Item deletion, finish admitted persistence and canonical publication even after their initiating UI leaves. Terminal save/delete navigation belongs only to the originating mounted entity session; late completion must not redirect a successor route. The exact UI owners are [`useFormController`](../../../src/item-authoring/ui/useFormController.ts), [`useProjectFormController`](../../../src/project-authoring/ui/useProjectFormController.ts), and [`useDeleteController`](../../../src/item-authoring/ui/useDeleteController.ts).
 
-Resource **Optimize** follows this same write path. The renderer passes exact IDs and one semantic resource type. Main holds the repository semaphore while it processes one resource at a time through temporary files, then copies only changed files through one ordered write plan and publishes one fresh Project projection. Artwork is losslessly normalized; SFX is scanned for silent edges and re-encoded only when trimming is needed. Resource bodies are not accumulated in JavaScript memory. Optimization does not invoke Arkpack Build or its 256 px Artwork bake; general `image/` and Music resources are not optimized.
+Resource **Optimize** follows this same write path. The renderer passes exact IDs and one semantic resource type. Main holds the repository semaphore while it processes one resource at a time through temporary files, then copies only changed files through one ordered write plan and publishes one fresh Project projection. Artwork is losslessly normalized; SFX is scanned for silent edges and re-encoded only when trimming is needed. Resource bodies are not accumulated in JavaScript memory. Optimization does not invoke Serapack Build or its 256 px Artwork bake; general `image/` and Music resources are not optimized.
 The filesystem operation reports completed resources over a dedicated renderer event. One project-scoped, process-lifetime Atom owns the command and its latest progress, so route changes neither interrupt optimization nor erase its pending or settled presentation.
 
 Resource import checks the same renderer write admission and finishes an admitted native commit through Project publication even if its caller unmounts. Native source transfers serialize import preparation, conversion, commit and cleanup with source export. Idle waits acquire the transfer permit before awaiting repository operations, so Refresh also drains imports that have not reached their repository write yet.
@@ -127,7 +127,7 @@ Build and CLI pack publish compiled JSON and validated staged resource bytes. Im
 
 ## IPC and MCP
 
-- Main validates the registered Arkini renderer, exact main frame, trusted URL and request schema before dispatch.
+- Main validates the registered Serakki renderer, exact main frame, trusted URL and request schema before dispatch.
 - Renderer validates every result again through the pure transport contract.
 - Repository failure is serialized as the exact project operation plus bounded message, not leaked native state.
 - Editor persistence may fail independently without preventing gameplay boot; Editor channels report unavailable state.
@@ -153,4 +153,4 @@ Usually not affected:
 - Installed-game Runtime saves and recovery; they use separate Game Persistence ownership.
 - Gameplay Runtime, Tick and production behavior.
 - Flow/Estimate algorithms and Pixi presentation.
-- Arkpack catalog selection unless Build/install or portable source semantics change.
+- Serapack catalog selection unless Build/install or portable source semantics change.

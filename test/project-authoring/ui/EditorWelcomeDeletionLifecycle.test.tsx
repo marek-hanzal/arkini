@@ -61,10 +61,10 @@ vi.mock("~/project-authoring/fx/createFreshProjectFx", async () => {
 	};
 });
 
-vi.mock("~/project-authoring/fx/importEditorArkpackFileFx", async () => {
+vi.mock("~/project-authoring/fx/importEditorSerapackFileFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		importEditorArkpackFileFx: () => Effect.die("Unexpected arkpack import."),
+		importEditorSerapackFileFx: () => Effect.die("Unexpected serapack import."),
 	};
 });
 
@@ -90,7 +90,7 @@ describe("editor project deletion lifecycle", () => {
 	] as const)(
 		"keeps a committed %s final when Recent refresh fails and retries only refresh",
 		async (mode) => {
-			vi.stubGlobal("arkini", {
+			vi.stubGlobal("serakki", {
 				editor: {
 					dismissInvalidProjectFn: async (root: string) => {
 						try {

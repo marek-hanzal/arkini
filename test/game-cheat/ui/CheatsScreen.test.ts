@@ -46,7 +46,7 @@ vi.mock("~/game-shell/ui/PlayableGameResources", async () => {
 });
 vi.mock("~/game-presentation/ui/useGameEngine", () => {
 	const useGameEngine = () => ({
-		arkpack: {
+		serapack: {
 			packageId: "package:cheats",
 		},
 		saveKey: {

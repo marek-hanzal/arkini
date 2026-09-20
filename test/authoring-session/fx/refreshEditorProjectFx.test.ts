@@ -68,7 +68,7 @@ const runRefresh = async (
 		]).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
 	);
 	vi.stubGlobal("window", {
-		arkini: {
+		serakki: {
 			editor: {
 				refreshProjectFn: async (): Promise<
 					EditorProjectTransport.Result<EditorProjectTransport.Project>

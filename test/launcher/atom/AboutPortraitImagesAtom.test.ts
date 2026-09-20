@@ -6,7 +6,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
+import { SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { AboutPortraitImagesAtom } from "~/launcher/atom/AboutPortraitImagesAtom";
 
@@ -50,25 +50,25 @@ const payload = {
 		{
 			id: "hero",
 			type: "image",
-			url: "arkini://game/resource/hero",
+			url: "serakki://game/resource/hero",
 		},
 		{
 			id: "avatar:one",
 			type: "image",
-			url: "arkini://game/resource/avatar-one",
+			url: "serakki://game/resource/avatar-one",
 		},
 		{
 			id: "avatar:two",
 			type: "image",
-			url: "arkini://game/resource/avatar-two",
+			url: "serakki://game/resource/avatar-two",
 		},
 	],
 };
 
-vi.mock("~/arkpack-catalog/fx/loadArkpackFx", async () => {
+vi.mock("~/serapack-catalog/fx/loadSerapackFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>
+		loadSerapackFx: ({ packageId }: { readonly packageId: string }) =>
 			Effect.suspend(() => {
 				harness.loadedPackageIds.push(packageId);
 				return harness.loadFailure === undefined
@@ -133,13 +133,13 @@ describe("AboutPortraitImagesAtom", () => {
 		await vi.waitFor(() =>
 			expect(container.textContent).toBe(
 				JSON.stringify([
-					"arkini://game/resource/avatar-two",
-					"arkini://game/resource/avatar-one",
+					"serakki://game/resource/avatar-two",
+					"serakki://game/resource/avatar-one",
 				]),
 			),
 		);
 		expect(harness.loadedPackageIds).toEqual([
-			ArkiniDefaultPackageId,
+			SerakkiDefaultPackageId,
 		]);
 	});
 
@@ -158,7 +158,7 @@ describe("AboutPortraitImagesAtom", () => {
 		});
 		expect(container.textContent).toBe("[]");
 		expect(harness.loadedPackageIds).toEqual([
-			ArkiniDefaultPackageId,
+			SerakkiDefaultPackageId,
 		]);
 	});
 });

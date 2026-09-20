@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
+import { createTestPngBytes } from "~test/serapack-support/fn/createTestPngBytes";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
@@ -11,7 +11,7 @@ import {
 
 let harness: ProjectTestHarness;
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-resource-admission-");
+	harness = await createProjectTestHarness("serakki-resource-admission-");
 });
 afterEach(async () => harness.close());
 

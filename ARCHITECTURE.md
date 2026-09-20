@@ -1,4 +1,4 @@
-# Arkini architecture
+# Serakki architecture
 
 This is the global map of implemented ownership and lifecycle. It keeps only cross-cutting invariants. Use [`DOMAIN_ATLAS.md`](DOMAIN_ATLAS.md) to find a domain and follow its local README for a dense island.
 
@@ -6,7 +6,7 @@ Gameplay meaning belongs to [`GAME.MD`](GAME.MD), portable authoring to [`CONFIG
 
 ## Reading the architecture
 
-Arkini's concrete module graph is acyclic and checked by [Dependency Cruiser](.dependency-cruiser.cjs). Its top-level domain graph is not a DAG: two domains may import different modules from each other without forming a module cycle.
+Serakki's concrete module graph is acyclic and checked by [Dependency Cruiser](.dependency-cruiser.cjs). Its top-level domain graph is not a DAG: two domains may import different modules from each other without forming a module cycle.
 
 Use exact edge language:
 
@@ -67,7 +67,7 @@ Each live Game owns one child Game Session runtime and Scope. HMR may restart ap
 
 ## Runtime
 
-Arkini has three game forms:
+Serakki has three game forms:
 
 ```text
 GameConfig → validated static definition
@@ -99,9 +99,9 @@ The complete mutation, Tick and session navigation is in [`src/game-runtime/READ
 
 ## Session and installed Game
 
-Game Session composes Runtime, Tick, save, command/listener scopes and first-failure publication. Playable Game adds resource URLs and presentation fail-stop without package identity. Game Incident records session transitions and failures for both Installed Game and Editor Board; only installed packages produce Arkpack-backed incident archives. Installed Game adds Arkpack/save bootstrap, resource leases and serialized package lifecycle.
+Game Session composes Runtime, Tick, save, command/listener scopes and first-failure publication. Playable Game adds resource URLs and presentation fail-stop without package identity. Game Incident records session transitions and failures for both Installed Game and Editor Board; only installed packages produce Serapack-backed incident archives. Installed Game adds Serapack/save bootstrap, resource leases and serialized package lifecycle.
 
-Electron main inspects and hashes portable Arkpacks as streams. First use extracts raw resource ranges into a content-hash installation; matching installations are reused optimistically without checking their extracted bodies. Renderer bootstrap receives config plus lazy same-origin `arkini://app/game/resource` URLs, never the archive or resource bytes. The protocol serves contained native files on demand and preserves byte ranges for media. Editor project resources use the sibling `arkini://app/editor/resource` boundary; Editor Arkpack import reuses the same extraction boundary before publishing a portable source tree.
+Electron main inspects and hashes portable Serapacks as streams. First use extracts raw resource ranges into a content-hash installation; matching installations are reused optimistically without checking their extracted bodies. Renderer bootstrap receives config plus lazy same-origin `serakki://app/game/resource` URLs, never the archive or resource bytes. The protocol serves contained native files on demand and preserves byte ranges for media. Editor project resources use the sibling `serakki://app/editor/resource` boundary; Editor Serapack import reuses the same extraction boundary before publishing a portable source tree.
 
 React mount state is never desired-Game state. Same-package acquisition shares one provisional lease; explicit load adopts it. A different package finalizes the current resource before acquisition.
 
@@ -113,7 +113,7 @@ The Editor owns a separate revision-pinned `EditorBoardGameResource`. It uses th
 
 React owns routes, screen composition, forms, menus, modal state, command presentation and disposable projections. Feature Atoms own renderer commands whose admission/result must survive remounts. Route loaders and process services own lifecycle work; component effects do not.
 
-React never owns gameplay, package/catalog, persistence or Game lifecycle truth. Native controls keep native state; other semantic visual state uses typed `data-ui-*` projection. Accessibility-only semantics and reduced-motion branches are outside Arkini's product contract.
+React never owns gameplay, package/catalog, persistence or Game lifecycle truth. Native controls keep native state; other semantic visual state uses typed `data-ui-*` projection. Accessibility-only semantics and reduced-motion branches are outside Serakki's product contract.
 
 Retained gameplay rendering is downstream:
 
@@ -133,19 +133,19 @@ The router uses history routing in development and packaged Electron. `/` owns r
 
 Electron main owns native windows, protocols, privileged IPC and GUI-side filesystem composition. Node-compatible Project and MCP transport capabilities live under their semantic `src` owners, so the GUI and CLI may compose them without importing each other's process root. Renderer domains receive typed capabilities through `electron/contract`; native objects and managed project-internal paths never cross it. A user-selected Resource source crosses only as Electron's native path identity so main can copy it without transporting its bytes.
 
-Development admits only the configured loopback Vite origin. Packaged builds admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. HTTP(S) links requesting a new window from the trusted renderer open in the system browser; Electron popups remain denied, as do other URL schemes and URLs containing credentials. IPC validates the registered Arkini `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
+Development admits only the configured loopback Vite origin. Packaged builds admit only `serakki://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. HTTP(S) links requesting a new window from the trusted renderer open in the system browser; Electron popups remain denied, as do other URL schemes and URLs containing credentials. IPC validates the registered Serakki `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
 ## Persistence and Editor
 
-Arkini-owned data is resolved independently from Electron below the effective system user's home:
+Serakki-owned data is resolved independently from Electron below the effective system user's home:
 
 ```text
-~/.arkini/diagnostics/  application logs
-~/.arkini/game/         Arkpacks, content-hash installations, saves, preferences, latest incident
-~/.arkini/editor/       project catalog, managed projects, MCP state
+~/.serakki/diagnostics/  application logs
+~/.serakki/game/         Serapacks, content-hash installations, saves, preferences, latest incident
+~/.serakki/editor/       project catalog, managed projects, MCP state
 ```
 
-`src/application-data` is the only owner of that root and complete path tree. Electron's `userData` remains private Chromium storage and is never an Arkini persistence root.
+`src/application-data` is the only owner of that root and complete path tree. Electron's `userData` remains private Chromium storage and is never an Serakki persistence root.
 
 Game Persistence observes changed Runtime root identity, debounces and always flushes the latest canonical snapshot. Event-only transitions do not wake it. Persistence is an observer, not gameplay truth.
 
@@ -157,10 +157,10 @@ The GUI Editor and `serakki-cli editor mcp` are alternative owners of that repos
 
 Gameplay version is output metadata stored as `{ major, minor, suffix? }` in `game.json`. Build remembers valid settings before compilation without advancing authoring revision or publishing a Board change; failed compilation retains those settings. The produced artifact owns the formatted version used by install compatibility. Ordinary content writes preserve output metadata and retain their normal revision boundary.
 
-Editor Build and CLI pack compile the current saved source tree under the project write lock and stream PNG sources into the artifact. PNG bodies never enter the mounted authoring projection. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Arkpack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
+Editor Build and CLI pack compile the current saved source tree under the project write lock and stream PNG sources into the artifact. PNG bodies never enter the mounted authoring projection. There is no internal VCS, committed HEAD, object store, or persisted Board scenario. `src/editor-board` owns the ephemeral routed Board session; refresh, disposal and revision synchronization remain independent of Serapack version. See [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 
 ## Hosted validation and delivery
 
-[`Argcfile.sh`](Argcfile.sh) owns every repository and packaging command. Working branches run the complete `argc check` once on hosted Linux. macOS and Windows run `argc platform-check` for production build and real filesystem, Electron, Arkpack, source and schema-writer portability.
+[`Argcfile.sh`](Argcfile.sh) owns every repository and packaging command. Working branches run the complete `argc check` once on hosted Linux. macOS and Windows run `argc platform-check` for production build and real filesystem, Electron, Serapack, source and schema-writer portability.
 
-Prerelease tags repeat those gates before delivery; stable tags deliberately skip them. Both build and sign one canonical Arkpack, byte-compare it across native packages and publish the same standalone artifact. Production packages omit source maps; incident diagnostics and exact replay are the supported debugging surface.
+Prerelease tags repeat those gates before delivery; stable tags deliberately skip them. Both build and sign one canonical Serapack, byte-compare it across native packages and publish the same standalone artifact. Production packages omit source maps; incident diagnostics and exact replay are the supported debugging surface.

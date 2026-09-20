@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemWindowPreferencesFx } from "~electron/main/window/createFilesystemWindowPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
+const preferenceDirectory = () => join(root, "serakki", "game", "preferences");
 const modePath = () => join(preferenceDirectory(), "window.mode.json");
 
 const createPreferences = () =>
@@ -18,7 +18,7 @@ const createPreferences = () =>
 	);
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-window-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-window-"));
 });
 
 afterEach(async () => {

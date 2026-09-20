@@ -12,7 +12,7 @@ export const readProjectResourceUrlFn = ({
 	resourceId,
 	version,
 }: readProjectResourceUrlFn.Props): string =>
-	`arkini://app/editor/resource?${new URLSearchParams({
+	`serakki://app/editor/resource?${new URLSearchParams({
 		projectId,
 		resourceId,
 		version,

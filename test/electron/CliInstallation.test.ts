@@ -23,7 +23,7 @@ afterEach(async () => {
 });
 
 const createFixture = async () => {
-	const directory = await mkdtemp(join(tmpdir(), "arkini cli's installation-"));
+	const directory = await mkdtemp(join(tmpdir(), "serakki cli's installation-"));
 	temporaryDirectories.push(directory);
 	const launcherPath = join(directory, "Serakki.app", "Contents", "MacOS", "serakki-cli");
 	const commandPath = join(directory, "home", ".local", "bin", "serakki-cli");
@@ -78,7 +78,7 @@ describe.skipIf(process.platform === "win32")("filesystem CLI installation", () 
 		});
 		await writeFile(
 			fixture.commandPath,
-			"#!/bin/sh\n# serakki-cli managed launcher\nexec '/Volumes/Arkini/Serakki.app/Contents/MacOS/serakki-cli' \"$@\"\n",
+			"#!/bin/sh\n# serakki-cli managed launcher\nexec '/Volumes/Serakki/Serakki.app/Contents/MacOS/serakki-cli' \"$@\"\n",
 		);
 
 		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({

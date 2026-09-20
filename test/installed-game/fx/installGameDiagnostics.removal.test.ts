@@ -28,7 +28,7 @@ it("logs every committed removal loss beyond the history cap with owner, source,
 	Object.defineProperty(globalThis, "window", {
 		configurable: true,
 		value: {
-			arkini: {
+			serakki: {
 				diagnostics: {
 					writeFn,
 				},

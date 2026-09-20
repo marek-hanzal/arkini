@@ -37,11 +37,11 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 		);
 		if (resource === null) return;
 		resource.assertUsableFn();
-		if (resource.game.arkpack.packageId === params.packageId) return;
+		if (resource.game.serapack.packageId === params.packageId) return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {
-				packageId: resource.game.arkpack.packageId,
+				packageId: resource.game.serapack.packageId,
 			},
 			search: {
 				destination: "game",
@@ -69,11 +69,11 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			throw completed.cause;
 		}
 		const resource = completed.value;
-		if (resource.game.arkpack.packageId !== params.packageId) {
+		if (resource.game.serapack.packageId !== params.packageId) {
 			throw redirect({
 				to: "/game/$packageId/action/leave",
 				params: {
-					packageId: resource.game.arkpack.packageId,
+					packageId: resource.game.serapack.packageId,
 				},
 				search: {
 					destination: "game",

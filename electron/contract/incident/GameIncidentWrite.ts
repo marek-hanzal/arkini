@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const GameIncidentWriteSchema = z
 	.object({
-		arkpack: z
+		serapack: z
 			.object({
 				packageId: z.string().min(1),
 				contentHash: z.string().regex(/^[a-f0-9]{64}$/),

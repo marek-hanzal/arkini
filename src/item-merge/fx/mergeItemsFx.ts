@@ -50,7 +50,7 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 	return yield* program.pipe(
 		Random.withSeed(
 			[
-				"arkini:merge",
+				"serakki:merge",
 				`v${MergeRandomVersion}`,
 				source.id,
 				source.mergeSequence ?? 0,

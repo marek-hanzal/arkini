@@ -52,7 +52,7 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 							request_header_add: [
 								`${TunnelProvenanceHeader}:${provenance}`,
 							],
-							forwards_to: "arkini-editor-mcp",
+							forwards_to: "serakki-editor-mcp",
 						});
 						const candidate = listener.url();
 						if (candidate === null) {

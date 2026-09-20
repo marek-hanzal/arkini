@@ -14,7 +14,7 @@ import {
 let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-fs-resource-optimize-");
+	harness = await createProjectTestHarness("serakki-fs-resource-optimize-");
 });
 
 afterEach(async () => harness.close());

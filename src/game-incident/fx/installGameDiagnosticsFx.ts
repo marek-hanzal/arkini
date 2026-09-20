@@ -2,14 +2,14 @@ import { TickFx } from "~/game-tick/service/TickFx";
 import { Clock, Effect, Exit } from "effect";
 
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import {
 	toDiagnosticValueFn,
 	toDiagnosticValueResultFn,
 } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
-import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
+import { encodeSerakkiSaveFn } from "~/game-persistence/fn/encodeSerakkiSaveFn";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GAME_DIAGNOSTIC_HISTORY_LIMIT } from "~/game-incident/constant/GameDiagnosticHistoryLimit";
@@ -42,7 +42,7 @@ export namespace installGameDiagnosticsFx {
 		readonly session: GameDiagnosticsSession;
 	} & (
 		| {
-				readonly arkpack: ArkpackDescriptor;
+				readonly serapack: SerapackDescriptor;
 		  }
 		| {
 				readonly projectId: string;
@@ -77,13 +77,13 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 		level: "info",
 		sessionId,
 		data: {
-			applicationVersion: ArkiniAppVersion,
-			...("arkpack" in props
+			applicationVersion: SerakkiAppVersion,
+			...("serapack" in props
 				? {
-						packageId: props.arkpack.packageId,
-						contentHash: props.arkpack.contentHash,
-						arkini: props.arkpack.arkini,
-						gameVersion: props.arkpack.version,
+						packageId: props.serapack.packageId,
+						contentHash: props.serapack.contentHash,
+						serakki: props.serapack.serakki,
+						gameVersion: props.serapack.version,
 					}
 				: {
 						projectId: props.projectId,
@@ -249,18 +249,18 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			} satisfies DiagnosticRecord;
 			runRendererEffectFn(writeDiagnosticRecordFx(fatalRecord));
 			// Board sessions have project identity and logs, but no installed package to archive.
-			if (!("arkpack" in props)) return;
-			const { arkpack } = props;
+			if (!("serapack" in props)) return;
+			const { serapack } = props;
 			const report = {
 				capturedAt: observedAt,
 				diagnostics: {
 					identity: {
 						sessionId,
-						applicationVersion: ArkiniAppVersion,
-						packageId: arkpack.packageId,
-						contentHash: arkpack.contentHash,
-						gameVersion: arkpack.version,
-						arkiniVersion: arkpack.arkini,
+						applicationVersion: SerakkiAppVersion,
+						packageId: serapack.packageId,
+						contentHash: serapack.contentHash,
+						gameVersion: serapack.version,
+						serakkiVersion: serapack.serakki,
 						restored,
 						startedAt,
 					},
@@ -280,9 +280,9 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			} satisfies GameIncidentReport;
 			runRendererEffectFn(
 				writeLastGameIncidentFx({
-					arkpack,
-					saveBytes: encodeArkiniSaveFn({
-						version: arkpack.version,
+					serapack,
+					saveBytes: encodeSerakkiSaveFn({
+						version: serapack.version,
 						state: fromRuntimeFn({
 							runtime: transition.runtime,
 						}),

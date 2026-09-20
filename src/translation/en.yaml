@@ -67,14 +67,14 @@ Any local:
   dynamic: true
 Artwork:
   value: Artwork
-Artwork Arkpack import summary:
-  value: Import all Artwork. Matching resource IDs are replaced.
 Artwork ID:
   value: Artwork ID
 Artwork ID help:
   value: The stable Resource ID used by Item artwork references.
 Artwork PNG import summary:
   value: Import selected square PNGs. Filenames become Artwork IDs.
+Artwork Serapack import summary:
+  value: Import all Artwork. Matching resource IDs are replaced.
 Artwork catalog help:
   value: Browse square PNG Artwork used by Items. Import, inspect, rename, replace, optimize, or remove it here.
 Artwork delete available description:
@@ -310,7 +310,7 @@ Build failed:
   value: Build failed
 Build help:
   value: |
-    Build checks the saved project and creates a portable Arkpack.
+    Build checks the saved project and creates a portable Serapack.
 
     1. Choose **Major**, **Minor** and an optional **Suffix**.
     2. Fix any errors that link back into the Editor.
@@ -322,9 +322,9 @@ Build major update warning:
 Build output:
   value: Build output
 Build ready description:
-  value: Validate the **saved project** and create an Arkpack you can install or save.
+  value: Validate the **saved project** and create an Serapack you can install or save.
 Build stale description:
-  value: Your project has changed since the last build. **Build again** to replace the previous Arkpack.
+  value: Your project has changed since the last build. **Build again** to replace the previous Serapack.
 Build validation blocked description:
   value: Fix the **errors below**, then try Build again.
 Byte size:
@@ -383,8 +383,8 @@ Choose a track to listen to it here.:
 Choose a valid value.:
   value: Choose a valid value.
   dynamic: true
-Choose an existing .arkpack file:
-  value: Create a project from an .arkpack file
+Choose an existing .serapack file:
+  value: Create a project from an .serapack file
 Clear:
   value: Clear
 Clear interval:
@@ -799,8 +799,8 @@ Force delete reference removal help:
     Other saved data still uses this item. Force delete removes those links and then deletes the item.
 Force delete…:
   value: Force delete…
-From Arkpack:
-  value: From Arkpack
+From Serapack:
+  value: From Serapack
 General:
   value: General
 General PNG images keep their original dimensions.:
@@ -832,8 +832,6 @@ Images:
   value: Images
 Import SFX:
   value: Import SFX
-Import arkpack:
-  value: Import arkpack
 Import artwork:
   value: Import artwork
 Import audio files to create the project music library.:
@@ -844,6 +842,8 @@ Import images:
   value: Import images
 Import music:
   value: Import music
+Import serapack:
+  value: Import serapack
 Imported artwork:
   value: Imported artwork
 Imported image count:
@@ -1488,7 +1488,7 @@ Notes help:
 
     A note may link to several Items or Resources. Their Notes tabs show the same shared note, already filtered for that entry.
 
-    Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Arkpack builds.
+    Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Serapack builds.
 Notes unavailable:
   value: Notes are unavailable.
 Nothing produces this item:

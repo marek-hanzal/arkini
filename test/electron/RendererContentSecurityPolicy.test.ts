@@ -11,13 +11,13 @@ describe("RendererContentSecurityPolicy", () => {
 		);
 		const policy = createRendererDevelopmentContentSecurityPolicyFn({
 			developmentUrl,
-			nonce: "arkini-test-nonce",
+			nonce: "serakki-test-nonce",
 		});
 
-		expect(policy).toContain("script-src 'self' 'nonce-arkini-test-nonce'");
+		expect(policy).toContain("script-src 'self' 'nonce-serakki-test-nonce'");
 		expect(policy).toContain("connect-src 'self' blob: data: ws://127.0.0.1:4040/");
 		expect(policy.split("; ").find((directive) => directive.startsWith("media-src "))).toBe(
-			"media-src 'self' blob: arkini://app",
+			"media-src 'self' blob: serakki://app",
 		);
 		expect(policy).not.toContain("unsafe-eval");
 		expect(policy).not.toContain("script-src 'self' 'unsafe-inline'");

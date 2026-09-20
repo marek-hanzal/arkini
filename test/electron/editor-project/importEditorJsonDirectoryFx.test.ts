@@ -23,7 +23,7 @@ let directory = "";
 
 beforeEach(async () => {
 	electron.showOpenDialog.mockReset();
-	directory = await mkdtemp(join(tmpdir(), "arkini-json-import-"));
+	directory = await mkdtemp(join(tmpdir(), "serakki-json-import-"));
 });
 
 afterEach(async () => {

@@ -14,7 +14,7 @@ export const createElectronEditorBuildRepositoryFx = Effect.gen(function* () {
 			admission.admitWriteFx(
 				"save-build-version",
 				invokeProjectTransportFx({
-					callFn: () => window.arkini.editor.saveBuildVersionFn(request),
+					callFn: () => window.serakki.editor.saveBuildVersionFn(request),
 					operation: "save-build-version",
 					parseFn: (value) => VersionPartsSchema.parse(value),
 					requestMessage: "The editor IPC request failed.",
@@ -25,7 +25,7 @@ export const createElectronEditorBuildRepositoryFx = Effect.gen(function* () {
 			admission.admitWriteFx(
 				"build-project",
 				invokeProjectTransportFx({
-					callFn: () => window.arkini.editor.buildProjectFn(request),
+					callFn: () => window.serakki.editor.buildProjectFn(request),
 					operation: "build-project",
 					parseFn: (value) => EditorProjectBuildSchema.parse(value),
 					requestMessage: "The editor IPC request failed.",

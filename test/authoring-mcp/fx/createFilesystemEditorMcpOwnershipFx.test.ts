@@ -20,7 +20,7 @@ afterEach(cleanupMcpHarnesses);
 describe("filesystem Editor MCP ownership", () => {
 	it("interrupts an in-flight tool before close settles", async () => {
 		const repository = await createProjectRepository();
-		const directory = await mkdtemp(join(tmpdir(), "arkini-editor-mcp-owner-"));
+		const directory = await mkdtemp(join(tmpdir(), "serakki-editor-mcp-owner-"));
 		registerMcpCleanup(() =>
 			rm(directory, {
 				force: true,

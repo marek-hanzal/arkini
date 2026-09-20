@@ -1,4 +1,4 @@
-/** Finite native cursor vocabulary used by Arkini interaction surfaces. */
+/** Finite native cursor vocabulary used by Serakki interaction surfaces. */
 export type CursorSemantic =
 	| "default"
 	| "pointer"

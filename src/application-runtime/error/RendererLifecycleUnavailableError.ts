@@ -5,6 +5,6 @@ export class RendererLifecycleUnavailableError extends Data.TaggedError(
 	"RendererLifecycleUnavailableError",
 )<{}> {
 	override get message(): string {
-		return "Arkini Electron lifecycle is unavailable.";
+		return "Serakki Electron lifecycle is unavailable.";
 	}
 }

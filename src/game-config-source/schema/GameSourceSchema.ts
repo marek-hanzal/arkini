@@ -63,8 +63,8 @@ export const GameSourceSchema = z
 	.strict()
 	.meta({
 		id: "GameSourceSchema",
-		$id: "urn:arkini:schema:game-source",
-		title: "Arkini game source",
+		$id: "urn:serakki:schema:game-source",
+		title: "Serakki game source",
 		description: "The internal assembly value for one canonical game project.",
 	});
 

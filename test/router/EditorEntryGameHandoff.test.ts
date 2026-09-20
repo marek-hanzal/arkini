@@ -30,7 +30,7 @@ const installEditorApis = () => {
 			port: 32_310,
 		}),
 	);
-	Object.assign(window.arkini, {
+	Object.assign(window.serakki, {
 		editor: {
 			status,
 		},
@@ -105,7 +105,7 @@ describe("Editor entry Game handoff", () => {
 			expect(
 				rendererRuntime.runSync(
 					GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-				)?.game.arkpack.packageId,
+				)?.game.serapack.packageId,
 			).toBe(nextPackageId);
 		} finally {
 			Effect.runSync(Deferred.succeed(disposalGate, undefined));

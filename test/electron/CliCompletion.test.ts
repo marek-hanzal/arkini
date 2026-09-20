@@ -20,7 +20,7 @@ afterEach(async () => {
 });
 
 const createFixture = async () => {
-	const directory = await mkdtemp(join(tmpdir(), "arkini CLI completion-"));
+	const directory = await mkdtemp(join(tmpdir(), "serakki CLI completion-"));
 	temporaryDirectories.push(directory);
 	const launcherPath = join(directory, "Serakki.app", "Contents", "MacOS", "serakki-cli");
 	const completionPath = join(directory, "home", ".zsh", "completions", "_serakki-cli");

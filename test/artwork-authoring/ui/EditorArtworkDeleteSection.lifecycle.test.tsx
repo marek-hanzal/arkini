@@ -73,7 +73,7 @@ it.each([
 		finishFn = resolveFn;
 	});
 	const deleteResourceFn = vi.fn(() => response);
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		editor: {
 			deleteResourceFn,
 		},

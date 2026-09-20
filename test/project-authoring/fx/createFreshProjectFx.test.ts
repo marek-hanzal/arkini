@@ -7,7 +7,7 @@ import {
 	ProjectRepository,
 	type ProjectRepositoryService,
 } from "~/project-authoring/service/ProjectRepository";
-import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
+import { installTestPngDecoder } from "~test/serapack-support/fn/createTestPngBytes";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const createRepository = (

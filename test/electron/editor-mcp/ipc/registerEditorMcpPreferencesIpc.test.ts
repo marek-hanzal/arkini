@@ -2,7 +2,7 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { registerEditorMcpPreferencesIpcFx } from "~electron/main/editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
 import {
 	createEvent,
@@ -59,7 +59,7 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		);
 
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpConfigure, {
+			invoke(event, SerakkiElectronApi.channels.editorMcpConfigure, {
 				type: "port",
 				port: 32_311,
 			}),
@@ -69,7 +69,7 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 			port: 32_311,
 		});
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpConfigure, {
+			invoke(event, SerakkiElectronApi.channels.editorMcpConfigure, {
 				type: "ngrok",
 				authtoken: " ngrok-token ",
 				domain: " STABLE-EXAMPLE.NGROK-FREE.APP ",
@@ -81,7 +81,7 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 			domain: "stable-example.ngrok-free.app",
 		});
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpConfigure, {
+			invoke(event, SerakkiElectronApi.channels.editorMcpConfigure, {
 				type: "ngrok",
 				authtoken: "ngrok-token",
 				domain: "https://stable-example.ngrok-free.app/path",
@@ -89,7 +89,7 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		).rejects.toBeDefined();
 		expect(ownership.configureFx).toHaveBeenCalledTimes(2);
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpCommand, "start-everything"),
+			invoke(event, SerakkiElectronApi.channels.editorMcpCommand, "start-everything"),
 		).rejects.toBeDefined();
 	});
 
@@ -104,41 +104,41 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		);
 
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one"),
+			invoke(event, SerakkiElectronApi.channels.editorMcpProjectContextSet, "project-one"),
 		).resolves.toBeUndefined();
 		expect(ownership.readProjectContextFn()).toBe("project-one");
 		await expect(
 			invoke(
 				event,
-				ArkiniElectronApi.channels.editorMcpProjectContextClear,
+				SerakkiElectronApi.channels.editorMcpProjectContextClear,
 				"another-project",
 			),
 		).resolves.toBeUndefined();
 		expect(ownership.readProjectContextFn()).toBe("project-one");
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextClear, "project-one"),
+			invoke(event, SerakkiElectronApi.channels.editorMcpProjectContextClear, "project-one"),
 		).resolves.toBeUndefined();
 		expect(ownership.readProjectContextFn()).toBeUndefined();
 
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, ""),
+			invoke(event, SerakkiElectronApi.channels.editorMcpProjectContextSet, ""),
 		).rejects.toBeDefined();
 		expect(ownership.readProjectContextFn()).toBeUndefined();
 
-		await invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one");
+		await invoke(event, SerakkiElectronApi.channels.editorMcpProjectContextSet, "project-one");
 		sender.emit(
 			"did-start-navigation",
 			{},
-			"arkini://app/editor/project-one/mcp/server",
+			"serakki://app/editor/project-one/mcp/server",
 			true,
 			true,
 		);
 		expect(ownership.readProjectContextFn()).toBe("project-one");
-		sender.emit("did-start-navigation", {}, "arkini://app/frame", false, false);
+		sender.emit("did-start-navigation", {}, "serakki://app/frame", false, false);
 		expect(ownership.readProjectContextFn()).toBe("project-one");
-		sender.emit("did-start-navigation", {}, "arkini://app/main-menu", false, true);
+		sender.emit("did-start-navigation", {}, "serakki://app/main-menu", false, true);
 		expect(ownership.readProjectContextFn()).toBeUndefined();
-		await invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-two");
+		await invoke(event, SerakkiElectronApi.channels.editorMcpProjectContextSet, "project-two");
 		sender.emit("destroyed");
 		expect(ownership.readProjectContextFn()).toBeUndefined();
 	});
@@ -154,7 +154,7 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		);
 
 		await expect(
-			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one"),
+			invoke(event, SerakkiElectronApi.channels.editorMcpProjectContextSet, "project-one"),
 		).rejects.toThrow("authorize MCP context test renderer");
 		expect(ownership.readProjectContextFn()).toBeUndefined();
 	});

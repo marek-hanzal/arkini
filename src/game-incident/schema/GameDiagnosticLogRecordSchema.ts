@@ -4,7 +4,7 @@ import { DiagnosticValueSchema } from "~electron/contract/diagnostics/Diagnostic
 import { GameDiagnosticHistoryEntrySchema } from "~/game-incident/schema/GameDiagnosticHistorySchema";
 import { GameDiagnosticItemReferenceSchema } from "~/game-incident/schema/GameDiagnosticReferenceSchema";
 
-/** Exact LogTape JSON-lines record emitted by Arkini's process diagnostic sink. */
+/** Exact LogTape JSON-lines record emitted by Serakki's process diagnostic sink. */
 export const GameDiagnosticLogRecordSchema = z
 	.object({
 		"@timestamp": z.iso.datetime(),
@@ -30,7 +30,7 @@ export const GameDiagnosticSessionStartedDataSchema = z
 		applicationVersion: z.string().min(1),
 		packageId: z.string().min(1),
 		contentHash: z.string().min(1),
-		arkini: z.string().min(1),
+		serakki: z.string().min(1),
 		gameVersion: z.string().min(1),
 		restored: z.boolean(),
 		startedAt: z.iso.datetime(),

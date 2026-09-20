@@ -6,7 +6,7 @@ import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
 } from "~/game-config-source/constant/GameProjectReference";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import type { Project } from "~/project-authoring/type/Project";
 import type { NoteSchema } from "~/project-note/schema/NoteSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
@@ -215,7 +215,7 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 			writes.push({
 				target: paths.projectFile,
 				bytes: encodeJsonFn({
-					arkini: ArkiniAppVersion,
+					serakki: SerakkiAppVersion,
 					revision: next.revision,
 				}),
 			});

@@ -1,26 +1,26 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
 const runRendererEffectFn = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
-const testArkpack = {
+const testSerapack = {
 	packageId: "package:test",
 	contentHash: "0".repeat(64),
 	title: "Test",
 	version: "1.0",
-	arkini: "1",
+	serakki: "1",
 	source: "bundled",
 	provenance: {
 		type: "official",
 	},
-} satisfies ArkpackDescriptor;
+} satisfies SerapackDescriptor;
 
 afterEach(() => {
 	Object.defineProperty(globalThis, "window", {
@@ -35,7 +35,7 @@ describe("Game diagnostics fail-stop", () => {
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
 			value: {
-				arkini: {
+				serakki: {
 					diagnostics: {
 						writeFn: write,
 						writeApplicationFn: () => Promise.resolve(),
@@ -44,7 +44,7 @@ describe("Game diagnostics fail-stop", () => {
 					incident: {
 						writeFn: () => Promise.resolve(),
 					},
-				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
+				} as Pick<SerakkiElectronApi.Api, "diagnostics">,
 			},
 		});
 		const config = createJobTestConfig();
@@ -54,7 +54,7 @@ describe("Game diagnostics fail-stop", () => {
 		});
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
-				arkpack: testArkpack,
+				serapack: testSerapack,
 				config,
 				restored: false,
 				runRendererEffectFn,

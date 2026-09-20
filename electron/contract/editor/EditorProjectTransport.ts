@@ -19,7 +19,7 @@ export namespace EditorProjectTransport {
 		| "delete-note"
 		| "export-json-directory"
 		| "import-json-directory"
-		| "import-arkpack"
+		| "import-serapack"
 		| "list-notes"
 		| "list-projects"
 		| "open-project-directory"
@@ -137,7 +137,7 @@ export namespace EditorProjectTransport {
 	export interface ImportResourcesRequest {
 		readonly files: ReadonlyArray<ImportResourcesFile>;
 		readonly projectId: string;
-		readonly source: "arkpack" | "files";
+		readonly source: "serapack" | "files";
 		readonly type: Resource["type"];
 	}
 

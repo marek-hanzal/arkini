@@ -12,7 +12,7 @@ import {
 let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-fs-project-delete-");
+	harness = await createProjectTestHarness("serakki-fs-project-delete-");
 });
 
 afterEach(async () => harness.close());

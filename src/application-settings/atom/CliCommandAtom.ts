@@ -8,22 +8,22 @@ export const CliCommandAtom = Effect.runSync(
 	createCliCommandAtomFx({
 		readFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<InstallationStatus> => window.arkini.cli.statusFn(),
+				try: (): Promise<InstallationStatus> => window.serakki.cli.statusFn(),
 				catch: (cause) => cause,
 			}),
 		installFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<InstallationStatus> => window.arkini.cli.installFn(),
+				try: (): Promise<InstallationStatus> => window.serakki.cli.installFn(),
 				catch: (cause) => cause,
 			}),
 		replaceFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<InstallationStatus> => window.arkini.cli.replaceFn(),
+				try: (): Promise<InstallationStatus> => window.serakki.cli.replaceFn(),
 				catch: (cause) => cause,
 			}),
 		uninstallFx: () =>
 			Effect.tryPromise({
-				try: (): Promise<InstallationStatus> => window.arkini.cli.uninstallFn(),
+				try: (): Promise<InstallationStatus> => window.serakki.cli.uninstallFn(),
 				catch: (cause) => cause,
 			}),
 	}),

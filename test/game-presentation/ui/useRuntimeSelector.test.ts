@@ -12,8 +12,8 @@ import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import { useGameFx } from "~test/support/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { startFx } from "~/game-start/fx/startFx";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import {
 	type TestGameTransitionFields,
 	makeTestGameTransitionFieldsFx,
@@ -36,18 +36,18 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 		Effect.gen(function* () {
 			const transitions = yield* makeTestGameTransitionFieldsFx(runtime);
 			const game = {
-				arkpack: {
+				serapack: {
 					packageId,
 					contentHash: `content:${packageId}`,
-					title: testArkpackConfig.meta.title,
+					title: testSerapackConfig.meta.title,
 					version: "1.0",
-					arkini: ArkiniAppVersion,
+					serakki: SerakkiAppVersion,
 					provenance: {
 						type: "community",
 					} as const,
 					source: "user" as const,
 				},
-				config: testArkpackConfig,
+				config: testSerapackConfig,
 				saveKey: {
 					packageId,
 				},
@@ -73,7 +73,7 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 const initialRuntime = Effect.runSync(
 	startFx().pipe(
 		useGameFx({
-			config: testArkpackConfig,
+			config: testSerapackConfig,
 		}),
 	),
 );

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 
 const electron = vi.hoisted(() => ({
 	isPackaged: false,
@@ -36,10 +36,10 @@ afterEach(() => {
 
 describe("Diagnostic log", () => {
 	it("keeps human application history beside bounded gameplay JSONL", async () => {
-		const userDataPath = mkdtempSync(join(tmpdir(), "arkini-diagnostics-"));
+		const userDataPath = mkdtempSync(join(tmpdir(), "serakki-diagnostics-"));
 		temporaryDirectories.push(userDataPath);
 		const diagnostics = Effect.runSync(
-			createDiagnosticLogFx(join(userDataPath, "arkini", "diagnostics")),
+			createDiagnosticLogFx(join(userDataPath, "serakki", "diagnostics")),
 		);
 
 		await Effect.runPromise(diagnostics.openDirectoryFx);
@@ -114,7 +114,7 @@ describe("Diagnostic log", () => {
 			/^# \d{4}-\d{2}-\d{2}T[^\n]+ \[ERROR\] - Application failure \d+/u,
 		);
 		expect(applicationText).toContain(
-			`\n\nArkini v${ArkiniAppVersion} · development · ${process.platform} ${process.arch}\n\nOperation: test\n\n`,
+			`\n\nSerakki v${SerakkiAppVersion} · development · ${process.platform} ${process.arch}\n\nOperation: test\n\n`,
 		);
 		expect(applicationText).not.toContain('"logger"');
 		expect(applicationText).not.toContain("gameplay-application-event");
@@ -127,7 +127,7 @@ describe("Diagnostic log", () => {
 			.map((line) => JSON.parse(line) as Record<string, unknown>);
 		expect(currentRecords.at(-1)).toMatchObject({
 			level: "INFO",
-			logger: "arkini.application",
+			logger: "serakki.application",
 			message: "gameplay-application-event",
 			properties: {
 				event: "gameplay-application-event",
@@ -142,7 +142,7 @@ describe("Diagnostic log", () => {
 		const fatalText = readFileSync(join(diagnostics.directoryPath, "application.md"), "utf8");
 		expect(fatalText).toContain("[FATAL] - Application lifecycle failed");
 		expect(fatalText).toContain(
-			`Arkini v${ArkiniAppVersion} · development · ${process.platform} ${process.arch}`,
+			`Serakki v${SerakkiAppVersion} · development · ${process.platform} ${process.arch}`,
 		);
 		expect(fatalText).toContain("name: Error\nmessage: late main failure");
 	});

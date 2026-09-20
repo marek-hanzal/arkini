@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { LauncherScene } from "~/launcher/ui/LauncherScene";
 
 const pendingProgressTransitionMs = 220;
-const actionProgressViewTransitionName = "arkini-action-progress";
+const actionProgressViewTransitionName = "serakki-action-progress";
 const initialProgress = 12;
 /** Keeps route admission and its progress curve on the same readable minimum duration. */
 export const ActionLoadingMinimumDurationMs = 2_500;

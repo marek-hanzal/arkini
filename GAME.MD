@@ -1,10 +1,10 @@
-# Arkini gameplay contract
+# Serakki gameplay contract
 
 This document owns implemented gameplay meaning. [`CONFIG.md`](CONFIG.md) owns authoring syntax; [`ARCHITECTURE.md`](ARCHITECTURE.md) owns execution and lifecycle; source and focused tests prove the current implementation.
 
 ## World, locations, and stacks
 
-Arkini runs multiple isolated Board spaces plus global Inventory and optional Toolbar storage. A Board cell is `space + x + y`; equal coordinates in different spaces never interact. `currentSpace` selects presentation and the Board destination for an Inventory release; that release uses the item's authored scope, tries the current Board before Toolbar for `any`, and never returns to Inventory. All spaces keep simulating.
+Serakki runs multiple isolated Board spaces plus global Inventory and optional Toolbar storage. A Board cell is `space + x + y`; equal coordinates in different spaces never interact. `currentSpace` selects presentation and the Board destination for an Inventory release; that release uses the item's authored scope, tries the current Board before Toolbar for `any`, and never returns to Inventory. All spaces keep simulating.
 
 Each Board cell holds one item stack or one delivery-origin lease. Inventory and Toolbar likewise have one occupant per slot. Birth, output, return and merge replacement use the same occupancy rules; ordinary placement into an occupied destination rejects the operation atomically. Explicit forced removal may discard capacity overflow within its atomic transition. Board interaction has no layer selection or hidden occupant.
 

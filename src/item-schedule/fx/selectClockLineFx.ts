@@ -43,7 +43,7 @@ export const selectClockLineFx = Effect.fn("selectClockLineFx")(function* ({
 	let draw = yield* Random.nextBetween(0, totalWeight).pipe(
 		Random.withSeed(
 			[
-				"arkini:clock:v1",
+				"serakki:clock:v1",
 				item.id,
 				item.item.id,
 				item.schedule?.pulseSequence ?? 0,

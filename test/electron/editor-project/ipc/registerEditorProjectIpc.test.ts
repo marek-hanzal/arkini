@@ -3,7 +3,7 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect, Semaphore } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { ElectronMainError } from "~electron/main/ElectronMainError";
 import type { DiagnosticLog } from "~electron/main/diagnostics/createDiagnosticLogFx";
 import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
@@ -38,7 +38,7 @@ const completedSourceExport = {
 };
 const writeApplicationLog = vi.fn();
 const diagnostics = {
-	directoryPath: "/tmp/arkini-diagnostics",
+	directoryPath: "/tmp/serakki-diagnostics",
 	writeFx: () => Effect.void,
 	writeApplicationFx: (record) => Effect.sync(() => writeApplicationLog(record)),
 	openDirectoryFx: Effect.void,
@@ -64,7 +64,7 @@ const electron = vi.hoisted(() => {
 		handlers,
 		module: {
 			app: {
-				getAppPath: () => "/protected/arkini",
+				getAppPath: () => "/protected/serakki",
 				getPath: (name: string) => `/protected/${name}`,
 				once: (event: string, listener: () => void) => appListeners.set(event, listener),
 			},
@@ -100,7 +100,7 @@ vi.mock("electron", () => electron.module);
 const event = {
 	sender: {},
 	senderFrame: {
-		url: "arkini://app/editor/welcome",
+		url: "serakki://app/editor/welcome",
 	},
 } as IpcMainInvokeEvent;
 const createTrustedRenderer = (trusted = true): TrustedRenderer => ({
@@ -135,26 +135,26 @@ const register = (
 	);
 
 const projectChannels = [
-	ArkiniElectronApi.channels.editorStatus,
-	ArkiniElectronApi.channels.editorAwaitIdle,
-	ArkiniElectronApi.channels.editorProjectBuild,
-	ArkiniElectronApi.channels.editorProjectBuildVersionSave,
-	ArkiniElectronApi.channels.editorProjectBuildSave,
-	ArkiniElectronApi.channels.editorProjectCreate,
-	ArkiniElectronApi.channels.editorProjectDismissInvalid,
-	ArkiniElectronApi.channels.editorProjectDelete,
-	ArkiniElectronApi.channels.editorProjectDeleteItem,
-	ArkiniElectronApi.channels.editorProjectDeleteResource,
-	ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
-	ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
-	ArkiniElectronApi.channels.editorProjectList,
-	ArkiniElectronApi.channels.editorProjectOpenDirectory,
-	ArkiniElectronApi.channels.editorProjectOptimizeResources,
-	ArkiniElectronApi.channels.editorProjectRead,
-	ArkiniElectronApi.channels.editorProjectRefresh,
-	ArkiniElectronApi.channels.editorProjectReplaceConfig,
-	ArkiniElectronApi.channels.editorProjectReplaceResource,
-	ArkiniElectronApi.channels.editorProjectUpsertItem,
+	SerakkiElectronApi.channels.editorStatus,
+	SerakkiElectronApi.channels.editorAwaitIdle,
+	SerakkiElectronApi.channels.editorProjectBuild,
+	SerakkiElectronApi.channels.editorProjectBuildVersionSave,
+	SerakkiElectronApi.channels.editorProjectBuildSave,
+	SerakkiElectronApi.channels.editorProjectCreate,
+	SerakkiElectronApi.channels.editorProjectDismissInvalid,
+	SerakkiElectronApi.channels.editorProjectDelete,
+	SerakkiElectronApi.channels.editorProjectDeleteItem,
+	SerakkiElectronApi.channels.editorProjectDeleteResource,
+	SerakkiElectronApi.channels.editorProjectExportJsonDirectory,
+	SerakkiElectronApi.channels.editorProjectImportJsonDirectory,
+	SerakkiElectronApi.channels.editorProjectList,
+	SerakkiElectronApi.channels.editorProjectOpenDirectory,
+	SerakkiElectronApi.channels.editorProjectOptimizeResources,
+	SerakkiElectronApi.channels.editorProjectRead,
+	SerakkiElectronApi.channels.editorProjectRefresh,
+	SerakkiElectronApi.channels.editorProjectReplaceConfig,
+	SerakkiElectronApi.channels.editorProjectReplaceResource,
+	SerakkiElectronApi.channels.editorProjectUpsertItem,
 ];
 
 beforeEach(async () => {
@@ -233,10 +233,10 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "artwork",
 		};
 
-		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
+		await expect(invoke(SerakkiElectronApi.channels.editorStatus)).resolves.toEqual({
 			type: "ready",
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toMatchObject({
+		await expect(invoke(SerakkiElectronApi.channels.editorAwaitIdle)).resolves.toMatchObject({
 			type: "success",
 		});
 		const saveVersionRequest = {
@@ -249,14 +249,14 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		};
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, saveVersionRequest),
+			invoke(SerakkiElectronApi.channels.editorProjectBuildVersionSave, saveVersionRequest),
 		).resolves.toEqual({
 			type: "success",
 			value: saveVersionRequest.version,
 		});
 		expect(repository.saveBuildVersionFx).toHaveBeenCalledExactlyOnceWith(saveVersionRequest);
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, {
+			invoke(SerakkiElectronApi.channels.editorProjectBuildVersionSave, {
 				...saveVersionRequest,
 				version: "2.3-preview",
 			}),
@@ -268,7 +268,7 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		expect(repository.saveBuildVersionFx).toHaveBeenCalledOnce();
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectBuild, {
+			invoke(SerakkiElectronApi.channels.editorProjectBuild, {
 				expectedVersion: parseVersionFn(editorTestPayload.version),
 				projectId: "project-one",
 				expectedRevision: 1,
@@ -283,7 +283,7 @@ describe("registerEditorProjectIpcFx", () => {
 			expectedRevision: 1,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectBuildSave, {
+			invoke(SerakkiElectronApi.channels.editorProjectBuildSave, {
 				projectId: "project-one",
 				expectedRevision: 1,
 				contentHash: "a".repeat(64),
@@ -292,7 +292,7 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "success",
 			value: false,
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorProjectList)).resolves.toEqual({
+		await expect(invoke(SerakkiElectronApi.channels.editorProjectList)).resolves.toEqual({
 			type: "success",
 			value: [
 				{
@@ -303,56 +303,62 @@ describe("registerEditorProjectIpcFx", () => {
 			],
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectRead, "project-one"),
+			invoke(SerakkiElectronApi.channels.editorProjectRead, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: editorProjectIpcProject,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectRefresh, "project-one"),
+			invoke(SerakkiElectronApi.channels.editorProjectRefresh, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: editorProjectIpcProject,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectCreate, "project-one"),
+			invoke(SerakkiElectronApi.channels.editorProjectCreate, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: editorProjectIpcProject,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectDelete, "project-one"),
+			invoke(SerakkiElectronApi.channels.editorProjectDelete, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: undefined,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectExportJsonDirectory, "project-one"),
+			invoke(SerakkiElectronApi.channels.editorProjectExportJsonDirectory, "project-one"),
 		).resolves.toEqual({
 			type: "success",
 			value: completedSourceExport,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, replaceConfigRequest),
+			invoke(SerakkiElectronApi.channels.editorProjectReplaceConfig, replaceConfigRequest),
 		).resolves.toEqual({
 			type: "success",
 			value: editorProjectIpcCommit,
 		});
 		await invoke(
-			ArkiniElectronApi.channels.editorProjectReplaceResource,
+			SerakkiElectronApi.channels.editorProjectReplaceResource,
 			replaceResourceRequest,
 		);
-		await invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, upsertItemRequest);
-		await invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, deleteItemRequest);
-		await invoke(ArkiniElectronApi.channels.editorProjectDeleteResource, deleteResourceRequest);
+		await invoke(SerakkiElectronApi.channels.editorProjectUpsertItem, upsertItemRequest);
+		await invoke(SerakkiElectronApi.channels.editorProjectDeleteItem, deleteItemRequest);
+		await invoke(
+			SerakkiElectronApi.channels.editorProjectDeleteResource,
+			deleteResourceRequest,
+		);
 		const metadataRequest = {
 			...deleteResourceRequest,
 			name: "Dusty Plains",
 		};
-		await invoke(ArkiniElectronApi.channels.editorProjectSaveResourceMetadata, metadataRequest);
+		await invoke(
+			SerakkiElectronApi.channels.editorProjectSaveResourceMetadata,
+			metadataRequest,
+		);
 		expect(repository.saveResourceMetadataFx).toHaveBeenCalledWith(metadataRequest);
 		await invoke(
-			ArkiniElectronApi.channels.editorProjectOptimizeResources,
+			SerakkiElectronApi.channels.editorProjectOptimizeResources,
 			optimizeResourcesRequest,
 		);
 		expect(repository.createProjectFx).toHaveBeenCalledWith({
@@ -385,7 +391,7 @@ describe("registerEditorProjectIpcFx", () => {
 			onProgressFn: expect.any(Function),
 		});
 		expect(electron.editorWindow.webContents.send).toHaveBeenCalledWith(
-			ArkiniElectronApi.channels.editorProjectOptimizeResourcesProgress,
+			SerakkiElectronApi.channels.editorProjectOptimizeResourcesProgress,
 			{
 				completedResourceCount: 1,
 				expectedRevision: optimizeResourcesRequest.expectedRevision,
@@ -395,7 +401,7 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		);
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectCreate, ""),
+			invoke(SerakkiElectronApi.channels.editorProjectCreate, ""),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {
@@ -405,7 +411,7 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		expect(repository.createProjectFx).toHaveBeenCalledOnce();
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectDelete, ""),
+			invoke(SerakkiElectronApi.channels.editorProjectDelete, ""),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {
@@ -423,7 +429,7 @@ describe("registerEditorProjectIpcFx", () => {
 			repository,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, ""),
+			invoke(SerakkiElectronApi.channels.editorProjectDismissInvalid, ""),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {
@@ -432,7 +438,7 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		expect(repository.dismissInvalidProjectFx).not.toHaveBeenCalled();
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, "/projects/duplicate"),
+			invoke(SerakkiElectronApi.channels.editorProjectDismissInvalid, "/projects/duplicate"),
 		).resolves.toEqual({
 			type: "success",
 			value: undefined,
@@ -460,7 +466,7 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, "/projects/forged"),
+			invoke(SerakkiElectronApi.channels.editorProjectOpenDirectory, "/projects/forged"),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {
@@ -469,7 +475,7 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		expect(electron.module.shell.openPath).not.toHaveBeenCalled();
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, "/projects/broken"),
+			invoke(SerakkiElectronApi.channels.editorProjectOpenDirectory, "/projects/broken"),
 		).resolves.toEqual({
 			type: "success",
 			value: undefined,
@@ -497,12 +503,12 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 
 		const exporting = invoke(
-			ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+			SerakkiElectronApi.channels.editorProjectExportJsonDirectory,
 			"project-one",
 		);
 		await started;
 		let idleSettled = false;
-		const idle = Promise.resolve(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).finally(
+		const idle = Promise.resolve(invoke(SerakkiElectronApi.channels.editorAwaitIdle)).finally(
 			() => {
 				idleSettled = true;
 			},
@@ -567,7 +573,7 @@ describe("registerEditorProjectIpcFx", () => {
 				type: "ready",
 				repository,
 			});
-			const importing = invoke(ArkiniElectronApi.channels.editorProjectImportResources, {
+			const importing = invoke(SerakkiElectronApi.channels.editorProjectImportResources, {
 				projectId: "project-one",
 				source: "files",
 				type: "artwork",
@@ -581,7 +587,7 @@ describe("registerEditorProjectIpcFx", () => {
 			await started;
 			let idleSettled = false;
 			const idle = Promise.resolve(
-				invoke(ArkiniElectronApi.channels.editorAwaitIdle),
+				invoke(SerakkiElectronApi.channels.editorAwaitIdle),
 			).finally(() => {
 				idleSettled = true;
 			});
@@ -608,7 +614,7 @@ describe("registerEditorProjectIpcFx", () => {
 			expectedRevision: 0,
 			config: editorTestPayload.config,
 		};
-		await invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request);
+		await invoke(SerakkiElectronApi.channels.editorProjectReplaceConfig, request);
 		const record = writeApplicationLog.mock.calls.find(
 			([entry]) => entry.message === "Editor operation completed: replace-config",
 		)?.[0];
@@ -634,7 +640,7 @@ describe("registerEditorProjectIpcFx", () => {
 			),
 		);
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
+			invoke(SerakkiElectronApi.channels.editorProjectReplaceConfig, request),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {
@@ -658,7 +664,7 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "ready",
 			repository,
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorProjectList)).resolves.toEqual({
+		await expect(invoke(SerakkiElectronApi.channels.editorProjectList)).resolves.toEqual({
 			type: "failure",
 			error: {
 				operation: "list-projects",
@@ -685,16 +691,16 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "unavailable",
 			message: "Editor storage could not be opened.",
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
+		await expect(invoke(SerakkiElectronApi.channels.editorStatus)).resolves.toEqual({
 			type: "unavailable",
 			message: "Editor storage could not be opened.",
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toEqual({
+		await expect(invoke(SerakkiElectronApi.channels.editorAwaitIdle)).resolves.toEqual({
 			type: "success",
 			value: undefined,
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectRead, "project-one"),
+			invoke(SerakkiElectronApi.channels.editorProjectRead, "project-one"),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {
@@ -702,7 +708,7 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		});
 		await expect(
-			invoke(ArkiniElectronApi.channels.editorProjectRead, ""),
+			invoke(SerakkiElectronApi.channels.editorProjectRead, ""),
 		).resolves.toMatchObject({
 			type: "failure",
 			error: {

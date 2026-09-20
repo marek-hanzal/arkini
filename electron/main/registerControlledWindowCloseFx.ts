@@ -1,6 +1,6 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent } from "electron";
 import { Effect } from "effect";
-import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "../contract/SerakkiElectronApi";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 
 type ControlledCloseIpc = Pick<IpcMain, "on" | "removeListener">;
@@ -21,13 +21,13 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 			let closeRequested = false;
 
 			const removeResponseListenersFn = () => {
-				ipc.removeListener(ArkiniElectronApi.channels.closeReady, onCloseReadyFn);
-				ipc.removeListener(ArkiniElectronApi.channels.closeFailed, onCloseFailedFn);
+				ipc.removeListener(SerakkiElectronApi.channels.closeReady, onCloseReadyFn);
+				ipc.removeListener(SerakkiElectronApi.channels.closeFailed, onCloseFailedFn);
 			};
 			const removeAllListenersFn = () => {
 				removeResponseListenersFn();
-				ipc.removeListener(ArkiniElectronApi.channels.requestClose, onRequestCloseFn);
-				ipc.removeListener(ArkiniElectronApi.channels.forceClose, onForceCloseFn);
+				ipc.removeListener(SerakkiElectronApi.channels.requestClose, onRequestCloseFn);
+				ipc.removeListener(SerakkiElectronApi.channels.forceClose, onForceCloseFn);
 			};
 			const ownsTrustedWindowFn = (event: IpcMainEvent) =>
 				trustedRenderer.isTrustedIpcSenderFn(event) &&
@@ -42,7 +42,7 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 				if (!ownsTrustedWindowFn(event)) return;
 				closeRequested = false;
 				removeResponseListenersFn();
-				console.error("Arkini renderer controlled-close orchestration failed:", message);
+				console.error("Serakki renderer controlled-close orchestration failed:", message);
 			};
 			const onRequestCloseFn = (event: IpcMainEvent) => {
 				if (!ownsTrustedWindowFn(event) || window.isDestroyed()) return;
@@ -55,16 +55,16 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 				if (!window.isDestroyed()) window.close();
 			};
 
-			ipc.on(ArkiniElectronApi.channels.requestClose, onRequestCloseFn);
-			ipc.on(ArkiniElectronApi.channels.forceClose, onForceCloseFn);
+			ipc.on(SerakkiElectronApi.channels.requestClose, onRequestCloseFn);
+			ipc.on(SerakkiElectronApi.channels.forceClose, onForceCloseFn);
 			window.on("close", (event) => {
 				if (closeAllowed || window.webContents.isDestroyed()) return;
 				event.preventDefault();
 				if (closeRequested) return;
 				closeRequested = true;
-				ipc.on(ArkiniElectronApi.channels.closeReady, onCloseReadyFn);
-				ipc.on(ArkiniElectronApi.channels.closeFailed, onCloseFailedFn);
-				window.webContents.send(ArkiniElectronApi.channels.beforeClose);
+				ipc.on(SerakkiElectronApi.channels.closeReady, onCloseReadyFn);
+				ipc.on(SerakkiElectronApi.channels.closeFailed, onCloseFailedFn);
+				window.webContents.send(SerakkiElectronApi.channels.beforeClose);
 			});
 			window.webContents.once("render-process-gone", () => {
 				closeAllowed = true;

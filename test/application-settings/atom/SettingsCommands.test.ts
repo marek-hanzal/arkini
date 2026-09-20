@@ -11,7 +11,7 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 const makeRegistry = () => {
@@ -31,7 +31,7 @@ describe("Settings feature commands", () => {
 					resolveOpen = resolve;
 				}),
 		);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				diagnostics: {
@@ -55,7 +55,7 @@ describe("Settings feature commands", () => {
 	});
 
 	it("projects a diagnostics open failure", async () => {
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				diagnostics: {
@@ -76,7 +76,7 @@ describe("Settings feature commands", () => {
 	});
 
 	it("projects a user-data open failure", async () => {
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				userData: {

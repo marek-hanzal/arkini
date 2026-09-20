@@ -7,12 +7,12 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,
@@ -37,18 +37,18 @@ const createGame = ({
 	readonly disposeFx?: Game["disposeFx"];
 	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
 } = {}): Game => ({
-	arkpack: {
+	serapack: {
 		packageId,
 		contentHash: "content-critical",
-		title: testArkpackConfig.meta.title,
+		title: testSerapackConfig.meta.title,
 		version: "1.0",
-		arkini: ArkiniAppVersion,
+		serakki: SerakkiAppVersion,
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	disposeFx,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
@@ -66,7 +66,7 @@ const createGame = ({
 
 const installElectronApi = (clear: () => Promise<void> = () => Promise.resolve()) => {
 	const forceClose = vi.fn();
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			save: {
@@ -77,7 +77,7 @@ const installElectronApi = (clear: () => Promise<void> = () => Promise.resolve()
 			lifecycle: {
 				forceCloseFn: forceClose,
 			},
-		} as unknown as ArkiniElectronApi.Api,
+		} as unknown as SerakkiElectronApi.Api,
 	});
 	return forceClose;
 };
@@ -92,7 +92,7 @@ const createHarness = async ({
 	const { rendererRuntime } = createTestRendererRuntime({
 		clearSaveFx: (key) =>
 			Effect.tryPromise({
-				try: () => window.arkini.save.clearFn(key),
+				try: () => window.serakki.save.clearFn(key),
 				catch: (cause) => cause,
 			}),
 		createResourceFx: () =>

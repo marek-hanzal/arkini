@@ -95,12 +95,12 @@ describe("Cheats", () => {
 		});
 		const game: Game = {
 			...session,
-			arkpack: {
+			serapack: {
 				packageId: "package:cheats",
 				contentHash: "content:cheats",
 				title: "Cheats game",
 				version: "1.0",
-				arkini: "1.0",
+				serakki: "1.0",
 				provenance: {
 					type: "community",
 				} as const,
@@ -173,12 +173,12 @@ describe("Cheats", () => {
 		});
 		const game: Game = {
 			...session,
-			arkpack: {
+			serapack: {
 				packageId: "package:cheats-race",
 				contentHash: "content:cheats-race",
 				title: "Cheats race game",
 				version: "1.0",
-				arkini: "1.0",
+				serakki: "1.0",
 				provenance: {
 					type: "community",
 				} as const,

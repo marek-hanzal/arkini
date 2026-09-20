@@ -35,7 +35,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>(() => Promise.resolve());
 		const writeIncident = vi.fn(() => Promise.resolve());
 		vi.stubGlobal("window", {
-			arkini: {
+			serakki: {
 				diagnostics: {
 					writeFn: write,
 				},
@@ -77,7 +77,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 			}),
 		);
 		expect(createObjectUrl).not.toHaveBeenCalled();
-		expect("arkpack" in game).toBe(false);
+		expect("serapack" in game).toBe(false);
 		expect("saveKey" in game).toBe(false);
 
 		await game.runFn(

@@ -31,7 +31,7 @@ export const makeActionUnitSpendRandomFx = Effect.fn("makeActionUnitSpendRandomF
 	// The seed namespace is stable gameplay identity; terminology changes must not reroll output.
 	return yield* program.pipe(
 		Random.withSeed(
-			`arkini:charge-spend:v${ActionUnitSpendRandomVersion}:${ownerItemId}:${actionId}:${itemId}:${quantity}:${remainingUnits}:${cost}`,
+			`serakki:charge-spend:v${ActionUnitSpendRandomVersion}:${ownerItemId}:${actionId}:${itemId}:${quantity}:${remainingUnits}:${cost}`,
 		),
 	);
 });

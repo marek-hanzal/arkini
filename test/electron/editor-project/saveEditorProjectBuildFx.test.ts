@@ -33,11 +33,11 @@ afterEach(async () => {
 });
 
 describe("saveEditorProjectBuildFx", () => {
-	it("publishes one local Editor Arkpack without release provenance", async () => {
-		const root = await mkdtemp(join(tmpdir(), "arkini-editor-build-save-"));
+	it("publishes one local Editor Serapack without release provenance", async () => {
+		const root = await mkdtemp(join(tmpdir(), "serakki-editor-build-save-"));
 		temporaryRoots.push(root);
 		const repository = createEditorProjectIpcRepository();
-		const source = join(root, "source.arkpack");
+		const source = join(root, "source.serapack");
 		await writeFile(source, Uint8Array.of(1, 2, 3));
 		vi.mocked(repository.withProjectBuildPathFx).mockImplementation((_request, useFx) =>
 			useFx(source),
@@ -65,7 +65,7 @@ describe("saveEditorProjectBuildFx", () => {
 			request,
 			expect.any(Function),
 		);
-		await expect(readFile(join(root, "custom-name.arkpack"))).resolves.toEqual(
+		await expect(readFile(join(root, "custom-name.serapack"))).resolves.toEqual(
 			Buffer.from([
 				1,
 				2,

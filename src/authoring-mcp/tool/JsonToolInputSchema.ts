@@ -12,7 +12,7 @@ export const JsonToolInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:json-tool-input",
+		$id: "urn:serakki:schema:mcp:json-tool-input",
 		title: "JSON authoring tool input",
 		description:
 			"One serialized JSON object whose exact schema is named by the authoring tool.",

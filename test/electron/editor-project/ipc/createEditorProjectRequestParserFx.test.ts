@@ -16,7 +16,7 @@ describe("createEditorProjectRequestParserFx", () => {
 					path: "/music/Unresolved Waltz.mp3",
 				},
 			],
-			projectId: "arkini",
+			projectId: "serakki",
 			source: "files" as const,
 			type,
 		};

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Semantic resource kinds currently admitted by portable projects and Arkpacks. */
+/** Semantic resource kinds currently admitted by portable projects and Serapacks. */
 export const ResourceTypeSchema = z.enum([
 	"artwork",
 	"image",

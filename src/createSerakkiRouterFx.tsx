@@ -1,0 +1,99 @@
+import { createRouter, type Router } from "@tanstack/react-router";
+import { Effect } from "effect";
+import { routeTree } from "~/_route";
+import type { RootContext } from "~/application-shell/context/RootContext";
+import { resolveRouteViewTransitionTypesFx } from "~/application-shell/fx/resolveRouteViewTransitionTypesFx";
+
+const isSkippedViewTransitionFn = (error: unknown) =>
+	typeof error === "object" &&
+	error !== null &&
+	"name" in error &&
+	(error.name === "AbortError" || error.name === "InvalidStateError");
+
+const observeSkippedViewTransitionFn = (transition: ViewTransition) => {
+	void transition.ready.catch((error: unknown) => {
+		if (!isSkippedViewTransitionFn(error)) throw error;
+	});
+};
+
+/**
+ * Creates the one process router around an explicit renderer-runtime context.
+ * Routes may borrow that authority; router or React lifetime must not recreate it.
+ */
+export const createSerakkiRouterFx = Effect.fn("createSerakkiRouterFx")((context: RootContext) =>
+	Effect.sync(() => {
+		const supportsTypedViewTransitions =
+			typeof window !== "undefined" &&
+			typeof window.CSS?.supports === "function" &&
+			window.CSS.supports("selector(:active-view-transition-type(serakki))");
+		const router = createRouter({
+			routeTree,
+			context,
+			defaultPreload: "intent",
+			defaultViewTransition: supportsTypedViewTransitions
+				? {
+						types: (locations) =>
+							Effect.runSync(resolveRouteViewTransitionTypesFx(locations)),
+					}
+				: false,
+			scrollRestoration: true,
+			scrollToTopSelectors: [
+				'[data-scroll-restoration-id="editor-artwork-list"]',
+				'[data-scroll-restoration-id="editor-estimate-list"]',
+				'[data-scroll-restoration-id="editor-item-list"]',
+				'[data-scroll-restoration-id="editor-item-type-picker"]',
+				'[data-scroll-restoration-id="editor-section-page"]',
+			],
+		});
+		const startRouterViewTransitionFn = router.startViewTransition.bind(router);
+		router.startViewTransition = (updateFn) => {
+			if (
+				typeof document === "undefined" ||
+				typeof document.startViewTransition !== "function"
+			) {
+				startRouterViewTransitionFn(updateFn);
+				return;
+			}
+			const startNativeViewTransitionFn = document.startViewTransition;
+			const ownStartViewTransition = Object.getOwnPropertyDescriptor(
+				document,
+				"startViewTransition",
+			);
+			const guardedStartViewTransitionFn = ((
+				...args: Parameters<typeof document.startViewTransition>
+			) => {
+				const transition = Reflect.apply(startNativeViewTransitionFn, document, args);
+				observeSkippedViewTransitionFn(transition);
+				return transition;
+			}) as typeof document.startViewTransition;
+			Object.defineProperty(document, "startViewTransition", {
+				configurable: true,
+				value: guardedStartViewTransitionFn,
+			});
+			try {
+				startRouterViewTransitionFn(updateFn);
+			} finally {
+				if (document.startViewTransition === guardedStartViewTransitionFn) {
+					if (ownStartViewTransition === undefined) {
+						Reflect.deleteProperty(document, "startViewTransition");
+					} else {
+						Object.defineProperty(
+							document,
+							"startViewTransition",
+							ownStartViewTransition,
+						);
+					}
+				}
+			}
+		};
+		return router;
+	}),
+);
+
+export type SerakkiRouter = Router<typeof routeTree, "never", false>;
+
+declare module "@tanstack/react-router" {
+	interface Register {
+		router: SerakkiRouter;
+	}
+}

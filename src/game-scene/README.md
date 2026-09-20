@@ -1,6 +1,6 @@
 # Game Scene map
 
-Game Scene is Arkini's concrete retained Pixi executor. `src/tile-presentation` owns semantic actor projections, `src/tile-rendering` owns native actors and animation capabilities, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution.
+Game Scene is Serakki's concrete retained Pixi executor. `src/tile-presentation` owns semantic actor projections, `src/tile-rendering` owns native actors and animation capabilities, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution.
 
 The engine remains gameplay truth. React owns routes, pages and menus; `src/item-detail` owns Item Detail dialog composition. Start at `fx/createMainRuntimeFx.ts` for Board + Toolbar and `fx/createInventoryRuntimeFx.ts` for Inventory.
 

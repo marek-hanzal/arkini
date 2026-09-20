@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 const createRoot = () => {
-	const directory = mkdtempSync(join(tmpdir(), "arkini-mcp-storage-limit-test-"));
+	const directory = mkdtempSync(join(tmpdir(), "serakki-mcp-storage-limit-test-"));
 	directories.push(directory);
 	return {
 		directory,
@@ -53,7 +53,7 @@ describe("filesystem MCP storage limits", () => {
 			join(root, "mcp.json"),
 			JSON.stringify({
 				port: 32_310,
-				password: "arkini_mcp_fixture",
+				password: "serakki_mcp_fixture",
 				clients: Array.from(
 					{
 						length: 100,

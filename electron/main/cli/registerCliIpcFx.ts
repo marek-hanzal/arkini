@@ -1,7 +1,7 @@
 import { app, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
 import type { Completion } from "./createCompletionFx";
@@ -32,36 +32,36 @@ export const registerCliIpcFx = Effect.fn("registerCliIpcFx")(
 				);
 			const handlers = [
 				[
-					ArkiniElectronApi.channels.cliStatus,
+					SerakkiElectronApi.channels.cliStatus,
 					(event: IpcMainInvokeEvent) =>
 						runAuthorizedFn(event, installation.readStatusFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliInstall,
+					SerakkiElectronApi.channels.cliInstall,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, installation.installFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliReplace,
+					SerakkiElectronApi.channels.cliReplace,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, installation.replaceFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliUninstall,
+					SerakkiElectronApi.channels.cliUninstall,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, installation.uninstallFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliCompletionStatus,
+					SerakkiElectronApi.channels.cliCompletionStatus,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.readStatusFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliCompletionInstall,
+					SerakkiElectronApi.channels.cliCompletionInstall,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.installFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliCompletionReplace,
+					SerakkiElectronApi.channels.cliCompletionReplace,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.replaceFx),
 				],
 				[
-					ArkiniElectronApi.channels.cliCompletionUninstall,
+					SerakkiElectronApi.channels.cliCompletionUninstall,
 					(event: IpcMainInvokeEvent) => runAuthorizedFn(event, completion.uninstallFx),
 				],
 			] as const;

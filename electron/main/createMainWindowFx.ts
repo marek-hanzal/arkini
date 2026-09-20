@@ -1,8 +1,8 @@
 import { BrowserWindow, ipcMain, Menu, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
-import { ArkiniWindowTitle } from "~shared/ArkiniAppMetadata";
-import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
+import { SerakkiWindowTitle } from "~shared/SerakkiAppMetadata";
+import { SerakkiElectronApi } from "../contract/SerakkiElectronApi";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
@@ -35,7 +35,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 			const window = new BrowserWindow({
 				...bounds,
 				show: false,
-				title: ArkiniWindowTitle,
+				title: SerakkiWindowTitle,
 				backgroundColor: "#000000",
 				fullscreen: windowMode === "fullscreen",
 				fullscreenable: true,
@@ -53,7 +53,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 
 			const onReadyToShowFn = () => {
 				window.show();
-				window.webContents.send(ArkiniElectronApi.channels.windowVisible);
+				window.webContents.send(SerakkiElectronApi.channels.windowVisible);
 			};
 
 			return yield* Effect.gen(function* () {
@@ -85,12 +85,12 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 								mode: "detach",
 							});
 						} else {
-							await window.loadURL("arkini://app/");
+							await window.loadURL("serakki://app/");
 						}
 					},
 					catch: (cause) =>
 						new ElectronMainError({
-							operation: "load the Arkini renderer",
+							operation: "load the Serakki renderer",
 							cause,
 						}),
 				});

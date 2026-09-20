@@ -33,8 +33,8 @@ export const EditItemLinesInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "urn:arkini:schema:mcp:edit-item-lines-input",
-		$id: "urn:arkini:schema:mcp:edit-item-lines-input",
+		id: "urn:serakki:schema:mcp:edit-item-lines-input",
+		$id: "urn:serakki:schema:mcp:edit-item-lines-input",
 		title: "Edit item lines tool input",
 		description:
 			"Up to 20 complete create, replace or delete operations across items, validated before one revision-guarded best-effort commit.",

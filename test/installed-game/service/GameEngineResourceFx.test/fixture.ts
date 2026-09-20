@@ -3,7 +3,7 @@ import { Effect, Exit, Fiber, ManagedRuntime, Scope } from "effect";
 import { afterEach } from "vitest";
 
 import type { Game } from "~/installed-game/type/Game";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 
 import { GameEngineResourceLayer } from "~/installed-game/layer/GameEngineResourceLayer";
 
@@ -16,7 +16,7 @@ import {
 
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 
@@ -35,18 +35,18 @@ export const makeResource = ({
 }) =>
 	Effect.runSync(
 		createGameEngineResourceFx<Game>({
-			arkpack: {
+			serapack: {
 				packageId,
 				contentHash: `content:${packageId}`,
-				title: testArkpackConfig.meta.title,
+				title: testSerapackConfig.meta.title,
 				version: "1.0",
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				provenance: {
 					type: "community",
 				},
 				source: "user",
 			},
-			config: testArkpackConfig,
+			config: testSerapackConfig,
 			disposeFx,
 			disposeWithoutSaveFx,
 			flushSaveFx: Effect.void,

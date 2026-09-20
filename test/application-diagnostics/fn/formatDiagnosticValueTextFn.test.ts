@@ -9,7 +9,7 @@ import { formatDiagnosticValueTextFn } from "~/application-diagnostics/fn/format
 
 describe("formatDiagnosticValueTextFn", () => {
 	it("preserves local evidence for application diagnostics", () => {
-		const path = "/Users/developer/Project/arkini/editor/project.json";
+		const path = "/Users/developer/Project/serakki/editor/project.json";
 		const text = formatDiagnosticValueTextFn({
 			value: {
 				cause: {

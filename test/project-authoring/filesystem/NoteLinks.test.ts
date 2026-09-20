@@ -9,7 +9,7 @@ import {
 } from "./support/createProjectTestHarness";
 let harness: ProjectTestHarness;
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-note-links-");
+	harness = await createProjectTestHarness("serakki-note-links-");
 });
 afterEach(async () => harness.close());
 

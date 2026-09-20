@@ -17,7 +17,7 @@ const canonicalizeLocalesFn = (locales: readonly string[]): readonly string[] =>
 					canonicalLocales.push(canonicalLocale);
 			}
 		} catch {
-			// OS preferences are outside Arkini's control; malformed entries cannot win negotiation.
+			// OS preferences are outside Serakki's control; malformed entries cannot win negotiation.
 		}
 	}
 	return canonicalLocales;

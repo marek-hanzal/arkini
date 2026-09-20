@@ -78,7 +78,7 @@ Usually not affected:
 
 - Runtime production execution, Tick or save behavior. Similar vocabulary does not make Estimate a simulator.
 - Project filesystem transactions, Versions or MCP mutation authority.
-- Arkpack encoding, provenance and installed-game lifecycle.
+- Serapack encoding, provenance and installed-game lifecycle.
 
 An authored schema or production semantic change can affect both Runtime and analysis, but each owner needs its own proof. Never use an Estimate test as evidence for engine behavior.
 

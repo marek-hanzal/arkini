@@ -1,0 +1,424 @@
+{
+	"$schema": "./schema.json",
+	"version": {
+		"major": 1,
+		"minor": 0
+	},
+	"meta": {
+		"id": "serakki",
+		"title": "Serakki",
+		"introduction": "# Good luck!\n\n> **TL;DR:** Think before you drag things onto other things.  \n> Serakki will happily let you make questionable decisions.\n\n---\n\nSerakki is a sandbox.\n\nThings react to what you do.  \nOften **quite literally**.\n\nItems can spoil. Animals can get hungry, sick, injured, or worse. Resources can be wasted. Tools may end up somewhere you really didn't want them.\n\nSome mistakes are reversible.\n\nSome are expensive.\n\nSome are just **funny**.\n\n---\n\nThere is no giant recipe book waiting to explain every possible interaction.\n\n<u>Experiment.</u>  \n**Observe.**  \n*Remember what happened.*\n\nSimilar things often behave in similar ways.\n\nAnd sometimes they absolutely don't.\n\n> If something looks like a bad idea, it probably is.\n\nThat does **not** mean you shouldn't try it.\n\n---\n\nTime keeps moving.\n\nDirection can matter.\n\nThe world may reward curiosity.\n\nThe world may also respond to curiosity with **consequences**.\n\nYou are allowed to make mistakes.\n\nYou are even allowed to make **spectacularly stupid** mistakes.\n\n---\n\n## One last thing\n\nSerakki won't always save you from yourself.\n\nIt may not even try.\n\n**Good luck.**\n\n*Seriously.*",
+		"board": {
+			"width": 17,
+			"height": 11
+		},
+		"inventory": {
+			"width": 15,
+			"height": 9
+		},
+		"toolbarSize": 17
+	},
+	"resources": {
+		"hero": "hero",
+		"avatar-01": "avatar-01",
+		"avatar-02": "avatar-02",
+		"avatar-03": "avatar-03",
+		"avatar-04": "avatar-04",
+		"avatar-05": "avatar-05",
+		"avatar-06": "avatar-06",
+		"avatar-07": "avatar-07"
+	},
+	"music": {
+		"playlist": [
+			"zq5fhwfah11satehes12fqja",
+			"apkai01c677b0y8mq57avdaw",
+			"rqnaxq061p1er16aa7e8hpgx",
+			"bq2mkh5ajs17stc64ku3omts",
+			"r33e6qz6tw7ve4ax5qy0c09a",
+			"vn88wjd7s4mm4gfsqfigetry",
+			"fcc8vbb46h72my4tvigmofl4",
+			"n3paxnhisot9mmw9s4v9yo4l",
+			"vjd86nxytetklp0nhbf8wqqa",
+			"qu8zbi394ras0gc2qwqnpo4o",
+			"a7tqhjgj6ibiat4oqnpe8uzf"
+		]
+	},
+	"sfx": {
+		"events": {
+			"current-space:changed": "ngbb07df7gs9w9ma69itu40b",
+			"job:completed": "y1qjga9zph6pnrcr3mzffp4v",
+			"item:merged": "vl75fu7cnkiv0tmprga9t3cx",
+			"item:placed": "tuijuys1uhuwv04yoswv7c23",
+			"job:started": "ijw32mlemae12vdyp0kz9lo7",
+			"job:aborted": "avaxbsa7uaxoo01y9lfnc4qx",
+			"item:spawned": "elimu23r1lj7128bampftj0s",
+			"item:unit-spent": "ba8yybck1l5zjee9j4i5et9e",
+			"item:input-stored": "uoimkyf8dxad8q4fvjoznz0j",
+			"item:consumed": "uoimkyf8dxad8q4fvjoznz0j",
+			"item:depleted": "l5ofxpvd9lywzbss6q2cb6tq",
+			"item:split": "gvuu9yvkdn51z9hwblyttyne",
+			"item:stacked": "huor6bfv03ctq6aj3xs7sudw",
+			"item-detail:closed": "jds2ufexkrwsd8d971fr167p",
+			"item-detail:opened": "v84lteiusbdwrd3f14lm94q8",
+			"job-queue:cleared": "avaxbsa7uaxoo01y9lfnc4qx",
+			"item:expired": "huor6bfv03ctq6aj3xs7sudw",
+			"item:discarded": "b681gtair0i22okcvoweaviz",
+			"item:disappeared": "w1v289htioc7lwo96p2rw2gd",
+			"job:queued": "t4ps0gbfy3c4ybc1vkr1ij31",
+			"item:swapped": "hp5epo5hznpiearnat1ufe96",
+			"item:portal-transferred": "ftlvx59l426nd2mmp6s6b5lt",
+			"line-input:autofill-started": "r8j85m4ar8fhx0ialyk6f1u4"
+		}
+	},
+	"start": {
+		"currentSpace": 0,
+		"board": [
+			{
+				"x": 1,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 6,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 7,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 10,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 5,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 4,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 3,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 12,
+				"y": 2,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 11,
+				"y": 1,
+				"space": 1,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 0,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 1,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 4,
+				"space": 0,
+				"itemId": "foundation-chest",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 0,
+				"itemId": "base-camp",
+				"quantity": 1
+			},
+			{
+				"x": 16,
+				"y": 0,
+				"space": 0,
+				"itemId": "stone-deposit",
+				"quantity": 1
+			},
+			{
+				"x": 0,
+				"y": 2,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 1,
+				"y": 0,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 0,
+				"space": 0,
+				"itemId": "tree",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 2,
+				"space": 0,
+				"itemId": "forest",
+				"quantity": 1
+			}
+		],
+		"inventory": [],
+		"toolbar": [
+			{
+				"itemId": "homeland-portal",
+				"quantity": 1,
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "farmland-portal",
+				"quantity": 1,
+				"position": {
+					"x": 1,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "forest-portal",
+				"quantity": 1,
+				"position": {
+					"x": 2,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "industrial-portal",
+				"quantity": 1,
+				"position": {
+					"x": 3,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "mining-portal",
+				"quantity": 1,
+				"position": {
+					"x": 4,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "workshop-portal",
+				"quantity": 1,
+				"position": {
+					"x": 5,
+					"y": 0
+				}
+			},
+			{
+				"itemId": "inventory",
+				"quantity": 1,
+				"position": {
+					"x": 16,
+					"y": 0
+				}
+			}
+		]
+	}
+}

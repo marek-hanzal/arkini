@@ -9,7 +9,7 @@ export const saveEditorBuildFx = Effect.fn("saveEditorBuildFx")(
 	(artifact: EditorProjectBuildSchema.Type) =>
 		invokeProjectTransportFx({
 			callFn: () =>
-				window.arkini.editor.saveProjectBuildFn({
+				window.serakki.editor.saveProjectBuildFn({
 					projectId: artifact.projectId,
 					expectedRevision: artifact.revision,
 					contentHash: artifact.contentHash,

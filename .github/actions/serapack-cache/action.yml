@@ -1,0 +1,17 @@
+name: Prepare Community Serapack cache
+description: Restore the repository game build using the canonical Argcfile fingerprint.
+runs:
+  using: composite
+  steps:
+    - name: Compute canonical Serapack fingerprint
+      id: fingerprint
+      shell: bash
+      run: |
+        fingerprint=$(./Argcfile.sh serapack-fingerprint)
+        [[ "$fingerprint" =~ ^[a-f0-9]{64}$ ]]
+        echo "value=$fingerprint" >> "$GITHUB_OUTPUT"
+    - name: Restore Community Serapack and checksum
+      uses: actions/cache@v5
+      with:
+        path: game/serakki/build
+        key: community-serapack-${{ runner.os }}-${{ runner.arch }}-${{ steps.fingerprint.outputs.value }}

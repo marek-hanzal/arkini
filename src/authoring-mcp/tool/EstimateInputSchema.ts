@@ -22,7 +22,7 @@ export const EstimateInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:estimate-input",
+		$id: "urn:serakki:schema:mcp:estimate-input",
 		title: "Estimate tool input",
 		description: "Pagination, search, and display mode for the global Estimate tool.",
 	});

@@ -1,10 +1,10 @@
 # Serakki
 
 <p align="center">
-  <img src="game/arkini/image/hero.png" alt="Serakki logo with winged unicorns and magical machinery" width="100%" />
+  <img src="game/serakki/image/hero.png" alt="Serakki logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Serakki is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Artwork. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results through `item_chain({ itemId, detail, maxDepth })`: `full` (default) includes complete step details, while `summary` retains starting operations, immediate branches and outcome states. Depth defaults to 5 and accepts 1–12; cycle detection and the expansion safety limit apply to both.
+Serakki is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Serapacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Artwork. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results through `item_chain({ itemId, detail, maxDepth })`: `full` (default) includes complete step details, while `summary` retains starting operations, immediate branches and outcome states. Depth defaults to 5 and accepts 1–12; cycle detection and the expansion safety limit apply to both.
 
 ## Start here
 
@@ -17,7 +17,7 @@ Read the smallest entry point needed for the task:
 | Find a domain, public entrypoint or dense local map | [`DOMAIN_ATLAS.md`](DOMAIN_ATLAS.md) |
 | Implemented gameplay semantics | [`GAME.MD`](GAME.MD) |
 | Project layout, authoring, compiler, validation | [`CONFIG.md`](CONFIG.md) |
-| Compatibility, external formats, Arkpack provenance | [`VERSION.md`](VERSION.md) |
+| Compatibility, external formats, Serapack provenance | [`VERSION.md`](VERSION.md) |
 
 ## Repository map
 
@@ -27,7 +27,7 @@ Read the smallest entry point needed for the task:
 | Production | Conditions, actions, inputs, lines, jobs, delivery and output | [`src/production-line/README.md`](src/production-line/README.md) |
 | Retained gameplay presentation | Tile projection/rendering/motion/interaction and concrete scenes | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored source | Foundational values, completed Config, source files, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
-| Artifacts and compatibility | Arkpack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |
+| Artifacts and compatibility | Serapack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |
 | Editor persistence | Portable repository, renderer project session, IPC, Notes and Build | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 | Acquisition and Estimate | Shared authored acquisition graph and static optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
 | Application and platform | Launcher, renderer runtime/shell/settings, routes and Electron | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
@@ -62,15 +62,15 @@ argc mcp-inspect
 
 `argc translations:sync` reconciles every `src/translation/*.yaml` catalog. It extracts configured literal keys, adds missing entries, removes dead static entries, preserves explicit dynamic entries, and sorts the result. `argc translations:check` performs the same work without writing and fails on drift. The renderer bundles those catalogs, negotiates against Electron's preferred languages, and falls back to `en`; there is no generated copy or runtime download.
 
-`argc dc` checks dependency topology across every active module root and standalone TypeScript config. `argc check` runs formatting and translation drift, all TypeScript configurations, a production Electron build, Community Arkpack packing and verification, dependency checks, copy/paste detection, and the permanent Vitest suite.
+`argc dc` checks dependency topology across every active module root and standalone TypeScript config. `argc check` runs formatting and translation drift, all TypeScript configurations, a production Electron build, Community Serapack packing and verification, dependency checks, copy/paste detection, and the permanent Vitest suite.
 
-`argc check --skip-arkpack` skips bundled game Arkpack packing and verification entirely, including the cache lookup. The Electron build and all other checks still run; use plain `argc check` for the complete gate. `argc preview-macos --build --skip-arkpack` also skips this step while rebuilding the app, bundling the existing Arkpack if available or starting without one.
+`argc check --skip-serapack` skips bundled game Serapack packing and verification entirely, including the cache lookup. The Electron build and all other checks still run; use plain `argc check` for the complete gate. `argc preview-macos --build --skip-serapack` also skips this step while rebuilding the app, bundling the existing Serapack if available or starting without one.
 
 `argc check --silent` still packs and verifies the bundled game, but suppresses its warning diagnostics. Validation errors and the normal pack summary remain visible.
 
 `argc platform-check` is the narrower hosted macOS/Windows portability gate. It runs the production build plus real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; this does not replace the complete closing gate.
 
-Serakki is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
+Serakki is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `serakki://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/serakki/build/` artifacts.
 
 MCP `item_input`, `item_output`, and `item_estimate` accept optional `detail: "summary" | "full"`. Omitted detail preserves the full response. Relation summaries retain every discovered operation and traversal level, compact authored inputs, output sets/roll chances, and gates without repeated dependency witnesses. Estimate summaries retain the selected result and all requirement groups without the selected fact DAG. Diagnostic counts describe only the estimator's bounded reported evidence, not a complete count of rejected alternatives. Both modes use the same analysis; summary reduces presentation size without imposing a result limit.
 
@@ -88,12 +88,12 @@ Local MCP always starts on the port saved by the Editor. `--remote` additionally
 
 ## Distribution
 
-The application ships as **Serakki** (`dev.marekhanzal.serakki`) with the `serakki-cli` command. The staged rebrand currently retains `~/.arkini`, the `arkini://` protocol, the official `game/arkini` project and package ID, internal source identifiers, and the Arkpack/save formats. These data identities change in a separate step.
+The application ships as **Serakki** (`dev.marekhanzal.serakki`) with the `serakki-cli` command. Current data uses `~/.serakki`, the `serakki://` protocol, `serakki` writer provenance, and the official `game/serakki` project with package ID `serakki`. Packages use the `SERAPACK` envelope and `.serapack` extension; saves use `.serasave`. Readers accept only the current format; no previous-brand readers, aliases, or automatic data migration are provided.
 
-`argc preview-macos --build` rebuilds and launches an unpacked local arm64 app. Always pass `--build` to platform preview commands so the opened application reflects the current source. A failed Arkpack rebuild is reported but does not block this interactive preview: it keeps the last successful bundled Arkpack when available, or starts without one. `argc build`, repository checks, and native package commands remain strict. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.
+`argc preview-macos --build` rebuilds and launches an unpacked local arm64 app. Always pass `--build` to platform preview commands so the opened application reflects the current source. A failed Serapack rebuild is reported but does not block this interactive preview: it keeps the last successful bundled Serapack when available, or starts without one. `argc build`, repository checks, and native package commands remain strict. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.
 
 The macOS application requires macOS 13 (Ventura) or newer, matching Electron 44.
 
-Working branches run the complete repository gate on hosted Linux and the focused platform gate on macOS and Windows; every platform builds and verifies a Community Arkpack. `main` deliberately runs nothing. Prerelease tags repeat those gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release.
+Working branches run the complete repository gate on hosted Linux and the focused platform gate on macOS and Windows; every platform builds and verifies a Community Serapack. `main` deliberately runs nothing. Prerelease tags repeat those gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release.
 
-Every tag build creates the official Arkpack once, embeds a keyless Sigstore proof for the configured distribution channel, and reuses the exact self-contained bytes in every native package and standalone release artifact. Local and Editor packs are Community. Both states are playable; [`VERSION.md`](VERSION.md) owns soft provenance.
+Every tag build creates the official Serapack once, embeds a keyless Sigstore proof for the configured distribution channel, and reuses the exact self-contained bytes in every native package and standalone release artifact. Local and Editor packs are Community. Both states are playable; [`VERSION.md`](VERSION.md) owns soft provenance.

@@ -18,14 +18,14 @@ const formatStackFn = (stack: string): readonly string[] => {
 	if (lines.length <= 1) return lines;
 	const message = lines[0] ?? "Error";
 	const frames = lines.slice(1);
-	const arkiniFrames = frames.filter(
+	const serakkiFrames = frames.filter(
 		(line) =>
 			line.includes("/src/") ||
 			line.includes("/electron/") ||
 			line.includes("/shared/") ||
 			line.includes(".out/desktop/build"),
 	);
-	const retained = arkiniFrames.length === 0 ? frames.slice(0, 4) : arkiniFrames.slice(0, 8);
+	const retained = serakkiFrames.length === 0 ? frames.slice(0, 4) : serakkiFrames.slice(0, 8);
 	const omitted = frames.length - retained.length;
 	return [
 		message,

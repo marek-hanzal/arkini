@@ -11,7 +11,7 @@ let registry: AtomRegistry.AtomRegistry | undefined;
 afterEach(() => {
 	registry?.dispose();
 	registry = undefined;
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("Settings CLI completion command", () => {
@@ -23,7 +23,7 @@ describe("Settings CLI completion command", () => {
 				shell: "zsh" as const,
 			}),
 		);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				cli: {

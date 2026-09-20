@@ -112,7 +112,7 @@ it("keeps the refreshed Board when cached route data has a higher revision", asy
 		},
 	};
 	harness.setProject(fresh);
-	Object.assign(window.arkini.editor, {
+	Object.assign(window.serakki.editor, {
 		refreshProjectFn: async () => ({
 			type: "success",
 			value: fresh,

@@ -31,11 +31,11 @@ const formatSummaryFn = (session: GameDiagnosticSession) => {
 		"# Game diagnostic session",
 		"",
 		`- Session: ${identity.sessionId}`,
-		`- Arkini application: ${identity.applicationVersion}`,
+		`- Serakki application: ${identity.applicationVersion}`,
 		`- Package: ${identity.packageId}`,
 		`- Content hash: ${identity.contentHash}`,
 		`- Game version: ${identity.gameVersion}`,
-		`- Arkini writer: ${identity.arkiniVersion}`,
+		`- Serakki writer: ${identity.serakkiVersion}`,
 		`- Restored save: ${identity.restored ? "yes" : "no"}`,
 		`- Started: ${identity.startedAt}`,
 		...(failure === null

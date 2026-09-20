@@ -87,7 +87,7 @@ const replacePathBeforeClaim = (path: string, displacedPath: string) => {
 
 describe.skipIf(process.platform === "win32")("CLI removal claims", () => {
 	it("preserves a command file swapped in before the removal claim", async () => {
-		const directory = await mkdtemp(join(tmpdir(), "arkini CLI removal claim-"));
+		const directory = await mkdtemp(join(tmpdir(), "serakki CLI removal claim-"));
 		temporaryDirectories.push(directory);
 		const launcherPath = await createLauncher(directory);
 		const commandPath = join(directory, "home", ".local", "bin", "serakki-cli");
@@ -107,7 +107,7 @@ describe.skipIf(process.platform === "win32")("CLI removal claims", () => {
 	});
 
 	it("preserves a completion file swapped in before the removal claim", async () => {
-		const directory = await mkdtemp(join(tmpdir(), "arkini completion removal claim-"));
+		const directory = await mkdtemp(join(tmpdir(), "serakki completion removal claim-"));
 		temporaryDirectories.push(directory);
 		const launcherPath = await createLauncher(directory);
 		const completionPath = join(directory, "home", ".zsh", "completions", "_serakki-cli");

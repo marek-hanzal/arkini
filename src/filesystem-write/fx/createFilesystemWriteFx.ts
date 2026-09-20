@@ -15,7 +15,7 @@ interface FilesystemLock {
 }
 
 const HeldFilesystemWriteLocks = Context.Reference<ReadonlyMap<string, number>>(
-	"Arkini/FilesystemWrite/HeldLocks",
+	"Serakki/FilesystemWrite/HeldLocks",
 	{
 		defaultValue: () => new Map(),
 	},

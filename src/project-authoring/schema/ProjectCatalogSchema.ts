@@ -27,7 +27,7 @@ export const ProjectCatalogSchema = z
 	})
 	.meta({
 		id: "EditorProjectCatalogSchema",
-		description: "The global projects.json file stored below Arkini user data.",
+		description: "The global projects.json file stored below Serakki user data.",
 	});
 
 export type ProjectCatalogSchema = typeof ProjectCatalogSchema;

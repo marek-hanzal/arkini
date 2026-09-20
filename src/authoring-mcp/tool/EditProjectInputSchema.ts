@@ -4,7 +4,7 @@ import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { RolesSchema } from "~/game-config/schema/RolesSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";
 
-const editProjectInputSchemaId = "urn:arkini:schema:mcp:edit-project-input";
+const editProjectInputSchemaId = "urn:serakki:schema:mcp:edit-project-input";
 
 export const EditProjectInputSchema = z
 	.object({

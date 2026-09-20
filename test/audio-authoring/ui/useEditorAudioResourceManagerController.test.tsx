@@ -55,7 +55,7 @@ vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
 		new Map([
 			[
 				"job-start",
-				"arkini://app/editor/resource?resourceId=job-start",
+				"serakki://app/editor/resource?resourceId=job-start",
 			],
 		]),
 }));

@@ -15,7 +15,7 @@ This map separates authored values, portable source, diagnostics, semantic valid
 | `game-config-validation` | Completed-config semantic validation and blocking diagnostics | [`../game-config-validation/fx/validateGameConfigFx.ts`](../game-config-validation/fx/validateGameConfigFx.ts) |
 | `game-config-compiler` | Deterministic source assembly, validation orchestration and compilation result | [`../game-config-compiler/fx/compileGameDirectoryFx.ts`](../game-config-compiler/fx/compileGameDirectoryFx.ts) |
 
-Arkpack, Editor Build and CLI consume this pipeline. None of them owns another source reader, config assembler or semantic validator.
+Serapack, Editor Build and CLI consume this pipeline. None of them owns another source reader, config assembler or semantic validator.
 
 ## Dependency shape
 
@@ -47,7 +47,7 @@ project.json + schema.json + game.json + items + typed visual/Music resources
 → semantic and typed resource validation
 → blocking-diagnostic gate
 → completed Game Config
-→ Arkpack normalization and streamed encoding, or lazy Editor preview
+→ Serapack normalization and streamed encoding, or lazy Editor preview
 ```
 
 Source, validation, Editor Build, CLI and packing must not create variants of this flow. Conflicts remain diagnostics with exact source provenance and never silently overwrite another provider.
@@ -55,9 +55,9 @@ Source, validation, Editor Build, CLI and packing must not create variants of th
 ## Important invariants
 
 - `game-config` owns values only; it imports no source, validation, compiler, Editor, renderer, route or Electron behavior.
-- `game-value` owns only reusable scalar schemas and imports no Arkini domain.
+- `game-value` owns only reusable scalar schemas and imports no Serakki domain.
 - Source reads exact allowlisted paths. Arbitrary recursive JSON is not game source.
-- Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. The completed config owns the explicit global Music playlist and the mapping from exact SFX events to resources; those events comprise committed gameplay plus explicit presentation interactions without converting UI lifecycle into gameplay history. Validation resolves every assigned ID against the SFX semantic type. Item `music` is an exact Music reference for its open detail; validation and resource usage include it. Arkpack compilation includes playlist-selected and item-requested Music and every SFX source. Artwork is normalized to bounded square RGBA while general Image and canonical Ogg/Opus bytes are preserved unless the author explicitly optimizes SFX silent edges.
+- Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. The completed config owns the explicit global Music playlist and the mapping from exact SFX events to resources; those events comprise committed gameplay plus explicit presentation interactions without converting UI lifecycle into gameplay history. Validation resolves every assigned ID against the SFX semantic type. Item `music` is an exact Music reference for its open detail; validation and resource usage include it. Serapack compilation includes playlist-selected and item-requested Music and every SFX source. Artwork is normalized to bounded square RGBA while general Image and canonical Ogg/Opus bytes are preserved unless the author explicitly optimizes SFX silent edges.
 - The generated `schema.json` comes from the current project source-schema union and uses stable references.
 - Validation extends beyond Zod shape parsing and preserves source/entity provenance.
 - The compiler rejects blocking diagnostics and cannot publish a usable invalid result.
@@ -69,7 +69,7 @@ Likely affected:
 
 - Generated project JSON Schema and source admission.
 - Semantic validation and diagnostic variants.
-- CLI validation/packing, Editor Build and Arkpack admission.
+- CLI validation/packing, Editor Build and Serapack admission.
 - Project Authoring forms and every current-format authored-data writer.
 - Runtime, Flow and Estimate when the completed Game Config shape or semantics change.
 

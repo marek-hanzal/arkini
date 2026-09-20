@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { writeSoundVolumeFx } from "~/application-settings/fx/writeSoundVolumeFx";
 
 afterEach(() => {
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("writeSoundVolumeFx", () => {
@@ -19,7 +19,7 @@ describe("writeSoundVolumeFx", () => {
 			.fn()
 			.mockImplementationOnce(() => first)
 			.mockResolvedValue(undefined);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				sound: {

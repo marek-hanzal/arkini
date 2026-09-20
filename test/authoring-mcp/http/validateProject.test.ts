@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { createTestPngBytes } from "~test/arkpack-support/fn/createTestPngBytes";
+import { createTestPngBytes } from "~test/serapack-support/fn/createTestPngBytes";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,

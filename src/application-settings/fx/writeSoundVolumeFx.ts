@@ -10,7 +10,7 @@ export const writeSoundVolumeFx = Effect.fn("writeSoundVolumeFx")(
 	(channel: SoundChannel, volume: SoundVolumeSchema.Type) =>
 		writeSemaphore.withPermits(1)(
 			Effect.tryPromise({
-				try: () => window.arkini.sound.writeFn(channel, volume),
+				try: () => window.serakki.sound.writeFn(channel, volume),
 				catch: (cause) => cause,
 			}),
 		),

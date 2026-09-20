@@ -38,8 +38,8 @@ export const CreateItemInputSchema = z
 		not: ItemSchema.meta()?.not,
 		if: ItemSchema.meta()?.if,
 		then: ItemSchema.meta()?.then,
-		id: "urn:arkini:schema:mcp:create-item-input",
-		$id: "urn:arkini:schema:mcp:create-item-input",
+		id: "urn:serakki:schema:mcp:create-item-input",
+		$id: "urn:serakki:schema:mcp:create-item-input",
 		title: "Create item tool input",
 		description: "Authoring fields accepted when creating one item.",
 	});

@@ -14,8 +14,8 @@ export const CreateItemLineInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "urn:arkini:schema:mcp:create-item-line-input",
-		$id: "urn:arkini:schema:mcp:create-item-line-input",
+		id: "urn:serakki:schema:mcp:create-item-line-input",
+		$id: "urn:serakki:schema:mcp:create-item-line-input",
 		title: "Create item line tool input",
 		description: "Append one complete production line; reject an existing line ID.",
 	});

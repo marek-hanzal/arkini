@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { importEditorArtworkFx } from "~/artwork-authoring/fx/importEditorArtworkFx";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
@@ -32,7 +32,7 @@ afterEach(() => {
 
 describe("Artwork Authoring importEditorArtworkFx from PNG files", () => {
 	it("passes only native paths over IPC and publishes the imported project", async () => {
-		const importResourcesFn = vi.fn<ArkiniElectronApi.Api["editor"]["importResourcesFn"]>(
+		const importResourcesFn = vi.fn<SerakkiElectronApi.Api["editor"]["importResourcesFn"]>(
 			async () => ({
 				type: "success",
 				value: {
@@ -44,8 +44,8 @@ describe("Artwork Authoring importEditorArtworkFx from PNG files", () => {
 				},
 			}),
 		);
-		vi.stubGlobal("arkini", undefined);
-		Object.defineProperty(window, "arkini", {
+		vi.stubGlobal("serakki", undefined);
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				file: {
@@ -54,7 +54,7 @@ describe("Artwork Authoring importEditorArtworkFx from PNG files", () => {
 				editor: {
 					importResourcesFn,
 				},
-			} as unknown as ArkiniElectronApi.Api,
+			} as unknown as SerakkiElectronApi.Api,
 		});
 		const registry = AtomRegistry.make({
 			scheduleTask,

@@ -2,15 +2,15 @@ import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
+import type { SerapackStorage } from "~/serapack-catalog/service/SerapackStorage";
 import { createGameFx as createGameFromPackageFx } from "~/installed-game/fx/createGameFx";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
-import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
+import { decodeSerakkiSaveFx } from "~/game-persistence/fx/decodeSerakkiSaveFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
-import { installTestPngDecoder } from "~test/arkpack-support/fn/createTestPngBytes";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
+import { installTestPngDecoder } from "~test/serapack-support/fn/createTestPngBytes";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 
 const encodeJsonFn = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
 
@@ -21,17 +21,17 @@ const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEff
 	});
 
 const createStorages = async (version = "1.0", introduction?: string) => {
-	const file: ArkpackStorage.LoadedFile = {
-		packageId: testArkpackConfig.meta.id,
-		filename: "test.arkpack",
+	const file: SerapackStorage.LoadedFile = {
+		packageId: testSerapackConfig.meta.id,
+		filename: "test.serapack",
 		contentHash: "a".repeat(64),
-		title: testArkpackConfig.meta.title,
+		title: testSerapackConfig.meta.title,
 		version,
-		arkini: ArkiniAppVersion,
+		serakki: SerakkiAppVersion,
 		config: {
-			...testArkpackConfig,
+			...testSerapackConfig,
 			meta: {
-				...testArkpackConfig.meta,
+				...testSerapackConfig.meta,
 				introduction,
 			},
 		},
@@ -39,12 +39,12 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 			{
 				id: "hero",
 				type: "image",
-				url: "arkini://test/hero",
+				url: "serakki://test/hero",
 			},
 			{
 				id: "artwork:water",
 				type: "artwork",
-				url: "arkini://test/asset-water",
+				url: "serakki://test/asset-water",
 			},
 		],
 		provenance: {
@@ -53,7 +53,7 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 		source: "user",
 		overridesBundled: false,
 	};
-	const arkpackStorage: ArkpackStorage = {
+	const serapackStorage: SerapackStorage = {
 		listFx: Effect.succeed([
 			file,
 		]),
@@ -83,7 +83,7 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 			}),
 	};
 	return {
-		arkpackStorage,
+		serapackStorage,
 		descriptor: file,
 		packageId: file.packageId,
 		saveKey: {
@@ -113,16 +113,16 @@ describe("createGameFx", () => {
 		const first = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
 
-		expect(first.arkpack.packageId).toBe(storages.packageId);
-		expect(first.config).toEqual(testArkpackConfig);
+		expect(first.serapack.packageId).toBe(storages.packageId);
+		expect(first.config).toEqual(testSerapackConfig);
 		expect(first.getSnapshotFn().items).toEqual([
 			expect.objectContaining({
-				item: testArkpackConfig.items.water,
+				item: testSerapackConfig.items.water,
 				location: {
 					scope: "board",
 					space: 0,
@@ -133,14 +133,14 @@ describe("createGameFx", () => {
 				},
 			}),
 		]);
-		expect(first.getResourceUrlFn("artwork:water")).toBe("arkini://test/asset-water");
+		expect(first.getResourceUrlFn("artwork:water")).toBe("serakki://test/asset-water");
 		await Effect.runPromise(first.disposeFx);
 		expect(storages.readSaved()).not.toBeNull();
 
 		const restored = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
@@ -159,7 +159,7 @@ describe("createGameFx", () => {
 			Effect.runPromise(
 				createGameFx({
 					packageId: storages.packageId,
-					arkpackStorage: storages.arkpackStorage,
+					serapackStorage: storages.serapackStorage,
 					saveStorage: storages.saveStorage,
 				}),
 			);
@@ -199,7 +199,7 @@ describe("createGameFx", () => {
 		const game = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
@@ -212,19 +212,19 @@ describe("createGameFx", () => {
 		expect(storages.readSaved()).not.toBeNull();
 	});
 
-	it("restores an older compatible minor save and stamps the current arkpack version", async () => {
+	it("restores an older compatible minor save and stamps the current serapack version", async () => {
 		const storages = await createStorages("1.1");
 		const first = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
 		await Effect.runPromise(first.disposeFx);
 		const bytes = storages.readSaved();
 		if (bytes === null) throw new Error("Expected a save.");
-		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const saved = await Effect.runPromise(decodeSerakkiSaveFx(bytes));
 		storages.setSaved(
 			encodeJsonFn({
 				...saved,
@@ -235,14 +235,14 @@ describe("createGameFx", () => {
 		const restored = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
 		await Effect.runPromise(restored.disposeFx);
 		const upgradedBytes = storages.readSaved();
 		if (upgradedBytes === null) throw new Error("Expected an upgraded save.");
-		expect((await Effect.runPromise(decodeArkiniSaveFx(upgradedBytes))).version).toBe("1.1");
+		expect((await Effect.runPromise(decodeSerakkiSaveFx(upgradedBytes))).version).toBe("1.1");
 	});
 
 	it("rejects a different gameplay major without changing its save", async () => {
@@ -250,7 +250,7 @@ describe("createGameFx", () => {
 		const first = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
@@ -271,7 +271,7 @@ describe("createGameFx", () => {
 		await Effect.runPromise(first.disposeFx);
 		const bytes = storages.readSaved();
 		if (bytes === null) throw new Error("Expected a save.");
-		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const saved = await Effect.runPromise(decodeSerakkiSaveFx(bytes));
 		const incompatibleBytes = encodeJsonFn({
 			...saved,
 			version: "2.0",
@@ -282,7 +282,7 @@ describe("createGameFx", () => {
 			Effect.runPromise(
 				createGameFx({
 					packageId: storages.packageId,
-					arkpackStorage: storages.arkpackStorage,
+					serapackStorage: storages.serapackStorage,
 					saveStorage: storages.saveStorage,
 				}),
 			),
@@ -295,7 +295,7 @@ describe("createGameFx", () => {
 		const storages = await createStorages();
 		const diagnosticWrites: Array<DiagnosticRecord> = [];
 		vi.stubGlobal("window", {
-			arkini: {
+			serakki: {
 				diagnostics: {
 					writeFn: (record: DiagnosticRecord) => {
 						diagnosticWrites.push(record);
@@ -319,7 +319,7 @@ describe("createGameFx", () => {
 		const game = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage,
 			}),
 		);
@@ -377,7 +377,7 @@ describe("createGameFx", () => {
 		const saved = storages.readSaved();
 		expect(saved).not.toBeNull();
 		if (saved === null) throw new Error("Expected the retried save bytes.");
-		const decoded = await Effect.runPromise(decodeArkiniSaveFx(saved));
+		const decoded = await Effect.runPromise(decodeSerakkiSaveFx(saved));
 		expect(decoded.state.items.map(({ id }) => id)).toContain("runtime:public-disposal-retry");
 	});
 
@@ -385,7 +385,7 @@ describe("createGameFx", () => {
 		const storages = await createStorages();
 		vi.spyOn(console, "warn").mockImplementation(() => undefined);
 		vi.stubGlobal("window", {
-			arkini: {
+			serakki: {
 				diagnostics: {
 					writeFn: () => {
 						throw new Error("logger unavailable");
@@ -401,7 +401,7 @@ describe("createGameFx", () => {
 		const game = await Effect.runPromise(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage,
 			}),
 		);
@@ -419,7 +419,7 @@ describe("createGameFx", () => {
 		storages.setSaved(
 			encodeJsonFn({
 				version: "not-a-version",
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				state: {},
 			}),
 		);
@@ -428,7 +428,7 @@ describe("createGameFx", () => {
 		const exit = await Effect.runPromiseExit(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: storages.arkpackStorage,
+				serapackStorage: storages.serapackStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);
@@ -448,16 +448,16 @@ describe("createGameFx", () => {
 
 	it("does not mark package validation failures as clearable save failures", async () => {
 		const storages = await createStorages();
-		const corruptStorage: ArkpackStorage = {
-			...storages.arkpackStorage,
+		const corruptStorage: SerapackStorage = {
+			...storages.serapackStorage,
 			readFx: () =>
 				Effect.succeed([
 					{
 						...storages.descriptor,
 						config: {
-							...testArkpackConfig,
+							...testSerapackConfig,
 							meta: {
-								...testArkpackConfig.meta,
+								...testSerapackConfig.meta,
 								id: "wrong-package",
 							},
 						},
@@ -468,7 +468,7 @@ describe("createGameFx", () => {
 		const exit = await Effect.runPromiseExit(
 			createGameFx({
 				packageId: storages.packageId,
-				arkpackStorage: corruptStorage,
+				serapackStorage: corruptStorage,
 				saveStorage: storages.saveStorage,
 			}),
 		);

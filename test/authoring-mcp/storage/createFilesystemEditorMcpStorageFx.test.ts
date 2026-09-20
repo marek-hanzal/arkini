@@ -23,7 +23,7 @@ afterEach(() => {
 const createStorage = (
 	runPromiseFn: createFilesystemEditorMcpStorageFx.Props["runPromiseFn"] = Effect.runPromise,
 ) => {
-	const directory = mkdtempSync(join(tmpdir(), "arkini-mcp-storage-test-"));
+	const directory = mkdtempSync(join(tmpdir(), "serakki-mcp-storage-test-"));
 	directories.push(directory);
 	const root = join(directory, "editor");
 	return Effect.runPromise(
@@ -41,7 +41,7 @@ const createStorage = (
 const authorizationCode = (): AuthorizationCode => ({
 	authorizationCode: "authorization-code",
 	clientId: "client-one",
-	userId: "arkini-owner",
+	userId: "serakki-owner",
 	expiresAt: new Date(Date.now() + 60_000),
 	codeChallenge: "challenge",
 	redirectUri: "http://127.0.0.1/callback",
@@ -57,7 +57,7 @@ const refreshToken = (): RefreshToken => ({
 		"editor:mcp",
 	],
 	clientId: "client-one",
-	userId: "arkini-owner",
+	userId: "serakki-owner",
 });
 
 describe("createFilesystemEditorMcpStorageFx", () => {

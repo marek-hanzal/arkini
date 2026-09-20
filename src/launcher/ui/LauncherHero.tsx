@@ -5,8 +5,8 @@ import { LauncherHeroUrlAtom } from "~/launcher/atom/LauncherHeroUrlAtom";
 const heroAspectRatio = "1535 / 1024";
 const compactWidth = "var(--ak-compact-hero-width)";
 const fullWidth = "var(--ak-full-hero-width)";
-const launcherHeroArtworkViewTransitionName = "arkini-launcher-hero-artwork";
-const launcherHeroShadowViewTransitionName = "arkini-launcher-hero-shadow";
+const launcherHeroArtworkViewTransitionName = "serakki-launcher-hero-artwork";
+const launcherHeroShadowViewTransitionName = "serakki-launcher-hero-shadow";
 
 interface LauncherHeroProps {
 	readonly compact?: boolean;

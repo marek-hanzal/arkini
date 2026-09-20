@@ -3,7 +3,7 @@ import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { Effect } from "effect";
 
-import type { ExtractedArkpack } from "~/arkpack-admission/type/ExtractedArkpack";
+import type { ExtractedSerapack } from "~/serapack-admission/type/ExtractedSerapack";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import { readInitialAudioResourceNameFn } from "~/audio-authoring/fn/readInitialAudioResourceNameFn";
 import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
@@ -14,7 +14,7 @@ export const copyExtractedProjectResourcesFx = Effect.fn("copyExtractedProjectRe
 		resources,
 		root,
 	}: {
-		readonly resources: ExtractedArkpack["resources"];
+		readonly resources: ExtractedSerapack["resources"];
 		readonly root: string;
 	}) {
 		const paths = yield* createProjectPathsFx(root);
@@ -39,7 +39,7 @@ export const copyExtractedProjectResourcesFx = Effect.fn("copyExtractedProjectRe
 						recursive: true,
 					});
 					await copyFile(resource.path, target, constants.COPYFILE_EXCL);
-					// Arkpacks intentionally carry no Editor names; import creates fresh metadata.
+					// Serapacks intentionally carry no Editor names; import creates fresh metadata.
 					if (metadataTarget !== undefined)
 						await writeFile(
 							metadataTarget,

@@ -9,7 +9,7 @@ export const AppearanceThemeSchema = z
 	.meta({
 		id: "AppearanceThemeSchema",
 		description:
-			"The explicit Arkini appearance preference. Missing preference data defaults to dark; system is selected only by the user.",
+			"The explicit Serakki appearance preference. Missing preference data defaults to dark; system is selected only by the user.",
 	});
 
 export type AppearanceThemeSchema = typeof AppearanceThemeSchema;

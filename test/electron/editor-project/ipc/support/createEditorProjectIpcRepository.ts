@@ -57,7 +57,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	saveBuildVersionFx: vi.fn(({ version }) => Effect.succeed(version)),
 	buildProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcBuild)),
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	importArkpackFileFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	importSerapackFileFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	dismissInvalidProjectFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
 	createNoteFx: vi.fn(({ projectId, content, itemUids, resourceIds }) =>
@@ -109,7 +109,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	openProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	withProjectBuildPathFx: vi.fn((_request, useFx) =>
-		useFx("/editor/project-one/build/project-one.arkpack"),
+		useFx("/editor/project-one/build/project-one.serapack"),
 	),
 	readProjectRootFx: vi.fn(() => Effect.succeed("/editor/project-one")),
 	refreshProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),

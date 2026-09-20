@@ -31,7 +31,7 @@ export const jsonToolInputFn = (input: unknown) => ({
 export const createProjectRepository = async (
 	registerCleanup: (cleanup: () => Promise<void>) => void = registerMcpCleanup,
 ): Promise<OwnedEditorProjectRepository> => {
-	const root = await mkdtemp(join(tmpdir(), "arkini-editor-mcp-projects-"));
+	const root = await mkdtemp(join(tmpdir(), "serakki-editor-mcp-projects-"));
 	registerCleanup(() =>
 		rm(root, {
 			force: true,
@@ -69,7 +69,7 @@ export const createTestStorage = async (
 		readonly domain: string;
 	},
 ) => {
-	const directory = await mkdtemp(join(tmpdir(), "arkini-editor-mcp-storage-"));
+	const directory = await mkdtemp(join(tmpdir(), "serakki-editor-mcp-storage-"));
 	registerMcpCleanup(() =>
 		rm(directory, {
 			force: true,
@@ -90,7 +90,7 @@ export const createTestStorage = async (
 export const connectMcpClient = async (port: number) => {
 	const client = new Client(
 		{
-			name: "arkini-editor-test",
+			name: "serakki-editor-test",
 			version: "1.0.0",
 		},
 		{

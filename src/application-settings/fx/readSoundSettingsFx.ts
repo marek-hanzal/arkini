@@ -7,7 +7,7 @@ import { SoundVolumeSchema } from "~electron/contract/sound/SoundVolumeSchema";
 export const readSoundSettingsFx = Effect.fn("readSoundSettingsFx")(() =>
 	Effect.tryPromise({
 		try: async () => {
-			const candidate = await window.arkini.sound.readFn();
+			const candidate = await window.serakki.sound.readFn();
 			return {
 				master: SoundVolumeSchema.parse(candidate.master),
 				music: SoundVolumeSchema.parse(candidate.music),

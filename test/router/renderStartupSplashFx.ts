@@ -13,8 +13,8 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { Route as StartupRouteDefinition } from "~/@routes/index";
@@ -27,7 +27,7 @@ if (StartupSplash === undefined) throw new Error("Startup route component is mis
 export namespace renderStartupSplashFx {
 	export interface Props {
 		readonly bootstrapFx: Effect.Effect<LauncherStartup.Result, unknown>;
-		readonly catalog: ArkpackCatalog;
+		readonly catalog: SerapackCatalog;
 	}
 }
 
@@ -43,7 +43,7 @@ export const renderStartupSplashFx = Effect.fn("renderStartupSplashFx")(
 				defaultIdleTTL: 400,
 				scheduleTask,
 			});
-			registry.set(ArkpackCatalogOwnerAtom, catalog);
+			registry.set(SerapackCatalogOwnerAtom, catalog);
 			registry.set(
 				RendererLifecycleOwnerAtom,
 				Effect.runSync(

@@ -11,7 +11,7 @@ export const AppearanceAccentSchema = z
 	.meta({
 		id: "AppearanceAccentSchema",
 		description:
-			"The explicit Arkini accent palette. Missing or malformed preference data defaults to rose.",
+			"The explicit Serakki accent palette. Missing or malformed preference data defaults to rose.",
 	});
 
 export type AppearanceAccentSchema = typeof AppearanceAccentSchema;

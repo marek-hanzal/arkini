@@ -38,7 +38,7 @@ export const useCopyButtonController = ({
 		setCopiedFn(false);
 		setErrorFn(undefined);
 		try {
-			await window.arkini.clipboard.writeTextFn(value);
+			await window.serakki.clipboard.writeTextFn(value);
 			if (request !== requestRef.current) return;
 			setCopiedFn(true);
 			timeoutRef.current = window.setTimeout(() => setCopiedFn(false), 3_000);

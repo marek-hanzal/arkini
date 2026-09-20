@@ -56,7 +56,7 @@ export const editEditorArtworkFx = Effect.fn("editEditorArtworkFx")(function* ({
 							}
 						: {
 								...(yield* validateEditorArtworkFileFx(file, resourceId)),
-								path: window.arkini.file.readPathFn(file),
+								path: window.serakki.file.readPathFn(file),
 							};
 				const config = yield* renameGameResourceFx({
 					config: project.config,

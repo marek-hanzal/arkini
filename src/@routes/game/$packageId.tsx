@@ -21,7 +21,7 @@ export const Route = createFileRoute("/game/$packageId")({
 				),
 			),
 		);
-		if (resource === null || resource.game.arkpack.packageId !== params.packageId) {
+		if (resource === null || resource.game.serapack.packageId !== params.packageId) {
 			throw redirect({
 				to: "/action/load-game/$packageId",
 				params,

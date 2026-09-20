@@ -6,31 +6,31 @@ const launcherPagePresentation = {
 		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
 		panel: "max-h-full w-full max-w-xl overflow-hidden border border-line bg-surface shadow-2xl",
-		viewTransitionName: "arkini-panel-about",
+		viewTransitionName: "serakki-panel-about",
 	},
-	arkpacks: {
+	serapacks: {
 		content: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
 		panel: "size-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
-		viewTransitionName: "arkini-panel-arkpacks",
+		viewTransitionName: "serakki-panel-serapacks",
 	},
 	"editor-welcome": {
 		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
 		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
-		viewTransitionName: "arkini-panel-editor-welcome",
+		viewTransitionName: "serakki-panel-editor-welcome",
 	},
 	"main-menu": {
 		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
 		panel: "max-h-full w-full max-w-sm overflow-visible border-0 border-line bg-transparent shadow-none",
-		viewTransitionName: "arkini-panel-main-menu",
+		viewTransitionName: "serakki-panel-main-menu",
 	},
 	settings: {
 		content: "h-full max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "overlaid-hero",
 		panel: "h-full max-h-full w-full max-w-xl overflow-hidden border border-line bg-surface shadow-2xl",
-		viewTransitionName: "arkini-panel-settings",
+		viewTransitionName: "serakki-panel-settings",
 	},
 } as const;
 

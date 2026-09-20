@@ -126,7 +126,7 @@ describe("createGameAudioRuntimeFx", () => {
 							type: "music",
 						},
 					],
-					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+					getResourceUrlFn: (id) => `serakki://resource/${id}`,
 				},
 				maximumSfxVoices: 0,
 				sound: {
@@ -152,8 +152,8 @@ describe("createGameAudioRuntimeFx", () => {
 		await Effect.runPromise(runtime.unlockFx);
 		expect(harness.resume).toHaveBeenCalledOnce();
 		expect(harness.audios.filter(({ play }) => play.mock.calls.length === 1)).toHaveLength(1);
-		expect(harness.audios.some(({ src }) => src === "arkini://resource/theme")).toBe(true);
-		expect(harness.audios.some(({ src }) => src === "arkini://resource/item-theme")).toBe(
+		expect(harness.audios.some(({ src }) => src === "serakki://resource/theme")).toBe(true);
+		expect(harness.audios.some(({ src }) => src === "serakki://resource/item-theme")).toBe(
 			false,
 		);
 
@@ -190,7 +190,7 @@ describe("createGameAudioRuntimeFx", () => {
 							type: "sfx",
 						},
 					],
-					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+					getResourceUrlFn: (id) => `serakki://resource/${id}`,
 				},
 				maximumSfxVoices: 1,
 				sound: {
@@ -216,7 +216,7 @@ describe("createGameAudioRuntimeFx", () => {
 		);
 		const sfx = harness.audios.find(({ preload }) => preload === "none");
 		if (sfx === undefined) throw new Error("Expected one streamed SFX voice.");
-		expect(sfx.src).toBe("arkini://resource/custom-job-start");
+		expect(sfx.src).toBe("serakki://resource/custom-job-start");
 		expect(sfx.play).toHaveBeenCalledOnce();
 
 		await Effect.runPromise(
@@ -258,7 +258,7 @@ describe("createGameAudioRuntimeFx", () => {
 							type: "sfx",
 						},
 					],
-					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+					getResourceUrlFn: (id) => `serakki://resource/${id}`,
 				},
 				maximumSfxVoices: 1,
 				sound: {
@@ -306,7 +306,7 @@ describe("createGameAudioRuntimeFx", () => {
 							type: "music",
 						},
 					],
-					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+					getResourceUrlFn: (id) => `serakki://resource/${id}`,
 				},
 				maximumSfxVoices: 0,
 				sound: {
@@ -357,7 +357,7 @@ describe("item detail music", () => {
 						id,
 						type: "music" as const,
 					})),
-					getResourceUrlFn: (id) => `arkini://resource/${id}`,
+					getResourceUrlFn: (id) => `serakki://resource/${id}`,
 				},
 				maximumSfxVoices: 0,
 				sound: {

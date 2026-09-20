@@ -1,18 +1,18 @@
 import { z } from "zod";
 
-import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
+import { SerakkiVersionSchema } from "~/application-version/schema/SerakkiVersionSchema";
 
 /** Root marker required before a directory can be opened as a game project. */
 export const GameProjectManifestSchema = z
 	.object({
-		arkini: ArkiniVersionSchema,
+		serakki: SerakkiVersionSchema,
 		revision: z.number().int().nonnegative(),
 	})
 	.strict()
 	.meta({
 		id: "GameProjectManifestSchema",
-		$id: "urn:arkini:schema:game-project-manifest",
-		title: "Arkini game project manifest",
+		$id: "urn:serakki:schema:game-project-manifest",
+		title: "Serakki game project manifest",
 		description: "The minimal root marker for one portable game project directory.",
 	});
 

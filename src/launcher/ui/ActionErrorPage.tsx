@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { LauncherScene } from "~/launcher/ui/LauncherScene";
 
-const actionPanelViewTransitionName = "arkini-action-panel";
+const actionPanelViewTransitionName = "serakki-action-panel";
 
 interface ActionErrorPageProps extends PropsWithChildren {
 	readonly error: unknown;

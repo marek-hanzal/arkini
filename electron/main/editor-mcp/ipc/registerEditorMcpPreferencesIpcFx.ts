@@ -2,7 +2,7 @@ import { app, ipcMain, type IpcMainInvokeEvent, type WebContents } from "electro
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { EditorMcpCommandSchema } from "~/authoring-mcp/schema/EditorMcpCommandSchema";
 import { EditorMcpConfigurationSchema } from "~/authoring-mcp/schema/EditorMcpConfigurationSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
@@ -42,10 +42,10 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 				});
 				sender.once("destroyed", ownership.resetProjectContextFn);
 			};
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpOverviewRead, (event) =>
+			ipcMain.handle(SerakkiElectronApi.channels.editorMcpOverviewRead, (event) =>
 				runAuthorizedFn(event, ownership.readOverviewFx),
 			);
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpConfigure, (event, candidate) =>
+			ipcMain.handle(SerakkiElectronApi.channels.editorMcpConfigure, (event, candidate) =>
 				runAuthorizedFn(
 					event,
 					Effect.try({
@@ -54,7 +54,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 					}).pipe(Effect.flatMap(ownership.configureFx)),
 				),
 			);
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpCommand, (event, candidate) =>
+			ipcMain.handle(SerakkiElectronApi.channels.editorMcpCommand, (event, candidate) =>
 				runAuthorizedFn(
 					event,
 					Effect.try({
@@ -74,7 +74,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 				),
 			);
 			ipcMain.handle(
-				ArkiniElectronApi.channels.editorMcpProjectContextSet,
+				SerakkiElectronApi.channels.editorMcpProjectContextSet,
 				(event, candidate) =>
 					runAuthorizedFn(
 						event,
@@ -93,7 +93,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 					),
 			);
 			ipcMain.handle(
-				ArkiniElectronApi.channels.editorMcpProjectContextClear,
+				SerakkiElectronApi.channels.editorMcpProjectContextClear,
 				(event, candidate) =>
 					runAuthorizedFn(
 						event,
@@ -110,11 +110,11 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			);
 			app.once("will-quit", () => {
 				for (const channel of [
-					ArkiniElectronApi.channels.editorMcpOverviewRead,
-					ArkiniElectronApi.channels.editorMcpConfigure,
-					ArkiniElectronApi.channels.editorMcpCommand,
-					ArkiniElectronApi.channels.editorMcpProjectContextSet,
-					ArkiniElectronApi.channels.editorMcpProjectContextClear,
+					SerakkiElectronApi.channels.editorMcpOverviewRead,
+					SerakkiElectronApi.channels.editorMcpConfigure,
+					SerakkiElectronApi.channels.editorMcpCommand,
+					SerakkiElectronApi.channels.editorMcpProjectContextSet,
+					SerakkiElectronApi.channels.editorMcpProjectContextClear,
 				]) {
 					ipcMain.removeHandler(channel);
 				}

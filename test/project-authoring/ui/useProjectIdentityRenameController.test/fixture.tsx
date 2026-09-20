@@ -48,7 +48,7 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 	const routeGate = Effect.runSync(Deferred.make<void>());
 	const routeStarted = Effect.runSync(Deferred.make<void>());
 	let physicalId = project.projectId;
-	const replaceConfigFn = vi.fn<Window["arkini"]["editor"]["replaceConfigFn"]>(
+	const replaceConfigFn = vi.fn<Window["serakki"]["editor"]["replaceConfigFn"]>(
 		async (request) => {
 			await Effect.runPromise(Deferred.await(commitGate));
 			if (outcome === "failure")
@@ -79,8 +79,8 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 		type: "success",
 		value: undefined,
 	}));
-	const originalArkini = Object.getOwnPropertyDescriptor(window, "arkini");
-	Object.defineProperty(window, "arkini", {
+	const originalSerakki = Object.getOwnPropertyDescriptor(window, "serakki");
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor: {
@@ -152,8 +152,8 @@ export const mountIdentityRenameFn = async (outcome: "success" | "failure" = "su
 			Effect.runSync(Deferred.succeed(routeGate, undefined));
 			await act(async () => root.unmount());
 			host.remove();
-			if (originalArkini === undefined) Reflect.deleteProperty(window, "arkini");
-			else Object.defineProperty(window, "arkini", originalArkini);
+			if (originalSerakki === undefined) Reflect.deleteProperty(window, "serakki");
+			else Object.defineProperty(window, "serakki", originalSerakki);
 		},
 	};
 };

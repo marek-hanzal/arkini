@@ -10,7 +10,7 @@ import type {
 } from "~/project-authoring/service/ProjectWriteAdmission";
 
 const HeldWriteAdmissions = Context.Reference<ReadonlyMap<symbol, number>>(
-	"Arkini/ProjectWriteAdmission/Held",
+	"Serakki/ProjectWriteAdmission/Held",
 	{
 		defaultValue: () => new Map(),
 	},

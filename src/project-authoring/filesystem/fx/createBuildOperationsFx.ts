@@ -8,11 +8,11 @@ import type { EditorBuildRepositoryService } from "~/editor-build/service/Editor
 import type { ReadEditorBuildProps } from "~/editor-build/service/EditorBuildRepository";
 import { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
-import { packDirectoryFx } from "~/arkpack-artifact/fx/packDirectoryFx";
-import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
+import { packDirectoryFx } from "~/serapack-artifact/fx/packDirectoryFx";
+import { readSerapackFileLayoutFx } from "~/serapack-artifact/fx/readSerapackFileLayoutFx";
 import { GameValidationError } from "~/game-config-diagnostic/error/GameValidationError";
 import { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackArtifactNameFn";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { readProjectFilesFx } from "./readProjectFilesFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
@@ -142,7 +142,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.filterOrFail(
 				(files) =>
 					files.marker.revision === state.project.revision &&
-					isDeepStrictEqual(files.arkpack, state.project.version) &&
+					isDeepStrictEqual(files.serapack, state.project.version) &&
 					isDeepStrictEqual(files.config, state.project.config) &&
 					isDeepStrictEqual(
 						files.resources.map(({ id, type }) => ({
@@ -317,9 +317,12 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 						const build = state.paths.build;
 						if (!(yield* fileSystem.exists(build)))
 							return yield* Effect.fail(new Error("No Editor project build exists."));
-						const arkpackPath = path.join(build, readArkpackArtifactNameFn(projectId));
+						const serapackPath = path.join(
+							build,
+							readSerapackArtifactNameFn(projectId),
+						);
 						if (
-							(yield* readArkpackFileLayoutFx(arkpackPath)).contentHash !==
+							(yield* readSerapackFileLayoutFx(serapackPath)).contentHash !==
 							contentHash
 						)
 							return yield* Effect.fail(
@@ -327,7 +330,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 									"The current Editor build does not match the requested artifact.",
 								),
 							);
-						return yield* useFx(arkpackPath);
+						return yield* useFx(serapackPath);
 					}),
 				);
 			}).pipe(

@@ -137,7 +137,7 @@ vi.mock("@effect/atom-react", () => ({
 							: AsyncResult.initial(),
 }));
 
-vi.mock("~/arkpack-catalog/atom/CatalogAtom", () => ({
+vi.mock("~/serapack-catalog/atom/CatalogAtom", () => ({
 	CatalogAtom: {
 		kind: "catalog",
 		key: "canonical",
@@ -248,7 +248,7 @@ beforeEach(() => {
 	state.buildResult = AsyncResult.initial();
 	state.catalogState = {
 		type: "ready",
-		arkpacks: [],
+		serapacks: [],
 	};
 	state.commandSetters.clear();
 	state.dismissedValidations.clear();
@@ -533,13 +533,13 @@ describe("EditorBuild", () => {
 		state.buildResult = AsyncResult.success(artifact);
 		state.catalogState = {
 			type: "ready",
-			arkpacks: [
+			serapacks: [
 				{
 					packageId: artifact.projectId,
 					contentHash: "b".repeat(64),
 					title: "Existing",
 					version: "2.0",
-					arkini: "0.5.0",
+					serakki: "0.5.0",
 					provenance: {
 						type: "community",
 					},
@@ -567,13 +567,13 @@ describe("EditorBuild", () => {
 		state.buildResult = AsyncResult.success(artifact);
 		state.catalogState = {
 			type: "ready",
-			arkpacks: [
+			serapacks: [
 				{
 					packageId: artifact.projectId,
 					contentHash: "a".repeat(64),
 					version: "1.8",
 					title: "Installed",
-					arkini: "0.5.0",
+					serakki: "0.5.0",
 					provenance: {
 						type: "community",
 					},
@@ -616,13 +616,13 @@ describe("EditorBuild", () => {
 		state.buildResult = AsyncResult.success(artifact);
 		state.catalogState = {
 			type: "ready",
-			arkpacks: [
+			serapacks: [
 				{
 					packageId: "editor-test",
 					contentHash: "a".repeat(64),
 					title: "Existing",
 					version: "2.0",
-					arkini: "1.0.0",
+					serakki: "1.0.0",
 					provenance: {
 						type: "community",
 					},
@@ -656,13 +656,13 @@ describe("EditorBuild", () => {
 		state.buildResult = AsyncResult.success(artifact);
 		state.catalogState = {
 			type: "ready",
-			arkpacks: [
+			serapacks: [
 				{
 					packageId: "editor-test",
 					contentHash: "a".repeat(64),
 					title: "Existing",
 					version: "1.9",
-					arkini: "1.0.0",
+					serakki: "1.0.0",
 					provenance: {
 						type: "community",
 					},

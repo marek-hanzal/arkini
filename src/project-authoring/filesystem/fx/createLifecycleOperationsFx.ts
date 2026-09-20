@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import type { ProjectState } from "../ProjectState";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectCatalog } from "./createProjectCatalogFx";
@@ -24,7 +24,7 @@ import { readProjectNotesFx } from "./readProjectNotesFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import { copyExtractedProjectResourcesFx } from "./copyExtractedProjectResourcesFx";
-import type { ExtractedArkpack } from "~/arkpack-admission/type/ExtractedArkpack";
+import type { ExtractedSerapack } from "~/serapack-admission/type/ExtractedSerapack";
 import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 
 interface LifecycleOperations {
@@ -36,7 +36,7 @@ interface LifecycleOperations {
 		props: ProjectRepository.CreateProjectProps,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly createExtractedProjectFx: (
-		arkpack: ExtractedArkpack,
+		serapack: ExtractedSerapack,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly deleteProjectFx: (
 		projectId: string,
@@ -135,7 +135,7 @@ const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
 				project: {
 					projectId,
 					title: files.config.meta.title,
-					version: files.arkpack,
+					version: files.serapack,
 					createdAtMs: Math.min(catalog.createdAtMs, files.marker.revision),
 					updatedAtMs: files.marker.revision,
 					revision: files.marker.revision,
@@ -367,13 +367,13 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 											recursive: true,
 										});
 										const marker = GameProjectManifestSchema.parse({
-											arkini: ArkiniAppVersion,
+											serakki: SerakkiAppVersion,
 											revision: nowMs,
 										});
 										yield* writeProjectFx({
 											root: pendingRoot,
 											next: {
-												arkpack: version,
+												serapack: version,
 												marker,
 												config,
 												resources,
@@ -455,16 +455,16 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			});
 		});
 
-	const createExtractedProjectFx: LifecycleOperations["createExtractedProjectFx"] = (arkpack) =>
+	const createExtractedProjectFx: LifecycleOperations["createExtractedProjectFx"] = (serapack) =>
 		createManagedProjectFx({
-			projectId: arkpack.config.meta.id,
-			version: parseVersionFn(arkpack.version),
-			config: arkpack.config,
+			projectId: serapack.config.meta.id,
+			version: parseVersionFn(serapack.version),
+			config: serapack.config,
 			resources: [],
 			populatePendingFx: (pendingRoot) =>
 				providePlatformFx(
 					copyExtractedProjectResourcesFx({
-						resources: arkpack.resources,
+						resources: serapack.resources,
 						root: pendingRoot,
 					}),
 				),

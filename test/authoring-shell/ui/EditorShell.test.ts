@@ -77,7 +77,7 @@ beforeEach(() => {
 		configurable: true,
 		value: vi.fn(),
 	});
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			lifecycle: {
@@ -344,7 +344,7 @@ describe("EditorShell", () => {
 				value: undefined,
 			};
 		});
-		Object.defineProperty(window.arkini, "editor", {
+		Object.defineProperty(window.serakki, "editor", {
 			configurable: true,
 			value: {
 				awaitIdleFn,

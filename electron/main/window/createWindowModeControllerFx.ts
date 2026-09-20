@@ -1,6 +1,6 @@
 import { screen, type BrowserWindow } from "electron";
 import { Deferred, Effect, Exit, Fiber, FiberHandle, Queue, Scope, SynchronizedRef } from "effect";
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { WindowPreferences } from "./createFilesystemWindowPreferencesFx";
@@ -93,7 +93,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				}
 				currentMode = mode;
 				if (!window.webContents.isDestroyed()) {
-					window.webContents.send(ArkiniElectronApi.channels.windowModeChanged, mode);
+					window.webContents.send(SerakkiElectronApi.channels.windowModeChanged, mode);
 				}
 			};
 
@@ -101,7 +101,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				windowPreferences.writeModeFx(mode).pipe(
 					Effect.catchCause((cause) =>
 						Effect.sync(() => {
-							console.error("Arkini window mode could not be persisted.", cause);
+							console.error("Serakki window mode could not be persisted.", cause);
 						}),
 					),
 				);
@@ -299,7 +299,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 						currentMode === "fullscreen" ? previousWindowedMode : "fullscreen",
 					),
 				).catch((cause) => {
-					console.error("Arkini window mode shortcut failed.", cause);
+					console.error("Serakki window mode shortcut failed.", cause);
 				});
 			});
 

@@ -73,7 +73,7 @@ export const normalizeArtworkPngFileFx = Effect.fn("normalizeArtworkPngFileFx")(
 						);
 				},
 				catch: (cause) =>
-					new Error(`Artwork ${resourceId} could not be normalized for the Arkpack.`, {
+					new Error(`Artwork ${resourceId} could not be normalized for the Serapack.`, {
 						cause,
 					}),
 			});

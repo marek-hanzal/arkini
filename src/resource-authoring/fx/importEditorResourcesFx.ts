@@ -13,7 +13,7 @@ export namespace importEditorResourcesFx {
 		| {
 				readonly file: File;
 				readonly projectId: string;
-				readonly source: "arkpack";
+				readonly source: "serapack";
 				readonly type: ResourceTypeSchema.Type;
 		  }
 		| {
@@ -36,7 +36,7 @@ export const importEditorResourcesFx = Effect.fn("importEditorResourcesFx")(func
 	props: importEditorResourcesFx.Props,
 ) {
 	const files =
-		props.source === "arkpack"
+		props.source === "serapack"
 			? [
 					props.file,
 				]
@@ -48,10 +48,10 @@ export const importEditorResourcesFx = Effect.fn("importEditorResourcesFx")(func
 			Effect.gen(function* () {
 				const result = yield* invokeProjectTransportFx({
 					callFn: () =>
-						window.arkini.editor.importResourcesFn({
+						window.serakki.editor.importResourcesFn({
 							files: files.map((file) => ({
 								name: file.name,
-								path: window.arkini.file.readPathFn(file),
+								path: window.serakki.file.readPathFn(file),
 							})),
 							projectId: props.projectId,
 							source: props.source,

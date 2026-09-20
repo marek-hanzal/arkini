@@ -23,7 +23,7 @@ export const makeUnitDepletionRandomFx = Effect.fn("makeUnitDepletionRandomFx")(
 	// The seed namespace is stable gameplay identity; terminology changes must not reroll output.
 	return yield* program.pipe(
 		Random.withSeed(
-			`arkini:charge-depletion:v${UnitDepletionRandomVersion}:${job.id}:${itemId}`,
+			`serakki:charge-depletion:v${UnitDepletionRandomVersion}:${job.id}:${itemId}`,
 		),
 	);
 });

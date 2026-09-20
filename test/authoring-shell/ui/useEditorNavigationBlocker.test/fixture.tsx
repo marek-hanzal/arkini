@@ -91,7 +91,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 			value: project,
 		};
 	});
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor: {
@@ -159,7 +159,7 @@ export const createFixture = async (navigationLoader?: () => Promise<void>) => {
 		Effect.runSync(Deferred.succeed(writeGate, undefined));
 		await act(async () => root.unmount());
 		host.remove();
-		Reflect.deleteProperty(window, "arkini");
+		Reflect.deleteProperty(window, "serakki");
 		await rendererRuntime.dispose();
 	});
 	await act(async () =>

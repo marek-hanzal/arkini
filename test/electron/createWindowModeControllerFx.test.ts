@@ -1,7 +1,7 @@
 import { Deferred, Effect, Fiber, Result } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { createHarness } from "./createWindowModeControllerFx.test/fixture";
 
 const electronState = vi.hoisted(() => ({
@@ -40,7 +40,7 @@ describe("createWindowModeControllerFx", () => {
 			"fullscreen",
 		]);
 		expect(harness.send).toHaveBeenCalledWith(
-			ArkiniElectronApi.channels.windowModeChanged,
+			SerakkiElectronApi.channels.windowModeChanged,
 			"fullscreen",
 		);
 	});
@@ -100,7 +100,7 @@ describe("createWindowModeControllerFx", () => {
 			"bordered",
 		]);
 		expect(harness.send).toHaveBeenLastCalledWith(
-			ArkiniElectronApi.channels.windowModeChanged,
+			SerakkiElectronApi.channels.windowModeChanged,
 			"bordered",
 		);
 
@@ -112,7 +112,7 @@ describe("createWindowModeControllerFx", () => {
 			"default",
 		]);
 		expect(harness.send).toHaveBeenLastCalledWith(
-			ArkiniElectronApi.channels.windowModeChanged,
+			SerakkiElectronApi.channels.windowModeChanged,
 			"default",
 		);
 	});
@@ -152,7 +152,7 @@ describe("createWindowModeControllerFx", () => {
 
 		expect(harness.isMaximized()).toBe(false);
 		expect(harness.send).toHaveBeenLastCalledWith(
-			ArkiniElectronApi.channels.windowModeChanged,
+			SerakkiElectronApi.channels.windowModeChanged,
 			"default",
 		);
 	});

@@ -6,7 +6,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createTextureStoreFx, type TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 
-const url = "arkini://app/editor/resource?projectId=p&resourceId=r&version=v";
+const url = "serakki://app/editor/resource?projectId=p&resourceId=r&version=v";
 const stores: TextureStore[] = [];
 let originalParsers: typeof Assets.loader.parsers;
 let loadTextureFn: () => Promise<Texture>;

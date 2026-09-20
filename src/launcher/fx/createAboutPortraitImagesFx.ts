@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
-import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
-import type { LoadedArkpackResource } from "~/arkpack-catalog/fx/readArkpackCandidatesFx";
+import { SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
+import { loadSerapackFx } from "~/serapack-catalog/fx/loadSerapackFx";
+import type { LoadedSerapackResource } from "~/serapack-catalog/fx/readSerapackCandidatesFx";
 
 const avatarRoles = [
 	"avatar-01",
@@ -17,7 +17,7 @@ const readAboutPortraitResourcesFn = (payload: {
 	readonly config: {
 		readonly resources: Readonly<Record<string, string>>;
 	};
-	readonly resources: ReadonlyArray<LoadedArkpackResource>;
+	readonly resources: ReadonlyArray<LoadedSerapackResource>;
 }) => {
 	const resourceById = new Map(
 		payload.resources.map((resource) => [
@@ -37,11 +37,11 @@ const readAboutPortraitResourcesFn = (payload: {
 	});
 };
 
-/** Resolves canonical Arkini About portraits to lazy installed-resource URLs. */
+/** Resolves canonical Serakki About portraits to lazy installed-resource URLs. */
 export const createAboutPortraitImagesFx = Effect.fn("createAboutPortraitImagesFx")(() =>
 	Effect.gen(function* () {
-		const loaded = yield* loadArkpackFx({
-			packageId: ArkiniDefaultPackageId,
+		const loaded = yield* loadSerapackFx({
+			packageId: SerakkiDefaultPackageId,
 		});
 		return readAboutPortraitResourcesFn(loaded.payload).map(({ url }) => url);
 	}).pipe(Effect.catch(() => Effect.succeed([]))),

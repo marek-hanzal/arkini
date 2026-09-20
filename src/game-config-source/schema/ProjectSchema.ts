@@ -12,8 +12,8 @@ export const ProjectSchema = z
 		AudioResourceMetadataSchema,
 	])
 	.meta({
-		$id: "urn:arkini:schema:project",
-		title: "Arkini project authoring schema",
+		$id: "urn:serakki:schema:project",
+		title: "Serakki project authoring schema",
 		description:
 			"A strict game.json root, UID-owned item fragment, or Editor audio metadata file.",
 	});

@@ -4,12 +4,12 @@ import { createTestGameSession } from "~test/support/createTestGameSession";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 
 describe("fromRuntimeFn", () => {
 	it("creates a detached complete state that constructs one fresh session", async () => {
 		const first = await createTestGameSession({
-			config: testArkpackConfig,
+			config: testSerapackConfig,
 			tickIntervalMs: 60_000,
 		});
 		try {
@@ -36,7 +36,7 @@ describe("fromRuntimeFn", () => {
 			expect(state.items.some(({ id }) => id === "runtime:later")).toBe(false);
 
 			const restored = await createTestGameSession({
-				config: testArkpackConfig,
+				config: testSerapackConfig,
 				state,
 				tickIntervalMs: 60_000,
 			});

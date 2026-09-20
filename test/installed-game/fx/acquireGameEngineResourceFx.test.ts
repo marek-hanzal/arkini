@@ -5,10 +5,10 @@ import { vi } from "vitest";
 import { acquireGameEngineResourceFx } from "~/installed-game/fx/acquireGameEngineResourceFx";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { Game } from "~/installed-game/type/Game";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/testGameRead";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 
 const createGame = ({
 	packageId = "package:acquire",
@@ -17,18 +17,18 @@ const createGame = ({
 	readonly packageId?: string;
 	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
 } = {}): Game => ({
-	arkpack: {
+	serapack: {
 		packageId,
 		contentHash: "content:acquire",
-		title: testArkpackConfig.meta.title,
+		title: testSerapackConfig.meta.title,
 		version: "1.0",
-		arkini: ArkiniAppVersion,
+		serakki: SerakkiAppVersion,
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
@@ -70,7 +70,7 @@ describe("acquireGameEngineResourceFx", () => {
 				"create:package:acquire",
 				"remember:package:acquire",
 			]);
-			expect(resource.game.arkpack).toBe(game.arkpack);
+			expect(resource.game.serapack).toBe(game.serapack);
 			yield* resource.game.disposeWithoutSaveFx;
 		}),
 	);

@@ -53,10 +53,10 @@ files:
     filter:
       - '**/*'
 extraResources:
-  - from: game/arkini/build
+  - from: game/serakki/build
     to: game
     filter:
-      - arkini.arkpack
+      - serakki.serapack
 mac:
   category: public.app-category.games
   icon: icon.png

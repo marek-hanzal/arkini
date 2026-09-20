@@ -3,7 +3,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
@@ -41,13 +41,13 @@ import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
 const ProjectInputSchema = z.object({}).strict().meta({
-	$id: "urn:arkini:schema:mcp:project-input",
+	$id: "urn:serakki:schema:mcp:project-input",
 	title: "Project tool input",
 	description: "The project summary tool accepts no arguments.",
 });
 
 const ItemMetaInputSchema = z.object({}).strict().meta({
-	$id: "urn:arkini:schema:mcp:item-meta-input",
+	$id: "urn:serakki:schema:mcp:item-meta-input",
 	title: "Item metadata tool input",
 	description: "The item metadata summary tool accepts no arguments.",
 });
@@ -58,7 +58,7 @@ const ItemDetailInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-detail-input",
+		$id: "urn:serakki:schema:mcp:item-detail-input",
 		title: "Item detail tool input",
 		description: "The identity of the item whose simplified detail is requested.",
 	});
@@ -69,7 +69,7 @@ const ItemConfigInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-config-input",
+		$id: "urn:serakki:schema:mcp:item-config-input",
 		title: "Item configuration tool input",
 		description: "The identity of the item whose canonical configuration is requested.",
 	});
@@ -81,7 +81,7 @@ const ItemLineConfigInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-line-config-input",
+		$id: "urn:serakki:schema:mcp:item-line-config-input",
 		title: "Item line configuration tool input",
 		description: "The item and production-line identities whose canonical config is requested.",
 	});
@@ -92,7 +92,7 @@ const ItemLinesInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-lines-input",
+		$id: "urn:serakki:schema:mcp:item-lines-input",
 		title: "Item line summaries tool input",
 		description: "Read authored line identities and behavior in their existing order.",
 	});
@@ -123,7 +123,7 @@ const ItemLineConfigsInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-line-configs-input",
+		$id: "urn:serakki:schema:mcp:item-line-configs-input",
 		title: "Item line configurations tool input",
 		description: "Read canonical line configurations from one project snapshot and revision.",
 	});
@@ -140,7 +140,7 @@ const ItemConfigsInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-configs-input",
+		$id: "urn:serakki:schema:mcp:item-configs-input",
 		title: "Item configurations tool input",
 		description: "Read canonical item configurations from one project snapshot and revision.",
 	});
@@ -159,7 +159,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 		})
 		.strict()
 		.meta({
-			$id: `urn:arkini:schema:mcp:item-${role}-relation`,
+			$id: `urn:serakki:schema:mcp:item-${role}-relation`,
 			title: `Item ${role} relation tool input`,
 			description: `The root item and traversal depth for the item ${role} relation tool.`,
 		});
@@ -180,7 +180,7 @@ const ItemChainInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-chain-input",
+		$id: "urn:serakki:schema:mcp:item-chain-input",
 		title: "Item Chain tool input",
 		description:
 			"The starting item, detail level and bounded traversal depth for the Chain projection.",
@@ -194,7 +194,7 @@ const ItemEstimateInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-estimate-input",
+		$id: "urn:serakki:schema:mcp:item-estimate-input",
 		title: "Item estimate tool input",
 		description: "The target item and quantity for one authored dependency estimate.",
 	});
@@ -219,7 +219,7 @@ const SchemaDetailInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:schema-detail-input",
+		$id: "urn:serakki:schema:mcp:schema-detail-input",
 		title: "Schema detail tool input",
 		description: "The exact registered schema identity to read.",
 	});
@@ -234,7 +234,7 @@ const readProjectTextFn = (project: Project) => {
 		`Title: ${project.title}`,
 		`Project ID: ${project.projectId}`,
 		`Game ID: ${project.config.meta.id}`,
-		`Arkpack version: ${formatVersionFn(project.version)}`,
+		`Serapack version: ${formatVersionFn(project.version)}`,
 		`Revision: ${project.revision}`,
 		`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
 		`Toolbar: ${project.config.meta.toolbarSize === undefined || project.config.meta.toolbarSize === 0 ? "disabled" : `${project.config.meta.toolbarSize} slots`}`,
@@ -487,7 +487,7 @@ const createServerFn = (
 	const server = new McpServer(
 		{
 			name: "serakki-editor",
-			version: ArkiniAppVersion,
+			version: SerakkiAppVersion,
 		},
 		{
 			instructions:

@@ -3,9 +3,9 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
-import { installBuiltEditorArkpackFx } from "~/editor-build/fx/installBuiltEditorArkpackFx";
+import { installBuiltEditorSerapackFx } from "~/editor-build/fx/installBuiltEditorSerapackFx";
 import { saveEditorBuildFx } from "~/editor-build/fx/saveEditorBuildFx";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { EditorBuildRepository } from "~/editor-build/service/EditorBuildRepository";
@@ -65,10 +65,10 @@ export const BuildCommandAtoms = RendererRuntime.runSync(
 						return Effect.fail(
 							new Error("The selected editor build artifact is stale."),
 						);
-					const catalog = get(ArkpackCatalogOwnerAtom);
+					const catalog = get(SerapackCatalogOwnerAtom);
 					if (catalog === undefined)
-						return Effect.fail(new Error("Arkpack catalog is not configured."));
-					return installBuiltEditorArkpackFx({
+						return Effect.fail(new Error("Serapack catalog is not configured."));
+					return installBuiltEditorSerapackFx({
 						...request,
 						catalog,
 					});

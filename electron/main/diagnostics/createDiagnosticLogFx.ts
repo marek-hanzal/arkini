@@ -14,7 +14,7 @@ import { join } from "node:path";
 
 import type { ApplicationLogRecordSchema } from "~electron/contract/diagnostics/ApplicationLogRecord";
 import type { DiagnosticRecord } from "~electron/contract/diagnostics/DiagnosticRecord";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 
 /** Process-owned bounded diagnostic log capability exposed to trusted renderer IPC. */
 export interface DiagnosticLog {
@@ -99,7 +99,7 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 		mkdirSync(directoryPath, {
 			recursive: true,
 		});
-		const runtimeIdentity = `Arkini v${ArkiniAppVersion} · ${app.isPackaged ? "packaged" : "development"} · ${process.platform} ${process.arch}`;
+		const runtimeIdentity = `Serakki v${SerakkiAppVersion} · ${app.isPackaged ? "packaged" : "development"} · ${process.platform} ${process.arch}`;
 		configureSync({
 			reset: true,
 			sinks: {
@@ -118,7 +118,7 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 			},
 			loggers: [
 				{
-					category: "arkiniApplication",
+					category: "serakkiApplication",
 					lowestLevel: "debug",
 					parentSinks: "override",
 					sinks: [
@@ -126,7 +126,7 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 					],
 				},
 				{
-					category: "arkini",
+					category: "serakki",
 					lowestLevel: "debug",
 					parentSinks: "override",
 					sinks: [
@@ -141,8 +141,8 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 				},
 			],
 		});
-		const logger = getLogger("arkini");
-		const applicationLogger = getLogger("arkiniApplication");
+		const logger = getLogger("serakki");
+		const applicationLogger = getLogger("serakkiApplication");
 		let closed = false;
 
 		return {

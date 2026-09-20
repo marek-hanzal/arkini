@@ -120,8 +120,8 @@ describe("game load failure recovery", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack,
-		).toBe(game.arkpack);
+			)?.game.serapack,
+		).toBe(game.serapack);
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup + 1);
 	});
 

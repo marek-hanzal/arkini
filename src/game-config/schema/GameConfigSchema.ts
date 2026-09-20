@@ -54,8 +54,8 @@ export const GameConfigSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:game-config",
-		title: "Arkini game configuration",
+		$id: "urn:serakki:schema:game-config",
+		title: "Serakki game configuration",
 		description: "The root configuration for a game.",
 	});
 

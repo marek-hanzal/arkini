@@ -34,9 +34,9 @@ describe("editor MCP authoring schema registry", () => {
 			return schema;
 		};
 
-		const producer = await readSchemaDetail("urn:arkini:schema:mcp:create-item-input");
+		const producer = await readSchemaDetail("urn:serakki:schema:mcp:create-item-input");
 		expect(producer).toMatchObject({
-			$id: "urn:arkini:schema:mcp:create-item-input",
+			$id: "urn:serakki:schema:mcp:create-item-input",
 			properties: {
 				artwork: {
 					$ref: "ArtworkSchema",
@@ -54,7 +54,7 @@ describe("editor MCP authoring schema registry", () => {
 			},
 			type: "object",
 		});
-		expect(await readSchemaDetail("urn:arkini:schema:mcp:edit-item-input")).toMatchObject({
+		expect(await readSchemaDetail("urn:serakki:schema:mcp:edit-item-input")).toMatchObject({
 			properties: {
 				patch: {
 					$ref: "ItemPatchSchema",
@@ -62,7 +62,7 @@ describe("editor MCP authoring schema registry", () => {
 			},
 		});
 		expect(
-			await readSchemaDetail("urn:arkini:schema:mcp:replace-item-line-input"),
+			await readSchemaDetail("urn:serakki:schema:mcp:replace-item-line-input"),
 		).toMatchObject({
 			properties: {
 				line: {
@@ -129,7 +129,7 @@ describe("editor MCP authoring schema registry", () => {
 			minProperties: 1,
 			type: "object",
 		});
-		expect(await readSchemaDetail("urn:arkini:schema:mcp:edit-project-input")).toMatchObject({
+		expect(await readSchemaDetail("urn:serakki:schema:mcp:edit-project-input")).toMatchObject({
 			properties: {
 				patch: {
 					minProperties: 1,
@@ -224,13 +224,13 @@ describe("editor MCP authoring schema registry", () => {
 			});
 		}
 		const pending = [
-			"urn:arkini:schema:mcp:create-item-input",
-			"urn:arkini:schema:mcp:edit-item-input",
-			"urn:arkini:schema:mcp:create-item-line-input",
-			"urn:arkini:schema:mcp:replace-item-line-input",
-			"urn:arkini:schema:mcp:delete-item-line-input",
-			"urn:arkini:schema:mcp:edit-item-lines-input",
-			"urn:arkini:schema:mcp:edit-project-input",
+			"urn:serakki:schema:mcp:create-item-input",
+			"urn:serakki:schema:mcp:edit-item-input",
+			"urn:serakki:schema:mcp:create-item-line-input",
+			"urn:serakki:schema:mcp:replace-item-line-input",
+			"urn:serakki:schema:mcp:delete-item-line-input",
+			"urn:serakki:schema:mcp:edit-item-lines-input",
+			"urn:serakki:schema:mcp:edit-project-input",
 		];
 		const visited = new Set<string>();
 		while (pending.length > 0) {
@@ -279,7 +279,7 @@ describe("editor MCP authoring schema registry", () => {
 		const ajv = new Ajv2020({
 			strict: false,
 		});
-		const schemaUri = (id: string) => `https://schema.arkini.test/${encodeURIComponent(id)}`;
+		const schemaUri = (id: string) => `https://schema.serakki.test/${encodeURIComponent(id)}`;
 		// MCP refs are exact registry IDs; give Ajv absolute addresses for that same graph.
 		for (const [id, schema] of schemasById)
 			ajv.addSchema(
@@ -326,7 +326,7 @@ describe("editor MCP authoring schema registry", () => {
 			}),
 		).toBe(true);
 
-		const validateCreate = ajv.getSchema(schemaUri("urn:arkini:schema:mcp:create-item-input"));
+		const validateCreate = ajv.getSchema(schemaUri("urn:serakki:schema:mcp:create-item-input"));
 		const validatePatch = ajv.getSchema(schemaUri("ItemPatchSchema"));
 		if (validateCreate === undefined || validatePatch === undefined)
 			throw new Error("Missing public item schema.");

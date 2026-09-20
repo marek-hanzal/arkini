@@ -10,7 +10,7 @@ import { createProjectCatalogFx } from "./createProjectCatalogFx";
 import { createBuildOperationsFx } from "./createBuildOperationsFx";
 import { createCommitOperationsFx } from "./createCommitOperationsFx";
 import { createLifecycleOperationsFx } from "./createLifecycleOperationsFx";
-import { extractArkpackFileFx } from "~/arkpack-admission/fx/extractArkpackFileFx";
+import { extractSerapackFileFx } from "~/serapack-admission/fx/extractSerapackFileFx";
 import { randomUUID } from "node:crypto";
 
 export namespace createFilesystemEditorProjectRepositoryFx {
@@ -110,14 +110,14 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		...builds,
 		...commits,
 		...notes,
-		importArkpackFileFx: (arkpackPath: string) =>
+		importSerapackFileFx: (serapackPath: string) =>
 			Effect.gen(function* () {
 				const pending = path.join(
 					path.dirname(projectsRoot),
-					`.arkpack-import-${randomUUID()}`,
+					`.serapack-import-${randomUUID()}`,
 				);
-				return yield* extractArkpackFileFx({
-					arkpackPath,
+				return yield* extractSerapackFileFx({
+					serapackPath,
 					outputRoot: pending,
 				}).pipe(
 					Effect.flatMap(projects.createExtractedProjectFx),
@@ -133,8 +133,8 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 						cause instanceof ProjectRepositoryError
 							? cause
 							: new ProjectRepositoryError({
-									operation: "import-arkpack",
-									message: "The Arkpack could not be imported into the Editor.",
+									operation: "import-serapack",
+									message: "The Serapack could not be imported into the Editor.",
 									cause,
 								}),
 					),
@@ -154,8 +154,8 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		saveBuildVersionFx: (props) => provideFx(repository.saveBuildVersionFx(props)),
 		buildProjectFx: (props) => provideFx(repository.buildProjectFx(props)),
 		createProjectFx: (props) => provideFx(repository.createProjectFx(props)),
-		importArkpackFileFx: (arkpackPath) =>
-			provideFx(repository.importArkpackFileFx(arkpackPath)),
+		importSerapackFileFx: (serapackPath) =>
+			provideFx(repository.importSerapackFileFx(serapackPath)),
 		dismissInvalidProjectFx: (root) => provideFx(repository.dismissInvalidProjectFx(root)),
 		deleteProjectFx: (projectId) => provideFx(repository.deleteProjectFx(projectId)),
 		openProjectFx: (props) => provideFx(repository.openProjectFx(props)),

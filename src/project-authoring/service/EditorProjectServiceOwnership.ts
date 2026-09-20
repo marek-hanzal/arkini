@@ -16,8 +16,8 @@ export interface OwnedEditorProjectRepository
 	readonly dismissInvalidProjectFx: (
 		root: string,
 	) => Effect.Effect<void, ProjectRepositoryError, never>;
-	readonly importArkpackFileFx: (
-		arkpackPath: string,
+	readonly importSerapackFileFx: (
+		serapackPath: string,
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly upsertResourceFilesFx: (props: {
 		readonly projectId: string;

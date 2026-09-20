@@ -36,7 +36,7 @@ const startRemoteHandler = async () => {
 	if (address === null || typeof address === "string")
 		throw new Error("Expected an ephemeral HTTP port.");
 	const origin = new URL(`http://127.0.0.1:${address.port}`);
-	const storageRoot = mkdtempSync(join(tmpdir(), "arkini-editor-mcp-auth-"));
+	const storageRoot = mkdtempSync(join(tmpdir(), "serakki-editor-mcp-auth-"));
 	cleanups.push(async () =>
 		rmSync(storageRoot, {
 			recursive: true,
@@ -91,7 +91,7 @@ describe("createRemoteHandlerFx", () => {
 				"content-type": "application/json",
 			},
 			body: JSON.stringify({
-				client_name: "Arkini test client",
+				client_name: "Serakki test client",
 				redirect_uris: [
 					redirectUri,
 				],
@@ -109,7 +109,7 @@ describe("createRemoteHandlerFx", () => {
 		const registered = (await registration.json()) as {
 			readonly client_id: string;
 		};
-		const verifier = "arkini-editor-mcp-pkce-verifier-abcdefghijklmnopqrstuvwxyz0123456789";
+		const verifier = "serakki-editor-mcp-pkce-verifier-abcdefghijklmnopqrstuvwxyz0123456789";
 		const codeChallenge = createHash("sha256").update(verifier).digest("base64url");
 		const authorize = new URL("/authorize", origin);
 		authorize.search = new URLSearchParams({
@@ -118,7 +118,7 @@ describe("createRemoteHandlerFx", () => {
 			redirect_uri: redirectUri,
 			code_challenge: codeChallenge,
 			code_challenge_method: "S256",
-			state: "arkini-state",
+			state: "serakki-state",
 			scope: "editor:mcp",
 			resource,
 		}).toString();
@@ -131,7 +131,7 @@ describe("createRemoteHandlerFx", () => {
 		const consent = await fetch(consentUrl);
 		expect(consent.status).toBe(200);
 		expect(consent.headers.get("content-security-policy")).not.toContain("form-action");
-		expect(await consent.text()).toContain("Arkini test client");
+		expect(await consent.text()).toContain("Serakki test client");
 
 		const consentFields = new URL(consentUrl).searchParams;
 		const wrongPassword = await fetch(new URL("/confirm", origin), {

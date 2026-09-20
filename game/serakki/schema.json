@@ -1,0 +1,1993 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"anyOf": [
+		{
+			"$ref": "urn:serakki:schema:project#/$defs/GameFileSchema"
+		},
+		{
+			"$ref": "urn:serakki:schema:project#/$defs/ItemFileSchema"
+		},
+		{
+			"$ref": "urn:serakki:schema:project#/$defs/AudioResourceMetadataSchema"
+		}
+	],
+	"$id": "urn:serakki:schema:project",
+	"title": "Serakki project authoring schema",
+	"description": "A strict game.json root, UID-owned item fragment, or Editor audio metadata file.",
+	"$defs": {
+		"GameFileSchema": {
+			"type": "object",
+			"properties": {
+				"$schema": {
+					"type": "string",
+					"const": "./schema.json"
+				},
+				"meta": {
+					"description": "Core metadata and player-available layouts for this game.",
+					"$ref": "urn:serakki:schema:project#/$defs/MetaSchema"
+				},
+				"resources": {
+					"description": "Explicit non-item resource roles used by the game shell.",
+					"$ref": "urn:serakki:schema:project#/$defs/resource.RolesSchema"
+				},
+				"music": {
+					"description": "Optional global Music behavior for this game.",
+					"$ref": "urn:serakki:schema:project#/$defs/music.MusicSchema"
+				},
+				"sfx": {
+					"description": "Optional SFX event assignments for this game.",
+					"$ref": "urn:serakki:schema:project#/$defs/sfx.SfxSchema"
+				},
+				"start": {
+					"description": "The initial board, inventory, and toolbar contents created for a new game.",
+					"$ref": "urn:serakki:schema:project#/$defs/StartSchema"
+				},
+				"version": {
+					"$ref": "urn:serakki:schema:project#/$defs/VersionPartsSchema"
+				}
+			},
+			"required": [
+				"$schema",
+				"meta",
+				"resources",
+				"start",
+				"version"
+			],
+			"additionalProperties": false,
+			"$id": "urn:serakki:schema:game-file",
+			"title": "Serakki game source file",
+			"description": "The complete game.json contract excluding items owned by items/<uid>.json files."
+		},
+		"IdSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A non-empty exact identity used across Serakki."
+		},
+		"TitleSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A required non-empty configuration title."
+		},
+		"PositiveIntegerSchema": {
+			"type": "integer",
+			"exclusiveMinimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A whole number greater than zero."
+		},
+		"grid.SizeSchema": {
+			"type": "object",
+			"properties": {
+				"width": {
+					"description": "The positive number of grid cells arranged horizontally.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"height": {
+					"description": "The positive number of grid cells arranged vertically.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"width",
+				"height"
+			],
+			"additionalProperties": false,
+			"description": "The explicit width and height of a two-dimensional game grid."
+		},
+		"ToolbarSizeSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 64,
+			"description": "The optional toolbar slot count from zero through sixty-four."
+		},
+		"MetaSchema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The stable ID of this game configuration.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this game.",
+					"$ref": "urn:serakki:schema:project#/$defs/TitleSchema"
+				},
+				"introduction": {
+					"description": "Optional Markdown shown before starting a game without a save.",
+					"type": "string"
+				},
+				"board": {
+					"description": "The size of the board on which items are placed.",
+					"$ref": "urn:serakki:schema:project#/$defs/grid.SizeSchema"
+				},
+				"inventory": {
+					"description": "The size of the inventory grid available to the player.",
+					"$ref": "urn:serakki:schema:project#/$defs/grid.SizeSchema"
+				},
+				"toolbarSize": {
+					"description": "The optional one-row toolbar slot count; zero or undefined disables it.",
+					"$ref": "urn:serakki:schema:project#/$defs/ToolbarSizeSchema"
+				}
+			},
+			"required": [
+				"id",
+				"title",
+				"board",
+				"inventory"
+			],
+			"additionalProperties": false,
+			"description": "Core metadata and player-available layouts for a game."
+		},
+		"resource.RolesSchema": {
+			"type": "object",
+			"properties": {
+				"hero": {
+					"description": "The explicit resource ID used by the game splash hero.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-01": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-02": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-03": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-04": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-05": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-06": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-07": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"hero"
+			],
+			"additionalProperties": false,
+			"description": "Named non-item resource references required by the game."
+		},
+		"music.MusicSchema": {
+			"type": "object",
+			"properties": {
+				"playlist": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+					},
+					"description": "Music resource IDs included in the global random playlist."
+				}
+			},
+			"required": [
+				"playlist"
+			],
+			"additionalProperties": false,
+			"description": "The global random Music playlist authored for one game."
+		},
+		"sfx.SfxSchema": {
+			"type": "object",
+			"properties": {
+				"events": {
+					"type": "object",
+					"propertyNames": {
+						"$ref": "urn:serakki:schema:project#/$defs/SfxEventEnumSchema"
+					},
+					"additionalProperties": {
+						"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+					},
+					"description": "SFX resource IDs assigned to gameplay and presentation events."
+				}
+			},
+			"required": [
+				"events"
+			],
+			"additionalProperties": false,
+			"description": "The event SFX assignments authored for one game."
+		},
+		"SfxEventEnumSchema": {
+			"type": "string",
+			"enum": [
+				"current-space:changed",
+				"job:queued",
+				"line-input:autofill-started",
+				"job-queue:cleared",
+				"job:started",
+				"job:completed",
+				"job:aborted",
+				"item:discarded",
+				"item:merged",
+				"item:expired",
+				"item:spawned",
+				"item:portal-transferred",
+				"item:placed",
+				"item:swapped",
+				"item:stacked",
+				"item:split",
+				"item:consumed",
+				"item:input-stored",
+				"item:unit-spent",
+				"item:depleted",
+				"item:disappeared",
+				"item-drop:rejected",
+				"item-detail:opened",
+				"item-detail:closed"
+			],
+			"description": "The finite vocabulary of events assignable to SFX."
+		},
+		"NonNegativeIntegerSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A whole number greater than or equal to zero."
+		},
+		"start.BoardItemSchema": {
+			"type": "object",
+			"properties": {
+				"x": {
+					"description": "The zero-based horizontal grid coordinate.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"y": {
+					"description": "The zero-based vertical grid coordinate.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"space": {
+					"description": "The explicit board space containing this initial item.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"itemId": {
+					"description": "The canonical item ID placed on the initial board.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The optional stack quantity placed in this exact initial board cell; omitted means one.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"x",
+				"y",
+				"space",
+				"itemId"
+			],
+			"additionalProperties": false,
+			"description": "One canonical item placed at an explicit initial board coordinate."
+		},
+		"start.InventoryItemSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The canonical item ID added to the initial inventory.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"position": {
+					"description": "The exact initial inventory slot occupied by this stack.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositionSchema"
+				},
+				"quantity": {
+					"default": 1,
+					"description": "The positive initial inventory quantity; defaults to one.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"itemId",
+				"position",
+				"quantity"
+			],
+			"additionalProperties": false,
+			"description": "A positive quantity of one canonical item in the initial inventory."
+		},
+		"PositionSchema": {
+			"type": "object",
+			"properties": {
+				"x": {
+					"description": "The zero-based horizontal grid coordinate.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"y": {
+					"description": "The zero-based vertical grid coordinate.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"x",
+				"y"
+			],
+			"additionalProperties": false,
+			"description": "One zero-based position in a two-dimensional game grid."
+		},
+		"start.ToolbarItemSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The canonical item ID placed in the initial toolbar.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The optional stack quantity placed in this exact initial toolbar slot; omitted means one.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"position": {
+					"description": "The exact zero-based initial toolbar slot.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositionSchema"
+				}
+			},
+			"required": [
+				"itemId",
+				"position"
+			],
+			"additionalProperties": false,
+			"description": "One canonical item placed at an explicit initial toolbar slot."
+		},
+		"StartSchema": {
+			"type": "object",
+			"properties": {
+				"currentSpace": {
+					"description": "The board space presented when a new game starts.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"board": {
+					"default": [],
+					"description": "The items placed at explicit coordinates when a new game starts.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/start.BoardItemSchema"
+					}
+				},
+				"inventory": {
+					"default": [],
+					"description": "The item quantities added to inventory when a new game starts.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/start.InventoryItemSchema"
+					}
+				},
+				"toolbar": {
+					"default": [],
+					"description": "The items placed at explicit slots when a new game starts.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/start.ToolbarItemSchema"
+					}
+				}
+			},
+			"required": [
+				"currentSpace",
+				"board",
+				"inventory",
+				"toolbar"
+			],
+			"additionalProperties": false,
+			"description": "The initial board placements, inventory contents, and toolbar placements for a new game."
+		},
+		"VersionPartsSchema": {
+			"type": "object",
+			"properties": {
+				"major": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 9007199254740991
+				},
+				"minor": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 9007199254740991
+				},
+				"suffix": {
+					"type": "string",
+					"pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+				}
+			},
+			"required": [
+				"major",
+				"minor"
+			],
+			"additionalProperties": false,
+			"description": "The structured project-owned gameplay version."
+		},
+		"ItemFileSchema": {
+			"type": "object",
+			"properties": {
+				"$schema": {
+					"type": "string",
+					"const": "../schema.json"
+				},
+				"item": {
+					"description": "The canonical item owned by this UID-named file.",
+					"$ref": "urn:serakki:schema:project#/$defs/ItemSchema"
+				}
+			},
+			"required": [
+				"$schema",
+				"item"
+			],
+			"additionalProperties": false,
+			"$id": "urn:serakki:schema:item-file",
+			"title": "Serakki item source file",
+			"description": "One item stored at items/<encoded uid>.json."
+		},
+		"DescriptionSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A required non-empty configuration description."
+		},
+		"item.CompositionSchema": {
+			"anyOf": [
+				{
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+						}
+					],
+					"items": false,
+					"minItems": 1,
+					"maxItems": 1
+				},
+				{
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+						}
+					],
+					"items": false,
+					"minItems": 2,
+					"maxItems": 2
+				}
+			],
+			"description": "A one- or two-layer Artwork composition in back-to-front order."
+		},
+		"ArtworkSchema": {
+			"type": "object",
+			"properties": {
+				"scale": {
+					"type": "number",
+					"minimum": 0.25,
+					"maximum": 1,
+					"description": "The artwork canvas scale within its full tile, from 0.25 through 1."
+				},
+				"default": {
+					"description": "The default one- or two-layer visual composition in back-to-front order.",
+					"$ref": "urn:serakki:schema:project#/$defs/item.CompositionSchema"
+				}
+			},
+			"required": [
+				"scale",
+				"default"
+			],
+			"additionalProperties": false,
+			"description": "The visual artwork definition for a game item."
+		},
+		"scope.StorageSchema": {
+			"type": "string",
+			"enum": [
+				"board",
+				"inventory",
+				"toolbar",
+				"any"
+			],
+			"description": "Where one canonical item may physically exist in grid state."
+		},
+		"UnitsSchema": {
+			"type": "object",
+			"properties": {
+				"amount": {
+					"description": "The positive number of units owned by every fresh item instance.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"output": {
+					"description": "The optional output emitted exactly once from the depleted item's real grid origin.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				}
+			},
+			"required": [
+				"amount"
+			],
+			"additionalProperties": false,
+			"description": "A finite unit supply and optional output emitted on depletion."
+		},
+		"OutputSchema": {
+			"type": "object",
+			"properties": {
+				"set": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/roll.SetSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/roll.SetSchema"
+					},
+					"minItems": 1,
+					"description": "One or more alternative roll sets provided by this output."
+				}
+			},
+			"required": [
+				"set"
+			],
+			"additionalProperties": false,
+			"description": "A configured output produced by a gameplay source."
+		},
+		"roll.SetSchema": {
+			"type": "object",
+			"properties": {
+				"weight": {
+					"default": 1,
+					"description": "The positive relative weight used to select this roll set.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/drop.RuleSchema"
+					},
+					"description": "Availability rules evaluated before this set enters weighted selection."
+				},
+				"roll": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/RollSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/RollSchema"
+					},
+					"minItems": 1,
+					"description": "One or more rolls evaluated after this set is selected."
+				}
+			},
+			"required": [
+				"weight",
+				"rules",
+				"roll"
+			],
+			"additionalProperties": false,
+			"description": "An alternative non-empty collection of output rolls."
+		},
+		"drop.RuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/drop.rule.EnableSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/drop.rule.DisableSchema"
+				}
+			],
+			"description": "An availability rule evaluated for an output candidate or drop."
+		},
+		"drop.rule.EnableSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this selected-drop rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this selected-drop rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"enable"
+					],
+					"description": "Identifies this rule as an enable gate for the selected drop."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that enables a selected drop when its conditions pass."
+		},
+		"NonEmptyStringSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A trimmed non-empty string."
+		},
+		"WhenSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/when.ExistsSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/when.CountSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/when.RangeSchema"
+				}
+			],
+			"description": "A standalone condition that evaluates an item-query quantity."
+		},
+		"when.ExistsSchema": {
+			"type": "object",
+			"properties": {
+				"query": {
+					"description": "The query used to find the items evaluated by this condition.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"exists"
+					],
+					"description": "Identifies this condition as an item-query existence check."
+				}
+			},
+			"required": [
+				"query",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A condition that checks whether an item query returns any quantity."
+		},
+		"query.BoardSchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"board"
+					],
+					"description": "Identifies this query as a board-only query."
+				},
+				"distance": {
+					"$ref": "urn:serakki:schema:project#/$defs/DistanceSchema"
+				}
+			},
+			"required": [
+				"selector",
+				"scope",
+				"distance"
+			],
+			"additionalProperties": false,
+			"description": "A board-only item query constrained by a required board distance."
+		},
+		"SelectorSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "item"
+				},
+				"itemId": {
+					"description": "The stable ID of the selected canonical item.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"type",
+				"itemId"
+			],
+			"additionalProperties": false,
+			"description": "A selector that resolves one canonical game item by stable ID."
+		},
+		"DistanceSchema": {
+			"type": "string",
+			"enum": [
+				"self",
+				"close",
+				"near-close",
+				"near",
+				"far"
+			],
+			"description": "Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance."
+		},
+		"query.InventorySchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"inventory"
+					],
+					"description": "Identifies this query as an inventory-only query."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "An inventory-only item query without a board distance."
+		},
+		"query.ToolbarSchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"toolbar"
+					],
+					"description": "Identifies this query as a toolbar-only query."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "A toolbar-only item query without a board distance."
+		},
+		"query.AnySchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"any"
+					],
+					"description": "Identifies this query as one that searches the origin-space board, shared inventory, and toolbar."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "An item query that searches the origin-space board, shared inventory, and toolbar without a distance."
+		},
+		"query.UniverseSchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"universe"
+					],
+					"description": "Searches every board space plus both passive storage surfaces."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "A universe-wide item query across every board space and both passive storage surfaces without distance."
+		},
+		"QuerySchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/query.BoardSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/query.InventorySchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/query.ToolbarSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/query.AnySchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/query.UniverseSchema"
+				}
+			],
+			"description": "A board, exact passive-storage, local combined, or universe-wide item query selected by scope."
+		},
+		"when.CountSchema": {
+			"type": "object",
+			"properties": {
+				"query": {
+					"description": "The query used to find the items evaluated by this condition.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"count"
+					],
+					"description": "Identifies this condition as an exact item-query quantity check."
+				},
+				"count": {
+					"description": "The exact item quantity that the query must return.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"query",
+				"type",
+				"count"
+			],
+			"additionalProperties": false,
+			"description": "A condition that checks an item query against one exact quantity."
+		},
+		"when.RangeSchema": {
+			"type": "object",
+			"properties": {
+				"query": {
+					"description": "The query used to find the items evaluated by this condition.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"range"
+					],
+					"description": "Identifies this condition as an inclusive item-query quantity range check."
+				},
+				"min": {
+					"description": "The smallest item quantity accepted by this condition.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"max": {
+					"description": "The largest item quantity accepted by this condition.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"query",
+				"type",
+				"min",
+				"max"
+			],
+			"additionalProperties": false,
+			"description": "A condition that checks an item query against an inclusive quantity range."
+		},
+		"drop.rule.DisableSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this selected-drop rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this selected-drop rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"disable"
+					],
+					"description": "Identifies this rule as a disable veto for the selected drop."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that disables a selected drop when its conditions pass."
+		},
+		"RollSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/roll.GuaranteedSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/roll.ChanceSchema"
+				}
+			],
+			"description": "A typed roll that an output may produce."
+		},
+		"roll.GuaranteedSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"guaranteed"
+					]
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+					},
+					"minItems": 1,
+					"description": "One or more items emitted when this roll succeeds."
+				}
+			},
+			"required": [
+				"type",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "A roll that guarantees its output when its rules allow it."
+		},
+		"DropSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The ID of the canonical game item emitted by this drop.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The quantity emitted by this drop.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuantitySchema"
+				},
+				"placement": {
+					"default": "drop",
+					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
+					"$ref": "urn:serakki:schema:project#/$defs/PlacementSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/drop.RuleSchema"
+					},
+					"description": "Rules evaluated after this drop is selected by a successful roll."
+				}
+			},
+			"required": [
+				"itemId",
+				"quantity",
+				"placement",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "A canonical game item, quantity, board-placement strategy, and rules for a successful roll's drop."
+		},
+		"QuantitySchema": {
+			"type": "object",
+			"properties": {
+				"min": {
+					"description": "The smallest quantity that may resolve.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"max": {
+					"description": "The largest quantity that may resolve.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"min",
+				"max"
+			],
+			"additionalProperties": false,
+			"description": "The inclusive positive bounds resolved by one quantity contract."
+		},
+		"PlacementSchema": {
+			"type": "string",
+			"enum": [
+				"drop",
+				"random"
+			],
+			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement, independently from inventory fallback."
+		},
+		"roll.ChanceSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"chance"
+					]
+				},
+				"chance": {
+					"description": "The probability that this roll provides its output, from 0 to 1 inclusive.",
+					"$ref": "urn:serakki:schema:project#/$defs/ChanceSchema"
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+					},
+					"minItems": 1,
+					"description": "One or more items emitted when this roll succeeds."
+				}
+			},
+			"required": [
+				"type",
+				"chance",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "A roll that provides its output according to a probability."
+		},
+		"ChanceSchema": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 1,
+			"description": "A probability from zero to one inclusive."
+		},
+		"MergeSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/merge.SpendSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/merge.KeepSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/merge.RemoveSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/merge.ReplaceSchema"
+				}
+			],
+			"description": "A discriminated target-specific directional item merge."
+		},
+		"merge.SpendSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"spend"
+					],
+					"description": "Identifies this merge as one that spends a unit from its selected target."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that spends one unit from its selected receiving item."
+		},
+		"merge.SourceActionSchema": {
+			"type": "string",
+			"enum": [
+				"use",
+				"consume",
+				"spend"
+			],
+			"description": "The action applied to a source item after it initiates a merge."
+		},
+		"merge.KeepSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"keep"
+					],
+					"description": "Identifies this merge as one that keeps its selected target unchanged."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that leaves its selected receiving item unchanged."
+		},
+		"merge.RemoveSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"remove"
+					],
+					"description": "Identifies this merge as one that removes its selected target."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that removes its selected receiving item."
+		},
+		"merge.ReplaceSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"replace"
+					],
+					"description": "Identifies this merge as one that replaces its selected target."
+				},
+				"result": {
+					"description": "The canonical item that replaces the selected target.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect",
+				"result"
+			],
+			"additionalProperties": false,
+			"description": "A merge that replaces its selected receiving item with an explicit result."
+		},
+		"ItemScheduleSchema": {
+			"type": "object",
+			"properties": {
+				"intervalMs": {
+					"description": "Optional active milliseconds between weighted selections from rule-enabled Clock lines for ordinary queue admission; omission creates no pulses.",
+					"minimum": 100,
+					"$ref": "urn:serakki:schema:project#/$defs/TimeSchema"
+				},
+				"durationMs": {
+					"description": "Optional active lifetime; expiryMode determines whether accepted work may outlive it.",
+					"minimum": 100,
+					"$ref": "urn:serakki:schema:project#/$defs/TimeSchema"
+				},
+				"expiryMode": {
+					"description": "Lifetime expiry policy; omission uses loose-kill. Has no effect without a finite duration.",
+					"type": "string",
+					"enum": [
+						"loose-kill",
+						"kill-switch"
+					]
+				},
+				"enable": {
+					"default": true,
+					"type": "boolean"
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/action.RuleSchema"
+					}
+				},
+				"onExpire": {
+					"description": "Output resolved at owner expiry in both modes; kill-switch places what fits after returned materials and logs the excess as lost, within the same atomic removal.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				}
+			},
+			"required": [
+				"enable",
+				"rules"
+			],
+			"additionalProperties": false,
+			"anyOf": [
+				{
+					"required": [
+						"intervalMs"
+					]
+				},
+				{
+					"required": [
+						"durationMs"
+					]
+				}
+			],
+			"description": "Clock-line admission, finite lifetime, or both, with availability rules and expiry output."
+		},
+		"TimeSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A non-negative whole time value expressed in milliseconds."
+		},
+		"action.RuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/action.EnableRuleSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/action.DisableRuleSchema"
+				}
+			],
+			"description": "Enable gates and disable vetoes evaluated for an immediate item action."
+		},
+		"action.EnableRuleSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this action rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this action rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"enable"
+					]
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that enables an immediate item action when its conditions pass."
+		},
+		"action.DisableRuleSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this action rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this action rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"disable"
+					]
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that disables an immediate item action when its conditions pass."
+		},
+		"itemAction.ActionSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/itemAction.SpaceActionSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/itemAction.InventoryActionSchema"
+				}
+			],
+			"description": "One immediate item action selected by its type discriminator."
+		},
+		"itemAction.SpaceActionSchema": {
+			"type": "object",
+			"properties": {
+				"input": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/action.InputSchema"
+					}
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/action.RuleSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"const": "space"
+				},
+				"space": {
+					"description": "The board space selected after successful activation.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"input",
+				"rules",
+				"type",
+				"space"
+			],
+			"additionalProperties": false,
+			"description": "An immediate action whose requirements settle atomically with navigation."
+		},
+		"action.InputSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/input.SimpleSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitsSchema"
+				}
+			],
+			"description": "A simple or board-units requirement resolved by an immediate item action."
+		},
+		"input.SimpleSchema": {
+			"type": "object",
+			"properties": {
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"simple"
+					],
+					"description": "Identifies this input as having no consumable resource requirement."
+				}
+			},
+			"required": [
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "An explicit action requirement with no consumable resource requirement."
+		},
+		"input.UnitCostSchema": {
+			"type": "object",
+			"properties": {
+				"cost": {
+					"description": "The positive number of units paid when the enclosing action commits.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"from": {
+					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitSourceSchema"
+				}
+			},
+			"required": [
+				"cost",
+				"from"
+			],
+			"additionalProperties": false,
+			"description": "One action-requirement unit cost and the runtime item that pays it."
+		},
+		"input.UnitSourceSchema": {
+			"type": "string",
+			"enum": [
+				"self",
+				"target"
+			],
+			"description": "Whether one requirement cost is paid by the action owner or its resolved target."
+		},
+		"input.UnitsSchema": {
+			"type": "object",
+			"properties": {
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"units"
+					],
+					"description": "Identifies this input as one item on the Board that can pay units."
+				},
+				"query": {
+					"description": "The board query used to select one target with units for this input.",
+					"$ref": "urn:serakki:schema:project#/$defs/query.BoardSchema"
+				}
+			},
+			"required": [
+				"type",
+				"query"
+			],
+			"additionalProperties": false,
+			"description": "A board query that resolves one Board item that can pay units."
+		},
+		"itemAction.InventoryActionSchema": {
+			"type": "object",
+			"properties": {
+				"input": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/action.InputSchema"
+					}
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/action.RuleSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"const": "inventory"
+				}
+			},
+			"required": [
+				"input",
+				"rules",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "An immediate action opening the Inventory screen."
+		},
+		"LineSchema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The stable ID of this product line within its owning item.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this product line.",
+					"$ref": "urn:serakki:schema:project#/$defs/TitleSchema"
+				},
+				"artwork": {
+					"description": "Optional Artwork resource ID shown beside the production line title.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this product line's purpose.",
+					"$ref": "urn:serakki:schema:project#/$defs/DescriptionSchema"
+				},
+				"clock": {
+					"description": "Whether this line participates in weighted Clock selection, independently of Default.",
+					"type": "boolean"
+				},
+				"clockWeight": {
+					"default": 1,
+					"description": "Relative Clock selection weight among lines allowed by their evaluated rules.",
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 999
+				},
+				"default": {
+					"default": false,
+					"description": "Whether this line is the authored fallback default for its owning item.",
+					"type": "boolean"
+				},
+				"show": {
+					"default": true,
+					"description": "Whether this product line is visible before its rules are evaluated.",
+					"type": "boolean"
+				},
+				"enable": {
+					"default": true,
+					"description": "Whether this product line is enabled before its rules are evaluated.",
+					"type": "boolean"
+				},
+				"runtimeMs": {
+					"description": "The runtime of this product line in milliseconds; zero completes immediately.",
+					"$ref": "urn:serakki:schema:project#/$defs/TimeSchema"
+				},
+				"input": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/InputSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/InputSchema"
+					},
+					"minItems": 1,
+					"description": "One or more input requirements for this product line."
+				},
+				"output": {
+					"description": "The optional result produced when this product line completes.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/line.RuleSchema"
+					},
+					"description": "Rules that can change this product line's visibility, availability, or behavior."
+				}
+			},
+			"required": [
+				"id",
+				"title",
+				"description",
+				"clockWeight",
+				"default",
+				"show",
+				"enable",
+				"runtimeMs",
+				"input",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "A single product line with its accepted inputs and produced output."
+		},
+		"InputSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/input.SimpleSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/input.MaterialSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitsSchema"
+				}
+			],
+			"description": "A simple, material-item, or Board unit-cost input requirement for a product line."
+		},
+		"input.MaterialSchema": {
+			"type": "object",
+			"properties": {
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"materials"
+					],
+					"description": "Identifies this input as a directly delivered material item."
+				},
+				"query": {
+					"description": "The required item and the search scope used by automatic material delivery. Manual delivery uses only the selector.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
+				},
+				"mode": {
+					"default": "consume",
+					"description": "Whether this input is consumed or reserved; defaults to consume.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.ModeSchema"
+				},
+				"quantity": {
+					"description": "The exact or bounded total amount accepted across all matching materials.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuantitySchema"
+				}
+			},
+			"required": [
+				"type",
+				"query",
+				"mode",
+				"quantity"
+			],
+			"additionalProperties": false,
+			"description": "A directly delivered material item required by a product line."
+		},
+		"input.ModeSchema": {
+			"type": "string",
+			"enum": [
+				"consume",
+				"reserve"
+			],
+			"description": "How an input item participates in a product line."
+		},
+		"line.RuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/line.rule.ShowSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/line.rule.HideSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/action.EnableRuleSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/action.DisableRuleSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/line.rule.RuntimeAdjustmentSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/line.rule.RuntimeMultiplierSchema"
+				}
+			],
+			"description": "A rule evaluated for a product line."
+		},
+		"line.rule.ShowSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"show"
+					],
+					"description": "Identifies this rule as a request to show the product line."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that conditionally makes a product line visible."
+		},
+		"line.rule.HideSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"hide"
+					],
+					"description": "Identifies this rule as a request to hide the product line."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that hides a product line when its condition is satisfied."
+		},
+		"line.rule.RuntimeAdjustmentSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"runtime:adjust"
+					],
+					"description": "Identifies this rule as a product-line runtime adjustment."
+				},
+				"adjustMs": {
+					"type": "integer",
+					"minimum": -9007199254740991,
+					"maximum": 9007199254740991,
+					"description": "The signed millisecond adjustment added to this product line's runtime."
+				}
+			},
+			"required": [
+				"when",
+				"type",
+				"adjustMs"
+			],
+			"additionalProperties": false,
+			"description": "A rule that adjusts a product line's runtime by a signed millisecond value."
+		},
+		"line.rule.RuntimeMultiplierSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
+					},
+					"minItems": 1,
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"runtime:multiplier"
+					],
+					"description": "Identifies this rule as a product-line runtime multiplier."
+				},
+				"multiplier": {
+					"description": "The positive factor multiplied into this product line's runtime.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveNumberSchema"
+				}
+			},
+			"required": [
+				"when",
+				"type",
+				"multiplier"
+			],
+			"additionalProperties": false,
+			"description": "A rule that multiplies a product line's runtime when its conditions pass."
+		},
+		"PositiveNumberSchema": {
+			"type": "number",
+			"exclusiveMinimum": 0,
+			"description": "A number greater than zero."
+		},
+		"ItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:serakki:schema:project#/$defs/TitleSchema"
+				},
+				"draft": {
+					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
+					"type": "boolean"
+				},
+				"description": {
+					"description": "The optional human-readable explanation of this item's purpose.",
+					"$ref": "urn:serakki:schema:project#/$defs/DescriptionSchema"
+				},
+				"ui": {
+					"default": "default",
+					"description": "Item interface and player production control: simple shows only information but allows Board clicks on the default line; default enables manual production and always shows all sections, even without production lines.",
+					"type": "string",
+					"enum": [
+						"simple",
+						"default"
+					]
+				},
+				"music": {
+					"description": "Music resource requested while this item detail is open; omission keeps the global playlist.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"artwork": {
+					"description": "The visual artwork definition used to render this item.",
+					"$ref": "urn:serakki:schema:project#/$defs/ArtworkSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:serakki:schema:project#/$defs/scope.StorageSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"units": {
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"$ref": "urn:serakki:schema:project#/$defs/UnitsSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/MergeSchema"
+					},
+					"minItems": 1
+				},
+				"clock": {
+					"$ref": "urn:serakki:schema:project#/$defs/ItemScheduleSchema"
+				},
+				"action": {
+					"description": "An optional immediate action; mutually exclusive with production lines.",
+					"$ref": "urn:serakki:schema:project#/$defs/itemAction.ActionSchema"
+				},
+				"maxQueueSize": {
+					"default": 1,
+					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"lines": {
+					"default": [],
+					"description": "Optional production lines; an item without lines or an action is passive.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/LineSchema"
+					}
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"ui",
+				"artwork",
+				"scope",
+				"maxStackSize",
+				"maxQueueSize",
+				"lines"
+			],
+			"additionalProperties": false,
+			"if": {
+				"required": [
+					"clock"
+				]
+			},
+			"then": {
+				"properties": {
+					"maxStackSize": {
+						"const": 1
+					}
+				},
+				"not": {
+					"required": [
+						"action"
+					]
+				}
+			},
+			"not": {
+				"required": [
+					"action",
+					"lines"
+				],
+				"properties": {
+					"lines": {
+						"minItems": 1
+					}
+				}
+			},
+			"description": "An ordinary item with optional production, Clock scheduling, or one immediate action."
+		},
+		"AudioResourceMetadataSchema": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": [
+				"name"
+			],
+			"additionalProperties": false,
+			"description": "Editor-only display name for one Music or SFX resource."
+		}
+	}
+}

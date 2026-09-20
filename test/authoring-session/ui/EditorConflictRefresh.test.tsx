@@ -111,7 +111,7 @@ it.each([
 				},
 			});
 		const logFn = vi.fn(async () => undefined);
-		vi.stubGlobal("arkini", {
+		vi.stubGlobal("serakki", {
 			diagnostics: {
 				writeApplicationFn: logFn,
 			},

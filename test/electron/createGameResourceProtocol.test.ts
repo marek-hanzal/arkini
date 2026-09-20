@@ -18,7 +18,7 @@ import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameP
 let root = "";
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-game-resource-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-game-resource-"));
 	netFetch.mockReset();
 });
 
@@ -74,13 +74,13 @@ describe("Game resource protocol", () => {
 					isTrustedUrlFn: () => true,
 				}),
 			);
-			const url = `arkini://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${contentHash}&resourceId=${encodeURIComponent(JSON.stringify(resourceId))}`;
+			const url = `serakki://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${contentHash}&resourceId=${encodeURIComponent(JSON.stringify(resourceId))}`;
 
 			const response = await Effect.runPromise(
 				protocol.handleRequestFx(
 					new Request(url, {
 						headers: {
-							Origin: "arkini://app",
+							Origin: "serakki://app",
 							Range: "bytes=1-2",
 						},
 					}),
@@ -92,7 +92,7 @@ describe("Game resource protocol", () => {
 			expect(response.headers.get("Content-Range")).toBe("bytes 1-2/6");
 			expect(response.headers.get("Content-Length")).toBe("2");
 			expect(response.headers.get("Content-Type")).toBe("image/png");
-			expect(response.headers.get("Access-Control-Allow-Origin")).toBe("arkini://app");
+			expect(response.headers.get("Access-Control-Allow-Origin")).toBe("serakki://app");
 			expect(response.headers.get("Vary")).toBe("Origin");
 			expect(await response.text()).toBe("bc");
 			expect(netFetch).toHaveBeenCalledWith(

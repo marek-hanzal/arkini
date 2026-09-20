@@ -84,10 +84,10 @@ export const formatGameIncidentTextBundleFn = (
 ): GameIncidentTextBundle => {
 	const { identity, history, failure, source } = report.diagnostics;
 	const incident = [
-		"# Arkini game incident",
+		"# Serakki game incident",
 		"",
 		`- Captured: ${report.capturedAt}`,
-		`- Arkini application: ${identity.applicationVersion}`,
+		`- Serakki application: ${identity.applicationVersion}`,
 		`- Session: ${identity.sessionId}`,
 		`- Package: ${identity.packageId}`,
 		`- Content hash: ${identity.contentHash}`,
@@ -108,8 +108,8 @@ export const formatGameIncidentTextBundleFn = (
 		"- [Failure](./failure.md) — fatal source, related item identities and bounded error tree.",
 		"- [Semantic history](./history.md) — bounded available events and identity deltas.",
 		"- [Runtime state](./runtime-state.md) — complete latest committed runtime projection.",
-		"- [Arkpack](./game.arkpack) — exact gameplay package loaded by the failed session.",
-		"- [Save](./save.arksave) — exact latest committed state for replay.",
+		"- [Serapack](./game.serapack) — exact gameplay package loaded by the failed session.",
+		"- [Save](./save.serasave) — exact latest committed state for replay.",
 		...(source.issues.length === 0
 			? []
 			: [

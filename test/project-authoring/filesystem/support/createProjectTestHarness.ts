@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect, FileSystem } from "effect";
 
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { createFilesystemEditorProjectRepositoryFx } from "~/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { writeProjectFilesFx } from "~/project-authoring/filesystem/fx/writeProjectFilesFx";
@@ -67,9 +67,9 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 				writeProjectFilesFx({
 					root,
 					next: {
-						arkpack: parseVersionFn(editorTestPayload.version),
+						serapack: parseVersionFn(editorTestPayload.version),
 						marker: GameProjectManifestSchema.parse({
-							arkini: ArkiniAppVersion,
+							serakki: SerakkiAppVersion,
 							revision: 1,
 						}),
 						config: {

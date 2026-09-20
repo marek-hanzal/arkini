@@ -15,8 +15,8 @@ import type { GameEngine } from "~/playable-game/type/GameEngine";
 
 type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscreen";
 
-const gameBoardViewTransitionName = "arkini-game-board";
-const editorGameBoardViewTransitionName = "arkini-editor-game-board";
+const gameBoardViewTransitionName = "serakki-game-board";
+const editorGameBoardViewTransitionName = "serakki-editor-game-board";
 
 /** Keeps the shell's higher overlay from competing with its owned Item Detail. */
 const ItemDetailOverlayPrecedence = () => {

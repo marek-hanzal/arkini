@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
 /**
  * One process-lifetime registry for every React-visible renderer Atom.
- * Arkini deliberately does not preserve application state across HMR.
+ * Serakki deliberately does not preserve application state across HMR.
  *
  * TODO(#397): Re-audit stable registry/runtime construction, scheduler integration,
  * retention semantics, and the measured need for the 400ms default idle TTL.

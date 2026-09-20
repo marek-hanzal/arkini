@@ -40,11 +40,11 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 			)
 			.with(
 				{
-					destination: "arkpacks",
+					destination: "serapacks",
 				},
 				() => {
 					throw redirect({
-						to: "/arkpacks",
+						to: "/serapacks",
 						replace: true,
 					});
 				},

@@ -13,9 +13,9 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { Route as MainMenuRouteDefinition } from "~/@routes/_launcher/main-menu";
@@ -54,24 +54,24 @@ describe("MainMenu", () => {
 		);
 		const catalogState = {
 			type: "ready" as const,
-			arkpacks: [
+			serapacks: [
 				{
 					packageId: "competing-official",
 					contentHash: "b".repeat(64),
 					title: "Other Game",
 					version: "1.0",
-					arkini: "1",
+					serakki: "1",
 					provenance: {
 						type: "official",
 					} as const,
 					source: "bundled" as const,
 				},
 				{
-					packageId: "arkini",
+					packageId: "serakki",
 					contentHash: "a".repeat(64),
-					title: "Arkini",
+					title: "Serakki",
 					version: "1.0",
-					arkini: "1",
+					serakki: "1",
 					provenance: {
 						type: "official",
 					} as const,
@@ -80,9 +80,9 @@ describe("MainMenu", () => {
 			],
 		};
 		const catalogStateRef = Effect.runSync(
-			SubscriptionRef.make<ArkpackCatalog.State>(catalogState),
+			SubscriptionRef.make<SerapackCatalog.State>(catalogState),
 		);
-		const catalog: ArkpackCatalog = {
+		const catalog: SerapackCatalog = {
 			awaitIdleFx: Effect.void,
 			state: catalogStateRef,
 			refreshFx: Effect.void,
@@ -98,7 +98,7 @@ describe("MainMenu", () => {
 		registry.set(EditorServiceStatusAtom, {
 			type: "ready",
 		});
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(
 			RendererLifecycleOwnerAtom,
 			Effect.runSync(
@@ -116,7 +116,7 @@ describe("MainMenu", () => {
 					theme: "dark" as const,
 					accent: "rose" as const,
 				},
-				defaultPackageId: "arkini",
+				defaultPackageId: "serakki",
 				cheatsAvailable: false,
 				sound: {
 					master: 100,
@@ -166,14 +166,14 @@ describe("MainMenu", () => {
 		const play = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Play",
 		);
-		expect(play?.getAttribute("href")).toContain("/action/load-game/arkini");
+		expect(play?.getAttribute("href")).toContain("/action/load-game/serakki");
 		await act(async () => {
 			await Effect.runPromise(
 				SubscriptionRef.set(catalogStateRef, {
 					type: "ready",
-					arkpacks: [
+					serapacks: [
 						{
-							...catalogState.arkpacks[1]!,
+							...catalogState.serapacks[1]!,
 							provenance: {
 								type: "community",
 							},
@@ -208,12 +208,12 @@ describe("MainMenu", () => {
 		expect(
 			Array.from(container.querySelectorAll("a")).some((link) => link.textContent === "Play"),
 		).toBe(true);
-		expect(container.textContent).toContain("Arkpacks");
+		expect(container.textContent).toContain("Serapacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="ArkiniAppVersion"]')?.textContent,
-		).toBe(`v${ArkiniAppVersion}`);
+			container.querySelector<HTMLElement>('[data-ui="SerakkiAppVersion"]')?.textContent,
+		).toBe(`v${SerakkiAppVersion}`);
 
 		const exit = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Exit",

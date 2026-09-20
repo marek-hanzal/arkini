@@ -42,7 +42,7 @@ const project: EditorProjectTransport.Project = {
 };
 
 const installEditorApi = () => {
-	const editor: Window["arkini"]["editor"] = {
+	const editor: Window["serakki"]["editor"] = {
 		saveBuildVersionFn: vi.fn(async ({ version }) => success(version)),
 		buildProjectFn: vi.fn(async () => {
 			throw new Error("Unexpected build.");
@@ -82,8 +82,8 @@ const installEditorApi = () => {
 		),
 		exportJsonDirectoryFn: vi.fn(async () => success(null)),
 		importJsonDirectoryFn: vi.fn(async () => success(descriptor)),
-		importArkpackFn: vi.fn(async () => success(descriptor)),
-		importInstalledArkpackFn: vi.fn(async () => success(descriptor)),
+		importSerapackFn: vi.fn(async () => success(descriptor)),
+		importInstalledSerapackFn: vi.fn(async () => success(descriptor)),
 		importResourcesFn: vi.fn(async () =>
 			success({
 				project,
@@ -121,7 +121,7 @@ const installEditorApi = () => {
 			}),
 		),
 	};
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor,
@@ -155,7 +155,7 @@ const createRepository = () => {
 };
 
 afterEach(() => {
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("createElectronProjectRepositoryFx", () => {
@@ -340,7 +340,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		const onProgressFn = vi.fn();
 		const unsubscribeFn = vi.fn();
 		let reportProgressFn:
-			| Parameters<Window["arkini"]["editor"]["onOptimizeResourcesProgressFn"]>[0]
+			| Parameters<Window["serakki"]["editor"]["onOptimizeResourcesProgressFn"]>[0]
 			| undefined;
 		vi.mocked(editor.onOptimizeResourcesProgressFn).mockImplementation((listenerFn) => {
 			reportProgressFn = listenerFn;

@@ -13,7 +13,7 @@ describe("Editor Build saveEditorBuildFx", () => {
 			type: "success" as const,
 			value: true,
 		}));
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				editor: {

@@ -14,8 +14,8 @@ export const GameFileSchema = GameConfigSchema.omit({
 	})
 	.meta({
 		id: "GameFileSchema",
-		$id: "urn:arkini:schema:game-file",
-		title: "Arkini game source file",
+		$id: "urn:serakki:schema:game-file",
+		title: "Serakki game source file",
 		description:
 			"The complete game.json contract excluding items owned by items/<uid>.json files.",
 	});

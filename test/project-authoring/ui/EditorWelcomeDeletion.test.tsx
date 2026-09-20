@@ -23,7 +23,7 @@ const actions = vi.hoisted(() => ({
 	dismissedProjectRoots: new Set<string>(),
 	error: undefined as unknown,
 	exitFn: vi.fn(),
-	importArkpackFileFn: vi.fn(),
+	importSerapackFileFn: vi.fn(),
 	importJsonDirectoryFn: vi.fn(),
 	openProjectFolderFn: vi.fn(),
 	projectRefreshError: undefined as unknown,
@@ -139,7 +139,7 @@ describe("EditorWelcome project rows", () => {
 								ownership: "managed",
 								project: {
 									projectId: "project-one",
-									title: "Arkini",
+									title: "Serakki",
 									version: {
 										major: 1,
 										minor: 0,
@@ -181,7 +181,7 @@ describe("EditorWelcome project rows", () => {
 		await act(async () => managedDelete.click());
 
 		const dialog = container.querySelector('[data-ui="EditorProjectDeleteDialog"]');
-		expect(dialog?.textContent).toContain("Arkini");
+		expect(dialog?.textContent).toContain("Serakki");
 		expect(dialog?.textContent).toContain("project-one");
 		expect(dialog?.getAttribute("data-project-ownership")).toBe("managed");
 		expect(actions.deleteProjectFn).not.toHaveBeenCalled();

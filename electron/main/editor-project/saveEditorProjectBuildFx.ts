@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import type { EditorProjectTransport } from "~electron/contract/editor/EditorProjectTransport";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
+import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackArtifactNameFn";
 
 const copyFileFx = Effect.fn("saveEditorProjectBuildFx.copyFileFx")(
 	(source: string, target: string) =>
@@ -31,14 +31,14 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 			const selection = yield* Effect.tryPromise({
 				try: () =>
 					dialog.showSaveDialog(window, {
-						title: "Save Arkpack",
-						buttonLabel: "Save Arkpack",
-						defaultPath: readArkpackArtifactNameFn(request.projectId),
+						title: "Save Serapack",
+						buttonLabel: "Save Serapack",
+						defaultPath: readSerapackArtifactNameFn(request.projectId),
 						filters: [
 							{
-								name: "Arkini package",
+								name: "Serakki package",
 								extensions: [
-									"arkpack",
+									"serapack",
 								],
 							},
 						],
@@ -47,11 +47,11 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 			});
 			if (selection.canceled || selection.filePath === undefined) return false;
 
-			const arkpackPath = selection.filePath.endsWith(".arkpack")
+			const serapackPath = selection.filePath.endsWith(".serapack")
 				? selection.filePath
-				: `${selection.filePath}.arkpack`;
+				: `${selection.filePath}.serapack`;
 			yield* repository.withProjectBuildPathFx(request, (sourcePath) =>
-				sourcePath === arkpackPath ? Effect.void : copyFileFx(sourcePath, arkpackPath),
+				sourcePath === serapackPath ? Effect.void : copyFileFx(sourcePath, serapackPath),
 			);
 			return true;
 		}).pipe(

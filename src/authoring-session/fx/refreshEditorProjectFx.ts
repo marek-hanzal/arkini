@@ -24,7 +24,7 @@ export namespace refreshEditorProjectFx {
 
 const requestRefreshFx = (projectId: string) =>
 	invokeProjectTransportFx({
-		callFn: () => window.arkini.editor.refreshProjectFn(projectId),
+		callFn: () => window.serakki.editor.refreshProjectFn(projectId),
 		operation: "refresh-project",
 		parseFn: (candidate: EditorProjectTransport.Project) => {
 			return ProjectPayloadSchema.parse(candidate);

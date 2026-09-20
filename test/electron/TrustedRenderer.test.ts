@@ -93,7 +93,7 @@ const createIpcEvent = (webContents: WebContents, senderFrame: WebFrameMain | nu
 	}) as IpcMainEvent;
 
 describe("trusted Electron renderer policy", () => {
-	it("allows only the packaged Arkini origin in production", async () => {
+	it("allows only the packaged Serakki origin in production", async () => {
 		const policy = await Effect.runPromise(
 			createTrustedRendererFx({
 				isPackaged: true,
@@ -101,13 +101,13 @@ describe("trusted Electron renderer policy", () => {
 			}),
 		);
 
-		expect(policy.isTrustedUrlFn("arkini://app/")).toBe(true);
-		expect(policy.isTrustedUrlFn("arkini://app/game/arkini?x=1#tile")).toBe(true);
-		expect(policy.isTrustedUrlFn("arkini://other/")).toBe(false);
+		expect(policy.isTrustedUrlFn("serakki://app/")).toBe(true);
+		expect(policy.isTrustedUrlFn("serakki://app/game/serakki?x=1#tile")).toBe(true);
+		expect(policy.isTrustedUrlFn("serakki://other/")).toBe(false);
 		expect(policy.isTrustedUrlFn("https://example.com/")).toBe(false);
 		expect(policy.isTrustedUrlFn("file:///tmp/index.html")).toBe(false);
-		expect(policy.isTrustedUrlFn("data:text/html,Arkini")).toBe(false);
-		expect(policy.isTrustedUrlFn("arkini://user@app/")).toBe(false);
+		expect(policy.isTrustedUrlFn("data:text/html,Serakki")).toBe(false);
+		expect(policy.isTrustedUrlFn("serakki://user@app/")).toBe(false);
 	});
 
 	it("allows only the exact configured development origin", async () => {
@@ -118,11 +118,11 @@ describe("trusted Electron renderer policy", () => {
 			}),
 		);
 
-		expect(policy.isTrustedUrlFn("http://127.0.0.1:4040/game/arkini")).toBe(true);
+		expect(policy.isTrustedUrlFn("http://127.0.0.1:4040/game/serakki")).toBe(true);
 		expect(policy.isTrustedUrlFn("http://127.0.0.1:4041/")).toBe(false);
 		expect(policy.isTrustedUrlFn("http://localhost:4040/")).toBe(false);
 		expect(policy.isTrustedUrlFn("https://127.0.0.1:4040/")).toBe(false);
-		expect(policy.isTrustedUrlFn("arkini://app/")).toBe(false);
+		expect(policy.isTrustedUrlFn("serakki://app/")).toBe(false);
 	});
 
 	it("rejects development URLs outside the exact configured loopback origin", async () => {
@@ -139,7 +139,7 @@ describe("trusted Electron renderer policy", () => {
 						developmentRendererUrl,
 					}),
 				),
-			).rejects.toThrow("configure the trusted Arkini renderer origin");
+			).rejects.toThrow("configure the trusted Serakki renderer origin");
 		}
 	});
 
@@ -149,11 +149,11 @@ describe("trusted Electron renderer policy", () => {
 				isPackaged: true,
 			}),
 		);
-		const harness = createWindowHarness("arkini://app/");
+		const harness = createWindowHarness("serakki://app/");
 		Effect.runSync(policy.registerWindowFx(harness.window));
 
 		expect(
-			harness.emitNavigation("will-navigate", "arkini://app/game/arkini", true),
+			harness.emitNavigation("will-navigate", "serakki://app/game/serakki", true),
 		).not.toHaveBeenCalled();
 		expect(
 			harness.emitNavigation("will-navigate", "https://example.com/", true),
@@ -162,10 +162,10 @@ describe("trusted Electron renderer policy", () => {
 			harness.emitNavigation("will-redirect", "file:///tmp/index.html", true),
 		).toHaveBeenCalledOnce();
 		expect(
-			harness.emitNavigation("will-frame-navigate", "arkini://app/", false),
+			harness.emitNavigation("will-frame-navigate", "serakki://app/", false),
 		).toHaveBeenCalledOnce();
 		expect(
-			harness.emitNavigation("will-attach-webview", "arkini://app/", false),
+			harness.emitNavigation("will-attach-webview", "serakki://app/", false),
 		).toHaveBeenCalledOnce();
 		expect(
 			harness.openHandler()?.({
@@ -194,7 +194,7 @@ describe("trusted Electron renderer policy", () => {
 				isPackaged: true,
 			}),
 		);
-		const harness = createWindowHarness("arkini://app/");
+		const harness = createWindowHarness("serakki://app/");
 		Effect.runSync(policy.registerWindowFx(harness.window));
 		const open = harness.openHandler()!;
 		expect(
@@ -210,7 +210,7 @@ describe("trusted Electron renderer policy", () => {
 			"javascript:alert(1)",
 			"custom://app",
 			"https://user:pass@example.com",
-			"arkini://app/",
+			"serakki://app/",
 			"invalid",
 		]) {
 			expect(
@@ -234,7 +234,7 @@ describe("trusted Electron renderer policy", () => {
 				isPackaged: true,
 			}),
 		);
-		const harness = createWindowHarness("arkini://app/game/arkini");
+		const harness = createWindowHarness("serakki://app/game/serakki");
 		Effect.runSync(policy.registerWindowFx(harness.window));
 
 		expect(
@@ -243,7 +243,7 @@ describe("trusted Electron renderer policy", () => {
 		expect(
 			policy.isTrustedIpcSenderFn(
 				createIpcEvent(harness.webContents, {
-					url: "arkini://app/",
+					url: "serakki://app/",
 				} as WebFrameMain),
 			),
 		).toBe(false);
@@ -271,7 +271,7 @@ describe("trusted Electron renderer policy", () => {
 				isPackaged: true,
 			}),
 		);
-		const harness = createWindowHarness("arkini://app/");
+		const harness = createWindowHarness("serakki://app/");
 		Effect.runSync(policy.registerWindowFx(harness.window));
 		const event = createIpcEvent(harness.webContents, harness.mainFrame);
 		expect(policy.isTrustedIpcSenderFn(event)).toBe(true);

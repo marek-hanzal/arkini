@@ -4,7 +4,7 @@ export interface GameDiagnosticIdentity {
 	readonly packageId: string;
 	readonly contentHash: string;
 	readonly gameVersion: string;
-	readonly arkiniVersion: string;
+	readonly serakkiVersion: string;
 	readonly restored: boolean;
 	readonly startedAt: string;
 }

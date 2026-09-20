@@ -5,7 +5,7 @@ import { CheatAvailabilitySchema } from "~electron/contract/cheat/CheatAvailabil
 export const readCheatAvailabilityFx = Effect.fn("readCheatAvailabilityFx")(() =>
 	Effect.tryPromise({
 		try: async () =>
-			CheatAvailabilitySchema.parse(await window.arkini.cheats.readAvailableFn()),
+			CheatAvailabilitySchema.parse(await window.serakki.cheats.readAvailableFn()),
 		catch: (cause) => cause,
 	}),
 );

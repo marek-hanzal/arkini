@@ -24,7 +24,7 @@ afterEach(async () => {
 
 describe("tx", () => {
 	it("reconciles exact live keys and reports catalog drift as typed failure", async () => {
-		const root = await mkdtemp(join(tmpdir(), "arkini-translations-"));
+		const root = await mkdtemp(join(tmpdir(), "serakki-translations-"));
 		temporaryRoots.push(root);
 		const sourceDirectory = join(root, "translations");
 		await mkdir(join(root, "src"), {

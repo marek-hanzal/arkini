@@ -5,8 +5,8 @@ import { Cause, Effect, SubscriptionRef } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
@@ -20,10 +20,10 @@ import { completeLauncherSplashAtom } from "~/launcher/atom/completeLauncherSpla
 import { retryLauncherStartupAtom } from "~/launcher/atom/retryLauncherStartupAtom";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
-const catalog: ArkpackCatalog = {
+const catalog: SerapackCatalog = {
 	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
-		SubscriptionRef.make<ArkpackCatalog.State>({
+		SubscriptionRef.make<SerapackCatalog.State>({
 			type: "loading",
 		}),
 	),
@@ -44,7 +44,7 @@ describe("LauncherStartupAtom", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		const bootstrap = vi.fn();
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "hero.png",
@@ -101,7 +101,7 @@ describe("LauncherStartupAtom", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		let attempt = 0;
 		const failure = new Error("catalog unavailable");
 		registry.set(LauncherStartupConfigAtom, {
@@ -150,7 +150,7 @@ describe("LauncherStartupAtom", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		let attempt = 0;
 		let resolveRetry!: () => void;
 		const retryGate = new Promise<void>((resolve) => {
@@ -205,7 +205,7 @@ describe("LauncherStartupAtom", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "hero.png",
 			bootstrapFx: Effect.succeed({
@@ -254,7 +254,7 @@ describe("LauncherStartupAtom", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		const started = vi.fn();
 		const interrupted = vi.fn();
 		registry.set(LauncherStartupConfigAtom, {

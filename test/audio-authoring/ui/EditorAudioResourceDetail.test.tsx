@@ -155,7 +155,7 @@ it.each([
 		});
 		const audioConstructor = vi.fn();
 		vi.stubGlobal("Audio", audioConstructor);
-		vi.stubGlobal("arkini", {
+		vi.stubGlobal("serakki", {
 			editor: {
 				saveResourceMetadataFn,
 				deleteResourceFn,

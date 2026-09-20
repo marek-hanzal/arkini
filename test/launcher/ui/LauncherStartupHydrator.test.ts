@@ -7,8 +7,8 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { StrictMode, act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
@@ -24,10 +24,10 @@ import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
-const catalog: ArkpackCatalog = {
+const catalog: SerapackCatalog = {
 	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
-		SubscriptionRef.make<ArkpackCatalog.State>({
+		SubscriptionRef.make<SerapackCatalog.State>({
 			type: "loading",
 		}),
 	),
@@ -54,7 +54,7 @@ describe("LauncherStartupHydrator", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		const bootstrap = vi.fn();
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",

@@ -102,7 +102,7 @@ const importResourcesSchema = z
 			.min(1),
 		projectId: IdSchema,
 		source: z.enum([
-			"arkpack",
+			"serapack",
 			"files",
 		]),
 		type: z.enum([

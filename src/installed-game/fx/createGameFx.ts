@@ -1,8 +1,8 @@
 import { GameplaySpeedUpMultiplier } from "~/game-cheat/constant/GameplaySpeedUpMultiplier";
 import { Effect, Semaphore } from "effect";
 import { TickFx } from "~/game-tick/service/TickFx";
-import type { ArkpackStorage } from "~/arkpack-catalog/service/ArkpackStorage";
-import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
+import type { SerapackStorage } from "~/serapack-catalog/service/SerapackStorage";
+import { loadSerapackFx } from "~/serapack-catalog/fx/loadSerapackFx";
 import type { Game } from "~/installed-game/type/Game";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
@@ -11,8 +11,8 @@ import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnost
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
-import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
-import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
+import { encodeSerakkiSaveFn } from "~/game-persistence/fn/encodeSerakkiSaveFn";
+import { decodeSerakkiSaveFx } from "~/game-persistence/fx/decodeSerakkiSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
@@ -25,7 +25,7 @@ interface GameResourceUrls {
 export namespace createGameFx {
 	export interface Props {
 		packageId: string;
-		arkpackStorage?: ArkpackStorage;
+		serapackStorage?: SerapackStorage;
 		runRendererEffectFn: installGameDiagnosticsFx.Props["runRendererEffectFn"];
 		saveStorage?: GameSaveStorage;
 	}
@@ -39,16 +39,16 @@ export namespace createGameFx {
  */
 export const createGameFx = Effect.fn("createGameFx")(function* ({
 	packageId,
-	arkpackStorage,
+	serapackStorage,
 	runRendererEffectFn,
 	saveStorage: providedSaveStorage,
 }: createGameFx.Props) {
-	const loaded = yield* loadArkpackFx({
+	const loaded = yield* loadSerapackFx({
 		packageId,
-		...(arkpackStorage === undefined
+		...(serapackStorage === undefined
 			? {}
 			: {
-					storage: arkpackStorage,
+					storage: serapackStorage,
 				}),
 	});
 	const saveStorage = providedSaveStorage ?? (yield* createElectronGameSaveStorageFx());
@@ -58,7 +58,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	const savedBytes = yield* saveStorage.readFx(saveKey);
 	let state: StateSchema.Type | undefined;
 	if (savedBytes !== null) {
-		const saved = yield* decodeArkiniSaveFx(savedBytes).pipe(
+		const saved = yield* decodeSerakkiSaveFx(savedBytes).pipe(
 			Effect.mapError(
 				(cause) =>
 					new GameSaveBootstrapError({
@@ -67,13 +67,13 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					}),
 			),
 		);
-		const arkpackVersion = readGameVersionMajorFn(loaded.payload.version);
+		const serapackVersion = readGameVersionMajorFn(loaded.payload.version);
 		const saveVersion = readGameVersionMajorFn(saved.version);
-		if (saveVersion.major !== arkpackVersion.major) {
+		if (saveVersion.major !== serapackVersion.major) {
 			return yield* Effect.fail(
 				new GameSaveBootstrapError({
 					cause: new Error(
-						`Save version ${saved.version} is incompatible with arkpack version ${loaded.payload.version}.`,
+						`Save version ${saved.version} is incompatible with serapack version ${loaded.payload.version}.`,
 					),
 					saveKey,
 				}),
@@ -98,7 +98,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			writeFx: (nextState) =>
 				saveStorage.writeFx(
 					saveKey,
-					encodeArkiniSaveFn({
+					encodeSerakkiSaveFn({
 						version: loaded.payload.version,
 						state: nextState,
 					}),
@@ -143,7 +143,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		}
 
 		const diagnostics = yield* installGameDiagnosticsFx({
-			arkpack: loaded.descriptor,
+			serapack: loaded.descriptor,
 			config: loaded.payload.config,
 			restored: state !== undefined,
 			runRendererEffectFn,
@@ -153,7 +153,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			Effect.sync(() => diagnostics.close(reason)).pipe(Effect.catchCause(() => Effect.void));
 		return {
 			...session,
-			arkpack: loaded.descriptor,
+			serapack: loaded.descriptor,
 			config: loaded.payload.config,
 			resources: loaded.payload.resources.map(({ id, type }) => ({
 				id,

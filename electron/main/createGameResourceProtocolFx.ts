@@ -66,7 +66,7 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 							JSON.parse(url.searchParams.get("resourceId") ?? "null"),
 						);
 						if (
-							url.protocol !== "arkini:" ||
+							url.protocol !== "serakki:" ||
 							url.host !== "app" ||
 							url.pathname !== "/game/resource" ||
 							!packageId ||

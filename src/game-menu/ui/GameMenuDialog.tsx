@@ -8,8 +8,8 @@ import { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";
 import { useGameMenuFocus } from "~/game-menu/ui/useGameMenuFocus";
 import { gameMenuTransition, useGameMenuMotion } from "~/game-menu/ui/useGameMenuMotion";
 
-const gameMenuBackdropViewTransitionName = "arkini-game-menu-backdrop";
-const gameMenuDialogViewTransitionName = "arkini-game-menu-dialog";
+const gameMenuBackdropViewTransitionName = "serakki-game-menu-backdrop";
+const gameMenuDialogViewTransitionName = "serakki-game-menu-dialog";
 
 interface GameMenuDialogProps extends useGameMenuMotion.Props {
 	readonly game: Game;

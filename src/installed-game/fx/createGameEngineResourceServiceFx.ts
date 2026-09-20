@@ -555,13 +555,13 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 			const validateResourceFx = Effect.fn("GameEngineAcquisitionFx.validateResourceFx")(
 				(owner: AcquisitionOwner, resource: InstalledGameEngineResource) =>
 					Effect.gen(function* () {
-						if (resource.game.arkpack.packageId === owner.packageId) {
+						if (resource.game.serapack.packageId === owner.packageId) {
 							return resource;
 						}
 						const identityFailure = new CriticalGameLifecycleError({
 							operation: "engine-ownership",
 							cause: new Error(
-								`Game Engine creation returned package ${resource.game.arkpack.packageId} for requested package ${owner.packageId}.`,
+								`Game Engine creation returned package ${resource.game.serapack.packageId} for requested package ${owner.packageId}.`,
 							),
 						});
 						const disposeExit = yield* Effect.exit(
@@ -614,7 +614,7 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 									};
 								}
 								if (state._tag === "Active") {
-									return state.resource.game.arkpack.packageId === packageId
+									return state.resource.game.serapack.packageId === packageId
 										? {
 												_tag: "Resource" as const,
 												resource: state.resource,

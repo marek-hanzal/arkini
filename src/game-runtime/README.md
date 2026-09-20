@@ -51,7 +51,7 @@ Important invariants:
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`../game-persistence/schema/StateSchema.ts`](../game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save scope, command admission, subscriptions and fail-stop | [`../game-session/fx/createGameSessionFx.ts`](../game-session/fx/createGameSessionFx.ts) |
 | `playable-game` | Package-independent Game capability, semantic Resource catalog and URLs | [`../playable-game/type/PlayableGame.ts`](../playable-game/type/PlayableGame.ts) |
-| `installed-game` | Arkpack/save bootstrap, resource leases, recovery, incident and finalization | [`../installed-game/fx/createGameEngineResourceServiceFx.ts`](../installed-game/fx/createGameEngineResourceServiceFx.ts) |
+| `installed-game` | Serapack/save bootstrap, resource leases, recovery, incident and finalization | [`../installed-game/fx/createGameEngineResourceServiceFx.ts`](../installed-game/fx/createGameEngineResourceServiceFx.ts) |
 
 ## Dependency shape
 
@@ -74,7 +74,7 @@ GameConfig or State
 → GameSessionLayerFx (Runtime + Tick)
 → createGameSessionFx (commands + subscriptions + save + disposal)
 → PlayableGame (resources and presentation guard)
-→ InstalledGame (Arkpack/save identity and process lifecycle)
+→ InstalledGame (Serapack/save identity and process lifecycle)
 ```
 
 Runtime commits are immediate. Tick, persistence, diagnostics, audio and Pixi observe committed facts and may lag without becoming truth.
@@ -107,10 +107,10 @@ Likely affected:
 Usually not affected:
 
 - Portable Editor project persistence and Version object storage.
-- Authored source parsing, compiler diagnostics or Arkpack envelope/provenance.
+- Authored source parsing, compiler diagnostics or Serapack envelope/provenance.
 - Pixi geometry and motion tuning unless the committed Runtime/Event projection changes.
 
-If a Runtime schema changes, the last two groups can become affected through State, Arkpack or renderer contracts. Follow the changed field rather than trusting this default.
+If a Runtime schema changes, the last two groups can become affected through State, Serapack or renderer contracts. Follow the changed field rather than trusting this default.
 
 Game and Editor inject the fixed `GameplaySpeedUpMultiplier` from `game-cheat` into `createGameSessionFx`, then `GameSessionLayerFx` and `TickLayerFx`. `TickLayerFx` reads the saved switches and converts the injected multiplier into the wall cadence. Each accelerated wake advances at most one ordinary 100 ms step and drops overdue accelerated wall-time debt. `GameLoopLayerFx` uses Tick's next-delay result, compensates computation time, and yields between wakes; overload slows playback instead of creating catch-up batches. Normal gameplay retains full elapsed-time replay. `advanceRuntimeElapsedFx` accepts simulation time only. Jobs, deliveries, Clock intervals and lifetimes keep their ordinary simulation-step logic; toggling speed-up never settles work. Generic sessions default to normal speed when no multiplier is supplied.
 
@@ -120,7 +120,7 @@ Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successf
 
 ### Performance diagnostics
 
-Game and Editor Board keep `tick-performance` records in `~/.arkini/diagnostics/diagnostics.jsonl` (logger `arkini.game.performance`, correlated by `sessionId`). Tick aggregates numeric counters over wall-time windows of at least one second; there is no per-step IPC, full-runtime serialization, or extra sampling timer. Closing the diagnostic session detaches its listener. Diagnostic sink failures cannot stop gameplay.
+Game and Editor Board keep `tick-performance` records in `~/.serakki/diagnostics/diagnostics.jsonl` (logger `serakki.game.performance`, correlated by `sessionId`). Tick aggregates numeric counters over wall-time windows of at least one second; there is no per-step IPC, full-runtime serialization, or extra sampling timer. Closing the diagnostic session detaches its listener. Diagnostic sink failures cannot stop gameplay.
 
 - `windowMs`, `wakes`, `advances`, `failedAdvances`: elapsed observation window, loop wakes, actual replay calls, and rejected advances. Stable no-op wakes need no replay call.
 - `advanceMs`, `maxAdvanceMs`: summed and peak Tick work in the window, measured with Effect Clock. This includes runtime acquisition/replay/commit, excludes the observer callback, and does not measure GPU rendering.

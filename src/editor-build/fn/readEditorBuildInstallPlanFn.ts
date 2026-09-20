@@ -1,4 +1,4 @@
-import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
 import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/VersionSchema";
@@ -14,20 +14,20 @@ interface EditorBuildInstallPlan {
 	readonly action: "install" | "update";
 	readonly confirmation?: EditorBuildMajorUpdateConfirmation;
 	readonly expectedCurrent: Pick<
-		ArkpackDescriptor,
+		SerapackDescriptor,
 		"packageId" | "contentHash" | "version"
 	> | null;
 }
 
 /** Classifies one exact build against the effective canonical package catalog. */
 export const readEditorBuildInstallPlanFn = ({
-	arkpacks,
+	serapacks,
 	artifact,
 }: {
-	readonly arkpacks: ReadonlyArray<ArkpackDescriptor>;
+	readonly serapacks: ReadonlyArray<SerapackDescriptor>;
 	readonly artifact: EditorProjectBuildSchema.Type;
 }): EditorBuildInstallPlan => {
-	const installed = arkpacks.find(({ packageId }) => packageId === artifact.projectId);
+	const installed = serapacks.find(({ packageId }) => packageId === artifact.projectId);
 	if (installed === undefined) {
 		return {
 			action: "install",

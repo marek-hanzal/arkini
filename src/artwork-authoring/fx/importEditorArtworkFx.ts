@@ -5,7 +5,7 @@ type ImportEditorArtworkProps =
 	| {
 			readonly file: File;
 			readonly projectId: string;
-			readonly source: "arkpack";
+			readonly source: "serapack";
 	  }
 	| {
 			readonly files: ReadonlyArray<File>;

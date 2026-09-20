@@ -55,7 +55,7 @@ it("rereads retained Notes after hard Refresh without an authoring revision chan
 			updatedAtMs: 1,
 		},
 	];
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		editor: {
 			onProjectChangedFn: () => () => undefined,
 			refreshProjectFn: async () => ({

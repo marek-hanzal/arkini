@@ -7,7 +7,7 @@ import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";
 /** Bootstraps the process-lifetime renderer listener for Electron-confirmed mode changes. */
 export const bootstrapWindowModeSyncFx = Effect.fn("bootstrapWindowModeSyncFx")(() =>
 	Effect.map(AtomRegistry.AtomRegistry, (registry) =>
-		window.arkini.window.onModeChangedFn((candidate) => {
+		window.serakki.window.onModeChangedFn((candidate) => {
 			registry.set(WindowModeAtom, WindowModeSchema.parse(candidate));
 			registry.set(WindowModeReadyAtom, true);
 		}),

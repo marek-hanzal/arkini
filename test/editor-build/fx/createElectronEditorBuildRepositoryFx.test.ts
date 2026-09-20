@@ -10,8 +10,8 @@ import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteA
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 const installBuildApi = () => {
-	const buildProject = vi.fn<Window["arkini"]["editor"]["buildProjectFn"]>();
-	Object.defineProperty(window, "arkini", {
+	const buildProject = vi.fn<Window["serakki"]["editor"]["buildProjectFn"]>();
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor: {
@@ -42,7 +42,7 @@ const createRepository = () => {
 };
 
 afterEach(() => {
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("Editor Build createElectronEditorBuildRepositoryFx", () => {

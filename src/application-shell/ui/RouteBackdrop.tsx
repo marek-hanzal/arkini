@@ -1,4 +1,4 @@
-const launcherBackdropViewTransitionName = "arkini-launcher-backdrop";
+const launcherBackdropViewTransitionName = "serakki-launcher-backdrop";
 
 interface RouteBackdropProps {
 	readonly className: string;

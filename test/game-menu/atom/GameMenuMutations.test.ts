@@ -9,7 +9,7 @@ import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererL
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { gameMenuCommandAtom } from "~/game-menu/atom/gameMenuCommandAtom";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/testGameRead";
 
@@ -32,18 +32,18 @@ const makeRegistry = () => {
 };
 
 const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void): Game => ({
-	arkpack: {
+	serapack: {
 		packageId: "package:menu",
 		contentHash: "content:menu",
 		title: "Menu game",
 		version: "1.0",
-		arkini: "1.0",
+		serakki: "1.0",
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	saveKey: {
 		packageId: "package:menu",
 	},

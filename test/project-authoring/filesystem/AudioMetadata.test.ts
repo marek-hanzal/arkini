@@ -12,7 +12,7 @@ import {
 
 let harness: ProjectTestHarness;
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-audio-metadata-");
+	harness = await createProjectTestHarness("serakki-audio-metadata-");
 });
 afterEach(async () => harness.close());
 

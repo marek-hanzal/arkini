@@ -2,7 +2,7 @@ import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import type { Completion } from "~electron/main/cli/createCompletionFx";
 import type { Installation } from "~electron/main/cli/createInstallationFx";
 import { registerCliIpcFx } from "~electron/main/cli/registerCliIpcFx";
@@ -101,14 +101,14 @@ describe("CLI installation IPC", () => {
 		);
 
 		for (const channel of [
-			ArkiniElectronApi.channels.cliStatus,
-			ArkiniElectronApi.channels.cliInstall,
-			ArkiniElectronApi.channels.cliReplace,
-			ArkiniElectronApi.channels.cliUninstall,
-			ArkiniElectronApi.channels.cliCompletionStatus,
-			ArkiniElectronApi.channels.cliCompletionInstall,
-			ArkiniElectronApi.channels.cliCompletionReplace,
-			ArkiniElectronApi.channels.cliCompletionUninstall,
+			SerakkiElectronApi.channels.cliStatus,
+			SerakkiElectronApi.channels.cliInstall,
+			SerakkiElectronApi.channels.cliReplace,
+			SerakkiElectronApi.channels.cliUninstall,
+			SerakkiElectronApi.channels.cliCompletionStatus,
+			SerakkiElectronApi.channels.cliCompletionInstall,
+			SerakkiElectronApi.channels.cliCompletionReplace,
+			SerakkiElectronApi.channels.cliCompletionUninstall,
 		]) {
 			const handler = electron.handlers.get(channel);
 			if (handler === undefined) throw new Error(`Missing ${channel}.`);

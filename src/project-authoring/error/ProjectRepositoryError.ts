@@ -15,7 +15,7 @@ export type ProjectRepositoryOperation =
 	| "delete-note"
 	| "export-json-directory"
 	| "import-json-directory"
-	| "import-arkpack"
+	| "import-serapack"
 	| "list-notes"
 	| "list-projects"
 	| "open-project-directory"

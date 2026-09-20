@@ -21,7 +21,7 @@ import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererL
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { GameMenu } from "~/game-menu/ui/GameMenu";
 import { GameMenuProvider } from "~/game-menu/ui/GameMenuProvider";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/testGameRead";
@@ -75,18 +75,18 @@ const createGame = (
 	flushSaveFx: Game["flushSaveFx"] = Effect.void,
 	cheatEnabled = false,
 ): Game => ({
-	arkpack: {
+	serapack: {
 		packageId: "package:menu",
 		contentHash: "content:menu",
 		title: "Menu game",
 		version: "1.0",
-		arkini: "1.0",
+		serakki: "1.0",
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	saveKey: {
 		packageId: "package:menu",
 	},

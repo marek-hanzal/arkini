@@ -1,5 +1,5 @@
 *.local
-.arkini/
+.serakki/
 .out/
 .DS_Store
 .env
@@ -9,7 +9,7 @@ bun.lockb
 game/schema.json
 node_modules
 .npm-cache/
-arkini-npm-cache-linux-x64-*.tgz
+serakki-npm-cache-linux-x64-*.tgz
 npm-debug.log*
 pnpm-debug.log*
 pnpm-lock.yaml

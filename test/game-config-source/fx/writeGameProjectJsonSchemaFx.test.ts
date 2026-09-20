@@ -17,12 +17,12 @@ describe("writeGameProjectJsonSchemaFx", () => {
 					reused: "inline",
 					target: "draft-2020-12",
 				}),
-				"urn:arkini:schema:game-config",
+				"urn:serakki:schema:game-config",
 				"object",
 			],
 			[
 				GameProjectJsonSchema,
-				"urn:arkini:schema:project",
+				"urn:serakki:schema:project",
 				"union",
 			],
 		] as const;
@@ -69,7 +69,7 @@ describe("writeGameProjectJsonSchemaFx", () => {
 			const schema = JSON.parse(jsonSchema);
 
 			expect(schema).toMatchObject({
-				$id: "urn:arkini:schema:project",
+				$id: "urn:serakki:schema:project",
 				anyOf: expect.any(Array),
 			});
 			expect(Object.keys(schema.$defs ?? {})).not.toContain(
@@ -82,7 +82,7 @@ describe("writeGameProjectJsonSchemaFx", () => {
 				]),
 				properties: {
 					currentSpace: {
-						$ref: expect.stringMatching(/^urn:arkini:schema:project#\/\$defs\//),
+						$ref: expect.stringMatching(/^urn:serakki:schema:project#\/\$defs\//),
 					},
 				},
 			});

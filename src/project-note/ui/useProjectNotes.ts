@@ -71,7 +71,7 @@ export const useProjectNotes = (projectId: string): useProjectNotes.Output => {
 	]);
 	useEffect(
 		() =>
-			window.arkini.editor.onProjectChangedFn((changedProjectId) => {
+			window.serakki.editor.onProjectChangedFn((changedProjectId) => {
 				if (changedProjectId !== projectId) return;
 				// Publish the next read only after any pending write has settled.
 				setRefreshRequestedFn(true);

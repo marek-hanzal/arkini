@@ -7,12 +7,12 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
 import type { Game } from "~/installed-game/type/Game";
 import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
-import { testArkpackConfig } from "~test/arkpack-support/fx/createTestArkpack";
+import { testSerapackConfig } from "~test/serapack-support/fx/createTestSerapack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,
@@ -27,18 +27,18 @@ const createGame = (
 	disposeFx: Game["disposeFx"] = Effect.void,
 	subscribeEventsFn: Game["subscribeEventsFn"] = () => () => undefined,
 ): Game => ({
-	arkpack: {
+	serapack: {
 		packageId: "package-route",
 		contentHash: "content-route",
-		title: testArkpackConfig.meta.title,
+		title: testSerapackConfig.meta.title,
 		version: "1.0",
-		arkini: ArkiniAppVersion,
+		serakki: SerakkiAppVersion,
 		provenance: {
 			type: "community",
 		} as const,
 		source: "user",
 	},
-	config: testArkpackConfig,
+	config: testSerapackConfig,
 	disposeFx,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
@@ -71,7 +71,7 @@ const createHarness = async (
 	const usesFakeTimers = vi.isFakeTimers();
 	if (usesFakeTimers) vi.useRealTimers();
 	const resource = await rendererRuntime
-		.runPromise(adoptTestGameEngineResourceFx(game.arkpack.packageId))
+		.runPromise(adoptTestGameEngineResourceFx(game.serapack.packageId))
 		.finally(() => {
 			if (usesFakeTimers) vi.useFakeTimers();
 		});
@@ -100,7 +100,7 @@ afterEach(async () => {
 	});
 	vi.useRealTimers();
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("game route lifecycle", () => {
@@ -215,7 +215,7 @@ describe("game route lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack.packageId,
+			)?.game.serapack.packageId,
 		).toBe("package-route");
 
 		await router.navigate({
@@ -229,13 +229,13 @@ describe("game route lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack.packageId,
+			)?.game.serapack.packageId,
 		).toBe("package-route");
 	});
 
 	it("releases the active Game before opening the editor", async () => {
 		vi.useFakeTimers();
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				editor: {

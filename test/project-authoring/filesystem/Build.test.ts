@@ -6,19 +6,19 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
 	createTestPngBytes,
 	createAlternateTestPngBytes,
-} from "~/../test/arkpack-support/fn/createTestPngBytes";
+} from "~/../test/serapack-support/fn/createTestPngBytes";
 import {
 	createProjectTestHarness,
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
-import { decodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
-import { encodeTestArkpackEnvelopeFx } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { decodeTestSerapackEnvelopeFx } from "~test/serapack-support/fx/testSerapackCodecFx";
+import { encodeTestSerapackEnvelopeFx } from "~test/serapack-support/fx/testSerapackCodecFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
 let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-fs-project-build-");
+	harness = await createProjectTestHarness("serakki-fs-project-build-");
 });
 
 afterEach(async () => harness.close());
@@ -153,7 +153,7 @@ describe("filesystem Editor project build", () => {
 			revision: project.revision,
 		});
 		expect(await readdir(join(root, "build"))).toEqual([
-			"project%2Ebuild.arkpack",
+			"project%2Ebuild.serapack",
 		]);
 		expect(await readFile(join(root, ".gitignore"), "utf8")).toContain("/build/\n");
 		const content = await Effect.runPromise(
@@ -185,7 +185,7 @@ describe("filesystem Editor project build", () => {
 			}),
 		);
 		expect(rebuilt.contentHash).toBe(artifact.contentHash);
-		expect(await readFile(join(root, "build", "project%2Ebuild.arkpack"))).toEqual(content);
+		expect(await readFile(join(root, "build", "project%2Ebuild.serapack"))).toEqual(content);
 	});
 
 	it("rejects changed bytes and preserves a user's existing gitignore content", async () => {
@@ -204,17 +204,17 @@ describe("filesystem Editor project build", () => {
 				expectedRevision: project.revision,
 			}),
 		);
-		const arkpackPath = join(root, "build", "project-tamper.arkpack");
+		const serapackPath = join(root, "build", "project-tamper.serapack");
 		const envelope = Effect.runSync(
-			decodeTestArkpackEnvelopeFx(new Uint8Array(await readFile(arkpackPath))),
+			decodeTestSerapackEnvelopeFx(new Uint8Array(await readFile(serapackPath))),
 		);
 		const changedPayload = envelope.payload.slice();
 		changedPayload[changedPayload.byteLength - 1] =
 			(changedPayload[changedPayload.byteLength - 1] ?? 0) ^ 1;
 		await writeFile(
-			arkpackPath,
+			serapackPath,
 			Effect.runSync(
-				encodeTestArkpackEnvelopeFx({
+				encodeTestSerapackEnvelopeFx({
 					payload: changedPayload,
 					proof: envelope.proof,
 				}),

@@ -114,7 +114,7 @@ export const useGameMenuActions = ({
 			navigateFn({
 				to: "/game/$packageId/cheats",
 				params: {
-					packageId: game.arkpack.packageId,
+					packageId: game.serapack.packageId,
 				},
 			}),
 		);
@@ -124,7 +124,7 @@ export const useGameMenuActions = ({
 			navigateFn({
 				to: "/game/$packageId/action/leave",
 				params: {
-					packageId: game.arkpack.packageId,
+					packageId: game.serapack.packageId,
 				},
 				search: {
 					destination: "main-menu",
@@ -147,7 +147,7 @@ export const useGameMenuActions = ({
 			navigateFn({
 				to: "/game/$packageId/action/reset",
 				params: {
-					packageId: game.arkpack.packageId,
+					packageId: game.serapack.packageId,
 				},
 			}),
 		);

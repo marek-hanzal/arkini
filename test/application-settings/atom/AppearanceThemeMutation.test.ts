@@ -38,7 +38,7 @@ const installDesktopAppearance = (write: (theme: AppearanceThemeSchema.Type) => 
 	Object.defineProperty(globalThis, "window", {
 		configurable: true,
 		value: {
-			arkini: {
+			serakki: {
 				appearance: {
 					writeFn: write,
 				},

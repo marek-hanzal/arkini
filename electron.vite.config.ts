@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "electron-vite";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFn } from "./electron/security/fn/createRendererDevelopmentContentSecurityPolicyFn";
-import { ArkpackDistributionChannelDefaults } from "./src/arkpack-artifact/constant/ArkpackDistributionChannel";
+import { SerapackDistributionChannelDefaults } from "./src/serapack-artifact/constant/SerapackDistributionChannel";
 
 const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),
@@ -16,9 +16,9 @@ const sourceAlias = {
 	"~shared": fileURLToPath(new URL("./shared", import.meta.url)),
 };
 const releaseIssuer =
-	process.env.ARKINI_RELEASE_ISSUER ?? ArkpackDistributionChannelDefaults.issuer;
+	process.env.SERAKKI_RELEASE_ISSUER ?? SerapackDistributionChannelDefaults.issuer;
 const releaseIdentity =
-	process.env.ARKINI_RELEASE_IDENTITY ?? ArkpackDistributionChannelDefaults.workflow;
+	process.env.SERAKKI_RELEASE_IDENTITY ?? SerapackDistributionChannelDefaults.workflow;
 new URL(releaseIssuer);
 new URL(releaseIdentity);
 
@@ -29,8 +29,8 @@ export default defineConfig(({ command }) => {
 	return {
 		main: {
 			define: {
-				__ARKINI_RELEASE_ISSUER__: JSON.stringify(releaseIssuer),
-				__ARKINI_RELEASE_IDENTITY__: JSON.stringify(releaseIdentity),
+				__SERAKKI_RELEASE_ISSUER__: JSON.stringify(releaseIssuer),
+				__SERAKKI_RELEASE_IDENTITY__: JSON.stringify(releaseIdentity),
 			},
 			resolve: {
 				alias: sourceAlias,
@@ -46,7 +46,7 @@ export default defineConfig(({ command }) => {
 					],
 					input: {
 						index: resolve("electron/main/index.ts"),
-						"cli/serakki": resolve("src/arkini-cli/arkini.ts"),
+						"cli/serakki": resolve("src/serakki-cli/serakki.ts"),
 					},
 				},
 			},

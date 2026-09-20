@@ -38,7 +38,7 @@ const RevisionSchema = z.number().int().nonnegative().meta({
 });
 
 const ProjectConfigInputSchema = z.object({}).strict().meta({
-	$id: "urn:arkini:schema:mcp:project-config-input",
+	$id: "urn:serakki:schema:mcp:project-config-input",
 	title: "Project configuration tool input",
 	description: "The project configuration read tool accepts no arguments.",
 });
@@ -52,7 +52,7 @@ const ValidateProjectInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:validate-project-input",
+		$id: "urn:serakki:schema:mcp:validate-project-input",
 		title: "Validate project tool input",
 		description: "Controls whether project validation includes warning diagnostics.",
 	});
@@ -72,7 +72,7 @@ const RenameItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:rename-item-input",
+		$id: "urn:serakki:schema:mcp:rename-item-input",
 		title: "Rename item tool input",
 		description:
 			"An item title and/or ID rename with optional Artwork synchronization and revision guard.",
@@ -84,7 +84,7 @@ const ItemDeleteImpactInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-delete-impact-input",
+		$id: "urn:serakki:schema:mcp:item-delete-impact-input",
 		title: "Item delete impact tool input",
 		description: "The item whose deletion impact should be inspected.",
 	});
@@ -100,7 +100,7 @@ const DeleteItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:delete-item-input",
+		$id: "urn:serakki:schema:mcp:delete-item-input",
 		title: "Delete item tool input",
 		description: "A revision-guarded safe or forced item deletion request.",
 	});
@@ -121,7 +121,7 @@ const EditProjectLayoutInputSchema = z
 		"At least one layout value must be supplied.",
 	)
 	.meta({
-		$id: "urn:arkini:schema:mcp:edit-project-layout-input",
+		$id: "urn:serakki:schema:mcp:edit-project-layout-input",
 		minProperties: 2,
 		title: "Edit project layout tool input",
 		description: "A revision-pinned patch of the board, inventory, and toolbar capacities.",
@@ -140,7 +140,7 @@ const SetStartItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:set-start-item-input",
+		$id: "urn:serakki:schema:mcp:set-start-item-input",
 		title: "Set start item tool input",
 		description: "One exact initial stack to insert or replace at a grid location.",
 	});
@@ -154,7 +154,7 @@ const RemoveStartItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:remove-start-item-input",
+		$id: "urn:serakki:schema:mcp:remove-start-item-input",
 		title: "Remove start item tool input",
 		description: "The exact occupied initial grid location to clear.",
 	});

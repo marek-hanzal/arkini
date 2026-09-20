@@ -57,12 +57,12 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 						const adoptionExit = yield* Effect.exit(
 							restoreFx(
 								Effect.gen(function* () {
-									if (game.arkpack.packageId !== packageId) {
+									if (game.serapack.packageId !== packageId) {
 										return yield* Effect.fail(
 											new CriticalGameLifecycleError({
 												operation: "engine-ownership",
 												cause: new Error(
-													`Game Engine creation returned package ${game.arkpack.packageId} for requested package ${packageId}.`,
+													`Game Engine creation returned package ${game.serapack.packageId} for requested package ${packageId}.`,
 												),
 											}),
 										);

@@ -31,20 +31,20 @@ export const EditorProjectProvider = ({
 		const projectId = IdSchema.parse(loaded.projectId);
 		void RendererRuntime.runPromise(
 			Effect.tryPromise({
-				try: () => window.arkini.editorMcp.setProjectContextFn(projectId),
+				try: () => window.serakki.editorMcp.setProjectContextFn(projectId),
 				catch: (cause) => cause,
 			}),
 		).catch((cause) =>
-			console.error("Arkini editor MCP project context could not be set.", cause),
+			console.error("Serakki editor MCP project context could not be set.", cause),
 		);
 		return () => {
 			void RendererRuntime.runPromise(
 				Effect.tryPromise({
-					try: () => window.arkini.editorMcp.clearProjectContextFn(projectId),
+					try: () => window.serakki.editorMcp.clearProjectContextFn(projectId),
 					catch: (cause) => cause,
 				}),
 			).catch((cause) =>
-				console.error("Arkini editor MCP project context could not be cleared.", cause),
+				console.error("Serakki editor MCP project context could not be cleared.", cause),
 			);
 		};
 	}, [
@@ -60,7 +60,7 @@ export const EditorProjectProvider = ({
 	]);
 	useLayoutEffect(() => {
 		let mounted = true;
-		const unsubscribeFn = window.arkini.editor.onProjectChangedFn((projectId) => {
+		const unsubscribeFn = window.serakki.editor.onProjectChangedFn((projectId) => {
 			if (projectId !== loaded.projectId) return;
 			void RendererRuntime.runPromise(
 				readProjectFx({
@@ -88,7 +88,7 @@ export const EditorProjectProvider = ({
 				})
 				.catch((cause) =>
 					console.error(
-						"Arkini editor project could not refresh after an MCP write.",
+						"Serakki editor project could not refresh after an MCP write.",
 						cause,
 					),
 				);

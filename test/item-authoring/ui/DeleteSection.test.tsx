@@ -109,7 +109,7 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 	const deletion = createGate<unknown>();
 	const navigation = createGate<void>();
 	const deleteItemFn = vi.fn(() => deletion.promise);
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		editor: {
 			deleteItemFn,
 		},

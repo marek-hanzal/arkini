@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemLauncherPreferencesFx } from "~electron/main/launcher/createFilesystemLauncherPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
+const preferenceDirectory = () => join(root, "serakki", "game", "preferences");
 const currentPath = () => join(preferenceDirectory(), "launcher.last-package.json");
 
 const createPreferences = () =>
@@ -18,7 +18,7 @@ const createPreferences = () =>
 	);
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-launcher-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-launcher-"));
 });
 
 afterEach(async () => {

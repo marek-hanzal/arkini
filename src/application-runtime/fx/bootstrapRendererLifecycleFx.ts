@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 
 /** Adapts and publishes the renderer process's one native lifecycle capability. */
 export const bootstrapRendererLifecycleFx = Effect.fn("bootstrapRendererLifecycleFx")(function* (
 	lifecycleApi: Pick<
-		ArkiniElectronApi.Api["lifecycle"],
+		SerakkiElectronApi.Api["lifecycle"],
 		"forceCloseFn" | "requestCloseFn" | "waitUntilVisibleFn"
 	>,
 ) {

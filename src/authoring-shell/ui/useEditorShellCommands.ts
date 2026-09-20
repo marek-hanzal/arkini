@@ -5,7 +5,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useEffect, useState } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { useEditorProjectRefreshController } from "~/authoring-session/ui/useEditorProjectRefreshController";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -14,7 +14,7 @@ import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteA
 const waitForEditorProjectWritesCommandAtom = RendererRuntime.runSync(
 	Effect.map(ProjectRepository, (repository) =>
 		Atom.fn((_, get) => {
-			const catalog = get(ArkpackCatalogOwnerAtom);
+			const catalog = get(SerapackCatalogOwnerAtom);
 			return Effect.all([
 				repository.awaitIdleFx,
 				catalog?.awaitIdleFx ?? Effect.void,
@@ -59,7 +59,7 @@ export const useEditorShellCommands = ({
 		projectId,
 	});
 
-	useEffect(() => window.arkini.lifecycle.onCloseFailedFn(() => setExitPendingFn(false)), []);
+	useEffect(() => window.serakki.lifecycle.onCloseFailedFn(() => setExitPendingFn(false)), []);
 
 	const closeFn = async () => {
 		if (exitPending || refresh.pending || writeAdmission.isNavigationBlockedFn()) return;

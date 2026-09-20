@@ -17,7 +17,7 @@ export const ItemLineOrderInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:item-line-order-input",
+		$id: "urn:serakki:schema:mcp:item-line-order-input",
 		title: "Item line order tool input",
 		description:
 			"Reorder an item's complete existing line list without changing any line values.",

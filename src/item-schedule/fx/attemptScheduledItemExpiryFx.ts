@@ -55,7 +55,7 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 		origin: context.origin,
 		output: schedule.onExpire,
 		randomSeed: [
-			"arkini:scheduled-expiry",
+			"serakki:scheduled-expiry",
 			"v1",
 			item.id,
 			item.item.id,

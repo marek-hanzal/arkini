@@ -15,7 +15,7 @@ export namespace createApplicationOwnerFx {
 const maximumResolution = 2;
 const hostGenerations = new WeakMap<HTMLElement, number>();
 
-// Arkini owns rendering explicitly. Pixi's Event/Scheduler systems may register
+// Serakki owns rendering explicitly. Pixi's Event/Scheduler systems may register
 // listeners here, but must never auto-start a process-wide idle RAF.
 Ticker.system.autoStart = false;
 Ticker.system.stop();
@@ -23,7 +23,7 @@ Ticker.system.stop();
 /**
  * Acquires one explicitly rendered Pixi application and its complete DOM/resize lifecycle.
  *
- * Arkini keeps both Pixi tickers stopped: Motion drives interpolation and every visual writer
+ * Serakki keeps both Pixi tickers stopped: Motion drives interpolation and every visual writer
  * invalidates the local demand frame owner. Closing this owner is therefore the terminal scene
  * boundary and must happen only after children release their display objects and listeners.
  */

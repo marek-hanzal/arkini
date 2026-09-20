@@ -9,9 +9,9 @@ export const resolveLauncherLeaveDestinationFn = (
 			return {
 				destination: "about",
 			};
-		case "/arkpacks":
+		case "/serapacks":
 			return {
-				destination: "arkpacks",
+				destination: "serapacks",
 			};
 		case "/settings":
 			return {

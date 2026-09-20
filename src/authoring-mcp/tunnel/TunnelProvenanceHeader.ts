@@ -1,1 +1,1 @@
-export const TunnelProvenanceHeader = "x-arkini-mcp-tunnel";
+export const TunnelProvenanceHeader = "x-serakki-mcp-tunnel";

@@ -1,0 +1,173 @@
+import { Cause, Deferred, Effect, Exit, Fiber, SubscriptionRef } from "effect";
+import { describe, expect, it } from "@effect/vitest";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
+import { createSerapackCatalogFx } from "~/serapack-catalog/fx/createSerapackCatalogFx";
+import { builtIn, imported } from "~test/serapack-catalog/fx/createSerapackCatalogFx.test/fixture";
+
+describe("createSerapackCatalogFx lifecycle", () => {
+	it.effect("keeps the ready catalog visible while a manual refresh is pending", () =>
+		Effect.gen(function* () {
+			let listAttempt = 0;
+			const refreshStarted = yield* Deferred.make<void>();
+			const finishRefresh = yield* Deferred.make<ReadonlyArray<SerapackDescriptor>>();
+			const catalog = yield* createSerapackCatalogFx({
+				listFx: Effect.suspend(() => {
+					listAttempt += 1;
+					return listAttempt === 1
+						? Effect.succeed([
+								builtIn,
+							])
+						: Deferred.succeed(refreshStarted, undefined).pipe(
+								Effect.andThen(Deferred.await(finishRefresh)),
+							);
+				}),
+			});
+			yield* catalog.refreshFx;
+
+			const refreshing = yield* catalog.refreshFx.pipe(Effect.forkChild);
+			yield* Deferred.await(refreshStarted);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				serapacks: [
+					builtIn,
+				],
+			});
+
+			yield* Deferred.succeed(finishRefresh, [
+				builtIn,
+				imported,
+			]);
+			yield* Fiber.join(refreshing);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				serapacks: [
+					builtIn,
+					imported,
+				],
+			});
+		}),
+	);
+
+	it.effect("settles a malformed import defect and permits an exact retry", () =>
+		Effect.gen(function* () {
+			let descriptors: ReadonlyArray<SerapackDescriptor> = [
+				builtIn,
+			];
+			let attempts = 0;
+			const malformed = new Error("Invalid pack: magic header mismatch.");
+			const catalog = yield* createSerapackCatalogFx({
+				listFx: Effect.sync(() => descriptors),
+				importFileFx: () =>
+					Effect.suspend(() => {
+						attempts += 1;
+						if (attempts === 1) return Effect.die(malformed);
+						descriptors = [
+							builtIn,
+							imported,
+						];
+						return Effect.succeed(imported);
+					}),
+			});
+
+			const first = yield* Effect.exit(catalog.importFileFx());
+			expect(Exit.isFailure(first)).toBe(true);
+			if (Exit.isFailure(first)) {
+				expect(Cause.hasDies(first.cause)).toBe(true);
+				expect(Cause.squash(first.cause)).toBe(malformed);
+			}
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				serapacks: [
+					builtIn,
+				],
+			});
+
+			expect(yield* catalog.importFileFx()).toBe(imported);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				serapacks: [
+					builtIn,
+					imported,
+				],
+			});
+		}),
+	);
+
+	it.effect("publishes loading before import and remove operations complete", () =>
+		Effect.gen(function* () {
+			let descriptors: ReadonlyArray<SerapackDescriptor> = [
+				builtIn,
+			];
+			const importStarted = yield* Deferred.make<void>();
+			const finishImport = yield* Deferred.make<void>();
+			const removeStarted = yield* Deferred.make<void>();
+			const finishRemove = yield* Deferred.make<void>();
+			const catalog = yield* createSerapackCatalogFx({
+				listFx: Effect.sync(() => descriptors),
+				importFileFx: () =>
+					Deferred.succeed(importStarted, undefined).pipe(
+						Effect.andThen(Deferred.await(finishImport)),
+						Effect.tap(() =>
+							Effect.sync(() => {
+								descriptors = [
+									builtIn,
+									imported,
+								];
+							}),
+						),
+						Effect.as(imported),
+					),
+				removeFx: () =>
+					Deferred.succeed(removeStarted, undefined).pipe(
+						Effect.andThen(Deferred.await(finishRemove)),
+						Effect.tap(() =>
+							Effect.sync(() => {
+								descriptors = [
+									builtIn,
+								];
+							}),
+						),
+					),
+			});
+			yield* catalog.refreshFx;
+
+			const importing = yield* catalog.importFileFx().pipe(Effect.forkChild);
+			yield* Deferred.await(importStarted);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "loading",
+			});
+			const idleSettled = yield* Deferred.make<void>();
+			const waitingForIdle = yield* catalog.awaitIdleFx.pipe(
+				Effect.andThen(Deferred.succeed(idleSettled, undefined)),
+				Effect.forkChild,
+			);
+			yield* Effect.yieldNow;
+			expect(yield* Deferred.isDone(idleSettled)).toBe(false);
+			yield* Deferred.succeed(finishImport, undefined);
+			expect(yield* Fiber.join(importing)).toBe(imported);
+			yield* Fiber.join(waitingForIdle);
+			expect(yield* Deferred.isDone(idleSettled)).toBe(true);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				serapacks: [
+					builtIn,
+					imported,
+				],
+			});
+
+			const removing = yield* catalog.removeFx(imported.packageId).pipe(Effect.forkChild);
+			yield* Deferred.await(removeStarted);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "loading",
+			});
+			yield* Deferred.succeed(finishRemove, undefined);
+			expect(yield* Fiber.join(removing)).toBeUndefined();
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				serapacks: [
+					builtIn,
+				],
+			});
+		}),
+	);
+});

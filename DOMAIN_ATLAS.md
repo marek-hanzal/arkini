@@ -1,4 +1,4 @@
-# Arkini domain atlas
+# Serakki domain atlas
 
 This is an on-demand navigation index, not another global semantic contract. Search for the exact domain, then open its local map or the smallest owning contract. The source graph and [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) remain the authority for exact imports.
 
@@ -54,7 +54,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`src/game-persistence/schema/StateSchema.ts`](src/game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save execution scope and fail-stop lifecycle | [`src/game-session/fx/createGameSessionFx.ts`](src/game-session/fx/createGameSessionFx.ts) |
 | `playable-game` | Package-independent live Game capability and resource URLs | [`src/playable-game/type/PlayableGame.ts`](src/playable-game/type/PlayableGame.ts) |
-| `installed-game` | Arkpack/save bootstrap, leases, diagnostics and finalization | [`src/installed-game/fx/createGameEngineResourceServiceFx.ts`](src/installed-game/fx/createGameEngineResourceServiceFx.ts) |
+| `installed-game` | Serapack/save bootstrap, leases, diagnostics and finalization | [`src/installed-game/fx/createGameEngineResourceServiceFx.ts`](src/installed-game/fx/createGameEngineResourceServiceFx.ts) |
 | `game-incident` | Session diagnostics, failed-session model and text rendering | [`src/game-incident/fx/installGameDiagnosticsFx.ts`](src/game-incident/fx/installGameDiagnosticsFx.ts) |
 | `game-start` | Initial placement plan and atomic empty-runtime start | [`src/game-start/fx/planStartFx.ts`](src/game-start/fx/planStartFx.ts) |
 | `runtime-identity` | Injectable opaque identity entropy, independent of seeded gameplay rolls | [`src/runtime-identity/context/RuntimeIdentityFx.ts`](src/runtime-identity/context/RuntimeIdentityFx.ts) |
@@ -115,14 +115,14 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-config-diagnostic` | Provenance-aware validation diagnostics | [`src/game-config-diagnostic/schema/GameDiagnosticsSchema.ts`](src/game-config-diagnostic/schema/GameDiagnosticsSchema.ts) |
 | `game-config-validation` | Completed-config semantic validation | [`src/game-config-validation/fx/validateGameConfigFx.ts`](src/game-config-validation/fx/validateGameConfigFx.ts) |
 | `game-config-compiler` | Deterministic source assembly and blocking gate | [`src/game-config-compiler/fx/compileGameDirectoryFx.ts`](src/game-config-compiler/fx/compileGameDirectoryFx.ts) |
-| `application-version` | Arkini writer provenance and major-only admission | [`src/application-version/fn/readArkiniVersionIncompatibilityFn.ts`](src/application-version/fn/readArkiniVersionIncompatibilityFn.ts) |
+| `application-version` | Serakki writer provenance and major-only admission | [`src/application-version/fn/readSerakkiVersionIncompatibilityFn.ts`](src/application-version/fn/readSerakkiVersionIncompatibilityFn.ts) |
 | `game-version` | Project-owned gameplay compatibility | [`src/game-version/schema/VersionSchema.ts`](src/game-version/schema/VersionSchema.ts) |
 | `filesystem-write` | Shared Node-only lock and durable write mechanics | [`src/filesystem-write/fx/createFilesystemWriteFx.ts`](src/filesystem-write/fx/createFilesystemWriteFx.ts) |
-| `arkpack-artifact` | Package bytes, envelope, compression, signing and provenance | [`src/arkpack-artifact/fx/packDirectoryFx.ts`](src/arkpack-artifact/fx/packDirectoryFx.ts) |
-| `arkpack-admission` | Bounded decode and semantic package admission | [`src/arkpack-admission/fx/readArkpackFx.ts`](src/arkpack-admission/fx/readArkpackFx.ts) |
-| `arkpack-catalog` | Renderer catalog state, storage and mutation lifecycle | [`src/arkpack-catalog/service/ArkpackCatalog.ts`](src/arkpack-catalog/service/ArkpackCatalog.ts) |
-| `arkpack-selector` | Catalog commands and package-list presentation | [`src/arkpack-selector/ui/ArkpackCatalogList.tsx`](src/arkpack-selector/ui/ArkpackCatalogList.tsx) |
-| `arkini-cli` | Product CLI, replay, diagnostic slicing and Node root | [`src/arkini-cli/arkini.ts`](src/arkini-cli/arkini.ts) |
+| `serapack-artifact` | Package bytes, envelope, compression, signing and provenance | [`src/serapack-artifact/fx/packDirectoryFx.ts`](src/serapack-artifact/fx/packDirectoryFx.ts) |
+| `serapack-admission` | Bounded decode and semantic package admission | [`src/serapack-admission/fx/readSerapackFx.ts`](src/serapack-admission/fx/readSerapackFx.ts) |
+| `serapack-catalog` | Renderer catalog state, storage and mutation lifecycle | [`src/serapack-catalog/service/SerapackCatalog.ts`](src/serapack-catalog/service/SerapackCatalog.ts) |
+| `serapack-selector` | Catalog commands and package-list presentation | [`src/serapack-selector/ui/SerapackCatalogList.tsx`](src/serapack-selector/ui/SerapackCatalogList.tsx) |
+| `serakki-cli` | Product CLI, replay, diagnostic slicing and Node root | [`src/serakki-cli/serakki.ts`](src/serakki-cli/serakki.ts) |
 
 [`CONFIG.md`](CONFIG.md) owns portable authoring semantics. [`VERSION.md`](VERSION.md) owns compatibility and external envelopes.
 
@@ -155,7 +155,7 @@ The filesystem Project Repository and Electron IPC composition are mapped in [`e
 
 | Domain | Role | First read |
 | --- | --- | --- |
-| `application-data` | Canonical system-user Arkini data root and complete path tree | [`src/application-data/fn/createArkiniUserDataPathsFn.ts`](src/application-data/fn/createArkiniUserDataPathsFn.ts) |
+| `application-data` | Canonical system-user Serakki data root and complete path tree | [`src/application-data/fn/createSerakkiUserDataPathsFn.ts`](src/application-data/fn/createSerakkiUserDataPathsFn.ts) |
 | `application-diagnostics` | Shared failure extraction, bounded formatting and transport | [`src/application-diagnostics/fn/formatApplicationDiagnosticTextFn.ts`](src/application-diagnostics/fn/formatApplicationDiagnosticTextFn.ts) |
 | `application-runtime` | Renderer ManagedRuntime, Atom bridge and native lifecycle | [`src/application-runtime/service/RendererRuntime.ts`](src/application-runtime/service/RendererRuntime.ts) |
 | `application-settings` | Appearance, Cheat availability and Settings | [`src/application-settings/atom/SettingsCommandAtom.ts`](src/application-settings/atom/SettingsCommandAtom.ts) |
@@ -167,10 +167,10 @@ The filesystem Project Repository and Electron IPC composition are mapped in [`e
 | `fuzzy-search` | App-wide exact-first Fuse search over explicit domain terms | [`src/fuzzy-search/fn/createFuzzySearchFn.ts`](src/fuzzy-search/fn/createFuzzySearchFn.ts) |
 | `ui` | Cross-product presentation primitives only | [`src/ui/ui`](src/ui/ui) |
 | `@routes` | Route registration, loaders, actions and leaf composition | [`src/@routes`](src/@routes) |
-| `electron/contract` | Pure typed renderer/main transport seam | [`electron/contract/ArkiniElectronApi.ts`](electron/contract/ArkiniElectronApi.ts) |
+| `electron/contract` | Pure typed renderer/main transport seam | [`electron/contract/SerakkiElectronApi.ts`](electron/contract/SerakkiElectronApi.ts) |
 | `electron/main` | Native window, protocol, GUI composition and privileged IPC authority | [`electron/main/electronMainFx.ts`](electron/main/electronMainFx.ts) |
 | `electron/preload` | Transport-only context bridge | [`electron/preload/index.ts`](electron/preload/index.ts) |
 | `electron/security` | Trusted URL, frame and renderer admission | [`electron/security`](electron/security) |
 | `shared` | Immutable cross-process metadata and hard limits | [`shared`](shared) |
-| `game/arkini` | Official portable game project | [`game/arkini`](game/arkini) |
+| `game/serakki` | Official portable game project | [`game/serakki`](game/serakki) |
 | `test` | Focused regression proofs mirroring production owners | [`test`](test) |

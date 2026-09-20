@@ -5,7 +5,7 @@ import { createProjectPathsFx } from "~/project-authoring/filesystem/createProje
 import { readProjectFilesFx } from "~/project-authoring/filesystem/fx/readProjectFilesFx";
 import { readProjectNotesFx } from "~/project-authoring/filesystem/fx/readProjectNotesFx";
 import { writeProjectFilesFx } from "~/project-authoring/filesystem/fx/writeProjectFilesFx";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
@@ -22,10 +22,10 @@ export const writeReimportableProjectFx = (root: string, revision: number, withA
 	writeProjectFilesFx({
 		root,
 		next: {
-			arkpack: parseVersionFn(editorTestPayload.version),
+			serapack: parseVersionFn(editorTestPayload.version),
 			config: editorTestPayload.config,
 			marker: GameProjectManifestSchema.parse({
-				arkini: ArkiniAppVersion,
+				serakki: SerakkiAppVersion,
 				revision,
 			}),
 			resources: withAudio

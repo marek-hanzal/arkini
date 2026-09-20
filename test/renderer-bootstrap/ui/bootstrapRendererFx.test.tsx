@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { bootstrapRendererFx } from "~/renderer-bootstrap/ui/bootstrapRendererFx";
 
@@ -17,13 +17,13 @@ vi.mock("react-dom/client", () => ({
 }));
 
 const installLifecycleFn = (forceCloseFn: () => void) => {
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			lifecycle: {
 				forceCloseFn,
 			},
-		} as unknown as ArkiniElectronApi.Api,
+		} as unknown as SerakkiElectronApi.Api,
 	});
 };
 

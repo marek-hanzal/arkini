@@ -44,7 +44,7 @@ vi.mock("~/game-config-resource/fx/optimizeOggOpusResourceFileFx", async () => {
 let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-fs-audio-optimize-");
+	harness = await createProjectTestHarness("serakki-fs-audio-optimize-");
 	optimizer.callFn.mockReset();
 });
 

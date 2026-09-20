@@ -2,7 +2,7 @@ import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { ElectronMainRuntime } from "~electron/main/ElectronMainRuntime";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema";
@@ -64,7 +64,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					),
 				);
 
-			handleFn(ArkiniElectronApi.channels.editorNoteList, (candidate) =>
+			handleFn(SerakkiElectronApi.channels.editorNoteList, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"list-notes",
 					ownership,
@@ -73,7 +73,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					(repository, projectId) => repository.listNotesFx(projectId),
 				),
 			);
-			handleFn(ArkiniElectronApi.channels.editorNoteCreate, (candidate) =>
+			handleFn(SerakkiElectronApi.channels.editorNoteCreate, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"create-note",
 					ownership,
@@ -82,7 +82,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					(repository, request) => repository.createNoteFx(request),
 				),
 			);
-			handleFn(ArkiniElectronApi.channels.editorNoteUpdate, (candidate) =>
+			handleFn(SerakkiElectronApi.channels.editorNoteUpdate, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"update-note",
 					ownership,
@@ -91,7 +91,7 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 					(repository, request) => repository.updateNoteFx(request),
 				),
 			);
-			handleFn(ArkiniElectronApi.channels.editorNoteDelete, (candidate) =>
+			handleFn(SerakkiElectronApi.channels.editorNoteDelete, (candidate) =>
 				executeEditorProjectRepositoryFx(
 					"delete-note",
 					ownership,
@@ -102,10 +102,10 @@ export const registerEditorNoteIpcFx = Effect.fn("registerEditorNoteIpcFx")(
 			);
 
 			return [
-				ArkiniElectronApi.channels.editorNoteList,
-				ArkiniElectronApi.channels.editorNoteCreate,
-				ArkiniElectronApi.channels.editorNoteUpdate,
-				ArkiniElectronApi.channels.editorNoteDelete,
+				SerakkiElectronApi.channels.editorNoteList,
+				SerakkiElectronApi.channels.editorNoteCreate,
+				SerakkiElectronApi.channels.editorNoteUpdate,
+				SerakkiElectronApi.channels.editorNoteDelete,
 			];
 		}),
 );

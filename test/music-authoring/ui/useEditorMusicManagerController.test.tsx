@@ -78,11 +78,11 @@ vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
 		new Map([
 			[
 				"opening-theme",
-				"arkini://app/editor/resource?resourceId=opening-theme",
+				"serakki://app/editor/resource?resourceId=opening-theme",
 			],
 			[
 				"battle-march",
-				"arkini://app/editor/resource?resourceId=battle-march",
+				"serakki://app/editor/resource?resourceId=battle-march",
 			],
 		]),
 }));

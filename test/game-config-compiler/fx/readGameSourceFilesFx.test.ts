@@ -6,7 +6,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { readGameSourceFilesFx } from "~/game-config-compiler/fx/readGameSourceFilesFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 
 describe("readGameSourceFilesFx", () => {
 	it.effect(
@@ -126,7 +126,7 @@ describe("readGameSourceFilesFx", () => {
 			yield* fileSystem.writeFileString(
 				path.join(input, "project.json"),
 				JSON.stringify({
-					arkini: ArkiniAppVersion,
+					serakki: SerakkiAppVersion,
 					revision: 1,
 				}),
 			);

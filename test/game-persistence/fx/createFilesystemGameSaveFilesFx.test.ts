@@ -10,7 +10,7 @@ import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameP
 
 let root = "";
 const first = {
-	packageId: "arkini",
+	packageId: "serakki",
 };
 const second = {
 	packageId: "second",
@@ -22,7 +22,7 @@ const demo = {
 const createRepository = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemGameSaveFilesFx({
-			root: join(root, "arkini", "game", "saves"),
+			root: join(root, "serakki", "game", "saves"),
 			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
@@ -31,7 +31,7 @@ const readNodeFileSystem = () =>
 	Effect.runPromise(FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)));
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-saves-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-saves-"));
 });
 afterEach(async () => {
 	await rm(root, {
@@ -96,7 +96,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		expect(
 			new Uint8Array(
 				await readFile(
-					join(root, "arkini", "game", "saves", demo.packageId, "current.arksave"),
+					join(root, "serakki", "game", "saves", demo.packageId, "current.serasave"),
 				),
 			),
 		).toEqual(bytes);
@@ -109,7 +109,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		const writeEntered = Effect.runSync(Deferred.make<void>());
 		const releaseWrite = Effect.runSync(Deferred.make<void>());
 		const clearEntered = Effect.runSync(Deferred.make<void>());
-		const saveDirectory = join(root, "arkini", "game", "saves", first.packageId);
+		const saveDirectory = join(root, "serakki", "game", "saves", first.packageId);
 		const gatedFileSystem: FileSystem.FileSystem = {
 			...fileSystem,
 			writeFile: (target, bytes, options) =>
@@ -167,7 +167,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				]),
 			),
 		);
-		const path = join(root, "arkini", "game", "saves", "arkini", "current.arksave");
+		const path = join(root, "serakki", "game", "saves", "serakki", "current.serasave");
 		expect(new Uint8Array(await readFile(path))).toEqual(
 			new Uint8Array([
 				9,
@@ -193,11 +193,11 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			access(
 				join(
 					root,
-					"arkini",
+					"serakki",
 					"game",
 					"saves",
 					encodeGameProjectFileStemFn(encoded.packageId),
-					"current.arksave",
+					"current.serasave",
 				),
 			),
 		).resolves.toBeUndefined();
@@ -214,7 +214,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			),
 		).rejects.toMatchObject({
 			_tag: "GameSaveFilesError",
-			operation: "Invalid Arkini save identity",
+			operation: "Invalid Serakki save identity",
 		});
 	});
 });

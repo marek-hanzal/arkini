@@ -10,7 +10,7 @@ class GameSaveFilesError extends Data.TaggedError("GameSaveFilesError")<{
 	readonly operation:
 		| "access game save"
 		| "clear game save"
-		| "Invalid Arkini save identity"
+		| "Invalid Serakki save identity"
 		| "read game save"
 		| "write game save";
 	readonly cause: unknown;
@@ -43,7 +43,7 @@ const readGameSaveDirectoryNameFx = Effect.fn("readGameSaveDirectoryNameFx")(fun
 	if (parsed.success) return encodeGameProjectFileStemFn(parsed.data);
 	return yield* Effect.fail(
 		new GameSaveFilesError({
-			operation: "Invalid Arkini save identity",
+			operation: "Invalid Serakki save identity",
 			cause: key,
 		}),
 	);
@@ -69,7 +69,7 @@ const readGameSaveFx = ({
 	readonly directoryName: string;
 }) =>
 	Effect.gen(function* () {
-		const path = join(root, directoryName, "current.arksave");
+		const path = join(root, directoryName, "current.serasave");
 		if (!(yield* fileSystem.exists(path))) return null;
 		return Uint8Array.from(yield* fileSystem.readFile(path));
 	}).pipe(Effect.mapError(mapGameSaveFilesErrorFn("read game save")));
@@ -89,7 +89,7 @@ const writeGameSaveFx = ({
 		Effect.flatMap((directoryName) =>
 			filesystemWrite.replaceFileFx({
 				lock: join(root, `.${directoryName}.lock`),
-				target: join(root, directoryName, "current.arksave"),
+				target: join(root, directoryName, "current.serasave"),
 				bytes,
 			}),
 		),

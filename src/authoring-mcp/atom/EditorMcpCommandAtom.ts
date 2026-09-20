@@ -9,7 +9,7 @@ import { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOvervie
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 const readEditorMcpOverviewFx = Effect.tryPromise({
-	try: async () => EditorMcpOverviewSchema.parse(await window.arkini.editorMcp.readOverviewFn()),
+	try: async () => EditorMcpOverviewSchema.parse(await window.serakki.editorMcp.readOverviewFn()),
 	catch: (cause) => cause,
 });
 
@@ -22,7 +22,7 @@ const configureEditorMcpFx = Effect.fn("configureEditorMcpFx")((candidate: unkno
 			Effect.tryPromise({
 				try: async () =>
 					EditorMcpOverviewSchema.parse(
-						await window.arkini.editorMcp.configureFn(configuration),
+						await window.serakki.editorMcp.configureFn(configuration),
 					),
 				catch: (cause) => cause,
 			}),
@@ -39,7 +39,7 @@ const executeEditorMcpCommandFx = Effect.fn("executeEditorMcpCommandFx")((candid
 			Effect.tryPromise({
 				try: async () =>
 					EditorMcpCommandResultSchema.parse(
-						await window.arkini.editorMcp.commandFn(command),
+						await window.serakki.editorMcp.commandFn(command),
 					),
 				catch: (cause) => cause,
 			}),

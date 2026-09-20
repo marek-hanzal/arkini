@@ -112,7 +112,7 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 		});
 		const handler = createMcpHandler(factory.create);
 		const boundNodeHandlerFn = toNodeHandler(handler, {
-			onerror: (error) => console.error("Arkini editor MCP request failed.", error),
+			onerror: (error) => console.error("Serakki editor MCP request failed.", error),
 		});
 		const listener = createServer((request, response) => {
 			let pathname: string;
@@ -162,7 +162,7 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 					handler
 						.close()
 						.catch((error) =>
-							console.error("Arkini editor MCP handler could not close.", error),
+							console.error("Serakki editor MCP handler could not close.", error),
 						),
 				),
 			),
@@ -194,7 +194,7 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 			void mcpHandler
 				?.close()
 				.catch((error) =>
-					console.error("Arkini editor MCP handler could not close.", error),
+					console.error("Serakki editor MCP handler could not close.", error),
 				);
 			mcpHandler = undefined;
 			nodeHandlerFn = undefined;

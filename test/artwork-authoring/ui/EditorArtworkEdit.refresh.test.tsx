@@ -99,7 +99,7 @@ it("drains admitted artwork validation, commit and publication before hard Refre
 			),
 		},
 	}));
-	vi.stubGlobal("arkini", {
+	vi.stubGlobal("serakki", {
 		file: {
 			readPathFn: () => "/tmp/replacement.png",
 		},

@@ -12,7 +12,7 @@ const mcpState = vi.hoisted(
 		overview: {
 			port: 32_310,
 			ngrokDomain: "stable-example.ngrok-free.app",
-			remotePassword: "arkini_mcp_generated",
+			remotePassword: "serakki_mcp_generated",
 			local: {
 				type: "inactive" as const,
 			},
@@ -26,7 +26,7 @@ const mcpState = vi.hoisted(
 
 beforeEach(() => {
 	vi.stubGlobal("window", {
-		arkini: {
+		serakki: {
 			editorMcp: {
 				commandFn: async () => ({
 					overview: mcpState.overview,
@@ -75,7 +75,7 @@ describe("EditorMcpCommandAtom", () => {
 			expect(registry.get(EditorMcpCommandAtom)).toMatchObject({
 				kind: "ready",
 				overview: {
-					remotePassword: "arkini_mcp_generated",
+					remotePassword: "serakki_mcp_generated",
 				},
 			}),
 		);
@@ -94,7 +94,7 @@ describe("EditorMcpCommandAtom", () => {
 		expect(await waitForReady(registry)).toMatchObject({
 			kind: "ready",
 			overview: {
-				remotePassword: "arkini_mcp_generated",
+				remotePassword: "serakki_mcp_generated",
 				remote: {
 					type: "unavailable",
 				},

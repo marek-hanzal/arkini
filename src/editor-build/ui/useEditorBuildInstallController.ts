@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { useState } from "react";
 
-import { CatalogAtom } from "~/arkpack-catalog/atom/CatalogAtom";
+import { CatalogAtom } from "~/serapack-catalog/atom/CatalogAtom";
 import {
 	type EditorBuildMajorUpdateConfirmation,
 	readEditorBuildInstallPlanFn,
@@ -41,7 +41,7 @@ export const useEditorBuildInstallController = ({
 	const installPlan =
 		artifact !== undefined && catalogState.type === "ready"
 			? readEditorBuildInstallPlanFn({
-					arkpacks: catalogState.arkpacks,
+					serapacks: catalogState.serapacks,
 					artifact,
 				})
 			: undefined;

@@ -19,8 +19,8 @@ export const ReplaceItemLineInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "urn:arkini:schema:mcp:replace-item-line-input",
-		$id: "urn:arkini:schema:mcp:replace-item-line-input",
+		id: "urn:serakki:schema:mcp:replace-item-line-input",
+		$id: "urn:serakki:schema:mcp:replace-item-line-input",
 		title: "Replace item line tool input",
 		description: "Item identity, line identity, revision, and complete replacement line.",
 	});

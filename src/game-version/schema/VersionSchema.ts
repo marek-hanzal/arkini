@@ -15,8 +15,8 @@ export const VersionSchema = z
 		);
 	}, "Version components must be safe non-negative integers.")
 	.meta({
-		id: "ArkpackVersionSchema",
-		description: "The arkpack gameplay compatibility version.",
+		id: "SerapackVersionSchema",
+		description: "The serapack gameplay compatibility version.",
 	});
 
 export type VersionSchema = typeof VersionSchema;

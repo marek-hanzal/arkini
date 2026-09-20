@@ -32,7 +32,7 @@ afterEach(async () => {
 	for (const registry of registries.splice(0)) registry.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("Cheat availability Atom", () => {
@@ -144,7 +144,7 @@ describe("Cheat availability Atom", () => {
 	it("publishes a changed value only after persistence succeeds", async () => {
 		const gate = Effect.runSync(Deferred.make<void>());
 		const writeAvailable = vi.fn(() => Effect.runPromise(Deferred.await(gate)));
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				cheats: {
@@ -176,7 +176,7 @@ describe("Cheat availability Atom", () => {
 
 	it("keeps the published value unchanged when persistence fails", async () => {
 		const failure = new Error("cheat preference write failed");
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				cheats: {
@@ -214,7 +214,7 @@ describe("Cheat availability Atom", () => {
 					});
 				}),
 		);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				cheats: {

@@ -6,11 +6,11 @@ describe("formatGameDiagnosticValueTextFn", () => {
 	it("removes physical Unix, file URL, and Windows paths from rendered diagnostics", () => {
 		const text = formatGameDiagnosticValueTextFn({
 			nested: {
-				"/Users/private-name/Project/arkini/secret.txt": "failed",
+				"/Users/private-name/Project/serakki/secret.txt": "failed",
 			},
-			unix: "/Users/private-name/Project/arkini/src/game.ts:12:4",
-			url: "file:///Users/private-name/Project/arkini/src/game.ts:12:4",
-			windows: "C:\\Users\\private-name\\Project\\arkini\\src\\game.ts:12:4",
+			unix: "/Users/private-name/Project/serakki/src/game.ts:12:4",
+			url: "file:///Users/private-name/Project/serakki/src/game.ts:12:4",
+			windows: "C:\\Users\\private-name\\Project\\serakki\\src\\game.ts:12:4",
 		});
 
 		expect(text).not.toContain("private-name");

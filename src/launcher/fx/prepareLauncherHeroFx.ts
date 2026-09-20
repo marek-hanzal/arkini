@@ -1,8 +1,8 @@
 import { Effect } from "effect";
-import { loadArkpackFx } from "~/arkpack-catalog/fx/loadArkpackFx";
+import { loadSerapackFx } from "~/serapack-catalog/fx/loadSerapackFx";
 import { readLastPackageIdFx } from "~/installed-game/fx/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/launcher/fx/preloadLauncherHeroFx";
-import type { LoadedArkpackResource } from "~/arkpack-catalog/fx/readArkpackCandidatesFx";
+import type { LoadedSerapackResource } from "~/serapack-catalog/fx/readSerapackCandidatesFx";
 
 interface PrepareLauncherHeroProps {
 	readonly fallbackUrl: string;
@@ -16,12 +16,14 @@ const readHeroResourceFx = Effect.fn("prepareLauncherHeroFx.readResourceFx")(fun
 	readonly config: {
 		readonly resources: Readonly<Record<string, string>>;
 	};
-	readonly resources: ReadonlyArray<LoadedArkpackResource>;
+	readonly resources: ReadonlyArray<LoadedSerapackResource>;
 }) {
 	const resourceId = payload.config.resources.hero;
 	const resource = payload.resources.find((candidate) => candidate.id === resourceId);
 	if (resource === undefined) {
-		return yield* Effect.fail(new Error(`Arkpack Hero resource ${resourceId} is unavailable.`));
+		return yield* Effect.fail(
+			new Error(`Serapack Hero resource ${resourceId} is unavailable.`),
+		);
 	}
 	return resource;
 });
@@ -36,7 +38,7 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 					url: fallbackUrl,
 				} satisfies PreparedLauncherHero;
 			}
-			const loaded = yield* loadArkpackFx({
+			const loaded = yield* loadSerapackFx({
 				packageId,
 			});
 			const resource = yield* readHeroResourceFx(loaded.payload);

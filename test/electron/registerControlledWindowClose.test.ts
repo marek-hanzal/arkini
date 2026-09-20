@@ -1,7 +1,7 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import { registerControlledWindowCloseFx } from "~electron/main/registerControlledWindowCloseFx";
 import type { TrustedRenderer } from "~electron/main/security/TrustedRenderer";
 
@@ -14,7 +14,7 @@ const createHarness = () => {
 	const ipcListeners = new Map<string, Set<IpcListener>>();
 	const send = vi.fn();
 	const mainFrameState = {
-		url: "arkini://app/",
+		url: "serakki://app/",
 	};
 	const mainFrame = mainFrameState as WebFrameMain;
 	const close = vi.fn();
@@ -58,7 +58,7 @@ const createHarness = () => {
 		isTrustedIpcSenderFn: (event: IpcMainEvent) =>
 			event.sender.id === 17 &&
 			event.senderFrame === mainFrame &&
-			mainFrame.url.startsWith("arkini://app/"),
+			mainFrame.url.startsWith("serakki://app/"),
 	} as TrustedRenderer;
 	Effect.runSync(
 		registerControlledWindowCloseFx({
@@ -105,10 +105,10 @@ describe("registerControlledWindowCloseFx", () => {
 		const preventDefault = harness.requestClose();
 
 		expect(preventDefault).toHaveBeenCalledOnce();
-		expect(harness.send).toHaveBeenCalledWith(ArkiniElectronApi.channels.beforeClose);
+		expect(harness.send).toHaveBeenCalledWith(SerakkiElectronApi.channels.beforeClose);
 		expect(harness.close).not.toHaveBeenCalled();
 
-		harness.emitIpc(ArkiniElectronApi.channels.closeReady);
+		harness.emitIpc(SerakkiElectronApi.channels.closeReady);
 		expect(harness.close).toHaveBeenCalledOnce();
 		const recursiveClose = harness.requestClose();
 		expect(recursiveClose).not.toHaveBeenCalled();
@@ -118,35 +118,35 @@ describe("registerControlledWindowCloseFx", () => {
 		const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const harness = createHarness();
 		harness.requestClose();
-		harness.emitIpc(ArkiniElectronApi.channels.closeFailed, "disk full");
+		harness.emitIpc(SerakkiElectronApi.channels.closeFailed, "disk full");
 
 		expect(harness.close).not.toHaveBeenCalled();
 		expect(consoleError).toHaveBeenCalledWith(
-			"Arkini renderer controlled-close orchestration failed:",
+			"Serakki renderer controlled-close orchestration failed:",
 			"disk full",
 		);
 
 		harness.requestClose();
 		expect(harness.send).toHaveBeenCalledTimes(2);
-		harness.emitIpc(ArkiniElectronApi.channels.closeReady);
+		harness.emitIpc(SerakkiElectronApi.channels.closeReady);
 		expect(harness.close).toHaveBeenCalledOnce();
 	});
 	it("routes an explicit renderer retry through the same guarded close handshake", () => {
 		const harness = createHarness();
-		harness.emitIpc(ArkiniElectronApi.channels.requestClose);
+		harness.emitIpc(SerakkiElectronApi.channels.requestClose);
 		expect(harness.close).toHaveBeenCalledOnce();
 
 		const preventDefault = harness.requestClose();
 		expect(preventDefault).toHaveBeenCalledOnce();
-		expect(harness.send).toHaveBeenCalledWith(ArkiniElectronApi.channels.beforeClose);
+		expect(harness.send).toHaveBeenCalledWith(SerakkiElectronApi.channels.beforeClose);
 	});
 
 	it("allows an explicit force-close decision without another save acknowledgement", () => {
 		const harness = createHarness();
 		harness.requestClose();
-		harness.emitIpc(ArkiniElectronApi.channels.closeFailed, "disk full");
+		harness.emitIpc(SerakkiElectronApi.channels.closeFailed, "disk full");
 
-		harness.emitIpc(ArkiniElectronApi.channels.forceClose);
+		harness.emitIpc(SerakkiElectronApi.channels.forceClose);
 		expect(harness.close).toHaveBeenCalledOnce();
 		const preventDefault = harness.requestClose();
 		expect(preventDefault).not.toHaveBeenCalled();
@@ -156,9 +156,9 @@ describe("registerControlledWindowCloseFx", () => {
 		const harness = createHarness();
 		harness.setMainFrameUrl("https://example.com/");
 
-		harness.emitIpc(ArkiniElectronApi.channels.requestClose);
-		harness.emitIpc(ArkiniElectronApi.channels.forceClose);
-		harness.emitIpc(ArkiniElectronApi.channels.closeReady);
+		harness.emitIpc(SerakkiElectronApi.channels.requestClose);
+		harness.emitIpc(SerakkiElectronApi.channels.forceClose);
+		harness.emitIpc(SerakkiElectronApi.channels.closeReady);
 
 		expect(harness.close).not.toHaveBeenCalled();
 	});

@@ -12,8 +12,8 @@ export const ItemFileSchema = z
 	.strict()
 	.meta({
 		id: "ItemFileSchema",
-		$id: "urn:arkini:schema:item-file",
-		title: "Arkini item source file",
+		$id: "urn:serakki:schema:item-file",
+		title: "Serakki item source file",
 		description: "One item stored at items/<encoded uid>.json.",
 	});
 

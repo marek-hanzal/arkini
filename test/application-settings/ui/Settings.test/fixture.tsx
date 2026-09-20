@@ -66,7 +66,7 @@ afterEach(async () => {
 	for (const registry of registries.splice(0)) registry.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 const createDeferred = () => {
@@ -182,7 +182,7 @@ export const renderSettings = async (
 		configurable: true,
 		value: vi.fn(),
 	});
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			cli: {
@@ -226,12 +226,12 @@ export const renderSettings = async (
 		});
 		const createdGame: Game = {
 			...session,
-			arkpack: {
+			serapack: {
 				packageId: "package:settings",
 				contentHash: "content:settings",
 				title: "Settings game",
 				version: "1.0",
-				arkini: "1.0",
+				serakki: "1.0",
 				provenance: {
 					type: "community",
 				} as const,
@@ -250,7 +250,7 @@ export const renderSettings = async (
 		runtimeHarnesses.push(runtimeHarness);
 		game = (
 			await runtimeHarness.rendererRuntime.runPromise(
-				adoptTestGameEngineResourceFx(createdGame.arkpack.packageId),
+				adoptTestGameEngineResourceFx(createdGame.serapack.packageId),
 			)
 		).game;
 	}

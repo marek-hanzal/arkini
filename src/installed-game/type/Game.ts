@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
@@ -8,7 +8,7 @@ import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage
 /** One loaded game instance exclusively owned by its package route resource. */
 export interface Game extends PlayableGame {
 	/** Exact package identity and launcher metadata for this live game. */
-	readonly arkpack: ArkpackDescriptor;
+	readonly serapack: SerapackDescriptor;
 	/** Stable filesystem save identity owned by this live game. */
 	readonly saveKey: GameSaveStorage.Key;
 	/** Pending first-game welcome; stays acknowledged across scene remounts in this session. */

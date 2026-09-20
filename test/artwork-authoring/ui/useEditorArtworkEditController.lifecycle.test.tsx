@@ -13,7 +13,7 @@ import type { EditorUnsavedChangesSession } from "~/authoring-session/service/Ed
 import {
 	createTestPngBytes,
 	installTestPngDecoder,
-} from "~test/arkpack-support/fn/createTestPngBytes";
+} from "~test/serapack-support/fn/createTestPngBytes";
 import {
 	editorTestResources,
 	editorTestPayload,

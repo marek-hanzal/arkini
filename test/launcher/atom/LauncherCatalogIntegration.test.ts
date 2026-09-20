@@ -6,10 +6,10 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkiniDefaultPackageId } from "~shared/ArkiniAppMetadata";
-import { CatalogAtom } from "~/arkpack-catalog/atom/CatalogAtom";
-import { ArkpackCatalogOwnerAtom } from "~/arkpack-catalog/atom/ArkpackCatalogOwnerAtom";
-import { createArkpackCatalogFx } from "~/arkpack-catalog/fx/createArkpackCatalogFx";
+import { SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
+import { CatalogAtom } from "~/serapack-catalog/atom/CatalogAtom";
+import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
+import { createSerapackCatalogFx } from "~/serapack-catalog/fx/createSerapackCatalogFx";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
@@ -52,7 +52,7 @@ describe("Launcher catalog integration", () => {
 	it("reaches the launcher with an empty catalog so the user can repair it", async () => {
 		const list = vi.fn(() => []);
 		const catalog = Effect.runSync(
-			createArkpackCatalogFx({
+			createSerapackCatalogFx({
 				listFx: Effect.sync(list),
 			}),
 		);
@@ -61,7 +61,7 @@ describe("Launcher catalog integration", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(
 			RendererLifecycleOwnerAtom,
 			Effect.runSync(
@@ -86,11 +86,11 @@ describe("Launcher catalog integration", () => {
 
 		const startup = registry.get(LauncherStartupAtom);
 		if (!AsyncResult.isSuccess(startup)) throw new Error("Expected successful startup.");
-		expect(startup.value.defaultPackageId).toBe(ArkiniDefaultPackageId);
-		expect(registry.get(ArkpackCatalogOwnerAtom)).toBe(catalog);
+		expect(startup.value.defaultPackageId).toBe(SerakkiDefaultPackageId);
+		expect(registry.get(SerapackCatalogOwnerAtom)).toBe(catalog);
 		expect(registry.get(CatalogAtom)).toEqual({
 			type: "ready",
-			arkpacks: [],
+			serapacks: [],
 		});
 		expect(list).toHaveBeenCalledOnce();
 	});

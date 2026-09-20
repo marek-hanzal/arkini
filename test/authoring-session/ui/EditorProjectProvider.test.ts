@@ -33,7 +33,7 @@ beforeEach(() => {
 	clearProjectContext.mockClear();
 	readProject.mockReset();
 	projectChangedListener = undefined;
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor: {
@@ -59,7 +59,7 @@ afterEach(async () => {
 	});
 	for (const registry of registries.splice(0)) registry.dispose();
 	document.body.replaceChildren();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 const createProject = (revision: number, projectId = "project"): Project => ({

@@ -11,7 +11,7 @@ const EditorServiceReadinessTimeoutMs = 2_000;
 
 afterEach(() => {
 	vi.useRealTimers();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 describe("refreshEditorServiceStatusFx", () => {
@@ -19,7 +19,7 @@ describe("refreshEditorServiceStatusFx", () => {
 		const status = {
 			type: "ready" as const,
 		};
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				editor: {
@@ -44,7 +44,7 @@ describe("refreshEditorServiceStatusFx", () => {
 
 	it("publishes unavailable when status IPC never settles", async () => {
 		vi.useFakeTimers();
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				editor: {
@@ -71,7 +71,7 @@ describe("refreshEditorServiceStatusFx", () => {
 	});
 
 	it("publishes unavailable and succeeds when status IPC rejects", async () => {
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				editor: {

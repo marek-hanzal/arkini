@@ -6,14 +6,14 @@ import { Effect } from "effect";
 
 import { GameIncidentFiles } from "~shared/GameIncidentMetadata";
 import { writeLatestGameIncidentFx } from "~electron/main/incident/writeLatestGameIncidentFx";
-import { readArkpackArtifactNameFn } from "~/arkpack-artifact/fn/readArkpackArtifactNameFn";
-import { readArkpackFileLayoutFx } from "~/arkpack-artifact/fx/readArkpackFileLayoutFx";
-import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackArtifactNameFn";
+import { readSerapackFileLayoutFx } from "~/serapack-artifact/fx/readSerapackFileLayoutFx";
+import { createTestSerapack } from "~test/serapack-support/fx/createTestSerapack";
 
 let root = "";
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-incident-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-incident-"));
 });
 
 afterEach(async () => {
@@ -24,28 +24,28 @@ afterEach(async () => {
 });
 
 describe("latest game incident files", () => {
-	it("hard-overwrites the fixed Arkpack, save, and themed diagnostic environment", async () => {
-		const bundledArkpacksRoot = join(root, "bundled");
-		const userArkpacksRoot = join(root, "user");
+	it("hard-overwrites the fixed Serapack, save, and themed diagnostic environment", async () => {
+		const bundledSerapacksRoot = join(root, "bundled");
+		const userSerapacksRoot = join(root, "user");
 		const packageId = "game:test";
-		const arkpackPath = join(userArkpacksRoot, readArkpackArtifactNameFn(packageId));
-		await mkdir(userArkpacksRoot, {
+		const serapackPath = join(userSerapacksRoot, readSerapackArtifactNameFn(packageId));
+		await mkdir(userSerapacksRoot, {
 			recursive: true,
 		});
-		let latestArkpack = new Uint8Array();
+		let latestSerapack = new Uint8Array();
 		for (const marker of [
 			1,
 			2,
 		]) {
-			latestArkpack = createTestArkpack(undefined, packageId, marker === 1 ? "1.0" : "1.1");
-			await writeFile(arkpackPath, latestArkpack);
-			const layout = await Effect.runPromise(readArkpackFileLayoutFx(arkpackPath));
+			latestSerapack = createTestSerapack(undefined, packageId, marker === 1 ? "1.0" : "1.1");
+			await writeFile(serapackPath, latestSerapack);
+			const layout = await Effect.runPromise(readSerapackFileLayoutFx(serapackPath));
 			await Effect.runPromise(
 				writeLatestGameIncidentFx({
-					bundledArkpacksRoot,
+					bundledSerapacksRoot,
 					incidentsRoot: root,
 					incident: {
-						arkpack: {
+						serapack: {
 							packageId,
 							contentHash: layout.contentHash,
 							source: "user",
@@ -58,7 +58,7 @@ describe("latest game incident files", () => {
 							runtimeState: `# Runtime ${marker}`,
 						},
 					},
-					userArkpacksRoot,
+					userSerapacksRoot,
 				}),
 			);
 			if (marker === 1) {
@@ -70,8 +70,8 @@ describe("latest game incident files", () => {
 		}
 
 		const directory = join(root, GameIncidentFiles.directory);
-		expect(await readFile(join(directory, GameIncidentFiles.arkpack))).toEqual(
-			Buffer.from(latestArkpack),
+		expect(await readFile(join(directory, GameIncidentFiles.serapack))).toEqual(
+			Buffer.from(latestSerapack),
 		);
 		expect(await readFile(join(directory, GameIncidentFiles.save))).toEqual(
 			Buffer.from([

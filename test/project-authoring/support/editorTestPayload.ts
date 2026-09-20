@@ -1,10 +1,10 @@
 import {
 	createAlternateTestPngBytes,
 	createTestPngBytes,
-} from "~/../test/arkpack-support/fn/createTestPngBytes";
+} from "~/../test/serapack-support/fn/createTestPngBytes";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ArkiniAppVersion } from "~shared/ArkiniAppMetadata";
-import type { TestArkpackPayload } from "~test/arkpack-support/fx/testArkpackCodecFx";
+import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import type { TestSerapackPayload } from "~test/serapack-support/fx/testSerapackCodecFx";
 
 export const editorTestConfig = GameConfigSchema.parse({
 	resources: {
@@ -55,9 +55,9 @@ export const editorTestConfig = GameConfigSchema.parse({
 	},
 });
 
-export const editorTestPayload: TestArkpackPayload = {
+export const editorTestPayload: TestSerapackPayload = {
 	version: "1.0",
-	arkini: ArkiniAppVersion,
+	serakki: SerakkiAppVersion,
 	config: editorTestConfig,
 	resources: [
 		{

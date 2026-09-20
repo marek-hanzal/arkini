@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemAppearancePreferencesFx } from "~electron/main/appearance/createFilesystemAppearancePreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
+const preferenceDirectory = () => join(root, "serakki", "game", "preferences");
 const themePath = () => join(preferenceDirectory(), "appearance.theme.json");
 const accentPath = () => join(preferenceDirectory(), "appearance.accent.json");
 
@@ -19,7 +19,7 @@ const createPreferences = () =>
 	);
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-appearance-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-appearance-"));
 });
 
 afterEach(async () => {

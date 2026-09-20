@@ -247,7 +247,7 @@ describe("editor MCP item creation", () => {
 				.items["item:committed"],
 		).toBeDefined();
 		expect(consoleError).toHaveBeenCalledWith(
-			"Arkini editor could not announce an MCP project mutation.",
+			"Serakki editor could not announce an MCP project mutation.",
 			expect.anything(),
 		);
 	});

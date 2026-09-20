@@ -58,7 +58,7 @@ export const Route = createFileRoute("/_launcher/settings/dev")({
 				<SettingsOpenActionRow
 					dataUi="SettingsUserData"
 					title="Application data"
-					description="Open Serakki's data root containing editor projects, Arkpacks, saves, preferences, and logs."
+					description="Open Serakki's data root containing editor projects, Serapacks, saves, preferences, and logs."
 					pending={directories.userDataStatus.kind === "pending"}
 					idleLabel="Open data folder"
 					onClickFn={directories.openUserDataFn}

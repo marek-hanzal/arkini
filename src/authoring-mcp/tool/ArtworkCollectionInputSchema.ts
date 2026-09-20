@@ -19,7 +19,7 @@ export const ArtworkCollectionInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:arkini:schema:mcp:artwork-collection-input",
+		$id: "urn:serakki:schema:mcp:artwork-collection-input",
 		title: "Artwork collection tool input",
 		description: "Pagination, usage filtering, and search for Artwork resources.",
 	});

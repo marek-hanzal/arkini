@@ -32,8 +32,8 @@ describe("game load action lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack,
-		).toBe(game.arkpack);
+			)?.game.serapack,
+		).toBe(game.serapack);
 	});
 
 	it("repairs a direct Board entry through the same explicit load action", async () => {
@@ -48,8 +48,8 @@ describe("game load action lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack,
-		).toBe(game.arkpack);
+			)?.game.serapack,
+		).toBe(game.serapack);
 	});
 
 	it("cancels an unfinished route-owned creation when navigation leaves the load action", async () => {
@@ -152,7 +152,7 @@ describe("game load action lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack.packageId,
+			)?.game.serapack.packageId,
 		).toBe(nextPackageId);
 	});
 });

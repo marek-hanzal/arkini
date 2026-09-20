@@ -52,12 +52,12 @@ const makeGame = (
 	suffix: string,
 ): Game => ({
 	...session,
-	arkpack: {
+	serapack: {
 		packageId: `package:spawn-${suffix}`,
 		contentHash: `content:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
 		version: "1.0",
-		arkini: "1.0",
+		serakki: "1.0",
 		provenance: {
 			type: "community",
 		} as const,

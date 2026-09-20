@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
-import { ArkiniElectronApi as ArkiniElectronContract } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
+import { SerakkiElectronApi as SerakkiElectronContract } from "~electron/contract/SerakkiElectronApi";
 
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (...args: Array<unknown>) => unknown>();
-	let exposed: ArkiniElectronApi.Api | undefined;
+	let exposed: SerakkiElectronApi.Api | undefined;
 	return {
 		handlers,
 		contextBridge: {
-			exposeInMainWorld: vi.fn((_name: string, api: ArkiniElectronApi.Api) => {
+			exposeInMainWorld: vi.fn((_name: string, api: SerakkiElectronApi.Api) => {
 				exposed = api;
 			}),
 		},
@@ -46,25 +46,25 @@ const loadPreload = async () => {
 };
 
 const requestBeforeClose = async () => {
-	const handler = electron.handlers.get(ArkiniElectronContract.channels.beforeClose);
+	const handler = electron.handlers.get(SerakkiElectronContract.channels.beforeClose);
 	if (handler === undefined) throw new Error("Expected before-close listener registration.");
 	await handler();
 };
 
 const reportWindowVisible = () => {
-	const handler = electron.handlers.get(ArkiniElectronContract.channels.windowVisible);
+	const handler = electron.handlers.get(SerakkiElectronContract.channels.windowVisible);
 	if (handler === undefined) throw new Error("Expected window-visible listener registration.");
 	handler();
 };
 
 const reportEditorProjectChanged = (projectId: string) => {
-	const handler = electron.handlers.get(ArkiniElectronContract.channels.editorProjectChanged);
+	const handler = electron.handlers.get(SerakkiElectronContract.channels.editorProjectChanged);
 	if (handler === undefined) throw new Error("Expected editor-project listener registration.");
 	handler(undefined, projectId);
 };
 
 const reportEditorResourceOptimizationProgress = (
-	progress: ArkiniElectronApi.Api["editor"] extends {
+	progress: SerakkiElectronApi.Api["editor"] extends {
 		readonly onOptimizeResourcesProgressFn: (
 			listenerFn: (value: infer Progress) => void,
 		) => () => void;
@@ -73,7 +73,7 @@ const reportEditorResourceOptimizationProgress = (
 		: never,
 ) => {
 	const handler = electron.handlers.get(
-		ArkiniElectronContract.channels.editorProjectOptimizeResourcesProgress,
+		SerakkiElectronContract.channels.editorProjectOptimizeResourcesProgress,
 	);
 	if (handler === undefined) throw new Error("Expected resource optimization listener.");
 	handler(undefined, progress);
@@ -116,7 +116,7 @@ describe("Electron preload lifecycle", () => {
 			"en-GB",
 		]);
 		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
-			ArkiniElectronContract.channels.localizationPreferredLanguagesRead,
+			SerakkiElectronContract.channels.localizationPreferredLanguagesRead,
 		);
 	});
 
@@ -128,12 +128,12 @@ describe("Electron preload lifecycle", () => {
 		await expect(api.editorMcp.clearProjectContextFn("project-one")).resolves.toBeUndefined();
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			1,
-			ArkiniElectronContract.channels.editorMcpProjectContextSet,
+			SerakkiElectronContract.channels.editorMcpProjectContextSet,
 			"project-one",
 		);
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			2,
-			ArkiniElectronContract.channels.editorMcpProjectContextClear,
+			SerakkiElectronContract.channels.editorMcpProjectContextClear,
 			"project-one",
 		);
 	});
@@ -180,7 +180,7 @@ describe("Electron preload lifecycle", () => {
 		expect(second).toBe(first);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledTimes(1);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledWith(
-			ArkiniElectronContract.channels.requestClose,
+			SerakkiElectronContract.channels.requestClose,
 		);
 	});
 
@@ -193,7 +193,7 @@ describe("Electron preload lifecycle", () => {
 		await requestBeforeClose();
 		await expect(first).rejects.toBe(failure);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledWith(
-			ArkiniElectronContract.channels.closeFailed,
+			SerakkiElectronContract.channels.closeFailed,
 			"Error: save failed",
 		);
 
@@ -201,7 +201,7 @@ describe("Electron preload lifecycle", () => {
 		expect(retry).not.toBe(first);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledTimes(3);
 		expect(electron.ipcRenderer.send).toHaveBeenLastCalledWith(
-			ArkiniElectronContract.channels.requestClose,
+			SerakkiElectronContract.channels.requestClose,
 		);
 	});
 
@@ -223,7 +223,7 @@ describe("Electron preload lifecycle", () => {
 			"presentation",
 		]);
 		expect(electron.ipcRenderer.send).toHaveBeenLastCalledWith(
-			ArkiniElectronContract.channels.closeReady,
+			SerakkiElectronContract.channels.closeReady,
 		);
 	});
 });

@@ -43,8 +43,8 @@ jobs:
       - name: Install dependencies
         run: ./Argcfile.sh install
 
-      - name: Prepare Community Arkpack cache
-        uses: ./.github/actions/arkpack-cache
+      - name: Prepare Community Serapack cache
+        uses: ./.github/actions/serapack-cache
 
       - name: Run repository gate
         run: ./Argcfile.sh "${{ matrix.command }}"

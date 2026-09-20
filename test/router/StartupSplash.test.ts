@@ -5,16 +5,16 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/arkpack-catalog/service/ArkpackCatalog";
+import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import { LauncherSplashCompletedAtom } from "~/launcher/atom/LauncherSplashCompletedAtom";
 import { renderStartupSplashFx } from "~test/router/renderStartupSplashFx";
 
 const roots: Root[] = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
-const catalog: ArkpackCatalog = {
+const catalog: SerapackCatalog = {
 	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
-		SubscriptionRef.make<ArkpackCatalog.State>({
+		SubscriptionRef.make<SerapackCatalog.State>({
 			type: "loading",
 		}),
 	),

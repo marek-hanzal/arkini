@@ -9,7 +9,7 @@ describe("installRendererNativeDragGuardFx", () => {
 	it("prevents native descendant drags until its process listener is removed", () => {
 		const root = document.createElement("div");
 		const link = document.createElement("a");
-		link.href = "arkini://app/arkpacks";
+		link.href = "serakki://app/serapacks";
 		root.append(link);
 		document.body.append(root);
 

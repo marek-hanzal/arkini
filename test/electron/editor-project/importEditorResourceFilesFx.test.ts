@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorResourceFilesFx } from "~electron/main/editor-project/importEditorResourceFilesFx";
-import { createTestArkpack } from "~test/arkpack-support/fx/createTestArkpack";
+import { createTestSerapack } from "~test/serapack-support/fx/createTestSerapack";
 import { createTestOggOpusBytesFn } from "~test/game-config-resource/support/createTestOggOpusBytesFn";
 import type { OwnedEditorProjectRepository } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import {
@@ -34,7 +34,7 @@ vi.mock("~/game-config-resource/fx/optimizeOggOpusResourceFileFx", () => ({
 let root = "";
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-editor-artwork-"));
+	root = await mkdtemp(join(tmpdir(), "serakki-editor-artwork-"));
 });
 
 afterEach(async () => {
@@ -221,9 +221,9 @@ describe("importEditorResourceFilesFx", () => {
 		});
 	});
 
-	it("extracts an Arkpack to files that stay available through the repository write", async () => {
-		const arkpackPath = join(root, "source.arkpack");
-		await writeFile(arkpackPath, createTestArkpack());
+	it("extracts an Serapack to files that stay available through the repository write", async () => {
+		const serapackPath = join(root, "source.serapack");
+		await writeFile(serapackPath, createTestSerapack());
 		let extractedPaths: ReadonlyArray<string> = [];
 		const base = createEditorProjectIpcRepository();
 		const upsertResourceFilesFx = vi.fn<OwnedEditorProjectRepository["upsertResourceFilesFx"]>(
@@ -245,12 +245,12 @@ describe("importEditorResourceFilesFx", () => {
 				request: {
 					files: [
 						{
-							name: "source.arkpack",
-							path: arkpackPath,
+							name: "source.serapack",
+							path: serapackPath,
 						},
 					],
 					projectId: "project-one",
-					source: "arkpack",
+					source: "serapack",
 					type: "artwork",
 				},
 			}),

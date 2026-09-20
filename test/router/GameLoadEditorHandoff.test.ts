@@ -85,8 +85,8 @@ describe("game load editor handoff", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack,
-		).toBe(installedGame.arkpack);
+			)?.game.serapack,
+		).toBe(installedGame.serapack);
 
 		Effect.runSync(Deferred.succeed(writeFinished, undefined));
 		await delayedPublication;
@@ -132,8 +132,8 @@ describe("game load editor handoff", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack,
-		).toBe(game.arkpack);
+			)?.game.serapack,
+		).toBe(game.serapack);
 	});
 
 	it("refuses package creation after failed editor disposal and permits a clean retry", async () => {
@@ -185,7 +185,7 @@ describe("game load editor handoff", () => {
 		expect(
 			rendererRuntime.runSync(
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
-			)?.game.arkpack,
-		).toBe(game.arkpack);
+			)?.game.serapack,
+		).toBe(game.serapack);
 	});
 });

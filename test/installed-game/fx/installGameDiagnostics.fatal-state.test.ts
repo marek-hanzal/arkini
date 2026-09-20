@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import {
 	type DiagnosticRecord,
 	DiagnosticRecordSchema,
@@ -10,8 +10,8 @@ import {
 	type GameIncidentWrite,
 	GameIncidentWriteSchema,
 } from "~electron/contract/incident/GameIncidentWrite";
-import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
-import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
+import { decodeSerakkiSaveFx } from "~/game-persistence/fx/decodeSerakkiSaveFx";
 import { GameSessionFatalError } from "~/game-session/error/GameSessionFatalError";
 import type { GameTransition } from "~/game-session/type/GameSession";
 import { installGameDiagnosticsFx } from "~/game-incident/fx/installGameDiagnosticsFx";
@@ -45,7 +45,7 @@ describe("Game fatal-state diagnostics", () => {
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
 			value: {
-				arkini: {
+				serakki: {
 					diagnostics: {
 						writeFn: write,
 						writeApplicationFn: () => Promise.resolve(),
@@ -54,7 +54,7 @@ describe("Game fatal-state diagnostics", () => {
 					incident: {
 						writeFn: writeIncident,
 					},
-				} as Pick<ArkiniElectronApi.Api, "diagnostics" | "incident">,
+				} as Pick<SerakkiElectronApi.Api, "diagnostics" | "incident">,
 			},
 		});
 		let fatalListener: (() => void) | undefined;
@@ -139,17 +139,17 @@ describe("Game fatal-state diagnostics", () => {
 		});
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
-				arkpack: {
+				serapack: {
 					packageId: "package:test",
 					contentHash: "0".repeat(64),
 					title: "Test",
 					version: "1.0",
-					arkini: "1",
+					serakki: "1",
 					source: "bundled",
 					provenance: {
 						type: "official",
 					},
-				} satisfies ArkpackDescriptor,
+				} satisfies SerapackDescriptor,
 				config,
 				restored: true,
 				runRendererEffectFn: Effect.runSync,
@@ -229,11 +229,11 @@ describe("Game fatal-state diagnostics", () => {
 		});
 		expect(writeIncident).toHaveBeenCalledWith(
 			expect.objectContaining({
-				arkpack: expect.objectContaining({
+				serapack: expect.objectContaining({
 					packageId: "package:test",
 				}),
 				text: expect.objectContaining({
-					incident: expect.stringContaining("# Arkini game incident"),
+					incident: expect.stringContaining("# Serakki game incident"),
 					failure: expect.stringContaining("config-uid uid:producer:finite"),
 					runtimeState: expect.stringContaining("config-uid uid:producer:finite"),
 				}),
@@ -242,7 +242,7 @@ describe("Game fatal-state diagnostics", () => {
 		const incident = writeIncident.mock.calls[0]?.[0];
 		if (incident === undefined) throw new Error("Expected a failed-session incident.");
 		expect(incident.text.runtimeState).not.toContain("Revision:");
-		const saved = Effect.runSync(decodeArkiniSaveFx(incident.saveBytes));
+		const saved = Effect.runSync(decodeSerakkiSaveFx(incident.saveBytes));
 		expect(saved).toMatchObject({
 			version: "1.0",
 			state: {

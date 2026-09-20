@@ -10,7 +10,7 @@ import {
 import { invokeProjectTransportFx } from "~/project-authoring/fx/invokeProjectTransportFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import { importEditorArkpackFileFx } from "~/project-authoring/fx/importEditorArkpackFileFx";
+import { importEditorSerapackFileFx } from "~/project-authoring/fx/importEditorSerapackFileFx";
 
 export namespace EditorWelcomeCommandAtom {
 	export type Action =
@@ -18,7 +18,7 @@ export namespace EditorWelcomeCommandAtom {
 		| "dismiss-invalid-project"
 		| "delete-project"
 		| "exit"
-		| "import-arkpack"
+		| "import-serapack"
 		| "import-json"
 		| "open-project-folder";
 
@@ -35,7 +35,7 @@ export namespace EditorWelcomeCommandAtom {
 				readonly action: "exit";
 		  }
 		| {
-				readonly action: "import-arkpack";
+				readonly action: "import-serapack";
 		  }
 		| {
 				readonly action: "import-json";
@@ -67,7 +67,7 @@ export namespace EditorWelcomeCommandAtom {
 		  }
 		| {
 				readonly kind: "ready";
-				readonly action: "create" | "import-arkpack" | "import-json";
+				readonly action: "create" | "import-serapack" | "import-json";
 				readonly project: ProjectDescriptor;
 		  }
 		| {
@@ -138,7 +138,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			if (command.action === "dismiss-invalid-project") {
 				const result = yield* Effect.exit(
 					invokeProjectTransportFx({
-						callFn: () => window.arkini.editor.dismissInvalidProjectFn(command.root),
+						callFn: () => window.serakki.editor.dismissInvalidProjectFn(command.root),
 						operation: "dismiss-invalid-project",
 						parseFn: () => undefined,
 						requestMessage:
@@ -157,7 +157,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			if (command.action === "open-project-folder") {
 				const result = yield* Effect.exit(
 					invokeProjectTransportFx({
-						callFn: () => window.arkini.editor.openProjectDirectoryFn(command.root),
+						callFn: () => window.serakki.editor.openProjectDirectoryFn(command.root),
 						operation: "open-project-directory",
 						parseFn: () => undefined,
 						requestMessage: "The invalid Editor project folder request failed.",
@@ -175,10 +175,10 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 					? createFreshProjectFx(command.projectId).pipe(
 							Effect.provideService(ProjectRepository, editorProjectRepository),
 						)
-					: command.action === "import-arkpack"
-						? importEditorArkpackFileFx()
+					: command.action === "import-serapack"
+						? importEditorSerapackFileFx()
 						: invokeProjectTransportFx({
-								callFn: () => window.arkini.editor.importJsonDirectoryFn(),
+								callFn: () => window.serakki.editor.importJsonDirectoryFn(),
 								operation: "import-json-directory",
 								parseFn: (value) =>
 									value === null ? null : ProjectDescriptorSchema.parse(value),

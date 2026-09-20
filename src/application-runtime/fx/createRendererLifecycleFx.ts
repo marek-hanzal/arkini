@@ -1,5 +1,5 @@
 import { Data, Effect } from "effect";
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 
 type RendererLifecycleOperation = "force-close" | "request-close" | "wait-until-visible";
 
@@ -27,7 +27,7 @@ export interface RendererLifecycle {
 export const createRendererLifecycleFx = Effect.fn("createRendererLifecycleFx")(
 	(
 		api: Pick<
-			ArkiniElectronApi.Api["lifecycle"],
+			SerakkiElectronApi.Api["lifecycle"],
 			"forceCloseFn" | "requestCloseFn" | "waitUntilVisibleFn"
 		>,
 	) =>

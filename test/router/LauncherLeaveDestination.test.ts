@@ -7,8 +7,8 @@ describe("launcher leave destination", () => {
 		expect(resolveLauncherLeaveDestinationFn("/about")).toEqual({
 			destination: "about",
 		});
-		expect(resolveLauncherLeaveDestinationFn("/arkpacks")).toEqual({
-			destination: "arkpacks",
+		expect(resolveLauncherLeaveDestinationFn("/serapacks")).toEqual({
+			destination: "serapacks",
 		});
 		expect(resolveLauncherLeaveDestinationFn("/settings")).toEqual({
 			destination: "settings",

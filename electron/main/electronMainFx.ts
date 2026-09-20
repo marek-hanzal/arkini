@@ -3,14 +3,14 @@ import { fileURLToPath } from "node:url";
 import { basename, dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
 import { formatApplicationDiagnosticTextFn } from "~/application-diagnostics/fn/formatApplicationDiagnosticTextFn";
-import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "../contract/SerakkiElectronApi";
 import type { ApplicationLogRecordSchema } from "../contract/diagnostics/ApplicationLogRecord";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { createEditorResourceProtocolFx } from "./createEditorResourceProtocolFx";
-import { handleArkiniProtocolRequestFx } from "./handleArkiniProtocolRequestFx";
+import { handleSerakkiProtocolRequestFx } from "./handleSerakkiProtocolRequestFx";
 import { createGameResourceProtocolFx } from "./createGameResourceProtocolFx";
-import { registerArkiniElectronIpcFx } from "./registerArkiniElectronIpcFx";
+import { registerSerakkiElectronIpcFx } from "./registerSerakkiElectronIpcFx";
 import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
 import { createFilesystemCheatPreferencesFx } from "./cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesystemLauncherPreferencesFx";
@@ -19,7 +19,7 @@ import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 import { createFilesystemSoundPreferencesFx } from "./sound/createFilesystemSoundPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
-import { resolveArkiniUserDataPathsFx } from "~/application-data/fx/resolveArkiniUserDataPathsFx";
+import { resolveSerakkiUserDataPathsFx } from "~/application-data/fx/resolveSerakkiUserDataPathsFx";
 import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
 import { createFilesystemEditorMcpOwnershipFx } from "~/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx";
@@ -51,7 +51,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* Effect.promise(() => app.whenReady());
 
-	const userDataPaths = yield* resolveArkiniUserDataPathsFx;
+	const userDataPaths = yield* resolveSerakkiUserDataPathsFx;
 	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.diagnostics).pipe(
 		Effect.catch((cause) =>
 			Effect.sync(() => {
@@ -180,7 +180,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			for (const window of BrowserWindow.getAllWindows()) {
 				if (window.isDestroyed()) continue;
 				window.webContents.send(
-					ArkiniElectronApi.channels.editorMcpOverviewChanged,
+					SerakkiElectronApi.channels.editorMcpOverviewChanged,
 					overview,
 				);
 			}
@@ -188,7 +188,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		notifyProjectChangedFn: (projectId) => {
 			for (const window of BrowserWindow.getAllWindows()) {
 				if (window.isDestroyed()) continue;
-				window.webContents.send(ArkiniElectronApi.channels.editorProjectChanged, projectId);
+				window.webContents.send(
+					SerakkiElectronApi.channels.editorProjectChanged,
+					projectId,
+				);
 			}
 		},
 		root: userDataPaths.editor.root,
@@ -269,9 +272,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		isTrustedUrlFn: trustedRenderer.isTrustedUrlFn,
 	});
 	yield* Effect.sync(() => {
-		protocol.handle("arkini", (request) =>
+		protocol.handle("serakki", (request) =>
 			ElectronMainRuntime.runPromise(
-				handleArkiniProtocolRequestFx({
+				handleSerakkiProtocolRequestFx({
 					request,
 					rendererRoot,
 					handleEditorResourceRequestFx: editorResourceProtocol?.handleRequestFx,
@@ -280,10 +283,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			),
 		);
 	});
-	yield* registerArkiniElectronIpcFx({
-		bundledArkpacksRoot: app.isPackaged
+	yield* registerSerakkiElectronIpcFx({
+		bundledSerapacksRoot: app.isPackaged
 			? join(process.resourcesPath, "game")
-			: resolve("game/arkini/build"),
+			: resolve("game/serakki/build"),
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,
@@ -296,13 +299,13 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		editorProjectServiceOwnership,
 	});
 	yield* registerEditorProjectIpcFx({
-		bundledArkpacksRoot: app.isPackaged
+		bundledSerapacksRoot: app.isPackaged
 			? join(process.resourcesPath, "game")
-			: resolve("game/arkini/build"),
+			: resolve("game/serakki/build"),
 		diagnostics,
 		trustedRenderer,
 		ownership: editorProjectServiceOwnership,
-		userArkpacksRoot: userDataPaths.game.arkpacks,
+		userSerapacksRoot: userDataPaths.game.serapacks,
 	});
 	yield* registerEditorMcpPreferencesIpcFx({
 		trustedRenderer,

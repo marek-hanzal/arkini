@@ -8,7 +8,7 @@ import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLi
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { bootstrapRendererControlledCloseFx } from "~/application-runtime/fx/bootstrapRendererControlledCloseFx";
-import type { ArkiniRouter } from "~/createArkiniRouterFx";
+import type { SerakkiRouter } from "~/createSerakkiRouterFx";
 import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
@@ -19,7 +19,7 @@ type CloseListener = () => Promise<void>;
 
 const createResource = (packageId: string): InstalledGameEngineResource => ({
 	game: {
-		arkpack: {
+		serapack: {
 			packageId,
 		},
 		disposeFx: Effect.void,
@@ -75,7 +75,7 @@ const createRouter = () => {
 	return {
 		navigate,
 		router: {
-			navigate: navigate as ArkiniRouter["navigate"],
+			navigate: navigate as SerakkiRouter["navigate"],
 		},
 	};
 };

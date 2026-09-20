@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Editor-only audio metadata. The paired filename owns identity; Arkpacks omit this file. */
+/** Editor-only audio metadata. The paired filename owns identity; Serapacks omit this file. */
 export const AudioResourceMetadataSchema = z
 	.object({
 		name: z.string().trim().min(1, "Name is required."),

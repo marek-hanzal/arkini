@@ -84,10 +84,10 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 				cause,
 			}),
 	});
-	const arkpack = yield* Effect.try({
-		try: () => VersionPartsSchema.parse(files.arkpack),
+	const serapack = yield* Effect.try({
+		try: () => VersionPartsSchema.parse(files.serapack),
 		catch: (cause) =>
-			new Error("The Editor Arkpack version is invalid.", {
+			new Error("The Editor Serapack version is invalid.", {
 				cause,
 			}),
 	});
@@ -103,7 +103,7 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 		try: () =>
 			GameFileSchema.parse({
 				$schema: GameProjectGameSchemaReference,
-				version: arkpack,
+				version: serapack,
 				...gameCandidate,
 			}),
 		catch: (cause) =>

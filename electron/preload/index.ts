@@ -1,20 +1,20 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
-import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
+import { SerakkiElectronApi } from "../contract/SerakkiElectronApi";
 
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 const closeFailedListeners = new Set<(error: unknown) => void>();
 const editorProjectChangedListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChangedFn"]>[0]
+	Parameters<SerakkiElectronApi.Api["editor"]["onProjectChangedFn"]>[0]
 >();
 const editorResourceOptimizationProgressListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editor"]["onOptimizeResourcesProgressFn"]>[0]
+	Parameters<SerakkiElectronApi.Api["editor"]["onOptimizeResourcesProgressFn"]>[0]
 >();
 const editorMcpOverviewListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["editorMcp"]["onOverviewChangedFn"]>[0]
+	Parameters<SerakkiElectronApi.Api["editorMcp"]["onOverviewChangedFn"]>[0]
 >();
 const windowModeListeners = new Set<
-	Parameters<ArkiniElectronApi.Api["window"]["onModeChangedFn"]>[0]
+	Parameters<SerakkiElectronApi.Api["window"]["onModeChangedFn"]>[0]
 >();
 let closing = false;
 let requestedClose:
@@ -30,33 +30,33 @@ const visiblePromise = new Promise<number>((resolveFn) => {
 	resolveVisibleFn = resolveFn;
 });
 
-ipcRenderer.on(ArkiniElectronApi.channels.windowVisible, () => {
+ipcRenderer.on(SerakkiElectronApi.channels.windowVisible, () => {
 	if (visibleAtMs !== undefined) return;
 	visibleAtMs = performance.now();
 	resolveVisibleFn(visibleAtMs);
 });
 
-ipcRenderer.on(ArkiniElectronApi.channels.windowModeChanged, (_event, mode) => {
+ipcRenderer.on(SerakkiElectronApi.channels.windowModeChanged, (_event, mode) => {
 	for (const listenerFn of Array.from(windowModeListeners)) listenerFn(mode);
 });
 
-ipcRenderer.on(ArkiniElectronApi.channels.editorProjectChanged, (_event, projectId) => {
+ipcRenderer.on(SerakkiElectronApi.channels.editorProjectChanged, (_event, projectId) => {
 	for (const listenerFn of Array.from(editorProjectChangedListeners)) listenerFn(projectId);
 });
 
 ipcRenderer.on(
-	ArkiniElectronApi.channels.editorProjectOptimizeResourcesProgress,
+	SerakkiElectronApi.channels.editorProjectOptimizeResourcesProgress,
 	(_event, progress) => {
 		for (const listenerFn of Array.from(editorResourceOptimizationProgressListeners))
 			listenerFn(progress);
 	},
 );
 
-ipcRenderer.on(ArkiniElectronApi.channels.editorMcpOverviewChanged, (_event, overview) => {
+ipcRenderer.on(SerakkiElectronApi.channels.editorMcpOverviewChanged, (_event, overview) => {
 	for (const listenerFn of Array.from(editorMcpOverviewListeners)) listenerFn(overview);
 });
 
-ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
+ipcRenderer.on(SerakkiElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
 	closing = true;
 	try {
@@ -64,111 +64,112 @@ ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 		await Promise.all(Array.from(beforeCloseReadyListeners, (listenerFn) => listenerFn()));
 		requestedClose?.resolveFn();
 		requestedClose = undefined;
-		ipcRenderer.send(ArkiniElectronApi.channels.closeReady);
+		ipcRenderer.send(SerakkiElectronApi.channels.closeReady);
 	} catch (error) {
 		closing = false;
 		for (const listenerFn of Array.from(closeFailedListeners)) listenerFn(error);
-		ipcRenderer.send(ArkiniElectronApi.channels.closeFailed, String(error));
+		ipcRenderer.send(SerakkiElectronApi.channels.closeFailed, String(error));
 		requestedClose?.rejectFn(error);
 		requestedClose = undefined;
 	}
 });
 
-const api: ArkiniElectronApi.Api = {
+const api: SerakkiElectronApi.Api = {
 	file: {
 		readPathFn: (file) => webUtils.getPathForFile(file),
 	},
 	appearance: {
-		readFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceRead),
-		writeFn: (theme) => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceWrite, theme),
-		readAccentFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentRead),
+		readFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceRead),
+		writeFn: (theme) => ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceWrite, theme),
+		readAccentFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceAccentRead),
 		writeAccentFn: (accent) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentWrite, accent),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceAccentWrite, accent),
 	},
 	cheats: {
-		readAvailableFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityRead),
+		readAvailableFn: () =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.cheatAvailabilityRead),
 		writeAvailableFn: (available) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.cheatAvailabilityWrite, available),
 	},
 	sound: {
-		readFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.soundRead),
+		readFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.soundRead),
 		writeFn: (channel, volume) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.soundWrite, channel, volume),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.soundWrite, channel, volume),
 	},
 	clipboard: {
 		writeTextFn: (text) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.clipboardWriteText, text),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.clipboardWriteText, text),
 	},
 	cli: {
-		statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
-		installFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliInstall),
-		replaceFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliReplace),
-		uninstallFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliUninstall),
+		statusFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliStatus),
+		installFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliInstall),
+		replaceFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliReplace),
+		uninstallFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliUninstall),
 		completion: {
-			statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionStatus),
-			installFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionInstall),
-			replaceFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionReplace),
+			statusFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliCompletionStatus),
+			installFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliCompletionInstall),
+			replaceFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.cliCompletionReplace),
 			uninstallFn: () =>
-				ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionUninstall),
+				ipcRenderer.invoke(SerakkiElectronApi.channels.cliCompletionUninstall),
 		},
 	},
 	launcher: {
 		readLastPackageIdFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.launcherLastPackageIdRead),
 		writeLastPackageIdFn: (packageId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
 	localization: {
 		readPreferredLanguagesFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.localizationPreferredLanguagesRead),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.localizationPreferredLanguagesRead),
 	},
 	editor: {
 		saveBuildVersionFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildVersionSave, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectBuildVersionSave, request),
 		buildProjectFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuild, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectBuild, request),
 		saveProjectBuildFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildSave, request),
-		statusFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
-		awaitIdleFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectBuildSave, request),
+		statusFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.editorStatus),
+		awaitIdleFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.editorAwaitIdle),
 		createProjectFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectCreate, projectId),
 		deleteProjectFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDelete, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectDelete, projectId),
 		deleteItemFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectDeleteItem, request),
 		saveResourceMetadataFn: (request) =>
 			ipcRenderer.invoke(
-				ArkiniElectronApi.channels.editorProjectSaveResourceMetadata,
+				SerakkiElectronApi.channels.editorProjectSaveResourceMetadata,
 				request,
 			),
 		deleteResourceFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteResource, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectDeleteResource, request),
 		exportJsonDirectoryFn: (projectId) =>
 			ipcRenderer.invoke(
-				ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+				SerakkiElectronApi.channels.editorProjectExportJsonDirectory,
 				projectId,
 			),
 		importJsonDirectoryFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportJsonDirectory),
-		importArkpackFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportArkpack),
-		importInstalledArkpackFn: (packageId) =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectImportJsonDirectory),
+		importSerapackFn: () =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectImportSerapack),
+		importInstalledSerapackFn: (packageId) =>
 			ipcRenderer.invoke(
-				ArkiniElectronApi.channels.editorProjectImportInstalledArkpack,
+				SerakkiElectronApi.channels.editorProjectImportInstalledSerapack,
 				packageId,
 			),
 		importResourcesFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportResources, request),
-		listProjectsFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectImportResources, request),
+		listProjectsFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectList),
 		dismissInvalidProjectFn: (root) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDismissInvalid, root),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectDismissInvalid, root),
 		openProjectDirectoryFn: (root) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, root),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectOpenDirectory, root),
 		readProjectFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectRead, projectId),
 		refreshProjectFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRefresh, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectRefresh, projectId),
 		onProjectChangedFn: (listenerFn) => {
 			editorProjectChangedListeners.add(listenerFn);
 			return () => editorProjectChangedListeners.delete(listenerFn);
@@ -178,73 +179,75 @@ const api: ArkiniElectronApi.Api = {
 			return () => editorResourceOptimizationProgressListeners.delete(listenerFn);
 		},
 		optimizeResourcesFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOptimizeResources, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectOptimizeResources, request),
 		replaceConfigFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectReplaceConfig, request),
 		replaceResourceFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceResource, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectReplaceResource, request),
 		upsertItemFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorProjectUpsertItem, request),
 		listNotesFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteList, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorNoteList, projectId),
 		createNoteFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteCreate, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorNoteCreate, request),
 		updateNoteFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteUpdate, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorNoteUpdate, request),
 		deleteNoteFn: (request) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteDelete, request),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorNoteDelete, request),
 	},
 	editorMcp: {
-		readOverviewFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpOverviewRead),
+		readOverviewFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.editorMcpOverviewRead),
 		configureFn: (configuration) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpConfigure, configuration),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorMcpConfigure, configuration),
 		commandFn: (command) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpCommand, command),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorMcpCommand, command),
 		onOverviewChangedFn: (listenerFn) => {
 			editorMcpOverviewListeners.add(listenerFn);
 			return () => editorMcpOverviewListeners.delete(listenerFn);
 		},
 		setProjectContextFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextSet, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorMcpProjectContextSet, projectId),
 		clearProjectContextFn: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextClear, projectId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.editorMcpProjectContextClear, projectId),
 	},
-	arkpack: {
-		listFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
+	serapack: {
+		listFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.serapackList),
 		readFn: (packageId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),
-		importFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackImport),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.serapackRead, packageId),
+		importFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.serapackImport),
 		installEditorBuildFn: (record) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstallEditorBuild, record),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.serapackInstallEditorBuild, record),
 		removeFn: (packageId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRemove, packageId),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.serapackRemove, packageId),
 		openUserDirectoryFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackOpenUserDirectory),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.serapackOpenUserDirectory),
 	},
 	save: {
-		readFn: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveRead, key),
+		readFn: (key) => ipcRenderer.invoke(SerakkiElectronApi.channels.saveRead, key),
 		writeFn: (key, bytes) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.saveWrite, key, bytes),
-		clearFn: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveClear, key),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.saveWrite, key, bytes),
+		clearFn: (key) => ipcRenderer.invoke(SerakkiElectronApi.channels.saveClear, key),
 	},
 	diagnostics: {
 		writeFn: (record) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWrite, record),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.diagnosticsWrite, record),
 		writeApplicationFn: (record) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWriteApplication, record),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.diagnosticsWriteApplication, record),
 		openDirectoryFn: () =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.diagnosticsOpenDirectory),
 	},
 	incident: {
 		writeFn: (incident) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.incidentWrite, incident),
+			ipcRenderer.invoke(SerakkiElectronApi.channels.incidentWrite, incident),
 	},
 	userData: {
-		openDirectoryFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.userDataOpenDirectory),
+		openDirectoryFn: () =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.userDataOpenDirectory),
 	},
 	window: {
-		readModeFn: () => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeRead),
-		writeModeFn: (mode) => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeWrite, mode),
+		readModeFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.windowModeRead),
+		writeModeFn: (mode) =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.windowModeWrite, mode),
 		onModeChangedFn: (listenerFn) => {
 			windowModeListeners.add(listenerFn);
 			return () => windowModeListeners.delete(listenerFn);
@@ -277,11 +280,11 @@ const api: ArkiniElectronApi.Api = {
 				resolveFn: resolveRequestFn,
 				rejectFn: rejectRequestFn,
 			};
-			ipcRenderer.send(ArkiniElectronApi.channels.requestClose);
+			ipcRenderer.send(SerakkiElectronApi.channels.requestClose);
 			return promise;
 		},
-		forceCloseFn: () => ipcRenderer.send(ArkiniElectronApi.channels.forceClose),
+		forceCloseFn: () => ipcRenderer.send(SerakkiElectronApi.channels.forceClose),
 	},
 };
 
-contextBridge.exposeInMainWorld("arkini", api);
+contextBridge.exposeInMainWorld("serakki", api);

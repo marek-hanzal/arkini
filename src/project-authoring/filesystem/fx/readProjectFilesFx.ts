@@ -9,7 +9,7 @@ import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJs
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { ItemFileSchema } from "~/game-config-source/schema/ItemFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
-import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
+import { admitSerakkiVersionFx } from "~/application-version/fx/admitSerakkiVersionFx";
 import type { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import { collectSourceFilesFx } from "~/game-config-source/fx/collectSourceFilesFx";
@@ -167,10 +167,10 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 		),
 		({ id, type, path: resourcePath }) => readProjectResourceMetadataFx(id, type, resourcePath),
 	);
-	yield* admitArkiniVersionFx("Editor project", marker.arkini);
+	yield* admitSerakkiVersionFx("Editor project", marker.serakki);
 
 	return {
-		arkpack: version,
+		serapack: version,
 		marker,
 		config,
 		resources,

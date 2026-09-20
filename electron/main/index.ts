@@ -2,16 +2,16 @@ import { app, protocol } from "electron";
 import { electronMainFx } from "./electronMainFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { writeFatalApplicationLogFx } from "./diagnostics/writeFatalApplicationLogFx";
-import { resolveArkiniUserDataPathsFx } from "~/application-data/fx/resolveArkiniUserDataPathsFx";
+import { resolveSerakkiUserDataPathsFx } from "~/application-data/fx/resolveSerakkiUserDataPathsFx";
 
-if (!app.isPackaged && process.env.ARKINI_DEV_CONTROL === "1") {
+if (!app.isPackaged && process.env.SERAKKI_DEV_CONTROL === "1") {
 	app.commandLine.appendSwitch("remote-debugging-address", "127.0.0.1");
 	app.commandLine.appendSwitch("remote-debugging-port", "9222");
 }
 
 protocol.registerSchemesAsPrivileged([
 	{
-		scheme: "arkini",
+		scheme: "serakki",
 		privileges: {
 			standard: true,
 			secure: true,
@@ -24,9 +24,9 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 void ElectronMainRuntime.runPromise(electronMainFx()).catch(async (error) => {
-	console.error("Arkini Electron main failed.", error);
+	console.error("Serakki Electron main failed.", error);
 	try {
-		const userDataPaths = await ElectronMainRuntime.runPromise(resolveArkiniUserDataPathsFx);
+		const userDataPaths = await ElectronMainRuntime.runPromise(resolveSerakkiUserDataPathsFx);
 		await ElectronMainRuntime.runPromise(
 			writeFatalApplicationLogFx({
 				directoryPath: userDataPaths.diagnostics,
@@ -34,7 +34,7 @@ void ElectronMainRuntime.runPromise(electronMainFx()).catch(async (error) => {
 			}),
 		);
 	} catch (diagnosticError) {
-		console.error("Arkini could not record the fatal application error.", diagnosticError);
+		console.error("Serakki could not record the fatal application error.", diagnosticError);
 	}
 	app.quit();
 });

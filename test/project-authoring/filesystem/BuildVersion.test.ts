@@ -11,7 +11,7 @@ import {
 
 let harness: ProjectTestHarness;
 beforeEach(async () => {
-	harness = await createProjectTestHarness("arkini-build-version-");
+	harness = await createProjectTestHarness("serakki-build-version-");
 });
 afterEach(async () => harness.close());
 

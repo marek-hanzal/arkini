@@ -38,7 +38,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 			className="grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] overflow-hidden bg-[var(--ak-editor-background)] text-foreground"
 			data-ui="EditorShell"
 			style={{
-				viewTransitionName: "arkini-editor-shell",
+				viewTransitionName: "serakki-editor-shell",
 			}}
 		>
 			<EditorWorkspaceNavigation
@@ -57,7 +57,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 				className="min-h-0 min-w-0 overflow-hidden bg-[var(--ak-editor-background)]"
 				data-ui="EditorContent"
 				style={{
-					viewTransitionName: "arkini-editor-content",
+					viewTransitionName: "serakki-editor-content",
 				}}
 			>
 				{children}

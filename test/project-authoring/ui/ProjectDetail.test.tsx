@@ -85,7 +85,7 @@ describe("project detail", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		Object.defineProperty(window, "arkini", {
+		Object.defineProperty(window, "serakki", {
 			configurable: true,
 			value: {
 				editor: {

@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARKINI_RELEASE_ISSUER: https://token.actions.githubusercontent.com
-  ARKINI_RELEASE_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/release.yml
+  SERAKKI_RELEASE_ISSUER: https://token.actions.githubusercontent.com
+  SERAKKI_RELEASE_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/release.yml
 
 jobs:
   prerelease_checks:
@@ -46,15 +46,15 @@ jobs:
         run: ./Argcfile.sh install
       - name: Use tag version for release checks
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
-      - name: Prepare Community Arkpack cache
-        uses: ./.github/actions/arkpack-cache
+      - name: Prepare Community Serapack cache
+        uses: ./.github/actions/serapack-cache
       - name: Run repository gate
         run: ./Argcfile.sh "${{ matrix.command }}"
 
-  prepare_arkpack:
+  prepare_serapack:
     needs: prerelease_checks
     if: ${{ always() && (needs.prerelease_checks.result == 'success' || needs.prerelease_checks.result == 'skipped') }}
-    name: Build and sign the canonical Arkpack once
+    name: Build and sign the canonical Serapack once
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -71,22 +71,22 @@ jobs:
         run: ./Argcfile.sh install
       - name: Use tag version for release artifacts
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
-      - name: Build, sign, and verify canonical Arkpack
+      - name: Build, sign, and verify canonical Serapack
         env:
-          ARKINI_EXPECTED_PROVENANCE: official
-          ARKINI_RELEASE_SIGN: "1"
+          SERAKKI_EXPECTED_PROVENANCE: official
+          SERAKKI_RELEASE_SIGN: "1"
         run: ./Argcfile.sh build
-      - name: Upload canonical Arkpack
+      - name: Upload canonical Serapack
         uses: actions/upload-artifact@v6
         with:
           name: serakki-canonical-${{ github.ref_name }}
-          path: game/arkini/build/arkini.arkpack
+          path: game/serakki/build/serakki.serapack
           if-no-files-found: error
           retention-days: ${{ contains(github.ref_name, '-') && 14 || 30 }}
 
   package:
     name: Package ${{ matrix.name }}
-    needs: prepare_arkpack
+    needs: prepare_serapack
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     permissions:
@@ -102,7 +102,7 @@ jobs:
             paths: |
               .out/desktop/release/*.dmg
               .out/desktop/release/*.zip
-              .out/desktop/release/*.arkpack
+              .out/desktop/release/*.serapack
           - name: Windows x64
             os: windows-2025
             command: package-windows
@@ -126,8 +126,8 @@ jobs:
       run:
         shell: bash
     env:
-      ARKINI_EXPECTED_PROVENANCE: official
-      ARKINI_PREBUILT_ARKPACK: ${{ github.workspace }}/.release/arkini.arkpack
+      SERAKKI_EXPECTED_PROVENANCE: official
+      SERAKKI_PREBUILT_SERAPACK: ${{ github.workspace }}/.release/serakki.serapack
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - name: Check out release commit
@@ -138,7 +138,7 @@ jobs:
         run: ./Argcfile.sh install
       - name: Use tag version for release artifacts
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
-      - name: Download canonical Arkpack
+      - name: Download canonical Serapack
         uses: actions/download-artifact@v8
         with:
           name: serakki-canonical-${{ github.ref_name }}
@@ -192,7 +192,7 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             release/macos/*.dmg \
             release/macos/*.zip \
-            release/macos/arkini.arkpack \
+            release/macos/serakki.serapack \
             release/windows/*.exe \
             release/windows/*.zip \
             release/linux-x64/*.AppImage \
@@ -200,4 +200,4 @@ jobs:
             --verify-tag \
             "${release_flags[@]}" \
             --title "Serakki $GITHUB_REF_NAME" \
-            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 applications with one embedded official Arkpack, plus the same standalone Arkpack. GitHub exposes the SHA-256 digest of every asset; macOS requires the normal Gatekeeper override."
+            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 applications with one embedded official Serapack, plus the same standalone Serapack. GitHub exposes the SHA-256 digest of every asset; macOS requires the normal Gatekeeper override."

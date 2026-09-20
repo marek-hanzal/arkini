@@ -13,8 +13,8 @@ import { Route as IndexRouteImport } from "./@routes/index"
 import { Route as LauncherRouteImport } from "./@routes/_launcher"
 import { Route as EditorRouteImport } from "./@routes/editor"
 import { Route as LauncherAboutRouteImport } from "./@routes/_launcher/about"
-import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
 import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-menu"
+import { Route as LauncherSerapacksRouteImport } from "./@routes/_launcher/serapacks"
 import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settings"
 import { Route as ActionDiscardFailedGameRouteImport } from "./@routes/action/discard-failed-game"
 import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
@@ -98,14 +98,14 @@ const LauncherAboutRoute = LauncherAboutRouteImport.update({
   path: "/about",
   getParentRoute: () => LauncherRoute,
 } as any)
-const LauncherArkpacksRoute = LauncherArkpacksRouteImport.update({
-  id: "/arkpacks",
-  path: "/arkpacks",
-  getParentRoute: () => LauncherRoute,
-} as any)
 const LauncherMainMenuRoute = LauncherMainMenuRouteImport.update({
   id: "/main-menu",
   path: "/main-menu",
+  getParentRoute: () => LauncherRoute,
+} as any)
+const LauncherSerapacksRoute = LauncherSerapacksRouteImport.update({
+  id: "/serapacks",
+  path: "/serapacks",
   getParentRoute: () => LauncherRoute,
 } as any)
 const LauncherSettingsRoute = LauncherSettingsRouteImport.update({
@@ -463,8 +463,8 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/editor": typeof EditorRouteWithChildren
   "/about": typeof LauncherAboutRoute
-  "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
+  "/serapacks": typeof LauncherSerapacksRoute
   "/settings": typeof LauncherSettingsRouteWithChildren
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
@@ -532,8 +532,8 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/editor": typeof EditorRouteWithChildren
   "/about": typeof LauncherAboutRoute
-  "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
+  "/serapacks": typeof LauncherSerapacksRoute
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
@@ -591,8 +591,8 @@ export interface FileRoutesById {
   "/_launcher": typeof LauncherRouteWithChildren
   "/editor": typeof EditorRouteWithChildren
   "/_launcher/about": typeof LauncherAboutRoute
-  "/_launcher/arkpacks": typeof LauncherArkpacksRoute
   "/_launcher/main-menu": typeof LauncherMainMenuRoute
+  "/_launcher/serapacks": typeof LauncherSerapacksRoute
   "/_launcher/settings": typeof LauncherSettingsRouteWithChildren
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
@@ -663,8 +663,8 @@ export interface FileRouteTypes {
     | "/"
     | "/editor"
     | "/about"
-    | "/arkpacks"
     | "/main-menu"
+    | "/serapacks"
     | "/settings"
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
@@ -732,8 +732,8 @@ export interface FileRouteTypes {
     | "/"
     | "/editor"
     | "/about"
-    | "/arkpacks"
     | "/main-menu"
+    | "/serapacks"
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/editor/$projectId"
@@ -790,8 +790,8 @@ export interface FileRouteTypes {
     | "/_launcher"
     | "/editor"
     | "/_launcher/about"
-    | "/_launcher/arkpacks"
     | "/_launcher/main-menu"
+    | "/_launcher/serapacks"
     | "/_launcher/settings"
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
@@ -897,18 +897,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LauncherAboutRouteImport
       parentRoute: typeof LauncherRoute
     }
-    "/_launcher/arkpacks": {
-      id: "/_launcher/arkpacks"
-      path: "/arkpacks"
-      fullPath: "/arkpacks"
-      preLoaderRoute: typeof LauncherArkpacksRouteImport
-      parentRoute: typeof LauncherRoute
-    }
     "/_launcher/main-menu": {
       id: "/_launcher/main-menu"
       path: "/main-menu"
       fullPath: "/main-menu"
       preLoaderRoute: typeof LauncherMainMenuRouteImport
+      parentRoute: typeof LauncherRoute
+    }
+    "/_launcher/serapacks": {
+      id: "/_launcher/serapacks"
+      path: "/serapacks"
+      fullPath: "/serapacks"
+      preLoaderRoute: typeof LauncherSerapacksRouteImport
       parentRoute: typeof LauncherRoute
     }
     "/_launcher/settings": {
@@ -1376,15 +1376,15 @@ const LauncherSettingsRouteWithChildren =
 
 interface LauncherRouteChildren {
   LauncherAboutRoute: typeof LauncherAboutRoute
-  LauncherArkpacksRoute: typeof LauncherArkpacksRoute
   LauncherMainMenuRoute: typeof LauncherMainMenuRoute
+  LauncherSerapacksRoute: typeof LauncherSerapacksRoute
   LauncherSettingsRoute: typeof LauncherSettingsRouteWithChildren
 }
 
 const LauncherRouteChildren: LauncherRouteChildren = {
   LauncherAboutRoute: LauncherAboutRoute,
-  LauncherArkpacksRoute: LauncherArkpacksRoute,
   LauncherMainMenuRoute: LauncherMainMenuRoute,
+  LauncherSerapacksRoute: LauncherSerapacksRoute,
   LauncherSettingsRoute: LauncherSettingsRouteWithChildren,
 }
 

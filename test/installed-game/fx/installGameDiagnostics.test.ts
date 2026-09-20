@@ -3,12 +3,12 @@ import type { TickPerformance } from "~/game-tick/type/TickPerformance";
 import { Cause, Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "~electron/contract/ArkiniElectronApi";
+import type { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import {
 	type DiagnosticRecord,
 	DiagnosticRecordSchema,
 } from "~electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackDescriptor } from "~/arkpack-catalog/type/ArkpackDescriptor";
+import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import type {
 	GameSession,
 	GameTransition,
@@ -22,17 +22,17 @@ import { createJobTestConfig } from "~test/production-job/support/jobTestConfig"
 const originalWindow = globalThis.window;
 const runRendererEffectFn = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
 
-const testArkpack = {
+const testSerapack = {
 	packageId: "package:test",
 	contentHash: "0".repeat(64),
 	title: "Test",
 	version: "1.0",
-	arkini: "1",
+	serakki: "1",
 	source: "bundled",
 	provenance: {
 		type: "official",
 	},
-} satisfies ArkpackDescriptor;
+} satisfies SerapackDescriptor;
 
 afterEach(() => {
 	Object.defineProperty(globalThis, "window", {
@@ -69,7 +69,7 @@ describe("Game diagnostics", () => {
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
 			value: {
-				arkini: {
+				serakki: {
 					diagnostics: {
 						writeFn: write,
 						writeApplicationFn: () => Promise.resolve(),
@@ -78,7 +78,7 @@ describe("Game diagnostics", () => {
 					incident: {
 						writeFn: () => Promise.resolve(),
 					},
-				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
+				} as Pick<SerakkiElectronApi.Api, "diagnostics">,
 			},
 		});
 		let transitionListener: ((transition: GameTransition) => void) | undefined;
@@ -131,7 +131,7 @@ describe("Game diagnostics", () => {
 		>;
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
-				arkpack: testArkpack,
+				serapack: testSerapack,
 				config: createJobTestConfig(),
 				restored: true,
 				runRendererEffectFn,

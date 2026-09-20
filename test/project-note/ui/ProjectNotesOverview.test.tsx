@@ -43,7 +43,7 @@ let projectChangedFn: ((projectId: string) => void) | undefined;
 
 beforeEach(() => {
 	projectChangedFn = undefined;
-	Object.defineProperty(window, "arkini", {
+	Object.defineProperty(window, "serakki", {
 		configurable: true,
 		value: {
 			editor: {
@@ -84,7 +84,7 @@ afterEach(async () => {
 	});
 	document.body.replaceChildren();
 	for (const registry of registries.splice(0)) registry.dispose();
-	Reflect.deleteProperty(window, "arkini");
+	Reflect.deleteProperty(window, "serakki");
 });
 
 const renderOverview = async () => {

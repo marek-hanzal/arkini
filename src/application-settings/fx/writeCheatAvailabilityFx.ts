@@ -9,7 +9,9 @@ export const writeCheatAvailabilityFx = Effect.fn("writeCheatAvailabilityFx")(
 		writeSemaphore.withPermits(1)(
 			Effect.tryPromise({
 				try: async () =>
-					window.arkini.cheats.writeAvailableFn(CheatAvailabilitySchema.parse(available)),
+					window.serakki.cheats.writeAvailableFn(
+						CheatAvailabilitySchema.parse(available),
+					),
 				catch: (cause) => cause,
 			}),
 		),

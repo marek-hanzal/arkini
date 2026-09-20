@@ -9,7 +9,7 @@ import { readProjectFilesFx } from "~/project-authoring/filesystem/fx/readProjec
 import { writeProjectFilesFx } from "~/project-authoring/filesystem/fx/writeProjectFilesFx";
 
 export const createProjectFilesHarness = async () => {
-	const parent = await mkdtemp(join(tmpdir(), "arkini-editor-files-"));
+	const parent = await mkdtemp(join(tmpdir(), "serakki-editor-files-"));
 	const root = join(parent, "project");
 
 	return {

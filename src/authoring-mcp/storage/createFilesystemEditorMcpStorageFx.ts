@@ -16,7 +16,7 @@ import { z } from "zod";
 
 /*
 	OAuth records are library-owned protocol data, but the persisted collection and
-	its identities are Arkini-owned. Parse the complete records before indexing them.
+	its identities are Serakki-owned. Parse the complete records before indexing them.
 */
 const StoredDateSchema = z.iso
 	.datetime()
@@ -96,7 +96,7 @@ interface State {
 	readonly refreshTokens: Map<string, RefreshToken>;
 }
 
-const createPasswordFn = () => `arkini_mcp_${createId()}`;
+const createPasswordFn = () => `serakki_mcp_${createId()}`;
 
 const createStateFn = (port = DefaultPort, ngrok?: StoredNgrok): State => ({
 	port,

@@ -59,21 +59,21 @@ export const Route = createFileRoute("/editor/$projectId")({
 		void context.rendererRuntime
 			.runPromise(syncRoutedEditorBoardGameFx(loaderData))
 			.catch((cause) =>
-				console.error("Arkini editor Board game could not be synchronized.", cause),
+				console.error("Serakki editor Board game could not be synchronized.", cause),
 			);
 	},
 	onStay: ({ context, loaderData }) => {
 		void context.rendererRuntime
 			.runPromise(syncRoutedEditorBoardGameFx(loaderData))
 			.catch((cause) =>
-				console.error("Arkini editor Board game could not be synchronized.", cause),
+				console.error("Serakki editor Board game could not be synchronized.", cause),
 			);
 	},
 	onLeave: ({ context }) => {
 		void context.rendererRuntime
 			.runPromise(releaseCurrentEditorBoardGameFx)
 			.catch((cause) =>
-				console.error("Arkini editor Board game could not be released.", cause),
+				console.error("Serakki editor Board game could not be released.", cause),
 			);
 	},
 	shouldReload: ({ cause }) => cause === "enter",

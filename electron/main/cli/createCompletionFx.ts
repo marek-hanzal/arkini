@@ -10,7 +10,7 @@ import { ElectronMainError } from "../ElectronMainError";
 import { createManagedFileFx } from "./createManagedFileFx";
 
 const execFileAsyncFn = promisify(execFile);
-const managedCompletionPrefix = "# arkini-cli managed completion\n";
+const managedCompletionPrefix = "# serakki-cli managed completion\n";
 
 /** Main-process ownership of one user-level shell completion file. */
 export interface Completion {
@@ -87,7 +87,7 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 		} catch (cause) {
 			return {
 				type: "unavailable",
-				message: `The packaged arkini-cli launcher is unavailable: ${String(cause)}`,
+				message: `The packaged serakki-cli launcher is unavailable: ${String(cause)}`,
 			};
 		}
 		const inspection = await requireManagedFileFn().inspectFn();
@@ -105,7 +105,7 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 				type: "repairable",
 				completionPath: completion.path,
 				shell: completion.shell,
-				message: `${completion.shell} completion no longer matches this Arkini installation.`,
+				message: `${completion.shell} completion no longer matches this Serakki installation.`,
 			};
 		}
 		return {

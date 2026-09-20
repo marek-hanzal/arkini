@@ -19,7 +19,7 @@ describe("Settings CLI command", () => {
 		const install = vi.fn(() =>
 			Promise.resolve({
 				type: "installed" as const,
-				commandPath: "/tmp/arkini-cli",
+				commandPath: "/tmp/serakki-cli",
 			}),
 		);
 		Object.defineProperty(window, "arkini", {
@@ -29,7 +29,7 @@ describe("Settings CLI command", () => {
 					statusFn: () =>
 						Promise.resolve({
 							type: "not-installed" as const,
-							commandPath: "/tmp/arkini-cli",
+							commandPath: "/tmp/serakki-cli",
 						}),
 					installFn: install,
 					replaceFn: vi.fn(),
@@ -66,7 +66,7 @@ describe("Settings CLI command", () => {
 		const replace = vi.fn(() =>
 			Promise.resolve({
 				type: "installed" as const,
-				commandPath: "/tmp/arkini-cli",
+				commandPath: "/tmp/serakki-cli",
 			}),
 		);
 		Object.defineProperty(window, "arkini", {
@@ -76,7 +76,7 @@ describe("Settings CLI command", () => {
 					statusFn: () =>
 						Promise.resolve({
 							type: "conflict" as const,
-							commandPath: "/tmp/arkini-cli",
+							commandPath: "/tmp/serakki-cli",
 							message: "Another file already exists.",
 							replaceable: true,
 						}),

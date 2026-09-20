@@ -403,7 +403,7 @@ describe("CLI completion", () => {
 				},
 			);
 
-			expect(result.stdout).toContain("arkini-cli");
+			expect(result.stdout).toContain("serakki-cli");
 			expect(result.stdout).toContain("editor");
 			expect(result.stdout).toContain("game");
 			expect(result.stdout).toContain("arkpack");

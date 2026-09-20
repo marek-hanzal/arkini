@@ -1,10 +1,10 @@
-# Arkini
+# Serakki
 
 <p align="center">
-  <img src="game/arkini/image/hero.png" alt="Arkini logo with winged unicorns and magical machinery" width="100%" />
+  <img src="game/arkini/image/hero.png" alt="Serakki logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Arkini is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Artwork. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results through `item_chain({ itemId, detail, maxDepth })`: `full` (default) includes complete step details, while `summary` retains starting operations, immediate branches and outcome states. Depth defaults to 5 and accepts 1–12; cycle detection and the expansion safety limit apply to both.
+Serakki is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Arkpacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Artwork. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results through `item_chain({ itemId, detail, maxDepth })`: `full` (default) includes complete step details, while `summary` retains starting operations, immediate branches and outcome states. Depth defaults to 5 and accepts 1–12; cycle detection and the expansion safety limit apply to both.
 
 ## Start here
 
@@ -70,7 +70,7 @@ argc mcp-inspect
 
 `argc platform-check` is the narrower hosted macOS/Windows portability gate. It runs the production build plus real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; this does not replace the complete closing gate.
 
-Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
+Serakki is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 
 MCP `item_input`, `item_output`, and `item_estimate` accept optional `detail: "summary" | "full"`. Omitted detail preserves the full response. Relation summaries retain every discovered operation and traversal level, compact authored inputs, output sets/roll chances, and gates without repeated dependency witnesses. Estimate summaries retain the selected result and all requirement groups without the selected fact DAG. Diagnostic counts describe only the estimator's bounded reported evidence, not a complete count of rejected alternatives. Both modes use the same analysis; summary reduces presentation size without imposing a result limit.
 
@@ -79,14 +79,16 @@ MCP `schema_detail({ id, resolveDepth })` optionally inlines registered schema r
 The installed macOS CLI can list Editor projects and run one project's configured MCP server without opening the Editor:
 
 ```bash
-arkini-cli project list
-arkini-cli editor mcp <projectId>
-arkini-cli editor mcp <projectId> --remote
+serakki-cli project list
+serakki-cli editor mcp <projectId>
+serakki-cli editor mcp <projectId> --remote
 ```
 
 Local MCP always starts on the port saved by the Editor. `--remote` additionally starts its saved ngrok tunnel. Running the GUI Editor and this command at the same time is unsupported and is not actively prevented.
 
 ## Distribution
+
+The application ships as **Serakki** (`dev.marekhanzal.serakki`) with the `serakki-cli` command. The staged rebrand currently retains `~/.arkini`, the `arkini://` protocol, the official `game/arkini` project and package ID, internal source identifiers, and the Arkpack/save formats. These data identities change in a separate step.
 
 `argc preview-macos --build` rebuilds and launches an unpacked local arm64 app. Always pass `--build` to platform preview commands so the opened application reflects the current source. A failed Arkpack rebuild is reported but does not block this interactive preview: it keeps the last successful bundled Arkpack when available, or starts without one. `argc build`, repository checks, and native package commands remain strict. Native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications. GitHub exposes the SHA-256 digest of every published release asset.
 

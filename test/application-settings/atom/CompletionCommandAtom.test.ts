@@ -19,7 +19,7 @@ describe("Settings CLI completion command", () => {
 		const install = vi.fn(() =>
 			Promise.resolve({
 				type: "installed" as const,
-				completionPath: "/tmp/_arkini-cli",
+				completionPath: "/tmp/_serakki-cli",
 				shell: "zsh" as const,
 			}),
 		);
@@ -31,7 +31,7 @@ describe("Settings CLI completion command", () => {
 						statusFn: () =>
 							Promise.resolve({
 								type: "not-installed" as const,
-								completionPath: "/tmp/_arkini-cli",
+								completionPath: "/tmp/_serakki-cli",
 								shell: "zsh" as const,
 							}),
 						installFn: install,

@@ -9,7 +9,7 @@ import { createFilesystemEditorProjectRepositoryFx } from "~/project-authoring/f
 const toUserErrorFn = (cause: unknown) =>
 	new CliError.UserError({
 		cause,
-		userMessage: cause instanceof Error ? cause.message : "Arkini Editor MCP failed.",
+		userMessage: cause instanceof Error ? cause.message : "Serakki Editor MCP failed.",
 	});
 
 const runEditorMcpFx = Effect.fn("runEditorMcpFx")(function* ({
@@ -71,7 +71,7 @@ const runEditorMcpFx = Effect.fn("runEditorMcpFx")(function* ({
 			yield* Effect.sync(() =>
 				console.log(
 					[
-						`Arkini Editor MCP is ready for project ${projectId}.`,
+						`Serakki Editor MCP is ready for project ${projectId}.`,
 						`Local: http://127.0.0.1:${localPort}/editor/mcp`,
 						...(remoteResult?.overview.remote.type === "ready"
 							? [

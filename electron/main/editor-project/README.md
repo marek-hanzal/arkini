@@ -35,7 +35,7 @@ This island has deliberate cross-process and lifecycle coupling:
 - `filesystem-write` stays mechanical and imports none of its product consumers. The Editor repository supplies path ownership, file sets, serialization and error meaning.
 - MCP calls the same Project Repository capabilities and revision checks. It never owns a second project store or bypass mutation path.
 - Arkpack import is selected in Electron main, stream-extracted through the shared admission owner, and published as one managed portable project. Archive and resource bytes never cross renderer IPC.
-- `arkini-cli editor mcp <projectId>` selects one catalog project and composes the same Node-compatible filesystem MCP storage, HTTP server, tools and optional ngrok tunnel as the GUI Editor without starting Electron.
+- `serakki-cli editor mcp <projectId>` selects one catalog project and composes the same Node-compatible filesystem MCP storage, HTTP server, tools and optional ngrok tunnel as the GUI Editor without starting Electron.
 
 The top-level domain graph is cyclic; the process authority is not. Physical mutation terminates in this filesystem repository.
 

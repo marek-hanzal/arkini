@@ -7,5 +7,5 @@ import "~/launcher/ui/launcher.css";
 import "~/main.css";
 
 void RendererRuntime.runPromise(bootstrapRendererFx()).catch((cause) => {
-	console.error("Arkini renderer fatal surface could not render.", cause);
+	console.error("Serakki renderer fatal surface could not render.", cause);
 });

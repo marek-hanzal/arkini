@@ -81,7 +81,7 @@ export const Route = createFileRoute("/")({
 											{
 												kind: "loading",
 											},
-											() => <p>Preparing Arkini…</p>,
+											() => <p>Preparing Serakki…</p>,
 										)
 										.with(
 											{

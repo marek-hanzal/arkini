@@ -84,7 +84,7 @@ beforeEach(async () => {
 	});
 	// Isolate expensive compilation while exercising the real Argcfile control flow and hasher.
 	await writeFile(
-		join(root, ".out/desktop/build/main/cli/arkini.js"),
+		join(root, ".out/desktop/build/main/cli/serakki.js"),
 		`
 const fs = require("node:fs");
 if (process.argv.includes("pack")) {

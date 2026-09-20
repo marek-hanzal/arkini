@@ -61,7 +61,7 @@ const renderConsentFn = (candidate: unknown, error?: string) => {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Connect to Arkini</title>
+<title>Connect to Serakki</title>
 <style>
 :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #111014; color: #f5f2f7; }
 body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
@@ -75,15 +75,15 @@ button { width: 100%; margin-top: 18px; border: 0; border-radius: 10px; padding:
 </head>
 <body>
 <main>
-<p>ARKINI EDITOR</p>
+<p>SERAKKI EDITOR</p>
 <h1>Connect ${escapeHtmlFn(clientName)}</h1>
-<p>This client will receive full access to the project currently open in Arkini.</p>
-<p>After approval, Arkini will return control to ${escapeHtmlFn(redirectUri)}.</p>
+<p>This client will receive full access to the project currently open in Serakki.</p>
+<p>After approval, Serakki will return control to ${escapeHtmlFn(redirectUri)}.</p>
 ${error === undefined ? "" : `<p class="error">${escapeHtmlFn(error)}</p>`}
 <form method="post" action="/confirm">
 ${hidden}
 <label>Remote password<input type="password" name="secret" required autocomplete="current-password"></label>
-<button type="submit">Connect to Arkini</button>
+<button type="submit">Connect to Serakki</button>
 </form>
 </main>
 </body>
@@ -208,7 +208,7 @@ export const createRemoteHandlerFx = Effect.fn("createRemoteHandlerFx")(
 					provider,
 					baseUrl: origin,
 					resourceServerUrl: resourceUrl,
-					resourceName: "Arkini Editor MCP",
+					resourceName: "Serakki Editor MCP",
 					scopesSupported: [
 						"editor:mcp",
 					],

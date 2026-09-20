@@ -1,5 +1,5 @@
-appId: dev.marekhanzal.arkini
-productName: Arkini
+appId: dev.marekhanzal.serakki
+productName: Serakki
 asar: true
 asarUnpack:
   - node_modules/@img/**/*
@@ -70,8 +70,8 @@ mac:
       arch:
         - arm64
   extraFiles:
-    - from: electron/resources/arkini-cli
-      to: MacOS/arkini-cli
+    - from: electron/resources/serakki-cli
+      to: MacOS/serakki-cli
 dmg:
   title: ${productName} ${version}
 win:

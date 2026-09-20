@@ -41,7 +41,7 @@ export namespace createManagedFileFx {
 	}
 }
 
-/** Owns the race-safe filesystem mechanics shared by Arkini-managed CLI artifacts. */
+/** Owns the race-safe filesystem mechanics shared by Serakki-managed CLI artifacts. */
 export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 	path,
 	managedPrefix,
@@ -54,7 +54,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		const opened = await handle.stat();
 		const contents = await handle.readFile("utf8");
 		if (!opened.isFile() || !contents.startsWith(managedPrefix)) {
-			throw new Error(`${subject} at ${path} is no longer managed by Arkini.`);
+			throw new Error(`${subject} at ${path} is no longer managed by Serakki.`);
 		}
 		return opened;
 	};
@@ -125,7 +125,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		await mkdir(directory, {
 			recursive: true,
 		});
-		const temporaryDirectory = await mkdtemp(join(directory, ".arkini-cli-"));
+		const temporaryDirectory = await mkdtemp(join(directory, ".serakki-cli-"));
 		const temporaryPath = join(temporaryDirectory, basename(path));
 		try {
 			await writeFile(temporaryPath, await readExpectedContentsFn(), {
@@ -152,7 +152,7 @@ export const createManagedFileFx = Effect.fn("createManagedFileFx")(function* ({
 		try {
 			const opened = await assertManagedHandleFn(handle);
 			const directory = dirname(path);
-			const claimDirectory = await mkdtemp(join(directory, ".arkini-cli-removal-"));
+			const claimDirectory = await mkdtemp(join(directory, ".serakki-cli-removal-"));
 			const claimedPath = join(claimDirectory, basename(path));
 			try {
 				await rename(path, claimedPath);

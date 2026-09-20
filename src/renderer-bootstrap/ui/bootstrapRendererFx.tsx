@@ -23,7 +23,7 @@ import { bootstrapWindowModeSyncFx } from "~/window-mode/fx/bootstrapWindowModeS
 
 const readRendererRootFx = Effect.sync(() => {
 	const rootElement = document.getElementById("root");
-	if (rootElement === null) throw new Error("Arkini root element is missing.");
+	if (rootElement === null) throw new Error("Serakki root element is missing.");
 	return rootElement;
 });
 
@@ -33,7 +33,7 @@ const forceCloseUnrenderableRendererFx = Effect.sync(() =>
 	Effect.catchCause((cause) =>
 		Effect.sync(() => {
 			console.error(
-				"Arkini could not close after its fatal renderer surface failed.",
+				"Serakki could not close after its fatal renderer surface failed.",
 				Cause.squash(cause),
 			);
 		}),

@@ -14,8 +14,8 @@ describe("Settings CLI integration", () => {
 			{
 				cliStatus: {
 					type: "conflict",
-					commandPath: "/tmp/arkini-cli",
-					message: "Another file already exists at /tmp/arkini-cli.",
+					commandPath: "/tmp/serakki-cli",
+					message: "Another file already exists at /tmp/serakki-cli.",
 					replaceable: true,
 				},
 			},
@@ -34,11 +34,11 @@ describe("Settings CLI integration", () => {
 			{
 				cliStatus: {
 					type: "not-installed",
-					commandPath: "/tmp/arkini-cli",
+					commandPath: "/tmp/serakki-cli",
 				},
 				completionStatus: {
 					type: "installed",
-					completionPath: "/tmp/_arkini-cli",
+					completionPath: "/tmp/_serakki-cli",
 					shell: "zsh",
 				},
 			},

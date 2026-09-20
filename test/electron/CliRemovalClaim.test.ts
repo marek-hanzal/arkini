@@ -54,7 +54,7 @@ afterEach(async () => {
 });
 
 const createLauncher = async (directory: string) => {
-	const launcherPath = join(directory, "Arkini.app", "Contents", "MacOS", "arkini-cli");
+	const launcherPath = join(directory, "Serakki.app", "Contents", "MacOS", "serakki-cli");
 	await mkdir(dirname(launcherPath), {
 		recursive: true,
 	});
@@ -68,7 +68,7 @@ const expectForeignClaimPreserved = async (path: string) => {
 		withFileTypes: true,
 	});
 	const claimDirectory = entries.find(
-		(entry) => entry.isDirectory() && entry.name.startsWith(".arkini-cli-removal-"),
+		(entry) => entry.isDirectory() && entry.name.startsWith(".serakki-cli-removal-"),
 	);
 	if (claimDirectory === undefined) throw new Error("Expected a preserved removal claim.");
 	await expect(
@@ -78,7 +78,7 @@ const expectForeignClaimPreserved = async (path: string) => {
 
 const replacePathBeforeClaim = (path: string, displacedPath: string) => {
 	renameInterception.before = async (from, to, rename) => {
-		if (from !== path || !dirname(to).includes(".arkini-cli-removal-")) return;
+		if (from !== path || !dirname(to).includes(".serakki-cli-removal-")) return;
 		renameInterception.before = undefined;
 		await rename(path, displacedPath);
 		await writeFile(path, "foreign\n");
@@ -90,7 +90,7 @@ describe.skipIf(process.platform === "win32")("CLI removal claims", () => {
 		const directory = await mkdtemp(join(tmpdir(), "arkini CLI removal claim-"));
 		temporaryDirectories.push(directory);
 		const launcherPath = await createLauncher(directory);
-		const commandPath = join(directory, "home", ".local", "bin", "arkini-cli");
+		const commandPath = join(directory, "home", ".local", "bin", "serakki-cli");
 		const installation = Effect.runSync(
 			createInstallationFx({
 				commandPath,
@@ -110,7 +110,7 @@ describe.skipIf(process.platform === "win32")("CLI removal claims", () => {
 		const directory = await mkdtemp(join(tmpdir(), "arkini completion removal claim-"));
 		temporaryDirectories.push(directory);
 		const launcherPath = await createLauncher(directory);
-		const completionPath = join(directory, "home", ".zsh", "completions", "_arkini-cli");
+		const completionPath = join(directory, "home", ".zsh", "completions", "_serakki-cli");
 		const completion = Effect.runSync(
 			createCompletionFx({
 				completion: {

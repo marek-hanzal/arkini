@@ -153,7 +153,7 @@ export const useGameMenuActions = ({
 		);
 
 	const status = (() => {
-		if (saveAndExitPending) return "Saving and exiting Arkini…";
+		if (saveAndExitPending) return "Saving and exiting Serakki…";
 		if (savePending) return "Saving…";
 		if (commandFailure !== undefined) {
 			const label = commandFailure.command === "save-and-exit" ? "Save and exit" : "Save";

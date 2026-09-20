@@ -36,7 +36,7 @@ export const LauncherHero = ({ compact = false, style }: LauncherHeroProps) => {
 			/>
 			<img
 				src={heroUrl}
-				alt="Arkini"
+				alt="Serakki"
 				className="absolute inset-0 z-10 size-full object-contain"
 				data-ui="LauncherHeroArtwork"
 				draggable={false}

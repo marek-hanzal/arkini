@@ -3,7 +3,7 @@ declare const __ARKINI_RELEASE_IDENTITY__: string | undefined;
 
 export const ArkpackDistributionChannelDefaults = {
 	issuer: "https://token.actions.githubusercontent.com",
-	workflow: "https://github.com/marek-hanzal/arkini/.github/workflows/release.yml",
+	workflow: "https://github.com/marek-hanzal/serakki/.github/workflows/release.yml",
 } as const;
 
 const escapeRegExpFn = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

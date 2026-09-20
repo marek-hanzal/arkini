@@ -59,7 +59,7 @@ renderer      → RendererRuntime
 product CLI   → NodeRuntime.runMain
 ```
 
-`arkini-cli editor mcp` owns its filesystem repository, MCP server and optional ngrok tunnel directly inside the existing Node CLI root. It does not start or import an Electron runtime. The GUI Electron main composes the same Node-compatible capabilities independently.
+`serakki-cli editor mcp` owns its filesystem repository, MCP server and optional ngrok tunnel directly inside the existing Node CLI root. It does not start or import an Electron runtime. The GUI Electron main composes the same Node-compatible capabilities independently.
 
 Application Runtime also owns the renderer's one process-lifetime Atom registry/runtime bridge. It installs exact lower capabilities and never becomes a second source of their state. Ordinary components, callbacks and IPC handlers do not create private runtimes or Promise schedulers.
 
@@ -153,7 +153,7 @@ The Editor's portable current tree is canonical. The GUI Electron main and Node 
 
 External authored JSON and Resource catalog changes are ignored while mounted. Project projections hold resource metadata, never binary bodies; item/config saves write only changed JSON and the revision marker. Requested image and music previews stream current files from their registered native paths; Music may request byte ranges. Already mounted images, audio and Editor Board are not watched. Explicit Refresh settles writes, discards drafts and Editor Board, rereads the directory metadata and publishes one replacement. There is no watcher, merge, repair mode, partial load or second project store. MCP uses the same repository, schemas and revision checks.
 
-The GUI Editor and `arkini-cli editor mcp` are alternative owners of that repository. Running them concurrently is unsupported by contract and is neither detected nor prevented.
+The GUI Editor and `serakki-cli editor mcp` are alternative owners of that repository. Running them concurrently is unsupported by contract and is neither detected nor prevented.
 
 Gameplay version is output metadata stored as `{ major, minor, suffix? }` in `game.json`. Build remembers valid settings before compilation without advancing authoring revision or publishing a Board change; failed compilation retains those settings. The produced artifact owns the formatted version used by install compatibility. Ordinary content writes preserve output metadata and retain their normal revision boundary.
 

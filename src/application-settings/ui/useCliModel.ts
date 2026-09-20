@@ -6,12 +6,12 @@ import { CliCommandAtom } from "~/application-settings/atom/CliCommandAtom";
 import { useCliCompletionModel } from "~/application-settings/ui/useCliCompletionModel";
 
 const describeInstallationFn = (status: InstallationStatus | undefined) => {
-	if (status === undefined) return "Checking whether arkini-cli can be installed…";
+	if (status === undefined) return "Checking whether serakki-cli can be installed…";
 	switch (status.type) {
 		case "installed":
-			return `arkini-cli is installed at ${status.commandPath}.`;
+			return `serakki-cli is installed at ${status.commandPath}.`;
 		case "not-installed":
-			return `Install arkini-cli at ${status.commandPath}. Its directory must be on your shell PATH.`;
+			return `Install serakki-cli at ${status.commandPath}. Its directory must be on your shell PATH.`;
 		case "repairable":
 			return status.message;
 		case "conflict":

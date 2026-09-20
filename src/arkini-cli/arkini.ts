@@ -38,7 +38,7 @@ const EditorCommand = Command.make("editor")
 	)
 	.pipe(Command.withDescription("Editor project commands."));
 
-const ArkiniCommand = Command.make("arkini-cli")
+const ArkiniCommand = Command.make("serakki-cli")
 	.pipe(
 		Command.withSubcommands([
 			ArkpackCommand,
@@ -48,7 +48,7 @@ const ArkiniCommand = Command.make("arkini-cli")
 			ProjectCommand,
 		]),
 	)
-	.pipe(Command.withDescription("Arkini game authoring and Arkpack commands."));
+	.pipe(Command.withDescription("Serakki game authoring and Arkpack commands."));
 
 Command.run(ArkiniCommand, {
 	version: ArkiniAppVersion,

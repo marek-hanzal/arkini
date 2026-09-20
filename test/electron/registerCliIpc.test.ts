@@ -43,41 +43,41 @@ describe("CLI installation IPC", () => {
 		const cliCompletion: Completion = {
 			readStatusFx: Effect.succeed({
 				type: "not-installed",
-				completionPath: "/tmp/_arkini-cli",
+				completionPath: "/tmp/_serakki-cli",
 				shell: "zsh",
 			}),
 			installFx: Effect.succeed({
 				type: "installed",
-				completionPath: "/tmp/_arkini-cli",
+				completionPath: "/tmp/_serakki-cli",
 				shell: "zsh",
 			}),
 			replaceFx: Effect.succeed({
 				type: "installed",
-				completionPath: "/tmp/_arkini-cli",
+				completionPath: "/tmp/_serakki-cli",
 				shell: "zsh",
 			}),
 			uninstallFx: Effect.succeed({
 				type: "not-installed",
-				completionPath: "/tmp/_arkini-cli",
+				completionPath: "/tmp/_serakki-cli",
 				shell: "zsh",
 			}),
 		};
 		const cliInstallation: Installation = {
 			readStatusFx: Effect.succeed({
 				type: "not-installed",
-				commandPath: "/tmp/arkini-cli",
+				commandPath: "/tmp/serakki-cli",
 			}),
 			installFx: Effect.succeed({
 				type: "installed",
-				commandPath: "/tmp/arkini-cli",
+				commandPath: "/tmp/serakki-cli",
 			}),
 			replaceFx: Effect.succeed({
 				type: "installed",
-				commandPath: "/tmp/arkini-cli",
+				commandPath: "/tmp/serakki-cli",
 			}),
 			uninstallFx: Effect.succeed({
 				type: "not-installed",
-				commandPath: "/tmp/arkini-cli",
+				commandPath: "/tmp/serakki-cli",
 			}),
 		};
 		const trustedRenderer: TrustedRenderer = {

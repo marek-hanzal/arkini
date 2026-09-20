@@ -42,7 +42,7 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 		return (
 			<ActionErrorPage
 				{...props}
-				description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
+				description="Serakki could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
 				resetFn={() => {
 					void router.invalidate().catch(() => undefined);
 				}}

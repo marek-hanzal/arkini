@@ -59,9 +59,9 @@ export const About = () => {
 			data-ui="About"
 		>
 			<div className="relative z-10 grid gap-4 text-center">
-				<h1 className="text-2xl font-semibold">About Arkini</h1>
+				<h1 className="text-2xl font-semibold">About Serakki</h1>
 				<p className="leading-7 text-muted">
-					Arkini is a merge-economy game about building production chains, discovering
+					Serakki is a merge-economy game about building production chains, discovering
 					recipes and shaping a living board-sized world.
 				</p>
 				<section className="border-t border-line pt-4 text-left">
@@ -69,9 +69,9 @@ export const About = () => {
 						Project credits
 					</p>
 					<p className="mt-2 text-sm leading-6 text-muted">
-						Arkini is being forged through the hard work of ChatGPT-5.6, standing on the
-						the blood-soaked work of ChatGPT-5.4 and ChatGPT-5.5, whose heroic suffering
-						produced the original v0; Marek Hanzal, serving as chief mega-nag,
+						Serakki is being forged through the hard work of ChatGPT-5.6, standing on
+						the the blood-soaked work of ChatGPT-5.4 and ChatGPT-5.5, whose heroic
+						suffering produced the original v0; Marek Hanzal, serving as chief mega-nag,
 						relentless tormentor, and supreme authority on whether anything is actually
 						good enough; and with inspiration from his wife, Šárka Hanušová.
 					</p>

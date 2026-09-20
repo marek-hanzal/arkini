@@ -55,7 +55,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.diagnostics).pipe(
 		Effect.catch((cause) =>
 			Effect.sync(() => {
-				console.error("Arkini diagnostic log could not be initialized.", cause);
+				console.error("Serakki diagnostic log could not be initialized.", cause);
 				return {
 					directoryPath: "",
 					writeFx: () => Effect.void,
@@ -98,7 +98,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 					}),
 				);
 			} catch (cause) {
-				console.error("Arkini could not record the fatal main-process error.", cause);
+				console.error("Serakki could not record the fatal main-process error.", cause);
 			}
 		};
 		process.on("uncaughtExceptionMonitor", reportFatalProcessErrorFn);
@@ -113,7 +113,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 					})
 					.pipe(Effect.andThen(diagnostics.closeFx)),
 			).catch((cause) => {
-				console.error("Arkini diagnostic log could not be closed.", cause);
+				console.error("Serakki diagnostic log could not be closed.", cause);
 			});
 		});
 	});
@@ -134,7 +134,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 				}).pipe(
 					Effect.tap(() =>
 						Effect.sync(() =>
-							console.error("Arkini editor storage could not be initialized.", cause),
+							console.error(
+								"Serakki editor storage could not be initialized.",
+								cause,
+							),
 						),
 					),
 					Effect.as({
@@ -202,19 +205,19 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		isPackaged: app.isPackaged,
 		developmentRendererUrl: process.env.ELECTRON_RENDERER_URL,
 	});
-	const packagedCliLauncherPath = join(dirname(process.execPath), "arkini-cli");
+	const packagedCliLauncherPath = join(dirname(process.execPath), "serakki-cli");
 	const transientMacAppPath =
 		process.execPath.startsWith("/Volumes/") || process.execPath.includes("/AppTranslocation/");
 	const cliUnavailableMessage = !app.isPackaged
-		? "arkini-cli can be installed from a packaged Arkini build."
+		? "serakki-cli can be installed from a packaged Serakki build."
 		: process.platform === "darwin"
 			? transientMacAppPath
-				? "Move Arkini.app from the disk image to Applications before installing arkini-cli."
+				? "Move Serakki.app from the disk image to Applications before installing serakki-cli."
 				: undefined
-			: `arkini-cli installation is not available on ${process.platform} yet.`;
+			: `serakki-cli installation is not available on ${process.platform} yet.`;
 	const homePath = app.getPath("home");
 	const cliInstallation = yield* createInstallationFx({
-		commandPath: join(homePath, ".local", "bin", "arkini-cli"),
+		commandPath: join(homePath, ".local", "bin", "serakki-cli"),
 		launcherPath: packagedCliLauncherPath,
 		unavailableMessage: cliUnavailableMessage,
 	});
@@ -223,7 +226,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		completion:
 			shellName === "zsh"
 				? {
-						path: join(homePath, ".zsh", "completions", "_arkini-cli"),
+						path: join(homePath, ".zsh", "completions", "_serakki-cli"),
 						shell: "zsh",
 					}
 				: shellName === "bash"
@@ -234,7 +237,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 								"share",
 								"bash-completion",
 								"completions",
-								"arkini-cli",
+								"serakki-cli",
 							),
 							shell: "bash",
 						}
@@ -245,7 +248,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 									".config",
 									"fish",
 									"completions",
-									"arkini-cli.fish",
+									"serakki-cli.fish",
 								),
 								shell: "fish",
 							}
@@ -331,7 +334,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		app.on("activate", () => {
 			if (BrowserWindow.getAllWindows().length === 0) {
 				void ElectronMainRuntime.runPromise(createWindowFx).catch((error) => {
-					console.error("Arkini could not create a replacement window.", error);
+					console.error("Serakki could not create a replacement window.", error);
 					void ElectronMainRuntime.runPromise(
 						writeApplicationSafelyFx({
 							level: "error",

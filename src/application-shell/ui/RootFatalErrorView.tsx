@@ -15,7 +15,7 @@ interface RootFatalErrorViewProps {
 /** Renders and closes the application from the unrecoverable renderer boundary. */
 export const RootFatalErrorView = ({ error, onCloseFn }: RootFatalErrorViewProps) => {
 	useEffect(() => {
-		console.error("Arkini renderer entered the fatal lifecycle boundary.", error);
+		console.error("Serakki renderer entered the fatal lifecycle boundary.", error);
 		RendererRuntime.runSync(
 			writeApplicationLogFx({
 				level: "fatal",
@@ -42,7 +42,7 @@ export const RootFatalErrorView = ({ error, onCloseFn }: RootFatalErrorViewProps
 				>
 					<h1 className="text-xl font-semibold text-danger">Something critical failed</h1>
 					<p className="text-sm text-muted">
-						Arkini cannot continue this session. Close the application and start the
+						Serakki cannot continue this session. Close the application and start the
 						game again.
 					</p>
 					<div className="flex flex-wrap justify-center gap-3">
@@ -50,14 +50,14 @@ export const RootFatalErrorView = ({ error, onCloseFn }: RootFatalErrorViewProps
 							onClick={() => {
 								void RendererRuntime.runPromise(openDiagnosticDirectoryFx()).catch(
 									(cause) => {
-										console.error("Arkini could not open diagnostics.", cause);
+										console.error("Serakki could not open diagnostics.", cause);
 									},
 								);
 							}}
 						>
 							Open diagnostics
 						</Button>
-						<DangerButton onClick={onCloseFn}>Close Arkini</DangerButton>
+						<DangerButton onClick={onCloseFn}>Close Serakki</DangerButton>
 					</div>
 				</section>
 			</main>

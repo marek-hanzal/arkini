@@ -17,17 +17,23 @@ import fixture from "./verifyArkpackProvenanceFx.test/official.fixture.json";
 // payload/channel. Production trust remains src/arkpack-artifact/constant/trusted-root.json.
 const payload = Uint8Array.from(Buffer.from(fixture.payloadBase64, "base64"));
 const proof = new TextEncoder().encode(JSON.stringify(fixture.proof));
+// The signed fixture has its own immutable channel; it does not track product renames.
+const fixtureChannel = {
+	issuer: ArkpackDistributionChannel.issuer,
+	subjectAlternativeName:
+		/^https:\/\/github[.]com\/marek-hanzal\/arkini\/[.]github\/workflows\/release[.]yml@.+$/,
+};
 const verifyFixtureFx = (artifact: Uint8Array, candidateProof: Uint8Array | null = proof) =>
 	verifyArkpackProofFx({
 		artifact,
 		proof: candidateProof ?? undefined,
-		channel: ArkpackDistributionChannel,
+		channel: fixtureChannel,
 		trustedRoot: fixture.trustedRoot,
 	});
 
 describe("Arkpack release provenance", () => {
 	it("keeps release versions outside the exact workflow channel identity", () => {
-		const workflow = "https://github.com/marek-hanzal/arkini/.github/workflows/release.yml";
+		const workflow = "https://github.com/marek-hanzal/serakki/.github/workflows/release.yml";
 		expect(
 			ArkpackDistributionChannel.subjectAlternativeName.test(`${workflow}@refs/tags/v0.4.9`),
 		).toBe(true);
@@ -44,9 +50,24 @@ describe("Arkpack release provenance", () => {
 		expect(ArkpackDistributionChannel.subjectAlternativeName.test(workflow)).toBe(false);
 	});
 
-	it("offline-verifies the checked-in payload proof as Official", async () => {
+	it("offline-verifies the checked-in payload proof for its signed fixture channel", async () => {
 		await expect(Effect.runPromise(verifyFixtureFx(payload))).resolves.toEqual({
 			type: "official",
+		});
+	});
+
+	it("does not trust the former repository proof after the Serakki channel rename", async () => {
+		await expect(
+			Effect.runPromise(
+				verifyArkpackProofFx({
+					artifact: payload,
+					proof,
+					channel: ArkpackDistributionChannel,
+					trustedRoot: fixture.trustedRoot,
+				}),
+			),
+		).resolves.toEqual({
+			type: "community",
 		});
 	});
 
@@ -81,7 +102,7 @@ describe("Arkpack release provenance", () => {
 							resources: [],
 							size: release.byteLength,
 						},
-						channel: ArkpackDistributionChannel,
+						channel: fixtureChannel,
 						trustedRoot: fixture.trustedRoot,
 					}),
 				),

@@ -43,7 +43,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 							Cause.hasInterruptsOnly(cause)
 								? Effect.void
 								: logGameAudioFailureFx(
-										"Arkini game audio disposal failed; gameplay continues.",
+										"Serakki game audio disposal failed; gameplay continues.",
 										cause,
 									),
 						),
@@ -62,7 +62,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
 							: logGameAudioFailureFx(
-									"Arkini game audio unlock failed; gameplay continues.",
+									"Serakki game audio unlock failed; gameplay continues.",
 									cause,
 								),
 					),
@@ -80,7 +80,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
 							: logGameAudioFailureFx(
-									"Arkini game audio preparation failed; gameplay continues.",
+									"Serakki game audio preparation failed; gameplay continues.",
 									cause,
 								),
 					),
@@ -100,7 +100,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
 							: logGameAudioFailureFx(
-									"Arkini game audio batch failed; gameplay continues.",
+									"Serakki game audio batch failed; gameplay continues.",
 									cause,
 								),
 					),
@@ -125,7 +125,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
 							: logGameAudioFailureFx(
-									"Arkini game audio cue failed; gameplay continues.",
+									"Serakki game audio cue failed; gameplay continues.",
 									cause,
 								),
 					),
@@ -141,7 +141,7 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 					Cause.hasInterruptsOnly(cause)
 						? Effect.void
 						: logGameAudioFailureFx(
-								"Arkini detail music failed; gameplay continues.",
+								"Serakki detail music failed; gameplay continues.",
 								cause,
 							),
 				),

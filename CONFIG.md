@@ -22,7 +22,7 @@ sfx/<id>.json
 notes/<noteId>.json
 ```
 
-Only `game.json`, `items/<uid>.json`, `artwork/*.png`, `image/*.png`, `music/*.ogg`, and `sfx/*.ogg` are game sources. The paired `music/<id>.json` and `sfx/<id>.json` files are validated Editor metadata, not gameplay config or packed resources. Project metadata, audio names, Notes, locks, temporary files, and ignored `build/` artifacts never enter Arkpacks. Editor Build and `arkini-cli game pack` validate and build the current saved sources directly.
+Only `game.json`, `items/<uid>.json`, `artwork/*.png`, `image/*.png`, `music/*.ogg`, and `sfx/*.ogg` are game sources. The paired `music/<id>.json` and `sfx/<id>.json` files are validated Editor metadata, not gameplay config or packed resources. Project metadata, audio names, Notes, locks, temporary files, and ignored `build/` artifacts never enter Arkpacks. Editor Build and `serakki-cli game pack` validate and build the current saved sources directly.
 
 - `project.json` is the root marker and contains Arkini writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
@@ -59,12 +59,12 @@ Validation, Editor Build, tests, and packing must not assemble their own variati
 Product commands are:
 
 ```bash
-arkini-cli game schema [--output path]
-arkini-cli game validate [project] [--silent]
-arkini-cli game pack [project] [--silent]
-arkini-cli game replay --incident <latest-directory> --until-fatal [--timeout-ms 10000]
-arkini-cli game replay --arkpack <file> --save <file> --until-fatal [--timeout-ms 10000]
-arkini-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-session-id>] [--section all|summary|failure|history|runtime]
+serakki-cli game schema [--output path]
+serakki-cli game validate [project] [--silent]
+serakki-cli game pack [project] [--silent]
+serakki-cli game replay --incident <latest-directory> --until-fatal [--timeout-ms 10000]
+serakki-cli game replay --arkpack <file> --save <file> --until-fatal [--timeout-ms 10000]
+serakki-cli diagnostics slice <incident-or-jsonl-path> [--session-id <jsonl-session-id>] [--section all|summary|failure|history|runtime]
 ```
 
 Replay assumes the supplied Arkpack has already passed the canonical build path, decodes its current artifact and save contracts, and runs the real production `GameSession` without touching installed saves. The incident form resolves the fixed `game.arkpack` and `save.arksave` files. Its bounded text report distinguishes a reproduced fatal failure from a timeout, includes semantic history, and compares the initial and final runtime without dumping duplicate complete states. The common rotating diagnostic directory contains human-readable application runtime and fatal history in `application.md` beside the private gameplay session stream in `diagnostics.jsonl`. Every application record carries severity, the `package.json` application version, packaged/development mode, platform, and architecture; any bounded normalization or final text truncation is visible in the record. Diagnostic slicing defaults to the latest failed gameplay session, accepts the fixed text incident or that rotating JSONL stream, reports malformed input without physical paths, and renders only stable human/LLM-readable text. `--session-id` selects only JSONL sessions; `--section runtime` reads only the fixed incident's complete runtime projection. The fixed incident directory links `incident.md`, `failure.md`, `history.md`, and `runtime-state.md`; Item references include runtime ID, authored ID, and immutable configured UID whenever resolution is possible.

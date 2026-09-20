@@ -120,7 +120,7 @@ export const renderSettings = async (
 		activeGame = false,
 		cliStatus = {
 			type: "unavailable",
-			commandPath: "/tmp/arkini-cli",
+			commandPath: "/tmp/serakki-cli",
 			message: "Available in packaged builds.",
 		},
 		completionStatus = {
@@ -152,7 +152,7 @@ export const renderSettings = async (
 			type: "not-installed" as const,
 			completionPath:
 				completionStatus.type === "unavailable"
-					? "/tmp/_arkini-cli"
+					? "/tmp/_serakki-cli"
 					: completionStatus.completionPath,
 			shell:
 				completionStatus.type === "unavailable" ? ("zsh" as const) : completionStatus.shell,

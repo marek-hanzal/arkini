@@ -79,7 +79,7 @@ jobs:
       - name: Upload canonical Arkpack
         uses: actions/upload-artifact@v6
         with:
-          name: arkini-canonical-${{ github.ref_name }}
+          name: serakki-canonical-${{ github.ref_name }}
           path: game/arkini/build/arkini.arkpack
           if-no-files-found: error
           retention-days: ${{ contains(github.ref_name, '-') && 14 || 30 }}
@@ -98,7 +98,7 @@ jobs:
           - name: macOS arm64
             os: macos-15
             command: package-macos
-            artifact: arkini-macos-arm64
+            artifact: serakki-macos-arm64
             paths: |
               .out/desktop/release/*.dmg
               .out/desktop/release/*.zip
@@ -106,20 +106,20 @@ jobs:
           - name: Windows x64
             os: windows-2025
             command: package-windows
-            artifact: arkini-windows-x64
+            artifact: serakki-windows-x64
             paths: |
               .out/desktop/release/*.exe
               .out/desktop/release/*.zip
           - name: Linux x64
             os: ubuntu-24.04
             command: package-linux
-            artifact: arkini-linux-x64
+            artifact: serakki-linux-x64
             paths: |
               .out/desktop/release/*.AppImage
           - name: Linux arm64
             os: ubuntu-24.04-arm
             command: package-linux-arm64
-            artifact: arkini-linux-arm64
+            artifact: serakki-linux-arm64
             paths: |
               .out/desktop/release/*.AppImage
     defaults:
@@ -141,7 +141,7 @@ jobs:
       - name: Download canonical Arkpack
         uses: actions/download-artifact@v8
         with:
-          name: arkini-canonical-${{ github.ref_name }}
+          name: serakki-canonical-${{ github.ref_name }}
           path: .release
       - name: Package release artifacts
         run: ./Argcfile.sh "${{ matrix.command }}"
@@ -163,22 +163,22 @@ jobs:
       - name: Download macOS artifacts
         uses: actions/download-artifact@v8
         with:
-          name: arkini-macos-arm64-${{ github.ref_name }}
+          name: serakki-macos-arm64-${{ github.ref_name }}
           path: release/macos
       - name: Download Windows artifacts
         uses: actions/download-artifact@v8
         with:
-          name: arkini-windows-x64-${{ github.ref_name }}
+          name: serakki-windows-x64-${{ github.ref_name }}
           path: release/windows
       - name: Download Linux x64 artifacts
         uses: actions/download-artifact@v8
         with:
-          name: arkini-linux-x64-${{ github.ref_name }}
+          name: serakki-linux-x64-${{ github.ref_name }}
           path: release/linux-x64
       - name: Download Linux arm64 artifacts
         uses: actions/download-artifact@v8
         with:
-          name: arkini-linux-arm64-${{ github.ref_name }}
+          name: serakki-linux-arm64-${{ github.ref_name }}
           path: release/linux-arm64
       - name: Publish GitHub release
         env:
@@ -199,5 +199,5 @@ jobs:
             release/linux-arm64/*.AppImage \
             --verify-tag \
             "${release_flags[@]}" \
-            --title "Arkini $GITHUB_REF_NAME" \
+            --title "Serakki $GITHUB_REF_NAME" \
             --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 applications with one embedded official Arkpack, plus the same standalone Arkpack. GitHub exposes the SHA-256 digest of every asset; macOS requires the normal Gatekeeper override."

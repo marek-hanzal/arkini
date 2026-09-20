@@ -4,14 +4,14 @@ set -euo pipefail
 
 if [[ "${ARKINI_MISE_ACTIVE:-}" != "1" ]]; then
 	if ! command -v mise >/dev/null 2>&1; then
-		echo "Arkini repository commands require mise: https://mise.jdx.dev" >&2
+		echo "Serakki repository commands require mise: https://mise.jdx.dev" >&2
 		exit 127
 	fi
 	export ARKINI_MISE_ACTIVE=1
 	exec mise exec -- bash "$0" "$@"
 fi
 
-# @describe Arkini repository commands
+# @describe Serakki repository commands
 
 desktop_version() {
 	node -p "require('./package.json').version"
@@ -72,7 +72,7 @@ install_game_arkpack() {
 			"$record" == "$(cat "$cache")" ]]; then
 			echo "Arkpack unchanged; reusing $target."
 		else
-			node .out/desktop/build/main/cli/arkini.js "${pack_arguments[@]}" || return $?
+			node .out/desktop/build/main/cli/serakki.js "${pack_arguments[@]}" || return $?
 		fi
 	else
 		source_dir=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd) || return $?
@@ -86,7 +86,7 @@ install_game_arkpack() {
 		cp "$source" "$target" || return $?
 	fi
 	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
-	node .out/desktop/build/main/cli/arkini.js arkpack verify "$target" |
+	node .out/desktop/build/main/cli/serakki.js arkpack verify "$target" |
 		grep -Fx "{\"type\":\"$verdict\"}" || return $?
 	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" && "${ARKINI_RELEASE_SIGN:-}" != 1 ]]; then
 		{ printf '%s\n' "$fingerprint"; coreutils sha256sum --binary "$target"; } > "$cache" || return $?
@@ -128,8 +128,8 @@ copy_paste_check() {
 package_macos_artifacts() {
 	local packaged_asar packaged_cli version
 	version=$(desktop_version)
-	packaged_cli=.out/desktop/release/mac-arm64/Arkini.app/Contents/MacOS/arkini-cli
-	packaged_asar=.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/app.asar
+	packaged_cli=.out/desktop/release/mac-arm64/Serakki.app/Contents/MacOS/serakki-cli
+	packaged_asar=.out/desktop/release/mac-arm64/Serakki.app/Contents/Resources/app.asar
 	electron-builder \
 		--config electron-builder.yml \
 		--mac \
@@ -138,7 +138,7 @@ package_macos_artifacts() {
 	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
 	"$packaged_cli" --version | grep -F "$version"
 	cmp game/arkini/build/arkini.arkpack \
-		.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/game/arkini.arkpack
+		.out/desktop/release/mac-arm64/Serakki.app/Contents/Resources/game/arkini.arkpack
 	"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
 		grep -Fx "{\"type\":\"${ARKINI_EXPECTED_PROVENANCE:-community}\"}"
 	"$packaged_cli" editor mcp --help | grep -F -- "--remote"
@@ -364,7 +364,7 @@ build() {
 # @flag --skip-arkpack Skip bundled game Arkpack packing and verification
 preview-macos() {
 	local application
-	application=.out/desktop/release/mac-arm64/Arkini.app
+	application=.out/desktop/release/mac-arm64/Serakki.app
 	if [[ "${argc_build:-0}" == 1 || ! -d "$application" ]]; then
 		clean_desktop
 		build_desktop
@@ -384,12 +384,12 @@ preview-macos() {
 	open "$application"
 }
 
-# @cmd Run the compiled Arkini CLI
+# @cmd Run the compiled Serakki CLI
 # @flag --build Force a rebuild before running the CLI
-# @arg arguments~ Arguments passed to arkini-cli
+# @arg arguments~ Arguments passed to serakki-cli
 preview-cli() {
 	local cli
-	cli=.out/desktop/build/main/cli/arkini.js
+	cli=.out/desktop/build/main/cli/serakki.js
 	if [[ "${argc_build:-0}" == 1 || ! -f "$cli" ]]; then
 		clean_desktop
 		build

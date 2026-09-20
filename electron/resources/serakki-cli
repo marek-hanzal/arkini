@@ -3,6 +3,6 @@ set -eu
 
 macos_directory=$(cd "$(dirname "$0")" && pwd)
 export ELECTRON_RUN_AS_NODE=1
-exec "$macos_directory/Arkini" \
-	"$macos_directory/../Resources/app.asar/app/main/cli/arkini.js" \
+exec "$macos_directory/Serakki" \
+	"$macos_directory/../Resources/app.asar/app/main/cli/serakki.js" \
 	"$@"

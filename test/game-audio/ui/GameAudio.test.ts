@@ -605,11 +605,11 @@ describe("GameAudio", () => {
 		listener(jobStartedBatch);
 		await vi.waitFor(() => {
 			expect(consoleError).toHaveBeenCalledWith(
-				"Arkini game audio unlock failed; gameplay continues.",
+				"Serakki game audio unlock failed; gameplay continues.",
 				unlockError,
 			);
 			expect(consoleError).toHaveBeenCalledWith(
-				"Arkini game audio batch failed; gameplay continues.",
+				"Serakki game audio batch failed; gameplay continues.",
 				Cause.die(playError),
 			);
 		});
@@ -618,7 +618,7 @@ describe("GameAudio", () => {
 		roots.splice(roots.indexOf(root), 1);
 		await vi.waitFor(() =>
 			expect(consoleError).toHaveBeenCalledWith(
-				"Arkini game audio disposal failed; gameplay continues.",
+				"Serakki game audio disposal failed; gameplay continues.",
 				closeError,
 			),
 		);

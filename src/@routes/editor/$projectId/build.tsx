@@ -27,7 +27,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 		const artifactSummary =
 			controller.artifact === undefined
 				? undefined
-				: `${readArkpackArtifactNameFn(controller.artifact.projectId)} · ${formatByteSizeFn(controller.artifact.size)} · v${controller.artifact.version} · Arkini ${ArkiniAppVersion} · Community`;
+				: `${readArkpackArtifactNameFn(controller.artifact.projectId)} · ${formatByteSizeFn(controller.artifact.size)} · v${controller.artifact.version} · Serakki ${ArkiniAppVersion} · Community`;
 
 		return (
 			<EditorSectionPage

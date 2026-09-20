@@ -24,7 +24,7 @@ describe("editor MCP server", () => {
 		const client = await connectMcpClient(port);
 		expect(client.getProtocolEra()).toBe("modern");
 		expect(client.getServerVersion()).toMatchObject({
-			name: "arkini-editor",
+			name: "serakki-editor",
 			version: ArkiniAppVersion,
 		});
 		const tools = await client.listTools();
@@ -177,7 +177,7 @@ describe("editor MCP server", () => {
 			isError: true,
 			content: [
 				{
-					text: "Editor operation failed: No editor project is currently open. Open a project in Arkini before using editor tools.",
+					text: "Editor operation failed: No editor project is currently open. Open a project in Serakki before using editor tools.",
 					type: "text",
 				},
 			],

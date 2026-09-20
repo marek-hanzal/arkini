@@ -45,7 +45,7 @@ describe("bootstrapRendererFx", () => {
 		const forceCloseFn = vi.fn();
 		installLifecycleFn(forceCloseFn);
 
-		await expect(runBootstrapFx()).rejects.toThrow("Arkini root element is missing.");
+		await expect(runBootstrapFx()).rejects.toThrow("Serakki root element is missing.");
 
 		expect(createRootFn).not.toHaveBeenCalled();
 		expect(forceCloseFn).toHaveBeenCalledOnce();

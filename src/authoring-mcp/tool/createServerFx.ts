@@ -441,7 +441,7 @@ const readCurrentProjectFx = (
 				const current = readProjectContextFn();
 				if (current === undefined)
 					throw new Error(
-						"No editor project is currently open. Open a project in Arkini before using editor tools.",
+						"No editor project is currently open. Open a project in Serakki before using editor tools.",
 					);
 				return current;
 			},
@@ -486,12 +486,12 @@ const createServerFn = (
 	};
 	const server = new McpServer(
 		{
-			name: "arkini-editor",
+			name: "serakki-editor",
 			version: ArkiniAppVersion,
 		},
 		{
 			instructions:
-				"Every project tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail with optional resolveDepth (0–256) to inline registered references. Remaining $refs can be read through schema_detail again. Create and edit tools persist canonical saved editor state.",
+				"Every project tool targets only the project currently open in the Serakki editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail with optional resolveDepth (0–256) to inline registered references. Remaining $refs can be read through schema_detail again. Create and edit tools persist canonical saved editor state.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
@@ -695,7 +695,7 @@ const createServerFn = (
 		"project",
 		{
 			description:
-				"Summarize the project currently open in Arkini, including its identity, version, layouts, and collection sizes.",
+				"Summarize the project currently open in Serakki, including its identity, version, layouts, and collection sizes.",
 			inputSchema: ProjectInputSchema,
 		},
 		async () => runToolFn(readProjectFx().pipe(Effect.map(readProjectTextFn))),

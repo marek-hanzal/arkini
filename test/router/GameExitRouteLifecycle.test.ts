@@ -150,7 +150,7 @@ describe("game exit action route", () => {
 		const container = await renderRouter(router);
 
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(container.textContent).toContain("Saving and exiting Arkini…");
+		expect(container.textContent).toContain("Saving and exiting Serakki…");
 		expect(container.querySelector('[data-ui="Board"]')).toBeNull();
 		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
 
@@ -187,7 +187,7 @@ describe("game exit action route", () => {
 		expect(container.textContent).not.toContain("Force");
 		expect(console.error).toHaveBeenCalledOnce();
 		expect(vi.mocked(console.error).mock.calls[0]?.[0]).toBe(
-			"Arkini controlled close finalization failed; closing anyway.",
+			"Serakki controlled close finalization failed; closing anyway.",
 		);
 		const loggedCause = vi.mocked(console.error).mock.calls[0]?.[1];
 		expect(loggedCause).toBeInstanceOf(CriticalGameLifecycleError);

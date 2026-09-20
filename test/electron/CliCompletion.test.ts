@@ -22,8 +22,8 @@ afterEach(async () => {
 const createFixture = async () => {
 	const directory = await mkdtemp(join(tmpdir(), "arkini CLI completion-"));
 	temporaryDirectories.push(directory);
-	const launcherPath = join(directory, "Arkini.app", "Contents", "MacOS", "arkini-cli");
-	const completionPath = join(directory, "home", ".zsh", "completions", "_arkini-cli");
+	const launcherPath = join(directory, "Serakki.app", "Contents", "MacOS", "serakki-cli");
+	const completionPath = join(directory, "home", ".zsh", "completions", "_serakki-cli");
 	await mkdir(dirname(launcherPath), {
 		recursive: true,
 	});
@@ -53,7 +53,7 @@ describe.skipIf(process.platform === "win32")("filesystem CLI completion", () =>
 			shell: "zsh",
 		});
 		expect(await readFile(fixture.completionPath, "utf8")).toBe(
-			"# arkini-cli managed completion\n# generated zsh completion\n",
+			"# serakki-cli managed completion\n# generated zsh completion\n",
 		);
 		await expect(Effect.runPromise(fixture.completion.uninstallFx)).resolves.toMatchObject({
 			type: "not-installed",
@@ -67,7 +67,7 @@ describe.skipIf(process.platform === "win32")("filesystem CLI completion", () =>
 		});
 		await writeFile(
 			fixture.completionPath,
-			"# arkini-cli managed completion\n# stale completion\n",
+			"# serakki-cli managed completion\n# stale completion\n",
 		);
 
 		await expect(Effect.runPromise(fixture.completion.readStatusFx)).resolves.toMatchObject({

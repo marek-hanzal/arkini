@@ -689,7 +689,7 @@ Editor MCP:
   value: Editor MCP
 Editor MCP help:
   value: |
-    MCP lets Codex and other AI tools read and edit the project currently open in Arkini.
+    MCP lets Codex and other AI tools read and edit the project currently open in Serakki.
 
     > A connected client has full project access. Connect only tools you trust and keep the intended project open.
 
@@ -704,7 +704,7 @@ Editor MCP help:
     1. Save the domain without `https://` or a path, then paste the authtoken.
     2. Return to **Server** and start Remote MCP.
     3. Copy the published address into your client.
-    4. When Arkini asks, paste the password from **Copy password**.
+    4. When Serakki asks, paste the password from **Copy password**.
 
     The token is stored unencrypted on this device, so use one you can revoke. **Reset password** stops Remote MCP and disconnects existing clients.
 Editor game could not synchronize:
@@ -941,7 +941,7 @@ Item ID help:
   value: |
     The stable name used by production, merges, rules, Board layouts and MCP.
 
-    Renaming it updates project links when you **Save**. Keep it short, for example `healing-kit`. Text outside Arkini cannot be updated.
+    Renaming it updates project links when you **Save**. Keep it short, for example `healing-kit`. Text outside Serakki cannot be updated.
 Item UID:
   value: Item UID
 Item action empty title:
@@ -2097,7 +2097,7 @@ Target unit cost help:
     Choose a Board item that pays the Unit cost.
 
     - **Selected item:** which kind may pay.
-    - **Board distance:** how far away Arkini may look.
+    - **Board distance:** how far away Serakki may look.
     - **Cost:** Units removed each time the action or job starts.
 
     The payer stays in place. At zero Units, it depletes normally.

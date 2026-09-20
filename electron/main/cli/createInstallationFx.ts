@@ -7,10 +7,10 @@ import type { InstallationStatus } from "~electron/contract/cli/InstallationStat
 import { ElectronMainError } from "../ElectronMainError";
 import { createManagedFileFx } from "./createManagedFileFx";
 
-const managedCommandPrefix = "#!/bin/sh\n# arkini-cli managed launcher\n";
+const managedCommandPrefix = "#!/bin/sh\n# serakki-cli managed launcher\n";
 const quoteShellArgumentFn = (value: string) => `'${value.replaceAll("'", `'"'"'`)}'`;
 
-/** Main-process ownership of the one user-level arkini-cli command link. */
+/** Main-process ownership of the one user-level serakki-cli command link. */
 export interface Installation {
 	readonly readStatusFx: Effect.Effect<InstallationStatus, ElectronMainError, never>;
 	readonly installFx: Effect.Effect<InstallationStatus, ElectronMainError, never>;
@@ -58,7 +58,7 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 			return {
 				type: "unavailable",
 				commandPath,
-				message: `The packaged arkini-cli launcher is unavailable: ${String(cause)}`,
+				message: `The packaged serakki-cli launcher is unavailable: ${String(cause)}`,
 			};
 		}
 
@@ -76,7 +76,7 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 				type: "repairable",
 				commandPath,
 				message:
-					"arkini-cli no longer matches this app or its executable permissions changed. Repair the command to use this Arkini installation.",
+					"serakki-cli no longer matches this app or its executable permissions changed. Repair the command to use this Serakki installation.",
 			};
 		}
 		return {

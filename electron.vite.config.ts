@@ -46,7 +46,7 @@ export default defineConfig(({ command }) => {
 					],
 					input: {
 						index: resolve("electron/main/index.ts"),
-						"cli/arkini": resolve("src/arkini-cli/arkini.ts"),
+						"cli/serakki": resolve("src/arkini-cli/arkini.ts"),
 					},
 				},
 			},

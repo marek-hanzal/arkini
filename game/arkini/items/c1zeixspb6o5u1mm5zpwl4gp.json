@@ -1,28 +1,28 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "j3uy7jal3539u6u1zqup1mcz",
-		"id": "arrows",
-		"title": "Arrows",
-		"description": "Quill",
-		"ui": "simple",
+		"uid": "c1zeixspb6o5u1mm5zpwl4gp",
+		"id": "quiver",
+		"title": "Quiver",
+		"draft": true,
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"arrows"
+				"quiver"
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 1,
+		"maxStackSize": 4,
 		"merge": [
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-quiver"
+					"itemId": "bow"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "quiver"
+				"result": "bow-and-arrows"
 			}
 		],
 		"maxQueueSize": 1,

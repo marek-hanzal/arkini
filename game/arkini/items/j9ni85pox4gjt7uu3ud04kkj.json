@@ -4,8 +4,8 @@
 		"uid": "j9ni85pox4gjt7uu3ud04kkj",
 		"id": "bow",
 		"title": "Bow",
-		"ui": "simple",
 		"description": "Bow. Hunt something",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "quiver"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "bow-and-arrows"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

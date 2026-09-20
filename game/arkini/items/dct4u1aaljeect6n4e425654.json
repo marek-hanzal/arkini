@@ -1,0 +1,20 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "dct4u1aaljeect6n4e425654",
+		"id": "wooden-sticks",
+		"title": "Wooden Sticks",
+		"draft": true,
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"wooden-sticks"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 10,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

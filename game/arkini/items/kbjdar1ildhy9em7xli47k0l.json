@@ -1,0 +1,20 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "kbjdar1ildhy9em7xli47k0l",
+		"id": "unfinished-arrows",
+		"title": "Unfinished Arrows",
+		"draft": true,
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"unfinished-arrows"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

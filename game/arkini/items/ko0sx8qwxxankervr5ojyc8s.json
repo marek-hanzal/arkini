@@ -4,8 +4,8 @@
 		"uid": "ko0sx8qwxxankervr5ojyc8s",
 		"id": "arrowheads",
 		"title": "Arrowheads",
-		"ui": "simple",
 		"description": "Arrow. Oh, just a tip",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,17 @@
 		},
 		"scope": "any",
 		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wooden-sticks"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "unfinished-arrows"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

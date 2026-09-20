@@ -4,8 +4,8 @@
 		"uid": "qxqafymuxw7keyketjpn9cye",
 		"id": "feather",
 		"title": "Feather",
-		"ui": "simple",
 		"description": "Piece of arrow. Or piece of writing tool",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -23,6 +23,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "flying-pig"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "unfinished-arrows"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "arrows"
 			}
 		],
 		"maxQueueSize": 1,

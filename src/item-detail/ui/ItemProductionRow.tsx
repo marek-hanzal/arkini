@@ -45,15 +45,15 @@ export const ItemProductionRow = ({
 			}}
 			data-line-id={line.id}
 		>
-			<div className="relative isolate flex min-h-48 flex-col pt-3 pb-[13rem] transition-opacity duration-300 group-data-[ui-rule-disabled=true]/production-row:opacity-45">
+			<div className="relative isolate grid min-h-[17.6rem] grid-rows-[minmax(3.5rem,1fr)_auto_minmax(3.5rem,1fr)] py-3 transition-opacity duration-300 group-data-[ui-rule-disabled=true]/production-row:opacity-45">
 				{backdrop}
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-3 self-start">
 					{leadingControl}
 					<h3 className="min-w-0 text-xl font-semibold transition-colors duration-300 ease-out group-hover/production-row:text-accent">
 						{line.title}
 					</h3>
-					<span className="inline-flex shrink-0 items-center gap-2 text-muted">
-						<Clock className="size-[1em] shrink-0" />
+					<span className="inline-flex shrink-0 items-center gap-2 text-xl text-muted">
+						<Clock className="size-8 shrink-0" />
 						{formatDurationFn(line.runtimeMs)}
 					</span>
 					<div className="ml-auto flex shrink-0 items-center gap-8">{actions}</div>

@@ -632,3 +632,100 @@ it("shows interval-only Clock phase from stored material without borrowing an un
 		})[0].clock,
 	).toBeUndefined();
 });
+
+it("reports the selected external target's remaining units, including during an active job", () => {
+	const unitLine = {
+		...line,
+		input: [
+			{
+				type: "units",
+				units: {
+					from: "target",
+					cost: 1,
+				},
+				query: {
+					scope: "board",
+					distance: "far",
+					selector: {
+						type: "item",
+						itemId: water.item.id,
+					},
+				},
+			},
+		],
+	} satisfies typeof line;
+	const source = {
+		...water,
+		remainingUnits: 7,
+		item: {
+			...water.item,
+			units: {
+				amount: 20,
+			},
+		},
+		location: {
+			scope: "board",
+			space: 0,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const runtime = {
+		...base,
+		items: [
+			{
+				...owner,
+				item: {
+					...owner.item,
+					lines: [
+						unitLine,
+					],
+				},
+			},
+			source,
+			{
+				...source,
+				id: "other-source",
+				remainingUnits: 50,
+				location: {
+					...source.location,
+					position: {
+						x: 2,
+						y: 0,
+					},
+				},
+			},
+		],
+	};
+	for (const running of [
+		false,
+		true,
+	]) {
+		const inputs = Effect.runSync(
+			readItemLineInputsFx({
+				ownerItemId: owner.id,
+				line: unitLine,
+				runtime: {
+					...runtime,
+					jobs: running
+						? [
+								{
+									id: "job",
+									ownerItemId: owner.id,
+									lineId: line.id,
+									durationMs: 1000,
+									remainingMs: 500,
+								},
+							]
+						: [],
+				},
+			}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig)),
+		);
+		expect(inputs[0]).toMatchObject({
+			availableQuantity: 7,
+			committed: running,
+		});
+	}
+});

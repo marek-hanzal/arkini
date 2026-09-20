@@ -243,7 +243,8 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					continue;
 				}
 				if (active.stage === "exiting") continue;
-				if (active.stage === "contacted") {
+				// Engine settlement can overtake the final travel frame; visible payloads still exit smoothly.
+				if (active.actor.container.visible) {
 					active.stage = "exiting";
 					let settled = false;
 					const settleFn = () => {

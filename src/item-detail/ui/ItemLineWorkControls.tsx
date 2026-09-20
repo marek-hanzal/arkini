@@ -100,7 +100,7 @@ export const ItemLineWorkControls = ({
 								onClick={controller.clearFn}
 								data-ui="ItemLineClear"
 							>
-								<span className="text-3xl font-semibold tabular-nums">
+								<span className="text-xl font-semibold tabular-nums">
 									x{queued}
 								</span>
 								<ListX className="size-8" />
@@ -140,7 +140,7 @@ export const ItemLineWorkControls = ({
 									},
 								})}
 							>
-								x1 <Clock className="size-5" />
+								<Clock className="size-8 shrink-0" />
 								<ItemLineCountdown jobId={props.jobId} />
 							</span>
 						</Tooltip>

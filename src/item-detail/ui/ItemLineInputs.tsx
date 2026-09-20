@@ -41,7 +41,13 @@ export const ItemLineInputs = ({
 				}),
 			);
 			if (Exit.isFailure(result)) throw result.cause;
-			return result.value;
+			const liveLine = runtime.items
+				.find((item) => item.id === ownerItemId)
+				?.item.lines.find((candidate) => candidate.id === line.id);
+			return result.value.filter((input) => {
+				const requirement = (liveLine ?? line).input[input.inputIndex];
+				return requirement.type !== "units" || requirement.query.distance !== "self";
+			});
 		},
 		[
 			game,
@@ -55,7 +61,7 @@ export const ItemLineInputs = ({
 	if (inputs.length === 0) return null;
 	return (
 		<div
-			className="mt-3 flex flex-wrap items-center gap-3"
+			className="flex flex-wrap items-center gap-3"
 			data-ui="ItemLineInputs"
 		>
 			{inputs.map((input) => {
@@ -94,7 +100,7 @@ export const ItemLineInputs = ({
 										{translator.textFn("Click to bring this here.")}
 									</span>
 								) : null}
-								{input.type === "materials" && input.availableQuantity > 0 ? (
+								{input.availableQuantity > 0 ? (
 									<span className="block">
 										{translator.textFn("Available")}:{" "}
 										<strong className="font-bold">
@@ -131,7 +137,7 @@ export const ItemLineInputs = ({
 								})}
 							>
 								<ItemArtwork
-									size="lg"
+									className="size-[5.76rem]"
 									sourceUrl={game.getResourceUrlFn(item.artwork.default[0])}
 									compositeUrl={
 										item.artwork.default[1] === undefined

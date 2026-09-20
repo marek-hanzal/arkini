@@ -74,7 +74,10 @@ const item = {
 };
 
 describe("delivery runtime", () => {
-	it("fades concurrent deliveries after they settle back into Inventory", () => {
+	it.each([
+		true,
+		false,
+	])("fades settled deliveries (travel completed: %s)", (travelCompleted) => {
 		const firstItem = {
 			...item,
 			id: "runtime:returning-water",
@@ -178,7 +181,7 @@ describe("delivery runtime", () => {
 				generation: 1,
 				remainingDurationMs: 500,
 				item: firstItem,
-				phase: "returning",
+				phase: travelCompleted ? "returning" : "outbound",
 				to: origin,
 			},
 			{
@@ -186,7 +189,7 @@ describe("delivery runtime", () => {
 				generation: 1,
 				remainingDurationMs: 500,
 				item: secondItem,
-				phase: "returning",
+				phase: travelCompleted ? "returning" : "outbound",
 				to: origin,
 			},
 		] satisfies TileDelivery[];
@@ -194,8 +197,10 @@ describe("delivery runtime", () => {
 		Effect.runSync(runtime.syncFx(deliveries));
 		const travels = animations.filter((animation) => animation.channel === "pose");
 		expect(travels).toHaveLength(2);
-		for (const travel of travels) {
-			travel.onCompleteFn?.();
+		if (travelCompleted) {
+			for (const travel of travels) {
+				travel.onCompleteFn?.();
+			}
 		}
 
 		Effect.runSync(runtime.syncFx([]));
@@ -205,6 +210,11 @@ describe("delivery runtime", () => {
 		expect(fades).toHaveLength(2);
 		expect(destroyed).toEqual([]);
 		expect(actors.size).toBe(2);
+		Effect.runSync(runtime.syncFx([]));
+		expect(destroyed).toEqual([]);
+		expect(
+			animations.filter((animation) => animation.channel === "lifecycle-opacity"),
+		).toHaveLength(2);
 
 		for (const fade of fades) {
 			fade.onCompleteFn?.();

@@ -32,15 +32,16 @@ export const Tooltip = ({
 		open,
 		onOpenChange: setOpenFn,
 		placement,
+		strategy: "fixed",
+		// The portal belongs to the viewport, not the trigger's clipped animation containers.
 		middleware: [
 			offset(8),
 			flip({
-				altBoundary: true,
-				boundary: "clippingAncestors",
+				boundary: [],
+				padding: 8,
 			}),
 			shift({
-				altBoundary: true,
-				boundary: "clippingAncestors",
+				boundary: [],
 				padding: 8,
 			}),
 		],
@@ -70,7 +71,7 @@ export const Tooltip = ({
 						ref={refs.setFloating}
 						style={floatingStyles}
 						className={twMerge(
-							"z-10 max-w-[40.5rem] rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 text-foreground shadow-xl",
+							"z-10 max-w-[min(40.5rem,calc(100vw-1rem))] rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 break-words whitespace-normal text-foreground shadow-xl",
 							contentClassName,
 						)}
 						{...getFloatingPropsFn()}

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
@@ -31,7 +32,7 @@ export namespace readItemLineInputsFx {
 		readonly quantity: MaterialSchema.Type["quantity"];
 		readonly filled: number;
 		readonly available: boolean;
-		/** For materials, obtainable stock plus this slot's incoming deliveries, excluding already filled material. */
+		/** For materials, obtainable stock plus this slot's incoming deliveries, excluding already filled material. For units, the selected target's remaining units. */
 		readonly availableQuantity: number;
 		readonly committed: boolean;
 		readonly canWithdraw: boolean;
@@ -78,9 +79,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			)?.id === work.id);
 	// Resolve the whole line so several inputs cannot claim the same remaining units.
 	const unitReadiness =
-		job === undefined &&
-		owner?.location.scope === "board" &&
-		liveLine?.input.some((input) => input.type === "units")
+		owner?.location.scope === "board" && liveLine?.input.some((input) => input.type === "units")
 			? yield* resolveLineRunFx({
 					ownerItemId: owner.id,
 					lineId: line.id,
@@ -92,7 +91,12 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 		if (input.type === "units") {
 			// Active jobs have already paid their unit costs, even if that exhausted the payer.
 			const committed = job !== undefined;
-			const available = unitReadiness?.input[inputIndex]?.resolution.ready ?? false;
+			const resolution = unitReadiness?.input[inputIndex]?.resolution;
+			const available = resolution?.ready ?? false;
+			const target =
+				resolution?.type === "units"
+					? runtime.items.find((item) => item.id === resolution.targetItemId)
+					: undefined;
 			inputs.push({
 				type: "units",
 				inputIndex,
@@ -103,7 +107,8 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				},
 				filled: available || committed ? 1 : 0,
 				available,
-				availableQuantity: available ? 1 : 0,
+				availableQuantity:
+					target === undefined ? 0 : (readItemRemainingUnitsFn(target) ?? 0),
 				committed,
 				canWithdraw: false,
 				canAutofill: false,

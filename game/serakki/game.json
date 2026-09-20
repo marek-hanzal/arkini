@@ -359,6 +359,69 @@
 				"space": 0,
 				"itemId": "forest",
 				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 6,
+				"space": 0,
+				"itemId": "flint-and-steel",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 7,
+				"space": 0,
+				"itemId": "campfire-extinguished",
+				"quantity": 1
+			},
+			{
+				"x": 3,
+				"y": 8,
+				"space": 0,
+				"itemId": "paper",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 7,
+				"space": 0,
+				"itemId": "firewood",
+				"quantity": 1
+			},
+			{
+				"x": 13,
+				"y": 3,
+				"space": 0,
+				"itemId": "bucket-with-water",
+				"quantity": 1
+			},
+			{
+				"x": 14,
+				"y": 3,
+				"space": 0,
+				"itemId": "empty-well",
+				"quantity": 1
+			},
+			{
+				"x": 13,
+				"y": 6,
+				"space": 0,
+				"itemId": "scissors",
+				"quantity": 1
+			},
+			{
+				"x": 13,
+				"y": 7,
+				"space": 0,
+				"itemId": "dirty-scrubbing-brush",
+				"quantity": 1
+			},
+			{
+				"x": 13,
+				"y": 8,
+				"space": 0,
+				"itemId": "boar-bristles",
+				"quantity": 1
 			}
 		],
 		"inventory": [],

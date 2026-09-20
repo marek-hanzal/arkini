@@ -155,7 +155,7 @@ const readLineDescriptorFn = (
 				anyOf: [],
 			},
 			availability,
-			owner.clock !== undefined && owner.ui === "simple"
+			owner.clock !== undefined && owner.ui === "simple" && !line.default
 				? readAcquisitionAvailabilityRequirementsFn({
 						items: config.items,
 						rules: owner.clock.rules,
@@ -174,6 +174,7 @@ const readLineExecutionConstraintFn = (
 	line: LineSchema.Type,
 ): AcquisitionRoute["executionConstraint"] => {
 	const clock = owner.clock;
+	if (line.default) return clock?.durationMs === undefined ? undefined : "finite-owner-lifetime";
 	if (clock === undefined) return owner.ui === "simple" ? "unavailable" : undefined;
 	if (
 		owner.ui === "simple" &&
@@ -216,7 +217,9 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	}
 	const executionConstraint = readLineExecutionConstraintFn(descriptor.owner, descriptor.line);
 	const minimumActionIntervalMs =
-		descriptor.owner.clock !== undefined && descriptor.owner.ui === "simple"
+		descriptor.owner.clock !== undefined &&
+		descriptor.owner.ui === "simple" &&
+		!descriptor.line.default
 			? descriptor.owner.clock.intervalMs
 			: undefined;
 	const execution = {

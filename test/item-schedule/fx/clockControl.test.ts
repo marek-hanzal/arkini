@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
+import { fillDefaultLineQueueFx } from "~/production-job/fx/fillDefaultLineQueueFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
@@ -52,7 +53,8 @@ it("rejects player production commands atomically for simple UI owners while aut
 			const material = yield* spawnClockItemFx("permit", 5);
 			const before = yield* readRuntimeFx();
 			const enqueue = yield* Effect.result(
-				enqueueDefaultLineFx({
+				enqueueLineFx({
+					lineId: "a",
 					ownerItemId: owner.id,
 				}),
 			);
@@ -256,4 +258,59 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 		remainingIntervalMs: 500,
 		remainingDurationMs: 1000,
 	});
+});
+
+it.each([
+	true,
+	false,
+])("allows simple-item Board production only with an authored default (%s)", (defaultLine) => {
+	const config = createClockConfig({
+		ui: "simple",
+		lines: [
+			{
+				...createLine({
+					id: "a",
+					default: defaultLine,
+				}),
+				runtimeMs: 400,
+			},
+		],
+	});
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const owner = yield* spawnClockItemFx();
+			const before = yield* readRuntimeFx();
+			const enqueue = yield* Effect.result(
+				enqueueDefaultLineFx({
+					ownerItemId: owner.id,
+				}),
+			);
+			const after = yield* readRuntimeFx();
+			const fill = yield* Effect.result(
+				fillDefaultLineQueueFx({
+					ownerItemId: owner.id,
+				}),
+			);
+			return {
+				before,
+				after,
+				enqueue,
+				fill,
+			};
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+	expect(result.enqueue._tag).toBe(defaultLine ? "Success" : "Failure");
+	expect(result.fill._tag).toBe(defaultLine ? "Success" : "Failure");
+	if (defaultLine)
+		expect(result.after.jobQueue).toMatchObject([
+			{
+				ownerItemId: "runtime:clock",
+				lineId: "a",
+			},
+		]);
+	else expect(result.after).toEqual(result.before);
 });

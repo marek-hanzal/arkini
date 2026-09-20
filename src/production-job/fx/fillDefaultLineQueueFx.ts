@@ -1,4 +1,3 @@
-import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { Effect, Result } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -34,10 +33,6 @@ export const fillDefaultLineQueueFx = Effect.fn("fillDefaultLineQueueFx")(functi
 }: fillDefaultLineQueueFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			yield* assertItemProductionPlayerControlFx({
-				ownerItemId,
-				runtime,
-			});
 			const line = yield* readDefaultLineQueueTargetFx({
 				ownerItemId,
 				runtime,

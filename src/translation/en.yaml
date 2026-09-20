@@ -1066,7 +1066,7 @@ Item interface:
   value: Item interface
 Item interface help:
   value: |
-    **Simple** shows only item information and leaves production to the game. Players cannot start jobs, manage production inputs or queues, or select Default and Clock lines.
+    **Simple** shows only item information. Board clicks can run the Default line, including filling its queue. Without a Default line, clicks do not start production. Players cannot directly select other production lines, manage inputs or queues, or change Default and Clock selections.
 
     **Default** shows all sections, even without production lines, and enables ordinary manual production.
 
@@ -1116,7 +1116,7 @@ Item production help:
     - **Clock** marks lines for weighted selection at every Clock interval. Line rules filter the pool before one line is selected.
     - All lines share one queue; the active job counts toward its size.
     - A failed Clock attempt is skipped, not saved for later.
-    - Item interface **Default** enables player controls; **Simple** leaves production to the game.
+    - Item interface **Default** enables player controls; **Simple** permits Board clicks on the Default line while hiding production controls.
 
     Adding Production removes Action when you save. Clock may also exist without any line when you only need a Lifetime.
 Item search shortcuts:

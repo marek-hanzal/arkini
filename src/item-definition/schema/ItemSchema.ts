@@ -58,7 +58,7 @@ export const ItemSchema = z
 			])
 			.default("default")
 			.describe(
-				"Item interface and player production control: simple shows only information and leaves production to the game; default enables manual production and always shows all sections, even without production lines.",
+				"Item interface and player production control: simple shows only information but allows Board clicks on the default line; default enables manual production and always shows all sections, even without production lines.",
 			),
 		music: IdSchema.optional().describe(
 			"Music resource requested while this item detail is open; omission keeps the global playlist.",

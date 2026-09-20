@@ -226,7 +226,7 @@ describe("Clock authored acquisition boundaries", () => {
 		}
 	});
 
-	it("bounds automatic throughput by the interval without exposing non-default manual production", async () => {
+	it("bounds automatic throughput while allowing the authored default line manually", async () => {
 		const graph = await createClockGraph();
 		const [target, other, expired] = estimateRequestsFn({
 			graph,
@@ -248,7 +248,7 @@ describe("Clock authored acquisition boundaries", () => {
 			durationMs: 3000,
 		});
 		expect(other).toMatchObject({
-			status: "unreachable",
+			status: "complete",
 		});
 		expect(expired).toMatchObject({
 			status: "unreachable",

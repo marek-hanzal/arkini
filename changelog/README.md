@@ -1,4 +1,4 @@
-# Arkini changelog
+# Serakki changelog
 
 Each `<version>.md` is the cumulative, English source for one GitHub Release.
 Create it from `TEMPLATE.md` only for an explicitly chosen version.

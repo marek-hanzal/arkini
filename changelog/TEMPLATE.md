@@ -1,4 +1,4 @@
-# Arkini X.Y.Z
+# Serakki X.Y.Z
 
 <!--
 Follow README.md. Remove every comment and unused section before release.
@@ -22,7 +22,7 @@ Summarize the release in one short paragraph, leading with the most important pl
 
 <!-- Author-visible AI and MCP capabilities. -->
 
-## Arkpacks, saves, and distribution
+## Serapacks, saves, and distribution
 
 <!-- Package, persistence, installation, trust, CLI, and delivery behavior. -->
 

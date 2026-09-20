@@ -77,7 +77,6 @@ it("replaces detail requests directly and releases them for missing music, vanis
 		target: {
 			kind,
 			itemId,
-			tab: "info",
 			origin: null,
 		},
 	});
@@ -114,7 +113,6 @@ it("replaces detail requests directly and releases them for missing music, vanis
 			target: {
 				kind: "definition",
 				itemId: "definition:second",
-				tab: "info",
 				origin: null,
 			},
 		});

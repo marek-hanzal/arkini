@@ -23,7 +23,6 @@ describe("Item Detail frame provider", () => {
 
 		openItemDetail(readControl(), {
 			itemId: "runtime:first",
-			tab: "lines",
 		});
 		expect(playSfxEventFn).toHaveBeenCalledWith(
 			PresentationSfxEventEnumSchema.enum.ItemDetailOpened,
@@ -31,7 +30,6 @@ describe("Item Detail frame provider", () => {
 
 		openItemDetail(readControl(), {
 			itemId: "runtime:first",
-			tab: "info",
 		});
 		expect(playSfxEventFn).toHaveBeenCalledTimes(1);
 
@@ -60,7 +58,6 @@ describe("Item Detail frame provider", () => {
 		expect(
 			openItemDetail(readControl(), {
 				itemId: "runtime:missing",
-				tab: "info",
 			}),
 		).toBe(false);
 		expect(readControl().state).toEqual({

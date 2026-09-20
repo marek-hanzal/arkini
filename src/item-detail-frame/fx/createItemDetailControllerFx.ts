@@ -27,7 +27,7 @@ const closedState = {
 } as const satisfies ItemDetailState;
 
 const sameTargetFn = (left: ItemDetailTarget, right: ItemDetailTarget) =>
-	left.kind === right.kind && left.itemId === right.itemId && left.tab === right.tab;
+	left.kind === right.kind && left.itemId === right.itemId;
 
 /**
  * Creates the non-React Item Detail state owner. Motion reports generation-keyed

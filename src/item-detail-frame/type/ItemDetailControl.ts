@@ -1,19 +1,15 @@
 import type { Effect } from "effect";
 import type * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
-
 export type ItemDetailTarget =
 	| {
 			readonly kind: "runtime";
 			readonly itemId: string;
-			readonly tab: ItemDetailTabEnumSchema.Type;
 			readonly origin: HTMLElement | null;
 	  }
 	| {
 			readonly kind: "definition";
 			readonly itemId: string;
-			readonly tab: ItemDetailTabEnumSchema.Type;
 			readonly origin: HTMLElement | null;
 	  };
 
@@ -44,36 +40,20 @@ export interface CloseItemDetailProps {
 
 interface OpenItemDetailProps {
 	readonly itemId: string;
-	readonly tab?: ItemDetailTabEnumSchema.Type;
 	readonly origin?: HTMLElement | null;
 }
 
 interface OpenItemDefinitionDetailProps {
 	readonly itemId: string;
-	readonly tab?: ItemDetailTabEnumSchema.Type;
 	readonly origin?: HTMLElement | null;
 }
 
-interface SelectRetainedItemDetailTabProps {
-	readonly kind: ItemDetailTarget["kind"];
-	readonly itemId: string;
-	readonly tab: ItemDetailTabEnumSchema.Type;
-}
-
-/** Canvas-local owner for one exact tabbed Item Detail modal. */
+/** Canvas-local owner for one exact Item Detail modal. */
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
 	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean, never, never>;
 	readonly openItemDefinitionDetailFx: (
 		props: OpenItemDefinitionDetailProps,
-	) => Effect.Effect<boolean, never, never>;
-	/**
-	 * Changes only the presentation tab of the exact retained target.
-	 * It never resolves or grants gameplay authority to a disappeared runtime item
-	 * or removed definition.
-	 */
-	readonly selectRetainedItemDetailTabFx: (
-		props: SelectRetainedItemDetailTabProps,
 	) => Effect.Effect<boolean, never, never>;
 	readonly closeAtom: Atom.AtomResultFn<CloseItemDetailProps | undefined, void, never>;
 	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void, never, never>;

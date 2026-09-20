@@ -41,10 +41,7 @@ export const useItemDetailFocus = ({
 
 	useEffect(() => {
 		const overlay = overlayRef.current;
-		const selectedTab = overlay?.querySelector<HTMLElement>(
-			'[data-ui="ItemDetailTabs"] button[data-ui-selected="true"]:not([disabled])',
-		);
-		(selectedTab ?? overlay?.querySelector<HTMLElement>(overlayFocusableSelector))?.focus();
+		overlay?.querySelector<HTMLElement>(overlayFocusableSelector)?.focus();
 		return () => {
 			if (!restoreFocusRef.current) return;
 			const latestOrigin = originRef.current;
@@ -68,10 +65,7 @@ export const useItemDetailFocus = ({
 	useEffect(() => {
 		if (phase !== "open") return;
 		const overlay = overlayRef.current;
-		const selectedTab = overlay?.querySelector<HTMLElement>(
-			'[data-ui="ItemDetailTabs"] button[data-ui-selected="true"]:not([disabled])',
-		);
-		(selectedTab ?? overlay?.querySelector<HTMLElement>(overlayFocusableSelector))?.focus();
+		overlay?.querySelector<HTMLElement>(overlayFocusableSelector)?.focus();
 	}, [
 		focusKey,
 		phase,

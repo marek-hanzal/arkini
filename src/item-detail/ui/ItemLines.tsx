@@ -271,7 +271,7 @@ export const ItemLines = ({
 						{...linePresenceMotion}
 						className="overflow-hidden"
 					>
-						<div className="px-6 pt-6 pb-[50cqh]">
+						<div className="p-6">
 							<SectionEnd>
 								{translator.textFn("That's everything you can make for now!")}
 							</SectionEnd>

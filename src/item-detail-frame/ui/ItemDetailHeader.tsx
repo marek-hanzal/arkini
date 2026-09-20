@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
 
 import { ItemIdentity } from "~/ui/ui/ItemIdentity";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
@@ -14,12 +13,10 @@ interface ItemDetailHeaderIdentity {
 export const ItemDetailHeader = ({
 	disabled,
 	identity,
-	navigation,
 	status,
 }: {
 	readonly disabled: boolean;
 	readonly identity: ItemDetailHeaderIdentity;
-	readonly navigation?: ReactNode;
 	readonly status?: string;
 }) => {
 	const closeItemDetailFn = useCloseItemDetail();
@@ -28,7 +25,6 @@ export const ItemDetailHeader = ({
 			artworkDataUi="ItemDetailHeaderArtwork"
 			className="flex-1"
 			compositeUrl={identity.compositeUrl}
-			description={navigation}
 			size="lg"
 			sourceUrl={identity.sourceUrl}
 			title={status === undefined ? identity.title : `${identity.title} · ${status}`}

@@ -40,7 +40,6 @@ it("disables Make across all lines when the owner's queue fills and enables it w
 			target: {
 				kind: "runtime",
 				itemId: owner.id,
-				tab: "lines",
 				origin: null,
 			},
 		});
@@ -109,7 +108,6 @@ it("retains the terminal commit across batched updates and detaches when the tar
 			target: {
 				kind: "runtime",
 				itemId: id,
-				tab: "info",
 				origin: null,
 			},
 		});
@@ -199,7 +197,6 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 			target: {
 				kind: "runtime",
 				itemId: ownerId,
-				tab: "lines",
 				origin: null,
 			},
 		});

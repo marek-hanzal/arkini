@@ -16,16 +16,9 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 
 vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
-	resolveItemDetailTargetFn: ({
-		itemId,
-		requestedTab,
-	}: {
-		readonly itemId: string;
-		readonly requestedTab?: string;
-	}) => ({
+	resolveItemDetailTargetFn: ({ itemId }: { readonly itemId: string }) => ({
 		itemId,
 		kind: "available",
-		tab: requestedTab ?? "info",
 	}),
 }));
 
@@ -162,7 +155,6 @@ describe("Playable Game shell overlay precedence", () => {
 			Effect.runSync(
 				readItemDetail().openItemDetailFx({
 					itemId: "runtime:first",
-					tab: "lines",
 				}),
 			);
 		});

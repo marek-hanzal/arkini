@@ -14,7 +14,7 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 		phase: state.phase,
 		origin: state.target.origin,
 		restoreFocus: state.phase === "exiting" ? state.restoreFocus : true,
-		focusKey: `${state.target.kind}:${state.target.itemId}:${state.target.tab}`,
+		focusKey: `${state.target.kind}:${state.target.itemId}`,
 	});
 	const disabled = state.phase === "exiting";
 	return (
@@ -38,7 +38,6 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 				ref={focus.overlayRef}
 				className="flex h-[90%] max-h-full w-[90%] max-w-full cursor-default flex-col overflow-hidden rounded-2xl border border-line-strong bg-modal p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)]"
 				data-ui="ItemDetailModal"
-				data-tab={state.target.tab}
 				data-target-kind={state.target.kind}
 				data-runtime-id={state.target.kind === "runtime" ? state.target.itemId : undefined}
 				data-item-id={state.target.itemId}

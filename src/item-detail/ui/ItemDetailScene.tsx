@@ -2,7 +2,6 @@ import { ItemDetailHeader } from "~/item-detail-frame/ui/ItemDetailHeader";
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { ItemInfo } from "~/item-detail/ui/ItemInfo";
 import { ItemLines } from "~/item-detail/ui/ItemLines";
-import { ItemDetailTabs } from "~/item-detail/ui/ItemDetailTabs";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Tx } from "~/translation/ui/Tx";
@@ -21,15 +20,6 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	const translator = useTranslator();
 	const status = controller.stale ? translator.textFn("Gone") : undefined;
 	const fullInterface = controller.detail?.ui === "default";
-	const tab = fullInterface ? target.tab : "info";
-	const navigation = fullInterface ? (
-		<ItemDetailTabs
-			active={tab}
-			disabled={disabled}
-			retained={controller.stale}
-			target={target}
-		/>
-	) : undefined;
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
@@ -39,7 +29,6 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 				<ItemDetailHeader
 					disabled={disabled}
 					identity={controller.detail}
-					navigation={navigation}
 					status={status}
 				/>
 			) : (
@@ -48,7 +37,6 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						<h2 className="text-lg font-semibold">
 							<Tx label="Item unavailable" />
 						</h2>
-						{navigation}
 					</div>
 					<button
 						type="button"
@@ -68,12 +56,8 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						stale: controller.stale,
 					},
 				})}
-				data-tab={tab}
 			>
-				{tab === "info" && controller.detail !== undefined ? (
-					<ItemInfo detail={controller.detail} />
-				) : null}
-				{tab === "lines" && controller.detail !== undefined ? (
+				{fullInterface && controller.detail !== undefined ? (
 					<ItemLines
 						key={`${target.kind}:${target.itemId}`}
 						lines={controller.detail.lines}
@@ -83,6 +67,11 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						disabled={disabled || controller.stale}
 						makeDisabled={!controller.detail.canMake}
 					/>
+				) : null}
+				{controller.detail !== undefined ? (
+					<div className="pb-[50cqh]">
+						<ItemInfo detail={controller.detail} />
+					</div>
 				) : null}
 			</div>
 		</div>

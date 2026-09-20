@@ -19,13 +19,7 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
-	resolveItemDetailTargetFn: ({
-		itemId,
-		requestedTab,
-	}: {
-		readonly itemId: string;
-		readonly requestedTab?: string;
-	}) =>
+	resolveItemDetailTargetFn: ({ itemId }: { readonly itemId: string }) =>
 		itemId === "runtime:missing"
 			? {
 					kind: "unavailable",
@@ -33,7 +27,6 @@ vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 			: {
 					itemId,
 					kind: "available",
-					tab: requestedTab ?? "info",
 				},
 }));
 

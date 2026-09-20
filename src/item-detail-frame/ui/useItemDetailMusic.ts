@@ -6,7 +6,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemDetailState } from "~/item-detail-frame/type/ItemDetailControl";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 
-/** The visible detail owns one music request, independent of its scene and tab lifetimes. */
+/** The visible detail owns one music request, independent of its scene lifetime. */
 export const useItemDetailMusic = (game: GameEngine, state: ItemDetailState) => {
 	const { requestDetailMusicFn } = useGameAudioControl();
 	const target = state.phase === "entering" || state.phase === "open" ? state.target : undefined;

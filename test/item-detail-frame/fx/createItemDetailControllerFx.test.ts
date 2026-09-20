@@ -8,17 +8,14 @@ import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailContro
 
 const runtimeTarget = ({
 	itemId = "runtime:first",
-	tab = "lines",
 	origin = null,
 }: {
 	readonly itemId?: string;
-	readonly tab?: "info" | "lines";
 	readonly origin?: HTMLElement | null;
 } = {}) =>
 	({
 		kind: "runtime",
 		itemId,
-		tab,
 		origin,
 	}) satisfies ItemDetailTarget;
 

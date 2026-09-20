@@ -16,7 +16,7 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 			: Math.max(0, Math.min(1, 1 - detail.units.remaining / detail.units.total));
 	return (
 		<section
-			className="flex min-h-full items-center justify-center p-6"
+			className="flex items-center justify-center p-6"
 			data-ui="ItemInfo"
 		>
 			<div className="grid w-full max-w-5xl grid-cols-2 items-center gap-12">

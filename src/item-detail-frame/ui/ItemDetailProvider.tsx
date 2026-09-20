@@ -25,7 +25,7 @@ import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationS
 /**
  * Game-shell owner for one exact Item Detail target and modal lifecycle.
  * Engine-backed resolvers remain authoritative for
- * target availability; the fixed presentation tabs do not retain or manufacture
+ * target availability; the modal does not manufacture
  * gameplay facts when a runtime item or configured definition disappears.
  *
  * Gesture semantics are decided by the invoking surface: right click opens
@@ -89,19 +89,17 @@ export const ItemDetailProvider = ({
 	useItemDetailMusic(game, snapshot);
 
 	const openItemDetailFx = useCallback(
-		({ itemId, tab, origin = null }: Parameters<ItemDetailControl["openItemDetailFx"]>[0]) =>
+		({ itemId, origin = null }: Parameters<ItemDetailControl["openItemDetailFx"]>[0]) =>
 			Effect.suspend(() => {
 				const runtime = game.getSnapshotFn();
 				const resolved = resolveItemDetailTargetFn({
 					itemId,
-					requestedTab: tab,
 					runtime,
 				});
 				if (resolved.kind === "unavailable") return Effect.succeed(false);
 				return openTargetFx({
 					kind: "runtime",
 					itemId: resolved.itemId,
-					tab: resolved.tab,
 					origin: controller.readOriginFn(origin),
 				});
 			}),
@@ -115,7 +113,6 @@ export const ItemDetailProvider = ({
 		({
 			itemId,
 			origin = null,
-			tab,
 		}: Parameters<ItemDetailControl["openItemDefinitionDetailFx"]>[0]) =>
 			Effect.suspend(() => {
 				const item = game.config.items[itemId];
@@ -123,39 +120,12 @@ export const ItemDetailProvider = ({
 				return openTargetFx({
 					kind: "definition",
 					itemId,
-					tab: item.ui === "simple" ? "info" : (tab ?? "lines"),
 					origin: controller.readOriginFn(origin),
 				});
 			}),
 		[
 			game,
 			openTargetFx,
-		],
-	);
-
-	const selectRetainedItemDetailTabFx = useCallback(
-		({
-			kind,
-			itemId,
-			tab,
-		}: Parameters<ItemDetailControl["selectRetainedItemDetailTabFx"]>[0]) =>
-			Effect.suspend(() => {
-				const current = controller.getSnapshotFn();
-				if (
-					current.phase === "closed" ||
-					current.phase === "exiting" ||
-					current.target.kind !== kind ||
-					current.target.itemId !== itemId
-				) {
-					return Effect.succeed(false);
-				}
-				return controller.openTargetFx({
-					...current.target,
-					tab,
-				});
-			}),
-		[
-			controller,
 		],
 	);
 
@@ -190,7 +160,6 @@ export const ItemDetailProvider = ({
 			state: snapshot,
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
-			selectRetainedItemDetailTabFx,
 			closeAtom,
 			closeFx,
 			completeEnterFx: controller.completeEnterFx,
@@ -202,7 +171,6 @@ export const ItemDetailProvider = ({
 			controller,
 			openItemDefinitionDetailFx,
 			openItemDetailFx,
-			selectRetainedItemDetailTabFx,
 			snapshot,
 		],
 	);

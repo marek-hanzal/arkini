@@ -4,8 +4,8 @@
 		"uid": "s5z9wc6yevl1yzs693yr1z7z",
 		"id": "coin",
 		"title": "Coin",
-		"ui": "simple",
 		"description": "Everybody wanna be rich.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -59,6 +59,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "wishing-well-with-coffee"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "empty-cauldron"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "leprechaun"
 			}
 		],
 		"maxQueueSize": 1,

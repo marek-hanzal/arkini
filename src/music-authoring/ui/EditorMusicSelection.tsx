@@ -141,7 +141,13 @@ export const EditorMusicSelection = ({
 			)}
 			<EditorAudioPreviewPlayer
 				fill
+				trackName={selected?.name ?? selected?.id}
 				disabled={selected === undefined}
+				placeholder={
+					selected === undefined
+						? translator.textFn("Choose a track to listen to it here.")
+						: undefined
+				}
 				error={preview.playbackError}
 				progress={selected !== undefined && selectedActive ? preview.playbackProgress : 0}
 				playing={selected !== undefined && selectedActive && preview.playing}

@@ -32,8 +32,6 @@ Action rules help:
     Every **Enable** rule must pass. Any matching **Disable** rule blocks it. Costs are paid only after the rules pass.
 Action type:
   value: Action type
-Active job:
-  value: Active job
 Add at least one condition.:
   value: Add at least one condition.
 Add at least one drop.:
@@ -341,6 +339,8 @@ Cancel:
   value: Cancel
 Cancel edit:
   value: Cancel edit
+Cancel the planned batches of this recipe. Anything already cooking keeps going.:
+  value: Cancel the planned batches of this recipe. Anything already cooking keeps going.
 Capacity:
   value: Capacity
 Chain:
@@ -378,6 +378,8 @@ Chance roll type help:
     On success, every drop in this roll continues. On failure, this roll creates nothing; the other rolls still run.
 Choose a different Project ID.:
   value: Choose a different Project ID.
+Choose a track to listen to it here.:
+  value: Choose a track to listen to it here.
 Choose a valid value.:
   value: Choose a valid value.
   dynamic: true
@@ -389,8 +391,6 @@ Clear interval:
   value: Clear interval
 Clear lifetime:
   value: Clear lifetime
-Clear this line's queued tasks.:
-  value: Clear this line's queued tasks.
 Click to bring this here.:
   value: Click to bring this here.
 Click to take one back.:
@@ -1236,6 +1236,8 @@ Main menu:
   value: Main menu
 Major:
   value: Major
+Make this recipe when you click the item on the board.:
+  value: Make this recipe when you click the item on the board.
 Managed:
   value: Managed
 Matches any positive board distance and excludes only Self.:
@@ -1497,6 +1499,8 @@ Nothing requires this item:
   dynamic: true
 Nothing to make right now.:
   value: Nothing to make right now.
+One batch is in progress. This is how long it has left.:
+  value: One batch is in progress. This is how long it has left.
 Open:
   value: Open
 Open artwork:
@@ -1566,8 +1570,6 @@ Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
   value: Paste ngrok authtoken
-Paused:
-  value: Paused
 Pick random space:
   value: Pick random space
 Player hint:
@@ -1758,8 +1760,6 @@ Query scope Universe help:
     Use it when the current Space is too small a world.
 Queue capacity:
   value: Queue capacity
-Queued:
-  value: Queued
 Random:
   value: Random
 Random drop placement help:
@@ -2065,12 +2065,16 @@ Starting layout controls help:
     - **Minus** removes one item; **Delete** removes the whole stack.
 Status:
   value: Status
+Still missing a few ingredients. Bring them over to get things moving.:
+  value: Still missing a few ingredients. Bring them over to get things moving.
 Stop Local MCP:
   value: Stop Local MCP
 Stop Remote MCP:
   value: Stop Remote MCP
-Stop this job. Materials already used won't be returned.:
-  value: Stop this job. Materials already used won't be returned.
+Stop making this recipe when you click the item on the board.:
+  value: Stop making this recipe when you click the item on the board.
+Stop this batch and throw it away. Materials already used are lost.:
+  value: Stop this batch and throw it away. Materials already used are lost.
 Storage:
   value: Storage
 Storage scope:
@@ -2223,12 +2227,6 @@ Visible:
   value: Visible
 Volume:
   value: Volume
-Waiting for materials:
-  value: Waiting for materials
-Waiting for space:
-  value: Waiting for space
-Waiting to start:
-  value: Waiting to start
 Weight:
   value: Weight
 When Autofill starts bringing materials to a production line.:

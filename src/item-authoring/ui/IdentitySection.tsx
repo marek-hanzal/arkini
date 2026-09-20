@@ -80,18 +80,16 @@ export const IdentitySection = () => {
 						</form.AppField>
 						<ItemInterfaceField />
 					</div>
-					<div className="grid grid-cols-2 gap-4">
-						<form.AppField name="maxStackSize">
-							{(field) => (
-								<field.NumberField
-									disabled={clock !== undefined}
-									label={translator.textFn("Maximum stack size")}
-									description={<Mx label="Item stack size help" />}
-									min={1}
-								/>
-							)}
-						</form.AppField>
-					</div>
+					<form.AppField name="maxStackSize">
+						{(field) => (
+							<field.NumberField
+								disabled={clock !== undefined}
+								label={translator.textFn("Maximum stack size")}
+								description={<Mx label="Item stack size help" />}
+								min={1}
+							/>
+						)}
+					</form.AppField>
 					<form.AppField name="music">
 						{(field) => (
 							<EditorMusicSelection

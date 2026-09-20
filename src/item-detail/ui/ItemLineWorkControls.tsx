@@ -8,6 +8,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { useItemLineWorkController } from "~/item-detail/ui/useItemLineWorkController";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 interface ItemLineWorkControlsProps extends useItemLineWorkController.Props {
@@ -82,61 +83,81 @@ export const ItemLineWorkControls = ({
 	const active = props.jobId !== undefined;
 	return (
 		<div
-			className="absolute top-3 right-0 flex items-center"
+			className="flex items-center"
 			data-ui="ItemLineWorkControls"
 		>
 			<AnimatePresence initial={false}>
 				{queued > 0 ? (
 					<WorkGroup key="queued">
-						<LinkButton
-							className={workButtonClassName}
-							title={translator.textFn("Clear this line's queued tasks.")}
-							disabled={controller.clearDisabled}
-							onClick={controller.clearFn}
-							data-ui="ItemLineClear"
+						<Tooltip
+							content={translator.textFn(
+								"Cancel the planned batches of this recipe. Anything already cooking keeps going.",
+							)}
 						>
-							<span className="text-3xl font-semibold tabular-nums">{queued}</span>
-							<ListX className="size-8" />
-						</LinkButton>
+							<LinkButton
+								className={workButtonClassName}
+								disabled={controller.clearDisabled}
+								onClick={controller.clearFn}
+								data-ui="ItemLineClear"
+							>
+								<span className="text-3xl font-semibold tabular-nums">
+									x{queued}
+								</span>
+								<ListX className="size-8" />
+							</LinkButton>
+						</Tooltip>
 					</WorkGroup>
 				) : null}
 				{waitingMaterials ? (
 					<WorkGroup key="waiting-materials">
-						<span
-							className="grid size-14 place-items-center text-muted"
-							title={translator.textFn("Waiting for materials")}
-							data-ui="ItemLineWaitingMaterials"
+						<Tooltip
+							content={translator.textFn(
+								"Still missing a few ingredients. Bring them over to get things moving.",
+							)}
 						>
-							<PackageSearch className="size-8" />
-						</span>
+							<span
+								className={workButtonClassName}
+								data-ui="ItemLineWaitingMaterials"
+							>
+								<PackageSearch className="size-8" />
+							</span>
+						</Tooltip>
 					</WorkGroup>
 				) : null}
 				{active ? (
 					<WorkGroup key="active">
-						<span
-							className="flex h-14 items-center gap-3 pl-3 text-xl text-muted tabular-nums transition-colors duration-300 data-[ui-running=true]:text-accent"
-							title={translator.textFn("Active job")}
-							{...readDataUiFn({
-								dataUi: "ItemLineActiveCount",
-								state: {
-									running,
-								},
-							})}
-						>
-							x1 <Clock className="size-5" />
-							<ItemLineCountdown jobId={props.jobId} />
-						</span>
-						<LinkButton
-							className={workButtonClassName}
-							title={translator.textFn(
-								"Stop this job. Materials already used won't be returned.",
+						<Tooltip
+							content={translator.textFn(
+								"One batch is in progress. This is how long it has left.",
 							)}
-							disabled={controller.cancelJobDisabled}
-							onClick={controller.cancelJobFn}
-							data-ui="ItemLineAbort"
 						>
-							<Trash2 className="size-8" />
-						</LinkButton>
+							<span
+								className="flex h-14 items-center gap-3 pl-3 text-xl text-muted tabular-nums transition-colors duration-300 data-[ui-running=true]:text-accent"
+								{...readDataUiFn({
+									dataUi: "ItemLineActiveCount",
+									state: {
+										running,
+									},
+								})}
+							>
+								x1 <Clock className="size-5" />
+								<ItemLineCountdown jobId={props.jobId} />
+							</span>
+						</Tooltip>
+						<Tooltip
+							content={translator.textFn(
+								"Stop this batch and throw it away. Materials already used are lost.",
+							)}
+						>
+							<LinkButton
+								className={workButtonClassName}
+								disabled={controller.cancelJobDisabled}
+								onClick={controller.cancelJobFn}
+								data-ui="ItemLineAbort"
+							>
+								<Trash2 className="size-8" />
+							</LinkButton>
+						</Tooltip>
 					</WorkGroup>
 				) : null}
 			</AnimatePresence>

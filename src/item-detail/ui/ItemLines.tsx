@@ -2,7 +2,6 @@ import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { Factory, Info, Star } from "lucide-react";
 import { useCallback } from "react";
-import { match } from "ts-pattern";
 
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
@@ -13,11 +12,11 @@ import { useItemLineMakeController } from "~/item-detail/ui/useItemLineMakeContr
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
 import { ItemLineBackdrop } from "~/item-detail/ui/ItemLineBackdrop";
 import { useItemLineDefaultController } from "~/item-detail/ui/useItemLineDefaultController";
-import { useItemLineCancelController } from "~/item-detail/ui/useItemLineCancelController";
 import { useItemLinesStatus } from "~/item-detail/ui/useItemLinesStatus";
 import type { readItemLineStatusesFn } from "~/item-detail-read/fn/readItemLineStatusesFn";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Tooltip } from "~/ui/ui/Tooltip";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
 import { ItemLineWorkControls } from "~/item-detail/ui/ItemLineWorkControls";
@@ -107,44 +106,25 @@ const ItemLine = ({
 		authoredDefault: line.default,
 		disabled,
 	});
-	const cancelController = useItemLineCancelController({
-		ownerItemId: props.ownerItemId,
-		lineId: line.id,
-		requestId: status?.requestId,
-		disabled,
-	});
 	const translator = useTranslator();
 	const state = status?.state ?? "idle";
-	const statusLabel = match(state)
-		.with("idle", () => null)
-		.with("waiting-inputs", () => null)
-		.with("waiting-start", () => translator.textFn("Waiting to start"))
-		.with("running", () => null)
-		.with("paused", () => translator.textFn("Paused"))
-		.with("awaiting-output", () => translator.textFn("Waiting for space"))
-		.with("queued", () => translator.textFn("Queued"))
-		.exhaustive();
 	return (
 		<motion.div
 			{...linePresenceMotion}
 			layout="position"
-			className="-mx-3 overflow-hidden border-t border-line px-3 first:border-t-0"
+			className="overflow-hidden border-t border-line first:border-t-0"
 			data-ui="ItemLinePresence"
 			inert={!present}
 		>
 			<ItemProductionRow
 				line={line}
 				activateFn={
-					state === "waiting-inputs"
-						? cancelController.disabled
-							? undefined
-							: cancelController.cancelFn
-						: disabled ||
-								makeDisabled ||
-								controller.pending ||
-								props.ownerItemId === undefined
-							? undefined
-							: controller.makeFn
+					disabled ||
+					makeDisabled ||
+					controller.pending ||
+					props.ownerItemId === undefined
+						? undefined
+						: controller.makeFn
 				}
 				ruleDisabled={ruleDisabled}
 				backdrop={
@@ -156,11 +136,20 @@ const ItemLine = ({
 						/>
 					)
 				}
-				actions={
-					<>
+				leadingControl={
+					<Tooltip
+						content={
+							defaultController.selected
+								? translator.textFn(
+										"Stop making this recipe when you click the item on the board.",
+									)
+								: translator.textFn(
+										"Make this recipe when you click the item on the board.",
+									)
+						}
+					>
 						<LinkButton
-							className="absolute top-3 left-0 grid size-14 place-items-center rounded-lg text-muted transition-[color,background-color,opacity] duration-300 hover:bg-surface-raised/50 data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
-							title={translator.textFn("Default")}
+							className="grid size-14 shrink-0 place-items-center rounded-lg text-muted transition-[color,background-color,opacity] duration-300 hover:bg-surface-raised/50 data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
 							disabled={defaultController.disabled}
 							onClick={defaultController.toggleFn}
 							{...readDataUiFn({
@@ -172,16 +161,18 @@ const ItemLine = ({
 						>
 							<Star className="size-8" />
 						</LinkButton>
-						<ItemLineWorkControls
-							ownerItemId={props.ownerItemId}
-							lineId={line.id}
-							jobId={status?.jobId}
-							queued={status?.queued ?? 0}
-							running={state === "running"}
-							waitingMaterials={state === "waiting-inputs"}
-							disabled={disabled}
-						/>
-					</>
+					</Tooltip>
+				}
+				actions={
+					<ItemLineWorkControls
+						ownerItemId={props.ownerItemId}
+						lineId={line.id}
+						jobId={status?.jobId}
+						queued={status?.queued ?? 0}
+						running={state === "running"}
+						waitingMaterials={state === "waiting-inputs"}
+						disabled={disabled}
+					/>
 				}
 				inputs={
 					<ItemLineInputs
@@ -190,18 +181,6 @@ const ItemLine = ({
 						idle={state === "idle"}
 						disabled={disabled}
 					/>
-				}
-				status={
-					<>
-						{statusLabel !== null ? (
-							<p
-								className="shrink-0 text-foreground"
-								data-ui="ItemLineStatus"
-							>
-								{statusLabel}
-							</p>
-						) : null}
-					</>
 				}
 				overlay={
 					<AnimatePresence
@@ -258,10 +237,7 @@ export const ItemLines = ({
 	const translator = useTranslator();
 	const statuses = useItemLinesStatus(ownerItemId);
 	return (
-		<section
-			className="px-3"
-			data-ui="ItemLines"
-		>
+		<section data-ui="ItemLines">
 			<AnimatePresence initial={false}>
 				{lines.map((line) => (
 					<ItemLine
@@ -295,7 +271,7 @@ export const ItemLines = ({
 						{...linePresenceMotion}
 						className="overflow-hidden"
 					>
-						<div className="pb-[50cqh]">
+						<div className="px-6 pt-6 pb-[50cqh]">
 							<SectionEnd>
 								{translator.textFn("That's everything you can make for now!")}
 							</SectionEnd>

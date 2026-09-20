@@ -1,4 +1,4 @@
-import { Pause, Play } from "lucide-react";
+import { Music, Pause, Play } from "lucide-react";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -7,6 +7,8 @@ export const EditorAudioPreviewPlayer = ({
 	disabled = false,
 	fill = false,
 	error,
+	placeholder,
+	trackName,
 	progress,
 	playing,
 	seekFn,
@@ -15,6 +17,8 @@ export const EditorAudioPreviewPlayer = ({
 	readonly disabled?: boolean;
 	readonly fill?: boolean;
 	readonly error?: string;
+	readonly placeholder?: string;
+	readonly trackName?: string;
 	readonly progress: number;
 	readonly playing: boolean;
 	readonly seekFn: (progress: number) => void;
@@ -23,7 +27,7 @@ export const EditorAudioPreviewPlayer = ({
 	return (
 		<div
 			data-ui="EditorAudioPreview"
-			className="flex h-9 items-center gap-3"
+			className="flex h-[var(--ak-control-min-height)] items-center gap-3"
 		>
 			{error === undefined ? null : (
 				<p
@@ -41,7 +45,7 @@ export const EditorAudioPreviewPlayer = ({
 						fill,
 					},
 				})}
-				className="relative flex h-[75%] w-64 cursor-pointer items-center justify-end overflow-hidden rounded-md bg-surface-raised data-[ui-fill=true]:min-w-0 data-[ui-fill=true]:flex-1 data-[ui-disabled=true]:cursor-default data-[ui-disabled=true]:grayscale"
+				className="relative flex h-full w-64 cursor-pointer items-center justify-end overflow-hidden rounded-lg border border-secondary-border bg-secondary-subtle text-secondary-foreground transition-colors data-[ui-fill=true]:min-w-0 data-[ui-fill=true]:flex-1 data-[ui-disabled=true]:cursor-default"
 				onClick={(event) => {
 					if (disabled) return;
 					const bounds = event.currentTarget.getBoundingClientRect();
@@ -50,21 +54,40 @@ export const EditorAudioPreviewPlayer = ({
 			>
 				<div
 					data-ui="EditorAudioPreviewProgress"
-					className="pointer-events-none absolute inset-y-0 left-0 bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
+					className="pointer-events-none absolute inset-y-0 left-0 bg-secondary-selected transition-[width] duration-200 ease-linear"
 					style={{
 						width: `${progress * 100}%`,
 					}}
 				/>
+				{trackName || placeholder ? (
+					<span
+						className="relative min-w-0 flex-1 truncate px-3 text-sm data-[ui-placeholder=true]:text-subtle"
+						{...readDataUiFn({
+							dataUi: "EditorAudioPreviewLabel",
+							state: {
+								placeholder: trackName === undefined,
+							},
+						})}
+					>
+						{trackName ?? placeholder}
+					</span>
+				) : null}
 				<LinkButton
 					disabled={disabled}
-					className="relative grid h-full w-9 shrink-0 place-items-center text-foreground"
+					className="relative grid h-full w-[var(--ak-control-min-height)] shrink-0 place-items-center text-secondary-foreground transition-colors enabled:hover:bg-secondary-hover"
 					data-ui="EditorAudioPreviewToggle"
 					onClick={(event) => {
 						event.stopPropagation();
 						toggleFn();
 					}}
 				>
-					{playing ? <Pause className="size-4" /> : <Play className="size-4" />}
+					{placeholder ? (
+						<Music className="size-4" />
+					) : playing ? (
+						<Pause className="size-4" />
+					) : (
+						<Play className="size-4" />
+					)}
 				</LinkButton>
 			</div>
 		</div>

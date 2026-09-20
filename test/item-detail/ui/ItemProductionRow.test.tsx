@@ -36,11 +36,13 @@ it("activates the row without stealing nested controls or activating an unavaila
 					</button>
 				}
 				inputs={
-					<button disabled>
-						<span>Input</span>
-					</button>
+					<>
+						<button disabled>
+							<span>Input</span>
+						</button>
+						<button onClick={controlFn}>Input action</button>
+					</>
 				}
-				status={<button onClick={controlFn}>Cancel</button>}
 			/>,
 		);
 	try {

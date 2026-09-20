@@ -9,8 +9,6 @@ export const SectionEnd = ({ children }: { readonly children?: ReactNode }) => (
 		data-ui="SectionEnd"
 	>
 		<Check className="size-3.5" />
-		<span>
-			{children ?? <Tx label="End of section" />}
-		</span>
+		<span>{children ?? <Tx label="End of section" />}</span>
 	</div>
 );

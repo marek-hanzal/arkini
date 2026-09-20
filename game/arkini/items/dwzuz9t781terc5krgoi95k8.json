@@ -10,7 +10,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"spoiled-fruit-seed"
+				"spoiled-tree-seed"
 			]
 		},
 		"scope": "any",

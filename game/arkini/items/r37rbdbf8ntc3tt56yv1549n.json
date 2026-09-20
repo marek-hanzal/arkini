@@ -17,61 +17,6 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "coin",
-				"title": "Coin",
-				"description": "Get some coins, you'll need them.",
-				"clockWeight": 1,
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 180000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"rules": [],
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "coin",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								},
-								{
-									"type": "chance",
-									"chance": 0.25,
-									"drop": [
-										{
-											"itemId": "coin",
-											"quantity": {
-												"min": 1,
-												"max": 2
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": []
-			},
-			{
 				"id": "labor-t1",
 				"title": "Labor - Tier 1",
 				"artwork": "labor-t1",

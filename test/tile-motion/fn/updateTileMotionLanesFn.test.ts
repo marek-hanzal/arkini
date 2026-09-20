@@ -357,65 +357,35 @@ describe("updateTileMotionLanesFn", () => {
 	});
 });
 
-it("reserves no active lanes for local reveals while eight producer batches emit their other drops", () => {
-	const batches = Array.from(
-		{
-			length: 8,
-		},
-		(_, index) => {
-			const outgoing = spawnCue({
-				sequence: index,
-				eventIndex: 1,
-			});
-			const local = {
-				...outgoing,
-				eventIndex: 0,
-				actorId: `local:${index}`,
-				targetLocation: outgoing.originLocation,
-				revealAtOriginExit: true as const,
-			};
-			return {
-				local,
-				outgoing,
-			};
-		},
-	);
-	let state = updateTileMotionLanesFn({
+it("launches a same-slot replacement together with outgoing drops", () => {
+	const outgoing = spawnCue({
+		sequence: 7,
+		eventIndex: 1,
+	});
+	const local = {
+		...outgoing,
+		eventIndex: 0,
+		actorId: "local",
+		targetLocation: outgoing.originLocation,
+	};
+	const state = updateTileMotionLanesFn({
 		state: {
 			active: [],
 			pending: [],
 		},
 		action: {
 			type: "enqueue",
-			cues: batches.flatMap(({ local, outgoing }) => [
+			cues: [
 				local,
 				outgoing,
-			]),
+			],
 		},
 	});
-	expect(state.active).toEqual(batches.map((batch) => batch.outgoing));
-	expect(state.pending).toEqual(batches.map((batch) => batch.local));
-	for (const { local, outgoing } of batches) {
-		state = updateTileMotionLanesFn({
-			state,
-			action: {
-				type: "complete",
-				cue: outgoing,
-			},
-		});
-		expect(state.active).toContain(local);
-		state = updateTileMotionLanesFn({
-			state,
-			action: {
-				type: "complete",
-				cue: local,
-			},
-		});
-	}
-	expect(state).toEqual({
-		active: [],
-		pending: [],
-	});
+	expect(state.active).toEqual([
+		local,
+		outgoing,
+	]);
+	expect(state.pending).toEqual([]);
 });
 
 it("reveals a local spawn before later drops can stack into that same actor", () => {
@@ -426,7 +396,6 @@ it("reveals a local spawn before later drops can stack into that same actor", ()
 			originActorId: "origin",
 		}),
 		targetLocation: location(0),
-		revealAtOriginExit: true,
 	};
 	const stacked = stackCue({
 		eventIndex: 1,

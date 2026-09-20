@@ -22,7 +22,7 @@ The root has only direct grammar layers: `ui/` for React canvas composition, `fx
 | Pointer gestures, activation and frozen release facts | `src/tile-interaction/{atom,fn,fx,type}` |
 | Drop submission/presentation | `src/tile-interaction/fx/createDrop*Fx.ts` |
 | Engine-delivery presentation | `fx/readTileDeliveriesFx.ts` + `fx/createDeliveryRuntimeFx.ts` |
-| Cue lanes, choreography, magnetic response and handoffs | `src/tile-motion/{service,type,fn,fx}` |
+| Cue lanes, choreography and handoffs | `src/tile-motion/{service,type,fn,fx}` |
 | Interpolation/springs | `src/tile-rendering/fx/createAnimationDriverFx.ts` |
 | Typed actor-channel writes | `src/tile-rendering/fx/createActorAnimatorFx.ts` |
 
@@ -53,8 +53,9 @@ Pointer takeover of a spawn also releases its origin claim. Once no remaining cu
 - Board + Toolbar and Inventory use fixed 512 px world cells under the same camera implementation, with one camera per canvas, including masks, feedback and transient actors. The initial camera fits the whole scene; wheel/pinch zoom anchors at the pointer and right drag pans freely. A short right click still opens Item Detail; crossing the screen-space drag threshold gives the gesture to the camera. `0` restores the fitted default view for the mounted board or inventory in both Game and Editor. Resize preserves the viewed world center and zoom. Pointer coordinates enter world space before tile gestures; the drag threshold stays in screen pixels. Camera gestures cancel tile gestures, and overlays block both.
 - Board/Toolbar left click runs the primary action; `Ctrl+left click` fills remaining default-line queue capacity; `Shift+left click` splits a Board stack; right click opens Item Detail.
 - Inventory left click releases the item to its permitted current Board or Toolbar destination; right click opens Item Detail. Authored actions and production never override that Inventory interaction.
-- Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented without allocating a second gameplay actor or triggering pointer-frequency React renders. A non-interactive snapshot marks its committed origin below the actor layer until the real actor settles or leaves the scene; it never participates in hit testing, drop preview, or magnetism. Travel settles into the single Board actor layer or the destination storage surface. Canonical slot occupancy selects pointer hits, drop targets and magnetic candidates.
-- The Engine drop preview owns validity and magnetic eligibility. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
+- Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented without allocating a second gameplay actor or triggering pointer-frequency React renders. A non-interactive snapshot marks its committed origin below the actor layer until the real actor settles or leaves the scene; it never participates in hit testing or drop preview. Travel settles into the single Board actor layer or the destination storage surface. Canonical slot occupancy selects pointer hits and drop targets.
+- During manual drag, the hovered target artwork shrinks and fades to 0.8 for rejected drops or swaps, then returns on target change or gesture end. Merge, stack, input and inventory acceptance keep their normal appearance. This response has its own animation channel and never changes placement, hit geometry, lifecycle or running opacity.
+- The Engine drop preview owns validity. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
 - Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown. [`useTileCommands`](../tile-interaction/ui/useTileCommands.ts) binds each submission to its exact Game and returns an independent Promise; concurrent callers never share an Atom result.
 
 ## Invariants
@@ -64,7 +65,7 @@ Pointer takeover of a spawn also releases its origin claim. Once no remaining cu
 - Root pose, grab offset, lifecycle, crowd, particles, and visual revision remain independent channels. Tuning belongs in implementation, not this contract.
 - `TileActorVisual.artworkScale` projects the required authored `artwork.scale` once. Retained faces, layers, badges, progress and activity geometry use it on Board, Inventory and Toolbar, including Editor Board. Every crossfade slot keeps its own revision's ratio. The slot anchor, hit area and placement geometry remain full-size; transient actor/container motion still settles to its own neutral scale.
 - Actor stores follow exact runtime identities within their canvas. Pure canonical placement may normalize identity; presentation never assumes continuity from intent.
-- A drop into its removed source's own slot waits for the other outgoing drops, then enters together with source exit once its artwork is ready. Later drops stacking into that local successor follow its reveal; they cannot block it. This choreography never delays canonical placement.
+- A removed output producer starts its exit with output dispatch, including output into its own slot; output travel and artwork readiness never delay that exit. Its retained actor supplies origin geometry until queued outputs release their claims. An explicitly projected consumed stack instead keeps its physical source as the travelling payload.
 - Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
 - Board Clock rings project the canonical interval phase and Clock enable/rules independently of jobs and queue admission. They have no pointer interaction; the existing job/lifetime bar retains its precedence. Exhausted finite Clocks have no upcoming pulse ring.
 - Async texture completion is generation-guarded. A complete current visual remains until a complete replacement is ready; superseded work cannot publish or destroy the surviving generation.
@@ -83,7 +84,6 @@ Pointer takeover of a spawn also releases its origin claim. Once no remaining cu
 | Autofill delivery | `fx/createDeliveryRuntimeFx.ts`; canonical behavior is `production-delivery/` + Tick |
 | Inventory handoff | `ui/PixiInventorySurface.tsx` + main Inventory opener |
 | Geometry/hit testing | `fx/create*SurfaceFx.ts`, `fn/read*LayoutFn.ts`, `fn/readSlotFn.ts` |
-| Magnetic response | `src/tile-motion` |
 | Frame/interpolation | `src/tile-rendering` |
 
 Focused proofs follow the exact owner:

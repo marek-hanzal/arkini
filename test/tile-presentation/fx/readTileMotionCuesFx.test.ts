@@ -238,7 +238,7 @@ describe("readTileMotionCuesFx", () => {
 it.each([
 	true,
 	false,
-])("marks a same-slot spawn for source exit only when the source is removed (%s)", (removed) => {
+])("projects a same-slot spawn regardless of whether the source survives (%s)", (removed) => {
 	const cues = Effect.runSync(
 		readCues({
 			sequence: 50,
@@ -273,5 +273,48 @@ it.each([
 		kind: "spawn",
 		targetLocation: sourceLocation,
 	});
-	expect(cues[0]?.kind === "spawn" && cues[0].revealAtOriginExit === true).toBe(removed);
+});
+
+it.each([
+	false,
+	true,
+])("distinguishes consumed stack actors from same-type merge output (merge: %s)", (merge) => {
+	const cues = Effect.runSync(
+		readCues({
+			sequence: 51,
+			previousRuntime: runtime,
+			runtime: {
+				...committedRuntime,
+				items: committedRuntime.items.filter((item) => item.id !== source.id),
+			},
+			events: [
+				...(merge
+					? [
+							{
+								type: GameEventEnumSchema.enum.ItemMerged,
+								sourceItemId: target.id,
+								sourceCanonicalItemId: target.item.id,
+								targetItemId: source.id,
+								targetCanonicalItemId: source.item.id,
+								action: "use" as const,
+								effect: "remove" as const,
+							},
+						]
+					: []),
+				{
+					type: GameEventEnumSchema.enum.ItemStacked,
+					itemId: target.id,
+					canonicalItemId: target.item.id,
+					originItemId: source.id,
+					location: targetLocation,
+					previousQuantity: 1,
+					quantity: 2,
+				},
+			],
+		}),
+	);
+	expect(cues).toHaveLength(1);
+	const cue = cues[0];
+	if (cue?.kind !== "stack") throw new Error("Expected stack output.");
+	expect(cue.sourceActorId).toBe(merge ? undefined : source.id);
 });

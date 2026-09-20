@@ -18,7 +18,7 @@ import {
 
 describe("detached swap lifecycle", () => {
 	it("releases a detached swap counterpart when the motion runtime closes", () => {
-		const { animations, cue, magneticReleases, runtime, source, target } = createSwapHarness();
+		const { animations, cue, runtime, source, target } = createSwapHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -33,19 +33,6 @@ describe("detached swap lifecycle", () => {
 			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.get(source.item.id),
 		).toBe("handoff");
 		Effect.runSync(runtime.closeFx);
-
-		expect(magneticReleases).toEqual(
-			expect.arrayContaining([
-				{
-					sourceActorId: target.item.id,
-					sourceKind: "motion",
-				},
-				{
-					sourceActorId: source.item.id,
-					sourceKind: "motion",
-				},
-			]),
-		);
 	});
 
 	it("keeps pending work parked when an independent cue completes during detached swap ownership", () => {
@@ -130,6 +117,8 @@ describe("detached swap lifecycle", () => {
 	it("finalizes a detached swap counterpart that loses its canonical item before settlement", () => {
 		const { actors, animations, canonicalItems, cue, exitingActors, runtime, source, target } =
 			createSwapHarness();
+		source.container.alpha = 1;
+		source.lifecycleTargetAlpha = 1;
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -162,6 +151,8 @@ describe("detached swap lifecycle", () => {
 	it("finalizes an already-settled counterpart when the other swap leg is handed off", () => {
 		const { actors, animations, canonicalItems, cue, exitingActors, runtime, source, target } =
 			createSwapHarness();
+		source.container.alpha = 1;
+		source.lifecycleTargetAlpha = 1;
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,

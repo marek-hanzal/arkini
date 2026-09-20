@@ -226,81 +226,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						};
 			};
 
-			const appendIntersectingLocationsFn = (
-				locations: TileActorItem["location"][],
-				surface: MainLayout["board"] | null,
-				bounds: {
-					readonly height: number;
-					readonly paddingRatio?: number;
-					readonly width: number;
-					readonly x: number;
-					readonly y: number;
-				},
-			) => {
-				const padding =
-					surface === null
-						? 0
-						: Math.max(bounds.width, bounds.height, surface.cellSize) *
-							(bounds.paddingRatio ?? 0);
-				const queryBounds = {
-					height: bounds.height + padding * 2,
-					width: bounds.width + padding * 2,
-					x: bounds.x - padding,
-					y: bounds.y - padding,
-				};
-				if (
-					surface === null ||
-					queryBounds.width <= 0 ||
-					queryBounds.height <= 0 ||
-					queryBounds.x >= surface.x + surface.width ||
-					queryBounds.y >= surface.y + surface.height ||
-					queryBounds.x + queryBounds.width <= surface.x ||
-					queryBounds.y + queryBounds.height <= surface.y
-				) {
-					return;
-				}
-				const firstX = Math.max(
-					0,
-					Math.floor((queryBounds.x - surface.x) / surface.cellSize),
-				);
-				const lastX = Math.min(
-					surface.columns - 1,
-					Math.ceil((queryBounds.x + queryBounds.width - surface.x) / surface.cellSize) -
-						1,
-				);
-				const firstY = Math.max(
-					0,
-					Math.floor((queryBounds.y - surface.y) / surface.cellSize),
-				);
-				const lastY = Math.min(
-					surface.rows - 1,
-					Math.ceil((queryBounds.y + queryBounds.height - surface.y) / surface.cellSize) -
-						1,
-				);
-				for (let slotY = firstY; slotY <= lastY; slotY += 1) {
-					for (let slotX = firstX; slotX <= lastX; slotX += 1) {
-						locations.push(
-							surface.kind === "board"
-								? {
-										scope: LocationScopeEnumSchema.enum.Board,
-										space: latestTransition.runtime.currentSpace,
-										position: {
-											x: slotX,
-											y: slotY,
-										},
-									}
-								: {
-										scope: LocationScopeEnumSchema.enum.Toolbar,
-										position: {
-											x: slotX,
-											y: 0,
-										},
-									},
-						);
-					}
-				}
-			};
-
 			return {
 				transientActorLayer,
 				closeFx: Effect.sync(() => {
@@ -328,17 +253,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				),
 				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
 					Effect.sync(() => readLocationPoseFn(location)),
-				),
-				readLocalActorIdsFx: Effect.fn("MainSurface.readLocalActorIdsFx")((bounds) =>
-					Effect.gen(function* () {
-						const locations: TileActorItem["location"][] = [];
-						appendIntersectingLocationsFn(locations, layout.board, bounds);
-						appendIntersectingLocationsFn(locations, layout.toolbar, bounds);
-						const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
-						return occupants
-							.filter(({ id }) => id !== bounds.excludeActorId)
-							.map(({ id }) => id);
-					}),
 				),
 				redrawFx: Effect.gen(function* () {
 					layoutRevision += 1;

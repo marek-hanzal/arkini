@@ -116,15 +116,6 @@ const readSpawnCueFn = ({
 	if (originLocation === null || target === null) return null;
 	return {
 		kind: "spawn",
-		...(!transition.runtime.items.some((item) => item.id === event.originItemId) &&
-		isSameGridLocationFn({
-			left: originLocation,
-			right: target.location,
-		})
-			? {
-					revealAtOriginExit: true as const,
-				}
-			: {}),
 		sequence: transition.sequence,
 		eventIndex,
 		actorId: target.id,
@@ -162,8 +153,25 @@ const readEventCueFn = ({
 			runtime: transition.runtime,
 		});
 		if (originLocation === null || target === null) return null;
+		const previousSource = readGridRuntimeItemFn({
+			itemId: event.originItemId,
+			runtime: transition.previousRuntime,
+		});
+		const sourceConsumed =
+			previousSource?.item.id === event.canonicalItemId &&
+			!transition.runtime.items.some((item) => item.id === event.originItemId) &&
+			!transition.events.some(
+				(fact) =>
+					fact.type === GameEventEnumSchema.enum.ItemMerged &&
+					fact.targetItemId === event.originItemId,
+			);
 		return {
 			kind: "stack",
+			...(sourceConsumed
+				? {
+						sourceActorId: event.originItemId,
+					}
+				: {}),
 			sequence: transition.sequence,
 			eventIndex,
 			targetActorId: target.id,

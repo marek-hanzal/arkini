@@ -51,9 +51,27 @@ export const finalizeMotionActorsFx = Effect.fn("finalizeMotionActorsFx")(functi
 		if (canonical === undefined || pose === null) {
 			yield* actorStore.releaseActorFx(actorId);
 			onActorSettledFn(actor);
+			const remainingExitMs =
+				actor.lifecycleTargetAlpha === 0 && actor.lifecycleTransitionStarted
+					? Math.max(
+							0,
+							actor.lifecycleNotBeforeMs +
+								actor.lifecycleDurationMs -
+								performance.now(),
+						)
+					: undefined;
+			if (
+				remainingExitMs === 0 ||
+				(actor.lifecycleTargetAlpha === 0 && actor.container.alpha === 0)
+			) {
+				yield* animator.cancelActorFx(actor);
+				yield* actorStore.destroyExitingActorFx(actor);
+				continue;
+			}
 			yield* startActorExitFx({
 				actor,
 				animator,
+				durationMs: remainingExitMs,
 				onCompleteFn: () => {
 					RendererRuntime.runSync(animator.cancelActorFx(actor));
 					RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));

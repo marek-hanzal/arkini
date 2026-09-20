@@ -12,9 +12,7 @@ import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
-import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";
 import { flashMotionTargetFx } from "~/tile-motion/fx/flashMotionTargetFx";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
@@ -32,7 +30,6 @@ export namespace runStackMotionFx {
 		readonly cue: TileStackMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: MagneticField;
 		readonly onCompleteFn: () => void;
 		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
 		readonly origin: ActorPose;
@@ -55,7 +52,6 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 	cue,
 	cueKey,
 	delayMs,
-	magneticField,
 	onCompleteFn,
 	onPayloadCreatedFn,
 	origin,
@@ -73,7 +69,8 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 		onCompleteFn();
 		return;
 	}
-	const candidateSource = actorStore.actors.get(cue.originActorId);
+	const candidateSource =
+		cue.sourceActorId === undefined ? undefined : actorStore.actors.get(cue.sourceActorId);
 	const source =
 		candidateSource?.item.itemId === cue.canonicalItemId &&
 		!actorStore.canonicalItems.has(cue.originActorId)
@@ -137,30 +134,11 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 			movingActor: payload,
 		});
 	};
-	const magneticProjector = yield* createMagneticProjectorFx({
-		actor: payload,
-		attractedActorId: cue.targetActorId,
-		eligibleAttractionActorIds: new Set([
-			cue.targetActorId,
-		]),
-		magneticField,
-		surface,
-		readAttractionFn: () => {
-			const route = readCurrentRouteFn();
-			return {
-				attractedActorId: route.actorId,
-				eligibleAttractionActorIds: new Set([
-					route.actorId,
-				]),
-			};
-		},
-	});
 	yield* chaseTargetFx({
 		actor: payload,
 		animator,
 		delayMs,
 		fallbackTarget: target,
-		onPoseFn: magneticProjector.projectPoseFn,
 		onSettledFn: () => {
 			const route = readCurrentRouteFn();
 			RendererRuntime.runSync(
@@ -174,7 +152,6 @@ export const runStackMotionFx = Effect.fn("runStackMotionFx")(function* ({
 			const settleFn = () => {
 				if (settled) return;
 				settled = true;
-				magneticProjector.releaseFn();
 				RendererRuntime.runSync(animator.cancelActorFx(payload));
 				RendererRuntime.runSync(destroyTileActorFx(payload));
 				onCompleteFn();

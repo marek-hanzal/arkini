@@ -31,7 +31,6 @@ describe("main drag controller: motion", () => {
 		);
 		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
 		expect(mounted.finishCursorGrab).not.toHaveBeenCalled();
-		expect(mounted.magneticUpdates).toHaveLength(0);
 		expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
 		expect(mounted.actor.container.x).toBe(10);
 		expect(mounted.actor.container.y).toBe(20);

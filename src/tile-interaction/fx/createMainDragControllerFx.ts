@@ -17,7 +17,6 @@ import { readPointerOffsetFn } from "~/tile-interaction/fn/readPointerOffsetFn";
 import { setDraggedActorPoseFx } from "~/tile-interaction/fx/setDraggedActorPoseFx";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 import type { DropSubmission } from "~/tile-interaction/fx/createDropSubmissionFx";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
@@ -44,7 +43,6 @@ interface Props {
 	readonly dragOriginGhosts: DragOriginGhosts;
 	readonly dropSubmission: DropSubmission;
 	readonly game: GameEngine;
-	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
 	readonly onActivateFn: (
 		item: TileActorItem,
@@ -84,40 +82,6 @@ interface MovableGesture extends ActiveDragBase {
 }
 
 type ActiveDrag = ActivationOnlyGesture | MotionHandoffGesture | MovableGesture;
-const updateMagneticFieldFx = Effect.fn("createMainDragControllerFx.updateMagneticFieldFx")(
-	function* ({
-		actor,
-		attractedActorId,
-		candidateActorIds,
-		eligibleAttractionActorIds,
-		field,
-		sourceDirection,
-		sourceItem,
-	}: {
-		readonly actor: PixiTileActor;
-		readonly attractedActorId: string | null;
-		readonly candidateActorIds: ReadonlyArray<string>;
-		readonly eligibleAttractionActorIds: ReadonlySet<string>;
-		readonly field: MagneticField;
-		readonly sourceDirection: {
-			readonly x: number;
-			readonly y: number;
-		} | null;
-		readonly sourceItem: TileActorItem;
-	}) {
-		yield* field.updateFx({
-			attractedActorId,
-			candidateActorIds,
-			eligibleAttractionActorIds,
-			sourceActorId: sourceItem.id,
-			sourceInstanceId: actor.instanceId,
-			sourceDirection,
-			sourceX: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
-			sourceY: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
-		});
-	},
-);
-
 const removeCheatItemFx = Effect.fn("createMainDragControllerFx.removeCheatItemFx")(
 	({ game, sourceItem }: { readonly game: GameEngine; readonly sourceItem: TileActorItem }) =>
 		game
@@ -152,7 +116,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	dragOriginGhosts,
 	dropSubmission,
 	game,
-	magneticField,
 	motion,
 	onActivateFn,
 	readAckTintFn,
@@ -165,6 +128,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 
 	const dragPreview = yield* createMainDragPreviewFx({
 		actorStore,
+		animator,
 		game,
 		surface,
 	});
@@ -193,12 +157,12 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const cancelDragFn = (drag: ActiveDrag) => {
+		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
 		releaseDragPointerFn(drag.pointerId);
 		if (drag.mode !== "drag") return;
 		RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-		RendererRuntime.runSync(magneticField.resetFx);
 		RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
 		settleActorFn(drag.actor);
 	};
@@ -209,6 +173,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const detachActorFn = (actor: PixiTileActor) => {
+		RendererRuntime.runSync(dragPreview.detachTargetFx(actor));
 		if (actor.onPointerDownFn !== null) {
 			actor.container.off("pointerdown", actor.onPointerDownFn);
 			actor.onPointerDownFn = null;
@@ -220,13 +185,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		const drag = activeDrag;
 		activeDrag = null;
+		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		releaseDragPointerFn(drag.pointerId);
 		if (drag.mode !== "drag") {
 			actor.container.cursor = "default";
 			return;
 		}
 		RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-		RendererRuntime.runSync(magneticField.resetFx);
 		RendererRuntime.runSync(cursorGrab.finishFx(actor));
 		actor.dragging = false;
 		actor.container.cursor = "default";
@@ -333,67 +298,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			cancelDragFn(drag);
 			return;
 		}
-		const pointerTravel = {
-			x: sample.x - drag.lastPointerX,
-			y: sample.y - drag.lastPointerY,
-		};
-		const pointerTravelMagnitude = Math.hypot(pointerTravel.x, pointerTravel.y);
-		const sourceWidth = drag.actor.size * drag.actor.container.scale.x;
-		const sourceHeight = drag.actor.size * drag.actor.container.scale.y;
-		const sourceX =
-			drag.actor.container.x - drag.actor.container.pivot.x * drag.actor.container.scale.x;
-		const sourceY =
-			drag.actor.container.y - drag.actor.container.pivot.y * drag.actor.container.scale.y;
-		const localCandidateActorIds = RendererRuntime.runSync(
-			surface.readLocalActorIdsFx({
-				excludeActorId: sourceItem.id,
-				height: sourceHeight,
-				paddingRatio: 1.5,
-				width: sourceWidth,
-				x: sourceX,
-				y: sourceY,
-			}),
-		);
-		const candidateActorIds = Array.from(
-			new Set([
-				...localCandidateActorIds,
-				...RendererRuntime.runSync(magneticField.readActiveSourceActorIdsFx),
-				...(targetFacts.occupant === null
-					? []
-					: [
-							targetFacts.occupant.id,
-						]),
-			]),
-		).filter((actorId) => actorId !== sourceItem.id);
-		RendererRuntime.runSync(
-			dragPreview.refreshAttractionEligibilityFx({
-				candidateActorIds,
-				drag,
-				sourceItem,
-				targetFacts,
-			}),
-		);
-		RendererRuntime.runSync(
-			updateMagneticFieldFx({
-				actor: drag.actor,
-				attractedActorId: dragPreview.readAttractionActorIdFn({
-					previewKind: drag.previewKind,
-					targetItem: drag.targetItem,
-				}),
-				candidateActorIds,
-				eligibleAttractionActorIds: drag.eligibleAttractionActorIds,
-				field: magneticField,
-				sourceDirection:
-					pointerTravelMagnitude <= 0.001
-						? null
-						: {
-								x: pointerTravel.x / pointerTravelMagnitude,
-								y: pointerTravel.y / pointerTravelMagnitude,
-							},
-				sourceItem,
-			}),
-		);
-		RendererRuntime.runSync(magneticField.flushFx);
 		drag.lastPointerX = sample.x;
 		drag.lastPointerY = sample.y;
 	};
@@ -514,6 +418,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				return;
 			}
 			activeDrag = null;
+			RendererRuntime.runSync(dragPreview.clearTargetFx);
 			RendererRuntime.runSync(
 				dropSubmission.submitFx({
 					actor: drag.actor,
@@ -571,6 +476,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		releaseDragPointerFn(drag.pointerId);
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
+		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		RendererRuntime.runSync(dropSubmission.submitFx(submission));
 	};
 
@@ -606,27 +512,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			game.reportCriticalFailureFn("game-presentation", cause);
 		});
 	};
-
-	const unsubscribeSourceMembershipFn = yield* magneticField.subscribeSourceMembershipFx(
-		(sourceKind) => {
-			const drag = activeDrag;
-			if (
-				sourceKind !== "motion" ||
-				drag === null ||
-				drag.mode !== "drag" ||
-				drag.phase !== "dragging"
-			) {
-				return;
-			}
-			RendererRuntime.runSync(
-				pointerSampler.scheduleFallbackFx({
-					pointerId: drag.pointerId,
-					x: drag.lastPointerX,
-					y: drag.lastPointerY,
-				}),
-			);
-		},
-	);
 
 	application.stage.on("globalpointermove", onPointerMoveFn);
 	application.stage.on("pointerup", finishPointerFn);
@@ -692,8 +577,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 										? "fill-default-line-queue"
 										: "primary",
 						actor,
-						attractionEligibilityByActorId: new Map(),
-						eligibleAttractionActorIds: new Set(),
 						pointerId: event.pointerId,
 						pressScreenX: event.global.x,
 						pressScreenY: event.global.y,
@@ -744,7 +627,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		closeFx: Effect.gen(function* () {
 			if (closed) return;
 			closed = true;
-			unsubscribeSourceMembershipFn();
 			cancelInteractionFn();
 			yield* pointerSampler.cancelFx;
 			application.stage.off("globalpointermove", onPointerMoveFn);

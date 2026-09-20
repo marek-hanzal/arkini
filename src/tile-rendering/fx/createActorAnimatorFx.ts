@@ -76,6 +76,10 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 			const applyWriteFn = (write: PresentationWrite) => {
 				if (write.actor.container.destroyed) return;
 				switch (write.channel) {
+					case "drop-target":
+						write.actor.visualLayer.scale.set(write.factor);
+						write.actor.visualLayer.alpha = write.factor;
+						break;
 					case "activity-particles":
 						if (write.reset) {
 							for (const { particle } of write.actor.activityParticles.particles) {
@@ -124,6 +128,8 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const fromAlpha = actor.container.alpha;
 					const fromLifecycleScale = actor.lifecycleLayer.scale.x;
 					const fromCrowdAlpha = actor.crowdLayer.alpha;
+					const fromDropScale = channel === "drop-target" ? actor.visualLayer.scale.x : 1;
+					const fromDropAlpha = channel === "drop-target" ? actor.visualLayer.alpha : 1;
 					const fromIncomingAlpha =
 						animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
 					const fromOutgoingAlpha =
@@ -149,6 +155,15 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 								onUpdateFn: (progress) => {
 									if (closed || actor.container.destroyed) return;
 									switch (animation.channel) {
+										case "drop-target":
+											actor.visualLayer.scale.set(
+												fromDropScale +
+													(animation.toFactor - fromDropScale) * progress,
+											);
+											actor.visualLayer.alpha =
+												fromDropAlpha +
+												(animation.toFactor - fromDropAlpha) * progress;
+											break;
 										case "activity-particles":
 											animation.renderFn(progress);
 											break;

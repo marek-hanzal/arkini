@@ -75,35 +75,6 @@ describe("main canonical occupancy", () => {
 		expect(store.canonicalItems.get(boardItem.id)).toBe(revised);
 	});
 
-	it("returns unique occupants in deterministic caller slot order", () => {
-		const store = Effect.runSync(createMainActorStoreFx());
-		const first = item("runtime:first", board(1, 0));
-		const second = item("runtime:second", board(2, 0));
-		const tool = item("runtime:tool", toolbar(0));
-		Effect.runSync(
-			store.replaceCanonicalItemsFx([
-				second,
-				tool,
-				first,
-			]),
-		);
-
-		expect(
-			Effect.runSync(
-				store.readCanonicalOccupantsFx([
-					board(1, 0),
-					board(2, 0),
-					board(1, 0),
-					toolbar(0),
-				]),
-			).map(({ id }) => id),
-		).toEqual([
-			first.id,
-			second.id,
-			tool.id,
-		]);
-	});
-
 	it("rejects impossible duplicate occupancy without publishing a partial replacement", () => {
 		const store = Effect.runSync(createMainActorStoreFx());
 		const retained = item("runtime:retained", board(0, 0));

@@ -36,7 +36,7 @@ describe("sequential stack contact", () => {
 				canonical,
 			],
 		]);
-		const { animations, magneticReleases, runtime } = createMotionHarness({
+		const { animations, runtime } = createMotionHarness({
 			actors,
 			canonicalItems,
 		});
@@ -109,9 +109,6 @@ describe("sequential stack contact", () => {
 					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === firstTransient.item.id),
-		).toHaveLength(1);
 		const secondTravel = animations.find(
 			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:21:0",
 		);
@@ -137,9 +134,6 @@ describe("sequential stack contact", () => {
 					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(2);
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === secondTransient.item.id),
-		).toHaveLength(1);
 		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
 			new Map(),
 		);

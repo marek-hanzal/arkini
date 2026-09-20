@@ -14,7 +14,6 @@ import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type {
 	InteractionClaim,
 	MotionRuntime,
@@ -36,7 +35,6 @@ export namespace createMotionRuntimeFx {
 		readonly actorStore: MainActorStore;
 		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly magneticField: MagneticField;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
@@ -294,7 +292,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	actorStore,
 	animator,
 	application,
-	magneticField,
 	onActorSettledFn,
 	readPaletteFn,
 	surface,
@@ -532,33 +529,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				application,
 				cue,
 				cueKey,
-				magneticField,
 				isCueActiveFn: () => !closed && cueLifecycleByKey.get(cueKey)?.started === true,
 				onActorSettledFn,
 				onCompleteFn: () => completeCue(cue),
-				onSpawnRevealFn: () => {
-					if (
-						cue.kind === "spawn" &&
-						cue.revealAtOriginExit === true &&
-						!actorStore.canonicalItems.has(cue.originActorId)
-					) {
-						RendererRuntime.runSync(
-							finalizeMotionActorsFx({
-								actorIds: new Set([
-									cue.originActorId,
-								]),
-								actorStore,
-								animator,
-								application,
-								onActorSettledFn,
-								readPaletteFn,
-								stillClaimedActorIds: new Set(),
-								surface,
-								textures,
-							}),
-						);
-					}
-				},
 				onSwapLegSettledFn: (actorId) => {
 					settleSwapLeg(cueKey, actorId);
 				},
@@ -690,11 +663,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				if (cue.kind === "input" && started) {
 					const actor = actorStore.actors.get(cue.sourceActorId);
 					if (actor !== undefined && !actor.container.destroyed) {
-						yield* magneticField.releaseFx({
-							sourceActorId: actor.item.id,
-							sourceInstanceId: actor.instanceId,
-							sourceKind: "motion",
-						});
 						// The real source survives for delivery; retire any input contact fade.
 						yield* animator.setFx({
 							actor,
@@ -1008,7 +976,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				yield* animator.cancelActorFx(payloadActor);
 				yield* destroyTileActorFx(payloadActor);
 			}
-			yield* magneticField.releaseSourcesFx("motion");
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			cueLifecycleByKey.clear();

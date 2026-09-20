@@ -51,12 +51,10 @@ describe("main drag controller: pointer", () => {
 		mounted.stage.emit("globalpointermove", pointer(70, 20));
 
 		expect(mounted.actor.dragging).toBe(false);
-		expect(mounted.magneticUpdates).toEqual([]);
 		mounted.flushFrame();
 
 		expect(mounted.actor.dragging).toBe(true);
 		expect(mounted.actor.container.x).toBe(70);
-		expect(mounted.magneticUpdates).toHaveLength(1);
 	});
 
 	it("keeps an origin ghost from the drag threshold through a cancelled return", () => {
@@ -164,9 +162,9 @@ describe("main drag controller: pointer", () => {
 			y: 35,
 		});
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
-		const updateCount = mounted.magneticUpdates.length;
+		const targetReadCount = mounted.dropTargetReads.length;
 		mounted.flushFrame();
-		expect(mounted.magneticUpdates).toHaveLength(updateCount);
+		expect(mounted.dropTargetReads).toHaveLength(targetReadCount);
 	});
 
 	it.each([
@@ -196,7 +194,6 @@ describe("main drag controller: pointer", () => {
 		mounted.flushFrame();
 
 		expect(mounted.actor.dragging).toBe(false);
-		expect(mounted.magneticUpdates).toEqual([]);
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 	});
 

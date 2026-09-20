@@ -17,7 +17,6 @@ import { createMainDragControllerFx } from "~/tile-interaction/fx/createMainDrag
 import { createDeliveryRuntimeFx } from "~/game-scene/fx/createDeliveryRuntimeFx";
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 import { createDropSubmissionFx } from "~/tile-interaction/fx/createDropSubmissionFx";
-import { createMagneticFieldFx } from "~/tile-motion/fx/createMagneticFieldFx";
 import { createMotionRuntimeFx } from "~/tile-motion/fx/createMotionRuntimeFx";
 import { createApplicationOwnerFx } from "~/tile-rendering/fx/createApplicationOwnerFx";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
@@ -118,18 +117,10 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(dragOriginGhosts.closeFx);
-		const magneticField = yield* createMagneticFieldFx({
-			actorStore,
-			animationDriver,
-			scheduleApplyFn: (applyFn) =>
-				RendererRuntime.runSync(application.frames.scheduleFx(applyFn)),
-		});
-		registerRollbackFn(magneticField.closeFx);
 		const motion = yield* createMotionRuntimeFx({
 			actorStore,
 			animator,
 			application,
-			magneticField,
 			onActorSettledFn: (actor) => RendererRuntime.runSync(dragOriginGhosts.settleFx(actor)),
 			readPaletteFn: () => paletteState.current,
 			surface,
@@ -150,7 +141,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			cursorGrab,
 			dropPresentation,
 			game,
-			magneticField,
 			motion,
 			onSettledDropFn: () => replayCurrentTransitionFn(),
 			onDropFn,
@@ -167,7 +157,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			dragOriginGhosts,
 			dropSubmission,
 			game,
-			magneticField,
 			motion,
 			onActivateFn,
 			readAckTintFn: () => paletteState.current.success,
@@ -202,7 +191,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			animator,
 			application,
 			drag,
-			magneticField,
 			particleTextures,
 			readPaletteFn: () => paletteState.current,
 			surface,
@@ -217,7 +205,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			delivery,
 			dropPresentation,
 			game,
-			magneticField,
 			motion,
 			particleTextures,
 			readPaletteFn: () => paletteState.current,

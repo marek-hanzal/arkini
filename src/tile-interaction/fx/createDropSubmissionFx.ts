@@ -18,7 +18,6 @@ import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { MotionRedirect } from "~/tile-motion/type/MotionTarget";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
@@ -46,7 +45,6 @@ interface Props {
 	readonly cursorGrab: CursorGrabMotion;
 	readonly dropPresentation: DropPresentation;
 	readonly game: GameEngine;
-	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
 	readonly onSettledDropFn: () => void;
 	readonly onRejectedDropFn?: () => void;
@@ -197,7 +195,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	cursorGrab,
 	dropPresentation,
 	game,
-	magneticField,
 	motion,
 	onSettledDropFn,
 	onDropFn,
@@ -253,7 +250,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 				Effect.sync(() => {
 					if (closed) return;
 					RendererRuntime.runSync(cursorGrab.finishFx(actor));
-					RendererRuntime.runSync(magneticField.resetFx);
 					RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 					actor.container.cursor = readActorCursorFn({
 						phase: "pending",

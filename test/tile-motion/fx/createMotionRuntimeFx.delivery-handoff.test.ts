@@ -16,7 +16,7 @@ describe("spawn ownership transfer to delivery", () => {
 	]) {
 		it(`releases ${phase} spawn claims without destroying the delivery actor`, () => {
 			const harness = createSpawnHarness();
-			const { actorStore, application, magneticField, spawnCue, spawned, surface } = harness;
+			const { actorStore, application, spawnCue, spawned, surface } = harness;
 			const tweens: Array<{
 				props: Parameters<AnimationDriver["startTweenFx"]>[0];
 				active: boolean;
@@ -52,7 +52,6 @@ describe("spawn ownership transfer to delivery", () => {
 					actorStore,
 					animator,
 					application,
-					magneticField,
 					onActorSettledFn: () => {},
 					surface,
 					readPaletteFn: () => palette,

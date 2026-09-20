@@ -18,7 +18,6 @@ export namespace chaseTargetFx {
 		readonly delayMs?: number;
 		readonly durationMs?: number;
 		readonly fallbackTarget: ActorPose;
-		readonly onPoseFn?: (pose: PresentedPose) => void;
 		readonly onSettledFn: () => void;
 		readonly ownerKey: string;
 		readonly readLiveTargetFn?: () => Required<PresentedPose> | null;
@@ -44,7 +43,6 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 	delayMs = 0,
 	durationMs,
 	fallbackTarget,
-	onPoseFn,
 	onSettledFn,
 	ownerKey,
 	readLiveTargetFn,
@@ -129,7 +127,6 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 					animator,
 					curve,
 					fallbackTarget: semanticTarget,
-					onPoseFn,
 					onSettledFn,
 					ownerKey,
 					readLiveTargetFn,
@@ -142,7 +139,6 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 		},
 		readPoseFn: (progress) => {
 			const pose = poseSampler.readPoseFn(progress);
-			onPoseFn?.(pose);
 			if (progress < 1 && !proximitySettlementQueued && isInsideSettlementFieldFn(pose)) {
 				proximitySettlementQueued = true;
 				// The animator applies this returned pose after `readPose`; settle from the next

@@ -12,15 +12,8 @@ import {
 
 describe("swap interaction handoff", () => {
 	it("hands one live swap leg to direct interaction without canceling its counterpart", () => {
-		const {
-			animations,
-			canceledAnimationKeys,
-			cue,
-			magneticReleases,
-			runtime,
-			source,
-			target,
-		} = createSwapHarness();
+		const { animations, canceledAnimationKeys, cue, runtime, source, target } =
+			createSwapHarness();
 		const pendingCue = {
 			...cue,
 			eventIndex: 1,
@@ -41,10 +34,6 @@ describe("swap interaction handoff", () => {
 
 		expect(canceledAnimationKeys).toContain(`motion:9:0:${target.item.id}`);
 		expect(canceledAnimationKeys).not.toContain(`motion:9:0:${source.item.id}`);
-		expect(magneticReleases).toContainEqual({
-			sourceActorId: target.item.id,
-			sourceKind: "motion",
-		});
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(
 			new Map([
 				[
@@ -61,10 +50,6 @@ describe("swap interaction handoff", () => {
 
 		samplePoseAnimation(sourceTravel, 1);
 		sourceTravel.onCompleteFn?.();
-		expect(magneticReleases).toContainEqual({
-			sourceActorId: source.item.id,
-			sourceKind: "motion",
-		});
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
 		expect(target.container).toMatchObject({
 			x: liveTargetPose.x,
@@ -73,16 +58,9 @@ describe("swap interaction handoff", () => {
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(target.item.id))).toBe(false);
 	});
 
-	it("hands both swap legs over independently without leaving a stale magnetic source", () => {
-		const {
-			animations,
-			canceledAnimationKeys,
-			cue,
-			magneticReleases,
-			runtime,
-			source,
-			target,
-		} = createSwapHarness();
+	it("hands both swap legs over independently", () => {
+		const { animations, canceledAnimationKeys, cue, runtime, source, target } =
+			createSwapHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -109,21 +87,7 @@ describe("swap interaction handoff", () => {
 				`motion:9:0:${source.item.id}`,
 			]),
 		);
-		expect(magneticReleases).toEqual(
-			expect.arrayContaining([
-				{
-					sourceActorId: target.item.id,
-					sourceKind: "motion",
-				},
-				{
-					sourceActorId: source.item.id,
-					sourceKind: "motion",
-				},
-			]),
-		);
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
-		const releaseCount = magneticReleases.length;
 		Effect.runSync(runtime.closeFx);
-		expect(magneticReleases).toHaveLength(releaseCount);
 	});
 });

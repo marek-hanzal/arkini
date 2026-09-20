@@ -17,16 +17,7 @@ import {
 
 describe("motion target redirection", () => {
 	it("follows a consumed held target into its redirected sink before vanishing", () => {
-		const {
-			actors,
-			animations,
-			canonicalItems,
-			cue,
-			magneticReleases,
-			magneticUpdates,
-			runtime,
-			target,
-		} = createStackHarness();
+		const { actors, animations, canonicalItems, cue, runtime, target } = createStackHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -85,14 +76,6 @@ describe("motion target redirection", () => {
 		});
 		redirectedTravel.onCompleteFn?.();
 
-		expect(magneticUpdates.length).toBeGreaterThan(0);
-		expect(magneticUpdates.at(-1)).toMatchObject({
-			attractedActorId: inventory.item.id,
-			eligibleAttractionActorIds: new Set([
-				inventory.item.id,
-			]),
-		});
-		expect(magneticReleases).toEqual([]);
 		expect(transient.container.destroyed).toBe(false);
 		expect(destroy).not.toHaveBeenCalled();
 		const vanishOpacity = animations.find(
@@ -110,12 +93,6 @@ describe("motion target redirection", () => {
 
 		expect(transient.container.destroyed).toBe(true);
 		expect(destroy).toHaveBeenCalledOnce();
-		expect(magneticReleases).toEqual([
-			{
-				sourceActorId: transient.item.id,
-				sourceKind: "motion",
-			},
-		]);
 		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
 			new Map(),
 		);
@@ -123,11 +100,10 @@ describe("motion target redirection", () => {
 		Effect.runSync(runtime.closeFx);
 		Effect.runSync(runtime.closeFx);
 		expect(destroy).toHaveBeenCalledOnce();
-		expect(magneticReleases).toHaveLength(1);
 	});
 
 	it("retargets a replacement stack actor and publishes contact only on the surviving instance", () => {
-		const { actors, animations, cue, magneticReleases, runtime, target } = createStackHarness();
+		const { actors, animations, cue, runtime, target } = createStackHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -178,17 +154,10 @@ describe("motion target redirection", () => {
 					animation.actor === replacement && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
-		expect(magneticReleases).toEqual([
-			{
-				sourceActorId: transient.item.id,
-				sourceKind: "motion",
-			},
-		]);
 		expect(transient.container.destroyed).toBe(true);
 		expect(destroy).toHaveBeenCalledOnce();
 
 		Effect.runSync(runtime.closeFx);
 		expect(destroy).toHaveBeenCalledOnce();
-		expect(magneticReleases).toHaveLength(1);
 	});
 });

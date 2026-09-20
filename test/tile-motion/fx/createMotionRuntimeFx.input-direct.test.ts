@@ -19,7 +19,6 @@ import {
 	createItem,
 	createActor,
 	createRecordingAnimator,
-	createRecordingMagneticField,
 	readPoseAnimation,
 	samplePoseAnimation,
 	advanceInputRemainderFlash,
@@ -42,7 +41,7 @@ describe("direct input remainder", () => {
 		source.container.alpha = 1;
 		source.container.eventMode = "static";
 		source.container.position.set(280, 40);
-		source.offsetLayer.position.set(6, -4);
+		source.lifecycleLayer.position.set(6, -4);
 		owner.container.position.set(300, 40);
 		const actorLayer = new Container();
 		const transientActorLayer = new Container();
@@ -78,8 +77,8 @@ describe("direct input remainder", () => {
 			transientActorLayer,
 		});
 		const effectivePoseBeforeSetup = {
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		};
 		const cue = {
 			canonicalItemId: source.item.itemId,
@@ -110,10 +109,8 @@ describe("direct input remainder", () => {
 				application,
 				cue,
 				cueKey: "42:0",
-				magneticField: createRecordingMagneticField(),
 				onActorSettledFn: () => {},
 				onCompleteFn: completed,
-				onSpawnRevealFn: () => {},
 				onInputRemainderRevealedFn: () => {
 					source.item = {
 						...source.item,
@@ -143,8 +140,8 @@ describe("direct input remainder", () => {
 		expect(source.item.quantity).toBe(8);
 		expect(source.item.badgeCount).toBe(8);
 		expect({
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		}).toEqual(effectivePoseBeforeSetup);
 		expect(source.container).toMatchObject({
 			alpha: 1,
@@ -181,8 +178,8 @@ describe("direct input remainder", () => {
 			y: home.y,
 		});
 		const effectivePoseBeforeCompletion = {
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		};
 		returned.onCompleteFn?.();
 
@@ -196,8 +193,8 @@ describe("direct input remainder", () => {
 		});
 		expect(source.lifecycleLayer.scale.x).toBe(1);
 		expect({
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		}).toEqual(effectivePoseBeforeCompletion);
 		expect(source.item.quantity).toBe(7);
 		expect(completed).toHaveBeenCalledOnce();

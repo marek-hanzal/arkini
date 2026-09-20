@@ -61,15 +61,8 @@ describe("motion runtime lifecycle", () => {
 	});
 
 	it("clears claims on close and ignores late swap completion callbacks", () => {
-		const {
-			animations,
-			canceledAnimationKeys,
-			cue,
-			magneticReleases,
-			runtime,
-			source,
-			target,
-		} = createSwapHarness();
+		const { animations, canceledAnimationKeys, cue, runtime, source, target } =
+			createSwapHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -85,18 +78,6 @@ describe("motion runtime lifecycle", () => {
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
 		expect(canceledAnimationKeys).toContain(`motion:9:0:${cue.actorId}`);
 		expect(canceledAnimationKeys).toContain(`motion:9:0:${cue.counterpartActorId}`);
-		expect(magneticReleases).toEqual(
-			expect.arrayContaining([
-				{
-					sourceActorId: target.item.id,
-					sourceKind: "motion",
-				},
-				{
-					sourceActorId: source.item.id,
-					sourceKind: "motion",
-				},
-			]),
-		);
 		expect(animations).toHaveLength(2);
 	});
 });

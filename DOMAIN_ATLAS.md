@@ -90,7 +90,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | --- | --- | --- |
 | `tile-presentation` | Semantic actor values, feedback and motion intents | [`src/tile-presentation/fx/readTileActorsFx.ts`](src/tile-presentation/fx/readTileActorsFx.ts) |
 | `tile-rendering` | Pixi application, native actors, visuals and animation channels | [`src/tile-rendering/fx/createApplicationOwnerFx.ts`](src/tile-rendering/fx/createApplicationOwnerFx.ts) |
-| `tile-motion` | Cue lanes, choreography, magnetic response and playback | [`src/tile-motion/fx/createMotionRuntimeFx.ts`](src/tile-motion/fx/createMotionRuntimeFx.ts) |
+| `tile-motion` | Cue lanes, choreography and playback | [`src/tile-motion/fx/createMotionRuntimeFx.ts`](src/tile-motion/fx/createMotionRuntimeFx.ts) |
 | `tile-interaction` | Pointer gestures, drop execution and command admission | [`src/tile-interaction/fx/createMainDragControllerFx.ts`](src/tile-interaction/fx/createMainDragControllerFx.ts) |
 | `game-scene` | Concrete retained Board, Toolbar and Inventory scenes | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | `item-detail-read` | Shared framework-neutral detail reads | [`src/item-detail-read/fx/readItemDetailQueueFx.ts`](src/item-detail-read/fx/readItemDetailQueueFx.ts) |

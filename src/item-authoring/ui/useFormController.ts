@@ -201,7 +201,7 @@ export const useFormController = ({
 		form.setFieldValue("action", undefined);
 		form.setFieldValue("maxStackSize", 1);
 		form.setFieldValue("clock", {
-			durationMs: 300_000,
+			durationMs: 900_000,
 			enable: true,
 			rules: [],
 		});

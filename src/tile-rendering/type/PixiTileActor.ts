@@ -8,7 +8,6 @@ export interface PixiTileActor {
 	readonly instanceId: string;
 	readonly container: Container;
 	readonly lifecycleLayer: Container;
-	readonly offsetLayer: Container;
 	readonly crowdLayer: Container;
 	readonly visualLayer: Container;
 	readonly activityParticles: ActivityParticles;

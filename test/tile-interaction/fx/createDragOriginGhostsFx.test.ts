@@ -35,7 +35,6 @@ describe("drag origin ghosts", () => {
 					x: 40,
 					y: 80,
 				}),
-			readLocalActorIdsFx: () => Effect.succeed([]),
 			readTargetFactsFx: () => Effect.die("Unexpected target read."),
 			renderDropFeedbackFx: () => Effect.void,
 			transientActorLayer: new Container(),

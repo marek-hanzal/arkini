@@ -31,7 +31,6 @@ import type { MainDragController } from "~/tile-interaction/fx/createMainDragCon
 import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
 import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
@@ -50,7 +49,6 @@ interface CreateMainReconcilerProps {
 	readonly delivery: DeliveryRuntime;
 	readonly dropPresentation: DropPresentation;
 	readonly game: GameEngine;
-	readonly magneticField: MagneticField;
 	readonly motion: MotionRuntime;
 	readonly particleTextures: ParticleTextures;
 	readonly readPaletteFn: () => PixiScenePalette;
@@ -103,7 +101,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	delivery,
 	dropPresentation,
 	game,
-	magneticField,
 	motion,
 	particleTextures,
 	readPaletteFn,
@@ -592,7 +589,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			inventoryActorIds,
 			mainItems: nextItems,
 		});
-		yield* magneticField.pruneFx;
 		yield* motion.syncPresentationFx;
 		yield* motion.startFx;
 		yield* drag.requestRefreshFx;

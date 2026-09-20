@@ -124,10 +124,6 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				eventMode: "none",
 				label: `TileActorLifecycle:${item.id}:${instanceId}`,
 			});
-			const offsetLayer = new Container({
-				eventMode: "none",
-				label: `TileActorOffset:${item.id}:${instanceId}`,
-			});
 			const crowdLayer = new Container({
 				eventMode: "none",
 				label: `TileActorCrowd:${item.id}:${instanceId}`,
@@ -167,15 +163,18 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 			]);
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
-			offsetLayer.addChild(crowdLayer, activityParticles.container, progressBar, clockRing);
-			lifecycleLayer.addChild(offsetLayer);
+			lifecycleLayer.addChild(
+				crowdLayer,
+				activityParticles.container,
+				progressBar,
+				clockRing,
+			);
 			container.addChild(lifecycleLayer);
 
 			return {
 				instanceId,
 				container,
 				lifecycleLayer,
-				offsetLayer,
 				crowdLayer,
 				visualLayer,
 				activityParticles,

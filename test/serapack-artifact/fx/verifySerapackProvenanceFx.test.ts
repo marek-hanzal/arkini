@@ -1,3 +1,6 @@
+import { execFile } from "node:child_process";
+import { createRequire } from "node:module";
+import { promisify } from "node:util";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -32,6 +35,25 @@ const verifyFixtureFx = (artifact: Uint8Array, candidateProof: Uint8Array | null
 	});
 
 describe("Serapack release provenance", () => {
+	it("verifies offline proofs and rejects tampering in the shipped Electron runtime", async () => {
+		const electronPath: string = createRequire(import.meta.url)("electron");
+		await promisify(execFile)(
+			electronPath,
+			[
+				"--import",
+				"tsx",
+				"test/serapack-artifact/fx/verifySerapackProvenanceFx.test/electron.ts",
+			],
+			{
+				env: {
+					...process.env,
+					ELECTRON_RUN_AS_NODE: "1",
+				},
+				timeout: 15_000,
+			},
+		);
+	}, 20_000);
+
 	it("keeps release versions outside the exact workflow channel identity", () => {
 		const workflow = "https://github.com/marek-hanzal/serakki/.github/workflows/release.yml";
 		expect(

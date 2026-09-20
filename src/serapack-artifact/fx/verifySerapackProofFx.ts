@@ -1,4 +1,6 @@
 import { bundleFromJSON } from "@sigstore/bundle";
+import { crypto as sigstoreCrypto } from "@sigstore/core";
+import { KeyObject, verify as verifyNodeSignatureFn } from "node:crypto";
 import { TrustedRoot } from "@sigstore/protobuf-specs";
 import { toSignedEntity, toTrustMaterial, Verifier } from "@sigstore/verify";
 import { Effect } from "effect";
@@ -33,15 +35,34 @@ export const verifySerapackProofFx = Effect.fn("verifySerapackProofFx")(
 						}).decode(proof),
 					),
 				);
-				new Verifier(toTrustMaterial(TrustedRoot.fromJSON(trustedRoot)), {
+				const verifier = new Verifier(toTrustMaterial(TrustedRoot.fromJSON(trustedRoot)), {
 					ctlogThreshold: 1,
 					tlogThreshold: 1,
-				}).verify(toSignedEntity(bundle, Buffer.from(artifact)), {
-					subjectAlternativeName: channel.subjectAlternativeName,
-					extensions: {
-						issuer: channel.issuer,
-					},
 				});
+				const originalVerifyFn = sigstoreCrypto.verify;
+				// Electron requires an explicit ECDSA digest for Sigstore's Rekor checks.
+				// The override and verification are synchronous; restore before yielding or returning.
+				sigstoreCrypto.verify = (data, key, signature, algorithm) => {
+					const keyType = key instanceof KeyObject ? key.asymmetricKeyType : undefined;
+					const digest =
+						algorithm ??
+						(keyType === "ed25519" || keyType === "ed448" ? null : "sha256");
+					try {
+						return verifyNodeSignatureFn(digest, data, key, signature);
+					} catch {
+						return false;
+					}
+				};
+				try {
+					verifier.verify(toSignedEntity(bundle, Buffer.from(artifact)), {
+						subjectAlternativeName: channel.subjectAlternativeName,
+						extensions: {
+							issuer: channel.issuer,
+						},
+					});
+				} finally {
+					sigstoreCrypto.verify = originalVerifyFn;
+				}
 				return {
 					type: "official",
 				};

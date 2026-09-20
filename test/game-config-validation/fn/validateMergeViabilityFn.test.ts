@@ -24,7 +24,6 @@ const mergeSource = ({
 	action = "consume",
 	units,
 	effect = "keep",
-	maxCount,
 	result,
 	target,
 }: {
@@ -33,7 +32,6 @@ const mergeSource = ({
 		amount: number;
 	};
 	effect?: "spend" | "keep" | "replace";
-	maxCount?: number;
 	result?: string;
 	target: {
 		type: "item";
@@ -42,7 +40,6 @@ const mergeSource = ({
 }) => ({
 	...createSimpleItem("source"),
 	units,
-	maxCount,
 	merge: [
 		effect === "replace"
 			? {
@@ -193,29 +190,8 @@ describe("validateMergeViabilityFn", () => {
 		]);
 	});
 
-	it("rejects an exact self-target when maxCount allows only one identity", async () => {
-		const source = mergeSource({
-			maxCount: 1,
-			target: {
-				type: "item",
-				itemId: "source",
-			},
-		});
-
-		expect(
-			await mergeDiagnostics({
-				[source.id]: source,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				reason: InvalidMergeReasonEnumSchema.enum.SelfTargetUnavailable,
-			}),
-		]);
-	});
-
 	it("does not reject exact self-target merely when a second identity is possible", async () => {
 		const source = mergeSource({
-			maxCount: 2,
 			target: {
 				type: "item",
 				itemId: "source",

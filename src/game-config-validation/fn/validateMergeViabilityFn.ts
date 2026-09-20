@@ -68,30 +68,6 @@ export const validateMergeViabilityFn = ({
 			}
 			const missingExactTarget = config.items[merge.target.itemId] === undefined;
 			if (!missingExactTarget) {
-				const exactSelfTargetUnavailable =
-					merge.target.itemId === ownerItemId &&
-					owner.maxCount === 1 &&
-					(owner.scope === StorageSchema.enum.Board ||
-						owner.scope === StorageSchema.enum.Any);
-				if (exactSelfTargetUnavailable) {
-					diagnostics.push({
-						code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
-						severity: DiagnosticSeverityEnumSchema.enum.Error,
-						path: [
-							"items",
-							ownerItemId,
-							"merge",
-							mergeIndex,
-							"target",
-						],
-						source: provenance.items[ownerItemId],
-						message: `Merge ${mergeIndex} of item ${ownerItemId} requires a second live identity of itself, but maxCount is 1.`,
-						ownerItemId,
-						mergeIndex,
-						reason: InvalidMergeReasonEnumSchema.enum.SelfTargetUnavailable,
-					});
-				}
-
 				const matchedTargets = selectItemsFn({
 					items: Object.values(config.items),
 					selector: merge.target,

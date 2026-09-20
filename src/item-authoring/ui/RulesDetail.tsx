@@ -3,7 +3,6 @@ import { match } from "ts-pattern";
 import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
-import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { QueryDetail } from "~/item-authoring/ui/QueryDetail";
 import { Tx } from "~/translation/ui/Tx";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
@@ -105,31 +104,14 @@ const WhenDetail = ({
 				</>
 			),
 		)
-		.with(
-			{
-				type: "limit",
-			},
-			() => <Tx label="Limit" />,
-		)
 		.exhaustive();
 	return (
 		<li className="grid gap-1 border-l-2 border-accent">
-			{when.type === "limit" ? (
-				<SelectorDetail
-					eyebrow={eyebrow}
-					description={heading}
-					selector={{
-						type: "item",
-						itemId: when.itemId,
-					}}
-				/>
-			) : (
-				<QueryDetail
-					eyebrow={eyebrow}
-					query={when.query}
-					heading={heading}
-				/>
-			)}
+			<QueryDetail
+				eyebrow={eyebrow}
+				query={when.query}
+				heading={heading}
+			/>
 		</li>
 	);
 };

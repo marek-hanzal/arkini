@@ -126,7 +126,6 @@ export const ProjectBoardSection = () => {
 					])
 				}
 				scope="board"
-				start={start}
 				width={width}
 			/>
 		</div>

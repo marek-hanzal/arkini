@@ -1,8 +1,6 @@
-import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
-import { ItemJobCancel } from "~/item-detail/ui/ItemJobCancel";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
-import { Factory, Info, ListPlus, Star, X } from "lucide-react";
+import { Factory, Info, Star } from "lucide-react";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -22,6 +20,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Status } from "~/ui/ui/Status";
+import { ItemLineWorkControls } from "~/item-detail/ui/ItemLineWorkControls";
 import { ItemProductionRow } from "~/item-detail/ui/ItemProductionRow";
 
 const linePresenceMotion = {
@@ -51,38 +50,6 @@ interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly status?: readItemLineStatusesFn.Status;
 }
 
-/** Live time is separate from debounced status so Tick cannot postpone a status change. */
-const ItemLineCountdown = ({
-	ownerItemId,
-	lineId,
-}: {
-	readonly ownerItemId?: IdSchema.Type;
-	readonly lineId: IdSchema.Type;
-}) => {
-	const game = useGameEngine();
-	const selectorFn = useCallback(
-		(runtime: RuntimeSchema.Type) => {
-			const job = runtime.jobs.find(
-				(job) => job.ownerItemId === ownerItemId && job.lineId === lineId,
-			);
-			return formatDurationFn(job?.remainingMs ?? 0, "countdown");
-		},
-		[
-			ownerItemId,
-			lineId,
-		],
-	);
-	const remaining = useRuntimeSelector(game, selectorFn);
-	return (
-		<span
-			className="inline-block min-w-[6ch] text-right tabular-nums"
-			data-ui="ItemLineCountdown"
-		>
-			{remaining}
-		</span>
-	);
-};
-
 /** Progress follows the live job's captured duration, independently of debounced status. */
 const ItemLineProgressBackdrop = ({
 	ownerItemId,
@@ -100,7 +67,7 @@ const ItemLineProgressBackdrop = ({
 				(job) => job.ownerItemId === ownerItemId && job.lineId === lineId,
 			);
 			return job === undefined
-				? 0
+				? undefined
 				: job.durationMs === 0
 					? 1
 					: 1 - job.remainingMs / job.durationMs;
@@ -150,17 +117,13 @@ const ItemLine = ({
 	const state = status?.state ?? "idle";
 	const statusLabel = match(state)
 		.with("idle", () => null)
-		.with("waiting-inputs", () => translator.textFn("Waiting for materials"))
+		.with("waiting-inputs", () => null)
 		.with("waiting-start", () => translator.textFn("Waiting to start"))
 		.with("running", () => null)
 		.with("paused", () => translator.textFn("Paused"))
 		.with("awaiting-output", () => translator.textFn("Waiting for space"))
 		.with("queued", () => translator.textFn("Queued"))
 		.exhaustive();
-	const extra =
-		state === "waiting-inputs" || state === "waiting-start"
-			? Math.max(0, (status?.queued ?? 0) - 1)
-			: (status?.queued ?? 0);
 	return (
 		<motion.div
 			{...linePresenceMotion}
@@ -171,6 +134,18 @@ const ItemLine = ({
 		>
 			<ItemProductionRow
 				line={line}
+				activateFn={
+					state === "waiting-inputs"
+						? cancelController.disabled
+							? undefined
+							: cancelController.cancelFn
+						: disabled ||
+								makeDisabled ||
+								controller.pending ||
+								props.ownerItemId === undefined
+							? undefined
+							: controller.makeFn
+				}
 				ruleDisabled={ruleDisabled}
 				backdrop={
 					line.artwork === undefined ? null : (
@@ -184,7 +159,8 @@ const ItemLine = ({
 				actions={
 					<>
 						<LinkButton
-							className="inline-flex items-center gap-2 text-muted data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
+							className="absolute top-3 left-0 grid size-14 place-items-center rounded-lg text-muted transition-[color,background-color,opacity] duration-300 hover:bg-surface-raised/50 data-[ui-selected=false]:opacity-60 data-[ui-selected=true]:text-accent"
+							title={translator.textFn("Default")}
 							disabled={defaultController.disabled}
 							onClick={defaultController.toggleFn}
 							{...readDataUiFn({
@@ -194,22 +170,17 @@ const ItemLine = ({
 								},
 							})}
 						>
-							<Star className="size-5" />
-							{translator.textFn("Default")}
+							<Star className="size-8" />
 						</LinkButton>
-						<LinkButton
-							className="inline-flex shrink-0 items-center gap-2"
-							disabled={
-								disabled ||
-								makeDisabled ||
-								controller.pending ||
-								props.ownerItemId === undefined
-							}
-							onClick={controller.makeFn}
-						>
-							<ListPlus className="size-5" />
-							{translator.textFn("Make")}
-						</LinkButton>
+						<ItemLineWorkControls
+							ownerItemId={props.ownerItemId}
+							lineId={line.id}
+							jobId={status?.jobId}
+							queued={status?.queued ?? 0}
+							running={state === "running"}
+							waitingMaterials={state === "waiting-inputs"}
+							disabled={disabled}
+						/>
 					</>
 				}
 				inputs={
@@ -222,46 +193,17 @@ const ItemLine = ({
 				}
 				status={
 					<>
-						{statusLabel !== null || state === "running" ? (
+						{statusLabel !== null ? (
 							<p
 								className="shrink-0 text-foreground"
 								data-ui="ItemLineStatus"
 							>
 								{statusLabel}
-								{state === "running" ? (
-									<ItemLineCountdown
-										ownerItemId={props.ownerItemId}
-										lineId={line.id}
-									/>
-								) : null}
-								{state === "queued"
-									? ` ${status?.queued ?? 0}`
-									: extra > 0
-										? ` (+${extra})`
-										: ""}
 							</p>
-						) : null}
-						{status?.jobId !== undefined ? (
-							<ItemJobCancel
-								ownerItemId={props.ownerItemId}
-								jobId={status.jobId}
-								lineId={line.id}
-								disabled={disabled}
-							/>
-						) : null}
-						{status?.requestId !== undefined ? (
-							<LinkButton
-								className="inline-flex items-center gap-2"
-								disabled={cancelController.disabled}
-								onClick={cancelController.cancelFn}
-							>
-								<X className="size-4" />
-								{translator.textFn("Cancel")}
-							</LinkButton>
 						) : null}
 					</>
 				}
-				footer={
+				overlay={
 					<AnimatePresence
 						initial={false}
 						mode="wait"
@@ -269,12 +211,24 @@ const ItemLine = ({
 						{ruleDisabled && blockingHint !== undefined ? (
 							<motion.div
 								key={blockingHint}
-								{...linePresenceMotion}
-								className="overflow-hidden"
+								initial={{
+									opacity: 0,
+								}}
+								animate={{
+									opacity: 1,
+								}}
+								exit={{
+									opacity: 0,
+								}}
+								transition={{
+									duration: 0.25,
+									ease: "easeInOut",
+								}}
+								className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-16 py-20"
 								data-ui="ItemLineBlockingHints"
 							>
-								<p className="mt-3 flex items-start gap-2 text-sm text-accent">
-									<Info className="mt-0.5 size-4 shrink-0" />
+								<p className="flex max-w-3xl items-center gap-4 rounded-xl bg-surface/90 px-6 py-4 text-center text-2xl leading-relaxed font-semibold text-accent">
+									<Info className="size-8 shrink-0" />
 									<span className="whitespace-pre-wrap">{blockingHint}</span>
 								</p>
 							</motion.div>
@@ -342,7 +296,9 @@ export const ItemLines = ({
 						className="overflow-hidden"
 					>
 						<div className="pb-[50cqh]">
-							<SectionEnd />
+							<SectionEnd>
+								{translator.textFn("That's everything you can make for now!")}
+							</SectionEnd>
 						</div>
 					</motion.div>
 				)}

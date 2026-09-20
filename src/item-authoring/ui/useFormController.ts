@@ -181,7 +181,6 @@ export const useFormController = ({
 			if (current.scope !== next.scope) form.setFieldValue("scope", next.scope);
 			if (current.maxStackSize !== next.maxStackSize)
 				form.setFieldValue("maxStackSize", next.maxStackSize);
-			if (current.maxCount !== next.maxCount) form.setFieldValue("maxCount", next.maxCount);
 			if (current.artwork !== next.artwork) form.setFieldValue("artwork", next.artwork);
 			if (current.lines !== next.lines) form.setFieldValue("lines", next.lines);
 			if (current.maxQueueSize !== next.maxQueueSize)

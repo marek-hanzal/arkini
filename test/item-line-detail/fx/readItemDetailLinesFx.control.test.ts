@@ -1,8 +1,5 @@
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import {
-	Effect,
-	GameConfigFx,
 	describe,
 	expect,
 	it,
@@ -53,12 +50,6 @@ const readControlledOwner = (ui: ItemSchema.Type["ui"], remainingDurationMs = 30
 	};
 	return {
 		lines: readLines(runtime, "runtime:workshop", config),
-		queue: Effect.runSync(
-			readItemDetailQueueFx({
-				itemId: "runtime:workshop",
-				runtime,
-			}).pipe(Effect.provideService(GameConfigFx, config)),
-		),
 	};
 };
 
@@ -92,10 +83,6 @@ describe("Item Detail production ui", () => {
 				},
 			],
 		});
-		expect(automatic.queue).toMatchObject({
-			kind: "available",
-			canClearQueue: false,
-		});
 
 		const interactive = readControlledOwner("default");
 		expect(interactive.lines).toMatchObject({
@@ -119,9 +106,6 @@ describe("Item Detail production ui", () => {
 					],
 				},
 			],
-		});
-		expect(interactive.queue).toMatchObject({
-			canClearQueue: true,
 		});
 
 		const draining = readControlledOwner("default", 0);

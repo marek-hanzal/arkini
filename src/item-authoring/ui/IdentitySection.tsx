@@ -91,16 +91,6 @@ export const IdentitySection = () => {
 								/>
 							)}
 						</form.AppField>
-						<form.AppField name="maxCount">
-							{(field) => (
-								<field.NumberField
-									label={translator.textFn("Maximum global count")}
-									description={<Mx label="Item global count help" />}
-									min={1}
-									optional
-								/>
-							)}
-						</form.AppField>
 					</div>
 					<form.AppField name="music">
 						{(field) => (

@@ -69,7 +69,6 @@ export const ProjectToolbarSection = () => {
 							)
 						}
 						scope="toolbar"
-						start={start}
 						width={size}
 					/>
 				)}

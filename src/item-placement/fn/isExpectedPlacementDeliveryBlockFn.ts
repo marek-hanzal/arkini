@@ -10,7 +10,6 @@ export const isExpectedPlacementDeliveryBlockFn = (reason: PlacementUnavailableE
 				PlacementUnavailableError.Reason.BoardFull,
 				PlacementUnavailableError.Reason.InventoryFull,
 				PlacementUnavailableError.Reason.ToolbarFull,
-				PlacementUnavailableError.Reason.ItemMaxCount,
 			),
 			() => true,
 		)

@@ -59,16 +59,6 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 						</FactList>
 						<FactList columns={1}>
 							<Fact
-								label={translator.textFn("Maximum in the game")}
-								value={
-									detail.maxCount === undefined
-										? translator.textFn("Unlimited")
-										: detail.maxCount === 1
-											? translator.textFn("Unique item")
-											: detail.maxCount
-								}
-							/>
-							<Fact
 								label={translator.textFn("Units remaining")}
 								value={
 									detail.units === undefined

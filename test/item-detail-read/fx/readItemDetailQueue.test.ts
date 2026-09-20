@@ -5,7 +5,6 @@ import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueue
 import { useGameFx } from "~test/support/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { createOutput } from "~test/game-config-validation/support/gameValidationTestSource";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,
@@ -62,25 +61,17 @@ describe("readItemDetailQueue", () => {
 			}),
 		).toEqual({
 			kind: "available",
-			itemId: "runtime:workshop",
-			capacity: 2,
-			used: 2,
-			canClearQueue: true,
 			active: [
 				{
-					jobId: "job:active",
 					lineId: "line:workshop:build",
-					title: "Build",
 					status: "running",
-					durationMs: 1_000,
-					remainingMs: 600,
+					jobId: "job:active",
 				},
 			],
 			request: [
 				{
 					requestId: "job:queued",
 					lineId: "line:workshop:build",
-					title: "Build",
 					status: "blocked-active",
 				},
 			],
@@ -93,7 +84,6 @@ describe("readItemDetailQueue", () => {
 		workshop.lines.push({
 			...workshop.lines[0],
 			id: "line:workshop:ready",
-			title: "Ready work",
 			input: [
 				{
 					type: "simple",
@@ -139,7 +129,6 @@ describe("readItemDetailQueue", () => {
 					requestId: "job:queued",
 					lineId: "line:workshop:build",
 					status: "waiting-inputs",
-					missingQuantity: 2,
 				},
 				{
 					requestId: "job:later",
@@ -179,16 +168,11 @@ describe("readItemDetailQueue", () => {
 			}),
 		).toEqual({
 			kind: "available",
-			itemId: "runtime:workshop",
-			capacity: 1,
-			used: 1,
-			canClearQueue: true,
 			active: [],
 			request: [
 				{
 					requestId: "job:queued",
 					lineId: "line:workshop:build",
-					title: "Build",
 					status: "inputs-ready",
 				},
 			],
@@ -211,7 +195,7 @@ describe("readItemDetailQueue", () => {
 		});
 	});
 
-	it("omits active and queued work for a currently hidden line without freeing its slots", () => {
+	it("omits active and queued work for a currently hidden line", () => {
 		const base = queuedRuntime(lineRunRuntime({}));
 		const runtime = {
 			...base,
@@ -233,8 +217,6 @@ describe("readItemDetailQueue", () => {
 			}),
 		).toMatchObject({
 			kind: "available",
-			capacity: 2,
-			used: 2,
 			active: [],
 			request: [],
 		});
@@ -254,7 +236,6 @@ describe("readItemDetailQueue", () => {
 		).toMatchObject({
 			request: [
 				{
-					missingQuantity: 3,
 					requestId: "job:queued",
 					status: "waiting-inputs",
 				},
@@ -297,47 +278,5 @@ describe("readItemDetailQueue", () => {
 				},
 			],
 		});
-	});
-
-	it("blocks a material-ready request at the output cap without reporting missing inputs", () => {
-		const config = structuredClone(lineRunTestConfig);
-		config.items.permit.maxCount = 1;
-		const workshop = config.items.workshop;
-		workshop.lines[0].output = createOutput([
-			{
-				itemId: "permit",
-			},
-		]);
-		const base = queuedRuntime(
-			lineRunRuntime({
-				permit: true,
-				water: [
-					3,
-				],
-			}),
-		);
-		const result = readQueue(
-			{
-				itemId: "runtime:workshop",
-				runtime: {
-					...base,
-					items: base.items.map((item) => ({
-						...item,
-						item: config.items[item.item.id],
-					})),
-				},
-			},
-			config,
-		);
-		if (result.kind !== "available") throw new Error("Expected an available queue.");
-		expect(result.request).toEqual([
-			{
-				requestId: "job:queued",
-				lineId: "line:workshop:build",
-				title: "Build",
-				outputItemId: "permit",
-				status: "blocked-condition",
-			},
-		]);
 	});
 });

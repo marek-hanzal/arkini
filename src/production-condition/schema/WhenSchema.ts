@@ -3,7 +3,6 @@ import { z } from "zod";
 import { CountSchema } from "./CountSchema";
 import { ExistsSchema } from "./ExistsSchema";
 import { RangeSchema } from "./RangeSchema";
-import { LimitSchema } from "./LimitSchema";
 
 /**
  * A standalone condition that produces a boolean result from game-state facts.
@@ -16,12 +15,10 @@ export const WhenSchema = z
 		ExistsSchema,
 		CountSchema,
 		RangeSchema,
-		LimitSchema,
 	])
 	.meta({
 		id: "WhenSchema",
-		description:
-			"A standalone condition that evaluates an item-query quantity or an item's global quantity limit.",
+		description: "A standalone condition that evaluates an item-query quantity.",
 	});
 
 export type WhenSchema = typeof WhenSchema;

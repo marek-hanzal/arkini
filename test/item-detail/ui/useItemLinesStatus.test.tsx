@@ -43,20 +43,12 @@ it("settles bursts once without being starved by running clock ticks and drops o
 	state.readQueueFx.mockImplementation(({ itemId, runtime }) =>
 		Effect.succeed({
 			kind: "available",
-			itemId,
-			capacity: 2,
-			used: runtime.phase === "idle" ? 0 : 1,
-			canClearQueue: true,
 			active:
 				runtime.phase === "running" && itemId === "owner:a"
 					? [
 							{
-								jobId: "job",
 								lineId: "line",
-								title: "Line",
 								status: "running",
-								durationMs: 1000,
-								remainingMs: runtime.remainingMs,
 							},
 						]
 					: [],
@@ -66,7 +58,6 @@ it("settles bursts once without being starved by running clock ticks and drops o
 							{
 								requestId: "request",
 								lineId: "line",
-								title: "Line",
 								status: "waiting-inputs",
 							},
 						]

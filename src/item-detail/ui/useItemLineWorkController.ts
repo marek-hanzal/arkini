@@ -9,34 +9,40 @@ import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { cancelItemJobFx } from "~/production-job/fx/cancelItemJobFx";
+import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
-export namespace useItemJobCancelController {
+export namespace useItemLineWorkController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
-		readonly lineId?: IdSchema.Type;
+		readonly lineId: IdSchema.Type;
 		readonly jobId?: IdSchema.Type;
 		readonly disabled: boolean;
 	}
 	export interface Output {
-		readonly disabled: boolean;
-		readonly cancelFn: () => void;
+		readonly clearDisabled: boolean;
+		readonly cancelJobDisabled: boolean;
+		readonly clearFn: () => void;
+		readonly cancelJobFn: () => void;
 	}
 }
 
-/** Cancels the displayed active job identity; never substitutes a newer request. */
-export const useItemJobCancelController = ({
+/** Clears one line's pending work and cancels only the displayed active job identity. */
+export const useItemLineWorkController = ({
 	ownerItemId,
 	lineId,
 	jobId,
 	disabled,
-}: useItemJobCancelController.Props): useItemJobCancelController.Output => {
+}: useItemLineWorkController.Props): useItemLineWorkController.Output => {
 	const game = useGameEngine();
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) => {
 			const owner = runtime.items.find((item) => item.id === ownerItemId);
 			return {
+				queued: runtime.jobQueue.some(
+					(request) => request.ownerItemId === ownerItemId && request.lineId === lineId,
+				),
 				present: runtime.jobs.some(
 					(job) =>
 						job.id === jobId &&
@@ -67,11 +73,31 @@ export const useItemJobCancelController = ({
 	);
 	const [result, cancelJobFn] = useAtom(commandAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
-	const unavailable = disabled || !state.controllable || !state.present || result.waiting;
+	const clearAtom = useMemo(
+		() => Atom.fn((props: clearItemJobQueueFx.Props) => game.runFx(clearItemJobQueueFx(props))),
+		[
+			game,
+			ownerItemId,
+			lineId,
+		],
+	);
+	const [clearResult, clearQueueFn] = useAtom(clearAtom);
+	RendererRuntime.runSync(readSettledAsyncResultErrorFx(clearResult));
+	const unavailable = disabled || !state.controllable || result.waiting || clearResult.waiting;
+	const clearDisabled = unavailable || !state.queued;
+	const cancelJobDisabled = unavailable || !state.present;
 	return {
-		disabled: unavailable,
-		cancelFn: () => {
-			if (unavailable || ownerItemId === undefined || jobId === undefined) return;
+		clearDisabled,
+		cancelJobDisabled,
+		clearFn: () => {
+			if (clearDisabled || ownerItemId === undefined) return;
+			clearQueueFn({
+				ownerItemId,
+				lineId,
+			});
+		},
+		cancelJobFn: () => {
+			if (cancelJobDisabled || ownerItemId === undefined || jobId === undefined) return;
 			cancelJobFn({
 				ownerItemId,
 				jobId,

@@ -6,11 +6,9 @@ import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 class ItemAlreadyExistsError extends Data.TaggedError("ItemAlreadyExistsError")<{
 	itemId: IdSchema.Type;
@@ -77,16 +75,6 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 					}),
 				);
 			}
-
-			yield* assertPlacementMaxCountFx({
-				drop: {
-					itemId,
-					placement: PlacementSchema.enum.Drop,
-					quantity,
-				},
-				item,
-				runtime,
-			});
 
 			const nextRuntime = {
 				...runtime,

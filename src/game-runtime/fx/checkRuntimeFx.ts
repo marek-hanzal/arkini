@@ -2,9 +2,7 @@ import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItem
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { isItemPureWithIndexFn } from "~/game-runtime/fn/isItemPureWithIndexFn";
 import { readItemPurityIndexFn } from "~/game-runtime/fn/readItemPurityIndexFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -13,7 +11,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/game-runtime/schema/DuplicateItemIdIssueSchema";
 import { ItemUnitsIssueReasonEnumSchema } from "~/game-runtime/schema/ItemUnitsIssueReasonEnumSchema";
 import type { ItemUnitsIssueSchema } from "~/game-runtime/schema/ItemUnitsIssueSchema";
-import type { ItemMaxCountIssueSchema } from "~/game-runtime/schema/ItemMaxCountIssueSchema";
 import type { ItemStackSizeIssueSchema } from "~/game-runtime/schema/ItemStackSizeIssueSchema";
 import type { LocationOccupiedIssueSchema } from "~/game-runtime/schema/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/game-runtime/schema/LocationOutOfBoundsIssueSchema";
@@ -28,7 +25,6 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
 import { checkRuntimeInputLocationsFn } from "~/production-input/fn/checkRuntimeInputLocationsFn";
 import { checkRuntimeJobsFn } from "~/production-job/fn/checkRuntimeJobsFn";
-import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import { checkRuntimeDefaultLinesFn } from "~/production-line/fn/checkRuntimeDefaultLinesFn";
 
 interface CheckRuntimeProps {
@@ -104,15 +100,7 @@ const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitiesFx")(f
 	runtime: RuntimeSchema.Type,
 ) {
 	const stackIssues: ItemStackSizeIssueSchema.Type[] = [];
-	const maxCountIssues: ItemMaxCountIssueSchema.Type[] = [];
 	const purityIndex = readItemPurityIndexFn(runtime);
-	const liveByCanonicalItemId = new Map<
-		IdSchema.Type,
-		{
-			readonly itemIds: IdSchema.Type[];
-			quantity: number;
-		}
-	>();
 
 	for (const item of runtime.items) {
 		const maxStackSize = isItemPureWithIndexFn({
@@ -131,60 +119,9 @@ const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitiesFx")(f
 				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
 			});
 		}
-		const live = liveByCanonicalItemId.get(item.item.id);
-		if (live === undefined) {
-			liveByCanonicalItemId.set(item.item.id, {
-				itemIds: [
-					item.id,
-				],
-				quantity: item.quantity,
-			});
-		} else {
-			live.itemIds.push(item.id);
-			live.quantity += item.quantity;
-		}
 	}
 
-	const reserved = readReservedJobOutputQuantitiesFn({
-		runtime,
-	});
-	const canonicalItemIds = new Set<IdSchema.Type>([
-		...liveByCanonicalItemId.keys(),
-		...reserved.keys(),
-	]);
-	const config = yield* GameConfigFx;
-
-	for (const itemId of canonicalItemIds) {
-		const item =
-			config.items[itemId] ??
-			(yield* resolveItemFx({
-				itemId,
-			}));
-		if (item.maxCount === undefined) continue;
-
-		const live = liveByCanonicalItemId.get(itemId);
-		const liveQuantity = live?.quantity ?? 0;
-		const reservation = reserved.get(itemId);
-		const reservedQuantity = reservation?.quantity ?? 0;
-		const quantity = liveQuantity + reservedQuantity;
-		if (quantity <= item.maxCount) continue;
-
-		maxCountIssues.push({
-			itemId,
-			itemIds: live?.itemIds ?? [],
-			jobIds: reservation?.jobIds ?? [],
-			liveQuantity,
-			reservedQuantity,
-			maxCount: item.maxCount,
-			quantity,
-			type: RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
-		});
-	}
-
-	return [
-		...stackIssues,
-		...maxCountIssues,
-	];
+	return stackIssues;
 });
 
 const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: RuntimeSchema.Type) => {

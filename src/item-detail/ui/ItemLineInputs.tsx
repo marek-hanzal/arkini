@@ -94,7 +94,7 @@ export const ItemLineInputs = ({
 										{translator.textFn("Click to bring this here.")}
 									</span>
 								) : null}
-								{input.type === "materials" ? (
+								{input.type === "materials" && input.availableQuantity > 0 ? (
 									<span className="block">
 										{translator.textFn("Available")}:{" "}
 										<strong className="font-bold">

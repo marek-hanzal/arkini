@@ -4,12 +4,10 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({
 	id,
-	maxCount,
 	maxStackSize,
 	scope,
 }: {
 	id: string;
-	maxCount?: number;
 	maxStackSize: number;
 	scope: "any" | "board" | "inventory";
 }) => {
@@ -28,7 +26,6 @@ const simpleItem = ({
 			],
 		},
 		scope,
-		maxCount,
 		maxStackSize,
 	} as const;
 };
@@ -80,7 +77,6 @@ export const placementTestConfig = GameConfigSchema.parse({
 		}),
 		limited: simpleItem({
 			id: "limited",
-			maxCount: 2,
 			maxStackSize: 2,
 			scope: "any",
 		}),

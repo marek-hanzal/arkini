@@ -107,7 +107,6 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 				runtime,
 			});
 			yield* assertLineEnqueueConditionsFx({
-				candidateId: queueRequestId,
 				resolution,
 				runtime,
 			});

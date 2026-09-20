@@ -16,7 +16,6 @@ describe("queued blocked probes", () => {
 		"self-unit",
 		"aggregate-self-unit",
 		"target-unit",
-		"output-capacity",
 		"placement",
 	])(
 		"preserves input, units, reservations, deliveries and randomness on %s rejection",
@@ -56,11 +55,7 @@ describe("queued blocked probes", () => {
 			);
 
 			const errorTag =
-				blocker === "placement"
-					? "PlacementUnavailableError"
-					: blocker === "output-capacity"
-						? "OutputCapacityError"
-						: "LineRunUnavailableError";
+				blocker === "placement" ? "PlacementUnavailableError" : "LineRunUnavailableError";
 			for (const attempt of [
 				result.first,
 				result.retry,

@@ -6,18 +6,11 @@ import type { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetail
 it("counts only each line's pending requests and keeps the active state ahead of its queue", () => {
 	const queue = {
 		kind: "available",
-		itemId: "owner",
-		capacity: 8,
-		used: 6,
-		canClearQueue: true,
 		active: [
 			{
 				jobId: "job",
 				lineId: "a",
-				title: "A",
 				status: "running",
-				durationMs: 1000,
-				remainingMs: 900,
 			},
 		],
 		request: [
@@ -29,7 +22,6 @@ it("counts only each line's pending requests and keeps the active state ahead of
 		].map((lineId, index) => ({
 			requestId: `request:${index}`,
 			lineId,
-			title: lineId,
 			status: "blocked-active" as const,
 		})),
 	} satisfies readItemDetailQueueFx.Result;
@@ -39,7 +31,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 			state: "running",
 			jobId: "job",
 			queued: 2,
-			requestId: undefined,
+			requestId: "request:0",
 		},
 		{
 			lineId: "b",
@@ -55,17 +47,6 @@ it("counts only each line's pending requests and keeps the active state ahead of
 			active: [
 				{
 					...queue.active[0]!,
-					remainingMs: 400,
-				},
-			],
-		}),
-	).toEqual(expected);
-	expect(
-		readItemLineStatusesFn({
-			...queue,
-			active: [
-				{
-					...queue.active[0]!,
 					status: "awaiting-output",
 				},
 			],
@@ -75,35 +56,28 @@ it("counts only each line's pending requests and keeps the active state ahead of
 		state: "awaiting-output",
 		jobId: "job",
 		queued: 2,
-		requestId: undefined,
+		requestId: "request:0",
 	});
 });
 
 it("distinguishes missing input from other start blockers without claiming that queued work is running", () => {
 	const queue = {
 		kind: "available",
-		itemId: "owner",
-		capacity: 4,
-		used: 3,
-		canClearQueue: true,
 		active: [],
 		request: [
 			{
 				requestId: "first",
 				lineId: "a",
-				title: "A",
 				status: "waiting-inputs",
 			},
 			{
 				requestId: "second",
 				lineId: "a",
-				title: "A",
 				status: "waiting-inputs",
 			},
 			{
 				requestId: "third",
 				lineId: "b",
-				title: "B",
 				status: "blocked-condition",
 			},
 		],

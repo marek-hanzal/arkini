@@ -80,7 +80,6 @@ export const ProjectInventorySection = () => {
 						)
 					}
 					scope="inventory"
-					start={start}
 					width={width}
 				/>
 			</EditorFormSection>

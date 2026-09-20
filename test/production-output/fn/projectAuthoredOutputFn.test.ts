@@ -56,8 +56,14 @@ describe("projectAuthoredOutputFn", () => {
 											type: "disable",
 											when: [
 												{
-													type: "limit",
-													itemId: "item:missing",
+													type: "exists",
+													query: {
+														scope: "universe",
+														selector: {
+															type: "item",
+															itemId: "item:missing",
+														},
+													},
 												},
 											],
 										},

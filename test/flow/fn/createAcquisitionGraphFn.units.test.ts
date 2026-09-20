@@ -174,7 +174,6 @@ describe("createAcquisitionGraphFn", () => {
 					type: "item",
 				},
 			},
-			sourceMaxCount: 2,
 		});
 		const graph = createAcquisitionGraphFn(config);
 		const selfMerge = graph.routes.find(
@@ -400,7 +399,6 @@ describe("createAcquisitionGraphFn", () => {
 			units: {
 				amount: 1,
 			},
-			maxCount: 2,
 			scope: "board" as const,
 		};
 		const result = await Effect.runPromise(

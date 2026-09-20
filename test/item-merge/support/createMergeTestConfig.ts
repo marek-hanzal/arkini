@@ -6,14 +6,12 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 const simpleItem = ({
 	units,
 	id,
-	maxCount,
 	maxStackSize = 10,
 	merge,
 	scope = "any",
 }: {
 	units?: UnitsSchema.Type;
 	id: string;
-	maxCount?: number;
 	maxStackSize?: number;
 	merge?: readonly [
 		MergeSchema.Type,
@@ -36,7 +34,6 @@ const simpleItem = ({
 		],
 	},
 	scope,
-	maxCount,
 	maxStackSize,
 	merge,
 });
@@ -51,10 +48,8 @@ export const createMergeTestConfig = ({
 		height: 1,
 	},
 	outputMaxStackSize = 10,
-	resultMaxCount,
 	rule,
 	sourceUnits,
-	sourceMaxCount,
 	sourceMaxStackSize = 10,
 	sourceScope = "any",
 	targetMaxStackSize = 10,
@@ -69,7 +64,6 @@ export const createMergeTestConfig = ({
 		height: number;
 	};
 	outputMaxStackSize?: number;
-	resultMaxCount?: number;
 	rule:
 		| MergeSchema.Type
 		| readonly [
@@ -77,7 +71,6 @@ export const createMergeTestConfig = ({
 				...MergeSchema.Type[],
 		  ];
 	sourceUnits?: UnitsSchema.Type;
-	sourceMaxCount?: number;
 	sourceMaxStackSize?: number;
 	sourceScope?: "any" | "board" | "inventory";
 	targetMaxStackSize?: number;
@@ -100,7 +93,6 @@ export const createMergeTestConfig = ({
 			source: simpleItem({
 				units: sourceUnits,
 				id: "source",
-				maxCount: sourceMaxCount,
 				maxStackSize: sourceMaxStackSize,
 				merge: Array.isArray(rule)
 					? (rule as [
@@ -119,7 +111,6 @@ export const createMergeTestConfig = ({
 			}),
 			result: simpleItem({
 				id: "result",
-				maxCount: resultMaxCount,
 			}),
 			output: simpleItem({
 				id: "output",

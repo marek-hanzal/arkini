@@ -275,11 +275,6 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 					]),
 			`Storage: ${item.scope}`,
 			`Stack capacity: ${item.maxStackSize}`,
-			...(item.maxCount === undefined
-				? []
-				: [
-						`Game limit: ${item.maxCount}`,
-					]),
 		].join("\n");
 	}),
 );

@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
-import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
@@ -12,7 +11,6 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 const output = {
 	set: [
@@ -140,7 +138,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 			units: {
 				amount: 1,
 			},
-			maxCount: 1,
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -585,54 +582,5 @@ describe("job completion unit lifecycle", () => {
 		expect(result.restarted.type).toBe("started");
 		expect(result.runtime.items.some((item) => item.item.id === "craft:repeatable")).toBe(true);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(1);
-	});
-
-	it("reserves only the net maxCount increase when a depleted owner reproduces itself", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:phoenix",
-					itemId: "producer:phoenix",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const started = yield* startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:phoenix:renew",
-				});
-				const activeRuntime = yield* readRuntimeFx();
-				const activeCheck = yield* checkRuntimeFx({
-					runtime: activeRuntime,
-				});
-				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
-				});
-				return {
-					activeCheck,
-					owner,
-					runtime: yield* readRuntimeFx(),
-					started,
-				};
-			}),
-		);
-
-		expect(result.started.type).toBe("started");
-		expect(
-			result.activeCheck.issues.some(
-				(issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
-			),
-		).toBe(false);
-		const phoenixes = result.runtime.items.filter(
-			(item) => item.item.id === "producer:phoenix",
-		);
-		expect(phoenixes).toHaveLength(1);
-		expect(phoenixes[0]?.id).not.toBe(result.owner.id);
 	});
 });

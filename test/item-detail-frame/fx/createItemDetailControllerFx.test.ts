@@ -12,7 +12,7 @@ const runtimeTarget = ({
 	origin = null,
 }: {
 	readonly itemId?: string;
-	readonly tab?: "info" | "lines" | "queue";
+	readonly tab?: "info" | "lines";
 	readonly origin?: HTMLElement | null;
 } = {}) =>
 	({

@@ -1,5 +1,4 @@
 import { match } from "ts-pattern";
-import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
@@ -69,8 +68,7 @@ const RuleTypeTranslationKey = {
 	show: "Show",
 } as const satisfies Record<RuleType, string>;
 
-const readConditionItemIdFn = (when: DraftWhen): string =>
-	when.type === "limit" ? when.itemId : when.query.selector.itemId;
+const readConditionItemIdFn = (when: DraftWhen): string => when.query.selector.itemId;
 
 const readRuleItemIdsFn = (rule: DraftRule): ReadonlyArray<string> => [
 	...new Set(
@@ -115,7 +113,6 @@ const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: Dr
 };
 
 const readConditionSummaryFn = (when: DraftWhen, textFn: (key: string) => string): string => {
-	if (when.type === "limit") return textFn("Limit");
 	const scope = textFn(QueryScopePresentation[when.query.scope].label);
 	const querySummary =
 		when.query.scope === "board"
@@ -181,8 +178,6 @@ const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget): ReactNod
 	return <Mx label="Production runtime multiplier rule help" />;
 };
 
-const includeLimitedItemFn = (item: ItemSchema.Type) => item.maxCount !== undefined;
-
 const WhenControl = ({
 	onChangeFn,
 	showBranchEnd,
@@ -195,7 +190,6 @@ const WhenControl = ({
 	const validationIssues = useFormValidationIssues(value);
 	const translator = useTranslator();
 	const selectedValue = value.type === undefined ? undefined : value;
-	const project = useEditorProject();
 	return (
 		<div className="grid min-w-0 gap-3">
 			<EditorChoiceControl
@@ -218,32 +212,9 @@ const WhenControl = ({
 						label: translator.textFn("Count range"),
 						value: "range",
 					},
-					{
-						description: <Mx label="Limit condition help" />,
-						label: translator.textFn("Limit"),
-						value: "limit",
-					},
 				]}
 				onChangeFn={(type) => {
-					const itemId = readConditionItemIdFn(value);
-					if (type === "limit") {
-						onChangeFn({
-							type,
-							itemId:
-								project.config.items[itemId]?.maxCount === undefined ? "" : itemId,
-						});
-						return;
-					}
-					const query: QuerySchema.Type =
-						value.type === "limit"
-							? {
-									scope: "any",
-									selector: {
-										type: "item",
-										itemId,
-									},
-								}
-							: value.query;
+					const query = value.query;
 					onChangeFn(
 						type === "exists"
 							? {
@@ -265,26 +236,7 @@ const WhenControl = ({
 					);
 				}}
 			/>
-			{selectedValue === undefined ? null : selectedValue.type === "limit" ? (
-				<>
-					<SelectorControl
-						error={readEditorFormValidationErrorFn(validationIssues, "itemId")}
-						includeItemFn={includeLimitedItemFn}
-						labelVisible={false}
-						value={{
-							type: "item",
-							itemId: selectedValue.itemId,
-						}}
-						onChangeFn={({ itemId }) =>
-							onChangeFn({
-								type: "limit",
-								itemId,
-							})
-						}
-					/>
-					{showBranchEnd && <SectionEnd />}
-				</>
-			) : (
+			{selectedValue === undefined ? null : (
 				<>
 					<SelectorControl
 						error={readEditorFormValidationErrorFn(
@@ -526,9 +478,7 @@ const RuleControl = ({
 											? "Exact count"
 											: rule.when[whenIndex].type === "range"
 												? "Count range"
-												: rule.when[whenIndex].type === "limit"
-													? "Limit"
-													: "Exists",
+												: "Exists",
 									)}`
 						}
 						itemSearchTermsFn={(whenIndex) => {

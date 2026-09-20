@@ -1,4 +1,4 @@
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
@@ -134,8 +134,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			...base("item:product"),
-
-			maxCount: 1,
 		},
 	},
 });
@@ -259,100 +257,5 @@ describe("consume material lifecycle", () => {
 		expect(
 			result.completed.items.filter((item) => item.item.id === "item:product"),
 		).toHaveLength(1);
-	});
-
-	it("rolls back destructive subtree consume when a later start invariant fails", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const converter = yield* prepareNestedConsumeFx();
-				yield* spawnItemFx({
-					id: "runtime:product:blocker",
-					itemId: "item:product",
-					location: board(4),
-					quantity: 1,
-				});
-				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.result(
-					startLineFx({
-						ownerItemId: converter.id,
-						lineId: "line:converter:run",
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					attempt,
-					before,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.attempt).toEqual(
-			Result.fail(
-				expect.objectContaining({
-					_tag: "OutputCapacityError",
-					itemId: "item:product",
-				}),
-			),
-		);
-		expect(result.after).toEqual(result.before);
-		expect(result.after.items.map((item) => item.id)).toEqual(
-			expect.arrayContaining([
-				"runtime:inner",
-				"runtime:middle",
-				"runtime:payload",
-			]),
-		);
-	});
-
-	it("reserves only the net maxCount increase of consumed job material", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const converter = yield* spawnItemFx({
-					id: "runtime:converter",
-					itemId: "producer:converter",
-					location: board(0),
-					quantity: 1,
-				});
-				const product = yield* spawnItemFx({
-					id: "runtime:product",
-					itemId: "item:product",
-					location: board(1),
-					quantity: 1,
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId: converter.id,
-					lineId: "line:converter:recycle",
-					inputIndex: 0,
-					sourceItemId: product.id,
-					sourceItemRevision: product.revision,
-					quantity: 1,
-				});
-				const started = yield* startLineFx({
-					ownerItemId: converter.id,
-					lineId: "line:converter:recycle",
-				});
-				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
-				});
-				return {
-					product,
-					runtime: yield* readRuntimeFx(),
-					started,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.started.type).toBe("started");
-		const products = result.runtime.items.filter((item) => item.item.id === "item:product");
-		expect(products).toHaveLength(1);
-		expect(products[0]?.id).not.toBe(result.product.id);
 	});
 });

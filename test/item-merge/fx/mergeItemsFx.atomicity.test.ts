@@ -154,54 +154,6 @@ describe("mergeItemsFx atomicity", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("rolls back target replacement when a used source cannot return through maxCount", () => {
-		const config = createMergeTestConfig({
-			sourceMaxCount: 1,
-			sourceMaxStackSize: 1,
-			rule: {
-				target: {
-					type: "item",
-					itemId: "target",
-				},
-				action: "use",
-				effect: "replace",
-				result: "source",
-			},
-		});
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				boardItem("source", "source", 0),
-				boardItem("target", "target", 1),
-			],
-			jobQueue: [],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const result = Effect.runSync(
-			mergeAttemptFx().pipe(
-				useGameFx({
-					config,
-					state,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				itemId: "source",
-				reason: "item:max-count",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
-
 	it("rolls back source consumption when optional output cannot fit completely", () => {
 		const config = createMergeTestConfig({
 			board: {
@@ -309,52 +261,5 @@ describe("mergeItemsFx atomicity", () => {
 				?.item.id;
 		expect(outputId(afterRetry)).toBeDefined();
 		expect(outputId(afterRetry)).toBe(outputId(firstTry));
-	});
-
-	it("lets removed source quantity satisfy maxCount for same-item optional output", () => {
-		const config = createMergeTestConfig({
-			sourceMaxCount: 1,
-			sourceMaxStackSize: 1,
-			rule: {
-				target: {
-					type: "item",
-					itemId: "target",
-				},
-				action: "consume",
-				effect: "keep",
-				output: guaranteedMergeOutput({
-					itemId: "source",
-				}),
-			},
-		});
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				boardItem("source", "source", 0),
-				boardItem("target", "target", 1),
-			],
-			jobQueue: [],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const result = Effect.runSync(
-			mergeAttemptFx().pipe(
-				useGameFx({
-					config,
-					state,
-				}),
-			),
-		);
-
-		expect(Result.isSuccess(result.attempt)).toBe(true);
-		expect(
-			result.after.items
-				.filter((item) => item.item.id === "source")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(1);
 	});
 });

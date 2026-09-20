@@ -66,7 +66,6 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	}
 
 	yield* assertLineEnqueueConditionsFx({
-		candidateId: `queue-admission:${ownerItemId}:${lineId}`,
 		resolution,
 		runtime,
 	});

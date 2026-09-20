@@ -51,7 +51,6 @@ const createInventoryProject = () =>
 						],
 					},
 					scope: "any",
-					maxCount: 1,
 					maxStackSize: 1,
 				},
 			},
@@ -302,43 +301,5 @@ describe("ProjectFormSchema", () => {
 				},
 			}).success,
 		).toBe(true);
-	});
-
-	it("rejects initial item quantities above the canonical max count across grids", () => {
-		const project = createInventoryProject();
-		const result = createProjectFormSchema(project).safeParse({
-			...createValidFormValue(project),
-			start: {
-				currentSpace: 0,
-				board: [
-					{
-						itemId: "backpack",
-						quantity: 1,
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [],
-				toolbar: [
-					{
-						itemId: "backpack",
-						position: {
-							x: 0,
-							y: 0,
-						},
-						quantity: 1,
-					},
-				],
-			},
-		});
-
-		expect(result.success).toBe(false);
-		if (result.success) return;
-		expect(result.error.issues.map(({ path }) => path)).toContainEqual([
-			"start",
-			"toolbar",
-			0,
-		]);
 	});
 });

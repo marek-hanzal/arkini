@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
-import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import {
 	boardFn,
 	bufferFn,
@@ -203,11 +202,8 @@ describe("Tick queue progress priority", () => {
 		});
 	});
 
-	it.each([
-		"units",
-		"output",
-	] as const)("re-evaluates A2 after B1 spends the shared %s budget", (budget) => {
-		const config = createContendedQueueConfigFn(budget);
+	it("re-evaluates A2 after B1 spends the shared unit budget", () => {
+		const config = createContendedQueueConfigFn();
 		const queue = [
 			requestFn("request:a1", "line:older"),
 			requestFn("request:b1", "line:later", "owner:b"),
@@ -250,22 +246,9 @@ describe("Tick queue progress priority", () => {
 			queue[2],
 		]);
 		expect(result.events.filter((event) => event.type === "job:started")).toHaveLength(1);
-		if (budget === "units") {
-			expect(result.runtime.items.find((item) => item.id === "payer")).toMatchObject({
-				remainingUnits: 1,
-			});
-		} else {
-			expect(
-				readReservedJobOutputQuantitiesFn({
-					runtime: result.runtime,
-				}).get("result"),
-			).toEqual({
-				quantity: 1,
-				jobIds: [
-					result.runtime.jobs[0]?.id,
-				],
-			});
-		}
+		expect(result.runtime.items.find((item) => item.id === "payer")).toMatchObject({
+			remainingUnits: 1,
+		});
 	});
 
 	it("does not dispatch any pending request for a stored owner", () => {

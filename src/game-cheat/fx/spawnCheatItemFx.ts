@@ -6,7 +6,6 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
-import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
@@ -51,11 +50,6 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 					}),
 				);
 			}
-			yield* assertPlacementMaxCountFx({
-				drop,
-				item,
-				runtime,
-			});
 			const plan = yield* planBoardPlacementFx({
 				item,
 				origin: {

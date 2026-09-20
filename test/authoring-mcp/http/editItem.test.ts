@@ -49,7 +49,7 @@ describe("editor MCP item editing", () => {
 						[producer.id]: producer,
 						water: {
 							...water,
-							maxCount: 2,
+							description: "Existing water.",
 						},
 					},
 				},
@@ -75,7 +75,7 @@ describe("editor MCP item editing", () => {
 			revision: created.revision,
 			item: {
 				...water,
-				maxCount: 2,
+				description: "Existing water.",
 			},
 		};
 		expect(await readConfig("water")).toEqual(waterConfig);
@@ -91,7 +91,7 @@ describe("editor MCP item editing", () => {
 				revision: waterConfig.revision,
 				patch: {
 					draft: true,
-					maxCount: null,
+					description: null,
 					title: "Fresh Water",
 				},
 			}),
@@ -106,13 +106,14 @@ describe("editor MCP item editing", () => {
 						"ID: water",
 						"UID: water",
 						`Revision: ${project.revision}`,
-						"Replaced: draft, maxCount, title",
+						"Replaced: description, draft, title",
 					].join("\n"),
 				},
 			],
 		});
 		expect(project.config.items.water).toEqual({
 			...water,
+			description: undefined,
 			draft: true,
 			title: "Fresh Water",
 		});

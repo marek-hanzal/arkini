@@ -10,7 +10,6 @@ import { settleActionUnitsFx } from "~/production-action/fx/settleActionUnitsFx"
 import type { applyInputMaterialConsumeRunPlanFx } from "~/production-input/fx/applyInputMaterialConsumeRunPlanFx";
 import { applyInputRunPlanFx } from "~/production-input/fx/applyInputRunPlanFx";
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
-import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
@@ -145,8 +144,7 @@ export namespace startLineRuntimeFx {
 /**
  * Canonical internal start pipeline used by direct starts and queue dispatch.
  *
- * Pure output admission runs before job identity creation or mutation. The job
- * identity is then created before inputs move because consumed and reserved
+ * Job identity is created before inputs move because consumed and reserved
  * material locations refer to it. Stateful owner stacks are isolated last.
  * Depletion output conditions use this start's input snapshot, including prior
  * Tick transitions, rather than the outer transaction or partially applied inputs.
@@ -163,13 +161,6 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	});
 	const plan = yield* assertLineStartReadyFx({
 		resolution,
-	});
-	yield* assertOutputCapacityFx({
-		candidateId: `line-admission:${ownerItemId}:${lineId}`,
-		ownerItemId,
-		lineId,
-		plan,
-		runtime,
 	});
 	const job = yield* createJobFx({
 		ownerItemId,

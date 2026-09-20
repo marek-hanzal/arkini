@@ -166,17 +166,6 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			),
 		),
 		Effect.catchTags({
-			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeDropRejectedResultFn({
-						reason:
-							error.itemId === targetItemId
-								? DropItemRejectedReason.StaleTarget
-								: DropItemRejectedReason.StaleSource,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
 			JobOwnerBusyError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

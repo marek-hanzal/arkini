@@ -53,13 +53,6 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 		}
 		for (const { id: actionId, input: inputs, path } of actions) {
 			let selfCost = 0;
-			const exactTargetCosts = new Map<
-				string,
-				{
-					cost: number;
-					inputIndex: number;
-				}
-			>();
 			for (const [inputIndex, input] of inputs.entries()) {
 				const diagnosticPath = [
 					...path,
@@ -130,13 +123,6 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 					continue;
 				}
 
-				const payerItemId = input.query.selector.itemId;
-				const current = exactTargetCosts.get(payerItemId);
-				exactTargetCosts.set(payerItemId, {
-					cost: (current?.cost ?? 0) + input.units.cost,
-					inputIndex,
-				});
-
 				const targetUnitCost = input.units.cost;
 				const matchedCandidates = selectItemsFn({
 					items:
@@ -168,38 +154,6 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 						reason: InvalidInputUnitsReasonEnumSchema.enum.TargetUnavailable,
 					});
 				}
-			}
-
-			for (const [payerItemId, total] of exactTargetCosts) {
-				const payer = config.items[payerItemId];
-				if (
-					payer === undefined ||
-					(payer.scope !== StorageSchema.enum.Board &&
-						payer.scope !== StorageSchema.enum.Any) ||
-					payer.units === undefined ||
-					payer.maxCount === undefined
-				) {
-					continue;
-				}
-				const maximumSupply = payer.units.amount * payer.maxCount;
-				if (total.cost <= maximumSupply) continue;
-
-				diagnostics.push({
-					code: DiagnosticCodeEnumSchema.enum.InputUnitsInvalid,
-					severity: DiagnosticSeverityEnumSchema.enum.Error,
-					path: [
-						...path,
-						"input",
-						total.inputIndex,
-						"units",
-					],
-					source: provenance.items[itemId],
-					message: `Action ${actionId} requires ${total.cost} total units from exact payer ${payerItemId}, but at most ${maximumSupply} can exist.`,
-					ownerItemId: itemId,
-					lineId: actionId,
-					inputIndex: total.inputIndex,
-					reason: InvalidInputUnitsReasonEnumSchema.enum.TargetInsufficientTotalUnits,
-				});
 			}
 		}
 	}

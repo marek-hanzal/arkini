@@ -83,13 +83,6 @@ export namespace ItemDetailLines {
 				readonly kind: "units-target-missing";
 				readonly selector: SelectorSchema.Type;
 				readonly distance: DistanceSchema.Type;
-		  }
-		| {
-				readonly kind: "direct-output-capacity";
-				readonly itemId: IdSchema.Type;
-				readonly liveQuantity: number;
-				readonly reservedQuantity: number;
-				readonly maxCount: number;
 		  };
 
 	export type Availability =

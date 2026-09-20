@@ -9,7 +9,6 @@ export type Blocker =
 	| "self-unit"
 	| "aggregate-self-unit"
 	| "target-unit"
-	| "output-capacity"
 	| "placement";
 
 export const createBlockedQueueFixture = (blocker: Blocker) => {
@@ -84,7 +83,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				uid: "result",
 				scope: "board",
 				maxStackSize: 1,
-				maxCount: 1,
 			},
 			debris: {
 				...base.items.tool,
@@ -173,11 +171,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 										},
 									]
 								: [],
-						...(blocker === "output-capacity"
-							? {
-									output: output("result", 1),
-								}
-							: {}),
 					},
 					{
 						id: "ready",

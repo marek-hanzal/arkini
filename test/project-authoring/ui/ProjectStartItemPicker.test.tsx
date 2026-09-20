@@ -5,7 +5,6 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectStartItemPicker } from "~/project-authoring/ui/ProjectStartItemPicker";
-import { startTestConfig } from "~test/game-start/support/startTestConfig";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
@@ -20,7 +19,6 @@ vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", async () => {
 		...startTestConfig.items,
 		backpack: {
 			...startTestConfig.items.backpack,
-			maxCount: 1,
 		},
 	};
 	return {
@@ -61,11 +59,9 @@ afterEach(async () => {
 const PickerHarness = ({
 	onSelect,
 	scope = "inventory",
-	start = startTestConfig.start,
 }: {
 	readonly onSelect: (itemId: string) => void;
 	readonly scope?: "board" | "inventory" | "toolbar";
-	readonly start?: typeof startTestConfig.start;
 }) => {
 	const [open, setOpen] = useState(false);
 	return (
@@ -82,7 +78,6 @@ const PickerHarness = ({
 					onCloseFn={() => setOpen(false)}
 					onSelectFn={onSelect}
 					scope={scope}
-					start={start}
 				/>
 			) : null}
 		</>
@@ -172,37 +167,5 @@ describe("ProjectStartItemPicker", () => {
 		});
 		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).toBeNull();
 		expect(document.activeElement).toBe(opener);
-	});
-
-	it("keeps a scope-compatible item visible but inert after reaching max count", async () => {
-		const onSelect = vi.fn();
-		const { container } = await renderPicker(onSelect, {
-			scope: "toolbar",
-			start: {
-				currentSpace: 0,
-				board: [
-					{
-						itemId: "backpack",
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [],
-				toolbar: [],
-			},
-		});
-		const backpack = container.querySelector<HTMLButtonElement>(
-			'button[data-item-id="backpack"]',
-		);
-		if (backpack === null) throw new Error("Expected visible Backpack option.");
-
-		expect(backpack.disabled).toBe(true);
-		expect(
-			backpack.querySelector('[data-ui="ItemSpotlightOptionDisabledReason"]'),
-		).not.toBeNull();
-		await act(async () => backpack.click());
-		expect(onSelect).not.toHaveBeenCalled();
-		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).not.toBeNull();
 	});
 });

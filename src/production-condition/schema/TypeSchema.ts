@@ -8,7 +8,6 @@ export const TypeSchema = z
 		Exists: "exists",
 		Count: "count",
 		Range: "range",
-		Limit: "limit",
 	})
 	.meta({
 		id: "when.TypeSchema",

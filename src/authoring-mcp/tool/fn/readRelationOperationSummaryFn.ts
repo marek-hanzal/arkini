@@ -22,8 +22,6 @@ const whenFn = (project: Project, when: WhenSchema.Type): string => {
 			return `${queryFn(project, when.query)} count=${when.count}`;
 		case "range":
 			return `${queryFn(project, when.query)} count=${when.min}–${when.max}`;
-		case "limit":
-			return `${itemFn(project, when.itemId)} at global limit ${project.config.items[when.itemId]?.maxCount ?? "uncapped"}`;
 	}
 };
 // Preserve authored conjunctions and vetoes; acquisition requirements alone omit negative and spatial gates.

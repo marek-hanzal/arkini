@@ -12,7 +12,6 @@ const itemPatch = z
 	.extend({
 		units: ItemSchema.shape.units.nullable(),
 		description: ItemSchema.shape.description.nullable(),
-		maxCount: ItemSchema.shape.maxCount.nullable(),
 		merge: ItemSchema.shape.merge.nullable(),
 		action: ItemSchema.shape.action.nullable(),
 		clock: ItemSchema.shape.clock.nullable(),

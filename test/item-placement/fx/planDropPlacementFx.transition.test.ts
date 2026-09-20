@@ -235,50 +235,6 @@ describe("drop placement transition", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("enforces canonical maxCount before consuming placement capacity", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:limited",
-					itemId: "limited",
-					location: inventoryLocation(0),
-					quantity: 2,
-				});
-
-				return yield* Effect.result(
-					placeDropForTestFx({
-						drop: configuredDrop({
-							itemId: "limited",
-							placement: "drop",
-							quantity: 1,
-						}),
-						originItemId: "runtime:origin",
-					}),
-				);
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				itemId: "limited",
-				reason: "item:max-count",
-				remainingQuantity: 1,
-			});
-		}
-	});
-
 	it("does not consume randomness for configured-origin drop placement", () => {
 		const nextRandom = Effect.runSync(
 			Effect.gen(function* () {

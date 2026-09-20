@@ -12,10 +12,8 @@ const readOutputDropsFn = (output: OutputSchema.Type | undefined) =>
 const readOutputSetRulesFn = (output: OutputSchema.Type | undefined) =>
 	output?.set.flatMap((set) => set.rules) ?? [];
 
-const requiresAbsentFactFn = (when: WhenSchema.Type, config: GameConfigSchema.Type) => {
+const requiresAbsentFactFn = (when: WhenSchema.Type) => {
 	switch (when.type) {
-		case "limit":
-			return config.items[when.itemId]?.maxCount !== undefined;
 		case "exists":
 			return true;
 		case "count":
@@ -42,7 +40,7 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 				line.rules.some(
 					(rule) =>
 						rule.type === "disable" &&
-						rule.when.some((when) => requiresAbsentFactFn(when, config)),
+						rule.when.some((when) => requiresAbsentFactFn(when)),
 				)
 			)
 				limitations.add("negative-availability-constraints-ignored");
@@ -54,7 +52,7 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 				limitations.add("conditional-runtime-adjustments-ignored");
 			if (
 				line.input.some(({ type }) => type === "units") ||
-				line.rules.some(({ when }) => when.some(({ type }) => type !== "limit"))
+				line.rules.some(({ when }) => when.length > 0)
 			)
 				limitations.add("spatial-requirements-approximated");
 		}
@@ -68,11 +66,11 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 					rules.some(
 						(rule) =>
 							rule.type === "disable" &&
-							rule.when.some((when) => requiresAbsentFactFn(when, config)),
+							rule.when.some((when) => requiresAbsentFactFn(when)),
 					)
 				)
 					limitations.add("negative-availability-constraints-ignored");
-				return rules.some(({ when }) => when.some(({ type }) => type !== "limit"));
+				return rules.some(({ when }) => when.length > 0);
 			})
 		)
 			limitations.add("spatial-requirements-approximated");

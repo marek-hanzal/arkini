@@ -31,7 +31,7 @@ export interface AcquisitionRequirement {
 
 export interface AcquisitionUnsupportedRequirement {
 	readonly factId: string;
-	readonly reason: "exact-count" | "negative-condition" | "uncapped-limit" | "upper-bound";
+	readonly reason: "exact-count" | "negative-condition" | "upper-bound";
 	readonly source: "line-condition" | "output-condition";
 }
 

@@ -27,7 +27,6 @@ const readInputItemIdFn = (input: LineInputSchema.Type | ActionInputSchema.Type)
 };
 
 const readAvailabilityFactsFn = (
-	items: GameConfigSchema.Type["items"],
 	rules: ReadonlyArray<{
 		readonly type: string;
 		readonly when: ReadonlyArray<WhenSchema.Type>;
@@ -35,7 +34,6 @@ const readAvailabilityFactsFn = (
 ) =>
 	rules.flatMap((rule, ruleIndex) => {
 		const requirements = readAcquisitionAvailabilityRequirementsFn({
-			items,
 			rules: [
 				rule,
 			],
@@ -45,7 +43,6 @@ const readAvailabilityFactsFn = (
 		if (requirements.allOf.length === 0 && requirements.anyOf.length === 0) return [];
 		return rule.when.flatMap((when, whenIndex) => {
 			const condition = readAcquisitionAvailabilityRequirementsFn({
-				items,
 				rules: [
 					{
 						...rule,
@@ -70,14 +67,13 @@ const readAvailabilityFactsFn = (
 	});
 
 const addOutputFactsFn = (
-	items: GameConfigSchema.Type["items"],
 	facts: ItemConnectionFact[],
 	output: OutputSchema.Type | undefined,
 	source: readItemConnectionFactsFn.Source,
 ) => {
 	if (output === undefined) return;
 	for (const [setIndex, set] of output.set.entries()) {
-		for (const { factId, condition } of readAvailabilityFactsFn(items, set.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(set.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -103,7 +99,7 @@ const addOutputFactsFn = (
 						roll: position,
 					},
 				});
-				for (const { factId, condition } of readAvailabilityFactsFn(items, drop.rules))
+				for (const { factId, condition } of readAvailabilityFactsFn(drop.rules))
 					facts.push({
 						factId,
 						origin: {
@@ -118,10 +114,7 @@ const addOutputFactsFn = (
 	}
 };
 
-const readOwnerFactsFn = (
-	items: GameConfigSchema.Type["items"],
-	item: ItemSchema.Type,
-): ItemConnectionFact[] => {
+const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 	const facts: ItemConnectionFact[] = [];
 	for (const [lineIndex, line] of item.lines.entries()) {
 		const source: readItemConnectionFactsFn.Source = {
@@ -141,7 +134,7 @@ const readOwnerFactsFn = (
 					},
 				});
 		}
-		for (const { factId, condition } of readAvailabilityFactsFn(items, line.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(line.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -150,7 +143,7 @@ const readOwnerFactsFn = (
 					condition,
 				},
 			});
-		addOutputFactsFn(items, facts, line.output, source);
+		addOutputFactsFn(facts, line.output, source);
 	}
 	if (item.action !== undefined) {
 		const source = {
@@ -168,7 +161,7 @@ const readOwnerFactsFn = (
 					},
 				});
 		}
-		for (const { factId, condition } of readAvailabilityFactsFn(items, item.action.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(item.action.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -198,16 +191,16 @@ const readOwnerFactsFn = (
 					role: "replacement",
 				},
 			});
-		addOutputFactsFn(items, facts, merge.output, source);
+		addOutputFactsFn(facts, merge.output, source);
 	}
-	addOutputFactsFn(items, facts, item.units?.output, {
+	addOutputFactsFn(facts, item.units?.output, {
 		type: "units",
 	});
 	if (item.clock !== undefined) {
-		addOutputFactsFn(items, facts, item.clock.onExpire, {
+		addOutputFactsFn(facts, item.clock.onExpire, {
 			type: "expiry",
 		});
-		for (const { factId, condition } of readAvailabilityFactsFn(items, item.clock.rules))
+		for (const { factId, condition } of readAvailabilityFactsFn(item.clock.rules))
 			facts.push({
 				factId,
 				origin: {
@@ -238,7 +231,7 @@ export const readItemConnectionFactsFn = (
 			];
 	for (const owner of owners) {
 		if (owner === undefined) continue;
-		for (const fact of readOwnerFactsFn(config.items, owner)) {
+		for (const fact of readOwnerFactsFn(owner)) {
 			const isOutput = fact.origin.role === "output" || fact.origin.role === "replacement";
 			if (isOutput !== outputs || (reverse && fact.factId !== factId)) continue;
 			const itemId = reverse ? owner.id : fact.factId;

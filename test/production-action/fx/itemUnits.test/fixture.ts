@@ -327,69 +327,6 @@ export const unitsConfig = GameConfigSchema.parse({
 				},
 			],
 		},
-		"producer:capped-shrine": {
-			...base({
-				id: "producer:capped-shrine",
-			}),
-
-			units: {
-				amount: 1,
-				output: output("item:capped-gift"),
-			},
-			maxQueueSize: 1,
-			lines: [
-				{
-					id: "line:capped-shrine:work",
-					title: "Capped shrine",
-					description: "Both completion outputs share one max count.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-							units: {
-								from: "self",
-								cost: 1,
-							},
-						},
-					],
-					output: output("item:capped-gift"),
-					rules: [],
-				},
-			],
-		},
-		"producer:capped-lumberjack": {
-			...base({
-				id: "producer:capped-lumberjack",
-			}),
-
-			maxQueueSize: 1,
-			lines: [
-				{
-					id: "line:capped-lumberjack:work",
-					title: "Capped lumberjack",
-					description: "Deplete one capped sapling.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "units",
-							query: {
-								scope: "board",
-								selector: {
-									type: "item",
-									itemId: "units:capped-sapling",
-								},
-								distance: "close",
-							},
-							units: {
-								from: "target",
-								cost: 1,
-							},
-						},
-					],
-					rules: [],
-				},
-			],
-		},
 		"units:self-well": {
 			...base({
 				id: "units:self-well",
@@ -452,19 +389,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			units: {
 				amount: 1,
 				output: output("item:seed"),
-			},
-		},
-		"units:capped-sapling": {
-			maxQueueSize: 1,
-			lines: [],
-
-			...base({
-				id: "units:capped-sapling",
-			}),
-
-			units: {
-				amount: 1,
-				output: output("item:capped-seed"),
 			},
 		},
 		"units:empty": {
@@ -531,26 +455,6 @@ export const unitsConfig = GameConfigSchema.parse({
 			...base({
 				id: "item:trash",
 			}),
-		},
-		"item:capped-gift": {
-			maxQueueSize: 1,
-			lines: [],
-
-			...base({
-				id: "item:capped-gift",
-			}),
-
-			maxCount: 1,
-		},
-		"item:capped-seed": {
-			maxQueueSize: 1,
-			lines: [],
-
-			...base({
-				id: "item:capped-seed",
-			}),
-
-			maxCount: 1,
 		},
 		"item:blocker": {
 			maxQueueSize: 1,

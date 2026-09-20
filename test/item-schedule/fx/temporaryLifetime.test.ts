@@ -467,7 +467,7 @@ describe("temporary item lifetime", () => {
 	});
 
 	it("expires simultaneous items in stable runtime-ID order", () => {
-		const runtime = Effect.runSync(
+		const transition = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnTemporaryFx({
 					id: "runtime:b",
@@ -482,7 +482,7 @@ describe("temporary item lifetime", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 600,
 				});
-				return yield* readRuntimeFx();
+				return yield* (yield* CommittedTransitionsFx).read;
 			}).pipe(
 				useGameFx({
 					config,
@@ -490,16 +490,17 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(runtime.items.some((item) => item.id === "runtime:a")).toBe(false);
-		expect(runtime.items).toContainEqual(
-			expect.objectContaining({
-				id: "runtime:b",
-				schedule: {
-					remainingDurationMs: 0,
-				},
-			}),
-		);
-		expect(runtime.items.filter((item) => item.item.id === "cappedResult")).toHaveLength(1);
+		expect(
+			transition.events
+				.filter((event) => event.type === GameEventEnumSchema.enum.ItemExpired)
+				.map((event) => event.itemId),
+		).toEqual([
+			"runtime:a",
+			"runtime:b",
+		]);
+		expect(
+			transition.runtime.items.filter((item) => item.item.id === "cappedResult"),
+		).toHaveLength(2);
 	});
 
 	it("does not retroactively age a temporary item created during the current step", () => {

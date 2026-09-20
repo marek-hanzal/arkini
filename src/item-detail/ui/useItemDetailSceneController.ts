@@ -11,7 +11,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
-import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
@@ -23,14 +22,10 @@ export namespace useItemDetailSceneController {
 		readonly target: ItemDetailTarget;
 	}
 	export interface Detail
-		extends Pick<
-			ItemSchema.Type,
-			"description" | "scope" | "maxStackSize" | "maxCount" | "lines" | "ui"
-		> {
+		extends Pick<ItemSchema.Type, "description" | "scope" | "maxStackSize" | "lines" | "ui"> {
 		readonly canMake: boolean;
 		readonly disabledLineIds: readonly string[];
 		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
-		readonly queueSize?: number;
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
@@ -152,9 +147,6 @@ export const useItemDetailSceneController = ({
 				disabledLineIds: visibleLines
 					.filter((state) => !state.enabled)
 					.map((state) => state.line.id),
-				queueSize: readItemQueueSizeFn({
-					item,
-				}),
 				canMake,
 				ui: item.ui,
 				title: item.title,
@@ -166,7 +158,6 @@ export const useItemDetailSceneController = ({
 				description: item.description,
 				scope: item.scope,
 				maxStackSize: item.maxStackSize,
-				maxCount: item.maxCount,
 				units:
 					item.units === undefined
 						? undefined

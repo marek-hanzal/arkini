@@ -120,7 +120,6 @@ const itemDiscardedEventSchema = z
 			"board:full",
 			"inventory:full",
 			"toolbar:full",
-			"item:max-count",
 		]),
 	})
 	.strict();

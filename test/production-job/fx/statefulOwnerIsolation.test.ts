@@ -110,7 +110,6 @@ const config = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 10,
-			maxCount: 4,
 		},
 		blocker: {
 			maxQueueSize: 1,
@@ -325,39 +324,5 @@ describe("line start state owner isolation", () => {
 		} finally {
 			await Effect.runPromise(session.disposeFx);
 		}
-	});
-
-	it("applies worst-case maxCount reservation to a generic producer line", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx(1);
-				const started = yield* Effect.result(
-					startLineFx({
-						ownerItemId: "runtime:producer",
-						lineId: "line:producer:limited",
-					}),
-				);
-
-				return {
-					runtime: yield* readRuntimeFx(),
-					started,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.started)).toBe(true);
-		if (Result.isFailure(result.started)) {
-			expect(result.started.failure).toMatchObject({
-				_tag: "OutputCapacityError",
-				itemId: "limited",
-				reservedQuantity: 5,
-				maxCount: 4,
-			});
-		}
-		expect(result.runtime.jobs).toEqual([]);
 	});
 });

@@ -23,15 +23,6 @@ export const ProjectStartItemPicker = (props: ProjectStartItemPickerProps) => {
 			onSelectItemFn={controller.selectItemFn}
 			options={controller.options.map((option) => ({
 				artwork: <EditorItemSearchThumbnail item={controller.items[option.id]} />,
-				disabled: option.maxCountReached !== undefined,
-				disabledReason:
-					option.maxCountReached === undefined ? undefined : (
-						<>
-							<Tx label="Max count reached" /> ·{" "}
-							{option.maxCountReached.currentQuantity}/
-							{option.maxCountReached.maxCount}
-						</>
-					),
 				itemId: option.id,
 				label: option.label,
 				terms: option.terms,

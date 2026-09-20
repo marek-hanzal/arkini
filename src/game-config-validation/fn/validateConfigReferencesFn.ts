@@ -59,23 +59,6 @@ const validateWhenReferenceFn = ({
 	path: DiagnosticPathSchema.Type;
 	source?: string;
 }) => {
-	if (when.type === "limit") {
-		if (config.items[when.itemId] !== undefined) return [] as GameDiagnosticsSchema.Type;
-		return [
-			{
-				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-				severity: DiagnosticSeverityEnumSchema.enum.Error,
-				path: [
-					...path,
-					"itemId",
-				],
-				source,
-				message: `Limit references missing item ${when.itemId}.`,
-				reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-				referenceId: when.itemId,
-			} satisfies GameDiagnosticSchema.Type,
-		];
-	}
 	return validateSelectorReferenceFn({
 		config,
 		selector: when.query.selector,

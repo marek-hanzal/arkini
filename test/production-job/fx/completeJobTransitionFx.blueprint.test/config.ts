@@ -7,12 +7,10 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({
 	id,
-	maxCount,
 	scope = "board",
 	maxStackSize = 1,
 }: {
 	id: string;
-	maxCount?: number;
 	scope?: "any" | "board";
 	maxStackSize?: number;
 }) =>
@@ -32,7 +30,6 @@ const simpleItem = ({
 			],
 		},
 		scope,
-		maxCount,
 		maxStackSize,
 	});
 
@@ -240,7 +237,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 				amount: 1,
 				output: blueprintOutput("blueprint:depletion-self"),
 			},
-			maxCount: 1,
 		},
 		"blueprint:depletion-random": {
 			...blueprintItem({
@@ -266,27 +262,22 @@ export const blueprintConfig = GameConfigSchema.parse({
 				output: blueprintOutput("blueprint:depletion-self-no-output"),
 				reserveTool: true,
 			}),
-			maxCount: 1,
 		},
 		"item:target": simpleItem({
 			id: "item:target",
-			maxCount: 1,
 		}),
 		"item:target-unlimited": simpleItem({
 			id: "item:target-unlimited",
 		}),
 		"item:byproduct": simpleItem({
 			id: "item:byproduct",
-			maxCount: 2,
 			maxStackSize: 2,
 		}),
 		"item:limited": simpleItem({
 			id: "item:limited",
-			maxCount: 4,
 		}),
 		"item:depletion-product": simpleItem({
 			id: "item:depletion-product",
-			maxCount: 1,
 		}),
 		"item:tool": simpleItem({
 			id: "item:tool",
@@ -296,11 +287,9 @@ export const blueprintConfig = GameConfigSchema.parse({
 		}),
 		"item:queue-product": simpleItem({
 			id: "item:queue-product",
-			maxCount: 1,
 		}),
 		"item:shared": simpleItem({
 			id: "item:shared",
-			maxCount: 2,
 		}),
 		"producer:limited": {
 			uid: "producer:limited",
@@ -500,7 +489,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 			},
 			scope: "board",
 			maxStackSize: 3,
-			maxCount: 3,
 			maxQueueSize: 1,
 			units: {
 				amount: 1,

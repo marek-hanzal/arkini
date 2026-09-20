@@ -8,7 +8,6 @@ export const InvalidInputUnitsReasonEnumSchema = z
 		SelfMissingUnits: "self-missing-units",
 		SelfInsufficientUnits: "self-insufficient-units",
 		TargetUnavailable: "target-unavailable",
-		TargetInsufficientTotalUnits: "target-insufficient-total-units",
 	})
 	.meta({
 		id: "InvalidInputUnitsReasonEnumSchema",

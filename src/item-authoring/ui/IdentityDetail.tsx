@@ -74,14 +74,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								}
 							/>
 							<Fact
-								label={translator.textFn("Game limit")}
-								value={
-									item.maxCount === undefined
-										? translator.textFn("Unlimited")
-										: item.maxCount
-								}
-							/>
-							<Fact
 								label={translator.textFn("Item ID")}
 								mono
 								value={

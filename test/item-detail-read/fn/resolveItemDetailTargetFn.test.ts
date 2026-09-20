@@ -21,7 +21,6 @@ describe("resolveItemDetailTargetFn", () => {
 		});
 		for (const requestedTab of [
 			"lines",
-			"queue",
 			"info",
 		] as const) {
 			expect(
@@ -150,7 +149,6 @@ describe("resolveItemDetailTargetFn", () => {
 		for (const requestedTab of [
 			undefined,
 			"lines",
-			"queue",
 		] as const) {
 			expect(
 				resolveItemDetailTargetFn({

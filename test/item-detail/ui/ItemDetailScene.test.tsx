@@ -36,9 +36,6 @@ vi.mock("~/item-detail/ui/ItemDetailTabs", () => ({
 vi.mock("~/item-detail/ui/ItemLines", () => ({
 	ItemLines: () => <span>Lines panel</span>,
 }));
-vi.mock("~/item-detail/ui/ItemQueue", () => ({
-	ItemQueue: () => <span>Queue panel</span>,
-}));
 
 it("uses explicit UI mode for direct tab entry, independently of authored production", async () => {
 	const host = document.createElement("div");
@@ -68,14 +65,14 @@ it("uses explicit UI mode for direct tab entry, independently of authored produc
 							kind: "runtime",
 							itemId: owner.id,
 							origin: null,
-							tab: "queue",
+							tab: "lines",
 						}}
 					/>
 				</TranslationTestProvider>,
 			),
 		);
 		expect(host.querySelector('[data-ui="ItemInfo"]')).not.toBeNull();
-		expect(host.textContent).not.toContain("Queue panel");
+		expect(host.textContent).not.toContain("Lines panel");
 		expect(host.textContent).not.toContain("Navigation");
 		// The same mounted target gains all sections with default, even after removing every line.
 		state.runtime = {
@@ -100,31 +97,15 @@ it("uses explicit UI mode for direct tab entry, independently of authored produc
 							kind: "runtime",
 							itemId: owner.id,
 							origin: null,
-							tab: "queue",
-						}}
-					/>
-				</TranslationTestProvider>,
-			),
-		);
-		expect(host.textContent).toContain("Navigation");
-		expect(host.textContent).toContain("Queue panel");
-		expect(host.querySelector('[data-ui="ItemInfo"]')).toBeNull();
-		await act(async () =>
-			root.render(
-				<TranslationTestProvider>
-					<ItemDetailScene
-						disabled={false}
-						target={{
-							kind: "runtime",
-							itemId: owner.id,
-							origin: null,
 							tab: "lines",
 						}}
 					/>
 				</TranslationTestProvider>,
 			),
 		);
+		expect(host.textContent).toContain("Navigation");
 		expect(host.textContent).toContain("Lines panel");
+		expect(host.querySelector('[data-ui="ItemInfo"]')).toBeNull();
 	} finally {
 		await act(async () => root.unmount());
 		host.remove();

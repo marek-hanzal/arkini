@@ -52,7 +52,7 @@ export const readItemLineStatusesFn = (
 				: {
 						jobId: active.jobId,
 					}),
-			requestId: active === undefined ? first?.requestId : undefined,
+			requestId: first?.requestId,
 		};
 	});
 };

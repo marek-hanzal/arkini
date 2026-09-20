@@ -15,20 +15,6 @@ interface StartItemAtLocation {
 	readonly quantity: PositiveIntegerSchema.Type;
 }
 
-const readStartItemQuantityFn = (start: StartSchema.Type, itemId: IdSchema.Type) =>
-	start.board.reduce(
-		(quantity, entry) => quantity + (entry.itemId === itemId ? (entry.quantity ?? 1) : 0),
-		0,
-	) +
-	start.inventory.reduce(
-		(quantity, entry) => quantity + (entry.itemId === itemId ? entry.quantity : 0),
-		0,
-	) +
-	start.toolbar.reduce(
-		(quantity, entry) => quantity + (entry.itemId === itemId ? (entry.quantity ?? 1) : 0),
-		0,
-	);
-
 const readStartItemAtLocationFn = (
 	start: StartSchema.Type,
 	location: StartLocationSchema.Type,
@@ -154,13 +140,11 @@ const removeStartItemFn = (
 const readStartItemSetErrorFn = ({
 	itemId,
 	location,
-	previous,
 	project,
 	quantity,
 }: {
 	readonly itemId: IdSchema.Type;
 	readonly location: StartLocationSchema.Type;
-	readonly previous: StartItemAtLocation | undefined;
 	readonly project: Project;
 	readonly quantity: PositiveIntegerSchema.Type;
 }) => {
@@ -175,12 +159,6 @@ const readStartItemSetErrorFn = ({
 		return `Item ${itemId} cannot be stored in ${location.scope}.`;
 	if (quantity > item.maxStackSize)
 		return `Item ${itemId} stack may contain at most ${item.maxStackSize}.`;
-	const nextItemQuantity =
-		readStartItemQuantityFn(project.config.start, itemId) -
-		(previous?.itemId === itemId ? previous.quantity : 0) +
-		quantity;
-	if (item.maxCount !== undefined && nextItemQuantity > item.maxCount)
-		return `Item ${itemId} may exist at most ${item.maxCount} times, but this start state would contain ${nextItemQuantity}.`;
 	if (location.scope === LocationScopeEnumSchema.enum.Board) {
 		const { height, width } = project.config.meta.board;
 		if (location.position.x >= width || location.position.y >= height)
@@ -251,7 +229,6 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 		const error = readStartItemSetErrorFn({
 			itemId: change.itemId,
 			location,
-			previous,
 			project,
 			quantity: change.quantity,
 		});

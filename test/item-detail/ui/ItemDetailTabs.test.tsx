@@ -63,13 +63,13 @@ it("switches the mounted Item Detail directly with its local section shortcut", 
 			new KeyboardEvent("keydown", {
 				bubbles: true,
 				cancelable: true,
-				key: "q",
+				key: "l",
 			}),
 		),
 	);
 	expect(state.openItemDetailFx).toHaveBeenCalledExactlyOnceWith({
 		itemId: "runtime:item",
-		tab: "queue",
+		tab: "lines",
 	});
 });
 

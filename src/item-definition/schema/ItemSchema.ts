@@ -72,12 +72,6 @@ export const ItemSchema = z
 		 */
 		scope: StorageSchema.describe("The part of game state in which this item may be stored."),
 		/**
-		 * Optional maximum number of this item allowed across the game state.
-		 */
-		maxCount: PositiveIntegerSchema.optional().describe(
-			"The optional maximum number of this item allowed across the game state.",
-		),
-		/**
 		 * Maximum number of this item that one stack can hold.
 		 *
 		 * Runtime keeps an item with mutable state, such as production progress, in an

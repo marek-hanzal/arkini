@@ -5,7 +5,6 @@ import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerS
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 const PlacementFailureReason = {
-	ItemMaxCount: "item:max-count",
 	BoardFull: "board:full",
 	InventoryFull: "inventory:full",
 	ToolbarFull: "toolbar:full",

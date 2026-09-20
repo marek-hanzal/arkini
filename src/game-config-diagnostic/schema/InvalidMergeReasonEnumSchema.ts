@@ -7,7 +7,6 @@ export const InvalidMergeReasonEnumSchema = z
 		TargetUnitsDisabled: "target-units-disabled",
 		TargetUnavailable: "target-unavailable",
 		ResultUnavailable: "result-unavailable",
-		SelfTargetUnavailable: "self-target-unavailable",
 	})
 	.meta({
 		id: "InvalidMergeReasonEnumSchema",

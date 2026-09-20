@@ -1,14 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({
-	id,
-	maxStackSize = 1,
-	maxCount,
-}: {
-	id: string;
-	maxStackSize?: number;
-	maxCount?: number;
-}) => ({
+const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -21,7 +13,6 @@ const baseItem = ({
 	},
 	scope: "board" as const,
 	maxStackSize,
-	maxCount,
 });
 
 const guaranteedOutput = ({
@@ -147,7 +138,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 
 				...baseItem({
 					id: "cappedResult",
-					maxCount: 1,
 				}),
 			},
 			temporaryPlain: {

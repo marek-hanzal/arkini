@@ -81,7 +81,7 @@ export const queueConfig = GameConfigSchema.parse({
 	},
 });
 
-export const createContendedQueueConfigFn = (budget: "units" | "output") => {
+export const createContendedQueueConfigFn = () => {
 	const producer = queueConfig.items.forge;
 	return GameConfigSchema.parse({
 		...queueConfig,
@@ -95,12 +95,6 @@ export const createContendedQueueConfigFn = (budget: "units" | "output") => {
 					amount: 3,
 				},
 			},
-			result: {
-				...queueConfig.items.water,
-				id: "result",
-				uid: "result",
-				maxCount: 1,
-			},
 			forge: {
 				...producer,
 				lines: producer.lines.map((line) =>
@@ -108,51 +102,23 @@ export const createContendedQueueConfigFn = (budget: "units" | "output") => {
 						? line
 						: {
 								...line,
-								...(budget === "units"
-									? {
-											input: [
-												{
-													type: "units",
-													query: {
-														scope: "board",
-														selector: {
-															type: "item",
-															itemId: "payer",
-														},
-														distance: "close",
-													},
-													units: {
-														from: "target",
-														cost: 2,
-													},
-												},
-											],
-										}
-									: {
-											output: {
-												set: [
-													{
-														rules: [],
-														roll: [
-															{
-																type: "guaranteed",
-																drop: [
-																	{
-																		itemId: "result",
-																		quantity: {
-																			min: 1,
-																			max: 1,
-																		},
-																		placement: "drop",
-																		rules: [],
-																	},
-																],
-															},
-														],
-													},
-												],
+								input: [
+									{
+										type: "units",
+										query: {
+											scope: "board",
+											selector: {
+												type: "item",
+												itemId: "payer",
 											},
-										}),
+											distance: "close",
+										},
+										units: {
+											from: "target",
+											cost: 2,
+										},
+									},
+								],
 							},
 				),
 			},

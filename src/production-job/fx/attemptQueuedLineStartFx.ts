@@ -4,7 +4,6 @@ import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProd
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import type { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
-import type { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
@@ -30,7 +29,6 @@ export namespace attemptQueuedLineStartFx {
 				error:
 					| ItemUnitsUnavailableError
 					| ItemNotOnBoardError
-					| OutputCapacityError
 					| LineRunUnavailableError
 					| PlacementUnavailableError;
 				runtime: RuntimeSchema.Type;
@@ -124,12 +122,6 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 					runtime,
 				} satisfies attemptQueuedLineStartFx.Result),
 			PlacementUnavailableError: (error) =>
-				Effect.succeed({
-					type: "blocked",
-					error,
-					runtime,
-				} satisfies attemptQueuedLineStartFx.Result),
-			OutputCapacityError: (error) =>
 				Effect.succeed({
 					type: "blocked",
 					error,

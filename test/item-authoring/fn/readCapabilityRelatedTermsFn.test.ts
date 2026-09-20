@@ -92,8 +92,14 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 							type: "enable",
 							when: [
 								{
-									type: "limit",
-									itemId: "set-permit",
+									type: "exists",
+									query: {
+										scope: "universe",
+										selector: {
+											type: "item",
+											itemId: "set-permit",
+										},
+									},
 								},
 							],
 						},

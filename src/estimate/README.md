@@ -45,7 +45,6 @@ Item Chain is a separate authored consequence projection in [`readItemChainsFn`]
 ## Estimate semantics
 
 - Estimate is optimistic static authored-dependency analysis using bounded output distributions and expected first-hitting time.
-- An Enable Limit condition contributes the referenced item’s authored `maxCount` as an ongoing positive prerequisite. An uncapped target makes that route unavailable and remains visible as `uncapped-limit` relation metadata. Disable Limit stays an optimistic negative-condition annotation; Estimate does not simulate live capacity or production reservations. Limit has no spatial query to approximate.
 - Indivisible deterministic batches round up; stochastic outputs retain authored probability.
 - Route selection is deterministic and quantity-aware. Stable route identity breaks equal-cost ties.
 - Alternative refinement is bounded where finite roots or co-products invalidate the locally ranked route set; this is not exhaustive combinatorial optimization.

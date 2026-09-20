@@ -93,8 +93,14 @@ describe("chain termination and authored output boundaries", () => {
 							type: "enable",
 							when: [
 								{
-									type: "limit",
-									itemId: "a",
+									type: "exists",
+									query: {
+										scope: "universe",
+										selector: {
+											type: "item",
+											itemId: "a",
+										},
+									},
 								},
 							],
 						},

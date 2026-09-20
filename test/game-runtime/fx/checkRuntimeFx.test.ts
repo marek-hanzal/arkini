@@ -61,7 +61,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			scope: "any",
-			maxCount: 3,
 			maxStackSize: 2,
 		},
 		board: {
@@ -199,7 +198,7 @@ describe("checkRuntimeFx", () => {
 		]);
 	});
 
-	it("reports readable stack-size and max-count invariant violations", () => {
+	it("reports readable stack-size invariant violations", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
@@ -245,19 +244,6 @@ describe("checkRuntimeFx", () => {
 				maxStackSize: 2,
 				quantity: 3,
 				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
-			},
-			{
-				itemId: "limited",
-				itemIds: [
-					"limited:first",
-					"limited:second",
-				],
-				jobIds: [],
-				liveQuantity: 4,
-				reservedQuantity: 0,
-				maxCount: 3,
-				quantity: 4,
-				type: RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
 			},
 		]);
 	});

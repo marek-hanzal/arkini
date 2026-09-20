@@ -32,6 +32,8 @@ Action rules help:
     Every **Enable** rule must pass. Any matching **Disable** rule blocks it. Costs are paid only after the rules pass.
 Action type:
   value: Action type
+Active job:
+  value: Active job
 Add at least one condition.:
   value: Add at least one condition.
 Add at least one drop.:
@@ -257,8 +259,6 @@ Available:
   value: Available
 Available for this job.:
   value: Available for this job.
-Available slots:
-  value: Available slots
 Avatar:
   value: Avatar
 Avatar {index}:
@@ -383,16 +383,14 @@ Choose a valid value.:
   dynamic: true
 Choose an existing .arkpack file:
   value: Create a project from an .arkpack file
-Choose something to make in Lines.:
-  value: Choose something to make in Lines.
 Clear:
   value: Clear
 Clear interval:
   value: Clear interval
 Clear lifetime:
   value: Clear lifetime
-Clear queue:
-  value: Clear queue
+Clear this line's queued tasks.:
+  value: Clear this line's queued tasks.
 Click to bring this here.:
   value: Click to bring this here.
 Click to take one back.:
@@ -803,8 +801,6 @@ Force delete…:
   value: Force delete…
 From Arkpack:
   value: From Arkpack
-Game limit:
-  value: Game limit
 General:
   value: General
 General PNG images keep their original dimensions.:
@@ -1045,18 +1041,12 @@ Item estimate help:
 Item expired:
   value: Item expired
   dynamic: true
-Item global count help:
-  value: |
-    Maximum total quantity of this item across the whole game.
-
-    Stacks count every item. Leave empty for no limit.
 Item identity help:
   value: |
     The Item page is the overview: artwork, storage, Production, Merges, Units, Clock and Action in one place.
 
     - **Allowed storage** chooses Board, Toolbar, Inventory or any of them.
     - **Maximum stack size** limits how many items share one cell.
-    - **Maximum global count** limits the item across the whole game.
     - **Show all** opens the full detail page for a section; **Edit** opens its form.
 
     Action cannot coexist with Production or Clock. Merges work independently.
@@ -1211,13 +1201,6 @@ Lifetime:
   value: Lifetime
 Lifetime (seconds):
   value: Lifetime (seconds)
-Limit:
-  value: Limit
-Limit condition help:
-  value: |
-    Passes when the selected item has reached its **Maximum global count**. Counts existing quantities across all Boards, Inventory, Toolbar, stored inputs and jobs. Future job output is not counted.
-
-    An item without a maximum never satisfies this condition. Use **Disable + Limit** to stop a line or skip a drop while the limit is reached.
 Line ID:
   value: Line ID
 Line behavior:
@@ -1253,8 +1236,6 @@ Main menu:
   value: Main menu
 Major:
   value: Major
-Make:
-  value: Make
 Managed:
   value: Managed
 Matches any positive board distance and excludes only Self.:
@@ -1298,16 +1279,10 @@ Materials input type help:
     Requires matching items to be delivered here.
 
     Use **Consume** for ingredients or **Reserve** for tools that should return.
-Max count reached:
-  value: Max count reached
 Maximum:
   value: Maximum
 Maximum count:
   value: Maximum count
-Maximum global count:
-  value: Maximum global count
-Maximum in the game:
-  value: Maximum in the game
 Maximum stack size:
   value: Maximum stack size
 Merge:
@@ -1514,8 +1489,6 @@ Notes help:
     Removing a link keeps the note. Deleting a note removes it everywhere. Notes travel with the Editor project but are left out of Arkpack builds.
 Notes unavailable:
   value: Notes are unavailable.
-Nothing is being made right now.:
-  value: Nothing is being made right now.
 Nothing produces this item:
   value: Nothing produces this item
   dynamic: true
@@ -2124,6 +2097,8 @@ Target unit cost help:
     - **Cost:** Units removed each time the action or job starts.
 
     The payer stays in place. At zero Units, it depletes normally.
+That's everything you can make for now!:
+  value: That's everything you can make for now!
 The project changed. Refresh and try again.:
   value: The project changed. Refresh and try again.
 This Item ID is already in use.:
@@ -2150,8 +2125,6 @@ This item doesn't use units.:
 This item has no inputs:
   value: This item has no inputs
   dynamic: true
-This item has nothing to make.:
-  value: This item has nothing to make.
 This item is unreachable.:
   value: This item is unreachable.
 This item produces nothing:
@@ -2183,8 +2156,6 @@ Unavailable item:
   value: Unavailable item
 Unavailable resource:
   value: Unavailable resource
-Unique item:
-  value: Unique item
 Unit cost:
   value: Unit cost
 Unit depletion:
@@ -2332,8 +2303,6 @@ Write a note…:
   value: Write a note…
 Write a welcome in Markdown…:
   value: Write a welcome in Markdown…
-Your queue is empty.:
-  value: Your queue is empty.
 added by invisible color cleanup:
   value: added by invisible color cleanup
 assigned:
@@ -2364,8 +2333,6 @@ keep:
   value: keep
 kill-switch:
   value: stop immediately
-limit:
-  value: limit
 managed:
   value: managed
 music:

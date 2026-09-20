@@ -11,65 +11,6 @@ import {
 } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/fixture";
 
 describe("blueprint depleted-owner accounting", () => {
-	it("keeps repeated random depletion reads pure and conservatively blocks every branch", () => {
-		const result = runBlueprint(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:depletion-product",
-					itemId: "item:depletion-product",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const owner = yield* spawnBlueprintFx({
-					id: "runtime:depletion-random",
-					space: 0,
-					itemId: "blueprint:depletion-random",
-					x: 0,
-					y: 0,
-				});
-				const before = yield* readRuntimeFx();
-				const first = yield* readItemDetailLinesFx({
-					itemId: owner.id,
-					runtime: before,
-				});
-				const second = yield* readItemDetailLinesFx({
-					itemId: owner.id,
-					runtime: before,
-				});
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					first,
-					second,
-				};
-			}),
-		);
-
-		expect(result.first).toEqual(result.second);
-		expect(result.after).toEqual(result.before);
-		expect(result.first).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					availability: {
-						kind: "unavailable",
-						reason: {
-							kind: "direct-output-capacity",
-							itemId: "item:depletion-product",
-						},
-					},
-				},
-			],
-		});
-	});
-
 	it("subtracts exactly one depleted owner, including when no lifecycle output exists", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {

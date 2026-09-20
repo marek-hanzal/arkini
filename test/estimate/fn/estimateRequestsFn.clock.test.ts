@@ -343,8 +343,14 @@ describe("Clock authored acquisition boundaries", () => {
 							type: "disable",
 							when: [
 								{
-									type: "limit",
-									itemId: "target",
+									type: "exists",
+									query: {
+										scope: "universe",
+										selector: {
+											type: "item",
+											itemId: "target",
+										},
+									},
 								},
 							],
 						},

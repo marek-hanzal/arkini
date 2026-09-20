@@ -40,16 +40,12 @@ const runFn = (config: GameConfigSchema.Type) =>
 	);
 
 describe("committed material expiry settlement", () => {
-	it("releases the aborted job's global output reservation before placing expiry output", () => {
+	it("places expiry output once after aborting the material owner job", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const config = GameConfigSchema.parse({
 			...base,
 			items: {
 				...base.items,
-				product: {
-					...base.items.product,
-					maxCount: 1,
-				},
 				temporary: {
 					...base.items.temporary,
 					clock: {

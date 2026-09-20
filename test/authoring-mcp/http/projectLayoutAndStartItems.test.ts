@@ -176,7 +176,6 @@ describe("editor MCP project layout and start items", () => {
 					items: {
 						water: {
 							...editorTestPayload.config.items.water,
-							maxCount: 7,
 						},
 					},
 				},
@@ -284,32 +283,6 @@ describe("editor MCP project layout and start items", () => {
 			},
 		});
 		expect(missingBoardSpace.isError).toBe(true);
-
-		const exceedsMaximum = await client.callTool({
-			name: "set_start_item",
-			arguments: {
-				revision: project.revision,
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				itemId: "water",
-				quantity: 1,
-			},
-		});
-		expect(exceedsMaximum).toMatchObject({
-			isError: true,
-			content: [
-				{
-					text: expect.stringContaining(
-						"Item water may exist at most 7 times, but this start state would contain 8.",
-					),
-				},
-			],
-		});
 
 		const removed = await client.callTool({
 			name: "remove_start_item",

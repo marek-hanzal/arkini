@@ -19,7 +19,6 @@ import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 
-import { assertPlacementMaxCountFx } from "./assertPlacementMaxCountFx";
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
@@ -182,11 +181,6 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 }: PlanDropPlacementProps) {
 	const item = yield* resolveItemFx({
 		itemId: drop.itemId,
-	});
-	yield* assertPlacementMaxCountFx({
-		drop,
-		item,
-		runtime,
 	});
 	// Board-only single items cannot stack or fall back to passive storage. Count
 	// claimed cells before sorting locations or allocating spawn identities.

@@ -1,4 +1,4 @@
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
@@ -11,40 +11,6 @@ import {
 } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/fixture";
 
 describe("blueprint completion lifecycle", () => {
-	it("rejects a job when any quantity in its random range can exceed maxCount", () => {
-		const result = runBlueprint(
-			Effect.gen(function* () {
-				const owner = yield* spawnBlueprintFx({
-					id: "runtime:range",
-					space: 0,
-					itemId: "blueprint:range",
-					x: 0,
-					y: 0,
-				});
-				const started = yield* startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:blueprint:range",
-				}).pipe(Effect.result);
-				return {
-					started,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
-
-		expect(Result.isFailure(result.started)).toBe(true);
-		if (Result.isFailure(result.started)) {
-			expect(result.started.failure).toMatchObject({
-				_tag: "OutputCapacityError",
-				itemId: "item:limited",
-				reservedQuantity: 5,
-				maxCount: 4,
-			});
-		}
-		expect(result.runtime.jobs).toEqual([]);
-		expect(result.runtime.items.some((item) => item.item.id === "blueprint:range")).toBe(true);
-	});
-
 	it("round-trips an active blueprint job through persisted state", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {

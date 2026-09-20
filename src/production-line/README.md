@@ -9,7 +9,7 @@ This README maps the peer `production-*` roots. It lives beside Production Line 
 | Domain | Owns | Public entrypoints |
 | --- | --- | --- |
 | `production-condition` | Authored runtime condition evaluation | [`whenFx.ts`](../production-condition/fx/whenFx.ts) |
-| `production-output` | Output, drop and roll schemas; deterministic resolution | [`outputFx.ts`](../production-output/fx/outputFx.ts), [`readOutputMaximumQuantitiesFn.ts`](../production-output/fn/readOutputMaximumQuantitiesFn.ts) |
+| `production-output` | Output, drop and roll schemas; deterministic resolution | [`outputFx.ts`](../production-output/fx/outputFx.ts) |
 | `production-action` | Immediate action admission, action inputs and unit settlement | [`resolveActionRuleFx.ts`](../production-action/fx/resolveActionRuleFx.ts), [`settleActionUnitsFx.ts`](../production-action/fx/settleActionUnitsFx.ts) |
 | `production-input` | Material resolution, buffers, autofill, withdrawal and storage mutation | [`resolveInputRunFx.ts`](../production-input/fx/resolveInputRunFx.ts), [`applyInputRunPlanFx.ts`](../production-input/fx/applyInputRunPlanFx.ts) |
 | `production-line` | Line definitions, rules, reads and one pinned-snapshot run plan | [`fx/resolveLineRunFx.ts`](fx/resolveLineRunFx.ts) |
@@ -45,16 +45,16 @@ Do not call one side globally upstream or downstream. State the exact layer: for
 ```text
 enqueueLineFx
 → resolve owner + line + rules + non-material requirements
-→ validate units, output capacity and queue capacity
+→ validate units and queue capacity
 → append intent only
 
 Tick: persisted global queue order, earliest actionable request per idle owner
 → skip blocked requests without changing state or intent order
-→ recheck rules, non-material requirements, units and output limits
+→ recheck rules, non-material requirements and units
 → autofill useful material through Delivery when possible
 → retry from fresh Runtime facts
 → resolveLineRunFx from one pinned snapshot
-→ reserve inputs + units + worst-case output
+→ commit inputs + spend units
 → start one Job atomically
 → only start or scheduled delivery handles this owner for the queue pass
 
@@ -68,7 +68,7 @@ Tick: ready Job in stable ID order
 Tick: ready expired material after completion settlement
 → remove the expired identity, its Job and remaining consumed roots
 → settle a depleted owner and return stored inputs and reservations
-→ place expiry output from the physical owner origin with canceled-job capacity freed
+→ place expiry output from the physical owner origin with consumed material removed
 → retry idle owners' queued requests in global intent order
 → commit all or nothing
 
@@ -79,7 +79,7 @@ clear pending owner queue
 → commit all or nothing
 ```
 
-A queued request owns no time, material, units or output reservation. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
+A queued request owns no time, material or units. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
 Scheduled owners filter their selected Clock pool by line rules, draw by `clockWeight`, then use ordinary one-intent admission. `Item.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally in loose-kill mode, while kill-switch cancels it. Player-control admission is separate from autonomous work and shared by production commands and their projections.
 
@@ -88,10 +88,9 @@ Scheduled owners filter their selected Clock pool by line rules, draw by `clockW
 - Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.
 - A skipped request keeps its identity, line and valid stored inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs and stored owners stay blocked. Explicit forced owner removal can abort active Jobs.
-- Players can cancel an exact active job through [`cancelItemJobFx`](../production-job/fx/cancelItemJobFx.ts). Shared [`abortJobRuntimeFx`](../production-job/fx/abortJobRuntimeFx.ts) consumes committed material, returns reservations, and settles owner depletion atomically. Stale job IDs never cancel a replacement.
-- Clearing pending work returns its unused line-input material without cancelling active work. An exact request ID cancels only that pending request; stale IDs are no-ops. Shared line buffers and deliveries stay while another request for that line remains.
+- The engine can cancel an exact active job through [`cancelItemJobFx`](../production-job/fx/cancelItemJobFx.ts). Shared [`abortJobRuntimeFx`](../production-job/fx/abortJobRuntimeFx.ts) consumes committed material, returns reservations, and settles owner depletion atomically. Stale job IDs never cancel a replacement.
+- Clearing pending work returns its unused line-input material without cancelling active work. An optional line ID restricts clearing to that line. An exact request ID cancels only that pending request; stale IDs are no-ops. Shared line buffers and deliveries stay while another request for that line remains.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.
-- Active Jobs reserve the worst possible output quantity; queued requests reserve nothing. The shared `limit` condition observes global existing quantities against the selected item's `maxCount`, independently of future reservations; Rule controls expose it to both lines and drops.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.
 - Job, delivery and item-schedule advancement order belongs to Game Tick, not to any production root.

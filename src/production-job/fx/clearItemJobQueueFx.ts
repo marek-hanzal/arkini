@@ -14,6 +14,8 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace clearItemJobQueueFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
+		/** When provided, limits removal to pending requests for this production line. */
+		lineId?: IdSchema.Type;
 		/** When provided, removes only this exact pending request; a stale identity is a no-op. */
 		requestId?: IdSchema.Type;
 	}
@@ -22,6 +24,7 @@ export namespace clearItemJobQueueFx {
 /** Removes one owner's pending work and returns its unused line-input material atomically. */
 export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 	ownerItemId,
+	lineId,
 	requestId,
 }: clearItemJobQueueFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
@@ -38,6 +41,7 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 			const clearedRequests = runtime.jobQueue.filter(
 				(request) =>
 					request.ownerItemId === ownerItemId &&
+					(lineId === undefined || request.lineId === lineId) &&
 					(requestId === undefined || request.id === requestId),
 			);
 			if (clearedRequests.length === 0) {

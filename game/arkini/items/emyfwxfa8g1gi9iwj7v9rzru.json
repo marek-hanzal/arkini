@@ -4,8 +4,8 @@
 		"uid": "emyfwxfa8g1gi9iwj7v9rzru",
 		"id": "forester",
 		"title": "Forester",
+		"description": "Keeps basic forestry renewable: plants trees from seed beside established Forest, searches Forest for new seed, and can consolidate three trees into a new Forest.",
 		"ui": "default",
-		"description": "Finds forests. Or trees. Or both",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -17,17 +17,246 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "forest",
-				"title": "Forest",
-				"description": "Keeps care of forest so you'll get one",
-				"default": true,
+				"id": "plant-tree",
+				"title": "Plant Tree",
+				"artwork": "tree",
+				"description": "Use a loose Tree Seed while working beside an established Forest. The Forester plants the new tree somewhere suitable on the board.",
+				"clock": false,
 				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 20000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "tree-seed"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "tree",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "Place the Forester next to a Forest.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "forest"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "plant-tree-stored",
+				"title": "Plant Tree From Sack",
+				"artwork": "tree",
+				"description": "Use stored Tree Seed while working beside an established Forest. The sack survives the indignity and comes back empty.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 20000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "sack-with-tree-seed"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "tree",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "random",
+											"rules": []
+										},
+										{
+											"itemId": "empty-sack",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "Place the Forester next to a Forest.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "forest"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "search-tree-seed",
+				"title": "Search For Tree Seed",
+				"artwork": "forest",
+				"description": "Search a nearby Forest for viable seed. Each trip has a 25% chance to find one.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": false,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "chance",
+									"chance": 0.25,
+									"drop": [
+										{
+											"itemId": "tree-seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"hint": "Place the Forester next to a Forest.",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "forest"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "establish-forest",
+				"title": "Establish Forest",
+				"artwork": "forest",
+				"description": "Turn three existing trees into a permanent Forest. It is less magic than admitting that three trees have become somebody's management problem.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 60000,
 				"input": [
 					{
-						"type": "simple"
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "tree"
+							},
+							"scope": "board",
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						}
 					}
 				],
 				"output": {

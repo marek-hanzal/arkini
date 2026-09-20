@@ -4,8 +4,8 @@
 		"uid": "w61ftom9lbm4m70y9oagapuu",
 		"id": "dirty-scrubbing-brush",
 		"title": "Dirty Scrubbing Brush",
+		"description": "A dirty brush. It cannot clean anything, but it can absolutely make other brushes share the problem.",
 		"ui": "simple",
-		"description": "No longer is able to clean up things",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -65,6 +65,33 @@
 				"action": "use",
 				"effect": "replace",
 				"result": "dirty-cutting-board"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "scrubbing-brush"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "dirty-scrubbing-brush"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "soapy-scrubbing-brush"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "dirty-scrubbing-brush"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "trimmed-scrubbing-brush"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "trimmed-dirty-scrubbing-brush"
 			}
 		],
 		"maxQueueSize": 1,

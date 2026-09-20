@@ -20,7 +20,7 @@
 			{
 				"id": "harvest",
 				"title": "Cut Grass",
-				"description": "Harvest cut grass from a nearby planted field.",
+				"description": "Harvest cut grass from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,
@@ -41,6 +41,21 @@
 							"scope": "board",
 							"distance": "close"
 						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "bucket-with-water"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
 					}
 				],
 				"output": {
@@ -57,6 +72,15 @@
 											"quantity": {
 												"min": 2,
 												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-bucket",
+											"quantity": {
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

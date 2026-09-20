@@ -1,15 +1,16 @@
 {
 	"$schema": "../schema.json",
 	"item": {
-		"uid": "g1w4g5ccovd4q91eyaano0tp",
-		"id": "trimmed-scrubbing-brush",
-		"title": "Trimmed Scrubbing Brush",
+		"uid": "dwzuz9t781terc5krgoi95k8",
+		"id": "spoiled-tree-seed",
+		"title": "Spoiled Tree Seed",
 		"draft": false,
+		"description": "A tree seed that waited too long to become a tree.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"trimmed-scrubbing-brush"
+				"spoiled-fruit-seed"
 			]
 		},
 		"scope": "any",

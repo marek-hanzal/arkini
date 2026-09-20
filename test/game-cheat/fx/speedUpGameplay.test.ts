@@ -98,7 +98,7 @@ describe("Speed up", () => {
 				});
 				yield* startLineFx(startProps);
 				yield* runTickRuntimeByFx({
-					elapsedMs: 1,
+					elapsedMs: 3,
 				});
 				const before = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
@@ -111,12 +111,12 @@ describe("Speed up", () => {
 				const delayed = yield* readRuntimeFx();
 				expect(samples).toHaveLength(1);
 				expect(samples[0]).toMatchObject({
-					windowMs: 9002,
+					windowMs: 9004,
 					wakes: 3,
 					advances: 2,
 					failedAdvances: 0,
 					simulationBudgetMs: 200,
-					droppedWallMs: 8998,
+					droppedWallMs: 8996,
 					maxWakeGapMs: 9000,
 					speedMultiplier: GameplaySpeedUpMultiplier,
 				});

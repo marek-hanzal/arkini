@@ -433,6 +433,11 @@ package-linux-arm64() {
 	package_linux_artifacts arm64
 }
 
+# @cmd Serve the standalone landing page locally
+website:preview() {
+	python3 -m http.server 4173 --bind 127.0.0.1 --directory website
+}
+
 # @cmd Format the repository
 format() {
 	biome format --write .

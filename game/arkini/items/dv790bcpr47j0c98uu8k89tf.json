@@ -4,8 +4,8 @@
 		"uid": "dv790bcpr47j0c98uu8k89tf",
 		"id": "stoneworks",
 		"title": "Stoneworks",
-		"ui": "default",
 		"description": "Even this one is good to advance - stone would be better stone. Everybody likes better stones!",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,14 +14,15 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
-		"maxQueueSize": 1,
+		"maxQueueSize": 4,
 		"lines": [
 			{
 				"id": "stone-block",
 				"title": "Stone Block",
+				"artwork": "stone-block",
 				"description": "You'll get better stone from simple good old stone boulder.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 10000,
@@ -29,11 +30,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
-							}
+							},
+							"scope": "any"
 						},
 						"mode": "consume",
 						"quantity": {

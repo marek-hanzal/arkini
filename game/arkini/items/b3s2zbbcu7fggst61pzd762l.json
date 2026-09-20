@@ -15,11 +15,11 @@
 		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
-			"intervalMs": 30000,
+			"intervalMs": 90000,
 			"enable": true,
 			"rules": []
 		},
-		"maxQueueSize": 6,
+		"maxQueueSize": 1,
 		"lines": [
 			{
 				"id": "idle",

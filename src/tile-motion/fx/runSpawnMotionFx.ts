@@ -7,8 +7,6 @@ import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 import { whenVisualReadyFx } from "~/tile-rendering/fx/whenVisualReadyFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
-import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
@@ -21,7 +19,6 @@ export namespace runSpawnMotionFx {
 		readonly cue: TileSpawnMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: MagneticField;
 		readonly onCompleteFn: () => void;
 		readonly isCueActiveFn: () => boolean;
 		readonly onRevealFn: () => void;
@@ -38,7 +35,6 @@ const startSpawnFx = Effect.fn("runSpawnMotionFx.startSpawnFx")(function* ({
 	cue,
 	cueKey,
 	delayMs,
-	magneticField,
 	onCompleteFn,
 	origin,
 	surface,
@@ -80,23 +76,14 @@ const startSpawnFx = Effect.fn("runSpawnMotionFx.startSpawnFx")(function* ({
 		target,
 		targetLocation: cue.targetLocation,
 	});
-	const magneticProjector = yield* createMagneticProjectorFx({
-		actor,
-		attractedActorId: null,
-		eligibleAttractionActorIds: new Set(),
-		magneticField,
-		surface,
-	});
 	yield* animator.animateFx({
 		actor,
 		channel: "pose",
 		delayMs,
 		durationMs,
 		ownerKey: `motion:${cueKey}`,
-		onCancelFn: magneticProjector.releaseFn,
 		onCompleteFn: () => {
 			const settleFn = () => {
-				magneticProjector.releaseFn();
 				const currentTarget =
 					RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ??
 					target;
@@ -114,7 +101,6 @@ const startSpawnFx = Effect.fn("runSpawnMotionFx.startSpawnFx")(function* ({
 					actor,
 					animator,
 					fallbackTarget: target,
-					onPoseFn: magneticProjector.projectPoseFn,
 					onSettledFn: settleFn,
 					ownerKey: `motion:${cueKey}`,
 					surface,
@@ -122,11 +108,7 @@ const startSpawnFx = Effect.fn("runSpawnMotionFx.startSpawnFx")(function* ({
 				}),
 			);
 		},
-		readPoseFn: (progress) => {
-			const pose = poseSampler.readPoseFn(progress);
-			magneticProjector.projectPoseFn(pose);
-			return pose;
-		},
+		readPoseFn: poseSampler.readPoseFn,
 	});
 });
 

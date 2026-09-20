@@ -157,21 +157,9 @@ describe("delivery runtime", () => {
 					attachActorFx: () => Effect.void,
 					detachActorFx: () => Effect.void,
 				} as unknown as MainDragController,
-				magneticField: {
-					closeFx: Effect.void,
-					flushFx: Effect.void,
-					pruneFx: Effect.void,
-					readActiveSourceActorIdsFx: Effect.succeed([]),
-					releaseFx: () => Effect.void,
-					releaseSourcesFx: () => Effect.void,
-					resetFx: Effect.void,
-					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
-					updateFx: () => Effect.void,
-				},
 				particleTextures: {} as never,
 				readPaletteFn: () => ({}) as never,
 				surface: {
-					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
 						Effect.succeed({
 							layer: new Container(),
@@ -290,8 +278,6 @@ describe("delivery runtime", () => {
 		} satisfies ActorAnimator;
 		const detachActorFx = vi.fn(() => Effect.void);
 		const attachActorFx = vi.fn(() => Effect.void);
-		const updateMagnetFx = vi.fn(() => Effect.void);
-		const releaseMagnetFx = vi.fn(() => Effect.void);
 		const runtime = Effect.runSync(
 			createDeliveryRuntimeFx({
 				actorStore: {
@@ -308,21 +294,9 @@ describe("delivery runtime", () => {
 					attachActorFx,
 					detachActorFx,
 				} as unknown as MainDragController,
-				magneticField: {
-					closeFx: Effect.void,
-					flushFx: Effect.void,
-					pruneFx: Effect.void,
-					readActiveSourceActorIdsFx: Effect.succeed([]),
-					releaseFx: releaseMagnetFx,
-					releaseSourcesFx: () => Effect.void,
-					resetFx: Effect.void,
-					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
-					updateFx: updateMagnetFx,
-				},
 				particleTextures: {} as never,
 				readPaletteFn: () => ({}) as never,
 				surface: {
-					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
 						Effect.succeed(
 							geometryAvailable
@@ -363,13 +337,6 @@ describe("delivery runtime", () => {
 		if (animations[0]?.channel !== "pose") throw new Error("Expected outbound chase.");
 		targetContainer.x = 340;
 		animations[0].readPoseFn?.(0.5);
-		expect(updateMagnetFx).toHaveBeenCalledWith(
-			expect.objectContaining({
-				attractedActorId: targetActor.item.id,
-				sourceActorId: item.id,
-				sourceKind: "motion",
-			}),
-		);
 		expect(animations[0].readPoseFn?.(1)).toMatchObject({
 			x: 340,
 			y: 0,
@@ -411,10 +378,6 @@ describe("delivery runtime", () => {
 		expect(container.x).toBe(120);
 		expect(animations).toHaveLength(2);
 		animations[1]?.onCompleteFn?.();
-		expect(releaseMagnetFx).toHaveBeenCalledWith({
-			sourceActorId: item.id,
-			sourceKind: "motion",
-		});
 
 		container.position.set(90, 0);
 		Effect.runSync(

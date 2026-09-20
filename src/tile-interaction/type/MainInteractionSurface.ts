@@ -36,14 +36,6 @@ export interface MainInteractionSurface {
 		x: number,
 		y: number,
 	) => Effect.Effect<MainInteractionTargetFacts, never, never>;
-	readonly readLocalActorIdsFx: (bounds: {
-		readonly excludeActorId?: string;
-		readonly height: number;
-		readonly paddingRatio?: number;
-		readonly width: number;
-		readonly x: number;
-		readonly y: number;
-	}) => Effect.Effect<ReadonlyArray<string>, never, never>;
 	readonly renderDropFeedbackFx: (
 		target: MainInteractionDropTarget | null,
 		kind: readDropItemPreviewFx.Result["kind"] | null,

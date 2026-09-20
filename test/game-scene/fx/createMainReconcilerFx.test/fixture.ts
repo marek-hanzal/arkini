@@ -35,7 +35,6 @@ import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { TileDelivery } from "~/game-scene/fx/readTileDeliveriesFx";
 import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 
@@ -197,7 +196,6 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 	container.alpha = 1;
 	container.position.set(40, 60);
 	const lifecycleLayer = new Container();
-	const offsetLayer = new Container();
 	const crowdLayer = new Container();
 	const visualLayer = new Container();
 	const particle = new Particle(Texture.EMPTY);
@@ -212,14 +210,12 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 	const currentVisual = createVisual(item);
 	visualLayer.addChild(currentVisual.container);
 	crowdLayer.addChild(visualLayer);
-	offsetLayer.addChild(activityParticleContainer, crowdLayer);
-	lifecycleLayer.addChild(offsetLayer);
+	lifecycleLayer.addChild(activityParticleContainer, crowdLayer);
 	container.addChild(lifecycleLayer);
 	return {
 		instanceId: `test:${item.id}`,
 		container,
 		lifecycleLayer,
-		offsetLayer,
 		crowdLayer,
 		visualLayer,
 		activityParticles: {
@@ -305,20 +301,6 @@ export const createActorStore = (actor: PixiTileActor) => {
 					Array.from(canonicalItems.values()).find(
 						(item) => JSON.stringify(item.location) === JSON.stringify(location),
 					) ?? null,
-				),
-			readCanonicalOccupantsFx: (locations: ReadonlyArray<TileActorItem["location"]>) =>
-				Effect.succeed(
-					locations.flatMap((location) => {
-						const item = Array.from(canonicalItems.values()).find(
-							(candidate) =>
-								JSON.stringify(candidate.location) === JSON.stringify(location),
-						);
-						return item === undefined
-							? []
-							: [
-									item,
-								];
-					}),
 				),
 			replaceCanonicalItemsFx: (items: ReadonlyArray<TileActorItem>) =>
 				Effect.sync(() => {
@@ -543,17 +525,6 @@ export const createReconcilerHarness = ({
 			},
 			dropPresentation,
 			game,
-			magneticField: {
-				closeFx: Effect.void,
-				flushFx: Effect.void,
-				pruneFx: Effect.void,
-				readActiveSourceActorIdsFx: Effect.succeed([]),
-				releaseFx: () => Effect.void,
-				releaseSourcesFx: () => Effect.void,
-				resetFx: Effect.void,
-				subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
-				updateFx: () => Effect.void,
-			} satisfies MagneticField,
 			motion,
 			particleTextures: {
 				closeFx: Effect.void,

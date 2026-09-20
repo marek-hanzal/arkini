@@ -8,7 +8,6 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { runInputMotionFx } from "~/tile-motion/fx/runInputMotionFx";
 import { runSpawnMotionFx } from "~/tile-motion/fx/runSpawnMotionFx";
 import { runStackMotionFx } from "~/tile-motion/fx/runStackMotionFx";
@@ -25,7 +24,6 @@ export namespace runMotionCueFx {
 		readonly application: PixiApplicationOwner;
 		readonly cue: TileMotionCue;
 		readonly cueKey: string;
-		readonly magneticField: MagneticField;
 		readonly isCueActiveFn: () => boolean;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
@@ -64,14 +62,8 @@ const readMotionOriginFx = Effect.fn("runMotionCueFx.readOriginFx")(function* ({
 		return {
 			layer: originActor.container.parent ?? surface.transientActorLayer,
 			size: originActor.size * scale,
-			x:
-				originActor.container.x -
-				originActor.container.pivot.x * scale +
-				originActor.offsetLayer.x * scale,
-			y:
-				originActor.container.y -
-				originActor.container.pivot.y * scale +
-				originActor.offsetLayer.y * scale,
+			x: originActor.container.x - originActor.container.pivot.x * scale,
+			y: originActor.container.y - originActor.container.pivot.y * scale,
 		};
 	}
 	return yield* surface.readLocationPoseFx(originLocation);
@@ -84,7 +76,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	application,
 	cue,
 	cueKey,
-	magneticField,
 	isCueActiveFn,
 	onActorSettledFn,
 	onCompleteFn,
@@ -132,7 +123,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									onRevealFn: onSpawnRevealFn,
 									cueKey,
 									delayMs: spawn.revealAtOriginExit ? 0 : delayMs,
-									magneticField,
 									onCompleteFn,
 									origin: spawn.revealAtOriginExit ? target : origin,
 									surface,
@@ -151,7 +141,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cue: stack,
 									cueKey,
 									delayMs,
-									magneticField,
 									onCompleteFn,
 									onPayloadCreatedFn,
 									origin,
@@ -175,7 +164,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									isCueActiveFn,
 									cueKey,
 									delayMs,
-									magneticField,
 									onActorSettledFn,
 									onCompleteFn,
 									onRemainderRevealedFn: onInputRemainderRevealedFn,
@@ -198,7 +186,6 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									cue: swap,
 									cueKey,
 									delayMs,
-									magneticField,
 									onCompleteFn,
 									onSwapLegSettledFn,
 									onSwapLegStartedFn,

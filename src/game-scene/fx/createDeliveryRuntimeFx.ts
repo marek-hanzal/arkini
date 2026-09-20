@@ -13,10 +13,8 @@ import { startRemainderFeedbackFx } from "~/tile-rendering/fx/startRemainderFeed
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";
-import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { flashMotionTargetFx } from "~/tile-motion/fx/flashMotionTargetFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
@@ -28,7 +26,6 @@ interface CreateDeliveryRuntimeProps {
 	readonly animator: ActorAnimator;
 	readonly application: PixiApplicationOwner;
 	readonly drag: MainDragController;
-	readonly magneticField: MagneticField;
 	readonly particleTextures: ParticleTextures;
 	readonly readPaletteFn: () => PixiScenePalette;
 	readonly surface: MainSurface;
@@ -39,7 +36,6 @@ interface ActiveDelivery {
 	readonly actor: PixiTileActor;
 	delivery: TileDelivery;
 	readonly generation: number;
-	releaseMagnetFn: () => void;
 	stage:
 		| "awaiting-return-geometry"
 		| "awaiting-travel-geometry"
@@ -73,7 +69,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 	animator,
 	application,
 	drag,
-	magneticField,
 	particleTextures,
 	readPaletteFn,
 	surface,
@@ -88,7 +83,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		active: ActiveDelivery,
 	) {
 		if (activeByItemId.get(itemId) !== active) return;
-		active.releaseMagnetFn();
 		activeByItemId.delete(itemId);
 		if (actorStore.actors.get(itemId) === active.actor) {
 			yield* actorStore.releaseActorFx(itemId);
@@ -122,20 +116,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		readonly to: ActorPose;
 	}) {
 		active.stage = "traveling";
-		active.releaseMagnetFn();
-		const magneticProjector =
-			delivery.phase === "outbound" && delivery.targetActorId !== undefined
-				? yield* createMagneticProjectorFx({
-						actor: active.actor,
-						attractedActorId: delivery.targetActorId,
-						eligibleAttractionActorIds: new Set([
-							delivery.targetActorId,
-						]),
-						magneticField,
-						surface,
-					})
-				: null;
-		active.releaseMagnetFn = () => magneticProjector?.releaseFn();
 		const readLiveTargetFn = () =>
 			delivery.targetActorId === undefined
 				? null
@@ -150,9 +130,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 			durationMs: Math.max(0, delivery.remainingDurationMs - 100),
 			curve: delivery.phase === "returning" ? deliveryReturnCurve : deliveryOutboundCurve,
 			fallbackTarget: to,
-			onPoseFn: magneticProjector?.projectPoseFn,
 			onSettledFn: () => {
-				active.releaseMagnetFn();
 				if (delivery.phase === "outbound" && delivery.targetActorId !== undefined) {
 					RendererRuntime.runSync(
 						flashMotionTargetFx({
@@ -235,7 +213,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 			if (closed) return;
 			closed = true;
 			for (const active of activeByItemId.values()) {
-				active.releaseMagnetFn();
 				yield* animator.cancelActorFx(active.actor);
 			}
 			activeByItemId.clear();
@@ -255,7 +232,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 			);
 			for (const [itemId, active] of activeByItemId) {
 				if (deliveryByItemId.has(itemId)) continue;
-				active.releaseMagnetFn();
 				yield* animator.cancelChannelFx(active.actor, "pose");
 				const canonical = actorStore.canonicalItems.get(itemId);
 				if (canonical !== undefined) {
@@ -294,7 +270,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					active === undefined || active.generation !== delivery.generation;
 				if (from === null || to === null) {
 					if (active !== undefined) {
-						active.releaseMagnetFn();
 						const contactReturn =
 							generationChanged &&
 							active.delivery.phase === "outbound" &&
@@ -316,7 +291,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 								actor: previous.actor,
 								delivery,
 								generation: delivery.generation,
-								releaseMagnetFn: () => undefined,
 								stage: contactReturn
 									? "contact-fade-out"
 									: "awaiting-travel-geometry",
@@ -404,7 +378,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 						channel: "lifecycle-opacity",
 					});
 				}
-				active?.releaseMagnetFn();
 
 				if (actor === undefined) {
 					actor = yield* createTileActorFx({
@@ -452,7 +425,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					actor,
 					delivery,
 					generation: delivery.generation,
-					releaseMagnetFn: () => undefined,
 					stage: "traveling",
 					target: to,
 				};

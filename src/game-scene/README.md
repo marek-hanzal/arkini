@@ -22,7 +22,7 @@ The root has only direct grammar layers: `ui/` for React canvas composition, `fx
 | Pointer gestures, activation and frozen release facts | `src/tile-interaction/{atom,fn,fx,type}` |
 | Drop submission/presentation | `src/tile-interaction/fx/createDrop*Fx.ts` |
 | Engine-delivery presentation | `fx/readTileDeliveriesFx.ts` + `fx/createDeliveryRuntimeFx.ts` |
-| Cue lanes, choreography, magnetic response and handoffs | `src/tile-motion/{service,type,fn,fx}` |
+| Cue lanes, choreography and handoffs | `src/tile-motion/{service,type,fn,fx}` |
 | Interpolation/springs | `src/tile-rendering/fx/createAnimationDriverFx.ts` |
 | Typed actor-channel writes | `src/tile-rendering/fx/createActorAnimatorFx.ts` |
 
@@ -53,8 +53,8 @@ Pointer takeover of a spawn also releases its origin claim. Once no remaining cu
 - Board + Toolbar and Inventory use fixed 512 px world cells under the same camera implementation, with one camera per canvas, including masks, feedback and transient actors. The initial camera fits the whole scene; wheel/pinch zoom anchors at the pointer and right drag pans freely. A short right click still opens Item Detail; crossing the screen-space drag threshold gives the gesture to the camera. `0` restores the fitted default view for the mounted board or inventory in both Game and Editor. Resize preserves the viewed world center and zoom. Pointer coordinates enter world space before tile gestures; the drag threshold stays in screen pixels. Camera gestures cancel tile gestures, and overlays block both.
 - Board/Toolbar left click runs the primary action; `Ctrl+left click` fills remaining default-line queue capacity; `Shift+left click` splits a Board stack; right click opens Item Detail.
 - Inventory left click releases the item to its permitted current Board or Toolbar destination; right click opens Item Detail. Authored actions and production never override that Inventory interaction.
-- Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented without allocating a second gameplay actor or triggering pointer-frequency React renders. A non-interactive snapshot marks its committed origin below the actor layer until the real actor settles or leaves the scene; it never participates in hit testing, drop preview, or magnetism. Travel settles into the single Board actor layer or the destination storage surface. Canonical slot occupancy selects pointer hits, drop targets and magnetic candidates.
-- The Engine drop preview owns validity and magnetic eligibility. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
+- Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented without allocating a second gameplay actor or triggering pointer-frequency React renders. A non-interactive snapshot marks its committed origin below the actor layer until the real actor settles or leaves the scene; it never participates in hit testing or drop preview. Travel settles into the single Board actor layer or the destination storage surface. Canonical slot occupancy selects pointer hits and drop targets.
+- The Engine drop preview owns validity. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
 - Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown. [`useTileCommands`](../tile-interaction/ui/useTileCommands.ts) binds each submission to its exact Game and returns an independent Promise; concurrent callers never share an Atom result.
 
 ## Invariants
@@ -83,7 +83,6 @@ Pointer takeover of a spawn also releases its origin claim. Once no remaining cu
 | Autofill delivery | `fx/createDeliveryRuntimeFx.ts`; canonical behavior is `production-delivery/` + Tick |
 | Inventory handoff | `ui/PixiInventorySurface.tsx` + main Inventory opener |
 | Geometry/hit testing | `fx/create*SurfaceFx.ts`, `fn/read*LayoutFn.ts`, `fn/readSlotFn.ts` |
-| Magnetic response | `src/tile-motion` |
 | Frame/interpolation | `src/tile-rendering` |
 
 Focused proofs follow the exact owner:

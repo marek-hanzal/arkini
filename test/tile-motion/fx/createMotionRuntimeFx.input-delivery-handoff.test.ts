@@ -11,7 +11,6 @@ import {
 	createActorStore,
 	createApplication,
 	createSurface,
-	createRecordingMagneticField,
 	firstBoardLocation,
 	secondBoardLocation,
 	palette,
@@ -57,7 +56,6 @@ for (const phase of [
 			),
 		});
 		const application = createApplication();
-		const magneticField = createRecordingMagneticField();
 		const layer = new Container();
 		const surface = createSurface({
 			readLocationPose: (location) => ({
@@ -102,7 +100,6 @@ for (const phase of [
 				actorStore,
 				animator,
 				application,
-				magneticField,
 				onActorSettledFn: () => {},
 				surface,
 				readPaletteFn: () => palette,
@@ -114,7 +111,6 @@ for (const phase of [
 				actorStore,
 				animator,
 				application,
-				magneticField,
 				surface,
 				readPaletteFn: () => palette,
 				textures: {} as never,
@@ -215,7 +211,6 @@ for (const phase of [
 				alpha: 1,
 			});
 			expect(source.lifecycleLayer.scale.x).toBe(1);
-			expect(Effect.runSync(magneticField.readActiveSourceActorIdsFx)).toEqual([]);
 			Effect.runSync(
 				delivery.syncFx([
 					{

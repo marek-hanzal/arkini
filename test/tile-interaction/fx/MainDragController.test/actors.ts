@@ -46,8 +46,6 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 	container.cursor = "grab";
 	container.position.set(10, 20);
 	const lifecycleLayer = new Container();
-	const offsetLayer = new Container();
-	lifecycleLayer.addChild(offsetLayer);
 	container.addChild(lifecycleLayer);
 	const visual = {
 		composite: new Sprite(Texture.EMPTY),
@@ -109,7 +107,6 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		lifecycleIntentGeneration: 0,
 		lifecycleNotBeforeMs: 0,
 		lifecycleTargetAlpha: 1,
-		offsetLayer,
 		onPointerDownFn: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),

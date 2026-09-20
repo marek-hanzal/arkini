@@ -13,15 +13,8 @@ import {
 
 describe("spawn interaction handoff", () => {
 	it("hands an active spawn to direct interaction at its exact live pose", () => {
-		const {
-			animations,
-			canceledAnimationKeys,
-			magneticReleases,
-			magneticUpdates,
-			runtime,
-			spawnCue,
-			spawned,
-		} = createSpawnHarness();
+		const { animations, canceledAnimationKeys, runtime, spawnCue, spawned } =
+			createSpawnHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				spawnCue,
@@ -35,23 +28,6 @@ describe("spawn interaction handoff", () => {
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(spawned.item.id))).toBe(true);
 
 		expect(canceledAnimationKeys).toContain("motion:11:0");
-		expect(magneticUpdates).toHaveLength(1);
-		expect(magneticUpdates[0]).toMatchObject({
-			attractedActorId: null,
-			sourceActorId: spawned.item.id,
-			sourceDirection: {
-				x: -1,
-				y: 0,
-			},
-			sourceKind: "motion",
-		});
-		expect(magneticUpdates[0]?.eligibleAttractionActorIds.size).toBe(0);
-		expect(magneticReleases).toEqual([
-			{
-				sourceActorId: spawned.item.id,
-				sourceKind: "motion",
-			},
-		]);
 		expect(
 			animations
 				.filter((animation) => animation.actor === spawned)
@@ -72,8 +48,8 @@ describe("spawn interaction handoff", () => {
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(spawned.item.id))).toBe(false);
 	});
 
-	it("releases a spawned magnetic source on natural settlement", () => {
-		const { animations, magneticReleases, runtime, spawnCue, spawned } = createSpawnHarness();
+	it("releases a spawned interaction claim on natural settlement", () => {
+		const { animations, runtime, spawnCue, spawned } = createSpawnHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				spawnCue,
@@ -84,12 +60,6 @@ describe("spawn interaction handoff", () => {
 		samplePoseAnimation(spawnTravel, 1);
 		spawnTravel.onCompleteFn?.();
 
-		expect(magneticReleases).toEqual([
-			{
-				sourceActorId: spawned.item.id,
-				sourceKind: "motion",
-			},
-		]);
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
 	});
 

@@ -137,7 +137,7 @@ const item = (
 });
 
 describe("main surface", () => {
-	it("reads coherent target facts and deterministic grid-local candidates from canonical occupancy", () => {
+	it("reads coherent target facts from canonical occupancy across revision and layout changes", () => {
 		const actorStore = Effect.runSync(createMainActorStoreFx());
 		const boardFirst = item("runtime:board-first", {
 			scope: "board",
@@ -252,77 +252,8 @@ describe("main surface", () => {
 		expect(revisedFacts.occupant).toBe(revisedFirst);
 		expect(revisedFacts.stableKey).not.toBe(firstFacts.stableKey);
 
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					height: firstPose.size,
-					width: firstPose.size * 2,
-					x: firstPose.x,
-					y: firstPose.y,
-				}),
-			),
-		).toEqual([
-			boardFirst.id,
-			boardSecond.id,
-		]);
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					excludeActorId: boardSecond.id,
-					height: firstPose.size,
-					width: firstPose.size,
-					x: firstPose.x + firstPose.size,
-					y: firstPose.y,
-				}),
-			),
-		).toEqual([]);
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					height: firstPose.size,
-					width: 0.0004,
-					x: firstPose.x + firstPose.size - 0.001,
-					y: firstPose.y,
-				}),
-			),
-		).toEqual([
-			boardFirst.id,
-		]);
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					height: firstPose.size,
-					width: 0.0005,
-					x: firstPose.x - firstPose.size - 0.001,
-					y: firstPose.y,
-				}),
-			),
-		).toEqual([]);
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					height: 10,
-					width: 10,
-					x: 0,
-					y: 0,
-				}),
-			),
-		).toEqual([]);
-
 		const toolbarPose = Effect.runSync(surface.readActorPoseFx(toolbarItem));
 		if (toolbarPose === null) throw new Error("Expected Toolbar pose.");
-		expect(
-			Effect.runSync(
-				surface.readLocalActorIdsFx({
-					height: toolbarPose.size,
-					width: toolbarPose.size,
-					x: toolbarPose.x,
-					y: toolbarPose.y,
-				}),
-			),
-		).toEqual([
-			toolbarItem.id,
-		]);
 
 		screen.width = 900;
 		screen.height = 600;

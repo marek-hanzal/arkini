@@ -116,17 +116,6 @@ describe("main reconciliation / drop settlement", () => {
 					startFx: () => Effect.void,
 					closeFx: Effect.void,
 				},
-				magneticField: {
-					closeFx: Effect.void,
-					flushFx: Effect.void,
-					pruneFx: Effect.void,
-					readActiveSourceActorIdsFx: Effect.succeed([]),
-					releaseFx: () => Effect.void,
-					releaseSourcesFx: () => Effect.void,
-					resetFx: Effect.void,
-					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
-					updateFx: () => Effect.void,
-				},
 				motion: createMotion(),
 				game: {
 					reportCriticalFailureFn,

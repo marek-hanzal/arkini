@@ -53,22 +53,6 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 						return key === null ? null : (canonicalOccupants.get(key) ?? null);
 					}),
 			),
-			readCanonicalOccupantsFx: Effect.fn("MainActorStore.readCanonicalOccupantsFx")(
-				(locations) =>
-					Effect.sync(() => {
-						const seen = new Set<string>();
-						const occupants: PixiTileActor["item"][] = [];
-						for (const location of locations) {
-							const key = readCanonicalSlotKeyFn(location);
-							if (key === null) continue;
-							const occupant = canonicalOccupants.get(key);
-							if (occupant === undefined || seen.has(occupant.id)) continue;
-							seen.add(occupant.id);
-							occupants.push(occupant);
-						}
-						return occupants;
-					}),
-			),
 			replaceCanonicalItemsFx: Effect.fn("MainActorStore.replaceCanonicalItemsFx")((items) =>
 				Effect.sync(() => {
 					if (closed) return;

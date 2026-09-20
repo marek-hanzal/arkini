@@ -11,9 +11,7 @@ import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParti
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import { startRemainderFeedbackFx } from "~/tile-rendering/fx/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
-import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";
 import { flashMotionTargetFx } from "~/tile-motion/fx/flashMotionTargetFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
@@ -29,7 +27,6 @@ export namespace runInputMotionFx {
 		readonly cue: TileInputMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: MagneticField;
 		readonly isCueActiveFn: () => boolean;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
@@ -109,7 +106,6 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	animator,
 	cue,
 	cueKey,
-	magneticField,
 	isCueActiveFn,
 	onCompleteFn,
 	source,
@@ -120,31 +116,19 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	readonly animator: ActorAnimator;
 	readonly cue: TileInputMotionCue;
 	readonly cueKey: string;
-	readonly magneticField: MagneticField;
 	readonly isCueActiveFn: () => boolean;
 	readonly onCompleteFn: () => void;
 	readonly source: PixiTileActor;
 	readonly sourceHome: ActorPose;
 	readonly surface: MainSurface;
 }) {
-	const magneticProjector = yield* createMagneticProjectorFx({
-		actor: source,
-		attractedActorId: null,
-		eligibleAttractionActorIds: new Set([
-			source.item.id,
-		]),
-		magneticField,
-		surface,
-	});
 	yield* chaseTargetFx({
 		actor: source,
 		animator,
 		curve: inputReturnCurve,
 		fallbackTarget: sourceHome,
-		onPoseFn: magneticProjector.projectPoseFn,
 		onSettledFn: () => {
 			if (!isCueActiveFn()) return;
-			magneticProjector.releaseFn();
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					const latestHome =
@@ -190,7 +174,6 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	cue,
 	cueKey,
 	delayMs,
-	magneticField,
 	isCueActiveFn,
 	onActorSettledFn,
 	onCompleteFn,
@@ -240,25 +223,14 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 			movingActor: source,
 		});
 	};
-	const magneticProjector = yield* createMagneticProjectorFx({
-		actor: source,
-		attractedActorId: cue.targetActorId,
-		eligibleAttractionActorIds: new Set([
-			cue.targetActorId,
-		]),
-		magneticField,
-		surface,
-	});
 	yield* chaseTargetFx({
 		actor: source,
 		animator,
 		curve: inputArrivalCurve,
 		delayMs,
 		fallbackTarget: target,
-		onPoseFn: magneticProjector.projectPoseFn,
 		onSettledFn: () => {
 			if (!isCueActiveFn()) return;
-			magneticProjector.releaseFn();
 			RendererRuntime.runSync(
 				flashMotionTargetFx({
 					actorStore,
@@ -281,7 +253,6 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 										animator,
 										cue,
 										cueKey,
-										magneticField,
 										onCompleteFn,
 										source,
 										sourceHome,

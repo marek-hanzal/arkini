@@ -15,7 +15,6 @@ import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMot
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 import { createDropSubmissionFx } from "~/tile-interaction/fx/createDropSubmissionFx";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
@@ -34,7 +33,6 @@ const previewState = vi.hoisted(() => ({
 		string,
 		"merge" | "move" | "reject" | "stack" | "store-input" | "store-inventory" | "swap"
 	>(),
-	failureActorIds: new Set<string>(),
 	kind: "move" as "ignored" | "move" | "reject" | "store-inventory" | "swap",
 	reads: 0,
 	readsByActorId: new Map<string, number>(),
@@ -71,9 +69,6 @@ vi.mock("~/tile-interaction/fx/readTileDropPreviewFx", () => ({
 					actorId,
 					(previewState.readsByActorId.get(actorId) ?? 0) + 1,
 				);
-				if (previewState.failureActorIds.has(actorId)) {
-					throw new Error(`preview failed:${actorId}`);
-				}
 			}
 			return {
 				kind:
@@ -172,7 +167,6 @@ export const mountController = ({
 } = {}) => {
 	previewState.kind = "move";
 	previewState.actorKinds.clear();
-	previewState.failureActorIds.clear();
 	previewState.reads = 0;
 	previewState.readsByActorId.clear();
 	removalState.remove.mockClear();
@@ -195,7 +189,6 @@ export const mountController = ({
 	const finishCursorGrab = vi.fn();
 	const beginOriginGhost = vi.fn();
 	const settleOriginGhost = vi.fn();
-	const flushMagneticField = vi.fn();
 	const startCursorGrab = vi.fn();
 	let scheduledFrameWork: (() => void) | null = null;
 	const flushFrame = () => {
@@ -206,14 +199,6 @@ export const mountController = ({
 	const animations: ActorAnimation[] = [];
 	const presentationWrites: PresentationWrite[] = [];
 	const dropTargetReads: Array<{
-		readonly x: number;
-		readonly y: number;
-	}> = [];
-	const localActorReads: Array<{
-		readonly excludeActorId?: string;
-		readonly height: number;
-		readonly paddingRatio?: number;
-		readonly width: number;
 		readonly x: number;
 		readonly y: number;
 	}> = [];
@@ -248,13 +233,9 @@ export const mountController = ({
 	};
 	const actorPoses = new Map<string, typeof currentActorPose>();
 	let currentDropTargetX = 1;
-	let activeMagneticSourceActorIds: ReadonlyArray<string> = [];
-	let sourceMembershipListener: ((sourceKind: "drag" | "motion") => void) | null = null;
-	let currentLocalActorIds: ReadonlyArray<string> | null = null;
 	let currentTargetKind: "board" | "toolbar" | null = "board";
 	let currentOccupant: TileActorItem | null = null;
 	let targetFactsFailure: unknown | null = null;
-	const magneticUpdates: Array<Parameters<MagneticField["updateFx"]>[0]> = [];
 	const targetRedirects: Array<Parameters<MotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
 	const onSettledDrop = vi.fn();
@@ -293,7 +274,6 @@ export const mountController = ({
 		readActorFx: (actorId) => Effect.sync(() => actors.get(actorId) ?? null),
 		readCanonicalItemFx: (actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
 		readCanonicalOccupantFx: () => Effect.succeed(null),
-		readCanonicalOccupantsFx: () => Effect.succeed([]),
 		releaseActorFx: (actorId) =>
 			Effect.sync(() => {
 				const released = actors.get(actorId) ?? null;
@@ -362,26 +342,6 @@ export const mountController = ({
 		reportCriticalFailureFn,
 		runFx: (effect: Effect.Effect<unknown, unknown>) => effect,
 	} as never;
-	const magneticField = {
-		closeFx: Effect.void,
-		flushFx: Effect.sync(flushMagneticField),
-		pruneFx: Effect.void,
-		readActiveSourceActorIdsFx: Effect.sync(() => activeMagneticSourceActorIds),
-		releaseFx: () => Effect.void,
-		releaseSourcesFx: () => Effect.void,
-		resetFx: Effect.void,
-		subscribeSourceMembershipFx: (listen) =>
-			Effect.sync(() => {
-				sourceMembershipListener = listen;
-				return () => {
-					if (sourceMembershipListener === listen) sourceMembershipListener = null;
-				};
-			}),
-		updateFx: (sample) =>
-			Effect.sync(() => {
-				magneticUpdates.push(sample);
-			}),
-	} satisfies MagneticField;
 	const motion = {
 		beginInteractionHandoffFx: (actorId) => Effect.sync(() => beginInteractionHandoff(actorId)),
 		handoffDeliveriesFx: () => Effect.void,
@@ -403,13 +363,6 @@ export const mountController = ({
 	const surface = {
 		readActorPoseFx: (actorItem: TileActorItem) =>
 			Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
-		readLocalActorIdsFx: (
-			bounds: Parameters<MainInteractionSurface["readLocalActorIdsFx"]>[0],
-		) =>
-			Effect.sync(() => {
-				localActorReads.push(bounds);
-				return currentLocalActorIds ?? Array.from(actors.keys());
-			}),
 		readTargetFactsFx: (x: number, y: number) =>
 			Effect.sync(() => {
 				if (targetFactsFailure !== null) throw targetFactsFailure;
@@ -452,7 +405,6 @@ export const mountController = ({
 			cursorGrab,
 			dropPresentation,
 			game,
-			magneticField,
 			motion,
 			onSettledDropFn: onSettledDrop,
 			onDropFn: onDrop as never,
@@ -499,7 +451,6 @@ export const mountController = ({
 				dragOriginGhosts,
 				dropSubmission,
 				game,
-				magneticField,
 				motion,
 				onActivateFn: onActivate,
 				readAckTintFn: () => 0x57d7b2,
@@ -533,11 +484,8 @@ export const mountController = ({
 		dropSubmission,
 		dropTargetReads,
 		finishCursorGrab,
-		flushMagneticField,
 		flushFrame,
 		keyboardTarget,
-		localActorReads,
-		magneticUpdates,
 		onActivate,
 		onSettledDrop,
 		onDrop,
@@ -549,12 +497,6 @@ export const mountController = ({
 		storeInventory: storageState.store,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
-		},
-		setActiveMagneticSourceActorIds: (actorIds: ReadonlyArray<string>) => {
-			activeMagneticSourceActorIds = actorIds;
-		},
-		triggerSourceMembership: (sourceKind: "drag" | "motion") => {
-			sourceMembershipListener?.(sourceKind);
 		},
 		setItemActorPose: (itemId: string, pose: typeof currentActorPose) => {
 			actorPoses.set(itemId, pose);
@@ -573,9 +515,6 @@ export const mountController = ({
 		},
 		setItem: (nextItem: TileActorItem) => {
 			actor.item = nextItem;
-		},
-		setLocalActorIds: (actorIds: ReadonlyArray<string>) => {
-			currentLocalActorIds = actorIds;
 		},
 		setTargetFactsFailure: (cause: unknown | null) => {
 			targetFactsFailure = cause;

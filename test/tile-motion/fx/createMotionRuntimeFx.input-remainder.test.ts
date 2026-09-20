@@ -61,7 +61,7 @@ describe("input remainder travel", () => {
 		source.container.position.set(125, 40);
 		source.container.alpha = 1;
 		source.container.eventMode = "static";
-		source.offsetLayer.position.set(5, -4);
+		source.lifecycleLayer.position.set(5, -4);
 		owner.container.position.set(200, 40);
 		owner.container.alpha = 1;
 		const canonicalSource = {
@@ -71,7 +71,7 @@ describe("input remainder travel", () => {
 		};
 		const actors = createActorMap(source, owner);
 		const canonicalItems = createItemMap(canonicalSource, owner.item);
-		const { animations, magneticReleases, magneticUpdates, runtime } = createMotionHarness({
+		const { animations, runtime } = createMotionHarness({
 			actors,
 			canonicalItems,
 		});
@@ -81,8 +81,8 @@ describe("input remainder travel", () => {
 			sequence: 40,
 		});
 		const effectivePoseBeforeSetup = {
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		};
 
 		Effect.runSync(
@@ -96,8 +96,8 @@ describe("input remainder travel", () => {
 		expect(source.item.quantity).toBe(7);
 		expect(source.container.alpha).toBe(1);
 		expect({
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		}).toEqual(effectivePoseBeforeSetup);
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map([
@@ -154,16 +154,10 @@ describe("input remainder travel", () => {
 			},
 			delayMs: 0,
 		});
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
-		).toHaveLength(0);
 		samplePoseAnimation(finalTravel, 1);
 		source.dragging = true;
 		finalTravel.onCompleteFn?.();
 
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
-		).toHaveLength(1);
 		expect(source.item.quantity).toBe(7);
 		const flash = advanceInputRemainderFlash({
 			actor: transient,
@@ -224,8 +218,8 @@ describe("input remainder travel", () => {
 			y: 40,
 		});
 		const effectivePoseBeforeCompletion = {
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		};
 		source.dragging = false;
 		returnTravel.onCompleteFn?.();
@@ -237,8 +231,8 @@ describe("input remainder travel", () => {
 		expect(source.lifecycleLayer.scale.x).toBe(1);
 		expect(source.container.eventMode).toBe("static");
 		expect({
-			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
-			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+			x: source.container.x + source.lifecycleLayer.x * source.container.scale.x,
+			y: source.container.y + source.lifecycleLayer.y * source.container.scale.y,
 		}).toEqual(effectivePoseBeforeCompletion);
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map(),
@@ -251,17 +245,6 @@ describe("input remainder travel", () => {
 					animation.actor === owner && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
-		expect(magneticUpdates.at(-1)).toMatchObject({
-			attractedActorId: null,
-			eligibleAttractionActorIds: new Set([
-				source.item.id,
-			]),
-			sourceActorId: transient.item.id,
-			sourceKind: "motion",
-		});
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
-		).toHaveLength(2);
 		Effect.runSync(runtime.closeFx);
 	});
 

@@ -21,7 +21,6 @@ describe("motion stack contact", () => {
 		producer.container.position.set(460, 300);
 		producer.container.pivot.set(16, 12);
 		producer.container.scale.set(1.25);
-		producer.offsetLayer.position.set(5, -4);
 		actors.set(producer.item.id, producer);
 
 		Effect.runSync(
@@ -36,8 +35,8 @@ describe("motion stack contact", () => {
 		);
 		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
 		expect(travel.actor.container).toMatchObject({
-			x: 446.25,
-			y: 280,
+			x: 440,
+			y: 285,
 		});
 		expect(travel.actor.container.scale.x).toBe(1.25);
 		expect(travel.actor.container.x).not.toBe(100);
@@ -47,7 +46,7 @@ describe("motion stack contact", () => {
 	});
 
 	it("travels continuously to live stack contact before vanish", () => {
-		const { animations, cue, magneticReleases, runtime, target } = createStackHarness();
+		const { animations, cue, runtime, target } = createStackHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
@@ -80,10 +79,6 @@ describe("motion stack contact", () => {
 			y: target.container.y,
 		});
 		expect(travel.actor.container.scale.x).toBe(target.container.scale.x);
-		expect(magneticReleases).not.toContainEqual({
-			sourceActorId: travel.actor.item.id,
-			sourceKind: "motion",
-		});
 
 		travel.onCompleteFn?.();
 		const vanish = advanceStackMergeVanish({
@@ -95,10 +90,6 @@ describe("motion stack contact", () => {
 		expect(vanish.vanishOpacity.durationMs).toBe(lifecycleDurationMs);
 		expect(travel.actor.container.destroyed).toBe(true);
 		expect(target.item.quantity).toBe(2);
-		expect(magneticReleases).toContainEqual({
-			sourceActorId: travel.actor.item.id,
-			sourceKind: "motion",
-		});
 		Effect.runSync(runtime.closeFx);
 	});
 

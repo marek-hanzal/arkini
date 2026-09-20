@@ -31,7 +31,7 @@ const restingAlpha = 0.24;
  *
  * Ghosts live in the origin actor layer, below its interactive children. Their retained texture is
  * refreshed before every requested scene render so current Clock, job, quantity, and artwork state
- * remains visible. They never enter actor stores, hit testing, drop preview, or magnetic queries,
+ * remains visible. They never enter actor stores, hit testing, or drop preview,
  * and disappear only when presentation has settled the real actor or retired it from the main scene.
  */
 export const createDragOriginGhostsFx = Effect.fn("createDragOriginGhostsFx")(function* ({

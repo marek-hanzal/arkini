@@ -6,8 +6,6 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
-import type { MagneticField } from "~/tile-motion/service/MagneticField";
-import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
@@ -27,7 +25,6 @@ export namespace runSwapMotionFx {
 		readonly cue: TileSwapMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: MagneticField;
 		readonly onCompleteFn: () => void;
 		readonly onSwapLegSettledFn: (actorId: string) => void;
 		readonly onSwapLegStartedFn: (actorId: string) => void;
@@ -44,7 +41,6 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 	cue,
 	cueKey,
 	delayMs,
-	magneticField,
 	onCompleteFn,
 	onSwapLegSettledFn,
 	onSwapLegStartedFn,
@@ -110,17 +106,6 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 			target: leg.target,
 			targetLocation: leg.targetLocation,
 		});
-		const counterpartActorId =
-			leg.actor.item.id === cue.actorId ? cue.counterpartActorId : cue.actorId;
-		const magneticProjector = yield* createMagneticProjectorFx({
-			actor: leg.actor,
-			attractedActorId: null,
-			eligibleAttractionActorIds: new Set([
-				counterpartActorId,
-			]),
-			magneticField,
-			surface,
-		});
 		onSwapLegStartedFn(leg.actor.item.id);
 		yield* animator.animateFx({
 			actor: leg.actor,
@@ -132,11 +117,9 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 			delayMs,
 			durationMs,
 			ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
-			onCancelFn: magneticProjector.releaseFn,
 			onCompleteFn: () => {
 				const settleFn = () => {
 					if (!pendingActorIds.delete(leg.actor.item.id)) return;
-					magneticProjector.releaseFn();
 					if (!leg.actor.container.destroyed) {
 						const canonical = actorStore.canonicalItems.get(leg.actor.item.id);
 						const currentTarget =
@@ -158,7 +141,6 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 						actor: leg.actor,
 						animator,
 						fallbackTarget: leg.target,
-						onPoseFn: magneticProjector.projectPoseFn,
 						onSettledFn: settleFn,
 						ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
 						surface,
@@ -166,11 +148,7 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 					}),
 				);
 			},
-			readPoseFn: (progress) => {
-				const pose = poseSampler.readPoseFn(progress);
-				magneticProjector.projectPoseFn(pose);
-				return pose;
-			},
+			readPoseFn: poseSampler.readPoseFn,
 		});
 	}
 });

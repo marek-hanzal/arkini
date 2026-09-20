@@ -49,16 +49,15 @@ describe("motion delivery batch", () => {
 						x: location.position.x * boardGeometry.stepX,
 						y: boardGeometry.y,
 					};
-		const { animations, magneticReleases, magneticUpdates, runtime, transientActorLayer } =
-			createMotionHarness({
-				actors,
-				boundingRect: {
-					left: 10,
-					top: 20,
-				},
-				canonicalItems,
-				readPose: readLocationPose,
-			});
+		const { animations, runtime, transientActorLayer } = createMotionHarness({
+			actors,
+			boundingRect: {
+				left: 10,
+				top: 20,
+			},
+			canonicalItems,
+			readPose: readLocationPose,
+		});
 		const cues = [
 			{
 				actorId: spawned.item.id,
@@ -189,18 +188,14 @@ describe("motion delivery batch", () => {
 			x: 1_200,
 			y: 600,
 		});
-		// Magnetic feedback is child-local presentation only. It must not move the physical
-		// contact anchor or recursively extend the stack chase.
-		stacked.offsetLayer.position.set(6, -4);
+		// Child-local feedback must not move the physical contact anchor or extend the chase.
+		stacked.lifecycleLayer.position.set(6, -4);
 		const animationCountBeforeContact = animations.length;
 		expect(
 			animations.filter(
 				(animation) =>
 					animation.actor === stacked && animation.channel === "activity-particles",
 			),
-		).toHaveLength(0);
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === stackTransient.item.id),
 		).toHaveLength(0);
 		finalContact.onCompleteFn?.();
 		expect(animations.length).toBeGreaterThanOrEqual(animationCountBeforeContact + 3);
@@ -212,20 +207,6 @@ describe("motion delivery batch", () => {
 		expect(stacked.size).toBe(draggedStackSize);
 		expect(stacked.container.parent).toBe(transientActorLayer);
 		expect(stackTransient.container.destroyed).toBe(true);
-		expect(magneticUpdates.length).toBeGreaterThan(0);
-		expect(magneticUpdates.at(-1)).toMatchObject({
-			attractedActorId: stacked.item.id,
-			sourceActorId: stackTransient.item.id,
-			sourceKind: "motion",
-		});
-		expect(
-			magneticReleases.filter((release) => release.sourceActorId === stackTransient.item.id),
-		).toEqual([
-			{
-				sourceActorId: stackTransient.item.id,
-				sourceKind: "motion",
-			},
-		]);
 		expect(
 			animations.filter(
 				(animation) =>

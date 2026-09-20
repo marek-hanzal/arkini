@@ -16,7 +16,6 @@ import type {
 	PresentationWrite,
 } from "~/tile-rendering/service/ActorAnimator";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
-import type { MagneticField, MagneticSample } from "~/tile-motion/service/MagneticField";
 import { createMotionRuntimeFx } from "~/tile-motion/fx/createMotionRuntimeFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
@@ -84,7 +83,6 @@ vi.mock("~/tile-rendering/fx/createTileActorFx", async () => {
 				lifecycleIntentGeneration: 0,
 				lifecycleNotBeforeMs: 0,
 				lifecycleTargetAlpha: 0,
-				offsetLayer: new PixiContainer(),
 				onPointerDown: null,
 				pendingVisual: null,
 				size: 80,
@@ -180,8 +178,6 @@ export const createActor = (id: string): PixiTileActor => {
 	const container = new Container();
 	container.alpha = 0;
 	const lifecycleLayer = new Container();
-	const offsetLayer = new Container();
-	lifecycleLayer.addChild(offsetLayer);
 	container.addChild(lifecycleLayer);
 	const visual = {
 		container: new Container(),
@@ -242,7 +238,6 @@ export const createActor = (id: string): PixiTileActor => {
 		lifecycleIntentGeneration: 0,
 		lifecycleNotBeforeMs: 0,
 		lifecycleTargetAlpha: 0,
-		offsetLayer,
 		onPointerDownFn: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),
@@ -306,7 +301,6 @@ export const createActorStore = ({
 	readActorFx: (actorId) => Effect.sync(() => actors.get(actorId) ?? null),
 	readCanonicalItemFx: (actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
 	readCanonicalOccupantFx: () => Effect.succeed(null),
-	readCanonicalOccupantsFx: () => Effect.succeed([]),
 	releaseActorFx: (actorId) =>
 		Effect.sync(() => {
 			const actor = actors.get(actorId) ?? null;
@@ -361,7 +355,6 @@ export const createSurface = ({
 	closeFx: Effect.void,
 	readActorPoseFx: (item) =>
 		Effect.succeed(readActorPose?.(item) ?? readLocationPose(item.location)),
-	readLocalActorIdsFx: () => Effect.succeed([]),
 	readLocationPoseFx: (location) => Effect.succeed(readLocationPose(location)),
 	readTargetFactsFx: () =>
 		Effect.succeed({
@@ -429,76 +422,6 @@ export const createRecordingAnimator = ({
 			applyPresentationWrite(write);
 		}),
 });
-
-export const createRecordingMagneticField = ({
-	releases = [],
-	updates = [],
-}: {
-	readonly releases?: Array<{
-		readonly sourceActorId: string;
-		readonly sourceKind: "drag" | "motion";
-	}>;
-	readonly updates?: MagneticSample[];
-} = {}): MagneticField => {
-	const activeSources = new Map<string, MagneticSample>();
-	const readSourceKey = (
-		sourceKind: "drag" | "motion",
-		sourceActorId: string,
-		sourceInstanceId: string,
-	) =>
-		JSON.stringify([
-			sourceKind,
-			sourceActorId,
-			sourceInstanceId,
-		]);
-	return {
-		closeFx: Effect.void,
-		flushFx: Effect.void,
-		pruneFx: Effect.void,
-		readActiveSourceActorIdsFx: Effect.sync(() =>
-			Array.from(activeSources.values(), ({ sourceActorId }) => sourceActorId),
-		),
-		releaseFx: (source) =>
-			Effect.sync(() => {
-				if (
-					!activeSources.delete(
-						readSourceKey(
-							source.sourceKind,
-							source.sourceActorId,
-							source.sourceInstanceId,
-						),
-					)
-				)
-					return;
-				releases.push({
-					sourceActorId: source.sourceActorId,
-					sourceKind: source.sourceKind,
-				});
-			}),
-		releaseSourcesFx: (sourceKind) =>
-			Effect.sync(() => {
-				for (const [key, sample] of activeSources) {
-					if ((sample.sourceKind ?? "drag") !== sourceKind) continue;
-					activeSources.delete(key);
-					releases.push({
-						sourceActorId: sample.sourceActorId,
-						sourceKind,
-					});
-				}
-			}),
-		resetFx: Effect.void,
-		subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
-		updateFx: (sample) =>
-			Effect.sync(() => {
-				updates.push(sample);
-				const sourceKind = sample.sourceKind ?? "drag";
-				activeSources.set(
-					readSourceKey(sourceKind, sample.sourceActorId, sample.sourceInstanceId),
-					sample,
-				);
-			}),
-	};
-};
 
 export const readPoseAnimation = (
 	animations: ReadonlyArray<ActorAnimation>,
@@ -628,11 +551,6 @@ export const createMotionHarness = ({
 	const animations: ActorAnimation[] = [];
 	const canceledOwnerKeys: string[] = [];
 	const exitingActors = new Set<PixiTileActor>();
-	const magneticReleases: Array<{
-		readonly sourceActorId: string;
-		readonly sourceKind: "drag" | "motion";
-	}> = [];
-	const magneticUpdates: MagneticSample[] = [];
 	const settledActors: PixiTileActor[] = [];
 	const resolvePose =
 		readPose ??
@@ -656,16 +574,11 @@ export const createMotionHarness = ({
 		readLocationPose: resolvePose,
 		transientActorLayer,
 	});
-	const magneticField = createRecordingMagneticField({
-		releases: magneticReleases,
-		updates: magneticUpdates,
-	});
 	const runtime = Effect.runSync(
 		createMotionRuntimeFx({
 			actorStore,
 			animator,
 			application,
-			magneticField,
 			onActorSettledFn: (actor) => {
 				settledActors.push(actor);
 			},
@@ -683,9 +596,6 @@ export const createMotionHarness = ({
 		application,
 		canceledOwnerKeys,
 		exitingActors,
-		magneticField,
-		magneticReleases,
-		magneticUpdates,
 		runtime,
 		settledActors,
 		surface,
@@ -898,7 +808,6 @@ export type {
 	MainSurface,
 	PixiScenePalette,
 	PixiTileActor,
-	MagneticSample,
 	TileActorItem,
 	TileMotionCue,
 };

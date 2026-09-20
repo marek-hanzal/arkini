@@ -11,7 +11,6 @@ import {
 	createApplication,
 	createSurface,
 	createRecordingAnimator,
-	createRecordingMagneticField,
 	firstBoardLocation,
 	palette,
 } from "~test/tile-motion/fx/createMotionRuntimeFx.test/fixture";
@@ -53,7 +52,6 @@ it("reveals a Toolbar return that settled while the other endpoint was off-scree
 				animations: [],
 			}),
 			application,
-			magneticField: createRecordingMagneticField(),
 			surface,
 			readPaletteFn: () => palette,
 			textures: {} as never,

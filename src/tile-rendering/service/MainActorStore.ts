@@ -16,10 +16,6 @@ export interface MainActorStore {
 	readonly readCanonicalOccupantFx: (
 		location: TileActorItem["location"],
 	) => Effect.Effect<TileActorItem | null, never, never>;
-	/** Reads unique canonical occupants in caller-provided deterministic slot order. */
-	readonly readCanonicalOccupantsFx: (
-		locations: ReadonlyArray<TileActorItem["location"]>,
-	) => Effect.Effect<ReadonlyArray<TileActorItem>, never, never>;
 	readonly releaseActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null, never, never>;
 	readonly replaceCanonicalItemsFx: (
 		items: ReadonlyArray<TileActorItem>,

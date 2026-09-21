@@ -181,7 +181,7 @@ describe("PixiBoardToolbarSurface", () => {
 		});
 	});
 
-	it("keeps an unavailable left click inert and reserves Item Detail for right click", async () => {
+	it("keeps an unavailable primary intent inert and opens Item Detail for detail intent", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");

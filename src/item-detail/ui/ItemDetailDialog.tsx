@@ -38,6 +38,11 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 				ref={focus.overlayRef}
 				className="flex h-[90%] max-h-full w-[90%] max-w-full cursor-default flex-col overflow-hidden rounded-2xl border border-line-strong bg-modal p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)]"
 				data-ui="ItemDetailModal"
+				onContextMenu={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					if (!disabled) closeItemDetailFn();
+				}}
 				data-target-kind={state.target.kind}
 				data-runtime-id={state.target.kind === "runtime" ? state.target.itemId : undefined}
 				data-item-id={state.target.itemId}

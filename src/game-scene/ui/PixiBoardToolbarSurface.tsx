@@ -20,8 +20,8 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
  *
- * Left click performs the canonical primary action, Ctrl+left click fills its default-line queue,
- * Shift+left click splits a Board stack, and right click opens Item Detail. React forwards commands
+ * Right click performs the canonical primary action, Ctrl+right click fills its default-line queue,
+ * Shift+right click splits a Board stack, and left click opens Item Detail. Portals and inventory openers retain their original click mapping. React forwards commands
  * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
 interface PixiBoardToolbarSurfaceProps {

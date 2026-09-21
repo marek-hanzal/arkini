@@ -530,6 +530,9 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				});
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
 					const gestureMode = event.button === 2 ? "activation-only" : "drag";
+					const keepsPrimaryLeft =
+						actor.item.primaryAction.kind === "activate-space" ||
+						actor.item.primaryAction.kind === "open-inventory";
 					if (
 						closed ||
 						interactionBlocked ||
@@ -553,7 +556,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					const point = application.stage.toLocal(event.global);
 					activeDrag = {
 						activationIntent:
-							event.button === 2
+							event.button === (keepsPrimaryLeft ? 2 : 0)
 								? "detail"
 								: event.shiftKey
 									? "split-stack"

@@ -28,7 +28,7 @@ import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationS
  * target availability; the modal does not manufacture
  * gameplay facts when a runtime item or configured definition disappears.
  *
- * Gesture semantics are decided by the invoking surface: right click opens
+ * Gesture semantics are decided by the invoking surface: a detail click opens
  * Detail and suppresses the immediate primary action. The provider receives only
  * the resulting open intent, so no click timers or double-click policy belong
  * here.

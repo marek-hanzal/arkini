@@ -169,8 +169,8 @@ describe("main drag controller: motion", () => {
 			running: false,
 		} satisfies TileActorItem;
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("pointerup", pointer(10, 20));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20, 2));
+		mounted.stage.emit("pointerup", pointer(10, 20, 2));
 		mounted.setItem(completedInstantRun);
 		await flushMicrotasks();
 
@@ -180,8 +180,8 @@ describe("main drag controller: motion", () => {
 			expect.anything(),
 		);
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("pointerup", pointer(10, 20));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20, 2));
+		mounted.stage.emit("pointerup", pointer(10, 20, 2));
 		await flushMicrotasks();
 
 		expect(mounted.onActivate).toHaveBeenCalledTimes(2);

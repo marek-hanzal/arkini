@@ -10,6 +10,72 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: pointer", () => {
+	it.each([
+		{
+			button: 0,
+			ctrlKey: false,
+			shiftKey: false,
+			intent: "detail",
+		},
+		{
+			button: 2,
+			ctrlKey: false,
+			shiftKey: false,
+			intent: "primary",
+		},
+		{
+			button: 2,
+			ctrlKey: true,
+			shiftKey: false,
+			intent: "fill-default-line-queue",
+		},
+		{
+			button: 2,
+			ctrlKey: false,
+			shiftKey: true,
+			intent: "split-stack",
+		},
+	])("maps ordinary item clicks to $intent", async ({ button, ctrlKey, shiftKey, intent }) => {
+		const mounted = mountController();
+		mounted.actor.item = {
+			...mounted.actor.item,
+			primaryAction: {
+				kind: "none",
+			},
+		};
+		mounted.actorEvents.emit("pointerdown", {
+			...pointer(10, 20, button),
+			ctrlKey,
+			shiftKey,
+		});
+		mounted.stage.emit("pointerup", pointer(10, 20, button));
+		await Promise.resolve();
+		expect(mounted.onActivate.mock.calls[0]?.[1]).toBe(intent);
+	});
+
+	it.each([
+		"activate-space",
+		"open-inventory",
+	] as const)("preserves clicks for %s", async (kind) => {
+		for (const button of [
+			0,
+			2,
+		]) {
+			const mounted = mountController();
+			mounted.actor.item = {
+				...mounted.actor.item,
+				primaryAction: {
+					kind,
+					currentSpace: 0,
+				},
+			};
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20, button));
+			mounted.stage.emit("pointerup", pointer(10, 20, button));
+			await Promise.resolve();
+			expect(mounted.onActivate.mock.calls[0]?.[1]).toBe(button === 0 ? "primary" : "detail");
+		}
+	});
+
 	it("does not activate a right release exactly at the screen threshold after fractional zoom", async () => {
 		const mounted = mountController();
 		const scale = 800 / 2432;

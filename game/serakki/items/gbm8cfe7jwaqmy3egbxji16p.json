@@ -14,7 +14,7 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 4,
+		"maxStackSize": 1,
 		"units": {
 			"amount": 24
 		},

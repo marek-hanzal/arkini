@@ -4,7 +4,8 @@
 		"uid": "dct4u1aaljeect6n4e425654",
 		"id": "wooden-sticks",
 		"title": "Wooden Sticks",
-		"draft": true,
+		"draft": false,
+		"description": "Simple straight wooden shafts for arrows and other lightweight construction. Crude ones come from the Lumber Camp; the Carpenter gets more from processed timber.",
 		"ui": "default",
 		"artwork": {
 			"scale": 1,

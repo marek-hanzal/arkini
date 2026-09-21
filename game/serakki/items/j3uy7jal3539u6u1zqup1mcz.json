@@ -3,8 +3,8 @@
 	"item": {
 		"uid": "j3uy7jal3539u6u1zqup1mcz",
 		"id": "arrows",
-		"title": "Arrows",
-		"description": "Quill",
+		"title": "Arrow",
+		"description": "A single finished arrow. Hunters consume these one at a time; keeping them separate makes ammunition an actual resource instead of a decorative bundle.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -13,7 +13,7 @@
 			]
 		},
 		"scope": "any",
-		"maxStackSize": 1,
+		"maxStackSize": 12,
 		"merge": [
 			{
 				"target": {

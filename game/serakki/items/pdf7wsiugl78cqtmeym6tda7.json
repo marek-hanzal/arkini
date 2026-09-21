@@ -4,8 +4,8 @@
 		"uid": "pdf7wsiugl78cqtmeym6tda7",
 		"id": "silenced-bow",
 		"title": "Silenced Bow",
-		"ui": "simple",
 		"description": "It makes less noise",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -14,6 +14,68 @@
 		},
 		"scope": "any",
 		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wolf"
+				},
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "bow",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "cotton-fabric",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "cotton-wool",
+											"quantity": {
+												"min": 1,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "empty-quiver",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "wolf-with-arrow"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

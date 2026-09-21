@@ -139,6 +139,60 @@
 					]
 				},
 				"rules": []
+			},
+			{
+				"id": "wooden-sticks",
+				"title": "Wooden Sticks",
+				"artwork": "wooden-sticks",
+				"description": "Roughly split fresh wood into simple straight sticks. Cheap, crude, and good enough for arrow shafts.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 8000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wood"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "wooden-sticks",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
 			}
 		]
 	}

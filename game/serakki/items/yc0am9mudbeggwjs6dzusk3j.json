@@ -23,7 +23,7 @@
 				"artwork": "empty-bucket",
 				"description": "Make a wooden bucket for carrying water and other liquids.",
 				"clockWeight": 1,
-				"default": true,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 10000,
@@ -391,6 +391,60 @@
 											"quantity": {
 												"min": 1,
 												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "wooden-sticks",
+				"title": "Wooden Sticks",
+				"artwork": "wooden-sticks",
+				"description": "Cut processed planks into a larger batch of straight wooden sticks with less waste.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 12000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "planks"
+							},
+							"scope": "any"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "wooden-sticks",
+											"quantity": {
+												"min": 4,
+												"max": 4
 											},
 											"placement": "drop",
 											"rules": []

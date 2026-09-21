@@ -13,8 +13,8 @@
 		"postinstall": "install-electron"
 	},
 	"dependencies": {
-		"@effect/atom-react": "4.0.0-rc.115",
-		"@effect/platform-node": "4.0.0-rc.115",
+		"@effect/atom-react": "4.0.0-rc.117",
+		"@effect/platform-node": "4.0.0-rc.117",
 		"@floating-ui/react": "^0.27.20",
 		"@formatjs/intl-localematcher": "0.9.0",
 		"@logtape/file": "2.3.4",
@@ -31,7 +31,7 @@
 		"@tanstack/react-hotkeys": "^0.10.0",
 		"@tanstack/react-router": "1.170.35",
 		"@tanstack/react-virtual": "3.14.12",
-		"effect": "4.0.0-rc.115",
+		"effect": "4.0.0-rc.117",
 		"express": "5.2.1",
 		"express-rate-limit": "8.7.0",
 		"fuse.js": "7.5.0",
@@ -52,7 +52,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.13",
-		"@effect/vitest": "4.0.0-rc.115",
+		"@effect/vitest": "4.0.0-rc.117",
 		"@modelcontextprotocol/client": "^2.0.0",
 		"@modelcontextprotocol/inspector": "2.6.0",
 		"@modyfi/vite-plugin-yaml": "1.1.1",

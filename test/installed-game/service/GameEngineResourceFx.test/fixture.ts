@@ -27,10 +27,12 @@ export const runtimes: Array<ManagedRuntime.ManagedRuntime<GameEngineResourceFx,
 export const makeResource = ({
 	disposeFx = Effect.void,
 	disposeWithoutSaveFx = Effect.void,
+	prepareRestoreFx = () => Effect.succeed(Effect.void),
 	packageId,
 }: {
 	readonly disposeFx?: Game["disposeFx"];
 	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
+	readonly prepareRestoreFx?: Game["prepareRestoreFx"];
 	readonly packageId: string;
 }) =>
 	Effect.runSync(
@@ -50,6 +52,9 @@ export const makeResource = ({
 			disposeFx,
 			disposeWithoutSaveFx,
 			flushSaveFx: Effect.void,
+			manualSaveFx: Effect.void,
+			listSavesFx: Effect.succeed([]),
+			prepareRestoreFx,
 			resources: [],
 			getResourceUrlFn: () => "blob:test",
 			...Effect.runSync(

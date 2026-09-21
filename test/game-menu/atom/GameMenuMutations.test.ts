@@ -47,6 +47,9 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 	saveKey: {
 		packageId: "package:menu",
 	},
+	manualSaveFx: explicitSaveFx,
+	listSavesFx: Effect.succeed([]),
+	prepareRestoreFx: () => Effect.succeed(Effect.void),
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.die("Lifecycle flushSaveFx must not own an explicit UI save."),

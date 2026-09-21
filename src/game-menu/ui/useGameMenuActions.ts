@@ -1,7 +1,9 @@
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
 import { useAtom } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Cause, Exit, Option } from "effect";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import type { Game } from "~/installed-game/type/Game";
@@ -11,6 +13,24 @@ import { gameMenuCommandAtom } from "~/game-menu/atom/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 
 const errorMessageFn = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+export namespace useGameMenuActions {
+	export interface Output {
+		readonly status: string | null;
+		readonly pending: boolean;
+		readonly actionDisabled: boolean;
+		readonly confirmingReset: boolean;
+		readonly setConfirmingResetFn: (value: boolean) => void;
+		readonly closeFn: () => void;
+		readonly requestSettingsFn: () => void;
+		readonly requestCheatsFn: () => void;
+		readonly requestMainMenuFn: () => void;
+		readonly requestSaveFn: () => void;
+		readonly requestLoadFn: (slot: GameSaveSlotSchema.Type) => void;
+		readonly requestSaveAndExitFn: () => void;
+		readonly requestHardResetFn: () => void;
+	}
+}
 
 /**
  * Orchestrates menu intent without taking Game lifecycle ownership. Local save
@@ -24,9 +44,18 @@ export const useGameMenuActions = ({
 	phase,
 }: {
 	readonly game: Game;
-	readonly phase: Exclude<GameMenuPhase, "closed">;
-}) => {
+	readonly phase: GameMenuPhase;
+}): useGameMenuActions.Output => {
 	const menu = useGameMenuControl();
+	const ownerRef = useRef<object | null>(null);
+	useEffect(() => {
+		ownerRef.current = {};
+		return () => {
+			ownerRef.current = null;
+		};
+	}, [
+		game,
+	]);
 	const navigateFn = useNavigate();
 	const commandAtom = gameMenuCommandAtom(game);
 	const [commandResult, runCommandFn] = useAtom(commandAtom);
@@ -132,6 +161,25 @@ export const useGameMenuActions = ({
 			}),
 		);
 
+	const requestLoadFn = (slot: GameSaveSlotSchema.Type) =>
+		requestNavigationFn("load", async () => {
+			const owner = ownerRef.current;
+			const saves = await RendererRuntime.runPromise(game.listSavesFx);
+			if (owner === null || ownerRef.current !== owner) return;
+			if (!saves.some((save) => save.slot === slot && save.savedAt !== null)) {
+				return;
+			}
+			return navigateFn({
+				to: "/game/$packageId/action/load",
+				params: {
+					packageId: game.serapack.packageId,
+				},
+				search: {
+					slot,
+				},
+			});
+		});
+
 	const requestSaveFn = () => {
 		if (!menu.beginActionFn("save")) return;
 		runCommandFn("save");
@@ -152,6 +200,26 @@ export const useGameMenuActions = ({
 			}),
 		);
 
+	useEffect(() => {
+		const onKeyDownFn = (event: KeyboardEvent) => {
+			if (event.key !== "F5" && event.key !== "F9") return;
+			if (
+				event.defaultPrevented ||
+				event.altKey ||
+				event.ctrlKey ||
+				event.metaKey ||
+				event.shiftKey
+			)
+				return;
+			event.preventDefault();
+			if (event.repeat || pending || (phase !== "closed" && phase !== "open")) return;
+			if (event.key === "F5") requestSaveFn();
+			else requestLoadFn("manual");
+		};
+		window.addEventListener("keydown", onKeyDownFn);
+		return () => window.removeEventListener("keydown", onKeyDownFn);
+	});
+
 	const status = (() => {
 		if (saveAndExitPending) return "Saving and exiting Serakki…";
 		if (savePending) return "Saving…";
@@ -162,6 +230,7 @@ export const useGameMenuActions = ({
 		if (navigationError !== undefined) {
 			return `Navigation failed: ${errorMessageFn(navigationError)}`;
 		}
+		if (menu.activeAction === "load") return null;
 		if (
 			menu.activeAction === "settings" ||
 			menu.activeAction === "cheats" ||
@@ -186,6 +255,7 @@ export const useGameMenuActions = ({
 		requestCheatsFn,
 		requestMainMenuFn,
 		requestSaveFn,
+		requestLoadFn,
 		requestSaveAndExitFn,
 		requestHardResetFn,
 	};

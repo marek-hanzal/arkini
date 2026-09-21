@@ -60,6 +60,9 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 				runFn: (() => Promise.reject(new Error("Not used by this test."))) as Game["runFn"],
 				disposeFx: Effect.void,
 				disposeWithoutSaveFx: Effect.void,
+				manualSaveFx: Effect.void,
+				listSavesFx: Effect.succeed([]),
+				prepareRestoreFx: () => Effect.succeed(Effect.void),
 				flushSaveFx: Effect.void,
 			} satisfies Game;
 

@@ -4,6 +4,7 @@ import { TickFx } from "~/game-tick/service/TickFx";
 import type { SerapackStorage } from "~/serapack-catalog/service/SerapackStorage";
 import { loadSerapackFx } from "~/serapack-catalog/fx/loadSerapackFx";
 import type { Game } from "~/installed-game/type/Game";
+import { GameSaveRestoreError } from "~/installed-game/error/GameSaveRestoreError";
 import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/game-session/fx/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/playable-game/fx/discardGameBootstrapFx";
@@ -16,6 +17,10 @@ import { decodeSerakkiSaveFx } from "~/game-persistence/fx/decodeSerakkiSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { readMajorFn as readGameVersionMajorFn } from "~/game-version/fn/readMajorFn";
+
+import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
 
 interface GameResourceUrls {
 	readonly getFn: (resourceId: string) => string;
@@ -168,6 +173,48 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				Effect.tap(() => closeDiagnosticsFx("discarded")),
 				Effect.andThen(liveResourceUrls.releaseFx),
 			),
+			manualSaveFx: session.runFx(
+				RuntimeSaveFx.pipe(
+					Effect.flatMap((save) =>
+						save.saveSnapshotFx((state) =>
+							saveStorage.writeFx(
+								saveKey,
+								encodeSerakkiSaveFn({
+									version: loaded.payload.version,
+									state,
+								}),
+								"manual",
+							),
+						),
+					),
+				),
+			),
+			listSavesFx: saveStorage.listFx(saveKey),
+			prepareRestoreFx: (slot: GameSaveSlotSchema.Type) =>
+				Effect.gen(function* () {
+					const bytes = yield* saveStorage.readFx(saveKey, slot);
+					if (bytes === null)
+						return yield* Effect.fail(
+							new GameSaveRestoreError({
+								message: "This save is not available.",
+							}),
+						);
+					const saved = yield* decodeSerakkiSaveFx(bytes);
+					if (
+						readGameVersionMajorFn(saved.version).major !==
+						readGameVersionMajorFn(loaded.payload.version).major
+					) {
+						return yield* Effect.fail(
+							new GameSaveRestoreError({
+								message: "This save is incompatible with the installed game.",
+							}),
+						);
+					}
+					yield* fromStateFx({
+						state: saved.state,
+					}).pipe(Effect.provideService(GameConfigFx, loaded.payload.config));
+					return saveStorage.restoreFx(saveKey, bytes);
+				}),
 			saveKey,
 			...(introductionPending
 				? {

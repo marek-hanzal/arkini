@@ -91,7 +91,12 @@ export const GameMenuProvider = ({
 	const beginActionFn = useCallback(
 		(action: GameMenuAction) => {
 			const current = stateRef.current;
-			if (current.activeAction !== null || current.phase !== "open") return false;
+			if (current.activeAction !== null) return false;
+			if (
+				current.phase !== "open" &&
+				!(current.phase === "closed" && (action === "save" || action === "load"))
+			)
+				return false;
 			publishFn({
 				...current,
 				activeAction: action,

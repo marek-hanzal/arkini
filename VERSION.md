@@ -56,6 +56,12 @@ Use the smallest non-derivable payload:
 
 The Editor installation catalog stores discovery roots, managed/external ownership, and timestamps only. It never copies canonical project identity or mutable project fields.
 
+## Installed save slots
+
+Each game stores `current.serasave`, `manual.serasave`, `5-min.serasave`, `30-min.serasave`, and `4-hour.serasave` beneath `~/.serakki/game/saves/<encoded-package-id>/`. Each file uses the same save codec and compatibility checks. Filesystem modification time is the snapshot timestamp; it is set on the temporary file before atomic rename publishes bytes and timestamp together. No timestamp sidecar or save-format change is required.
+
+Current follows autosave and final save. Each checkpoint initializes on the first current save and refreshes independently when its own real-time interval elapses, including after restart or a long gap. The interval is not a promise of exact snapshot age. Manual save only replaces its own slot. Restoring validated bytes replaces Current without rotating checkpoints. One package lock serializes reads, writes, restore, and deletion. Each replacement is atomic individually; a later checkpoint failure does not roll back earlier successful slots, and failed slots remain due for retry. Reset deletes the complete game save directory. Editor Board sessions remain ephemeral.
+
 ## Built and runtime artifacts
 
 | Artifact | Contract |

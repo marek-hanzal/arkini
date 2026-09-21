@@ -1,3 +1,4 @@
+import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
 import {
 	app,
 	BrowserWindow,
@@ -346,13 +347,17 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 				);
 				ipcMain.handle(
 					SerakkiElectronApi.channels.saveRead,
-					(event, key: SerakkiElectronApi.SaveKey) =>
-						runAuthorizedFn(event, saves.readFx(key)),
+					(event, key: SerakkiElectronApi.SaveKey, slot?: GameSaveSlotSchema.Type) =>
+						runAuthorizedFn(event, saves.readFx(key, slot)),
 				);
 				ipcMain.handle(
 					SerakkiElectronApi.channels.saveWrite,
-					(event, key: SerakkiElectronApi.SaveKey, bytes: Uint8Array) =>
-						runAuthorizedFn(event, saves.writeFx(key, bytes)),
+					(
+						event,
+						key: SerakkiElectronApi.SaveKey,
+						bytes: Uint8Array,
+						slot?: "current" | "manual",
+					) => runAuthorizedFn(event, saves.writeFx(key, bytes, slot)),
 				);
 				ipcMain.handle(
 					SerakkiElectronApi.channels.saveClear,
@@ -360,6 +365,16 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 						runAuthorizedFn(event, saves.clearFx(key)),
 				);
 
+				ipcMain.handle(
+					SerakkiElectronApi.channels.saveList,
+					(event, key: SerakkiElectronApi.SaveKey) =>
+						runAuthorizedFn(event, saves.listFx(key)),
+				);
+				ipcMain.handle(
+					SerakkiElectronApi.channels.saveRestore,
+					(event, key: SerakkiElectronApi.SaveKey, bytes: Uint8Array) =>
+						runAuthorizedFn(event, saves.restoreFx(key, bytes)),
+				);
 				const cleanupFn = () => {
 					nativeTheme.removeListener("updated", synchronizeWindowBackgroundsFn);
 					for (const channel of [
@@ -384,6 +399,8 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 						SerakkiElectronApi.channels.saveRead,
 						SerakkiElectronApi.channels.saveWrite,
 						SerakkiElectronApi.channels.saveClear,
+						SerakkiElectronApi.channels.saveList,
+						SerakkiElectronApi.channels.saveRestore,
 						SerakkiElectronApi.channels.diagnosticsWrite,
 						SerakkiElectronApi.channels.diagnosticsWriteApplication,
 						SerakkiElectronApi.channels.diagnosticsOpenDirectory,

@@ -9,6 +9,8 @@ describe("createElectronGameSaveStorageFx", () => {
 			createElectronGameSaveStorageFx({
 				api: {
 					clearFn: vi.fn(),
+					listFn: vi.fn(),
+					restoreFn: vi.fn(),
 					readFn: vi.fn(),
 					writeFn: vi.fn().mockRejectedValue(cause),
 				},

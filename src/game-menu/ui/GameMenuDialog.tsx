@@ -1,10 +1,11 @@
+import { GameSaveMenu } from "~/game-menu/ui/GameSaveMenu";
 import { RotateCcw } from "lucide-react";
 import { motion } from "motion/react";
 
 import type { Game } from "~/installed-game/type/Game";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { Button, DangerButton, PrimaryButton } from "~/ui/ui/Button";
-import { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";
+import type { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";
 import { useGameMenuFocus } from "~/game-menu/ui/useGameMenuFocus";
 import { gameMenuTransition, useGameMenuMotion } from "~/game-menu/ui/useGameMenuMotion";
 
@@ -13,15 +14,12 @@ const gameMenuDialogViewTransitionName = "serakki-game-menu-dialog";
 
 interface GameMenuDialogProps extends useGameMenuMotion.Props {
 	readonly game: Game;
+	readonly actions: useGameMenuActions.Output;
 }
 
 /** Composes menu actions, focus, and motion into the active overlay presentation. */
-export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
+export const GameMenuDialog = ({ game, phase, actions }: GameMenuDialogProps) => {
 	const cheatAvailability = useCheatAvailability();
-	const actions = useGameMenuActions({
-		game,
-		phase,
-	});
 	const actorMotion = useGameMenuMotion({
 		phase,
 	});
@@ -108,9 +106,15 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSaveFn}
+						title="Save · F5"
 					>
 						Save
 					</Button>
+					<GameSaveMenu
+						game={game}
+						disabled={actions.actionDisabled}
+						onLoadFn={actions.requestLoadFn}
+					/>
 					<Button
 						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
@@ -126,8 +130,8 @@ export const GameMenuDialog = ({ game, phase }: GameMenuDialogProps) => {
 						{actions.confirmingReset ? (
 							<div className="grid gap-2 rounded-xl border border-danger/35 bg-danger/5 p-3">
 								<p className="text-sm text-muted">
-									Start a new game from the beginning? Your current progress will
-									be permanently lost.
+									Start a new game from the beginning? All saves for this game
+									will be permanently lost.
 								</p>
 								<div className="grid grid-cols-2 gap-2">
 									<Button

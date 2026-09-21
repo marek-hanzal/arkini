@@ -40,7 +40,7 @@ interface Cancellation {
 
 interface Finalization {
 	readonly resource: InstalledGameEngineResource;
-	readonly operation: "release" | "reset";
+	readonly operation: "release" | "reset" | "restore";
 	readonly completion: Deferred.Deferred<void, CriticalGameLifecycleError>;
 }
 
@@ -187,7 +187,11 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					const failure = readExactCauseFailureFn(exit.cause);
 					return Exit.fail(
 						finalization.resource.markCriticalFailureFn(
-							finalization.operation === "release" ? "game-leave" : "game-reset",
+							finalization.operation === "release"
+								? "game-leave"
+								: finalization.operation === "restore"
+									? "game-restore"
+									: "game-reset",
 							Option.isSome(failure) ? failure.value : exit.cause,
 						),
 					);
@@ -312,6 +316,20 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					Effect.suspend(() => resource.game.disposeFx),
 					allowAlreadyFinalized,
 				),
+			);
+
+			const restoreFx: GameEngineResourceFxService["restoreFx"] = Effect.fn(
+				"GameEngineResourceFx.restoreFx",
+			)(({ resource, slot }) =>
+				Effect.gen(function* () {
+					const applyFx = yield* resource.game.prepareRestoreFx(slot);
+					yield* finalizeFx(
+						resource,
+						"restore",
+						resource.game.disposeWithoutSaveFx.pipe(Effect.andThen(applyFx)),
+						false,
+					);
+				}),
 			);
 
 			const resetFx: GameEngineResourceFxService["resetFx"] = Effect.fn(
@@ -1219,6 +1237,7 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 				adoptLeaseFx,
 				claimForCloseFx,
 				releaseFx,
+				restoreFx,
 				resetFx,
 				closeFx,
 				discardFailedFx,

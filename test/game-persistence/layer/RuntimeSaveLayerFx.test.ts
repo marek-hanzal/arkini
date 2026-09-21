@@ -1,4 +1,4 @@
-import { Cause, Deferred, Effect, Layer } from "effect";
+import { Cause, Deferred, Effect, Fiber, Layer } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 import { createTestGameSession } from "~test/support/createTestGameSession";
@@ -31,6 +31,61 @@ const emitCompletedEventFx = (jobId: string) =>
 	);
 
 describe("RuntimeSaveLayerFx", () => {
+	it.effect(
+		"serializes explicit snapshots with autosave and writes unchanged manual snapshots",
+		() => {
+			const writes: string[] = [];
+			const core = GameRuntimeLayerFx({
+				config: createJobTestConfig(),
+			});
+			return Effect.gen(function* () {
+				const entered = yield* Deferred.make<void>();
+				const release = yield* Deferred.make<void>();
+				const save = RuntimeSaveLayerFx({
+					debounceMs: 60_000,
+					saveFx: () =>
+						Effect.sync(() => {
+							writes.push("auto");
+						}),
+				}).pipe(Layer.provide(core));
+				yield* Effect.gen(function* () {
+					const coordinator = yield* RuntimeSaveFx;
+					const manual = yield* Effect.forkChild(
+						coordinator.saveSnapshotFx(() =>
+							Effect.gen(function* () {
+								writes.push("manual-start");
+								yield* Deferred.succeed(entered, undefined);
+								yield* Deferred.await(release);
+								writes.push("manual-end");
+							}),
+						),
+					);
+					yield* Deferred.await(entered);
+					const auto = yield* Effect.forkChild(coordinator.flush);
+					yield* Effect.yieldNow;
+					expect(writes).toEqual([
+						"manual-start",
+					]);
+					yield* Deferred.succeed(release, undefined);
+					yield* Fiber.join(manual);
+					yield* Fiber.join(auto);
+					yield* coordinator.saveSnapshotFx(() =>
+						Effect.sync(() => {
+							writes.push("manual-again");
+						}),
+					);
+					expect(writes).toEqual([
+						"manual-start",
+						"manual-end",
+						"auto",
+						"manual-again",
+					]);
+					yield* coordinator.discard;
+				}).pipe(Effect.provide(Layer.merge(core, save)));
+			});
+		},
+	);
+
 	it.effect("does not deduplicate a snapshot skipped while saving is disabled", () => {
 		let enabled = false;
 		const saves: StateSchema.Type[] = [];

@@ -223,10 +223,13 @@ const api: SerakkiElectronApi.Api = {
 			ipcRenderer.invoke(SerakkiElectronApi.channels.serapackOpenUserDirectory),
 	},
 	save: {
-		readFn: (key) => ipcRenderer.invoke(SerakkiElectronApi.channels.saveRead, key),
-		writeFn: (key, bytes) =>
-			ipcRenderer.invoke(SerakkiElectronApi.channels.saveWrite, key, bytes),
+		readFn: (key, slot) => ipcRenderer.invoke(SerakkiElectronApi.channels.saveRead, key, slot),
+		writeFn: (key, bytes, slot) =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.saveWrite, key, bytes, slot),
 		clearFn: (key) => ipcRenderer.invoke(SerakkiElectronApi.channels.saveClear, key),
+		listFn: (key) => ipcRenderer.invoke(SerakkiElectronApi.channels.saveList, key),
+		restoreFn: (key, bytes) =>
+			ipcRenderer.invoke(SerakkiElectronApi.channels.saveRestore, key, bytes),
 	},
 	diagnostics: {
 		writeFn: (record) =>

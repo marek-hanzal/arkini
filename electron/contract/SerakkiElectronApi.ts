@@ -29,6 +29,8 @@ export namespace SerakkiElectronApi {
 		saveRead: "serakki:save:read",
 		saveWrite: "serakki:save:write",
 		saveClear: "serakki:save:clear",
+		saveList: "serakki:save:list",
+		saveRestore: "serakki:save:restore",
 		appearanceRead: "serakki:appearance:read",
 		appearanceWrite: "serakki:appearance:write",
 		appearanceAccentRead: "serakki:appearance:accent:read",
@@ -135,6 +137,12 @@ export namespace SerakkiElectronApi {
 		readonly contentHash: string;
 	}
 
+	export type SaveSlot = "current" | "manual" | "5-min" | "30-min" | "4-hour";
+	/** Plain preload transport; persistence owns validation and rotation policy. */
+	export interface SaveSlotInfo {
+		readonly slot: SaveSlot;
+		readonly savedAt: number | null;
+	}
 	export interface SaveKey {
 		readonly packageId: string;
 	}
@@ -299,9 +307,15 @@ export namespace SerakkiElectronApi {
 			readonly clearProjectContextFn: (projectId: string) => Promise<void>;
 		};
 		readonly save: {
-			readonly readFn: (key: SaveKey) => Promise<Uint8Array | null>;
-			readonly writeFn: (key: SaveKey, bytes: Uint8Array) => Promise<void>;
+			readonly readFn: (key: SaveKey, slot?: SaveSlot) => Promise<Uint8Array | null>;
+			readonly writeFn: (
+				key: SaveKey,
+				bytes: Uint8Array,
+				slot?: "current" | "manual",
+			) => Promise<void>;
 			readonly clearFn: (key: SaveKey) => Promise<void>;
+			readonly listFn: (key: SaveKey) => Promise<readonly SaveSlotInfo[]>;
+			readonly restoreFn: (key: SaveKey, bytes: Uint8Array) => Promise<void>;
 		};
 		readonly diagnostics: {
 			readonly writeFn: (record: DiagnosticRecord) => Promise<void>;

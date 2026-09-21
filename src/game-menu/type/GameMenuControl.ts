@@ -1,6 +1,7 @@
 export type GameMenuPhase = "closed" | "entering" | "open" | "exiting";
 
 export type GameMenuAction =
+	| "load"
 	| "save"
 	| "save-and-exit"
 	| "hard-reset"

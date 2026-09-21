@@ -71,6 +71,11 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 	let saved: Uint8Array | null = null;
 	let clears = 0;
 	const saveStorage: GameSaveStorage = {
+		listFx: () => Effect.succeed([]),
+		restoreFx: (_key, bytes) =>
+			Effect.sync(() => {
+				saved = bytes.slice();
+			}),
 		readFx: () => Effect.sync(() => saved?.slice() ?? null),
 		clearFx: () =>
 			Effect.sync(() => {
@@ -99,6 +104,58 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 };
 
 describe("createGameFx", () => {
+	it("pins validated restore bytes and rejects missing, incompatible or invalid snapshots", async () => {
+		const storages = await createStorages();
+		const game = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				serapackStorage: storages.serapackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		try {
+			await Effect.runPromise(game.flushSaveFx);
+			const bytes = storages.readSaved();
+			if (bytes === null) throw new Error("Expected saved bytes");
+			const saved = await Effect.runPromise(decodeSerakkiSaveFx(bytes));
+			const apply = await Effect.runPromise(game.prepareRestoreFx("manual"));
+			storages.setSaved(
+				encodeJsonFn({
+					invalid: true,
+				}),
+			);
+			await Effect.runPromise(apply);
+			expect(storages.readSaved()).toEqual(bytes);
+			for (const rejected of [
+				null,
+				encodeJsonFn({
+					invalid: true,
+				}),
+				encodeJsonFn({
+					...saved,
+					version: "2.0",
+				}),
+				encodeJsonFn({
+					...saved,
+					state: {
+						...saved.state,
+						items: saved.state.items.map((item) => ({
+							...item,
+							itemId: "missing",
+						})),
+					},
+				}),
+			]) {
+				storages.setSaved(rejected);
+				await expect(Effect.runPromise(game.prepareRestoreFx("manual"))).rejects.toThrow();
+				expect(storages.readSaved()).toEqual(rejected);
+				expect(game.getFatalErrorFn()).toBeNull();
+			}
+		} finally {
+			await Effect.runPromise(game.disposeWithoutSaveFx);
+		}
+	});
+
 	beforeEach(() => {
 		installTestPngDecoder();
 	});

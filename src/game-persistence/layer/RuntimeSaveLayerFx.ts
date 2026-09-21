@@ -59,6 +59,23 @@ export const RuntimeSaveLayerFx = <Error>({
 				),
 			);
 
+			const saveSnapshotFx = (
+				writeFx: (state: StateSchema.Type) => Effect.Effect<void, unknown>,
+			) =>
+				saveMutex.withPermits(1)(
+					Effect.uninterruptible(
+						Effect.gen(function* () {
+							if (!isEnabledFn() || (yield* Ref.get(discarded))) return;
+							const runtime = yield* runtimeFx.read;
+							yield* writeFx(
+								fromRuntimeFn({
+									runtime,
+								}),
+							);
+						}),
+					),
+				);
+
 			const stream = committedTransitions.changes.pipe(
 				Stream.map((transition) => transition.runtime),
 				Stream.changesWith(Object.is),
@@ -101,6 +118,7 @@ export const RuntimeSaveLayerFx = <Error>({
 			);
 
 			return {
+				saveSnapshotFx,
 				discard,
 				flush,
 			};

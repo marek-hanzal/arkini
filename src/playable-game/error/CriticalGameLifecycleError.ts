@@ -3,6 +3,7 @@ export type CriticalGameLifecycleOperation =
 	| "game-read"
 	| "game-leave"
 	| "game-reset"
+	| "game-restore"
 	| "game-runtime"
 	| "game-save"
 	| "game-presentation";

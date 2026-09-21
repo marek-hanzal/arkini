@@ -3,6 +3,8 @@ import { Context, type Effect, type Scope } from "effect";
 import type { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 
+import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
+
 declare const GameEngineLeaseTypeId: unique symbol;
 
 /** Opaque scoped claim on one exact renderer Game resource acquisition. */
@@ -78,6 +80,10 @@ export interface GameEngineResourceFxService {
 	readonly releaseFx: (
 		props: GameEngineResourceFx.ReleaseProps,
 	) => Effect.Effect<void, unknown, never>;
+	readonly restoreFx: (props: {
+		resource: InstalledGameEngineResource;
+		slot: GameSaveSlotSchema.Type;
+	}) => Effect.Effect<void, unknown>;
 	readonly resetFx: (
 		props: GameEngineResourceFx.ResetProps,
 	) => Effect.Effect<void, unknown, never>;

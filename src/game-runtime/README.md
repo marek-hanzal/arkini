@@ -136,3 +136,10 @@ For a slow Board, compare normal and accelerated windows for the same session an
 [`forceRemoveRuntimeItemFx`](fx/forceRemoveRuntimeItemFx.ts) plans general forced removal on an explicit Runtime: cancel owned jobs/queue, consume aborted inputs, remove the root, return reservations before buffers, and reconcile any parent material job. [`discardRuntimeItemTreeFx`](fx/discardRuntimeItemTreeFx.ts) destroys only an idle passive ownership tree and returns exact loss facts. [`placeRuntimeItemBestEffortFx`](../item-placement/fx/placeRuntimeItemBestEffortFx.ts) reuses canonical placement, retaining fitting quantities and reporting explicit capacity overflow. These operations never publish; the enclosing Runtime transaction commits state and all events together.
 
 Clock kill-switch is the first explicit caller through `item-expiry`; ordinary removal, merge, queued cancellation, job completion and loose-kill retain their strict placement semantics. Speed-up does not select removal policy. Expiry Output resolves from the original operation snapshot and follows returns in the same transaction.
+
+
+### Installed save slots
+
+The existing Runtime Save mutex serializes autosave, manual snapshots and final flush. Installed-game storage keeps `current.serasave`, `manual.serasave`, `5-min.serasave`, `30-min.serasave`, and `4-hour.serasave` in the exact package directory. Each slot publishes its bytes and timestamp together by renaming a temporary file; its filesystem modification time is the persisted snapshot time. A failed replacement leaves that slot's previous bytes and time intact. A save pass is not an aggregate transaction across slots: already-published slots may advance if a later checkpoint fails, and remaining due slots are retryable.
+
+Explicit restore first pins and validates the selected bytes, then joins installed resource finalization with discard-only session shutdown, and replaces Current without checkpoint rotation. Reset removes the complete package save directory. No save slots are added to Editor Board persistence.

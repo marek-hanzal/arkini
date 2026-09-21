@@ -52,6 +52,9 @@ const makeGame = (
 	suffix: string,
 ): Game => ({
 	...session,
+	manualSaveFx: Effect.void,
+	listSavesFx: Effect.succeed([]),
+	prepareRestoreFx: () => Effect.succeed(Effect.void),
 	serapack: {
 		packageId: `package:spawn-${suffix}`,
 		contentHash: `content:spawn-${suffix}`,

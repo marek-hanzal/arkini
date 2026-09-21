@@ -56,6 +56,7 @@ import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$pac
 import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
 import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
 import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$packageId/action/leave"
+import { Route as GamePackageIdActionLoadRouteImport } from "./@routes/game/$packageId/action/load"
 import { Route as GamePackageIdActionResetRouteImport } from "./@routes/game/$packageId/action/reset"
 import { Route as EditorProjectIdArtworkResourceIdDetailRouteImport } from "./@routes/editor/$projectId/artwork/$resourceId/detail"
 import { Route as EditorProjectIdArtworkResourceIdEditRouteImport } from "./@routes/editor/$projectId/artwork/$resourceId/edit"
@@ -326,6 +327,11 @@ const GamePackageIdActionLeaveRoute =
     path: "/action/leave",
     getParentRoute: () => GamePackageIdRoute,
   } as any)
+const GamePackageIdActionLoadRoute = GamePackageIdActionLoadRouteImport.update({
+  id: "/action/load",
+  path: "/action/load",
+  getParentRoute: () => GamePackageIdRoute,
+} as any)
 const GamePackageIdActionResetRoute =
   GamePackageIdActionResetRouteImport.update({
     id: "/action/reset",
@@ -498,6 +504,7 @@ export interface FileRoutesByFullPath {
   "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/load": typeof GamePackageIdActionLoadRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
   "/editor/$projectId/artwork/": typeof EditorProjectIdArtworkIndexRoute
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
@@ -557,6 +564,7 @@ export interface FileRoutesByTo {
   "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/load": typeof GamePackageIdActionLoadRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
   "/editor/$projectId/artwork": typeof EditorProjectIdArtworkIndexRoute
   "/editor/$projectId/board": typeof EditorProjectIdBoardIndexRoute
@@ -627,6 +635,7 @@ export interface FileRoutesById {
   "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/load": typeof GamePackageIdActionLoadRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
   "/editor/$projectId/artwork/": typeof EditorProjectIdArtworkIndexRoute
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
@@ -698,6 +707,7 @@ export interface FileRouteTypes {
     | "/game/$packageId/inventory"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/load"
     | "/game/$packageId/action/reset"
     | "/editor/$projectId/artwork/"
     | "/editor/$projectId/board/"
@@ -757,6 +767,7 @@ export interface FileRouteTypes {
     | "/game/$packageId/inventory"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/load"
     | "/game/$packageId/action/reset"
     | "/editor/$projectId/artwork"
     | "/editor/$projectId/board"
@@ -826,6 +837,7 @@ export interface FileRouteTypes {
     | "/game/$packageId/_scene/inventory"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/load"
     | "/game/$packageId/action/reset"
     | "/editor/$projectId/artwork/"
     | "/editor/$projectId/board/"
@@ -1196,6 +1208,13 @@ declare module "@tanstack/react-router" {
       path: "/action/leave"
       fullPath: "/game/$packageId/action/leave"
       preLoaderRoute: typeof GamePackageIdActionLeaveRouteImport
+      parentRoute: typeof GamePackageIdRoute
+    }
+    "/game/$packageId/action/load": {
+      id: "/game/$packageId/action/load"
+      path: "/action/load"
+      fullPath: "/game/$packageId/action/load"
+      preLoaderRoute: typeof GamePackageIdActionLoadRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
     "/game/$packageId/action/reset": {
@@ -1709,6 +1728,7 @@ interface GamePackageIdRouteChildren {
   GamePackageIdCheatsRoute: typeof GamePackageIdCheatsRoute
   GamePackageIdActionExitRoute: typeof GamePackageIdActionExitRoute
   GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
+  GamePackageIdActionLoadRoute: typeof GamePackageIdActionLoadRoute
   GamePackageIdActionResetRoute: typeof GamePackageIdActionResetRoute
 }
 
@@ -1717,6 +1737,7 @@ const GamePackageIdRouteChildren: GamePackageIdRouteChildren = {
   GamePackageIdCheatsRoute: GamePackageIdCheatsRoute,
   GamePackageIdActionExitRoute: GamePackageIdActionExitRoute,
   GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,
+  GamePackageIdActionLoadRoute: GamePackageIdActionLoadRoute,
   GamePackageIdActionResetRoute: GamePackageIdActionResetRoute,
 }
 

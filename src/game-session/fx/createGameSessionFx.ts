@@ -190,6 +190,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					save === undefined
 						? Layer.succeed(RuntimeSaveFx, {
 								discard: Effect.void,
+								saveSnapshotFx: () => Effect.void,
 								flush: Effect.void,
 							})
 						: RuntimeSaveLayerFx({

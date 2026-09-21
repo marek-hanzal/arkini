@@ -80,6 +80,9 @@ vi.mock("electron", async () => {
 	}
 
 	return {
+		app: {
+			isPackaged: false,
+		},
 		BrowserWindow: TestBrowserWindow,
 		ipcMain: ipc,
 		Menu: {

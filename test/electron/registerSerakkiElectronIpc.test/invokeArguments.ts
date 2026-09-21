@@ -7,6 +7,19 @@ export const saveKey = {
 
 export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 	[
+		SerakkiElectronApi.channels.saveList,
+		[
+			saveKey,
+		],
+	],
+	[
+		SerakkiElectronApi.channels.saveRestore,
+		[
+			saveKey,
+			new Uint8Array(),
+		],
+	],
+	[
 		SerakkiElectronApi.channels.appearanceRead,
 		[],
 	],

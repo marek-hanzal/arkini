@@ -5,8 +5,16 @@ import type { GameEngineResource } from "~/playable-game/type/GameEngineResource
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 
+import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
+
 /** One loaded game instance exclusively owned by its package route resource. */
 export interface Game extends PlayableGame {
+	readonly manualSaveFx: Effect.Effect<void, unknown>;
+	readonly listSavesFx: Effect.Effect<readonly GameSaveStorage.Slot[], unknown>;
+	/** Validates and pins the selected bytes before any live session is discarded. */
+	readonly prepareRestoreFx: (
+		slot: GameSaveSlotSchema.Type,
+	) => Effect.Effect<Effect.Effect<void, unknown>, unknown>;
 	/** Exact package identity and launcher metadata for this live game. */
 	readonly serapack: SerapackDescriptor;
 	/** Stable filesystem save identity owned by this live game. */

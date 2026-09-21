@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import { RegistryContext } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import {
@@ -226,6 +227,9 @@ export const renderSettings = async (
 		});
 		const createdGame: Game = {
 			...session,
+			manualSaveFx: Effect.void,
+			listSavesFx: Effect.succeed([]),
+			prepareRestoreFx: () => Effect.succeed(Effect.void),
 			serapack: {
 				packageId: "package:settings",
 				contentHash: "content:settings",

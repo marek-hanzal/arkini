@@ -1,10 +1,60 @@
 import { describe, expect, it, vi } from "vitest";
 import { Cause, Deferred, Effect, Option } from "effect";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
 
 import { createHarness, makeResource, runtimes } from "./GameEngineResourceFx.test/fixture";
 
 describe("GameEngineResourceFx / finalization", () => {
+	it("validates restore before disposal and promotes only after discard without a final save", async () => {
+		const calls: string[] = [];
+		let invalid = true;
+		const resource = makeResource({
+			packageId: "restore",
+			disposeFx: Effect.sync(() => {
+				calls.push("save");
+			}),
+			disposeWithoutSaveFx: Effect.sync(() => {
+				calls.push("discard");
+			}),
+			prepareRestoreFx: () =>
+				Effect.suspend(() =>
+					invalid
+						? Effect.fail(new Error("invalid save"))
+						: Effect.succeed(
+								Effect.sync(() => {
+									calls.push("restore");
+								}),
+							),
+				),
+		});
+		const harness = createHarness(() => Effect.succeed(resource));
+		const owner = harness.startLease("restore");
+		await harness.adopt(await owner.promise);
+		const restore = () =>
+			harness.runtime.runPromise(
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) =>
+						service.restoreFx({
+							resource,
+							slot: "manual",
+						}),
+					),
+				),
+			);
+		await expect(restore()).rejects.toThrow("invalid save");
+		expect(await harness.current()).toBe(resource);
+		expect(calls).toEqual([]);
+		invalid = false;
+		await restore();
+		expect(calls).toEqual([
+			"discard",
+			"restore",
+		]);
+		expect(await harness.current()).toBeNull();
+		await owner.close();
+	});
+
 	it("joins one exact finalization result without retrying success or failure", async () => {
 		const releaseGate = Effect.runSync(Deferred.make<void>());
 		const dispose = vi.fn();

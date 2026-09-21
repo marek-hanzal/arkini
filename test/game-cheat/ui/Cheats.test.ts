@@ -95,6 +95,9 @@ describe("Cheats", () => {
 		});
 		const game: Game = {
 			...session,
+			manualSaveFx: Effect.void,
+			listSavesFx: Effect.succeed([]),
+			prepareRestoreFx: () => Effect.succeed(Effect.void),
 			serapack: {
 				packageId: "package:cheats",
 				contentHash: "content:cheats",
@@ -173,6 +176,9 @@ describe("Cheats", () => {
 		});
 		const game: Game = {
 			...session,
+			manualSaveFx: Effect.void,
+			listSavesFx: Effect.succeed([]),
+			prepareRestoreFx: () => Effect.succeed(Effect.void),
 			serapack: {
 				packageId: "package:cheats-race",
 				contentHash: "content:cheats-race",

@@ -6,7 +6,6 @@ import type { Game } from "~/installed-game/type/Game";
 import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
-import { RuntimeSaveFx } from "~/game-persistence/service/RuntimeSaveFx";
 
 type GameMenuCommand = "save" | "save-and-exit";
 
@@ -15,9 +14,7 @@ export const gameMenuCommandAtom = Effect.runSync(
 	makeExactGameAtomFamilyFx((game: Game) =>
 		Atom.fn((command: GameMenuCommand) => {
 			const commandFx = match(command)
-				.with("save", () =>
-					game.runFx(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush))),
-				)
+				.with("save", () => game.manualSaveFx)
 				.with("save-and-exit", () =>
 					readRendererLifecycleFx().pipe(
 						Effect.flatMap((lifecycle) => lifecycle.requestCloseFx),

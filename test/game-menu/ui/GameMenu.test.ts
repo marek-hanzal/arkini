@@ -90,6 +90,9 @@ const createGame = (
 	saveKey: {
 		packageId: "package:menu",
 	},
+	manualSaveFx: flushSaveFx,
+	listSavesFx: Effect.succeed([]),
+	prepareRestoreFx: () => Effect.succeed(Effect.void),
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
@@ -242,6 +245,12 @@ const renderMenu = async ({
 		path: "/action/reset",
 		component: () => createElement("div", null, "Reset action"),
 	});
+	const loadRoute = createRoute({
+		getParentRoute: () => gameRoute,
+		path: "/action/load",
+		validateSearch: (search: Record<string, unknown>) => search,
+		component: () => createElement("div", null, "Load action"),
+	});
 	const leaveRoute = createRoute({
 		getParentRoute: () => gameRoute,
 		path: "/action/leave",
@@ -265,6 +274,7 @@ const renderMenu = async ({
 				cheatsRoute,
 				resetRoute,
 				leaveRoute,
+				loadRoute,
 			]),
 			settingsRoute,
 			mainMenuRoute,
@@ -322,13 +332,155 @@ const openMenu = async (container: ParentNode) => {
 
 const buttonByText = (container: ParentNode, text: string) => {
 	const button = Array.from(container.querySelectorAll("button")).find(
-		(candidate) => candidate.textContent === text,
+		(candidate) => candidate.textContent?.trim() === text,
 	);
 	if (!(button instanceof HTMLButtonElement)) throw new Error(`Expected ${text}.`);
 	return button;
 };
 
 describe("GameMenu", () => {
+	it("quick-saves with the menu closed and blocks repeated shortcuts and load until saving settles", async () => {
+		const gate = deferred();
+		const manual = vi.fn(() => gate.promise);
+		const flush = vi.fn();
+		const { container, router } = await renderMenu({
+			game: {
+				...createGame(),
+				manualSaveFx: fromPromiseFx(manual),
+				flushSaveFx: Effect.sync(flush),
+			},
+		});
+		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
+		const pressFn = (key: string, options: KeyboardEventInit = {}) => {
+			const event = new KeyboardEvent("keydown", {
+				key,
+				bubbles: true,
+				cancelable: true,
+				...options,
+			});
+			window.dispatchEvent(event);
+			return event;
+		};
+		await act(async () => {
+			pressFn("F5", {
+				repeat: true,
+			});
+			pressFn("F5", {
+				ctrlKey: true,
+			});
+			pressFn("F5", {
+				metaKey: true,
+			});
+		});
+		expect(manual).not.toHaveBeenCalled();
+		await act(async () => {
+			expect(pressFn("F5").defaultPrevented).toBe(true);
+			pressFn("F5");
+			pressFn("F9");
+		});
+		expect(manual).toHaveBeenCalledOnce();
+		expect(flush).not.toHaveBeenCalled();
+		expect(router.state.location.pathname).toBe("/game/package:menu/board");
+		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
+		await act(async () => {
+			gate.resolve();
+			await gate.promise;
+		});
+		await vi.waitFor(() => expect(container.textContent).toContain("Saved."));
+	});
+
+	it("quick-loads the manual slot while the menu is closed", async () => {
+		const { container, router } = await renderMenu({
+			game: {
+				...createGame(),
+				listSavesFx: Effect.succeed([
+					{
+						slot: "manual",
+						savedAt: 1_700_000_000_000,
+					},
+				]),
+			},
+		});
+		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
+		await act(async () => {
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "F9",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/game/package%3Amenu/action/load"),
+		);
+		expect(router.state.location.search).toEqual({
+			slot: "manual",
+		});
+	});
+
+	it("silently keeps the game running when quick-load has no manual save", async () => {
+		const readSavesFn = vi.fn(() => []);
+		const { container, router } = await renderMenu({
+			game: {
+				...createGame(),
+				listSavesFx: Effect.sync(readSavesFn),
+			},
+		});
+		await act(async () => {
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "F9",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		await vi.waitFor(() => expect(readSavesFn).toHaveBeenCalledOnce());
+		await act(async () => {
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="GameSaveNotice"]')).toBeNull();
+		expect(router.state.location.pathname).toBe("/game/package:menu/board");
+		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
+	});
+
+	it("does not navigate after an in-flight save lookup outlives its menu owner", async () => {
+		const gate = deferred();
+		const readSavesFn = vi.fn(async () => {
+			await gate.promise;
+			return [
+				{
+					slot: "manual" as const,
+					savedAt: 1_700_000_000_000,
+				},
+			];
+		});
+		const { router, setMenuMounted } = await renderMenu({
+			game: {
+				...createGame(),
+				listSavesFx: Effect.promise(readSavesFn),
+			},
+		});
+		await act(async () => {
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "F9",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		await vi.waitFor(() => expect(readSavesFn).toHaveBeenCalledOnce());
+		await act(async () => setMenuMounted(false));
+		await act(async () => {
+			gate.resolve();
+			await gate.promise;
+		});
+		expect(router.state.location.pathname).toBe("/game/package:menu/board");
+		expect(router.state.location.search).toEqual({});
+	});
+
 	it("animates Escape close through the owned motion lifecycle", async () => {
 		const { container } = await renderMenu();
 		await openMenu(container);
@@ -394,6 +546,47 @@ describe("GameMenu", () => {
 		await vi.waitFor(() =>
 			expect(enabled.router.state.location.pathname).toBe("/game/package%3Amenu/cheats"),
 		);
+	});
+
+	it("loads only an available exact slot from the floating picker", async () => {
+		const game = {
+			...createGame(),
+			listSavesFx: Effect.succeed([
+				{
+					slot: "manual" as const,
+					savedAt: 1_700_000_000_000,
+				},
+				{
+					slot: "5-min" as const,
+					savedAt: null,
+				},
+			]),
+		};
+		const { container, router } = await renderMenu({
+			game,
+		});
+		await openMenu(container);
+		await act(async () => buttonByText(container, "Load").click());
+		await vi.waitFor(() =>
+			expect(document.querySelector('[data-ui="GameSaveMenu"]')).not.toBeNull(),
+		);
+		const buttons = () => [
+			...document.querySelectorAll<HTMLButtonElement>('[data-ui="GameSaveMenu"] button'),
+		];
+		await vi.waitFor(() => expect(buttons()[0]?.disabled).toBe(false));
+		expect(buttons()).toHaveLength(5);
+		expect(
+			buttons()
+				.slice(1)
+				.every((button) => button.disabled),
+		).toBe(true);
+		await act(async () => buttons()[0]!.click());
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/game/package%3Amenu/action/load"),
+		);
+		expect(router.state.location.search).toEqual({
+			slot: "manual",
+		});
 	});
 
 	it("runs one explicit save while disabling overlapping menu actions", async () => {
@@ -480,11 +673,18 @@ describe("GameMenu", () => {
 		);
 	});
 
-	it("keeps one Escape listener while React re-renders the provider", async () => {
+	it("keeps keyboard listeners balanced while the menu rerenders", async () => {
 		const addEventListener = vi.spyOn(window, "addEventListener");
-		await renderMenu();
-		expect(addEventListener.mock.calls.filter(([event]) => event === "keydown")).toHaveLength(
-			1,
-		);
+		const removeEventListener = vi.spyOn(window, "removeEventListener");
+		const { container } = await renderMenu();
+		const activeCountFn = () =>
+			addEventListener.mock.calls.filter(([event]) => event === "keydown").length -
+			removeEventListener.mock.calls.filter(([event]) => event === "keydown").length;
+		const initialCount = activeCountFn();
+		await openMenu(container);
+		expect(activeCountFn()).toBe(initialCount);
+		await pressEscape();
+		await finishMotion(motionTestRuntime.completions.length - 1);
+		expect(activeCountFn()).toBe(initialCount);
 	});
 });

@@ -188,6 +188,8 @@ export const createActor = (id: string): PixiTileActor => {
 			text: String(item.quantity),
 		}),
 		quantityBackground: new Graphics(),
+		stackQuantity: new Text({ text: "" }),
+		stackQuantityBackground: new Graphics(),
 		item,
 		readyListeners: new Set(),
 		releaseTexturesFn: () => {},

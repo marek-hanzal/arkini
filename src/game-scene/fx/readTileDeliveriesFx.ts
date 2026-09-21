@@ -83,6 +83,11 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 			generation: current.location.generation,
 			item: {
 				...visual,
+				...(current.item.units === undefined
+					? {}
+					: {
+							badgeKind: "units" as const,
+						}),
 				...(badgeCount === undefined
 					? {}
 					: {

@@ -113,13 +113,27 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		},
 		text: String(item.quantity),
 	});
-	container.addChild(primary, composite, quantityBackground, quantity);
+	const stackQuantityBackground = new Graphics();
+	const stackQuantity = new Text({
+		style: quantity.style.clone(),
+		text: "",
+	});
+	container.addChild(
+		primary,
+		composite,
+		quantityBackground,
+		quantity,
+		stackQuantityBackground,
+		stackQuantity,
+	);
 	const visual = {
 		container,
 		primary,
 		composite,
 		quantity,
 		quantityBackground,
+		stackQuantity,
+		stackQuantityBackground,
 		readyListeners: new Set(),
 		releaseTexturesFn,
 		reportCriticalFailureFn: frames.reportCriticalFailureFn,

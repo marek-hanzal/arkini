@@ -33,6 +33,12 @@ export interface MainDragController {
 	readonly settleOriginGhostFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	/** Coalesces canonical/layout invalidation onto the current drag frame slot. */
 	readonly requestRefreshFx: Effect.Effect<void, never, never>;
+	/** Reprojects a held pointer after a camera change without promoting a pressed gesture. */
+	readonly refreshPointerFx: (pointer: {
+		readonly pointerId: number;
+		readonly x: number;
+		readonly y: number;
+	}) => Effect.Effect<void, never, never>;
 	readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }
@@ -595,6 +601,25 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				y: drag.lastPointerY,
 			});
 		}),
+		refreshPointerFx: Effect.fn("MainDragController.refreshPointerFx")((pointer) =>
+			Effect.gen(function* () {
+				const drag = activeDrag;
+				if (
+					drag === null ||
+					drag.mode !== "drag" ||
+					drag.phase !== "dragging" ||
+					drag.pointerId !== pointer.pointerId
+				)
+					return;
+				const point = application.stage.toLocal(pointer);
+				// Replace queued world coordinates captured before the camera moved.
+				yield* pointerSampler.flushFx({
+					pointerId: pointer.pointerId,
+					x: point.x,
+					y: point.y,
+				});
+			}),
+		),
 		setInteractionBlockedFx: Effect.fn("MainDragController.setInteractionBlockedFx")(
 			(blocked) =>
 				Effect.sync(() => {

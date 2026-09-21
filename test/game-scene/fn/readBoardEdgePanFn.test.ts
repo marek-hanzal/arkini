@@ -34,7 +34,7 @@ describe("readBoardEdgePanFn", () => {
 				pointerY: 0,
 			}),
 		).toEqual({
-			x: -40,
+			x: 20,
 			y: -200,
 		});
 		expect(
@@ -93,7 +93,7 @@ describe("readBoardEdgePanFn", () => {
 				pointerX: 800,
 			}),
 		).toEqual({
-			x: 240,
+			x: 180,
 			y: -200,
 		});
 		expect(
@@ -112,7 +112,7 @@ describe("readBoardEdgePanFn", () => {
 				x: -500,
 			}),
 		).toEqual({
-			x: -440,
+			x: -380,
 			y: -200,
 		});
 	});
@@ -133,7 +133,7 @@ describe("readBoardEdgePanFn", () => {
 				...input,
 				pointerX: 30,
 			}).x,
-		).toBe(-70);
+		).toBe(-40);
 		expect(
 			readBoardEdgePanFn({
 				...input,

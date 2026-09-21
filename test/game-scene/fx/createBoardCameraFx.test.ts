@@ -39,6 +39,7 @@ const mountFn = (
 	} as DOMRect);
 	const stage = new Container();
 	const cancelFn = vi.fn();
+	const refreshPointerFn = vi.fn();
 	const blockFn = vi.fn();
 	const screen = {
 		width: 1000,
@@ -75,6 +76,7 @@ const mountFn = (
 			} as unknown as PixiApplicationOwner,
 			drag: {
 				cancelInteractionFx: Effect.sync(cancelFn),
+				refreshPointerFx: (pointer) => Effect.sync(() => refreshPointerFn(pointer)),
 				setInteractionBlockedFx: (blocked: boolean) => Effect.sync(() => blockFn(blocked)),
 			},
 			surfaces,
@@ -85,13 +87,14 @@ const mountFn = (
 		canvas.remove();
 		stage.destroy();
 	});
-	const pointerFn = (type: string, x: number, y: number, button = 2) => {
+	const pointerFn = (type: string, x: number, y: number, button = 2, buttons = 0) => {
 		const event = new MouseEvent(type, {
 			bubbles: true,
 			cancelable: true,
 			clientX: x,
 			clientY: y,
 			button,
+			buttons,
 		});
 		Object.defineProperties(event, {
 			pointerId: {
@@ -127,6 +130,7 @@ const mountFn = (
 		canvas,
 		blockFn,
 		cancelFn,
+		refreshPointerFn,
 		pointerFn,
 		wheelFn,
 		resizeFn: () => resizeFn(),
@@ -358,6 +362,29 @@ describe("Board edge navigation", () => {
 		const oldLimit = mounted.stage.y;
 		mounted.frameFn();
 		expect(mounted.stage.y).toBeLessThan(oldLimit);
+	});
+
+	it("keeps edge navigation active with a held item and refreshes its stationary pointer", () => {
+		const mounted = mountFn([
+			mainLayout.board,
+			mainLayout.toolbar!,
+		]);
+		mounted.stage.scale.set(1);
+		mounted.stage.position.set(0, 0);
+		mounted.pointerFn("pointerdown", 1010, 440, 0, 1);
+		mounted.pointerFn("pointermove", 1010, 440, 0, 1);
+		expect(mounted.edgeFrames.size).toBe(1);
+		mounted.frameFn();
+		expect(mounted.stage.x).toBeLessThan(0);
+		expect(mounted.refreshPointerFn).toHaveBeenLastCalledWith({
+			pointerId: 1,
+			x: 990,
+			y: 400,
+		});
+		mounted.frameFn();
+		expect(mounted.refreshPointerFn).toHaveBeenCalledTimes(2);
+		mounted.pointerFn("pointerup", 1010, 440, 0);
+		expect(mounted.edgeFrames.size).toBe(0);
 	});
 
 	it("does not run in fitted view and cancels before an item or camera drag", () => {

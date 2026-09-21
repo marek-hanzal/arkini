@@ -13,7 +13,7 @@ interface ReadBoardEdgePanProps {
 }
 
 const edgeThreshold = 60;
-const maximumSpeed = 600;
+const maximumSpeed = 1200;
 
 const readAxisFn = (
 	position: number,

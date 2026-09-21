@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -9,6 +10,73 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: motion", () => {
+	it("keeps a held item and its release target at a stationary pointer after camera movement", async () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		const initialX = mounted.actor.container.x;
+		const initialY = mounted.actor.container.y;
+
+		// This queued sample belongs to the old camera and must not overwrite the refresh.
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.container.position.set(-80, -40);
+		Effect.runSync(
+			mounted.controller.refreshPointerFx({
+				pointerId: 1,
+				x: 30,
+				y: 20,
+			}),
+		);
+		expect(mounted.actor.container.x).toBe(initialX + 80);
+		expect(mounted.actor.container.y).toBe(initialY + 40);
+		expect(mounted.dropTargetReads.at(-1)).toEqual({
+			x: 110,
+			y: 60,
+		});
+		const readsAfterRefresh = mounted.dropTargetReads.length;
+		mounted.flushFrame();
+		expect(mounted.dropTargetReads).toHaveLength(readsAfterRefresh);
+		expect(mounted.actor.container.x).toBe(initialX + 80);
+
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+		expect(mounted.dropTargetReads.at(-1)).toEqual({
+			x: 110,
+			y: 60,
+		});
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+		Effect.runSync(mounted.controller.closeFx);
+	});
+
+	it("does not promote a press or refresh another pointer when the camera moves", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.container.position.set(-80, -40);
+		Effect.runSync(
+			mounted.controller.refreshPointerFx({
+				pointerId: 1,
+				x: 10,
+				y: 20,
+			}),
+		);
+		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+		expect(mounted.dropTargetReads).toHaveLength(0);
+
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		const reads = mounted.dropTargetReads.length;
+		Effect.runSync(
+			mounted.controller.refreshPointerFx({
+				pointerId: 2,
+				x: 90,
+				y: 20,
+			}),
+		);
+		expect(mounted.dropTargetReads).toHaveLength(reads);
+		Effect.runSync(mounted.controller.closeFx);
+	});
+
 	it.each([
 		"cue",
 		"pose",

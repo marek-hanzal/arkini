@@ -11,6 +11,11 @@ interface Props {
 	readonly application: PixiApplicationOwner;
 	readonly drag: {
 		readonly cancelInteractionFx: Effect.Effect<void>;
+		readonly refreshPointerFx?: (pointer: {
+			readonly pointerId: number;
+			readonly x: number;
+			readonly y: number;
+		}) => Effect.Effect<void>;
 		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
 	};
 	readonly dragThreshold: number;
@@ -39,6 +44,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	const canvas = app.canvas;
 	const clock = yield* Clock.Clock;
 	let edgePointer: {
+		pointerId: number;
 		clientX: number;
 		clientY: number;
 	} | null = null;
@@ -107,13 +113,23 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		edgeFrameTime = now;
 		if (next === null || (next.x === stage.x && next.y === stage.y)) return;
 		stage.position.set(next.x, next.y);
+		if (edgePointer !== null && drag.refreshPointerFx !== undefined) {
+			const bounds = canvas.getBoundingClientRect();
+			RendererRuntime.runSync(
+				drag.refreshPointerFx({
+					pointerId: edgePointer.pointerId,
+					x: ((edgePointer.clientX - bounds.left) * width) / bounds.width,
+					y: ((edgePointer.clientY - bounds.top) * height) / bounds.height,
+				}),
+			);
+		}
 		invalidateFn();
 		cancelEdgeFrameFn = RendererRuntime.runSync(frames.scheduleFx(edgeFrameFn));
 	};
 	const trackEdgePointerFn = (event: PointerEvent) => {
 		if (
 			event.target !== canvas ||
-			event.buttons !== 0 ||
+			(event.buttons & ~1) !== 0 ||
 			blocked ||
 			closed ||
 			pan !== null ||
@@ -123,6 +139,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			return;
 		}
 		edgePointer = {
+			pointerId: event.pointerId,
 			clientX: event.clientX,
 			clientY: event.clientY,
 		};
@@ -224,6 +241,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		invalidateFn();
 	};
 	const pointerUpFn = (event: PointerEvent) => {
+		stopEdgePanFn();
 		if (pan === null || event.pointerId !== pan.pointerId) return;
 		if (event.type === "pointerup") pointerMoveFn(event);
 		if (pan?.phase === "dragging") event.stopImmediatePropagation();

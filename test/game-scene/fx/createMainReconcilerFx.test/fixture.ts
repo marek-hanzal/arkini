@@ -429,6 +429,7 @@ export const createDrag = () => {
 					detached.push(actor);
 				}),
 			requestRefreshFx: Effect.sync(requestRefresh),
+			refreshPointerFx: () => Effect.void,
 			settleOriginGhostFx: (actor: PixiTileActor) =>
 				Effect.sync(() => {
 					settledOriginGhosts.push(actor);

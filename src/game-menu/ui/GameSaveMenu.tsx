@@ -9,6 +9,7 @@ import {
 	useFloating,
 	useInteractions,
 } from "@floating-ui/react";
+import { DateTime } from "luxon";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -136,7 +137,10 @@ export const GameSaveMenu = ({
 									</span>
 									<span className="text-xs text-muted">
 										{savedAt != null
-											? new Date(savedAt).toLocaleString()
+											? DateTime.fromMillis(savedAt).toRelative({
+													locale: "en",
+													style: "short",
+												})
 											: error !== undefined
 												? "Could not check availability"
 												: saves === undefined
@@ -146,10 +150,6 @@ export const GameSaveMenu = ({
 								</Button>
 							);
 						})}
-						<p className="px-3 pt-2 text-xs text-muted">
-							Checkpoints refresh at these intervals. Times show when each was saved.
-							Loading replaces your current progress.
-						</p>
 						{error !== undefined ? (
 							<p className="px-3 pt-2 text-xs text-danger">{error}</p>
 						) : null}

@@ -3,7 +3,7 @@ import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchem
 
 const writeSemaphore = Semaphore.makeUnsafe(1);
 
-/** Serializes, persists, and applies one requested native window mode through Electron. */
+/** Serializes preference writes through Electron; native mode application is best effort. */
 export const writeWindowModeFx = Effect.fn("writeWindowModeFx")((mode: WindowModeSchema.Type) =>
 	writeSemaphore.withPermits(1)(
 		Effect.tryPromise({

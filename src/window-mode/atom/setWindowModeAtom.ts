@@ -4,7 +4,7 @@ import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchem
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { writeWindowModeFx } from "~/window-mode/fx/writeWindowModeFx";
 
-/** Requests one mode and lets Electron-confirmed events publish the physical result. */
+/** Requests one mode and lets Electron publish the successfully saved preference. */
 export const setWindowModeAtom = Atom.fn(
 	(nextMode: WindowModeSchema.Type) =>
 		Effect.gen(function* () {

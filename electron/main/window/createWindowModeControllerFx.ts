@@ -1,5 +1,5 @@
 import { screen, type BrowserWindow } from "electron";
-import { Deferred, Effect, Exit, Fiber, FiberHandle, Queue, Scope, SynchronizedRef } from "effect";
+import { Cause, Deferred, Effect, Exit, FiberHandle, Scope, SynchronizedRef } from "effect";
 import { SerakkiElectronApi } from "~electron/contract/SerakkiElectronApi";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
@@ -15,11 +15,8 @@ type WindowedMode = Exclude<WindowModeSchema.Type, "fullscreen">;
 
 interface PendingRequest {
 	readonly mode: WindowModeSchema.Type;
-	readonly nativeConfirmations: Queue.Queue<NativeConfirmation>;
-	readonly outcome: Deferred.Deferred<void, unknown>;
+	readonly ready: Deferred.Deferred<void>;
 }
-
-type NativeConfirmation = "enter-full-screen" | "leave-full-screen";
 
 const NATIVE_TRANSITION_TIMEOUT_MS = 5_000;
 
@@ -36,10 +33,14 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 	}) =>
 		Effect.gen(function* () {
 			let currentMode = initialMode;
+			let revision = 0;
+			let closed = false;
 			let previousWindowedMode: WindowedMode =
 				initialMode === "fullscreen" ? "default" : initialMode;
 			let nativeFullscreenTarget = initialMode === "fullscreen";
 			let applyingWindowedMode = false;
+			const nativeFullscreenAcknowledgements = new Set<boolean>();
+			const nativeWindowedAcknowledgements = new Set<WindowedMode>();
 
 			const controllerScope = yield* Scope.make();
 			const requestFibers = yield* FiberHandle.make<void, never>().pipe(
@@ -58,18 +59,20 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				Effect.gen(function* () {
 					applyingWindowedMode = true;
 					if (mode === "bordered") {
+						if (!window.isMaximized()) nativeWindowedAcknowledgements.add("bordered");
 						window.maximize();
+						while (!window.isMaximized()) yield* Effect.sleep(50);
+						nativeWindowedAcknowledgements.delete("bordered");
 						return;
 					}
 					const display = screen.getDisplayMatching(window.getBounds());
 					const { x, y, width, height } = calculateInitialWindowBoundsFn(
 						display.workArea,
 					);
+					if (window.isMaximized()) nativeWindowedAcknowledgements.add("default");
 					window.unmaximize();
-					yield* Effect.callback<void>((resumeFn) => {
-						const immediate = setImmediate(() => resumeFn(Effect.void));
-						return Effect.sync(() => clearImmediate(immediate));
-					});
+					while (window.isMaximized()) yield* Effect.sleep(50);
+					nativeWindowedAcknowledgements.delete("default");
 					window.setBounds({
 						x,
 						y,
@@ -85,7 +88,6 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				);
 
 			const publishModeFn = (mode: WindowModeSchema.Type) => {
-				nativeFullscreenTarget = mode === "fullscreen";
 				if (mode === "fullscreen") {
 					if (currentMode !== "fullscreen") previousWindowedMode = currentMode;
 				} else {
@@ -97,70 +99,35 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 				}
 			};
 
-			const persistPassiveModeFx = (mode: WindowModeSchema.Type) =>
-				windowPreferences.writeModeFx(mode).pipe(
-					Effect.catchCause((cause) =>
-						Effect.sync(() => {
-							console.error("Serakki window mode could not be persisted.", cause);
-						}),
-					),
-				);
-
-			const settlePassiveModeFx = (mode: WindowModeSchema.Type) =>
-				Effect.sync(() => publishModeFn(mode)).pipe(
-					Effect.andThen(persistPassiveModeFx(mode)),
-				);
-
 			const readPendingRequestFx = SynchronizedRef.get(pendingRequest);
 
-			const confirmNativeModeFx = (
-				confirmation: NativeConfirmation,
-				mode: WindowModeSchema.Type,
-			) =>
+			// Native events are hints; Windows can update state without delivering the
+			// fullscreen event. Polling also handles a synchronous event during setFullScreen.
+			const awaitFullscreenStateFx = (fullscreen: boolean) =>
 				Effect.gen(function* () {
-					const request = yield* readPendingRequestFx;
-					if (request !== undefined) {
-						yield* Queue.offer(request.nativeConfirmations, confirmation);
-						return;
-					}
-					yield* settlePassiveModeFx(mode);
+					while (window.isFullScreen() !== fullscreen) yield* Effect.sleep(50);
+					nativeFullscreenAcknowledgements.delete(fullscreen);
 				});
 
-			const awaitNativeConfirmationFx = (
-				request: PendingRequest,
-				expected: NativeConfirmation,
-			): Effect.Effect<void, never, never> =>
+			const applyFullscreenStateFx = (fullscreen: boolean) =>
 				Effect.gen(function* () {
-					while ((yield* Queue.take(request.nativeConfirmations)) !== expected) {
-						// Electron can still deliver a superseded transition's native event.
-					}
-				});
-
-			const applyFullscreenStateFx = (request: PendingRequest, fullscreen: boolean) =>
-				Effect.gen(function* () {
-					const awaitConfirmationFx = (nextFullscreen: boolean) =>
-						awaitNativeConfirmationFx(
-							request,
-							nextFullscreen ? "enter-full-screen" : "leave-full-screen",
-						);
-
 					if (window.isFullScreen() !== nativeFullscreenTarget) {
-						yield* awaitConfirmationFx(nativeFullscreenTarget);
+						yield* awaitFullscreenStateFx(nativeFullscreenTarget);
 					}
 					if (window.isFullScreen() === fullscreen) return;
 					nativeFullscreenTarget = fullscreen;
+					nativeFullscreenAcknowledgements.add(fullscreen);
 					window.setFullScreen(fullscreen);
-					yield* awaitConfirmationFx(fullscreen);
+					yield* awaitFullscreenStateFx(fullscreen);
 				});
 
 			const requestLifecycleFx = (request: PendingRequest) =>
 				Effect.gen(function* () {
 					yield* Effect.gen(function* () {
 						if (request.mode === "fullscreen") {
-							if (currentMode !== "fullscreen") previousWindowedMode = currentMode;
-							yield* applyFullscreenStateFx(request, true);
+							yield* applyFullscreenStateFx(true);
 						} else {
-							yield* applyFullscreenStateFx(request, false);
+							yield* applyFullscreenStateFx(false);
 							yield* applyWindowedModeFx(request.mode);
 						}
 					}).pipe(
@@ -169,124 +136,140 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 							orElse: () =>
 								Effect.sync(() => {
 									nativeFullscreenTarget = window.isFullScreen();
-								}).pipe(
-									Effect.andThen(
-										Effect.fail(
-											new Error(
-												`Electron did not confirm ${request.mode} mode in time.`,
-											),
-										),
-									),
-								),
+									console.warn(
+										`Serakki saved ${request.mode} mode, but Electron did not reach it in time.`,
+									);
+								}),
 						}),
+						Effect.catchCause((cause) =>
+							Cause.hasInterrupts(cause)
+								? Effect.failCause(cause)
+								: Effect.sync(() => {
+										nativeFullscreenTarget = window.isFullScreen();
+										console.error(
+											"Serakki saved the window mode, but could not apply it.",
+											cause,
+										);
+									}),
+						),
 					);
-
-					yield* Effect.sync(() => publishModeFn(request.mode));
-					yield* windowPreferences.writeModeFx(request.mode);
 				}).pipe(Effect.ensuring(clearPendingRequestFx(request)));
 
-			const requestModeFx = (mode: WindowModeSchema.Type) =>
+			const requestModeFx = (mode: WindowModeSchema.Type, passiveRevision?: number) =>
 				Effect.gen(function* () {
 					const request: PendingRequest = {
 						mode,
-						nativeConfirmations: yield* Queue.unbounded<NativeConfirmation>(),
-						outcome: yield* Deferred.make<void, unknown>(),
+						ready: yield* Deferred.make<void>(),
 					};
-					const fiber = yield* SynchronizedRef.modifyEffect(pendingRequest, (previous) =>
+					yield* SynchronizedRef.modifyEffect(pendingRequest, (previous) =>
 						Effect.gen(function* () {
-							if (previous !== undefined) {
-								yield* Deferred.fail(
-									previous.outcome,
-									new Error(`Window mode request was superseded by ${mode}.`),
-								);
+							if (
+								passiveRevision !== undefined &&
+								(passiveRevision !== revision || previous !== undefined)
+							) {
+								return [
+									undefined,
+									previous,
+								] as const;
 							}
-							const nextFiber = yield* FiberHandle.run(
+							// Persist and publish in admission order. Native application runs in
+							// the window scope and never holds an IPC caller behind OS confirmation.
+							yield* windowPreferences.writeModeFx(mode);
+							revision += 1;
+							if (passiveRevision !== undefined)
+								nativeFullscreenTarget = window.isFullScreen();
+							publishModeFn(mode);
+							if (closed)
+								return [
+									undefined,
+									previous,
+								] as const;
+							yield* FiberHandle.run(
 								requestFibers,
-								Deferred.into(requestLifecycleFx(request), request.outcome).pipe(
-									Effect.asVoid,
+								Deferred.await(request.ready).pipe(
+									Effect.andThen(requestLifecycleFx(request)),
 								),
 							);
 							return [
-								nextFiber,
+								undefined,
 								request,
 							] as const;
 						}),
 					);
+					yield* Deferred.succeed(request.ready, undefined);
+				});
 
-					return yield* Deferred.await(request.outcome).pipe(
-						Effect.onInterrupt(() =>
-							clearPendingRequestFx(request).pipe(
-								Effect.andThen(Fiber.interrupt(fiber)),
-							),
-						),
-					);
+			const settlePassiveModeFx = (mode: WindowModeSchema.Type) =>
+				Effect.gen(function* () {
+					if (mode === currentMode) return;
+					yield* requestModeFx(mode, revision);
+				}).pipe(
+					Effect.catchCause((cause) =>
+						Effect.sync(() => {
+							console.error(
+								"Serakki native window mode could not be persisted.",
+								cause,
+							);
+						}),
+					),
+				);
+
+			const handleFullscreenEventFx = (fullscreen: boolean, acknowledgement: boolean) =>
+				Effect.gen(function* () {
+					if ((yield* readPendingRequestFx) !== undefined) return;
+					if (acknowledgement) {
+						// A timed-out or superseded native transition must not replace the saved
+						// intent. The set is bounded by the two possible fullscreen targets.
+						if (window.isFullScreen() !== (currentMode === "fullscreen")) {
+							yield* requestModeFx(currentMode, revision);
+						}
+						return;
+					}
+					if (window.isFullScreen() !== fullscreen) return;
+					yield* settlePassiveModeFx(fullscreen ? "fullscreen" : previousWindowedMode);
 				});
 
 			window.on("enter-full-screen", () => {
+				const acknowledgement = nativeFullscreenAcknowledgements.delete(true);
 				void ElectronMainRuntime.runPromise(
-					confirmNativeModeFx("enter-full-screen", "fullscreen"),
+					handleFullscreenEventFx(true, acknowledgement),
+				).catch((cause) =>
+					console.error("Serakki could not reconcile the native window mode.", cause),
 				);
 			});
 			window.on("leave-full-screen", () => {
+				const acknowledgement = nativeFullscreenAcknowledgements.delete(false);
+				void ElectronMainRuntime.runPromise(
+					handleFullscreenEventFx(false, acknowledgement),
+				).catch((cause) =>
+					console.error("Serakki could not reconcile the native window mode.", cause),
+				);
+			});
+			const onWindowedModeChangedFn = (mode: WindowedMode) => {
+				const acknowledgement = nativeWindowedAcknowledgements.delete(mode);
+				if (window.isFullScreen() || applyingWindowedMode) return;
 				void ElectronMainRuntime.runPromise(
 					Effect.gen(function* () {
-						const request = yield* readPendingRequestFx;
-						if (request !== undefined) {
-							yield* Queue.offer(request.nativeConfirmations, "leave-full-screen");
+						if (acknowledgement) {
+							if (
+								(yield* readPendingRequestFx) === undefined &&
+								(window.isMaximized() ? "bordered" : "default") !== currentMode
+							) {
+								yield* requestModeFx(currentMode, revision);
+							}
 							return;
 						}
-						yield* applyWindowedModeFx(previousWindowedMode);
-						yield* settlePassiveModeFx(previousWindowedMode);
+						yield* settlePassiveModeFx(window.isMaximized() ? "bordered" : "default");
 					}),
+				).catch((cause) =>
+					console.error("Serakki could not reconcile the native window mode.", cause),
 				);
-			});
-			window.on("maximize", () => {
-				if (window.isFullScreen()) return;
-				void ElectronMainRuntime.runPromise(
-					Effect.gen(function* () {
-						const request = yield* readPendingRequestFx;
-						if (request !== undefined) return;
-						if (!applyingWindowedMode) {
-							yield* settlePassiveModeFx(
-								window.isMaximized() ? "bordered" : "default",
-							);
-						}
-					}),
-				);
-			});
-			window.on("unmaximize", () => {
-				if (window.isFullScreen()) return;
-				void ElectronMainRuntime.runPromise(
-					Effect.gen(function* () {
-						const request = yield* readPendingRequestFx;
-						if (request !== undefined) return;
-						if (!applyingWindowedMode) {
-							yield* settlePassiveModeFx(
-								window.isMaximized() ? "bordered" : "default",
-							);
-						}
-					}),
-				);
-			});
+			};
+			window.on("maximize", () => onWindowedModeChangedFn("bordered"));
+			window.on("unmaximize", () => onWindowedModeChangedFn("default"));
 			window.once("closed", () => {
-				void ElectronMainRuntime.runPromise(
-					SynchronizedRef.modifyEffect(pendingRequest, (request) =>
-						Effect.gen(function* () {
-							if (request !== undefined) {
-								yield* Deferred.fail(
-									request.outcome,
-									new Error(
-										"The window closed before its mode transition completed.",
-									),
-								);
-							}
-							return [
-								undefined,
-								undefined,
-							] as const;
-						}),
-					).pipe(Effect.andThen(Scope.close(controllerScope, Exit.void))),
-				);
+				closed = true;
+				void ElectronMainRuntime.runPromise(Scope.close(controllerScope, Exit.void));
 			});
 			window.webContents.on("before-input-event", (event, input) => {
 				if (input.type !== "keyDown" || input.isAutoRepeat) return;

@@ -22,11 +22,15 @@ export const createHarness = (
 	initialMode: WindowModeSchema.Type,
 	{
 		deferFullscreenStateUntilEvent = false,
+		deferMaximizeStateUntilEvent = false,
 		fullscreen = initialMode === "fullscreen",
+		synchronousFullscreenEvent = false,
 		writeModeFx,
 	}: {
 		readonly deferFullscreenStateUntilEvent?: boolean;
+		readonly deferMaximizeStateUntilEvent?: boolean;
 		readonly fullscreen?: boolean;
+		readonly synchronousFullscreenEvent?: boolean;
 		readonly writeModeFx?: WindowPreferences["writeModeFx"];
 	} = {},
 ) => {
@@ -35,7 +39,7 @@ export const createHarness = (
 	let isFullscreen = fullscreen;
 	let isMaximized = initialMode === "bordered";
 	const maximize = vi.fn(() => {
-		isMaximized = true;
+		if (!deferMaximizeStateUntilEvent) isMaximized = true;
 	});
 	const unmaximize = vi.fn(() => {
 		isMaximized = false;
@@ -65,6 +69,8 @@ export const createHarness = (
 		setBounds,
 		setFullScreen: vi.fn((next: boolean) => {
 			if (!deferFullscreenStateUntilEvent) isFullscreen = next;
+			if (synchronousFullscreenEvent)
+				windowEvents.emit(next ? "enter-full-screen" : "leave-full-screen");
 		}),
 		unmaximize,
 		webContents: Object.assign(webContentsEvents, {

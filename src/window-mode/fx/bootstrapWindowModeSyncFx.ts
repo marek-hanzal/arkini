@@ -4,7 +4,7 @@ import { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";
 
-/** Bootstraps the process-lifetime renderer listener for Electron-confirmed mode changes. */
+/** Bootstraps the process-lifetime renderer listener for saved window-mode changes. */
 export const bootstrapWindowModeSyncFx = Effect.fn("bootstrapWindowModeSyncFx")(() =>
 	Effect.map(AtomRegistry.AtomRegistry, (registry) =>
 		window.serakki.window.onModeChangedFn((candidate) => {

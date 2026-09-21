@@ -162,7 +162,7 @@ The filesystem Project Repository and Electron IPC composition are mapped in [`e
 | `application-shell` | Root context, fatal surface and route transitions | [`src/application-shell/ui/renderRendererFx.tsx`](src/application-shell/ui/renderRendererFx.tsx) |
 | `renderer-bootstrap` | Ordered renderer startup and React root composition | [`src/renderer-bootstrap/ui/bootstrapRendererFx.tsx`](src/renderer-bootstrap/ui/bootstrapRendererFx.tsx) |
 | `launcher` | Session startup, Hero/About resources and shell surfaces | [`src/launcher/ui/LauncherScene.tsx`](src/launcher/ui/LauncherScene.tsx) |
-| `window-mode` | Native window-mode state and confirmed synchronization | [`src/window-mode/fx/bootstrapWindowModeSyncFx.ts`](src/window-mode/fx/bootstrapWindowModeSyncFx.ts) |
+| `window-mode` | Saved window-mode preference and native synchronization | [`src/window-mode/fx/bootstrapWindowModeSyncFx.ts`](src/window-mode/fx/bootstrapWindowModeSyncFx.ts) |
 | `translation` | Locale catalogs, negotiation, translator and Markdown | [`src/translation/fx/bootstrapTranslationFx.ts`](src/translation/fx/bootstrapTranslationFx.ts) |
 | `fuzzy-search` | App-wide exact-first Fuse search over explicit domain terms | [`src/fuzzy-search/fn/createFuzzySearchFn.ts`](src/fuzzy-search/fn/createFuzzySearchFn.ts) |
 | `ui` | Cross-product presentation primitives only | [`src/ui/ui`](src/ui/ui) |

@@ -1,4 +1,5 @@
-import { BrowserWindow, ipcMain, Menu, screen } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, screen } from "electron";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
 import { SerakkiWindowTitle } from "~shared/SerakkiAppMetadata";
@@ -36,6 +37,9 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				...bounds,
 				show: false,
 				title: SerakkiWindowTitle,
+				icon: app.isPackaged
+					? fileURLToPath(new URL("../renderer/icon-512.png", import.meta.url))
+					: resolve("public/icon-512.png"),
 				backgroundColor: "#000000",
 				fullscreen: windowMode === "fullscreen",
 				fullscreenable: true,

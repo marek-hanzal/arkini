@@ -94,6 +94,6 @@ The application ships as **Serakki** (`dev.marekhanzal.serakki`) with the `serak
 
 The macOS application requires macOS 13 (Ventura) or newer, matching Electron 44.
 
-Working branches run the complete repository gate on hosted Linux and the focused platform gate on macOS and Windows; every platform builds and verifies a Community Serapack. `main` deliberately runs nothing. Prerelease tags repeat those gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release.
+Working branches run the complete repository gate on hosted Linux and the focused platform gate on macOS and Windows; every platform builds and verifies a Community Serapack. `main` deliberately runs nothing. Prerelease tags repeat those gates before packaging, while stable tags package without rerunning them; both publish a GitHub Release. The release workflow can also be dispatched from `main` with an existing `release_tag` to recover delivery without moving that tag; source checkout, version stamping, and artifact names all use the selected tag.
 
 Every tag build creates the official Serapack once, embeds a keyless Sigstore proof for the configured distribution channel, and reuses the exact self-contained bytes in every native package and standalone release artifact. Local and Editor packs are Community. Both states are playable; [`VERSION.md`](VERSION.md) owns soft provenance.

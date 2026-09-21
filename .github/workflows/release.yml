@@ -1,21 +1,29 @@
 name: Release Artifacts
+run-name: Release ${{ inputs.release_tag || github.ref_name }}
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing immutable release tag to build
+        required: true
+        type: string
   push:
     tags:
       - "v[0-9]*.[0-9]*.[0-9]*"
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.release_tag || github.ref_name }}
   cancel-in-progress: false
 
 env:
+  SERAKKI_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
   SERAKKI_RELEASE_ISSUER: https://token.actions.githubusercontent.com
   SERAKKI_RELEASE_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/release.yml
 
 jobs:
   prerelease_checks:
-    if: ${{ contains(github.ref_name, '-') }}
+    if: ${{ contains(inputs.release_tag || github.ref_name, '-') }}
     name: Prerelease ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -40,12 +48,14 @@ jobs:
     steps:
       - name: Check out release commit
         uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ env.SERAKKI_RELEASE_TAG }}
       - name: Install repository toolchain
         uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
       - name: Install dependencies
         run: ./Argcfile.sh install
       - name: Use tag version for release checks
-        run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
+        run: ./Argcfile.sh version "${SERAKKI_RELEASE_TAG#v}"
       - name: Prepare Community Serapack cache
         uses: ./.github/actions/serapack-cache
       - name: Run repository gate
@@ -53,7 +63,7 @@ jobs:
 
   prepare_serapack:
     needs: prerelease_checks
-    if: ${{ always() && (needs.prerelease_checks.result == 'success' || needs.prerelease_checks.result == 'skipped') }}
+    if: ${{ !cancelled() && (needs.prerelease_checks.result == 'success' || needs.prerelease_checks.result == 'skipped') }}
     name: Build and sign the canonical Serapack once
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -64,13 +74,14 @@ jobs:
       - name: Check out release commit
         uses: actions/checkout@v6
         with:
+          ref: refs/tags/${{ env.SERAKKI_RELEASE_TAG }}
           fetch-depth: 0
       - name: Install repository toolchain
         uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
       - name: Install dependencies
         run: ./Argcfile.sh install
       - name: Use tag version for release artifacts
-        run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
+        run: ./Argcfile.sh version "${SERAKKI_RELEASE_TAG#v}"
       - name: Build, sign, and verify canonical Serapack
         env:
           SERAKKI_EXPECTED_PROVENANCE: official
@@ -79,14 +90,15 @@ jobs:
       - name: Upload canonical Serapack
         uses: actions/upload-artifact@v6
         with:
-          name: serakki-canonical-${{ github.ref_name }}
+          name: serakki-canonical-${{ env.SERAKKI_RELEASE_TAG }}
           path: game/serakki/build/serakki.serapack
           if-no-files-found: error
-          retention-days: ${{ contains(github.ref_name, '-') && 14 || 30 }}
+          retention-days: ${{ contains(inputs.release_tag || github.ref_name, '-') && 14 || 30 }}
 
   package:
     name: Package ${{ matrix.name }}
     needs: prepare_serapack
+    if: ${{ !cancelled() && needs.prepare_serapack.result == 'success' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     permissions:
@@ -132,29 +144,32 @@ jobs:
     steps:
       - name: Check out release commit
         uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ env.SERAKKI_RELEASE_TAG }}
       - name: Install repository toolchain
         uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
       - name: Install dependencies
         run: ./Argcfile.sh install
       - name: Use tag version for release artifacts
-        run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
+        run: ./Argcfile.sh version "${SERAKKI_RELEASE_TAG#v}"
       - name: Download canonical Serapack
         uses: actions/download-artifact@v8
         with:
-          name: serakki-canonical-${{ github.ref_name }}
+          name: serakki-canonical-${{ env.SERAKKI_RELEASE_TAG }}
           path: .release
       - name: Package release artifacts
         run: ./Argcfile.sh "${{ matrix.command }}"
       - name: Upload release artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ matrix.artifact }}-${{ github.ref_name }}
+          name: ${{ matrix.artifact }}-${{ env.SERAKKI_RELEASE_TAG }}
           path: ${{ matrix.paths }}
           if-no-files-found: error
-          retention-days: ${{ contains(github.ref_name, '-') && 14 || 30 }}
+          retention-days: ${{ contains(inputs.release_tag || github.ref_name, '-') && 14 || 30 }}
 
   publish_release:
     needs: package
+    if: ${{ !cancelled() && needs.package.result == 'success' }}
     name: Publish complete release
     runs-on: ubuntu-24.04
     permissions:
@@ -163,22 +178,22 @@ jobs:
       - name: Download macOS artifacts
         uses: actions/download-artifact@v8
         with:
-          name: serakki-macos-arm64-${{ github.ref_name }}
+          name: serakki-macos-arm64-${{ env.SERAKKI_RELEASE_TAG }}
           path: release/macos
       - name: Download Windows artifacts
         uses: actions/download-artifact@v8
         with:
-          name: serakki-windows-x64-${{ github.ref_name }}
+          name: serakki-windows-x64-${{ env.SERAKKI_RELEASE_TAG }}
           path: release/windows
       - name: Download Linux x64 artifacts
         uses: actions/download-artifact@v8
         with:
-          name: serakki-linux-x64-${{ github.ref_name }}
+          name: serakki-linux-x64-${{ env.SERAKKI_RELEASE_TAG }}
           path: release/linux-x64
       - name: Download Linux arm64 artifacts
         uses: actions/download-artifact@v8
         with:
-          name: serakki-linux-arm64-${{ github.ref_name }}
+          name: serakki-linux-arm64-${{ env.SERAKKI_RELEASE_TAG }}
           path: release/linux-arm64
       - name: Publish GitHub release
         env:
@@ -186,10 +201,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           release_flags=()
-          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+          if [[ "$SERAKKI_RELEASE_TAG" == *-* ]]; then
             release_flags+=(--prerelease)
           fi
-          gh release create "$GITHUB_REF_NAME" \
+          gh release create "$SERAKKI_RELEASE_TAG" \
             release/macos/*.dmg \
             release/macos/*.zip \
             release/macos/serakki.serapack \
@@ -199,5 +214,5 @@ jobs:
             release/linux-arm64/*.AppImage \
             --verify-tag \
             "${release_flags[@]}" \
-            --title "Serakki $GITHUB_REF_NAME" \
+            --title "Serakki $SERAKKI_RELEASE_TAG" \
             --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 applications with one embedded official Serapack, plus the same standalone Serapack. GitHub exposes the SHA-256 digest of every asset; macOS requires the normal Gatekeeper override."

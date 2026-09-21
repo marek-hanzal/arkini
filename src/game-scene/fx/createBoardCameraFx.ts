@@ -261,8 +261,8 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		const delta =
 			event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? height : 1);
 		const nextScale = Math.max(
-			0.02,
-			Math.min(8, stage.scale.x * Math.exp(-delta * (event.ctrlKey ? 0.01 : 0.002))),
+			0.08,
+			Math.min(1.65, stage.scale.x * Math.exp(-delta * (event.ctrlKey ? 0.01 : 0.002))),
 		);
 		const ratio = nextScale / stage.scale.x;
 		stage.position.set(x - (x - stage.x) * ratio, y - (y - stage.y) * ratio);

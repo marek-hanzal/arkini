@@ -22,3 +22,5 @@ https://marek-hanzal.github.io/serakki/, and the local hero artwork.
 Update canonical, Open Graph, and Twitter image URLs together if the domain changes.
 The longer gameplay sample uses the complete 21.32.28 recording (about 2 minutes
 46 seconds), without trimming. It is exported at 1920 pixels wide and loads on demand.
+
+Downloads resolve platform assets from GitHub's public `releases/latest` API at page load. Asset suffixes match the desktop packaging names; versions are not embedded in the page. Drafts and prereleases are excluded. The static latest-release link remains usable without JavaScript or if the API is unavailable/rate-limited. No token is shipped to the browser.

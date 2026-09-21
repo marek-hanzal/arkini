@@ -30,10 +30,11 @@ const updateProgressBarFn = ({
 	if (progressRatio === undefined) return;
 	const inset = (size * (1 - actor.item.artworkScale)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
-	const width = faceSize * 0.76;
+	const padding = inset + faceSize * 0.05;
+	const width = size - padding * 2;
 	const height = Math.max(2, faceSize * 0.045);
-	const x = inset + (faceSize - width) / 2;
-	const y = Math.min(size - height, inset + faceSize + Math.max(1, (inset - height) / 2));
+	const x = padding;
+	const y = size - padding - height;
 	const radius = height / 2;
 	actor.progressBar.roundRect(x, y, width, height, radius).fill({
 		alpha: 0.62,

@@ -26,7 +26,7 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 }: updateActorVisualFx.Props) {
 	const inset = (size * (1 - item.artworkScale)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
-	const badgeFontSize = Math.max(9, Math.min(18, faceSize * 0.14));
+	const badgeFontSize = Math.max(18, Math.min(36, faceSize * 0.28));
 
 	visual.item = item;
 	visual.size = size;
@@ -57,7 +57,6 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 		item.badgeKind === "units" && (item.badgeCount ?? 0) <= 1 ? undefined : item.badgeCount;
 	const stackCount =
 		item.badgeKind !== undefined && item.quantity > 1 ? item.quantity : undefined;
-	let badgeRight = inset + faceSize - faceSize * 0.05;
 	for (const badge of [
 		{
 			text: visual.quantity,
@@ -82,7 +81,10 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 		const badgePaddingY = Math.max(2, faceSize * 0.02);
 		const badgeWidth = badge.text.width + badgePaddingX * 2;
 		const badgeHeight = badge.text.height + badgePaddingY * 2;
-		const badgeX = badgeRight - badgeWidth;
+		const badgeX =
+			badge.kind === undefined
+				? inset + faceSize * 0.05
+				: inset + faceSize - faceSize * 0.05 - badgeWidth;
 		const badgeY = inset + faceSize * 0.05;
 		badge.text.x = badgeX + badgePaddingX;
 		badge.text.y = badgeY + badgePaddingY;
@@ -93,6 +95,5 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 				alpha: 0.86,
 				color: palette.overlay,
 			});
-		badgeRight = badgeX - Math.max(2, faceSize * 0.025);
 	}
 });

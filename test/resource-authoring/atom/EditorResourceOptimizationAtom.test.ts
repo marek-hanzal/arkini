@@ -1,5 +1,5 @@
 import { scheduleTask } from "@effect/atom-react";
-import { Deferred, Effect } from "effect";
+import { Cause, Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -209,5 +209,96 @@ describe("EditorResourceOptimizationAtom", () => {
 			kind: "idle",
 		});
 		unmount();
+	});
+	it("keeps one typed optimization failure dismissible without changing its identity", async () => {
+		const error = new Error("resource conversion failed");
+		state.optimize.mockReturnValue(Effect.fail(error));
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registries.push(registry);
+		const atom = EditorResourceOptimizationAtom("typed-failure-project");
+		const unmount = registry.mount(atom);
+		registry.set(atom, {
+			kind: "optimize",
+			expectedRevision: 4,
+			resourceIds: [
+				"one",
+			],
+			type: "artwork",
+		});
+		await vi.waitFor(() =>
+			expect(registry.get(atom)).toMatchObject({
+				kind: "failure",
+			}),
+		);
+		const settled = registry.get(atom);
+		if (settled.kind !== "failure") throw new Error("Expected typed optimization failure.");
+		expect(settled.error).toBe(error);
+		registry.set(atom, {
+			kind: "dismiss",
+		});
+		expect(registry.get(atom)).toEqual({
+			kind: "idle",
+		});
+		unmount();
+	});
+
+	it.each([
+		"defect",
+		"mixed",
+		"interrupt",
+	] as const)("propagates the complete %s cause across optimization remount", async (kind) => {
+		const defect = new Error("project publication defect");
+		const cause =
+			kind === "defect"
+				? Cause.die(defect)
+				: kind === "mixed"
+					? Cause.combine(Cause.fail(new Error("conversion failure")), Cause.die(defect))
+					: Cause.interrupt(123);
+		state.optimize.mockReturnValue(
+			kind === "mixed"
+				? Effect.yieldNow.pipe(Effect.andThen(Effect.failCause(cause)))
+				: Effect.failCause(cause),
+		);
+		const registry = AtomRegistry.make({
+			scheduleTask,
+			defaultIdleTTL: 10,
+		});
+		registries.push(registry);
+		const atom = EditorResourceOptimizationAtom(`fatal-${kind}-project`);
+		const unmount = registry.mount(atom);
+		try {
+			registry.set(atom, {
+				kind: "optimize",
+				expectedRevision: 4,
+				resourceIds: [
+					"one",
+				],
+				type: "artwork",
+			});
+		} catch (error) {
+			expect(error).toBe(cause);
+		}
+		const readThrown = () => {
+			try {
+				registry.get(atom);
+			} catch (error) {
+				return error;
+			}
+			return undefined;
+		};
+		await vi.waitFor(() => expect(readThrown()).toBe(cause));
+		unmount();
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		let remount: (() => void) | undefined;
+		try {
+			remount = registry.mount(atom);
+		} catch (error) {
+			expect(error).toBe(cause);
+		}
+		expect(readThrown()).toBe(cause);
+		remount?.();
+		expect(state.optimize).toHaveBeenCalledOnce();
 	});
 });

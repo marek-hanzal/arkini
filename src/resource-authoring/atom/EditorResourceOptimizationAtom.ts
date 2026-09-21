@@ -1,6 +1,8 @@
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
-import { Cause, Effect, Exit } from "effect";
+import { Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -75,10 +77,11 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 								),
 							);
 							if (Exit.isFailure(exit)) {
-								if (Cause.hasInterruptsOnly(exit.cause))
+								const failure = readExactCauseFailureFn(exit.cause);
+								if (Option.isNone(failure))
 									return yield* Effect.failCause(exit.cause);
 								yield* Atom.set(stateAtom, {
-									error: Cause.squash(exit.cause),
+									error: failure.value,
 									kind: "failure",
 									type: command.type,
 								});
@@ -97,7 +100,8 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 
 				return Atom.writable(
 					(get) => {
-						get(runnerAtom);
+						const result = get(runnerAtom);
+						if (AsyncResult.isFailure(result) && !result.waiting) throw result.cause;
 						return get(stateAtom);
 					},
 					(context, command: EditorResourceOptimizationAtom.Command) => {

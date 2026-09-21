@@ -421,6 +421,8 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			const resourceId = game.config.sfx?.events[cue.event];
 			if (
 				disposed ||
+				sound.master === 0 ||
+				sound.sfx === 0 ||
 				!unlocked ||
 				activeContext === null ||
 				resourceId === undefined ||

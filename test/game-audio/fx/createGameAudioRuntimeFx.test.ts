@@ -172,6 +172,92 @@ describe("createGameAudioRuntimeFx", () => {
 		expect(harness.close).toHaveBeenCalledOnce();
 	});
 
+	it.each([
+		"master",
+		"sfx",
+	] as const)(
+		"skips muted %s SFX without restarting music or replaying skipped cues",
+		async (channel) => {
+			const harness = createHarness();
+			const getResourceUrlFn = vi.fn((id: string) => `serakki://resource/${id}`);
+			const sound = {
+				master: 100,
+				music: 100,
+				sfx: 100,
+			};
+			const runtime = Effect.runSync(
+				createGameAudioRuntimeFx({
+					game: {
+						config: {
+							music: {
+								playlist: [
+									"theme",
+								],
+							},
+							sfx: {
+								events: {
+									"job:started": "cue",
+								},
+							},
+						},
+						resources: [
+							{
+								id: "theme",
+								type: "music",
+							},
+							{
+								id: "cue",
+								type: "sfx",
+							},
+						],
+						getResourceUrlFn,
+					},
+					maximumSfxVoices: 1,
+					sound: {
+						...sound,
+						[channel]: 0,
+					},
+				}),
+			);
+			await Effect.runPromise(runtime.unlockFx);
+			const music = harness.audios.find(({ src }) => src.endsWith("/theme"));
+			const sfx = harness.audios.find(({ preload }) => preload === "none");
+			if (music === undefined || sfx === undefined)
+				throw new Error("Expected music and SFX voices.");
+			music.currentTime = 37;
+			music.pause.mockClear();
+			getResourceUrlFn.mockClear();
+			const cues = [
+				{
+					event: "job:started" as const,
+					strength: 1,
+				},
+			];
+			await Effect.runPromise(runtime.playFx(cues));
+			expect(getResourceUrlFn).not.toHaveBeenCalled();
+			expect(sfx.load).not.toHaveBeenCalled();
+			expect(sfx.play).not.toHaveBeenCalled();
+			Effect.runSync(runtime.setSoundFx(sound));
+			expect(sfx.play).not.toHaveBeenCalled();
+			expect(music.currentTime).toBe(37);
+			expect(music.play).toHaveBeenCalledOnce();
+			expect(music.pause).not.toHaveBeenCalled();
+			await Effect.runPromise(runtime.playFx(cues));
+			expect(sfx.play).toHaveBeenCalledOnce();
+			expect(sfx.load).toHaveBeenCalledOnce();
+			sfx.dispatchEvent(new Event("ended"));
+			Effect.runSync(
+				runtime.setSoundFx({
+					...sound,
+					[channel]: 0,
+				}),
+			);
+			await Effect.runPromise(runtime.playFx(cues));
+			expect(sfx.play).toHaveBeenCalledOnce();
+			await Effect.runPromise(runtime.closeFx);
+		},
+	);
+
 	it("streams packaged SFX through a fixed voice pool", async () => {
 		const harness = createHarness();
 		const runtime = Effect.runSync(

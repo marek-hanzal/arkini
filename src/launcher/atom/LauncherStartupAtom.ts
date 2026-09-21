@@ -20,6 +20,9 @@ import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceR
 import { LauncherCheatAvailabilityReadyAtom } from "~/launcher/atom/LauncherCheatAvailabilityReadyAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
+import { defaultSoundSettings } from "~electron/contract/sound/SoundSettings";
+import { writeApplicationLogFx } from "~/application-diagnostics/fx/writeApplicationLogFx";
+import { formatApplicationDiagnosticTextFn } from "~/application-diagnostics/fn/formatApplicationDiagnosticTextFn";
 import { readSoundSettingsFx } from "~/application-settings/fx/readSoundSettingsFx";
 
 /** Publishes persisted appearance once without overwriting later user changes on retry. */
@@ -89,6 +92,15 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 	);
 	const windowModeFx = readWindowModeFx().pipe(Effect.tap(applyLauncherWindowModeHydrationFx));
 	const soundFx = readSoundSettingsFx().pipe(
+		Effect.catch((cause) =>
+			writeApplicationLogFx({
+				level: "warning",
+				message: "Sound preferences could not be loaded; using defaults",
+				body: formatApplicationDiagnosticTextFn({
+					value: cause,
+				}),
+			}).pipe(Effect.as(defaultSoundSettings)),
+		),
 		Effect.tap((sound) => Atom.set(SoundSettingsAtom, sound)),
 	);
 	const catalogFx = catalog.refreshFx.pipe(

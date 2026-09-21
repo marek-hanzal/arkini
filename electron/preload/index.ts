@@ -244,6 +244,7 @@ const api: SerakkiElectronApi.Api = {
 			ipcRenderer.invoke(SerakkiElectronApi.channels.incidentWrite, incident),
 	},
 	userData: {
+		hardResetFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.userDataHardReset),
 		openDirectoryFn: () =>
 			ipcRenderer.invoke(SerakkiElectronApi.channels.userDataOpenDirectory),
 	},

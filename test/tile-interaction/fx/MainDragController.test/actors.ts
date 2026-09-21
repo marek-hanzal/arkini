@@ -56,7 +56,9 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 			text: String(actorItem.quantity),
 		}),
 		quantityBackground: new Graphics(),
-		stackQuantity: new Text({ text: "" }),
+		stackQuantity: new Text({
+			text: "",
+		}),
 		stackQuantityBackground: new Graphics(),
 		readyListeners: new Set(),
 		releaseTexturesFn: () => {},

@@ -34,6 +34,7 @@ import type { WindowModeControllerOwnership } from "./window/createWindowModeCon
 import type { EditorProjectServiceOwnership } from "~/project-authoring/service/EditorProjectServiceOwnership";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { z } from "zod";
+import { requestApplicationHardResetFx } from "./requestApplicationHardResetFx";
 
 let registered = false;
 const maxClipboardTextLength = 65_536;
@@ -215,6 +216,9 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 							),
 						),
 					),
+				);
+				ipcMain.handle(SerakkiElectronApi.channels.userDataHardReset, (event) =>
+					runAuthorizedFn(event, requestApplicationHardResetFx),
 				);
 				ipcMain.handle(SerakkiElectronApi.channels.userDataOpenDirectory, (event) =>
 					runAuthorizedFn(
@@ -406,6 +410,7 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 						SerakkiElectronApi.channels.diagnosticsOpenDirectory,
 						SerakkiElectronApi.channels.incidentWrite,
 						SerakkiElectronApi.channels.userDataOpenDirectory,
+						SerakkiElectronApi.channels.userDataHardReset,
 						SerakkiElectronApi.channels.windowModeRead,
 						SerakkiElectronApi.channels.windowModeWrite,
 					]) {

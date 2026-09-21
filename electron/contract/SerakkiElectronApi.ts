@@ -93,6 +93,7 @@ export namespace SerakkiElectronApi {
 		diagnosticsOpenDirectory: "serakki:diagnostics:open-directory",
 		incidentWrite: "serakki:incident:write",
 		userDataOpenDirectory: "serakki:user-data:open-directory",
+		userDataHardReset: "serakki:user-data:hard-reset",
 		windowModeRead: "serakki:window:mode:read",
 		windowModeWrite: "serakki:window:mode:write",
 		windowModeChanged: "serakki:window:mode:changed",
@@ -326,6 +327,7 @@ export namespace SerakkiElectronApi {
 			readonly writeFn: (incident: GameIncidentWrite) => Promise<void>;
 		};
 		readonly userData: {
+			readonly hardResetFn: () => Promise<void>;
 			readonly openDirectoryFn: () => Promise<void>;
 		};
 		readonly window: {

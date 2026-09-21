@@ -133,6 +133,8 @@ The router uses history routing in development and packaged Electron. `/` owns r
 
 Electron main owns native windows, protocols, privileged IPC and GUI-side filesystem composition. Window-mode requests persist the preference before publishing it to the renderer; applying it to the native window is best effort. Native acknowledgement failures are diagnostic only, while preference-write failures remain observable to the caller. Node-compatible Project and MCP transport capabilities live under their semantic `src` owners, so the GUI and CLI may compose them without importing each other's process root. Renderer domains receive typed capabilities through `electron/contract`; native objects and managed project-internal paths never cross it. A user-selected Resource source crosses only as Electron's native path identity so main can copy it without transporting its bytes.
 
+Hard reset is a trusted, path-free main-process request. It relaunches with a one-shot reset flag and exits the old process; the replacement process removes the canonical application data root before initializing diagnostics, repositories, or gameplay services. It never removes the root while the old application can still write into it.
+
 Development admits only the configured loopback Vite origin. Packaged builds admit only `serakki://app/*`. Navigation, frames, popups, permissions, CSP and privileged channels fail closed. HTTP(S) links requesting a new window from the trusted renderer open in the system browser; Electron popups remain denied, as do other URL schemes and URLs containing credentials. IPC validates the registered Serakki `webContents`, exact main frame and current trusted URL; an ID alone is not authorization.
 
 ## Persistence and Editor

@@ -139,6 +139,7 @@ export const renderSettings = async (
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
 	const writeSound = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
+	const hardReset = vi.fn(() => Promise.resolve());
 	const openUserData = vi.fn(() => Promise.resolve());
 	const replaceCli = vi.fn(() =>
 		Promise.resolve({
@@ -212,6 +213,7 @@ export const renderSettings = async (
 			},
 			userData: {
 				openDirectoryFn: openUserData,
+				hardResetFn: hardReset,
 			},
 			window: {
 				writeModeFn: writeWindowMode,
@@ -356,6 +358,7 @@ export const renderSettings = async (
 		writeWindowMode,
 		openDiagnostics,
 		openUserData,
+		hardReset,
 		readCliStatus,
 		readCompletionStatus,
 		replaceCli,

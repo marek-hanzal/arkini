@@ -8,6 +8,27 @@ import {
 afterEach(cleanupRegisteredIpcHarnesses);
 
 describe("registerSerakkiElectronIpcFx native presentation", () => {
+	it("only trusted renderers can request the destructive restart", async () => {
+		const harness = await createRegisteredIpcHarness();
+		await expect(
+			harness.invoke(SerakkiElectronApi.channels.userDataHardReset, harness.untrustedEvent),
+		).rejects.toThrow();
+		expect(harness.relaunch).not.toHaveBeenCalled();
+		expect(harness.exit).not.toHaveBeenCalled();
+		await harness.invoke(
+			SerakkiElectronApi.channels.userDataHardReset,
+			harness.trustedEvent,
+			"/untrusted-path",
+		);
+		expect(harness.relaunch).toHaveBeenCalledWith({
+			args: [
+				...process.argv.slice(1),
+				"--serakki-hard-reset",
+			],
+		});
+		expect(harness.exit).toHaveBeenCalledWith(0);
+	});
+
 	it("preserves confirmed window mode and bounded directory capabilities", async () => {
 		const harness = await createRegisteredIpcHarness();
 		const event = harness.trustedEvent;

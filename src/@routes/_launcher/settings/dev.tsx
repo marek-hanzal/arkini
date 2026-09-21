@@ -1,6 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { SettingsHardReset } from "~/application-settings/ui/SettingsHardReset";
 import { SettingsOpenActionRow } from "~/application-settings/ui/SettingsOpenActionRow";
 import { SettingsDiagnosticsCommandAtom } from "~/application-settings/atom/SettingsDiagnosticsCommandAtom";
 import { SettingsUserDataCommandAtom } from "~/application-settings/atom/SettingsUserDataCommandAtom";
@@ -63,6 +64,7 @@ export const Route = createFileRoute("/_launcher/settings/dev")({
 					idleLabel="Open data folder"
 					onClickFn={directories.openUserDataFn}
 				/>
+				<SettingsHardReset />
 				{directories.diagnosticsStatus.kind === "error" ? (
 					<p className="text-center text-sm text-danger">
 						Diagnostics failed: {errorMessageFn(directories.diagnosticsStatus.error)}

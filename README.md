@@ -74,6 +74,9 @@ argc mcp-inspect
 
 Serakki is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `serakki://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/serakki/build/` artifacts.
 
+Settings → Dev includes a two-click **Hard reset**. It permanently deletes the entire `~/.serakki` data root (including managed Editor projects, installed games, saves, preferences, and logs) and restarts the app. Projects stored outside that root are not deleted.
+
+
 MCP `item_input`, `item_output`, and `item_estimate` accept optional `detail: "summary" | "full"`. Omitted detail preserves the full response. Relation summaries retain every discovered operation and traversal level, compact authored inputs, output sets/roll chances, and gates without repeated dependency witnesses. Estimate summaries retain the selected result and all requirement groups without the selected fact DAG. Diagnostic counts describe only the estimator's bounded reported evidence, not a complete count of rejected alternatives. Both modes use the same analysis; summary reduces presentation size without imposing a result limit.
 
 MCP `schema_detail({ id, resolveDepth })` optionally inlines registered schema references. `resolveDepth` defaults to `0` (the original response) and accepts integers from `0` through `256`; each followed `$ref` consumes one level, independently per branch. Cycles, unknown references, and references at the limit remain visible as `$ref`. Embedded local fragment references retain their original resource identity. The limit bounds reference depth, not total response size.

@@ -189,6 +189,10 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		SerakkiElectronApi.channels.userDataHardReset,
+		[],
+	],
+	[
 		SerakkiElectronApi.channels.userDataOpenDirectory,
 		[],
 	],

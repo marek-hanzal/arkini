@@ -1,6 +1,8 @@
 import { vi } from "vitest";
 
 const electronHarness = vi.hoisted(() => {
+	const relaunch = vi.fn();
+	const exit = vi.fn();
 	const handlers = new Map<string, (event: unknown, ...args: unknown[]) => unknown>();
 	const appListeners = new Map<string, () => void>();
 	const nativeThemeListeners = new Map<string, () => void>();
@@ -31,6 +33,8 @@ const electronHarness = vi.hoisted(() => {
 		themeSource: "dark",
 	};
 	return {
+		relaunch,
+		exit,
 		appListeners,
 		browserWindow,
 		handlers,
@@ -44,6 +48,8 @@ const electronHarness = vi.hoisted(() => {
 		writeClipboardText,
 		module: {
 			app: {
+				relaunch,
+				exit,
 				getPreferredSystemLanguages: () => preferredSystemLanguages.value,
 				getPath: () => userDataPath.value,
 				once: (event: string, listener: () => void) => {

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, protocol } from "electron";
+import { app, BrowserWindow, dialog, nativeTheme, protocol } from "electron";
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
@@ -27,6 +27,7 @@ import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorP
 import { createFilesystemEditorProjectRepositoryFx } from "~/project-authoring/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { createInstallationFx } from "./cli/createInstallationFx";
 import { createCompletionFx } from "./cli/createCompletionFx";
+import { consumeApplicationHardResetFx } from "./consumeApplicationHardResetFx";
 import { registerCliIpcFx } from "./cli/registerCliIpcFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
@@ -50,6 +51,18 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		});
 	});
 	yield* Effect.promise(() => app.whenReady());
+
+	const resetSucceeded = yield* consumeApplicationHardResetFx.pipe(
+		Effect.match({
+			onSuccess: () => true,
+			onFailure: (cause) => {
+				dialog.showErrorBox("Serakki could not reset its data", String(cause));
+				app.exit(1);
+				return false;
+			},
+		}),
+	);
+	if (!resetSucceeded) return;
 
 	const userDataPaths = yield* resolveSerakkiUserDataPathsFx;
 	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.diagnostics).pipe(

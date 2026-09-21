@@ -146,6 +146,8 @@ export const createRegisteredIpcHarness = async () => {
 
 	return {
 		assertTrustedIpcSenderFx,
+		relaunch: electronHarness.relaunch,
+		exit: electronHarness.exit,
 		dispose,
 		handlers: electronHarness.handlers,
 		invoke: (channel: string, event: IpcMainInvokeEvent, ...args: ReadonlyArray<unknown>) => {

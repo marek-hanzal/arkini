@@ -17,8 +17,8 @@ be run manually. Publishing is separate from the application release workflow.
 The gameplay clips are web-sized, silent MP4 exports of the supplied recordings.
 The hero and author portrait are local copies of the supplied originals.
 
-Social metadata uses the current GitHub Pages URL,
-https://marek-hanzal.github.io/serakki/, and the local hero artwork.
+Social metadata uses the official HTTPS domain,
+https://serakki.dev/, and the local hero artwork.
 Update canonical, Open Graph, and Twitter image URLs together if the domain changes.
 The longer gameplay sample uses the complete 21.32.28 recording (about 2 minutes
 46 seconds), without trimming. It is exported at 1920 pixels wide and loads on demand.

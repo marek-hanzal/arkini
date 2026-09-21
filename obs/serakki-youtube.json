@@ -1,0 +1,326 @@
+{
+	"name": "Serakki YouTube",
+	"sources": [
+		{
+			"name": "Serakki window",
+			"uuid": "af5eb9c6-73ea-410f-bdd9-1715a8bd3e63",
+			"id": "screen_capture",
+			"versioned_id": "screen_capture",
+			"settings": {
+				"type": 1,
+				"window": 0,
+				"application": "dev.marekhanzal.serakki",
+				"show_cursor": true,
+				"show_hidden_windows": false
+			},
+			"mixers": 0,
+			"sync": 0,
+			"flags": 0,
+			"volume": 0.5,
+			"balance": 0.5,
+			"enabled": true,
+			"muted": true,
+			"monitoring_type": 0,
+			"hotkeys": {},
+			"private_settings": {}
+		},
+		{
+			"name": "Voice - DJI Wireless Mic Rx",
+			"uuid": "2d33fa90-e481-4df6-867f-2e46bdaadb70",
+			"id": "coreaudio_input_capture",
+			"versioned_id": "coreaudio_input_capture",
+			"settings": {
+				"device_id": ""
+			},
+			"mixers": 3,
+			"sync": 0,
+			"flags": 2,
+			"volume": 1.0,
+			"balance": 0.5,
+			"enabled": true,
+			"muted": false,
+			"monitoring_type": 0,
+			"hotkeys": {},
+			"private_settings": {}
+		},
+		{
+			"name": "Gameplay",
+			"uuid": "07b7b53f-df67-4210-bd78-27ebf95d8395",
+			"id": "scene",
+			"versioned_id": "scene",
+			"settings": {
+				"id_counter": 5,
+				"custom_size": false,
+				"items": [
+					{
+						"name": "Serakki window",
+						"source_uuid": "af5eb9c6-73ea-410f-bdd9-1715a8bd3e63",
+						"visible": true,
+						"locked": true,
+						"id": 1,
+						"pos": {
+							"x": 960.0,
+							"y": 540.0
+						},
+						"scale": {
+							"x": 1.0,
+							"y": 1.0
+						},
+						"rot": 0.0,
+						"align": 0,
+						"bounds_type": 2,
+						"bounds_align": 0,
+						"bounds": {
+							"x": 1920.0,
+							"y": 1080.0
+						},
+						"crop_left": 0,
+						"crop_top": 0,
+						"crop_right": 0,
+						"crop_bottom": 0
+					},
+					{
+						"name": "Voice - DJI Wireless Mic Rx",
+						"source_uuid": "2d33fa90-e481-4df6-867f-2e46bdaadb70",
+						"visible": true,
+						"locked": true,
+						"id": 2,
+						"pos": {
+							"x": 960.0,
+							"y": 540.0
+						},
+						"scale": {
+							"x": 1.0,
+							"y": 1.0
+						},
+						"rot": 0.0,
+						"align": 0,
+						"bounds_type": 0,
+						"bounds_align": 0,
+						"bounds": {
+							"x": 1920.0,
+							"y": 1080.0
+						},
+						"crop_left": 0,
+						"crop_top": 0,
+						"crop_right": 0,
+						"crop_bottom": 0
+					},
+					{
+						"name": "FaceTime camera",
+						"source_uuid": "6dcdcb24-6a7e-4a3c-a6d5-15cc352e1952",
+						"visible": true,
+						"locked": true,
+						"id": 3,
+						"pos": {
+							"x": 1596.0,
+							"y": 36.0
+						},
+						"scale": {
+							"x": 1.0,
+							"y": 1.0
+						},
+						"rot": 0.0,
+						"align": 5,
+						"bounds_type": 2,
+						"bounds_align": 0,
+						"bounds": {
+							"x": 288.0,
+							"y": 288.0
+						},
+						"crop_left": 0,
+						"crop_top": 0,
+						"crop_right": 0,
+						"crop_bottom": 0
+					},
+					{
+						"name": "Purple camera ring",
+						"source_uuid": "0828f75c-bf40-4b51-85ea-a61ba0adf9c4",
+						"visible": true,
+						"locked": true,
+						"id": 4,
+						"pos": {
+							"x": 1596.0,
+							"y": 36.0
+						},
+						"scale": {
+							"x": 1.0,
+							"y": 1.0
+						},
+						"rot": 0.0,
+						"align": 5,
+						"bounds_type": 2,
+						"bounds_align": 0,
+						"bounds": {
+							"x": 288.0,
+							"y": 288.0
+						},
+						"crop_left": 0,
+						"crop_top": 0,
+						"crop_right": 0,
+						"crop_bottom": 0
+					},
+					{
+						"name": "Game audio - Serakki",
+						"source_uuid": "05672c50-450f-46db-bb28-e23aebb8944f",
+						"visible": true,
+						"locked": true,
+						"id": 5,
+						"pos": {
+							"x": 960.0,
+							"y": 540.0
+						},
+						"scale": {
+							"x": 1.0,
+							"y": 1.0
+						},
+						"rot": 0.0,
+						"align": 0,
+						"bounds_type": 0,
+						"bounds_align": 0,
+						"bounds": {
+							"x": 1920.0,
+							"y": 1080.0
+						},
+						"crop_left": 0,
+						"crop_top": 0,
+						"crop_right": 0,
+						"crop_bottom": 0
+					}
+				]
+			},
+			"mixers": 0,
+			"sync": 0,
+			"flags": 0,
+			"volume": 1.0,
+			"balance": 0.5,
+			"enabled": true,
+			"muted": false,
+			"monitoring_type": 0,
+			"hotkeys": {},
+			"private_settings": {}
+		},
+		{
+			"name": "FaceTime camera",
+			"uuid": "6dcdcb24-6a7e-4a3c-a6d5-15cc352e1952",
+			"id": "macos-avcapture",
+			"versioned_id": "macos-avcapture",
+			"settings": {
+				"device": "",
+				"use_preset": true,
+				"preset": "AVCaptureSessionPreset1280x720",
+				"enable_audio": false
+			},
+			"mixers": 0,
+			"sync": 0,
+			"flags": 0,
+			"volume": 1.0,
+			"balance": 0.5,
+			"enabled": true,
+			"muted": false,
+			"monitoring_type": 0,
+			"hotkeys": {},
+			"private_settings": {},
+			"filters": [
+				{
+					"name": "Square portrait",
+					"uuid": "f5aea31a-b9ec-48c1-bb9d-53ace0807e5d",
+					"id": "crop_filter",
+					"versioned_id": "crop_filter",
+					"settings": {
+						"relative": true,
+						"left": 180,
+						"right": 380,
+						"top": 0,
+						"bottom": 0
+					},
+					"mixers": 0,
+					"sync": 0,
+					"flags": 0,
+					"volume": 1.0,
+					"balance": 0.5,
+					"enabled": true,
+					"muted": false,
+					"monitoring_type": 0,
+					"hotkeys": {},
+					"private_settings": {}
+				},
+				{
+					"name": "Circle mask",
+					"uuid": "86c80b17-91fd-46ad-9a0f-697b63a2146a",
+					"id": "mask_filter",
+					"versioned_id": "mask_filter_v2",
+					"settings": {
+						"type": "mask_alpha_filter.effect",
+						"image_path": "assets/camera-mask.png",
+						"opacity": 1.0,
+						"stretch": true
+					},
+					"mixers": 0,
+					"sync": 0,
+					"flags": 0,
+					"volume": 1.0,
+					"balance": 0.5,
+					"enabled": true,
+					"muted": false,
+					"monitoring_type": 0,
+					"hotkeys": {},
+					"private_settings": {}
+				}
+			]
+		},
+		{
+			"name": "Purple camera ring",
+			"uuid": "0828f75c-bf40-4b51-85ea-a61ba0adf9c4",
+			"id": "image_source",
+			"versioned_id": "image_source",
+			"settings": {
+				"file": "assets/camera-ring.png"
+			},
+			"mixers": 0,
+			"sync": 0,
+			"flags": 0,
+			"volume": 1.0,
+			"balance": 0.5,
+			"enabled": true,
+			"muted": false,
+			"monitoring_type": 0,
+			"hotkeys": {},
+			"private_settings": {}
+		},
+		{
+			"name": "Game audio - Serakki",
+			"uuid": "05672c50-450f-46db-bb28-e23aebb8944f",
+			"id": "sck_audio_capture",
+			"versioned_id": "sck_audio_capture",
+			"settings": {
+				"type": 1,
+				"application": "dev.marekhanzal.serakki"
+			},
+			"mixers": 5,
+			"sync": 0,
+			"flags": 0,
+			"volume": 0.2511886432,
+			"balance": 0.5,
+			"enabled": true,
+			"muted": false,
+			"monitoring_type": 0,
+			"hotkeys": {},
+			"private_settings": {}
+		}
+	],
+	"groups": [],
+	"scene_order": [
+		{
+			"name": "Gameplay"
+		}
+	],
+	"current_scene": "Gameplay",
+	"current_program_scene": "Gameplay",
+	"current_transition": "Fade",
+	"transition_duration": 300,
+	"transitions": [],
+	"quick_transitions": [],
+	"preview_locked": true,
+	"version": 2
+}

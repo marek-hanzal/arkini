@@ -1,6 +1,10 @@
 import { useAtom, useAtomValue } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Cause } from "effect";
+import { AnimatePresence, motion } from "motion/react";
+import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
+import { Cause, Effect } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { SerakkiAppVersion, SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
@@ -12,7 +16,25 @@ import { MainMenuExitCommandAtom } from "~/launcher/atom/MainMenuExitCommandAtom
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 
 export const Route = createFileRoute("/_launcher/main-menu")({
+	staleTime: 0,
+	loader: ({ context, abortController }) =>
+		context.rendererRuntime.runPromise(
+			createElectronGameSaveStorageFx().pipe(
+				Effect.flatMap((storage) =>
+					storage.listFx({
+						packageId: SerakkiDefaultPackageId,
+					}),
+				),
+			),
+			{
+				signal: abortController.signal,
+			},
+		),
 	component: () => {
+		const saves = Route.useLoaderData();
+		const hasSave = saves.some((save) => save.savedAt !== null);
+		const canContinue = saves.some((save) => save.slot === "current" && save.savedAt !== null);
+		const [confirmingNewGame, setConfirmingNewGameFn] = useState(false);
 		const { state: catalogState } = useSerapacks();
 		const startup = useAtomValue(LauncherStartupAtom);
 		const [exitState, requestExitFn] = useAtom(MainMenuExitCommandAtom);
@@ -34,20 +56,96 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 		return (
 			<LauncherPageLayout page="main-menu">
 				<nav
-					className="grid w-full gap-4"
+					className="grid w-full gap-4 [&_button]:border-line/30 [&_a]:border-line/30"
 					data-ui="MainMenu"
 				>
 					{defaultPackageAvailable ? (
-						<PrimaryButtonLink
-							to="/action/load-game/$packageId"
-							preload={false}
-							params={{
-								packageId: SerakkiDefaultPackageId,
-							}}
-							className="rounded-xl"
-						>
-							Play
-						</PrimaryButtonLink>
+						<>
+							{canContinue && (
+								<PrimaryButtonLink
+									to="/action/load-game/$packageId"
+									preload={false}
+									params={{
+										packageId: SerakkiDefaultPackageId,
+									}}
+									className="rounded-xl"
+								>
+									Continue <ArrowRight className="ml-2 size-5" />
+								</PrimaryButtonLink>
+							)}
+							{hasSave ? (
+								<section data-ui="MainMenuNewGameConfirmation">
+									{confirmingNewGame ? (
+										<ButtonLink
+											className="w-full rounded-xl"
+											to="/action/load-game/$packageId"
+											params={{
+												packageId: SerakkiDefaultPackageId,
+											}}
+											search={{
+												newGame: true,
+											}}
+											preload={false}
+										>
+											New Game
+										</ButtonLink>
+									) : (
+										<Button
+											className="w-full rounded-xl"
+											onClick={() => setConfirmingNewGameFn(true)}
+										>
+											New Game
+										</Button>
+									)}
+									<AnimatePresence initial={false}>
+										{confirmingNewGame && (
+											<motion.div
+												key="cancel"
+												initial={{
+													height: 0,
+													opacity: 0,
+												}}
+												animate={{
+													height: "auto",
+													opacity: 1,
+												}}
+												exit={{
+													height: 0,
+													opacity: 0,
+												}}
+												transition={{
+													duration: 0.18,
+													ease: "easeOut",
+												}}
+												className="overflow-hidden"
+											>
+												<div className="pt-3">
+													<Button
+														className="w-full rounded-xl"
+														onClick={() =>
+															setConfirmingNewGameFn(false)
+														}
+													>
+														Cancel
+													</Button>
+												</div>
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</section>
+							) : (
+								<PrimaryButtonLink
+									to="/action/load-game/$packageId"
+									params={{
+										packageId: SerakkiDefaultPackageId,
+									}}
+									preload={false}
+									className="rounded-xl"
+								>
+									New Game
+								</PrimaryButtonLink>
+							)}
+						</>
 					) : (
 						<PrimaryButton
 							className="rounded-xl"

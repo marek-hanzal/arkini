@@ -23,7 +23,7 @@ const launcherPagePresentation = {
 	"main-menu": {
 		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
-		panel: "max-h-full w-full max-w-sm overflow-visible border-0 border-line bg-transparent shadow-none",
+		panel: "-mt-[5cqh] z-10 max-h-[calc(100%+5cqh)] w-full max-w-sm overflow-hidden border border-line/20 bg-surface/20 shadow-lg",
 		viewTransitionName: "serakki-panel-main-menu",
 	},
 	settings: {

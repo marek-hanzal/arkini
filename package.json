@@ -1,6 +1,6 @@
 {
 	"name": "serakki",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"private": true,
 	"type": "module",
 	"packageManager": "npm@12.0.2",

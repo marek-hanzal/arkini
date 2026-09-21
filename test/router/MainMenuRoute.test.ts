@@ -44,7 +44,20 @@ afterEach(async () => {
 });
 
 describe("MainMenu", () => {
-	it("plays the effective default package and requests native exit once", async () => {
+	it.each([
+		false,
+		true,
+	])("uses the effective default package and guards new game (saved=%s)", async (saved) => {
+		vi.spyOn(MainMenuRouteDefinition, "useLoaderData").mockReturnValue(
+			saved
+				? [
+						{
+							slot: "current",
+							savedAt: 1,
+						},
+					]
+				: [],
+		);
 		let resolveClose: (() => void) | undefined;
 		const requestClose = vi.fn(
 			() =>
@@ -164,9 +177,27 @@ describe("MainMenu", () => {
 		);
 
 		const play = Array.from(container.querySelectorAll("a")).find(
-			(link) => link.textContent === "Play",
+			(link) => link.textContent?.trim() === (saved ? "Continue" : "New Game"),
 		);
 		expect(play?.getAttribute("href")).toContain("/action/load-game/serakki");
+		if (saved) {
+			const newGame = Array.from(container.querySelectorAll("button")).find(
+				(button) => button.textContent === "New Game",
+			)!;
+			await act(async () => newGame.click());
+			const confirmed = container.querySelector<HTMLAnchorElement>(
+				'[data-ui="MainMenuNewGameConfirmation"] a',
+			);
+			expect(confirmed?.getAttribute("href")).toContain("newGame=true");
+			await act(async () =>
+				container
+					.querySelector<HTMLButtonElement>(
+						'[data-ui="MainMenuNewGameConfirmation"] button',
+					)!
+					.click(),
+			);
+			expect(container.querySelector('[data-ui="MainMenuNewGameConfirmation"] a')).toBeNull();
+		}
 		await act(async () => {
 			await Effect.runPromise(
 				SubscriptionRef.set(catalogStateRef, {
@@ -182,7 +213,9 @@ describe("MainMenu", () => {
 				}),
 			);
 		});
-		await vi.waitFor(() => expect(container.textContent).toContain("Play"));
+		await vi.waitFor(() =>
+			expect(container.textContent).toContain(saved ? "Continue" : "New Game"),
+		);
 		const editor = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Editor",
 		);
@@ -206,7 +239,9 @@ describe("MainMenu", () => {
 		expect((unavailableEditor as HTMLButtonElement).disabled).toBe(true);
 		expect(container.textContent).toContain("SQLite unavailable.");
 		expect(
-			Array.from(container.querySelectorAll("a")).some((link) => link.textContent === "Play"),
+			Array.from(container.querySelectorAll("a")).some(
+				(link) => link.textContent?.trim() === (saved ? "Continue" : "New Game"),
+			),
 		).toBe(true);
 		expect(container.textContent).toContain("Serapacks");
 		expect(container.textContent).toContain("Settings");

@@ -1,9 +1,11 @@
 import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/react-router";
 
+import { z } from "zod";
 import { Cause, Effect, Exit, Option } from "effect";
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { releaseCurrentEditorBoardGameFx } from "~/editor-board/fx/releaseCurrentEditorBoardGameFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
+import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { GameEngineErrorView } from "~/game-presentation/ui/GameEngineErrorView";
 import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
@@ -31,6 +33,10 @@ const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
  * here, preventing two live resources from overlapping.
  */
 export const Route = createFileRoute("/action/load-game/$packageId")({
+	validateSearch: z.object({
+		newGame: z.boolean().optional(),
+	}),
+	loaderDeps: ({ search }) => search,
 	beforeLoad: ({ context, params }) => {
 		const resource = context.rendererRuntime.runSync(
 			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
@@ -50,7 +56,7 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			replace: true,
 		});
 	},
-	loader: async ({ abortController, context, params }) => {
+	loader: async ({ abortController, context, params, deps }) => {
 		const completed = await context.rendererRuntime.runPromiseExit(
 			loadGameRouteFx(params.packageId),
 			{
@@ -59,7 +65,30 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 		);
 		if (Exit.isFailure(completed)) {
 			const failure = readExactCauseFailureFn(completed.cause);
-			if (Option.isSome(failure)) throw failure.value;
+			if (Option.isSome(failure)) {
+				if (deps.newGame && failure.value instanceof GameSaveBootstrapError) {
+					// Confirmed new-game intent may discard this verified save failure,
+					// but package/bootstrap failures never authorize deleting player data.
+					await context.rendererRuntime.runPromise(
+						runActionRouteFx(
+							GameEngineResourceFx.pipe(
+								Effect.flatMap((service) =>
+									service.recoverFailedSaveFx({
+										packageId: params.packageId,
+									}),
+								),
+							),
+						),
+					);
+					throw redirect({
+						to: "/action/load-game/$packageId",
+						params,
+						search: {},
+						replace: true,
+					});
+				}
+				throw failure.value;
+			}
 			if (Cause.hasInterruptsOnly(completed.cause) && abortController.signal.aborted) {
 				throw (
 					abortController.signal.reason ??
@@ -84,7 +113,7 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 		}
 		resource.assertUsableFn();
 		throw redirect({
-			to: "/game/$packageId/board",
+			to: deps.newGame ? "/game/$packageId/action/reset" : "/game/$packageId/board",
 			params,
 			replace: true,
 		});

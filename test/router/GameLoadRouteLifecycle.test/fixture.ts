@@ -178,6 +178,7 @@ export const setUpGameLoadRouteTest = () => {
 			},
 			save: {
 				clearFn: clearSaveMock,
+				listFn: vi.fn(() => Promise.resolve([])),
 				readFn: vi.fn(() => Promise.resolve(null)),
 				writeFn: vi.fn(() => Promise.resolve()),
 			},

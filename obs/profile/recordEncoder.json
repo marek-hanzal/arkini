@@ -1,0 +1,8 @@
+{
+	"rate_control": "CRF",
+	"quality": 70,
+	"limit_bitrate": false,
+	"keyint_sec": 2,
+	"profile": "high",
+	"bframes": true
+}

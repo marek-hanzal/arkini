@@ -23,6 +23,55 @@ beforeEach(setUpGameLoadRouteTest);
 afterEach(tearDownGameLoadRouteTest);
 
 describe("game load failure recovery", () => {
+	it("starts fresh after confirmed New Game despite an unreadable current save", async () => {
+		createGameFxMock
+			.mockReturnValueOnce(
+				Effect.fail(
+					new GameSaveBootstrapError({
+						cause: new Error("invalid save"),
+						saveKey: {
+							packageId,
+						},
+					}),
+				),
+			)
+			.mockReturnValue(Effect.succeed(createGame()));
+		const { router } = createHarness(`/action/load-game/${packageId}?newGame=true`);
+		const loading = router.load();
+		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalled());
+		await vi.advanceTimersByTimeAsync(10_000);
+		await loading;
+		expect(clearSaveMock).toHaveBeenCalledExactlyOnceWith({
+			packageId,
+		});
+		expect(createGameFxMock).toHaveBeenCalledTimes(2);
+		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
+		expect(router.state.location.search).toEqual({});
+	});
+	it("uses the existing reset lifecycle once for confirmed New Game", async () => {
+		const discarded = vi.fn();
+		createGameFxMock
+			.mockReturnValueOnce(
+				Effect.succeed(
+					createGame({
+						disposeWithoutSaveFx: Effect.sync(discarded),
+					}),
+				),
+			)
+			.mockReturnValue(Effect.succeed(createGame()));
+		const { router } = createHarness(`/action/load-game/${packageId}?newGame=true`);
+		const loading = router.load();
+		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalled());
+		await vi.advanceTimersByTimeAsync(10_000);
+		await loading;
+		expect(discarded).toHaveBeenCalledOnce();
+		expect(clearSaveMock).toHaveBeenCalledExactlyOnceWith({
+			packageId,
+		});
+		expect(createGameFxMock).toHaveBeenCalledTimes(2);
+		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
+		expect(router.state.location.search).toEqual({});
+	});
 	it("discards an ordinary failed bootstrap and exits without deleting a save", async () => {
 		createGameFxMock.mockReturnValue(Effect.fail(new Error("bootstrap failed")));
 		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);

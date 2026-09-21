@@ -1,0 +1,7 @@
+# Local exports, device bindings, and recording output.
+local/
+recordings/
+*.bak
+*.mkv
+*.mp4
+*.mov

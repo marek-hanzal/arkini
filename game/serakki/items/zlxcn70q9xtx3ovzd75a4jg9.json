@@ -1,0 +1,49 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zlxcn70q9xtx3ovzd75a4jg9",
+		"id": "hand-saw",
+		"title": "Hand Saw",
+		"draft": true,
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"hand-saw"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wood"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "planks"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "planks"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "wood-fibers"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "firewood"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "wood-fibers"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

@@ -1,0 +1,31 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "yrqgq01g1jnsd2k2tduv35qb",
+		"id": "hand-plane",
+		"title": "Hand Plane",
+		"draft": true,
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"hand-plane"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "planks"
+				},
+				"action": "use",
+				"effect": "replace",
+				"result": "cutting-board"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

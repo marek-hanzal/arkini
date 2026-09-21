@@ -529,6 +529,15 @@
 				"action": "use",
 				"effect": "replace",
 				"result": "quill"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "knife"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "scissors"
 			}
 		],
 		"maxQueueSize": 1,

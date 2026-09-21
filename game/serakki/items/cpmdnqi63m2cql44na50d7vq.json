@@ -385,6 +385,39 @@
 					]
 				},
 				"effect": "keep"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "tree"
+				},
+				"action": "use",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "leafs",
+											"quantity": {
+												"min": 2,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "trimmed-tree"
 			}
 		],
 		"maxQueueSize": 1,

@@ -1,0 +1,49 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zrl8i2n5f5a9ujjf8lujqdx4",
+		"id": "leafs",
+		"title": "Leafs",
+		"draft": true,
+		"ui": "default",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"leafs"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"clock": {
+			"durationMs": 600000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "spoiled-leafs",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

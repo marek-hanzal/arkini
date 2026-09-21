@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { PngResourceLimits } from "~/game-config-resource/constant/PngResourceLimits";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
 
-const maxArtworkDimension = 256;
+const maxArtworkDimension = 512;
 
 /** Streams one square Artwork PNG into a bounded normalized RGBA file. */
 export const normalizeArtworkPngFileFx = Effect.fn("normalizeArtworkPngFileFx")(

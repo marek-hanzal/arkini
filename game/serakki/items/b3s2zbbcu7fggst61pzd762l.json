@@ -23,27 +23,11 @@
 				"description": "Work a nearby Forest for a clean cut of meat. Slow, deliberate, and intentionally boring enough to bootstrap food without vomiting half a carcass onto the board.",
 				"clock": false,
 				"clockWeight": 1,
-				"default": true,
+				"default": false,
 				"show": true,
-				"enable": true,
+				"enable": false,
 				"runtimeMs": 180000,
 				"input": [
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "forest"
-							},
-							"scope": "board",
-							"distance": "near-close"
-						},
-						"mode": "reserve",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
-					},
 					{
 						"type": "materials",
 						"query": {
@@ -99,7 +83,25 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"hint": "Hunter without a forest is no hunter",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "forest"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
 			},
 			{
 				"id": "hunt-raw-meat",
@@ -110,25 +112,9 @@
 				"clockWeight": 1,
 				"default": false,
 				"show": true,
-				"enable": true,
+				"enable": false,
 				"runtimeMs": 150000,
 				"input": [
-					{
-						"type": "materials",
-						"query": {
-							"selector": {
-								"type": "item",
-								"itemId": "forest"
-							},
-							"scope": "board",
-							"distance": "near-close"
-						},
-						"mode": "reserve",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						}
-					},
 					{
 						"type": "materials",
 						"query": {
@@ -184,7 +170,25 @@
 						}
 					]
 				},
-				"rules": []
+				"rules": [
+					{
+						"hint": "Wanna meat? Hunter wants a forest!",
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "forest"
+									},
+									"scope": "board",
+									"distance": "near-close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
 			},
 			{
 				"id": "hunt-fawn",

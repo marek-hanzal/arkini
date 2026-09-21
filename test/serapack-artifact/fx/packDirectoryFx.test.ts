@@ -131,8 +131,8 @@ describe("packDirectoryFx game-project contract", () => {
 				}),
 			);
 			expect(normalized.info).toMatchObject({
-				width: 256,
-				height: 256,
+				width: 512,
+				height: 512,
 				channels: 4,
 				hasAlpha: true,
 			});

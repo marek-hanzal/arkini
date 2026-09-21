@@ -1,9 +1,11 @@
-import { Effect } from "effect";
+import { Clock, Effect } from "effect";
 import { Rectangle } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
+
+import { readBoardEdgePanFn } from "~/game-scene/fn/readBoardEdgePanFn";
 
 interface Props {
 	readonly application: PixiApplicationOwner;
@@ -35,6 +37,13 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 }: Props) {
 	const { app, stage, frames } = application;
 	const canvas = app.canvas;
+	const clock = yield* Clock.Clock;
+	let edgePointer: {
+		clientX: number;
+		clientY: number;
+	} | null = null;
+	let cancelEdgeFrameFn: (() => void) | null = null;
+	let edgeFrameTime = 0;
 	let width = app.screen.width;
 	let height = app.screen.height;
 	let blocked = false;
@@ -50,6 +59,14 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	const right = Math.max(...surfaces.map((surface) => surface.x + surface.width));
 	const bottom = Math.max(...surfaces.map((surface) => surface.y + surface.height));
 
+	const cameraSurface: SurfaceLayout = {
+		...surfaces[0],
+		x: left,
+		y: top,
+		width: right - left,
+		height: bottom - top,
+	};
+
 	const invalidateFn = () => {
 		// Pixi hitArea is local even though it covers the whole screen, including empty space.
 		stage.hitArea = new Rectangle(
@@ -59,6 +76,64 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			height / stage.scale.y,
 		);
 		RendererRuntime.runSync(frames.invalidateFx);
+	};
+	const stopEdgePanFn = () => {
+		cancelEdgeFrameFn?.();
+		cancelEdgeFrameFn = null;
+		edgePointer = null;
+	};
+	const readEdgePositionFn = (deltaMs: number) => {
+		if (edgePointer === null || closed || blocked || pan !== null) return null;
+		const bounds = canvas.getBoundingClientRect();
+		if (bounds.width <= 0 || bounds.height <= 0) return null;
+		const pointerX = ((edgePointer.clientX - bounds.left) * width) / bounds.width;
+		const pointerY = ((edgePointer.clientY - bounds.top) * height) / bounds.height;
+		return readBoardEdgePanFn({
+			board: cameraSurface,
+			width,
+			height,
+			x: stage.x,
+			y: stage.y,
+			scale: stage.scale.x,
+			pointerX,
+			pointerY,
+			deltaMs,
+		});
+	};
+	const edgeFrameFn = () => {
+		cancelEdgeFrameFn = null;
+		const now = clock.currentTimeMillisUnsafe();
+		const next = readEdgePositionFn(Math.max(1, Math.min(50, now - edgeFrameTime)));
+		edgeFrameTime = now;
+		if (next === null || (next.x === stage.x && next.y === stage.y)) return;
+		stage.position.set(next.x, next.y);
+		invalidateFn();
+		cancelEdgeFrameFn = RendererRuntime.runSync(frames.scheduleFx(edgeFrameFn));
+	};
+	const trackEdgePointerFn = (event: PointerEvent) => {
+		if (
+			event.target !== canvas ||
+			event.buttons !== 0 ||
+			blocked ||
+			closed ||
+			pan !== null ||
+			!event.isPrimary
+		) {
+			stopEdgePanFn();
+			return;
+		}
+		edgePointer = {
+			clientX: event.clientX,
+			clientY: event.clientY,
+		};
+		const next = readEdgePositionFn(1);
+		if (next === null || (next.x === stage.x && next.y === stage.y)) {
+			stopEdgePanFn();
+			return;
+		}
+		if (cancelEdgeFrameFn !== null) return;
+		edgeFrameTime = clock.currentTimeMillisUnsafe();
+		cancelEdgeFrameFn = RendererRuntime.runSync(frames.scheduleFx(edgeFrameFn));
 	};
 	const fitFn = () => {
 		const scale = Math.min(width / (right - left + 256), height / (bottom - top + 256), 1);
@@ -84,6 +159,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		updateInteractionFn();
 	};
 	const cancelFn = () => {
+		stopEdgePanFn();
 		finishPanFn();
 		RendererRuntime.runSync(drag.cancelInteractionFx);
 	};
@@ -108,6 +184,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		fitFn();
 	};
 	const pointerDownFn = (event: PointerEvent) => {
+		stopEdgePanFn();
 		if (
 			closed ||
 			blocked ||
@@ -127,6 +204,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		updateInteractionFn();
 	};
 	const pointerMoveFn = (event: PointerEvent) => {
+		trackEdgePointerFn(event);
 		if (pan === null || event.pointerId !== pan.pointerId) return;
 		if (pan.phase === "pressed") {
 			if (Math.hypot(event.clientX - pan.x, event.clientY - pan.y) < dragThreshold) return;
@@ -150,9 +228,11 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		if (event.type === "pointerup") pointerMoveFn(event);
 		if (pan?.phase === "dragging") event.stopImmediatePropagation();
 		finishPanFn();
+		stopEdgePanFn();
 	};
 	const wheelFn = (event: WheelEvent) => {
 		if (closed || blocked) return;
+		stopEdgePanFn();
 		event.preventDefault();
 		if (pan !== null) return;
 		const bounds = canvas.getBoundingClientRect();
@@ -188,6 +268,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	window.addEventListener("pointermove", pointerMoveFn, true);
 	window.addEventListener("pointerup", pointerUpFn, true);
 	window.addEventListener("pointercancel", pointerUpFn, true);
+	canvas.addEventListener("pointerleave", stopEdgePanFn);
 	canvas.addEventListener("lostpointercapture", pointerUpFn);
 	canvas.addEventListener("wheel", wheelFn, {
 		passive: false,
@@ -214,6 +295,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			window.removeEventListener("pointermove", pointerMoveFn, true);
 			window.removeEventListener("pointerup", pointerUpFn, true);
 			window.removeEventListener("pointercancel", pointerUpFn, true);
+			canvas.removeEventListener("pointerleave", stopEdgePanFn);
 			canvas.removeEventListener("lostpointercapture", pointerUpFn);
 			canvas.removeEventListener("wheel", wheelFn);
 			document.removeEventListener("visibilitychange", visibilityFn);

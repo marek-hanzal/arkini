@@ -45,6 +45,7 @@ const mountFn = (
 		height: 800,
 	};
 	let resizeFn = () => {};
+	const edgeFrames = new Set<() => void>();
 	const camera = Effect.runSync(
 		createBoardCameraFx({
 			dragThreshold: 5,
@@ -56,6 +57,13 @@ const mountFn = (
 				stage,
 				frames: {
 					invalidateFx: Effect.void,
+					scheduleFx: (workFn: () => void) =>
+						Effect.sync(() => {
+							edgeFrames.add(workFn);
+							return () => {
+								edgeFrames.delete(workFn);
+							};
+						}),
 				},
 				addResizeListenerFx: (listenerFn: () => void) =>
 					Effect.sync(() => {
@@ -106,6 +114,14 @@ const mountFn = (
 		);
 	return {
 		camera,
+		edgeFrames,
+		frameFn: () => {
+			const callbacks = [
+				...edgeFrames,
+			];
+			edgeFrames.clear();
+			for (const callbackFn of callbacks) callbackFn();
+		},
 		stage,
 		screen,
 		canvas,
@@ -271,5 +287,91 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 		Effect.runSync(mounted.camera.closeFx);
 		mounted.wheelFn();
 		expect(mounted.stage.scale.x).toBe(scale);
+	});
+});
+
+describe("Board edge navigation", () => {
+	it("continues without pointer movement and stops on overlays, pointer exit, blur and teardown", () => {
+		const mounted = mountFn([
+			mainLayout.board,
+			mainLayout.toolbar!,
+		]);
+		mounted.stage.scale.set(1);
+		mounted.stage.position.set(0, 0);
+		mounted.pointerFn("pointermove", 1010, 440, 0);
+		expect(mounted.edgeFrames.size).toBe(1);
+		mounted.frameFn();
+		const first = mounted.stage.x;
+		expect(first).toBeLessThan(0);
+		mounted.frameFn();
+		expect(mounted.stage.x).toBeLessThan(first);
+		Effect.runSync(mounted.camera.setInteractionBlockedFx(true));
+		expect(mounted.edgeFrames.size).toBe(0);
+		Effect.runSync(mounted.camera.setInteractionBlockedFx(false));
+		mounted.pointerFn("pointermove", 1010, 440, 0);
+		mounted.canvas.dispatchEvent(new Event("pointerleave"));
+		expect(mounted.edgeFrames.size).toBe(0);
+		mounted.pointerFn("pointermove", 1010, 440, 0);
+		window.dispatchEvent(new Event("blur"));
+		expect(mounted.edgeFrames.size).toBe(0);
+		mounted.pointerFn("pointermove", 1010, 440, 0);
+		Effect.runSync(mounted.camera.closeFx);
+		expect(mounted.edgeFrames.size).toBe(0);
+	});
+
+	it("continues over the toolbar and enables navigation in overflowing inventory", () => {
+		const mounted = mountFn([
+			mainLayout.board,
+			mainLayout.toolbar!,
+		]);
+		mounted.stage.scale.set(1);
+		mounted.stage.position.set(990 - mainLayout.toolbar!.x, 100 - mainLayout.toolbar!.y);
+		mounted.pointerFn("pointermove", 1015, 145, 0);
+		expect(mounted.edgeFrames.size).toBe(1);
+		const inventory = mountFn([
+			readInventoryLayoutFn({
+				columns: 5,
+				rows: 4,
+			}).surface,
+		]);
+		inventory.stage.scale.set(1);
+		inventory.pointerFn("pointermove", 1010, 440, 0);
+		expect(inventory.edgeFrames.size).toBe(1);
+	});
+
+	it("keeps scrolling down through the gap and past the Board-only limit", () => {
+		const mounted = mountFn([
+			mainLayout.board,
+			mainLayout.toolbar!,
+		]);
+		mounted.stage.scale.set(1);
+		const boardBottom = mainLayout.board.y + mainLayout.board.height;
+		const gapMiddle = (boardBottom + mainLayout.toolbar!.y) / 2;
+		mounted.stage.position.set(0, 790 - gapMiddle);
+		mounted.pointerFn("pointermove", 520, 830, 0);
+		expect(mounted.edgeFrames.size).toBe(1);
+		const beforeGap = mounted.stage.y;
+		mounted.frameFn();
+		expect(mounted.stage.y).toBeLessThan(beforeGap);
+		// The entire toolbar remains reachable beyond the old Board-only overscroll bound.
+		mounted.stage.y = 800 - boardBottom - mainLayout.board.cellSize;
+		const oldLimit = mounted.stage.y;
+		mounted.frameFn();
+		expect(mounted.stage.y).toBeLessThan(oldLimit);
+	});
+
+	it("does not run in fitted view and cancels before an item or camera drag", () => {
+		const mounted = mountFn([
+			mainLayout.board,
+			mainLayout.toolbar!,
+		]);
+		mounted.pointerFn("pointermove", 1010, 440, 0);
+		expect(mounted.edgeFrames.size).toBe(0);
+		mounted.stage.scale.set(1);
+		mounted.stage.position.set(0, 0);
+		mounted.pointerFn("pointermove", 1010, 440, 0);
+		expect(mounted.edgeFrames.size).toBe(1);
+		mounted.pointerFn("pointerdown", 1010, 440, 0);
+		expect(mounted.edgeFrames.size).toBe(0);
 	});
 });

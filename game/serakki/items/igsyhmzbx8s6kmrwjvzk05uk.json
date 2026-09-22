@@ -1,0 +1,56 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "igsyhmzbx8s6kmrwjvzk05uk",
+		"id": "sad-banknote-in-sack",
+		"title": "Sad Banknote In Sack",
+		"draft": true,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"sad-banknote-in-sack"
+			]
+		},
+		"clock": {
+			"durationMs": 5000,
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "empty-sack",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"itemId": "serakki-banknote",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

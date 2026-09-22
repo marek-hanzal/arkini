@@ -6,7 +6,7 @@
 		"title": "Wooden Sticks",
 		"draft": false,
 		"description": "Simple straight wooden shafts for arrows and other lightweight construction. Crude ones come from the Lumber Camp; the Carpenter gets more from processed timber.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

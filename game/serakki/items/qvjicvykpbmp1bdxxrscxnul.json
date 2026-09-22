@@ -62,6 +62,15 @@
 				"action": "consume",
 				"effect": "replace",
 				"result": "stone-excalixe"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "lumber-camp-construction"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "lumer-camp"
 			}
 		],
 		"maxQueueSize": 1,

@@ -1,0 +1,19 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "w1v49hyq2s3jwxhmb0kms9tk",
+		"id": "lumber-camp-construction",
+		"title": "Lumber Camp Construction",
+		"draft": false,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"construction-site",
+				"lumber-camp"
+			]
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

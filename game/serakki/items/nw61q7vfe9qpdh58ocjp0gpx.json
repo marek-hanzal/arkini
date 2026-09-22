@@ -5,7 +5,7 @@
 		"id": "foundation-chest",
 		"title": "Foundation Chest",
 		"description": "A suspiciously convenient box of everything a fledgling settlement needs to make its first mistakes. Open carefully; some of this stuff is harder to replace than it looks.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

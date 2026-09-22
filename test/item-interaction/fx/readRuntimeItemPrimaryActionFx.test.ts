@@ -35,12 +35,6 @@ const config = GameConfigSchema.parse({
 				x: 1,
 				y: 0,
 			},
-			{
-				itemId: "satchel-control",
-				space: 0,
-				x: 2,
-				y: 0,
-			},
 		],
 	},
 	items: {
@@ -91,20 +85,6 @@ const config = GameConfigSchema.parse({
 			},
 			maxStackSize: 10,
 		},
-		"satchel-control": {
-			uid: "satchel-control",
-			id: "satchel-control",
-
-			maxStackSize: 1,
-			title: "Satchel",
-			description: "Opens the shared inventory.",
-			artwork: {
-				scale: 0.8,
-				default: [
-					"artwork:satchel",
-				],
-			},
-		},
 	},
 });
 
@@ -118,8 +98,7 @@ const runtime = Effect.runSync(
 
 const producer = runtime.items.find((item) => item.item.id === "producer");
 const resource = runtime.items.find((item) => item.item.id === "resource");
-const inventoryOpener = runtime.items.find((item) => item.item.id === "satchel-control");
-if (producer === undefined || resource === undefined || inventoryOpener === undefined) {
+if (producer === undefined || resource === undefined) {
 	throw new Error("Missing fixtures.");
 }
 

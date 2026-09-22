@@ -58,7 +58,7 @@ const output = (
 	],
 });
 
-const simpleItem = (id: string, _scope: "any" | "board" = "any") => ({
+const simpleItem = (id: string) => ({
 	maxQueueSize: 1,
 	lines: [],
 
@@ -181,8 +181,8 @@ const stashConfig = GameConfigSchema.parse({
 		"item:key": simpleItem("item:key"),
 		"item:coin": simpleItem("item:coin"),
 		"item:gem": simpleItem("item:gem"),
-		"item:board-a": simpleItem("item:board-a", "board"),
-		"item:board-b": simpleItem("item:board-b", "board"),
+		"item:board-a": simpleItem("item:board-a"),
+		"item:board-b": simpleItem("item:board-b"),
 		"item:blocker": simpleItem("item:blocker"),
 	},
 });

@@ -26,7 +26,7 @@ describe("editor MCP item editing", () => {
 		const producer = {
 			...createDraftFn({
 				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
-				uid: "inventory-uid",
+				uid: "producer-uid",
 			}),
 			id: "producer:test",
 			title: "Test Producer",

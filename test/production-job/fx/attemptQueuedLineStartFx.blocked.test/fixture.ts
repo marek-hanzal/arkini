@@ -12,7 +12,7 @@ export type Blocker =
 	| "placement";
 
 export const createBlockedQueueFixture = (blocker: Blocker) => {
-	const base = createJobTestConfig(2, "any");
+	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
 	const material = {
 		type: "materials",

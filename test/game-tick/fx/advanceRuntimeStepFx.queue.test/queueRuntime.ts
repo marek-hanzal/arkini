@@ -6,7 +6,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 
-const base = createJobTestConfig(4, "any");
+const base = createJobTestConfig(4);
 const forge = base.items.forge;
 
 export const queueConfig = GameConfigSchema.parse({

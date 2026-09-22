@@ -100,14 +100,7 @@ export const targetUnitInput = (itemId: string) => ({
 	},
 });
 
-export const base = ({
-	id,
-	maxStackSize = 1,
-}: {
-	id: string;
-	maxStackSize?: number;
-	scope?: "any" | "board";
-}) => ({
+export const base = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
 	uid: id,
 	id,
 	title: id,

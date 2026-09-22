@@ -120,7 +120,7 @@ const craftItem = ({
 		uid: id,
 	}) satisfies z.input<typeof ItemSchema>;
 
-const simpleItem = (id: string, _scope: "any" | "board" = "any") =>
+const simpleItem = (id: string) =>
 	({
 		maxQueueSize: 1,
 		lines: [],
@@ -165,11 +165,11 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 			id: "craft:sink",
 		}),
 		"item:blocker": simpleItem("item:blocker"),
-		"item:bonus": simpleItem("item:bonus", "board"),
+		"item:bonus": simpleItem("item:bonus"),
 		"item:product": simpleItem("item:product"),
 		"item:random-a": simpleItem("item:random-a"),
 		"item:random-b": simpleItem("item:random-b"),
-		"item:result": simpleItem("item:result", "board"),
+		"item:result": simpleItem("item:result"),
 		"item:tool": simpleItem("item:tool"),
 	},
 	meta: {

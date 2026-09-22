@@ -18,11 +18,7 @@ const baseItem = ({ id }: { id: string }) => ({
 	maxStackSize: 10,
 });
 
-export const createJobTestConfig = (
-	maxQueueSize = 2,
-	_forgeScope: "board" | "any" = "board",
-	runtimeMs = 1_000,
-) =>
+export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 	GameConfigSchema.parse({
 		resources: {
 			hero: "hero",

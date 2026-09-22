@@ -16,8 +16,8 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
 
-const createConfig = (scope: "any" | "universe") => {
-	const base = createJobTestConfig(2, "any");
+const createConfig = (distance: "far" | "universe") => {
+	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
 
 	return GameConfigSchema.parse({
@@ -71,7 +71,7 @@ const createConfig = (scope: "any" | "universe") => {
 								{
 									type: "exists",
 									query: {
-										distance: scope === "universe" ? "universe" : "far",
+										distance,
 										selector: {
 											type: "item",
 											itemId: "permit",
@@ -175,7 +175,7 @@ const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
 });
 
 describe("multi-space owner ownership graph", () => {
-	it("pauses after travel when a local any dependency remains in the original space", () => {
+	it("pauses after travel when a local dependency remains in the original space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareTravelFx();
@@ -185,7 +185,7 @@ describe("multi-space owner ownership graph", () => {
 				return yield* readRuntimeFx();
 			}).pipe(
 				useGameFx({
-					config: createConfig("any"),
+					config: createConfig("far"),
 				}),
 			),
 		);

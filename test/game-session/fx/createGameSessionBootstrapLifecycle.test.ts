@@ -113,7 +113,7 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 		"interrupts post-boot initialization and stops the live Tick/save runtime before returning",
 		() =>
 			Effect.gen(function* () {
-				const config = createJobTestConfig(2, "board", 60_000);
+				const config = createJobTestConfig(2, 60_000);
 				let preparedState: StateSchema.Type | undefined;
 				const preparation = yield* createGameSessionFx({
 					config,

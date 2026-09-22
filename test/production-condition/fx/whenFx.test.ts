@@ -120,7 +120,7 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 				},
 			});
 			yield* placeItemFx({
-				id: "inventory",
+				id: "board-far",
 				itemId: "tree",
 				quantity: 3,
 				location: {

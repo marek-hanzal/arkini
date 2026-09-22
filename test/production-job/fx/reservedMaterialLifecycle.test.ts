@@ -11,7 +11,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
-const base = (id: string, _scope: "any" | "board" = "board") => ({
+const base = (id: string) => ({
 	uid: id,
 	id,
 	title: id,
@@ -92,7 +92,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		"producer:worker": {
-			...base("producer:worker", "any"),
+			...base("producer:worker"),
 
 			units: {
 				amount: 2,
@@ -131,20 +131,20 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [],
 
-			...base("item:payload", "any"),
+			...base("item:payload"),
 		},
 		"item:tool": {
 			maxQueueSize: 1,
 			lines: [],
 
-			...base("item:tool", "any"),
+			...base("item:tool"),
 			maxStackSize: 10,
 		},
 		"item:blocker": {
 			maxQueueSize: 1,
 			lines: [],
 
-			...base("item:blocker", "any"),
+			...base("item:blocker"),
 		},
 	},
 });

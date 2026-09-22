@@ -55,20 +55,6 @@ export const configInput = {
 			},
 			maxStackSize: 10,
 		},
-		backpack: {
-			uid: "backpack",
-			id: "backpack",
-
-			maxStackSize: 1,
-			title: "Backpack",
-			description: "Backpack",
-			artwork: {
-				scale: 0.8,
-				default: [
-					"artwork:backpack",
-				],
-			},
-		},
 	},
 } as const;
 

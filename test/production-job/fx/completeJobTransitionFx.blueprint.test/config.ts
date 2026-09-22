@@ -5,14 +5,7 @@ import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const simpleItem = ({
-	id,
-	maxStackSize = 1,
-}: {
-	id: string;
-	scope?: "any" | "board";
-	maxStackSize?: number;
-}) =>
+const simpleItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) =>
 	ItemSchema.parse({
 		maxQueueSize: 1,
 		lines: [],

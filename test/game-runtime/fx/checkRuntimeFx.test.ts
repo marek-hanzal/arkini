@@ -76,25 +76,14 @@ const config = GameConfigSchema.parse({
 	},
 });
 
-const location = (scope: "board" | "inventory", x: number, y: number) => {
-	return scope === "board"
-		? ({
-				scope: "board",
-				space: 0,
-				position: {
-					x,
-					y,
-				},
-			} as const)
-		: ({
-				scope: "board" as const,
-				space: 0,
-				position: {
-					x,
-					y,
-				},
-			} as const);
-};
+const boardLocationFn = (x: number, y: number) => ({
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x,
+		y,
+	},
+});
 
 describe("checkRuntimeFx", () => {
 	it("reports readable stack-size invariant violations", () => {
@@ -109,14 +98,14 @@ describe("checkRuntimeFx", () => {
 				{
 					id: "limited:first",
 					item: config.items.limited,
-					location: location("board", 0, 0),
+					location: boardLocationFn(0, 0),
 					quantity: 3,
 					revision: "revision:test",
 				},
 				{
 					id: "limited:second",
 					item: config.items.limited,
-					location: location("board", 1, 0),
+					location: boardLocationFn(1, 0),
 					quantity: 1,
 					revision: "revision:test",
 				},
@@ -160,14 +149,14 @@ it("reports readable identity and location invariant violations", () => {
 			{
 				id: "duplicate",
 				item: config.items.any,
-				location: location("board", 0, 0),
+				location: boardLocationFn(0, 0),
 				quantity: 1,
 				revision: "revision:test",
 			},
 			{
 				id: "duplicate",
 				item: config.items.any,
-				location: location("board", 1, 0),
+				location: boardLocationFn(1, 0),
 				quantity: 1,
 				revision: "revision:test",
 			},
@@ -175,21 +164,21 @@ it("reports readable identity and location invariant violations", () => {
 			{
 				id: "outside",
 				item: config.items.any,
-				location: location("board", 2, 0),
+				location: boardLocationFn(2, 0),
 				quantity: 1,
 				revision: "revision:test",
 			},
 			{
 				id: "occupied:first",
 				item: config.items.any,
-				location: location("board", 1, 1),
+				location: boardLocationFn(1, 1),
 				quantity: 1,
 				revision: "revision:test",
 			},
 			{
 				id: "occupied:second",
 				item: config.items.board,
-				location: location("board", 1, 1),
+				location: boardLocationFn(1, 1),
 				quantity: 1,
 				revision: "revision:test",
 			},
@@ -217,7 +206,7 @@ it("reports readable identity and location invariant violations", () => {
 
 		{
 			itemId: "outside",
-			location: location("board", 2, 0),
+			location: boardLocationFn(2, 0),
 			size: config.meta.board,
 			type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
 		},
@@ -226,7 +215,7 @@ it("reports readable identity and location invariant violations", () => {
 				"occupied:first",
 				"occupied:second",
 			],
-			location: location("board", 1, 1),
+			location: boardLocationFn(1, 1),
 			type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
 		},
 	]);
@@ -238,7 +227,7 @@ it("rejects invalid command candidates atomically", () => {
 				spawnItemFx({
 					id: "outside",
 					itemId: "any",
-					location: location("board", 2, 0),
+					location: boardLocationFn(2, 0),
 					quantity: 1,
 				}),
 			);

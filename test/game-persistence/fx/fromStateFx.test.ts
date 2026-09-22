@@ -65,7 +65,7 @@ const state = StateSchema.parse({
 			quantity: 1,
 		},
 		{
-			id: "runtime:inventory:tree",
+			id: "runtime:stack:tree",
 			itemId: "tree",
 			location: {
 				scope: "board" as const,
@@ -220,8 +220,8 @@ it("builds every runtime item with the original canonical game object", () => {
 	);
 	const canonicalTree = config.items.tree;
 	const boardTree = runtime.items.find((item) => item.id === "runtime:board:tree");
-	const inventoryTree = runtime.items.find((item) => item.id === "runtime:inventory:tree");
+	const stackedTree = runtime.items.find((item) => item.id === "runtime:stack:tree");
 
 	expect(boardTree?.item).toBe(canonicalTree);
-	expect(inventoryTree?.item).toBe(canonicalTree);
+	expect(stackedTree?.item).toBe(canonicalTree);
 });

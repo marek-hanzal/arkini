@@ -61,22 +61,7 @@ const portalConfig = GameConfigSchema.parse({
 					action: "consume",
 					effect: "keep",
 				},
-				{
-					target: {
-						type: "item",
-						itemId: "backpack",
-					},
-					action: "consume",
-					effect: "keep",
-				},
 			],
-		},
-		inventoryOnly: {
-			...configInput.items.water,
-			uid: "inventoryOnly",
-			id: "inventoryOnly",
-			title: "Inventory only",
-			description: "Inventory only",
 		},
 	},
 });

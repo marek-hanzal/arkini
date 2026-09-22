@@ -50,7 +50,6 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			itemId: item.id,
 			canonicalItemId: item.item.id,
 			location: origin,
-			quantity: item.quantity,
 		},
 	];
 	if (
@@ -124,7 +123,6 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			itemId: item.id,
 			canonicalItemId: item.item.id,
 			location: origin,
-			quantity: item.quantity,
 		});
 	}
 	return {

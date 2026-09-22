@@ -45,7 +45,6 @@ export const removeItemRuntimeTransitionFx = Effect.fn("removeItemRuntimeTransit
 		itemId: item.id,
 		canonicalItemId: item.item.id,
 		location: item.location,
-		quantity: item.quantity,
 	} satisfies GameEventSchema.Type;
 	const removal = yield* removeRuntimeItemFx({
 		item,

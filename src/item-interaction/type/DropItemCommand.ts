@@ -1,6 +1,5 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 
@@ -20,7 +19,6 @@ export interface DropItemCommand {
 				readonly inputStore?: {
 					readonly lineId: IdSchema.Type;
 					readonly inputIndex: NonNegativeIntegerSchema.Type;
-					readonly quantity: PositiveIntegerSchema.Type;
 				};
 		  }
 		| {

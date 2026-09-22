@@ -15,7 +15,6 @@ export const checkRuntimeItemSchedulesFn = (
 		if (config === undefined) {
 			if (state !== undefined) reason = "unexpected-state";
 		} else if (state === undefined) reason = "missing-state";
-		else if (item.quantity !== 1) reason = "invalid-location";
 		else if (
 			config.intervalMs === undefined
 				? state.remainingIntervalMs !== undefined

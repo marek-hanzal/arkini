@@ -5,7 +5,6 @@ import { readRuntimeItemOwnedStateFn } from "~/game-runtime/fn/readRuntimeItemOw
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import { discardRuntimeItemTreeFx } from "~/game-runtime/fx/discardRuntimeItemTreeFx";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
@@ -48,74 +47,24 @@ export const placeRuntimeItemBestEffortFx = Effect.fn("placeRuntimeItemBestEffor
 			}),
 		);
 	}
-	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
-	while (true) {
-		const item = yield* readRuntimeItemByIdFx({
-			itemId,
-			runtime: draft,
-		});
-		const attempt = yield* placeRuntimeItemFx({
-			itemId,
-			origin,
-			originItemId,
-			runtime: draft,
-		}).pipe(
-			Effect.map((placement) => ({
-				type: "placed" as const,
-				placement,
-			})),
-			Effect.catchTag("PlacementUnavailableError", (error) =>
-				Effect.succeed({
-					type: "blocked" as const,
-					error,
-				}),
-			),
-		);
-		if (attempt.type === "placed")
-			return {
-				runtime: attempt.placement.runtime,
-				events: [
-					...events,
-					...attempt.placement.events,
-				],
-			} satisfies placeRuntimeItemBestEffortFx.Result;
-		const reason = attempt.error.reason;
-		const lostQuantity = Math.min(item.quantity, attempt.error.remainingQuantity);
-		if (lostQuantity === item.quantity) {
-			const discarded = yield* discardRuntimeItemTreeFx({
+	const item = yield* readRuntimeItemByIdFx({
+		itemId,
+		runtime,
+	});
+	return yield* placeRuntimeItemFx({
+		itemId,
+		origin,
+		originItemId,
+		runtime,
+	}).pipe(
+		Effect.catchTag("PlacementUnavailableError", (error) =>
+			discardRuntimeItemTreeFx({
 				item,
 				ownerItemId: originItemId,
 				source,
-				reason,
-				runtime: draft,
-			});
-			return {
-				runtime: discarded.runtime,
-				events: [
-					...events,
-					...discarded.events,
-				],
-			} satisfies placeRuntimeItemBestEffortFx.Result;
-		}
-		const reduced = yield* reviseRuntimeItemFx({
-			item: {
-				...item,
-				quantity: item.quantity - lostQuantity,
-			},
-		});
-		draft = {
-			...draft,
-			items: draft.items.map((candidate) => (candidate.id === item.id ? reduced : candidate)),
-		};
-		events.push({
-			type: "item:discarded",
-			ownerItemId: originItemId,
-			canonicalItemId: item.item.id,
-			itemId: item.id,
-			quantity: lostQuantity,
-			source,
-			reason,
-		});
-	}
+				reason: error.reason,
+				runtime,
+			}),
+		),
+	);
 });

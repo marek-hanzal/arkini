@@ -8,8 +8,5 @@ interface ReadPlacementPlanQuantityProps {
  * Reads the total emitted quantity represented by one placement plan.
  */
 export const readPlacementPlanQuantityFn = ({ plan }: ReadPlacementPlanQuantityProps) => {
-	return (
-		plan.stack.reduce((quantity, item) => quantity + item.quantity, 0) +
-		plan.spawn.reduce((quantity, item) => quantity + item.item.quantity, 0)
-	);
+	return plan.spawn.length;
 };

@@ -62,7 +62,6 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 				Effect.catchTags({
 					JobQueueFullError: () => Effect.succeed(undefined),
 					LineRunUnavailableError: () => Effect.succeed(undefined),
-					PlacementUnavailableError: () => Effect.succeed(undefined),
 					ItemNotOnBoardError: () => Effect.succeed(undefined),
 				}),
 			);

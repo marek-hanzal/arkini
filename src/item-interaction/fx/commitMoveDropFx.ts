@@ -154,7 +154,6 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 						originItemId: movedItem.id,
 						previousLocation: item.location,
 						location: movedItem.location,
-						quantity: movedItem.quantity,
 					} satisfies GameEventSchema.Type,
 				],
 			] as const;

@@ -7,7 +7,6 @@ export interface DropTransferActor {
 	};
 	readonly revision: string;
 	readonly location: BoardLocationSchema.Type;
-	readonly quantity: number;
 }
 
 /** Projects the canonical current actor shape shared by drop commit results. */
@@ -19,6 +18,5 @@ export const projectDropActorCurrentFn = (item: DropTransferActor | undefined) =
 				canonicalItemId: item.item.id,
 				revision: item.revision,
 				location: item.location,
-				quantity: item.quantity,
 			};
 };

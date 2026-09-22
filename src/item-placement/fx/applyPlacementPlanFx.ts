@@ -1,9 +1,6 @@
 import { Effect } from "effect";
 
-import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
-import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
-import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -15,10 +12,6 @@ interface ApplyPlacementPlanProps {
 export namespace applyPlacementPlanFx {
 	export interface Result {
 		readonly remove: ReadonlyArray<RuntimeItemSchema.Type>;
-		readonly stack: ReadonlyArray<{
-			readonly item: RuntimeItemSchema.Type;
-			readonly quantity: number;
-		}>;
 		readonly spawn: ReadonlyArray<RuntimeItemSchema.Type>;
 	}
 }
@@ -31,45 +24,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 	runtime,
 }: ApplyPlacementPlanProps) {
 	const removedItems = runtime.items.filter((item) => plan.remove.includes(item.id));
-	const stackResults: applyPlacementPlanFx.Result["stack"][number][] = [];
-	const updatedItems: RuntimeItemSchema.Type[] = [];
-
-	for (const item of runtime.items) {
-		if (plan.remove.includes(item.id)) {
-			continue;
-		}
-
-		const stack = plan.stack.find((candidate) => candidate.itemId === item.id);
-		if (stack === undefined) {
-			updatedItems.push(item);
-			continue;
-		}
-
-		const pure = isItemPureFn({
-			item,
-			runtime,
-		});
-		if (!pure) {
-			return yield* Effect.fail(
-				new ItemStatefulError({
-					itemId: item.id,
-				}),
-			);
-		}
-
-		const updatedItem = yield* reviseRuntimeItemFx({
-			item: {
-				...item,
-				quantity: item.quantity + stack.quantity,
-			} satisfies RuntimeItemSchema.Type,
-		});
-		updatedItems.push(updatedItem);
-		stackResults.push({
-			item: updatedItem,
-			quantity: stack.quantity,
-		});
-	}
-
+	const updatedItems = runtime.items.filter((item) => !plan.remove.includes(item.id));
 	const spawnedItems = plan.spawn.map(({ item }) => item);
 	const nextRuntime = {
 		...runtime,
@@ -81,7 +36,6 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 	const result = {
 		remove: removedItems,
 		spawn: spawnedItems,
-		stack: stackResults,
 	} satisfies applyPlacementPlanFx.Result;
 
 	return [

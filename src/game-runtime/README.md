@@ -116,7 +116,7 @@ Game and Editor inject the fixed `GameplaySpeedUpMultiplier` from `game-cheat` i
 
 Runtime item IDs, revisions, and job IDs use the injectable [`RuntimeIdentityFx`](../runtime-identity/context/RuntimeIdentityFx.ts) entropy source, backed by host UUIDs. Identity entropy stays separate from seeded gameplay Random so retries cannot reuse identities merely by replaying the same roll seed. Tokens remain opaque; saved identities are not rewritten.
 
-Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successful source merges advance it atomically, including nested participant depletion rolls; blocked retries and hydration retain it. It is history for the surviving identity, not input/production ownership, so it does not make an otherwise pure stack impure. Runtime and State item schemas carry it; `fromRuntimeFn` and `fromStateFx` preserve it while session revisions remain transient.
+Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successful source merges advance it atomically, including nested participant depletion rolls; blocked retries and hydration retain it. It is history for the surviving identity, not input/production ownership, so it does not make an otherwise pure item impure. Runtime and State item schemas carry it; `fromRuntimeFn` and `fromStateFx` preserve it while session revisions remain transient.
 
 ### Performance diagnostics
 

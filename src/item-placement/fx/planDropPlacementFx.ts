@@ -33,8 +33,6 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
-	if (item.maxStackSize !== 1) return;
-
 	const config = yield* GameConfigFx;
 	const boardSpace = origin.space;
 	const occupied = new Set<string>();

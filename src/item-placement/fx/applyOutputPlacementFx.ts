@@ -99,7 +99,6 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
 			placement: {
 				remove: placement.results.flatMap(({ remove }) => remove),
 				spawn: placement.results.flatMap(({ spawn }) => spawn),
-				stack: placement.results.flatMap(({ stack }) => stack),
 			},
 		} satisfies ApplyOutputDropPlacement,
 		placement.draft,
@@ -110,10 +109,10 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
 /**
  * Applies one already resolved output to one explicit runtime draft.
  *
- * Optional excluded locations constrain every normal stack and spawn candidate
+ * Optional excluded locations constrain every spawn candidate
  * without changing the authored output or selecting a replacement destination.
  * Drops are planned and applied in authored result order against the evolving
- * draft, so an earlier stack or spawn consumes capacity seen by later drops.
+ * draft, so an earlier spawn consumes capacity seen by later drops.
  * Every quantity unit in a random Board drop plans from its own random origin.
  * This function does not publish; its enclosing runtime command owns all-or-nothing
  * commit of the complete output.

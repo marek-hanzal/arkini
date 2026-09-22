@@ -2,21 +2,20 @@ import { z } from "zod";
 import { ScheduleStateSchema } from "~/item-schedule/schema/ScheduleStateSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 
 /**
- * A hydrated live item or item stack that owns its current location.
+ * A hydrated live item that owns its current location.
  */
 export const RuntimeItemSchema = z
 	.object({
 		/**
-		 * Stable identity of this live item or stack.
+		 * Stable identity of this live item.
 		 */
-		id: IdSchema.describe("The stable identity of this live item or stack."),
+		id: IdSchema.describe("The stable identity of this live item."),
 		/**
 		 * Canonical immutable item definition shared with the loaded game.
 		 */
@@ -36,15 +35,9 @@ export const RuntimeItemSchema = z
 			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
 		schedule: ScheduleStateSchema.optional(),
-		/** Persisted merge random-stream cursor; bookkeeping does not make a stack impure. */
+		/** Persisted merge random-stream cursor; bookkeeping does not make an item impure. */
 		mergeSequence: NonNegativeIntegerSchema.optional().describe(
 			"Successful source merges on this surviving identity; omitted means zero.",
-		),
-		/**
-		 * Number of canonical items represented by this live runtime entry.
-		 */
-		quantity: PositiveIntegerSchema.describe(
-			"The positive quantity represented by this live runtime entry.",
 		),
 		/**
 		 * Opaque optimistic-concurrency token replaced after command-relevant mutations.
@@ -59,7 +52,7 @@ export const RuntimeItemSchema = z
 	.strict()
 	.meta({
 		id: "RuntimeItemSchema",
-		description: "A hydrated live item or item stack that owns its current location.",
+		description: "A hydrated live item that owns its current location.",
 	});
 
 export type RuntimeItemSchema = typeof RuntimeItemSchema;

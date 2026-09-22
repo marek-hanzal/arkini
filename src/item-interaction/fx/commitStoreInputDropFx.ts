@@ -21,7 +21,6 @@ export namespace commitStoreInputDropFx {
 		readonly targetLocation: BoardLocationSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly inputIndex: number;
-		readonly quantity: number;
 	}
 }
 
@@ -35,7 +34,6 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 	targetLocation,
 	lineId,
 	inputIndex,
-	quantity,
 }: commitStoreInputDropFx.Props) {
 	const rejectBlockedFx = () =>
 		Effect.succeed(
@@ -55,16 +53,14 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 			sourceItemId,
 			sourceItemRevision: sourceRevision,
 			expectedSourceLocation: sourceLocation,
-			quantity,
 		});
 		const source = projectDropTransferActorFn({
-			after: stored.sourceItem,
+			after: undefined,
 			before: stored.sourceBefore,
 		});
 
 		return {
 			kind: DropItemResultKind.StoreInput,
-			storedQuantity: stored.storedItem.quantity,
 			lineId,
 			inputIndex,
 			source,
@@ -122,8 +118,6 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 				),
 		}),
 		Effect.catchTags({
-			ItemStatefulError: rejectBlockedFx,
-			PlacementUnavailableError: rejectBlockedFx,
 			InputMaterialUnavailableError: rejectBlockedFx,
 			LineInputClosedError: rejectBlockedFx,
 		}),

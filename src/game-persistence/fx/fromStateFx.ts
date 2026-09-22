@@ -20,7 +20,6 @@ const fromStateItemFx = Effect.fn("fromStateItemFx")(function* (state: StateItem
 		id: state.id,
 		item,
 		location: state.location,
-		quantity: state.quantity,
 		mergeSequence: state.mergeSequence,
 		remainingUnits: state.remainingUnits,
 		schedule: state.schedule,

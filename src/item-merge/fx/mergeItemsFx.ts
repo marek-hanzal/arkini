@@ -22,7 +22,7 @@ import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
-const MergeRandomVersion = 4;
+const MergeRandomVersion = 5;
 
 const readRemainingUnitsSeedFn = (item: RuntimeItemSchema.Type) => {
 	return item.remainingUnits ?? item.item.units?.amount ?? "full";
@@ -54,11 +54,9 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 				source.id,
 				source.mergeSequence ?? 0,
 				source.item.id,
-				source.quantity,
 				readRemainingUnitsSeedFn(source),
 				target.id,
 				target.item.id,
-				target.quantity,
 				readRemainingUnitsSeedFn(target),
 				ruleIndex,
 				actionSeed,
@@ -171,8 +169,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				source,
 				target,
 			});
-			// A successful reusable source can return to the same stack with identical
-			// quantities. Advance its persisted stream only in this committed candidate;
+			// Advance the surviving source stream only in this committed candidate;
 			// revisions cannot seed it because hydration replaces those tokens.
 			const nextRuntime = {
 				...mergeTransition.runtime,

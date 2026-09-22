@@ -46,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},
@@ -132,7 +132,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},
@@ -233,7 +233,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},
@@ -317,7 +317,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},
@@ -401,7 +401,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},
@@ -485,7 +485,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},
@@ -569,7 +569,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows"
+								"itemId": "arrows---tier-1"
 							},
 							"distance": "far"
 						},

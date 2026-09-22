@@ -29,7 +29,7 @@
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "arrows"
+				"result": "arrows---tier-1"
 			}
 		],
 		"maxQueueSize": 1,

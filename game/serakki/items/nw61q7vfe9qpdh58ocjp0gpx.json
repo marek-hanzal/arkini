@@ -197,7 +197,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "arrows",
+											"itemId": "arrows---tier-1",
 											"quantity": {
 												"min": 8,
 												"max": 8

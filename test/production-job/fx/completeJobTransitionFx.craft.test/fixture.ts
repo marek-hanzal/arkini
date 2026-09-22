@@ -8,7 +8,7 @@ import { craftCompletionConfig } from "~test/production-job/fx/completeJobTransi
 
 type CraftItemId =
 	| "craft:drop"
-	| "craft:ordered-output"
+	| "craft:ordered-outcome"
 	| "craft:random"
 	| "craft:reserve"
 	| "craft:sink";

@@ -6,10 +6,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import {
-	boardLocation,
-	multiSpaceTestConfig,
-} from "~test/space-action/support/multiSpaceTestConfig";
+import { boardLocation, multiSpaceTestConfig } from "~test/space/support/multiSpaceTestConfig";
 
 describe("multi-space simulation", () => {
 	it("completes active jobs outside the presented space", () => {

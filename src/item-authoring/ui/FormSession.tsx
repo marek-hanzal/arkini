@@ -35,9 +35,9 @@ export const FormSession = ({
 	ruleIndex,
 	whenIndex,
 	mergeIndex,
-	outputSetIndex,
-	outputRollIndex,
-	outputDropIndex,
+	outcomeSetIndex,
+	outcomeRollIndex,
+	outcomeIndex,
 	productionLineId,
 	resourceId,
 	sectionId,
@@ -53,9 +53,9 @@ export const FormSession = ({
 	readonly ruleIndex?: number;
 	readonly whenIndex?: number;
 	readonly mergeIndex?: number;
-	readonly outputSetIndex?: number;
-	readonly outputRollIndex?: number;
-	readonly outputDropIndex?: number;
+	readonly outcomeSetIndex?: number;
+	readonly outcomeRollIndex?: number;
+	readonly outcomeIndex?: number;
 	readonly productionLineId?: string;
 	readonly resourceId?: string;
 	readonly sectionId: SectionId;
@@ -189,9 +189,9 @@ export const FormSession = ({
 			ruleIndex,
 			whenIndex,
 			mergeIndex,
-			outputSetIndex,
-			outputRollIndex,
-			outputDropIndex,
+			outcomeSetIndex,
+			outcomeRollIndex,
+			outcomeIndex,
 			productionLineId,
 		}),
 		[
@@ -202,9 +202,9 @@ export const FormSession = ({
 			ruleIndex,
 			whenIndex,
 			mergeIndex,
-			outputSetIndex,
-			outputRollIndex,
-			outputDropIndex,
+			outcomeSetIndex,
+			outcomeRollIndex,
+			outcomeIndex,
 			productionLineId,
 		],
 	);
@@ -225,7 +225,6 @@ export const FormSession = ({
 					discardFn={discardFn}
 					error={controller.error}
 					rootCard={
-						sectionId !== "action" &&
 						sectionId !== "clock" &&
 						sectionId !== "artwork" &&
 						sectionId !== "units" &&

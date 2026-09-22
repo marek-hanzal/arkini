@@ -90,7 +90,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -98,8 +98,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dye-farm",
 											"quantity": {
 												"min": 1,

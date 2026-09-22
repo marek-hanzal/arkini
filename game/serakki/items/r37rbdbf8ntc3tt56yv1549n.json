@@ -41,7 +41,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -49,8 +49,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "labor-t1",
 											"quantity": {
 												"min": 1,
@@ -60,6 +61,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "dirty-copper-pan",
 											"quantity": {
 												"min": 1,

@@ -56,7 +56,7 @@ export const lastUnitConfigFn = (expiryMode: "loose-kill" | "kill-switch") => {
 				...owner,
 				units: {
 					amount: 1,
-					output: base.items.temporary!.clock!.onExpire,
+					outcome: base.items.temporary!.clock!.onExpire,
 				},
 				lines: [
 					{

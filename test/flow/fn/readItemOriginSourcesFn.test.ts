@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { readItemOriginSourcesFn } from "~/flow/fn/readItemOriginSourcesFn";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
@@ -11,7 +11,8 @@ import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestC
 const readItemOriginSources = (config: Parameters<typeof createAcquisitionGraphFn>[0]) =>
 	readItemOriginSourcesFn(createAcquisitionGraphFn(config));
 
-const dropOf = (itemId: string): DropSchema.Type => ({
+const dropOf = (itemId: string): OutcomeSchema.Type => ({
+	type: "item",
 	itemId,
 	placement: "drop",
 	quantity: {
@@ -21,13 +22,13 @@ const dropOf = (itemId: string): DropSchema.Type => ({
 	rules: [],
 });
 
-const outputOf = (itemId: string): OutputSchema.Type => ({
+const outputOf = (itemId: string): OutcomeTableSchema.Type => ({
 	set: [
 		{
 			rules: [],
 			roll: [
 				{
-					drop: [
+					outcome: [
 						dropOf(itemId),
 					],
 					type: "guaranteed",
@@ -61,20 +62,20 @@ describe("readItemOriginSourcesFn", () => {
 				existsWhen("permit"),
 			],
 		});
-		line.output = {
+		line.outcome = {
 			set: [
 				{
 					rules: [],
 					roll: [
 						{
 							chance: 0,
-							drop: [
+							outcome: [
 								dropOf("dust"),
 							],
 							type: "chance",
 						},
 						{
-							drop: [
+							outcome: [
 								ingotDrop,
 							],
 							type: "guaranteed",
@@ -94,7 +95,7 @@ describe("readItemOriginSourcesFn", () => {
 			...line,
 			enable: false,
 			id: "line:forge:disabled",
-			output: outputOf("dust"),
+			outcome: outputOf("dust"),
 			rules: [],
 		});
 		const graph = createAcquisitionGraphFn(config);
@@ -175,7 +176,7 @@ describe("readItemOriginSourcesFn", () => {
 				title: itemId,
 				uid: itemId,
 			};
-		const conditionedDrop = (itemId: string, permitId: string): DropSchema.Type => ({
+		const conditionedDrop = (itemId: string, permitId: string): OutcomeSchema.Type => ({
 			...dropOf(itemId),
 			rules: [
 				{
@@ -186,13 +187,13 @@ describe("readItemOriginSourcesFn", () => {
 				},
 			],
 		});
-		forge.lines[0]!.output = {
+		forge.lines[0]!.outcome = {
 			set: [
 				{
 					rules: [],
 					roll: [
 						{
-							drop: [
+							outcome: [
 								conditionedDrop("ingot", "permit-a"),
 								conditionedDrop("slag", "permit-b"),
 							],

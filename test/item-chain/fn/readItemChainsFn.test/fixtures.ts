@@ -1,8 +1,8 @@
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { readItemChainsFn } from "~/item-chain/fn/readItemChainsFn";
 export const outputFn = (...ids: string[]) =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: [
 			{
 				weight: 1,
@@ -10,7 +10,8 @@ export const outputFn = (...ids: string[]) =>
 				roll: [
 					{
 						type: "guaranteed",
-						drop: ids.map((itemId) => ({
+						outcome: ids.map((itemId) => ({
+							type: "item",
 							itemId,
 							quantity: {
 								min: 1,
@@ -61,7 +62,7 @@ export const catalogFn = (...items: ItemSchema.Type[]) =>
 			item,
 		]),
 	);
-export const lineFn = (id: string, clock: boolean, output: OutputSchema.Type) => ({
+export const lineFn = (id: string, clock: boolean, outcome: OutcomeTableSchema.Type) => ({
 	id,
 	title: id,
 	description: id,
@@ -75,7 +76,7 @@ export const lineFn = (id: string, clock: boolean, output: OutputSchema.Type) =>
 			type: "simple",
 		},
 	],
-	output,
+	outcome,
 	rules: [],
 });
 export const finalIdsFn = (result: readItemChainsFn.Result) =>

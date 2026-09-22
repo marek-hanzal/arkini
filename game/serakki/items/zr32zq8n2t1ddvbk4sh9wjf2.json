@@ -44,8 +44,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-pumpkin-seed",
 										"quantity": {
 											"min": 1,

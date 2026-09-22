@@ -30,7 +30,7 @@ export namespace enqueueLineRuntimeFx {
 /**
  * Appends one explicit line intent without starting, filling, or reserving inputs.
  *
- * Missing concrete material is queueable. Owner, line, rules, non-material inputs, output limits,
+ * Missing concrete material is queueable. Owner, line, rules, non-material inputs, outcome limits,
  * and queue capacity remain authoritative hard admission boundaries.
  */
 export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* ({

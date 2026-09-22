@@ -59,7 +59,7 @@ export const createRandomCompletionConfig = () => {
 								type: "simple",
 							},
 						],
-						output: {
+						outcome: {
 							set: [
 								{
 									weight: 1,
@@ -67,8 +67,9 @@ export const createRandomCompletionConfig = () => {
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item" as const,
 													itemId: "outputA",
 													placement: "random",
 													quantity: {
@@ -87,8 +88,9 @@ export const createRandomCompletionConfig = () => {
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item" as const,
 													itemId: "outputB",
 													placement: "random",
 													quantity: {

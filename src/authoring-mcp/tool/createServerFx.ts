@@ -159,7 +159,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 		})
 		.strict()
 		.meta({
-			$id: `urn:serakki:schema:mcp:item-${role}-relation`,
+			$id: `urn:serakki:schema:mcp:item-${role === "input" ? "input" : "outcome"}-relation`,
 			title: `Item ${role} relation tool input`,
 			description: `The root item and traversal depth for the item ${role} relation tool.`,
 		});
@@ -532,7 +532,7 @@ const createServerFn = (
 		server.registerTool(
 			"edit_item",
 			{
-				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as artwork, units, merge, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
+				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as artwork, units, merge, lines, outcome, or nested rolls, read item_config and copy its revision into this request.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
@@ -848,14 +848,14 @@ const createServerFn = (
 		"input",
 		"output",
 	] as const) {
-		const name = role === "input" ? "item_input" : "item_output";
+		const name = role === "input" ? "item_input" : "item_outcome";
 		server.registerTool(
 			name,
 			{
 				description:
 					role === "input"
-						? "Read where one item is used as an input. Level 1 returns every operation that directly uses it; higher levels repeat input lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs. Use detail=summary for compact operations with authored gates and output odds; omitted detail or full retains detailed dependency witnesses."
-						: "Read where one item is produced as an output. Level 1 returns every operation that directly produces it; higher levels repeat output lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs. Use detail=summary for compact operations with authored gates and output odds; omitted detail or full retains detailed dependency witnesses.",
+						? "Read where one item is used as an input. Level 1 returns every operation that directly uses it; higher levels repeat input lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outcomes. Use detail=summary for compact operations with authored gates and outcome odds; omitted detail or full retains detailed dependency witnesses."
+						: "Read where one item is produced as an Item outcome. Level 1 returns every operation that directly produces it; higher levels repeat outcome lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outcomes. Use detail=summary for compact operations with authored gates and outcome odds; omitted detail or full retains detailed dependency witnesses.",
 				inputSchema: itemRelationInputSchema(role),
 			},
 			async ({ itemId, level, detail }) =>
@@ -893,7 +893,7 @@ const createServerFn = (
 		"item_chain",
 		{
 			description:
-				"Explore what one item can turn into through its own directional merges and Clock. Returns the same bounded projection as Item → Chain, as readable text. Summary keeps starting operations, their immediate branches and all outcome states; full (default) includes the complete Details tree: intermediate items, operation owners, merge/line identities, per-operation times and quantities, weighted output sets, guaranteed and chance groups, conditions and termination states. maxDepth defaults to 5 (the Editor default), with a range of 1–12. Cycle detection and the 400-expansion safety budget apply to both detail levels. Only the root's merges initiate interaction; subsequent steps follow Clock expiry and Clock-selected line outputs. Reverse/intermediate merges, other production lines and production input acquisition are excluded. No-Clock items terminate branches. This is authored possibility analysis, not runtime simulation or accumulated periodic yield. Use item_input/item_output for general relations and item_estimate for acquisition planning.",
+				"Explore what one item can turn into through its own directional merges and Clock. Returns the same bounded projection as Item → Chain, as readable text. Summary keeps starting operations, their immediate branches and all outcome states; full (default) includes the complete Details tree: intermediate items, operation owners, merge/line identities, per-operation times and quantities, weighted outcome sets, guaranteed and chance groups, conditions and termination states. maxDepth defaults to 5 (the Editor default), with a range of 1–12. Cycle detection and the 400-expansion safety budget apply to both detail levels. Only the root's merges initiate interaction; subsequent steps follow Clock expiry and Clock-selected line outcomes. Reverse/intermediate merges, other production lines and production input acquisition are excluded. No-Clock items terminate branches. This is authored possibility analysis, not runtime simulation or accumulated periodic yield. Use item_input/item_outcome for general relations and item_estimate for acquisition planning.",
 			inputSchema: ItemChainInputSchema,
 			annotations: {
 				readOnlyHint: true,

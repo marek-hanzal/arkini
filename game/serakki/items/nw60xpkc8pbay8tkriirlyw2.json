@@ -19,7 +19,7 @@
 					"itemId": "beer-barrel"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "beer-mug",
 											"quantity": {
 												"min": 1,
@@ -51,7 +52,7 @@
 					"itemId": "well"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -59,8 +60,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "water-mug",
 											"quantity": {
 												"min": 1,
@@ -83,7 +85,7 @@
 					"itemId": "wine-barrel"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -91,8 +93,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "wine-mug",
 											"quantity": {
 												"min": 1,
@@ -115,7 +118,7 @@
 					"itemId": "cafe"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -123,8 +126,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "coffee-tankard",
 											"quantity": {
 												"min": 1,
@@ -147,7 +151,7 @@
 					"itemId": "toilet-beer"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -155,8 +159,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,
@@ -180,7 +185,7 @@
 					"itemId": "well-with-coffee"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -188,8 +193,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "coffee-tankard",
 											"quantity": {
 												"min": 1,
@@ -212,7 +218,7 @@
 					"itemId": "cow"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -220,8 +226,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "milk-mug",
 											"quantity": {
 												"min": 1,

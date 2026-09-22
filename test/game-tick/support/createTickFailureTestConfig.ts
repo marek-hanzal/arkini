@@ -1,7 +1,7 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
-/** Creates one line whose output item can be removed after start to force a Tick failure. */
+/** Creates one line whose outcome item can be removed after start to force a Tick failure. */
 export const createTickFailureTestConfig = () => {
 	const base = createJobTestConfig(1);
 	const forge = base.items.forge;
@@ -16,7 +16,7 @@ export const createTickFailureTestConfig = () => {
 				...base.items.tool,
 				uid: "completionOutput",
 				id: "completionOutput",
-				title: "Tick failure output",
+				title: "Tick failure outcome",
 				description: "Removed after start by the test.",
 			},
 			forge: {
@@ -30,15 +30,16 @@ export const createTickFailureTestConfig = () => {
 								type: "simple",
 							},
 						],
-						output: {
+						outcome: {
 							set: [
 								{
 									rules: [],
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item" as const,
 													itemId: "completionOutput",
 													quantity: {
 														min: 1,

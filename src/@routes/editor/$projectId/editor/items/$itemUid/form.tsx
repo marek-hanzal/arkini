@@ -13,9 +13,9 @@ interface EditorItemFormSearch {
 	readonly rule?: number;
 	readonly when?: number;
 	readonly merge?: number;
-	readonly outputSet?: number;
-	readonly outputRoll?: number;
-	readonly outputDrop?: number;
+	readonly outcomeSet?: number;
+	readonly outcomeRoll?: number;
+	readonly outcomeIndex?: number;
 	readonly resourceId?: string;
 }
 
@@ -25,9 +25,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		const rule = typeof search.rule === "number" ? search.rule : Number.NaN;
 		const when = typeof search.when === "number" ? search.when : Number.NaN;
 		const merge = typeof search.merge === "number" ? search.merge : Number.NaN;
-		const outputSet = typeof search.outputSet === "number" ? search.outputSet : Number.NaN;
-		const outputRoll = typeof search.outputRoll === "number" ? search.outputRoll : Number.NaN;
-		const outputDrop = typeof search.outputDrop === "number" ? search.outputDrop : Number.NaN;
+		const outcomeSet = typeof search.outcomeSet === "number" ? search.outcomeSet : Number.NaN;
+		const outcomeRoll =
+			typeof search.outcomeRoll === "number" ? search.outcomeRoll : Number.NaN;
+		const outcomeIndex =
+			typeof search.outcomeIndex === "number" ? search.outcomeIndex : Number.NaN;
 		return {
 			...(Number.isInteger(when) && when >= 0
 				? {
@@ -44,19 +46,19 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						input,
 					}
 				: {}),
-			...(Number.isInteger(outputDrop) && outputDrop >= 0
+			...(Number.isInteger(outcomeIndex) && outcomeIndex >= 0
 				? {
-						outputDrop,
+						outcomeIndex,
 					}
 				: {}),
-			...(Number.isInteger(outputSet) && outputSet >= 0
+			...(Number.isInteger(outcomeSet) && outcomeSet >= 0
 				? {
-						outputSet,
+						outcomeSet,
 					}
 				: {}),
-			...(Number.isInteger(outputRoll) && outputRoll >= 0
+			...(Number.isInteger(outcomeRoll) && outcomeRoll >= 0
 				? {
-						outputRoll,
+						outcomeRoll,
 					}
 				: {}),
 			...(typeof search.defaultDraft === "boolean"
@@ -77,7 +79,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			...(search.enable === "units" ||
 			search.enable === "merges" ||
 			search.enable === "clock" ||
-			search.enable === "action" ||
 			search.enable === "production"
 				? {
 						enable: search.enable,
@@ -118,9 +119,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			rule,
 			when,
 			merge,
-			outputSet,
-			outputRoll,
-			outputDrop,
+			outcomeSet,
+			outcomeRoll,
+			outcomeIndex,
 			resourceId,
 		} = Route.useSearch();
 		const params = useParams({
@@ -140,9 +141,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				ruleIndex={rule}
 				whenIndex={when}
 				mergeIndex={merge}
-				outputSetIndex={outputSet}
-				outputRollIndex={outputRoll}
-				outputDropIndex={outputDrop}
+				outcomeSetIndex={outcomeSet}
+				outcomeRollIndex={outcomeRoll}
+				outcomeIndex={outcomeIndex}
 				productionLineId={lineId}
 				resourceId={resourceId}
 				sectionId={sectionId}

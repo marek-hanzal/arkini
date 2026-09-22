@@ -5,12 +5,13 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { readDraftRollDropsFn } from "~/production-authoring/fn/readDraftRollDropsFn";
+import { readDraftRollOutcomesFn } from "~/production-authoring/fn/readDraftRollOutcomesFn";
 
 /** Keeps authored order and deduplicates references independently on each side. */
 const readItemSidesFn = (line: LineSchema.Type) => {
 	const inputs = new Set<string>();
 	const outputs = new Set<string>();
+	const spaces = new Set<number>();
 	for (const input of line.input) {
 		switch (input.type) {
 			case "materials":
@@ -23,18 +24,24 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 	}
 	for (const rule of line.rules)
 		for (const when of rule.when) inputs.add(when.query.selector.itemId);
-	for (const set of line.output?.set ?? []) {
+	for (const set of line.outcome?.set ?? []) {
 		for (const rule of set.rules)
 			for (const when of rule.when) outputs.add(when.query.selector.itemId);
 		for (const roll of set.roll) {
-			const drops = readDraftRollDropsFn(roll);
-			for (const drop of drops) outputs.add(drop.itemId);
+			const drops = readDraftRollOutcomesFn(roll);
+			for (const outcome of drops) {
+				if (outcome.type === "item") outputs.add(outcome.itemId);
+				else spaces.add(outcome.space);
+			}
 			for (const drop of drops)
 				for (const rule of drop.rules)
 					for (const when of rule.when) outputs.add(when.query.selector.itemId);
 		}
 	}
 	return {
+		spaces: [
+			...spaces,
+		],
 		inputs: [
 			...inputs,
 		],
@@ -54,7 +61,9 @@ const ItemImages = ({
 	readonly emptyLabel: string;
 }) =>
 	ids.length === 0 ? (
-		<span className="text-xs text-subtle">({emptyLabel})</span>
+		emptyLabel === "" ? null : (
+			<span className="text-xs text-subtle">({emptyLabel})</span>
+		)
 	) : (
 		<span className="flex min-w-0 flex-wrap items-center gap-1">
 			{ids.map((id) => (
@@ -72,7 +81,7 @@ const ItemImages = ({
 		</span>
 	);
 
-/** Identifies a line and previews its authored input/rule and output references. */
+/** Identifies a line and previews its authored input/rule and outcome references. */
 export const ProductionLineOption = ({
 	line,
 	label,
@@ -83,7 +92,7 @@ export const ProductionLineOption = ({
 	readonly items: GameConfigSchema.Type["items"];
 }) => {
 	const translator = useTranslator();
-	const { inputs, outputs } = readItemSidesFn(line);
+	const { inputs, outputs, spaces } = readItemSidesFn(line);
 	return (
 		<EditorCollectionOption
 			label={label}
@@ -99,11 +108,19 @@ export const ProductionLineOption = ({
 					emptyLabel={translator.textFn("No inputs")}
 				/>
 				<ArrowRight className="size-4 shrink-0 text-subtle" />
-				<span className="flex min-w-0 justify-end">
+				<span className="flex min-w-0 items-center justify-end gap-2">
+					{spaces.map((space) => (
+						<span
+							key={space}
+							className="text-xs text-subtle"
+						>
+							{translator.textFn("Space")} {space}
+						</span>
+					))}
 					<ItemImages
 						ids={outputs}
 						items={items}
-						emptyLabel={translator.textFn("No outputs")}
+						emptyLabel={spaces.length === 0 ? translator.textFn("No outcomes") : ""}
 					/>
 				</span>
 			</span>

@@ -84,7 +84,7 @@ describe("craft completion recovery", () => {
 	});
 });
 
-it("keeps blocked craft completion unchanged and replays one deterministic output", () => {
+it("keeps blocked craft completion unchanged and replays one deterministic outcome", () => {
 	const result = runCraft(
 		Effect.gen(function* () {
 			const owner = yield* spawnCraftFx({

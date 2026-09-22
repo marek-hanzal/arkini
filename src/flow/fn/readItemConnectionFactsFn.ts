@@ -7,8 +7,8 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { InputSchema as ActionInputSchema } from "~/production-action/schema/InputSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
-import type { RollSchema } from "~/production-output/schema/RollSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { RollSchema } from "~/outcome/schema/RollSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 
 interface ItemConnectionFact {
 	readonly factId: string;
@@ -68,7 +68,7 @@ const readAvailabilityFactsFn = (
 
 const addOutputFactsFn = (
 	facts: ItemConnectionFact[],
-	output: OutputSchema.Type | undefined,
+	output: OutcomeTableSchema.Type | undefined,
 	source: readItemConnectionFactsFn.Source,
 ) => {
 	if (output === undefined) return;
@@ -84,21 +84,22 @@ const addOutputFactsFn = (
 				},
 			});
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			for (const [dropIndex, drop] of roll.drop.entries()) {
+			for (const [outcomeIndex, drop] of roll.outcome.entries()) {
 				const position = {
 					setIndex,
 					rollIndex,
 					rollType: roll.type,
-					dropIndex,
+					outcomeIndex,
 				};
-				facts.push({
-					factId: drop.itemId,
-					origin: {
-						source,
-						role: "output",
-						roll: position,
-					},
-				});
+				if (drop.type === "item")
+					facts.push({
+						factId: drop.itemId,
+						origin: {
+							source,
+							role: "output",
+							roll: position,
+						},
+					});
 				for (const { factId, condition } of readAvailabilityFactsFn(drop.rules))
 					facts.push({
 						factId,
@@ -143,33 +144,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					condition,
 				},
 			});
-		addOutputFactsFn(facts, line.output, source);
-	}
-	if (item.action !== undefined) {
-		const source = {
-			type: "action",
-		} as const;
-		for (const [inputIndex, input] of item.action.input.entries()) {
-			const factId = readInputItemIdFn(input);
-			if (factId !== undefined)
-				facts.push({
-					factId,
-					origin: {
-						source,
-						role: "input",
-						inputIndex,
-					},
-				});
-		}
-		for (const { factId, condition } of readAvailabilityFactsFn(item.action.rules))
-			facts.push({
-				factId,
-				origin: {
-					source,
-					role: "condition",
-					condition,
-				},
-			});
+		addOutputFactsFn(facts, line.outcome, source);
 	}
 	for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
 		const source = {
@@ -191,9 +166,9 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 					role: "replacement",
 				},
 			});
-		addOutputFactsFn(facts, merge.output, source);
+		addOutputFactsFn(facts, merge.outcome, source);
 	}
-	addOutputFactsFn(facts, item.units?.output, {
+	addOutputFactsFn(facts, item.units?.outcome, {
 		type: "units",
 	});
 	if (item.clock !== undefined) {
@@ -268,7 +243,7 @@ export namespace readItemConnectionFactsFn {
 				readonly mergeIndex: number;
 		  }
 		| {
-				readonly type: "action" | "units" | "expiry" | "clock";
+				readonly type: "units" | "expiry" | "clock";
 		  };
 
 	export interface Origin {
@@ -283,7 +258,7 @@ export namespace readItemConnectionFactsFn {
 		readonly roll?: {
 			readonly setIndex: number;
 			readonly rollIndex: number;
-			readonly dropIndex?: number;
+			readonly outcomeIndex?: number;
 			readonly rollType: RollSchema.Type["type"];
 		};
 	}

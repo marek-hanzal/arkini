@@ -116,93 +116,17 @@ it("returns each overlapping Board drop's own committed actor", async () => {
 	}
 });
 
-it("keeps rejected and committed overlapping Space activations distinct", async () => {
-	const { session, commands, hold, release, close } = await createSessionFixture();
-	try {
-		const firstLocation = {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		} as const;
-		const secondLocation = {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 1,
-				y: 0,
-			},
-		} as const;
-		const a = await session.runFn(
-			spawnItemFx({
-				id: "blocked",
-				itemId: "blocked",
-				location: firstLocation,
-			}),
-		);
-		const b = await session.runFn(
-			spawnItemFx({
-				id: "ready",
-				itemId: "ready",
-				location: secondLocation,
-			}),
-		);
-		await hold();
-		const first = commands.runItemActionFn({
-			currentSpace: 0,
-			itemId: a.id,
-			location: firstLocation,
-			revision: a.revision,
-		});
-		const second = commands.runItemActionFn({
-			currentSpace: 0,
-			itemId: b.id,
-			location: secondLocation,
-			revision: b.revision,
-		});
-		release();
-		const results = await Promise.all([
-			first,
-			second,
-		]);
-		expect(results[0]).toBeNull();
-		expect(results[1]?.transition?.runtime.currentSpace).toBe(7);
-		expect(session.getSnapshotFn().currentSpace).toBe(7);
-	} finally {
-		await close();
-	}
-});
-
 it("keeps command rejections recoverable without swallowing defects", async () => {
 	const rejection = new Error("rejection");
 	const defect = new Error("defect");
 	const runFx = vi
 		.fn()
 		.mockReturnValueOnce(Effect.fail(rejection))
-		.mockReturnValueOnce(Effect.die(defect))
-		.mockReturnValueOnce(Effect.fail(rejection))
 		.mockReturnValueOnce(Effect.die(defect));
 	const mounted = await mountCommands({
 		runFx,
 	} as unknown as PlayableGame);
-	const command = {
-		currentSpace: 0,
-		itemId: "portal",
-		revision: "revision",
-		location: {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-	} as const;
 	try {
-		expect(await mounted.getCommands().runItemActionFn(command)).toBeNull();
-		await expect(mounted.getCommands().runItemActionFn(command)).rejects.toBe(defect);
 		await expect(
 			mounted.getCommands().runDropFn({
 				sourceItemId: "item",

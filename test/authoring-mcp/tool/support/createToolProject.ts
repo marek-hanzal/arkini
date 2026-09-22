@@ -63,14 +63,15 @@ export const createGraphProject = () => {
 					...forge,
 					lines: forge.lines.map((line) => ({
 						...line,
-						output: {
+						outcome: {
 							set: [
 								{
 									rules: [],
 									roll: [
 										{
-											drop: [
+											outcome: [
 												{
+													type: "item",
 													itemId: "ingot",
 													placement: "drop",
 													quantity: {

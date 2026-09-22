@@ -10,7 +10,7 @@ import { Tx } from "~/translation/ui/Tx";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
-import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
+import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
@@ -136,10 +136,10 @@ export const ProductionLineDetail = ({
 				>
 					<ChevronRight className="size-5" />
 				</div>
-				<OutputDetail
-					emptyLabel={translator.textFn("No output")}
-					description={<Mx label="Authored production output summary help" />}
-					output={line.output}
+				<OutcomeDetail
+					emptyLabel={translator.textFn("No outcome")}
+					description={<Mx label="Authored production outcome summary help" />}
+					outcome={line.outcome}
 				/>
 			</div>
 			<RulesDetail rules={line.rules} />

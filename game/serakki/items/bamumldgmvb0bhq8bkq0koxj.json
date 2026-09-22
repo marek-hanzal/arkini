@@ -104,7 +104,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -112,8 +112,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "british-shorthair-kitten",
 											"quantity": {
 												"min": 1,
@@ -156,7 +157,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -164,8 +165,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "hungry-british-shorthair-kitten",
 											"quantity": {
 												"min": 1,
@@ -175,6 +177,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,
@@ -217,7 +220,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -225,8 +228,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-british-shorthair-kitten",
 											"quantity": {
 												"min": 1,
@@ -270,7 +274,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -278,8 +282,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-british-shorthair-kitten",
 											"quantity": {
 												"min": 1,
@@ -339,7 +344,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -347,8 +352,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-british-shorthair-kitten",
 											"quantity": {
 												"min": 1,
@@ -422,7 +428,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -430,8 +436,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "british-shorthair-cuddling-kitten",
 											"quantity": {
 												"min": 1,

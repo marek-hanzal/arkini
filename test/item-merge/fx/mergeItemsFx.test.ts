@@ -227,7 +227,7 @@ describe("mergeItemsFx", () => {
 							},
 							action: "consume",
 							effect: "remove",
-							output: guaranteedMergeOutput(),
+							outcome: guaranteedMergeOutput(),
 						},
 					}),
 					state: makeState(),
@@ -311,7 +311,7 @@ describe("mergeItemsFx", () => {
 						rule: spendRule,
 						sourceUnits: {
 							amount: 1,
-							output: guaranteedMergeOutput(),
+							outcome: guaranteedMergeOutput(),
 						},
 					}),
 					state: makeState({}),
@@ -395,7 +395,7 @@ describe("mergeItemsFx", () => {
 						rule: targetSpendRule,
 						targetUnits: {
 							amount: 1,
-							output: guaranteedMergeOutput(),
+							outcome: guaranteedMergeOutput(),
 						},
 					}),
 					state: makeState(),

@@ -70,7 +70,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -78,8 +78,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bread-basket",
 											"quantity": {
 												"min": 1,
@@ -92,8 +93,9 @@
 								},
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-bucket",
 											"quantity": {
 												"min": 1,

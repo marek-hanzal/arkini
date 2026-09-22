@@ -9,6 +9,7 @@ import {
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 const drop = {
+	type: "item" as const,
 	itemId: "item:test",
 	placement: "drop" as const,
 	quantity: 2,

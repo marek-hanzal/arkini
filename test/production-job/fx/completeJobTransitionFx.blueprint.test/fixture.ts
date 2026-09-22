@@ -17,8 +17,8 @@ export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 		| "blueprint:depletion-capped"
 		| "blueprint:depletion-random"
 		| "blueprint:depletion-self"
-		| "blueprint:depletion-self-no-output"
-		| "blueprint:output"
+		| "blueprint:depletion-self-no-outcome"
+		| "blueprint:outcome"
 		| "blueprint:plain"
 		| "blueprint:range"
 		| "blueprint:reserve";

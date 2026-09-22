@@ -19,7 +19,7 @@
 					"itemId": "empty-well"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-cauldron",
 											"quantity": {
 												"min": 1,
@@ -59,8 +60,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-cauldron",
 										"quantity": {
 											"min": 1,

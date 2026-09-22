@@ -9,7 +9,7 @@ import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapability
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** Presents the authored production lines and their input/output flows. */
+/** Presents the authored production lines and their input/outcome flows. */
 export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();

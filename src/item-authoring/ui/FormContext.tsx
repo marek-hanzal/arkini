@@ -8,9 +8,9 @@ type FormSession = useFormController.Output & {
 	readonly ruleIndex?: number;
 	readonly whenIndex?: number;
 	readonly mergeIndex?: number;
-	readonly outputSetIndex?: number;
-	readonly outputRollIndex?: number;
-	readonly outputDropIndex?: number;
+	readonly outcomeSetIndex?: number;
+	readonly outcomeRollIndex?: number;
+	readonly outcomeIndex?: number;
 	readonly productionLineId?: string;
 };
 

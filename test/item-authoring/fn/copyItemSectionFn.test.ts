@@ -159,23 +159,8 @@ describe("section copy ownership", () => {
 		"merges",
 		"units",
 		"clock",
-		"action",
 	] as const)("clears absent %s instead of retaining destination data", (section) => {
-		const action = {
-			type: "space" as const,
-			space: 0,
-			input: [],
-			rules: [],
-		};
-		const current =
-			section === "action"
-				? {
-						...destination,
-						lines: [],
-						clock: undefined,
-						action,
-					}
-				: destination;
+		const current = destination;
 		const result = copyItemSectionFn(
 			current,
 			{
@@ -183,56 +168,11 @@ describe("section copy ownership", () => {
 				merge: undefined,
 				units: undefined,
 				clock: undefined,
-				action: undefined,
 			},
 			section,
 		);
 		expect(result[section === "merges" ? "merge" : section]).toBeUndefined();
 		expect(result.artwork).toBe(current.artwork);
-	});
-	it("applies capability exclusions only when the copied capability is present", () => {
-		const action = {
-			type: "space" as const,
-			space: 0,
-			input: [],
-			rules: [],
-		};
-		const withAction = copyItemSectionFn(
-			destination,
-			{
-				...source,
-				lines: [],
-				clock: undefined,
-				action,
-			},
-			"action",
-		);
-		expect(withAction.lines).toEqual([]);
-		expect(withAction.clock).toBeUndefined();
-		expect(withAction.action).toEqual(action);
-		expect(copyItemSectionFn(withAction, source, "production").action).toBeUndefined();
-		expect(
-			copyItemSectionFn(
-				withAction,
-				{
-					...source,
-					lines: [],
-				},
-				"production",
-			).action,
-		).toBe(withAction.action);
-		const withClock = copyItemSectionFn(
-			{
-				...withAction,
-			},
-			source,
-			"clock",
-		);
-		expect(withClock).toMatchObject({
-			clock: source.clock,
-		});
-		expect(withClock.action).toBeUndefined();
-		expect(withClock.clock).not.toBe(source.clock);
 	});
 	it("does not copy onto the same stable identity after a draft rename", () => {
 		expect(

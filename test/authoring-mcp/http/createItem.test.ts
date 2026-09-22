@@ -141,7 +141,7 @@ describe("editor MCP item creation", () => {
 		).toBeUndefined();
 	});
 
-	it("creates an space action through the generic tool and rejects an incompatible clock", async () => {
+	it("creates a Space outcome line through the generic tool and permits Clock", async () => {
 		const { ownership, port, repository } = await createMcpHarness();
 		const projectId = "space-action-project";
 		await Effect.runPromise(
@@ -168,23 +168,51 @@ describe("editor MCP item creation", () => {
 			arguments: jsonToolInputFn({
 				id: "bag",
 				title: "Bag",
-				action: {
-					type: "space",
-					space: 0,
-				},
+				lines: [
+					{
+						id: "travel",
+						title: "Travel",
+						description: "Travel",
+						runtimeMs: 0,
+						default: true,
+						input: [
+							{
+								type: "simple",
+							},
+						],
+						rules: [],
+						outcome: {
+							set: [
+								{
+									rules: [],
+									roll: [
+										{
+											type: "guaranteed",
+											outcome: [
+												{
+													type: "space",
+													space: 0,
+													rules: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				],
 			}),
 		});
-		expect(created.isError).not.toBe(true);
+		expect(created.isError, JSON.stringify(created.content)).not.toBe(true);
 		const project = await Effect.runPromise(repository.readProjectFx(projectId));
-		expect(project?.config.items.bag).toMatchObject({
-			lines: [],
-			action: {
+		expect(project?.config.items.bag.lines[0]?.outcome?.set[0]?.roll[0]?.outcome).toEqual([
+			{
 				type: "space",
 				space: 0,
-				input: [],
 				rules: [],
 			},
-		});
+		]);
 		const rejected = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
@@ -196,10 +224,10 @@ describe("editor MCP item creation", () => {
 				},
 			}),
 		});
-		expect(rejected.isError).toBe(true);
-		expect((await Effect.runPromise(repository.readProjectFx(projectId)))?.revision).toBe(
-			project?.revision,
-		);
+		expect(rejected.isError).not.toBe(true);
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(projectId)))?.revision,
+		).toBeGreaterThan(project?.revision ?? 0);
 	});
 
 	it("acknowledges a committed item when renderer notification fails", async () => {
@@ -236,7 +264,7 @@ describe("editor MCP item creation", () => {
 				description: "Persists before renderer notification.",
 			}),
 		});
-		expect(created.isError).not.toBe(true);
+		expect(created.isError, JSON.stringify(created.content)).not.toBe(true);
 		expect(created.content).toMatchObject([
 			{
 				text: expect.stringContaining("Created item."),

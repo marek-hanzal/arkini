@@ -56,10 +56,40 @@ const config = GameConfigSchema.parse({
 			uid: "portal",
 			id: "portal",
 
-			action: {
-				type: "space" as const,
-				space: 9,
-			},
+			lines: [
+				{
+					id: "travel",
+					title: "Travel",
+					description: "Travel",
+					default: true,
+					runtimeMs: 0,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					rules: [],
+					outcome: {
+						set: [
+							{
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "space",
+												space: 9,
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				},
+			],
 
 			title: "Portal",
 			description: "Portal",

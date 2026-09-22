@@ -8,7 +8,6 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
 import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
-import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
@@ -148,21 +147,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					description={<Mx label="Authored Clock summary help" />}
 				/>
 				<ClockDetail
-					item={item}
-					preview
-				/>
-			</section>
-			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
-				data-ui="EditorItemActionDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="action"
-					title={translator.textFn("Action")}
-					description={<Mx label="Authored action summary help" />}
-				/>
-				<ActionDetail
 					item={item}
 					preview
 				/>

@@ -146,7 +146,7 @@ const previewFx = ({
 		}),
 	});
 
-const dropFx = ({
+const resolveItemOutcomeFx = ({
 	ownerRevision,
 	sourceRevision,
 }: {
@@ -183,7 +183,7 @@ describe("dropItemFx default-line input storage", () => {
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});
-				const outcome = yield* dropFx({
+				const outcome = yield* resolveItemOutcomeFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});
@@ -221,7 +221,7 @@ describe("dropItemFx default-line input storage", () => {
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});
-				const outcome = yield* dropFx({
+				const outcome = yield* resolveItemOutcomeFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});
@@ -362,7 +362,7 @@ describe("dropItemFx default-line input storage", () => {
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});
-				const outcome = yield* dropFx({
+				const outcome = yield* resolveItemOutcomeFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});

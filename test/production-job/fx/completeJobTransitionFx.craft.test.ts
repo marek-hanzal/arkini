@@ -12,7 +12,7 @@ import {
 } from "~test/production-job/fx/completeJobTransitionFx.craft.test/fixture";
 
 describe("craft job completion transition", () => {
-	it("consumes the craft, places ordinary output on its freed origin, then returns reservations", () => {
+	it("consumes the craft, places ordinary outcome on its freed origin, then returns reservations", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
@@ -87,15 +87,15 @@ describe("craft job completion transition", () => {
 		).toBe(false);
 	});
 
-	it("removes the depleted craft first and places ordered output from the freed origin", () => {
+	it("removes the depleted craft first and places ordered outcome from the freed origin", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:ordered-output",
+					itemId: "craft:ordered-outcome",
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:ordered-output",
+					lineId: "line:craft:ordered-outcome",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -104,7 +104,7 @@ describe("craft job completion transition", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "craft:ordered-output")).toBe(false);
+		expect(runtime.items.some((item) => item.item.id === "craft:ordered-outcome")).toBe(false);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
@@ -129,7 +129,7 @@ describe("craft job completion transition", () => {
 		);
 	});
 
-	it("supports a craft sink that consumes itself without output", () => {
+	it("supports a craft sink that consumes itself without outcome", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({

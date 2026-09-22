@@ -38,15 +38,16 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				}
 			: {}),
 	};
-	const output = (itemId: string, quantity: number, placement = "drop") => ({
+	const outcome = (itemId: string, quantity: number, placement = "drop") => ({
 		set: [
 			{
 				rules: [],
 				roll: [
 					{
 						type: "guaranteed",
-						drop: [
+						outcome: [
 							{
+								type: "item" as const,
 								itemId,
 								quantity: {
 									min: quantity,
@@ -93,7 +94,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				uid: "payer",
 				units: {
 					amount: 1,
-					output: output("debris", 2, "random"),
+					outcome: outcome("debris", 2, "random"),
 				},
 			},
 			forge: {

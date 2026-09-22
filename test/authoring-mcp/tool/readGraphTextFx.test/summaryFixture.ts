@@ -18,8 +18,9 @@ export const createSummaryProject = () => {
 				roll: [
 					{
 						type: "guaranteed",
-						drop: [
+						outcome: [
 							{
+								type: "item",
 								itemId,
 								quantity: {
 									min: 1,
@@ -70,7 +71,7 @@ export const createSummaryProject = () => {
 								],
 							},
 						],
-						output: {
+						outcome: {
 							set: [
 								{
 									weight: 3,
@@ -79,8 +80,9 @@ export const createSummaryProject = () => {
 										{
 											type: "chance",
 											chance: 0.25,
-											drop: [
+											outcome: [
 												{
+													type: "item",
 													itemId: "ingot",
 													quantity: {
 														min: 1,
@@ -99,6 +101,7 @@ export const createSummaryProject = () => {
 													],
 												},
 												{
+													type: "item",
 													itemId: "dust",
 													quantity: {
 														min: 2,
@@ -116,8 +119,9 @@ export const createSummaryProject = () => {
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item",
 													itemId: "plate",
 													quantity: {
 														min: 1,
@@ -137,14 +141,14 @@ export const createSummaryProject = () => {
 					...base.config.items.mill,
 					lines: base.config.items.mill.lines.map((line) => ({
 						...line,
-						output: output("forge"),
+						outcome: output("forge"),
 					})),
 				},
 				tool: {
 					...base.config.items.tool,
 					units: {
 						amount: 2,
-						output: output("ingot"),
+						outcome: output("ingot"),
 					},
 					merge: [
 						{
@@ -154,7 +158,7 @@ export const createSummaryProject = () => {
 								itemId: "water",
 							},
 							effect: "remove",
-							output: output("ingot"),
+							outcome: output("ingot"),
 						},
 					],
 				},
@@ -182,7 +186,7 @@ export const createSummaryProject = () => {
 									},
 								},
 							],
-							output: output("mill"),
+							outcome: output("mill"),
 						},
 					],
 				},
@@ -273,16 +277,16 @@ export const createConditionalSummaryProject = () => {
 								],
 							},
 						],
-						onExpire: base.config.items.forge.lines[0]!.output,
+						onExpire: base.config.items.forge.lines[0]!.outcome,
 					},
 				},
 				forge: {
 					...base.config.items.forge,
 					lines: base.config.items.forge.lines.map((line) => ({
 						...line,
-						output: {
-							...line.output,
-							set: line.output!.set.map((set) => ({
+						outcome: {
+							...line.outcome,
+							set: line.outcome!.set.map((set) => ({
 								...set,
 								rules: [
 									{

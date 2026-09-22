@@ -244,11 +244,11 @@ describe("compact MCP graph responses", () => {
 				detail: "summary",
 			}),
 		);
-		expect(summary).toContain("Replacement output: Ingot [ingot] x1");
+		expect(summary).toContain("Replacement outcome: Ingot [ingot] x1");
 		expect(summary).toContain(': expiry "Expiry"');
 		expect(summary).toContain("Runtime: 5 s");
 		expect(summary).toContain("Clock gates: enabled=false");
-		expect(summary).toContain("Output set 1: weight 3 rules:");
+		expect(summary).toContain("Outcome set 1: weight 3 rules:");
 		expect(summary).toContain("chance 25%");
 	});
 
@@ -263,7 +263,7 @@ describe("compact MCP graph responses", () => {
 		);
 		expect(summary).toContain("Depletion participants: source and target (distinct instances)");
 		expect(summary).toContain(
-			"Outputs per depleted instance; each participant rolls separately",
+			"Outcomes per depleted instance; each participant rolls separately",
 		);
 		expect(summary).toContain("Ingot [ingot] x1–2");
 	});

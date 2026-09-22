@@ -3,7 +3,7 @@ import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/tempor
 
 export type OutputPath = "expiry" | "line" | "deferred-depletion" | "immediate-depletion";
 
-const output = (itemId: string, conditional = false) => ({
+const outcome = (itemId: string, conditional = false) => ({
 	set: [
 		{
 			weight: 1,
@@ -11,8 +11,9 @@ const output = (itemId: string, conditional = false) => ({
 			roll: [
 				{
 					type: "guaranteed",
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId,
 							quantity: {
 								min: 1,
@@ -58,14 +59,14 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 				...base.items.temporaryPlain,
 				clock: {
 					durationMs: markerDuration,
-					onExpire: output("blocker"),
+					onExpire: outcome("blocker"),
 				},
 			},
 			temporaryOutput: {
 				...base.items.temporaryOutput,
 				clock: {
 					durationMs: 600,
-					onExpire: output("result", true),
+					onExpire: outcome("result", true),
 				},
 			},
 			payer: {
@@ -74,7 +75,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 				id: "payer",
 				units: {
 					amount: 1,
-					output: output("result", true),
+					outcome: outcome("result", true),
 				},
 			},
 			producer: {
@@ -84,7 +85,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 					path === "deferred-depletion"
 						? {
 								amount: 1,
-								output: output("result", true),
+								outcome: outcome("result", true),
 							}
 						: undefined,
 				lines: [
@@ -103,12 +104,12 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 										: undefined,
 							},
 						],
-						output: path === "line" ? output("result", true) : undefined,
+						outcome: path === "line" ? outcome("result", true) : undefined,
 					},
 					{
 						...line,
 						id: "spend",
-						output: undefined,
+						outcome: undefined,
 						input: [
 							{
 								type: "units",

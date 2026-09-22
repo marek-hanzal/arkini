@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { InputSchema } from "~/production-input/schema/InputSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { DescriptionSchema } from "~/game-value/schema/DescriptionSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
@@ -8,10 +8,10 @@ import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { RuleSchema } from "./RuleSchema";
 
 /**
- * A single product line with its accepted inputs and produced output.
+ * A single product line with its accepted inputs and produced outcome.
  *
  * Items that own lines may compose this schema into one or more product-line
- * capabilities without duplicating the input and output contract.
+ * capabilities without duplicating the input and outcome contract.
  */
 export const LineSchema = z
 	.object({
@@ -99,10 +99,10 @@ export const LineSchema = z
 		/**
 		 * Optional result produced when this product line completes.
 		 *
-		 * A line may consume its input without producing an output, for example
+		 * A line may consume its input without producing an outcome, for example
 		 * when a purifier removes pollution.
 		 */
-		output: OutputSchema.optional().describe(
+		outcome: OutcomeTableSchema.optional().describe(
 			"The optional result produced when this product line completes.",
 		),
 		/**
@@ -120,7 +120,7 @@ export const LineSchema = z
 	.strict()
 	.meta({
 		id: "LineSchema",
-		description: "A single product line with its accepted inputs and produced output.",
+		description: "A single product line with its accepted inputs and produced outcome.",
 	});
 
 export type LineSchema = typeof LineSchema;

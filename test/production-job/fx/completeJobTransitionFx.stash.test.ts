@@ -19,7 +19,7 @@ const value = (value: number) => ({
 	max: value,
 });
 
-const output = (
+const outcome = (
 	drops: ReadonlyArray<{
 		itemId: string;
 		type?: "chance" | "guaranteed";
@@ -33,8 +33,9 @@ const output = (
 					? {
 							type,
 							chance: 1,
-							drop: [
+							outcome: [
 								{
+									type: "item" as const,
 									itemId,
 									quantity: value(1),
 									placement: "drop" as const,
@@ -44,8 +45,9 @@ const output = (
 						}
 					: {
 							type,
-							drop: [
+							outcome: [
 								{
+									type: "item" as const,
 									itemId,
 									quantity: value(1),
 									placement: "drop" as const,
@@ -79,11 +81,11 @@ const simpleItem = (id: string) => ({
 const stashItem = ({
 	id,
 	lineId,
-	lineOutput,
+	lineOutcome,
 }: {
 	id: string;
 	lineId: string;
-	lineOutput: ReturnType<typeof output>;
+	lineOutcome: ReturnType<typeof outcome>;
 }) => ({
 	maxQueueSize: 1,
 
@@ -126,7 +128,7 @@ const stashItem = ({
 					quantity: value(1),
 				},
 			],
-			output: lineOutput,
+			outcome: lineOutcome,
 			rules: [],
 		},
 	],
@@ -151,7 +153,7 @@ const stashConfig = GameConfigSchema.parse({
 		"stash:guaranteed": stashItem({
 			id: "stash:guaranteed",
 			lineId: "line:stash:guaranteed",
-			lineOutput: output([
+			lineOutcome: outcome([
 				{
 					itemId: "item:coin",
 				},
@@ -160,7 +162,7 @@ const stashConfig = GameConfigSchema.parse({
 		"stash:chance": stashItem({
 			id: "stash:chance",
 			lineId: "line:stash:chance",
-			lineOutput: output([
+			lineOutcome: outcome([
 				{
 					itemId: "item:gem",
 					type: "chance",
@@ -170,7 +172,7 @@ const stashConfig = GameConfigSchema.parse({
 		"stash:blocked": stashItem({
 			id: "stash:blocked",
 			lineId: "line:stash:blocked",
-			lineOutput: output([
+			lineOutcome: outcome([
 				{
 					itemId: "item:board-a",
 				},
@@ -250,7 +252,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 });
 
 describe("stash line completion transition", () => {
-	it("stores input, starts explicitly, emits guaranteed output, and removes the owner once", () => {
+	it("stores input, starts explicitly, emits guaranteed outcome, and removes the owner once", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const started = yield* startStashFx({
@@ -287,7 +289,7 @@ describe("stash line completion transition", () => {
 		}
 	});
 
-	it("resolves chance output through the ordinary line output path", () => {
+	it("resolves chance outcome through the ordinary line outcome path", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				yield* startStashFx({
@@ -305,7 +307,7 @@ describe("stash line completion transition", () => {
 		expect(runtime.items.some((item) => item.item.id === "stash:chance")).toBe(false);
 	});
 
-	it("rolls back owner removal and partial output when the full output cannot be placed", () => {
+	it("rolls back owner removal and partial outcome when the full outcome cannot be placed", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const started = yield* startStashFx({

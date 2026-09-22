@@ -12,15 +12,16 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
-const output = {
+const outcome = {
 	set: [
 		{
 			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId: "item:gift",
 							quantity: {
 								min: 1,
@@ -99,7 +100,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output,
+					outcome,
 					rules: [],
 				},
 				{
@@ -149,15 +150,16 @@ const lifecycleConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output: {
+					outcome: {
 						set: [
 							{
 								rules: [],
 								roll: [
 									{
 										type: "guaranteed",
-										drop: [
+										outcome: [
 											{
+												type: "item" as const,
 												itemId: "producer:phoenix",
 												quantity: {
 													min: 1,
@@ -213,7 +215,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 				{
 					id: "line:blueprint:empty",
 					title: "Build nothing",
-					description: "Completes without output.",
+					description: "Completes without outcome.",
 					runtimeMs: 200,
 					input: [
 						{
@@ -244,7 +246,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 							type: "simple",
 						},
 					],
-					output,
+					outcome,
 					rules: [],
 				},
 			],
@@ -335,7 +337,7 @@ describe("job completion unit lifecycle", () => {
 		]);
 	});
 
-	it("removes a depleted producer after placing output", () => {
+	it("removes a depleted producer after placing outcome", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -512,7 +514,7 @@ describe("job completion unit lifecycle", () => {
 		);
 	});
 
-	it("allows a depleted blueprint to complete without any output", () => {
+	it("allows a depleted blueprint to complete without any outcome", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({

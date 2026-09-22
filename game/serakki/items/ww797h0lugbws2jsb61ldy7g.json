@@ -19,7 +19,7 @@
 					"itemId": "well"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bucket-with-water",
 											"quantity": {
 												"min": 1,
@@ -51,7 +52,7 @@
 					"itemId": "cauldron-with-soap"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -59,8 +60,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bucket-with-soapy-water",
 											"quantity": {
 												"min": 1,

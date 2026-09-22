@@ -7,7 +7,6 @@ import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import { type SectionId } from "~/item-authoring/type/Section";
-import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
@@ -35,8 +34,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				return <UnitsSection />;
 			case "merges":
 				return <MergesSection />;
-			case "action":
-				return <ActionSection />;
 			case "clock":
 				return <ClockSection />;
 			case "production":

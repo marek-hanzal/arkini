@@ -66,7 +66,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -74,8 +74,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-pig",
 											"quantity": {
 												"min": 1,
@@ -118,7 +119,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -126,8 +127,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "spoiled-raw-game-meat",
 											"quantity": {
 												"min": 3,
@@ -137,6 +139,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "spoiled-animal-bones",
 											"quantity": {
 												"min": 1,
@@ -169,7 +172,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -177,8 +180,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "disease",
 											"quantity": {
 												"min": 1,

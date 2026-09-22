@@ -8,7 +8,7 @@ import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeIt
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemDetailLines } from "~/item-line-detail/type/ItemDetailLines";
 import { readItemDetailInputsFx } from "~/item-line-detail/fx/readItemDetailInputsFx";
-import { readItemDetailOutputFx } from "~/item-line-detail/fx/readItemDetailOutputFx";
+import { readItemDetailOutcomeFx } from "~/item-line-detail/fx/readItemDetailOutcomeFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
@@ -156,7 +156,7 @@ const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(functio
 			canWithdraw: canControl && canWithdraw,
 		},
 		input,
-		output: yield* readItemDetailOutputFx({
+		outcome: yield* readItemDetailOutcomeFx({
 			line,
 			ruleContext: {
 				origin: owner.location,
@@ -218,7 +218,7 @@ const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx")(funct
 			ownerItemId,
 			runtime,
 		}),
-		output: yield* readItemDetailOutputFx({
+		outcome: yield* readItemDetailOutcomeFx({
 			line,
 		}),
 		...(activeJob === undefined

@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "oven-with-ash",
 										"quantity": {
 											"min": 1,
@@ -35,6 +36,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "loose-ash",
 										"quantity": {
 											"min": 1,

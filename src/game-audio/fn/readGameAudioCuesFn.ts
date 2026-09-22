@@ -27,7 +27,6 @@ const cuePriority: Record<AudibleGameEvent, number> = {
 	[GameEventEnumSchema.enum.ItemSpawned]: 2,
 	[GameEventEnumSchema.enum.ItemPlaced]: 2,
 	[GameEventEnumSchema.enum.ItemSwapped]: 2,
-	[GameEventEnumSchema.enum.ItemPortalTransferred]: 2,
 	[GameEventEnumSchema.enum.ItemConsumed]: 2,
 	[GameEventEnumSchema.enum.ItemInputStored]: 2,
 	[GameEventEnumSchema.enum.ItemUnitSpent]: 2,
@@ -137,12 +136,6 @@ const readGameAudioCueFn = (
 				type: GameEventEnumSchema.enum.ItemSpawned,
 			},
 			() => cueFn(GameEventEnumSchema.enum.ItemSpawned, 1),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemPortalTransferred,
-			},
-			() => cueFn(GameEventEnumSchema.enum.ItemPortalTransferred, 1),
 		)
 		.with(
 			{

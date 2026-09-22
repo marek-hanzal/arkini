@@ -12,7 +12,7 @@ import {
 	boardFn,
 } from "./materialExpirySettlement.test/fixture";
 
-// Compare exact output locations while leaving fresh runtime identity generation opaque.
+// Compare exact outcome locations while leaving fresh runtime identity generation opaque.
 const outputLocationsFn = (runtime: RuntimeSchema.Type) =>
 	runtime.items.filter((item) => item.item.id === "residue").map((item) => item.location);
 
@@ -22,9 +22,10 @@ describe("aborted job depletion replay", () => {
 		"kill-switch",
 	] as const)("replays random placement from the same snapshot under %s", (mode) => {
 		const config = lastUnitConfigFn(mode);
-		const roll = config.items.owner!.units!.output!.set[0]!.roll[0]!;
-		if (roll.type !== "guaranteed") throw new Error("Expected guaranteed fixture output");
-		const drop = roll.drop[0]!;
+		const roll = config.items.owner!.units!.outcome!.set[0]!.roll[0]!;
+		if (roll.type !== "guaranteed") throw new Error("Expected guaranteed fixture outcome");
+		const drop = roll.outcome[0]!;
+		if (drop.type !== "item") throw new Error("Expected Item outcome fixture");
 		drop.placement = "random";
 		drop.quantity = {
 			min: 2,
@@ -122,7 +123,7 @@ describe("aborted job depletion replay", () => {
 			expect(result.constrained.events).toContainEqual(
 				expect.objectContaining({
 					type: "item:discarded",
-					source: "depletion-output",
+					source: "depletion-outcome",
 					quantity: 1,
 					reason: "board:full",
 				}),

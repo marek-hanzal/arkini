@@ -3,7 +3,7 @@ import { z } from "zod";
 import { UnitsSchema } from "~/production-input/schema/UnitsSchema";
 import { SimpleSchema } from "~/production-input/schema/SimpleSchema";
 
-/** One immediate item-action requirement without Line-owned material buffering. */
+/** A non-material requirement shared by production admission. */
 export const InputSchema = z
 	.discriminatedUnion("type", [
 		SimpleSchema,

@@ -24,7 +24,7 @@ const durationFn = (ms: number) => `${ms / 1000} s`;
 
 const outputTextFn = (output: readItemChainsFn.OutputPath) =>
 	[
-		`${output.alternative ? "Alternative set" : "Output set"} ${output.set + 1} (weight ${output.setWeight})`,
+		`${output.alternative ? "Alternative set" : "Outcome set"} ${output.set + 1} (weight ${output.setWeight})`,
 		`Roll ${output.roll + 1}: ${output.type}`,
 		...(output.chance === undefined
 			? []
@@ -119,7 +119,7 @@ export const readItemChainTextFx = Effect.fn("readItemChainTextFx")(function* (
 		"Item Chain",
 		`Item: ${itemReferenceFn(project, itemId)}`,
 		`Project revision: ${project.revision}`,
-		"Scope: the root item's own directional merges and Clock; after the first operation, only Clock expiry and Clock-selected line outputs continue. Reverse merges, intermediate merges and production input acquisition are not traversed.",
+		"Scope: the root item's own directional merges and Clock; after the first operation, only Clock expiry and Clock-selected line outcomes continue. Reverse merges, intermediate merges and production input acquisition are not traversed.",
 		`Limits: maximum depth of ${maxDepth} operations, cycle detection and 400-expansion safety budget. Depth/loop/ongoing states are not final items.`,
 		"Interpretation: authored possibilities, not runtime simulation. Times and quantities belong to individual operations. Periodic outputs are shown once per admitted run; quantities are not cumulative yields. Each Clock interval selects one eligible Clock line by clockWeight after evaluating line rules; the live pool and its probabilities are not evaluated here. One eligible output set is selected by weight. Guaranteed groups and chance groups run within that set; a chance group emits all its drops together when successful. Disabled defaults and runtime conditions can prevent outcomes.",
 		`Truncated by safety limit: ${result.truncated ? "yes; some branches omitted" : "no"}`,

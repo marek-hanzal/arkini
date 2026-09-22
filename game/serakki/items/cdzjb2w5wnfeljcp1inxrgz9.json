@@ -36,7 +36,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 10,
@@ -44,8 +44,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "disease",
 											"quantity": {
 												"min": 1,
@@ -64,8 +65,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "plague",
 											"quantity": {
 												"min": 1,

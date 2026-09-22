@@ -14,7 +14,7 @@
 		},
 		"units": {
 			"amount": 32,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -22,8 +22,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "stone-deposit-deplated",
 										"quantity": {
 											"min": 1,

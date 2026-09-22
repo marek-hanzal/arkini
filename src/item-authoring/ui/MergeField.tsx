@@ -5,14 +5,14 @@ import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
-import { OutputControl } from "~/production-authoring/ui/OutputControl";
+import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 import { Mx } from "~/translation/ui/Mx";
 
-/** Edits the target, effects, replacement, and optional output of one merge definition. */
+/** Edits the target, effects, replacement, and optional outcome of one merge definition. */
 export const MergeField = ({
 	merge,
 	onChangeFn,
@@ -127,7 +127,7 @@ export const MergeField = ({
 									: {
 											action: merge.action,
 											effect,
-											output: merge.output,
+											outcome: merge.outcome,
 											target: merge.target,
 										},
 							)
@@ -151,16 +151,16 @@ export const MergeField = ({
 				<SectionEnd />
 			</EditorFormCard>
 			<EditorFormSection
-				description={<Mx label="Merge output help" />}
-				title={translator.textFn("Merge output")}
+				description={<Mx label="Merge outcome help" />}
+				title={translator.textFn("Merge outcome")}
 			>
 				<EditorFormCard>
-					<OutputControl
-						value={merge.output}
-						onChangeFn={(output) =>
+					<OutcomeControl
+						value={merge.outcome}
+						onChangeFn={(outcome) =>
 							onChangeFn({
 								...merge,
-								output,
+								outcome,
 							})
 						}
 					/>

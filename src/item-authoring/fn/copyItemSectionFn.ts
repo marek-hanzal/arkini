@@ -2,17 +2,10 @@ import type { FormValues } from "~/item-authoring/schema/FormSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 export namespace copyItemSectionFn {
-	export type Section =
-		| "identity"
-		| "artwork"
-		| "production"
-		| "merges"
-		| "units"
-		| "clock"
-		| "action";
+	export type Section = "identity" | "artwork" | "production" | "merges" | "units" | "clock";
 }
 
-/** Replaces one authored section while retaining destination identity and enforcing capability exclusions. */
+/** Replaces one authored section while retaining destination identity and unrelated capabilities. */
 export const copyItemSectionFn = (
 	current: FormValues,
 	source: ItemSchema.Type,
@@ -44,7 +37,6 @@ export const copyItemSectionFn = (
 				...current,
 				lines: structuredClone(source.lines),
 				maxQueueSize: source.maxQueueSize,
-				action: source.lines.length > 0 ? undefined : current.action,
 			};
 		case "merges":
 			return {
@@ -60,22 +52,6 @@ export const copyItemSectionFn = (
 			return {
 				...current,
 				clock: structuredClone(source.clock),
-				...(source.clock === undefined
-					? {}
-					: {
-							action: undefined,
-						}),
-			};
-		case "action":
-			return {
-				...current,
-				action: structuredClone(source.action),
-				...(source.action === undefined
-					? {}
-					: {
-							lines: [],
-							clock: undefined,
-						}),
 			};
 	}
 };

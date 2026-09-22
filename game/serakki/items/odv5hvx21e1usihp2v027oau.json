@@ -23,8 +23,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "faith",
 										"quantity": {
 											"min": 1,
@@ -34,6 +35,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "compost",
 										"quantity": {
 											"min": 1,

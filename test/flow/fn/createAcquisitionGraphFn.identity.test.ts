@@ -53,7 +53,7 @@ it.each([
 									lines: [
 										createLine({
 											id: lineId,
-											output: createOutput([
+											outcome: createOutput([
 												{
 													itemId: "product",
 												},

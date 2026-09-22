@@ -185,7 +185,6 @@ export const useFormController = ({
 			if (current.merge !== next.merge) form.setFieldValue("merge", next.merge);
 			if (current.units !== next.units) form.setFieldValue("units", next.units);
 			if (current.clock !== next.clock) form.setFieldValue("clock", next.clock);
-			if (current.action !== next.action) form.setFieldValue("action", next.action);
 		},
 		[
 			form,
@@ -194,7 +193,6 @@ export const useFormController = ({
 	);
 	const enableClockFn = useCallback(() => {
 		if (form.state.values.clock !== undefined) return;
-		form.setFieldValue("action", undefined);
 		form.setFieldValue("clock", {
 			durationMs: 900_000,
 			enable: true,
@@ -203,22 +201,8 @@ export const useFormController = ({
 	}, [
 		form,
 	]);
-	const enableActionFn = useCallback(() => {
-		if (form.state.values.action !== undefined) return;
-		form.setFieldValue("lines", []);
-		form.setFieldValue("clock", undefined);
-		form.setFieldValue("action", {
-			type: "space",
-			space: 0,
-			input: [],
-			rules: [],
-		});
-	}, [
-		form,
-	]);
 	const enableProductionFn = useCallback(() => {
 		if ((form.state.values.lines ?? []).length > 0) return;
-		form.setFieldValue("action", undefined);
 		form.setFieldValue("lines", [
 			createLineFn([], "", ""),
 		]);
@@ -230,9 +214,6 @@ export const useFormController = ({
 		if (initializedCapability.current || enableCapability === undefined) return;
 		initializedCapability.current = true;
 		switch (enableCapability) {
-			case "action":
-				enableActionFn();
-				break;
 			case "production":
 				enableProductionFn();
 				break;
@@ -256,7 +237,6 @@ export const useFormController = ({
 		}
 	}, [
 		enableCapability,
-		enableActionFn,
 		enableProductionFn,
 		enableClockFn,
 		form,
@@ -359,7 +339,6 @@ export const useFormController = ({
 			copySectionFn,
 			discardFn,
 			enableClockFn,
-			enableActionFn,
 			enableProductionFn,
 			error: persistenceError,
 			isDirty: dirty,
@@ -375,7 +354,6 @@ export const useFormController = ({
 			copySectionFn,
 			discardFn,
 			enableClockFn,
-			enableActionFn,
 			enableProductionFn,
 			dirty,
 			persistenceError,

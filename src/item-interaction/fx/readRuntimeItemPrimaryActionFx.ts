@@ -12,10 +12,6 @@ export namespace readRuntimeItemPrimaryActionFx {
 				readonly kind: "none";
 		  }
 		| {
-				readonly currentSpace: number;
-				readonly kind: "activate-space";
-		  }
-		| {
 				readonly kind: "enqueue-default-line";
 				readonly lineId: string;
 				readonly queue: {
@@ -34,11 +30,6 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click interaction of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
-		if (item.item.action !== undefined)
-			return {
-				kind: "activate-space" as const,
-				currentSpace: runtime.currentSpace,
-			};
 		const lineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(item.item));
 		if (lineOwnerItem === undefined) {
 			return {

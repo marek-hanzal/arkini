@@ -141,7 +141,6 @@ import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
-import { ActionSection } from "~/item-authoring/ui/ActionSection";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 import {
 	createLine,
@@ -300,7 +299,7 @@ const completeFirstProductionLine = async (container: HTMLElement) => {
 	if (title === null || description === null)
 		throw new Error("Missing new production line identity fields.");
 	await changeInput(title, "Test production line");
-	await changeTextArea(description, "Produces the test output.");
+	await changeTextArea(description, "Produces the test outcome.");
 };
 
 describe("item section form session", () => {
@@ -399,7 +398,6 @@ describe("item section form session", () => {
 		"production",
 		"merges",
 		"units",
-		"action",
 		"clock",
 	] as const)(
 		"returns %s edits to the matching detail after Save and Discard",
@@ -451,26 +449,11 @@ describe("item section form session", () => {
 		},
 	);
 	it.each([
-		"action",
 		"production",
 	] as const)("keeps the detail %s enable intent local until Save", async (capability) => {
 		const configured = ItemSchema.parse({
 			...item,
 			lines: [],
-			...(capability === "production"
-				? {
-						action: {
-							type: "space",
-							space: 0,
-							input: [],
-							rules: [],
-						},
-					}
-				: {
-						clock: {
-							intervalMs: 300000,
-						},
-					}),
 		});
 		state.persisted = configured;
 		(state.project as Project).config.items[item.id] = configured;
@@ -493,14 +476,7 @@ describe("item section form session", () => {
 				?.click();
 		});
 		const saved = state.saveItem.mock.lastCall?.[0].item;
-		if (capability === "action") {
-			expect(saved.action.type).toBe("space");
-			expect(saved.clock).toBeUndefined();
-			expect(saved.lines).toEqual([]);
-		} else {
-			expect(saved.action).toBeUndefined();
-			expect(saved.lines).toHaveLength(1);
-		}
+		expect(saved.lines).toHaveLength(1);
 	});
 
 	it("keeps an asset-origin draft seed in routed section links", async () => {
@@ -610,48 +586,6 @@ describe("item section form session", () => {
 			scale: 0.9,
 		});
 		expect(scaledItem.artwork.scale).toBe(0.65);
-	});
-
-	it("picks both bounds of the reserved random space range into the local draft", async () => {
-		const spaceItem = {
-			...item,
-
-			action: {
-				type: "space" as const,
-				space: 0,
-				input: [],
-				rules: [],
-			},
-		} satisfies ItemSchema.Type;
-		state.persisted = spaceItem;
-		(
-			state.project as {
-				config: {
-					items: Record<string, ItemSchema.Type>;
-				};
-			}
-		).config.items[item.id] = spaceItem;
-		const random = vi
-			.spyOn(Math, "random")
-			.mockReturnValueOnce(0)
-			.mockReturnValueOnce(1 - Number.EPSILON);
-		try {
-			const { container } = await render(<ActionSection />);
-			const input = container.querySelector<HTMLInputElement>('input[name="action.space"]');
-			const pickRandomSpaceButton = [
-				...container.querySelectorAll("button"),
-			].find((button) => button.textContent === "Pick random space");
-			if (input === null || pickRandomSpaceButton === undefined)
-				throw new Error("Missing Space action controls.");
-
-			await act(async () => pickRandomSpaceButton.click());
-			expect(input.value).toBe("128");
-			await act(async () => pickRandomSpaceButton.click());
-			expect(input.value).toBe("1024");
-			expect(state.saveItem).not.toHaveBeenCalled();
-		} finally {
-			random.mockRestore();
-		}
 	});
 
 	it("does not republish the form Context when parent inputs are unchanged", async () => {
@@ -890,10 +824,10 @@ describe("item section form session", () => {
 		});
 	});
 
-	it("selects and focuses the exact invalid control inside a nested output", async () => {
+	it("selects and focuses the exact invalid control inside a nested outcome", async () => {
 		const producerBase = createProducerItem({
 			id: "producer",
-			output: createOutput([
+			outcome: createOutput([
 				{
 					itemId: item.id,
 				},
@@ -951,13 +885,13 @@ describe("item section form session", () => {
 		};
 		const { container } = await render(<ProductionSection />);
 		const addOutputSet = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
+			'[data-ui="EditorOutcomeSetsCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		const saveButton = [
 			...container.querySelectorAll("button"),
 		].find((button) => button.textContent === "Save");
 		if (addOutputSet === null || saveButton === undefined)
-			throw new Error("Missing nested output controls.");
+			throw new Error("Missing nested outcome controls.");
 
 		await act(async () => addOutputSet.click());
 		const addRoll = container.querySelector<HTMLButtonElement>(
@@ -971,19 +905,19 @@ describe("item section form session", () => {
 		if (guaranteed === undefined) throw new Error("Missing roll type control.");
 		await act(async () => guaranteed.click());
 		const addDrop = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorDropsCollection"] [data-ui="EditorCollectionAdd"]',
+			'[data-ui="EditorOutcomesCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		if (addDrop === null) throw new Error("Missing add drop control.");
 		await act(async () => {
 			saveButton.click();
 			await Promise.resolve();
 		});
-		const emptyDrops = container.querySelector<HTMLInputElement>(
-			'input[placeholder="Search drops…"]',
+		const emptyOutcomes = container.querySelector<HTMLInputElement>(
+			'input[placeholder="Search outcomes…"]',
 		);
-		expect(emptyDrops?.disabled).toBe(true);
-		expect(emptyDrops?.dataset.uiInvalid).toBe("true");
-		expect(emptyDrops?.closest("label")?.textContent).toContain("Add at least one drop.");
+		expect(emptyOutcomes?.disabled).toBe(true);
+		expect(emptyOutcomes?.dataset.uiInvalid).toBe("true");
+		expect(emptyOutcomes?.closest("label")?.textContent).toContain("Add at least one outcome.");
 		const selectedCollectionLabels = Array.from(
 			container.querySelectorAll<HTMLInputElement>("input"),
 		).map((input) => input.value);
@@ -1006,109 +940,6 @@ describe("item section form session", () => {
 				}),
 		);
 		expect(document.activeElement).toBe(invalid);
-	});
-
-	it("replaces production with an action in the canonical saved item", async () => {
-		const common = {
-			...createProducerItem({
-				id: item.id,
-			}),
-			uid: item.uid,
-		};
-		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
-		const { container } = await render(<ActionSection />);
-		const enable = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Enable");
-		if (enable === undefined) throw new Error("Missing enable action control.");
-		await act(async () => enable.click());
-		// Persist the action and empty lines as one canonical item.
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					lines: [],
-					action: {
-						type: "space",
-						space: 0,
-						input: [],
-						rules: [],
-					},
-				}),
-			}),
-		);
-	});
-	it("replaces a configured action when the first production line is added", async () => {
-		const common = {
-			...item,
-
-			action: {
-				type: "space" as const,
-				space: 7,
-				input: [],
-				rules: [],
-			},
-		};
-		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
-		const { container } = await render(<ProductionSection />);
-		const add = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionAdd"]',
-		);
-		if (add === null) throw new Error("Missing add production line control.");
-		await act(async () => add.click());
-		await completeFirstProductionLine(container);
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					action: undefined,
-					lines: [
-						expect.objectContaining({
-							default: true,
-						}),
-					],
-				}),
-			}),
-		);
-	});
-	it("disables a configured action without changing the item identity", async () => {
-		const common = {
-			...item,
-
-			action: {
-				type: "space" as const,
-				space: 7,
-				input: [],
-				rules: [],
-			},
-		};
-		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
-		const { container, renderSection } = await render(<ActionSection />);
-		await renderSection(<ActionSection />, "action");
-		const disable = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Disable");
-		if (disable === undefined) throw new Error("Missing disable action control.");
-		await act(async () => disable.click());
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					id: item.id,
-					action: undefined,
-					lines: [],
-				}),
-			}),
-		);
 	});
 
 	it.each([
@@ -1490,12 +1321,6 @@ describe("item section form session", () => {
 	] as const)("enables a clock through the %s entry as one valid saved item", async (entry) => {
 		const common = {
 			...item,
-			action: {
-				type: "space" as const,
-				space: 2,
-				input: [],
-				rules: [],
-			},
 		};
 		state.persisted = common;
 		(state.project as Project).config.items[item.id] = common;
@@ -1517,7 +1342,6 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
-			action: undefined,
 			clock: {
 				durationMs: 900_000,
 			},
@@ -1556,7 +1380,7 @@ describe("item section form session", () => {
 			(button) => button.textContent === "Loose-kill",
 		);
 		const addExpiryOutput = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
+			'[data-ui="EditorOutcomeSetsCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		if (expiryMode === undefined || addExpiryOutput === null) {
 			throw new Error("Missing lifetime-dependent Clock controls.");
@@ -1567,7 +1391,7 @@ describe("item section form session", () => {
 			(button) => button.textContent === "Loose-kill",
 		);
 		const disabledAddExpiryOutput = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorOutputSetsCollection"] [data-ui="EditorCollectionAdd"]',
+			'[data-ui="EditorOutcomeSetsCollection"] [data-ui="EditorCollectionAdd"]',
 		);
 		expect(disabledExpiryMode?.matches(":disabled")).toBe(true);
 		expect(disabledAddExpiryOutput?.matches(":disabled")).toBe(true);
@@ -1587,7 +1411,7 @@ describe("item section form session", () => {
 		);
 	});
 
-	it("clears the Clock interval while preserving the edited lifetime and expiry output", async () => {
+	it("clears the Clock interval while preserving the edited lifetime and expiry outcome", async () => {
 		const onExpire = createOutput([
 			{
 				itemId: item.id,

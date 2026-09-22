@@ -42,25 +42,21 @@ const ForceDeleteImpactList = ({
 		entries.push(
 			`${translator.textFn("Remove merge rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
-	for (const { ownerItemId, inputNumber } of impact.removedActionInputs)
+	for (const { ownerItemId, ruleNumber } of impact.removedClockRules)
 		entries.push(
-			`${translator.textFn("Remove action input")} ${inputNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
-		);
-	for (const { ownerItemId, ruleNumber } of impact.removedActionRules)
-		entries.push(
-			`${translator.textFn("Remove action rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove Clock rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 	for (const { ownerItemId, title } of impact.removedLines)
 		entries.push(
 			`${translator.textFn("Remove production line")} “${title}” ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
-	for (const ownerItemId of impact.removedUnitOutputOwnerIds)
+	for (const ownerItemId of impact.removedUnitOutcomeOwnerIds)
 		entries.push(
-			`${translator.textFn("Remove the unit depletion output from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove the unit depletion outcome from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
-	for (const ownerItemId of impact.removedExpiryOutputOwnerIds)
+	for (const ownerItemId of impact.removedExpiryOutcomeOwnerIds)
 		entries.push(
-			`${translator.textFn("Remove the expiry output from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove the expiry outcome from")} ${readItemTitleFn(project, ownerItemId)}`,
 		);
 
 	return (

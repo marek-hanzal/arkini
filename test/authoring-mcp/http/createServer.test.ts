@@ -63,7 +63,7 @@ describe("editor MCP server", () => {
 			"item_line_configs",
 			"item_line_config",
 			"item_input",
-			"item_output",
+			"item_outcome",
 			"item_estimate",
 			"item_chain",
 		]);
@@ -121,7 +121,7 @@ describe("editor MCP server", () => {
 			.filter(({ name }) => !jsonInputToolNames.has(name))
 			.map(({ inputSchema, name }) => {
 				const expectedId =
-					name === "item_input" || name === "item_output"
+					name === "item_input" || name === "item_outcome"
 						? `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-relation`
 						: `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-input`;
 				expectNamedJsonSchemaGraph(inputSchema, {
@@ -156,7 +156,7 @@ describe("editor MCP server", () => {
 		});
 		for (const toolName of [
 			"item_input",
-			"item_output",
+			"item_outcome",
 		]) {
 			const properties = tools.tools.find(({ name }) => name === toolName)?.inputSchema
 				.properties;
@@ -305,7 +305,7 @@ describe("editor MCP server", () => {
 		});
 		for (const name of [
 			"item_input",
-			"item_output",
+			"item_outcome",
 			"item_estimate",
 		]) {
 			const argumentsBase = {

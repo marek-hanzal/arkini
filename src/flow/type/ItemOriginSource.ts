@@ -76,7 +76,7 @@ export type ItemOriginRelationRole = "input" | "output";
 
 export interface ItemOriginRelation {
 	readonly fromItemId: string;
-	readonly outputIndex?: number;
+	readonly outcomeIndex?: number;
 	readonly role: ItemOriginRelationRole;
 	readonly source: ItemOriginSource;
 	readonly toItemId: string;

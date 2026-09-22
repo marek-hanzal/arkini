@@ -19,13 +19,6 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 					index,
 				],
 			});
-	if (item.action !== undefined)
-		collections.push({
-			input: item.action.input,
-			path: [
-				"action",
-			],
-		});
 	return collections;
 };
 

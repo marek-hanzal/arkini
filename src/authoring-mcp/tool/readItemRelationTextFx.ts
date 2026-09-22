@@ -48,7 +48,7 @@ const readItemOriginRelationSubgraphFn = ({
 			(left, right) =>
 				Order.String(left.source.id, right.source.id) ||
 				Order.String(left.toItemId, right.toItemId) ||
-				(left.outputIndex ?? -1) - (right.outputIndex ?? -1),
+				(left.outcomeIndex ?? -1) - (right.outcomeIndex ?? -1),
 		);
 
 	const itemIds = new Set<string>([
@@ -86,7 +86,7 @@ const readItemOriginRelationSubgraphFn = ({
 				relation.source.id,
 				relation.fromItemId,
 				relation.toItemId,
-				relation.outputIndex ?? "input",
+				relation.outcomeIndex ?? "input",
 			]);
 			const existing = relationByKey.get(key);
 			if (existing === undefined || nextLevel < existing.level)
@@ -114,7 +114,7 @@ const readItemOriginRelationSubgraphFn = ({
 				Order.String(left.source.id, right.source.id) ||
 				Order.String(left.fromItemId, right.fromItemId) ||
 				Order.String(left.toItemId, right.toItemId) ||
-				(left.outputIndex ?? -1) - (right.outputIndex ?? -1),
+				(left.outcomeIndex ?? -1) - (right.outcomeIndex ?? -1),
 		),
 	};
 };
@@ -235,15 +235,16 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 		});
 	}
 	const direction = role === "output" ? "output" : "input";
+	const routesById = new Map(
+		graph.routes.map((route) => [
+			route.id,
+			route,
+		]),
+	);
 	if (detail === "summary") {
 		const byLevel = new Map<number, number>();
 		const byKind = new Map<string, number>();
-		const routesById = new Map(
-			graph.routes.map((route) => [
-				route.id,
-				route,
-			]),
-		);
+
 		const operations: string[] = [];
 		for (const group of groups.values()) {
 			const source = group.relations[0]!.source;
@@ -298,34 +299,28 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 				].flatMap((group) => {
 					const source = group.relations[0]?.source;
 					if (source === undefined) return [];
-					const inputs = [
-						...source.inputs,
-					].sort((left, right) => left.itemId.localeCompare(right.itemId));
+
 					return [
 						`- Level ${group.level}: ${source.kind} "${source.label}"`,
 						...sourceReferenceLinesFn(project, source),
-						...(source.runtimeMs === undefined
-							? []
-							: [
-									`  Runtime: ${source.runtimeMs / 1_000} s`,
-								]),
+						...readRelationOperationSummaryFn(
+							project,
+							source,
+							source.routeIds.flatMap((id) => {
+								const route = routesById.get(id);
+								return route === undefined
+									? []
+									: [
+											route,
+										];
+							}),
+						),
 						"  Traversed:",
 						...group.relations.map(
 							(relation) =>
 								`    - ${itemReferenceFn(project, relation.fromItemId)} -> ${itemReferenceFn(project, relation.toItemId)}`,
 						),
-						...(inputs.length === 0
-							? [
-									"  Inputs: none",
-								]
-							: [
-									"  Inputs:",
-									...inputs.map(
-										(input) =>
-											`    - ${itemReferenceFn(project, input.itemId)} (quantity ${formatQuantityFn(input.quantity)})`,
-									),
-								]),
-						"  Outputs:",
+						"  Item acquisition witnesses:",
 						...source.outputs.flatMap((output) => [
 							`    - ${itemReferenceFn(project, output.itemId)} (${outputAnnotationFn(output)})`,
 							...outputRequirementLinesFn(project, output),

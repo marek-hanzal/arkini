@@ -55,7 +55,7 @@ describe("createAcquisitionGraphFn", () => {
 					...createSimpleItem("payer"),
 					units: {
 						amount: 3,
-						output: createOutput([
+						outcome: createOutput([
 							{
 								itemId: "depleted-output",
 							},
@@ -70,7 +70,7 @@ describe("createAcquisitionGraphFn", () => {
 							input: [
 								spentUnits("payer", 2),
 							],
-							output: createOutput([
+							outcome: createOutput([
 								{
 									itemId: "target",
 								},
@@ -161,7 +161,7 @@ describe("createAcquisitionGraphFn", () => {
 			rule: {
 				action: "use",
 				effect: "keep",
-				output: createOutput([
+				outcome: createOutput([
 					{
 						itemId: "result",
 					},
@@ -201,7 +201,7 @@ describe("createAcquisitionGraphFn", () => {
 			rule: {
 				action: "spend",
 				effect: "keep",
-				output: guaranteedMergeOutput(),
+				outcome: guaranteedMergeOutput(),
 				target: {
 					itemId: "target",
 					type: "item",
@@ -209,7 +209,7 @@ describe("createAcquisitionGraphFn", () => {
 			},
 			sourceUnits: {
 				amount: 3,
-				output: guaranteedMergeOutput({
+				outcome: guaranteedMergeOutput({
 					itemId: "output:a",
 				}),
 			},
@@ -218,7 +218,7 @@ describe("createAcquisitionGraphFn", () => {
 		const mergeOutput = graph.routes.find(
 			(route) => route.metadata.kind === "merge-output" && route.output.factId === "output",
 		);
-		const depletionOutput = graph.routes.find(
+		const depletionOutcome = graph.routes.find(
 			(route) =>
 				route.metadata.kind === "merge-unit-depletion" &&
 				route.output.factId === "output:a",
@@ -233,7 +233,7 @@ describe("createAcquisitionGraphFn", () => {
 				},
 			],
 		});
-		expect(depletionOutput).toMatchObject({
+		expect(depletionOutcome).toMatchObject({
 			metadata: {
 				kind: "merge-unit-depletion",
 				mergeIndex: 0,
@@ -258,7 +258,7 @@ describe("createAcquisitionGraphFn", () => {
 			rule: {
 				action: "consume",
 				effect: "spend",
-				output: guaranteedMergeOutput(),
+				outcome: guaranteedMergeOutput(),
 				target: {
 					itemId: "target",
 					type: "item",
@@ -266,7 +266,7 @@ describe("createAcquisitionGraphFn", () => {
 			},
 			targetUnits: {
 				amount: 4,
-				output: guaranteedMergeOutput({
+				outcome: guaranteedMergeOutput({
 					itemId: "output:a",
 				}),
 			},
@@ -275,7 +275,7 @@ describe("createAcquisitionGraphFn", () => {
 		const mergeOutput = graph.routes.find(
 			(route) => route.metadata.kind === "merge-output" && route.output.factId === "output",
 		);
-		const depletionOutput = graph.routes.find(
+		const depletionOutcome = graph.routes.find(
 			(route) =>
 				route.metadata.kind === "merge-unit-depletion" &&
 				route.metadata.unitOwnerItemId === "target" &&
@@ -300,7 +300,7 @@ describe("createAcquisitionGraphFn", () => {
 				]),
 			},
 		});
-		expect(depletionOutput).toMatchObject({
+		expect(depletionOutcome).toMatchObject({
 			metadata: {
 				unitOwnerItemId: "target",
 				kind: "merge-unit-depletion",
@@ -326,7 +326,7 @@ describe("createAcquisitionGraphFn", () => {
 			rule: {
 				action: "consume",
 				effect: "replace",
-				output: guaranteedMergeOutput({
+				outcome: guaranteedMergeOutput({
 					itemId: "result",
 					quantity: 2,
 				}),
@@ -383,7 +383,7 @@ describe("createAcquisitionGraphFn", () => {
 						spentUnits("payer"),
 						spentUnits("payer"),
 					],
-					output: createOutput([
+					outcome: createOutput([
 						{
 							itemId: "target",
 						},
@@ -508,7 +508,7 @@ describe("createAcquisitionGraphFn", () => {
 	it("surfaces authored runtime rules that static duration does not evaluate", async () => {
 		const line = createLine({
 			id: "line:conditional",
-			output: createOutput([
+			outcome: createOutput([
 				{
 					itemId: "target",
 				},

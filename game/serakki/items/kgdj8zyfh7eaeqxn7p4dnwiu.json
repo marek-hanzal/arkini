@@ -25,8 +25,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-cacao-grove",
 										"quantity": {
 											"min": 1,

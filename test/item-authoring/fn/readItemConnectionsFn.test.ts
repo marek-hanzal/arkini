@@ -45,7 +45,7 @@ describe("readItemConnectionsFn", () => {
 					lines: forge.lines.map((line) => ({
 						...line,
 						enable: false,
-						output: undefined,
+						outcome: undefined,
 						rules: [],
 					})),
 				},
@@ -90,12 +90,12 @@ describe("readItemConnectionsFn", () => {
 		const common = base.items.blocker;
 		const { lines: _lines, maxQueueSize: _queueSize, ...baseItem } = common;
 		const producer = base.items.producer;
-		const output = guaranteedMergeOutput({
+		const outcome = guaranteedMergeOutput({
 			itemId: "result",
 		});
 		const line = {
 			...producer.lines[0],
-			output,
+			outcome,
 		};
 		const config = GameConfigSchema.parse({
 			...base,
@@ -105,7 +105,7 @@ describe("readItemConnectionsFn", () => {
 					...producer,
 					clock: {
 						durationMs: 1_000,
-						onExpire: output,
+						onExpire: outcome,
 					},
 					lines: [
 						line,
@@ -151,7 +151,7 @@ describe("readItemConnectionsFn", () => {
 
 					units: {
 						amount: 1,
-						output,
+						outcome,
 					},
 				},
 				mergeSource: {
@@ -169,7 +169,7 @@ describe("readItemConnectionsFn", () => {
 								itemId: "blocker",
 								type: "item",
 							},
-							output,
+							outcome,
 						},
 					],
 				},
@@ -227,7 +227,7 @@ describe("readItemConnectionsFn", () => {
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,
-					dropIndex: 0,
+					outcomeIndex: 0,
 					rollType: "guaranteed",
 				},
 			},
@@ -239,7 +239,7 @@ describe("readItemConnectionsFn", () => {
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,
-					dropIndex: 0,
+					outcomeIndex: 0,
 					rollType: "guaranteed",
 				},
 			},
@@ -251,7 +251,7 @@ describe("readItemConnectionsFn", () => {
 		).toEqual(reverseOrigins);
 	});
 
-	it("keeps positive line, output, and immediate-action conditions", () => {
+	it("keeps positive line, outcome, and Space outcome line conditions", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		const common = base.items.tool;
@@ -264,23 +264,24 @@ describe("readItemConnectionsFn", () => {
 					...forge,
 					lines: forge.lines.map((line) => ({
 						...line,
-						output: {
+						outcome: {
 							set: [
 								{
 									rules: [],
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
 													itemId: "result",
+													type: "item",
 													placement: "drop",
 													quantity: {
 														min: 1,
 														max: 1,
 													},
 													rules: [
-														enableRuleFn("output-permit"),
+														enableRuleFn("outcome-permit"),
 													],
 												},
 											],
@@ -300,25 +301,50 @@ describe("readItemConnectionsFn", () => {
 					uid: "portal",
 					title: "portal",
 
-					action: {
-						type: "space" as const,
-						space: 1,
-						input: [
-							{
-								type: "units",
-								query: {
-									distance: "far",
-									selector: {
-										itemId: "water",
-										type: "item",
+					lines: [
+						{
+							id: "portal-line",
+							title: "Portal line",
+							description: "Travel",
+							default: true,
+							runtimeMs: 0,
+							outcome: {
+								set: [
+									{
+										weight: 1,
+										rules: [],
+										roll: [
+											{
+												type: "guaranteed",
+												outcome: [
+													{
+														type: "space",
+														space: 1,
+														rules: [],
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+							input: [
+								{
+									type: "units",
+									query: {
+										distance: "far",
+										selector: {
+											itemId: "water",
+											type: "item",
+										},
 									},
 								},
-							},
-						],
-						rules: [
-							enableRuleFn("line-permit"),
-						],
-					},
+							],
+							rules: [
+								enableRuleFn("line-permit"),
+							],
+						},
+					],
 				},
 				result: {
 					...common,
@@ -332,18 +358,18 @@ describe("readItemConnectionsFn", () => {
 					uid: "line-permit",
 					title: "line-permit",
 				},
-				"output-permit": {
+				"outcome-permit": {
 					...common,
-					id: "output-permit",
-					uid: "output-permit",
-					title: "output-permit",
+					id: "outcome-permit",
+					uid: "outcome-permit",
+					title: "outcome-permit",
 				},
 			},
 		});
 
 		expect(readIdsFn(config, "forge", "inputs")).toEqual([
 			"line-permit",
-			"output-permit",
+			"outcome-permit",
 			"tool",
 			"water",
 		]);
@@ -351,11 +377,11 @@ describe("readItemConnectionsFn", () => {
 			"line-permit",
 			"water",
 		]);
-		expect(readIdsFn(config, "output-permit", "required-by")).toEqual([
+		expect(readIdsFn(config, "outcome-permit", "required-by")).toEqual([
 			"forge",
 		]);
 		expect(
-			readItemConnectionFactsFn(config, "output-permit", "produced-by").map(
+			readItemConnectionFactsFn(config, "outcome-permit", "produced-by").map(
 				({ itemId }) => itemId,
 			),
 		).toEqual([]);
@@ -365,7 +391,9 @@ describe("readItemConnectionsFn", () => {
 				origins: [
 					{
 						source: {
-							type: "action",
+							type: "line",
+							lineIndex: 0,
+							title: "Portal line",
 						},
 						role: "condition",
 						condition: {
@@ -380,7 +408,9 @@ describe("readItemConnectionsFn", () => {
 				origins: [
 					{
 						source: {
-							type: "action",
+							type: "line",
+							lineIndex: 0,
+							title: "Portal line",
 						},
 						role: "input",
 						inputIndex: 0,
@@ -389,7 +419,7 @@ describe("readItemConnectionsFn", () => {
 			},
 		]);
 		expect(
-			readItemConnectionFactsFn(config, "output-permit", "required-by")[0]?.origins,
+			readItemConnectionFactsFn(config, "outcome-permit", "required-by")[0]?.origins,
 		).toEqual(
 			forge.lines.map((line, lineIndex) => ({
 				source: {
@@ -405,7 +435,7 @@ describe("readItemConnectionsFn", () => {
 				roll: {
 					setIndex: 0,
 					rollIndex: 0,
-					dropIndex: 0,
+					outcomeIndex: 0,
 					rollType: "guaranteed",
 				},
 			})),

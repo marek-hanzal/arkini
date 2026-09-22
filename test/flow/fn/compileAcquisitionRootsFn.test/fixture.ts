@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import {
 	createLine,
 	createProducerItem,
@@ -10,14 +10,15 @@ import {
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
 const createRuledOutput = (type: "disable" | "enable") =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: [
 			{
 				rules: [],
 				roll: [
 					{
-						drop: [
+						outcome: [
 							{
+								type: "item",
 								itemId: `item:${type}`,
 								quantity: {
 									max: 1,
@@ -62,11 +63,11 @@ export const createMultiOutputLimitationConfigFx = Effect.fn("createMultiOutputL
 						lines: [
 							createLine({
 								id: "line:enable",
-								output: createRuledOutput("enable"),
+								outcome: createRuledOutput("enable"),
 							}),
 							createLine({
 								id: "line:disable",
-								output: createRuledOutput("disable"),
+								outcome: createRuledOutput("disable"),
 							}),
 						],
 					}),

@@ -1,15 +1,15 @@
 import { Order } from "effect";
 
 import type { AcquisitionGraph, AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
-const readOutputDropsFn = (output: OutputSchema.Type | undefined) =>
-	output?.set.flatMap((set) => set.roll.flatMap((roll) => roll.drop)) ?? [];
+const readOutputDropsFn = (output: OutcomeTableSchema.Type | undefined) =>
+	output?.set.flatMap((set) => set.roll.flatMap((roll) => roll.outcome)) ?? [];
 
-const readOutputSetRulesFn = (output: OutputSchema.Type | undefined) =>
+const readOutputSetRulesFn = (output: OutcomeTableSchema.Type | undefined) =>
 	output?.set.flatMap((set) => set.rules) ?? [];
 
 const requiresAbsentFactFn = (when: WhenSchema.Type) => {
@@ -25,9 +25,9 @@ const requiresAbsentFactFn = (when: WhenSchema.Type) => {
 
 const readItemOutputsFn = (item: ItemSchema.Type) => {
 	return [
-		...item.lines.map(({ output }) => output),
-		item.units?.output,
-		...(item.merge ?? []).map(({ output }) => output),
+		...item.lines.map(({ outcome }) => outcome),
+		item.units?.outcome,
+		...(item.merge ?? []).map(({ outcome }) => outcome),
 		item.clock?.onExpire,
 	];
 };

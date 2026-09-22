@@ -22,7 +22,7 @@
 					"itemId": "fawn"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -31,8 +31,9 @@
 								{
 									"type": "chance",
 									"chance": 0.5,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "hide",
 											"quantity": {
 												"min": 1,
@@ -45,8 +46,9 @@
 								},
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 1,
@@ -152,7 +154,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -160,8 +162,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "beagle",
 											"quantity": {
 												"min": 1,
@@ -204,7 +207,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -212,8 +215,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "hungry-beagle",
 											"quantity": {
 												"min": 1,
@@ -223,6 +227,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,
@@ -265,7 +270,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -273,8 +278,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-beagle",
 											"quantity": {
 												"min": 1,
@@ -318,7 +324,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -326,8 +332,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-beagle",
 											"quantity": {
 												"min": 1,
@@ -387,7 +394,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -395,8 +402,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-beagle",
 											"quantity": {
 												"min": 1,
@@ -470,7 +478,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -478,8 +486,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "beagle-cuddling-puppy",
 											"quantity": {
 												"min": 1,

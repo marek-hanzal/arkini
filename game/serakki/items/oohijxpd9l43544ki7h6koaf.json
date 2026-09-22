@@ -29,7 +29,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 5,
@@ -38,8 +38,9 @@
 								{
 									"type": "chance",
 									"chance": 0.75,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "fawn",
 											"quantity": {
 												"min": 1,
@@ -59,8 +60,9 @@
 								{
 									"type": "chance",
 									"chance": 0.75,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "wild-boar",
 											"quantity": {
 												"min": 1,
@@ -80,8 +82,9 @@
 								{
 									"type": "chance",
 									"chance": 0.75,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "wolf",
 											"quantity": {
 												"min": 1,
@@ -101,8 +104,9 @@
 								{
 									"type": "chance",
 									"chance": 0.75,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bear",
 											"quantity": {
 												"min": 1,

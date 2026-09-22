@@ -6,8 +6,6 @@ import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputS
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
-import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
@@ -151,21 +149,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		boardItem.location.space !== runtime.currentSpace
 	) {
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
-	}
-	if (targetItem.item.action?.type === "space") {
-		const config = yield* GameConfigFx;
-		const destination = readEmptyLocationsFn({
-			locations: readBoardLocationsFn({
-				size: config.meta.board,
-				space: targetItem.item.action.space,
-			}),
-			runtime,
-		})[0];
-		return destination === undefined
-			? rejectedFn(DropItemRejectedReason.Blocked)
-			: ({
-					kind: DropItemResultKind.Move,
-				} satisfies readDropItemPreviewFx.Result);
 	}
 	if (target.inputStore !== undefined) {
 		const inputStore = resolveLineInputStoreFn({

@@ -1,5 +1,5 @@
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { ItemOutcomeSchema } from "~/outcome/schema/ItemOutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({ id }: { id: string }) => {
@@ -78,11 +78,12 @@ export const configuredDrop = ({
 	rules = [],
 }: {
 	itemId: string;
-	placement: DropSchema.Type["placement"];
+	placement: ItemOutcomeSchema.Type["placement"];
 	quantity: number;
-	rules?: DropSchema.Type["rules"];
+	rules?: ItemOutcomeSchema.Type["rules"];
 }) => {
 	return {
+		type: "item" as const,
 		itemId,
 		placement,
 		quantity: {
@@ -90,13 +91,13 @@ export const configuredDrop = ({
 			max: quantity,
 		},
 		rules,
-	} satisfies DropSchema.Type;
+	} satisfies ItemOutcomeSchema.Type;
 };
 
 export const configuredOutput = (
-	drop: [
-		DropSchema.Type,
-		...DropSchema.Type[],
+	outcome: [
+		ItemOutcomeSchema.Type,
+		...ItemOutcomeSchema.Type[],
 	],
 ) => {
 	return {
@@ -106,11 +107,11 @@ export const configuredOutput = (
 				rules: [],
 				roll: [
 					{
-						drop,
+						outcome,
 						type: "guaranteed",
 					},
 				],
 			},
 		],
-	} satisfies OutputSchema.Type;
+	} satisfies OutcomeTableSchema.Type;
 };

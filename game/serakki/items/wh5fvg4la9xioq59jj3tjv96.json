@@ -22,7 +22,7 @@
 					"itemId": "wolf"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -30,8 +30,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 2,
@@ -41,6 +42,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "raw-game-meat",
 											"quantity": {
 												"min": 1,
@@ -110,7 +112,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -118,8 +120,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sheep",
 											"quantity": {
 												"min": 1,
@@ -162,7 +165,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -170,8 +173,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "hungry-sheep",
 											"quantity": {
 												"min": 1,
@@ -214,7 +218,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -222,8 +226,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-sheep",
 											"quantity": {
 												"min": 1,
@@ -267,7 +272,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -275,8 +280,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-sheep",
 											"quantity": {
 												"min": 1,
@@ -336,7 +342,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -344,8 +350,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sick-sheep",
 											"quantity": {
 												"min": 1,
@@ -419,7 +426,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -427,8 +434,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "well-fed-wolf",
 											"quantity": {
 												"min": 1,
@@ -438,6 +446,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 2,
@@ -447,6 +456,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "raw-game-meat",
 											"quantity": {
 												"min": 1,
@@ -520,7 +530,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -528,8 +538,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "well-fed-wolf",
 											"quantity": {
 												"min": 1,
@@ -539,6 +550,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 2,
@@ -548,6 +560,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "raw-game-meat",
 											"quantity": {
 												"min": 1,

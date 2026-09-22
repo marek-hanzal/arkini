@@ -7,7 +7,7 @@ import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/Rule
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
-import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
+import type { OutcomeRuleSchema } from "~/outcome/schema/OutcomeRuleSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
@@ -33,9 +33,9 @@ import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
-type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
+type RuleValue = ActionRuleSchema.Type | LineRuleSchema.Type | OutcomeRuleSchema.Type;
 type RuleType = LineRuleSchema.Type["type"];
-type RuleTarget = "action" | "set" | "drop" | "line";
+type RuleTarget = "action" | "set" | "outcome" | "line";
 type DraftWhen =
 	| WhenSchema.Type
 	| {
@@ -146,15 +146,15 @@ const ConditionOption = ({ label, when }: { readonly label: string; readonly whe
 const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget): ReactNode => {
 	if (target === "set")
 		return type === "enable" ? (
-			<Mx label="Output set enable rule help" />
+			<Mx label="Outcome set enable rule help" />
 		) : (
-			<Mx label="Output set disable rule help" />
+			<Mx label="Outcome set disable rule help" />
 		);
-	if (target === "drop")
+	if (target === "outcome")
 		return type === "enable" ? (
-			<Mx label="Drop enable rule help" />
+			<Mx label="Outcome enable rule help" />
 		) : (
-			<Mx label="Drop disable rule help" />
+			<Mx label="Outcome disable rule help" />
 		);
 	if (target === "action")
 		return type === "enable" ? (

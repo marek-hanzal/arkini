@@ -28,7 +28,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -36,8 +36,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "treasure-chest-t1",
 											"quantity": {
 												"min": 1,
@@ -68,7 +69,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -76,8 +77,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "treasure-chest-t2",
 											"quantity": {
 												"min": 1,
@@ -108,7 +110,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -116,8 +118,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "treasure-chest-t3",
 											"quantity": {
 												"min": 1,
@@ -148,7 +151,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -156,8 +159,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "treasure-chest-t4",
 											"quantity": {
 												"min": 1,

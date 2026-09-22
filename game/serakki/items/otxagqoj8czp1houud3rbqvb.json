@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-raw-chicken",
 										"quantity": {
 											"min": 1,

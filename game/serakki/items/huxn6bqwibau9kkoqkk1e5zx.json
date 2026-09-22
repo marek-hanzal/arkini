@@ -40,7 +40,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -48,8 +48,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cheese",
 											"quantity": {
 												"min": 1,
@@ -59,6 +60,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "clay-jug",
 											"quantity": {
 												"min": 1,

@@ -15,7 +15,7 @@
 		},
 		"units": {
 			"amount": 3,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -23,8 +23,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "base-camp",
 										"quantity": {
 											"min": 1,
@@ -53,8 +54,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "loose-ash",
 										"quantity": {
 											"min": 3,
@@ -64,6 +66,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "clutter",
 										"quantity": {
 											"min": 2,
@@ -96,7 +99,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -104,8 +107,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "air-pollution",
 											"quantity": {
 												"min": 1,

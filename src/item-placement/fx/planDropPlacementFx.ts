@@ -8,13 +8,13 @@ import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationCla
 import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import type { dropFx } from "~/production-output/fx/dropFx";
+import type { ResolvedOutcome } from "~/outcome/type/ResolvedOutcome";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
 
 interface PlanDropPlacementProps {
-	readonly drop: dropFx.Result;
+	readonly drop: ResolvedOutcome.Item;
 	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
@@ -27,7 +27,7 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 	origin,
 	runtime,
 }: {
-	readonly drop: dropFx.Result;
+	readonly drop: ResolvedOutcome.Item;
 	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly item: ItemSchema.Type;
 	readonly origin: BoardLocationSchema.Type;

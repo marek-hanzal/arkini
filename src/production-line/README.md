@@ -9,13 +9,13 @@ This README maps the peer `production-*` roots. It lives beside Production Line 
 | Domain | Owns | Public entrypoints |
 | --- | --- | --- |
 | `production-condition` | Authored runtime condition evaluation | [`whenFx.ts`](../production-condition/fx/whenFx.ts) |
-| `production-output` | Output, drop and roll schemas; deterministic resolution | [`outputFx.ts`](../production-output/fx/outputFx.ts) |
+| `outcome` | Typed Item/Space outcome schemas; deterministic resolution and ordered application | [`resolveOutcomeTableFx.ts`](../outcome/fx/resolveOutcomeTableFx.ts) |
 | `production-action` | Immediate action admission, action inputs and unit settlement | [`resolveActionRuleFx.ts`](../production-action/fx/resolveActionRuleFx.ts), [`settleActionUnitsFx.ts`](../production-action/fx/settleActionUnitsFx.ts) |
 | `production-input` | Material resolution, buffers, autofill, withdrawal and storage mutation | [`resolveInputRunFx.ts`](../production-input/fx/resolveInputRunFx.ts), [`applyInputRunPlanFx.ts`](../production-input/fx/applyInputRunPlanFx.ts) |
 | `production-line` | Line definitions, rules, reads and one pinned-snapshot run plan | [`fx/resolveLineRunFx.ts`](fx/resolveLineRunFx.ts) |
 | `production-job` | Queue admission, reservation, start, completion and cancellation cleanup | [`../production-job/fx/enqueueLineFx.ts`](../production-job/fx/enqueueLineFx.ts), [`../production-job/fx/attemptQueuedLineStartFx.ts`](../production-job/fx/attemptQueuedLineStartFx.ts), [`../production-job/fx/attemptJobCompletionFx.ts`](../production-job/fx/attemptJobCompletionFx.ts) |
 | `production-delivery` | Single-item delivery, travel, reconciliation and input settlement | [`advanceDeliveriesRuntimeFx.ts`](../production-delivery/fx/advanceDeliveriesRuntimeFx.ts), [`settleItemDeliveryRuntimeFx.ts`](../production-delivery/fx/settleItemDeliveryRuntimeFx.ts) |
-| `production-authoring` | Shared controlled Editor fields for Line/Input/Rule/Output values | [`LineFields.tsx`](../production-authoring/ui/LineFields.tsx) |
+| `production-authoring` | Shared controlled Editor fields for Line/Input/Rule/Outcome values | [`LineFields.tsx`](../production-authoring/ui/LineFields.tsx) |
 
 Gameplay consumers import these exact owners directly. Do not add a `production` barrel, coordinator, adapter or directory just to make the island look hierarchical.
 
@@ -34,7 +34,7 @@ The production domain graph contains real behavior cycles even though the concre
 
 Schema composition adds further non-behavioral back edges:
 
-- Item Definition embeds Line, Output and the `item-action` discriminated union; production reads Item definitions. Common action payloads reuse immediate Input/Rule schemas, and `space-action` owns the concrete navigation transaction. Action and production lines are mutually exclusive.
+- Item Definition embeds Line, Outcome and schedule contracts. Navigation is a Space outcome on an ordinary line; input and rule admission have one shared lifecycle.
 - Runtime schemas embed Job, default-line, input and delivery state; production operations consume Runtime values.
 - Production errors and schemas reuse exact Game Value identity, quantity and time contracts.
 

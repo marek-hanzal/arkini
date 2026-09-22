@@ -144,7 +144,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 				},
 				action: "consume",
 				effect: "keep",
-				output: guaranteedMergeOutput(),
+				outcome: guaranteedMergeOutput(),
 			},
 		}),
 		state: {
@@ -217,7 +217,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: output.id,
 				canonicalItemId: "output",
-				originItemId: "runtime:target",
+				originItemId: "runtime:source",
 				location: output.location,
 			},
 		]);

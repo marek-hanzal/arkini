@@ -19,7 +19,7 @@
 					"itemId": "marek"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bobik",
 											"quantity": {
 												"min": 1,
@@ -47,8 +48,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "tomasek",
 											"quantity": {
 												"min": 1,
@@ -79,7 +81,7 @@
 					"itemId": "honeyed-fruit-pancake"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -87,8 +89,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "clay-plate",
 											"quantity": {
 												"min": 1,

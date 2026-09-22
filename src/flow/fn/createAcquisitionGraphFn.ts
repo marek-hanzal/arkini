@@ -228,7 +228,7 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 					minimumActionIntervalMs,
 				}),
 	};
-	const outputModel = readAcquisitionOutputOccurrencesFn(descriptor.line.output);
+	const outputModel = readAcquisitionOutputOccurrencesFn(descriptor.line.outcome);
 	const operation = {
 		...descriptor.operation,
 		...(outputModel.compilation === "complete"
@@ -274,10 +274,10 @@ const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescrip
 	for (const [unitOwnerItemId, costs] of descriptor.unitCostsByItemId) {
 		const units = config.items[unitOwnerItemId]?.units;
 		const spendPerRun = costs.reduce((total, { cost }) => total + cost, 0);
-		if (units?.output === undefined || spendPerRun > units.amount) continue;
+		if (units?.outcome === undefined || spendPerRun > units.amount) continue;
 		if (units.amount % spendPerRun !== 0) continue;
 		const runMultiplier = units.amount / spendPerRun;
-		const unitOutputModel = readAcquisitionOutputOccurrencesFn(units.output);
+		const unitOutputModel = readAcquisitionOutputOccurrencesFn(units.outcome);
 		for (const occurrence of unitOutputModel.occurrences)
 			routes.push({
 				...execution,
@@ -405,7 +405,7 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 			sourceItemId: source.id,
 			targetItemId: merge.target.itemId,
 		} as const;
-		const outputModel = readAcquisitionOutputOccurrencesFn(merge.output);
+		const outputModel = readAcquisitionOutputOccurrencesFn(merge.outcome);
 		const replacementOutputGroupId = "output:replacement";
 		const operation = {
 			id: readAcquisitionIdentityFn("source", source.id, "merge", mergeIndex),
@@ -505,8 +505,8 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 			});
 
 		for (const [participantIndex, participant] of unitParticipants.entries()) {
-			if (participant.units.output === undefined) continue;
-			const unitOutputModel = readAcquisitionOutputOccurrencesFn(participant.units.output);
+			if (participant.units.outcome === undefined) continue;
+			const unitOutputModel = readAcquisitionOutputOccurrencesFn(participant.units.outcome);
 			const depletionRequirements: AcquisitionRoute["requirements"] = {
 				...requirements,
 				allOf: requirements.allOf.map((requirement) =>

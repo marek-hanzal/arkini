@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-copper-pan",
 										"quantity": {
 											"min": 1,

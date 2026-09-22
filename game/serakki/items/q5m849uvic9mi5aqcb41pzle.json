@@ -28,7 +28,7 @@
 					"itemId": "bed-milk"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -36,8 +36,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,
@@ -61,7 +62,7 @@
 					"itemId": "bed-biowaste"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -69,8 +70,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,

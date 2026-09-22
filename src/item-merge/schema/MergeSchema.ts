@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { SourceActionSchema } from "./SourceActionSchema";
 import { TargetEffectSchema } from "./TargetEffectSchema";
 
@@ -14,15 +14,15 @@ const BaseSchema = z
 		action: SourceActionSchema.describe(
 			"The action applied to the source item after this merge resolves.",
 		),
-		output: OutputSchema.optional().describe(
-			"The optional extra output evaluated after this merge resolves.",
+		outcome: OutcomeTableSchema.optional().describe(
+			"The optional extra outcome evaluated after this merge resolves.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "merge.BaseSchema",
 		description:
-			"The common source action, target selector, and output fields shared by directional item merges.",
+			"The common source action, target selector, and outcome fields shared by directional item merges.",
 	});
 
 const KeepSchema = z

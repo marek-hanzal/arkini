@@ -43,7 +43,7 @@ describe("merge settlement against the evolving draft", () => {
 		"replace",
 	] as const)("preserves source depletion beside the target before %s", (effect) => {
 		const output = guaranteedMergeOutput();
-		output.set[0].roll[0].drop[0].rules = [
+		output.set[0].roll[0].outcome[0].rules = [
 			{
 				type: "enable",
 				when: [
@@ -54,7 +54,7 @@ describe("merge settlement against the evolving draft", () => {
 							distance: "self",
 							selector: {
 								type: "item",
-								itemId: "target",
+								itemId: "source",
 							},
 						},
 					},
@@ -64,7 +64,7 @@ describe("merge settlement against the evolving draft", () => {
 		const config = createMergeTestConfig({
 			sourceUnits: {
 				amount: 1,
-				output: guaranteedMergeOutput({
+				outcome: guaranteedMergeOutput({
 					itemId: "target",
 				}),
 			},
@@ -82,7 +82,7 @@ describe("merge settlement against the evolving draft", () => {
 							effect,
 							result: "result",
 						}),
-				output,
+				outcome: output,
 			},
 		});
 		const result = Effect.runSync(
@@ -105,7 +105,7 @@ describe("merge settlement against the evolving draft", () => {
 			),
 		);
 		expect(result.runtime.items.filter((item) => item.item.id === "target").length).toBe(1);
-		// Optional output still queries the pre-merge target, even though settlement changed it.
+		// Outcome rules use the pre-merge source owner even after its depletion removes it.
 		expect(result.runtime.items.filter((item) => item.item.id === "output").length).toBe(1);
 		expect(result.transition.events).not.toContainEqual(
 			expect.objectContaining({

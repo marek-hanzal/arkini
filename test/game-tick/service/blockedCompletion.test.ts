@@ -80,14 +80,14 @@ describe("blocked job completion", () => {
 		expect(result.recovered.items.filter((item) => item.item.id === "tool").length).toBe(1);
 		expect(result.recovered.items.filter((item) => item.item.id === "ingot").length).toBe(1);
 	});
-	it("consumes the attempted budget when output completion fatally fails", () => {
+	it("consumes the attempted budget when outcome completion fatally fails", () => {
 		const config = createTickFailureTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const output = config.items.completionOutput;
-				if (output === undefined) throw new Error("Expected failure output fixture.");
+				const outcome = config.items.completionOutput;
+				if (outcome === undefined) throw new Error("Expected failure outcome fixture.");
 				const owner = yield* spawnItemFx({
-					id: "runtime:invalid-output-forge",
+					id: "runtime:invalid-outcome-forge",
 					itemId: "forge",
 					location: {
 						scope: "board",
@@ -110,7 +110,7 @@ describe("blocked job completion", () => {
 					}),
 				);
 				const afterFailure = yield* readRuntimeFx();
-				(config.items as Record<string, unknown>).completionOutput = output;
+				(config.items as Record<string, unknown>).completionOutput = outcome;
 				yield* runTickRuntimeByFx({
 					elapsedMs: 0,
 				});

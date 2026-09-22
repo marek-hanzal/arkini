@@ -45,8 +45,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-grain-seed",
 										"quantity": {
 											"min": 1,

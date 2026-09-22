@@ -65,20 +65,21 @@ export const value = (value: number) => ({
 });
 
 export const drop = (itemId: string) => ({
+	type: "item" as const,
 	itemId,
 	quantity: value(1),
 	placement: "drop" as const,
 	rules: [],
 });
 
-export const output = (...itemIds: string[]) => ({
+export const outcome = (...itemIds: string[]) => ({
 	set: [
 		{
 			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: itemIds.map(drop),
+					outcome: itemIds.map(drop),
 				},
 			],
 		},
@@ -137,7 +138,7 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			units: {
 				amount: 2,
-				output: output("item:dust"),
+				outcome: outcome("item:dust"),
 			},
 			maxQueueSize: 2,
 			lines: [
@@ -155,7 +156,7 @@ export const unitsConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output: output("item:gift"),
+					outcome: outcome("item:gift"),
 					rules: [],
 				},
 			],
@@ -283,7 +284,7 @@ export const unitsConfig = GameConfigSchema.parse({
 					input: [
 						targetUnitInput("units:tree"),
 					],
-					output: output("item:log"),
+					outcome: outcome("item:log"),
 					rules: [],
 				},
 				{
@@ -294,7 +295,7 @@ export const unitsConfig = GameConfigSchema.parse({
 					input: [
 						targetUnitInput("units:sapling"),
 					],
-					output: output("item:log"),
+					outcome: outcome("item:log"),
 					rules: [],
 				},
 				{
@@ -305,7 +306,7 @@ export const unitsConfig = GameConfigSchema.parse({
 					input: [
 						targetUnitInput("units:messy"),
 					],
-					output: output("item:log"),
+					outcome: outcome("item:log"),
 					rules: [],
 				},
 			],
@@ -341,7 +342,7 @@ export const unitsConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output: output("item:gift"),
+					outcome: outcome("item:gift"),
 					rules: [],
 				},
 			],
@@ -368,7 +369,7 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			units: {
 				amount: 1,
-				output: output("item:seed"),
+				outcome: outcome("item:seed"),
 			},
 		},
 		"units:empty": {
@@ -393,7 +394,7 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			units: {
 				amount: 1,
-				output: output("item:seed", "item:trash"),
+				outcome: outcome("item:seed", "item:trash"),
 			},
 		},
 		"item:gift": {

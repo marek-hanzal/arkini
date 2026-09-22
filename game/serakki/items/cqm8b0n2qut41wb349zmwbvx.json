@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-clay-vase-with-flowers",
 										"quantity": {
 											"min": 1,

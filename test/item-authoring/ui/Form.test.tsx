@@ -25,7 +25,7 @@ vi.mock("~/item-authoring/ui/useItemByUid", () => ({
 
 vi.mock("~/item-authoring/ui/FormSession", () => ({
 	FormSession: ({ initialItem }: { readonly initialItem: ItemSchema.Type }) =>
-		createElement("output", null, JSON.stringify(initialItem)),
+		createElement("outcome", null, JSON.stringify(initialItem)),
 }));
 
 import { Form } from "~/item-authoring/ui/Form";
@@ -75,7 +75,7 @@ describe("Form", () => {
 			);
 		});
 		const draft = JSON.parse(
-			container.querySelector("output")?.textContent ?? "null",
+			container.querySelector("outcome")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
 			id: "",
@@ -113,7 +113,7 @@ describe("Form", () => {
 			);
 		});
 		const draft = JSON.parse(
-			container.querySelector("output")?.textContent ?? "null",
+			container.querySelector("outcome")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
 			artwork: {

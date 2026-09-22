@@ -48,7 +48,7 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 	input: [
 		materialInput(itemId),
 	] as const,
-	output:
+	outcome:
 		outputItemId === undefined
 			? undefined
 			: {
@@ -58,8 +58,9 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 							roll: [
 								{
 									type: "guaranteed" as const,
-									drop: [
+									outcome: [
 										{
+											type: "item" as const,
 											itemId: outputItemId,
 											quantity: {
 												min: 1,

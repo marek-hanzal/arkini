@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 
 export namespace readItemChainsFn {
 	export type Stop = "final" | "retained" | "spent" | "cycle" | "depth" | "missing" | "ongoing";
@@ -124,18 +124,18 @@ export const readItemChainsFn = (
 		};
 	};
 	const outputFn = (
-		output: OutputSchema.Type | undefined,
+		output: OutcomeTableSchema.Type | undefined,
 		path: string,
 		depth: number,
 		ancestors: readonly string[],
 	): readItemChainsFn.Node[] => {
 		const nodes: readItemChainsFn.Node[] = [];
 		const appendFn = (
-			drop: DropSchema.Type,
+			drop: OutcomeSchema.Type,
 			suffix: string,
 			meta: readItemChainsFn.OutputPath,
 		) => {
-			if (drop.quantity.max === 0) return;
+			if (drop.type !== "item" || drop.quantity.max === 0) return;
 			if (remaining <= 0) {
 				truncated = true;
 				omitted++;
@@ -161,7 +161,7 @@ export const readItemChainsFn = (
 					conditional: set.rules.length > 0,
 					chance: roll.type === "chance" ? roll.chance : undefined,
 				};
-				for (const [dropIndex, drop] of roll.drop.entries())
+				for (const [dropIndex, drop] of roll.outcome.entries())
 					appendFn(drop, `${setIndex}/${rollIndex}/${dropIndex}`, meta);
 			}
 		}
@@ -190,7 +190,7 @@ export const readItemChainsFn = (
 				remaining--;
 				const nextPath = `${path}/pulse/${lineIndex}`;
 				const before = omitted;
-				const branches = outputFn(line.output, nextPath, depth + 1, ancestors);
+				const branches = outputFn(line.outcome, nextPath, depth + 1, ancestors);
 				steps.push({
 					path: nextPath,
 					kind: "pulse",
@@ -320,7 +320,7 @@ export const readItemChainsFn = (
 					merge.action === "use" ? "retained" : "spent",
 				),
 			);
-		branches.push(...outputFn(merge.output, `${path}/output`, 1, []));
+		branches.push(...outputFn(merge.outcome, `${path}/output`, 1, []));
 		// Spending may exhaust either participant. These are conditional merge side
 		// effects; existing identities are not restarted with a fresh Clock.
 		for (const [role, participant] of [
@@ -333,9 +333,9 @@ export const readItemChainsFn = (
 				merge.effect === "spend" ? items[merge.target.itemId] : undefined,
 			],
 		] as const) {
-			if (participant?.units?.output === undefined) continue;
+			if (participant?.units?.outcome === undefined) continue;
 			branches.push(
-				...outputFn(participant.units.output, `${path}/${role}-depletion`, 1, []).map(
+				...outputFn(participant.units.outcome, `${path}/${role}-depletion`, 1, []).map(
 					(node) => ({
 						...node,
 						output:

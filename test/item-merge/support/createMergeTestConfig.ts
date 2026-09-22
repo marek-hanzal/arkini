@@ -1,5 +1,5 @@
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { UnitsSchema } from "~/item-definition/schema/UnitsSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
@@ -110,7 +110,7 @@ export const guaranteedMergeOutput = ({
 	itemId?: string;
 	placement?: "drop" | "random";
 	quantity?: number;
-} = {}): OutputSchema.Type => ({
+} = {}): OutcomeTableSchema.Type => ({
 	set: [
 		{
 			weight: 1,
@@ -118,8 +118,9 @@ export const guaranteedMergeOutput = ({
 			roll: [
 				{
 					type: "guaranteed",
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId,
 							placement,
 							quantity: {
@@ -135,7 +136,7 @@ export const guaranteedMergeOutput = ({
 	],
 });
 
-export const weightedMergeOutput = (): OutputSchema.Type => ({
+export const weightedMergeOutput = (): OutcomeTableSchema.Type => ({
 	set: [
 		{
 			weight: 1,
@@ -143,8 +144,9 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 			roll: [
 				{
 					type: "guaranteed",
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId: "output:a",
 							placement: "drop",
 							quantity: {
@@ -163,8 +165,9 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 			roll: [
 				{
 					type: "guaranteed",
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId: "output:b",
 							placement: "drop",
 							quantity: {

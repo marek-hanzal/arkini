@@ -31,11 +31,6 @@ const FormSections = [
 		label: "Clock",
 		shortcut: "c",
 	},
-	{
-		id: "action",
-		label: "Action",
-		shortcut: "t",
-	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 
 const DetailSections = [

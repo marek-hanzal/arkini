@@ -90,15 +90,16 @@ it("reports material quantity available to autofill and a direct producer fallba
 								type: "simple",
 							},
 						],
-						output: {
+						outcome: {
 							set: [
 								{
 									rules: [],
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item",
 													itemId: "water",
 													quantity: {
 														min: 1,

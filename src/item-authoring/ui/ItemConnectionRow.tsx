@@ -75,9 +75,6 @@ const ConnectionOrigin = ({
 		case "merge":
 			label = `${translator.textFn("Merge")} ${source.mergeIndex + 1}`;
 			break;
-		case "action":
-			label = translator.textFn("Action");
-			break;
 		case "units":
 			label = translator.textFn("Unit depletion");
 			break;
@@ -91,7 +88,7 @@ const ConnectionOrigin = ({
 	const roleLabels = {
 		input: "Input",
 		condition: "Condition",
-		output: "Output",
+		output: "Outcome",
 		replacement: "Replacement",
 	} as const;
 	const rollLabels = {
@@ -118,9 +115,9 @@ const ConnectionOrigin = ({
 			search={{
 				lineId: source.type === "line" ? owner.lines?.[source.lineIndex]?.id : undefined,
 				merge: source.type === "merge" ? source.mergeIndex : undefined,
-				outputSet: origin.setIndex ?? roll?.setIndex,
-				outputRoll: roll?.rollIndex,
-				outputDrop: roll?.dropIndex,
+				outcomeSet: origin.setIndex ?? roll?.setIndex,
+				outcomeRoll: roll?.rollIndex,
+				outcomeIndex: roll?.outcomeIndex,
 				input: origin.inputIndex,
 				rule: origin.condition?.ruleIndex,
 				when: origin.condition?.whenIndex,
@@ -135,13 +132,13 @@ const ConnectionOrigin = ({
 			{origin.setIndex === undefined ? null : (
 				<>
 					{" · "}
-					{translator.textFn("Output set")} {origin.setIndex + 1}
+					{translator.textFn("Outcome set")} {origin.setIndex + 1}
 				</>
 			)}
 			{roll === undefined ? null : (
 				<>
 					{" · "}
-					{translator.textFn("Output set")} {roll.setIndex + 1}
+					{translator.textFn("Outcome set")} {roll.setIndex + 1}
 					{" / "}
 					{rollLabels[roll.rollType]} {translator.textFn("Roll")} {roll.rollIndex + 1}
 				</>

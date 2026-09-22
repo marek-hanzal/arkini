@@ -23,8 +23,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-flax-field",
 										"quantity": {
 											"min": 1,

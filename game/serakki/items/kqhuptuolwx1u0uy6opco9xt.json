@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "british-shorthair-shorn",
 										"quantity": {
 											"min": 2,
@@ -44,8 +45,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "british-shorthair-shorn",
 										"quantity": {
 											"min": 1,
@@ -55,6 +57,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "animal-bones---tier-1",
 										"quantity": {
 											"min": 1,
@@ -64,6 +67,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "raw-game-meat",
 										"quantity": {
 											"min": 1,

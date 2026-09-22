@@ -14,7 +14,7 @@
 		},
 		"units": {
 			"amount": 16,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -22,8 +22,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-herb-garden",
 										"quantity": {
 											"min": 1,

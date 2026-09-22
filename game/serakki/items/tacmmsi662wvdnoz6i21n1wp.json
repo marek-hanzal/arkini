@@ -55,7 +55,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -63,8 +63,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "air-pollution",
 											"quantity": {
 												"min": 2,
@@ -78,8 +79,9 @@
 								{
 									"type": "chance",
 									"chance": 0.5,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "loose-ash",
 											"quantity": {
 												"min": 1,
@@ -137,7 +139,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -145,8 +147,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "air-pollution",
 											"quantity": {
 												"min": 2,
@@ -160,8 +163,9 @@
 								{
 									"type": "chance",
 									"chance": 0.5,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "loose-ash",
 											"quantity": {
 												"min": 1,

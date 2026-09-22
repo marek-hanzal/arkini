@@ -52,19 +52,6 @@ const setupFn = async () => {
 						id: "other",
 						uid: "other-uid",
 					},
-					action: {
-						...config.items.tool,
-						id: "action",
-						uid: "action-uid",
-						clock: undefined,
-						lines: [],
-						action: {
-							type: "space",
-							space: 1,
-							input: [],
-							rules: [],
-						},
-					},
 				},
 			},
 		}),
@@ -193,11 +180,6 @@ it("rejects an entire batch before writing when a later operation or resulting i
 		{
 			operation: "create",
 			itemId: "missing",
-			line: first,
-		},
-		{
-			operation: "create",
-			itemId: "action",
 			line: first,
 		},
 		{

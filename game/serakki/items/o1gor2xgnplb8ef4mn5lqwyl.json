@@ -15,7 +15,7 @@
 		},
 		"units": {
 			"amount": 32,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -23,8 +23,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-grape-field",
 										"quantity": {
 											"min": 1,

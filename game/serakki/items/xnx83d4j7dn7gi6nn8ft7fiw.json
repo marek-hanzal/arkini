@@ -53,8 +53,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-raw-game-meat",
 										"quantity": {
 											"min": 2,

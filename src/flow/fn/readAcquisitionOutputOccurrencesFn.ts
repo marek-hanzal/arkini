@@ -8,9 +8,9 @@ import type {
 	AcquisitionUnsupportedRequirement,
 } from "~/flow/type/AcquisitionGraph";
 import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisitionAvailabilityRequirementsFn";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeRuleSchema } from "~/outcome/schema/OutcomeRuleSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 
 interface DistributionOutcome {
 	readonly probability: number;
@@ -192,7 +192,7 @@ const readMarginalDistributionFn = (
 
 /** Translates authored output schema into bounded occurrence, group and joint distributions. */
 export const readAcquisitionOutputOccurrencesFn = (
-	output: OutputSchema.Type | undefined,
+	output: OutcomeTableSchema.Type | undefined,
 ): AcquisitionOutputModel => {
 	if (output === undefined)
 		return {
@@ -212,10 +212,15 @@ export const readAcquisitionOutputOccurrencesFn = (
 	const groupByKey = new Map<string, string>();
 	const occurrenceIdsByGroup = new Map<string, string[]>();
 	const readDropFn = (
-		drop: DropSchema.Type,
+		drop: Extract<
+			OutcomeSchema.Type,
+			{
+				type: "item";
+			}
+		>,
 		id: string,
 		annotation: AcquisitionOutputAnnotation,
-		setRules: ReadonlyArray<DropRuleSchema.Type>,
+		setRules: ReadonlyArray<OutcomeRuleSchema.Type>,
 	): Distribution | undefined => {
 		const requirements = readAcquisitionAvailabilityRequirementsFn({
 			rules: [
@@ -267,8 +272,9 @@ export const readAcquisitionOutputOccurrencesFn = (
 		for (const [rollIndex, roll] of set.roll.entries()) {
 			if (roll.type === "chance" && roll.chance === 0) continue;
 			let drops: Distribution | undefined = constantDistributionFn();
-			for (const [dropIndex, drop] of roll.drop.entries()) {
-				const id = `set:${setIndex}:roll:${rollIndex}:drop:${dropIndex}`;
+			for (const [outcomeIndex, drop] of roll.outcome.entries()) {
+				if (drop.type !== "item") continue;
+				const id = `set:${setIndex}:roll:${rollIndex}:drop:${outcomeIndex}`;
 				drops = convolveDistributionsFn(
 					drops,
 					readDropFn(

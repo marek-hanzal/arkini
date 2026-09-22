@@ -28,6 +28,7 @@ const item = (id: string, title = id) => ({
 });
 
 const drop = (itemId: string, min = 1, max = min) => ({
+	type: "item" as const,
 	itemId,
 	quantity: {
 		min,
@@ -43,7 +44,7 @@ const guaranteedOutput = (itemId: string) => ({
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						drop(itemId),
 					],
 				},
@@ -60,14 +61,14 @@ const targetOutput = {
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						drop("target", 2),
 					],
 				},
 				{
 					type: "chance" as const,
 					chance: 0.65,
-					drop: [
+					outcome: [
 						drop("target", 1, 4),
 					],
 				},
@@ -79,7 +80,7 @@ const targetOutput = {
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						drop("byproduct"),
 					],
 				},
@@ -108,7 +109,7 @@ const targetLine = ({
 			type: "simple" as const,
 		},
 	],
-	output: targetOutput,
+	outcome: targetOutput,
 	rules:
 		showWhen === undefined
 			? []
@@ -147,7 +148,7 @@ const acquisitionLine = (id: string, outputItemId: string) => ({
 			type: "simple" as const,
 		},
 	],
-	output: guaranteedOutput(outputItemId),
+	outcome: guaranteedOutput(outputItemId),
 	rules: [],
 });
 

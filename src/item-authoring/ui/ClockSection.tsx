@@ -5,7 +5,7 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import { useStore } from "@tanstack/react-form";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
-import { OutputControl } from "~/production-authoring/ui/OutputControl";
+import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
@@ -13,10 +13,10 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
-/** Composes shared time, rule, and output controls for the authored schedule. */
+/** Composes shared time, rule, and outcome controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
-	const { form, ruleIndex, whenIndex, outputDropIndex } = useFormSession();
+	const { form, ruleIndex, whenIndex, outcomeIndex } = useFormSession();
 	const clock = useStore(form.store, (state) => state.values.clock);
 	const rulesDescription = <Mx label="Clock rules help" />;
 	if (clock === undefined) return null;
@@ -108,10 +108,10 @@ const ClockFields = () => {
 						{(rules) => (
 							<RulesControl
 								initialRuleIndex={
-									outputDropIndex === undefined ? ruleIndex : undefined
+									outcomeIndex === undefined ? ruleIndex : undefined
 								}
 								initialWhenIndex={
-									outputDropIndex === undefined ? whenIndex : undefined
+									outcomeIndex === undefined ? whenIndex : undefined
 								}
 								headerVisible={false}
 								rules={rules}
@@ -130,8 +130,8 @@ const ClockFields = () => {
 				</EditorFormCard>
 			</EditorFormSection>
 			<EditorFormSection
-				title={translator.textFn("Expiry output")}
-				description={<Mx label="Clock expiry output help" />}
+				title={translator.textFn("Expiry outcome")}
+				description={<Mx label="Clock expiry outcome help" />}
 			>
 				<EditorFormCard>
 					<fieldset
@@ -139,9 +139,9 @@ const ClockFields = () => {
 						disabled={clock.durationMs === undefined}
 					>
 						<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
-							{(output) => (
-								<OutputControl
-									value={output}
+							{(outcome) => (
+								<OutcomeControl
+									value={outcome}
 									onChangeFn={(next) =>
 										form.setFieldValue("clock.onExpire", next)
 									}

@@ -12,7 +12,7 @@ import {
 } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/fixture";
 
 describe("blueprint completion placement", () => {
-	it("removes the depleted blueprint and places the first output at its freed cell", () => {
+	it("removes the depleted blueprint and places the first outcome at its freed cell", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({

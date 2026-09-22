@@ -18,7 +18,7 @@ describe("blueprint completion rollback", () => {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
 					space: 0,
-					itemId: "blueprint:output",
+					itemId: "blueprint:outcome",
 					x: 0,
 					y: 0,
 				});
@@ -56,7 +56,7 @@ describe("blueprint completion rollback", () => {
 				}
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:output",
+					lineId: "line:blueprint:outcome",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -65,7 +65,7 @@ describe("blueprint completion rollback", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "blueprint:output")).toBe(true);
+		expect(runtime.items.some((item) => item.item.id === "blueprint:outcome")).toBe(true);
 		expect(runtime.items.some((item) => item.item.id === "item:target-unlimited")).toBe(false);
 		expect(runtime.items.some((item) => item.item.id === "item:byproduct")).toBe(false);
 		expect(runtime.jobs).toEqual([

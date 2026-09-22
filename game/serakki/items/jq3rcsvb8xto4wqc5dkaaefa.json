@@ -28,7 +28,7 @@
 					"itemId": "campfire-burning"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -36,8 +36,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "loose-ash",
 											"quantity": {
 												"min": 1,

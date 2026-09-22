@@ -73,7 +73,7 @@
 					"itemId": "campfire-burning"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -81,8 +81,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "hay",
 											"quantity": {
 												"min": 1,
@@ -112,8 +113,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "hay",
 										"quantity": {
 											"min": 1,

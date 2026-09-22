@@ -19,7 +19,7 @@
 					"itemId": "bio-waste"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 8,
@@ -51,7 +52,7 @@
 					"itemId": "fawn"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -59,8 +60,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "raw-game-meat",
 											"quantity": {
 												"min": 4,
@@ -70,6 +72,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 1,
@@ -79,6 +82,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "spoiled-raw-game-meat",
 											"quantity": {
 												"min": 5,
@@ -102,7 +106,7 @@
 					"itemId": "corn-field"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -110,8 +114,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "popcorn",
 											"quantity": {
 												"min": 5,
@@ -135,7 +140,7 @@
 					"itemId": "forest"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -143,8 +148,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "loose-ash",
 											"quantity": {
 												"min": 2,
@@ -154,6 +160,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "air-pollution",
 											"quantity": {
 												"min": 2,
@@ -163,6 +170,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "wood---tier-1",
 											"quantity": {
 												"min": 3,
@@ -172,6 +180,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "firewood",
 											"quantity": {
 												"min": 4,
@@ -195,7 +204,7 @@
 					"itemId": "chicken"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -203,8 +212,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "feather",
 											"quantity": {
 												"min": 3,

@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { readAcquisitionOutputOccurrencesFn } from "~/flow/fn/readAcquisitionOutputOccurrencesFn";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 
-const readFn = (input: unknown) => readAcquisitionOutputOccurrencesFn(OutputSchema.parse(input));
+const readFn = (input: unknown) =>
+	readAcquisitionOutputOccurrencesFn(OutcomeTableSchema.parse(input));
 
 describe("readAcquisitionOutputOccurrencesFn", () => {
 	it("keeps weighted selection and authored range probability mass", () => {
@@ -15,8 +16,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: "a",
 									quantity: {
 										min: 1,
@@ -34,8 +36,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: "b",
 									quantity: {
 										min: 1,
@@ -76,8 +79,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 					rules: [],
 					roll: [
 						{
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: "a",
 									quantity: {
 										max: 1,
@@ -90,8 +94,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 						},
 						{
 							chance: 0.5,
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: "a",
 									quantity: {
 										max: 1,
@@ -100,6 +105,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 									rules: [],
 								},
 								{
+									type: "item",
 									itemId: "b",
 									quantity: {
 										max: 1,
@@ -185,8 +191,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: "a",
 									quantity: {
 										min: 1,
@@ -204,8 +211,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: "b",
 									quantity: {
 										min: 1,
@@ -236,8 +244,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 	it("returns explicit overflow before authored output expansion becomes unbounded", () => {
 		const chanceRollFn = (index: number) => ({
 			chance: 0.5,
-			drop: [
+			outcome: [
 				{
+					type: "item",
 					itemId: `item:${index}`,
 					quantity: {
 						max: 1,
@@ -277,8 +286,9 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 						rules: [],
 						roll: [
 							{
-								drop: [
+								outcome: [
 									{
+										type: "item",
 										itemId: "huge",
 										quantity: {
 											max: 4_294_967_296,
@@ -296,4 +306,67 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 			}).compilation,
 		).toBe("state-space-unsupported");
 	});
+});
+
+it("keeps Space-only alternatives in item probability mass without creating acquisition facts", () => {
+	const result = readFn({
+		set: [
+			{
+				weight: 1,
+				rules: [],
+				roll: [
+					{
+						type: "guaranteed",
+						outcome: [
+							{
+								type: "space",
+								space: 7,
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+			{
+				weight: 1,
+				rules: [],
+				roll: [
+					{
+						type: "chance",
+						chance: 0.5,
+						outcome: [
+							{
+								type: "space",
+								space: 9,
+								rules: [],
+							},
+							{
+								type: "item",
+								itemId: "reward",
+								quantity: {
+									min: 1,
+									max: 1,
+								},
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	});
+	expect(result.compilation).toBe("complete");
+	expect(result.occurrences.map(({ factId }) => factId)).toEqual([
+		"reward",
+	]);
+	expect(result.occurrences[0]?.quantityDistribution).toEqual([
+		{
+			probability: 0.75,
+			quantity: 0,
+		},
+		{
+			probability: 0.25,
+			quantity: 1,
+		},
+	]);
 });

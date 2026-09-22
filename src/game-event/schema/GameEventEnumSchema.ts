@@ -14,7 +14,6 @@ export const GameEventEnumSchema = z
 		ItemMerged: "item:merged",
 		ItemExpired: "item:expired",
 		ItemSpawned: "item:spawned",
-		ItemPortalTransferred: "item:portal-transferred",
 		ItemPlaced: "item:placed",
 		ItemSwapped: "item:swapped",
 		ItemConsumed: "item:consumed",

@@ -6,13 +6,13 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
+import { RollTypeSchema } from "~/outcome/schema/RollTypeSchema";
 
-import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
+import { readItemOutcomeEntriesFn } from "./readItemOutcomeEntriesFn";
 
-type OutputRecreationCertainty = "guaranteed" | "stochastic" | "none";
+type OutcomeRecreationCertainty = "guaranteed" | "stochastic" | "none";
 
 export namespace validateUnitRenewalFn {
 	export interface Props {
@@ -21,25 +21,28 @@ export namespace validateUnitRenewalFn {
 	}
 }
 
-const readDropCertaintyFn = (
-	drops: ReadonlyArray<DropSchema.Type>,
+const readItemOutcomeCertaintyFn = (
+	drops: ReadonlyArray<OutcomeSchema.Type>,
 	itemId: IdSchema.Type,
-): OutputRecreationCertainty => {
-	const matching = drops.filter((drop) => drop.itemId === itemId);
+): OutcomeRecreationCertainty => {
+	const matching = drops.filter((drop) => drop.type === "item" && drop.itemId === itemId);
 	if (matching.length === 0) return "none";
 	return matching.some((drop) => drop.rules.length === 0) ? "guaranteed" : "stochastic";
 };
 
-const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSchema.Type) => {
-	const sets = output.set.map((set) => {
+const readOutcomeRecreationCertaintyFn = (
+	outcome: OutcomeTableSchema.Type,
+	itemId: IdSchema.Type,
+) => {
+	const sets = outcome.set.map((set) => {
 		const rolls = set.roll.map(
-			(roll): OutputRecreationCertainty =>
+			(roll): OutcomeRecreationCertainty =>
 				match(roll)
 					.with(
 						{
 							type: RollTypeSchema.enum.Guaranteed,
 						},
-						(guaranteed) => readDropCertaintyFn(guaranteed.drop, itemId),
+						(guaranteed) => readItemOutcomeCertaintyFn(guaranteed.outcome, itemId),
 					)
 					.with(
 						{
@@ -47,7 +50,7 @@ const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSc
 						},
 						(chance) => {
 							if (chance.chance === 0) return "none";
-							const drop = readDropCertaintyFn(chance.drop, itemId);
+							const drop = readItemOutcomeCertaintyFn(chance.outcome, itemId);
 							if (drop === "none") return "none";
 							return chance.chance === 1 && drop === "guaranteed"
 								? "guaranteed"
@@ -64,7 +67,7 @@ const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSc
 
 	if (
 		sets.every((set) => set === "guaranteed") &&
-		output.set.some((set) => set.rules.length === 0)
+		outcome.set.some((set) => set.rules.length === 0)
 	)
 		return "guaranteed";
 	if (sets.some((set) => set !== "none")) return "stochastic";
@@ -72,9 +75,9 @@ const readOutputRecreationCertaintyFn = (output: OutputSchema.Type, itemId: IdSc
 };
 
 const strongerCertaintyFn = (
-	current: OutputRecreationCertainty,
-	candidate: OutputRecreationCertainty,
-): OutputRecreationCertainty => {
+	current: OutcomeRecreationCertainty,
+	candidate: OutcomeRecreationCertainty,
+): OutcomeRecreationCertainty => {
 	if (current === "guaranteed" || candidate === "guaranteed") return "guaranteed";
 	if (current === "stochastic" || candidate === "stochastic") return "stochastic";
 	return "none";
@@ -82,24 +85,24 @@ const strongerCertaintyFn = (
 
 /** Warns when a item with units lacks a deterministic configured recreation path. */
 export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewalFn.Props) => {
-	const certainty = new Map<IdSchema.Type, OutputRecreationCertainty>();
+	const certainty = new Map<IdSchema.Type, OutcomeRecreationCertainty>();
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
 			if (merge.effect === TargetEffectSchema.enum.Replace) {
 				certainty.set(merge.result, "guaranteed");
 			}
 		}
-		const outputs = readItemOutputEntriesFn({
+		const outputs = readItemOutcomeEntriesFn({
 			itemId,
 			item,
 		});
-		for (const { output } of outputs) {
+		for (const { outcome } of outputs) {
 			for (const unitOwnerItemId of Object.keys(config.items)) {
 				if (config.items[unitOwnerItemId]?.units === undefined) continue;
-				const outputCertainty = readOutputRecreationCertaintyFn(output, unitOwnerItemId);
+				const outcomeCertainty = readOutcomeRecreationCertaintyFn(outcome, unitOwnerItemId);
 				certainty.set(
 					unitOwnerItemId,
-					strongerCertaintyFn(certainty.get(unitOwnerItemId) ?? "none", outputCertainty),
+					strongerCertaintyFn(certainty.get(unitOwnerItemId) ?? "none", outcomeCertainty),
 				);
 			}
 		}
@@ -119,7 +122,7 @@ export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewa
 					itemId,
 				],
 				source: provenance.items[itemId],
-				message: `Finite item ${itemId} is recreated only through probabilistic, weighted, or conditional output paths.`,
+				message: `Finite item ${itemId} is recreated only through probabilistic, weighted, or conditional outcome paths.`,
 				itemId,
 			});
 			continue;
@@ -132,7 +135,7 @@ export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewa
 				itemId,
 			],
 			source: provenance.items[itemId],
-			message: `Finite item ${itemId} has no configured output or merge path that recreates it.`,
+			message: `Finite item ${itemId} has no configured outcome or merge path that recreates it.`,
 			itemId,
 		});
 	}

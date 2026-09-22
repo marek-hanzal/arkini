@@ -36,7 +36,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -45,8 +45,9 @@
 								{
 									"type": "chance",
 									"chance": 0.25,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "ghost",
 											"quantity": {
 												"min": 1,

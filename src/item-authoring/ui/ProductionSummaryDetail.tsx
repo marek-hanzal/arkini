@@ -3,13 +3,13 @@ import { ArrowUpRight, Factory } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
-import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
+import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { ProductionLineBadges } from "~/production-authoring/ui/ProductionLineBadges";
 import { LineEditLink } from "~/production-authoring/ui/LineEditLink";
 import { Mx } from "~/translation/ui/Mx";
 
-/** Keeps the item overview to two authored lines, with full output semantics. */
+/** Keeps the item overview to two authored lines, with full outcome semantics. */
 export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	return (
@@ -34,8 +34,8 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 							key={line.id}
 							dataUi="EditorItemProductionOutputCard"
 						>
-							<OutputDetail
-								output={line.output}
+							<OutcomeDetail
+								outcome={line.outcome}
 								title={
 									<span className="inline-flex flex-wrap items-center gap-2">
 										<LineEditLink
@@ -48,9 +48,9 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 										<ProductionLineBadges line={line} />
 									</span>
 								}
-								emptyLabel={translator.textFn("No output")}
+								emptyLabel={translator.textFn("No outcome")}
 								description={
-									<Mx label="Authored production line output summary help" />
+									<Mx label="Authored production line outcome summary help" />
 								}
 							/>
 						</EditorRootCard>

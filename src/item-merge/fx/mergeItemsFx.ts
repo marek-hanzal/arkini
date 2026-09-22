@@ -42,7 +42,7 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 	readonly source: RuntimeItemSchema.Type;
 	readonly target: RuntimeItemSchema.Type;
 }) {
-	// Seed tags are stable gameplay identity; renaming an operation must not reroll output.
+	// Seed tags are stable gameplay identity; renaming an operation must not reroll outcome.
 	const actionSeed = rule.action === SourceActionSchema.enum.Spend ? "deposit" : rule.action;
 	const effectSeed = rule.effect === TargetEffectSchema.enum.Spend ? "deposit" : rule.effect;
 	const result = rule.effect === TargetEffectSchema.enum.Replace ? rule.result : "none";

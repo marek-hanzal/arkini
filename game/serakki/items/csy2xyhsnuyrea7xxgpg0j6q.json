@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "corrupted-beagle",
 										"quantity": {
 											"min": 1,
@@ -35,6 +36,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "corruption",
 										"quantity": {
 											"min": 1,
@@ -44,6 +46,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "bio-waste",
 										"quantity": {
 											"min": 1,

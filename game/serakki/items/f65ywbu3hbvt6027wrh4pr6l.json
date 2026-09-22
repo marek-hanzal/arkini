@@ -12,13 +12,44 @@
 				"industrial-portal"
 			]
 		},
-		"action": {
-			"input": [],
-			"rules": [],
-			"type": "space",
-			"space": 4
-		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "travel",
+				"title": "Travel",
+				"description": "Travel to the destination space.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"clock": false,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"rules": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "space",
+											"space": 4,
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
 	}
 }

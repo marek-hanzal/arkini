@@ -148,8 +148,8 @@ describe("editor MCP authoring schema registry", () => {
 						$ref: "InputSchema",
 					},
 				},
-				output: {
-					$ref: "OutputSchema",
+				outcome: {
+					$ref: "OutcomeTableSchema",
 				},
 				rules: {
 					items: {
@@ -158,7 +158,7 @@ describe("editor MCP authoring schema registry", () => {
 				},
 			},
 		});
-		expect(await readSchemaDetail("OutputSchema")).toMatchObject({
+		expect(await readSchemaDetail("OutcomeTableSchema")).toMatchObject({
 			properties: {
 				set: {
 					items: {
@@ -180,7 +180,7 @@ describe("editor MCP authoring schema registry", () => {
 			"InputSchema",
 			"RollSchema",
 			"line.RuleSchema",
-			"action.RuleSchema",
+			"OutcomeSchema",
 			"MergeSchema",
 		]) {
 			expect(await readSchemaDetail(id), id).toHaveProperty("oneOf");
@@ -248,10 +248,10 @@ describe("editor MCP authoring schema registry", () => {
 		]).toEqual(
 			expect.arrayContaining([
 				"InputSchema",
-				"OutputSchema",
+				"OutcomeTableSchema",
 				"RollSchema",
 				"line.RuleSchema",
-				"action.RuleSchema",
+				"OutcomeSchema",
 				"MergeSchema",
 				"ArtworkSchema",
 				"CompleteItemLineSchema",
@@ -316,48 +316,39 @@ describe("editor MCP authoring schema registry", () => {
 		const validatePatch = ajv.getSchema(schemaUri("ItemPatchSchema"));
 		if (validateCreate === undefined || validatePatch === undefined)
 			throw new Error("Missing public item schema.");
-		const action = {
-			type: "space",
-			space: 1,
-		};
+		const lines = [
+			createLine({
+				outcome: {
+					set: [
+						{
+							weight: 1,
+							rules: [],
+							roll: [
+								{
+									type: "guaranteed",
+									outcome: [
+										{
+											type: "space",
+											space: 1,
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			}),
+		];
 		const input = {
 			id: "item:portal",
 			title: "Portal",
-			action,
+			lines,
 		};
 		expect(validateCreate(input), JSON.stringify(validateCreate.errors)).toBe(true);
 		expect(
-			validateCreate({
-				...input,
-				lines: [],
-			}),
-			JSON.stringify(validateCreate.errors),
-		).toBe(true);
-		expect(
-			validateCreate({
-				...input,
-				lines: [
-					createLine({}),
-				],
-			}),
-		).toBe(false);
-		expect(
-			validateCreate({
-				id: "item:workshop",
-				title: "Workshop",
-				lines: [
-					createLine({}),
-				],
-			}),
-			JSON.stringify(validateCreate.errors),
-		).toBe(true);
-		// Patches may clear an action and replace lines together; the complete candidate enforces exclusivity.
-		expect(
 			validatePatch({
-				action: null,
-				lines: [
-					createLine({}),
-				],
+				lines,
 			}),
 			JSON.stringify(validatePatch.errors),
 		).toBe(true);
@@ -374,17 +365,6 @@ describe("editor MCP authoring schema registry", () => {
 			],
 		};
 		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);
-		for (const replacement of [
-			{
-				action,
-			},
-		])
-			expect(
-				validateCreate({
-					...scheduled,
-					...replacement,
-				}),
-			).toBe(false);
 		expect(
 			validatePatch({
 				clock: null,

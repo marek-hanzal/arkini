@@ -8,7 +8,7 @@ import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumS
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import type { OutputProjection } from "~/production-output/type/OutputProjection";
+import type { OutcomeProjection } from "~/outcome/type/OutcomeProjection";
 
 interface ItemDetailLineUnitCost {
 	readonly cost: number;
@@ -65,7 +65,8 @@ export namespace ItemDetailLines {
 
 	export type Input = MaterialInput | UnitsInput | SimpleInput;
 
-	export interface OutputItem {
+	export interface OutcomeItem {
+		readonly type: "item";
 		readonly itemId: IdSchema.Type;
 		readonly quantity: Readonly<QuantitySchema.Type>;
 		readonly activeRuleHints: readonly string[];
@@ -117,7 +118,7 @@ export namespace ItemDetailLines {
 			readonly canWithdraw: boolean;
 		};
 		readonly input: readonly Input[];
-		readonly output: readonly OutputProjection.Set<OutputItem>[];
+		readonly outcome: readonly OutcomeProjection.Set<OutcomeItem>[];
 		readonly activeJob?: {
 			readonly status: JobStatusEnumSchema.Type;
 			readonly durationMs: TimeSchema.Type;

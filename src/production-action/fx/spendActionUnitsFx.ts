@@ -2,15 +2,15 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
-import { outputFx } from "~/production-output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
+import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
@@ -34,7 +34,7 @@ export namespace spendActionUnitsFx {
 	}
 }
 
-/** Pays one resolved action unit and applies depletion, output, and events. */
+/** Pays one resolved action unit and applies depletion, outcome, and events. */
 export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	actionId,
 	cost,
@@ -114,31 +114,31 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	let draft = removed.runtime;
 	const removalEvents = removed.events;
 
-	let placement: applyOutputPlacementFx.Result = {
-		drop: [],
+	let placement: applyOutcomeTableFx.Result = {
+		item: [],
 	};
-	const depletionOutput = item.item.units?.output;
-	if (depletionOutput !== undefined) {
-		const [outputPlacement, withOutput] = yield* makeActionUnitSpendRandomFx({
+	const depletionOutcome = item.item.units?.outcome;
+	if (depletionOutcome !== undefined) {
+		const [outcomePlacement, withOutcome] = yield* makeActionUnitSpendRandomFx({
 			actionId,
 			cost,
 			itemId: item.id,
 			ownerItemId,
 			program: Effect.gen(function* () {
-				const output = yield* outputFx({
+				const outcome = yield* resolveOutcomeTableFx({
+					ownerItemId: item.id,
 					origin: item.location,
-					output: depletionOutput,
+					outcome: depletionOutcome,
 				});
-				return yield* applyOutputPlacementFx({
-					origin: item.location,
-					output,
+				return yield* applyOutcomeTableFx({
+					outcome,
 					runtime: draft,
 				});
 			}),
 			remainingUnits,
 		});
-		placement = outputPlacement;
-		draft = withOutput;
+		placement = outcomePlacement;
+		draft = withOutcome;
 	}
 
 	let releasedInputEvents: readonly GameEventSchema.Type[] = [];
@@ -151,7 +151,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 		releasedInputEvents = releasedInputs.events;
 		draft = releasedInputs.runtime;
 	}
-	const placementEvents = yield* readOutputPlacementItemEventsFx({
+	const placementEvents = yield* readOutcomePlacementItemEventsFx({
 		originItemId: item.id,
 		placement,
 	});

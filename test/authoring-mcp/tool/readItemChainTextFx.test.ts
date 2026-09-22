@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 import { readItemChainTextFx } from "~/authoring-mcp/tool/readItemChainTextFx";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
 	catalogFn,
@@ -14,7 +14,7 @@ import {
 import { createToolProject } from "./support/createToolProject";
 
 it("keeps nested Clock details, local quantities and alternative roll provenance in the text projection", async () => {
-	const weighted = OutputSchema.parse({
+	const weighted = OutcomeTableSchema.parse({
 		set: [
 			{
 				weight: 7,
@@ -23,13 +23,13 @@ it("keeps nested Clock details, local quantities and alternative roll provenance
 					{
 						type: "chance",
 						chance: 0.25,
-						drop: outputFn("bonus").set[0].roll[0].drop,
+						outcome: outputFn("bonus").set[0].roll[0].outcome,
 					},
 					{
 						type: "guaranteed",
-						drop: [
+						outcome: [
 							{
-								...outputFn("bonus").set[0].roll[0].drop[0],
+								...outputFn("bonus").set[0].roll[0].outcome[0],
 								quantity: {
 									min: 4,
 									max: 6,

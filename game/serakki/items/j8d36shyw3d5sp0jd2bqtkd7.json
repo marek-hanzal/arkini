@@ -19,7 +19,7 @@
 					"itemId": "campfire-burning"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cauldron-with-boiling-beeswax",
 											"quantity": {
 												"min": 1,

@@ -1,7 +1,7 @@
 import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 
@@ -33,13 +33,13 @@ export const createLine = ({
 			type: "simple",
 		},
 	],
-	output,
+	outcome,
 }: {
 	default?: boolean;
 	clock?: boolean;
 	id?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
-	output?: OutputSchema.Type;
+	outcome?: OutcomeTableSchema.Type;
 }) =>
 	LineSchema.parse({
 		id,
@@ -49,19 +49,19 @@ export const createLine = ({
 		clock,
 		runtimeMs: 0,
 		input,
-		output,
+		outcome,
 		rules: [],
 	});
 
 export const createProducerItem = ({
 	id,
 	input,
-	output,
+	outcome,
 	lines,
 }: {
 	id: string;
 	input?: ReadonlyArray<InputSchema.Type>;
-	output?: OutputSchema.Type;
+	outcome?: OutcomeTableSchema.Type;
 	lines?: ReadonlyArray<LineSchema.Type>;
 }) =>
 	ItemSchema.parse({
@@ -71,7 +71,7 @@ export const createProducerItem = ({
 		lines: lines ?? [
 			createLine({
 				input,
-				output,
+				outcome,
 			}),
 		],
 	});
@@ -82,14 +82,15 @@ export const createOutput = (
 		placement?: "drop" | "random";
 	}>,
 ) =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: [
 			{
 				rules: [],
 				roll: [
 					{
 						type: "guaranteed",
-						drop: drops.map(({ itemId, placement = "drop" }) => ({
+						outcome: drops.map(({ itemId, placement = "drop" }) => ({
+							type: "item",
 							itemId,
 							quantity: {
 								min: 1,

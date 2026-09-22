@@ -53,28 +53,6 @@ describe("main drag controller: pointer", () => {
 		expect(mounted.onActivate.mock.calls[0]?.[1]).toBe(intent);
 	});
 
-	it.each([
-		"activate-space",
-	] as const)("preserves clicks for %s", async (kind) => {
-		for (const button of [
-			0,
-			2,
-		]) {
-			const mounted = mountController();
-			mounted.actor.item = {
-				...mounted.actor.item,
-				primaryAction: {
-					kind,
-					currentSpace: 0,
-				},
-			};
-			mounted.actorEvents.emit("pointerdown", pointer(10, 20, button));
-			mounted.stage.emit("pointerup", pointer(10, 20, button));
-			await Promise.resolve();
-			expect(mounted.onActivate.mock.calls[0]?.[1]).toBe(button === 0 ? "primary" : "detail");
-		}
-	});
-
 	it("does not activate a right release exactly at the screen threshold after fractional zoom", async () => {
 		const mounted = mountController();
 		const scale = 800 / 2432;

@@ -69,7 +69,7 @@ it.each<OutputPath>([
 	"line",
 	"deferred-depletion",
 	"immediate-depletion",
-])("%s output conditions see earlier fixed steps regardless of Tick batching", (path) => {
+])("%s outcome conditions see earlier fixed steps regardless of Tick batching", (path) => {
 	const split = run(
 		path,
 		[
@@ -88,7 +88,7 @@ it.each<OutputPath>([
 	).toEqual(split);
 });
 
-it("later expiry sees earlier stable-ID expiry output within the same fixed step", () => {
+it("later expiry sees earlier stable-ID expiry outcome within the same fixed step", () => {
 	expect(
 		run(
 			"expiry",

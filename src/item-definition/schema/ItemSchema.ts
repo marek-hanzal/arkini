@@ -7,7 +7,6 @@ import { UnitsSchema } from "./UnitsSchema";
 
 import { z } from "zod";
 import { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
-import { ActionSchema } from "~/item-action/schema/ActionSchema";
 
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -70,7 +69,7 @@ export const ItemSchema = z
 		 * Optional finite unit supply initialized separately for each fresh item instance.
 		 */
 		units: UnitsSchema.optional().describe(
-			"The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+			"The optional supply of units, such as health, resource stock, or uses, and depletion outcome of each item instance.",
 		),
 		/**
 		 * Optional target-specific merges initiated when this item is dropped onto another item.
@@ -87,9 +86,6 @@ export const ItemSchema = z
 				"The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
 			),
 		clock: ItemScheduleSchema.optional(),
-		action: ActionSchema.optional().describe(
-			"An optional immediate action; mutually exclusive with production lines.",
-		),
 		/**
 		 * Maximum accepted work count: one active job plus pending requests.
 		 */
@@ -102,66 +98,12 @@ export const ItemSchema = z
 		lines: z
 			.array(LineSchema)
 			.default([])
-			.describe("Optional production lines; an item without lines or an action is passive."),
+			.describe("Optional production lines; an item without lines is passive."),
 	})
 	.strict()
-	.superRefine((item, context) => {
-		if (item.clock !== undefined) {
-			for (const [field, valid, message] of [
-				[
-					"action",
-					item.action === undefined,
-					"An item cannot have both Clock and Action.",
-				],
-			] as const) {
-				if (!valid)
-					context.addIssue({
-						code: "custom",
-						path: [
-							field,
-						],
-						message,
-					});
-			}
-		}
-		if (item.action !== undefined && item.lines.length > 0) {
-			context.addIssue({
-				code: "custom",
-				path: [
-					"action",
-				],
-				message: "An item cannot have both an action and production lines.",
-			});
-		}
-	})
 	.meta({
 		id: "ItemSchema",
-		// JSON Schema clients must enforce the same Clock constraints as canonical Item validation.
-		if: {
-			required: [
-				"clock",
-			],
-		},
-		then: {
-			not: {
-				required: [
-					"action",
-				],
-			},
-		},
-		not: {
-			required: [
-				"action",
-				"lines",
-			],
-			properties: {
-				lines: {
-					minItems: 1,
-				},
-			},
-		},
-		description:
-			"An ordinary item with optional production, Clock scheduling, or one immediate action.",
+		description: "An ordinary item with optional production and Clock scheduling.",
 	});
 
 export type ItemSchema = typeof ItemSchema;

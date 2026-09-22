@@ -54,7 +54,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -62,8 +62,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "herbs",
 											"quantity": {
 												"min": 1,
@@ -73,6 +74,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "empty-bucket",
 											"quantity": {
 												"min": 1,
@@ -130,7 +132,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -138,8 +140,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "medicine-jar",
 											"quantity": {
 												"min": 1,
@@ -197,7 +200,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -205,8 +208,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "poison-jar",
 											"quantity": {
 												"min": 1,
@@ -238,7 +242,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -246,8 +250,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-herb-garden",
 											"quantity": {
 												"min": 1,
@@ -291,7 +296,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -299,8 +304,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "herbalist-blueprint",
 											"quantity": {
 												"min": 1,

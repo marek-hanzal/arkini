@@ -22,7 +22,7 @@ export const createConfigFn = (small = false) =>
 			},
 			action: "use",
 			effect: "keep",
-			output: weightedMergeOutput(),
+			outcome: weightedMergeOutput(),
 		},
 	});
 export const initialState = StateSchema.parse({

@@ -20,7 +20,7 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
  * Mounts the one Pixi-native Board scene into the React-owned game shell.
  *
  * Right click performs the canonical primary action, Ctrl+right click fills its default-line queue,
- * Left click opens Item Detail. Portals retain their original click mapping. React forwards commands
+ * Left click opens Item Detail. React forwards commands
  * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
 export const PixiBoardSurface = () => {
@@ -32,7 +32,7 @@ export const PixiBoardSurface = () => {
 			playSfxEventFn,
 		],
 	);
-	const { runItemActionFn, runDropFn } = useTileCommands(game);
+	const { runDropFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
@@ -77,18 +77,6 @@ export const PixiBoardSurface = () => {
 				)
 				.with(
 					{
-						kind: "activate-space",
-					},
-					(primaryAction) =>
-						runItemActionFn({
-							currentSpace: primaryAction.currentSpace,
-							itemId: item.id,
-							location: item.location,
-							revision: item.revision,
-						}),
-				)
-				.with(
-					{
 						kind: "enqueue-default-line",
 					},
 					() => {
@@ -102,7 +90,6 @@ export const PixiBoardSurface = () => {
 		},
 		[
 			enqueueLineFn,
-			runItemActionFn,
 		],
 	);
 

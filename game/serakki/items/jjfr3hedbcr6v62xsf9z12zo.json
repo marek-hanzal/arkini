@@ -19,7 +19,7 @@
 					"itemId": "campfire-burning"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cauldron-with-boiling-water",
 											"quantity": {
 												"min": 1,
@@ -52,7 +53,7 @@
 					"itemId": "copper-bathtub"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -60,8 +61,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-cauldron",
 											"quantity": {
 												"min": 1,
@@ -85,7 +87,7 @@
 					"itemId": "toilet-biowaste"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -93,8 +95,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-cauldron",
 											"quantity": {
 												"min": 1,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { dropFx } from "~/production-output/fx/dropFx";
+import type { ResolvedOutcome } from "~/outcome/type/ResolvedOutcome";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
@@ -27,7 +27,7 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 	origin,
 	runtime,
 }: {
-	readonly drop: dropFx.Result;
+	readonly drop: ResolvedOutcome.Item;
 	readonly excludedLocations?: readonly BoardLocationSchema.Type[];
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;

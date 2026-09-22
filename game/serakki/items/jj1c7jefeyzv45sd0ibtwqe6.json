@@ -14,7 +14,7 @@
 		},
 		"units": {
 			"amount": 4,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -22,8 +22,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "dirty-cauldron",
 										"quantity": {
 											"min": 1,
@@ -46,7 +47,7 @@
 					"itemId": "copper-bathtub"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -54,8 +55,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-cauldron",
 											"quantity": {
 												"min": 1,
@@ -86,8 +88,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-cauldron",
 										"quantity": {
 											"min": 1,

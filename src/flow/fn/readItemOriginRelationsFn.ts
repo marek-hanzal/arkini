@@ -16,9 +16,9 @@ const projectItemOriginRelationsFn = (source: ItemOriginSource): ItemOriginRelat
 			source,
 			toItemId: source.ownerItemId,
 		})),
-	...source.outputs.map((output, outputIndex) => ({
+	...source.outputs.map((output, outcomeIndex) => ({
 		fromItemId: source.ownerItemId,
-		outputIndex,
+		outcomeIndex,
 		role: "output" as const,
 		source,
 		toItemId: output.itemId,

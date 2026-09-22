@@ -69,7 +69,16 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 				});
 			}),
 			Effect.map(([result, nextRuntime, emittedEvents = []]) => {
-				const events = readCommittedEventsFn(nextRuntime, emittedEvents);
+				const events: GameEventSchema.Type[] = readCommittedEventsFn(
+					nextRuntime,
+					emittedEvents,
+				).filter((event) => event.type !== "current-space:changed");
+				if (transition.runtime.currentSpace !== nextRuntime.currentSpace)
+					events.push({
+						type: "current-space:changed",
+						previousSpace: transition.runtime.currentSpace,
+						currentSpace: nextRuntime.currentSpace,
+					});
 				const changed = nextRuntime !== transition.runtime || events.length > 0;
 				const nextTransition = changed
 					? {

@@ -14,7 +14,7 @@
 		},
 		"units": {
 			"amount": 12,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -22,8 +22,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-rum-barrel",
 										"quantity": {
 											"min": 1,
@@ -51,8 +52,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-rum-barrel",
 										"quantity": {
 											"min": 1,

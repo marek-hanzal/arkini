@@ -14,7 +14,7 @@
 		},
 		"units": {
 			"amount": 32,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -22,8 +22,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-mine",
 										"quantity": {
 											"min": 1,
@@ -66,7 +67,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -75,8 +76,9 @@
 								{
 									"type": "chance",
 									"chance": 0.15,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "emerald",
 											"quantity": {
 												"min": 1,

@@ -18,8 +18,6 @@ const CapabilityHelp = ({ capability }: { readonly capability: OptionalCapabilit
 			return <Mx label="Disable Clock help" />;
 		case "units":
 			return <Mx label="Disable Units help" />;
-		case "action":
-			return <Mx label="Disable action help" />;
 	}
 };
 
@@ -37,8 +35,6 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 				return values.clock !== undefined;
 			case "units":
 				return values.units !== undefined;
-			case "action":
-				return values.action !== undefined;
 			default:
 				return false;
 		}
@@ -48,8 +44,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 		(sectionId !== "production" &&
 			sectionId !== "merges" &&
 			sectionId !== "clock" &&
-			sectionId !== "units" &&
-			sectionId !== "action")
+			sectionId !== "units")
 	)
 		return null;
 	return (
@@ -71,9 +66,6 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 							break;
 						case "units":
 							form.setFieldValue("units", undefined);
-							break;
-						case "action":
-							form.setFieldValue("action", undefined);
 							break;
 					}
 				}}

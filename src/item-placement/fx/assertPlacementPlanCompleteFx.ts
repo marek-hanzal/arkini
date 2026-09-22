@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import type { dropFx } from "~/production-output/fx/dropFx";
+import type { ResolvedOutcome } from "~/outcome/type/ResolvedOutcome";
 import { PlacementPlanInvalidError } from "~/item-placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 interface AssertPlacementPlanCompleteProps {
-	readonly drop: dropFx.Result;
+	readonly drop: ResolvedOutcome.Item;
 	readonly plan: PlacementPlan;
 	readonly quantity: PositiveIntegerSchema.Type;
 	readonly reason: PlacementUnavailableError.Reason;

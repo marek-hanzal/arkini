@@ -1,7 +1,7 @@
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { readDraftRollDropsFn } from "~/production-authoring/fn/readDraftRollDropsFn";
+import { readDraftRollOutcomesFn } from "~/production-authoring/fn/readDraftRollOutcomesFn";
 
 /** Indexes authored references only; it never expands the related items' own capabilities. */
 export const readCapabilityRelatedTermsFn = (
@@ -28,13 +28,13 @@ export const readCapabilityRelatedTermsFn = (
 		ids.add(capability.target.itemId);
 		if (capability.effect === "replace") ids.add(capability.result);
 	}
-	for (const set of capability.output?.set ?? []) {
+	for (const set of capability.outcome?.set ?? []) {
 		for (const rule of set.rules)
 			for (const when of rule.when) ids.add(when.query.selector.itemId);
 		for (const roll of set.roll) {
-			const drops = readDraftRollDropsFn(roll);
+			const drops = readDraftRollOutcomesFn(roll);
 			for (const drop of drops) {
-				ids.add(drop.itemId);
+				if (drop.type === "item") ids.add(drop.itemId);
 				for (const rule of drop.rules)
 					for (const when of rule.when) ids.add(when.query.selector.itemId);
 			}

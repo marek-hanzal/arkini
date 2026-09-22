@@ -207,7 +207,6 @@
 				"item:merged",
 				"item:expired",
 				"item:spawned",
-				"item:portal-transferred",
 				"item:placed",
 				"item:swapped",
 				"item:consumed",
@@ -388,18 +387,18 @@
 					"description": "The positive number of units owned by every fresh item instance.",
 					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
 				},
-				"output": {
-					"description": "The optional output emitted exactly once from the depleted item's real grid origin.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				"outcome": {
+					"description": "The optional outcome emitted exactly once from the depleted item's real grid origin.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				}
 			},
 			"required": [
 				"amount"
 			],
 			"additionalProperties": false,
-			"description": "A finite unit supply and optional output emitted on depletion."
+			"description": "A finite unit supply and optional outcome emitted on depletion."
 		},
-		"OutputSchema": {
+		"OutcomeTableSchema": {
 			"type": "object",
 			"properties": {
 				"set": {
@@ -413,14 +412,14 @@
 						"$ref": "urn:serakki:schema:project#/$defs/roll.SetSchema"
 					},
 					"minItems": 1,
-					"description": "One or more alternative roll sets provided by this output."
+					"description": "One or more alternative roll sets provided by this outcome."
 				}
 			},
 			"required": [
 				"set"
 			],
 			"additionalProperties": false,
-			"description": "A configured output produced by a gameplay source."
+			"description": "A configured outcome produced by a gameplay source."
 		},
 		"roll.SetSchema": {
 			"type": "object",
@@ -433,7 +432,7 @@
 				"rules": {
 					"type": "array",
 					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/drop.RuleSchema"
+						"$ref": "urn:serakki:schema:project#/$defs/outcome.RuleSchema"
 					},
 					"description": "Availability rules evaluated before this set enters weighted selection."
 				},
@@ -457,24 +456,24 @@
 				"roll"
 			],
 			"additionalProperties": false,
-			"description": "An alternative non-empty collection of output rolls."
+			"description": "An alternative non-empty collection of outcome rolls."
 		},
-		"drop.RuleSchema": {
+		"outcome.RuleSchema": {
 			"oneOf": [
 				{
-					"$ref": "urn:serakki:schema:project#/$defs/drop.rule.EnableSchema"
+					"$ref": "urn:serakki:schema:project#/$defs/outcome.rule.EnableSchema"
 				},
 				{
-					"$ref": "urn:serakki:schema:project#/$defs/drop.rule.DisableSchema"
+					"$ref": "urn:serakki:schema:project#/$defs/outcome.rule.DisableSchema"
 				}
 			],
-			"description": "An availability rule evaluated for an output candidate or drop."
+			"description": "An availability rule evaluated for an outcome candidate or outcome."
 		},
-		"drop.rule.EnableSchema": {
+		"outcome.rule.EnableSchema": {
 			"type": "object",
 			"properties": {
 				"hint": {
-					"description": "Player-facing explanation shown while this selected-drop rule applies.",
+					"description": "Player-facing explanation shown while this selected-outcome rule applies.",
 					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
 				},
 				"when": {
@@ -488,14 +487,14 @@
 						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
 					},
 					"minItems": 1,
-					"description": "Conditions that must all pass for this selected-drop rule to apply."
+					"description": "Conditions that must all pass for this selected-outcome rule to apply."
 				},
 				"type": {
 					"type": "string",
 					"enum": [
 						"enable"
 					],
-					"description": "Identifies this rule as an enable gate for the selected drop."
+					"description": "Identifies this rule as an enable gate for the selected outcome."
 				}
 			},
 			"required": [
@@ -503,7 +502,7 @@
 				"type"
 			],
 			"additionalProperties": false,
-			"description": "A rule that enables a selected drop when its conditions pass."
+			"description": "A rule that enables a selected outcome when its conditions pass."
 		},
 		"NonEmptyStringSchema": {
 			"type": "string",
@@ -654,11 +653,11 @@
 			"additionalProperties": false,
 			"description": "A condition that checks an item query against an inclusive quantity range."
 		},
-		"drop.rule.DisableSchema": {
+		"outcome.rule.DisableSchema": {
 			"type": "object",
 			"properties": {
 				"hint": {
-					"description": "Player-facing explanation shown while this selected-drop rule applies.",
+					"description": "Player-facing explanation shown while this selected-outcome rule applies.",
 					"$ref": "urn:serakki:schema:project#/$defs/NonEmptyStringSchema"
 				},
 				"when": {
@@ -672,14 +671,14 @@
 						"$ref": "urn:serakki:schema:project#/$defs/WhenSchema"
 					},
 					"minItems": 1,
-					"description": "Conditions that must all pass for this selected-drop rule to apply."
+					"description": "Conditions that must all pass for this selected-outcome rule to apply."
 				},
 				"type": {
 					"type": "string",
 					"enum": [
 						"disable"
 					],
-					"description": "Identifies this rule as a disable veto for the selected drop."
+					"description": "Identifies this rule as a disable veto for the selected outcome."
 				}
 			},
 			"required": [
@@ -687,7 +686,7 @@
 				"type"
 			],
 			"additionalProperties": false,
-			"description": "A rule that disables a selected drop when its conditions pass."
+			"description": "A rule that disables a selected outcome when its conditions pass."
 		},
 		"RollSchema": {
 			"oneOf": [
@@ -698,7 +697,7 @@
 					"$ref": "urn:serakki:schema:project#/$defs/roll.ChanceSchema"
 				}
 			],
-			"description": "A typed roll that an output may produce."
+			"description": "A typed roll that an outcome may produce."
 		},
 		"roll.GuaranteedSchema": {
 			"type": "object",
@@ -709,59 +708,77 @@
 						"guaranteed"
 					]
 				},
-				"drop": {
+				"outcome": {
 					"type": "array",
 					"prefixItems": [
 						{
-							"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+							"$ref": "urn:serakki:schema:project#/$defs/OutcomeSchema"
 						}
 					],
 					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+						"$ref": "urn:serakki:schema:project#/$defs/OutcomeSchema"
 					},
 					"minItems": 1,
-					"description": "One or more items emitted when this roll succeeds."
+					"description": "One or more outcomes emitted when this roll succeeds."
 				}
 			},
 			"required": [
 				"type",
-				"drop"
+				"outcome"
 			],
 			"additionalProperties": false,
-			"description": "A roll that guarantees its output when its rules allow it."
+			"description": "A roll that guarantees its outcome when its rules allow it."
 		},
-		"DropSchema": {
+		"OutcomeSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/ItemOutcomeSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/SpaceOutcomeSchema"
+				}
+			],
+			"description": "One authored item or space outcome."
+		},
+		"ItemOutcomeSchema": {
 			"type": "object",
 			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"item"
+					]
+				},
 				"itemId": {
-					"description": "The ID of the canonical game item emitted by this drop.",
+					"description": "The ID of the canonical game item emitted by this outcome.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				},
 				"quantity": {
-					"description": "The quantity emitted by this drop.",
+					"description": "The quantity emitted by this outcome.",
 					"$ref": "urn:serakki:schema:project#/$defs/QuantitySchema"
 				},
 				"placement": {
 					"default": "drop",
-					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop.",
+					"description": "The board-placement strategy for this outcome; defaults to a local Manhattan-distance drop.",
 					"$ref": "urn:serakki:schema:project#/$defs/PlacementSchema"
 				},
 				"rules": {
 					"type": "array",
 					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/drop.RuleSchema"
+						"$ref": "urn:serakki:schema:project#/$defs/outcome.RuleSchema"
 					},
-					"description": "Rules evaluated after this drop is selected by a successful roll."
+					"description": "Rules evaluated after this outcome is selected by a successful roll."
 				}
 			},
 			"required": [
+				"type",
 				"itemId",
 				"quantity",
 				"placement",
 				"rules"
 			],
 			"additionalProperties": false,
-			"description": "A canonical game item, quantity, board-placement strategy, and rules for a successful roll's drop."
+			"description": "A canonical game item, quantity, board-placement strategy, and rules for a successful roll's outcome."
 		},
 		"QuantitySchema": {
 			"type": "object",
@@ -790,6 +807,34 @@
 			],
 			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement."
 		},
+		"SpaceOutcomeSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"space"
+					]
+				},
+				"space": {
+					"description": "The destination Board space.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/outcome.RuleSchema"
+					}
+				}
+			},
+			"required": [
+				"type",
+				"space",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "Selects the player's Board space when this outcome settles."
+		},
 		"roll.ChanceSchema": {
 			"type": "object",
 			"properties": {
@@ -800,30 +845,30 @@
 					]
 				},
 				"chance": {
-					"description": "The probability that this roll provides its output, from 0 to 1 inclusive.",
+					"description": "The probability that this roll provides its outcome, from 0 to 1 inclusive.",
 					"$ref": "urn:serakki:schema:project#/$defs/ChanceSchema"
 				},
-				"drop": {
+				"outcome": {
 					"type": "array",
 					"prefixItems": [
 						{
-							"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+							"$ref": "urn:serakki:schema:project#/$defs/OutcomeSchema"
 						}
 					],
 					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/DropSchema"
+						"$ref": "urn:serakki:schema:project#/$defs/OutcomeSchema"
 					},
 					"minItems": 1,
-					"description": "One or more items emitted when this roll succeeds."
+					"description": "One or more outcomes emitted when this roll succeeds."
 				}
 			},
 			"required": [
 				"type",
 				"chance",
-				"drop"
+				"outcome"
 			],
 			"additionalProperties": false,
-			"description": "A roll that provides its output according to a probability."
+			"description": "A roll that provides its outcome according to a probability."
 		},
 		"ChanceSchema": {
 			"type": "number",
@@ -859,9 +904,9 @@
 					"description": "The action applied to the source item after this merge resolves.",
 					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
 				},
-				"output": {
-					"description": "The optional extra output evaluated after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				"outcome": {
+					"description": "The optional extra outcome evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				},
 				"effect": {
 					"type": "string",
@@ -899,9 +944,9 @@
 					"description": "The action applied to the source item after this merge resolves.",
 					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
 				},
-				"output": {
-					"description": "The optional extra output evaluated after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				"outcome": {
+					"description": "The optional extra outcome evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				},
 				"effect": {
 					"type": "string",
@@ -930,9 +975,9 @@
 					"description": "The action applied to the source item after this merge resolves.",
 					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
 				},
-				"output": {
-					"description": "The optional extra output evaluated after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				"outcome": {
+					"description": "The optional extra outcome evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				},
 				"effect": {
 					"type": "string",
@@ -961,9 +1006,9 @@
 					"description": "The action applied to the source item after this merge resolves.",
 					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
 				},
-				"output": {
-					"description": "The optional extra output evaluated after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+				"outcome": {
+					"description": "The optional extra outcome evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				},
 				"effect": {
 					"type": "string",
@@ -1020,7 +1065,7 @@
 				},
 				"onExpire": {
 					"description": "Output resolved at owner expiry in both modes; kill-switch places what fits after returned materials and logs the excess as lost, within the same atomic removal.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				}
 			},
 			"required": [
@@ -1040,7 +1085,7 @@
 					]
 				}
 			],
-			"description": "Clock-line admission, finite lifetime, or both, with availability rules and expiry output."
+			"description": "Clock-line admission, finite lifetime, or both, with availability rules and expiry outcome."
 		},
 		"TimeSchema": {
 			"type": "integer",
@@ -1127,130 +1172,6 @@
 			"additionalProperties": false,
 			"description": "A rule that disables an immediate item action when its conditions pass."
 		},
-		"itemAction.ActionSchema": {
-			"description": "Immediate travel to a board space.",
-			"$ref": "urn:serakki:schema:project#/$defs/itemAction.SpaceActionSchema"
-		},
-		"action.InputSchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/input.SimpleSchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/input.UnitsSchema"
-				}
-			],
-			"description": "A simple or board-units requirement resolved by an immediate item action."
-		},
-		"input.SimpleSchema": {
-			"type": "object",
-			"properties": {
-				"units": {
-					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
-					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"simple"
-					],
-					"description": "Identifies this input as having no consumable resource requirement."
-				}
-			},
-			"required": [
-				"type"
-			],
-			"additionalProperties": false,
-			"description": "An explicit action requirement with no consumable resource requirement."
-		},
-		"input.UnitCostSchema": {
-			"type": "object",
-			"properties": {
-				"cost": {
-					"description": "The positive number of units paid when the enclosing action commits.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"from": {
-					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
-					"$ref": "urn:serakki:schema:project#/$defs/input.UnitSourceSchema"
-				}
-			},
-			"required": [
-				"cost",
-				"from"
-			],
-			"additionalProperties": false,
-			"description": "One action-requirement unit cost and the runtime item that pays it."
-		},
-		"input.UnitSourceSchema": {
-			"type": "string",
-			"enum": [
-				"self",
-				"target"
-			],
-			"description": "Whether one requirement cost is paid by the action owner or its resolved target."
-		},
-		"input.UnitsSchema": {
-			"type": "object",
-			"properties": {
-				"units": {
-					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
-					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"units"
-					],
-					"description": "Identifies this input as one item on the Board that can pay units."
-				},
-				"query": {
-					"description": "The board query used to select one target with units for this input.",
-					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
-				}
-			},
-			"required": [
-				"type",
-				"query"
-			],
-			"additionalProperties": false,
-			"description": "A board query that resolves one Board item that can pay units."
-		},
-		"itemAction.SpaceActionSchema": {
-			"type": "object",
-			"properties": {
-				"input": {
-					"default": [],
-					"type": "array",
-					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/action.InputSchema"
-					}
-				},
-				"rules": {
-					"default": [],
-					"type": "array",
-					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/action.RuleSchema"
-					}
-				},
-				"type": {
-					"type": "string",
-					"const": "space"
-				},
-				"space": {
-					"description": "The board space selected after successful activation.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				}
-			},
-			"required": [
-				"input",
-				"rules",
-				"type",
-				"space"
-			],
-			"additionalProperties": false,
-			"description": "An immediate action whose requirements settle atomically with navigation."
-		},
 		"LineSchema": {
 			"type": "object",
 			"properties": {
@@ -1313,9 +1234,9 @@
 					"minItems": 1,
 					"description": "One or more input requirements for this product line."
 				},
-				"output": {
+				"outcome": {
 					"description": "The optional result produced when this product line completes.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutputSchema"
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				},
 				"rules": {
 					"type": "array",
@@ -1338,7 +1259,7 @@
 				"rules"
 			],
 			"additionalProperties": false,
-			"description": "A single product line with its accepted inputs and produced output."
+			"description": "A single product line with its accepted inputs and produced outcome."
 		},
 		"InputSchema": {
 			"oneOf": [
@@ -1353,6 +1274,54 @@
 				}
 			],
 			"description": "A simple, material-item, or Board unit-cost input requirement for a product line."
+		},
+		"input.SimpleSchema": {
+			"type": "object",
+			"properties": {
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"simple"
+					],
+					"description": "Identifies this input as having no consumable resource requirement."
+				}
+			},
+			"required": [
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "An explicit action requirement with no consumable resource requirement."
+		},
+		"input.UnitCostSchema": {
+			"type": "object",
+			"properties": {
+				"cost": {
+					"description": "The positive number of units paid when the enclosing action commits.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"from": {
+					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitSourceSchema"
+				}
+			},
+			"required": [
+				"cost",
+				"from"
+			],
+			"additionalProperties": false,
+			"description": "One action-requirement unit cost and the runtime item that pays it."
+		},
+		"input.UnitSourceSchema": {
+			"type": "string",
+			"enum": [
+				"self",
+				"target"
+			],
+			"description": "Whether one requirement cost is paid by the action owner or its resolved target."
 		},
 		"input.MaterialSchema": {
 			"type": "object",
@@ -1398,6 +1367,32 @@
 				"reserve"
 			],
 			"description": "How an input item participates in a product line."
+		},
+		"input.UnitsSchema": {
+			"type": "object",
+			"properties": {
+				"units": {
+					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"units"
+					],
+					"description": "Identifies this input as one item on the Board that can pay units."
+				},
+				"query": {
+					"description": "The board query used to select one target with units for this input.",
+					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
+				}
+			},
+			"required": [
+				"type",
+				"query"
+			],
+			"additionalProperties": false,
+			"description": "A board query that resolves one Board item that can pay units."
 		},
 		"line.RuleSchema": {
 			"oneOf": [
@@ -1620,7 +1615,7 @@
 					"$ref": "urn:serakki:schema:project#/$defs/ArtworkSchema"
 				},
 				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
+					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion outcome of each item instance.",
 					"$ref": "urn:serakki:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
@@ -1639,10 +1634,6 @@
 				"clock": {
 					"$ref": "urn:serakki:schema:project#/$defs/ItemScheduleSchema"
 				},
-				"action": {
-					"description": "An optional immediate action; mutually exclusive with production lines.",
-					"$ref": "urn:serakki:schema:project#/$defs/itemAction.ActionSchema"
-				},
 				"maxQueueSize": {
 					"default": 1,
 					"description": "The maximum number of accepted active and queued runs for this item; defaults to one.",
@@ -1650,7 +1641,7 @@
 				},
 				"lines": {
 					"default": [],
-					"description": "Optional production lines; an item without lines or an action is passive.",
+					"description": "Optional production lines; an item without lines is passive.",
 					"type": "array",
 					"items": {
 						"$ref": "urn:serakki:schema:project#/$defs/LineSchema"
@@ -1667,30 +1658,7 @@
 				"lines"
 			],
 			"additionalProperties": false,
-			"if": {
-				"required": [
-					"clock"
-				]
-			},
-			"then": {
-				"not": {
-					"required": [
-						"action"
-					]
-				}
-			},
-			"not": {
-				"required": [
-					"action",
-					"lines"
-				],
-				"properties": {
-					"lines": {
-						"minItems": 1
-					}
-				}
-			},
-			"description": "An ordinary item with optional production, Clock scheduling, or one immediate action."
+			"description": "An ordinary item with optional production and Clock scheduling."
 		},
 		"AudioResourceMetadataSchema": {
 			"type": "object",

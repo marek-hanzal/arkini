@@ -21,7 +21,7 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 					id: "a",
 					clock: true,
 					default: true,
-					output: createOutput([
+					outcome: createOutput([
 						{
 							itemId: "result",
 						},
@@ -133,7 +133,7 @@ describe("Clock kill switch", () => {
 			expect(losses).toEqual(
 				expect.arrayContaining([
 					expect.objectContaining({
-						source: "expiry-output",
+						source: "expiry-outcome",
 						quantity: 1,
 						reason: "board:full",
 					}),
@@ -201,7 +201,7 @@ describe("Clock kill switch", () => {
 		expect(result.events.filter((event) => event.type === "job:aborted")).toHaveLength(1);
 	});
 
-	it("rolls back removal and cancelled work when expiry output fails for a non-capacity reason", () => {
+	it("rolls back removal and cancelled work when expiry outcome fails for a non-capacity reason", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnClockItemFx();
@@ -224,9 +224,9 @@ describe("Clock kill switch", () => {
 									},
 								},
 								removalMode: "kill-switch",
-								output: createOutput([
+								outcome: createOutput([
 									{
-										itemId: "missing-output",
+										itemId: "missing-outcome",
 									},
 								]),
 								randomSeed: "rollback",

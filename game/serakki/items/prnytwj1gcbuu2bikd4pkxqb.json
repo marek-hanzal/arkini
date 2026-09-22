@@ -26,8 +26,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "loose-ash",
 										"quantity": {
 											"min": 1,

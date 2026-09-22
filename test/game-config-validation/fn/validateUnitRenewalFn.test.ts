@@ -1,10 +1,10 @@
-import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import type { RollSetSchema } from "~/outcome/schema/RollSetSchema";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import {
 	createOutput,
 	createProducerItem,
@@ -35,7 +35,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 	).diagnostics.filter(({ code }) => code.startsWith("units:"));
 
 const chanceOutput = (itemId: string, chance: number) =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: [
 			{
 				rules: [],
@@ -43,8 +43,9 @@ const chanceOutput = (itemId: string, chance: number) =>
 					{
 						type: "chance",
 						chance,
-						drop: [
+						outcome: [
 							{
+								type: "item",
 								itemId,
 								quantity: {
 									min: 1,
@@ -81,7 +82,7 @@ describe("validateUnitRenewalFn", () => {
 		const units = createFiniteItem("item:units");
 		const producer = createProducerItem({
 			id: "item:producer",
-			output: chanceOutput(units.id, 0),
+			outcome: chanceOutput(units.id, 0),
 		});
 
 		expect(
@@ -125,7 +126,7 @@ describe("validateUnitRenewalFn", () => {
 		};
 		const producer = createProducerItem({
 			id: "item:producer",
-			output: {
+			outcome: {
 				set: [
 					conditionalSet,
 				],
@@ -143,7 +144,7 @@ describe("validateUnitRenewalFn", () => {
 		]);
 		const fallback = createProducerItem({
 			id: producer.id,
-			output: {
+			outcome: {
 				set: [
 					conditionalSet,
 					output.set[0],
@@ -162,7 +163,7 @@ describe("validateUnitRenewalFn", () => {
 		const units = createFiniteItem("item:units");
 		const producer = createProducerItem({
 			id: "item:producer",
-			output: chanceOutput(units.id, 0.5),
+			outcome: chanceOutput(units.id, 0.5),
 		});
 
 		expect(
@@ -181,7 +182,7 @@ describe("validateUnitRenewalFn", () => {
 		const units = createFiniteItem("item:units");
 		const guaranteed = createProducerItem({
 			id: "item:guaranteed",
-			output: createOutput([
+			outcome: createOutput([
 				{
 					itemId: units.id,
 				},
@@ -189,7 +190,7 @@ describe("validateUnitRenewalFn", () => {
 		});
 		const stochastic = createProducerItem({
 			id: "item:stochastic",
-			output: chanceOutput(units.id, 0.5),
+			outcome: chanceOutput(units.id, 0.5),
 		});
 
 		expect(

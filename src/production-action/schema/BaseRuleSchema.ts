@@ -21,7 +21,7 @@ export const BaseRuleSchema = z
 	.strict()
 	.meta({
 		id: "action.BaseRuleSchema",
-		description: "The common fields shared by immediate item-action rules.",
+		description: "The common fields shared by production availability rules.",
 	});
 
 export type BaseRuleSchema = typeof BaseRuleSchema;

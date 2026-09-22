@@ -25,7 +25,6 @@ export namespace planLineInputAutofillFx {
 	export interface Entry {
 		readonly inputIndex: number;
 		readonly sourceItemId: IdSchema.Type;
-		readonly quantity: number;
 	}
 
 	export interface Result {
@@ -97,7 +96,6 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	});
 	const candidatesById = new Map<string, BoardRuntimeItemSchema.Type>();
 	const entries: planLineInputAutofillFx.Entry[] = [];
-	const entryIndexByKey = new Map<string, number>();
 	const slots: {
 		readonly closed: boolean;
 		readonly input: MaterialSchema.Type;
@@ -119,14 +117,14 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 				item.location.lineId === lineId &&
 				item.location.inputIndex === inputIndex,
 		);
-		const storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
+		const storedQuantity = storedItems.length;
 		const incomingQuantity = includeIncomingDeliveries
 			? readLineInputDeliveryClaimsFn({
 					inputIndex,
 					lineId,
 					ownerItemId,
 					runtime,
-				}).reduce((total, claim) => total + claim.quantity, 0)
+				}).length
 			: 0;
 		let plannedQuantity = storedQuantity + incomingQuantity;
 		const initialResolution = resolveInputMaterialFn({
@@ -159,45 +157,21 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	const candidates = [
 		...candidatesById.values(),
 	].sort(compareCandidatesFn(owner));
-	const remainingByItemId = new Map(
-		candidates.map((candidate) => [
-			candidate.id,
-			candidate.quantity,
-		]),
-	);
-
+	const allocatedItemIds = new Set<IdSchema.Type>();
 	const allocateToFn = (slot: (typeof slots)[number], targetQuantity: number) => {
-		let requestedQuantity = Math.max(0, targetQuantity - slot.plannedQuantity);
 		for (const candidate of candidates) {
-			if (requestedQuantity === 0) break;
-			const remainingQuantity = remainingByItemId.get(candidate.id) ?? 0;
-			if (remainingQuantity === 0) continue;
-
-			if (!slot.matchingRuntimeItemIds.has(candidate.id)) continue;
-			const quantity = Math.min(remainingQuantity, requestedQuantity);
-			if (quantity === 0) continue;
-
-			const entryKey = `${candidate.id}\u0000${slot.inputIndex}`;
-			const existingEntryIndex = entryIndexByKey.get(entryKey);
-			if (existingEntryIndex === undefined) {
-				entryIndexByKey.set(entryKey, entries.length);
-				entries.push({
-					inputIndex: slot.inputIndex,
-					sourceItemId: candidate.id,
-					quantity,
-				});
-			} else {
-				const existingEntry = entries[existingEntryIndex];
-				if (existingEntry !== undefined) {
-					entries[existingEntryIndex] = {
-						...existingEntry,
-						quantity: existingEntry.quantity + quantity,
-					};
-				}
-			}
-			remainingByItemId.set(candidate.id, remainingQuantity - quantity);
-			slot.plannedQuantity += quantity;
-			requestedQuantity -= quantity;
+			if (slot.plannedQuantity >= targetQuantity) break;
+			if (
+				allocatedItemIds.has(candidate.id) ||
+				!slot.matchingRuntimeItemIds.has(candidate.id)
+			)
+				continue;
+			entries.push({
+				inputIndex: slot.inputIndex,
+				sourceItemId: candidate.id,
+			});
+			allocatedItemIds.add(candidate.id);
+			slot.plannedQuantity += 1;
 		}
 	};
 
@@ -222,7 +196,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 
 	return {
 		entry: entries,
-		storedQuantity: entries.reduce((total, entry) => total + entry.quantity, 0),
+		storedQuantity: entries.length,
 		remainingMissingQuantity,
 	} satisfies planLineInputAutofillFx.Result;
 });

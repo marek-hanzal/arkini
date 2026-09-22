@@ -2,7 +2,6 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { InputRunPlanInvalidError } from "~/production-input/error/InputRunPlanInvalidError";
 import { narrowInputRuntimeItemFn } from "~/production-input/fn/narrowInputRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
@@ -15,7 +14,6 @@ export namespace readInputRunItemFx {
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		itemId: IdSchema.Type;
-		plannedQuantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -26,7 +24,6 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 	lineId,
 	inputIndex,
 	itemId,
-	plannedQuantity,
 	runtime,
 }: readInputRunItemFx.Props) {
 	const runtimeItem = yield* readRuntimeItemByIdFx({
@@ -39,15 +36,13 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 		item.location.ownerItemId === ownerItemId &&
 		item.location.lineId === lineId &&
 		item.location.inputIndex === inputIndex;
-	if (!validLocation || item === undefined || item.quantity < plannedQuantity) {
+	if (!validLocation || item === undefined) {
 		return yield* Effect.fail(
 			new InputRunPlanInvalidError({
 				ownerItemId,
 				lineId,
 				inputIndex,
 				itemId,
-				plannedQuantity,
-				availableQuantity: runtimeItem.quantity,
 			}),
 		);
 	}

@@ -13,7 +13,6 @@ import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -145,7 +144,7 @@ export namespace startLineRuntimeFx {
  * Canonical internal start pipeline used by direct starts and queue dispatch.
  *
  * Job identity is created before inputs move because consumed and reserved
- * material locations refer to it. Stateful owner stacks are isolated last.
+ * material locations refer to it. Input ownership and unit spending commit together.
  * Depletion output conditions use this start's input snapshot, including prior
  * Tick transitions, rather than the outer transaction or partially applied inputs.
  */
@@ -188,12 +187,8 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
-		ownerItemId,
-		runtime: spent.runtime,
-	});
 	const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
-		runtime: isolation.runtime,
+		runtime: spent.runtime,
 	});
 	return [
 		job,
@@ -201,7 +196,6 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		[
 			...inputTransition.events,
 			...spent.events,
-			...isolation.events,
 		],
 	] as const;
 });

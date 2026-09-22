@@ -8,7 +8,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 interface LineInputDeliveryClaim {
 	readonly delivery: DeliveryRuntimeItemSchema.Type;
 	readonly inputIndex: number;
-	readonly quantity: number;
 }
 
 /** Reads ordered outbound soft claims for one exact line or material-input slot. */
@@ -34,14 +33,12 @@ export const readLineInputDeliveryClaimsFn = ({
 		) {
 			continue;
 		}
-		for (const allocation of delivery.value.location.target.input) {
-			if (inputIndex !== undefined && allocation.inputIndex !== inputIndex) continue;
-			claims.push({
-				delivery: delivery.value,
-				inputIndex: allocation.inputIndex,
-				quantity: allocation.quantity,
-			});
-		}
+		const target = delivery.value.location.target;
+		if (inputIndex !== undefined && target.inputIndex !== inputIndex) continue;
+		claims.push({
+			delivery: delivery.value,
+			inputIndex: target.inputIndex,
+		});
 	}
 	return claims;
 };

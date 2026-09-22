@@ -8,7 +8,6 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
-import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
@@ -58,33 +57,11 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		} satisfies autofillLineInputsRuntimeFx.Result;
 	}
 
-	const allocationsBySourceItemId = new Map<
-		IdSchema.Type,
-		{
-			readonly inputIndex: number;
-			readonly quantity: number;
-		}[]
-	>();
-	for (const entry of plan.entry) {
-		const allocations = allocationsBySourceItemId.get(entry.sourceItemId);
-		const allocation = {
-			inputIndex: entry.inputIndex,
-			quantity: entry.quantity,
-		};
-		if (allocations === undefined) {
-			allocationsBySourceItemId.set(entry.sourceItemId, [
-				allocation,
-			]);
-		} else {
-			allocations.push(allocation);
-		}
-	}
-
 	let deliveryRuntime = runtime;
 	const deliveryItemIds: IdSchema.Type[] = [];
 	let scheduledQuantity = 0;
 	let skippedQuantity = 0;
-	for (const [sourceItemId, input] of allocationsBySourceItemId) {
+	for (const { sourceItemId, inputIndex } of plan.entry) {
 		const runtimeSource = deliveryRuntime.items.find((item) => item.id === sourceItemId);
 		if (runtimeSource === undefined) continue;
 		const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
@@ -100,7 +77,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 			source,
 		});
 		if (detached.type === "active-job") {
-			skippedQuantity += input.reduce((total, allocation) => total + allocation.quantity, 0);
+			skippedQuantity += 1;
 			continue;
 		}
 		const delivery = yield* reviseRuntimeItemFx({
@@ -119,7 +96,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 						kind: "line-input",
 						ownerItemId,
 						lineId,
-						input,
+						inputIndex,
 					},
 				},
 			},
@@ -133,16 +110,9 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 			],
 		} satisfies RuntimeSchema.Type;
 		deliveryItemIds.push(delivery.id);
-		scheduledQuantity += input.reduce((total, allocation) => total + allocation.quantity, 0);
+		scheduledQuantity += 1;
 	}
-	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
-		ownerItemId,
-		runtime: deliveryRuntime,
-	});
-	// Delivery admission is the fact; arrival emits its own input-storage event later.
-	const events: GameEventSchema.Type[] = [
-		...isolation.events,
-	];
+	const events: GameEventSchema.Type[] = [];
 	if (scheduledQuantity > 0) {
 		const owner = yield* readRuntimeItemByIdFx({
 			itemId: ownerItemId,
@@ -163,6 +133,6 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 			scheduledQuantity,
 			remainingMissingQuantity: plan.remainingMissingQuantity + skippedQuantity,
 		},
-		runtime: isolation.runtime,
+		runtime: deliveryRuntime,
 	} satisfies autofillLineInputsRuntimeFx.Result;
 });

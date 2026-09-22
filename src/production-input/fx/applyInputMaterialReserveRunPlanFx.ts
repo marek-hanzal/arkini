@@ -5,10 +5,7 @@ import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIn
 import { readInputRunItemFx } from "~/production-input/fx/readInputRunItemFx";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
-import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
-import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -44,7 +41,6 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 						lineId,
 						inputIndex,
 						itemId: allocation.itemId,
-						plannedQuantity: allocation.quantity,
 						runtime: draft,
 					});
 					const location = {
@@ -53,42 +49,17 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 						inputIndex,
 					} satisfies ReservedLocationSchema.Type;
 
-					if (allocation.quantity === item.quantity) {
-						const reservedItem = yield* reviseRuntimeItemFx({
-							item: {
-								...item,
-								location,
-							} satisfies ReservedRuntimeItemSchema.Type,
-						});
-						return {
-							...draft,
-							items: draft.items.map((candidate) => {
-								return candidate.id === item.id ? reservedItem : candidate;
-							}),
-						} satisfies RuntimeSchema.Type;
-					}
-
-					const sourceItem = yield* reviseRuntimeItemFx({
+					const reservedItem = yield* reviseRuntimeItemFx({
 						item: {
 							...item,
-							quantity: item.quantity - allocation.quantity,
-						} satisfies InputRuntimeItemSchema.Type,
+							location,
+						} satisfies ReservedRuntimeItemSchema.Type,
 					});
-					const reservedItem = yield* createRuntimeItemFx({
-						id: yield* createRuntimeItemIdFx(),
-						item: item.item,
-						location,
-						quantity: allocation.quantity,
-					});
-
 					return {
 						...draft,
-						items: [
-							...draft.items.map((candidate) => {
-								return candidate.id === item.id ? sourceItem : candidate;
-							}),
-							reservedItem,
-						],
+						items: draft.items.map((candidate) => {
+							return candidate.id === item.id ? reservedItem : candidate;
+						}),
 					} satisfies RuntimeSchema.Type;
 				});
 			},

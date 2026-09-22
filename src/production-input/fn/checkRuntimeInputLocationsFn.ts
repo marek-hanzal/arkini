@@ -128,9 +128,7 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 				candidate.location.inputIndex === current.location.inputIndex
 			);
 		});
-		const storedQuantity = items.reduce((quantity, candidate) => {
-			return quantity + candidate.item.quantity;
-		}, 0);
+		const storedQuantity = items.length;
 		const closed = isLineInputClosedFn({
 			ownerItemId: current.location.ownerItemId,
 			lineId: current.location.lineId,

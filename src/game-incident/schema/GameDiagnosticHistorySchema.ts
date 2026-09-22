@@ -20,7 +20,6 @@ const GameDiagnosticDefaultLineChangeSchema = z
 const GameDiagnosticDeliverySchema = z
 	.object({
 		item: GameDiagnosticItemReferenceSchema,
-		quantity: z.number().int().positive(),
 		generation: z.number().int().nonnegative(),
 		phase: z.enum([
 			"outbound",

@@ -63,8 +63,6 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			itemId: context.owner.id,
 			canonicalItemId: context.owner.item.id,
 			location: context.owner.location,
-			previousQuantity: context.owner.quantity,
-			resultingQuantity: 0,
 		});
 	}
 
@@ -134,7 +132,6 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			itemId: context.owner.id,
 			canonicalItemId: context.owner.item.id,
 			location: context.owner.location,
-			quantity: context.owner.quantity,
 		});
 	}
 

@@ -40,9 +40,7 @@ export const readLineInputAutofillCoverageFx = Effect.fn("readLineInputAutofillC
 			ownerItemId,
 			runtime,
 		});
-		const selectedQuantity = plan.entry.reduce((total, entry) => {
-			return total + entry.quantity;
-		}, 0);
+		const selectedQuantity = plan.entry.length;
 		if (plan.remainingMissingQuantity > 0) {
 			return {
 				type: "incomplete",

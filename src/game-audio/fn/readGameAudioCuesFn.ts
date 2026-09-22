@@ -28,8 +28,6 @@ const cuePriority: Record<AudibleGameEvent, number> = {
 	[GameEventEnumSchema.enum.ItemPlaced]: 2,
 	[GameEventEnumSchema.enum.ItemSwapped]: 2,
 	[GameEventEnumSchema.enum.ItemPortalTransferred]: 2,
-	[GameEventEnumSchema.enum.ItemStacked]: 2,
-	[GameEventEnumSchema.enum.ItemSplit]: 2,
 	[GameEventEnumSchema.enum.ItemConsumed]: 2,
 	[GameEventEnumSchema.enum.ItemInputStored]: 2,
 	[GameEventEnumSchema.enum.ItemUnitSpent]: 2,
@@ -132,72 +130,37 @@ const readGameAudioCueFn = (
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 			},
-			(event) =>
-				cueFn(GameEventEnumSchema.enum.ItemExpired, strengthForQuantityFn(event.quantity)),
+			() => cueFn(GameEventEnumSchema.enum.ItemExpired, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 			},
-			(event) =>
-				cueFn(GameEventEnumSchema.enum.ItemSpawned, strengthForQuantityFn(event.quantity)),
+			() => cueFn(GameEventEnumSchema.enum.ItemSpawned, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemPortalTransferred,
 			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemPortalTransferred,
-					strengthForQuantityFn(event.quantity),
-				),
+			() => cueFn(GameEventEnumSchema.enum.ItemPortalTransferred, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 			},
-			(event) =>
-				cueFn(GameEventEnumSchema.enum.ItemPlaced, strengthForQuantityFn(event.quantity)),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemStacked,
-			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemStacked,
-					strengthForQuantityFn(event.quantity - event.previousQuantity),
-				),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemSplit,
-			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemSplit,
-					strengthForQuantityFn(event.previousQuantity - event.quantity),
-				),
+			() => cueFn(GameEventEnumSchema.enum.ItemPlaced, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemConsumed,
 			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemConsumed,
-					strengthForQuantityFn(event.consumedQuantity),
-				),
+			() => cueFn(GameEventEnumSchema.enum.ItemConsumed, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemInputStored,
 			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemInputStored,
-					strengthForQuantityFn(event.storedQuantity),
-				),
+			() => cueFn(GameEventEnumSchema.enum.ItemInputStored, 1),
 		)
 		.with(
 			{
@@ -213,21 +176,13 @@ const readGameAudioCueFn = (
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemDepleted,
-					strengthForQuantityFn(event.previousQuantity),
-				),
+			() => cueFn(GameEventEnumSchema.enum.ItemDepleted, 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemDisappeared,
 			},
-			(event) =>
-				cueFn(
-					GameEventEnumSchema.enum.ItemDisappeared,
-					strengthForQuantityFn(event.quantity),
-				),
+			() => cueFn(GameEventEnumSchema.enum.ItemDisappeared, 1),
 		)
 		.with(
 			{

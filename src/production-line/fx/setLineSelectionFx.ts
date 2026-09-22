@@ -5,7 +5,6 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
-import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
@@ -132,14 +131,9 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 							)
 						: runtime.items,
 			} satisfies RuntimeSchema.Type;
-			const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
-				ownerItemId,
-				runtime: selectedRuntime,
-			});
 			return [
 				props,
-				isolation.runtime,
-				isolation.events,
+				selectedRuntime,
 			] as const;
 		}),
 	);

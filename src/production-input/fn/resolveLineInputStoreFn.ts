@@ -3,7 +3,6 @@ import { Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
@@ -19,7 +18,6 @@ export namespace resolveLineInputStoreFn {
 		readonly inputIndex?: NonNegativeIntegerSchema.Type;
 		readonly lineId?: IdSchema.Type;
 		readonly owner: BoardRuntimeItemSchema.Type;
-		readonly requestedQuantity?: PositiveIntegerSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 		readonly source: BoardRuntimeItemSchema.Type;
 	}
@@ -28,22 +26,20 @@ export namespace resolveLineInputStoreFn {
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly inputIndex: number;
-		readonly quantity: number;
 	}
 }
 
 /**
  * Resolves the first open material input on an explicit line or the owner's save-backed default.
  *
- * Pointer drops omit an input request and may use the first compatible slot's full capacity.
- * Engine-owned commands may constrain the exact line, slot, and requested quantity while preserving
+ * Pointer drops omit an input request and use the first compatible slot with capacity.
+ * Engine-owned commands may constrain the exact line and slot while preserving
  * the same source validation and authoritative capacity recheck.
  */
 export const resolveLineInputStoreFn = ({
 	inputIndex: requestedInputIndex,
 	lineId: requestedLineId,
 	owner,
-	requestedQuantity,
 	runtime,
 	source,
 }: resolveLineInputStoreFn.Props) => {
@@ -84,15 +80,13 @@ export const resolveLineInputStoreFn = ({
 		const plan = planInputMaterialStoreFn({
 			input,
 			item: source,
-			requestedQuantity: requestedQuantity ?? source.quantity,
-			storedQuantity: storedItems.reduce((total, item) => total + item.quantity, 0),
+			storedQuantity: storedItems.length,
 		});
 		if (plan === undefined) continue;
 		return {
 			ownerItemId: boardOwner.id,
 			lineId,
 			inputIndex,
-			quantity: plan.quantity,
 		} satisfies resolveLineInputStoreFn.Result;
 	}
 

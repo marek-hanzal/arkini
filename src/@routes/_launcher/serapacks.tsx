@@ -21,9 +21,9 @@ export const Route = createFileRoute("/_launcher/serapacks")({
 				>
 					<header>
 						<div className="flex items-center justify-between gap-4">
-							<p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
-								Serapacks
-							</p>
+							<h1 className="text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold">
+								Choose a game package
+							</h1>
 							<div className="flex flex-wrap items-center justify-end gap-4 text-sm">
 								<LinkButton
 									disabled={blocked}
@@ -45,13 +45,6 @@ export const Route = createFileRoute("/_launcher/serapacks")({
 								</LinkButton>
 							</div>
 						</div>
-						<h1 className="mt-2 text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold">
-							Choose a game package
-						</h1>
-						<p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-							Editor imports an Serapack into a separate project. Changes aren’t
-							live—build and install the project to update the Serapack.
-						</p>
 						{actions.actionError === undefined ? null : (
 							<p className="mt-3 text-sm text-danger">
 								{String(actions.actionError)}

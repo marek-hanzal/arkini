@@ -21,6 +21,22 @@ import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 
+const showSectionHeadingSeparatorFn = (sectionId: SectionId) => {
+	switch (sectionId) {
+		case "merges":
+		case "units":
+		case "clock":
+		case "action":
+		case "chain":
+		case "connections":
+		case "notes":
+		case "delete":
+			return false;
+		default:
+			return true;
+	}
+};
+
 /** Owns the stable item-detail header while routed sections replace only its body. */
 export const Detail = ({
 	children,
@@ -59,7 +75,12 @@ export const Detail = ({
 				: translator.textFn(section?.label ?? "Item details");
 	// Estimate owns its heading because its live summary and sort controls share that row.
 	const sectionHeading =
-		sectionId === "estimate" ? null : <EditorFormSectionDivider title={sectionTitle} />;
+		sectionId === "estimate" ? null : (
+			<EditorFormSectionDivider
+				separator={showSectionHeadingSeparatorFn(sectionId)}
+				title={sectionTitle}
+			/>
+		);
 	return (
 		<EditorSectionPage
 			contentClassName="mx-auto w-3/4"

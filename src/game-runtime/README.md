@@ -116,7 +116,7 @@ Game and Editor inject the fixed `GameplaySpeedUpMultiplier` from `game-cheat` i
 
 Runtime item IDs, revisions, and job IDs use the injectable [`RuntimeIdentityFx`](../runtime-identity/context/RuntimeIdentityFx.ts) entropy source, backed by host UUIDs. Identity entropy stays separate from seeded gameplay Random so retries cannot reuse identities merely by replaying the same roll seed. Tokens remain opaque; saved identities are not rewritten.
 
-Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successful source merges advance it atomically, including nested participant depletion rolls; blocked retries and hydration retain it. It is history for the surviving identity, not input/production ownership, so it does not make an otherwise pure item impure. Runtime and State item schemas carry it; `fromRuntimeFn` and `fromStateFx` preserve it while session revisions remain transient.
+Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successful source merges advance it atomically, including nested participant depletion rolls; blocked retries and hydration retain it. It is history for the surviving identity, not input/production ownership, and does not restrict merge reuse. Runtime and State item schemas carry it; `fromRuntimeFn` and `fromStateFx` preserve it while session revisions remain transient.
 
 ### Performance diagnostics
 
@@ -133,7 +133,7 @@ For a slow Board, compare normal and accelerated windows for the same session an
 
 ### Forced owner removal
 
-[`forceRemoveRuntimeItemFx`](fx/forceRemoveRuntimeItemFx.ts) plans general forced removal on an explicit Runtime: cancel owned jobs/queue, consume aborted inputs, remove the root, return reservations before buffers, and reconcile any parent material job. [`discardRuntimeItemTreeFx`](fx/discardRuntimeItemTreeFx.ts) destroys only an idle passive ownership tree and returns exact loss facts. [`placeRuntimeItemBestEffortFx`](../item-placement/fx/placeRuntimeItemBestEffortFx.ts) reuses canonical placement, retaining fitting quantities and reporting explicit capacity overflow. These operations never publish; the enclosing Runtime transaction commits state and all events together.
+[`forceRemoveRuntimeItemFx`](fx/forceRemoveRuntimeItemFx.ts) plans general forced removal on an explicit Runtime: cancel owned jobs/queue, consume aborted inputs, remove the root, return reservations before buffers, and reconcile any parent material job. [`discardRuntimeItemTreeFx`](fx/discardRuntimeItemTreeFx.ts) destroys only an idle passive ownership tree and returns exact loss facts. [`placeRuntimeItemBestEffortFx`](../item-placement/fx/placeRuntimeItemBestEffortFx.ts) returns the exact item identity when a cell is available and reports explicit capacity overflow otherwise. These operations never publish; the enclosing Runtime transaction commits state and all events together.
 
 Clock kill-switch is the first explicit caller through `item-expiry`; ordinary removal, merge, queued cancellation, job completion and loose-kill retain their strict placement semantics. Speed-up does not select removal policy. Expiry Output resolves from the original operation snapshot and follows returns in the same transaction.
 

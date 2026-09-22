@@ -63,10 +63,9 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-location` | Runtime locations, ownership-derived physical origins, grid claims, distances and location rejection | [`src/item-location/schema/LocationSchema.ts`](src/item-location/schema/LocationSchema.ts) |
 | `item-resolution` | Canonical configured Item lookup | [`src/item-resolution/fx/resolveItemFx.ts`](src/item-resolution/fx/resolveItemFx.ts) |
 | `item-query` | Authored query contracts and pinned-Runtime execution | [`src/item-query/fx/queryFx.ts`](src/item-query/fx/queryFx.ts) |
-| `item-placement` | Board stack, spawn and existing-item placement | [`src/item-placement/fx/planBoardPlacementFx.ts`](src/item-placement/fx/planBoardPlacementFx.ts) |
+| `item-placement` | Single-item Board spawn and exact-identity return | [`src/item-placement/fx/planBoardPlacementFx.ts`](src/item-placement/fx/planBoardPlacementFx.ts) |
 | `item-merge` | Directional merge admission and atomic lifecycle | [`src/item-merge/fx/mergeItemsFx.ts`](src/item-merge/fx/mergeItemsFx.ts) |
-| `item-state-isolation` | Identity-bound owner isolation and remainder placement | [`src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts`](src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts) |
-| `item-interaction` | Drop preview/commit, release, split, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
+| `item-interaction` | Drop preview/commit, release, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
 | `item-action` | Immediate space action admission and unit settlement | [`src/item-action/fx/activateItemActionFx.ts`](src/item-action/fx/activateItemActionFx.ts) |
 
 [`GAME.MD`](GAME.MD) owns gameplay meaning. The Runtime map owns state and lifecycle navigation.

@@ -16,7 +16,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood"
+					"itemId": "wood---tier-1"
 				},
 				"action": "use",
 				"effect": "replace",

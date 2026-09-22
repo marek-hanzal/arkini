@@ -1,0 +1,84 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "zblgatsfi13wi1v8wboffcc6",
+		"id": "wood---tier-2",
+		"title": "Wood - Tier 2",
+		"draft": true,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"wood-t2"
+			]
+		},
+		"units": {
+			"amount": 1
+		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wood---tier-2"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "wood---tier-3"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "split",
+				"title": "Split",
+				"description": "Split",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 5000,
+				"input": [
+					{
+						"units": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "units",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "wood---tier-2"
+							},
+							"distance": "self"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "wood---tier-1",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

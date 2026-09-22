@@ -4,8 +4,8 @@
 		"uid": "uoratu4uyxa3lg0eom8ubjcy",
 		"id": "sawmill-blueprint",
 		"title": "Sawmill Blueprint",
-		"ui": "default",
 		"description": "What about some stuff sawing other stuff?",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -23,8 +23,8 @@
 				"title": "Build Sawmill",
 				"artwork": "sawmill",
 				"description": "Let's build sawmill",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -48,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
+								"itemId": "wood---tier-1"
 							},
 							"distance": "far"
 						},
@@ -63,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone"
+								"itemId": "stone---tier-1"
 							},
 							"distance": "far"
 						},

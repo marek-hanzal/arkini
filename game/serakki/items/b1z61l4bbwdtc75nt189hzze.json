@@ -2,16 +2,27 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "b1z61l4bbwdtc75nt189hzze",
-		"id": "stone",
-		"title": "Stone",
+		"id": "stone---tier-1",
+		"title": "Stone - Tier 1",
 		"description": "Heavy, stubborn, useful. Civilization likes to pretend stone becomes architecture through planning rather than lifting.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"stone"
+				"stone-t1"
 			]
 		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "stone---tier-1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "stone---tier-2"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

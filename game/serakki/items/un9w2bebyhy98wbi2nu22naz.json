@@ -4,8 +4,8 @@
 		"uid": "un9w2bebyhy98wbi2nu22naz",
 		"id": "dynamite",
 		"title": "Dynamite",
-		"ui": "simple",
 		"description": "Kaboom. You should be extremely careful as this may literally destroy your progress.",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -163,7 +163,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "wood",
+											"itemId": "wood---tier-1",
 											"quantity": {
 												"min": 3,
 												"max": 5

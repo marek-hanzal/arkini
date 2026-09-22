@@ -17,7 +17,7 @@
 			{
 				"id": "wood",
 				"title": "Chop the wood from a tree",
-				"artwork": "wood",
+				"artwork": "wood-t1",
 				"description": "Get the wood from a tree. Find the tree. No tree, no wood. Really.",
 				"clockWeight": 1,
 				"default": true,
@@ -50,7 +50,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "wood",
+											"itemId": "wood---tier-1",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -99,7 +99,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
+								"itemId": "wood---tier-1"
 							},
 							"distance": "far"
 						},
@@ -153,7 +153,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
+								"itemId": "wood---tier-1"
 							},
 							"distance": "far"
 						},

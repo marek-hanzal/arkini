@@ -2,16 +2,27 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kwkucgj71atfynrxw5sugzpe",
-		"id": "wood",
-		"title": "Wood",
+		"id": "wood---tier-1",
+		"title": "Wood - Tier 1",
 		"description": "Freshly liberated from a tree. Basic, versatile, and destined to become almost everything before metal starts showing off.",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"wood"
+				"wood-t1"
 			]
 		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "wood---tier-1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "wood---tier-2"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

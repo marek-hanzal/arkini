@@ -4,9 +4,9 @@
 		"uid": "by7grm3nsxp00xfzn5f86hk7",
 		"id": "stoneworks-blueprint",
 		"title": "Stoneworks Blueprint",
-		"ui": "default",
 		"draft": false,
 		"description": "Turn rough stone into something a builder can pretend is civilized.",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -24,8 +24,8 @@
 				"title": "Build Stoneworks",
 				"artwork": "stoneworks",
 				"description": "Build a Stoneworks.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -49,7 +49,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
+								"itemId": "wood---tier-1"
 							},
 							"distance": "far"
 						},
@@ -64,7 +64,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone"
+								"itemId": "stone---tier-1"
 							},
 							"distance": "far"
 						},

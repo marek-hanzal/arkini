@@ -4,8 +4,8 @@
 		"uid": "xx2gqafu2hfas7hj6vl8k8qc",
 		"id": "well-blueprint",
 		"title": "Well Blueprint",
-		"ui": "default",
 		"description": "Wanna some well?",
+		"ui": "default",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -23,8 +23,8 @@
 				"title": "Well",
 				"artwork": "well",
 				"description": "Build a well well.",
-				"default": true,
 				"clockWeight": 1,
+				"default": true,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
@@ -63,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone"
+								"itemId": "stone---tier-1"
 							},
 							"distance": "far"
 						},
@@ -78,7 +78,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
+								"itemId": "wood---tier-1"
 							},
 							"distance": "far"
 						},

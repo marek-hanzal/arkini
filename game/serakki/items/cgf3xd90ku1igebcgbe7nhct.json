@@ -163,7 +163,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper"
+								"itemId": "paper---tier-1"
 							},
 							"distance": "far"
 						},

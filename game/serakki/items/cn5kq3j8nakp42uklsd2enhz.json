@@ -4,8 +4,8 @@
 		"uid": "cn5kq3j8nakp42uklsd2enhz",
 		"id": "battle-axe",
 		"title": "Battle Axe",
-		"ui": "simple",
 		"description": "Slice through things",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -34,7 +34,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood"
+					"itemId": "wood---tier-1"
 				},
 				"action": "consume",
 				"effect": "replace",

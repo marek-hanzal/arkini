@@ -2,8 +2,8 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ttkblp0xsb1irrbgg5oevm2y",
-		"id": "paper",
-		"title": "Paper",
+		"id": "paper---tier-1",
+		"title": "Paper - Tier 1",
 		"description": "Civilization runs on wood, stone, and paperwork. Mostly paperwork. Blueprints, notes, and better ideas all need somewhere to be written.",
 		"ui": "simple",
 		"artwork": {
@@ -76,6 +76,15 @@
 					]
 				},
 				"effect": "keep"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "paper---tier-1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "paper---tier-2"
 			}
 		],
 		"maxQueueSize": 1,

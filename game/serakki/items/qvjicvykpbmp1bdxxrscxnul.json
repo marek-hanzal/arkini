@@ -29,7 +29,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "wood",
+											"itemId": "wood---tier-1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -48,7 +48,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood"
+					"itemId": "wood---tier-1"
 				},
 				"action": "use",
 				"effect": "replace",

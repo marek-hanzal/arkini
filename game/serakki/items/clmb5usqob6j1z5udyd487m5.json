@@ -17,7 +17,7 @@
 			{
 				"id": "stone",
 				"title": "Stone",
-				"artwork": "stone",
+				"artwork": "stone-t1",
 				"description": "Get the stone from stone deposit.",
 				"clockWeight": 1,
 				"default": true,
@@ -50,7 +50,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "stone",
+											"itemId": "stone---tier-1",
 											"quantity": {
 												"min": 1,
 												"max": 2

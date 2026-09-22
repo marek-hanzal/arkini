@@ -502,7 +502,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "paper",
+											"itemId": "paper---tier-1",
 											"quantity": {
 												"min": 4,
 												"max": 4

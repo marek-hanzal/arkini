@@ -56,7 +56,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "paper"
+					"itemId": "paper---tier-1"
 				},
 				"action": "spend",
 				"effect": "replace",

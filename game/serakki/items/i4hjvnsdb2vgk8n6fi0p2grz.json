@@ -49,7 +49,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood"
+								"itemId": "wood---tier-1"
 							},
 							"distance": "far"
 						},

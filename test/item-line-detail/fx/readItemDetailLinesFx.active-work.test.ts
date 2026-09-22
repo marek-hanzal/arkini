@@ -108,4 +108,3 @@ describe("readItemDetailLinesFx / active work", () => {
 		});
 	});
 });
-

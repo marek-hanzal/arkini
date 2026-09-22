@@ -18,6 +18,8 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 
+import "./YourGamesList.css";
+
 const formatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
 	timeStyle: "short",
@@ -123,7 +125,7 @@ export const YourGamesList = ({
 				return (
 					<article
 						key={gameId}
-						className="ak-list-row flex min-w-0 items-center gap-3 px-4 py-3 hover:bg-[var(--ak-list-row-interactive-surface)] hover:shadow-[inset_3px_0_0_var(--ak-accent)]"
+						className="ak-list-row flex min-w-0 items-center gap-3 px-4 py-3"
 						data-row-kind={project === undefined ? "serapack" : "project"}
 						data-ui="YourGamesRow"
 					>

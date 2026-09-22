@@ -1,0 +1,4 @@
+.ak-list-row[data-ui="YourGamesRow"]:hover {
+	background-color: color-mix(in srgb, var(--ak-accent) 30%, var(--ak-surface));
+	box-shadow: inset 4px 0 0 var(--ak-accent);
+}

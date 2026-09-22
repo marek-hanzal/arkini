@@ -15,12 +15,7 @@ import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", async () => {
 	const { startTestConfig } = await import("~test/game-start/support/startTestConfig");
-	const items = {
-		...startTestConfig.items,
-		backpack: {
-			...startTestConfig.items.backpack,
-		},
-	};
+	const items = startTestConfig.items;
 	return {
 		useEditorItemSearchOptions: () => ({
 			items,
@@ -119,7 +114,6 @@ describe("ProjectStartItemPicker", () => {
 				.map((option) => option.dataset.itemId)
 				.sort(),
 		).toEqual([
-			"backpack",
 			"lens",
 			"log",
 			"tree",

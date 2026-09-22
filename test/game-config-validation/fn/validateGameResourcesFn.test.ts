@@ -539,7 +539,6 @@ describe("validateGameResourcesFn", () => {
 				"artwork:tree",
 				"artwork:log",
 				"artwork:lens",
-				"artwork:backpack",
 				"blueprint",
 			].map((id) => ({
 				id,

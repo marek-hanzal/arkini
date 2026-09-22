@@ -5,7 +5,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import {
@@ -55,7 +55,7 @@ const configFn = (mode: "reserve" | "consume") => {
 	});
 };
 
-const originFn = (): GridLocationSchema.Type => ({
+const originFn = (): BoardLocationSchema.Type => ({
 	scope: "board",
 	space: 0,
 	position: {
@@ -64,7 +64,7 @@ const originFn = (): GridLocationSchema.Type => ({
 	},
 });
 
-const stateFn = (origin: GridLocationSchema.Type): StateSchema.Type => ({
+const stateFn = (origin: BoardLocationSchema.Type): StateSchema.Type => ({
 	cheats: {
 		enabled: false,
 		everEnabled: false,

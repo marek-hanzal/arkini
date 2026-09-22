@@ -2,7 +2,7 @@ import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -369,7 +369,7 @@ export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({
 }: {
 	id: string;
 	itemId: string;
-	location: GridLocationSchema.Type;
+	location: BoardLocationSchema.Type;
 	quantity?: number;
 }) {
 	const item = yield* spawnItemFx({
@@ -382,7 +382,7 @@ export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({
 	const space = yield* activateItemActionFx({
 		currentSpace: runtime.currentSpace,
 		itemId: item.id,
-		location: item.location as GridLocationSchema.Type,
+		location: item.location as BoardLocationSchema.Type,
 		revision: item.revision,
 	});
 	return {

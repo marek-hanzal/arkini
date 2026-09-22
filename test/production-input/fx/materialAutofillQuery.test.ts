@@ -11,7 +11,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { autofillLineInputFx } from "~/production-input/fx/autofillLineInputFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
@@ -54,7 +54,7 @@ const configFn = (queries: ReadonlyArray<QuerySchema.Type>) =>
 const locations: ReadonlyArray<
 	readonly [
 		string,
-		GridLocationSchema.Type,
+		BoardLocationSchema.Type,
 	]
 > = [
 	[

@@ -14,7 +14,7 @@ import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -47,7 +47,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 		itemId,
 		runtime,
 	});
-	const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
+	const item = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeItem));
 	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnGridError({

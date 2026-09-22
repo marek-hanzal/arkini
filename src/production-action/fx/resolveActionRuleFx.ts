@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
 
 export namespace resolveActionRuleFx {
@@ -21,7 +21,7 @@ export const resolveActionRuleFx = Effect.fn("resolveActionRuleFx")(function* ({
 	origin,
 	rule,
 }: {
-	readonly origin: GridLocationSchema.Type;
+	readonly origin: BoardLocationSchema.Type;
 	readonly rule: RuleSchema.Type;
 }) {
 	let active = true;

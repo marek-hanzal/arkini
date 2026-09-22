@@ -3,12 +3,12 @@ import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 export namespace whenFx {
 	export interface Props {
-		origin: GridLocationSchema.Type;
+		origin: BoardLocationSchema.Type;
 		when: WhenSchema.Type;
 	}
 }

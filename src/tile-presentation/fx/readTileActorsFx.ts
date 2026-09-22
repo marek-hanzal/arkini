@@ -11,7 +11,7 @@ import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntim
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
@@ -62,7 +62,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			job,
 		]),
 	);
-	const gridItems = Array.getSomes(runtime.items.map(narrowGridRuntimeItemFn)).filter(
+	const gridItems = Array.getSomes(runtime.items.map(narrowBoardRuntimeItemFn)).filter(
 		(item) => item.location.space === runtime.currentSpace,
 	);
 

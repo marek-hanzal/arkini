@@ -17,7 +17,7 @@ import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
@@ -25,9 +25,8 @@ import { ItemLocationConflictError } from "~/item-location/error/ItemLocationCon
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 
@@ -35,20 +34,20 @@ export namespace storeInputMaterialFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 		ownerItemRevision?: RevisionSchema.Type;
-		expectedOwnerLocation?: GridLocationSchema.Type;
+		expectedOwnerLocation?: BoardLocationSchema.Type;
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		sourceItemId: IdSchema.Type;
 		sourceItemRevision: RevisionSchema.Type;
-		expectedSourceLocation?: GridLocationSchema.Type;
+		expectedSourceLocation?: BoardLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 	}
 
 	export interface Result {
-		readonly sourceBefore: GridRuntimeItemSchema.Type;
-		readonly ownerItem: GridRuntimeItemSchema.Type;
+		readonly sourceBefore: BoardRuntimeItemSchema.Type;
+		readonly ownerItem: BoardRuntimeItemSchema.Type;
 		readonly storedItem: InputRuntimeItemSchema.Type;
-		readonly sourceItem?: GridRuntimeItemSchema.Type;
+		readonly sourceItem?: BoardRuntimeItemSchema.Type;
 	}
 }
 
@@ -84,7 +83,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					expectedRevision: ownerItemRevision,
 				});
 			}
-			const gridOwner = Option.getOrUndefined(narrowGridRuntimeItemFn(owner));
+			const gridOwner = Option.getOrUndefined(narrowBoardRuntimeItemFn(owner));
 			if (expectedOwnerLocation !== undefined) {
 				if (gridOwner === undefined) {
 					return yield* Effect.fail(
@@ -118,7 +117,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				entityId: runtimeSource.id,
 				expectedRevision: sourceItemRevision,
 			});
-			const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+			const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -262,7 +261,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				itemId: ownerItemId,
 				runtime: reconciledRuntime,
 			});
-			const ownerItem = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeOwnerItem));
+			const ownerItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwnerItem));
 			if (ownerItem === undefined) {
 				return yield* Effect.die(
 					new Error(

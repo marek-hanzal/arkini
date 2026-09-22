@@ -5,7 +5,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
@@ -22,7 +22,7 @@ const emptyOutput = {
 export namespace settleJobRuntimeFx {
 	export interface Props {
 		readonly job: JobSchema.Type;
-		readonly owner: GridRuntimeItemSchema.Type;
+		readonly owner: BoardRuntimeItemSchema.Type;
 		readonly lineOutput?: OutputSchema.Type;
 		readonly reservations: readonly ReservedRuntimeItemSchema.Type[];
 		readonly overflow?: "discard";

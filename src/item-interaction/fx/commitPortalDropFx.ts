@@ -4,7 +4,6 @@ import { Array, Data, Effect, Option, pipe } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -16,7 +15,7 @@ import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
@@ -32,10 +31,10 @@ export namespace commitPortalDropFx {
 	export interface Props {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
+		readonly sourceLocation: BoardLocationSchema.Type;
 		readonly targetItemId: IdSchema.Type;
 		readonly targetRevision: RevisionSchema.Type;
-		readonly targetLocation: GridLocationSchema.Type;
+		readonly targetLocation: BoardLocationSchema.Type;
 	}
 }
 
@@ -94,7 +93,7 @@ export const commitPortalDropFx = Effect.fn("commitPortalDropFx")(function* ({
 				entityId: targetItemId,
 				expectedRevision: targetRevision,
 			});
-			const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+			const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -103,7 +102,7 @@ export const commitPortalDropFx = Effect.fn("commitPortalDropFx")(function* ({
 					}),
 				);
 			}
-			const target = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTarget));
+			const target = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTarget));
 			if (target === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

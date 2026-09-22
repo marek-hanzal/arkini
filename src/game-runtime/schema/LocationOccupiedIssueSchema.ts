@@ -3,7 +3,7 @@ import { z } from "zod";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 
 /**
  * Multiple live items own one concrete location.
@@ -14,7 +14,7 @@ export const LocationOccupiedIssueSchema = z
 			.array(IdSchema)
 			.min(2)
 			.describe("The live item identities that own the same location."),
-		location: GridLocationSchema.describe("The concrete location owned more than once."),
+		location: BoardLocationSchema.describe("The concrete location owned more than once."),
 		type: RuntimeCheckIssueEnumSchema.extract([
 			"LocationOccupied",
 		]),

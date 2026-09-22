@@ -6,7 +6,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
@@ -15,8 +15,8 @@ import { planBoardPlacementFx } from "./planBoardPlacementFx";
 
 interface PlanDropPlacementProps {
 	readonly drop: dropFx.Result;
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
-	readonly origin: GridLocationSchema.Type;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
+	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }
 
@@ -28,9 +28,9 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 	runtime,
 }: {
 	readonly drop: dropFx.Result;
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly item: ItemSchema.Type;
-	readonly origin: GridLocationSchema.Type;
+	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	if (item.maxStackSize !== 1) return;

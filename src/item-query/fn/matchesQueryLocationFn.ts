@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 
 /** Shared spatial reach for runtime queries and material sources, including delivery origins. */
@@ -8,10 +8,9 @@ export const matchesQueryLocationFn = ({
 	origin,
 	query,
 }: {
-	readonly location: GridLocationSchema.Type;
-	readonly origin?: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
+	readonly origin?: BoardLocationSchema.Type;
 	readonly query: QuerySchema.Type;
-	readonly currentSpace: number;
 }): boolean => {
 	if (query.distance === "universe") return true;
 	if (origin === undefined || location.space !== origin.space) return false;

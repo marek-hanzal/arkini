@@ -283,7 +283,7 @@
 				"board"
 			],
 			"additionalProperties": false,
-			"description": "The initial board placements, inventory contents, and toolbar placements for a new game."
+			"description": "The initial board placements for a new game."
 		},
 		"VersionPartsSchema": {
 			"type": "object",
@@ -749,7 +749,7 @@
 				},
 				"placement": {
 					"default": "drop",
-					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
+					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop.",
 					"$ref": "urn:serakki:schema:project#/$defs/PlacementSchema"
 				},
 				"rules": {
@@ -794,7 +794,7 @@
 				"drop",
 				"random"
 			],
-			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement, independently from inventory fallback."
+			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement."
 		},
 		"roll.ChanceSchema": {
 			"type": "object",
@@ -1134,6 +1134,7 @@
 			"description": "A rule that disables an immediate item action when its conditions pass."
 		},
 		"itemAction.ActionSchema": {
+			"description": "Immediate travel to a board space.",
 			"$ref": "urn:serakki:schema:project#/$defs/itemAction.SpaceActionSchema"
 		},
 		"action.InputSchema": {

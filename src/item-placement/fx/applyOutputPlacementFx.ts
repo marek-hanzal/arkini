@@ -1,7 +1,7 @@
 import { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
 import { Effect } from "effect";
 
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { outputFx } from "~/production-output/fx/outputFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
@@ -10,8 +10,8 @@ import { planDropPlacementFx } from "./planDropPlacementFx";
 
 interface ApplyOutputPlacementProps {
 	readonly overflow?: "discard";
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
-	readonly origin: GridLocationSchema.Type;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
+	readonly origin: BoardLocationSchema.Type;
 	readonly output: outputFx.Result;
 	readonly runtime: RuntimeSchema.Type;
 }

@@ -6,14 +6,14 @@ import { discardRuntimeItemTreeFx } from "~/game-runtime/fx/discardRuntimeItemTr
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { placeRuntimeItemBestEffortFx } from "~/item-placement/fx/placeRuntimeItemBestEffortFx";
 import { abortJobRuntimeFx } from "~/production-job/fx/abortJobRuntimeFx";
 
 export namespace forceRemoveRuntimeItemFx {
 	export interface Props {
 		readonly item: RuntimeItemSchema.Type;
-		readonly origin: GridLocationSchema.Type;
+		readonly origin: BoardLocationSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 

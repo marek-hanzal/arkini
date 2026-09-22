@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GridLocationSchema } from "./GridLocationSchema";
+import { BoardLocationSchema } from "./BoardLocationSchema";
 import { DeliveryLocationSchema } from "./DeliveryLocationSchema";
 import { InputLocationSchema } from "./InputLocationSchema";
 import { JobLocationSchema } from "./JobLocationSchema";
@@ -14,7 +14,7 @@ import { ReservedLocationSchema } from "./ReservedLocationSchema";
  */
 export const LocationSchema = z
 	.discriminatedUnion("scope", [
-		GridLocationSchema,
+		BoardLocationSchema,
 		DeliveryLocationSchema,
 		InputLocationSchema,
 		JobLocationSchema,

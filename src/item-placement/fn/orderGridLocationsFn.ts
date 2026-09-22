@@ -1,8 +1,8 @@
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 
 interface OrderGridLocationsProps {
-	readonly locations: ReadonlyArray<GridLocationSchema.Type>;
+	readonly locations: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly origin: PositionSchema.Type;
 }
 

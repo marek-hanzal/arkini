@@ -1,9 +1,8 @@
 import { Option } from "effect";
 
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { matchesQueryLocationFn } from "~/item-query/fn/matchesQueryLocationFn";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
@@ -17,15 +16,15 @@ export const readLineInputAutofillSourcesFn = ({
 	readonly owner: BoardRuntimeItemSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 	readonly query: QuerySchema.Type;
-}): readonly GridRuntimeItemSchema.Type[] => {
+}): readonly BoardRuntimeItemSchema.Type[] => {
 	// Pending work already owns its producer identity before a Job starts.
 	const busyOwnerItemIds = new Set([
 		...runtime.jobs.map((job) => job.ownerItemId),
 		...runtime.jobQueue.map((request) => request.ownerItemId),
 	]);
-	const sources: GridRuntimeItemSchema.Type[] = [];
+	const sources: BoardRuntimeItemSchema.Type[] = [];
 	for (const item of runtime.items) {
-		const candidate = Option.getOrUndefined(narrowGridRuntimeItemFn(item));
+		const candidate = Option.getOrUndefined(narrowBoardRuntimeItemFn(item));
 		if (
 			candidate === undefined ||
 			candidate.id === owner.id ||
@@ -38,7 +37,6 @@ export const readLineInputAutofillSourcesFn = ({
 				location: candidate.location,
 				origin: owner.location,
 				query,
-				currentSpace: runtime.currentSpace,
 			})
 		)
 			continue;

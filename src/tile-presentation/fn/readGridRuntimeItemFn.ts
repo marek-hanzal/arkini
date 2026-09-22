@@ -1,6 +1,6 @@
 import { Option } from "effect";
 
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads one grid item from an optional runtime without leaking Option to cue compilers. */
@@ -14,5 +14,5 @@ export const readGridRuntimeItemFn = ({
 	if (runtime === null) return null;
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined) return null;
-	return Option.getOrNull(narrowGridRuntimeItemFn(item));
+	return Option.getOrNull(narrowBoardRuntimeItemFn(item));
 };

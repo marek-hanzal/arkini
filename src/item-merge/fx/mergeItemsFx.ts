@@ -14,9 +14,8 @@ import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
@@ -86,10 +85,10 @@ type ItemMergedGameEvent = Extract<
 
 interface MergeItemsResult {
 	readonly event: ItemMergedGameEvent;
-	readonly sourceBefore: GridRuntimeItemSchema.Type;
-	readonly targetBefore: GridRuntimeItemSchema.Type;
-	readonly sourceAfter?: GridRuntimeItemSchema.Type;
-	readonly targetAfter?: GridRuntimeItemSchema.Type;
+	readonly sourceBefore: BoardRuntimeItemSchema.Type;
+	readonly targetBefore: BoardRuntimeItemSchema.Type;
+	readonly sourceAfter?: BoardRuntimeItemSchema.Type;
+	readonly targetAfter?: BoardRuntimeItemSchema.Type;
 }
 
 /** Commits one directional merge and returns exact before/after actor identities. */
@@ -127,7 +126,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				entityId: runtimeTarget.id,
 				expectedRevision: targetRevision,
 			});
-			const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+			const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -200,12 +199,12 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 						: undefined,
 			} satisfies ItemMergedGameEvent;
 			const sourceAfter = nextRuntime.items.find(
-				(item): item is GridRuntimeItemSchema.Type =>
+				(item): item is BoardRuntimeItemSchema.Type =>
 					item.id === source.id &&
 					item.location.scope === LocationScopeEnumSchema.enum.Board,
 			);
 			const targetAfter = nextRuntime.items.find(
-				(item): item is GridRuntimeItemSchema.Type =>
+				(item): item is BoardRuntimeItemSchema.Type =>
 					item.id === target.id &&
 					item.location.scope === LocationScopeEnumSchema.enum.Board,
 			);

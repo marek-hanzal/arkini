@@ -11,17 +11,17 @@ import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveLineInputStoreFn {
 	export interface Props {
 		readonly inputIndex?: NonNegativeIntegerSchema.Type;
 		readonly lineId?: IdSchema.Type;
-		readonly owner: GridRuntimeItemSchema.Type;
+		readonly owner: BoardRuntimeItemSchema.Type;
 		readonly requestedQuantity?: PositiveIntegerSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
-		readonly source: GridRuntimeItemSchema.Type;
+		readonly source: BoardRuntimeItemSchema.Type;
 	}
 
 	export interface Result {

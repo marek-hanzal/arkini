@@ -11,7 +11,6 @@ import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -86,7 +85,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
 		return rejectedFn(DropItemRejectedReason.StaleSource);
 	}
-	const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+	const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return rejectedFn(DropItemRejectedReason.InvalidSource);
 	}
@@ -129,7 +128,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
 		return rejectedFn(DropItemRejectedReason.StaleTarget);
 	}
-	const targetItem = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTargetItem));
+	const targetItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTargetItem));
 	if (targetItem === undefined) {
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}

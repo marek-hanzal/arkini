@@ -1,5 +1,5 @@
 import { placeRuntimeItemBestEffortFx } from "~/item-placement/fx/placeRuntimeItemBestEffortFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -14,7 +14,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace releaseOwnerInputsFx {
 	export interface Props {
 		owner: RuntimeItemSchema.Type;
-		origin?: GridLocationSchema.Type;
+		origin?: BoardLocationSchema.Type;
 		overflow?: "discard";
 		runtime: RuntimeSchema.Type;
 	}

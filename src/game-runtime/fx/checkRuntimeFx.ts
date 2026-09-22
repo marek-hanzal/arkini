@@ -17,7 +17,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckI
 import type { RuntimeCheckResultSchema } from "~/game-runtime/schema/RuntimeCheckResultSchema";
 import { indexGridLocationClaimsFn } from "~/item-location/fn/indexGridLocationClaimsFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
 import { checkRuntimeInputLocationsFn } from "~/production-input/fn/checkRuntimeInputLocationsFn";
@@ -124,7 +124,7 @@ const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitiesFx")(f
 const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: RuntimeSchema.Type) => {
 	const items: {
 		readonly item: RuntimeItemSchema.Type;
-		readonly location: GridLocationSchema.Type;
+		readonly location: BoardLocationSchema.Type;
 	}[] = [];
 	for (const item of runtime.items) {
 		if (item.location.scope === LocationScopeEnumSchema.enum.Board) {

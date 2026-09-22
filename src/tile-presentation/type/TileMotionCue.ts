@@ -1,12 +1,12 @@
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 
 interface TileMotionCueBase {
 	readonly sequence: number;
 	readonly eventIndex: number;
 	readonly staggerIndex: number;
 	readonly originActorId: string;
-	readonly originLocation: GridLocationSchema.Type;
-	readonly targetLocation: GridLocationSchema.Type;
+	readonly originLocation: BoardLocationSchema.Type;
+	readonly targetLocation: BoardLocationSchema.Type;
 }
 
 export interface TileSpawnMotionCue extends TileMotionCueBase {

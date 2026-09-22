@@ -4,19 +4,19 @@ import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { narrowDeliveryRuntimeItemFn } from "~/game-runtime/fn/narrowDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface TileDelivery {
-	readonly from: GridLocationSchema.Type;
+	readonly from: BoardLocationSchema.Type;
 	readonly generation: number;
 	readonly item: TileActorItem;
 	readonly phase: "outbound" | "returning";
 	readonly remainingDurationMs: number;
 	readonly targetActorId?: string;
-	readonly to: GridLocationSchema.Type;
+	readonly to: BoardLocationSchema.Type;
 }
 
 interface ReadTileDeliveriesProps {
@@ -39,7 +39,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 			current.location.phase === "outbound"
 				? current.location.origin
 				: current.location.returnFrom;
-		let semanticTo: GridLocationSchema.Type | undefined;
+		let semanticTo: BoardLocationSchema.Type | undefined;
 		if (current.location.phase === "returning") {
 			semanticTo = current.location.origin;
 		} else {

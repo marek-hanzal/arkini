@@ -8,7 +8,7 @@ import type { ProjectRepositoryService } from "~/project-authoring/service/Proje
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { StartLocationSchema } from "~/game-start/schema/StartLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
@@ -120,7 +120,7 @@ const EditProjectLayoutInputSchema = z
 const SetStartItemInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		location: StartLocationSchema.describe(
+		location: BoardLocationSchema.describe(
 			"The exact initial slot to set. Board locations require an explicit numeric space.",
 		),
 		itemId: IdSchema.describe("The exact canonical item ID to place initially."),
@@ -138,7 +138,7 @@ const SetStartItemInputSchema = z
 const RemoveStartItemInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		location: StartLocationSchema.describe(
+		location: BoardLocationSchema.describe(
 			"The exact initial slot to clear. Board locations require an explicit numeric space.",
 		),
 	})

@@ -1,5 +1,5 @@
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { TileSwapMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeItemFn";
@@ -7,7 +7,7 @@ import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeIte
 interface CapturedTileSwapActor {
 	readonly id: string;
 	readonly revision: string;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }
 
 /** Compiles the exchanged target only when one transition exactly commits both captured actors. */

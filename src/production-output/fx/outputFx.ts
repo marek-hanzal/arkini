@@ -3,12 +3,12 @@ import { Effect } from "effect";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { rollSetFx } from "~/production-output/fx/rollSetFx";
 import { selectRollSetFx } from "~/production-output/fx/selectRollSetFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { dropFx } from "./dropFx";
 
 export namespace outputFx {
 	export interface Props {
-		origin: GridLocationSchema.Type;
+		origin: BoardLocationSchema.Type;
 		output: OutputSchema.Type;
 	}
 

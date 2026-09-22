@@ -1,11 +1,11 @@
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface GridLocationClaim {
 	readonly itemId: string;
 	readonly kind: "delivery-origin" | "occupant";
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }
 
 /**

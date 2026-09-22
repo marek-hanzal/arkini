@@ -25,9 +25,8 @@ import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntime
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function* ({
@@ -39,7 +38,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	readonly action: SourceActionSchema.Type;
 	readonly actionId: string;
 	readonly runtime: RuntimeSchema.Type;
-	readonly source: GridRuntimeItemSchema.Type;
+	readonly source: BoardRuntimeItemSchema.Type;
 }) {
 	yield* assertOwnerIdleFx({
 		ownerItemId: source.id,
@@ -84,7 +83,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 			item: {
 				...source,
 				quantity: source.quantity - 1,
-			} satisfies GridRuntimeItemSchema.Type,
+			} satisfies BoardRuntimeItemSchema.Type,
 		});
 		draft = {
 			...runtime,
@@ -293,7 +292,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						: detachedRuntime.items.flatMap((item) => {
 								if (item.item.id !== resultItem.id) return [];
 								const gridItem = Option.getOrUndefined(
-									narrowGridRuntimeItemFn(item),
+									narrowBoardRuntimeItemFn(item),
 								);
 								return gridItem === undefined
 									? []
@@ -423,7 +422,7 @@ interface ApplyMergeRuntimeProps {
 	readonly rule: MergeSchema.Type;
 	readonly ruleIndex: number;
 	readonly runtime: RuntimeSchema.Type;
-	readonly source: GridRuntimeItemSchema.Type;
+	readonly source: BoardRuntimeItemSchema.Type;
 	readonly target: BoardRuntimeItemSchema.Type;
 }
 

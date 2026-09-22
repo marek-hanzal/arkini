@@ -2,14 +2,14 @@ import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 
 interface PlanSpawnPlacementProps {
 	readonly item: ItemSchema.Type;
-	readonly locations: ReadonlyArray<GridLocationSchema.Type>;
+	readonly locations: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly quantity: PositiveIntegerSchema.Type;
 }
 

@@ -1,7 +1,7 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
@@ -40,7 +40,7 @@ interface DropActorState {
 	readonly itemId: IdSchema.Type;
 	readonly canonicalItemId: IdSchema.Type;
 	readonly revision: RevisionSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly quantity: PositiveIntegerSchema.Type;
 }
 
@@ -48,7 +48,7 @@ interface DropTransferredActor {
 	readonly itemId: IdSchema.Type;
 	readonly canonicalItemId: IdSchema.Type;
 	readonly previousRevision: RevisionSchema.Type;
-	readonly previousLocation: GridLocationSchema.Type;
+	readonly previousLocation: BoardLocationSchema.Type;
 	readonly previousQuantity: PositiveIntegerSchema.Type;
 	readonly current: DropActorState | null;
 }
@@ -59,15 +59,15 @@ interface DropMovedResult {
 	readonly kind: typeof DropItemResultKind.Move;
 	readonly itemId: IdSchema.Type;
 	readonly revision: RevisionSchema.Type;
-	readonly previousLocation: GridLocationSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly previousLocation: BoardLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }
 
 interface DropSwappedActor {
 	readonly itemId: IdSchema.Type;
 	readonly revision: RevisionSchema.Type;
-	readonly previousLocation: GridLocationSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly previousLocation: BoardLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }
 
 interface DropSwappedResult {
@@ -94,7 +94,7 @@ interface DropStoredInputResult {
 	readonly owner: {
 		readonly itemId: IdSchema.Type;
 		readonly revision: RevisionSchema.Type;
-		readonly location: GridLocationSchema.Type;
+		readonly location: BoardLocationSchema.Type;
 	};
 }
 
@@ -111,7 +111,7 @@ interface DropIgnoredResult {
 	readonly kind: typeof DropItemResultKind.Ignored;
 	readonly reason: DropItemIgnoredReason;
 	readonly itemId: IdSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }
 
 interface DropRejectedResult {

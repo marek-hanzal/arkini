@@ -4,12 +4,12 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -25,19 +25,19 @@ import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
 class LocationOccupiedError extends Data.TaggedError("LocationOccupiedError")<{
 	readonly itemId: IdSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }> {}
 
 interface MoveItemProps {
 	readonly itemId: IdSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly revision: RevisionSchema.Type;
-	readonly expectedLocation?: GridLocationSchema.Type;
+	readonly expectedLocation?: BoardLocationSchema.Type;
 }
 
 interface MoveItemResult {
 	readonly item: RuntimeItemSchema.Type;
-	readonly previousLocation: GridLocationSchema.Type;
+	readonly previousLocation: BoardLocationSchema.Type;
 }
 
 const moveItemFx = Effect.fn("moveItemFx")(function* ({
@@ -65,7 +65,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				entityId: runtimeItem.id,
 				expectedRevision: revision,
 			});
-			const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
+			const item = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeItem));
 			if (item === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -166,8 +166,8 @@ export namespace commitMoveDropFx {
 	export interface Props {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
-		readonly targetLocation: GridLocationSchema.Type;
+		readonly sourceLocation: BoardLocationSchema.Type;
+		readonly targetLocation: BoardLocationSchema.Type;
 	}
 }
 

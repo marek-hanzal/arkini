@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import type { StartLocationSchema } from "~/game-start/schema/StartLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { commitProjectConfigFx } from "./commitProjectConfigFx";
 
-const readStartItemAtLocationFn = (start: StartSchema.Type, location: StartLocationSchema.Type) =>
+const readStartItemAtLocationFn = (start: StartSchema.Type, location: BoardLocationSchema.Type) =>
 	start.board.find(
 		(entry) =>
 			entry.space === location.space &&
@@ -17,7 +17,7 @@ const readStartItemAtLocationFn = (start: StartSchema.Type, location: StartLocat
 
 const removeStartItemFn = (
 	start: StartSchema.Type,
-	location: StartLocationSchema.Type,
+	location: BoardLocationSchema.Type,
 ): StartSchema.Type => ({
 	...start,
 	board: start.board.filter(
@@ -35,7 +35,7 @@ const setStartItemFn = ({
 	start,
 }: {
 	readonly itemId: IdSchema.Type;
-	readonly location: StartLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly quantity: PositiveIntegerSchema.Type;
 	readonly start: StartSchema.Type;
 }): StartSchema.Type => {
@@ -72,7 +72,7 @@ const readStartItemSetErrorFn = ({
 	quantity,
 }: {
 	readonly itemId: IdSchema.Type;
-	readonly location: StartLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly project: Project;
 	readonly quantity: PositiveIntegerSchema.Type;
 }) => {
@@ -85,7 +85,7 @@ const readStartItemSetErrorFn = ({
 		return `Board position ${location.position.x},${location.position.y} does not fit inside ${width}x${height}.`;
 	return undefined;
 };
-const formatStartLocationFn = (location: StartLocationSchema.Type) =>
+const formatStartLocationFn = (location: BoardLocationSchema.Type) =>
 	[
 		`Scope: ${location.scope}`,
 		`Space: ${location.space}`,
@@ -110,7 +110,7 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 		| {
 				readonly type: "remove";
 		  };
-	readonly location: StartLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;

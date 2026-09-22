@@ -78,7 +78,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 								<section data-ui="MainMenuNewGameConfirmation">
 									{confirmingNewGame ? (
 										<ButtonLink
-											className="w-full rounded-xl"
+											className="main-menu-tinted-action w-full rounded-xl"
 											to="/action/load-game/$packageId"
 											params={{
 												packageId: SerakkiDefaultPackageId,
@@ -92,7 +92,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 										</ButtonLink>
 									) : (
 										<Button
-											className="w-full rounded-xl"
+											className="main-menu-tinted-action w-full rounded-xl"
 											onClick={() => setConfirmingNewGameFn(true)}
 										>
 											New Game
@@ -122,7 +122,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 											>
 												<div className="pt-3">
 													<Button
-														className="w-full rounded-xl"
+														className="main-menu-tinted-action w-full rounded-xl"
 														onClick={() =>
 															setConfirmingNewGameFn(false)
 														}
@@ -158,24 +158,24 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 					)}
 					<ButtonLink
 						to="/serapacks"
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 					>
 						Your games
 					</ButtonLink>
 					<ButtonLink
 						to="/settings"
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 					>
 						Settings
 					</ButtonLink>
 					<ButtonLink
 						to="/about"
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 					>
 						About
 					</ButtonLink>
 					<Button
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 						cursorIntent={exitPending ? "progress" : undefined}
 						disabled={exitPending}
 						onClick={() => requestExitFn(undefined)}
@@ -191,7 +191,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						</p>
 						<button
 							type="button"
-							className="inline-flex cursor-pointer items-center gap-2 text-xs font-normal text-white underline-offset-4 transition-colors hover:text-accent hover:underline disabled:cursor-progress disabled:opacity-70"
+							className="inline-flex cursor-pointer items-center gap-2 text-xs font-normal text-foreground underline-offset-4 transition-colors hover:text-accent hover:underline disabled:cursor-progress disabled:opacity-70"
 							data-ui="ExportDiagnostics"
 							disabled={diagnosticsExportPending}
 							onClick={() => exportDiagnosticsFn(undefined)}

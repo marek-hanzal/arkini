@@ -5,7 +5,6 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
-import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
@@ -17,9 +16,6 @@ import type {
 } from "~/tile-motion/service/MotionRuntime";
 import { finalizeMotionActorsFx } from "~/tile-motion/fx/finalizeMotionActorsFx";
 import { runMotionCueFx } from "~/tile-motion/fx/runMotionCueFx";
-import { syncMotionPresentationFx } from "~/tile-motion/fx/syncMotionPresentationFx";
-import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
-import type { MotionRedirect, TargetRoute } from "~/tile-motion/type/MotionTarget";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
@@ -43,7 +39,6 @@ const emptyMotionLanes = {
 } satisfies updateTileMotionLanesFn.State;
 
 const maximumRememberedCueKeys = 256;
-const maximumRememberedTargetRedirects = 256;
 
 /** Moving actors remain unavailable until their cue settles. */
 const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
@@ -58,12 +53,7 @@ const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
 					claims.set(spawn.actorId, "blocked");
 				},
 			)
-			.with(
-				{
-					kind: "stack",
-				},
-				() => {},
-			)
+
 			.with(
 				{
 					kind: "input",
@@ -103,15 +93,7 @@ const readTileMotionActorClaimsFn = (cue: TileMotionCue) =>
 					spawn.originActorId,
 				]),
 		)
-		.with(
-			{
-				kind: "stack",
-			},
-			(stack) =>
-				new Set([
-					stack.originActorId,
-				]),
-		)
+
 		.with(
 			{
 				kind: "input",
@@ -134,90 +116,6 @@ const readTileMotionActorClaimsFn = (cue: TileMotionCue) =>
 		)
 		.exhaustive();
 
-interface ReadUnsettledTileInputSourceQuantitiesProps {
-	readonly cues: ReadonlyArray<TileMotionCue>;
-	readonly revealedCueKeys?: ReadonlySet<string>;
-}
-
-/**
- * Keeps each input source at the quantity shown by its oldest unsettled delivery.
- *
- * A source may feed several slots in immediately committed transitions. Only completion of the
- * preceding whole-stack round trip is allowed to reveal the next canonical quantity.
- */
-const readUnsettledTileInputSourceQuantitiesFn = ({
-	cues,
-	revealedCueKeys = new Set(),
-}: ReadUnsettledTileInputSourceQuantitiesProps): ReadonlyMap<string, number> => {
-	const quantities = new Map<string, number>();
-	for (const cue of cues) {
-		if (cue.kind !== "input" || quantities.has(cue.sourceActorId)) continue;
-		quantities.set(
-			cue.sourceActorId,
-			revealedCueKeys.has(`${cue.sequence}:${cue.eventIndex}`)
-				? cue.resultingQuantity
-				: cue.previousQuantity,
-		);
-	}
-	return quantities;
-};
-
-interface ReadQuantityPresentationProps {
-	readonly cues: ReadonlyArray<TileMotionCue>;
-	readonly resolvedTargetActorIdByCueKey: ReadonlyMap<string, string>;
-	readonly revealedInputCueKeys: ReadonlySet<string>;
-}
-
-/**
- * Replays pending quantity choreography in cue order.
- *
- * A later input's previous quantity already includes earlier stack events. Subtracting only stacks
- * queued before that input prevents either committed event from becoming visible before contact.
- */
-const readQuantityPresentationFn = ({
-	cues,
-	resolvedTargetActorIdByCueKey,
-	revealedInputCueKeys,
-}: ReadQuantityPresentationProps): ReadonlyMap<string, QuantityPresentation> => {
-	const presentations = new Map<string, QuantityPresentation>();
-	const inputQuantities = readUnsettledTileInputSourceQuantitiesFn({
-		cues,
-		revealedCueKeys: revealedInputCueKeys,
-	});
-	const firstInputIndexByActorId = new Map<string, number>();
-	for (const [index, cue] of cues.entries()) {
-		if (cue.kind !== "input" || firstInputIndexByActorId.has(cue.sourceActorId)) continue;
-		firstInputIndexByActorId.set(cue.sourceActorId, index);
-	}
-	const hiddenStackQuantities = new Map<string, number>();
-	for (const [index, cue] of cues.entries()) {
-		if (cue.kind !== "stack") continue;
-		const actorId =
-			resolvedTargetActorIdByCueKey.get(`${cue.sequence}:${cue.eventIndex}`) ??
-			cue.targetActorId;
-		const firstInputIndex = firstInputIndexByActorId.get(actorId);
-		if (firstInputIndex !== undefined && index >= firstInputIndex) continue;
-		hiddenStackQuantities.set(
-			actorId,
-			(hiddenStackQuantities.get(actorId) ?? 0) + cue.quantity,
-		);
-	}
-	for (const [actorId, quantity] of inputQuantities) {
-		presentations.set(actorId, {
-			kind: "exact",
-			quantity: Math.max(1, quantity - (hiddenStackQuantities.get(actorId) ?? 0)),
-		});
-		hiddenStackQuantities.delete(actorId);
-	}
-	for (const [actorId, quantity] of hiddenStackQuantities) {
-		presentations.set(actorId, {
-			kind: "subtract",
-			quantity,
-		});
-	}
-	return presentations;
-};
-
 const readMotionAnimationKeysFn = ({ cue, cueKey }: { cue: TileMotionCue; cueKey: string }) =>
 	match(cue)
 		.with(
@@ -228,14 +126,7 @@ const readMotionAnimationKeysFn = ({ cue, cueKey }: { cue: TileMotionCue; cueKey
 				`motion:${cueKey}`,
 			],
 		)
-		.with(
-			{
-				kind: "stack",
-			},
-			() => [
-				`motion:${cueKey}`,
-			],
-		)
+
 		.with(
 			{
 				kind: "input",
@@ -257,14 +148,10 @@ const readMotionAnimationKeysFn = ({ cue, cueKey }: { cue: TileMotionCue; cueKey
 		.exhaustive();
 
 interface CueLifecycle {
-	inputRemainderRevealed: boolean;
-	payloadActor: PixiTileActor | null;
 	started: boolean;
 }
 
 const createCueLifecycleFn = (): CueLifecycle => ({
-	inputRemainderRevealed: false,
-	payloadActor: null,
 	started: false,
 });
 
@@ -273,7 +160,7 @@ const createCueLifecycleFn = (): CueLifecycle => ({
  *
  * Cues are already compiled from committed engine facts. This runtime may serialize conflicting
  * presentation work, but it must never reinterpret a cue as a new gameplay mutation. Closing
- * cancels every keyed writer before destroying identity-free payload actors.
+ * cancels every keyed writer before releasing cue ownership.
  */
 export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function* ({
 	actorStore,
@@ -288,7 +175,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	let motionLanes: updateTileMotionLanesFn.State = emptyMotionLanes;
 	const knownCueKeys = new Set<string>();
 	const cueLifecycleByKey = new Map<string, CueLifecycle>();
-	const targetRedirectByActorId = new Map<string, MotionRedirect>();
 
 	const readCueKeyFn = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
 	const readCuesFn = () => [
@@ -304,34 +190,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		}
 	};
 
-	const retainNewestTargetRedirectsFn = () => {
-		while (targetRedirectByActorId.size > maximumRememberedTargetRedirects) {
-			const oldest = targetRedirectByActorId.keys().next().value;
-			if (oldest === undefined) return;
-			targetRedirectByActorId.delete(oldest);
-		}
-	};
-
-	const readTargetRouteFn = (actorId: string, location: TargetRoute["location"]): TargetRoute => {
-		let currentActorId = actorId;
-		let currentLocation = location;
-		let redirected = false;
-		const visitedActorIds = new Set<string>();
-		while (!visitedActorIds.has(currentActorId)) {
-			visitedActorIds.add(currentActorId);
-			const redirect = targetRedirectByActorId.get(currentActorId);
-			if (redirect === undefined || redirect.targetActorId === currentActorId) break;
-			currentActorId = redirect.targetActorId;
-			currentLocation = redirect.targetLocation;
-			redirected = true;
-		}
-		return {
-			actorId: currentActorId,
-			location: currentLocation,
-			redirected,
-		};
-	};
-
 	const readCurrentInteractionClaimsFn = () => readInteractionClaimsFn(readCuesFn());
 
 	const readRetainedActorIdsFn = () => {
@@ -344,67 +202,12 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		return actorIds;
 	};
 
-	const readRevealedInputCueKeysFn = () =>
-		new Set(
-			[
-				...cueLifecycleByKey.entries(),
-			].flatMap(([cueKey, lifecycle]) =>
-				lifecycle.inputRemainderRevealed
-					? [
-							cueKey,
-						]
-					: [],
-			),
-		);
-
-	const readCurrentQuantityPresentationFn = () => {
-		const cues = readCuesFn();
-		const revealedInputCueKeys = readRevealedInputCueKeysFn();
-		return readQuantityPresentationFn({
-			cues,
-			resolvedTargetActorIdByCueKey: new Map(
-				cues.flatMap((cue) =>
-					cue.kind === "stack"
-						? [
-								[
-									readCueKeyFn(cue),
-									readTargetRouteFn(cue.targetActorId, cue.targetLocation)
-										.actorId,
-								],
-							]
-						: [],
-				),
-			),
-			revealedInputCueKeys,
-		});
-	};
-
-	const syncPresentationFn = () => {
-		RendererRuntime.runSync(
-			syncMotionPresentationFx({
-				actorStore,
-				animator,
-				application,
-				quantityPresentationByActorId: readCurrentQuantityPresentationFn(),
-				readPaletteFn,
-				surface,
-				textures,
-			}),
-		);
-	};
-
 	function completeCue(cue: TileMotionCue) {
 		const cueKey = readCueKeyFn(cue);
 		const lifecycle = cueLifecycleByKey.get(cueKey);
 		if (closed || lifecycle?.started !== true) return;
 		cueLifecycleByKey.delete(cueKey);
-		const payload = lifecycle.payloadActor;
-		if (payload !== null && !payload.container.destroyed) {
-			RendererRuntime.runSync(animator.cancelActorFx(payload));
-			RendererRuntime.runSync(destroyTileActorFx(payload));
-		}
 		motionLanes = updateTileMotionLanesFn({
-			releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
 			action: {
 				cue,
 				type: "complete",
@@ -425,7 +228,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				textures,
 			}),
 		);
-		syncPresentationFn();
 		if (
 			cue.kind === "input" &&
 			!stillClaimedActorIds.has(cue.sourceActorId) &&
@@ -446,8 +248,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 
 	function startCue(cue: TileMotionCue) {
 		const cueKey = readCueKeyFn(cue);
-		const readSourceSurvivesFn = () =>
-			cue.kind === "input" && actorStore.canonicalItems.has(cue.sourceActorId);
 		RendererRuntime.runSync(
 			runMotionCueFx({
 				actorStore,
@@ -458,29 +258,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				isCueActiveFn: () => !closed && cueLifecycleByKey.get(cueKey)?.started === true,
 				onActorSettledFn,
 				onCompleteFn: () => completeCue(cue),
-				onPayloadCreatedFn: (actor) => {
-					const lifecycle = cueLifecycleByKey.get(cueKey);
-					if (lifecycle !== undefined) lifecycle.payloadActor = actor;
-				},
-				onInputRemainderRevealedFn: () => {
-					const lifecycle = cueLifecycleByKey.get(cueKey);
-					if (lifecycle === undefined) return;
-					lifecycle.inputRemainderRevealed = true;
-					// Contact releases the receiver; only the source remains claimed during its return.
-					motionLanes = updateTileMotionLanesFn({
-						action: {
-							cues: [],
-							type: "enqueue",
-						},
-						state: motionLanes,
-						releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
-					});
-					syncPresentationFn();
-					startCues();
-				},
 				readPaletteFn,
-				readSourceSurvivesFn,
-				readTargetRouteFn,
 				surface,
 				textures,
 			}),
@@ -558,7 +336,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				pending: motionLanes.pending.filter((cue) => !keys.has(readCueKeyFn(cue))),
 			};
 			motionLanes = updateTileMotionLanesFn({
-				releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
 				action: {
 					type: "enqueue",
 					cues: [],
@@ -591,23 +368,12 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				retainNewestCueKeysFn();
 				if (uniqueCues.length === 0) return;
 				motionLanes = updateTileMotionLanesFn({
-					releasedInputTargetCueKeys: readRevealedInputCueKeysFn(),
 					action: {
 						cues: uniqueCues,
 						type: "enqueue",
 					},
 					state: motionLanes,
 				});
-			}),
-		),
-		redirectTargetFx: Effect.fn("MotionRuntime.redirectTargetFx")((redirect) =>
-			Effect.sync(() => {
-				if (closed || redirect.sourceActorId === redirect.targetActorId) {
-					return;
-				}
-				targetRedirectByActorId.delete(redirect.sourceActorId);
-				targetRedirectByActorId.set(redirect.sourceActorId, redirect);
-				retainNewestTargetRedirectsFn();
 			}),
 		),
 		readSnapshotFx: Effect.sync(
@@ -626,11 +392,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 							: [],
 					),
 				),
-				quantityPresentationByActorId: readCurrentQuantityPresentationFn(),
 			}),
 		),
 		startFx: Effect.sync(() => startCues()),
-		syncPresentationFx: Effect.sync(() => syncPresentationFn()),
 		closeFx: Effect.gen(function* () {
 			if (closed) return;
 			closed = true;
@@ -645,15 +409,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					yield* animator.cancelFx(animationKey);
 				}
 			}
-			for (const { payloadActor } of cueLifecycleByKey.values()) {
-				if (payloadActor === null) continue;
-				yield* animator.cancelActorFx(payloadActor);
-				yield* destroyTileActorFx(payloadActor);
-			}
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			cueLifecycleByKey.clear();
-			targetRedirectByActorId.clear();
 		}),
 	} satisfies MotionRuntime;
 });

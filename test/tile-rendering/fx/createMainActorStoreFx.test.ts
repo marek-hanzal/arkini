@@ -37,7 +37,6 @@ const item = (
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 1,
 	revision,
 	running: false,
 	artworkScale: 0.8,

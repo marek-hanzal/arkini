@@ -14,7 +14,6 @@ export interface TileReplacement {
 	readonly actorId: string;
 	readonly key: string;
 	readonly previous: TileActorVisual;
-	readonly previousQuantity: number;
 }
 
 /** Compiles exact same-slot canonical replacements while excluding moves and swaps. */
@@ -74,7 +73,6 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 									game,
 									item: previous.item,
 								}),
-								previousQuantity: previous.quantity,
 							} satisfies TileReplacement;
 						}),
 				)

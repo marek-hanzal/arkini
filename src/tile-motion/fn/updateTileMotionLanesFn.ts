@@ -24,10 +24,7 @@ const readTileMotionBatchClaimFn = (
 });
 
 /** Separates exclusive actor motion from shareable deliveries in one producer batch. */
-const readTileMotionLaneClaimsFn = (
-	cue: TileMotionCue,
-	releasedInputTargetCueKeys: ReadonlySet<string>,
-) => {
+const readTileMotionLaneClaimsFn = (cue: TileMotionCue) => {
 	return match(cue)
 		.with(
 			{
@@ -41,15 +38,7 @@ const readTileMotionLaneClaimsFn = (
 				},
 			],
 		)
-		.with(
-			{
-				kind: "stack",
-			},
-			(stack): ReadonlyArray<TileMotionLaneClaim> => [
-				readTileMotionBatchClaimFn(cue, stack.originActorId),
-				readTileMotionBatchClaimFn(cue, stack.targetActorId),
-			],
-		)
+
 		.with(
 			{
 				kind: "input",
@@ -59,15 +48,11 @@ const readTileMotionLaneClaimsFn = (
 					kind: "exclusive",
 					actorId: input.sourceActorId,
 				},
-				...(releasedInputTargetCueKeys.has(readTileMotionCueKeyFn(cue))
-					? []
-					: [
-							readTileMotionBatchClaimFn(
-								cue,
-								input.targetActorId,
-								`input:${input.targetActorId}`,
-							),
-						]),
+				readTileMotionBatchClaimFn(
+					cue,
+					input.targetActorId,
+					`input:${input.targetActorId}`,
+				),
 			],
 		)
 		.with(
@@ -110,7 +95,6 @@ export namespace updateTileMotionLanesFn {
 	export interface Props {
 		readonly state: State;
 		readonly action: TileMotionLanesAction;
-		readonly releasedInputTargetCueKeys?: ReadonlySet<string>;
 	}
 }
 
@@ -123,10 +107,8 @@ interface TileMotionLaneSettlement {
 	readonly pendingClaims: TileMotionLaneClaim[];
 }
 
-const readTileMotionClaimsFn = (
-	cues: ReadonlyArray<TileMotionCue>,
-	releasedInputTargetCueKeys: ReadonlySet<string>,
-) => cues.flatMap((cue) => readTileMotionLaneClaimsFn(cue, releasedInputTargetCueKeys));
+const readTileMotionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) =>
+	cues.flatMap(readTileMotionLaneClaimsFn);
 
 const tileMotionLaneClaimsConflictFn = (left: TileMotionLaneClaim, right: TileMotionLaneClaim) =>
 	left.actorId === right.actorId &&
@@ -149,18 +131,17 @@ const canActivateTileMotionCueFn = (
 
 const settleTileMotionLanesFn = (
 	state: updateTileMotionLanesFn.State,
-	releasedInputTargetCueKeys: ReadonlySet<string>,
 ): updateTileMotionLanesFn.State => {
 	const settlement: TileMotionLaneSettlement = {
 		active: [
 			...state.active,
 		],
-		claims: readTileMotionClaimsFn(state.active, releasedInputTargetCueKeys),
+		claims: readTileMotionClaimsFn(state.active),
 		pending: [],
 		pendingClaims: [],
 	};
 	for (const cue of state.pending) {
-		const cueClaims = readTileMotionLaneClaimsFn(cue, releasedInputTargetCueKeys);
+		const cueClaims = readTileMotionLaneClaimsFn(cue);
 		if (canActivateTileMotionCueFn(settlement, cueClaims)) {
 			settlement.active.push(cue);
 			settlement.claims.push(...cueClaims);
@@ -178,22 +159,17 @@ const settleTileMotionLanesFn = (
 const completeTileMotionCueFn = ({
 	cue,
 	state,
-	releasedInputTargetCueKeys,
 }: {
 	readonly cue: TileMotionCue;
 	readonly state: updateTileMotionLanesFn.State;
-	readonly releasedInputTargetCueKeys: ReadonlySet<string>;
 }) => {
 	const completedKey = readTileMotionCueKeyFn(cue);
-	return settleTileMotionLanesFn(
-		{
-			active: state.active.filter(
-				(activeCue) => readTileMotionCueKeyFn(activeCue) !== completedKey,
-			),
-			pending: state.pending,
-		},
-		releasedInputTargetCueKeys,
-	);
+	return settleTileMotionLanesFn({
+		active: state.active.filter(
+			(activeCue) => readTileMotionCueKeyFn(activeCue) !== completedKey,
+		),
+		pending: state.pending,
+	});
 };
 
 const readUniqueIncomingCuesFn = ({
@@ -220,33 +196,24 @@ const readUniqueIncomingCuesFn = ({
 const enqueueTileMotionCuesFn = ({
 	cues,
 	state,
-	releasedInputTargetCueKeys,
 }: {
 	readonly cues: ReadonlyArray<TileMotionCue>;
 	readonly state: updateTileMotionLanesFn.State;
-	readonly releasedInputTargetCueKeys: ReadonlySet<string>;
 }) => {
-	return settleTileMotionLanesFn(
-		{
-			active: state.active,
-			pending: [
-				...state.pending,
-				...readUniqueIncomingCuesFn({
-					cues,
-					state,
-				}),
-			],
-		},
-		releasedInputTargetCueKeys,
-	);
+	return settleTileMotionLanesFn({
+		active: state.active,
+		pending: [
+			...state.pending,
+			...readUniqueIncomingCuesFn({
+				cues,
+				state,
+			}),
+		],
+	});
 };
 
 /** Adds or completes cues, then greedily fills independent bounded actor lanes. */
-export const updateTileMotionLanesFn = ({
-	state,
-	action,
-	releasedInputTargetCueKeys = new Set(),
-}: updateTileMotionLanesFn.Props) =>
+export const updateTileMotionLanesFn = ({ state, action }: updateTileMotionLanesFn.Props) =>
 	match(action)
 		.with(
 			{
@@ -256,7 +223,6 @@ export const updateTileMotionLanesFn = ({
 				completeTileMotionCueFn({
 					cue,
 					state,
-					releasedInputTargetCueKeys,
 				}),
 		)
 		.with(
@@ -267,7 +233,6 @@ export const updateTileMotionLanesFn = ({
 				enqueueTileMotionCuesFn({
 					cues,
 					state,
-					releasedInputTargetCueKeys,
 				}),
 		)
 		.exhaustive();

@@ -176,7 +176,6 @@ export const createUnitsRuntime = (
 					y: 1,
 				},
 			},
-			quantity: 1,
 			revision: "revision:workshop",
 		},
 		...trees.map(({ id, remainingUnits, x, y }) => ({
@@ -190,7 +189,6 @@ export const createUnitsRuntime = (
 					y,
 				},
 			},
-			quantity: 1,
 			...(remainingUnits === undefined
 				? {}
 				: {

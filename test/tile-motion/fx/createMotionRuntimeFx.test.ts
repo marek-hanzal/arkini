@@ -10,105 +10,14 @@ import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import {
 	createSurface,
 	secondBoardLocation,
-	createItem,
 	createActor,
 	createRecordingAnimator,
-	samplePoseAnimation,
-	advanceStackMergeVanish,
-	createStackHarness,
-	type TileMotionCue,
 	type PixiTileActor,
 	type ActorAnimation,
 	type AnimationChannel,
 } from "./createMotionRuntimeFx.test/fixture";
 
-describe("motion stack payload", () => {
-	it("presents a produced stack payload with its exact delta instead of the target total", () => {
-		const { animations, cue, runtime } = createStackHarness();
-		Effect.runSync(
-			runtime.enqueueFx([
-				{
-					...cue,
-					quantity: 2,
-				},
-			]),
-		);
-		Effect.runSync(runtime.startFx);
-		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(
-			new Set([
-				cue.originActorId,
-			]),
-		);
-		const travel = animations.find(
-			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
-		);
-		if (travel?.channel !== "pose") throw new Error("Expected a produced stack payload.");
-		expect(travel.actor.item.quantity).toBe(2);
-		expect(travel.actor.item.badgeCount).toBe(2);
-		Effect.runSync(runtime.closeFx);
-	});
-
-	it("isolates concurrent cue payload lifecycles across completion and close", () => {
-		const { actors, animations, canonicalItems, cue, runtime } = createStackHarness();
-		const secondTarget = createActor("runtime:second-stack-target");
-		secondTarget.item = createItem(secondTarget.item.id, {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 3,
-				y: 0,
-			},
-		});
-		actors.set(secondTarget.item.id, secondTarget);
-		canonicalItems.set(secondTarget.item.id, {
-			...secondTarget.item,
-			quantity: 2,
-		});
-		const secondCue = {
-			...cue,
-			eventIndex: 1,
-			targetActorId: secondTarget.item.id,
-			targetLocation: secondTarget.item.location,
-		} satisfies TileMotionCue;
-		Effect.runSync(
-			runtime.enqueueFx([
-				cue,
-				secondCue,
-			]),
-		);
-		Effect.runSync(runtime.startFx);
-		const firstTravel = animations.find(
-			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
-		);
-		const secondTravel = animations.find(
-			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:1",
-		);
-		if (firstTravel?.channel !== "pose" || secondTravel?.channel !== "pose") {
-			throw new Error("Expected both concurrent stack payloads.");
-		}
-		const firstDestroy = vi.spyOn(firstTravel.actor.container, "destroy");
-		const secondDestroy = vi.spyOn(secondTravel.actor.container, "destroy");
-
-		samplePoseAnimation(firstTravel, 1);
-		firstTravel.onCompleteFn?.();
-		advanceStackMergeVanish({
-			actor: firstTravel.actor,
-			animations,
-		});
-
-		expect(firstTravel.actor.container.destroyed).toBe(true);
-		expect(firstDestroy).toHaveBeenCalledOnce();
-		expect(secondTravel.actor.container.destroyed).toBe(false);
-		expect(secondDestroy).not.toHaveBeenCalled();
-
-		Effect.runSync(runtime.closeFx);
-		Effect.runSync(runtime.closeFx);
-
-		expect(firstDestroy).toHaveBeenCalledOnce();
-		expect(secondTravel.actor.container.destroyed).toBe(true);
-		expect(secondDestroy).toHaveBeenCalledOnce();
-	});
-
+describe("motion cancellation", () => {
 	it("ignores a queued proximity settlement after the pose writer is superseded", async () => {
 		const actor = createActor("runtime:proximity-cancel");
 		actor.container.position.set(0, 0);

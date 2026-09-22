@@ -49,88 +49,7 @@ describe("main reconciliation / delivery retention", () => {
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
 		expect(handedOff).toBe(true);
 	});
-	it("holds an input source at its pre-contact quantity and suppresses early feedback", () => {
-		const previous = createItem("runtime:input-source", boardLocation, {
-			badgeCount: 7,
-			quantity: 7,
-			revision: "revision:input-source:7",
-		});
-		const current = createItem(previous.id, boardLocation, {
-			badgeCount: 2,
-			quantity: 2,
-			revision: "revision:input-source:2",
-		});
-		const actor = createActor(previous);
-		const motion = {
-			...createMotion(),
-			readSnapshotFx: Effect.succeed({
-				interactionClaimByActorId: new Map([
-					[
-						previous.id,
-						"blocked" as const,
-					],
-				]),
-				retainedActorIds: new Set([
-					previous.id,
-					"runtime:owner",
-				]),
-				spawnCueByActorId: new Map(),
-				quantityPresentationByActorId: new Map([
-					[
-						previous.id,
-						{
-							kind: "exact",
-							quantity: 7,
-						},
-					],
-				]),
-			}),
-		} satisfies MotionRuntime;
-		const harness = createReconcilerHarness({
-			actor,
-			motion,
-		});
-		projectionState.main = [
-			current,
-		];
-		projectionState.cues = [
-			{
-				canonicalItemId: previous.itemId,
-				eventIndex: 0,
-				kind: "input",
-				originActorId: previous.id,
-				originLocation: boardLocation,
-				previousQuantity: 7,
-				storedQuantity: 5,
-				resultingQuantity: 2,
-				sequence: 2,
-				sourceActorId: previous.id,
-				staggerIndex: 0,
-				targetActorId: "runtime:owner",
-				targetLocation: boardLocation,
-			},
-		];
-		projectionState.feedback = [
-			{
-				actorId: previous.id,
-				key: "2:0:consume-source",
-				kind: "consume-source",
-			},
-		];
 
-		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
-
-		expect(actor.item.quantity).toBe(7);
-		expect(actor.currentVisual.item.badgeCount).toBe(7);
-		expect(
-			harness.animations.some(
-				(animation) =>
-					animation.actor === actor &&
-					animation.channel === "lifecycle-opacity" &&
-					animation.toAlpha === 0.42,
-			),
-		).toBe(false);
-	});
 	it("keeps a resolved line owner alive until its last input presentation settles", () => {
 		const owner = createItem("runtime:resolved-craft", boardLocation);
 		const actor = createActor(owner);
@@ -143,7 +62,6 @@ describe("main reconciliation / delivery retention", () => {
 				interactionClaimByActorId: new Map(),
 				retainedActorIds,
 				spawnCueByActorId: new Map(),
-				quantityPresentationByActorId: new Map(),
 			})),
 		} satisfies MotionRuntime;
 		const harness = createReconcilerHarness({

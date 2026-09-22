@@ -137,8 +137,6 @@ it("retains the terminal commit across batched updates and detaches when the tar
 					itemId: owner.id,
 					canonicalItemId: owner.item.id,
 					location: owner.location,
-					previousQuantity: 1,
-					resultingQuantity: 0,
 				},
 			],
 		});

@@ -29,7 +29,7 @@ export const item: TileActorItem = testItem;
 export const createItem = (id: string, x: number) => createTestItem(id, x);
 
 const previewState = vi.hoisted(() => ({
-	actorKinds: new Map<string, "merge" | "move" | "reject" | "stack" | "store-input" | "swap">(),
+	actorKinds: new Map<string, "merge" | "move" | "reject" | "store-input" | "swap">(),
 	kind: "move" as "ignored" | "move" | "reject" | "swap",
 	reads: 0,
 	readsByActorId: new Map<string, number>(),
@@ -215,7 +215,6 @@ export const mountController = ({
 	let currentTargetKind: "board" | null = "board";
 	let currentOccupant: TileActorItem | null = null;
 	let targetFactsFailure: unknown | null = null;
-	const targetRedirects: Array<Parameters<MotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
 	const onSettledDrop = vi.fn();
 	const reportCriticalFailureFn = vi.fn();
@@ -327,18 +326,12 @@ export const mountController = ({
 		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
-		redirectTargetFx: (redirect) =>
-			Effect.sync(() => {
-				targetRedirects.push(redirect);
-			}),
 		readSnapshotFx: Effect.succeed({
 			interactionClaimByActorId,
 			retainedActorIds: new Set(interactionClaimByActorId.keys()),
 			spawnCueByActorId: new Map(),
-			quantityPresentationByActorId: new Map(),
 		}),
 		startFx: Effect.void,
-		syncPresentationFx: Effect.void,
 	} satisfies MotionRuntime;
 	const surface = {
 		readActorPoseFx: (actorItem: TileActorItem) =>
@@ -385,7 +378,6 @@ export const mountController = ({
 			cursorGrab,
 			dropPresentation,
 			game,
-			motion,
 			onSettledDropFn: onSettledDrop,
 			onDropFn: onDrop as never,
 			onRejectedDropFn: onRejectedDrop,
@@ -501,16 +493,15 @@ export const mountController = ({
 		startCursorGrab,
 		settleOriginGhost,
 		stage,
-		targetRedirects,
 		transientActorLayer,
 	};
 };
 
-export const setStackTarget = (
+export const setSwapTarget = (
 	mounted: ReturnType<typeof mountController>,
 	target: TileActorItem,
 ) => {
-	previewState.actorKinds.set(target.id, "stack");
+	previewState.actorKinds.set(target.id, "swap");
 	mounted.setOccupant(target);
 	mounted.setCommandTarget({
 		kind: "slot",

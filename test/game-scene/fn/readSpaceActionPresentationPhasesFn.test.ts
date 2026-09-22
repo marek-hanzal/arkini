@@ -18,7 +18,6 @@ const unitOwnerItem = {
 			"artwork:tree",
 		],
 	},
-	maxStackSize: 1,
 	units: {
 		amount: 2,
 	},
@@ -46,7 +45,6 @@ const runtime = (currentSpace: number, remainingUnits?: number) =>
 				id: "runtime:tree",
 				item: unitOwnerItem,
 				location: payerLocation,
-				quantity: 1,
 				remainingUnits,
 				revision: `revision:${remainingUnits ?? 2}`,
 			},

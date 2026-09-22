@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -66,7 +66,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 			game,
 			item: current.item,
 		});
-		const badgeCount = readTileActorBadgeCountFn(current);
+		const badgeCount = readItemRemainingUnitsFn(current);
 		deliveries.push({
 			from,
 			generation: current.location.generation,
@@ -84,7 +84,6 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 						}),
 				id: current.id,
 				revision: current.revision,
-				quantity: current.quantity,
 				location: from,
 				running: false,
 				activityEffect: false,

@@ -37,7 +37,6 @@ const config = GameConfigSchema.parse({
 					"artwork:stone",
 				],
 			},
-			maxStackSize: 10,
 		},
 		mud: {
 			maxQueueSize: 1,
@@ -54,7 +53,6 @@ const config = GameConfigSchema.parse({
 					"artwork:mud",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });
@@ -82,7 +80,6 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 				revision: `revision:${item.id}`,
 				item,
 				location,
-				quantity: 1,
 			},
 		],
 		jobs: [],
@@ -130,7 +127,6 @@ describe("readCommittedTileReplacementsFx", () => {
 					itemId: "stone",
 					sourceUrl: "resource:artwork:stone",
 				},
-				previousQuantity: 1,
 			},
 		]);
 	});

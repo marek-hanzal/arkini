@@ -106,7 +106,7 @@ const removeCheatItemFx = Effect.fn("createMainDragControllerFx.removeCheatItemF
  *
  * Press-time identity anchors the gesture, while the release command rebases to the latest
  * canonical revision of that same actor at that same location. This lets an engine-committed
- * incoming stack update a held item without turning the eventual drop into a stale command.
+ * committed revision update a held item without turning the eventual drop into a stale command.
  * Geometry drives presentation only; the engine preview and command remain the authority for
  * every drop outcome. A submitted drop retains only its exact source actor and immediately
  * releases the scene-wide gesture slot.
@@ -516,11 +516,9 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 						activationIntent:
 							event.button === (keepsPrimaryLeft ? 2 : 0)
 								? "detail"
-								: event.shiftKey
-									? "split-stack"
-									: event.ctrlKey && !event.altKey && !event.metaKey
-										? "fill-default-line-queue"
-										: "primary",
+								: event.ctrlKey && !event.altKey && !event.metaKey
+									? "fill-default-line-queue"
+									: "primary",
 						actor,
 						pointerId: event.pointerId,
 						pressScreenX: event.global.x,

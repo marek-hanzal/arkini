@@ -9,7 +9,6 @@ import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
-import { startRemainderFeedbackFx } from "~/tile-rendering/fx/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";
@@ -30,8 +29,6 @@ export namespace runInputMotionFx {
 		readonly isCueActiveFn: () => boolean;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
-		readonly onRemainderRevealedFn: () => void;
-		readonly readSourceSurvivesFn: () => boolean;
 		readonly readPaletteFn: () => PixiScenePalette;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -43,12 +40,7 @@ const inputArrivalCurve = {
 	bounce: 0.1,
 	kind: "spring",
 } as const;
-const inputReturnCurve = {
-	bounce: 0.22,
-	kind: "spring",
-} as const;
-
-const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
+const finishConsumedItemFx = Effect.fn("finishConsumedItemFx")(function* ({
 	actorStore,
 	animator,
 	onActorSettledFn,
@@ -77,76 +69,7 @@ const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	onCompleteFn();
 });
 
-const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
-	actorStore,
-	animator,
-	cue,
-	cueKey,
-	isCueActiveFn,
-	onCompleteFn,
-	source,
-	sourceHome,
-	surface,
-}: {
-	readonly actorStore: MainActorStore;
-	readonly animator: ActorAnimator;
-	readonly cue: TileInputMotionCue;
-	readonly cueKey: string;
-	readonly isCueActiveFn: () => boolean;
-	readonly onCompleteFn: () => void;
-	readonly source: PixiTileActor;
-	readonly sourceHome: ActorPose;
-	readonly surface: MainSurface;
-}) {
-	yield* chaseTargetFx({
-		actor: source,
-		animator,
-		curve: inputReturnCurve,
-		fallbackTarget: sourceHome,
-		onSettledFn: () => {
-			if (!isCueActiveFn()) return;
-			if (!actorStore.canonicalItems.has(source.item.id)) {
-				onCompleteFn();
-				return;
-			}
-			RendererRuntime.runSync(
-				Effect.gen(function* () {
-					const latestHome =
-						(yield* surface.readLocationPoseFx(cue.originLocation)) ?? sourceHome;
-					if (
-						actorStore.actors.get(cue.sourceActorId) === source &&
-						!source.container.destroyed
-					) {
-						latestHome.layer.addChild(source.container);
-						yield* animator.setFx({
-							actor: source,
-							channel: "pose",
-							scale: latestHome.size / Math.max(1, source.size),
-							x: latestHome.x,
-							y: latestHome.y,
-						});
-						source.container.eventMode = "static";
-					}
-					onCompleteFn();
-				}),
-			);
-		},
-		ownerKey: `motion:${cueKey}`,
-		readLiveTargetFn: () => null,
-		surface,
-		targetLocation: cue.originLocation,
-	});
-});
-
-/**
- * Delivers one complete source stack and returns only a remainder that survives canonical truth.
- * The source keeps one physical actor through delivery and return; missing visual identities
- * receive target feedback without inventing an off-canvas payload.
- *
- * Several immediately committed input stores may consume one source before the oldest visual cue
- * reaches contact. An intermediate event remainder must not return as a ghost when the latest
- * canonical snapshot already removed that source.
- */
+/** Delivers one source item to its receiver before retiring the physical actor. */
 export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	actorStore,
 	animator,
@@ -157,9 +80,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 	isCueActiveFn,
 	onActorSettledFn,
 	onCompleteFn,
-	onRemainderRevealedFn,
 	readPaletteFn,
-	readSourceSurvivesFn,
 	surface,
 	target,
 	textures,
@@ -176,7 +97,6 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		onCompleteFn();
 		return;
 	}
-	const sourceSurvivesFn = () => cue.resultingQuantity > 0 && readSourceSurvivesFn();
 	source.container.eventMode = "none";
 	surface.transientActorLayer.addChild(source.container);
 	yield* updateTileActorFx({
@@ -193,8 +113,6 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		alpha: 1,
 		channel: "lifecycle-opacity",
 	});
-
-	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
 
 	const readLiveTargetFn = () => {
 		return readLiveContactPoseFn({
@@ -218,87 +136,6 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 					targetActorId: cue.targetActorId,
 				}),
 			);
-			if (sourceSurvivesFn()) {
-				if (sourceHome !== null) {
-					let finished = false;
-					let revealed = false;
-					let returned = false;
-					const finishFn = () => {
-						if (finished || !isCueActiveFn()) return;
-						if (!sourceSurvivesFn()) {
-							finished = true;
-							RendererRuntime.runSync(
-								finishConsumedStackFx({
-									actorStore,
-									animator,
-									onActorSettledFn,
-									onCompleteFn,
-									source,
-								}),
-							);
-						} else if (revealed && returned) {
-							finished = true;
-							onCompleteFn();
-						}
-					};
-					let returnStarted = false;
-					const startReturnFn = () => {
-						if (finished || returnStarted || !isCueActiveFn()) return;
-						returnStarted = true;
-						RendererRuntime.runSync(
-							returnInputRemainderFx({
-								isCueActiveFn,
-								actorStore,
-								animator,
-								cue,
-								cueKey,
-								onCompleteFn: () => {
-									returned = true;
-									finishFn();
-								},
-								source,
-								sourceHome,
-								surface,
-							}),
-						);
-					};
-					RendererRuntime.runSync(
-						startRemainderFeedbackFx({
-							actor: source,
-							animator,
-							ownerKey: `motion:${cueKey}:consume`,
-							onHiddenFx: Effect.sync(() => {
-								if (!isCueActiveFn()) return;
-								if (sourceSurvivesFn()) onRemainderRevealedFn();
-								else finishFn();
-							}),
-							shouldRevealFn: () => !finished && isCueActiveFn(),
-							onRevealStartedFn: startReturnFn,
-							onCancelFn: () => {
-								revealed = true;
-								if (
-									!finished &&
-									!returnStarted &&
-									isCueActiveFn() &&
-									sourceSurvivesFn()
-								) {
-									onRemainderRevealedFn();
-									startReturnFn();
-								}
-								finishFn();
-							},
-							onRevealedFn: () => {
-								revealed = true;
-								finishFn();
-							},
-						}),
-					);
-					return;
-				}
-				source.container.eventMode = "static";
-				onCompleteFn();
-				return;
-			}
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					let settled = false;
@@ -306,7 +143,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 						if (settled || !isCueActiveFn()) return;
 						settled = true;
 						RendererRuntime.runSync(
-							finishConsumedStackFx({
+							finishConsumedItemFx({
 								actorStore,
 								animator,
 								onActorSettledFn,

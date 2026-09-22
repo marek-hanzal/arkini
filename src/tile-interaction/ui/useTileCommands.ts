@@ -5,7 +5,6 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { splitBoardItemStackFx } from "~/item-interaction/fx/splitBoardItemStackFx";
 import {
 	activateItemActionWithTransitionFx,
 	type activateItemActionFx,
@@ -21,13 +20,6 @@ export const useTileCommands = (game: PlayableGame) =>
 		() => ({
 			runDropFn: (command: DropItemCommand) =>
 				RendererRuntime.runPromise(game.runFx(dropItemFx(command))),
-			runSplitFn: (command: splitBoardItemStackFx.Props) =>
-				RendererRuntime.runPromise(
-					game.runFx(splitBoardItemStackFx(command)).pipe(
-						Effect.as(true),
-						Effect.catch(() => Effect.succeed(false)),
-					),
-				),
 			runItemActionFn: (command: activateItemActionFx.Props) =>
 				RendererRuntime.runPromise(
 					game.runFx(activateItemActionWithTransitionFx(command)).pipe(

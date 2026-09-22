@@ -20,7 +20,7 @@ export const readItemDetailRemovalFn = (
 		if (event.type === "item:removed" && event.snapshot.id === itemId)
 			snapshot = event.snapshot;
 		if (!("itemId" in event) || event.itemId !== itemId) continue;
-		if (event.type === "item:depleted" && event.resultingQuantity === 0) reason = "depleted";
+		if (event.type === "item:depleted") reason = "depleted";
 		if (event.type === "item:expired" && reason !== "depleted") reason = "expired";
 	}
 	return snapshot === undefined

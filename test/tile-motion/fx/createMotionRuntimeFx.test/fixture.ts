@@ -166,7 +166,6 @@ export const createItem = (
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 1,
 	revision: `revision:${id}`,
 	running: false,
 	activityEffect: false,
@@ -183,14 +182,10 @@ export const createActor = (id: string): PixiTileActor => {
 		container: new Container(),
 		primary: new Sprite(Texture.EMPTY),
 		composite: new Sprite(Texture.EMPTY),
-		quantity: new Text({
-			text: String(item.quantity),
-		}),
-		quantityBackground: new Graphics(),
-		stackQuantity: new Text({
+		badge: new Text({
 			text: "",
 		}),
-		stackQuantityBackground: new Graphics(),
+		badgeBackground: new Graphics(),
 		item,
 		readyListeners: new Set(),
 		releaseTexturesFn: () => {},
@@ -456,84 +451,6 @@ export const samplePoseAnimation = (
 	return pose;
 };
 
-export const advanceInputRemainderFlash = ({
-	actor,
-	animations,
-	cancelFadeIn = false,
-	cueKey,
-}: {
-	readonly actor: PixiTileActor;
-	readonly animations: ReadonlyArray<ActorAnimation>;
-	readonly cancelFadeIn?: boolean;
-	readonly cueKey: string;
-}) => {
-	const fadeOut = animations.find(
-		(animation) =>
-			animation.actor === actor &&
-			animation.channel === "lifecycle-opacity" &&
-			animation.ownerKey === `motion:${cueKey}:consume` &&
-			animation.toAlpha === 0,
-	);
-	if (fadeOut?.channel !== "lifecycle-opacity") {
-		throw new Error("Expected the input consumption fade-out.");
-	}
-	const quantityBeforeFadeOut = actor.item.quantity;
-	fadeOut.onCompleteFn?.();
-	const badgeCountAfterFadeOut = actor.item.badgeCount;
-	const quantityAfterFadeOut = actor.item.quantity;
-
-	const fadeIn = animations.find(
-		(animation) =>
-			animation.actor === actor &&
-			animation.channel === "lifecycle-opacity" &&
-			animation.ownerKey === `motion:${cueKey}:consume` &&
-			animation.toAlpha === 1,
-	);
-	if (fadeIn?.channel !== "lifecycle-opacity") {
-		throw new Error("Expected the input remainder fade-in.");
-	}
-	(cancelFadeIn ? fadeIn.onCancelFn : fadeIn.onCompleteFn)?.();
-	return {
-		badgeCountAfterFadeOut,
-		fadeIn,
-		fadeOut,
-		quantityAfterFadeIn: actor.item.quantity,
-		quantityAfterFadeOut,
-		quantityBeforeFadeOut,
-	};
-};
-
-export const advanceStackMergeVanish = ({
-	actor,
-	animations,
-}: {
-	readonly actor: PixiTileActor;
-	readonly animations: ReadonlyArray<ActorAnimation>;
-}) => {
-	const vanishScale = animations
-		.filter((animation) => animation.actor === actor && animation.channel === "lifecycle-scale")
-		.at(-1);
-	if (vanishScale?.channel !== "lifecycle-scale") {
-		throw new Error("Expected stack merge lifecycle scale.");
-	}
-	const vanishOpacity = animations
-		.filter(
-			(animation) =>
-				animation.actor === actor &&
-				animation.channel === "lifecycle-opacity" &&
-				animation.toAlpha === 0,
-		)
-		.at(-1);
-	if (vanishOpacity?.channel !== "lifecycle-opacity") {
-		throw new Error("Expected stack merge vanish opacity.");
-	}
-	vanishOpacity.onCompleteFn?.();
-	return {
-		vanishOpacity,
-		vanishScale,
-	};
-};
-
 export const createMotionHarness = ({
 	actors = new Map<string, PixiTileActor>(),
 	boundingRect = {
@@ -758,51 +675,6 @@ export const createSpawnHarness = () => {
 		canceledAnimationKeys: harness.canceledOwnerKeys,
 		spawnCue,
 		spawned,
-	};
-};
-
-export const createStackHarness = () => {
-	const target = createActor("runtime:stack-target");
-	target.item = createItem(target.item.id, secondBoardLocation);
-	target.container.position.set(200, 40);
-	const canonicalTarget = {
-		...target.item,
-		quantity: 2,
-	};
-	const actors = new Map([
-		[
-			target.item.id,
-			target,
-		] as const,
-	]);
-	const canonicalItems = new Map([
-		[
-			target.item.id,
-			canonicalTarget,
-		] as const,
-	]);
-	const harness = createMotionHarness({
-		actors,
-		canonicalItems,
-	});
-	const cue = {
-		canonicalItemId: target.item.itemId,
-		eventIndex: 0,
-		kind: "stack",
-		originActorId: "runtime:producer",
-		originLocation: firstBoardLocation,
-		quantity: 1,
-		sequence: 30,
-		staggerIndex: 0,
-		targetActorId: target.item.id,
-		targetLocation: secondBoardLocation,
-	} satisfies TileMotionCue;
-	return {
-		...harness,
-		actors,
-		canonicalItems,
-		cue,
-		target,
 	};
 };
 

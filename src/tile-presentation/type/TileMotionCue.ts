@@ -14,23 +14,11 @@ export interface TileSpawnMotionCue extends TileMotionCueBase {
 	readonly actorId: string;
 }
 
-export interface TileStackMotionCue extends TileMotionCueBase {
-	/** Present only when the removed source itself travels, never for produced output. */
-	readonly sourceActorId?: string;
-	readonly kind: "stack";
-	readonly targetActorId: string;
-	readonly canonicalItemId: string;
-	readonly quantity: number;
-}
-
 export interface TileInputMotionCue extends TileMotionCueBase {
 	readonly kind: "input";
 	readonly sourceActorId: string;
 	readonly targetActorId: string;
 	readonly canonicalItemId: string;
-	readonly previousQuantity: number;
-	readonly storedQuantity: number;
-	readonly resultingQuantity: number;
 }
 
 export interface TileSwapMotionCue extends TileMotionCueBase {
@@ -40,8 +28,4 @@ export interface TileSwapMotionCue extends TileMotionCueBase {
 }
 
 /** One renderer-owned physical intent compiled from a complete committed transition. */
-export type TileMotionCue =
-	| TileSpawnMotionCue
-	| TileStackMotionCue
-	| TileInputMotionCue
-	| TileSwapMotionCue;
+export type TileMotionCue = TileSpawnMotionCue | TileInputMotionCue | TileSwapMotionCue;

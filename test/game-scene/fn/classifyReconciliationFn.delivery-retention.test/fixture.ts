@@ -23,7 +23,6 @@ export const createDeliveryActorItem = (
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 1,
 	revision: `revision:${id}`,
 	running: false,
 	artworkScale: 0.8,

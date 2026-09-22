@@ -126,7 +126,6 @@ const item = (
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 1,
 	revision,
 	running: false,
 	artworkScale: 0.8,
@@ -221,7 +220,6 @@ describe("main surface", () => {
 
 		const revisedFirst = {
 			...boardFirst,
-			quantity: 3,
 			revision: "revision:board-first:2",
 		};
 		Effect.runSync(

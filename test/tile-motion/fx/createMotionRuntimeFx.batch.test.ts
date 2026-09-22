@@ -5,7 +5,6 @@ import { Container } from "pixi.js";
 import { describe, expect, it } from "vitest";
 
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
-import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 
 import {
 	createMotionHarness,
@@ -17,7 +16,6 @@ import {
 	createActor,
 	readPoseAnimation,
 	samplePoseAnimation,
-	advanceStackMergeVanish,
 	type TileActorItem,
 	type TileMotionCue,
 } from "./createMotionRuntimeFx.test/fixture";
@@ -27,12 +25,11 @@ describe("motion delivery batch", () => {
 		const opener = createActor("runtime:producer-origin");
 		opener.container.position.set(150, 170);
 		const spawned = createActor("runtime:spawned");
-		const stacked = createActor("runtime:stacked");
-		stacked.container.position.set(200, 40);
-		const actors = createActorMap(opener, spawned, stacked);
+		const secondSpawn = createActor("runtime:secondSpawn");
+		secondSpawn.container.position.set(200, 40);
+		const actors = createActorMap(opener, spawned, secondSpawn);
 		const canonicalItems = createItemMap(opener.item, spawned.item, {
-			...stacked.item,
-			quantity: 2,
+			...secondSpawn.item,
 		});
 		const boardActorLayer = new Container();
 		let boardGeometry = {
@@ -49,7 +46,7 @@ describe("motion delivery batch", () => {
 						x: location.position.x * boardGeometry.stepX,
 						y: boardGeometry.y,
 					};
-		const { animations, runtime, transientActorLayer } = createMotionHarness({
+		const { animations, runtime } = createMotionHarness({
 			actors,
 			boundingRect: {
 				left: 10,
@@ -70,15 +67,13 @@ describe("motion delivery batch", () => {
 				targetLocation: firstBoardLocation,
 			},
 			{
-				canonicalItemId: stacked.item.itemId,
+				actorId: secondSpawn.item.id,
 				eventIndex: 1,
-				kind: "stack",
+				kind: "spawn",
 				originActorId: "runtime:producer-origin",
 				originLocation: originBoardLocation,
-				quantity: 1,
 				sequence: 7,
 				staggerIndex: 1,
-				targetActorId: stacked.item.id,
 				targetLocation: secondBoardLocation,
 			},
 		] satisfies TileMotionCue[];
@@ -87,8 +82,10 @@ describe("motion delivery batch", () => {
 		Effect.runSync(runtime.startFx);
 
 		expect(
-			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.has(stacked.item.id),
-		).toBe(false);
+			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.has(
+				secondSpawn.item.id,
+			),
+		).toBe(true);
 		expect(spawned.container.alpha).toBe(0);
 		expect(spawned.lifecycleLayer.scale.x).toBeLessThan(1);
 		expect(animations).toContainEqual(
@@ -135,84 +132,6 @@ describe("motion delivery batch", () => {
 		});
 		expect(spawned.container.alpha).toBe(0);
 
-		const stackTravel = animations.find(
-			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:7:1",
-		);
-		if (stackTravel?.channel !== "pose") {
-			throw new Error("Expected stack payload travel.");
-		}
-		const stackTransient = stackTravel.actor;
-		const stackBeforeTargetDrag = samplePoseAnimation(stackTravel, 0.8);
-		stacked.dragging = true;
-		const draggedStackSize = stacked.size;
-		boardGeometry = {
-			...boardGeometry,
-			size: 160,
-		};
-		transientActorLayer.addChild(stacked.container);
-		stacked.container.pivot.set(40);
-		stacked.container.position.set(940, 440);
-		const lateTargetMove = samplePoseAnimation(stackTravel, 0.95);
-		expect(lateTargetMove.x).toBeGreaterThan(stackBeforeTargetDrag.x);
-		expect(lateTargetMove.x).toBeLessThan(250);
-		expect(lateTargetMove.y).toBeLessThan(stackBeforeTargetDrag.y);
-		const firstEndpoint = samplePoseAnimation(stackTravel, 1);
-		expect(firstEndpoint).toEqual({
-			scale: 1.5,
-			x: 900,
-			y: 400,
-		});
-		stacked.container.position.set(1_240, 640);
-		stackTravel.onCompleteFn?.();
-		expect(stacked.item.quantity).toBe(1);
-
-		const finalContact = animations
-			.filter(
-				(animation) => animation.actor === stackTransient && animation.channel === "pose",
-			)
-			.at(-1);
-		if (finalContact?.channel !== "pose") {
-			throw new Error("Expected final live-target contact segment.");
-		}
-		expect(finalContact.durationMs).toBe(
-			readTravelDurationMsFn({
-				fromX: 900,
-				fromY: 400,
-				tileSize: 120,
-				toX: 1_200,
-				toY: 600,
-			}),
-		);
-		expect(samplePoseAnimation(finalContact, 1)).toEqual({
-			scale: 1.5,
-			x: 1_200,
-			y: 600,
-		});
-		// Child-local feedback must not move the physical contact anchor or extend the chase.
-		stacked.lifecycleLayer.position.set(6, -4);
-		const animationCountBeforeContact = animations.length;
-		expect(
-			animations.filter(
-				(animation) =>
-					animation.actor === stacked && animation.channel === "activity-particles",
-			),
-		).toHaveLength(0);
-		finalContact.onCompleteFn?.();
-		expect(animations.length).toBeGreaterThanOrEqual(animationCountBeforeContact + 3);
-		advanceStackMergeVanish({
-			actor: stackTransient,
-			animations,
-		});
-		expect(stacked.item.quantity).toBe(2);
-		expect(stacked.size).toBe(draggedStackSize);
-		expect(stacked.container.parent).toBe(transientActorLayer);
-		expect(stackTransient.container.destroyed).toBe(true);
-		expect(
-			animations.filter(
-				(animation) =>
-					animation.actor === stacked && animation.channel === "activity-particles",
-			),
-		).toHaveLength(1);
 		Effect.runSync(runtime.closeFx);
 		expect(spawned.container.destroyed).toBe(false);
 	});

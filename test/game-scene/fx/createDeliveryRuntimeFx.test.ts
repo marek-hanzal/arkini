@@ -64,7 +64,6 @@ const item = {
 	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	revision: "revision:delivery",
-	quantity: 7,
 	location: origin,
 	running: false,
 	activityEffect: false,
@@ -285,11 +284,7 @@ describe("delivery runtime", () => {
 		},
 	);
 
-	it.each([
-		"none",
-		"contact-fade-out",
-		"contact-fade-in",
-	])("adopts one actor through canonical changes (grid settlement: %s)", (settleDuring) => {
+	it("adopts one actor through missing geometry, return and canonical settlement", () => {
 		const container = new Container();
 		container.position.set(200, 0);
 		const actor = {
@@ -461,7 +456,6 @@ describe("delivery runtime", () => {
 					item: {
 						...item,
 						location: target,
-						quantity: 4,
 						revision: "revision:returning",
 					},
 					phase: "returning",
@@ -471,30 +465,6 @@ describe("delivery runtime", () => {
 		);
 		expect(container.x).toBe(90);
 		expect(animations).toHaveLength(3);
-		expect(animations[2]).toMatchObject({
-			channel: "lifecycle-opacity",
-			durationMs: 275,
-			ownerKey: "delivery:runtime:water:1:consume",
-			toAlpha: 0,
-		});
-		expect(actor.item.quantity).toBe(7);
-		if (settleDuring !== "none") {
-			const fadeOut = animations[2];
-			if (settleDuring === "contact-fade-in") fadeOut?.onCompleteFn?.();
-			const previousAnimationCount = animations.length;
-			Effect.runSync(runtime.syncFx([]));
-			expect(attachActorFx).toHaveBeenCalledWith(actor);
-			expect(actor.lifecycleTargetAlpha).toBe(1);
-			expect(animations.at(-1)).toMatchObject({
-				channel: "lifecycle-opacity",
-				toAlpha: 1,
-			});
-			expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(new Set());
-			// A late hidden callback cannot revive the obsolete delivery or overwrite restoration.
-			fadeOut?.onCompleteFn?.();
-			expect(animations).toHaveLength(previousAnimationCount + 2);
-			return;
-		}
 		geometryAvailable = false;
 		Effect.runSync(
 			runtime.syncFx([
@@ -505,7 +475,6 @@ describe("delivery runtime", () => {
 					item: {
 						...item,
 						location: target,
-						quantity: 4,
 						revision: "revision:returning",
 					},
 					phase: "returning",
@@ -514,16 +483,6 @@ describe("delivery runtime", () => {
 			]),
 		);
 		expect(container.visible).toBe(false);
-		animations[2]?.onCompleteFn?.();
-		expect(actor.item.quantity).toBe(4);
-		expect(animations[3]).toMatchObject({
-			channel: "lifecycle-opacity",
-			durationMs: 375,
-			ownerKey: "delivery:runtime:water:1:consume",
-			toAlpha: 1,
-		});
-		animations[3]?.onCompleteFn?.();
-		expect(animations).toHaveLength(4);
 		geometryAvailable = true;
 		geometryOffset = 20;
 		geometrySize = 100;
@@ -536,7 +495,6 @@ describe("delivery runtime", () => {
 					item: {
 						...item,
 						location: target,
-						quantity: 4,
 						revision: "revision:returning",
 					},
 					phase: "returning",
@@ -546,7 +504,7 @@ describe("delivery runtime", () => {
 		);
 		expect(container.visible).toBe(true);
 		expect(actor.size).toBe(100);
-		expect(animations[4]).toMatchObject({
+		expect(animations[3]).toMatchObject({
 			channel: "pose",
 			curve: {
 				bounce: 0.22,
@@ -554,13 +512,13 @@ describe("delivery runtime", () => {
 			},
 			ownerKey: "delivery:runtime:water:1",
 		});
-		if (animations[4]?.channel !== "pose") throw new Error("Expected pose animation.");
-		expect(animations[4].readPoseFn?.(1)).toMatchObject({
+		if (animations[3]?.channel !== "pose") throw new Error("Expected pose animation.");
+		expect(animations[3].readPoseFn?.(1)).toMatchObject({
 			x: 220,
 			y: 0,
 		});
-		animations[4].onCompleteFn?.();
-		animations[4].onCompleteFn?.();
+		animations[3].onCompleteFn?.();
+		animations[3].onCompleteFn?.();
 		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(
 			new Set([
 				"runtime:water",

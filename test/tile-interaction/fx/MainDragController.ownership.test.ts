@@ -8,7 +8,7 @@ import {
 	item,
 	mountController,
 	releaseOrdinaryDrag,
-	setStackTarget,
+	setSwapTarget,
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: ownership", () => {
@@ -19,7 +19,7 @@ describe("main drag controller: ownership", () => {
 				target,
 			],
 		});
-		setStackTarget(mounted, target);
+		setSwapTarget(mounted, target);
 		let resolveDrop!: (result: DropItemResult) => void;
 		mounted.onDrop.mockReturnValueOnce(
 			new Promise<DropItemResult>((resolve) => {

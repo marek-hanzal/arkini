@@ -1,8 +1,6 @@
 import type { Effect } from "effect";
 
 import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
-import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
-import type { MotionRedirect } from "~/tile-motion/type/MotionTarget";
 
 /** Moving actors block pointer interaction until landing. */
 export type InteractionClaim = "blocked";
@@ -20,7 +18,6 @@ export interface MotionSnapshot {
 			}
 		>
 	>;
-	readonly quantityPresentationByActorId: ReadonlyMap<string, QuantityPresentation>;
 }
 
 export interface MotionRuntime {
@@ -29,10 +26,7 @@ export interface MotionRuntime {
 		actorIds: ReadonlySet<string>,
 	) => Effect.Effect<void, never, never>;
 	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void, never, never>;
-	/** Transfers trailing presentation payloads when their original receiver is consumed. */
-	readonly redirectTargetFx: (redirect: MotionRedirect) => Effect.Effect<void, never, never>;
 	readonly readSnapshotFx: Effect.Effect<MotionSnapshot, never, never>;
 	readonly startFx: Effect.Effect<void, never, never>;
-	readonly syncPresentationFx: Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }

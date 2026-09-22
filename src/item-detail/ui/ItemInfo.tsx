@@ -41,16 +41,6 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 					<div className="grid grid-cols-2 items-start gap-8">
 						<FactList columns={1}>
 							<Fact
-								label={translator.textFn("Items per stack")}
-								value={
-									detail.maxStackSize === 1
-										? translator.textFn("Single item")
-										: detail.maxStackSize
-								}
-							/>
-						</FactList>
-						<FactList columns={1}>
-							<Fact
 								label={translator.textFn("Units remaining")}
 								value={
 									detail.units === undefined

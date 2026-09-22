@@ -11,12 +11,10 @@ import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import { runInputMotionFx } from "~/tile-motion/fx/runInputMotionFx";
 import { runSpawnMotionFx } from "~/tile-motion/fx/runSpawnMotionFx";
-import { runStackMotionFx } from "~/tile-motion/fx/runStackMotionFx";
 import { runSwapMotionFx } from "~/tile-motion/fx/runSwapMotionFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
-import type { TargetRoute } from "~/tile-motion/type/MotionTarget";
 
 export namespace runMotionCueFx {
 	export interface Props {
@@ -28,14 +26,7 @@ export namespace runMotionCueFx {
 		readonly isCueActiveFn: () => boolean;
 		readonly onActorSettledFn: (actor: PixiTileActor) => void;
 		readonly onCompleteFn: () => void;
-		readonly onPayloadCreatedFn: (actor: PixiTileActor) => void;
-		readonly onInputRemainderRevealedFn: () => void;
 		readonly readPaletteFn: () => PixiScenePalette;
-		readonly readSourceSurvivesFn: () => boolean;
-		readonly readTargetRouteFn: (
-			actorId: string,
-			location: TargetRoute["location"],
-		) => TargetRoute;
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
 	}
@@ -77,11 +68,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 	isCueActiveFn,
 	onActorSettledFn,
 	onCompleteFn,
-	onPayloadCreatedFn,
-	onInputRemainderRevealedFn,
 	readPaletteFn,
-	readSourceSurvivesFn,
-	readTargetRouteFn,
 	surface,
 	textures,
 }: runMotionCueFx.Props) {
@@ -93,13 +80,11 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 		surface,
 	});
 	// Removed producers retain their origin geometry for queued outputs, not their visibility.
-	// A consumed stack is different: its original actor is the travelling payload.
 	if (
 		originActor !== null &&
 		!actorStore.canonicalItems.has(originActor.item.id) &&
 		originActor.lifecycleTargetAlpha !== 0 &&
-		(cue.kind === "spawn" ||
-			(cue.kind === "stack" && cue.sourceActorId !== originActor.item.id))
+		cue.kind === "spawn"
 	) {
 		originActor.container.eventMode = "none";
 		originActor.container.cursor = "default";
@@ -138,28 +123,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									target,
 								}),
 						)
-						.with(
-							{
-								kind: "stack",
-							},
-							(stack) =>
-								runStackMotionFx({
-									actorStore,
-									animator,
-									application,
-									cue: stack,
-									cueKey,
-									delayMs,
-									onCompleteFn,
-									onPayloadCreatedFn,
-									origin,
-									readPaletteFn,
-									readTargetRouteFn,
-									surface,
-									target,
-									textures,
-								}),
-						)
+
 						.with(
 							{
 								kind: "input",
@@ -175,10 +139,8 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 									delayMs,
 									onActorSettledFn,
 									onCompleteFn,
-									onRemainderRevealedFn: onInputRemainderRevealedFn,
 
 									readPaletteFn,
-									readSourceSurvivesFn,
 									surface,
 									target,
 									textures,
@@ -238,12 +200,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 								);
 							},
 						)
-						.with(
-							{
-								kind: "stack",
-							},
-							() => {},
-						)
+
 						.with(
 							{
 								kind: "input",

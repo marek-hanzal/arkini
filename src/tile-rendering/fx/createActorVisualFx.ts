@@ -103,37 +103,23 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 	});
 	const primary = new Sprite(Texture.EMPTY);
 	const composite = new Sprite(Texture.EMPTY);
-	const quantityBackground = new Graphics();
-	const quantity = new Text({
+	const badgeBackground = new Graphics();
+	const badge = new Text({
 		style: {
 			fill: palette.overlayForeground,
 			fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
 			fontSize: 14,
 			fontWeight: "700",
 		},
-		text: String(item.quantity),
-	});
-	const stackQuantityBackground = new Graphics();
-	const stackQuantity = new Text({
-		style: quantity.style.clone(),
 		text: "",
 	});
-	container.addChild(
-		primary,
-		composite,
-		quantityBackground,
-		quantity,
-		stackQuantityBackground,
-		stackQuantity,
-	);
+	container.addChild(primary, composite, badgeBackground, badge);
 	const visual = {
 		container,
 		primary,
 		composite,
-		quantity,
-		quantityBackground,
-		stackQuantity,
-		stackQuantityBackground,
+		badge,
+		badgeBackground,
 		readyListeners: new Set(),
 		releaseTexturesFn,
 		reportCriticalFailureFn: frames.reportCriticalFailureFn,

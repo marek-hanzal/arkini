@@ -10,7 +10,6 @@ import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
-import { startRemainderFeedbackFx } from "~/tile-rendering/fx/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
@@ -37,14 +36,7 @@ interface ActiveDelivery {
 	readonly actor: PixiTileActor;
 	delivery: TileDelivery;
 	readonly generation: number;
-	stage:
-		| "awaiting-return-geometry"
-		| "awaiting-travel-geometry"
-		| "contact-fade-in"
-		| "contact-fade-out"
-		| "exiting"
-		| "contacted"
-		| "traveling";
+	stage: "awaiting-travel-geometry" | "exiting" | "contacted" | "traveling";
 	target: ActorPose | null;
 }
 
@@ -156,60 +148,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		});
 	});
 
-	const revealReturningDeliveryFx = Effect.fn("revealReturningDeliveryFx")(function* ({
-		active,
-		delivery,
-		to,
-	}: {
-		readonly active: ActiveDelivery;
-		readonly delivery: TileDelivery;
-		readonly to: ActorPose;
-	}) {
-		const ownerKey = `delivery:${delivery.item.id}:${delivery.generation}:consume`;
-		active.stage = "contact-fade-out";
-		yield* startRemainderFeedbackFx({
-			actor: active.actor,
-			animator,
-			shouldRevealFn: () => !closed && activeByItemId.get(delivery.item.id) === active,
-			onHiddenFx: Effect.gen(function* () {
-				if (
-					closed ||
-					activeByItemId.get(delivery.item.id) !== active ||
-					active.actor.container.destroyed
-				) {
-					return;
-				}
-				const latestTarget = active.target ?? to;
-				yield* updateTileActorFx({
-					actor: active.actor,
-					animator,
-					frames: application.frames,
-					item: active.delivery.item,
-					palette: readPaletteFn(),
-					size: latestTarget.size,
-					textures,
-				});
-				active.stage = "contact-fade-in";
-			}),
-			onRevealedFn: () => {
-				if (closed || activeByItemId.get(delivery.item.id) !== active) return;
-				const returnTarget = active.target;
-				if (returnTarget === null) {
-					active.stage = "awaiting-return-geometry";
-					return;
-				}
-				RendererRuntime.runSync(
-					startTravelFx({
-						active,
-						delivery: active.delivery,
-						to: returnTarget,
-					}),
-				);
-			},
-			ownerKey,
-		});
-	});
-
 	return {
 		closeFx: Effect.gen(function* () {
 			if (closed) return;
@@ -241,11 +179,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					active.actor.container.visible = true;
 					yield* application.frames.invalidateFx;
 					activeByItemId.delete(itemId);
-					if (
-						active.stage === "exiting" ||
-						active.stage === "contact-fade-out" ||
-						active.stage === "contact-fade-in"
-					) {
+					if (active.stage === "exiting") {
 						yield* restoreActorExitFx({
 							actor: active.actor,
 							animator,
@@ -298,45 +232,16 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					active === undefined || active.generation !== delivery.generation;
 				if (from === null || to === null) {
 					if (active !== undefined) {
-						const contactReturn =
-							generationChanged &&
-							active.delivery.phase === "outbound" &&
-							active.stage === "contacted" &&
-							delivery.phase === "returning";
 						if (generationChanged) {
-							if (
-								active.stage === "contact-fade-out" ||
-								active.stage === "contact-fade-in"
-							) {
-								yield* animator.setFx({
-									actor: active.actor,
-									alpha: 1,
-									channel: "lifecycle-opacity",
-								});
-							}
 							const previous = active;
 							active = {
 								actor: previous.actor,
 								delivery,
 								generation: delivery.generation,
-								stage: contactReturn
-									? "contact-fade-out"
-									: "awaiting-travel-geometry",
+								stage: "awaiting-travel-geometry",
 								target: null,
 							};
 							activeByItemId.set(delivery.item.id, active);
-							if (contactReturn) {
-								yield* revealReturningDeliveryFx({
-									active,
-									delivery,
-									to: {
-										layer: surface.transientActorLayer,
-										size: Math.max(1, active.actor.size),
-										x: active.actor.container.x,
-										y: active.actor.container.y,
-									},
-								});
-							}
 						} else {
 							active.delivery = delivery;
 							active.target = null;
@@ -366,17 +271,10 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					active.delivery = delivery;
 					active.target = to;
 					active.actor.container.visible = true;
-					if (
-						active.stage === "contact-fade-out" ||
-						active.stage === "contact-fade-in" ||
-						active.stage === "contacted"
-					) {
+					if (active.stage === "contacted") {
 						continue;
 					}
-					if (
-						active.stage === "awaiting-return-geometry" ||
-						active.stage === "awaiting-travel-geometry"
-					) {
+					if (active.stage === "awaiting-travel-geometry") {
 						yield* updateTileActorFx({
 							actor: active.actor,
 							animator,
@@ -394,17 +292,6 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 						continue;
 					}
 					if (!targetChanged) continue;
-				}
-				if (
-					generationChanged &&
-					active !== undefined &&
-					(active.stage === "contact-fade-out" || active.stage === "contact-fade-in")
-				) {
-					yield* animator.setFx({
-						actor: active.actor,
-						alpha: 1,
-						channel: "lifecycle-opacity",
-					});
 				}
 
 				if (actor === undefined) {
@@ -434,21 +321,15 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 				actor.container.eventMode = "none";
 				actor.container.cursor = "default";
 				surface.transientActorLayer.addChild(actor.container);
-				const contactReturn =
-					active?.delivery.phase === "outbound" &&
-					active.stage === "contacted" &&
-					delivery.phase === "returning";
-				if (!contactReturn) {
-					yield* updateTileActorFx({
-						actor,
-						animator,
-						frames: application.frames,
-						item: delivery.item,
-						palette: readPaletteFn(),
-						size: to.size,
-						textures,
-					});
-				}
+				yield* updateTileActorFx({
+					actor,
+					animator,
+					frames: application.frames,
+					item: delivery.item,
+					palette: readPaletteFn(),
+					size: to.size,
+					textures,
+				});
 				active = {
 					actor,
 					delivery,
@@ -457,19 +338,11 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 					target: to,
 				};
 				activeByItemId.set(delivery.item.id, active);
-				if (contactReturn) {
-					yield* revealReturningDeliveryFx({
-						active,
-						delivery,
-						to,
-					});
-				} else {
-					yield* startTravelFx({
-						active,
-						delivery,
-						to,
-					});
-				}
+				yield* startTravelFx({
+					active,
+					delivery,
+					to,
+				});
 			}
 		}),
 	} satisfies DeliveryRuntime;

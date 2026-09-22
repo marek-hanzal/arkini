@@ -4,7 +4,6 @@ import type {
 	TileInputMotionCue,
 	TileMotionCue,
 	TileSpawnMotionCue,
-	TileStackMotionCue,
 	TileSwapMotionCue,
 } from "~/tile-presentation/type/TileMotionCue";
 import { updateTileMotionLanesFn } from "~/tile-motion/fn/updateTileMotionLanesFn";
@@ -41,27 +40,6 @@ const spawnCue = ({
 	targetLocation: location(1),
 });
 
-const stackCue = ({
-	eventIndex,
-	originActorId,
-	targetActorId,
-}: {
-	readonly eventIndex: number;
-	readonly originActorId: string;
-	readonly targetActorId: string;
-}): TileStackMotionCue => ({
-	kind: "stack",
-	sequence: 7,
-	eventIndex,
-	staggerIndex: eventIndex,
-	originActorId,
-	targetActorId,
-	canonicalItemId: "water",
-	quantity: 1,
-	originLocation: location(0),
-	targetLocation: location(1),
-});
-
 const inputCue = ({
 	eventIndex,
 	sourceActorId = "runtime:source",
@@ -76,12 +54,9 @@ const inputCue = ({
 	kind: "input",
 	originActorId: sourceActorId,
 	originLocation: location(0),
-	previousQuantity: 1,
-	resultingQuantity: 0,
 	sequence: 7 + eventIndex,
 	sourceActorId,
 	staggerIndex: 0,
-	storedQuantity: 1,
 	targetActorId,
 	targetLocation: location(1),
 });
@@ -176,16 +151,18 @@ describe("updateTileMotionLanesFn", () => {
 
 	it("activates staggered deliveries from one committed producer batch together", () => {
 		const originActorId = "runtime:producer";
-		const targetActorId = "runtime:stack";
-		const first = stackCue({
+
+		const first = spawnCue({
+			sequence: 7,
 			eventIndex: 0,
 			originActorId,
-			targetActorId,
+			actorId: "runtime:first",
 		});
-		const second = stackCue({
+		const second = spawnCue({
+			sequence: 7,
 			eventIndex: 1,
 			originActorId,
-			targetActorId,
+			actorId: "runtime:second",
 		});
 		const third = spawnCue({
 			sequence: 7,
@@ -329,32 +306,6 @@ describe("updateTileMotionLanesFn", () => {
 		expectLaneCueKeys(afterFirstContact, cueKeys(second), cueKeys(output));
 		expectLaneCueKeys(complete(afterFirstContact, second), cueKeys(output), "");
 	});
-
-	it("does not let a later input bypass an older blocked stack on the same actor", () => {
-		const blocker = inputCue({
-			eventIndex: 0,
-			sourceActorId: "runtime:producer",
-			targetActorId: "runtime:blocking-owner",
-		});
-		const stack = stackCue({
-			eventIndex: 1,
-			originActorId: "runtime:producer",
-			targetActorId: "runtime:shared",
-		});
-		const input = inputCue({
-			eventIndex: 2,
-			sourceActorId: "runtime:shared",
-			targetActorId: "runtime:other-owner",
-		});
-
-		const state = enqueue([
-			blocker,
-			stack,
-			input,
-		]);
-
-		expectLaneCueKeys(state, cueKeys(blocker), cueKeys(stack, input));
-	});
 });
 
 it("launches a same-slot replacement together with outgoing drops", () => {
@@ -386,60 +337,4 @@ it("launches a same-slot replacement together with outgoing drops", () => {
 		outgoing,
 	]);
 	expect(state.pending).toEqual([]);
-});
-
-it("reveals a local spawn before later drops can stack into that same actor", () => {
-	const local: TileSpawnMotionCue = {
-		...spawnCue({
-			sequence: 7,
-			actorId: "local",
-			originActorId: "origin",
-		}),
-		targetLocation: location(0),
-	};
-	const stacked = stackCue({
-		eventIndex: 1,
-		originActorId: "origin",
-		targetActorId: "local",
-	});
-	let state = updateTileMotionLanesFn({
-		state: {
-			active: [],
-			pending: [],
-		},
-		action: {
-			type: "enqueue",
-			cues: [
-				local,
-				stacked,
-			],
-		},
-	});
-	expect(state.active).toEqual([
-		local,
-	]);
-	expect(state.pending).toEqual([
-		stacked,
-	]);
-	state = updateTileMotionLanesFn({
-		state,
-		action: {
-			type: "complete",
-			cue: local,
-		},
-	});
-	expect(state.active).toEqual([
-		stacked,
-	]);
-	state = updateTileMotionLanesFn({
-		state,
-		action: {
-			type: "complete",
-			cue: stacked,
-		},
-	});
-	expect(state).toEqual({
-		active: [],
-		pending: [],
-	});
 });

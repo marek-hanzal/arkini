@@ -92,7 +92,6 @@ describe("Editor Board createEditorBoardGameFx", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 		expect(game.getSnapshotFn().items).toHaveLength(2);
@@ -139,7 +138,6 @@ describe("Editor Board createEditorBoardGameFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			),
 		).rejects.toThrow("disposed");

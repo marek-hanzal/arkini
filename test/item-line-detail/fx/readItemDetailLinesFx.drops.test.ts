@@ -49,7 +49,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							"artwork:workshop",
 						],
 					},
-					maxStackSize: 1,
 					maxQueueSize: 1,
 					lines: [
 						{
@@ -162,7 +161,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							"artwork:wood",
 						],
 					},
-					maxStackSize: 10,
 				},
 				gem: {
 					maxQueueSize: 1,
@@ -179,7 +177,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							"artwork:gem",
 						],
 					},
-					maxStackSize: 10,
 				},
 			},
 		});

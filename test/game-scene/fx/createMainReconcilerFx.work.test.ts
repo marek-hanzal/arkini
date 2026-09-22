@@ -39,12 +39,10 @@ describe("main reconciliation / work and consumption", () => {
 	});
 	it("dips a surviving consumed source and restores only that lifecycle intent", () => {
 		const item = createItem("runtime:ore", boardLocation, {
-			quantity: 2,
 			revision: "revision:ore:2",
 		});
 		const actor = createActor(
 			createItem(item.id, boardLocation, {
-				quantity: 3,
 				revision: "revision:ore:3",
 			}),
 		);

@@ -67,10 +67,7 @@ describe("readItemDetailLinesFx / active work", () => {
 	it("keeps single-slot owners on a disabled Start action while work is active", () => {
 		const base = lineRunRuntime({
 			permit: true,
-			water: [
-				2,
-				1,
-			],
+			water: 3,
 		});
 		const runtime = {
 			...base,

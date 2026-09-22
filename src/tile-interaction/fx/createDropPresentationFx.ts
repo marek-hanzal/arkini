@@ -1,8 +1,8 @@
+import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
-import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
@@ -24,7 +24,6 @@ interface DropSnapshot {
 		readonly cues: ReadonlyArray<TileActorFeedbackCue>;
 		readonly generation: number;
 	}>;
-	readonly hiddenActorRevisions: ReadonlyMap<string, string>;
 	readonly landingActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly swaps: ReadonlyArray<{
@@ -46,9 +45,7 @@ export interface DropPresentation {
 	}) => Effect.Effect<void, never, never>;
 	readonly failFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly readSnapshotFx: Effect.Effect<DropSnapshot, never, never>;
-	readonly reconcileActorsFx: (props: {
-		readonly mainItems: ReadonlyArray<TileActorItem>;
-	}) => Effect.Effect<void, never, never>;
+	readonly reconcileActorsFx: () => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }
 
@@ -72,24 +69,7 @@ const readFeedbackCuesFn = (
 	result: DropItemResult,
 ): ReadonlyArray<TileActorFeedbackCue> =>
 	match(result)
-		.with(
-			{
-				kind: DropItemResultKind.Stack,
-			},
-			({ source, target }) =>
-				[
-					{
-						actorId: source.itemId,
-						key: `drop:${generation}:consume-source`,
-						kind: "consume-source",
-					},
-					{
-						actorId: target.itemId,
-						key: `drop:${generation}:consume`,
-						kind: "consume",
-					},
-				] satisfies TileActorFeedbackCue[],
-		)
+
 		.with(
 			{
 				kind: DropItemResultKind.StoreInput,
@@ -120,7 +100,6 @@ const readFeedbackCuesFn = (
 export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(() =>
 	Effect.sync((): DropPresentation => {
 		const feedback = new Map<number, PendingFeedback>();
-		const hiddenActorRevisions = new Map<string, string>();
 		const landingActorIds = new Set<string>();
 		let closed = false;
 		let nextGeneration = 0;
@@ -174,15 +153,6 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 							generation,
 						});
 					}
-					if (
-						result.kind === DropItemResultKind.Stack &&
-						result.source.current === null
-					) {
-						hiddenActorRevisions.set(
-							result.source.itemId,
-							result.source.previousRevision,
-						);
-					}
 					if (result.kind === DropItemResultKind.Move) {
 						landingActorIds.add(result.itemId);
 					}
@@ -200,7 +170,6 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 			readSnapshotFx: Effect.sync(
 				(): DropSnapshot => ({
 					feedback: Array.from(feedback.values()),
-					hiddenActorRevisions: new Map(hiddenActorRevisions),
 					landingActorIds: new Set(landingActorIds),
 					pendingActorIds: new Set(
 						Array.from(pending.values(), ({ sourceActorId }) => sourceActorId),
@@ -208,25 +177,15 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 					swaps: Array.from(swaps.values()),
 				}),
 			),
-			reconcileActorsFx: Effect.fn("DropPresentation.reconcileActorsFx")(({ mainItems }) =>
+			reconcileActorsFx: Effect.fn("DropPresentation.reconcileActorsFx")(() =>
 				Effect.sync(() => {
 					if (closed) return;
-					for (const [actorId, revision] of hiddenActorRevisions) {
-						if (
-							mainItems.some(
-								(item) => item.id === actorId && item.revision === revision,
-							)
-						)
-							continue;
-						hiddenActorRevisions.delete(actorId);
-					}
 					landingActorIds.clear();
 				}),
 			),
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;
-				hiddenActorRevisions.clear();
 				landingActorIds.clear();
 				pending.clear();
 				swaps.clear();

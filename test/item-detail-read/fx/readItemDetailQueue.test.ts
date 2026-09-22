@@ -93,9 +93,7 @@ describe("readItemDetailQueue", () => {
 		const base = queuedRuntime(
 			lineRunRuntime({
 				permit: true,
-				water: [
-					1,
-				],
+				water: 1,
 			}),
 		);
 		const runtime = {
@@ -143,9 +141,7 @@ describe("readItemDetailQueue", () => {
 	it("keeps an already queued ready request ready at capacity one and rejects unavailable owners", () => {
 		const runtime = lineRunRuntime({
 			permit: true,
-			water: [
-				3,
-			],
+			water: 3,
 		});
 		const singleSlotRuntime = {
 			...queuedRuntime(runtime),

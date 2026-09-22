@@ -8,60 +8,6 @@ const { committedRuntime, readCues, runtime, source, sourceLocation, target, tar
 	tileMotionCueTestFixture;
 
 describe("readTileMotionCuesFx", () => {
-	it("compiles ordered spawn and stack facts from the complete committed transition", () => {
-		const cues = Effect.runSync(
-			readCues({
-				sequence: 7,
-				previousRuntime: runtime,
-				runtime: committedRuntime,
-				events: [
-					{
-						type: GameEventEnumSchema.enum.ItemStacked,
-						itemId: target.id,
-						canonicalItemId: target.item.id,
-						originItemId: source.id,
-						location: targetLocation,
-						previousQuantity: 1,
-						quantity: 2,
-					},
-					{
-						type: GameEventEnumSchema.enum.ItemSpawned,
-						itemId: target.id,
-						canonicalItemId: target.item.id,
-						originItemId: source.id,
-						location: targetLocation,
-						quantity: 1,
-					},
-				],
-			}),
-		);
-
-		expect(cues).toEqual([
-			{
-				kind: "stack",
-				sequence: 7,
-				eventIndex: 0,
-				staggerIndex: 0,
-				targetActorId: target.id,
-				canonicalItemId: target.item.id,
-				quantity: 1,
-				originActorId: source.id,
-				originLocation: sourceLocation,
-				targetLocation,
-			},
-			{
-				kind: "spawn",
-				sequence: 7,
-				eventIndex: 1,
-				staggerIndex: 1,
-				actorId: target.id,
-				originActorId: source.id,
-				originLocation: sourceLocation,
-				targetLocation,
-			},
-		]);
-	});
-
 	it("keeps stagger indexes local to each producer in one committed transition", () => {
 		const cues = Effect.runSync(
 			readCues({
@@ -75,7 +21,6 @@ describe("readTileMotionCuesFx", () => {
 						canonicalItemId: target.item.id,
 						originItemId: source.id,
 						location: targetLocation,
-						quantity: 1,
 					},
 					{
 						type: GameEventEnumSchema.enum.ItemSpawned,
@@ -83,7 +28,6 @@ describe("readTileMotionCuesFx", () => {
 						canonicalItemId: source.item.id,
 						originItemId: target.id,
 						location: sourceLocation,
-						quantity: 1,
 					},
 					{
 						type: GameEventEnumSchema.enum.ItemSpawned,
@@ -91,7 +35,6 @@ describe("readTileMotionCuesFx", () => {
 						canonicalItemId: target.item.id,
 						originItemId: source.id,
 						location: targetLocation,
-						quantity: 1,
 					},
 				],
 			}),
@@ -117,9 +60,6 @@ describe("readTileMotionCuesFx", () => {
 							sourceItemId: source.id,
 							canonicalItemId: source.item.id,
 							previousSourceLocation: sourceLocation,
-							previousQuantity: 7,
-							storedQuantity: 5,
-							resultingQuantity: 2,
 							ownerItemId: target.id,
 							lineId: "line:water",
 							inputIndex: 0,
@@ -136,9 +76,6 @@ describe("readTileMotionCuesFx", () => {
 				sourceActorId: source.id,
 				targetActorId: target.id,
 				canonicalItemId: source.item.id,
-				previousQuantity: 7,
-				storedQuantity: 5,
-				resultingQuantity: 2,
 				originActorId: source.id,
 				originLocation: sourceLocation,
 				targetLocation,
@@ -154,13 +91,11 @@ describe("readTileMotionCuesFx", () => {
 				runtime: committedRuntime,
 				events: [
 					{
-						type: GameEventEnumSchema.enum.ItemStacked,
+						type: GameEventEnumSchema.enum.ItemSpawned,
 						itemId: target.id,
 						canonicalItemId: "fire",
 						originItemId: source.id,
 						location: targetLocation,
-						previousQuantity: 1,
-						quantity: 3,
 					},
 					{
 						type: GameEventEnumSchema.enum.ItemSpawned,
@@ -168,7 +103,6 @@ describe("readTileMotionCuesFx", () => {
 						canonicalItemId: target.item.id,
 						originItemId: source.id,
 						location: targetLocation,
-						quantity: 1,
 					},
 				],
 			}),
@@ -206,7 +140,6 @@ it.each([
 					canonicalItemId: target.item.id,
 					originItemId: source.id,
 					location: sourceLocation,
-					quantity: 1,
 				},
 			],
 		}),
@@ -216,48 +149,4 @@ it.each([
 		kind: "spawn",
 		targetLocation: sourceLocation,
 	});
-});
-
-it.each([
-	false,
-	true,
-])("distinguishes consumed stack actors from same-type merge output (merge: %s)", (merge) => {
-	const cues = Effect.runSync(
-		readCues({
-			sequence: 51,
-			previousRuntime: runtime,
-			runtime: {
-				...committedRuntime,
-				items: committedRuntime.items.filter((item) => item.id !== source.id),
-			},
-			events: [
-				...(merge
-					? [
-							{
-								type: GameEventEnumSchema.enum.ItemMerged,
-								sourceItemId: target.id,
-								sourceCanonicalItemId: target.item.id,
-								targetItemId: source.id,
-								targetCanonicalItemId: source.item.id,
-								action: "use" as const,
-								effect: "remove" as const,
-							},
-						]
-					: []),
-				{
-					type: GameEventEnumSchema.enum.ItemStacked,
-					itemId: target.id,
-					canonicalItemId: target.item.id,
-					originItemId: source.id,
-					location: targetLocation,
-					previousQuantity: 1,
-					quantity: 2,
-				},
-			],
-		}),
-	);
-	expect(cues).toHaveLength(1);
-	const cue = cues[0];
-	if (cue?.kind !== "stack") throw new Error("Expected stack output.");
-	expect(cue.sourceActorId).toBe(merge ? undefined : source.id);
 });

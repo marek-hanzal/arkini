@@ -39,7 +39,6 @@ const createItemFn = (artworkScale: number): TileActorItem => ({
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 3,
 	badgeCount: 3,
 	revision: "revision:tile",
 	running: true,
@@ -163,7 +162,7 @@ describe("authored tile artwork scale", () => {
 					expect(actor.container.scale.x).toBe(1);
 					for (const graphics of [
 						actor.progressBar,
-						actor.currentVisual.quantityBackground,
+						actor.currentVisual.badgeBackground,
 					]) {
 						const bounds = graphics.getLocalBounds();
 						expect(bounds.minX).toBeGreaterThanOrEqual(0);

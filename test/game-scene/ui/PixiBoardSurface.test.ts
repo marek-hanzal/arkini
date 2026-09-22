@@ -24,7 +24,6 @@ const boardState = vi.hoisted(() => ({
 	openItemDetail: vi.fn(),
 	runDrop: vi.fn(),
 	runSpaceActivation: vi.fn(() => Promise.resolve(true)),
-	splitStack: vi.fn(() => Promise.resolve(true)),
 	registerInteraction: vi.fn(),
 	enqueueLine: vi.fn(),
 	enqueueLineState: {
@@ -62,7 +61,6 @@ vi.mock("~/tile-interaction/ui/useTileCommands", () => ({
 	useTileCommands: () => ({
 		runDropFn: boardState.runDrop,
 		runItemActionFn: boardState.runSpaceActivation,
-		runSplitFn: boardState.splitStack,
 	}),
 }));
 
@@ -150,7 +148,6 @@ afterEach(async () => {
 	boardState.openItemDetail.mockClear();
 	boardState.runDrop.mockClear();
 	boardState.runSpaceActivation.mockClear();
-	boardState.splitStack.mockClear();
 	boardState.registerInteraction.mockClear();
 	boardState.enqueueLine.mockClear();
 	boardState.enqueueLineState = {
@@ -196,7 +193,6 @@ describe("PixiBoardSurface", () => {
 			primaryAction: {
 				kind: "none",
 			},
-			quantity: 1,
 			revision: "revision:producer",
 			running: false,
 			activityEffect: false,
@@ -238,45 +234,6 @@ describe("PixiBoardSurface", () => {
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
-	it("submits an exact Board-stack split without invoking the tile primary action", async () => {
-		await renderSurface();
-		const createProps = boardState.createProps;
-		if (createProps === null) throw new Error("Board scene did not create its runtime.");
-		const stack = {
-			id: "runtime:stack",
-			itemId: "material",
-
-			location: {
-				scope: "board",
-				space: 0,
-				position: {
-					x: 2,
-					y: 1,
-				},
-			},
-			primaryAction: {
-				kind: "activate-space",
-				currentSpace: 0,
-			},
-			quantity: 5,
-			revision: "revision:stack",
-			running: false,
-			activityEffect: false,
-			artworkScale: 0.8,
-			sourceUrl: "resource:material",
-		} satisfies TileActorItem;
-
-		await createProps.onActivateFn(stack, "split-stack", document.createElement("canvas"));
-
-		expect(boardState.splitStack).toHaveBeenCalledWith({
-			itemId: stack.id,
-			location: stack.location,
-			revision: stack.revision,
-		});
-		expect(boardState.navigate).not.toHaveBeenCalled();
-		expect(boardState.openItemDetail).not.toHaveBeenCalled();
-	});
-
 	it("routes single and fill default-line intents without interpreting queue capacity", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
@@ -302,7 +259,6 @@ describe("PixiBoardSurface", () => {
 					used: 2,
 				},
 			},
-			quantity: 1,
 			revision: "revision:producer:running",
 			running: true,
 			activityEffect: true,

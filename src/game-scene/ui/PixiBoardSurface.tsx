@@ -20,7 +20,7 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
  * Mounts the one Pixi-native Board scene into the React-owned game shell.
  *
  * Right click performs the canonical primary action, Ctrl+right click fills its default-line queue,
- * Shift+right click splits a Board stack, and left click opens Item Detail. Portals retain their original click mapping. React forwards commands
+ * Left click opens Item Detail. Portals retain their original click mapping. React forwards commands
  * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
 export const PixiBoardSurface = () => {
@@ -32,7 +32,7 @@ export const PixiBoardSurface = () => {
 			playSfxEventFn,
 		],
 	);
-	const { runItemActionFn, runDropFn, runSplitFn } = useTileCommands(game);
+	const { runItemActionFn, runDropFn } = useTileCommands(game);
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
@@ -53,15 +53,6 @@ export const PixiBoardSurface = () => {
 						origin,
 					}),
 				);
-				return;
-			}
-			if (intent === "split-stack") {
-				if (item.location.scope !== "board" || item.quantity < 2) return;
-				await runSplitFn({
-					itemId: item.id,
-					location: item.location,
-					revision: item.revision,
-				});
 				return;
 			}
 			if (intent === "fill-default-line-queue") {
@@ -112,7 +103,6 @@ export const PixiBoardSurface = () => {
 		[
 			enqueueLineFn,
 			runItemActionFn,
-			runSplitFn,
 		],
 	);
 

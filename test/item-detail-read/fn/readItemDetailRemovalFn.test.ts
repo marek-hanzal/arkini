@@ -25,8 +25,6 @@ const depleted = {
 	itemId: owner.id,
 	canonicalItemId: owner.item.id,
 	location: owner.location,
-	previousQuantity: 1,
-	resultingQuantity: 0,
 };
 
 it("retains zero units from the removal commit instead of the outgoing positive balance", () => {
@@ -56,22 +54,6 @@ it("retains zero units from the removal commit instead of the outgoing positive 
 		reason: "depleted",
 	});
 	expect(previous.items[0].remainingUnits).toBe(1);
-});
-
-it("preserves a surviving stack rather than marking its identity depleted", () => {
-	const transition = CommittedTransitionSchema.parse({
-		sequence: 1,
-		previousRuntime: previous,
-		runtime: previous,
-		events: [
-			{
-				...depleted,
-				previousQuantity: 2,
-				resultingQuantity: 1,
-			},
-		],
-	});
-	expect(readItemDetailRemovalFn(transition, owner.id)).toBeUndefined();
 });
 
 it("reads the whole terminal snapshot without reconstructing it from the previous commit", () => {
@@ -110,7 +92,6 @@ it("reads the whole terminal snapshot without reconstructing it from the previou
 				itemId: owner.id,
 				canonicalItemId: owner.item.id,
 				location: owner.location,
-				quantity: 1,
 			},
 		],
 	});

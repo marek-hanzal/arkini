@@ -25,15 +25,12 @@ for (const phase of [
 	"pending",
 	"outbound",
 	"fade-out",
-	"fade-in",
-	"return",
 ] as const) {
-	it(`retires ${phase} input playback before canonical delivery takes the remainder`, () => {
+	it(`retires ${phase} input playback before canonical delivery takes the item`, () => {
 		const source = createActor("runtime:source"),
 			receiver = createActor("runtime:receiver");
 		source.item = {
 			...source.item,
-			quantity: 7,
 			location: firstBoardLocation,
 		};
 		source.currentVisual.item = source.item;
@@ -50,7 +47,6 @@ for (const phase of [
 			canonicalItems: createItemMap(
 				{
 					...source.item,
-					quantity: 2,
 				},
 				receiver.item,
 			),
@@ -127,12 +123,9 @@ for (const phase of [
 			kind: "input",
 			originActorId: source.item.id,
 			originLocation: firstBoardLocation,
-			previousQuantity: 7,
-			resultingQuantity: 2,
 			sequence: 40,
 			sourceActorId: source.item.id,
 			staggerIndex: 0,
-			storedQuantity: 5,
 			targetActorId: receiver.item.id,
 			targetLocation: secondBoardLocation,
 		};
@@ -147,17 +140,14 @@ for (const phase of [
 					cue,
 				]),
 			);
-			Effect.runSync(runtime.syncPresentationFx);
 			if (phase !== "pending") Effect.runSync(runtime.startFx);
 			const outward = tweens.at(-1);
 			if (phase !== "pending") {
 				expect(outward).toBeDefined();
 				outward!.props.onUpdateFn(0.25);
 			}
-			if (phase === "fade-out" || phase === "fade-in" || phase === "return") {
+			if (phase === "fade-out") {
 				finishTween(outward!);
-				if (phase === "fade-in" || phase === "return") finishTween(tweens.at(-1)!);
-				if (phase === "return") finishTween(tweens.at(-1)!);
 			}
 			// A queued sibling is obsolete too; an unrelated successor must remain runnable.
 			Effect.runSync(
@@ -165,9 +155,6 @@ for (const phase of [
 					{
 						...cue,
 						sequence: 41,
-						previousQuantity: 2,
-						resultingQuantity: 1,
-						storedQuantity: 1,
 					},
 					{
 						kind: "spawn",
@@ -200,11 +187,7 @@ for (const phase of [
 			expect(
 				Effect.runSync(runtime.readSnapshotFx).retainedActorIds.has(source.item.id),
 			).toBe(false);
-			expect(
-				Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId.has(
-					source.item.id,
-				),
-			).toBe(false);
+
 			expect(source.container.destroyed).toBe(false);
 			expect(source.container).toMatchObject({
 				...livePose,
@@ -216,7 +199,6 @@ for (const phase of [
 					{
 						item: {
 							...source.item,
-							quantity: 1,
 						},
 						from: firstBoardLocation,
 						to: secondBoardLocation,
@@ -227,7 +209,6 @@ for (const phase of [
 					},
 				]),
 			);
-			Effect.runSync(runtime.syncPresentationFx);
 			Effect.runSync(runtime.startFx);
 			for (let i = 0; i < tweens.length && i < 100; i++) {
 				const tween = tweens[i]!;

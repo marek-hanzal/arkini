@@ -83,6 +83,7 @@ beforeEach(async () => {
 		mode: 0o755,
 	});
 	// Isolate expensive compilation while exercising the real Argcfile control flow and hasher.
+	await writeFile(join(root, ".out/desktop/build/main/index.js"), "");
 	await writeFile(
 		join(root, ".out/desktop/build/main/cli/serakki.js"),
 		`

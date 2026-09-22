@@ -23,6 +23,7 @@ clean_desktop() {
 
 build_desktop() {
 	electron-vite build
+	node --check .out/desktop/build/main/index.js
 }
 
 # @cmd Print the canonical SHA-256 key for the repository game build

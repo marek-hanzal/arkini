@@ -40,6 +40,10 @@ files:
     to: node_modules/detect-libc
     filter:
       - '**/*'
+  - from: node_modules/fflate
+    to: node_modules/fflate
+    filter:
+      - '**/*'
   - from: node_modules/sharp
     to: node_modules/sharp
     filter:

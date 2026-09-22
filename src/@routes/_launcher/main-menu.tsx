@@ -205,24 +205,26 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 					>
 						Exit
 					</Button>
-					<button
-						type="button"
-						className="mx-auto inline-flex items-center gap-2 pt-1 text-sm font-semibold text-white underline underline-offset-4 transition-colors hover:text-accent disabled:cursor-progress disabled:opacity-70"
-						data-ui="ExportDiagnostics"
-						disabled={diagnosticsExportPending}
-						onClick={() => exportDiagnosticsFn(undefined)}
-					>
-						{diagnosticsExportPending ? (
-							<LoaderCircle className="size-4 animate-spin" />
-						) : null}
-						Export diagnostics
-					</button>
-					<p
-						className="text-center text-xs text-subtle"
-						data-ui="SerakkiAppVersion"
-					>
-						v{SerakkiAppVersion}
-					</p>
+					<div className="flex items-center justify-center gap-4 pt-1">
+						<p
+							className="text-xs text-subtle"
+							data-ui="SerakkiAppVersion"
+						>
+							v{SerakkiAppVersion}
+						</p>
+						<button
+							type="button"
+							className="inline-flex cursor-pointer items-center gap-2 text-xs font-normal text-white underline-offset-4 transition-colors hover:text-accent hover:underline disabled:cursor-progress disabled:opacity-70"
+							data-ui="ExportDiagnostics"
+							disabled={diagnosticsExportPending}
+							onClick={() => exportDiagnosticsFn(undefined)}
+						>
+							{diagnosticsExportPending ? (
+								<LoaderCircle className="size-4 animate-spin" />
+							) : null}
+							Export diagnostics
+						</button>
+					</div>
 					{catalogState.type === "failed" ? (
 						<p className="text-center text-sm text-danger">
 							Catalog failed: {String(catalogState.error)}

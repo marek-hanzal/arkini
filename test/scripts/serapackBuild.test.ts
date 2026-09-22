@@ -115,6 +115,7 @@ describe("repository Serapack build cache", () => {
 		await mkdir(join(root, "game/serakki/build"));
 		await writeFile(join(root, artifact), "old build");
 		expect(await fingerprintFn()).toBe(initial);
+		let previous = initial;
 		for (const file of [
 			"src/builder.ts",
 			"game/serakki/game.json",
@@ -125,19 +126,21 @@ describe("repository Serapack build cache", () => {
 			"game/serakki/sfx/click.ogg",
 			"game/serakki/sfx/click.json",
 		]) {
-			const before = await fingerprintFn();
 			await appendFile(join(root, file), "changed");
-			expect(await fingerprintFn()).not.toBe(before);
+			const current = await fingerprintFn();
+			expect(current).not.toBe(previous);
+			previous = current;
 		}
-		const beforeRename = await fingerprintFn();
 		await rename(
 			join(root, "game/serakki/artwork/a space.png"),
 			join(root, "game/serakki/artwork/renamed.png"),
 		);
-		expect(await fingerprintFn()).not.toBe(beforeRename);
+		const renamed = await fingerprintFn();
+		expect(renamed).not.toBe(previous);
 		await rm(join(root, "game/serakki/artwork/renamed.png"));
-		expect(await fingerprintFn()).not.toBe(beforeRename);
-	});
+		expect(await fingerprintFn()).not.toBe(renamed);
+		// Each fingerprint launches the real Bash pipeline; Windows process startup needs headroom.
+	}, 30_000);
 
 	it("skips only intact builds and rebuilds after source changes or damaged cache", async () => {
 		await runFn("build");

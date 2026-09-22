@@ -16,17 +16,14 @@ import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx
 const saveBuildVersionSchema = z
 	.object({
 		version: VersionPartsSchema,
-		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
 	})
 	.strict();
-const buildProjectSchema = saveBuildVersionSchema
-	.omit({
-		version: true,
+const buildProjectSchema = z
+	.object({
+		projectId: IdSchema,
 	})
-	.extend({
-		expectedVersion: VersionPartsSchema,
-	});
+	.strict();
 const readProjectBuildSchema = z
 	.object({
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),

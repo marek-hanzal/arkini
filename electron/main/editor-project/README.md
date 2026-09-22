@@ -117,11 +117,11 @@ Project and Item save command state belongs to the mounted form, so explicit Ref
 
 Application diagnostics record successful IPC revision transitions (operation, project, expected/previous/result revision), MCP invalidation reads, and renderer Refresh start/completion/failure with its last stage. These records contain identities and revision tokens, never authored config or resource bodies.
 
-External authored JSON and resource catalog changes are ignored while mounted. Requested image and audio bodies come directly from their registered disk paths; already mounted resource/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
+External authored JSON and resource catalog changes do not refresh mounted Editor projections. Build reads the saved source tree independently. Requested image and audio bodies come directly from their registered disk paths; already mounted resource/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Output version and Build admission
 
-Output version settings live as structured `game.json.version` fields. Ordinary authoring preserves them. Build saves a validated choice without changing authoring revision, then builds that exact saved version and content revision. Saving and updating the renderer metadata settle together even when compilation fails; this metadata update never publishes or resets the live Board.
+Output version settings live as structured `game.json.version` fields. Ordinary authoring preserves them. Editor Build saves a validated choice onto the current game file without changing authoring revision, then compiles the saved tree without comparing it with mounted Editor state. Saving and updating the renderer metadata settle together even when compilation fails; this metadata update never publishes or resets the live Board. Build and Play uses the saved output version as-is.
 
 Build and CLI pack publish compiled JSON and validated staged resource bytes. Image and audio sources are copied before validation; Artwork is normalized into an owned staged file. Packing reads those same files, so external source edits cannot invalidate admitted resource lengths or bytes. Invalid staged resources leave the previous build intact. The build descriptor carries its actual formatted version, revision and content hash. Installation derives compatibility from that artifact, not from mutable output settings. There are no history, object-store or scenario operations.
 

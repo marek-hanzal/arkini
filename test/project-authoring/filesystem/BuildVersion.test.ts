@@ -49,7 +49,6 @@ describe("filesystem build version metadata", () => {
 		const saved = await Effect.runPromise(
 			repository.saveBuildVersionFx({
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 				version,
 			}),
 		);
@@ -68,7 +67,6 @@ describe("filesystem build version metadata", () => {
 		await Effect.runPromise(
 			repository.saveBuildVersionFx({
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 				version,
 			}),
 		);
@@ -88,8 +86,6 @@ describe("filesystem build version metadata", () => {
 		const build = await Effect.runPromise(
 			reopened.buildProjectFx({
 				projectId: project.projectId,
-				expectedRevision: project.revision,
-				expectedVersion: version,
 			}),
 		);
 		expect(build).toMatchObject({
@@ -98,28 +94,22 @@ describe("filesystem build version metadata", () => {
 		});
 	});
 
-	it("rejects a stale authoring revision and an intervening same-revision version selection", async () => {
+	it("saves output version after an item edit and builds the latest saved revision", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
-		await expect(
-			Effect.runPromise(
-				repository.saveBuildVersionFx({
-					projectId: project.projectId,
-					expectedRevision: project.revision - 1,
-					version: {
-						major: 8,
-						minor: 0,
-					},
-				}),
-			),
-		).rejects.toMatchObject({
-			operation: "save-build-version",
-			reason: "revision-conflict",
-		});
+		const edited = await Effect.runPromise(
+			repository.upsertItemFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+				item: {
+					...project.config.items.water,
+					title: "Edited before Build",
+				},
+			}),
+		);
 		await Effect.runPromise(
 			repository.saveBuildVersionFx({
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 				version: {
 					major: 2,
 					minor: 0,
@@ -130,17 +120,15 @@ describe("filesystem build version metadata", () => {
 			Effect.runPromise(
 				repository.buildProjectFx({
 					projectId: project.projectId,
-					expectedRevision: project.revision,
-					expectedVersion: project.version,
 				}),
 			),
-		).rejects.toMatchObject({
-			operation: "build-project",
-			message: expect.stringContaining("selected build version changed"),
+		).resolves.toMatchObject({
+			version: "2.0",
+			revision: edited.revision,
 		});
 	});
 
-	it("rejects unrefreshed source changes before replacing version metadata", async () => {
+	it("saves output version onto the current game file without discarding its other fields", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -155,24 +143,30 @@ describe("filesystem build version metadata", () => {
 			},
 		});
 		await writeFile(target, external);
-		await expect(
-			Effect.runPromise(
-				repository.saveBuildVersionFx({
-					projectId: project.projectId,
-					expectedRevision: project.revision,
-					version: {
-						major: 2,
-						minor: 0,
-					},
-				}),
-			),
-		).rejects.toMatchObject({
-			operation: "save-build-version",
+		await Effect.runPromise(
+			repository.saveBuildVersionFx({
+				projectId: project.projectId,
+				version: {
+					major: 2,
+					minor: 0,
+				},
+			}),
+		);
+		expect(JSON.parse(await readFile(target, "utf8"))).toMatchObject({
+			meta: {
+				title: "External title",
+			},
+			version: {
+				major: 2,
+				minor: 0,
+			},
 		});
-		expect(await readFile(target, "utf8")).toBe(external);
 		expect(
 			(await Effect.runPromise(repository.readProjectFx(project.projectId)))?.version,
-		).toEqual(project.version);
+		).toEqual({
+			major: 2,
+			minor: 0,
+		});
 	});
 
 	it("does not publish repository state when the version write fails", async () => {
@@ -206,7 +200,6 @@ describe("filesystem build version metadata", () => {
 			Effect.runPromise(
 				repository.saveBuildVersionFx({
 					projectId: project.projectId,
-					expectedRevision: project.revision,
 					version: {
 						major: 2,
 						minor: 0,

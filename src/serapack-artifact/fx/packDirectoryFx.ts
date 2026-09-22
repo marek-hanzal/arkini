@@ -260,6 +260,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		serapack: path.join(build, filename),
 		filename,
 		packageId: identity.packageId,
+		projectRevision: projectManifest.revision,
 		version: identity.version,
 		json: compilation.json,
 		resources: artifact.resources,

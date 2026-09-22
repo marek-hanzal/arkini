@@ -33,8 +33,6 @@ export const prepareProjectGameFx = Effect.fn("prepareProjectGameFx")(
 				};
 			const artifact = yield* builds.buildProjectFx({
 				projectId,
-				expectedRevision: project.revision,
-				expectedVersion: project.version,
 			});
 			const plan = readEditorBuildInstallPlanFn({
 				serapacks: state.serapacks,

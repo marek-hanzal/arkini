@@ -12,7 +12,6 @@ import { EditorBuildRepository } from "~/editor-build/service/EditorBuildReposit
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 interface BuildRequest {
-	readonly expectedRevision: number;
 	readonly version: VersionPartsSchema.Type;
 }
 
@@ -23,31 +22,31 @@ export const BuildCommandAtoms = RendererRuntime.runSync(
 			Atom.fn((request: BuildRequest) =>
 				Effect.gen(function* () {
 					// Remember output metadata even if compilation later fails, without publishing a Board revision.
-					yield* Effect.uninterruptible(
+					const mountedRevision = yield* Effect.uninterruptible(
 						Effect.gen(function* () {
 							const version = yield* repository.saveBuildVersionFx({
-								...request,
 								projectId,
+								version: request.version,
 							});
 							const projectAtom = EditorProjectAtom(projectId);
 							const project = yield* Atom.get(projectAtom);
-							if (
-								project !== undefined &&
-								project.revision === request.expectedRevision
-							)
+							if (project !== undefined)
 								yield* Atom.set(projectAtom, {
 									project: {
 										...project,
 										version,
 									},
 								});
+							return project?.revision;
 						}),
 					);
-					return yield* repository.buildProjectFx({
+					const artifact = yield* repository.buildProjectFx({
 						projectId,
-						expectedRevision: request.expectedRevision,
-						expectedVersion: request.version,
 					});
+					return {
+						artifact,
+						mountedRevision,
+					};
 				}),
 			).pipe(Atom.keepAlive),
 		),

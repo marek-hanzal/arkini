@@ -12,8 +12,11 @@ import {
 	type ProjectTestHarness,
 } from "./support/createProjectTestHarness";
 import { decodeTestSerapackEnvelopeFx } from "~test/serapack-support/fx/testSerapackCodecFx";
+import { decodeTestSerapackPayloadFx } from "~test/serapack-support/fx/testSerapackCodecFx";
 import { encodeTestSerapackEnvelopeFx } from "~test/serapack-support/fx/testSerapackCodecFx";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
+import { createFreshProjectFx } from "~/project-authoring/fx/createFreshProjectFx";
+import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 
 let harness: ProjectTestHarness;
 
@@ -24,6 +27,25 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project build", () => {
+	it("builds a newly created empty project before its first Editor build", async () => {
+		const repository = await harness.openRepository();
+		const project = await Effect.runPromise(
+			createFreshProjectFx("fresh-game").pipe(
+				Effect.provideService(ProjectRepository, repository),
+			),
+		);
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+				}),
+			),
+		).resolves.toMatchObject({
+			projectId: project.projectId,
+			revision: project.revision,
+		});
+	});
+
 	it("builds a fresh project directly", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project-unversioned");
@@ -31,9 +53,7 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
-					expectedVersion: project.version,
 					projectId: project.projectId,
-					expectedRevision: project.revision,
 				}),
 			),
 		).resolves.toMatchObject({
@@ -62,14 +82,37 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
-					expectedVersion: project.version,
 					projectId: project.projectId,
-					expectedRevision: dirty.revision,
 				}),
 			),
 		).resolves.toMatchObject({
 			version: "1.0",
 			revision: dirty.revision,
+		});
+	});
+
+	it("builds an item edit without refreshing the Editor project", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "project-item-edit");
+		const water = project.config.items.water;
+		const commit = await Effect.runPromise(
+			repository.upsertItemFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+				item: {
+					...water,
+					title: "Fresh Water",
+				},
+			}),
+		);
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+				}),
+			),
+		).resolves.toMatchObject({
+			revision: commit.revision,
 		});
 	});
 
@@ -115,8 +158,6 @@ describe("filesystem Editor project build", () => {
 			Effect.runPromise(
 				repository.buildProjectFx({
 					projectId: project.projectId,
-					expectedRevision: updated.revision,
-					expectedVersion: updated.version,
 				}),
 			),
 		).resolves.toMatchObject({
@@ -142,9 +183,7 @@ describe("filesystem Editor project build", () => {
 		if (root === null) throw new Error("Project root is missing.");
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
-				expectedVersion: project.version,
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 			}),
 		);
 
@@ -179,9 +218,7 @@ describe("filesystem Editor project build", () => {
 		);
 		const rebuilt = await Effect.runPromise(
 			repository.buildProjectFx({
-				expectedVersion: project.version,
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 			}),
 		);
 		expect(rebuilt.contentHash).toBe(artifact.contentHash);
@@ -199,9 +236,7 @@ describe("filesystem Editor project build", () => {
 		);
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
-				expectedVersion: project.version,
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 			}),
 		);
 		const serapackPath = join(root, "build", "project-tamper.serapack");
@@ -256,9 +291,7 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
-					expectedVersion: project.version,
 					projectId: project.projectId,
-					expectedRevision: project.revision,
 				}),
 			),
 		).rejects.toMatchObject({
@@ -284,9 +317,7 @@ describe("filesystem Editor project build", () => {
 
 		const artifact = await Effect.runPromise(
 			repository.buildProjectFx({
-				expectedVersion: project.version,
 				projectId: project.projectId,
-				expectedRevision: project.revision,
 			}),
 		);
 
@@ -298,33 +329,55 @@ describe("filesystem Editor project build", () => {
 		);
 	});
 
-	it("rejects unrefreshed external source changes before publishing", async () => {
+	it("builds the saved source even when the mounted Editor projection differs", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.external-change");
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Project root is missing.");
 		const gamePath = join(root, "game.json");
 		const source = JSON.parse(await readFile(gamePath, "utf8"));
-		source.meta.title = "Externally changed without Refresh";
+		source.meta.title = "Current saved title";
 		await writeFile(gamePath, `${JSON.stringify(source, undefined, "\t")}\n`);
+		const markerPath = join(root, "project.json");
+		const marker = JSON.parse(await readFile(markerPath, "utf8"));
+		await writeFile(
+			markerPath,
+			`${JSON.stringify({
+				...marker,
+				revision: project.revision + 1,
+			})}\n`,
+		);
 
+		const artifact = await Effect.runPromise(
+			repository.buildProjectFx({
+				projectId: project.projectId,
+			}),
+		);
+		const envelope = Effect.runSync(
+			decodeTestSerapackEnvelopeFx(
+				new Uint8Array(
+					await readFile(join(root, "build", "project%2Eexternal-change.serapack")),
+				),
+			),
+		);
+		const payload = Effect.runSync(decodeTestSerapackPayloadFx(envelope.payload));
+		expect(payload.config.meta.title).toBe("Current saved title");
+		expect(artifact.revision).toBe(project.revision + 1);
 		await expect(
 			Effect.runPromise(
-				repository.buildProjectFx({
-					expectedVersion: project.version,
-					projectId: project.projectId,
-					expectedRevision: project.revision,
-				}),
+				repository.withProjectBuildPathFx(
+					{
+						projectId: project.projectId,
+						expectedRevision: artifact.revision,
+						contentHash: artifact.contentHash,
+					},
+					(path) => Effect.promise(() => readFile(path)),
+				),
 			),
-		).rejects.toMatchObject({
-			operation: "build-project",
-			message:
-				"The saved project differs from the open Editor state. Refresh the project and build again.",
-		});
-		await expect(readdir(join(root, "build"))).rejects.toBeDefined();
+		).resolves.toHaveLength(artifact.size);
 	});
 
-	it("classifies structurally invalid external edits as requiring Refresh", async () => {
+	it("rejects structurally invalid saved source through compilation", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.invalid-external-change");
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -334,15 +387,11 @@ describe("filesystem Editor project build", () => {
 		await expect(
 			Effect.runPromise(
 				repository.buildProjectFx({
-					expectedVersion: project.version,
 					projectId: project.projectId,
-					expectedRevision: project.revision,
 				}),
 			),
 		).rejects.toMatchObject({
 			operation: "build-project",
-			message:
-				"The saved project differs from the open Editor state. Refresh the project and build again.",
 		});
 		await expect(readdir(join(root, "build"))).rejects.toBeDefined();
 	});

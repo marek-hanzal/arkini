@@ -89,10 +89,10 @@ export const useEditorBuildArtifactController = ({
 	const dismissedValidationAtom = DismissedEditorBuildValidationAtom(project.projectId);
 	const dismissedValidation = useAtomValue(dismissedValidationAtom);
 	const setDismissedValidationFn = useAtomSet(dismissedValidationAtom);
-	const builtArtifact =
+	const built =
 		AsyncResult.isSuccess(buildResult) && !buildResult.waiting ? buildResult.value : undefined;
-	const artifact = builtArtifact?.revision === project.revision ? builtArtifact : undefined;
-	const artifactStale = builtArtifact !== undefined && artifact === undefined;
+	const artifact = built?.mountedRevision === project.revision ? built.artifact : undefined;
+	const artifactStale = built !== undefined && artifact === undefined;
 	const buildError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(buildResult));
 	const buildFailure = readEditorBuildFailureFn(buildError);
 	const diagnostics =
@@ -128,7 +128,6 @@ export const useEditorBuildArtifactController = ({
 		buildFn: () => {
 			if (!canBuild) return;
 			runBuildFn({
-				expectedRevision: project.revision,
 				version,
 			});
 		},

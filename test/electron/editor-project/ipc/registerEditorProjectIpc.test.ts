@@ -1,4 +1,3 @@
-import { parseVersionFn } from "~/game-version/fn/parseVersionFn";
 import type { IpcMainInvokeEvent } from "electron";
 import { Effect, Semaphore } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -243,7 +242,6 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		const saveVersionRequest = {
 			projectId: "project-one",
-			expectedRevision: 1,
 			version: {
 				major: 2,
 				minor: 3,
@@ -271,18 +269,14 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.saveBuildVersionFx).toHaveBeenCalledOnce();
 		await expect(
 			invoke(SerakkiElectronApi.channels.editorProjectBuild, {
-				expectedVersion: parseVersionFn(editorTestPayload.version),
 				projectId: "project-one",
-				expectedRevision: 1,
 			}),
 		).resolves.toEqual({
 			type: "success",
 			value: editorProjectIpcBuild,
 		});
 		expect(repository.buildProjectFx).toHaveBeenCalledWith({
-			expectedVersion: parseVersionFn(editorTestPayload.version),
 			projectId: "project-one",
-			expectedRevision: 1,
 		});
 		await expect(
 			invoke(SerakkiElectronApi.channels.editorProjectBuildSave, {

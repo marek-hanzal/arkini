@@ -1,4 +1,4 @@
-import { Effect, FileSystem } from "effect";
+import { ByteSize, Effect, FileSystem } from "effect";
 import { access, mkdtemp, readFile, realpath, rm, truncate, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -57,6 +57,41 @@ describe("createFilesystemSerapackCatalogFx", () => {
 				source: "user",
 			}),
 		]);
+	});
+
+	it("admits a package larger than the former per-root budget through the default catalog", async () => {
+		const roots = readRoots(root);
+		const packageId = "large-artwork";
+		const packagePath = await writePackage({
+			root: roots.bundled,
+			packageId,
+			bytes: createBundledBytes(packageId),
+		});
+		const fileSystem = await createNodeFileSystem();
+		const inspectedPaths: string[] = [];
+		// The scan owns metadata admission; keep actual codec/provenance reads small and real.
+		const catalog = await createCatalog(root, {
+			...fileSystem,
+			stat: (path) =>
+				fileSystem.stat(path).pipe(
+					Effect.map((info) => {
+						if (path !== packagePath) return info;
+						inspectedPaths.push(path);
+						return {
+							...info,
+							size: ByteSize.bytes(300 * 1024 * 1024),
+						};
+					}),
+				),
+		});
+
+		expect(await Effect.runPromise(catalog.listFx)).toEqual([
+			readFileRecord({
+				packageId,
+				source: "bundled",
+			}),
+		]);
+		expect(inspectedPaths).toContain(packagePath);
 	});
 
 	it("round-trips every admitted UTF-16 package identity without filename collisions", async () => {

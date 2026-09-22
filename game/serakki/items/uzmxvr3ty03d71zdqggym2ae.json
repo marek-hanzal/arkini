@@ -12,7 +12,6 @@
 				"clay-jug-with-lye"
 			]
 		},
-		"maxStackSize": 3,
 		"maxQueueSize": 1,
 		"lines": []
 	}

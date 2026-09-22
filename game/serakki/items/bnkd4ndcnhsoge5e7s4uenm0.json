@@ -12,7 +12,6 @@
 				"grass-field"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 32,
 			"output": {

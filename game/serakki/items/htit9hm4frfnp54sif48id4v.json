@@ -12,7 +12,6 @@
 				"key-t6"
 			]
 		},
-		"maxStackSize": 2,
 		"maxQueueSize": 1,
 		"lines": []
 	}

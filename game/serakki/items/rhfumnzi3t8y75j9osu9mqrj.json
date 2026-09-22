@@ -12,7 +12,6 @@
 				"spoiled-beer-barrel"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

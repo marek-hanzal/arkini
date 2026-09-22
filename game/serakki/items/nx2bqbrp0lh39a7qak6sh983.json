@@ -12,7 +12,6 @@
 				"cooked-steak"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 1200000,
 			"enable": true,

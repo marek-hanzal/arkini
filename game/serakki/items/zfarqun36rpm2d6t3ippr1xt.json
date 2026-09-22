@@ -14,7 +14,6 @@
 				"corn-farm"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 1
 		},

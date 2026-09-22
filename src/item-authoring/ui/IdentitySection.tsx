@@ -3,7 +3,6 @@ import { Mx } from "~/translation/ui/Mx";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
-import { useStore } from "@tanstack/react-form";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -13,7 +12,6 @@ import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection"
 export const IdentitySection = () => {
 	const { form } = useFormSession();
 	const translator = useTranslator();
-	const clock = useStore(form.store, (state) => state.values.clock);
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormSectionDivider title={translator.textFn("Item details")} />
@@ -49,16 +47,6 @@ export const IdentitySection = () => {
 					<div className="flex items-start justify-between gap-4">
 						<ItemInterfaceField />
 					</div>
-					<form.AppField name="maxStackSize">
-						{(field) => (
-							<field.NumberField
-								disabled={clock !== undefined}
-								label={translator.textFn("Maximum stack size")}
-								description={<Mx label="Item stack size help" />}
-								min={1}
-							/>
-						)}
-					</form.AppField>
 					<form.AppField name="music">
 						{(field) => (
 							<EditorMusicSelection

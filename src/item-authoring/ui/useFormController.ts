@@ -178,8 +178,6 @@ export const useFormController = ({
 			if (current.description !== next.description)
 				form.setFieldValue("description", next.description);
 			if (current.ui !== next.ui) form.setFieldValue("ui", next.ui);
-			if (current.maxStackSize !== next.maxStackSize)
-				form.setFieldValue("maxStackSize", next.maxStackSize);
 			if (current.artwork !== next.artwork) form.setFieldValue("artwork", next.artwork);
 			if (current.lines !== next.lines) form.setFieldValue("lines", next.lines);
 			if (current.maxQueueSize !== next.maxQueueSize)
@@ -197,7 +195,6 @@ export const useFormController = ({
 	const enableClockFn = useCallback(() => {
 		if (form.state.values.clock !== undefined) return;
 		form.setFieldValue("action", undefined);
-		form.setFieldValue("maxStackSize", 1);
 		form.setFieldValue("clock", {
 			durationMs: 900_000,
 			enable: true,

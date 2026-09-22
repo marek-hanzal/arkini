@@ -12,7 +12,6 @@
 				"fruit-crate"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

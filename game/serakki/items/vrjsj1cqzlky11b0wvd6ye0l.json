@@ -12,7 +12,6 @@
 				"lumber-camp"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 8,
 		"lines": [
 			{

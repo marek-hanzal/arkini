@@ -12,7 +12,6 @@
 				"wood-fibers"
 			]
 		},
-		"maxStackSize": 10,
 		"merge": [
 			{
 				"target": {

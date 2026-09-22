@@ -12,7 +12,6 @@
 				"sick-bear"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 30000,
 			"durationMs": 300000,

@@ -12,7 +12,6 @@
 				"cocoa-powder"
 			]
 		},
-		"maxStackSize": 4,
 		"merge": [
 			{
 				"target": {

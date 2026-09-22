@@ -33,7 +33,6 @@ const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 		...project.config.start,
 		board: project.config.start.board.map((entry) => ({
 			...entry,
-			quantity: entry.quantity ?? 1,
 		})),
 	},
 });
@@ -63,14 +62,12 @@ describe("ProjectFormSchema", () => {
 				board: [
 					{
 						itemId: "water",
-						quantity: 1,
 						space: 0,
 						x: 0,
 						y: 0,
 					},
 					{
 						itemId: "stone",
-						quantity: 1,
 						space: 1,
 						x: 0,
 						y: 0,
@@ -87,7 +84,6 @@ describe("ProjectFormSchema", () => {
 					...value.start.board,
 					{
 						itemId: "stone",
-						quantity: 1,
 						space: 0,
 						x: 0,
 						y: 0,
@@ -174,7 +170,6 @@ describe("ProjectFormSchema", () => {
 					board: [
 						{
 							itemId: "water",
-							quantity: 1,
 							space: 0,
 							x: 1,
 							y: 1,

@@ -12,7 +12,6 @@
 				"british-shorthair-kitten-on-sword"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 30000,
 			"enable": true,

@@ -12,7 +12,6 @@
 				"soap"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

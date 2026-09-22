@@ -12,7 +12,6 @@
 				"burned-sack-with-corn-kernels"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 15000,
 			"enable": true,

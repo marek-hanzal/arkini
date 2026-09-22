@@ -63,7 +63,6 @@ const createClockGraph = async ({
 						...additionalLines,
 					],
 		}),
-		maxStackSize: 1,
 		ui,
 		clock: {
 			intervalMs: once ? undefined : 1000,
@@ -93,7 +92,6 @@ const createClockGraph = async ({
 							x: 0,
 							y: 0,
 							space: 0,
-							quantity: 1,
 						},
 					],
 				},

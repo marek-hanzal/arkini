@@ -12,7 +12,6 @@
 				"raw-chicken"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 900000,
 			"enable": true,

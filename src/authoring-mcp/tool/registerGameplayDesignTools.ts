@@ -7,7 +7,6 @@ import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { deleteItemFx } from "./deleteItemFx";
@@ -124,15 +123,12 @@ const SetStartItemInputSchema = z
 			"The exact initial slot to set. Board locations require an explicit numeric space.",
 		),
 		itemId: IdSchema.describe("The exact canonical item ID to place initially."),
-		quantity: PositiveIntegerSchema.default(1).describe(
-			"The initial stack quantity; defaults to one.",
-		),
 	})
 	.strict()
 	.meta({
 		$id: "urn:serakki:schema:mcp:set-start-item-input",
 		title: "Set start item tool input",
-		description: "One exact initial stack to insert or replace at a grid location.",
+		description: "One exact initial item to insert or replace at a grid location.",
 	});
 
 const RemoveStartItemInputSchema = z
@@ -271,17 +267,16 @@ export const registerGameplayDesignToolsFn = ({
 		"set_start_item",
 		{
 			description:
-				"Insert or replace one exact initial item stack. A board location must include its numeric space. The item must exist, fit the layout, and respect its stack limit. Read project_config first and copy its revision.",
+				"Insert or replace one exact initial item. A board location must include its numeric space. The item must exist, fit the layout. Read project_config first and copy its revision.",
 			inputSchema: SetStartItemInputSchema,
 		},
-		async ({ itemId, location, quantity, revision }) =>
+		async ({ itemId, location, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						updateStartItemFx({
 							change: {
 								itemId,
-								quantity,
 								type: "set",
 							},
 							location,
@@ -298,7 +293,7 @@ export const registerGameplayDesignToolsFn = ({
 		"remove_start_item",
 		{
 			description:
-				"Remove the item stack at one exact initial location. A board location must include its numeric space, so equal coordinates in another space remain untouched. Read project_config first and copy its revision.",
+				"Remove the item at one exact initial location. A board location must include its numeric space, so equal coordinates in another space remain untouched. Read project_config first and copy its revision.",
 			inputSchema: RemoveStartItemInputSchema,
 		},
 		async ({ location, revision }) =>

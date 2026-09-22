@@ -13,7 +13,6 @@
 				"charcoal-kiln"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
 			{

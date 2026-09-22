@@ -12,7 +12,6 @@
 				"pig-pen"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 8,
 			"output": {

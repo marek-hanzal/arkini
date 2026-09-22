@@ -13,7 +13,6 @@
 				"flax-farm"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
 			{

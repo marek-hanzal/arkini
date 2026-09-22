@@ -12,7 +12,6 @@
 				"beagles-sniffing-each-other"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,
 			"enable": true,

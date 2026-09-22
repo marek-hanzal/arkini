@@ -133,7 +133,6 @@ const createSearchItem = (id: string, spent: boolean) =>
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize: 1,
 		...(spent
 			? {
 					units: {

@@ -28,16 +28,26 @@ export const createGraphProject = () => {
 					{
 						itemId: "water",
 						space: 0,
+						x: 3,
+						y: 0,
+					},
+					{
+						itemId: "water",
+						space: 0,
+						x: 4,
+						y: 0,
+					},
+					{
+						itemId: "water",
+						space: 0,
 						x: 1,
 						y: 0,
-						quantity: 3,
 					},
 					{
 						itemId: "tool",
 						space: 0,
 						x: 2,
 						y: 0,
-						quantity: 1,
 					},
 					{
 						itemId: "forge",

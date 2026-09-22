@@ -13,7 +13,6 @@
 				"townhall-t1"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": [
 			{

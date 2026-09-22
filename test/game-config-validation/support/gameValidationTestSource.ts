@@ -16,7 +16,6 @@ export const createItemBase = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 10,
 });
 
 export const createSimpleItem = (id: string) =>

@@ -12,7 +12,6 @@
 				"paper"
 			]
 		},
-		"maxStackSize": 32,
 		"merge": [
 			{
 				"target": {

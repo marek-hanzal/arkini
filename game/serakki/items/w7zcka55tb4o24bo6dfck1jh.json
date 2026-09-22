@@ -12,7 +12,6 @@
 				"mouse-full-belly"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 30000,
 			"enable": true,

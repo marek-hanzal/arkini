@@ -45,7 +45,6 @@ export const editorTestConfig = GameConfigSchema.parse({
 					"item-water",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });

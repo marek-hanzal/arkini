@@ -29,7 +29,6 @@ export const createDraftFn = ({
 				string,
 			],
 		},
-		maxStackSize: 1,
 		lines: [],
 		maxQueueSize: 1,
 	};

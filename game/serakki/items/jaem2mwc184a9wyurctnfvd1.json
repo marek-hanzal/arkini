@@ -12,7 +12,6 @@
 				"bakery"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
 			{

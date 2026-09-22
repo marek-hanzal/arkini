@@ -12,7 +12,6 @@
 				"coin-stack"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

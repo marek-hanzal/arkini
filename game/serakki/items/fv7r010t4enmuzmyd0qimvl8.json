@@ -12,7 +12,6 @@
 				"gem-mine"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 32,
 			"output": {

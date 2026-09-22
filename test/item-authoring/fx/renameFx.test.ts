@@ -21,7 +21,6 @@ describe("renameFx", () => {
 					...createProducerItem({
 						id: "clock",
 					}),
-					maxStackSize: 1,
 					clock: {
 						intervalMs: 1000,
 						rules: [

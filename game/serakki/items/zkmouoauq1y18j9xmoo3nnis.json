@@ -12,7 +12,6 @@
 				"sack-with-cocoa-powder"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 900000,
 			"enable": true,

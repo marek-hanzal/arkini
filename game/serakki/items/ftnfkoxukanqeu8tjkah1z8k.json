@@ -13,7 +13,6 @@
 				"treasure-chest-t1"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 1
 		},

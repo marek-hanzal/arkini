@@ -12,7 +12,6 @@
 				"healing-kit"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 6
 		},

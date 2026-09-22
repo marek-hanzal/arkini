@@ -26,7 +26,6 @@ export const copyItemSectionFn = (
 				title: source.title,
 				description: source.description ?? "",
 				ui: source.ui,
-				maxStackSize: current.clock === undefined ? source.maxStackSize : 1,
 				music: source.music,
 			};
 		case "artwork":
@@ -65,7 +64,6 @@ export const copyItemSectionFn = (
 					? {}
 					: {
 							action: undefined,
-							maxStackSize: 1,
 						}),
 			};
 		case "action":

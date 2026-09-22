@@ -12,7 +12,6 @@
 				"corrupted-beagle-puppy-with-fawn"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 30000,
 			"enable": true,

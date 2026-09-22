@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { BoardItemSchema } from "~/game-start/schema/BoardItemSchema";
@@ -24,10 +23,6 @@ const EditorProjectSizeSchema = SizeSchema.extend({
 	width: SizeSchema.shape.width.max(EditorProjectSizeMax),
 });
 
-const ProjectStartBoardItemSchema = BoardItemSchema.extend({
-	quantity: PositiveIntegerSchema,
-});
-
 export const ProjectFormBaseSchema = z
 	.object({
 		title: TitleSchema,
@@ -38,7 +33,7 @@ export const ProjectFormBaseSchema = z
 		start: z
 			.object({
 				currentSpace: NonNegativeIntegerSchema,
-				board: z.array(ProjectStartBoardItemSchema),
+				board: z.array(BoardItemSchema),
 			})
 			.strict(),
 	})

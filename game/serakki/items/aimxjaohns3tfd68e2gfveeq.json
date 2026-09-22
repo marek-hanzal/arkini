@@ -12,7 +12,6 @@
 				"mouse-with-cut-tail"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 300000,
 			"enable": true,

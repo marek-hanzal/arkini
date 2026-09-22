@@ -12,7 +12,6 @@
 				"sack-with-grain"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

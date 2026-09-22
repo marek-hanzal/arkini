@@ -13,7 +13,6 @@
 				"paper-shredded"
 			]
 		},
-		"maxStackSize": 16,
 		"merge": [
 			{
 				"target": {

@@ -12,7 +12,6 @@
 				"glass-goblet-with-beer"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

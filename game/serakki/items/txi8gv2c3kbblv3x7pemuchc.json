@@ -12,7 +12,6 @@
 				"paper-boat-wine-bath"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 180000,
 			"enable": true,

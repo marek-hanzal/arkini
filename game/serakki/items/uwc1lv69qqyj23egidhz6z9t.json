@@ -12,7 +12,6 @@
 				"treasure-chest-t2"
 			]
 		},
-		"maxStackSize": 4,
 		"maxQueueSize": 1,
 		"lines": [
 			{

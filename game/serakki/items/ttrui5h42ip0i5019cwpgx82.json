@@ -12,7 +12,6 @@
 				"duvet"
 			]
 		},
-		"maxStackSize": 6,
 		"merge": [
 			{
 				"target": {

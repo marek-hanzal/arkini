@@ -13,7 +13,6 @@
 				"empty-fruit-garden"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

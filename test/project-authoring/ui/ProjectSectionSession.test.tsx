@@ -99,7 +99,6 @@ const state = vi.hoisted(() => ({
 
 interface TestStartGridCell {
 	readonly itemId: string;
-	readonly quantity: number;
 	readonly x: number;
 	readonly y: number;
 }
@@ -140,9 +139,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 		createElement(
 			"button",
 			{
-				"data-cells": cells
-					.map(({ itemId, quantity, x, y }) => `${itemId}:${quantity}:${x}:${y}`)
-					.join("|"),
+				"data-cells": cells.map(({ itemId, x, y }) => `${itemId}:${x}:${y}`).join("|"),
 				"data-invalid-cells": invalidCells.map(({ x, y }) => `${x}:${y}`).join("|"),
 				"data-ui": "EditorProjectStartGrid",
 				"data-width": width,
@@ -150,7 +147,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 					onCellsChangeFn(
 						cells.map((cell) => ({
 							...cell,
-							quantity: cell.quantity + 1,
+							x: 0,
 						})),
 					),
 				type: "button",
@@ -623,29 +620,29 @@ describe("project section form session", () => {
 		if (spaceInput === null) throw new Error("Missing initial Board space selector.");
 
 		expect(spaceInput.value).toBe("0");
-		expect(readGridCells()).toBe("water:1:0:0");
+		expect(readGridCells()).toBe("water:0:0");
 		await changeInput(spaceInput, "-1");
-		expect(readGridCells()).toBe("water:1:0:0");
+		expect(readGridCells()).toBe("water:0:0");
 		await changeInput(spaceInput, "1");
-		expect(readGridCells()).toBe("water:2:1:1");
+		expect(readGridCells()).toBe("water:1:1");
 		expect(spaceInput.max).toBe("31");
 		await changeInput(spaceInput, "32");
-		expect(readGridCells()).toBe("water:2:1:1");
+		expect(readGridCells()).toBe("water:1:1");
 		await changeInput(spaceInput, "31");
 		expect(readGridCells()).toBe("");
 		await changeInput(spaceInput, "1");
-		expect(readGridCells()).toBe("water:2:1:1");
+		expect(readGridCells()).toBe("water:1:1");
 
 		const gridButton = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorProjectStartGrid"]',
 		);
 		if (gridButton === null) throw new Error("Missing test grid action.");
 		await act(async () => gridButton.click());
-		expect(readGridCells()).toBe("water:3:1:1");
+		expect(readGridCells()).toBe("water:0:1");
 		await changeInput(spaceInput, "0");
-		expect(readGridCells()).toBe("water:1:0:0");
+		expect(readGridCells()).toBe("water:0:0");
 		await changeInput(spaceInput, "1");
-		expect(readGridCells()).toBe("water:3:1:1");
+		expect(readGridCells()).toBe("water:0:1");
 
 		state.section = <ProjectGeneralSection />;
 		await act(async () =>
@@ -662,7 +659,7 @@ describe("project section form session", () => {
 		expect(
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");
-		expect(readGridCells()).toBe("water:1:0:0");
+		expect(readGridCells()).toBe("water:0:0");
 	});
 
 	it("routes a start-item validation issue to its exact Board space and cell", async () => {
@@ -715,7 +712,7 @@ describe("project section form session", () => {
 		expect(
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");
-		expect(grid?.dataset.cells).toBe("water:1:0:0|water:2:0:0");
+		expect(grid?.dataset.cells).toBe("water:0:0|water:0:0");
 		expect(grid?.dataset.invalidCells).toBe("0:0");
 	});
 

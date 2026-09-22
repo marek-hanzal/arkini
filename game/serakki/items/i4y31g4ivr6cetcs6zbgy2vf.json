@@ -12,7 +12,6 @@
 				"bubble-reservoir"
 			]
 		},
-		"maxStackSize": 6,
 		"units": {
 			"amount": 8,
 			"output": {

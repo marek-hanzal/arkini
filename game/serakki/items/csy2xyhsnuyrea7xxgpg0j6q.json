@@ -12,7 +12,6 @@
 				"corrupted-well-fed-beagle"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 60000,
 			"enable": true,

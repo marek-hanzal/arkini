@@ -12,7 +12,6 @@
 				"waste"
 			]
 		},
-		"maxStackSize": 6,
 		"merge": [
 			{
 				"target": {

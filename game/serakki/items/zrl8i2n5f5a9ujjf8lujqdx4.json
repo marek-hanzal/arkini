@@ -12,7 +12,6 @@
 				"leafs"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 600000,
 			"enable": true,

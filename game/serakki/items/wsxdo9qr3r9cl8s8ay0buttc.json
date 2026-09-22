@@ -12,7 +12,6 @@
 				"beer-mug"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

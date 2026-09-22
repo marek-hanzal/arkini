@@ -12,7 +12,6 @@
 				"haunted-bed-beer"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 180000,
 			"enable": true,

@@ -12,7 +12,6 @@
 				"cauldron-with-water"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

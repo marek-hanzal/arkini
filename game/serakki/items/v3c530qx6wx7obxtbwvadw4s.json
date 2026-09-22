@@ -12,7 +12,6 @@
 				"british-shorthair-kitten-in-sack"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 10000,
 			"enable": true,

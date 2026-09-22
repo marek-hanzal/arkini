@@ -9,7 +9,6 @@ export const CreateItemInputSchema = z
 		artwork: true,
 		lines: true,
 		maxQueueSize: true,
-		maxStackSize: true,
 		uid: true,
 	})
 	.extend({
@@ -18,9 +17,6 @@ export const CreateItemInputSchema = z
 			.describe(
 				"Optional Item artwork; defaults to the first Artwork resource in the open project.",
 			),
-		maxStackSize: PositiveIntegerSchema.optional().describe(
-			"Optional maximum stack size; defaults to one.",
-		),
 		maxQueueSize: PositiveIntegerSchema.optional().describe(
 			"Optional accepted active and queued work count; defaults to one.",
 		),

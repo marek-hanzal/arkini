@@ -12,7 +12,6 @@
 				"inkwell"
 			]
 		},
-		"maxStackSize": 4,
 		"units": {
 			"amount": 8,
 			"output": {

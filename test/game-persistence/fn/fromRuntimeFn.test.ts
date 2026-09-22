@@ -30,7 +30,6 @@ it("creates a detached complete state that constructs one fresh session", async 
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 		expect(state.items.some(({ id }) => id === "runtime:later")).toBe(false);

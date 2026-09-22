@@ -1,12 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
-import {
-	guaranteedMergeOutput,
-	weightedMergeOutput,
-} from "~test/item-merge/support/createMergeTestConfig";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 
@@ -20,7 +15,7 @@ import {
 } from "./mergeItemsFx.random.test/fixture";
 
 describe("merge random stream lifecycle", () => {
-	it("advances successful reusable-stack rolls and resumes the same stream after save/load", () => {
+	it("advances successful reusable-item rolls and resumes the same stream after save/load", () => {
 		const config = createConfigFn();
 		const live = Effect.runSync(
 			Effect.gen(function* () {
@@ -45,7 +40,6 @@ describe("merge random stream lifecycle", () => {
 		// not a statistical sample of ambient randomness.
 		expect(new Set(live.first.flat()).size).toBe(2);
 		expect(live.runtime.items.find((item) => item.id === "reusable-source")).toMatchObject({
-			quantity: 2,
 			mergeSequence: 16,
 		});
 		const restored = Effect.runSync(
@@ -106,96 +100,6 @@ describe("merge random stream lifecycle", () => {
 		expect(restored).toEqual(live.output);
 	});
 
-	it.each([
-		"source",
-		"target",
-	] as const)(
-		"advances nested %s depletion rolls when output restores the spent stack",
-		(payer) => {
-			const base = createConfigFn();
-			const weighted = weightedMergeOutput();
-			const output = {
-				set: weighted.set.map((set) => ({
-					...set,
-					rules: [],
-					roll: [
-						...guaranteedMergeOutput({
-							itemId: payer,
-						}).set[0].roll,
-						...set.roll,
-					],
-				})),
-			};
-			const config = GameConfigSchema.parse({
-				...base,
-				items: {
-					...base.items,
-					source: {
-						...base.items.source,
-						units:
-							payer === "source"
-								? {
-										amount: 1,
-										output,
-									}
-								: undefined,
-						merge: [
-							{
-								target: {
-									type: "item",
-									itemId: "target",
-								},
-								action: payer === "source" ? "spend" : "use",
-								effect: payer === "target" ? "spend" : "keep",
-							},
-						],
-					},
-					target: {
-						...base.items.target,
-						units:
-							payer === "target"
-								? {
-										amount: 1,
-										output,
-									}
-								: undefined,
-					},
-				},
-			});
-			const state = StateSchema.parse({
-				...initialState,
-				items: initialState.items.map((item) => ({
-					...item,
-					quantity: 2,
-				})),
-			});
-			const result = Effect.runSync(
-				Effect.gen(function* () {
-					const rolls = yield* repeatFx(16);
-					return {
-						rolls,
-						runtime: yield* readRuntimeFx(),
-					};
-				}).pipe(
-					useGameFx({
-						config,
-						state,
-					}),
-				),
-			);
-			expect(new Set(result.rolls.flat()).size).toBe(2);
-			expect(
-				result.runtime.items.find((item) => item.id === "reusable-source"),
-			).toMatchObject({
-				quantity: 2,
-				mergeSequence: 16,
-			});
-			expect(result.runtime.items.find((item) => item.id === "stable-target")?.quantity).toBe(
-				2,
-			);
-		},
-	);
-
 	it("keeps an existing identity's stream when another merge replaces its definition", () => {
 		const base = createConfigFn();
 		const config = GameConfigSchema.parse({
@@ -239,7 +143,6 @@ describe("merge random stream lifecycle", () => {
 			),
 		);
 		expect(result.items.find((item) => item.id === "reusable-source")).toMatchObject({
-			quantity: 1,
 			mergeSequence: 1,
 		});
 	});

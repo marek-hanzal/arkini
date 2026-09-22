@@ -36,7 +36,6 @@ export const configInput = {
 					"artwork:water",
 				],
 			},
-			maxStackSize: 10,
 		},
 		stone: {
 			maxQueueSize: 1,
@@ -53,7 +52,6 @@ export const configInput = {
 					"artwork:stone",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 } as const;

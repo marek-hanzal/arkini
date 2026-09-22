@@ -30,21 +30,29 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
-	const water = yield* spawnItemFx({
-		id: "runtime:water",
-		itemId: "water",
-		location: {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 1,
-				y: 0,
+	for (let index = 0; index < 3; index++) {
+		const water = yield* spawnItemFx({
+			id: `runtime:water:${index}`,
+			itemId: "water",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
 			},
-		},
-		quantity: 3,
-	});
+		});
+		yield* storeInputMaterialFx({
+			ownerItemId: owner.id,
+			lineId: startProps.lineId,
+			inputIndex: 0,
+			sourceItemId: water.id,
+			sourceItemRevision: water.revision,
+		});
+	}
+
 	const tool = yield* spawnItemFx({
 		id: "runtime:tool",
 		itemId: "tool",
@@ -56,15 +64,6 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 				y: 0,
 			},
 		},
-		quantity: 1,
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId: owner.id,
-		lineId: startProps.lineId,
-		inputIndex: 0,
-		sourceItemId: water.id,
-		sourceItemRevision: water.revision,
-		quantity: 3,
 	});
 	yield* storeInputMaterialFx({
 		ownerItemId: owner.id,
@@ -72,7 +71,6 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 		inputIndex: 1,
 		sourceItemId: tool.id,
 		sourceItemRevision: tool.revision,
-		quantity: 1,
 	});
 	return owner;
 });
@@ -163,7 +161,6 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 		expect(result.transition.events.slice(1)).not.toHaveLength(0);
 		expect(
@@ -173,16 +170,8 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 		).toBe(false);
 		expect(result.runtime.items.some((item) => item.id === startProps.ownerItemId)).toBe(false);
 		expect(result.runtime.items.some((item) => item.location.scope === "input")).toBe(false);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "water")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(3);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "tool")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(1);
+		expect(result.runtime.items.filter((item) => item.item.id === "water").length).toBe(3);
+		expect(result.runtime.items.filter((item) => item.item.id === "tool").length).toBe(1);
 		expect(result.runtime.items.every((item) => item.location.scope !== "input")).toBe(true);
 		expect(
 			result.runtime.items
@@ -205,7 +194,6 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* setCheatEnabledFx({
 					enabled: true,
@@ -296,7 +284,6 @@ it("keeps the owner and every buffered input when one released item cannot be pl
 						space: 0,
 						position,
 					},
-					quantity: 10,
 				});
 			}
 			yield* setCheatEnabledFx({

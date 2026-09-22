@@ -21,7 +21,6 @@ const baseItem = (id: string) => ({
 			string,
 		],
 	},
-	maxStackSize: 4,
 });
 
 const depletionOutput = (itemId: string) => ({
@@ -336,7 +335,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			...baseItem("boardToken"),
-			maxStackSize: 1,
 		},
 	},
 });
@@ -365,18 +363,15 @@ export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({
 	id,
 	itemId,
 	location,
-	quantity = 1,
 }: {
 	id: string;
 	itemId: string;
 	location: BoardLocationSchema.Type;
-	quantity?: number;
 }) {
 	const item = yield* spawnItemFx({
 		id,
 		itemId,
 		location,
-		quantity,
 	});
 	const runtime = yield* readRuntimeFx();
 	const space = yield* activateItemActionFx({

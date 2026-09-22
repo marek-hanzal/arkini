@@ -71,19 +71,16 @@ describe("kill-switch material expiry", () => {
 					id: "owner",
 					itemId: "owner",
 					location: boardFn(0),
-					quantity: 1,
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
 					itemId: "temporary",
 					location: boardFn(1),
-					quantity: 1,
 				});
 				const reserve = yield* spawnItemFx({
 					id: "reserve",
 					itemId: "blocker",
 					location: boardFn(2),
-					quantity: 1,
 				});
 				for (const [inputIndex, source] of [
 					[
@@ -101,7 +98,6 @@ describe("kill-switch material expiry", () => {
 						inputIndex,
 						sourceItemId: source.id,
 						sourceItemRevision: source.revision,
-						quantity: 1,
 					});
 				}
 				yield* startLineFx({

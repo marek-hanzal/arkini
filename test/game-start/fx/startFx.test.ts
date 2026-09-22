@@ -9,7 +9,7 @@ import { startTestConfig } from "~test/game-start/support/startTestConfig";
 import { startFx } from "~/game-start/fx/startFx";
 
 describe("startFx", () => {
-	it("commits the exact sequential runtime for repeated stackable entries", () => {
+	it("commits the exact sequential runtime for repeated item definitions in separate cells", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			start: {
@@ -17,14 +17,12 @@ describe("startFx", () => {
 				board: [
 					{
 						itemId: "log",
-						quantity: 2,
 						space: 0,
 						x: 0,
 						y: 0,
 					},
 					{
 						itemId: "log",
-						quantity: 3,
 						space: 0,
 						x: 1,
 						y: 0,
@@ -41,11 +39,7 @@ describe("startFx", () => {
 		);
 
 		expect(runtime.items).toHaveLength(2);
-		expect(runtime.items.map((item) => item.quantity)).toEqual([
-			2,
-			3,
-		]);
-		expect(runtime.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
+		expect(new Set(runtime.items.map((item) => item.id)).size).toBe(2);
 	});
 
 	it("rejects an already populated runtime without changing it", () => {
@@ -62,7 +56,6 @@ describe("startFx", () => {
 						},
 						scope: "board",
 					},
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const started = yield* Effect.result(startFx());

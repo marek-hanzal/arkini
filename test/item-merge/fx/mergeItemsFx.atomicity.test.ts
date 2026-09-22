@@ -23,7 +23,6 @@ const boardItem = (id: "source" | "target", itemId: "source" | "target", x: numb
 			y: 0,
 		},
 	},
-	quantity: 1,
 });
 
 const mergeAttemptFx = () =>
@@ -73,7 +72,6 @@ const blockedOutputState = (includeBlocker = true) =>
 									y: 0,
 								},
 							},
-							quantity: 1,
 						},
 					]
 				: []),
@@ -89,7 +87,6 @@ describe("mergeItemsFx atomicity", () => {
 				width: 3,
 				height: 1,
 			},
-			outputMaxStackSize: 1,
 			rule: {
 				target: {
 					type: "item",
@@ -183,73 +180,4 @@ describe("mergeItemsFx atomicity", () => {
 		expect(outputId(afterRetry)).toBeDefined();
 		expect(outputId(afterRetry)).toBe(outputId(firstTry));
 	});
-});
-
-it("rolls back both stacks when an isolated replacement remainder cannot fit", () => {
-	const config = createMergeTestConfig({
-		board: {
-			width: 3,
-			height: 1,
-		},
-		rule: {
-			target: {
-				type: "item",
-				itemId: "target",
-			},
-			action: "consume",
-			effect: "replace",
-			result: "result",
-		},
-	});
-	const state = {
-		cheats: {
-			enabled: false,
-			everEnabled: false,
-			speedUpGameplay: false,
-		},
-		currentSpace: 0,
-		items: [
-			{
-				...boardItem("source", "source", 0),
-				quantity: 2,
-			},
-			{
-				...boardItem("target", "target", 1),
-				quantity: 2,
-			},
-			{
-				id: "runtime:blocker",
-				itemId: "blocker",
-				location: {
-					scope: "board" as const,
-					space: 0,
-					position: {
-						x: 2,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			},
-		],
-		jobQueue: [],
-		jobs: [],
-	} satisfies StateSchema.Type;
-	const result = Effect.runSync(
-		mergeAttemptFx().pipe(
-			useGameFx({
-				config,
-				state,
-			}),
-		),
-	);
-
-	expect(Result.isFailure(result.attempt)).toBe(true);
-	if (Result.isFailure(result.attempt)) {
-		expect(result.attempt.failure).toMatchObject({
-			_tag: "PlacementUnavailableError",
-			itemId: "target",
-			remainingQuantity: 1,
-		});
-	}
-	expect(result.after).toEqual(result.before);
 });

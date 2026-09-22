@@ -76,14 +76,13 @@ export const fixtureFn = (width = 2) => {
 			},
 			tool: {
 				...base.items.tool,
-				maxStackSize: 1,
+
 				units: {
 					amount: 2,
 				},
 			},
 			water: {
 				...base.items.water,
-				maxStackSize: 3,
 			},
 			holder: {
 				...base.items.forge,
@@ -97,12 +96,10 @@ export const fixtureFn = (width = 2) => {
 		id: string,
 		itemId: string,
 		location: RuntimeItemSchema.Type["location"],
-		quantity = 1,
 	): RuntimeItemSchema.Type => ({
 		id,
 		item: config.items[itemId],
 		location,
-		quantity,
 		revision: `revision:${id}`,
 	});
 	const owner = itemFn("owner", "forge", boardFn(0));
@@ -125,18 +122,13 @@ export const fixtureFn = (width = 2) => {
 		remainingUnits: 1,
 	};
 	const buffer = itemFn("buffer", "holder", inputFn(owner.id, 0));
-	const child = itemFn("child", "water", inputFn(buffer.id, 0, "line:forge:run"), 3);
-	const consumed = itemFn(
-		"consumed",
-		"water",
-		{
-			scope: "job",
-			jobId: "job",
-			inputIndex: 0,
-		},
-		3,
-	);
-	const blocker = itemFn("blocker", "water", boardFn(1), 3);
+	const child = itemFn("child", "water", inputFn(buffer.id, 0, "line:forge:run"));
+	const consumed = itemFn("consumed", "water", {
+		scope: "job",
+		jobId: "job",
+		inputIndex: 0,
+	});
+	const blocker = itemFn("blocker", "water", boardFn(1));
 	const runtime: RuntimeSchema.Type = {
 		cheats: {
 			enabled: false,

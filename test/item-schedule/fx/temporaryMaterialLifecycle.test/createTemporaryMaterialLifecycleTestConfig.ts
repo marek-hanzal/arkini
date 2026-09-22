@@ -1,6 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = (id: string, maxStackSize = 1) => ({
+const baseItem = (id: string) => ({
 	uid: id,
 	id,
 	title: id,
@@ -11,7 +11,6 @@ const baseItem = (id: string, maxStackSize = 1) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize,
 });
 
 const guaranteedOutput = (itemId: string) => ({
@@ -101,13 +100,13 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 				maxQueueSize: 1,
 				lines: [],
 
-				...baseItem("residue", 10),
+				...baseItem("residue"),
 			},
 			product: {
 				maxQueueSize: 1,
 				lines: [],
 
-				...baseItem("product", 10),
+				...baseItem("product"),
 			},
 			blocker: {
 				maxQueueSize: 1,

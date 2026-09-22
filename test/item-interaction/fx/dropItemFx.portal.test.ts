@@ -107,13 +107,11 @@ describe("dropItemFx / portal direction", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: board(0, 0, 0),
-					quantity: 2,
 				});
 				const portal = yield* spawnItemFx({
 					id: "runtime:portal",
 					itemId: "portal",
 					location: board(1, 0, 0),
-					quantity: 1,
 				});
 				const outcome = yield* dropOntoFx({
 					sourceId: source.id,
@@ -145,7 +143,6 @@ describe("dropItemFx / portal direction", () => {
 				portalItemId: result.portal.id,
 				previousLocation: board(0, 0, 0),
 				location: board(0, 0, 7),
-				quantity: 2,
 			},
 		]);
 		expect(GameEventSchema.safeParse(result.transition.events[0]).success).toBe(true);
@@ -159,7 +156,7 @@ describe("dropItemFx / portal direction", () => {
 		).toEqual([
 			{
 				event: "item:portal-transferred",
-				strength: 2,
+				strength: 1,
 			},
 		]);
 
@@ -171,7 +168,6 @@ describe("dropItemFx / portal direction", () => {
 				id: "water",
 			},
 			location: board(0, 0, 7),
-			quantity: 2,
 		});
 		expect(result.runtime.items.find((item) => item.id === result.portal.id)).toEqual(
 			result.portal,
@@ -185,13 +181,11 @@ describe("dropItemFx / portal direction", () => {
 					id: "runtime:portal",
 					itemId: "portal",
 					location: board(0, 0, 0),
-					quantity: 1,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
 					itemId: "stone",
 					location: board(1, 0, 0),
-					quantity: 1,
 				});
 				return yield* dropOntoFx({
 					sourceId: portal.id,
@@ -223,13 +217,11 @@ describe("dropItemFx / portal direction", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: board(0, 0, 0),
-					quantity: 1,
 				});
 				const portal = yield* spawnItemFx({
 					id: "runtime:portal",
 					itemId: "portal",
 					location: board(1, 0, 0),
-					quantity: 1,
 				});
 				for (let y = 0; y < 2; y += 1) {
 					for (let x = 0; x < 3; x += 1) {
@@ -237,7 +229,6 @@ describe("dropItemFx / portal direction", () => {
 							id: `runtime:blocker:${x}:${y}`,
 							itemId: "stone",
 							location: board(x, y, 7),
-							quantity: 1,
 						});
 					}
 				}

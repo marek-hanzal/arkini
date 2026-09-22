@@ -24,7 +24,6 @@ describe("readDropItemPreviewFx / preview", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const preview = yield* readDropItemPreviewFx({
 					sourceItemId: source.id,
@@ -56,13 +55,11 @@ describe("readDropItemPreviewFx / preview", () => {
 						id: "runtime:water",
 						itemId: "water",
 						location: sourceLocation,
-						quantity: 1,
 					});
 					const target = yield* spawnItemFx({
 						id: "runtime:stone",
 						itemId: "stone",
 						location: occupiedLocation,
-						quantity: 1,
 					});
 					return yield* readDropItemPreviewFx({
 						sourceItemId: source.id,
@@ -95,7 +92,6 @@ describe("readDropItemPreviewFx / preview", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				return yield* readDropItemPreviewFx({
 					sourceItemId: source.id,

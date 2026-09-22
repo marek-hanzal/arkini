@@ -21,7 +21,6 @@ const baseItem = ({ id }: { id: string }) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
 });
 
 const producerItem = ({
@@ -156,7 +155,6 @@ const createLifecycleConfig = ({
 					clock: {
 						durationMs: targetDurationMs,
 					},
-					maxStackSize: 1,
 				};
 
 	return GameConfigSchema.parse({
@@ -203,7 +201,6 @@ const createLifecycleConfig = ({
 							clock: {
 								durationMs: resultDurationMs,
 							},
-							maxStackSize: 1,
 						},
 			material: {
 				maxQueueSize: 1,
@@ -235,7 +232,6 @@ const boardItem = (id: "source" | "target" | "owner", x: number) => ({
 			y: 0,
 		},
 	},
-	quantity: 1,
 });
 
 const attemptMergeFx = () =>
@@ -430,7 +426,6 @@ describe("mergeItemsFx participant lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				},
 				{
 					id: "runtime:child",
@@ -441,7 +436,6 @@ describe("mergeItemsFx participant lifecycle", () => {
 						ownerItemId: "runtime:source",
 						scope: "input",
 					},
-					quantity: 1,
 				},
 			],
 			jobQueue: [],
@@ -597,7 +591,6 @@ describe("mergeItemsFx participant lifecycle", () => {
 							lineId: "line:source",
 							inputIndex: 0,
 						},
-						quantity: 1,
 					},
 				],
 				jobQueue: [],
@@ -668,7 +661,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				},
 			},
 			location: beforeTarget?.location,
-			quantity: 1,
+
 			remainingUnits: undefined,
 		});
 		expect(replaced?.revision).not.toBe(beforeTarget?.revision);
@@ -861,7 +854,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 							lineId: "line:target",
 							inputIndex: 0,
 						},
-						quantity: 1,
+
 						remainingUnits: 1,
 					},
 				],

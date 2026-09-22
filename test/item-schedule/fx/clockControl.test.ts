@@ -72,7 +72,6 @@ it("rejects player production commands atomically for simple UI owners while aut
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
-					quantity: 1,
 				}),
 			);
 			const after = yield* readRuntimeFx();

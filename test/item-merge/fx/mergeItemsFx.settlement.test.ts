@@ -25,13 +25,11 @@ const spawnParticipantsFx = Effect.gen(function* () {
 		id: "source",
 		itemId: "source",
 		location: board(0),
-		quantity: 1,
 	});
 	const target = yield* spawnItemFx({
 		id: "target",
 		itemId: "target",
 		location: board(1),
-		quantity: 1,
 	});
 	return {
 		source,
@@ -43,7 +41,7 @@ describe("merge settlement against the evolving draft", () => {
 	it.each([
 		"remove",
 		"replace",
-	] as const)("preserves source depletion stacked into the target before %s", (effect) => {
+	] as const)("preserves source depletion beside the target before %s", (effect) => {
 		const output = guaranteedMergeOutput();
 		output.set[0].roll[0].drop[0].rules = [
 			{
@@ -106,17 +104,9 @@ describe("merge settlement against the evolving draft", () => {
 				}),
 			),
 		);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "target")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(1);
+		expect(result.runtime.items.filter((item) => item.item.id === "target").length).toBe(1);
 		// Optional output still queries the pre-merge target, even though settlement changed it.
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "output")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(1);
+		expect(result.runtime.items.filter((item) => item.item.id === "output").length).toBe(1);
 		expect(result.transition.events).not.toContainEqual(
 			expect.objectContaining({
 				type: "item:disappeared",

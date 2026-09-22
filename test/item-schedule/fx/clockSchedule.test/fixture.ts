@@ -63,7 +63,7 @@ export const createClockConfig = (
 						},
 					],
 				}),
-				maxStackSize: 1,
+
 				maxQueueSize: 3,
 				ui: "default",
 				...overrides,
@@ -74,15 +74,12 @@ export const createClockConfig = (
 			},
 			permit: {
 				...createSimpleItem("permit"),
-				maxStackSize: 1,
 			},
 			result: {
 				...createSimpleItem("result"),
-				maxStackSize: 1,
 			},
 			expired: {
 				...createSimpleItem("expired"),
-				maxStackSize: 1,
 			},
 		},
 	});
@@ -90,7 +87,7 @@ export const spawnClockItemFx = (itemId = "clock", x = 0, y = 0) =>
 	spawnItemFx({
 		id: `runtime:${itemId}`,
 		itemId,
-		quantity: 1,
+
 		location: {
 			scope: "board",
 			space: 0,

@@ -12,6 +12,7 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
@@ -173,13 +174,15 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 			// revisions cannot seed it because hydration replaces those tokens.
 			const nextRuntime = {
 				...mergeTransition.runtime,
-				items: mergeTransition.runtime.items.map((item) =>
+				items: yield* Effect.forEach(mergeTransition.runtime.items, (item) =>
 					item.id === source.id
-						? {
-								...item,
-								mergeSequence: (source.mergeSequence ?? 0) + 1,
-							}
-						: item,
+						? reviseRuntimeItemFx({
+								item: {
+									...item,
+									mergeSequence: (source.mergeSequence ?? 0) + 1,
+								},
+							})
+						: Effect.succeed(item),
 				),
 			};
 			const event = {

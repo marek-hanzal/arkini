@@ -47,7 +47,6 @@ export const testSerapackConfig = GameConfigSchema.parse({
 					"asset-water",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });

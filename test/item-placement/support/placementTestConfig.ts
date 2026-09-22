@@ -2,7 +2,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const simpleItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) => {
+const simpleItem = ({ id }: { id: string }) => {
 	return {
 		maxQueueSize: 1,
 		lines: [],
@@ -17,7 +17,6 @@ const simpleItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) 
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize,
 	} as const;
 };
 
@@ -39,31 +38,24 @@ export const placementTestConfig = GameConfigSchema.parse({
 	items: {
 		origin: simpleItem({
 			id: "origin",
-			maxStackSize: 1,
 		}),
 		blocker: simpleItem({
 			id: "blocker",
-			maxStackSize: 1,
 		}),
 		log: simpleItem({
 			id: "log",
-			maxStackSize: 3,
 		}),
 		"board-only": simpleItem({
 			id: "board-only",
-			maxStackSize: 1,
 		}),
 		limited: simpleItem({
 			id: "limited",
-			maxStackSize: 2,
 		}),
 		replacement: simpleItem({
 			id: "replacement",
-			maxStackSize: 3,
 		}),
 		permit: simpleItem({
 			id: "permit",
-			maxStackSize: 1,
 		}),
 	},
 });

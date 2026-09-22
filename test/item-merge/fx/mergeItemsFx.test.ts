@@ -24,7 +24,6 @@ const makeState = ({
 			y: 0,
 		},
 	},
-	sourceQuantity = 2,
 	targetLocation = {
 		scope: "board" as const,
 		space: 0,
@@ -33,14 +32,9 @@ const makeState = ({
 			y: 0,
 		},
 	},
-	targetQuantity = 1,
-	resultQuantity,
 }: {
 	sourceLocation?: StateSchema.Type["items"][number]["location"];
-	sourceQuantity?: number;
 	targetLocation?: StateSchema.Type["items"][number]["location"];
-	targetQuantity?: number;
-	resultQuantity?: number;
 } = {}) =>
 	({
 		cheats: {
@@ -54,31 +48,12 @@ const makeState = ({
 				id: "runtime:source",
 				itemId: "source",
 				location: sourceLocation,
-				quantity: sourceQuantity,
 			},
 			{
 				id: "runtime:target",
 				itemId: "target",
 				location: targetLocation,
-				quantity: targetQuantity,
 			},
-			...(resultQuantity === undefined
-				? []
-				: [
-						{
-							id: "runtime:result",
-							itemId: "result",
-							location: {
-								scope: "board" as const,
-								space: 0,
-								position: {
-									x: 2,
-									y: 0,
-								},
-							},
-							quantity: resultQuantity,
-						},
-					]),
 		],
 		jobQueue: [],
 		jobs: [],
@@ -158,7 +133,7 @@ const combinations: ReadonlyArray<{
 
 describe("mergeItemsFx", () => {
 	for (const { action, effect } of combinations) {
-		it(`applies ${action} + ${effect} explicitly to one source and target quantity`, () => {
+		it(`applies ${action} + ${effect} explicitly to one source and target identity`, () => {
 			const targetSelector = {
 				type: "item" as const,
 				itemId: "target",
@@ -188,10 +163,18 @@ describe("mergeItemsFx", () => {
 				),
 			);
 
-			const sourceQuantity = result.after.items
-				.filter((item) => item.item.id === "source")
-				.reduce((total, item) => total + item.quantity, 0);
-			expect(sourceQuantity).toBe(action === "use" ? 2 : 1);
+			const sourceQuantity = result.after.items.filter(
+				(item) => item.item.id === "source",
+			).length;
+			expect(sourceQuantity).toBe(action === "use" ? 1 : 0);
+			if (action === "use") {
+				const sourceBefore = result.before.items.find(
+					(item) => item.id === "runtime:source",
+				);
+				const sourceAfter = result.after.items.find((item) => item.id === "runtime:source");
+				expect(sourceAfter?.location).toEqual(sourceBefore?.location);
+				expect(sourceAfter?.revision).not.toBe(sourceBefore?.revision);
+			}
 
 			const target = result.after.items.find((item) => item.id === "runtime:target");
 			if (effect === "keep") expect(target?.item.id).toBe("target");
@@ -212,11 +195,21 @@ describe("mergeItemsFx", () => {
 				effect === "remove"
 					? [
 							GameEventEnumSchema.enum.ItemMerged,
+							...(action === "consume"
+								? [
+										GameEventEnumSchema.enum.ItemRemoved,
+									]
+								: []),
 							GameEventEnumSchema.enum.ItemRemoved,
 							GameEventEnumSchema.enum.ItemDisappeared,
 						]
 					: [
 							GameEventEnumSchema.enum.ItemMerged,
+							...(action === "consume"
+								? [
+										GameEventEnumSchema.enum.ItemRemoved,
+									]
+								: []),
 						],
 			);
 		});
@@ -254,116 +247,6 @@ describe("mergeItemsFx", () => {
 		).toBe(true);
 	});
 
-	it("isolates a stacked replacement target through standard placement", () => {
-		const result = Effect.runSync(
-			runMergeFx().pipe(
-				useGameFx({
-					config: createMergeTestConfig({
-						rule: {
-							target: {
-								type: "item",
-								itemId: "target",
-							},
-							action: "consume",
-							effect: "replace",
-							result: "result",
-						},
-					}),
-					state: makeState({
-						sourceQuantity: 2,
-						targetQuantity: 2,
-					}),
-				}),
-			),
-		);
-
-		expect(result.after.items.find((item) => item.id === "runtime:source")).toMatchObject({
-			item: {
-				id: "source",
-			},
-			location: result.before.items.find((item) => item.id === "runtime:source")?.location,
-			quantity: 1,
-		});
-		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
-			item: {
-				id: "result",
-			},
-			location: result.before.items.find((item) => item.id === "runtime:target")?.location,
-			quantity: 1,
-		});
-
-		const targetRemainder = result.after.items.find((item) => item.item.id === "target");
-		expect(targetRemainder).toMatchObject({
-			location: {
-				scope: "board",
-				space: 0,
-			},
-			quantity: 1,
-		});
-		expect(targetRemainder?.id).not.toBe("runtime:target");
-		expect(targetRemainder?.location).not.toEqual(
-			result.before.items.find((item) => item.id === "runtime:target")?.location,
-		);
-	});
-
-	it("stacks a pure replacement result before spawning another stack", () => {
-		const result = Effect.runSync(
-			runMergeFx().pipe(
-				useGameFx({
-					config: createMergeTestConfig({
-						rule: {
-							target: {
-								type: "item",
-								itemId: "target",
-							},
-							action: "use",
-							effect: "replace",
-							result: "result",
-						},
-					}),
-					state: makeState({
-						resultQuantity: 8,
-						targetQuantity: 2,
-					}),
-				}),
-			),
-		);
-
-		expect(result.after.items.find((item) => item.id === "runtime:result")).toMatchObject({
-			item: {
-				id: "result",
-			},
-			quantity: 9,
-		});
-		expect(result.after.items.filter((item) => item.item.id === "result")).toHaveLength(1);
-		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
-		expect(
-			result.after.items
-				.filter((item) => item.item.id === "target")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(1);
-		expect(result.transition.events).toContainEqual({
-			type: GameEventEnumSchema.enum.ItemStacked,
-			itemId: "runtime:result",
-			canonicalItemId: "result",
-			originItemId: "runtime:target",
-			location: {
-				scope: "board",
-				space: 0,
-				position: {
-					x: 2,
-					y: 0,
-				},
-			},
-			previousQuantity: 8,
-			quantity: 9,
-		});
-		expect(result.transition.events).toContainEqual({
-			type: GameEventEnumSchema.enum.ItemRemoved,
-			snapshot: result.before.items.find((item) => item.id === "runtime:target"),
-		});
-	});
-
 	it("spends one real source unit for a Spend merge", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
@@ -374,22 +257,18 @@ describe("mergeItemsFx", () => {
 							amount: 2,
 						},
 					}),
-					state: makeState({
-						sourceQuantity: 1,
-					}),
+					state: makeState({}),
 				}),
 			),
 		);
 
 		expect(result.after.items.find((item) => item.id === "runtime:source")).toMatchObject({
-			quantity: 1,
 			remainingUnits: 1,
 		});
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
 				id: "target",
 			},
-			quantity: 1,
 		});
 	});
 
@@ -408,9 +287,7 @@ describe("mergeItemsFx", () => {
 					config: createMergeTestConfig({
 						rule: spendRule,
 					}),
-					state: makeState({
-						sourceQuantity: 1,
-					}),
+					state: makeState({}),
 				}),
 			),
 		);
@@ -437,9 +314,7 @@ describe("mergeItemsFx", () => {
 							output: guaranteedMergeOutput(),
 						},
 					}),
-					state: makeState({
-						sourceQuantity: 1,
-					}),
+					state: makeState({}),
 				}),
 			),
 		);
@@ -454,8 +329,6 @@ describe("mergeItemsFx", () => {
 				canonicalItemId: "source",
 				location: result.before.items.find((item) => item.id === "runtime:source")
 					?.location,
-				previousQuantity: 1,
-				resultingQuantity: 0,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemRemoved,
@@ -471,7 +344,6 @@ describe("mergeItemsFx", () => {
 				canonicalItemId: "output",
 				originItemId: "runtime:source",
 				location: output.location,
-				quantity: 1,
 			},
 		]);
 		expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
@@ -493,11 +365,16 @@ describe("mergeItemsFx", () => {
 		);
 
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
-			quantity: 1,
 			remainingUnits: 1,
 		});
 		expect(result.transition.events).toEqual([
 			result.event,
+			expect.objectContaining({
+				type: "item:removed",
+				snapshot: expect.objectContaining({
+					id: "runtime:source",
+				}),
+			}),
 			{
 				type: GameEventEnumSchema.enum.ItemUnitSpent,
 				itemId: "runtime:target",
@@ -530,14 +407,18 @@ describe("mergeItemsFx", () => {
 
 		expect(result.transition.events).toEqual([
 			result.event,
+			expect.objectContaining({
+				type: "item:removed",
+				snapshot: expect.objectContaining({
+					id: "runtime:source",
+				}),
+			}),
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 				itemId: "runtime:target",
 				canonicalItemId: "target",
 				location: result.before.items.find((item) => item.id === "runtime:target")
 					?.location,
-				previousQuantity: 1,
-				resultingQuantity: 0,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemRemoved,
@@ -553,7 +434,6 @@ describe("mergeItemsFx", () => {
 				canonicalItemId: "output",
 				originItemId: "runtime:target",
 				location: output.location,
-				quantity: 1,
 			},
 		]);
 		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
@@ -598,7 +478,7 @@ describe("mergeItemsFx", () => {
 						type: "item",
 						itemId: "target",
 					},
-					action: "consume",
+					action: "use",
 					effect: "keep",
 				},
 				{
@@ -606,7 +486,7 @@ describe("mergeItemsFx", () => {
 						type: "item",
 						itemId: "target",
 					},
-					action: "consume",
+					action: "use",
 					effect: "replace",
 					result: "result",
 				},

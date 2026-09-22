@@ -17,7 +17,7 @@ const board = (x: number) => ({
 });
 
 describe("runtime purity invariants", () => {
-	it("reports the effective singleton stack limit and buffered closed input", () => {
+	it("reports buffered material in a closed input", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
@@ -30,7 +30,7 @@ describe("runtime purity invariants", () => {
 					id: "runtime:craft",
 					item: purityTestConfig.items.craft,
 					location: board(0),
-					quantity: 2,
+
 					revision: "revision:craft",
 				},
 				{
@@ -42,7 +42,7 @@ describe("runtime purity invariants", () => {
 						lineId: "line:craft",
 						inputIndex: 0,
 					},
-					quantity: 1,
+
 					revision: "revision:material",
 				},
 			],
@@ -72,13 +72,6 @@ describe("runtime purity invariants", () => {
 
 		expect(result.issues).toEqual([
 			{
-				canonicalItemId: "craft",
-				itemId: "runtime:craft",
-				maxStackSize: 1,
-				quantity: 2,
-				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
-			},
-			{
 				ownerItemId: "runtime:craft",
 				lineId: "line:craft",
 				inputIndex: 0,
@@ -88,154 +81,5 @@ describe("runtime purity invariants", () => {
 				type: RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
 			},
 		]);
-	});
-
-	it.each([
-		{
-			name: "buffered input",
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				{
-					id: "runtime:material",
-					item: purityTestConfig.items.material,
-					location: {
-						scope: "input" as const,
-						ownerItemId: "runtime:producer",
-						lineId: "line:producer:zero",
-						inputIndex: 0,
-					},
-					quantity: 1,
-					revision: "revision:material",
-				},
-			],
-			jobs: [],
-			jobQueue: [],
-
-			defaultLineByOwnerItemId: {},
-		},
-		{
-			name: "active job",
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [],
-			jobs: [
-				{
-					id: "job:producer",
-					ownerItemId: "runtime:producer",
-					lineId: "line:producer:zero",
-					durationMs: 1_000,
-					remainingMs: 1_000,
-				},
-			],
-			jobQueue: [],
-
-			defaultLineByOwnerItemId: {},
-		},
-		{
-			name: "queued request",
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [],
-			jobs: [],
-			jobQueue: [
-				{
-					id: "request:producer",
-					ownerItemId: "runtime:producer",
-					lineId: "line:producer:zero",
-				},
-			],
-
-			defaultLineByOwnerItemId: {},
-		},
-	])("rejects an impure producer stack with $name", ({ items, jobs, jobQueue }) => {
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				{
-					id: "runtime:producer",
-					item: purityTestConfig.items.producer,
-					location: board(0),
-					quantity: 2,
-					revision: "revision:producer",
-				},
-				...items,
-			],
-			jobs,
-			jobQueue,
-
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-
-		const result = Effect.runSync(
-			checkRuntimeFx({
-				runtime,
-			}).pipe(
-				useGameFx({
-					config: purityTestConfig,
-				}),
-			),
-		);
-
-		expect(result.issues).toContainEqual({
-			canonicalItemId: "producer",
-			itemId: "runtime:producer",
-			maxStackSize: 1,
-			quantity: 2,
-			type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
-		});
-	});
-
-	it("keeps a pure producer stack at its configured limit", () => {
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				{
-					id: "runtime:producer",
-					item: purityTestConfig.items.producer,
-					location: board(0),
-					quantity: 2,
-					revision: "revision:producer",
-				},
-			],
-			jobs: [],
-
-			jobQueue: [],
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-
-		const result = Effect.runSync(
-			checkRuntimeFx({
-				runtime,
-			}).pipe(
-				useGameFx({
-					config: purityTestConfig,
-				}),
-			),
-		);
-
-		expect(result.issues).toEqual([]);
 	});
 });

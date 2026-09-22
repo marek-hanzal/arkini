@@ -18,13 +18,13 @@ export const prepareMaterialOwnerFx = Effect.fn("prepareMaterialOwnerFx")(functi
 	yield* spawnItemFx({
 		id: "owner",
 		itemId: "owner",
-		quantity: 1,
+
 		location: boardFn(0),
 	});
 	const input = yield* spawnItemFx({
 		id: "input",
 		itemId: "temporary",
-		quantity: 1,
+
 		location: boardFn(1),
 	});
 	yield* storeInputMaterialFx({
@@ -33,7 +33,6 @@ export const prepareMaterialOwnerFx = Effect.fn("prepareMaterialOwnerFx")(functi
 		inputIndex: 0,
 		sourceItemId: input.id,
 		sourceItemRevision: input.revision,
-		quantity: 1,
 	});
 });
 

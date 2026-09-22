@@ -43,13 +43,11 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:first",
 					itemId: "log",
 					location: boardLocation(0, 1),
-					quantity: 1,
 				});
 				const second = yield* spawnItemFx({
 					id: "runtime:second",
 					itemId: "log",
 					location: boardLocation(1, 1),
-					quantity: 1,
 				});
 				const runtime = yield* readRuntimeFx();
 				const checked = yield* checkRuntimeFx({
@@ -76,19 +74,16 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(1, 0),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:local",
 					itemId: "log",
 					location: boardLocation(1, 1),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:remote",
 					itemId: "log",
 					location: boardLocation(0, 1),
-					quantity: 1,
 				});
 				if (origin.location.scope !== "board") {
 					return yield* Effect.die(new Error("Expected board origin."));
@@ -138,13 +133,11 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:units-owner",
 					itemId: "unitsProducer",
 					location: boardLocation(1, 0),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:remote-payer",
 					itemId: "payer",
 					location: boardLocation(0, 1),
-					quantity: 1,
 				});
 				const remoteOnly = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
@@ -155,7 +148,6 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:local-payer",
 					itemId: "payer",
 					location: boardLocation(1, 1),
-					quantity: 1,
 				});
 				const local = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
@@ -174,39 +166,33 @@ describe("multi-space spatial isolation", () => {
 		expect(result.local.ready).toBe(true);
 	});
 
-	it("places stacks, spawns, and random origins only in the origin space", () => {
-		const stacked = Effect.runSync(
+	it("places new identities and random origins only in the origin space", () => {
+		const placed = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(1, 0),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
-					id: "runtime:local-stack",
+					id: "runtime:local-item",
 					itemId: "log",
 					location: boardLocation(1, 1),
-					quantity: 2,
 				});
 				yield* spawnItemFx({
-					id: "runtime:remote-stack",
+					id: "runtime:remote-item",
 					itemId: "log",
 					location: boardLocation(0, 1),
-					quantity: 2,
 				});
 				yield* placeDropForTestFx({
-					drop: drop("drop", 2),
+					drop: drop("drop", 1),
 					originItemId: origin.id,
 				});
 				return yield* readRuntimeFx();
 			}).pipe(useTestGame),
 		);
-
-		expect(stacked.items.find((item) => item.id === "runtime:local-stack")?.quantity).toBe(3);
-		expect(stacked.items.find((item) => item.id === "runtime:remote-stack")?.quantity).toBe(2);
 		expect(
-			stacked.items.some(
+			placed.items.some(
 				(item) =>
 					item.item.id === "log" &&
 					item.location.scope === "board" &&
@@ -221,7 +207,6 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:random-origin",
 					itemId: "origin",
 					location: boardLocation(4, 0),
-					quantity: 1,
 				});
 				yield* placeDropForTestFx({
 					drop: drop("random"),
@@ -253,7 +238,6 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(2, 0),
-					quantity: 1,
 				});
 				for (const x of [
 					1,
@@ -263,7 +247,6 @@ describe("multi-space spatial isolation", () => {
 						id: `runtime:blocker:${x}`,
 						itemId: "blocker",
 						location: boardLocation(2, x),
-						quantity: 1,
 					});
 				}
 				const before = yield* readRuntimeFx();
@@ -296,31 +279,26 @@ describe("multi-space spatial isolation", () => {
 					id: "runtime:movable",
 					itemId: "log",
 					location: boardLocation(0, 0),
-					quantity: 1,
 				});
 				const remote = yield* spawnItemFx({
 					id: "runtime:remote",
 					itemId: "blocker",
 					location: boardLocation(1, 1),
-					quantity: 1,
 				});
 				const source = yield* spawnItemFx({
 					id: "runtime:merge-source",
 					itemId: "mergeSource",
 					location: boardLocation(0, 2),
-					quantity: 1,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:merge-target",
 					itemId: "mergeTarget",
 					location: boardLocation(1, 2),
-					quantity: 1,
 				});
 				const owner = yield* spawnItemFx({
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: boardLocation(1, 0),
-					quantity: 1,
 				});
 
 				const before = yield* readRuntimeFx();
@@ -365,7 +343,6 @@ describe("multi-space spatial isolation", () => {
 						inputIndex: 0,
 						sourceItemId: movable.id,
 						sourceItemRevision: movable.revision,
-						quantity: 1,
 					}),
 				);
 				const after = yield* readRuntimeFx();

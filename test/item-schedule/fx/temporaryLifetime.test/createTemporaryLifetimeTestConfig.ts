@@ -1,6 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
+const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -11,7 +11,6 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize,
 });
 
 const guaranteedOutput = ({

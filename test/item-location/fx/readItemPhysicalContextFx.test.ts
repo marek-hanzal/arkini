@@ -73,19 +73,19 @@ describe("readItemPhysicalContextFx", () => {
 				yield* spawnItemFx({
 					id: "owner",
 					itemId: "owner",
-					quantity: 1,
+
 					location: boardFn(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
 					itemId: "temporary",
-					quantity: 1,
+
 					location: boardFn(1),
 				});
 				const child = yield* spawnItemFx({
 					id: "child",
 					itemId: "residue",
-					quantity: 1,
+
 					location: boardFn(2),
 				});
 				yield* storeInputMaterialFx({
@@ -94,7 +94,6 @@ describe("readItemPhysicalContextFx", () => {
 					inputIndex: 0,
 					sourceItemId: child.id,
 					sourceItemRevision: child.revision,
-					quantity: 1,
 				});
 				const storedMaterial = (yield* readRuntimeFx()).items.find(
 					(item) => item.id === material.id,
@@ -107,7 +106,6 @@ describe("readItemPhysicalContextFx", () => {
 					inputIndex: 0,
 					sourceItemId: storedMaterial.id,
 					sourceItemRevision: storedMaterial.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: "owner",

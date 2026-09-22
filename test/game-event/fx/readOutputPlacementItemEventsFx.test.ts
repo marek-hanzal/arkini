@@ -20,51 +20,41 @@ const item = ({
 	id,
 	itemId,
 	location,
-	quantity,
 }: {
 	id: string;
 	itemId: "water" | "tool";
 	location: ReturnType<typeof board>;
-	quantity: number;
 }) => ({
 	id,
 	item: config.items[itemId],
 	location,
-	quantity,
 	revision: `revision:${id}`,
 });
 
 describe("readOutputPlacementItemEventsFx", () => {
-	it("reports exact stack growth before exact spawned identities in placement order", () => {
-		const stacked = item({
-			id: "runtime:stacked",
+	it("reports exact spawned identities in placement order", () => {
+		const first = item({
+			id: "runtime:first",
 			itemId: "water",
 			location: board(0),
-			quantity: 3,
 		});
 		const spawned = item({
 			id: "runtime:spawned",
 			itemId: "water",
 			location: board(1),
-			quantity: 2,
 		});
 		const placement = {
 			drop: [
 				{
 					drop: {
 						itemId: "water",
-						quantity: 4,
+						quantity: 2,
 						placement: "drop",
 					},
 					placement: {
 						remove: [],
-						stack: [
-							{
-								item: stacked,
-								quantity: 2,
-							},
-						],
 						spawn: [
+							first,
 							spawned,
 						],
 					},
@@ -81,13 +71,11 @@ describe("readOutputPlacementItemEventsFx", () => {
 			),
 		).toEqual([
 			{
-				type: GameEventEnumSchema.enum.ItemStacked,
-				itemId: stacked.id,
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: first.id,
 				canonicalItemId: "water",
 				originItemId: "runtime:origin",
-				location: stacked.location,
-				previousQuantity: 1,
-				quantity: 3,
+				location: first.location,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
@@ -95,7 +83,6 @@ describe("readOutputPlacementItemEventsFx", () => {
 				canonicalItemId: "water",
 				originItemId: "runtime:origin",
 				location: spawned.location,
-				quantity: 2,
 			},
 		]);
 	});

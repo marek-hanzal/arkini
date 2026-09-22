@@ -5,7 +5,6 @@ import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlace
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
-import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
@@ -22,6 +21,39 @@ import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+
+/** Merge reuse and replacement cannot discard identity-owned state. */
+const hasMergeIdentityStateFn = ({
+	item,
+	runtime,
+}: {
+	readonly item: BoardRuntimeItemSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+}) => {
+	if (
+		item.schedule !== undefined ||
+		item.remainingUnits !== undefined ||
+		Object.hasOwn(runtime.defaultLineByOwnerItemId, item.id)
+	)
+		return true;
+	return item.item.lines.some(
+		(line) =>
+			runtime.items.some(
+				({ location }) =>
+					(location.scope === "input" &&
+						location.ownerItemId === item.id &&
+						location.lineId === line.id) ||
+					(location.scope === "delivery" &&
+						location.phase === "outbound" &&
+						location.target.ownerItemId === item.id &&
+						location.target.lineId === line.id),
+			) ||
+			runtime.jobs.some((job) => job.ownerItemId === item.id && job.lineId === line.id) ||
+			runtime.jobQueue.some(
+				(request) => request.ownerItemId === item.id && request.lineId === line.id,
+			),
+	);
+};
 
 const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function* ({
 	action,
@@ -56,11 +88,11 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	}
 
 	if (action === SourceActionSchema.enum.Use) {
-		const pure = isItemPureFn({
+		const hasState = hasMergeIdentityStateFn({
 			item: source,
 			runtime,
 		});
-		if (!pure) {
+		if (hasState) {
 			return yield* Effect.fail(
 				new ItemStatefulError({
 					itemId: source.id,
@@ -113,7 +145,7 @@ const resolveMergeReplacementUnitsFx = Effect.fn("resolveMergeReplacementUnitsFx
 	readonly runtime: RuntimeSchema.Type;
 	readonly target: BoardRuntimeItemSchema.Type;
 }) {
-	const otherwisePure = isItemPureFn({
+	const hasOtherState = hasMergeIdentityStateFn({
 		item: {
 			...target,
 			remainingUnits: undefined,
@@ -121,7 +153,7 @@ const resolveMergeReplacementUnitsFx = Effect.fn("resolveMergeReplacementUnitsFx
 		},
 		runtime,
 	});
-	if (!otherwisePure) {
+	if (hasOtherState) {
 		return yield* Effect.fail(
 			new ItemStatefulError({
 				itemId: target.id,

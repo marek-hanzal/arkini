@@ -18,7 +18,6 @@ const item = {
 			"artwork:tree",
 		],
 	},
-	maxStackSize: 1,
 } satisfies ItemSchema.Type;
 
 const stone = {

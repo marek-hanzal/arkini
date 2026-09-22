@@ -15,7 +15,7 @@ it("rejects insufficient board capacity before allocating identities, including 
 	const item = {
 		id: "origin",
 		item: placementTestConfig.items.origin,
-		quantity: 1,
+
 		revision: "revision",
 	};
 	const runtime: RuntimeSchema.Type = {

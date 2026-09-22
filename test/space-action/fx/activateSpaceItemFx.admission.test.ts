@@ -14,13 +14,11 @@ describe("Space item activation admission", () => {
 					id: "runtime:near-permit",
 					itemId: "permit",
 					location: board(1),
-					quantity: 1,
 				});
 				const portal = yield* spawnItemFx({
 					id: "runtime:near-portal",
 					itemId: "proximityPortal",
 					location: board(0),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				yield* activateItemActionFx({
@@ -40,13 +38,11 @@ describe("Space item activation admission", () => {
 					id: "runtime:far-permit",
 					itemId: "permit",
 					location: board(3),
-					quantity: 1,
 				});
 				const portal = yield* spawnItemFx({
 					id: "runtime:far-portal",
 					itemId: "proximityPortal",
 					location: board(0),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
@@ -75,7 +71,6 @@ describe("Space item activation admission", () => {
 					id: "runtime:hidden-portal",
 					itemId: "portal",
 					location: board(0, 0, 1),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
@@ -111,7 +106,6 @@ describe("Space item activation admission", () => {
 					id: "runtime:stale-portal",
 					itemId: "spentPortal",
 					location: board(1),
-					quantity: 1,
 				});
 				const observed = yield* readRuntimeFx();
 				yield* spawnAndActivate({

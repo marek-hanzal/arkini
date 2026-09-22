@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
-import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -91,19 +90,17 @@ const run = <A, E>(
 		),
 	);
 
-const setupFx = ({ quantity }: { readonly quantity: number }) =>
+const setupFx = () =>
 	Effect.gen(function* () {
 		yield* spawnItemFx({
 			id: "runtime:workshop",
 			itemId: "workshop",
 			location: workshopLocation,
-			quantity: 1,
 		});
 		yield* spawnItemFx({
 			id: "runtime:water",
 			itemId: "water",
 			location: sourceLocation(1),
-			quantity,
 		});
 		yield* setLineSelectionFx({
 			selection: "default",
@@ -166,28 +163,22 @@ const dropFx = ({
 	});
 
 describe("dropItemFx default-line input storage", () => {
-	it("uses an authored fallback without state until the drop atomically isolates one stacked owner", () => {
+	it("uses an authored fallback without persisting a line selection or replacing the owner", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: workshopLocation,
-					quantity: 3,
 				});
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation(1),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const beforeOwner = before.items.find((item) => item.id === owner.id);
 				if (beforeOwner === undefined) throw new Error("Missing authored-default owner.");
-				const pureBefore = isItemPureFn({
-					item: beforeOwner,
-					runtime: before,
-				});
 				const preview = yield* previewFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
@@ -198,53 +189,34 @@ describe("dropItemFx default-line input storage", () => {
 				});
 				const runtime = yield* readRuntimeFx();
 				const isolated = runtime.items.find((item) => item.id === owner.id);
-				const remainder = runtime.items.find(
-					(item) => item.item.id === "workshop" && item.id !== owner.id,
-				);
-				if (isolated === undefined || remainder === undefined) {
-					throw new Error("Expected isolated owner and pure remainder.");
-				}
+				if (isolated === undefined) throw new Error("Missing owner");
 				return {
 					isolated,
 					outcome,
 					preview,
-					pureBefore,
-					remainder,
-					remainderPure: isItemPureFn({
-						item: remainder,
-						runtime,
-					}),
 					runtime,
 				};
 			}),
 			authoredDefaultConfig,
 		);
 
-		expect(result.pureBefore).toBe(true);
 		expect(result.preview).toEqual({
 			kind: DropItemResultKind.StoreInput,
 			lineId,
 			inputIndex: 0,
-			quantity: 1,
 		});
 		expect(result.outcome.kind).toBe(DropItemResultKind.StoreInput);
 		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 		expect(result.isolated).toMatchObject({
 			id: "runtime:workshop",
-			quantity: 1,
 		});
-		expect(result.remainder).toMatchObject({
-			quantity: 2,
-		});
-		expect(result.remainderPure).toBe(true);
+		expect(result.runtime.items.filter((item) => item.item.id === "workshop")).toHaveLength(1);
 	});
 
 	it("previews and commits a full visible source store before swap", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({
-					quantity: 2,
-				});
+				const { owner, source } = yield* setupFx();
 				const preview = yield* previewFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
@@ -265,18 +237,15 @@ describe("dropItemFx default-line input storage", () => {
 			kind: DropItemResultKind.StoreInput,
 			lineId,
 			inputIndex: 0,
-			quantity: 2,
 		});
 		expect(result.outcome).toMatchObject({
 			kind: DropItemResultKind.StoreInput,
-			storedQuantity: 2,
 			lineId,
 			inputIndex: 0,
 			source: {
 				itemId: "runtime:water",
 				canonicalItemId: "water",
 				previousLocation: sourceLocation(1),
-				previousQuantity: 2,
 				current: null,
 			},
 			owner: {
@@ -292,53 +261,10 @@ describe("dropItemFx default-line input storage", () => {
 		});
 	});
 
-	it("reports one partial store and keeps the same visible source identity", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({
-					quantity: 7,
-				});
-				const outcome = yield* dropFx({
-					ownerRevision: owner.revision,
-					sourceRevision: source.revision,
-				});
-				return {
-					outcome,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
-
-		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKind.StoreInput,
-			storedQuantity: 3,
-			source: {
-				itemId: "runtime:water",
-				previousQuantity: 7,
-				current: {
-					itemId: "runtime:water",
-					canonicalItemId: "water",
-					location: sourceLocation(1),
-					quantity: 4,
-				},
-			},
-		});
-		const visibleSource = result.runtime.items.find((item) => item.id === "runtime:water");
-		expect(visibleSource?.quantity).toBe(4);
-		expect(visibleSource?.location).toEqual(sourceLocation(1));
-		expect(
-			result.runtime.items
-				.filter((item) => item.location.scope === "input")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(3);
-	});
-
 	it("admits only a valid exact input request before a compatible authored merge", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({
-					quantity: 7,
-				});
+				const { owner, source } = yield* setupFx();
 				const exactTarget = targetFor({
 					revision: owner.revision,
 				});
@@ -352,7 +278,6 @@ describe("dropItemFx default-line input storage", () => {
 					inputStore: {
 						lineId,
 						inputIndex: 1,
-						quantity: 1,
 					},
 				};
 				const before = yield* readRuntimeFx();
@@ -370,7 +295,6 @@ describe("dropItemFx default-line input storage", () => {
 					inputStore: {
 						lineId,
 						inputIndex: 0,
-						quantity: 3,
 					},
 				};
 				const preview = yield* readDropItemPreviewFx({
@@ -409,24 +333,16 @@ describe("dropItemFx default-line input storage", () => {
 			kind: DropItemResultKind.StoreInput,
 			lineId,
 			inputIndex: 0,
-			quantity: 3,
 		});
 		expect(result.outcome).toMatchObject({
 			kind: DropItemResultKind.StoreInput,
-			storedQuantity: 3,
 			source: {
-				previousQuantity: 7,
-				current: {
-					location: sourceLocation(1),
-					quantity: 4,
-				},
+				current: null,
 			},
 		});
-		expect(
-			result.runtime.items
-				.filter((item) => item.location.scope === "input")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(3);
+		expect(result.runtime.items.filter((item) => item.location.scope === "input").length).toBe(
+			1,
+		);
 	});
 
 	it("preserves ordinary swap when the target has no selected default line", () => {
@@ -436,13 +352,11 @@ describe("dropItemFx default-line input storage", () => {
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: workshopLocation,
-					quantity: 1,
 				});
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation(1),
-					quantity: 1,
 				});
 				const preview = yield* previewFx({
 					ownerRevision: owner.revision,
@@ -468,22 +382,33 @@ describe("dropItemFx default-line input storage", () => {
 	it("falls back to swap when the selected input has no remaining capacity", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({
-					quantity: 3,
-				});
+				const { owner, source } = yield* setupFx();
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
 					lineId,
 					inputIndex: 0,
 					sourceItemId: "runtime:water",
 					sourceItemRevision: source.revision,
-					quantity: 3,
 				});
+				for (let index = 0; index < 2; index++) {
+					const filler = yield* spawnItemFx({
+						id: `filler-${index}`,
+						itemId: "water",
+						location: sourceLocation(1),
+					});
+					yield* storeInputMaterialFx({
+						ownerItemId: owner.id,
+						lineId,
+						inputIndex: 0,
+						sourceItemId: filler.id,
+						sourceItemRevision: filler.revision,
+					});
+				}
+
 				const extra = yield* spawnItemFx({
 					id: "runtime:water-extra",
 					itemId: "water",
 					location: sourceLocation(1),
-					quantity: 1,
 				});
 				const runtime = yield* readRuntimeFx();
 				const currentOwner = runtime.items.find((item) => item.id === owner.id);
@@ -507,9 +432,7 @@ describe("dropItemFx default-line input storage", () => {
 	it("keeps authored merge precedence over default-line input storage", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({
-					quantity: 1,
-				});
+				const { owner, source } = yield* setupFx();
 				return yield* previewFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
@@ -524,7 +447,7 @@ describe("dropItemFx default-line input storage", () => {
 	});
 });
 
-it("rolls back an authored-default drop when the isolated remainder cannot be placed", () => {
+it("stores the exact identity on a full Board without requiring another cell", () => {
 	const sourceBoardLocation = {
 		scope: "board" as const,
 		space: 0,
@@ -539,13 +462,11 @@ it("rolls back an authored-default drop when the isolated remainder cannot be pl
 				id: "runtime:workshop",
 				itemId: "workshop",
 				location: workshopLocation,
-				quantity: 2,
 			});
 			const source = yield* spawnItemFx({
 				id: "runtime:water",
 				itemId: "water",
 				location: sourceBoardLocation,
-				quantity: 7,
 			});
 			const target = targetFor({
 				revision: owner.revision,
@@ -577,13 +498,10 @@ it("rolls back an authored-default drop when the isolated remainder cannot be pl
 
 	expect(result.preview.kind).toBe(DropItemResultKind.StoreInput);
 	expect(result.dropped._tag).toBe("Success");
-	if (result.dropped._tag === "Success") {
-		expect(result.dropped.success).toEqual({
-			kind: DropItemResultKind.Reject,
-			reason: "blocked",
-			itemId: "runtime:water",
-			targetItemId: "runtime:workshop",
-		});
-	}
-	expect(result.after).toEqual(result.before);
+	if (result.dropped._tag === "Success")
+		expect(result.dropped.success.kind).toBe(DropItemResultKind.StoreInput);
+	expect(result.after.items).toHaveLength(2);
+	expect(result.after.items.find((item) => item.id === "runtime:water")?.location.scope).toBe(
+		"input",
+	);
 });

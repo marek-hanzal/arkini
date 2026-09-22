@@ -1,6 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const simpleItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) => {
+const simpleItem = ({ id }: { id: string }) => {
 	return {
 		maxQueueSize: 1,
 		lines: [],
@@ -15,7 +15,6 @@ const simpleItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) 
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize,
 	} as const;
 };
 
@@ -45,15 +44,12 @@ export const startTestConfig = GameConfigSchema.parse({
 	items: {
 		tree: simpleItem({
 			id: "tree",
-			maxStackSize: 1,
 		}),
 		log: simpleItem({
 			id: "log",
-			maxStackSize: 3,
 		}),
 		lens: simpleItem({
 			id: "lens",
-			maxStackSize: 2,
 		}),
 	},
 });

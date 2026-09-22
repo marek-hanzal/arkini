@@ -2,6 +2,10 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";
+import {
+	placementTestConfig,
+	boardLocation,
+} from "~test/item-placement/support/placementTestConfig";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 const drop = {
@@ -13,13 +17,19 @@ const drop = {
 const plan = (quantity: number) =>
 	({
 		remove: [],
-		spawn: [],
-		stack: [
+		spawn: Array.from(
 			{
-				itemId: "runtime:stack",
-				quantity,
+				length: quantity,
 			},
-		],
+			(_, index) => ({
+				item: {
+					id: `spawn-${index}`,
+					item: placementTestConfig.items.log,
+					revision: `revision-${index}`,
+					location: boardLocation(index),
+				},
+			}),
+		),
 	}) satisfies PlacementPlan;
 
 const assert = (quantity: number) =>

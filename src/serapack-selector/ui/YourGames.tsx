@@ -102,10 +102,10 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 					>
 						<PackageOpen className="size-9 text-accent" />
 						<span className="text-lg">
-							<Tx label="Import serapack" />
+							<Tx label="Add a game" />
 						</span>
 						<span className="text-xs font-medium opacity-75">
-							<Tx label="Choose an existing .serapack file" />
+							<Tx label="Bring in a Serapack to play or edit" />
 						</span>
 					</Button>
 					<Button
@@ -119,10 +119,10 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 					>
 						<FileJson2 className="size-9 text-accent" />
 						<span className="text-lg">
-							<Tx label="Open folder" />
+							<Tx label="Open your project" />
 						</span>
 						<span className="text-xs font-medium opacity-75">
-							<Tx label="Use an existing Editor project in place" />
+							<Tx label="Jump back into a game you're making" />
 						</span>
 					</Button>
 					<Button
@@ -132,12 +132,12 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 						data-ui="YourGamesProjectCreateOpen"
 						onClick={() => setCreateOpenFn(true)}
 					>
-						<FilePlus2 className="size-9" />
+						<FilePlus2 className="size-9 text-accent" />
 						<span className="text-lg">
-							<Tx label="New project" />
+							<Tx label="Make a new game" />
 						</span>
 						<span className="text-xs font-medium opacity-75">
-							<Tx label="Start with an empty project" />
+							<Tx label="Start from scratch and make it yours" />
 						</span>
 					</Button>
 				</section>

@@ -48,6 +48,7 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 		title: testSerapackConfig.meta.title,
 		version: "1.0",
 		serakki: SerakkiAppVersion,
+		projectRevision: 1,
 		provenance: {
 			type: "community",
 		} as const,

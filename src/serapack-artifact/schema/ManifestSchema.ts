@@ -9,6 +9,9 @@ export const ManifestSchema = z
 	.object({
 		version: GameVersionSchema.describe("The gameplay compatibility version."),
 		serakki: SerakkiVersionSchema.describe("The Serakki version that built this package."),
+		projectRevision: NonNegativeIntegerSchema.describe(
+			"The source project revision used for this build.",
+		),
 		length: NonNegativeIntegerSchema.describe("The encoded configuration size in bytes."),
 		resources: z
 			.array(ManifestResourceSchema)

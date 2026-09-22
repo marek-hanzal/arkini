@@ -14,12 +14,6 @@ const launcherPagePresentation = {
 		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
 		viewTransitionName: "serakki-panel-serapacks",
 	},
-	"editor-welcome": {
-		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
-		layout: "fixed-hero",
-		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
-		viewTransitionName: "serakki-panel-editor-welcome",
-	},
 	"main-menu": {
 		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",

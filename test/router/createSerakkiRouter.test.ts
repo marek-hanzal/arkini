@@ -127,20 +127,20 @@ describe("createSerakkiRouterFx", () => {
 			],
 			[
 				"/main-menu",
-				"/editor/welcome",
+				"/serapacks",
 				[
 					"serakki-route",
 					"hero-to-hero",
-					"main-menu-to-editor-welcome",
+					"main-menu-to-serapacks",
 				],
 			],
 			[
-				"/editor/welcome",
+				"/serapacks",
 				"/editor/serakki/editor",
 				[
 					"serakki-route",
 					"hero-to-board",
-					"editor-welcome-to-editor",
+					"serapacks-to-editor",
 				],
 			],
 			[
@@ -275,12 +275,7 @@ describe("createSerakkiRouterFx", () => {
 		expect(resolveTypes("/main-menu", "/editor")).toEqual([
 			"serakki-route",
 			"hero-to-hero",
-			"main-menu-to-editor-welcome",
-		]);
-		expect(resolveTypes("/main-menu", "/editor/welcome/")).toEqual([
-			"serakki-route",
-			"hero-to-hero",
-			"main-menu-to-editor-welcome",
+			"main-menu-to-serapacks",
 		]);
 		for (const [from, to, types] of pairs) {
 			expect(resolveTypes(from, to)).toEqual(types);

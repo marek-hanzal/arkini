@@ -642,8 +642,6 @@ Edit:
   value: Edit
 Edit artwork:
   value: Edit artwork
-Editor:
-  value: Editor
 Editor Board:
   value: Editor Board
 Editor Board help:
@@ -687,8 +685,6 @@ Editor project could not be opened:
   value: Editor project could not be opened
 Editor unsaved changes description:
   value: "**Save** your changes before leaving, or **Discard** them to return to the saved version. Choose **Cancel** to keep editing."
-Editor welcome:
-  value: Editor welcome
 Enable:
   value: Enable
 Enable Units on this item before selecting Self.:
@@ -1640,18 +1636,12 @@ Reading image…:
   value: Reading image…
 Ready for this job.:
   value: Ready for this job.
-Recent projects:
-  value: Recent projects
-Recent projects could not be refreshed.:
-  value: Recent projects could not be refreshed.
 Refresh:
   value: Refresh
 Refresh failed:
   value: Refresh failed
 Refresh from disk:
   value: Refresh from disk
-Refresh projects:
-  value: Refresh projects
 Relative set weight:
   value: Set weight
 Remains:

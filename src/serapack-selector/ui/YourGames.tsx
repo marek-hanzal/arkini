@@ -3,14 +3,16 @@ import { useEffect, useState } from "react";
 
 import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import { ProjectDeleteDialog } from "~/project-authoring/ui/ProjectDeleteDialog";
+import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajorUpdateDialog";
 import { YourGamesList } from "~/serapack-selector/ui/YourGamesList";
 import { useSerapackSelectorActions } from "~/serapack-selector/ui/useSerapackSelectorActions";
+import { useYourGamesPlayController } from "~/serapack-selector/ui/useYourGamesPlayController";
 import { BackButton } from "~/ui/ui/BackButton";
 import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 import { ProjectCreateDialog } from "~/project-authoring/ui/ProjectCreateDialog";
-import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";
+import { useProjectCatalogActions } from "~/project-authoring/ui/useProjectCatalogActions";
 import { Tx } from "~/translation/ui/Tx";
 
 interface YourGamesProps {
@@ -28,11 +30,13 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 		}
 	> | null>(null);
 	const [deleteRequested, setDeleteRequestedFn] = useState(false);
-	const projectActions = useEditorWelcomeActions({
-		exitBlocked: true,
-	});
+	const projectActions = useProjectCatalogActions();
+	const play = useYourGamesPlayController(
+		projectActions.blocked || createOpen || projectToDelete !== null,
+	);
 	const actions = useSerapackSelectorActions({
-		externallyBlocked: projectActions.blocked || createOpen || projectToDelete !== null,
+		externallyBlocked:
+			projectActions.blocked || createOpen || projectToDelete !== null || play.blocked,
 	});
 	const blocked = actions.blocked;
 	useEffect(() => {
@@ -145,6 +149,16 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 							: String(projectActions.error)}
 					</p>
 				)}
+				{projectActions.projectRefreshError === undefined ? null : (
+					<p className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+						Recent projects could not be refreshed.
+					</p>
+				)}
+				{play.error === undefined || play.majorUpdate !== undefined ? null : (
+					<p className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+						{play.error instanceof Error ? play.error.message : String(play.error)}
+					</p>
+				)}
 				{projectCatalogError === undefined ? null : (
 					<p className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
 						Editor projects could not be loaded: {String(projectCatalogError)}
@@ -154,6 +168,7 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 				<section className="grid gap-3 border-t border-line pt-5">
 					<YourGamesList
 						blocked={blocked}
+						pendingProjectId={play.pendingProjectId}
 						projects={visibleProjects}
 						state={actions.state}
 						onDeleteProjectFn={(candidate) => {
@@ -163,6 +178,7 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 						onDismissInvalidProjectFn={projectActions.dismissInvalidProjectFn}
 						onOpenEditorSerapackFn={actions.openSerapackInEditorFn}
 						onOpenProjectFolderFn={projectActions.openProjectFolderFn}
+						onPlayProjectFn={play.playProjectFn}
 						onRemoveSerapackFn={actions.removeSerapackFn}
 					/>
 				</section>
@@ -199,6 +215,21 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 						setDeleteRequestedFn(true);
 						projectActions.deleteProjectFn(projectToDelete.project.projectId);
 					}}
+				/>
+			)}
+			{play.majorUpdate === undefined ? null : (
+				<EditorBuildMajorUpdateDialog
+					confirmation={play.majorUpdate.confirmation}
+					error={
+						play.error === undefined
+							? undefined
+							: play.error instanceof Error
+								? play.error.message
+								: String(play.error)
+					}
+					pending={play.pendingProjectId !== undefined}
+					onCancelFn={play.cancelMajorUpdateFn}
+					onConfirmFn={() => void play.confirmMajorUpdateFn()}
 				/>
 			)}
 		</LauncherPageLayout>

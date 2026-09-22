@@ -22,6 +22,7 @@ describe("listSerapacksFx", () => {
 				title: "Catalog",
 				version: "1.0",
 				serakki: SerakkiAppVersion,
+				projectRevision: 1,
 				provenance: {
 					type: "community",
 				},
@@ -54,6 +55,7 @@ describe("listSerapacksFx", () => {
 				title: "Bundled",
 				version: "1.0",
 				serakki: SerakkiAppVersion,
+				projectRevision: 1,
 				provenance: {
 					type: "official",
 				},
@@ -67,6 +69,7 @@ describe("listSerapacksFx", () => {
 				title: "Invalid",
 				version: "invalid",
 				serakki: SerakkiAppVersion,
+				projectRevision: 1,
 				provenance: {
 					type: "community",
 				},

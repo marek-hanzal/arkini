@@ -2,13 +2,13 @@ import { useAtom } from "@effect/atom-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 
-import { EditorWelcomeCommandAtom } from "~/project-authoring/atom/EditorWelcomeCommandAtom";
+import { ProjectCatalogCommandAtom } from "~/project-authoring/atom/ProjectCatalogCommandAtom";
 
-/** Owns editor-welcome navigation composition and Escape lifecycle. */
-export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
+/** Owns project catalog commands and navigation across the Your games surface. */
+export const useProjectCatalogActions = () => {
 	const navigateFn = useNavigate();
 	const router = useRouter();
-	const [state, runCommandFn] = useAtom(EditorWelcomeCommandAtom);
+	const [state, runCommandFn] = useAtom(ProjectCatalogCommandAtom);
 	const [deletedProjectIds, setDeletedProjectIdsFn] = useState<ReadonlySet<string>>(
 		() => new Set(),
 	);
@@ -56,24 +56,20 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 			return;
 		}
 		const navigation =
-			state.action === "exit"
+			state.action === "create"
 				? navigateFn({
-						to: "/main-menu",
+						to: "/editor/$projectId/project/form/$sectionId",
+						params: {
+							projectId: state.project.projectId,
+							sectionId: "general",
+						},
 					})
-				: state.action === "create"
-					? navigateFn({
-							to: "/editor/$projectId/project/form/$sectionId",
-							params: {
-								projectId: state.project.projectId,
-								sectionId: "general",
-							},
-						})
-					: navigateFn({
-							to: "/editor/$projectId/editor/items/list",
-							params: {
-								projectId: state.project.projectId,
-							},
-						});
+				: navigateFn({
+						to: "/editor/$projectId/editor/items/list",
+						params: {
+							projectId: state.project.projectId,
+						},
+					});
 		void navigation.then(
 			() =>
 				runCommandFn({
@@ -158,30 +154,6 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		],
 	);
 
-	const exitFn = useCallback(() => {
-		if (blocked) return;
-		runCommandFn({
-			action: "exit",
-		});
-	}, [
-		blocked,
-		runCommandFn,
-	]);
-
-	useEffect(() => {
-		const onKeyDownFn = (event: KeyboardEvent) => {
-			if (event.key !== "Escape" || blocked || exitBlocked) return;
-			event.preventDefault();
-			exitFn();
-		};
-		window.addEventListener("keydown", onKeyDownFn);
-		return () => window.removeEventListener("keydown", onKeyDownFn);
-	}, [
-		blocked,
-		exitFn,
-		exitBlocked,
-	]);
-
 	return {
 		active,
 		blocked,
@@ -191,7 +163,6 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		dismissInvalidProjectFn,
 		dismissedProjectRoots,
 		error: state.kind === "error" ? state.error : undefined,
-		exitFn,
 		importJsonDirectoryFn,
 		openProjectFolderFn,
 		projectRefreshError,

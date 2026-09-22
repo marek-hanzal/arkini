@@ -33,6 +33,7 @@ describe("SerapackSelector action recovery", () => {
 							title: "Local package",
 							version: "1.0",
 							serakki: "1",
+							projectRevision: 1,
 							provenance: {
 								type: "community",
 							} as const,
@@ -83,6 +84,7 @@ describe("SerapackSelector action recovery", () => {
 			title: "Imported package",
 			version: "1.0",
 			serakki: "1",
+			projectRevision: 1,
 			provenance: {
 				type: "community",
 			},

@@ -19,7 +19,6 @@ import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settin
 import { Route as ActionDiscardFailedGameRouteImport } from "./@routes/action/discard-failed-game"
 import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
 import { Route as EditorProjectIdRouteImport } from "./@routes/editor/$projectId"
-import { Route as EditorWelcomeRouteImport } from "./@routes/editor/welcome"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
 import { Route as LauncherSettingsIndexRouteImport } from "./@routes/_launcher/settings/index"
 import { Route as LauncherSettingsCommonRouteImport } from "./@routes/_launcher/settings/common"
@@ -125,11 +124,6 @@ const ActionRecoverGameSaveRoute = ActionRecoverGameSaveRouteImport.update({
 const EditorProjectIdRoute = EditorProjectIdRouteImport.update({
   id: "/$projectId",
   path: "/$projectId",
-  getParentRoute: () => EditorRoute,
-} as any)
-const EditorWelcomeRoute = EditorWelcomeRouteImport.update({
-  id: "/welcome",
-  path: "/welcome",
   getParentRoute: () => EditorRoute,
 } as any)
 const GamePackageIdRoute = GamePackageIdRouteImport.update({
@@ -461,7 +455,6 @@ export interface FileRoutesByFullPath {
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/settings/common": typeof LauncherSettingsCommonRoute
   "/settings/dev": typeof LauncherSettingsDevRoute
@@ -528,7 +521,6 @@ export interface FileRoutesByTo {
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/settings/common": typeof LauncherSettingsCommonRoute
   "/settings/dev": typeof LauncherSettingsDevRoute
@@ -587,7 +579,6 @@ export interface FileRoutesById {
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/_launcher/settings/common": typeof LauncherSettingsCommonRoute
   "/_launcher/settings/dev": typeof LauncherSettingsDevRoute
@@ -658,7 +649,6 @@ export interface FileRouteTypes {
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/editor/$projectId"
-    | "/editor/welcome"
     | "/game/$packageId"
     | "/settings/common"
     | "/settings/dev"
@@ -725,7 +715,6 @@ export interface FileRouteTypes {
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/editor/$projectId"
-    | "/editor/welcome"
     | "/game/$packageId"
     | "/settings/common"
     | "/settings/dev"
@@ -783,7 +772,6 @@ export interface FileRouteTypes {
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/editor/$projectId"
-    | "/editor/welcome"
     | "/game/$packageId"
     | "/_launcher/settings/common"
     | "/_launcher/settings/dev"
@@ -923,13 +911,6 @@ declare module "@tanstack/react-router" {
       path: "/$projectId"
       fullPath: "/editor/$projectId"
       preLoaderRoute: typeof EditorProjectIdRouteImport
-      parentRoute: typeof EditorRoute
-    }
-    "/editor/welcome": {
-      id: "/editor/welcome"
-      path: "/welcome"
-      fullPath: "/editor/welcome"
-      preLoaderRoute: typeof EditorWelcomeRouteImport
       parentRoute: typeof EditorRoute
     }
     "/game/$packageId": {
@@ -1657,12 +1638,10 @@ const EditorProjectIdRouteWithChildren = EditorProjectIdRoute._addFileChildren(
 
 interface EditorRouteChildren {
   EditorProjectIdRoute: typeof EditorProjectIdRouteWithChildren
-  EditorWelcomeRoute: typeof EditorWelcomeRoute
 }
 
 const EditorRouteChildren: EditorRouteChildren = {
   EditorProjectIdRoute: EditorProjectIdRouteWithChildren,
-  EditorWelcomeRoute: EditorWelcomeRoute,
 }
 
 const EditorRouteWithChildren =

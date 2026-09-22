@@ -99,6 +99,7 @@ describe("SerapackSelector", () => {
 							title: "Packaged title",
 							version: "1.0",
 							serakki: "1",
+							projectRevision: 1,
 							provenance: {
 								type: "community",
 							},
@@ -111,6 +112,7 @@ describe("SerapackSelector", () => {
 							title: "Package only",
 							version: "1.0",
 							serakki: "1",
+							projectRevision: 1,
 							provenance: {
 								type: "community",
 							},
@@ -141,8 +143,16 @@ describe("SerapackSelector", () => {
 		]);
 		expect(rows[0]?.textContent).toContain("Editor title");
 		expect(rows[0]?.textContent).not.toContain("Packaged title");
-		expect(rows[0]?.querySelector('a[href="/action/load-game/game%3Ashared"]')).not.toBeNull();
-		expect(rows[1]?.querySelector('a[href^="/action/load-game/"]')).toBeNull();
+		expect(
+			Array.from(rows[0]?.querySelectorAll("button") ?? []).some(
+				(button) => button.textContent?.trim() === "Play",
+			),
+		).toBe(true);
+		expect(
+			Array.from(rows[1]?.querySelectorAll("button") ?? []).some(
+				(button) => button.textContent?.trim() === "Play",
+			),
+		).toBe(true);
 		expect(
 			rows[1]?.querySelector('a[href="/editor/game%3Aproject-only/editor/items/list"]'),
 		).not.toBeNull();
@@ -159,6 +169,7 @@ describe("SerapackSelector", () => {
 					title: "Serakki",
 					version: "1.0",
 					serakki: "1",
+					projectRevision: 1,
 					provenance: {
 						type: "official",
 					} as const,
@@ -171,6 +182,7 @@ describe("SerapackSelector", () => {
 					title: "Local package",
 					version: "1.0",
 					serakki: "1",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					} as const,

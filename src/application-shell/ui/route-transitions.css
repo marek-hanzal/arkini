@@ -116,7 +116,6 @@
 ::view-transition-group(serakki-panel-settings),
 ::view-transition-group(serakki-panel-about),
 ::view-transition-group(serakki-panel-serapacks),
-::view-transition-group(serakki-panel-editor-welcome),
 ::view-transition-group(serakki-action-panel),
 ::view-transition-group(serakki-action-progress),
 ::view-transition-group(serakki-settings-content),
@@ -159,7 +158,6 @@
 ::view-transition-group(serakki-panel-settings),
 ::view-transition-group(serakki-panel-about),
 ::view-transition-group(serakki-panel-serapacks),
-::view-transition-group(serakki-panel-editor-welcome),
 ::view-transition-group(serakki-action-panel),
 ::view-transition-group(serakki-action-progress) {
 	z-index: 40;
@@ -205,8 +203,6 @@
 ::view-transition-new(serakki-panel-about),
 ::view-transition-old(serakki-panel-serapacks),
 ::view-transition-new(serakki-panel-serapacks),
-::view-transition-old(serakki-panel-editor-welcome),
-::view-transition-new(serakki-panel-editor-welcome),
 ::view-transition-old(serakki-action-panel),
 ::view-transition-new(serakki-action-panel),
 ::view-transition-old(serakki-action-progress),
@@ -268,7 +264,6 @@
 ::view-transition-old(serakki-panel-settings),
 ::view-transition-old(serakki-panel-about),
 ::view-transition-old(serakki-panel-serapacks),
-::view-transition-old(serakki-panel-editor-welcome),
 ::view-transition-old(serakki-action-panel) {
 	animation: serakki-vt-surface-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -277,7 +272,6 @@
 ::view-transition-new(serakki-panel-settings),
 ::view-transition-new(serakki-panel-about),
 ::view-transition-new(serakki-panel-serapacks),
-::view-transition-new(serakki-panel-editor-welcome),
 ::view-transition-new(serakki-action-panel) {
 	animation: serakki-vt-surface-in 320ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

@@ -48,6 +48,7 @@ export const readSerapackCandidatesFx = Effect.fn("readSerapackCandidatesFx")(fu
 							title: file.title,
 							version: GameVersionSchema.parse(file.version),
 							serakki: SerakkiVersionSchema.parse(file.serakki),
+							projectRevision: file.projectRevision,
 							provenance: file.provenance,
 							source: file.source,
 							overridesBundled: file.overridesBundled,

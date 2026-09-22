@@ -39,6 +39,7 @@ export const listSerapacksFx = Effect.fn("listSerapacksFx")(function* (
 							title: file.title,
 							version: GameVersionSchema.parse(file.version),
 							serakki: SerakkiVersionSchema.parse(file.serakki),
+							projectRevision: file.projectRevision,
 							provenance: file.provenance,
 							source: file.source,
 							overridesBundled: file.overridesBundled,

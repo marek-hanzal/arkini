@@ -21,7 +21,6 @@ import { createRendererLifecycleFx } from "~/application-runtime/fx/createRender
 import { Route as MainMenuRouteDefinition } from "~/@routes/_launcher/main-menu";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
-import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 
 (
 	globalThis as {
@@ -89,6 +88,7 @@ describe("MainMenu", () => {
 					title: "Other Game",
 					version: "1.0",
 					serakki: "1",
+					projectRevision: 1,
 					provenance: {
 						type: "official",
 					} as const,
@@ -100,6 +100,7 @@ describe("MainMenu", () => {
 					title: "Serakki",
 					version: "1.0",
 					serakki: "1",
+					projectRevision: 1,
 					provenance: {
 						type: "official",
 					} as const,
@@ -123,9 +124,6 @@ describe("MainMenu", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
-		registry.set(EditorServiceStatusAtom, {
-			type: "ready",
-		});
 		registry.set(SerapackCatalogOwnerAtom, catalog);
 		registry.set(
 			RendererLifecycleOwnerAtom,
@@ -231,34 +229,16 @@ describe("MainMenu", () => {
 		await vi.waitFor(() =>
 			expect(container.textContent).toContain(saved ? "Continue" : "New Game"),
 		);
-		const editor = Array.from(container.querySelectorAll("a")).find(
-			(link) => link.textContent === "Editor",
+		const games = Array.from(container.querySelectorAll("a")).find(
+			(link) => link.textContent === "Your games",
 		);
-		expect(editor?.getAttribute("href")).toBe("/editor/welcome");
-		await act(async () => {
-			registry.set(EditorServiceStatusAtom, {
-				type: "unavailable",
-				message: "SQLite unavailable.",
-			});
-		});
-		await vi.waitFor(() => expect(container.textContent).toContain("Editor unavailable"));
-		expect(
-			Array.from(container.querySelectorAll("a")).some((link) =>
-				link.getAttribute("href")?.includes("/editor"),
-			),
-		).toBe(false);
-		const unavailableEditor = Array.from(container.querySelectorAll("button")).find(
-			(button) => button.textContent === "Editor unavailable",
-		);
-		expect(unavailableEditor).toBeInstanceOf(HTMLButtonElement);
-		expect((unavailableEditor as HTMLButtonElement).disabled).toBe(true);
-		expect(container.textContent).toContain("SQLite unavailable.");
+		expect(games?.getAttribute("href")).toBe("/serapacks");
 		expect(
 			Array.from(container.querySelectorAll("a")).some(
 				(link) => link.textContent?.trim() === (saved ? "Continue" : "New Game"),
 			),
 		).toBe(true);
-		expect(container.textContent).toContain("Serapacks");
+		expect(container.textContent).toContain("Your games");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");
 		expect(

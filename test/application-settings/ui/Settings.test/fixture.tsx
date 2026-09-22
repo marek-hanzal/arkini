@@ -238,6 +238,7 @@ export const renderSettings = async (
 				title: "Settings game",
 				version: "1.0",
 				serakki: "1.0",
+				projectRevision: 1,
 				provenance: {
 					type: "community",
 				} as const,

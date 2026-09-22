@@ -102,7 +102,7 @@ vi.mock("electron", () => electron.module);
 const event = {
 	sender: {},
 	senderFrame: {
-		url: "serakki://app/editor/welcome",
+		url: "serakki://app/serapacks",
 	},
 } as IpcMainInvokeEvent;
 const createTrustedRenderer = (trusted = true): TrustedRenderer => ({

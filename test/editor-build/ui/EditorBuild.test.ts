@@ -540,6 +540,7 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "2.0",
 					serakki: "0.5.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},
@@ -574,6 +575,7 @@ describe("EditorBuild", () => {
 					version: "1.8",
 					title: "Installed",
 					serakki: "0.5.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},
@@ -623,6 +625,7 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "2.0",
 					serakki: "1.0.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},
@@ -663,6 +666,7 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "1.9",
 					serakki: "1.0.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},

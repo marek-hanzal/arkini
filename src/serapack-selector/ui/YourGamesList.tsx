@@ -15,7 +15,7 @@ import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandida
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import { createYourGamesRowsFn } from "~/serapack-selector/fn/createYourGamesRowsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
+import { ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
@@ -25,6 +25,7 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 
 interface YourGamesListProps {
 	readonly blocked: boolean;
+	readonly pendingProjectId?: string;
 	readonly projects: ReadonlyArray<ProjectCandidate>;
 	readonly state: SerapackCatalog.State;
 	readonly onDeleteProjectFn: (
@@ -38,18 +39,21 @@ interface YourGamesListProps {
 	readonly onDismissInvalidProjectFn: (root: string) => void;
 	readonly onOpenEditorSerapackFn: (packageId: string) => void;
 	readonly onOpenProjectFolderFn: (root: string) => void;
+	readonly onPlayProjectFn: (projectId: string) => void;
 	readonly onRemoveSerapackFn: (packageId: string) => void;
 }
 
 /** Renders one row per game identity, preferring Editor metadata when both forms exist. */
 export const YourGamesList = ({
 	blocked,
+	pendingProjectId,
 	projects,
 	state,
 	onDeleteProjectFn,
 	onDismissInvalidProjectFn,
 	onOpenEditorSerapackFn,
 	onOpenProjectFolderFn,
+	onPlayProjectFn,
 	onRemoveSerapackFn,
 }: YourGamesListProps) => {
 	const translator = useTranslator();
@@ -216,12 +220,12 @@ export const YourGamesList = ({
 									{formatter.format(project.updatedAtMs)}
 								</time>
 							)}
-							{serapack === undefined ? null : (
+							{row.type === "serapack" ? (
 								<PrimaryButtonLink
 									to="/action/load-game/$packageId"
 									preload={false}
 									params={{
-										packageId: serapack.packageId,
+										packageId: row.serapack.packageId,
 									}}
 									disabled={blocked}
 									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
@@ -229,6 +233,26 @@ export const YourGamesList = ({
 									<Play className="size-4" />
 									Play
 								</PrimaryButtonLink>
+							) : (
+								<PrimaryButton
+									disabled={blocked}
+									cursorIntent={
+										pendingProjectId === row.candidate.project.projectId
+											? "progress"
+											: undefined
+									}
+									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
+									onClick={() => onPlayProjectFn(row.candidate.project.projectId)}
+								>
+									{pendingProjectId === row.candidate.project.projectId ? (
+										<LoaderCircle className="size-4 animate-spin" />
+									) : (
+										<Play className="size-4" />
+									)}
+									{pendingProjectId === row.candidate.project.projectId
+										? "Preparing…"
+										: "Play"}
+								</PrimaryButton>
 							)}
 						</div>
 					</article>

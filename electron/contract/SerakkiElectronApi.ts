@@ -113,6 +113,7 @@ export namespace SerakkiElectronApi {
 		readonly title: string;
 		readonly version: string;
 		readonly serakki: string;
+		readonly projectRevision: number;
 		readonly provenance:
 			| {
 					readonly type: "official";

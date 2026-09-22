@@ -43,6 +43,7 @@ const createCatalog = ({
 					title: "Custom Serakki",
 					version: "1.0",
 					serakki: "1",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},

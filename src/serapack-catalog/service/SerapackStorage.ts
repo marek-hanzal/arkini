@@ -16,6 +16,7 @@ export namespace SerapackStorage {
 		readonly title: string;
 		readonly version: string;
 		readonly serakki: string;
+		readonly projectRevision: number;
 	}
 
 	export interface InstalledFile extends FilesystemFile {

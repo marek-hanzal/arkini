@@ -33,6 +33,7 @@ export const encodeTestSerapackPayloadFx = Effect.fn("encodeTestSerapackPayloadF
 				JSON.stringify({
 					version,
 					serakki,
+					projectRevision: 1,
 					length: configBytes.byteLength,
 					resources: resources.map((resource) => ({
 						id: resource.id,

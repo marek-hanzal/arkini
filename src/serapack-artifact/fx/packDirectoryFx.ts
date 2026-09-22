@@ -19,6 +19,8 @@ import { ManifestSchema } from "~/serapack-artifact/schema/ManifestSchema";
 import { normalizeArtworkPngFileFx } from "~/game-config-resource/fx/normalizeArtworkPngFileFx";
 import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
 import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePngResourceFileFx";
+import { GameProjectManifestFileName } from "~/game-config-source/constant/GameProjectReference";
+import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export namespace packDirectoryFx {
@@ -157,6 +159,13 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 	const config = yield* assertGameConfigValidFx(compilation);
 	const identity = compilation.projectIdentity!;
 	const root = yield* fileSystem.realPath(path.resolve(input));
+	const projectManifestSource = yield* fileSystem.readFileString(
+		path.join(root, GameProjectManifestFileName),
+	);
+	const projectManifest = yield* Effect.try({
+		try: () => GameProjectManifestSchema.parse(JSON.parse(projectManifestSource)),
+		catch: (cause) => cause,
+	});
 	const build = path.join(root, "build");
 	const temporary = path.join(root, `.serapack-build.${randomUUID()}`);
 	const filename = readSerapackArtifactNameFn(identity.packageId);
@@ -203,6 +212,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		const manifest = ManifestSchema.parse({
 			version: identity.version,
 			serakki: SerakkiVersionSchema.parse(SerakkiAppVersion),
+			projectRevision: projectManifest.revision,
 			length: configLength,
 			resources: resources.map(({ id, type, length }) => ({
 				id,

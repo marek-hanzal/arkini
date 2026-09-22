@@ -27,6 +27,7 @@ const descriptor = (
 	title: "Installed title is not identity",
 	version,
 	serakki: SerakkiAppVersion,
+	projectRevision: 1,
 	provenance: {
 		type: "community",
 	},

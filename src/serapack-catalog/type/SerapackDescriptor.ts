@@ -11,6 +11,7 @@ export interface SerapackDescriptor {
 	readonly title: string;
 	readonly version: GameVersionSchema.Type;
 	readonly serakki: SerakkiVersionSchema.Type;
+	readonly projectRevision: number;
 	readonly provenance: SerapackProvenanceSchema.Type;
 	readonly source: SerapackSource;
 	readonly overridesBundled?: boolean;

@@ -6,6 +6,7 @@ export const builtIn: SerapackDescriptor = {
 	title: "Serakki",
 	version: "1.0",
 	serakki: "1",
+	projectRevision: 1,
 	provenance: {
 		type: "official",
 	},
@@ -18,6 +19,7 @@ export const imported: SerapackDescriptor = {
 	title: "Imported",
 	version: "1.0",
 	serakki: "1",
+	projectRevision: 1,
 	provenance: {
 		type: "community",
 	},

@@ -10,6 +10,7 @@ const packageFor = (packageId: string, title: string): SerapackDescriptor => ({
 	title,
 	version: "1.0",
 	serakki: "1",
+	projectRevision: 1,
 	provenance: {
 		type: "community",
 	},

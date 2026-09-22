@@ -253,7 +253,7 @@ export const List = ({
 			fillContent={filteredItems.length === 0}
 			header={
 				<header className="flex min-w-0 flex-wrap items-center gap-2">
-					<EditorHistoryBackButton to="/editor/welcome" />
+					<EditorHistoryBackButton to="/serapacks" />
 					<SearchInput
 						value={query}
 						containerClassName="min-w-64 flex-1"

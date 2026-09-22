@@ -20,4 +20,5 @@ export interface ExtractedSerapack {
 	readonly provenance: SerapackProvenanceSchema.Type;
 	readonly resources: ReadonlyArray<ExtractedSerapackResource>;
 	readonly version: GameVersionSchema.Type;
+	readonly projectRevision: number;
 }

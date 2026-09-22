@@ -96,6 +96,7 @@ const builtIn = {
 	title: "Serakki",
 	version: "1.0",
 	serakki: "1.0",
+	projectRevision: 1,
 	provenance: {
 		type: "official" as const,
 	},

@@ -9,7 +9,6 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { SerakkiAppVersion, SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
 import { useSerapacks } from "~/serapack-selector/ui/useSerapacks";
-import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { MainMenuExitCommandAtom } from "~/launcher/atom/MainMenuExitCommandAtom";
@@ -40,7 +39,6 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 		const startup = useAtomValue(LauncherStartupAtom);
 		const [exitState, requestExitFn] = useAtom(MainMenuExitCommandAtom);
 		const [diagnosticsExportState, exportDiagnosticsFn] = useAtom(ExportDiagnosticsAtom);
-		const editorStatus = useAtomValue(EditorServiceStatusAtom);
 		const exitPending = exitState.kind === "pending";
 		const diagnosticsExportPending = diagnosticsExportState.kind === "pending";
 		const defaultPackageAvailable =
@@ -162,29 +160,8 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						to="/serapacks"
 						className="rounded-xl"
 					>
-						Serapacks
+						Your games
 					</ButtonLink>
-					{editorStatus.type === "ready" ? (
-						<ButtonLink
-							to="/editor/welcome"
-							preload={false}
-							className="rounded-xl"
-						>
-							Editor
-						</ButtonLink>
-					) : (
-						<Button
-							className="rounded-xl"
-							cursorIntent={
-								editorStatus.type === "starting" ? "progress" : "not-allowed"
-							}
-							disabled
-						>
-							{editorStatus.type === "starting"
-								? "Preparing Editor…"
-								: "Editor unavailable"}
-						</Button>
-					)}
 					<ButtonLink
 						to="/settings"
 						className="rounded-xl"
@@ -233,8 +210,6 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						<p className="text-center text-sm text-danger">
 							Startup failed: {String(Cause.squash(startup.cause))}
 						</p>
-					) : editorStatus.type === "unavailable" ? (
-						<p className="text-center text-sm text-danger">{editorStatus.message}</p>
 					) : exitState.kind === "error" ? (
 						<p className="text-center text-sm text-danger">
 							Exit failed: {String(exitState.error)}

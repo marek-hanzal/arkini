@@ -105,9 +105,7 @@ export const Route = createFileRoute("/editor/$projectId")({
 					{error instanceof Error ? error.message : String(error)}
 				</p>
 				<div className="mt-6 flex flex-wrap gap-3">
-					<ButtonLink to="/editor/welcome">
-						<Tx label="Editor welcome" />
-					</ButtonLink>
+					<ButtonLink to="/serapacks">Your games</ButtonLink>
 					<ButtonLink to="/main-menu">
 						<Tx label="Main menu" />
 					</ButtonLink>

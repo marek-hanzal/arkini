@@ -61,23 +61,7 @@ const portalConfig = GameConfigSchema.parse({
 					action: "consume",
 					effect: "keep",
 				},
-				{
-					target: {
-						type: "item",
-						itemId: "backpack",
-					},
-					action: "consume",
-					effect: "keep",
-				},
 			],
-		},
-		inventoryOnly: {
-			...configInput.items.water,
-			uid: "inventoryOnly",
-			id: "inventoryOnly",
-			title: "Inventory only",
-			description: "Inventory only",
-			scope: "inventory",
 		},
 	},
 });
@@ -232,58 +216,6 @@ describe("dropItemFx / portal direction", () => {
 		});
 	});
 
-	it("stores a portal dropped onto an Inventory action before its own merge rules", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const portal = yield* spawnItemFx({
-					id: "runtime:portal",
-					itemId: "portal",
-					location: board(0, 0, 0),
-					quantity: 1,
-				});
-				const inventory = yield* spawnItemFx({
-					id: "runtime:backpack",
-					itemId: "backpack",
-					location: board(1, 0, 0),
-					quantity: 1,
-				});
-				const outcome = yield* dropOntoFx({
-					sourceId: portal.id,
-					targetId: inventory.id,
-				});
-				return {
-					inventory,
-					outcome,
-					portal,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-			portalConfig,
-		);
-
-		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKind.StoreInventory,
-			source: {
-				itemId: result.portal.id,
-				previousLocation: result.portal.location,
-				current: null,
-			},
-		});
-		expect(result.runtime.items).toContainEqual(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					id: "portal",
-				}),
-				location: expect.objectContaining({
-					scope: "inventory",
-				}),
-			}),
-		);
-		expect(result.runtime.items.find((item) => item.id === result.inventory.id)).toEqual(
-			result.inventory,
-		);
-	});
-
 	it("rejects atomically when the destination Board has no free cell", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -335,42 +267,5 @@ describe("dropItemFx / portal direction", () => {
 		});
 		expect(result.runtime).toEqual(result.before);
 		expect(result.afterTransition).toBe(result.beforeTransition);
-	});
-
-	it("rejects an item whose authored scope cannot enter a Board", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const source = yield* spawnItemFx({
-					id: "runtime:inventory",
-					itemId: "inventoryOnly",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const portal = yield* spawnItemFx({
-					id: "runtime:portal",
-					itemId: "portal",
-					location: board(1, 0, 0),
-					quantity: 1,
-				});
-				return yield* dropOntoFx({
-					sourceId: source.id,
-					targetId: portal.id,
-				});
-			}),
-			portalConfig,
-		);
-
-		expect(result).toEqual({
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.InvalidTarget,
-			itemId: "runtime:inventory",
-			targetItemId: "runtime:portal",
-		});
 	});
 });

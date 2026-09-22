@@ -12,7 +12,6 @@
 				"grim-reaper"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 30000,

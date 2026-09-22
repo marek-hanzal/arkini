@@ -8,7 +8,6 @@ import {
 } from "react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { ProjectStartScope } from "~/project-authoring/type/ProjectStartScope";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { ProjectStartItemPicker } from "~/project-authoring/ui/ProjectStartItemPicker";
@@ -23,7 +22,6 @@ import { ButtonLink } from "~/ui/ui/Button";
 interface ProjectStartGridCommonProps {
 	readonly cells: ReadonlyArray<ProjectStartGridCell>;
 	readonly height: number;
-	readonly scope: ProjectStartScope;
 	readonly width: number;
 }
 
@@ -199,7 +197,6 @@ const ProjectStartGridSurface = ({
 	height,
 	items,
 	projectId,
-	scope,
 	width,
 }: ProjectStartGridCommonProps & {
 	readonly edit?: {
@@ -240,10 +237,9 @@ const ProjectStartGridSurface = ({
 	);
 	return (
 		<div
-			className="min-w-0 max-w-full overflow-x-auto rounded-xl bg-canvas/50 p-3 data-[mode=detail]:rounded-none data-[mode=detail]:bg-transparent data-[mode=detail]:p-0 data-[scope=board]:rounded-none data-[scope=board]:bg-transparent data-[scope=board]:p-0"
+			className="min-w-0 max-w-full overflow-x-auto"
 			data-ui="EditorProjectStartGrid"
 			data-mode={edit === undefined ? "detail" : "edit"}
-			data-scope={scope}
 		>
 			<div
 				className="mx-auto grid gap-1.5"
@@ -251,11 +247,7 @@ const ProjectStartGridSurface = ({
 				style={{
 					gridTemplateColumns: `repeat(${Math.max(1, width)}, minmax(0, 1fr))`,
 					// Fit square cells to the panel width and a viewport-bounded preview height.
-					// Toolbar intentionally retains fixed slots and horizontal scrolling.
-					width:
-						scope === "toolbar"
-							? `calc(${Math.max(1, width)} * 6.75rem + ${Math.max(0, width - 1)} * 0.375rem)`
-							: `min(100%, calc((70dvh - ${Math.max(0, height - 1)} * 0.375rem) / ${Math.max(1, height)} * ${Math.max(1, width)} + ${Math.max(0, width - 1)} * 0.375rem))`,
+					width: `min(100%, calc((70dvh - ${Math.max(0, height - 1)} * 0.375rem) / ${Math.max(1, height)} * ${Math.max(1, width)} + ${Math.max(0, width - 1)} * 0.375rem))`,
 				}}
 			>
 				{positions.map((position) => {
@@ -372,7 +364,6 @@ const ProjectStartGridEdit = ({
 	height,
 	invalidCells = [],
 	onCellsChangeFn,
-	scope,
 	width,
 }: ProjectStartGridEditProps) => {
 	const { items } = useEditorItemSearchOptions();
@@ -451,7 +442,6 @@ const ProjectStartGridEdit = ({
 				}}
 				height={height}
 				items={items}
-				scope={scope}
 				width={width}
 			/>
 			{pickerCell === undefined ? null : (
@@ -464,7 +454,6 @@ const ProjectStartGridEdit = ({
 							...pickerCell,
 						}))
 					}
-					scope={scope}
 				/>
 			)}
 			{dragVisual === undefined ? null : (

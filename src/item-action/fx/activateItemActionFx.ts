@@ -10,14 +10,14 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import type { ActionSchema } from "~/item-action/schema/ActionSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { modifyRuntimeWithTransitionFx } from "~/game-runtime/fx/modifyRuntimeWithTransitionFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readRuntimeCommandTargetFx } from "~/game-runtime/fx/readRuntimeCommandTargetFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -29,7 +29,7 @@ export namespace activateItemActionFx {
 	export interface Props {
 		currentSpace: NonNegativeIntegerSchema.Type;
 		itemId: IdSchema.Type;
-		location: GridLocationSchema.Type;
+		location: BoardLocationSchema.Type;
 		revision: RevisionSchema.Type;
 	}
 }
@@ -58,12 +58,8 @@ const resolveItemActionFx = Effect.fn("resolveItemActionFx")(function* ({
 		itemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
-	if (
-		owner === undefined ||
-		owner.location.scope === "inventory" ||
-		owner.item.action === undefined
-	) {
+	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeItem));
+	if (owner === undefined || owner.item.action === undefined) {
 		return yield* Effect.fail(
 			new ItemActionUnavailableError({
 				itemId,
@@ -179,7 +175,7 @@ const applyItemActionFx = Effect.fn("applyItemActionFx")(function* ({
 		revision,
 		runtime,
 	});
-	const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
+	const item = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeItem));
 	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnGridError({

@@ -25,7 +25,6 @@ const item = (id: string, title = id) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "any" as const,
 	maxStackSize: 10,
 });
 
@@ -121,7 +120,7 @@ const targetLine = ({
 							{
 								type: "exists" as const,
 								query: {
-									scope: "any" as const,
+									distance: "far",
 									selector: {
 										type: "item" as const,
 										itemId: showWhen,
@@ -135,8 +134,6 @@ const targetLine = ({
 
 const producer = (id: string, title: string, lines: readonly object[]) => ({
 	...item(id, title),
-
-	scope: "board" as const,
 	maxStackSize: 1,
 	maxQueueSize: 1,
 	lines,
@@ -166,10 +163,6 @@ export const config = GameConfigSchema.parse({
 		board: {
 			width: 5,
 			height: 5,
-		},
-		inventory: {
-			width: 5,
-			height: 1,
 		},
 	},
 	start: {
@@ -259,7 +252,8 @@ export const runtime = {
 			definition: "target",
 			id: "runtime:target",
 			location: {
-				scope: "inventory",
+				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -306,11 +300,10 @@ export const runtime = {
 			definition: "alpha",
 			id: "runtime:alpha:stored",
 			location: {
-				scope: "toolbar",
-				position: {
-					x: 0,
-					y: 0,
-				},
+				scope: "input",
+				ownerItemId: "runtime:beta:current",
+				lineId: "line:beta",
+				inputIndex: 0,
 			},
 		}),
 		runtimeItem({

@@ -13,7 +13,6 @@
 				"house-t2"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -35,7 +34,7 @@
 								"type": "item",
 								"itemId": "labor-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

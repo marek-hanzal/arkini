@@ -22,7 +22,8 @@ describe("CommittedTransitionsFx", () => {
 				id: "runtime:subscription:first-tail",
 				itemId: "water",
 				location: {
-					scope: "inventory",
+					scope: "board",
+					space: 0,
 					position: {
 						x: 0,
 						y: 0,

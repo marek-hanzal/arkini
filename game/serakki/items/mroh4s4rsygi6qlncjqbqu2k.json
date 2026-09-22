@@ -12,7 +12,6 @@
 				"empty-sack"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 12,
 		"merge": [
 			{

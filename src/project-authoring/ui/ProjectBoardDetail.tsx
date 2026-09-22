@@ -52,7 +52,6 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 					height={board.height}
 					items={project.config.items}
 					mode="detail"
-					scope="board"
 					projectId={project.projectId}
 					width={board.width}
 				/>

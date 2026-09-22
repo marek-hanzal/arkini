@@ -3,7 +3,6 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 import { match } from "ts-pattern";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
-import { QueryScopeControl } from "~/production-authoring/ui/QueryScopeControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -80,7 +79,6 @@ const UnitsPaidByControl = ({
 					query:
 						from === "self"
 							? {
-									scope: "board",
 									distance: "self",
 									selector: {
 										type: "item",
@@ -220,8 +218,8 @@ const MaterialInputControl = ({
 				/>
 			</div>
 			<div className="flex min-w-0 items-start justify-between gap-3">
-				<QueryScopeControl
-					error={readEditorFormValidationErrorFn(issues, "query", "scope")}
+				<BoardDistanceControl
+					error={readEditorFormValidationErrorFn(issues, "query", "distance")}
 					value={input.query}
 					onChangeFn={(query) =>
 						onChangeFn({
@@ -230,18 +228,6 @@ const MaterialInputControl = ({
 						})
 					}
 				/>
-				{input.query.scope === "board" ? (
-					<BoardDistanceControl
-						error={readEditorFormValidationErrorFn(issues, "query", "distance")}
-						value={input.query}
-						onChangeFn={(query) =>
-							onChangeFn({
-								...input,
-								query,
-							})
-						}
-					/>
-				) : null}
 			</div>
 		</div>
 	);
@@ -308,12 +294,11 @@ const UnitsTargetUnitCostControl = ({
 					error={readEditorFormValidationErrorFn(issues, "query", "distance")}
 					value={input.query}
 					onChangeFn={(query) => {
-						if (query.scope === "board")
-							onChangeFn({
-								...input,
-								units,
-								query,
-							});
+						onChangeFn({
+							...input,
+							units,
+							query,
+						});
 					}}
 				/>
 				<EditorNumberControl

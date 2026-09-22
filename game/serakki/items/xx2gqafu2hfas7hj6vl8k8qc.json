@@ -13,7 +13,6 @@
 				"well"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -42,18 +41,17 @@
 								"type": "item",
 								"itemId": "well-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "resource-research"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -64,11 +62,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "stone"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -79,11 +77,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "wood"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -94,11 +92,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "empty-bucket"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { dropRuleFx } from "~/production-output/fx/dropRuleFx";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { DropRuleTypeSchema } from "~/production-output/schema/DropRuleTypeSchema";
 
 export namespace resolveDropRulesEnabledFx {
 	export interface Props {
-		readonly origin: GridLocationSchema.Type;
+		readonly origin: BoardLocationSchema.Type;
 		readonly rules: ReadonlyArray<DropRuleSchema.Type>;
 	}
 }

@@ -14,7 +14,6 @@
 				"coffee-plant"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

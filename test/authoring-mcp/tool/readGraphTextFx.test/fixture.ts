@@ -56,7 +56,7 @@ export const createRelationTraversalProject = () => {
 						min: 1,
 					},
 					query: {
-						scope: "any" as const,
+						distance: "far",
 						selector: {
 							itemId: inputItemId,
 							type: "item" as const,

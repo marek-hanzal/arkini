@@ -1,5 +1,4 @@
 import { Effect, Option } from "effect";
-import { match } from "ts-pattern";
 
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
@@ -15,10 +14,6 @@ export namespace readRuntimeItemPrimaryActionFx {
 		| {
 				readonly currentSpace: number;
 				readonly kind: "activate-space";
-		  }
-		| {
-				readonly kind: "open-inventory";
-				readonly currentSpace: number;
 		  }
 		| {
 				readonly kind: "enqueue-default-line";
@@ -39,32 +34,11 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click interaction of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
-		if (item.location.scope === "inventory")
+		if (item.item.action !== undefined)
 			return {
-				kind: "none" as const,
+				kind: "activate-space" as const,
+				currentSpace: runtime.currentSpace,
 			};
-		if (item.item.action !== undefined) {
-			return match(item.item.action)
-				.with(
-					{
-						type: "space",
-					},
-					() => ({
-						currentSpace: runtime.currentSpace,
-						kind: "activate-space" as const,
-					}),
-				)
-				.with(
-					{
-						type: "inventory",
-					},
-					() => ({
-						kind: "open-inventory" as const,
-						currentSpace: runtime.currentSpace,
-					}),
-				)
-				.exhaustive();
-		}
 		const lineOwnerItem = Option.getOrUndefined(narrowLineOwnerItemFn(item.item));
 		if (lineOwnerItem === undefined) {
 			return {

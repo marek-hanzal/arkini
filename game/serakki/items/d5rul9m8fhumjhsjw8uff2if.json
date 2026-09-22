@@ -12,7 +12,6 @@
 				"faith-cow"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 300000,

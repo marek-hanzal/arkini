@@ -9,6 +9,4 @@ export interface PixiScenePalette {
 	readonly overlayForeground: number;
 	readonly success: number;
 	readonly surface: number;
-	readonly toolbarA: number;
-	readonly toolbarB: number;
 }

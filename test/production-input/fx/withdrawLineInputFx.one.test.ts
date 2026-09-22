@@ -165,7 +165,6 @@ it("rolls back the retained stack and queue when no output position is available
 			...queuedInputTestConfig.items,
 			water: {
 				...queuedInputTestConfig.items.water,
-				scope: "board",
 			},
 		},
 	});

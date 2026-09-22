@@ -164,32 +164,6 @@ describe("validateMergeViabilityFn", () => {
 		).toEqual([]);
 	});
 
-	it("rejects an exact inventory-only merge target", async () => {
-		const source = mergeSource({
-			target: {
-				type: "item",
-				itemId: "target",
-			},
-		});
-		const target = {
-			...createSimpleItem("target"),
-			scope: "inventory" as const,
-		};
-
-		expect(
-			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				ownerItemId: source.id,
-				mergeIndex: 0,
-				reason: InvalidMergeReasonEnumSchema.enum.TargetUnavailable,
-			}),
-		]);
-	});
-
 	it("does not reject exact self-target merely when a second identity is possible", async () => {
 		const source = mergeSource({
 			target: {
@@ -205,34 +179,6 @@ describe("validateMergeViabilityFn", () => {
 		).toEqual([]);
 	});
 
-	it("rejects an inventory-only replacement result", async () => {
-		const source = mergeSource({
-			effect: "replace",
-			result: "result",
-			target: {
-				type: "item",
-				itemId: "target",
-			},
-		});
-		const target = createSimpleItem("target");
-		const result = {
-			...createSimpleItem("result"),
-			scope: "inventory" as const,
-		};
-
-		expect(
-			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
-				[result.id]: result,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				reason: InvalidMergeReasonEnumSchema.enum.ResultUnavailable,
-			}),
-		]);
-	});
-
 	it("accepts a board-capable replacement result", async () => {
 		const source = mergeSource({
 			effect: "replace",
@@ -245,7 +191,6 @@ describe("validateMergeViabilityFn", () => {
 		const target = createSimpleItem("target");
 		const result = {
 			...createSimpleItem("result"),
-			scope: "board" as const,
 		};
 
 		expect(

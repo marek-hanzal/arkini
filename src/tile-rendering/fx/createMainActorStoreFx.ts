@@ -8,8 +8,6 @@ const readCanonicalSlotKeyFn = (location: PixiTileActor["item"]["location"]) => 
 	switch (location.scope) {
 		case "board":
 			return `board:${location.space}:${location.position.x}:${location.position.y}`;
-		case "toolbar":
-			return `toolbar:${location.position.x}`;
 		default:
 			return null;
 	}

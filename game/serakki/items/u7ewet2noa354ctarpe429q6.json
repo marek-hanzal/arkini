@@ -13,7 +13,6 @@
 				"chicken-farm"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -39,7 +38,6 @@
 								"type": "item",
 								"itemId": "chicken-coop"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -50,7 +48,7 @@
 								"type": "item",
 								"itemId": "grain"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -103,7 +101,7 @@
 								"type": "item",
 								"itemId": "empty-basket"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -118,7 +116,7 @@
 								"type": "item",
 								"itemId": "grain-seed"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -161,7 +159,6 @@
 										"type": "item",
 										"itemId": "chicken-coop"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -189,7 +186,7 @@
 								"type": "item",
 								"itemId": "planks"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -242,7 +239,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

@@ -12,7 +12,6 @@
 				"boar-bristles"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 8,
 		"merge": [
 			{

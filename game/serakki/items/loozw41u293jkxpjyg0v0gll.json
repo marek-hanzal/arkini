@@ -12,7 +12,6 @@
 				"dye-workshop-beer"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 60000,

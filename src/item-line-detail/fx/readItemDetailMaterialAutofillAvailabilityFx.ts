@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
 import { matchesQueryLocationFn } from "~/item-query/fn/matchesQueryLocationFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
@@ -39,7 +39,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	const origin =
 		owner === undefined
 			? undefined
-			: Option.getOrUndefined(narrowGridRuntimeItemFn(owner))?.location;
+			: Option.getOrUndefined(narrowBoardRuntimeItemFn(owner))?.location;
 	const selector = query.selector;
 	const space =
 		owner?.location.scope === LocationScopeEnumSchema.enum.Board
@@ -68,7 +68,6 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 					location: candidate.location.origin,
 					origin,
 					query,
-					currentSpace: runtime.currentSpace,
 				})
 			) {
 				continue;
@@ -86,14 +85,11 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		}
 
 		if (
-			(candidate.location.scope !== LocationScopeEnumSchema.enum.Board &&
-				candidate.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
-				candidate.location.scope !== LocationScopeEnumSchema.enum.Toolbar) ||
+			candidate.location.scope !== LocationScopeEnumSchema.enum.Board ||
 			!matchesQueryLocationFn({
 				location: candidate.location,
 				origin,
 				query,
-				currentSpace: runtime.currentSpace,
 			})
 		) {
 			continue;

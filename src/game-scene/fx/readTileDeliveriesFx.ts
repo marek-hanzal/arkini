@@ -4,19 +4,19 @@ import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { narrowDeliveryRuntimeItemFn } from "~/game-runtime/fn/narrowDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface TileDelivery {
-	readonly from: GridLocationSchema.Type;
+	readonly from: BoardLocationSchema.Type;
 	readonly generation: number;
 	readonly item: TileActorItem;
 	readonly phase: "outbound" | "returning";
 	readonly remainingDurationMs: number;
 	readonly targetActorId?: string;
-	readonly to: GridLocationSchema.Type;
+	readonly to: BoardLocationSchema.Type;
 }
 
 interface ReadTileDeliveriesProps {
@@ -24,12 +24,7 @@ interface ReadTileDeliveriesProps {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-/**
- * Projects canonical deliveries into main-scene motion facts.
- *
- * Inventory cells have no main-canvas pose. Their deliveries settle canonically without
- * inventing a visible portal or an unrelated source actor.
- */
+/** Projects canonical deliveries into main-scene motion facts. */
 export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 	game,
 	runtime,
@@ -44,32 +39,26 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 			current.location.phase === "outbound"
 				? current.location.origin
 				: current.location.returnFrom;
-		let semanticTo: GridLocationSchema.Type | undefined;
+		let semanticTo: BoardLocationSchema.Type | undefined;
 		if (current.location.phase === "returning") {
 			semanticTo = current.location.origin;
 		} else {
 			const ownerItemId = current.location.target.ownerItemId;
 			const owner = runtime.items.find((candidate) => candidate.id === ownerItemId);
-			if (
-				owner?.location.scope === LocationScopeEnumSchema.enum.Board ||
-				owner?.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-				owner?.location.scope === LocationScopeEnumSchema.enum.Toolbar
-			) {
+			if (owner?.location.scope === LocationScopeEnumSchema.enum.Board) {
 				semanticTo = owner.location;
 			}
 		}
 		if (semanticTo === undefined) continue;
 		const from = semanticFrom;
 		const to = semanticTo;
-		if (from.scope === "inventory" || to.scope === "inventory") continue;
 		const visibleOnMain = [
 			from,
 			to,
 		].some(
 			(location) =>
-				location.scope === LocationScopeEnumSchema.enum.Toolbar ||
-				(location.scope === LocationScopeEnumSchema.enum.Board &&
-					location.space === runtime.currentSpace),
+				location.scope === LocationScopeEnumSchema.enum.Board &&
+				location.space === runtime.currentSpace,
 		);
 		if (!visibleOnMain) continue;
 

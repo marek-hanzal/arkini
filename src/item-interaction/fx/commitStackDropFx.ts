@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
@@ -21,10 +21,10 @@ import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackRe
 
 interface StackItemsResult {
 	readonly transferredQuantity: PositiveIntegerSchema.Type;
-	readonly sourceBefore: GridRuntimeItemSchema.Type;
-	readonly sourceAfter?: GridRuntimeItemSchema.Type;
-	readonly targetBefore: GridRuntimeItemSchema.Type;
-	readonly targetAfter: GridRuntimeItemSchema.Type;
+	readonly sourceBefore: BoardRuntimeItemSchema.Type;
+	readonly sourceAfter?: BoardRuntimeItemSchema.Type;
+	readonly targetBefore: BoardRuntimeItemSchema.Type;
+	readonly targetAfter: BoardRuntimeItemSchema.Type;
 }
 
 const stackItemsFx = Effect.fn("stackItemsFx")(function* (props: commitStackDropFx.Props) {
@@ -105,10 +105,10 @@ export namespace commitStackDropFx {
 	export interface Props {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
+		readonly sourceLocation: BoardLocationSchema.Type;
 		readonly targetItemId: IdSchema.Type;
 		readonly targetRevision: RevisionSchema.Type;
-		readonly targetLocation: GridLocationSchema.Type;
+		readonly targetLocation: BoardLocationSchema.Type;
 	}
 }
 

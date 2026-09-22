@@ -26,7 +26,6 @@ export const copyItemSectionFn = (
 				title: source.title,
 				description: source.description ?? "",
 				ui: source.ui,
-				scope: source.scope,
 				maxStackSize: current.clock === undefined ? source.maxStackSize : 1,
 				music: source.music,
 			};

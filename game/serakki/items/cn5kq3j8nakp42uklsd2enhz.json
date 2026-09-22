@@ -12,7 +12,6 @@
 				"battle-axe"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

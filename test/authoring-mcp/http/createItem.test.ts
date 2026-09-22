@@ -141,9 +141,9 @@ describe("editor MCP item creation", () => {
 		).toBeUndefined();
 	});
 
-	it("creates an inventory action through the generic tool and rejects an incompatible clock", async () => {
+	it("creates an space action through the generic tool and rejects an incompatible clock", async () => {
 		const { ownership, port, repository } = await createMcpHarness();
-		const projectId = "inventory-action-project";
+		const projectId = "space-action-project";
 		await Effect.runPromise(
 			repository.createProjectFx({
 				...editorTestPayload,
@@ -169,17 +169,18 @@ describe("editor MCP item creation", () => {
 				id: "bag",
 				title: "Bag",
 				action: {
-					type: "inventory",
+					type: "space",
+					space: 0,
 				},
 			}),
 		});
 		expect(created.isError).not.toBe(true);
 		const project = await Effect.runPromise(repository.readProjectFx(projectId));
 		expect(project?.config.items.bag).toMatchObject({
-			scope: "any",
 			lines: [],
 			action: {
-				type: "inventory",
+				type: "space",
+				space: 0,
 				input: [],
 				rules: [],
 			},
@@ -192,7 +193,6 @@ describe("editor MCP item creation", () => {
 					clock: {
 						durationMs: 1000,
 					},
-					scope: "board",
 				},
 			}),
 		});

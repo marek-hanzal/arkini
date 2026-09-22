@@ -12,7 +12,6 @@
 				"treasure-chest"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

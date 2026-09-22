@@ -168,7 +168,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			boardWidth: game.config.meta.board.width,
 			fixedCellSize: 512,
 			height: application.app.screen.height,
-			toolbarSize: game.config.meta.toolbarSize ?? 0,
 			width: application.app.screen.width,
 		});
 		const camera = yield* createBoardCameraFx({
@@ -179,15 +178,9 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			application,
 			drag,
 			dragThreshold,
-			surfaces:
-				layout.toolbar === null
-					? [
-							layout.board,
-						]
-					: [
-							layout.board,
-							layout.toolbar,
-						],
+			surfaces: [
+				layout.board,
+			],
 		});
 		registerRollbackFn(camera.closeFx);
 		const delivery = yield* createDeliveryRuntimeFx({

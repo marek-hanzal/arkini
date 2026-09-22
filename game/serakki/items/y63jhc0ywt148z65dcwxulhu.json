@@ -12,7 +12,6 @@
 				"toilet-golem"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 600000,

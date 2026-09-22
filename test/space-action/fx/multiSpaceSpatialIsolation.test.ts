@@ -9,14 +9,11 @@ import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { queryFx } from "~/item-query/fx/queryFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import {
 	boardLocation,
-	inventoryLocation,
 	multiSpaceTestConfig,
 } from "~test/space-action/support/multiSpaceTestConfig";
 import { placeDropForTestFx } from "~test/item-placement/support/placeDropForTestFx";
@@ -72,7 +69,7 @@ describe("multi-space spatial isolation", () => {
 		expect(result.second.id).toBe("runtime:second");
 	});
 
-	it("keeps board and any queries local while inventory remains universe-wide", () => {
+	it("keeps far queries local while universe reaches every Board space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
@@ -93,12 +90,6 @@ describe("multi-space spatial isolation", () => {
 					location: boardLocation(0, 1),
 					quantity: 1,
 				});
-				yield* spawnItemFx({
-					id: "runtime:inventory",
-					itemId: "log",
-					location: inventoryLocation(0),
-					quantity: 1,
-				});
 				if (origin.location.scope !== "board") {
 					return yield* Effect.die(new Error("Expected board origin."));
 				}
@@ -106,7 +97,6 @@ describe("multi-space spatial isolation", () => {
 				const board = yield* queryFx({
 					origin: origin.location,
 					query: {
-						scope: "board",
 						distance: "far",
 						selector: {
 							type: "item",
@@ -114,10 +104,10 @@ describe("multi-space spatial isolation", () => {
 						},
 					},
 				});
-				const any = yield* queryFx({
+				const universe = yield* queryFx({
 					origin: origin.location,
 					query: {
-						scope: "any",
+						distance: "universe",
 						selector: {
 							type: "item",
 							itemId: "log",
@@ -126,7 +116,7 @@ describe("multi-space spatial isolation", () => {
 				});
 
 				return {
-					any: any.map((item) => item.id),
+					universe: universe.map((item) => item.id),
 					board: board.map((item) => item.id),
 				};
 			}).pipe(useTestGame),
@@ -135,9 +125,9 @@ describe("multi-space spatial isolation", () => {
 		expect(result.board).toEqual([
 			"runtime:local",
 		]);
-		expect(result.any).toEqual([
+		expect(result.universe).toEqual([
 			"runtime:local",
-			"runtime:inventory",
+			"runtime:remote",
 		]);
 	});
 
@@ -256,8 +246,8 @@ describe("multi-space spatial isolation", () => {
 		).toBe(true);
 	});
 
-	it("falls back to global inventory instead of another board space", () => {
-		const runtime = Effect.runSync(
+	it("rejects output on a full Board instead of spilling into another space", () => {
+		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
 					id: "runtime:origin",
@@ -276,17 +266,27 @@ describe("multi-space spatial isolation", () => {
 						quantity: 1,
 					});
 				}
-				yield* placeDropForTestFx({
-					drop: drop("drop"),
-					originItemId: origin.id,
-				});
-				return yield* readRuntimeFx();
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.result(
+					placeDropForTestFx({
+						drop: drop("drop"),
+						originItemId: origin.id,
+					}),
+				);
+				return {
+					before,
+					after: yield* readRuntimeFx(),
+					attempt,
+				};
 			}).pipe(useTestGame),
 		);
 
-		expect(runtime.items.find((item) => item.item.id === "log")?.location).toEqual(
-			inventoryLocation(0),
-		);
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt))
+			expect(result.attempt.failure).toMatchObject({
+				_tag: "PlacementUnavailableError",
+			});
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("rejects every direct cross-space board operation atomically", () => {
@@ -322,12 +322,6 @@ describe("multi-space spatial isolation", () => {
 					location: boardLocation(1, 0),
 					quantity: 1,
 				});
-				const inventory = yield* spawnItemFx({
-					id: "runtime:inventory",
-					itemId: "log",
-					location: inventoryLocation(0),
-					quantity: 1,
-				});
 
 				const before = yield* readRuntimeFx();
 				const moved = yield* dropItemFx({
@@ -347,19 +341,6 @@ describe("multi-space spatial isolation", () => {
 					sourceItemId: movable.id,
 					sourceRevision: movable.revision,
 					sourceLocation: movable.location,
-					target: {
-						kind: "slot",
-						location: remote.location,
-						occupant: {
-							itemId: remote.id,
-							revision: remote.revision,
-						},
-					},
-				});
-				const inventorySwapped = yield* dropItemFx({
-					sourceItemId: inventory.id,
-					sourceRevision: inventory.revision,
-					sourceLocation: inventory.location,
 					target: {
 						kind: "slot",
 						location: remote.location,
@@ -392,7 +373,6 @@ describe("multi-space spatial isolation", () => {
 				return {
 					after,
 					before,
-					inventorySwapped,
 					merged,
 					moved,
 					stored,
@@ -409,10 +389,6 @@ describe("multi-space spatial isolation", () => {
 			kind: DropItemResultKind.Reject,
 			reason: DropItemRejectedReason.InvalidTarget,
 		});
-		expect(result.inventorySwapped).toMatchObject({
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.InvalidTarget,
-		});
 		expect(Result.isFailure(result.merged)).toBe(true);
 		if (Result.isFailure(result.merged)) {
 			expect(result.merged.failure).toMatchObject({
@@ -426,61 +402,5 @@ describe("multi-space spatial isolation", () => {
 			});
 		}
 		expect(result.after).toEqual(result.before);
-	});
-
-	it("uses inventory as the only cross-space transfer path and targets the current space", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const item = yield* spawnItemFx({
-					id: "runtime:traveller",
-					itemId: "log",
-					location: boardLocation(0, 0),
-					quantity: 1,
-				});
-				const stored = yield* moveRuntimeItemForTestFx({
-					itemId: item.id,
-					revision: item.revision,
-					location: inventoryLocation(0),
-				});
-				const early = yield* dropItemFx({
-					sourceItemId: item.id,
-					sourceRevision: stored.item.revision,
-					sourceLocation: inventoryLocation(0),
-					target: {
-						kind: "slot",
-						location: boardLocation(1, 0),
-						occupant: null,
-					},
-				});
-				const portal = yield* spawnItemFx({
-					id: "runtime:portal",
-					itemId: "portal",
-					location: boardLocation(0, 0),
-					quantity: 1,
-				});
-				const beforeNavigation = yield* readRuntimeFx();
-				yield* activateItemActionFx({
-					currentSpace: beforeNavigation.currentSpace,
-					itemId: portal.id,
-					location: portal.location,
-					revision: portal.revision,
-				});
-				const placed = yield* moveRuntimeItemForTestFx({
-					itemId: item.id,
-					revision: stored.item.revision,
-					location: boardLocation(1, 0),
-				});
-				return {
-					early,
-					placed,
-				};
-			}).pipe(useTestGame),
-		);
-
-		expect(result.early).toMatchObject({
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.InvalidTarget,
-		});
-		expect(result.placed.item.location).toEqual(boardLocation(1, 0));
 	});
 });

@@ -12,7 +12,6 @@
 				"copper-pan-with-cooked-steak"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 1200000,

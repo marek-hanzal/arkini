@@ -22,10 +22,6 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				width: 5,
 				height: 2,
 			},
-			inventory: {
-				width: 1,
-				height: 1,
-			},
 		},
 		start: {
 			currentSpace: 0,
@@ -46,7 +42,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 							type: "materials",
 							mode: "consume",
 							query: {
-								scope: "any",
+								distance: "far",
 								selector: {
 									type: "item",
 									itemId: "absent",

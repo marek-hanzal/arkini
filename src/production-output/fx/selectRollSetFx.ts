@@ -1,6 +1,6 @@
 import { Array, Effect, Option, pipe, Random } from "effect";
 
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
 import { resolveDropRulesEnabledFx } from "./resolveDropRulesEnabledFx";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
@@ -8,7 +8,7 @@ import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 export namespace selectRollSetFx {
 	export interface Props {
 		readonly set: OutputSchema.Type["set"];
-		readonly origin: GridLocationSchema.Type;
+		readonly origin: BoardLocationSchema.Type;
 	}
 }
 

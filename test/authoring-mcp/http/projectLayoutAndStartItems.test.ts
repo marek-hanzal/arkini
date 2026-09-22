@@ -57,11 +57,6 @@ describe("editor MCP project layout and start items", () => {
 					width: 3,
 					height: 2,
 				},
-				inventory: {
-					width: 2,
-					height: 1,
-				},
-				toolbarSize: 2,
 			},
 		});
 		expect(edited.isError).not.toBe(true);
@@ -79,11 +74,6 @@ describe("editor MCP project layout and start items", () => {
 				width: 3,
 				height: 2,
 			},
-			inventory: {
-				width: 2,
-				height: 1,
-			},
-			toolbarSize: 2,
 		});
 		expect(project.config.start).toEqual(start);
 
@@ -148,11 +138,6 @@ describe("editor MCP project layout and start items", () => {
 					meta: {
 						...editorTestPayload.config.meta,
 						id: "start-items",
-						inventory: {
-							width: 2,
-							height: 1,
-						},
-						toolbarSize: 2,
 					},
 					start: {
 						currentSpace: 0,
@@ -170,8 +155,6 @@ describe("editor MCP project layout and start items", () => {
 								y: 0,
 							},
 						],
-						inventory: [],
-						toolbar: [],
 					},
 					items: {
 						water: {
@@ -238,35 +221,6 @@ describe("editor MCP project layout and start items", () => {
 		]);
 		project = await readProject();
 
-		for (const location of [
-			{
-				scope: "inventory",
-				position: {
-					x: 1,
-					y: 0,
-				},
-			},
-			{
-				scope: "toolbar",
-				position: {
-					x: 1,
-					y: 0,
-				},
-			},
-		] as const) {
-			const set = await client.callTool({
-				name: "set_start_item",
-				arguments: {
-					revision: project.revision,
-					location,
-					itemId: "water",
-					quantity: 1,
-				},
-			});
-			expect(set.isError).not.toBe(true);
-			project = await readProject();
-		}
-
 		const missingBoardSpace = await client.callTool({
 			name: "set_start_item",
 			arguments: {
@@ -319,26 +273,6 @@ describe("editor MCP project layout and start items", () => {
 				y: 0,
 			},
 		]);
-		expect(project.config.start.inventory).toEqual([
-			{
-				itemId: "water",
-				position: {
-					x: 1,
-					y: 0,
-				},
-				quantity: 1,
-			},
-		]);
-		expect(project.config.start.toolbar).toEqual([
-			{
-				itemId: "water",
-				position: {
-					x: 1,
-					y: 0,
-				},
-				quantity: 1,
-			},
-		]);
-		expect(notifyProjectChanged).toHaveBeenCalledTimes(5);
+		expect(notifyProjectChanged).toHaveBeenCalledTimes(3);
 	});
 });

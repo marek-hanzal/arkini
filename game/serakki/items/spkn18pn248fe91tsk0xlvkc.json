@@ -14,7 +14,6 @@
 				"townhall-t2"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -39,7 +38,7 @@
 								"type": "item",
 								"itemId": "townhall-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -58,7 +57,6 @@
 								"type": "item",
 								"itemId": "townhall-t2-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -69,7 +67,7 @@
 								"type": "item",
 								"itemId": "planks"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -84,7 +82,7 @@
 								"type": "item",
 								"itemId": "stone-block"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -99,7 +97,7 @@
 								"type": "item",
 								"itemId": "labor-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -114,7 +112,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -166,7 +164,7 @@
 										"type": "item",
 										"itemId": "school-t1"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}

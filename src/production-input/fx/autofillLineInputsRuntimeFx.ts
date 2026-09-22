@@ -11,7 +11,7 @@ import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAuto
 import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace autofillLineInputsRuntimeFx {
@@ -87,13 +87,13 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 	for (const [sourceItemId, input] of allocationsBySourceItemId) {
 		const runtimeSource = deliveryRuntime.items.find((item) => item.id === sourceItemId);
 		if (runtimeSource === undefined) continue;
-		const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+		const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 		if (source === undefined) continue;
 		const runtimeOwner = deliveryRuntime.items.find((item) => item.id === ownerItemId);
 		const owner =
 			runtimeOwner === undefined
 				? undefined
-				: Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeOwner));
+				: Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
 		if (owner === undefined) continue;
 		const detached = yield* detachLineInputSourceFx({
 			runtime: deliveryRuntime,

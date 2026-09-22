@@ -8,30 +8,27 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { ItemJobScopedError } from "~/game-runtime/error/ItemJobScopedError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
-import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
-import { readPlacementRouteFn } from "~/item-placement/fn/readPlacementRouteFn";
-import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocationsFn";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
 
 interface PlaceRuntimeItemProps {
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly itemId: IdSchema.Type;
-	readonly origin: GridLocationSchema.Type;
+	readonly origin: BoardLocationSchema.Type;
 	readonly originItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }
@@ -41,11 +38,11 @@ interface PlaceRuntimeItemResult {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-const excludeGridLocationsFn = <Location extends GridLocationSchema.Type>({
+const excludeGridLocationsFn = <Location extends BoardLocationSchema.Type>({
 	excludedLocations,
 	locations,
 }: {
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly locations: ReadonlyArray<Location>;
 }) =>
 	excludedLocations === undefined
@@ -67,8 +64,8 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 	runtime,
 }: {
 	readonly item: RuntimeItemSchema.Type;
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
-	readonly origin: GridLocationSchema.Type;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
+	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const config = yield* GameConfigFx;
@@ -77,72 +74,18 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 			excludedLocations,
 			locations: readBoardLocationsFn({
 				size: config.meta.board,
-				space:
-					origin.scope === LocationScopeEnumSchema.enum.Board
-						? origin.space
-						: runtime.currentSpace,
+				space: origin.space,
 			}),
 		}),
 		runtime,
 	});
-	const orderedBoard =
-		origin.scope === LocationScopeEnumSchema.enum.Board
-			? orderGridLocationsFn({
-					locations: emptyBoard,
-					origin: origin.position,
-				})
-			: emptyBoard;
-	const inventory = excludeGridLocationsFn({
-		excludedLocations,
-		locations: readInventoryLocationsFn({
-			size: config.meta.inventory,
-		}),
+	const orderedBoard = orderGridLocationsFn({
+		locations: emptyBoard,
+		origin: origin.position,
 	});
-	const emptyInventory = readEmptyLocationsFn({
-		locations: inventory,
-		runtime,
-	});
-	const orderedInventory =
-		origin.scope === LocationScopeEnumSchema.enum.Inventory
-			? orderGridLocationsFn({
-					locations: emptyInventory,
-					origin: origin.position,
-				})
-			: emptyInventory;
-	const toolbar = excludeGridLocationsFn({
-		excludedLocations,
-		locations: readToolbarLocationsFn({
-			size: config.meta.toolbarSize ?? 0,
-		}),
-	});
-	const emptyToolbar = readEmptyLocationsFn({
-		locations: toolbar,
-		runtime,
-	});
-	const orderedToolbar =
-		origin.scope === LocationScopeEnumSchema.enum.Toolbar
-			? orderGridLocationsFn({
-					locations: emptyToolbar,
-					origin: origin.position,
-				})
-			: emptyToolbar;
-
-	const locationsByScope = {
-		board: orderedBoard,
-		inventory: orderedInventory,
-		toolbar: orderedToolbar,
-	} satisfies Record<readPlacementRouteFn.Scope, ReadonlyArray<GridLocationSchema.Type>>;
-	const route = readPlacementRouteFn({
-		itemScope: item.item.scope,
-		originScope: origin.scope,
-		toolbarEnabled: (config.meta.toolbarSize ?? 0) > 0,
-	});
-	for (const step of route) {
-		const location = locationsByScope[step.scope][0];
-		if (location !== undefined) return location;
-	}
-
-	const reason = route[route.length - 1].unavailableReason;
+	const location = orderedBoard[0];
+	if (location !== undefined) return location;
+	const reason = PlacementUnavailableError.Reason.BoardFull;
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
 			itemId: item.item.id,
@@ -155,7 +98,7 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 });
 
 /**
- * Returns one existing input-buffered, reserved, or Inventory item through the
+ * Returns one existing input-buffered or reserved item through the
  * canonical drop policy and reports the exact visible placement facts.
  */
 export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
@@ -179,16 +122,15 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	}
 	if (
 		item.location.scope !== LocationScopeEnumSchema.enum.Input &&
-		item.location.scope !== LocationScopeEnumSchema.enum.Reserved &&
-		item.location.scope !== LocationScopeEnumSchema.enum.Inventory
+		item.location.scope !== LocationScopeEnumSchema.enum.Reserved
 	) {
 		return yield* Effect.die(
 			new Error(
-				`Existing-item placement only accepts input, reserved, or Inventory items; ${item.id} is ${item.location.scope}.`,
+				`Existing-item placement only accepts input or reserved items; ${item.id} is ${item.location.scope}.`,
 			),
 		);
 	}
-	if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) {
+	{
 		yield* assertOwnerIdleFx({
 			ownerItemId: item.id,
 			runtime,
@@ -225,7 +167,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			},
 		];
 		for (const stack of placement.stack) {
-			const stackedItem = Option.getOrUndefined(narrowGridRuntimeItemFn(stack.item));
+			const stackedItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(stack.item));
 			if (stackedItem === undefined) {
 				return yield* Effect.die(
 					new Error(
@@ -244,7 +186,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			});
 		}
 		for (const runtimeSpawnedItem of placement.spawn) {
-			const spawnedItem = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSpawnedItem));
+			const spawnedItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSpawnedItem));
 			if (spawnedItem === undefined) {
 				return yield* Effect.die(
 					new Error(
@@ -284,7 +226,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		item: {
 			...item,
 			location,
-		} satisfies GridRuntimeItemSchema.Type,
+		} satisfies BoardRuntimeItemSchema.Type,
 	});
 	const placedRuntime = {
 		...runtime,

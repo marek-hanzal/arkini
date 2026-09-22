@@ -16,7 +16,6 @@ const simpleItem = ({ id }: { id: string }) => {
 				`artwork:${id}`,
 			],
 		},
-		scope: "any",
 		maxStackSize: 10,
 	});
 };
@@ -43,7 +42,8 @@ export const runtimeInputTestItem = ({
 		id,
 		item: inputTestItems[itemId],
 		location: {
-			scope: "inventory",
+			scope: "board" as const,
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,

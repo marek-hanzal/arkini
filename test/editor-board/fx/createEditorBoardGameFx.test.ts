@@ -85,7 +85,8 @@ describe("Editor Board createEditorBoardGameFx", () => {
 				id: "runtime:ephemeral",
 				itemId: "water",
 				location: {
-					scope: "inventory",
+					scope: "board",
+					space: 1,
 					position: {
 						x: 0,
 						y: 0,
@@ -131,7 +132,8 @@ describe("Editor Board createEditorBoardGameFx", () => {
 					id: "runtime:after-dispose",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 1,
 						position: {
 							x: 0,
 							y: 0,

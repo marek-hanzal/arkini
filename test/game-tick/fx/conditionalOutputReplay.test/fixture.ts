@@ -27,7 +27,7 @@ const output = (itemId: string, conditional = false) => ({
 												{
 													type: "exists",
 													query: {
-														scope: "any",
+														distance: "far",
 														selector: {
 															type: "item",
 															itemId: "blocker",
@@ -113,7 +113,6 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 							{
 								type: "units",
 								query: {
-									scope: "board",
 									distance: "close",
 									selector: {
 										type: "item",

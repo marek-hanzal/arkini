@@ -34,7 +34,6 @@ const boardOnlyConfig = GameConfigSchema.parse({
 		...purityTestConfig.items,
 		material: {
 			...purityTestConfig.items.material,
-			scope: "board",
 		},
 	},
 });

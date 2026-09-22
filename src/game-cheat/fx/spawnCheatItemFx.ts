@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import { CheatItemNotSpawnableError } from "~/game-cheat/error/CheatItemNotSpawnableError";
 import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledError";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -10,7 +9,6 @@ import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlaceme
 import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 
@@ -28,13 +26,6 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	const item = yield* resolveItemFx({
 		itemId,
 	});
-	if (item.scope !== StorageSchema.enum.Board && item.scope !== StorageSchema.enum.Any) {
-		return yield* Effect.fail(
-			new CheatItemNotSpawnableError({
-				itemId,
-			}),
-		);
-	}
 	const drop = {
 		itemId,
 		placement: PlacementSchema.enum.Drop,

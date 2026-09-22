@@ -9,7 +9,7 @@ import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRu
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 
 import { settleJobRuntimeFx } from "./settleJobRuntimeFx";
@@ -41,7 +41,7 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		itemId: job.ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeOwner));
+	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined)
 		return yield* Effect.die(new Error(`Job ${jobId} owner has no grid origin.`));
 

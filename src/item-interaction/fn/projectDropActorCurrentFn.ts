@@ -1,4 +1,4 @@
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 
 export interface DropTransferActor {
 	readonly id: string;
@@ -6,7 +6,7 @@ export interface DropTransferActor {
 		readonly id: string;
 	};
 	readonly revision: string;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly quantity: number;
 }
 

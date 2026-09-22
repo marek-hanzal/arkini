@@ -26,7 +26,6 @@ const baseItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "any" as const,
 	maxStackSize: 1,
 });
 
@@ -39,7 +38,7 @@ const makeLine = (lineId: string) => ({
 		{
 			type: "materials" as const,
 			query: {
-				scope: "any" as const,
+				distance: "far" as const,
 				selector: {
 					type: "item" as const,
 					itemId: "material",
@@ -63,10 +62,6 @@ const config = GameConfigSchema.parse({
 		title: "Line owner delivery boundary",
 		board: {
 			width: 4,
-			height: 1,
-		},
-		inventory: {
-			width: 1,
 			height: 1,
 		},
 	},

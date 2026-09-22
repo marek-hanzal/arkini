@@ -12,7 +12,6 @@
 				"steam-dairy-farm"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 30000,
@@ -39,7 +38,7 @@
 								"type": "item",
 								"itemId": "sack-with-grain"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -54,7 +53,7 @@
 								"type": "item",
 								"itemId": "clay-jug"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

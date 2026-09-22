@@ -53,7 +53,6 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 			...config.items,
 			result: {
 				...config.items.result!,
-				scope: "board" as const,
 			},
 		},
 	};

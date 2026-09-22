@@ -38,7 +38,7 @@ const rolls = {
 const roll = {} as RollSchema.Type;
 
 const query = {
-	scope: "any",
+	distance: "far",
 	selector: {
 		type: "item",
 		itemId: "",
@@ -67,7 +67,6 @@ export const DraftDefaults = {
 				from: "target",
 			},
 			query: {
-				scope: "board",
 				distance: "close",
 				selector: {
 					type: "item",

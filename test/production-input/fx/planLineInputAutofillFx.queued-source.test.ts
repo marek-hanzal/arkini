@@ -32,7 +32,7 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 							{
 								type: "materials",
 								query: {
-									scope: "any",
+									distance: "far" as const,
 									selector: {
 										type: "item",
 										itemId: "workshop",
@@ -82,7 +82,7 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 				ownerItemId: "receiver",
 				runtime: blocked,
 				query: {
-					scope: "any",
+					distance: "far" as const,
 					selector: {
 						type: "item",
 						itemId: "workshop",

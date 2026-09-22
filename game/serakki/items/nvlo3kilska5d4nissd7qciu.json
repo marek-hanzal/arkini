@@ -12,7 +12,6 @@
 				"leprechaun"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,

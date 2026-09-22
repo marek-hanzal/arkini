@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BoardSchema } from "~/item-query/schema/BoardSchema";
+import { QuerySchema } from "~/item-query/schema/QuerySchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
@@ -23,7 +23,7 @@ export const UnitsSchema = z
 		/**
 		 * Board query used to select one target with units for this input.
 		 */
-		query: BoardSchema.describe(
+		query: QuerySchema.describe(
 			"The board query used to select one target with units for this input.",
 		),
 	})

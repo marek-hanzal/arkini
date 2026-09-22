@@ -21,10 +21,6 @@ const config = GameConfigSchema.parse({
 			width: 10,
 			height: 10,
 		},
-		inventory: {
-			width: 2,
-			height: 2,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -44,7 +40,6 @@ const config = GameConfigSchema.parse({
 					"artwork:source",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 		},
 	},
@@ -135,7 +130,7 @@ const createRollSet = ({
 const missingPermitWhen = {
 	type: "exists" as const,
 	query: {
-		scope: "any" as const,
+		distance: "far" as const,
 		selector: {
 			type: "item" as const,
 			itemId: "permit",

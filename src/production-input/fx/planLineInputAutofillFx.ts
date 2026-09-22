@@ -9,7 +9,6 @@ import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
@@ -40,18 +39,11 @@ const candidateRankFn = ({
 	candidate,
 	owner,
 }: {
-	readonly candidate: GridRuntimeItemSchema.Type;
+	readonly candidate: BoardRuntimeItemSchema.Type;
 	readonly owner: BoardRuntimeItemSchema.Type;
 }) => {
 	return {
-		scope:
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board
-				? candidate.location.space === owner.location.space
-					? 0
-					: 3
-				: candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar
-					? 1
-					: 2,
+		scope: candidate.location.space === owner.location.space ? 0 : 1,
 		distance:
 			candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
 			candidate.location.space === owner.location.space
@@ -64,7 +56,7 @@ const candidateRankFn = ({
 };
 
 const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
-	return (left: GridRuntimeItemSchema.Type, right: GridRuntimeItemSchema.Type) => {
+	return (left: BoardRuntimeItemSchema.Type, right: BoardRuntimeItemSchema.Type) => {
 		const leftRank = candidateRankFn({
 			candidate: left,
 			owner,
@@ -87,8 +79,7 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Each input applies its query. Sources prefer the owner's board space by distance, then Toolbar,
- * Inventory and other board spaces in stable slot order.
+ * Each input applies its query. Sources prefer the owner's board space by distance, then other board spaces in stable slot order.
  * Required minima are allocated across every slot before compatible range inputs receive optional
  * top-ups toward their maximum. The planner does not mutate runtime truth itself.
  */
@@ -104,7 +95,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		lineId,
 		runtime,
 	});
-	const candidatesById = new Map<string, GridRuntimeItemSchema.Type>();
+	const candidatesById = new Map<string, BoardRuntimeItemSchema.Type>();
 	const entries: planLineInputAutofillFx.Entry[] = [];
 	const entryIndexByKey = new Map<string, number>();
 	const slots: {

@@ -12,7 +12,6 @@
 				"explorer"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 3,
 		"lines": [
@@ -129,7 +128,6 @@
 										"type": "item",
 										"itemId": "forest"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"

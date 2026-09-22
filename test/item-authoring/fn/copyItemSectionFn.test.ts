@@ -14,7 +14,6 @@ const source = ItemSchema.parse({
 			"overlay",
 		],
 	},
-	scope: "board",
 	maxStackSize: 1,
 	maxQueueSize: 3,
 	lines: [
@@ -34,7 +33,6 @@ const source = ItemSchema.parse({
 						from: "self",
 					},
 					query: {
-						scope: "board",
 						distance: "self",
 						selector: {
 							type: "item",
@@ -107,6 +105,7 @@ describe("section copy ownership", () => {
 		expect(result.draft).toBe(true);
 		expect(FormSchema.parse(result).lines[0].input[0]).toMatchObject({
 			query: {
+				distance: "self",
 				selector: {
 					itemId: "destination",
 				},
@@ -122,7 +121,6 @@ describe("section copy ownership", () => {
 				title: "New title",
 				description: undefined,
 				clock: undefined,
-				scope: "inventory",
 				maxStackSize: 20,
 			},
 			"identity",
@@ -133,7 +131,6 @@ describe("section copy ownership", () => {
 			title: "New title",
 			draft: true,
 			description: "",
-			scope: "inventory",
 			maxStackSize: 1,
 		});
 		expect(result.lines).toBe(destination.lines);
@@ -168,7 +165,8 @@ describe("section copy ownership", () => {
 		"action",
 	] as const)("clears absent %s instead of retaining destination data", (section) => {
 		const action = {
-			type: "inventory" as const,
+			type: "space" as const,
+			space: 0,
 			input: [],
 			rules: [],
 		};
@@ -197,7 +195,8 @@ describe("section copy ownership", () => {
 	});
 	it("applies capability exclusions only when the copied capability is present", () => {
 		const action = {
-			type: "inventory" as const,
+			type: "space" as const,
+			space: 0,
 			input: [],
 			rules: [],
 		};
@@ -228,14 +227,12 @@ describe("section copy ownership", () => {
 		const withClock = copyItemSectionFn(
 			{
 				...withAction,
-				scope: "inventory",
 				maxStackSize: 5,
 			},
 			source,
 			"clock",
 		);
 		expect(withClock).toMatchObject({
-			scope: "inventory",
 			maxStackSize: 1,
 			clock: source.clock,
 		});

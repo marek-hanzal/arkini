@@ -30,7 +30,8 @@ describe("createGameSessionFx / final save lifecycle", () => {
 				id: "runtime:retry-final-save",
 				itemId: "water",
 				location: {
-					scope: "inventory",
+					scope: "board",
+					space: 0,
 					position: {
 						x: 0,
 						y: 0,
@@ -49,7 +50,8 @@ describe("createGameSessionFx / final save lifecycle", () => {
 					id: "runtime:must-not-change-after-shutdown",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

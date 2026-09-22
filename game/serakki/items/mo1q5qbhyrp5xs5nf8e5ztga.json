@@ -12,7 +12,6 @@
 				"rapeseed-seed"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

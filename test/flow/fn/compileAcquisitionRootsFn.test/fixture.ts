@@ -29,7 +29,7 @@ const createRuledOutput = (type: "disable" | "enable") =>
 										when: [
 											{
 												query: {
-													scope: "universe",
+													distance: "universe",
 													selector: {
 														itemId: "item:condition",
 														type: "item",

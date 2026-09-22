@@ -13,7 +13,7 @@ const quantityFn = ({ min, max }: { readonly min: number; readonly max: number }
 	min === max ? String(min) : `${min}–${max}`;
 
 const queryFn = (project: Project, query: QuerySchema.Type) =>
-	`${itemFn(project, query.selector.itemId)} @${query.scope}${query.scope === "board" ? `/${query.distance}` : ""}`;
+	`${itemFn(project, query.selector.itemId)} @${query.distance}`;
 const whenFn = (project: Project, when: WhenSchema.Type): string => {
 	switch (when.type) {
 		case "exists":

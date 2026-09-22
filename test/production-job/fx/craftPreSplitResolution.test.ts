@@ -19,10 +19,6 @@ const config = GameConfigSchema.parse({
 			width: 3,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -41,7 +37,6 @@ const config = GameConfigSchema.parse({
 					"artwork:craft",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 
 			units: {
@@ -65,7 +60,6 @@ const config = GameConfigSchema.parse({
 								{
 									type: "exists",
 									query: {
-										scope: "board",
 										distance: "close",
 										selector: {
 											type: "item",

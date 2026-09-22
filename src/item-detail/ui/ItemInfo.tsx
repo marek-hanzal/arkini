@@ -41,14 +41,6 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 					<div className="grid grid-cols-2 items-start gap-8">
 						<FactList columns={1}>
 							<Fact
-								label={translator.textFn("Where you can keep it")}
-								value={
-									detail.scope === "any"
-										? translator.textFn("Board, inventory and toolbar")
-										: translator.textFn(`Item storage scope - ${detail.scope}`)
-								}
-							/>
-							<Fact
 								label={translator.textFn("Items per stack")}
 								value={
 									detail.maxStackSize === 1

@@ -4,7 +4,7 @@ import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
+const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -15,15 +15,10 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope,
 	maxStackSize: 10,
 });
 
-export const createJobTestConfig = (
-	maxQueueSize = 2,
-	forgeScope: "board" | "any" = "board",
-	runtimeMs = 1_000,
-) =>
+export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 	GameConfigSchema.parse({
 		resources: {
 			hero: "hero",
@@ -35,10 +30,6 @@ export const createJobTestConfig = (
 				width: 5,
 				height: 2,
 			},
-			inventory: {
-				width: 3,
-				height: 1,
-			},
 		},
 		start: {
 			currentSpace: 0,
@@ -47,7 +38,6 @@ export const createJobTestConfig = (
 			forge: {
 				...baseItem({
 					id: "forge",
-					scope: forgeScope,
 				}),
 
 				maxStackSize: 1,
@@ -62,7 +52,7 @@ export const createJobTestConfig = (
 							{
 								type: "materials",
 								query: {
-									scope: "any",
+									distance: "far" as const,
 									selector: {
 										type: "item",
 										itemId: "water",
@@ -77,7 +67,7 @@ export const createJobTestConfig = (
 							{
 								type: "materials",
 								query: {
-									scope: "any",
+									distance: "far" as const,
 									selector: {
 										type: "item",
 										itemId: "tool",
@@ -100,7 +90,6 @@ export const createJobTestConfig = (
 
 				...baseItem({
 					id: "water",
-					scope: "any",
 				}),
 			},
 			tool: {
@@ -109,7 +98,6 @@ export const createJobTestConfig = (
 
 				...baseItem({
 					id: "tool",
-					scope: "any",
 				}),
 			},
 		},

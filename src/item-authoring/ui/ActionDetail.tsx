@@ -43,27 +43,15 @@ export const ActionDetail = ({
 	return (
 		<EditorRootCard dataUi="EditorActionDetailCard">
 			<DetailSection
-				description={
-					<Mx
-						label={
-							action.type === "space"
-								? "Space action summary help"
-								: "Inventory action summary help"
-						}
-					/>
-				}
-				title={translator.textFn(
-					action.type === "space" ? "Space action" : "Inventory action",
-				)}
+				description={<Mx label={"Space action summary help"} />}
+				title={translator.textFn("Space action")}
 			>
-				{action.type === "space" ? (
-					<DetailFacts>
-						<DetailFact
-							label={translator.textFn("Target space")}
-							value={action.space}
-						/>
-					</DetailFacts>
-				) : null}
+				<DetailFacts>
+					<DetailFact
+						label={translator.textFn("Target space")}
+						value={action.space}
+					/>
+				</DetailFacts>
 			</DetailSection>
 			<section className="min-w-0">
 				<h4 className="flex items-center gap-1 border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">

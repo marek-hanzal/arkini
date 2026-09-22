@@ -6,7 +6,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import { activateItemActionWithTransitionFx } from "~/item-action/fx/activateItemActionFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { board, inventory, toolbar, run, spawnAndActivate } from "../support/spaceActionFixture";
+import { board, run, spawnAndActivate } from "../support/spaceActionFixture";
 
 describe("Space item unit settlement", () => {
 	it("treats activation of the current space as an event-free same-runtime no-op", () => {
@@ -15,7 +15,7 @@ describe("Space item unit settlement", () => {
 				const portal = yield* spawnItemFx({
 					id: "runtime:same-space",
 					itemId: "sameSpacePortal",
-					location: toolbar(0),
+					location: board(0),
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
@@ -49,7 +49,7 @@ describe("Space item unit settlement", () => {
 				yield* spawnAndActivate({
 					id: "runtime:space-four-navigator",
 					itemId: "spentPortal",
-					location: toolbar(0),
+					location: board(0),
 				});
 				return yield* spawnAndActivate({
 					id: "runtime:spent",
@@ -66,7 +66,7 @@ describe("Space item unit settlement", () => {
 			spawnAndActivate({
 				id: "runtime:spent-stack",
 				itemId: "spentPortal",
-				location: toolbar(2),
+				location: board(2),
 				quantity: 2,
 			}),
 		);
@@ -76,7 +76,7 @@ describe("Space item unit settlement", () => {
 		expect(stackItems).toEqual([
 			expect.objectContaining({
 				id: passiveStack.item.id,
-				location: toolbar(2),
+				location: board(2),
 				quantity: 2,
 				remainingUnits: undefined,
 			}),
@@ -85,7 +85,7 @@ describe("Space item unit settlement", () => {
 			spawnAndActivate({
 				id: "runtime:spent-passive-stack",
 				itemId: "passiveFinitePortal",
-				location: toolbar(2),
+				location: board(2),
 				quantity: 2,
 			}),
 		);
@@ -101,7 +101,7 @@ describe("Space item unit settlement", () => {
 		);
 		expect(spentStackItems.find((item) => item.id !== spentPassiveStack.item.id)).toMatchObject(
 			{
-				location: toolbar(1),
+				location: board(1),
 				quantity: 1,
 				remainingUnits: undefined,
 			},
@@ -127,7 +127,7 @@ describe("Space item unit settlement", () => {
 				yield* spawnItemFx({
 					id: "runtime:later-commit",
 					itemId: "token",
-					location: inventory(3),
+					location: board(3),
 					quantity: 1,
 				});
 				return {
@@ -172,11 +172,12 @@ describe("Space item unit settlement", () => {
 				const portal = yield* spawnItemFx({
 					id: "runtime:passive-failure",
 					itemId: "passiveFailurePortal",
-					location: toolbar(0),
+					location: board(0),
 					quantity: 1,
 				});
 				for (let y = 0; y < 2; y++) {
 					for (let x = 0; x < 4; x++) {
+						if (x === 0 && y === 0) continue;
 						yield* spawnItemFx({
 							id: `runtime:board-blocker:${x}:${y}`,
 							itemId: "permit",

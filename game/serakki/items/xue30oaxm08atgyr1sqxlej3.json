@@ -12,7 +12,6 @@
 				"clay-camp"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 6,
 		"lines": [
@@ -37,7 +36,6 @@
 								"type": "item",
 								"itemId": "clay-deposit"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					}
@@ -76,7 +74,6 @@
 										"type": "item",
 										"itemId": "clay-deposit"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"

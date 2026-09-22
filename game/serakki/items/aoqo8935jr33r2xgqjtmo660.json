@@ -13,7 +13,6 @@
 				"vegetable-farm"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -42,7 +41,6 @@
 								"type": "item",
 								"itemId": "vegetable-farm-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -53,7 +51,7 @@
 								"type": "item",
 								"itemId": "planks"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -68,7 +66,7 @@
 								"type": "item",
 								"itemId": "stone-block"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -83,7 +81,7 @@
 								"type": "item",
 								"itemId": "labor-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

@@ -1,8 +1,8 @@
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
@@ -22,11 +22,6 @@ const config = GameConfigSchema.parse({
 			width: 10,
 			height: 10,
 		},
-		inventory: {
-			width: 2,
-			height: 2,
-		},
-		toolbarSize: 2,
 	},
 	start: {
 		currentSpace: 0,
@@ -46,7 +41,6 @@ const config = GameConfigSchema.parse({
 					"artwork:tree",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 	},
@@ -110,7 +104,7 @@ const runQuery = ({
 }: {
 	readonly query: QuerySchema.Type;
 	readonly runtime: RuntimeSchema.Type;
-	readonly queryOrigin?: GridLocationSchema.Type;
+	readonly queryOrigin?: BoardLocationSchema.Type;
 }) =>
 	queryFx({
 		origin: queryOrigin,
@@ -142,7 +136,6 @@ describe("queryFx", () => {
 					runQuery({
 						query: {
 							distance,
-							scope: "board",
 							selector,
 						},
 						runtime: snapshot,
@@ -182,163 +175,38 @@ describe("queryFx", () => {
 			"far",
 		]);
 	});
+});
 
-	it("maps board, passive, local-any, and universe reach without hidden ownership", () => {
-		const snapshot = runtime({
-			items: [
-				board("origin", 0, 0),
-				board("board", 0, 1),
-				board("other-space", 1, 1),
-				item("inventory", {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				}),
-				item("toolbar", {
-					scope: "toolbar",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				}),
-				item("input-hidden", {
-					scope: "input",
-					ownerItemId: "owner:hidden",
-					lineId: "line:hidden",
-					inputIndex: 0,
-				}),
-				item("reserved-hidden", {
-					scope: "reserved",
-					jobId: "job:hidden",
-					inputIndex: 0,
-				}),
-			],
-		});
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const query = (scope: "any" | "inventory" | "toolbar" | "universe") =>
-					runQuery({
-						query: {
-							scope,
-							selector,
-						},
-						runtime: snapshot,
-					});
-				return {
-					board: yield* runQuery({
-						query: {
-							distance: "far",
-							scope: "board",
-							selector,
-						},
-						runtime: snapshot,
-					}),
-					inventory: yield* query("inventory"),
-					toolbar: yield* query("toolbar"),
-					any: yield* query("any"),
-					universe: yield* query("universe"),
-				};
+it("universe includes the origin and remote Board spaces while excluding buffered and reserved material", () => {
+	const snapshot = runtime({
+		currentSpace: 9,
+		items: [
+			board("self", 0, 0),
+			board("remote", 2, 0),
+			item("buffer", {
+				scope: "input",
+				ownerItemId: "self",
+				lineId: "line",
+				inputIndex: 0,
 			}),
-		);
-
-		expect(readIds(result.board)).toEqual([
-			"board",
-		]);
-		expect(readIds(result.inventory)).toEqual([
-			"inventory",
-		]);
-		expect(readIds(result.toolbar)).toEqual([
-			"toolbar",
-		]);
-		expect(readIds(result.any)).toEqual([
-			"origin",
-			"board",
-			"inventory",
-			"toolbar",
-		]);
-		expect(readIds(result.universe)).toEqual([
-			"origin",
-			"board",
-			"other-space",
-			"inventory",
-			"toolbar",
-		]);
-	});
-
-	it("uses currentSpace when a passive origin asks for local-any reach", () => {
-		const snapshot = runtime({
-			currentSpace: 1,
-			items: [
-				board("space-zero", 0, 0),
-				board("space-one", 1, 0),
-				item("inventory", {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				}),
-			],
-		});
-		const result = Effect.runSync(
-			runQuery({
-				queryOrigin: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				query: {
-					scope: "any",
-					selector,
-				},
-				runtime: snapshot,
+			item("reserved", {
+				scope: "reserved",
+				jobId: "job",
+				inputIndex: 0,
 			}),
-		);
-
-		expect(readIds(result)).toEqual([
-			"space-one",
-			"inventory",
-		]);
+		],
 	});
-
-	it("rejects board reach before reading a passive origin runtime", () => {
-		const result = Effect.runSync(
-			Effect.result(
-				queryFx({
-					origin: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					query: {
-						distance: "far",
-						scope: "board",
-						selector,
-					},
-				}).pipe(
-					Effect.provideService(RuntimeFx, {
-						read: Effect.die(
-							new Error("Board origin rejection must precede Runtime read."),
-						),
-					}),
-				),
-			),
-		);
-
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "BoardQueryOriginUnavailableError",
-				origin: {
-					scope: "inventory",
-				},
-			});
-		}
-	});
+	const selected = Effect.runSync(
+		runQuery({
+			query: {
+				distance: "universe",
+				selector,
+			},
+			runtime: snapshot,
+		}),
+	);
+	expect(readIds(selected)).toEqual([
+		"self",
+		"remote",
+	]);
 });

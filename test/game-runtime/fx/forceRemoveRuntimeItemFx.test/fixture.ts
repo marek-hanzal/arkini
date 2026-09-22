@@ -36,7 +36,7 @@ export const fixtureFn = (width = 2) => {
 							{
 								type: "materials",
 								query: {
-									scope: "any",
+									distance: "far" as const,
 									selector: {
 										type: "item",
 										itemId: "holder",
@@ -58,7 +58,7 @@ export const fixtureFn = (width = 2) => {
 							{
 								type: "materials",
 								query: {
-									scope: "any",
+									distance: "far" as const,
 									selector: {
 										type: "item",
 										itemId: "water",
@@ -76,7 +76,6 @@ export const fixtureFn = (width = 2) => {
 			},
 			tool: {
 				...base.items.tool,
-				scope: "board",
 				maxStackSize: 1,
 				units: {
 					amount: 2,
@@ -84,7 +83,6 @@ export const fixtureFn = (width = 2) => {
 			},
 			water: {
 				...base.items.water,
-				scope: "board",
 				maxStackSize: 3,
 			},
 			holder: {

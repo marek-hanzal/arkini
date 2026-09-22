@@ -2,15 +2,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const simpleItem = ({
-	id,
-	maxStackSize,
-	scope,
-}: {
-	id: string;
-	maxStackSize: number;
-	scope: "any" | "board" | "inventory";
-}) => {
+const simpleItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) => {
 	return {
 		maxQueueSize: 1,
 		lines: [],
@@ -25,7 +17,6 @@ const simpleItem = ({
 				`artwork:${id}`,
 			],
 		},
-		scope,
 		maxStackSize,
 	} as const;
 };
@@ -41,10 +32,6 @@ export const placementTestConfig = GameConfigSchema.parse({
 			width: 4,
 			height: 1,
 		},
-		inventory: {
-			width: 2,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -53,42 +40,30 @@ export const placementTestConfig = GameConfigSchema.parse({
 		origin: simpleItem({
 			id: "origin",
 			maxStackSize: 1,
-			scope: "board",
 		}),
 		blocker: simpleItem({
 			id: "blocker",
 			maxStackSize: 1,
-			scope: "any",
 		}),
 		log: simpleItem({
 			id: "log",
 			maxStackSize: 3,
-			scope: "any",
 		}),
 		"board-only": simpleItem({
 			id: "board-only",
 			maxStackSize: 1,
-			scope: "board",
-		}),
-		"inventory-only": simpleItem({
-			id: "inventory-only",
-			maxStackSize: 2,
-			scope: "inventory",
 		}),
 		limited: simpleItem({
 			id: "limited",
 			maxStackSize: 2,
-			scope: "any",
 		}),
 		replacement: simpleItem({
 			id: "replacement",
 			maxStackSize: 3,
-			scope: "any",
 		}),
 		permit: simpleItem({
 			id: "permit",
 			maxStackSize: 1,
-			scope: "any",
 		}),
 	},
 });
@@ -101,16 +76,6 @@ export const boardLocation = (x: number) => {
 			y: 0,
 		},
 		scope: "board" as const,
-	};
-};
-
-export const inventoryLocation = (x: number) => {
-	return {
-		position: {
-			x,
-			y: 0,
-		},
-		scope: "inventory" as const,
 	};
 };
 

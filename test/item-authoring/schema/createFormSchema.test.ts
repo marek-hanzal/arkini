@@ -16,7 +16,6 @@ const createTargetPaidInput = (itemId: string) => ({
 		from: "target" as const,
 	},
 	query: {
-		scope: "board" as const,
 		distance: "close" as const,
 		selector: {
 			type: "item" as const,
@@ -226,7 +225,6 @@ describe("createFormSchema", () => {
 							from: "self" as const,
 						},
 						query: {
-							scope: "board" as const,
 							distance: "self" as const,
 							selector: {
 								type: "item" as const,
@@ -264,7 +262,6 @@ describe("createFormSchema", () => {
 						from: "self" as const,
 					},
 					query: {
-						scope: "board" as const,
 						distance: "self" as const,
 						selector: {
 							type: "item" as const,
@@ -313,7 +310,6 @@ describe("createFormSchema", () => {
 							from: "self" as const,
 						},
 						query: {
-							scope: "board" as const,
 							distance: "self" as const,
 							selector: {
 								type: "item" as const,

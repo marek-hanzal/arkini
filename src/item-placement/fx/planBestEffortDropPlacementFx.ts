@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
@@ -28,8 +28,8 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 	runtime,
 }: {
 	readonly drop: dropFx.Result;
-	readonly excludedLocations?: readonly GridLocationSchema.Type[];
-	readonly origin: GridLocationSchema.Type;
+	readonly excludedLocations?: readonly BoardLocationSchema.Type[];
+	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	let quantity = drop.quantity;

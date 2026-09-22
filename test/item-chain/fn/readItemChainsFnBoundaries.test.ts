@@ -95,7 +95,7 @@ describe("chain termination and authored output boundaries", () => {
 								{
 									type: "exists",
 									query: {
-										scope: "universe",
+										distance: "universe",
 										selector: {
 											type: "item",
 											itemId: "a",

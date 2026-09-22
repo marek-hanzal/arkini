@@ -434,43 +434,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		cancelDragFn(drag);
 	};
 
-	const storeDraggedItemInInventoryFn = (event: KeyboardEvent) => {
-		if (
-			closed ||
-			event.repeat ||
-			event.key.toLowerCase() !== "i" ||
-			event.altKey ||
-			event.ctrlKey ||
-			event.metaKey
-		) {
-			return;
-		}
-		RendererRuntime.runSync(pointerSampler.flushFx());
-		const drag = activeDrag;
-		if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") {
-			return;
-		}
-		event.preventDefault();
-		event.stopImmediatePropagation();
-		const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
-		if (sourceItem === null) return;
-		const submission = {
-			actor: drag.actor,
-			onReturnSettledFn: () => RendererRuntime.runSync(dragOriginGhosts.settleFx(drag.actor)),
-			sourceItem,
-			commandTarget: {
-				kind: "inventory" as const,
-			},
-			previewKind: null,
-			targetItem: null,
-		};
-		releaseDragPointerFn(drag.pointerId);
-		RendererRuntime.runSync(pointerSampler.cancelFx);
-		activeDrag = null;
-		RendererRuntime.runSync(dragPreview.clearTargetFx);
-		RendererRuntime.runSync(dropSubmission.submitFx(submission));
-	};
-
 	const removeDraggedItemFn = (event: KeyboardEvent) => {
 		if (
 			closed ||
@@ -509,9 +472,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	application.stage.on("pointerupoutside", finishPointerFn);
 	application.stage.on("pointercancel", cancelPointerFn);
 	const keyboardTarget = typeof window === "undefined" ? null : window;
-	keyboardTarget?.addEventListener("keydown", storeDraggedItemInInventoryFn, {
-		capture: true,
-	});
 	keyboardTarget?.addEventListener("keydown", removeDraggedItemFn, {
 		capture: true,
 	});
@@ -530,9 +490,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				});
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
 					const gestureMode = event.button === 2 ? "activation-only" : "drag";
-					const keepsPrimaryLeft =
-						actor.item.primaryAction.kind === "activate-space" ||
-						actor.item.primaryAction.kind === "open-inventory";
+					const keepsPrimaryLeft = actor.item.primaryAction.kind === "activate-space";
 					if (
 						closed ||
 						interactionBlocked ||
@@ -639,9 +597,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			application.stage.off("pointerup", finishPointerFn);
 			application.stage.off("pointerupoutside", finishPointerFn);
 			application.stage.off("pointercancel", cancelPointerFn);
-			keyboardTarget?.removeEventListener("keydown", storeDraggedItemInInventoryFn, {
-				capture: true,
-			});
 			keyboardTarget?.removeEventListener("keydown", removeDraggedItemFn, {
 				capture: true,
 			});

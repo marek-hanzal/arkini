@@ -1,14 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({
-	id,
-	maxStackSize,
-	scope,
-}: {
-	id: string;
-	maxStackSize: number;
-	scope: "any" | "board" | "inventory";
-}) => {
+const baseItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) => {
 	return {
 		uid: id,
 		id,
@@ -20,7 +12,6 @@ const baseItem = ({
 				`artwork:${id}`,
 			],
 		},
-		scope,
 		maxStackSize,
 	} as const;
 };
@@ -36,10 +27,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			width: 5,
 			height: 2,
 		},
-		inventory: {
-			width: 3,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -51,7 +38,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "workshop",
 				maxStackSize: 10,
-				scope: "any",
 			}),
 
 			lines: [
@@ -64,7 +50,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "water",
@@ -90,7 +76,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "water",
 				maxStackSize: 10,
-				scope: "any",
 			}),
 		},
 		stone: {
@@ -100,34 +85,11 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "stone",
 				maxStackSize: 10,
-				scope: "any",
 			}),
 
 			units: {
 				amount: 2,
 			},
-		},
-	},
-});
-
-export const inputRuntimeToolbarTestConfig = GameConfigSchema.parse({
-	...inputRuntimeTestConfig,
-	meta: {
-		...inputRuntimeTestConfig.meta,
-		toolbarSize: 3,
-	},
-	items: {
-		...inputRuntimeTestConfig.items,
-		inventory: {
-			...baseItem({
-				id: "inventory",
-				maxStackSize: 1,
-				scope: "board",
-			}),
-			action: {
-				type: "inventory",
-			},
-			scope: "any",
 		},
 	},
 });

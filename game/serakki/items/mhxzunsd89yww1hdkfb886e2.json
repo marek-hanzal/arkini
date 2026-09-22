@@ -13,7 +13,6 @@
 				"architect-t1"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": [
@@ -35,7 +34,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -77,7 +76,7 @@
 										"type": "item",
 										"itemId": "lumer-camp"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -92,7 +91,7 @@
 										"type": "item",
 										"itemId": "lumber-camp-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -119,7 +118,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -161,7 +160,7 @@
 										"type": "item",
 										"itemId": "stonemason-camp"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -176,7 +175,7 @@
 										"type": "item",
 										"itemId": "stonemason-camp-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -203,7 +202,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -245,7 +244,7 @@
 										"type": "item",
 										"itemId": "house-t1"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -260,7 +259,7 @@
 										"type": "item",
 										"itemId": "house-t1-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -287,7 +286,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -329,7 +328,7 @@
 										"type": "item",
 										"itemId": "explorer"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -344,7 +343,7 @@
 										"type": "item",
 										"itemId": "explorer-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -371,7 +370,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -413,7 +412,7 @@
 										"type": "item",
 										"itemId": "hunter"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -428,7 +427,7 @@
 										"type": "item",
 										"itemId": "hunter-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -455,7 +454,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -497,7 +496,7 @@
 										"type": "item",
 										"itemId": "well"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -512,7 +511,7 @@
 										"type": "item",
 										"itemId": "well-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -539,7 +538,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -581,7 +580,7 @@
 										"type": "item",
 										"itemId": "sawmill"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -596,7 +595,7 @@
 										"type": "item",
 										"itemId": "sawmill-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -623,7 +622,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -665,7 +664,7 @@
 										"type": "item",
 										"itemId": "stoneworks"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -680,7 +679,7 @@
 										"type": "item",
 										"itemId": "stoneworks-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -707,7 +706,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -749,7 +748,7 @@
 										"type": "item",
 										"itemId": "carpenter"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -764,7 +763,7 @@
 										"type": "item",
 										"itemId": "carpenter-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -791,7 +790,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -833,7 +832,7 @@
 										"type": "item",
 										"itemId": "charcoal-kiln"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -848,7 +847,7 @@
 										"type": "item",
 										"itemId": "charcoal-kiln-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -875,7 +874,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -917,7 +916,7 @@
 										"type": "item",
 										"itemId": "waste-incinerator"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -932,7 +931,7 @@
 										"type": "item",
 										"itemId": "waste-incinerator-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -959,7 +958,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1001,7 +1000,7 @@
 										"type": "item",
 										"itemId": "school-t1"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1016,7 +1015,7 @@
 										"type": "item",
 										"itemId": "school-t1-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}

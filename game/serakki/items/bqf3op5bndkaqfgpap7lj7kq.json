@@ -12,7 +12,6 @@
 				"resource-search"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 4,
 		"maxQueueSize": 1,
 		"lines": []

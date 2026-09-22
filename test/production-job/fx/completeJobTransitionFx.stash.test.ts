@@ -58,7 +58,7 @@ const output = (
 	],
 });
 
-const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
+const simpleItem = (id: string) => ({
 	maxQueueSize: 1,
 	lines: [],
 
@@ -73,7 +73,6 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
 			`artwork:${id}`,
 		],
 	},
-	scope,
 	maxStackSize: 1,
 });
 
@@ -102,7 +101,6 @@ const stashItem = ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize: 1,
 	lines: [
 		{
@@ -118,7 +116,7 @@ const stashItem = ({
 						cost: 1,
 					},
 					query: {
-						scope: "any" as const,
+						distance: "far" as const,
 						selector: {
 							type: "item" as const,
 							itemId: "item:key",
@@ -142,10 +140,6 @@ const stashConfig = GameConfigSchema.parse({
 		title: "Stash completion",
 		board: {
 			width: 2,
-			height: 1,
-		},
-		inventory: {
-			width: 1,
 			height: 1,
 		},
 	},
@@ -187,8 +181,8 @@ const stashConfig = GameConfigSchema.parse({
 		"item:key": simpleItem("item:key"),
 		"item:coin": simpleItem("item:coin"),
 		"item:gem": simpleItem("item:gem"),
-		"item:board-a": simpleItem("item:board-a", "board"),
-		"item:board-b": simpleItem("item:board-b", "board"),
+		"item:board-a": simpleItem("item:board-a"),
+		"item:board-b": simpleItem("item:board-b"),
 		"item:blocker": simpleItem("item:blocker"),
 	},
 });

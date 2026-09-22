@@ -12,7 +12,6 @@
 				"lit-carved-pumpkin"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -69,7 +68,6 @@
 								"type": "item",
 								"itemId": "ghost"
 							},
-							"scope": "board",
 							"distance": "near-close"
 						},
 						"mode": "consume",
@@ -89,7 +87,6 @@
 								"type": "item",
 								"itemId": "lit-carved-pumpkin"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}

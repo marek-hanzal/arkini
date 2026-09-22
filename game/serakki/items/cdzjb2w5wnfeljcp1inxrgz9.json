@@ -12,7 +12,6 @@
 				"plague"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 10000,

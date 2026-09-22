@@ -22,7 +22,7 @@ interface GameRuntimeCapabilities {
 const PixiGameRuntimeContext = createContext<GameRuntimeCapabilities | undefined>(undefined);
 
 /**
- * Owns route-local capabilities that must survive Board and Inventory scene alternation.
+ * Owns route-local capabilities that must survive Board scene lifetime.
  *
  * Individual scene runtimes still own their canvases, actors, and subscriptions. The deferred
  * cleanup prevents a React development remount from disposing capabilities that the surviving

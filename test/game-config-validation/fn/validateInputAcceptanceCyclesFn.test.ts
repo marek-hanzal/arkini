@@ -15,7 +15,7 @@ const materials = (selector: SelectorSchema.Type) => [
 	{
 		type: "materials" as const,
 		query: {
-			scope: "any" as const,
+			distance: "far" as const,
 			selector,
 		},
 		quantity: {

@@ -1,11 +1,11 @@
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 export namespace readDeliveryTravelDurationMsFn {
 	export interface Props {
-		readonly from: GridLocationSchema.Type;
-		readonly to: GridLocationSchema.Type;
+		readonly from: BoardLocationSchema.Type;
+		readonly to: BoardLocationSchema.Type;
 	}
 }
 
@@ -13,7 +13,7 @@ const minimumSameSurfaceDurationMs = 300;
 const millisecondsPerTile = 120;
 const crossSurfaceDurationMs = 500;
 
-const isSameSurfaceFn = (from: GridLocationSchema.Type, to: GridLocationSchema.Type) =>
+const isSameSurfaceFn = (from: BoardLocationSchema.Type, to: BoardLocationSchema.Type) =>
 	from.scope === to.scope &&
 	(from.scope !== LocationScopeEnumSchema.enum.Board ||
 		(to.scope === LocationScopeEnumSchema.enum.Board && from.space === to.space));

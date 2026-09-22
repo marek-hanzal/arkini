@@ -7,12 +7,11 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
@@ -90,7 +89,7 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				entityId: runtimeSecond.id,
 				expectedRevision: secondItemRevision,
 			});
-			const first = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeFirst));
+			const first = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeFirst));
 			if (first === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -99,7 +98,7 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			const second = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSecond));
+			const second = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSecond));
 			if (second === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -182,10 +181,10 @@ export namespace commitSwapDropFx {
 	export interface Props {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
+		readonly sourceLocation: BoardLocationSchema.Type;
 		readonly targetItemId: IdSchema.Type;
 		readonly targetRevision: RevisionSchema.Type;
-		readonly targetLocation: GridLocationSchema.Type;
+		readonly targetLocation: BoardLocationSchema.Type;
 	}
 }
 

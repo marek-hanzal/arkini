@@ -5,7 +5,7 @@ import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerS
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -16,14 +16,14 @@ class ItemAlreadyExistsError extends Data.TaggedError("ItemAlreadyExistsError")<
 
 class TestLocationOccupiedError extends Data.TaggedError("TestLocationOccupiedError")<{
 	itemId: IdSchema.Type;
-	location: GridLocationSchema.Type;
+	location: BoardLocationSchema.Type;
 }> {}
 
 export namespace spawnItemFx {
 	export interface Props {
 		id: IdSchema.Type;
 		itemId: IdSchema.Type;
-		location: GridLocationSchema.Type;
+		location: BoardLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 	}
 }

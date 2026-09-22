@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 import {
-	inputRuntimeToolbarTestConfig,
+	inputRuntimeTestConfig,
 	sourceLocation,
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
@@ -11,7 +11,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { autofillLineInputFx } from "~/production-input/fx/autofillLineInputFx";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
@@ -28,14 +28,14 @@ const selector = {
 } as const;
 const configFn = (queries: ReadonlyArray<QuerySchema.Type>) =>
 	GameConfigSchema.parse({
-		...inputRuntimeToolbarTestConfig,
+		...inputRuntimeTestConfig,
 		items: {
-			...inputRuntimeToolbarTestConfig.items,
+			...inputRuntimeTestConfig.items,
 			workshop: {
-				...inputRuntimeToolbarTestConfig.items.workshop,
+				...inputRuntimeTestConfig.items.workshop,
 				lines: [
 					{
-						...inputRuntimeToolbarTestConfig.items.workshop.lines[0],
+						...inputRuntimeTestConfig.items.workshop.lines[0],
 						id: target.lineId,
 						input: queries.map((query) => ({
 							type: "materials",
@@ -54,7 +54,7 @@ const configFn = (queries: ReadonlyArray<QuerySchema.Type>) =>
 const locations: ReadonlyArray<
 	readonly [
 		string,
-		GridLocationSchema.Type,
+		BoardLocationSchema.Type,
 	]
 > = [
 	[
@@ -76,26 +76,6 @@ const locations: ReadonlyArray<
 			space: 1,
 		},
 	],
-	[
-		"inventory",
-		{
-			scope: "inventory",
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-	],
-	[
-		"toolbar",
-		{
-			scope: "toolbar",
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-	],
 ];
 const spawnFx = Effect.gen(function* () {
 	yield* spawnItemFx({
@@ -113,10 +93,57 @@ const spawnFx = Effect.gen(function* () {
 		});
 });
 
+it("delivers universe material from another board space through ordinary settlement", () => {
+	const config = configFn([
+		{
+			distance: "universe" as const,
+			selector,
+		},
+	]);
+	Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "owner",
+				itemId: "workshop",
+				location: workshopLocation,
+				quantity: 1,
+			});
+			yield* spawnItemFx({
+				id: "remote",
+				itemId: "water",
+				location: {
+					...sourceLocation(1),
+					space: 1,
+				},
+				quantity: 1,
+			});
+			expect(
+				yield* autofillLineInputFx({
+					...target,
+					inputIndex: 0,
+				}),
+			).toBe(1);
+			yield* runTickRuntimeByFx({
+				elapsedMs: 1000,
+			});
+			const runtime = yield* readRuntimeFx();
+			expect(runtime.items.find((item) => item.id === "remote")?.location).toMatchObject({
+				scope: "input",
+				ownerItemId: "owner",
+				inputIndex: 0,
+			});
+			expect(runtime.jobs).toEqual([]);
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+});
+
 it.each([
 	[
 		{
-			scope: "board",
 			distance: "near-close",
 			selector,
 		},
@@ -127,46 +154,24 @@ it.each([
 	],
 	[
 		{
-			scope: "inventory",
-			selector,
-		},
-		[
-			"inventory",
-		],
-	],
-	[
-		{
-			scope: "toolbar",
-			selector,
-		},
-		[
-			"toolbar",
-		],
-	],
-	[
-		{
-			scope: "any",
+			distance: "far" as const,
 			selector,
 		},
 		[
 			"close",
 			"near",
 			"far",
-			"toolbar",
-			"inventory",
 		],
 	],
 	[
 		{
-			scope: "universe",
+			distance: "universe" as const,
 			selector,
 		},
 		[
 			"close",
 			"near",
 			"far",
-			"toolbar",
-			"inventory",
 			"remote",
 		],
 	],
@@ -218,25 +223,21 @@ it.each([
 		),
 	);
 });
-
 it("allocates same-definition instances by each slot's reach without double spending shared stock", () => {
 	const queries: QuerySchema.Type[] = [
 		{
-			scope: "board",
 			distance: "near",
 			selector,
 		},
 		{
-			scope: "inventory",
+			distance: "far" as const,
 			selector,
 		},
 		{
-			scope: "board",
 			distance: "near",
 			selector,
 		},
 		{
-			scope: "board",
 			distance: "near",
 			selector,
 		},
@@ -256,13 +257,13 @@ it("allocates same-definition instances by each slot's reach without double spen
 					quantity: 1,
 				},
 				{
-					inputIndex: 1,
-					sourceItemId: "inventory",
+					inputIndex: 2,
+					sourceItemId: "near",
 					quantity: 1,
 				},
 				{
-					inputIndex: 2,
-					sourceItemId: "near",
+					inputIndex: 1,
+					sourceItemId: "close",
 					quantity: 1,
 				},
 			]);
@@ -274,10 +275,9 @@ it("allocates same-definition instances by each slot's reach without double spen
 		),
 	);
 });
-
 it("keeps delivery remainder visibility tied to its origin and accepts manual material outside autofill reach", () => {
 	const query = {
-		scope: "inventory",
+		distance: "close" as const,
 		selector,
 	} as const;
 	Effect.runSync(
@@ -290,7 +290,7 @@ it("keeps delivery remainder visibility tied to its origin and accepts manual ma
 				}),
 			).toBe(1);
 			const runtime = yield* readRuntimeFx();
-			expect(runtime.items.find((item) => item.id === "inventory")?.location.scope).toBe(
+			expect(runtime.items.find((item) => item.id === "close")?.location.scope).toBe(
 				"delivery",
 			);
 			expect(
@@ -305,11 +305,11 @@ it("keeps delivery remainder visibility tied to its origin and accepts manual ma
 					ownerItemId: "owner",
 					runtime,
 					query: {
-						scope: "toolbar",
+						distance: "far" as const,
 						selector,
 					},
 				})).availableQuantity,
-			).toBe(2);
+			).toBe(5);
 			const source = runtime.items.find((item) => item.id === "far")!;
 			yield* storeInputMaterialFx({
 				...target,
@@ -335,63 +335,13 @@ it("keeps delivery remainder visibility tied to its origin and accepts manual ma
 		),
 	);
 });
-
-it("delivers universe material from another board space through ordinary settlement", () => {
-	const config = configFn([
-		{
-			scope: "universe",
-			selector,
-		},
-	]);
-	Effect.runSync(
-		Effect.gen(function* () {
-			yield* spawnItemFx({
-				id: "owner",
-				itemId: "workshop",
-				location: workshopLocation,
-				quantity: 1,
-			});
-			yield* spawnItemFx({
-				id: "remote",
-				itemId: "water",
-				location: {
-					...sourceLocation(1),
-					space: 1,
-				},
-				quantity: 1,
-			});
-			expect(
-				yield* autofillLineInputFx({
-					...target,
-					inputIndex: 0,
-				}),
-			).toBe(1);
-			yield* runTickRuntimeByFx({
-				elapsedMs: 1000,
-			});
-			const runtime = yield* readRuntimeFx();
-			expect(runtime.items.find((item) => item.id === "remote")?.location).toMatchObject({
-				scope: "input",
-				ownerItemId: "owner",
-				inputIndex: 0,
-			});
-			expect(runtime.jobs).toEqual([]);
-		}).pipe(
-			useGameFx({
-				config,
-			}),
-		),
-	);
-});
-
 it("fills a narrow minimum before a broad earlier slot can steal its only source", () => {
 	const config = configFn([
 		{
-			scope: "any",
+			distance: "far" as const,
 			selector,
 		},
 		{
-			scope: "board",
 			distance: "close",
 			selector,
 		},
@@ -411,15 +361,9 @@ it("fills a narrow minimum before a broad earlier slot can steal its only source
 				quantity: 1,
 			});
 			yield* spawnItemFx({
-				id: "inventory",
+				id: "far",
 				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
+				location: sourceLocation(3),
 				quantity: 1,
 			});
 			const runtime = yield* readRuntimeFx();
@@ -435,7 +379,7 @@ it("fills a narrow minimum before a broad earlier slot can steal its only source
 				},
 				{
 					inputIndex: 0,
-					sourceItemId: "inventory",
+					sourceItemId: "far",
 					quantity: 1,
 				},
 			]);

@@ -173,7 +173,6 @@ it("rolls back the selected line clear when its buffered material cannot return"
 			...config.items,
 			tool: {
 				...config.items.tool,
-				scope: "board",
 			},
 		},
 	});

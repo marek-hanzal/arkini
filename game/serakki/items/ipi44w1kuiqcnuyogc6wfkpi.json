@@ -12,7 +12,6 @@
 				"pig-farm"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -38,7 +37,6 @@
 								"type": "item",
 								"itemId": "pig-pen"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -49,7 +47,7 @@
 								"type": "item",
 								"itemId": "grain"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -64,7 +62,7 @@
 								"type": "item",
 								"itemId": "bucket-with-water"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -126,7 +124,7 @@
 								"type": "item",
 								"itemId": "planks"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -179,7 +177,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

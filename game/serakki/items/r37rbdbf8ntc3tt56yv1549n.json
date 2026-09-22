@@ -12,7 +12,6 @@
 				"house-t1"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -34,7 +33,7 @@
 								"type": "item",
 								"itemId": "copper-pan-with-cooked-steak"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

@@ -3,12 +3,12 @@ import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import { queryFx } from "~/item-query/fx/queryFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 export namespace whenFx {
 	export interface Props {
-		origin: GridLocationSchema.Type;
+		origin: BoardLocationSchema.Type;
 		when: WhenSchema.Type;
 	}
 }
@@ -20,10 +20,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 	const items = yield* queryFx({
 		origin,
 		query: when.query,
-	}).pipe(Effect.catchTag("BoardQueryOriginUnavailableError", () => Effect.succeed(undefined)));
-	// A missing physical Board origin makes the condition unavailable, not an
-	// empty query that could accidentally satisfy count: 0 or a zero-based range.
-	if (items === undefined) return false;
+	});
 	const quantity = items.reduce((total, item) => {
 		return total + item.quantity;
 	}, 0);

@@ -2,7 +2,7 @@ export interface SurfaceLayout {
 	readonly cellSize: number;
 	readonly columns: number;
 	readonly height: number;
-	readonly kind: "board" | "inventory" | "toolbar";
+	readonly kind: "board";
 	readonly rows: number;
 	readonly width: number;
 	readonly x: number;
@@ -11,13 +11,5 @@ export interface SurfaceLayout {
 
 export interface MainLayout {
 	readonly board: SurfaceLayout;
-	readonly toolbar: SurfaceLayout | null;
-	readonly toolbarGap: number;
 	readonly viewportPadding: number;
-}
-
-export interface InventoryLayout {
-	/** Inventory actors and slots share fixed world-cell geometry. */
-	readonly actorSize: number;
-	readonly surface: SurfaceLayout;
 }

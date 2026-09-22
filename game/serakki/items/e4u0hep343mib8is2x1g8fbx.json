@@ -12,7 +12,6 @@
 				"coffee-plant"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 1800000,

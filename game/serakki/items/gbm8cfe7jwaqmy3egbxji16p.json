@@ -13,7 +13,6 @@
 				"flint-and-steel"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 2,
 		"units": {
 			"amount": 24

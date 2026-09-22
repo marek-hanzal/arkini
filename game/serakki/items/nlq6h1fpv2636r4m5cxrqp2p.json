@@ -12,7 +12,6 @@
 				"clay-mug-with-lye"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 4,
 		"maxQueueSize": 1,
 		"lines": []

@@ -12,7 +12,6 @@
 				"well-fed-sarka"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 5000,

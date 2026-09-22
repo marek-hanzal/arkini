@@ -6,7 +6,7 @@ import { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 const fixedInput = MaterialSchema.parse({
 	type: "materials",
 	query: {
-		scope: "any",
+		distance: "far" as const,
 		selector: {
 			type: "item",
 			itemId: "item:water",
@@ -60,7 +60,7 @@ describe("resolveInputMaterialFn", () => {
 		const input = MaterialSchema.parse({
 			type: "materials",
 			query: {
-				scope: "any",
+				distance: "far" as const,
 				selector: {
 					type: "item",
 					itemId: "item:fuel",

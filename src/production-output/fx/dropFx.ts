@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -10,7 +10,7 @@ import { rollQuantityFx } from "./rollQuantityFx";
 
 interface Props {
 	readonly drop: DropSchema.Type;
-	readonly origin: GridLocationSchema.Type;
+	readonly origin: BoardLocationSchema.Type;
 }
 
 export namespace dropFx {

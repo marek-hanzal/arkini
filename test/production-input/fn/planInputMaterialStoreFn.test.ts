@@ -7,7 +7,7 @@ import { runtimeInputTestItem } from "~test/production-input/support/inputTestIt
 const input = MaterialSchema.parse({
 	type: "materials",
 	query: {
-		scope: "any",
+		distance: "far" as const,
 		selector: {
 			type: "item",
 			itemId: "item:water",

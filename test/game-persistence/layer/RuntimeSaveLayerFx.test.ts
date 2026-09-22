@@ -86,49 +86,6 @@ describe("RuntimeSaveLayerFx", () => {
 		},
 	);
 
-	it.effect("does not deduplicate a snapshot skipped while saving is disabled", () => {
-		let enabled = false;
-		const saves: StateSchema.Type[] = [];
-		const core = GameRuntimeLayerFx({
-			config: createJobTestConfig(),
-		});
-		const save = RuntimeSaveLayerFx({
-			debounceMs: 15,
-			isEnabledFn: () => enabled,
-			saveFx: (state) =>
-				Effect.sync(() => {
-					saves.push(state);
-				}),
-		}).pipe(Layer.provide(core));
-
-		return Effect.gen(function* () {
-			const runtimeSave = yield* RuntimeSaveFx;
-			yield* spawnItemFx({
-				id: "runtime:save:admission",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			});
-			yield* TestClock.adjust(15);
-			yield* runtimeSave.flush;
-			expect(saves).toHaveLength(0);
-
-			enabled = true;
-			yield* runtimeSave.flush;
-			expect(saves).toHaveLength(1);
-			expect(saves[0]?.items).toHaveLength(1);
-			yield* runtimeSave.flush;
-			expect(saves).toHaveLength(1);
-			yield* runtimeSave.discard;
-		}).pipe(Effect.provide(Layer.merge(core, save)));
-	});
-
 	it("preserves an exact mixed autosave Cause", async () => {
 		const mixedCause = Cause.combine(
 			Cause.fail(new Error("save typed failure")),
@@ -202,195 +159,6 @@ describe("RuntimeSaveLayerFx", () => {
 		} finally {
 			unsubscribe();
 			await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save defect");
-		}
-	});
-
-	it.effect("debounces committed snapshots and ignores failed mutations", () => {
-		const saves: StateSchema.Type[] = [];
-		const core = GameRuntimeLayerFx({
-			config: createJobTestConfig(),
-		});
-		const save = RuntimeSaveLayerFx({
-			debounceMs: 15,
-			saveFx: (state) =>
-				Effect.sync(() => {
-					saves.push(state);
-				}),
-		}).pipe(Layer.provide(core));
-
-		return Effect.gen(function* () {
-			const runtimeSave = yield* RuntimeSaveFx;
-			const first = yield* spawnItemFx({
-				id: "runtime:save:first",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			});
-			yield* spawnItemFx({
-				id: "runtime:save:second",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 1,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			});
-
-			yield* TestClock.adjust(15);
-			expect(saves).toHaveLength(1);
-			expect(saves[0]?.items).toHaveLength(2);
-			for (const item of saves[0]?.items ?? []) {
-				expect(item).not.toHaveProperty("revision");
-			}
-
-			const failure = yield* removeRuntimeItemForTestFx({
-				itemId: first.id,
-				revision: "revision:stale",
-			}).pipe(Effect.flip);
-			expect(failure).toBeDefined();
-			yield* runtimeSave.flush;
-			expect(saves).toHaveLength(1);
-			yield* runtimeSave.discard;
-		}).pipe(Effect.provide(Layer.merge(core, save)));
-	});
-
-	it.effect("does not let event-only traffic wake or postpone runtime autosave", () => {
-		const savedItemCounts: number[] = [];
-		const core = GameRuntimeLayerFx({
-			config: createJobTestConfig(),
-		});
-		const save = RuntimeSaveLayerFx({
-			debounceMs: 40,
-			saveFx: (state) =>
-				Effect.sync(() => {
-					savedItemCounts.push(state.items.length);
-				}),
-		}).pipe(Layer.provide(core));
-
-		return Effect.gen(function* () {
-			const runtimeSave = yield* RuntimeSaveFx;
-			yield* TestClock.adjust(40);
-			expect(savedItemCounts).toEqual([
-				0,
-			]);
-
-			yield* spawnItemFx({
-				id: "runtime:save:event-isolation",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			});
-
-			yield* TestClock.adjust(15);
-			yield* emitCompletedEventFx("job:save:event:0");
-			yield* TestClock.adjust(15);
-			yield* emitCompletedEventFx("job:save:event:1");
-			yield* TestClock.adjust(9);
-			yield* emitCompletedEventFx("job:save:event:2");
-			expect(savedItemCounts).toEqual([
-				0,
-			]);
-
-			yield* TestClock.adjust(1);
-			expect(savedItemCounts).toEqual([
-				0,
-				1,
-			]);
-
-			yield* emitCompletedEventFx("job:save:event:after-save");
-			yield* TestClock.adjust(60);
-			expect(savedItemCounts).toEqual([
-				0,
-				1,
-			]);
-			yield* runtimeSave.discard;
-		}).pipe(Effect.provide(Layer.merge(core, save)));
-	});
-
-	it("serializes autosave and explicit flush so an older write cannot win", async () => {
-		const savedItemCounts: number[] = [];
-		let releaseFirstSave: (() => void) | undefined;
-		let markFirstSaveStarted: (() => void) | undefined;
-		const firstSaveStarted = new Promise<void>((resolve) => {
-			markFirstSaveStarted = resolve;
-		});
-		const firstSaveGate = new Promise<void>((resolve) => {
-			releaseFirstSave = resolve;
-		});
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 0,
-				writeFx: (state) =>
-					Effect.promise(async () => {
-						if (state.items.length === 1) {
-							markFirstSaveStarted?.();
-							await firstSaveGate;
-						}
-						savedItemCounts.push(state.items.length);
-					}),
-			},
-		});
-
-		try {
-			await session.runFn(
-				spawnItemFx({
-					id: "runtime:save:race:first",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			await firstSaveStarted;
-			await session.runFn(
-				spawnItemFx({
-					id: "runtime:save:race:second",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-
-			const flush = Effect.runPromise(session.flushSaveFx);
-			releaseFirstSave?.();
-			await flush;
-
-			expect(savedItemCounts).toEqual([
-				0,
-				1,
-				2,
-			]);
-		} finally {
-			releaseFirstSave?.();
-			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -479,92 +247,203 @@ describe("RuntimeSaveLayerFx", () => {
 			"second dispose completed",
 		]);
 	});
+});
 
-	it("closes command admission before starting a slow final save", async () => {
-		const saves: StateSchema.Type[] = [];
-		const commandStarted = Effect.runSync(Deferred.make<void>());
-		const releaseCommand = Effect.runSync(Deferred.make<void>());
-		let markSaveStarted: (() => void) | undefined;
-		let releaseSave: (() => void) | undefined;
-		const saveStarted = new Promise<void>((resolve) => {
-			markSaveStarted = resolve;
-		});
-		const saveGate = new Promise<void>((resolve) => {
-			releaseSave = resolve;
-		});
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 60_000,
-				writeFx: (state) =>
-					Effect.promise(async () => {
-						saves.push(state);
-						markSaveStarted?.();
-						await saveGate;
-					}),
+it.effect("does not deduplicate a snapshot skipped while saving is disabled", () => {
+	let enabled = false;
+	const saves: StateSchema.Type[] = [];
+	const core = GameRuntimeLayerFx({
+		config: createJobTestConfig(),
+	});
+	const save = RuntimeSaveLayerFx({
+		debounceMs: 15,
+		isEnabledFn: () => enabled,
+		saveFx: (state) =>
+			Effect.sync(() => {
+				saves.push(state);
+			}),
+	}).pipe(Layer.provide(core));
+
+	return Effect.gen(function* () {
+		const runtimeSave = yield* RuntimeSaveFx;
+		yield* spawnItemFx({
+			id: "runtime:save:admission",
+			itemId: "water",
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
 			},
+			quantity: 1,
 		});
-		const command = session
-			.runFn(
-				Deferred.succeed(commandStarted, undefined).pipe(
-					Effect.andThen(Deferred.await(releaseCommand)),
-					Effect.andThen(
-						spawnItemFx({
-							id: "runtime:save:command-during-flush",
-							itemId: "water",
-							location: {
-								scope: "inventory",
-								position: {
-									x: 0,
-									y: 0,
-								},
-							},
-							quantity: 1,
-						}),
-					),
-				),
-			)
-			.then(
-				() => "completed" as const,
-				() => "interrupted" as const,
-			);
-		await Effect.runPromise(Deferred.await(commandStarted));
+		yield* TestClock.adjust(15);
+		yield* runtimeSave.flush;
+		expect(saves).toHaveLength(0);
 
-		const dispose = Effect.runPromise(session.disposeFx);
-		await saveStarted;
-		Effect.runSync(Deferred.succeed(releaseCommand, undefined));
-		try {
-			expect(await command).toBe("interrupted");
-		} finally {
-			releaseSave?.();
-			await dispose;
+		enabled = true;
+		yield* runtimeSave.flush;
+		expect(saves).toHaveLength(1);
+		expect(saves[0]?.items).toHaveLength(1);
+		yield* runtimeSave.flush;
+		expect(saves).toHaveLength(1);
+		yield* runtimeSave.discard;
+	}).pipe(Effect.provide(Layer.merge(core, save)));
+});
+it.effect("debounces committed snapshots and ignores failed mutations", () => {
+	const saves: StateSchema.Type[] = [];
+	const core = GameRuntimeLayerFx({
+		config: createJobTestConfig(),
+	});
+	const save = RuntimeSaveLayerFx({
+		debounceMs: 15,
+		saveFx: (state) =>
+			Effect.sync(() => {
+				saves.push(state);
+			}),
+	}).pipe(Layer.provide(core));
+
+	return Effect.gen(function* () {
+		const runtimeSave = yield* RuntimeSaveFx;
+		const first = yield* spawnItemFx({
+			id: "runtime:save:first",
+			itemId: "water",
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			quantity: 1,
+		});
+		yield* spawnItemFx({
+			id: "runtime:save:second",
+			itemId: "water",
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+			quantity: 1,
+		});
+
+		yield* TestClock.adjust(15);
+		expect(saves).toHaveLength(1);
+		expect(saves[0]?.items).toHaveLength(2);
+		for (const item of saves[0]?.items ?? []) {
+			expect(item).not.toHaveProperty("revision");
 		}
 
+		const failure = yield* removeRuntimeItemForTestFx({
+			itemId: first.id,
+			revision: "revision:stale",
+		}).pipe(Effect.flip);
+		expect(failure).toBeDefined();
+		yield* runtimeSave.flush;
 		expect(saves).toHaveLength(1);
-		expect(saves[0]?.items).toHaveLength(0);
+		yield* runtimeSave.discard;
+	}).pipe(Effect.provide(Layer.merge(core, save)));
+});
+it.effect("does not let event-only traffic wake or postpone runtime autosave", () => {
+	const savedItemCounts: number[] = [];
+	const core = GameRuntimeLayerFx({
+		config: createJobTestConfig(),
 	});
+	const save = RuntimeSaveLayerFx({
+		debounceMs: 40,
+		saveFx: (state) =>
+			Effect.sync(() => {
+				savedItemCounts.push(state.items.length);
+			}),
+	}).pipe(Layer.provide(core));
 
-	it("flushes the latest committed runtime when the session is disposed", async () => {
-		const saves: StateSchema.Type[] = [];
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 60_000,
-				writeFx: (state) =>
-					Effect.sync(() => {
-						saves.push(state);
-					}),
+	return Effect.gen(function* () {
+		const runtimeSave = yield* RuntimeSaveFx;
+		yield* TestClock.adjust(40);
+		expect(savedItemCounts).toEqual([
+			0,
+		]);
+
+		yield* spawnItemFx({
+			id: "runtime:save:event-isolation",
+			itemId: "water",
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
 			},
+			quantity: 1,
 		});
 
+		yield* TestClock.adjust(15);
+		yield* emitCompletedEventFx("job:save:event:0");
+		yield* TestClock.adjust(15);
+		yield* emitCompletedEventFx("job:save:event:1");
+		yield* TestClock.adjust(9);
+		yield* emitCompletedEventFx("job:save:event:2");
+		expect(savedItemCounts).toEqual([
+			0,
+		]);
+
+		yield* TestClock.adjust(1);
+		expect(savedItemCounts).toEqual([
+			0,
+			1,
+		]);
+
+		yield* emitCompletedEventFx("job:save:event:after-save");
+		yield* TestClock.adjust(60);
+		expect(savedItemCounts).toEqual([
+			0,
+			1,
+		]);
+		yield* runtimeSave.discard;
+	}).pipe(Effect.provide(Layer.merge(core, save)));
+});
+it("serializes autosave and explicit flush so an older write cannot win", async () => {
+	const savedItemCounts: number[] = [];
+	let releaseFirstSave: (() => void) | undefined;
+	let markFirstSaveStarted: (() => void) | undefined;
+	const firstSaveStarted = new Promise<void>((resolve) => {
+		markFirstSaveStarted = resolve;
+	});
+	const firstSaveGate = new Promise<void>((resolve) => {
+		releaseFirstSave = resolve;
+	});
+	const session = await createTestGameSession({
+		config: createJobTestConfig(),
+		tickIntervalMs: 60_000,
+		save: {
+			debounceMs: 0,
+			writeFx: (state) =>
+				Effect.promise(async () => {
+					if (state.items.length === 1) {
+						markFirstSaveStarted?.();
+						await firstSaveGate;
+					}
+					savedItemCounts.push(state.items.length);
+				}),
+		},
+	});
+
+	try {
 		await session.runFn(
 			spawnItemFx({
-				id: "runtime:save:dispose",
+				id: "runtime:save:race:first",
 				itemId: "water",
 				location: {
-					scope: "inventory",
+					scope: "board" as const,
+					space: 0,
 					position: {
 						x: 0,
 						y: 0,
@@ -573,9 +452,133 @@ describe("RuntimeSaveLayerFx", () => {
 				quantity: 1,
 			}),
 		);
-		await Effect.runPromise(session.disposeFx);
+		await firstSaveStarted;
+		await session.runFn(
+			spawnItemFx({
+				id: "runtime:save:race:second",
+				itemId: "water",
+				location: {
+					scope: "board" as const,
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
 
-		expect(saves).toHaveLength(1);
-		expect(saves[0]?.items).toHaveLength(1);
+		const flush = Effect.runPromise(session.flushSaveFx);
+		releaseFirstSave?.();
+		await flush;
+
+		expect(savedItemCounts).toEqual([
+			0,
+			1,
+			2,
+		]);
+	} finally {
+		releaseFirstSave?.();
+		await Effect.runPromise(session.disposeFx);
+	}
+});
+it("closes command admission before starting a slow final save", async () => {
+	const saves: StateSchema.Type[] = [];
+	const commandStarted = Effect.runSync(Deferred.make<void>());
+	const releaseCommand = Effect.runSync(Deferred.make<void>());
+	let markSaveStarted: (() => void) | undefined;
+	let releaseSave: (() => void) | undefined;
+	const saveStarted = new Promise<void>((resolve) => {
+		markSaveStarted = resolve;
 	});
+	const saveGate = new Promise<void>((resolve) => {
+		releaseSave = resolve;
+	});
+	const session = await createTestGameSession({
+		config: createJobTestConfig(),
+		tickIntervalMs: 60_000,
+		save: {
+			debounceMs: 60_000,
+			writeFx: (state) =>
+				Effect.promise(async () => {
+					saves.push(state);
+					markSaveStarted?.();
+					await saveGate;
+				}),
+		},
+	});
+	const command = session
+		.runFn(
+			Deferred.succeed(commandStarted, undefined).pipe(
+				Effect.andThen(Deferred.await(releaseCommand)),
+				Effect.andThen(
+					spawnItemFx({
+						id: "runtime:save:command-during-flush",
+						itemId: "water",
+						location: {
+							scope: "board" as const,
+							space: 0,
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					}),
+				),
+			),
+		)
+		.then(
+			() => "completed" as const,
+			() => "interrupted" as const,
+		);
+	await Effect.runPromise(Deferred.await(commandStarted));
+
+	const dispose = Effect.runPromise(session.disposeFx);
+	await saveStarted;
+	Effect.runSync(Deferred.succeed(releaseCommand, undefined));
+	try {
+		expect(await command).toBe("interrupted");
+	} finally {
+		releaseSave?.();
+		await dispose;
+	}
+
+	expect(saves).toHaveLength(1);
+	expect(saves[0]?.items).toHaveLength(0);
+});
+it("flushes the latest committed runtime when the session is disposed", async () => {
+	const saves: StateSchema.Type[] = [];
+	const session = await createTestGameSession({
+		config: createJobTestConfig(),
+		tickIntervalMs: 60_000,
+		save: {
+			debounceMs: 60_000,
+			writeFx: (state) =>
+				Effect.sync(() => {
+					saves.push(state);
+				}),
+		},
+	});
+
+	await session.runFn(
+		spawnItemFx({
+			id: "runtime:save:dispose",
+			itemId: "water",
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			quantity: 1,
+		}),
+	);
+	await Effect.runPromise(session.disposeFx);
+
+	expect(saves).toHaveLength(1);
+	expect(saves[0]?.items).toHaveLength(1);
 });

@@ -8,9 +8,8 @@ import type { ProjectRepositoryService } from "~/project-authoring/service/Proje
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { StartLocationSchema } from "~/game-start/schema/StartLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
-import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
 import { JsonToolInputSchema } from "./JsonToolInputSchema";
@@ -108,29 +107,20 @@ const DeleteItemInputSchema = z
 const EditProjectLayoutInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		board: SizeSchema.optional().describe("The complete replacement board size."),
-		inventory: SizeSchema.optional().describe("The complete replacement inventory size."),
-		toolbarSize: ToolbarSizeSchema.optional().describe(
-			"The replacement toolbar slot count; zero disables the toolbar.",
-		),
+		board: SizeSchema.describe("The complete replacement board size."),
 	})
 	.strict()
-	.refine(
-		({ board, inventory, toolbarSize }) =>
-			board !== undefined || inventory !== undefined || toolbarSize !== undefined,
-		"At least one layout value must be supplied.",
-	)
 	.meta({
 		$id: "urn:serakki:schema:mcp:edit-project-layout-input",
 		minProperties: 2,
 		title: "Edit project layout tool input",
-		description: "A revision-pinned patch of the board, inventory, and toolbar capacities.",
+		description: "A revision-pinned patch of the board size.",
 	});
 
 const SetStartItemInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		location: StartLocationSchema.describe(
+		location: BoardLocationSchema.describe(
 			"The exact initial slot to set. Board locations require an explicit numeric space.",
 		),
 		itemId: IdSchema.describe("The exact canonical item ID to place initially."),
@@ -148,7 +138,7 @@ const SetStartItemInputSchema = z
 const RemoveStartItemInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		location: StartLocationSchema.describe(
+		location: BoardLocationSchema.describe(
 			"The exact initial slot to clear. Board locations require an explicit numeric space.",
 		),
 	})
@@ -202,7 +192,7 @@ const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(funct
 		`- Expiry outputs removed from: ${formatListFn(impact.removedExpiryOutputOwnerIds)}`,
 		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemId, lineId }) => `${ownerItemId}/${lineId}`))}`,
 		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemId, ruleNumber }) => `${ownerItemId}#${ruleNumber}`))}`,
-		`- Start entries removed: board ${impact.removedStartEntries.board}, inventory ${impact.removedStartEntries.inventory}, toolbar ${impact.removedStartEntries.toolbar}`,
+		`- Start entries removed: board ${impact.removedStartEntries.board}`,
 	);
 	return lines.join("\n");
 });
@@ -259,21 +249,19 @@ export const registerGameplayDesignToolsFn = ({
 		"edit_project_layout",
 		{
 			description:
-				"Patch one or more project layout capacities without replacing unrelated metadata. Shrinking rejects every authored start item that would fall outside the new board, inventory, or toolbar instead of deleting it. Read project_config first and copy its revision.",
+				"Patch one or more project layout capacities without replacing unrelated metadata. Shrinking rejects every authored start item that would fall outside the new board instead of deleting it. Read project_config first and copy its revision.",
 			inputSchema: EditProjectLayoutInputSchema,
 		},
-		async ({ board, inventory, revision, toolbarSize }) =>
+		async ({ board, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						editProjectLayoutFx({
 							board,
-							inventory,
 							notifyProjectChangedFn,
 							project,
 							repository,
 							revision,
-							toolbarSize,
 						}),
 					),
 				),
@@ -283,7 +271,7 @@ export const registerGameplayDesignToolsFn = ({
 		"set_start_item",
 		{
 			description:
-				"Insert or replace one exact initial item stack. A board location must include its numeric space; inventory and toolbar locations are global. The item must exist, support the target storage scope, fit the layout, and respect its stack limit. Read project_config first and copy its revision.",
+				"Insert or replace one exact initial item stack. A board location must include its numeric space. The item must exist, fit the layout, and respect its stack limit. Read project_config first and copy its revision.",
 			inputSchema: SetStartItemInputSchema,
 		},
 		async ({ itemId, location, quantity, revision }) =>
@@ -310,7 +298,7 @@ export const registerGameplayDesignToolsFn = ({
 		"remove_start_item",
 		{
 			description:
-				"Remove the item stack at one exact initial location. A board location must include its numeric space, so equal coordinates in another space remain untouched. Inventory and toolbar locations are global. Read project_config first and copy its revision.",
+				"Remove the item stack at one exact initial location. A board location must include its numeric space, so equal coordinates in another space remain untouched. Read project_config first and copy its revision.",
 			inputSchema: RemoveStartItemInputSchema,
 		},
 		async ({ location, revision }) =>

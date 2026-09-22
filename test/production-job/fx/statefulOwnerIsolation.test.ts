@@ -1,4 +1,4 @@
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 
@@ -19,10 +19,6 @@ const config = GameConfigSchema.parse({
 			width: 2,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -41,7 +37,6 @@ const config = GameConfigSchema.parse({
 					"artwork:producer",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 
 			lines: [
@@ -108,7 +103,6 @@ const config = GameConfigSchema.parse({
 					"artwork:limited",
 				],
 			},
-			scope: "board",
 			maxStackSize: 10,
 		},
 		blocker: {
@@ -125,7 +119,6 @@ const config = GameConfigSchema.parse({
 					"artwork:blocker",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 	},
@@ -193,136 +186,62 @@ describe("line start state owner isolation", () => {
 			quantity: 2,
 		});
 	});
+});
 
-	it("rolls back the job and split when no remainder placement is available", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx(2);
-				yield* spawnItemFx({
-					id: "runtime:blocker:board",
-					itemId: "blocker",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 1,
-							y: 0,
-						},
+it("replans against the latest capacity and publishes no transient start event", async () => {
+	const session = await createTestGameSession({
+		config,
+		tickIntervalMs: 60_000,
+	});
+	const eventBatches: unknown[] = [];
+
+	try {
+		await session.runFn(spawnOwnerFx(2));
+		const observed = session.getSnapshotFn();
+		expect(
+			observed.items.some(
+				(item) => item.location.scope === "board" && item.location.position.x === 1,
+			),
+		).toBe(false);
+
+		await session.runFn(
+			spawnItemFx({
+				id: "runtime:blocker:board",
+				itemId: "blocker",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
 					},
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker:inventory",
-					itemId: "blocker",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const before = yield* readRuntimeFx();
-				const started = yield* Effect.result(
+				},
+				quantity: 1,
+			}),
+		);
+		const before = session.getSnapshotFn();
+		const unsubscribe = session.subscribeEventsFn((batch) => {
+			eventBatches.push(batch);
+		});
+
+		try {
+			await expect(
+				session.runFn(
 					startLineFx({
 						ownerItemId: "runtime:producer",
 						lineId: "line:producer",
 					}),
-				);
-
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					started,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.started)).toBe(true);
-		if (Result.isFailure(result.started)) {
-			expect(result.started.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				itemId: "producer",
-				reason: "inventory:full",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
-
-	it("replans against the latest capacity and publishes no transient start event", async () => {
-		const session = await createTestGameSession({
-			config,
-			tickIntervalMs: 60_000,
-		});
-		const eventBatches: unknown[] = [];
-
-		try {
-			await session.runFn(spawnOwnerFx(2));
-			await session.runFn(
-				spawnItemFx({
-					id: "runtime:blocker:inventory",
-					itemId: "blocker",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			const observed = session.getSnapshotFn();
-			expect(
-				observed.items.some(
-					(item) => item.location.scope === "board" && item.location.position.x === 1,
 				),
-			).toBe(false);
-
-			await session.runFn(
-				spawnItemFx({
-					id: "runtime:blocker:board",
-					itemId: "blocker",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			const before = session.getSnapshotFn();
-			const unsubscribe = session.subscribeEventsFn((batch) => {
-				eventBatches.push(batch);
+			).rejects.toMatchObject({
+				_tag: "PlacementUnavailableError",
 			});
-
-			try {
-				await expect(
-					session.runFn(
-						startLineFx({
-							ownerItemId: "runtime:producer",
-							lineId: "line:producer",
-						}),
-					),
-				).rejects.toMatchObject({
-					_tag: "PlacementUnavailableError",
-				});
-				await new Promise((resolve) => setTimeout(resolve, 20));
-				expect(session.getSnapshotFn()).toEqual(before);
-				expect(eventBatches).toEqual([]);
-			} finally {
-				unsubscribe();
-			}
+			await new Promise((resolve) => setTimeout(resolve, 20));
+			expect(session.getSnapshotFn()).toEqual(before);
+			expect(eventBatches).toEqual([]);
 		} finally {
-			await Effect.runPromise(session.disposeFx);
+			unsubscribe();
 		}
-	});
+	} finally {
+		await Effect.runPromise(session.disposeFx);
+	}
 });

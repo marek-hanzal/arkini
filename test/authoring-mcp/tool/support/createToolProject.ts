@@ -26,28 +26,24 @@ export const createGraphProject = () => {
 				...base.start,
 				board: [
 					{
-						itemId: "forge",
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-				],
-				inventory: [
-					{
 						itemId: "water",
-						position: {
-							x: 0,
-							y: 0,
-						},
+						space: 0,
+						x: 1,
+						y: 0,
 						quantity: 3,
 					},
 					{
 						itemId: "tool",
-						position: {
-							x: 1,
-							y: 0,
-						},
+						space: 0,
+						x: 2,
+						y: 0,
 						quantity: 1,
+					},
+					{
+						itemId: "forge",
+						space: 0,
+						x: 0,
+						y: 0,
 					},
 				],
 			},

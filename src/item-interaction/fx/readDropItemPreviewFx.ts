@@ -1,8 +1,6 @@
 import { Effect, Option } from "effect";
-import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputStoreFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
@@ -13,7 +11,6 @@ import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -28,7 +25,6 @@ export namespace readDropItemPreviewFx {
 					| typeof DropItemResultKind.Move
 					| typeof DropItemResultKind.Swap
 					| typeof DropItemResultKind.Merge
-					| typeof DropItemResultKind.StoreInventory
 					| typeof DropItemResultKind.Stack;
 		  }
 		| {
@@ -89,7 +85,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
 		return rejectedFn(DropItemRejectedReason.StaleSource);
 	}
-	const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+	const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return rejectedFn(DropItemRejectedReason.InvalidSource);
 	}
@@ -111,23 +107,8 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		if (claim !== undefined) {
 			return rejectedFn(DropItemRejectedReason.Occupied);
 		}
-		if (
-			!isItemLocationScopeAllowedFn({
-				item: source.item,
-				locationScope: target.location.scope,
-			})
-		) {
-			return rejectedFn(DropItemRejectedReason.InvalidTarget);
-		}
 		const config = yield* GameConfigFx;
-		const targetSize = match(target.location.scope)
-			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
-			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
-			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
-				width: config.meta.toolbarSize ?? 0,
-				height: 1,
-			}))
-			.exhaustive();
+		const targetSize = config.meta.board;
 		if (
 			target.location.position.x >= targetSize.width ||
 			target.location.position.y >= targetSize.height
@@ -147,7 +128,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
 		return rejectedFn(DropItemRejectedReason.StaleTarget);
 	}
-	const targetItem = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTargetItem));
+	const targetItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTargetItem));
 	if (targetItem === undefined) {
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
@@ -178,14 +159,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	if (targetItem.item.action?.type === "space") {
-		if (
-			!isItemLocationScopeAllowedFn({
-				item: source.item,
-				locationScope: LocationScopeEnumSchema.enum.Board,
-			})
-		) {
-			return rejectedFn(DropItemRejectedReason.InvalidTarget);
-		}
 		const config = yield* GameConfigFx;
 		const destination = readEmptyLocationsFn({
 			locations: readBoardLocationsFn({
@@ -199,19 +172,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			: ({
 					kind: DropItemResultKind.Move,
 				} satisfies readDropItemPreviewFx.Result);
-	}
-	if (
-		source.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
-		targetItem.item.action?.type === "inventory"
-	) {
-		return isItemLocationScopeAllowedFn({
-			item: source.item,
-			locationScope: LocationScopeEnumSchema.enum.Inventory,
-		})
-			? ({
-					kind: DropItemResultKind.StoreInventory,
-				} satisfies readDropItemPreviewFx.Result)
-			: rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	if (target.inputStore !== undefined) {
 		const inputStore = resolveLineInputStoreFn({
@@ -265,17 +225,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 				reason: stackResolution.reason,
 			}),
 		);
-	}
-	const sourceScopeAllowed = isItemLocationScopeAllowedFn({
-		item: source.item,
-		locationScope: targetItem.location.scope,
-	});
-	const targetScopeAllowed = isItemLocationScopeAllowedFn({
-		item: targetItem.item,
-		locationScope: source.location.scope,
-	});
-	if (!sourceScopeAllowed || !targetScopeAllowed) {
-		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
 	return {
 		kind: DropItemResultKind.Swap,

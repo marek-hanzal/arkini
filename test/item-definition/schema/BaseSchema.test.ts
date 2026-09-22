@@ -18,7 +18,6 @@ describe("BaseSchema draft status", () => {
 					"legacy-item",
 				],
 			},
-			scope: "any",
 			maxStackSize: 1,
 		});
 

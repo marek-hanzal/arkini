@@ -4,7 +4,7 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameConfigSchema as GameConfig } from "~/game-config/schema/GameConfigSchema";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 
-type StartSurface = "board" | "inventory" | "toolbar";
+type StartSurface = "board";
 
 interface ItemCleanup {
 	readonly actionInputIndexes: Set<number>;
@@ -70,17 +70,11 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	});
 	const startIndexes: Record<StartSurface, Set<number>> = {
 		board: new Set(),
-		inventory: new Set(),
-		toolbar: new Set(),
 	};
 	const itemCleanups = new Map<string, ItemCleanup>();
 	for (const blocker of blockers) {
 		const [root, second, third, fourth, fifth] = blocker.path;
-		if (
-			root === "start" &&
-			(second === "board" || second === "inventory" || second === "toolbar") &&
-			typeof third === "number"
-		) {
+		if (root === "start" && second === "board" && typeof third === "number") {
 			startIndexes[second].add(third);
 			continue;
 		}
@@ -234,12 +228,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			start: {
 				...config.start,
 				board: config.start.board.filter((_entry, index) => !startIndexes.board.has(index)),
-				inventory: config.start.inventory.filter(
-					(_entry, index) => !startIndexes.inventory.has(index),
-				),
-				toolbar: config.start.toolbar.filter(
-					(_entry, index) => !startIndexes.toolbar.has(index),
-				),
 			},
 			items,
 		}),
@@ -252,8 +240,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			removedMergeRules,
 			removedStartEntries: {
 				board: startIndexes.board.size,
-				inventory: startIndexes.inventory.size,
-				toolbar: startIndexes.toolbar.size,
 			},
 		},
 	};

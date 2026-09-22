@@ -37,7 +37,6 @@ const seededConfig = GameConfigSchema.parse({
 			title: "Workshop",
 			description: "Existing workshop.",
 			maxQueueSize: 4,
-			scope: "board",
 			clock: {
 				intervalMs: 1000,
 			},

@@ -237,8 +237,6 @@ const readProjectTextFn = (project: Project) => {
 		`Serapack version: ${formatVersionFn(project.version)}`,
 		`Revision: ${project.revision}`,
 		`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
-		`Toolbar: ${project.config.meta.toolbarSize === undefined || project.config.meta.toolbarSize === 0 ? "disabled" : `${project.config.meta.toolbarSize} slots`}`,
-		`Inventory: ${project.config.meta.inventory.width} × ${project.config.meta.inventory.height}`,
 		`Hero artwork: ${project.config.resources.hero}`,
 		...(avatarResourceIds.length === 0
 			? []
@@ -273,7 +271,6 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 						"Description:",
 						...item.description.split("\n").map((line) => `  ${line}`),
 					]),
-			`Storage: ${item.scope}`,
 			`Stack capacity: ${item.maxStackSize}`,
 		].join("\n");
 	}),

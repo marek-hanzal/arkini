@@ -2,9 +2,6 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { releaseInventoryItemFx } from "~/item-interaction/fx/releaseInventoryItemFx";
-import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
-import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
@@ -133,78 +130,6 @@ describe("Clock schedule boundaries", () => {
 			remainingDurationMs: 600,
 		});
 		expect(result.resumed.jobs).toHaveLength(0);
-	});
-
-	it("keeps phase and lifetime running in Inventory before returning to Board", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnClockItemFx();
-				const running = yield* tickClockFx(100);
-				const activeOwner = running.items.find((item) => item.id === ownerItemId);
-				if (activeOwner === undefined || activeOwner.location.scope !== "board") {
-					return yield* Effect.die(new Error("Expected Clock owner on Board."));
-				}
-				const stored = yield* storeInventoryItemFx({
-					sourceItemId: activeOwner.id,
-					sourceRevision: activeOwner.revision,
-					sourceLocation: activeOwner.location,
-				});
-				if (stored.kind !== DropItemResultKind.StoreInventory) {
-					return yield* Effect.die(
-						new Error(`Expected Inventory store, received "${stored.kind}".`),
-					);
-				}
-				const storedAging = yield* tickClockFx(500);
-				const storedOwner = storedAging.items.find((item) => item.id === ownerItemId);
-				if (storedOwner === undefined || storedOwner.location.scope !== "inventory") {
-					return yield* Effect.die(new Error("Expected Clock in Inventory."));
-				}
-				yield* releaseInventoryItemFx({
-					itemId: storedOwner.id,
-					location: storedOwner.location,
-					revision: storedOwner.revision,
-				});
-				const resumed = yield* tickClockFx(100);
-				const pulsed = yield* tickClockFx(100);
-				return {
-					storedAging,
-					pulsed,
-					resumed,
-					running,
-				};
-			}).pipe(
-				useGameFx({
-					config: createClockConfig({
-						scope: "any",
-						clock: {
-							durationMs: 1_000,
-						},
-					}),
-				}),
-			),
-		);
-		expect(result.running.items[0].schedule).toMatchObject({
-			remainingIntervalMs: 150,
-			remainingDurationMs: 900,
-		});
-		expect(result.storedAging.items[0].schedule).toMatchObject({
-			remainingIntervalMs: 150,
-			remainingDurationMs: 400,
-		});
-		expect(result.resumed.items[0].schedule).toMatchObject({
-			remainingIntervalMs: 50,
-			remainingDurationMs: 300,
-		});
-		expect(result.pulsed.items[0].schedule).toMatchObject({
-			remainingIntervalMs: 200,
-			remainingDurationMs: 200,
-		});
-		expect(result.pulsed.jobs).toMatchObject([
-			{
-				lineId: "a",
-				remainingMs: 400,
-			},
-		]);
 	});
 
 	it("persists an empty Clock selection while timers age and keeps Default independent", () => {

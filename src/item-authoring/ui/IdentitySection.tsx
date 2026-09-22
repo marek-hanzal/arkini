@@ -10,25 +10,6 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 
 import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection";
 
-const scopeOptions = [
-	{
-		label: "Any",
-		value: "any",
-	},
-	{
-		label: "Board",
-		value: "board",
-	},
-	{
-		label: "Inventory",
-		value: "inventory",
-	},
-	{
-		label: "Toolbar",
-		value: "toolbar",
-	},
-] as const;
-
 export const IdentitySection = () => {
 	const { form } = useFormSession();
 	const translator = useTranslator();
@@ -66,18 +47,6 @@ export const IdentitySection = () => {
 						</form.AppField>
 					</div>
 					<div className="flex items-start justify-between gap-4">
-						<form.AppField name="scope">
-							{(field) => (
-								<field.ChoiceField
-									label={translator.textFn("Storage scope")}
-									description={<Mx label="Item storage scope help" />}
-									options={scopeOptions.map((option) => ({
-										...option,
-										label: translator.textFn(option.label),
-									}))}
-								/>
-							)}
-						</form.AppField>
 						<ItemInterfaceField />
 					</div>
 					<form.AppField name="maxStackSize">

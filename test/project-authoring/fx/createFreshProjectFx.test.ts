@@ -77,11 +77,6 @@ describe("createFreshProjectFx", () => {
 						width: 15,
 						height: 9,
 					},
-					inventory: {
-						width: 15,
-						height: 9,
-					},
-					toolbarSize: 15,
 				},
 				resources: {
 					hero: "hero",
@@ -95,8 +90,6 @@ describe("createFreshProjectFx", () => {
 				start: {
 					currentSpace: 0,
 					board: [],
-					inventory: [],
-					toolbar: [],
 				},
 				items: {},
 			},

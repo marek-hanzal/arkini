@@ -12,7 +12,6 @@
 				"cauldron-with-boiling-beeswax"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,

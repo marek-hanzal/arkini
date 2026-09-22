@@ -12,7 +12,6 @@
 				"clay-jug-with-milk"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

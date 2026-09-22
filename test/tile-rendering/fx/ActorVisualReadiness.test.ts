@@ -49,8 +49,6 @@ const palette = {
 	overlayForeground: 0xffffff,
 	success: 0x57d7b2,
 	surface: 0,
-	toolbarA: 0,
-	toolbarB: 0,
 } satisfies PixiScenePalette;
 
 const createItem = ({

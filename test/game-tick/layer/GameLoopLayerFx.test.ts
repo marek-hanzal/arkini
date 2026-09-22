@@ -88,7 +88,7 @@ describe("GameLoopLayerFx", () => {
 				const after = yield* readRuntimeFx();
 				expect(before.jobs[0]?.remainingMs).toBe(100);
 				expect(after.jobs).toEqual([]);
-				expect(after.items.some((item) => item.item.id === "inventoryOutput")).toBe(true);
+				expect(after.items.some((item) => item.item.id === "completionOutput")).toBe(true);
 			}).pipe(
 				Effect.provide(GameLoopLayerFx()),
 				Effect.provide(
@@ -135,11 +135,11 @@ describe("GameLoopLayerFx", () => {
 			const transitionAtBoundary = yield* (yield* CommittedTransitionsFx).read;
 
 			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(SimulationStepMs);
-			expect(beforeBoundary.items.some((item) => item.item.id === "inventoryOutput")).toBe(
+			expect(beforeBoundary.items.some((item) => item.item.id === "completionOutput")).toBe(
 				false,
 			);
 			expect(atBoundary.jobs).toEqual([]);
-			expect(atBoundary.items.some((item) => item.item.id === "inventoryOutput")).toBe(true);
+			expect(atBoundary.items.some((item) => item.item.id === "completionOutput")).toBe(true);
 			expect(transitionAtBoundary.sequence).toBe(transitionBeforeBoundary.sequence + 1);
 			expect(transitionAtBoundary.runtime).toBe(atBoundary);
 			expect(transitionAtBoundary.events.map((event) => event.type)).toEqual([

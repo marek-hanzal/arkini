@@ -74,11 +74,6 @@ describe("editor MCP project configuration", () => {
 							width: 3,
 							height: 2,
 						},
-						inventory: {
-							width: 1,
-							height: 1,
-						},
-						toolbarSize: 2,
 					},
 				},
 			}),
@@ -98,7 +93,6 @@ describe("editor MCP project configuration", () => {
 				width: 3,
 				height: 2,
 			},
-			toolbarSize: 2,
 		});
 		expect(project?.config.start).toEqual(editorTestPayload.config.start);
 		expect(project?.config.items).toEqual(editorTestPayload.config.items);

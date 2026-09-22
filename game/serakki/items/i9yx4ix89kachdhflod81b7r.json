@@ -14,7 +14,6 @@
 				"fruit-crate"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -142,7 +141,6 @@
 								"type": "item",
 								"itemId": "quest-fruit-t1"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -153,7 +151,7 @@
 								"type": "item",
 								"itemId": "fruit-crate"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

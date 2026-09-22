@@ -167,7 +167,6 @@ describe("resolveInputRunFx", () => {
 				input: {
 					type: "units",
 					query: {
-						scope: "board",
 						selector: {
 							type: "item",
 							itemId: "stone",

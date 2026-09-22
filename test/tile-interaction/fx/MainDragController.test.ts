@@ -55,7 +55,6 @@ describe("main drag controller: pointer", () => {
 
 	it.each([
 		"activate-space",
-		"open-inventory",
 	] as const)("preserves clicks for %s", async (kind) => {
 		for (const button of [
 			0,

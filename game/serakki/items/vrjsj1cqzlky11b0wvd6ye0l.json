@@ -12,7 +12,6 @@
 				"lumber-camp"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 8,
 		"lines": [
@@ -38,7 +37,6 @@
 								"type": "item",
 								"itemId": "tree"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					}
@@ -77,7 +75,6 @@
 										"type": "item",
 										"itemId": "tree"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -105,7 +102,7 @@
 								"type": "item",
 								"itemId": "wood"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -159,7 +156,7 @@
 								"type": "item",
 								"itemId": "wood"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

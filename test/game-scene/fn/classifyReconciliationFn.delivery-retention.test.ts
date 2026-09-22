@@ -12,7 +12,6 @@ import {
 const emptyReconciliationFacts = {
 	feedbackCues: [],
 	hiddenActorIds: new Set<string>(),
-	inventoryActorIds: new Set<string>(),
 	motionRetainedActorIds: new Set<string>(),
 	pendingActorIds: new Set<string>(),
 	visibleActors: new Map(),

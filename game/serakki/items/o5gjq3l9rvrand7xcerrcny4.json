@@ -12,7 +12,6 @@
 				"construction-material-box-t3"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

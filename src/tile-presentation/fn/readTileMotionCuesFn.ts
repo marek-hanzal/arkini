@@ -3,7 +3,7 @@ import { readGridRuntimeItemFn } from "~/tile-presentation/fn/readGridRuntimeIte
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -64,7 +64,7 @@ const readTargetFn = ({
 }: {
 	readonly canonicalItemId: string;
 	readonly itemId: string;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) => {
 	const target = readGridRuntimeItemFn({
@@ -205,16 +205,6 @@ const readEventCueFn = ({
 			originLocation: event.previousSourceLocation,
 			targetLocation: target.location,
 		} satisfies UnstaggeredTileMotionCue;
-	}
-	if (
-		event.type === GameEventEnumSchema.enum.ItemPlaced &&
-		event.previousLocation.scope === LocationScopeEnumSchema.enum.Inventory
-	) {
-		return readSpawnCueFn({
-			event,
-			eventIndex,
-			transition,
-		});
 	}
 	return null;
 };

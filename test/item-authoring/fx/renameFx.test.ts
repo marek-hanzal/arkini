@@ -21,8 +21,6 @@ describe("renameFx", () => {
 					...createProducerItem({
 						id: "clock",
 					}),
-
-					scope: "board",
 					maxStackSize: 1,
 					clock: {
 						intervalMs: 1000,
@@ -33,7 +31,7 @@ describe("renameFx", () => {
 									{
 										type: "exists",
 										query: {
-											scope: "any",
+											distance: "far",
 											selector: {
 												type: "item",
 												itemId: "water",
@@ -66,6 +64,7 @@ describe("renameFx", () => {
 						when: [
 							{
 								query: {
+									distance: "far",
 									selector: {
 										itemId: "fresh-water",
 									},
@@ -137,7 +136,7 @@ describe("renameFx", () => {
 									mode: "consume",
 									type: "materials",
 									query: {
-										scope: "any",
+										distance: "far",
 										selector: {
 											type: "item",
 											itemId: "water",

@@ -11,7 +11,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
-const base = (id: string, scope: "any" | "board" = "board") => ({
+const base = (id: string) => ({
 	uid: id,
 	id,
 	title: id,
@@ -22,14 +22,13 @@ const base = (id: string, scope: "any" | "board" = "board") => ({
 			`artwork:${id}`,
 		],
 	},
-	scope,
 	maxStackSize: 1,
 });
 
 const reserveInput = (itemId: string) => ({
 	type: "materials" as const,
 	query: {
-		scope: "any" as const,
+		distance: "far" as const,
 		selector: {
 			type: "item" as const,
 			itemId,
@@ -52,10 +51,6 @@ const config = GameConfigSchema.parse({
 		board: {
 			width: 4,
 			height: 2,
-		},
-		inventory: {
-			width: 2,
-			height: 1,
 		},
 	},
 	start: {
@@ -97,7 +92,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		"producer:worker": {
-			...base("producer:worker", "any"),
+			...base("producer:worker"),
 
 			units: {
 				amount: 2,
@@ -136,20 +131,20 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [],
 
-			...base("item:payload", "any"),
+			...base("item:payload"),
 		},
 		"item:tool": {
 			maxQueueSize: 1,
 			lines: [],
 
-			...base("item:tool", "any"),
+			...base("item:tool"),
 			maxStackSize: 10,
 		},
 		"item:blocker": {
 			maxQueueSize: 1,
 			lines: [],
 
-			...base("item:blocker", "any"),
+			...base("item:blocker"),
 		},
 	},
 });
@@ -160,14 +155,6 @@ const board = (x: number, y = 0) => ({
 	position: {
 		x,
 		y,
-	},
-});
-
-const inventory = (x: number) => ({
-	scope: "inventory" as const,
-	position: {
-		x,
-		y: 0,
 	},
 });
 
@@ -415,90 +402,86 @@ describe("reserved material lifecycle", () => {
 			quantity: 3,
 		});
 	});
+});
 
-	it("keeps the whole completion blocked when an impure reservation has no exclusive cell", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const employer = yield* spawnItemFx({
-					id: "runtime:employer",
-					itemId: "producer:employer",
-					location: board(0),
-					quantity: 1,
-				});
-				const worker = yield* spawnItemFx({
-					id: "runtime:worker",
-					itemId: "producer:worker",
-					location: board(1),
-					quantity: 1,
-				});
-				const payload = yield* spawnItemFx({
-					id: "runtime:payload",
-					itemId: "item:payload",
-					location: board(2),
-					quantity: 1,
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId: worker.id,
-					lineId: "line:worker:reserve",
-					inputIndex: 0,
-					sourceItemId: payload.id,
-					sourceItemRevision: payload.revision,
-					quantity: 1,
-				});
-				const job = yield* reserveWorkerFx({
-					employerId: employer.id,
-					workerId: worker.id,
-				});
-				for (const [index, location] of [
-					board(1),
-					board(2),
-					board(3),
-					board(0, 1),
-					board(1, 1),
-					board(2, 1),
-					board(3, 1),
-					inventory(0),
-					inventory(1),
-				].entries()) {
-					yield* spawnItemFx({
-						id: `runtime:blocker:${index}`,
-						itemId: "item:blocker",
-						location,
-						quantity: 1,
-					});
-				}
-				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
-				});
-				return {
-					job,
-					runtime: yield* readRuntimeFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.runtime.jobs).toEqual([
-			expect.objectContaining({
-				id: result.job.id,
-				remainingMs: 0,
-			}),
-		]);
-		expect(result.runtime.items.find((item) => item.id === "runtime:worker")?.location).toEqual(
-			{
-				scope: "reserved",
-				jobId: result.job.id,
+it("keeps the whole completion blocked when an impure reservation has no exclusive cell", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const employer = yield* spawnItemFx({
+				id: "runtime:employer",
+				itemId: "producer:employer",
+				location: board(0),
+				quantity: 1,
+			});
+			const worker = yield* spawnItemFx({
+				id: "runtime:worker",
+				itemId: "producer:worker",
+				location: board(1),
+				quantity: 1,
+			});
+			const payload = yield* spawnItemFx({
+				id: "runtime:payload",
+				itemId: "item:payload",
+				location: board(2),
+				quantity: 1,
+			});
+			yield* storeInputMaterialFx({
+				ownerItemId: worker.id,
+				lineId: "line:worker:reserve",
 				inputIndex: 0,
-			},
-		);
-		expect(
-			result.runtime.items.find((item) => item.id === "runtime:payload")?.location,
-		).toMatchObject({
-			scope: "input",
-			ownerItemId: "runtime:worker",
-		});
+				sourceItemId: payload.id,
+				sourceItemRevision: payload.revision,
+				quantity: 1,
+			});
+			const job = yield* reserveWorkerFx({
+				employerId: employer.id,
+				workerId: worker.id,
+			});
+			for (const [index, location] of [
+				board(1),
+				board(2),
+				board(3),
+				board(0, 1),
+				board(1, 1),
+				board(2, 1),
+				board(3, 1),
+			].entries()) {
+				yield* spawnItemFx({
+					id: `runtime:blocker:${index}`,
+					itemId: "item:blocker",
+					location,
+					quantity: 1,
+				});
+			}
+			yield* runTickRuntimeByFx({
+				elapsedMs: 200,
+			});
+			return {
+				job,
+				runtime: yield* readRuntimeFx(),
+			};
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+
+	expect(result.runtime.jobs).toEqual([
+		expect.objectContaining({
+			id: result.job.id,
+			remainingMs: 0,
+		}),
+	]);
+	expect(result.runtime.items.find((item) => item.id === "runtime:worker")?.location).toEqual({
+		scope: "reserved",
+		jobId: result.job.id,
+		inputIndex: 0,
+	});
+	expect(
+		result.runtime.items.find((item) => item.id === "runtime:payload")?.location,
+	).toMatchObject({
+		scope: "input",
+		ownerItemId: "runtime:worker",
 	});
 });

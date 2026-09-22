@@ -13,7 +13,6 @@
 				"magic-sawmill"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -34,11 +33,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "lumer-camp"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -49,11 +48,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "sawmill"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -72,7 +71,6 @@
 								"type": "item",
 								"itemId": "magic-sawmill-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -110,7 +108,7 @@
 										"type": "item",
 										"itemId": "mage-lodge"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}

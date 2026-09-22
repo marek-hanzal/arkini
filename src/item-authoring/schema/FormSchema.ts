@@ -56,7 +56,6 @@ const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchem
 			? {
 					...input,
 					query: {
-						scope: "board" as const,
 						distance: "self" as const,
 						selector: {
 							type: "item" as const,

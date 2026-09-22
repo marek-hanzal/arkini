@@ -12,7 +12,6 @@
 				"paper-boat"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 8,
 		"merge": [
 			{

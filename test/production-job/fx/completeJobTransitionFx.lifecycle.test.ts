@@ -47,7 +47,6 @@ const base = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize: 1,
 });
 
@@ -60,10 +59,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 		title: "Completion lifecycle",
 		board: {
 			width: 3,
-			height: 1,
-		},
-		inventory: {
-			width: 1,
 			height: 1,
 		},
 	},
@@ -92,7 +87,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 								cost: 1,
 							},
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "item:material",
@@ -116,7 +111,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "item:material",

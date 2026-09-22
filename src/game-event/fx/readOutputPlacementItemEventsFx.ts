@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 
 interface ReadOutputPlacementItemEventsProps {
 	readonly originItemId: IdSchema.Type;
@@ -17,7 +17,7 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 		const events: GameEventSchema.Type[] = [];
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {
-				const stackedItem = Option.getOrUndefined(narrowGridRuntimeItemFn(stack.item));
+				const stackedItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(stack.item));
 				if (stackedItem === undefined) {
 					return yield* Effect.die(
 						new Error(
@@ -36,7 +36,7 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 				});
 			}
 			for (const runtimeItem of drop.placement.spawn) {
-				const item = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
+				const item = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeItem));
 				if (item === undefined) {
 					return yield* Effect.die(
 						new Error(

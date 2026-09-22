@@ -12,7 +12,6 @@
 				"marek-smelly"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

@@ -27,11 +27,9 @@ export const DropSchema = z
 		 *
 		 * The default local drop searches from the source by Manhattan distance.
 		 * Regardless of the selected strategy, runtime first checks board capacity.
-		 * If the board cannot accept the emitted items, their item scope determines
-		 * whether the remainder may be placed in inventory.
 		 */
 		placement: PlacementSchema.default(PlacementSchema.enum.Drop).describe(
-			"The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
+			"The board-placement strategy for this drop; defaults to a local Manhattan-distance drop.",
 		),
 		/**
 		 * Rules evaluated after this drop is selected by a successful roll.

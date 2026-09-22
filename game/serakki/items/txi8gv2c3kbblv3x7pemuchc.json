@@ -12,7 +12,6 @@
 				"paper-boat-wine-bath"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 180000,

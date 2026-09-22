@@ -9,54 +9,6 @@ import {
 import type { RuntimeSchema } from "../support/readItemDetailLinesFxFixture";
 
 describe("readItemDetailLinesFx / active work", () => {
-	it("keeps an active hidden-by-default line inspectable while its owner is stored", () => {
-		const runtime = lineRunRuntime({
-			permit: false,
-		});
-		const stored = {
-			...runtime,
-			items: runtime.items.map((item) =>
-				item.id === "runtime:workshop"
-					? {
-							...item,
-							location: {
-								scope: "toolbar" as const,
-								position: {
-									x: 0,
-									y: 0,
-								},
-							},
-						}
-					: item,
-			),
-			jobs: [
-				{
-					id: "job:workshop",
-					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
-					durationMs: 1_000,
-					remainingMs: 400,
-				},
-			],
-		} satisfies RuntimeSchema.Type;
-		const lines = readLines(stored);
-		expect(lines.kind).toBe("available");
-		if (lines.kind !== "available") throw new Error("Expected available lines.");
-		expect(lines.line).toMatchObject([
-			{
-				availability: {
-					kind: "unavailable",
-					reason: {
-						kind: "owner-stored",
-					},
-				},
-				activeJob: {
-					status: JobStatusEnumSchema.enum.Paused,
-					remainingMs: 400,
-				},
-			},
-		]);
-	});
 	it("projects active work as running, paused, or ready from canonical job truth", () => {
 		const job = {
 			id: "job:workshop",

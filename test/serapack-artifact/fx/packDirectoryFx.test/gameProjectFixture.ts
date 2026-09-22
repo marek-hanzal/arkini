@@ -33,10 +33,6 @@ const config = GameConfigSchema.parse({
 			width: 2,
 			height: 2,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	resources: {
 		hero: "hero",
@@ -54,7 +50,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 		board: [],
-		inventory: [],
 	},
 	items: {
 		portal: {
@@ -74,7 +69,6 @@ const config = GameConfigSchema.parse({
 					"item-water",
 				],
 			},
-			scope: "any",
 			maxStackSize: 1,
 		},
 		water: {
@@ -92,7 +86,6 @@ const config = GameConfigSchema.parse({
 					"item-water",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 	},

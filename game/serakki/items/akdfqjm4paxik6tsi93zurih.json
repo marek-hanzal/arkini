@@ -13,7 +13,6 @@
 				"crop-market"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 90000,
@@ -88,7 +87,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -146,7 +145,7 @@
 										"type": "item",
 										"itemId": "vegetable-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -204,7 +203,7 @@
 										"type": "item",
 										"itemId": "fruit-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -262,7 +261,7 @@
 										"type": "item",
 										"itemId": "sheep-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -320,7 +319,7 @@
 										"type": "item",
 										"itemId": "pumpkin-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -378,7 +377,7 @@
 										"type": "item",
 										"itemId": "sheep-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -393,7 +392,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}

@@ -1,19 +1,17 @@
 import { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
 import { Effect } from "effect";
 
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { outputFx } from "~/production-output/fx/outputFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
 
 interface ApplyOutputPlacementProps {
 	readonly overflow?: "discard";
-	readonly excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
-	readonly origin: GridLocationSchema.Type;
+	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
+	readonly origin: BoardLocationSchema.Type;
 	readonly output: outputFx.Result;
 	readonly runtime: RuntimeSchema.Type;
 }
@@ -39,12 +37,7 @@ const applyOutputDropPlacementFx = Effect.fn("applyOutputDropPlacementFx")(funct
 }: Omit<ApplyOutputPlacementProps, "output"> & {
 	readonly drop: outputFx.Result["drop"][number];
 }) {
-	const item = yield* resolveItemFx({
-		itemId: drop.itemId,
-	});
-	const usesRandomBoardPlacement =
-		drop.placement === PlacementSchema.enum.Random &&
-		(item.scope === StorageSchema.enum.Board || item.scope === StorageSchema.enum.Any);
+	const usesRandomBoardPlacement = drop.placement === PlacementSchema.enum.Random;
 	const drops =
 		usesRandomBoardPlacement && drop.quantity > 1
 			? Array.from(

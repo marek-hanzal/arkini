@@ -65,7 +65,8 @@ describe("createGameSessionFx / subscription visibility", () => {
 					id: "runtime:before-subscribe",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -93,7 +94,8 @@ describe("createGameSessionFx / subscription visibility", () => {
 						id: "runtime:after-subscribe",
 						itemId: "water",
 						location: {
-							scope: "inventory",
+							scope: "board",
+							space: 0,
 							position: {
 								x: 1,
 								y: 0,
@@ -175,7 +177,8 @@ describe("createGameSessionFx / subscription visibility", () => {
 					id: "runtime:no-op-tick:marker",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

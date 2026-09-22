@@ -11,7 +11,6 @@ const baseItem = (id: string, maxStackSize = 1) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize,
 });
 
@@ -51,10 +50,6 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 				width: 3,
 				height: 1,
 			},
-			inventory: {
-				width: 1,
-				height: 1,
-			},
 		},
 		start: {
 			currentSpace: 0,
@@ -74,7 +69,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 							{
 								type: "materials",
 								query: {
-									scope: "any",
+									distance: "far",
 									selector: {
 										type: "item",
 										itemId: "temporary",

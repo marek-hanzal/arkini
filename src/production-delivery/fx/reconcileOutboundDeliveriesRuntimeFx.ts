@@ -7,7 +7,7 @@ import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { narrowDeliveryRuntimeItemFn } from "~/game-runtime/fn/narrowDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -19,7 +19,7 @@ export namespace reconcileOutboundDeliveriesRuntimeFx {
 			IdSchema.Type,
 			ReadonlySet<IdSchema.Type>
 		>;
-		readonly returnFromByOwnerItemId?: ReadonlyMap<IdSchema.Type, GridLocationSchema.Type>;
+		readonly returnFromByOwnerItemId?: ReadonlyMap<IdSchema.Type, BoardLocationSchema.Type>;
 		readonly runtime: RuntimeSchema.Type;
 	}
 }

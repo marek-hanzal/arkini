@@ -11,8 +11,6 @@ import {
 const readControlledOwner = (ui: ItemSchema.Type["ui"], remainingDurationMs = 300) => {
 	const item = ItemSchema.parse({
 		...lineRunTestConfig.items.workshop,
-
-		scope: "board",
 		maxStackSize: 1,
 		clock: {
 			intervalMs: 100,

@@ -24,12 +24,16 @@ describe("blocked job completion", () => {
 					elapsedMs: 1_000,
 				});
 				const blocked = yield* readRuntimeFx();
-				const blocker = blocked.items.find((item) => item.item.id === "blocker");
-				if (blocker === undefined) throw new Error("Expected completion blocker.");
-				yield* removeRuntimeItemForTestFx({
-					itemId: blocker.id,
-					revision: blocker.revision,
-				});
+				const blockers = blocked.items
+					.filter((item) => item.item.id === "blocker")
+					.slice(0, 2);
+				for (const blocker of blockers) {
+					yield* removeRuntimeItemForTestFx({
+						itemId: blocker.id,
+						revision: blocker.revision,
+					});
+				}
+
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
@@ -88,7 +92,7 @@ describe("blocked job completion", () => {
 		const config = createTickFailureTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const output = config.items.inventoryOutput;
+				const output = config.items.completionOutput;
 				if (output === undefined) throw new Error("Expected failure output fixture.");
 				const owner = yield* spawnItemFx({
 					id: "runtime:invalid-output-forge",
@@ -107,7 +111,7 @@ describe("blocked job completion", () => {
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
 				});
-				delete (config.items as Record<string, unknown>).inventoryOutput;
+				delete (config.items as Record<string, unknown>).completionOutput;
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
 					runTickRuntimeByFx({
@@ -115,7 +119,7 @@ describe("blocked job completion", () => {
 					}),
 				);
 				const afterFailure = yield* readRuntimeFx();
-				(config.items as Record<string, unknown>).inventoryOutput = output;
+				(config.items as Record<string, unknown>).completionOutput = output;
 				yield* runTickRuntimeByFx({
 					elapsedMs: 0,
 				});
@@ -141,7 +145,7 @@ describe("blocked job completion", () => {
 		if (Result.isSuccess(result.attempt)) throw new Error("Expected Tick failure.");
 		expect(result.attempt.failure).toMatchObject({
 			_tag: "ItemNotFoundError",
-			itemId: "inventoryOutput",
+			itemId: "completionOutput",
 		});
 		expect(result.afterFailure).toEqual(result.before);
 		expect(result.afterNoRetry).toEqual(result.before);

@@ -172,7 +172,6 @@ const item: ItemSchema.Type = {
 			"artwork:water",
 		],
 	},
-	scope: "any",
 	maxStackSize: 1,
 };
 
@@ -187,10 +186,6 @@ beforeEach(() => {
 					width: 2,
 					height: 2,
 				},
-				inventory: {
-					width: 2,
-					height: 2,
-				},
 			},
 			resources: {
 				hero: "hero",
@@ -198,8 +193,6 @@ beforeEach(() => {
 			start: {
 				currentSpace: 0,
 				board: [],
-				inventory: [],
-				toolbar: [],
 			},
 			items: {
 				[item.id]: item,
@@ -468,7 +461,8 @@ describe("item section form session", () => {
 			...(capability === "production"
 				? {
 						action: {
-							type: "inventory",
+							type: "space",
+							space: 0,
 							input: [],
 							rules: [],
 						},
@@ -477,7 +471,6 @@ describe("item section form session", () => {
 						clock: {
 							intervalMs: 300000,
 						},
-						scope: "board",
 						maxStackSize: 1,
 					}),
 		});
@@ -919,7 +912,7 @@ describe("item section form session", () => {
 							{
 								type: "exists" as const,
 								query: {
-									scope: "any" as const,
+									distance: "far",
 									selector: {
 										type: "item" as const,
 										itemId: item.id,
@@ -934,7 +927,7 @@ describe("item section form session", () => {
 							{
 								type: "exists" as const,
 								query: {
-									scope: "any" as const,
+									distance: "far",
 									selector: {
 										type: "item" as const,
 										itemId: "",
@@ -1050,76 +1043,6 @@ describe("item section form session", () => {
 			}),
 		);
 	});
-	it("switches the action payload without losing shared requirements or rules", async () => {
-		const rule = {
-			type: "enable" as const,
-			when: [
-				{
-					type: "exists" as const,
-					query: {
-						scope: "universe" as const,
-						selector: {
-							type: "item" as const,
-							itemId: item.id,
-						},
-					},
-				},
-			] as [
-				{
-					type: "exists";
-					query: {
-						scope: "universe";
-						selector: {
-							type: "item";
-							itemId: string;
-						};
-					};
-				},
-			],
-		};
-		const input = {
-			type: "simple" as const,
-		};
-		const portal = {
-			...item,
-			action: {
-				type: "space" as const,
-				space: 7,
-				input: [
-					input,
-				],
-				rules: [
-					rule,
-				],
-			},
-		};
-		state.persisted = portal;
-		(state.project as Project).config.items[item.id] = portal;
-		const { container } = await render(<ActionSection />);
-		const inventory = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Inventory");
-		if (inventory === undefined) throw new Error("Missing Inventory action choice.");
-		await act(async () => inventory.click());
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenLastCalledWith(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					action: {
-						type: "inventory",
-						input: [
-							input,
-						],
-						rules: [
-							rule,
-						],
-					},
-				}),
-			}),
-		);
-	});
 	it("replaces a configured action when the first production line is added", async () => {
 		const common = {
 			...item,
@@ -1200,7 +1123,6 @@ describe("item section form session", () => {
 		async (capability) => {
 			const configured = ItemSchema.parse({
 				...item,
-				scope: "board",
 				maxQueueSize: 4,
 				units: {
 					amount: 3,
@@ -1570,8 +1492,6 @@ describe("item section form session", () => {
 	] as const)("enables a clock through the %s entry as one valid saved item", async (entry) => {
 		const common = {
 			...item,
-
-			scope: "inventory" as const,
 			maxStackSize: 9,
 			action: {
 				type: "space" as const,
@@ -1600,7 +1520,6 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
-			scope: "inventory",
 			maxStackSize: 1,
 			action: undefined,
 			clock: {
@@ -1617,8 +1536,6 @@ describe("item section form session", () => {
 				id: item.id,
 			}),
 			uid: item.uid,
-
-			scope: "board",
 			maxStackSize: 1,
 			clock: {
 				intervalMs: 1500,
@@ -1683,7 +1600,6 @@ describe("item section form session", () => {
 		]);
 		const scheduled = ItemSchema.parse({
 			...item,
-			scope: "board",
 			clock: {
 				intervalMs: 1500,
 				onExpire,
@@ -1720,8 +1636,6 @@ describe("item section form session", () => {
 	it("marks both missing Clock timers invalid and focuses the first field", async () => {
 		const once: ItemSchema.Type = {
 			...item,
-
-			scope: "board",
 			clock: {
 				durationMs: 2000,
 				enable: true,
@@ -1890,7 +1804,6 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 		id: "source",
 		title: "Source",
 		ui: "simple",
-		scope: "board",
 		clock: {
 			durationMs: 300000,
 			enable: true,
@@ -1926,7 +1839,6 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 				title: source.title,
 				ui: "simple",
 				clock: source.clock,
-				scope: "board",
 				maxStackSize: 1,
 			}),
 		}),

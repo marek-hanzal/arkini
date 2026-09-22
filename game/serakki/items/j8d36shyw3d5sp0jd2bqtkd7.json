@@ -12,7 +12,6 @@
 				"cauldron-with-beeswax"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

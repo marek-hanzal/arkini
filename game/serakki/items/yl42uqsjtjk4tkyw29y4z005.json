@@ -12,7 +12,6 @@
 				"corrupted-british-shorthair"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 10

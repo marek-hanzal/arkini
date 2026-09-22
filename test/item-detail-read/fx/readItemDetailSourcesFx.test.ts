@@ -82,16 +82,17 @@ describe("readItemDetailSourcesFx", () => {
 		]);
 	});
 
-	it("keeps off-Board owners exact and deterministically ordered", () => {
+	it("orders Board sources before input-owned sources", () => {
 		const stored = runtime.items.find(({ id }) => id === "runtime:alpha:stored");
 		const runtimeTarget = runtime.items.find(({ id }) => id === "runtime:target");
 		if (stored === undefined || runtimeTarget === undefined)
 			throw new Error("Missing fixtures.");
-		const inventory = runtimeItem({
+		const boardOwner = runtimeItem({
 			definition: "alpha",
-			id: "runtime:alpha:inventory",
+			id: "runtime:alpha:board",
 			location: {
-				scope: "inventory",
+				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,
@@ -104,19 +105,18 @@ describe("readItemDetailSourcesFx", () => {
 				...runtime,
 				items: [
 					runtimeTarget,
-					inventory,
+					boardOwner,
 					stored,
 				],
 			}),
 		);
 
 		expect(result.source.map(({ ownerItemId }) => ownerItemId)).toEqual([
-			"runtime:alpha:inventory",
+			"runtime:alpha:board",
 			"runtime:alpha:stored",
 		]);
 		expect(result.source.map(({ line }) => line.map(({ lineId }) => lineId))).toEqual([
 			[
-				"line:hidden",
 				"line:alpha:first",
 				"line:alpha:second",
 			],
@@ -163,7 +163,8 @@ describe("readItemDetailSourcesFx", () => {
 			definition: "permit",
 			id: "runtime:permit",
 			location: {
-				scope: "inventory",
+				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,
@@ -232,7 +233,8 @@ describe("readItemDetailSourcesFx", () => {
 			definition: "blueprint",
 			id: "runtime:blueprint",
 			location: {
-				scope: "inventory",
+				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,

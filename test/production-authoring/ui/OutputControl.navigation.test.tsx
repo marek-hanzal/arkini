@@ -359,7 +359,6 @@ it.each([
 					{
 						type: "exists",
 						query: {
-							scope: "board",
 							distance: "far",
 							selector: {
 								type: "item",
@@ -377,7 +376,6 @@ it.each([
 				].map((itemId) => ({
 					type: "exists",
 					query: {
-						scope: "board",
 						distance: "far",
 						selector: {
 							type: "item",
@@ -448,7 +446,7 @@ it("focuses and edits a set rule without changing the selected set's drops", asy
 	const condition = (itemId: string) => ({
 		type: "exists",
 		query: {
-			scope: "any",
+			distance: "far",
 			selector: {
 				type: "item",
 				itemId,

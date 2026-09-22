@@ -4,7 +4,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckI
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 
 const GridBoundsSchema = z
 	.object({
@@ -27,7 +27,7 @@ const GridBoundsSchema = z
 export const LocationOutOfBoundsIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The live item outside its grid bounds."),
-		location: GridLocationSchema.describe("The invalid concrete item location."),
+		location: BoardLocationSchema.describe("The invalid concrete item location."),
 		size: GridBoundsSchema.describe("The configured bounds of the targeted grid."),
 		type: RuntimeCheckIssueEnumSchema.extract([
 			"LocationOutOfBounds",

@@ -4,7 +4,7 @@ import { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
@@ -118,8 +118,6 @@ const itemDiscardedEventSchema = z
 		reason: z.enum([
 			"job-aborted",
 			"board:full",
-			"inventory:full",
-			"toolbar:full",
 		]),
 	})
 	.strict();
@@ -146,7 +144,7 @@ const itemExpiredEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		quantity: z.number().int().positive(),
 	})
 	.strict();
@@ -159,7 +157,7 @@ const itemSpawnedEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		originItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		quantity: z.number().int().positive(),
 	})
 	.strict();
@@ -172,8 +170,8 @@ const itemPortalTransferredEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		portalItemId: IdSchema,
-		previousLocation: GridLocationSchema,
-		location: GridLocationSchema,
+		previousLocation: BoardLocationSchema,
+		location: BoardLocationSchema,
 		quantity: PositiveIntegerSchema,
 	})
 	.strict();
@@ -187,8 +185,8 @@ const itemSwappedEventSchema = z
 		sourceCanonicalItemId: IdSchema,
 		targetItemId: IdSchema,
 		targetCanonicalItemId: IdSchema,
-		sourceLocation: GridLocationSchema,
-		targetLocation: GridLocationSchema,
+		sourceLocation: BoardLocationSchema,
+		targetLocation: BoardLocationSchema,
 	})
 	.strict();
 
@@ -203,9 +201,9 @@ const itemPlacedEventSchema = z
 		previousLocation: z.union([
 			InputLocationSchema,
 			ReservedLocationSchema,
-			GridLocationSchema,
+			BoardLocationSchema,
 		]),
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		quantity: z.number().int().positive(),
 	})
 	.strict();
@@ -218,7 +216,7 @@ const itemStackedEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		originItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		previousQuantity: z.number().int().positive(),
 		quantity: z.number().int().positive(),
 	})
@@ -234,7 +232,7 @@ const itemSplitEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		previousQuantity: z.number().int().min(2),
 		quantity: PositiveIntegerSchema,
 	})
@@ -272,7 +270,7 @@ const itemInputStoredEventSchema = z
 		]),
 		sourceItemId: IdSchema,
 		canonicalItemId: IdSchema,
-		previousSourceLocation: GridLocationSchema,
+		previousSourceLocation: BoardLocationSchema,
 		previousQuantity: z.number().int().positive(),
 		storedQuantity: z.number().int().positive(),
 		resultingQuantity: z.number().int().nonnegative(),
@@ -289,7 +287,7 @@ const itemUnitSpentEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		previousUnits: z.number().int().positive(),
 		resultingUnits: z.number().int().positive(),
 	})
@@ -305,7 +303,7 @@ const itemDepletedEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		previousQuantity: z.number().int().positive(),
 		resultingQuantity: z.number().int().nonnegative(),
 	})

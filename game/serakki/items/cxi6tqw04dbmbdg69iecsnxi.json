@@ -12,7 +12,6 @@
 				"chopped-vegetables"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

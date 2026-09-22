@@ -1,4 +1,5 @@
 import { describe } from "vitest";
+
 import {
 	Effect,
 	GameEventEnumSchema,
@@ -58,168 +59,144 @@ describe("item units / atomic depletion", () => {
 			location: board(1),
 		});
 	});
-	it("rolls back the whole start when depletion output cannot be placed", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:lumberjack",
-					itemId: "producer:lumberjack",
-					location: board(0),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:messy",
-					itemId: "units:messy",
-					location: board(1),
-					quantity: 1,
-				});
-				for (const [id, location] of [
-					[
-						"runtime:blocker:2",
-						board(2),
-					],
-					[
-						"runtime:blocker:3",
-						board(3),
-					],
-					[
-						"runtime:blocker:4",
-						board(0, 1),
-					],
-					[
-						"runtime:blocker:5",
-						board(1, 1),
-					],
-					[
-						"runtime:blocker:6",
-						board(2, 1),
-					],
-					[
-						"runtime:blocker:7",
-						board(3, 1),
-					],
-				] as const) {
-					yield* spawnItemFx({
-						id,
-						itemId: "item:blocker",
-						location,
-						quantity: 1,
-					});
-				}
-				yield* spawnItemFx({
-					id: "runtime:inventory-blocker",
-					itemId: "item:blocker",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.result(
-					startLineFx({
-						ownerItemId: owner.id,
-						lineId: "line:lumberjack:messy",
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					attempt,
-					before,
-				};
-			}),
-		);
+});
 
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		expect(result.after).toEqual(result.before);
-	});
-	it("resolves idle depletion before isolating a surviving owner with units", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:mixed-owner",
-					itemId: "producer:mixed-unit",
-					location: board(0),
-					quantity: 2,
-				});
+it("rolls back the whole start when depletion output cannot be placed", () => {
+	const result = run(
+		Effect.gen(function* () {
+			const owner = yield* spawnItemFx({
+				id: "runtime:lumberjack",
+				itemId: "producer:lumberjack",
+				location: board(0),
+				quantity: 1,
+			});
+			yield* spawnItemFx({
+				id: "runtime:messy",
+				itemId: "units:messy",
+				location: board(1),
+				quantity: 1,
+			});
+			for (const [id, location] of [
+				[
+					"runtime:blocker:2",
+					board(2),
+				],
+				[
+					"runtime:blocker:3",
+					board(3),
+				],
+				[
+					"runtime:blocker:4",
+					board(0, 1),
+				],
+				[
+					"runtime:blocker:5",
+					board(1, 1),
+				],
+				[
+					"runtime:blocker:6",
+					board(2, 1),
+				],
+				[
+					"runtime:blocker:7",
+					board(3, 1),
+				],
+			] as const) {
 				yield* spawnItemFx({
-					id: "runtime:empty-target",
-					itemId: "units:empty",
-					location: board(1),
-					quantity: 1,
-				});
-				for (const [id, location] of [
-					[
-						"runtime:mixed-blocker:2",
-						board(2),
-					],
-					[
-						"runtime:mixed-blocker:3",
-						board(3),
-					],
-					[
-						"runtime:mixed-blocker:4",
-						board(0, 1),
-					],
-					[
-						"runtime:mixed-blocker:5",
-						board(1, 1),
-					],
-					[
-						"runtime:mixed-blocker:6",
-						board(2, 1),
-					],
-					[
-						"runtime:mixed-blocker:7",
-						board(3, 1),
-					],
-				] as const) {
-					yield* spawnItemFx({
-						id,
-						itemId: "item:blocker",
-						location,
-						quantity: 1,
-					});
-				}
-				yield* spawnItemFx({
-					id: "runtime:mixed-inventory-blocker",
+					id,
 					itemId: "item:blocker",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
+					location,
 					quantity: 1,
 				});
-				yield* startLineFx({
+			}
+			const before = yield* readRuntimeFx();
+			const attempt = yield* Effect.result(
+				startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:mixed-unit:work",
-				});
-				return {
-					owner,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
+					lineId: "line:lumberjack:messy",
+				}),
+			);
+			return {
+				after: yield* readRuntimeFx(),
+				attempt,
+				before,
+			};
+		}),
+	);
 
-		const owners = result.runtime.items.filter(
-			(item) => item.item.id === "producer:mixed-unit",
-		);
-		expect(owners).toHaveLength(2);
-		expect(owners.find((item) => item.id === result.owner.id)).toMatchObject({
-			quantity: 1,
-			remainingUnits: 1,
-		});
-		expect(owners.find((item) => item.id !== result.owner.id)).toMatchObject({
-			location: board(1),
-			quantity: 1,
-			remainingUnits: undefined,
-		});
-		expect(result.runtime.items.some((item) => item.item.id === "units:empty")).toBe(false);
+	expect(Result.isFailure(result.attempt)).toBe(true);
+	expect(result.after).toEqual(result.before);
+});
+
+it("resolves idle depletion before isolating a surviving owner with units", () => {
+	const result = run(
+		Effect.gen(function* () {
+			const owner = yield* spawnItemFx({
+				id: "runtime:mixed-owner",
+				itemId: "producer:mixed-unit",
+				location: board(0),
+				quantity: 2,
+			});
+			yield* spawnItemFx({
+				id: "runtime:empty-target",
+				itemId: "units:empty",
+				location: board(1),
+				quantity: 1,
+			});
+			for (const [id, location] of [
+				[
+					"runtime:mixed-blocker:2",
+					board(2),
+				],
+				[
+					"runtime:mixed-blocker:3",
+					board(3),
+				],
+				[
+					"runtime:mixed-blocker:4",
+					board(0, 1),
+				],
+				[
+					"runtime:mixed-blocker:5",
+					board(1, 1),
+				],
+				[
+					"runtime:mixed-blocker:6",
+					board(2, 1),
+				],
+				[
+					"runtime:mixed-blocker:7",
+					board(3, 1),
+				],
+			] as const) {
+				yield* spawnItemFx({
+					id,
+					itemId: "item:blocker",
+					location,
+					quantity: 1,
+				});
+			}
+			yield* startLineFx({
+				ownerItemId: owner.id,
+				lineId: "line:mixed-unit:work",
+			});
+			return {
+				owner,
+				runtime: yield* readRuntimeFx(),
+			};
+		}),
+	);
+
+	const owners = result.runtime.items.filter((item) => item.item.id === "producer:mixed-unit");
+	expect(owners).toHaveLength(2);
+	expect(owners.find((item) => item.id === result.owner.id)).toMatchObject({
+		quantity: 1,
+		remainingUnits: 1,
 	});
+	expect(owners.find((item) => item.id !== result.owner.id)).toMatchObject({
+		location: board(1),
+		quantity: 1,
+		remainingUnits: undefined,
+	});
+	expect(result.runtime.items.some((item) => item.item.id === "units:empty")).toBe(false);
 });

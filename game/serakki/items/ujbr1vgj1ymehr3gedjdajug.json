@@ -13,7 +13,6 @@
 				"fire"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

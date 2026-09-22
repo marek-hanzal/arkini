@@ -13,7 +13,6 @@
 				"sheep-farm"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -39,7 +38,6 @@
 								"type": "item",
 								"itemId": "sheep-pen"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -50,7 +48,7 @@
 								"type": "item",
 								"itemId": "hay"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -103,7 +101,7 @@
 								"type": "item",
 								"itemId": "planks"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -156,7 +154,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

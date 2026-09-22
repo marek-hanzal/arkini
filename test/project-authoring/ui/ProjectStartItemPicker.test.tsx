@@ -15,12 +15,7 @@ import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", async () => {
 	const { startTestConfig } = await import("~test/game-start/support/startTestConfig");
-	const items = {
-		...startTestConfig.items,
-		backpack: {
-			...startTestConfig.items.backpack,
-		},
-	};
+	const items = startTestConfig.items;
 	return {
 		useEditorItemSearchOptions: () => ({
 			items,
@@ -56,13 +51,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const PickerHarness = ({
-	onSelect,
-	scope = "inventory",
-}: {
-	readonly onSelect: (itemId: string) => void;
-	readonly scope?: "board" | "inventory" | "toolbar";
-}) => {
+const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => void }) => {
 	const [open, setOpen] = useState(false);
 	return (
 		<>
@@ -77,7 +66,6 @@ const PickerHarness = ({
 				<ProjectStartItemPicker
 					onCloseFn={() => setOpen(false)}
 					onSelectFn={onSelect}
-					scope={scope}
 				/>
 			) : null}
 		</>
@@ -115,7 +103,7 @@ const renderPicker = async (
 };
 
 describe("ProjectStartItemPicker", () => {
-	it("admits only the requested scope and restores focus after exact selection", async () => {
+	it("lists board items and restores focus after exact selection", async () => {
 		const onSelect = vi.fn();
 		const { container, opener } = await renderPicker(onSelect);
 		const search = container.querySelector<HTMLInputElement>('input[type="search"]');
@@ -126,9 +114,9 @@ describe("ProjectStartItemPicker", () => {
 				.map((option) => option.dataset.itemId)
 				.sort(),
 		).toEqual([
-			"backpack",
 			"lens",
 			"log",
+			"tree",
 		]);
 
 		const lens = container.querySelector<HTMLButtonElement>('button[data-item-id="lens"]');

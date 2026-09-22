@@ -16,7 +16,6 @@ export const createItemBase = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "any",
 	maxStackSize: 10,
 });
 
@@ -110,8 +109,6 @@ export const createRootSource = ({
 	start = {
 		currentSpace: 0,
 		board: [],
-		inventory: [],
-		toolbar: [],
 	},
 }: {
 	path?: string;
@@ -129,10 +126,6 @@ export const createRootSource = ({
 				id: "game:test",
 				title: "Test",
 				board: {
-					width: 3,
-					height: 3,
-				},
-				inventory: {
 					width: 3,
 					height: 3,
 				},

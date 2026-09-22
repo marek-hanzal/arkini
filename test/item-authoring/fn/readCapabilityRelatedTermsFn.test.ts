@@ -23,7 +23,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 			{
 				type: "materials",
 				query: {
-					scope: "any",
+					distance: "far",
 					selector: {
 						type: "item",
 						itemId: "water",
@@ -38,7 +38,6 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 			{
 				type: "units",
 				query: {
-					scope: "board",
 					distance: "close",
 					selector: {
 						type: "item",
@@ -54,7 +53,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 					{
 						type: "exists",
 						query: {
-							scope: "any",
+							distance: "far",
 							selector: {
 								type: "item",
 								itemId: "permit",
@@ -94,7 +93,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 								{
 									type: "exists",
 									query: {
-										scope: "universe",
+										distance: "far",
 										selector: {
 											type: "item",
 											itemId: "set-permit",
@@ -118,7 +117,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 												{
 													type: "exists",
 													query: {
-														scope: "any",
+														distance: "far",
 														selector: {
 															type: "item",
 															itemId: "output-permit",

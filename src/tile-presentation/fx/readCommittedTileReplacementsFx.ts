@@ -7,7 +7,7 @@ import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisua
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 export interface TileReplacement {
@@ -49,10 +49,10 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 								return null;
 							}
 							const previous = Option.getOrUndefined(
-								narrowGridRuntimeItemFn(previousRuntimeItem),
+								narrowBoardRuntimeItemFn(previousRuntimeItem),
 							);
 							const current = Option.getOrUndefined(
-								narrowGridRuntimeItemFn(currentRuntimeItem),
+								narrowBoardRuntimeItemFn(currentRuntimeItem),
 							);
 							if (
 								previous === undefined ||

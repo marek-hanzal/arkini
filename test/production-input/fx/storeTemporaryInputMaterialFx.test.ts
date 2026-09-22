@@ -18,7 +18,6 @@ const baseItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize: 1,
 });
 
@@ -31,10 +30,6 @@ const config = GameConfigSchema.parse({
 		title: "Temporary material",
 		board: {
 			width: 2,
-			height: 1,
-		},
-		inventory: {
-			width: 1,
 			height: 1,
 		},
 	},
@@ -57,7 +52,7 @@ const config = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "temporary",

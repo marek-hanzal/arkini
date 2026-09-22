@@ -3,13 +3,12 @@ import { Option } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/item-interaction/error/StackItemsUnavailableError";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readItemStackResolutionFn {
@@ -17,17 +16,17 @@ export namespace readItemStackResolutionFn {
 		readonly runtime: RuntimeSchema.Type;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
+		readonly sourceLocation: BoardLocationSchema.Type;
 		readonly targetItemId: IdSchema.Type;
 		readonly targetRevision: RevisionSchema.Type;
-		readonly targetLocation: GridLocationSchema.Type;
+		readonly targetLocation: BoardLocationSchema.Type;
 	}
 
 	export type Result =
 		| {
 				readonly kind: "available";
-				readonly source: GridRuntimeItemSchema.Type;
-				readonly target: GridRuntimeItemSchema.Type;
+				readonly source: BoardRuntimeItemSchema.Type;
+				readonly target: BoardRuntimeItemSchema.Type;
 				readonly transferredQuantity: PositiveIntegerSchema.Type;
 		  }
 		| {
@@ -86,11 +85,11 @@ export const readItemStackResolutionFn = ({
 	if (runtimeTarget.revision !== targetRevision) {
 		return blockedFn(StackItemsUnavailableError.Reason.StaleTargetRevision);
 	}
-	const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+	const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return blockedFn(StackItemsUnavailableError.Reason.SourceNotOnGrid);
 	}
-	const target = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeTarget));
+	const target = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTarget));
 	if (target === undefined) {
 		return blockedFn(StackItemsUnavailableError.Reason.TargetNotOnGrid);
 	}

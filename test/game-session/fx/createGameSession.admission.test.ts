@@ -166,7 +166,8 @@ describe("createGameSessionFx / synchronous admission", () => {
 					id: "runtime:water:ui",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

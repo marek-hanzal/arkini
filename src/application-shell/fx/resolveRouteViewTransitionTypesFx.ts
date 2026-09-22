@@ -9,7 +9,6 @@ type VisualRouteId =
 	| "cheats"
 	| "editor"
 	| "editor-welcome"
-	| "inventory"
 	| "main-menu"
 	| "settings"
 	| "startup";
@@ -17,18 +16,11 @@ type VisualRouteId =
 const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
 const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
 const gameCheatsPattern = /^\/game\/[^/]+\/cheats\/?$/;
-const gameInventoryPattern = /^\/game\/[^/]+\/inventory\/?$/;
 const editorWelcomePattern = /^\/editor(?:\/welcome)?\/?$/;
 const editorProjectPattern = /^\/editor\/(?!welcome(?:\/|$))[^/]+(?:\/.*)?$/;
-const editorBoardPattern = /^\/editor\/[^/]+\/board\/?$/;
-const editorBoardInventoryPattern = /^\/editor\/[^/]+\/board\/inventory\/?$/;
 const editorArtworkDetailLeafPattern =
 	/^\/editor\/([^/]+)\/artwork\/([^/]+)\/detail\/(?:overview|usage|notes|delete)\/?$/;
 const settingsPattern = /^\/settings(?:\/(?:common|game|sound|dev))?\/?$/;
-
-const isEditorBoardLeafTransitionFn = (from: string, to: string) =>
-	(editorBoardPattern.test(from) && editorBoardInventoryPattern.test(to)) ||
-	(editorBoardInventoryPattern.test(from) && editorBoardPattern.test(to));
 
 const isSameEditorArtworkDetailTransitionFn = (from: string, to: string) => {
 	const fromDetail = editorArtworkDetailLeafPattern.exec(from);
@@ -51,13 +43,12 @@ const resolveVisualRouteIdFn = (pathname: string): VisualRouteId => {
 	if (editorProjectPattern.test(pathname)) return "editor";
 	if (gameBoardPattern.test(pathname)) return "board";
 	if (gameCheatsPattern.test(pathname)) return "cheats";
-	if (gameInventoryPattern.test(pathname)) return "inventory";
 	if (pathname.startsWith("/action/") || gameActionPattern.test(pathname)) return "action";
 	throw new Error(`Missing View Transition classification for route: ${pathname}`);
 };
 
 const isHeroRouteFn = (route: VisualRouteId) =>
-	route !== "board" && route !== "cheats" && route !== "editor" && route !== "inventory";
+	route !== "board" && route !== "cheats" && route !== "editor";
 
 /** Selects one explicit pair plus one broad scene relationship for every visible route change. */
 export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTransitionTypesFx")(
@@ -124,11 +115,6 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 							sceneRelationship,
 							pair,
 						];
-			return isEditorBoardLeafTransitionFn(fromLocation.pathname, toLocation.pathname)
-				? [
-						...types,
-						"editor-board-leaf",
-					]
-				: types;
+			return types;
 		}),
 );

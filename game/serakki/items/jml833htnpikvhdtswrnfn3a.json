@@ -12,7 +12,6 @@
 				"beagle-puppy"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -93,7 +92,6 @@
 								"type": "item",
 								"itemId": "beagle-puppy"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -146,7 +144,6 @@
 								"type": "item",
 								"itemId": "beagle-puppy"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -208,7 +205,6 @@
 								"type": "item",
 								"itemId": "beagle-puppy"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -262,7 +258,6 @@
 								"type": "item",
 								"itemId": "beagle-puppy"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -300,7 +295,6 @@
 										"type": "item",
 										"itemId": "disease"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -333,7 +327,6 @@
 								"type": "item",
 								"itemId": "beagle-puppy"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -371,7 +364,6 @@
 										"type": "item",
 										"itemId": "plague"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -404,7 +396,6 @@
 								"type": "item",
 								"itemId": "beagle"
 							},
-							"scope": "board",
 							"distance": "near-close"
 						}
 					},
@@ -419,7 +410,6 @@
 								"type": "item",
 								"itemId": "beagle-puppy"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -457,7 +447,6 @@
 										"type": "item",
 										"itemId": "beagle"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"

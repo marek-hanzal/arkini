@@ -4,7 +4,6 @@ import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesF
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
 import { Effect } from "effect";
 
-import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { advanceDeliveriesRuntimeFx } from "~/production-delivery/fx/advanceDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -164,8 +163,6 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 			readyMaterialJobIds.has(liveJob.id)
 		)
 			continue;
-		const owner = draft.items.find((item) => item.id === liveJob.ownerItemId);
-		if (owner !== undefined && isPassiveStorageLocationFn(owner.location)) continue;
 		const completion = yield* attemptJobCompletionFx({
 			jobId: liveJob.id,
 			runtime: draft,

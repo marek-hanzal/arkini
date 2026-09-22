@@ -72,81 +72,6 @@ describe("fromStateFx job material invariants", () => {
 		);
 	});
 
-	it("hydrates one stateful reserved instance with its passive owned subtree intact", () => {
-		const spentConfig = createJobTestConfig();
-		const worker = spentConfig.items.forge;
-		const reservedInput = worker.lines[0].input[1];
-		if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
-		reservedInput.query.selector = {
-			type: "item",
-			itemId: "forge",
-		};
-		worker.units = {
-			amount: 2,
-		};
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				owner,
-				{
-					id: "runtime:reserved-worker",
-					itemId: "forge",
-					location: {
-						scope: "reserved" as const,
-						jobId: job.id,
-						inputIndex: 1,
-					},
-					remainingUnits: 1,
-					quantity: 1,
-				},
-				{
-					id: "runtime:reserved-water",
-					itemId: "water",
-					location: {
-						scope: "input" as const,
-						ownerItemId: "runtime:reserved-worker",
-						lineId: "line:forge:run",
-						inputIndex: 0,
-					},
-					quantity: 1,
-				},
-			],
-			jobs: [
-				job,
-			],
-			jobQueue: [],
-		} satisfies StateSchema.Type;
-		const runtime = Effect.runSync(
-			fromStateFx({
-				state,
-			}).pipe(
-				useGameFx({
-					config: spentConfig,
-				}),
-			),
-		);
-
-		expect(runtime.items.find((item) => item.id === "runtime:reserved-worker")).toMatchObject({
-			remainingUnits: 1,
-			location: {
-				scope: "reserved",
-				jobId: job.id,
-				inputIndex: 1,
-			},
-		});
-		expect(
-			runtime.items.find((item) => item.id === "runtime:reserved-water")?.location,
-		).toMatchObject({
-			scope: "input",
-			ownerItemId: "runtime:reserved-worker",
-		});
-	});
-
 	it("rejects persisted consumed roots that still own runtime state", () => {
 		const state = {
 			cheats: {
@@ -348,5 +273,80 @@ describe("fromStateFx job material invariants", () => {
 				},
 			});
 		}
+	});
+});
+
+it("hydrates one stateful reserved instance with its passive owned subtree intact", () => {
+	const spentConfig = createJobTestConfig();
+	const worker = spentConfig.items.forge;
+	const reservedInput = worker.lines[0].input[1];
+	if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
+	reservedInput.query.selector = {
+		type: "item",
+		itemId: "forge",
+	};
+	worker.units = {
+		amount: 2,
+	};
+	const state = {
+		cheats: {
+			enabled: false,
+			everEnabled: false,
+			speedUpGameplay: false,
+		},
+		currentSpace: 0,
+		items: [
+			owner,
+			{
+				id: "runtime:reserved-worker",
+				itemId: "forge",
+				location: {
+					scope: "reserved" as const,
+					jobId: job.id,
+					inputIndex: 1,
+				},
+				remainingUnits: 1,
+				quantity: 1,
+			},
+			{
+				id: "runtime:reserved-water",
+				itemId: "water",
+				location: {
+					scope: "input" as const,
+					ownerItemId: "runtime:reserved-worker",
+					lineId: "line:forge:run",
+					inputIndex: 0,
+				},
+				quantity: 1,
+			},
+		],
+		jobs: [
+			job,
+		],
+		jobQueue: [],
+	} satisfies StateSchema.Type;
+	const runtime = Effect.runSync(
+		fromStateFx({
+			state,
+		}).pipe(
+			useGameFx({
+				config: spentConfig,
+			}),
+		),
+	);
+
+	expect(runtime.items.find((item) => item.id === "runtime:reserved-worker")).toMatchObject({
+		remainingUnits: 1,
+		location: {
+			scope: "reserved",
+			jobId: job.id,
+			inputIndex: 1,
+		},
+	});
+	expect(
+		runtime.items.find((item) => item.id === "runtime:reserved-water")?.location,
+	).toMatchObject({
+		scope: "input",
+		ownerItemId: "runtime:reserved-worker",
 	});
 });

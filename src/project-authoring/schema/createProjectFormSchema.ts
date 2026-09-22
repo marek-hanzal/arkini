@@ -1,7 +1,5 @@
 import type { Project } from "~/project-authoring/type/Project";
 import { ProjectFormBaseSchema } from "~/project-authoring/schema/ProjectFormSchema";
-import { readProjectStartItemIdsFn } from "~/project-authoring/fn/readProjectStartItemIdsFn";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */
 export const createProjectFormSchema = (project: Pick<Project, "config" | "resources">) => {
@@ -11,29 +9,6 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			type,
 		]),
 	);
-	const allowedStartItemIds = new Map([
-		[
-			LocationScopeEnumSchema.enum.Board,
-			readProjectStartItemIdsFn({
-				items: project.config.items,
-				scope: LocationScopeEnumSchema.enum.Board,
-			}),
-		],
-		[
-			LocationScopeEnumSchema.enum.Inventory,
-			readProjectStartItemIdsFn({
-				items: project.config.items,
-				scope: LocationScopeEnumSchema.enum.Inventory,
-			}),
-		],
-		[
-			LocationScopeEnumSchema.enum.Toolbar,
-			readProjectStartItemIdsFn({
-				items: project.config.items,
-				scope: LocationScopeEnumSchema.enum.Toolbar,
-			}),
-		],
-	] as const);
 
 	return ProjectFormBaseSchema.superRefine((value, context) => {
 		if (resourceTypes.get(value.hero) !== "image") {
@@ -70,15 +45,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			seenAvatars.add(avatar);
 		});
 
-		const validateItemFn = (
-			itemId: string,
-			quantity: number,
-			scope:
-				| typeof LocationScopeEnumSchema.enum.Board
-				| typeof LocationScopeEnumSchema.enum.Inventory
-				| typeof LocationScopeEnumSchema.enum.Toolbar,
-			path: (string | number)[],
-		) => {
+		const validateItemFn = (itemId: string, quantity: number, path: (string | number)[]) => {
 			const item = project.config.items[itemId];
 			if (item === undefined) {
 				context.addIssue({
@@ -87,13 +54,6 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 					path,
 				});
 				return;
-			}
-			if (!allowedStartItemIds.get(scope)?.has(itemId)) {
-				context.addIssue({
-					code: "custom",
-					message: `${item.title} cannot be stored in ${scope}.`,
-					path,
-				});
 			}
 			if (quantity > item.maxStackSize) {
 				context.addIssue({
@@ -111,12 +71,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				"board",
 				index,
 			];
-			validateItemFn(
-				startItem.itemId,
-				startItem.quantity,
-				LocationScopeEnumSchema.enum.Board,
-				path,
-			);
+			validateItemFn(startItem.itemId, startItem.quantity, path);
 			if (startItem.x >= value.board.width || startItem.y >= value.board.height) {
 				context.addIssue({
 					code: "custom",
@@ -136,75 +91,6 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				});
 			}
 			boardLocations.add(key);
-		});
-
-		const toolbarLocations = new Set<number>();
-		value.start.toolbar.forEach((startItem, index) => {
-			const path = [
-				"start",
-				"toolbar",
-				index,
-			];
-			validateItemFn(
-				startItem.itemId,
-				startItem.quantity,
-				LocationScopeEnumSchema.enum.Toolbar,
-				path,
-			);
-			if (startItem.position.y !== 0 || startItem.position.x >= value.toolbarSize) {
-				context.addIssue({
-					code: "custom",
-					message: `Initial toolbar item ${startItem.itemId} at slot ${startItem.position.x + 1} does not fit inside the toolbar.`,
-					path: [
-						"toolbarSize",
-					],
-				});
-			}
-			if (toolbarLocations.has(startItem.position.x)) {
-				context.addIssue({
-					code: "custom",
-					message: `Initial toolbar slot ${startItem.position.x + 1} is used more than once.`,
-					path,
-				});
-			}
-			toolbarLocations.add(startItem.position.x);
-		});
-
-		const inventoryLocations = new Set<string>();
-		value.start.inventory.forEach((startItem, index) => {
-			const path = [
-				"start",
-				"inventory",
-				index,
-			];
-			validateItemFn(
-				startItem.itemId,
-				startItem.quantity,
-				LocationScopeEnumSchema.enum.Inventory,
-				path,
-			);
-			if (
-				startItem.position.x >= value.inventory.width ||
-				startItem.position.y >= value.inventory.height
-			) {
-				context.addIssue({
-					code: "custom",
-					message: `Initial inventory item ${startItem.itemId} at ${startItem.position.x}, ${startItem.position.y} does not fit inside the inventory.`,
-					path: [
-						"inventory",
-						startItem.position.x >= value.inventory.width ? "width" : "height",
-					],
-				});
-			}
-			const key = `${startItem.position.x}:${startItem.position.y}`;
-			if (inventoryLocations.has(key)) {
-				context.addIssue({
-					code: "custom",
-					message: `Initial inventory slot ${startItem.position.x}, ${startItem.position.y} is used more than once.`,
-					path,
-				});
-			}
-			inventoryLocations.add(key);
 		});
 	});
 };

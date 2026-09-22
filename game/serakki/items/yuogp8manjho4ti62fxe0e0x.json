@@ -12,7 +12,6 @@
 				"key-t5"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 2,
 		"maxQueueSize": 1,
 		"lines": []

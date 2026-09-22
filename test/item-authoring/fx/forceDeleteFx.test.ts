@@ -23,8 +23,6 @@ describe("forceDeleteFx", () => {
 			...createProducerItem({
 				id: "clock",
 			}),
-
-			scope: "board",
 			maxStackSize: 1,
 			clock: {
 				intervalMs: 1000,
@@ -35,7 +33,7 @@ describe("forceDeleteFx", () => {
 							{
 								type: "exists",
 								query: {
-									scope: "any",
+									distance: "far",
 									selector: {
 										type: "item",
 										itemId: "water",
@@ -93,16 +91,6 @@ describe("forceDeleteFx", () => {
 			...editorTestConfig,
 			start: {
 				...editorTestConfig.start,
-				inventory: [
-					{
-						itemId: "water",
-						position: {
-							x: 0,
-							y: 0,
-						},
-						quantity: 2,
-					},
-				],
 			},
 			items: {
 				water: editorTestConfig.items.water,
@@ -153,7 +141,6 @@ describe("forceDeleteFx", () => {
 		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 		expect(result.config.items.water).toBeUndefined();
 		expect(result.config.start.board).toEqual([]);
-		expect(result.config.start.inventory).toEqual([]);
 		expect(result.config.items.oil).toMatchObject({
 			units: {
 				amount: 1,
@@ -189,8 +176,6 @@ describe("forceDeleteFx", () => {
 			],
 			removedStartEntries: {
 				board: 1,
-				inventory: 1,
-				toolbar: 0,
 			},
 		});
 	});
@@ -211,7 +196,6 @@ describe("forceDeleteFx", () => {
 					{
 						type: "units" as const,
 						query: {
-							scope: "board" as const,
 							distance: "close" as const,
 							selector: {
 								type: "item" as const,
@@ -231,7 +215,7 @@ describe("forceDeleteFx", () => {
 							{
 								type: "exists" as const,
 								query: {
-									scope: "universe" as const,
+									distance: "universe" as const,
 									selector: {
 										type: "item" as const,
 										itemId: "water",

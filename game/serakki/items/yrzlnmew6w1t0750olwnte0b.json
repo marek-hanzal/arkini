@@ -12,7 +12,6 @@
 				"fruit-crate"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

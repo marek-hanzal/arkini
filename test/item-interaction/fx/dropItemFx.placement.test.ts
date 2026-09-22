@@ -1,5 +1,4 @@
 import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
-import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { useGameFx } from "~test/support/useGameFx";
@@ -142,59 +141,6 @@ describe("dropItemFx / move storage and swap", () => {
 					item.location.position.y === emptyLocation.position.y,
 			),
 		).toHaveLength(1);
-	});
-
-	it("stores the whole source stack without an opener atomically", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const source = yield* spawnItemFx({
-					id: "runtime:water-source",
-					itemId: "water",
-					location: sourceLocation,
-					quantity: 3,
-				});
-				yield* spawnItemFx({
-					id: "runtime:water-stack",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 8,
-				});
-				const outcome = yield* storeInventoryItemFx({
-					sourceItemId: source.id,
-					sourceRevision: source.revision,
-					sourceLocation,
-				});
-				return {
-					outcome,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
-
-		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKind.StoreInventory,
-			source: {
-				itemId: "runtime:water-source",
-				previousQuantity: 3,
-				current: null,
-			},
-		});
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "water" && item.location.scope === "inventory")
-				.map((item) => item.quantity)
-				.sort((left, right) => left - right),
-		).toEqual([
-			1,
-			10,
-		]);
-		expect(result.runtime.items.some((item) => item.id === "runtime:water-source")).toBe(false);
 	});
 	it("swaps two non-mergeable occupied Board items and returns both actor identities", () => {
 		const result = run(

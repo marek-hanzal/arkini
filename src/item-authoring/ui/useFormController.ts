@@ -178,7 +178,6 @@ export const useFormController = ({
 			if (current.description !== next.description)
 				form.setFieldValue("description", next.description);
 			if (current.ui !== next.ui) form.setFieldValue("ui", next.ui);
-			if (current.scope !== next.scope) form.setFieldValue("scope", next.scope);
 			if (current.maxStackSize !== next.maxStackSize)
 				form.setFieldValue("maxStackSize", next.maxStackSize);
 			if (current.artwork !== next.artwork) form.setFieldValue("artwork", next.artwork);

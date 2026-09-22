@@ -12,7 +12,6 @@
 				"molasses-jar"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 1200000,

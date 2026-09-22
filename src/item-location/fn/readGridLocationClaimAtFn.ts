@@ -1,4 +1,4 @@
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { GridLocationClaim } from "./readGridLocationClaimsFn";
 import { readGridLocationKeyFn } from "./readGridLocationKeyFn";
 
@@ -8,7 +8,7 @@ export const readGridLocationClaimAtFn = ({
 	location,
 }: {
 	readonly claims: ReadonlyArray<GridLocationClaim>;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }) => {
 	const key = readGridLocationKeyFn(location);
 	for (const claim of claims) {

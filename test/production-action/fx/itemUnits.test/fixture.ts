@@ -88,7 +88,6 @@ export const output = (...itemIds: string[]) => ({
 export const targetUnitInput = (itemId: string) => ({
 	type: "units" as const,
 	query: {
-		scope: "board" as const,
 		selector: {
 			type: "item" as const,
 			itemId,
@@ -101,15 +100,7 @@ export const targetUnitInput = (itemId: string) => ({
 	},
 });
 
-export const base = ({
-	id,
-	maxStackSize = 1,
-	scope = "board",
-}: {
-	id: string;
-	maxStackSize?: number;
-	scope?: "any" | "board";
-}) => ({
+export const base = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -120,7 +111,6 @@ export const base = ({
 			`artwork:${id}`,
 		],
 	},
-	scope,
 	maxStackSize,
 });
 
@@ -134,10 +124,6 @@ export const unitsConfig = GameConfigSchema.parse({
 		board: {
 			width: 4,
 			height: 2,
-		},
-		inventory: {
-			width: 1,
-			height: 1,
 		},
 	},
 	start: {
@@ -233,7 +219,6 @@ export const unitsConfig = GameConfigSchema.parse({
 						{
 							type: "units",
 							query: {
-								scope: "board",
 								selector: {
 									type: "item",
 									itemId: "units:empty",
@@ -346,7 +331,6 @@ export const unitsConfig = GameConfigSchema.parse({
 						{
 							type: "units",
 							query: {
-								scope: "board",
 								selector: {
 									type: "item",
 									itemId: "units:self-well",
@@ -462,7 +446,6 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			...base({
 				id: "item:blocker",
-				scope: "any",
 			}),
 		},
 	},

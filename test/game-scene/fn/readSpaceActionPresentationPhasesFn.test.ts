@@ -18,7 +18,6 @@ const unitOwnerItem = {
 			"artwork:tree",
 		],
 	},
-	scope: "board",
 	maxStackSize: 1,
 	units: {
 		amount: 2,

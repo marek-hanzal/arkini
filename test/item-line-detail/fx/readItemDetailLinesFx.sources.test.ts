@@ -5,7 +5,6 @@ import {
 	expect,
 	it,
 	readLines,
-	type RuntimeSchema,
 } from "../support/readItemDetailLinesFxFixture";
 
 describe("readItemDetailLinesFx / unit sources", () => {
@@ -101,56 +100,6 @@ describe("readItemDetailLinesFx / unit sources", () => {
 						"runtime:tree",
 					],
 					ready: false,
-				},
-			],
-		});
-	});
-
-	it("projects stored units owners without inventing a board origin", () => {
-		const config = createUnitsConfig(1);
-		const boardRuntime = createUnitsRuntime(config, [
-			{
-				id: "runtime:tree",
-				x: 1,
-				y: 0,
-			},
-		]);
-		const storedRuntime = {
-			...boardRuntime,
-			items: boardRuntime.items.map((item) =>
-				item.id === "runtime:workshop"
-					? {
-							...item,
-							location: {
-								scope: "inventory" as const,
-								position: {
-									x: 0,
-									y: 0,
-								},
-							},
-						}
-					: item,
-			),
-		} satisfies RuntimeSchema.Type;
-
-		const lines = readLines(storedRuntime, "runtime:workshop", config);
-		expect(lines).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					availability: {
-						kind: "unavailable",
-						reason: {
-							kind: "owner-stored",
-						},
-					},
-					input: [
-						{
-							kind: "units",
-							availableUnits: 0,
-							targetItemIds: [],
-						},
-					],
 				},
 			],
 		});

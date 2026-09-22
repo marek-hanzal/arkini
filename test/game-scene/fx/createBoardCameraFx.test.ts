@@ -7,7 +7,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import { readInventoryLayoutFn } from "~/game-scene/fn/readInventoryLayoutFn";
 import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
 const cleanup: Array<() => void> = [];
@@ -145,7 +144,6 @@ const mountFn = (
 const mainLayout = readMainLayoutFn({
 	boardHeight: 3,
 	boardWidth: 4,
-	toolbarSize: 2,
 	fixedCellSize: 512,
 	width: 1000,
 	height: 800,
@@ -158,19 +156,9 @@ const cases: Array<{
 	];
 }> = [
 	{
-		name: "Board + Toolbar",
+		name: "Board",
 		surfaces: [
 			mainLayout.board,
-			mainLayout.toolbar!,
-		],
-	},
-	{
-		name: "Inventory",
-		surfaces: [
-			readInventoryLayoutFn({
-				columns: 5,
-				rows: 4,
-			}).surface,
 		],
 	},
 ];
@@ -323,7 +311,6 @@ describe("Board edge navigation", () => {
 	it("continues without pointer movement and stops on overlays, pointer exit, blur and teardown", () => {
 		const mounted = mountFn([
 			mainLayout.board,
-			mainLayout.toolbar!,
 		]);
 		mounted.stage.scale.set(1);
 		mounted.stage.position.set(0, 0);
@@ -348,51 +335,9 @@ describe("Board edge navigation", () => {
 		expect(mounted.edgeFrames.size).toBe(0);
 	});
 
-	it("continues over the toolbar and enables navigation in overflowing inventory", () => {
-		const mounted = mountFn([
-			mainLayout.board,
-			mainLayout.toolbar!,
-		]);
-		mounted.stage.scale.set(1);
-		mounted.stage.position.set(990 - mainLayout.toolbar!.x, 100 - mainLayout.toolbar!.y);
-		mounted.pointerFn("pointermove", 1015, 145, 0);
-		expect(mounted.edgeFrames.size).toBe(1);
-		const inventory = mountFn([
-			readInventoryLayoutFn({
-				columns: 5,
-				rows: 4,
-			}).surface,
-		]);
-		inventory.stage.scale.set(1);
-		inventory.pointerFn("pointermove", 1010, 440, 0);
-		expect(inventory.edgeFrames.size).toBe(1);
-	});
-
-	it("keeps scrolling down through the gap and past the Board-only limit", () => {
-		const mounted = mountFn([
-			mainLayout.board,
-			mainLayout.toolbar!,
-		]);
-		mounted.stage.scale.set(1);
-		const boardBottom = mainLayout.board.y + mainLayout.board.height;
-		const gapMiddle = (boardBottom + mainLayout.toolbar!.y) / 2;
-		mounted.stage.position.set(0, 790 - gapMiddle);
-		mounted.pointerFn("pointermove", 520, 830, 0);
-		expect(mounted.edgeFrames.size).toBe(1);
-		const beforeGap = mounted.stage.y;
-		mounted.frameFn();
-		expect(mounted.stage.y).toBeLessThan(beforeGap);
-		// The entire toolbar remains reachable beyond the old Board-only overscroll bound.
-		mounted.stage.y = 800 - boardBottom - mainLayout.board.cellSize;
-		const oldLimit = mounted.stage.y;
-		mounted.frameFn();
-		expect(mounted.stage.y).toBeLessThan(oldLimit);
-	});
-
 	it("keeps edge navigation active with a held item and refreshes its stationary pointer", () => {
 		const mounted = mountFn([
 			mainLayout.board,
-			mainLayout.toolbar!,
 		]);
 		mounted.stage.scale.set(1);
 		mounted.stage.position.set(0, 0);
@@ -415,7 +360,6 @@ describe("Board edge navigation", () => {
 	it("does not run in fitted view and cancels before an item or camera drag", () => {
 		const mounted = mountFn([
 			mainLayout.board,
-			mainLayout.toolbar!,
 		]);
 		mounted.pointerFn("pointermove", 1010, 440, 0);
 		expect(mounted.edgeFrames.size).toBe(0);

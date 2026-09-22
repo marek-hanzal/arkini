@@ -13,7 +13,6 @@
 				"townhall-t2"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -35,7 +34,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -50,7 +49,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -65,7 +64,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -107,7 +106,7 @@
 										"type": "item",
 										"itemId": "house-t2-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -122,7 +121,7 @@
 										"type": "item",
 										"itemId": "house-t2"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -149,7 +148,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -164,7 +163,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -179,7 +178,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -221,7 +220,7 @@
 										"type": "item",
 										"itemId": "house-t2"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -236,7 +235,7 @@
 										"type": "item",
 										"itemId": "school-t2-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -251,7 +250,7 @@
 										"type": "item",
 										"itemId": "school-t2"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -278,7 +277,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -293,7 +292,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -308,7 +307,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -350,7 +349,7 @@
 										"type": "item",
 										"itemId": "composting-workshop-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -365,7 +364,7 @@
 										"type": "item",
 										"itemId": "composting-workshop"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -392,7 +391,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -407,7 +406,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -422,7 +421,7 @@
 								"type": "item",
 								"itemId": "knowledge-t2"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -464,7 +463,7 @@
 										"type": "item",
 										"itemId": "composting-workshop"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -479,7 +478,7 @@
 										"type": "item",
 										"itemId": "growers-guild-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -494,7 +493,7 @@
 										"type": "item",
 										"itemId": "growers-guild"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -521,7 +520,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -536,7 +535,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -551,7 +550,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -593,7 +592,7 @@
 										"type": "item",
 										"itemId": "growers-guild"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -608,7 +607,7 @@
 										"type": "item",
 										"itemId": "animal-feed-workshop-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -623,7 +622,7 @@
 										"type": "item",
 										"itemId": "animal-feed-workshop"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -650,7 +649,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -665,7 +664,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -680,7 +679,7 @@
 								"type": "item",
 								"itemId": "knowledge-t2"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -722,7 +721,7 @@
 										"type": "item",
 										"itemId": "animal-feed-workshop"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -737,7 +736,7 @@
 										"type": "item",
 										"itemId": "herders-guild-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -752,7 +751,7 @@
 										"type": "item",
 										"itemId": "herders-guild"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}

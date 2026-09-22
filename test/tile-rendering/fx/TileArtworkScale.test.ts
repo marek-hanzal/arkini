@@ -22,8 +22,6 @@ const palette: PixiScenePalette = {
 	overlayForeground: 0xffffff,
 	success: 0,
 	surface: 0,
-	toolbarA: 0,
-	toolbarB: 0,
 };
 const createItemFn = (artworkScale: number): TileActorItem => ({
 	artworkScale,
@@ -142,20 +140,6 @@ describe("authored tile artwork scale", () => {
 			await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
 			for (const location of [
 				item.location,
-				{
-					scope: "inventory" as const,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				{
-					scope: "toolbar" as const,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
 			]) {
 				for (const size of [
 					512,

@@ -22,7 +22,6 @@ const simpleItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "any" as const,
 	maxStackSize: 10,
 });
 
@@ -53,7 +52,7 @@ const output = (itemId: string) => ({
 const materialInput = (itemId: string) => ({
 	type: "materials" as const,
 	query: {
-		scope: "any" as const,
+		distance: "far",
 		selector: {
 			type: "item" as const,
 			itemId,
@@ -86,7 +85,6 @@ const producer = ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize: 1,
 	maxQueueSize: 4,
 	lines: [
@@ -121,10 +119,6 @@ const config = GameConfigSchema.parse({
 		board: {
 			width: 8,
 			height: 3,
-		},
-		inventory: {
-			width: 3,
-			height: 1,
 		},
 	},
 	start: {

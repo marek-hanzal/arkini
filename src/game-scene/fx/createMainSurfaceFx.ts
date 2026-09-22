@@ -51,7 +51,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				boardHeight: game.config.meta.board.height,
 				boardWidth: game.config.meta.board.width,
 				height: application.app.screen.height,
-				toolbarSize: game.config.meta.toolbarSize ?? 0,
 				width: application.app.screen.width,
 			});
 
@@ -63,10 +62,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				eventMode: "passive",
 				label: "BoardActorLayer",
 			});
-			const toolbarActorLayer = new Container({
-				eventMode: "passive",
-				label: "ToolbarActorLayer",
-			});
 			const transientActorLayer = new Container({
 				eventMode: "passive",
 				label: "TransientActorLayer",
@@ -75,31 +70,19 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				eventMode: "none",
 				label: "BoardGrid",
 			});
-			const toolbarGrid = new Graphics({
-				eventMode: "none",
-				label: "ToolbarGrid",
-			});
 			const boardMask = new Graphics({
 				eventMode: "none",
 				label: "BoardMask",
 			});
-			const toolbarMask = new Graphics({
-				eventMode: "none",
-				label: "ToolbarMask",
-			});
 
-			gridLayer.addChild(boardGrid, toolbarGrid);
+			gridLayer.addChild(boardGrid);
 			boardGrid.mask = boardMask;
-			toolbarGrid.mask = toolbarMask;
 			boardActorLayer.mask = boardMask;
-			toolbarActorLayer.mask = toolbarMask;
 			application.stage.addChild(
 				gridLayer,
 				dropFeedback.container,
 				boardMask,
-				toolbarMask,
 				boardActorLayer,
-				toolbarActorLayer,
 				transientActorLayer,
 			);
 			application.stage.eventMode = "static";
@@ -117,39 +100,19 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						y: layout.board.y + location.position.y * layout.board.cellSize,
 					};
 				}
-				if (
-					location.scope === LocationScopeEnumSchema.enum.Toolbar &&
-					layout.toolbar !== null
-				) {
-					return {
-						layer: toolbarActorLayer,
-						size: layout.toolbar.cellSize,
-						x: layout.toolbar.x + location.position.x * layout.toolbar.cellSize,
-						y: layout.toolbar.y,
-					};
-				}
 				return null;
 			};
 
 			const readTargetLocationFn = (
 				target: PixiSceneDropTarget,
-			): TileActorItem["location"] =>
-				target.layout.kind === "board"
-					? {
-							scope: LocationScopeEnumSchema.enum.Board,
-							space: latestTransition.runtime.currentSpace,
-							position: {
-								x: target.x,
-								y: target.y,
-							},
-						}
-					: {
-							scope: LocationScopeEnumSchema.enum.Toolbar,
-							position: {
-								x: target.x,
-								y: 0,
-							},
-						};
+			): TileActorItem["location"] => ({
+				scope: LocationScopeEnumSchema.enum.Board,
+				space: latestTransition.runtime.currentSpace,
+				position: {
+					x: target.x,
+					y: target.y,
+				},
+			});
 
 			const readTargetFactsFromTargetFx = (
 				target: PixiSceneDropTarget | null,
@@ -199,19 +162,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				});
 
 			const readDropTargetFn = (x: number, y: number): PixiSceneDropTarget | null => {
-				const toolbar = layout.toolbar;
-				const toolbarSlot = readSlotFn({
-					surface: toolbar,
-					x,
-					y,
-				});
-				if (toolbar !== null && toolbarSlot !== null) {
-					return {
-						kind: "slot" as const,
-						layout: toolbar,
-						...toolbarSlot,
-					};
-				}
 				const boardSlot = readSlotFn({
 					surface: layout.board,
 					x,
@@ -233,9 +183,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					closed = true;
 					for (const displayObject of [
 						transientActorLayer,
-						toolbarActorLayer,
 						boardActorLayer,
-						toolbarMask,
 						boardMask,
 						gridLayer,
 					]) {
@@ -261,7 +209,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						boardHeight: game.config.meta.board.height,
 						boardWidth: game.config.meta.board.width,
 						height: application.app.screen.height,
-						toolbarSize: game.config.meta.toolbarSize ?? 0,
 						width: application.app.screen.width,
 					});
 
@@ -275,23 +222,9 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						surface: layout.board,
 						surfaceColor: palette.surface,
 					});
-					yield* drawSurfaceFx({
-						graphics: toolbarGrid,
-						lineColor: palette.line,
-						slotColors: [
-							palette.toolbarA,
-							palette.toolbarB,
-						],
-						surface: layout.toolbar,
-						surfaceColor: palette.surface,
-					});
 					yield* drawMaskFx({
 						graphics: boardMask,
 						surface: layout.board,
-					});
-					yield* drawMaskFx({
-						graphics: toolbarMask,
-						surface: layout.toolbar,
 					});
 					yield* application.frames.invalidateFx;
 				}),

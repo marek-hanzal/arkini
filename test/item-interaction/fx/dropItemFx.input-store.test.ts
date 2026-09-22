@@ -73,10 +73,6 @@ const authoredDefaultBlockedConfig = GameConfigSchema.parse({
 		...authoredDefaultConfig.meta,
 		id: "game:drop-input-authored-default-blocked",
 		board: {
-			width: 1,
-			height: 1,
-		},
-		inventory: {
 			width: 2,
 			height: 1,
 		},
@@ -241,81 +237,6 @@ describe("dropItemFx default-line input storage", () => {
 			quantity: 2,
 		});
 		expect(result.remainderPure).toBe(true);
-	});
-
-	it("rolls back an authored-default drop when the isolated remainder cannot be placed", () => {
-		const inventorySourceLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const result = run(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:workshop",
-					itemId: "workshop",
-					location: workshopLocation,
-					quantity: 2,
-				});
-				const source = yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: inventorySourceLocation,
-					quantity: 7,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker",
-					itemId: "stone",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const target = targetFor({
-					revision: owner.revision,
-				});
-				const preview = yield* readDropItemPreviewFx({
-					sourceItemId: source.id,
-					sourceRevision: source.revision,
-					sourceLocation: inventorySourceLocation,
-					target,
-				});
-				const before = yield* readRuntimeFx();
-				const dropped = yield* Effect.result(
-					dropItemFx({
-						sourceItemId: source.id,
-						sourceRevision: source.revision,
-						sourceLocation: inventorySourceLocation,
-						target,
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					dropped,
-					preview,
-				};
-			}),
-			authoredDefaultBlockedConfig,
-		);
-
-		expect(result.preview.kind).toBe(DropItemResultKind.StoreInput);
-		expect(result.dropped._tag).toBe("Success");
-		if (result.dropped._tag === "Success") {
-			expect(result.dropped.success).toEqual({
-				kind: DropItemResultKind.Reject,
-				reason: "blocked",
-				itemId: "runtime:water",
-				targetItemId: "runtime:workshop",
-			});
-		}
-		expect(result.after).toEqual(result.before);
 	});
 
 	it("previews and commits a full visible source store before swap", () => {
@@ -601,4 +522,68 @@ describe("dropItemFx default-line input storage", () => {
 			kind: DropItemResultKind.Merge,
 		});
 	});
+});
+
+it("rolls back an authored-default drop when the isolated remainder cannot be placed", () => {
+	const sourceBoardLocation = {
+		scope: "board" as const,
+		space: 0,
+		position: {
+			x: 1,
+			y: 0,
+		},
+	};
+	const result = run(
+		Effect.gen(function* () {
+			const owner = yield* spawnItemFx({
+				id: "runtime:workshop",
+				itemId: "workshop",
+				location: workshopLocation,
+				quantity: 2,
+			});
+			const source = yield* spawnItemFx({
+				id: "runtime:water",
+				itemId: "water",
+				location: sourceBoardLocation,
+				quantity: 7,
+			});
+			const target = targetFor({
+				revision: owner.revision,
+			});
+			const preview = yield* readDropItemPreviewFx({
+				sourceItemId: source.id,
+				sourceRevision: source.revision,
+				sourceLocation: sourceBoardLocation,
+				target,
+			});
+			const before = yield* readRuntimeFx();
+			const dropped = yield* Effect.result(
+				dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: sourceBoardLocation,
+					target,
+				}),
+			);
+			return {
+				after: yield* readRuntimeFx(),
+				before,
+				dropped,
+				preview,
+			};
+		}),
+		authoredDefaultBlockedConfig,
+	);
+
+	expect(result.preview.kind).toBe(DropItemResultKind.StoreInput);
+	expect(result.dropped._tag).toBe("Success");
+	if (result.dropped._tag === "Success") {
+		expect(result.dropped.success).toEqual({
+			kind: DropItemResultKind.Reject,
+			reason: "blocked",
+			itemId: "runtime:water",
+			targetItemId: "runtime:workshop",
+		});
+	}
+	expect(result.after).toEqual(result.before);
 });

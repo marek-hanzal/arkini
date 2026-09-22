@@ -94,24 +94,14 @@ describe("ProjectGeneralDetail", () => {
 		});
 
 		const links = Array.from(container.querySelectorAll<HTMLAnchorElement>("a"));
-		expect(links).toHaveLength(3);
+		expect(links).toHaveLength(1);
 		expect(links.map((link) => link.dataset.to)).toEqual([
-			"/editor/$projectId/project/detail/$sectionId",
-			"/editor/$projectId/project/detail/$sectionId",
 			"/editor/$projectId/project/detail/$sectionId",
 		]);
 		expect(links.map((link) => JSON.parse(link.dataset.params ?? "null"))).toEqual([
 			{
 				projectId: project.projectId,
 				sectionId: "board",
-			},
-			{
-				projectId: project.projectId,
-				sectionId: "inventory",
-			},
-			{
-				projectId: project.projectId,
-				sectionId: "toolbar",
 			},
 		]);
 		const rename = Array.from(container.querySelectorAll("button")).find(

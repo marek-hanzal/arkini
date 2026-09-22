@@ -3,13 +3,13 @@ import { Effect } from "effect";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
-import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace detachLineInputSourceFx {
 	export interface Props {
 		readonly runtime: RuntimeSchema.Type;
-		readonly source: GridRuntimeItemSchema.Type;
+		readonly source: BoardRuntimeItemSchema.Type;
 	}
 
 	export type Result =

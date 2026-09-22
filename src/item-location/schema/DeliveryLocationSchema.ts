@@ -4,7 +4,7 @@ import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeInteger
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPhaseEnumSchema";
 import { LineInputDeliveryTargetSchema } from "~/production-delivery/schema/LineInputDeliveryTargetSchema";
-import { GridLocationSchema } from "./GridLocationSchema";
+import { BoardLocationSchema } from "./BoardLocationSchema";
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 
 /**
@@ -21,7 +21,7 @@ const DeliveryLocationBaseSchema = z.object({
 	generation: NonNegativeIntegerSchema.describe(
 		"The monotonically increasing completion generation of this delivery.",
 	),
-	origin: GridLocationSchema.describe(
+	origin: BoardLocationSchema.describe(
 		"The exact grid cell leased until this delivery no longer needs to return.",
 	),
 	remainingDurationMs: TimeSchema.describe(
@@ -41,7 +41,7 @@ export const DeliveryLocationSchema = z
 			phase: DeliveryPhaseEnumSchema.extract([
 				"Returning",
 			]),
-			returnFrom: GridLocationSchema.describe(
+			returnFrom: BoardLocationSchema.describe(
 				"The semantic location from which return motion is reconstructed after hydration.",
 			),
 		}).strict(),

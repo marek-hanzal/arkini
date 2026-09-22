@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/item-interaction/fn/makeDropRejectedResultFn";
@@ -15,10 +15,10 @@ export namespace commitStoreInputDropFx {
 	export interface Props {
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
+		readonly sourceLocation: BoardLocationSchema.Type;
 		readonly targetItemId: IdSchema.Type;
 		readonly targetRevision: RevisionSchema.Type;
-		readonly targetLocation: GridLocationSchema.Type;
+		readonly targetLocation: BoardLocationSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly inputIndex: number;
 		readonly quantity: number;

@@ -82,7 +82,7 @@ describe("committed material expiry settlement", () => {
 					{
 						type: "exists",
 						query: {
-							scope: "any",
+							distance: "self",
 							selector: {
 								type: "item",
 								itemId: "owner",
@@ -124,7 +124,7 @@ describe("committed material expiry settlement", () => {
 		config.items.owner!.lines[0]!.input.push({
 			type: "materials",
 			query: {
-				scope: "any",
+				distance: "self",
 				selector: {
 					type: "item",
 					itemId: "blocker",

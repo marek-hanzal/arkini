@@ -12,7 +12,6 @@
 				"playing-british-shorthair-kittens"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 15000,

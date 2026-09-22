@@ -5,8 +5,6 @@ import type { GameLayerFx } from "~test/support/GameLayerFx";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-import { spawnItemFx } from "~test/support/spawnItemFx";
-
 export const configInput = {
 	resources: {
 		hero: "hero",
@@ -18,11 +16,6 @@ export const configInput = {
 			width: 3,
 			height: 2,
 		},
-		inventory: {
-			width: 2,
-			height: 1,
-		},
-		toolbarSize: 1,
 	},
 	start: {
 		currentSpace: 0,
@@ -43,7 +36,6 @@ export const configInput = {
 					"artwork:water",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 		stone: {
@@ -61,25 +53,7 @@ export const configInput = {
 					"artwork:stone",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
-		},
-		backpack: {
-			uid: "backpack",
-			id: "backpack",
-			action: {
-				type: "inventory",
-			},
-			scope: "any",
-			maxStackSize: 1,
-			title: "Backpack",
-			description: "Backpack",
-			artwork: {
-				scale: 0.8,
-				default: [
-					"artwork:backpack",
-				],
-			},
 		},
 	},
 } as const;
@@ -172,21 +146,6 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 	},
 });
 
-export const inventoryMergeResultScopeConfig = GameConfigSchema.parse({
-	...replaceMergeConfig,
-	meta: {
-		...replaceMergeConfig.meta,
-		id: "game:drop-item-inventory-merge-result-scope",
-	},
-	items: {
-		...replaceMergeConfig.items,
-		mud: {
-			...replaceMergeConfig.items.mud,
-			scope: "inventory",
-		},
-	},
-});
-
 export const sourceLocation = {
 	scope: "board" as const,
 	space: 0,
@@ -213,22 +172,6 @@ export const occupiedLocation = {
 		y: 0,
 	},
 };
-
-export const inventoryOpenerLocation = {
-	scope: "toolbar" as const,
-	position: {
-		x: 0,
-		y: 0,
-	},
-};
-
-export const spawnInventoryOpenerFx = () =>
-	spawnItemFx({
-		id: "runtime:backpack",
-		itemId: "backpack",
-		location: inventoryOpenerLocation,
-		quantity: 1,
-	});
 
 export const run = <A, E>(
 	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,

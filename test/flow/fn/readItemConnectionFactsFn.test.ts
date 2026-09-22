@@ -126,7 +126,6 @@ it("retains input and condition positions without turning absence-only guards in
 		},
 	});
 	const query = {
-		scope: "board" as const,
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
@@ -267,7 +266,7 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 			{
 				type: "exists" as const,
 				query: {
-					scope: "universe" as const,
+					distance: "universe",
 					selector: {
 						type: "item" as const,
 						itemId: "target",

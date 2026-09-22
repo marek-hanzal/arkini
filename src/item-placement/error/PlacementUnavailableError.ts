@@ -6,8 +6,6 @@ import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 const PlacementFailureReason = {
 	BoardFull: "board:full",
-	InventoryFull: "inventory:full",
-	ToolbarFull: "toolbar:full",
 } as const;
 
 type PlacementFailureReason = (typeof PlacementFailureReason)[keyof typeof PlacementFailureReason];

@@ -5,8 +5,6 @@ export const InvalidMergeReasonEnumSchema = z
 	.enum({
 		SourceUnitsDisabled: "source-units-disabled",
 		TargetUnitsDisabled: "target-units-disabled",
-		TargetUnavailable: "target-unavailable",
-		ResultUnavailable: "result-unavailable",
 	})
 	.meta({
 		id: "InvalidMergeReasonEnumSchema",

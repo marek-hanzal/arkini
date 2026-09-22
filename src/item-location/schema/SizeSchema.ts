@@ -5,7 +5,7 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 /**
  * The two-dimensional size of a game grid.
  *
- * Board and inventory layouts use the same explicit width-by-height contract.
+ * Board layouts use the same explicit width-by-height contract.
  */
 export const SizeSchema = z
 	.object({

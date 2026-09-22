@@ -12,7 +12,6 @@
 				"composting-workshop"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -33,7 +32,7 @@
 								"type": "item",
 								"itemId": "bio-waste"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -86,7 +85,7 @@
 								"type": "item",
 								"itemId": "spoiled-raw-game-meat"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -139,7 +138,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

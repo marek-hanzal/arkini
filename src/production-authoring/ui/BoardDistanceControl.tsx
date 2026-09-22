@@ -25,6 +25,10 @@ const boardDistanceOptions = [
 		...BoardDistancePresentation.far,
 		value: "far",
 	},
+	{
+		...BoardDistancePresentation.universe,
+		value: "universe",
+	},
 ] as const;
 
 export const BoardDistanceControl = ({
@@ -34,34 +38,18 @@ export const BoardDistanceControl = ({
 }: {
 	readonly error?: string;
 	readonly onChangeFn: (query: QuerySchema.Type) => void;
-	readonly value: Extract<
-		QuerySchema.Type,
-		{
-			readonly scope: "board";
-		}
-	>;
+	readonly value: QuerySchema.Type;
 }) => {
 	const translator = useTranslator();
 	return (
 		<EditorChoiceControl
 			error={error}
-			label={translator.textFn("Board distance")}
+			label={translator.textFn("Query reach")}
 			value={value.distance}
 			options={boardDistanceOptions.map((option) => ({
 				...option,
 				label: translator.textFn(option.label),
-				description:
-					option.value === "self" ? (
-						<Mx label="Board distance Self help" />
-					) : option.value === "close" ? (
-						<Mx label="Board distance Close help" />
-					) : option.value === "near-close" ? (
-						<Mx label="Board distance Near-Close help" />
-					) : option.value === "near" ? (
-						<Mx label="Board distance Near help" />
-					) : (
-						<Mx label="Board distance Far help" />
-					),
+				description: <Mx label={option.description} />,
 			}))}
 			onChangeFn={(distance) =>
 				onChangeFn({

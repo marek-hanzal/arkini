@@ -8,11 +8,9 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
 	boardLocation,
 	configuredDrop,
-	inventoryLocation,
 	placementTestConfig,
 } from "~test/item-placement/support/placementTestConfig";
 import { placeDropForTestFx } from "~test/item-placement/support/placeDropForTestFx";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 
 const requirePlacement = <Value>(value: Value | undefined): Value => {
 	expect(value).toBeDefined();
@@ -24,217 +22,6 @@ const requirePlacement = <Value>(value: Value | undefined): Value => {
 };
 
 describe("drop placement transition", () => {
-	it("fills board stacks, then nearby board cells, then inventory", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:log",
-					itemId: "log",
-					location: boardLocation(1),
-					quantity: 2,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker",
-					itemId: "blocker",
-					location: boardLocation(3),
-					quantity: 1,
-				});
-
-				const placement = yield* placeDropForTestFx({
-					drop: configuredDrop({
-						itemId: "log",
-						placement: "drop",
-						quantity: 5,
-					}),
-					originItemId: "runtime:origin",
-				});
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					placement,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		const placement = requirePlacement(result.placement);
-
-		expect(placement.placement.stack).toEqual([
-			{
-				item: expect.objectContaining({
-					id: "runtime:log",
-					quantity: 3,
-				}),
-				quantity: 1,
-			},
-		]);
-		expect(placement.placement.spawn).toEqual([
-			expect.objectContaining({
-				item: expect.objectContaining({
-					id: "log",
-				}),
-				location: boardLocation(2),
-				quantity: 3,
-			}),
-			expect.objectContaining({
-				item: expect.objectContaining({
-					id: "log",
-				}),
-				location: inventoryLocation(0),
-				quantity: 1,
-			}),
-		]);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "log")
-				.map((item) => item.quantity),
-		).toEqual([
-			3,
-			3,
-			1,
-		]);
-	});
-
-	it("places inventory-only drops directly into inventory stacks and cells", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:inventory-item",
-					itemId: "inventory-only",
-					location: inventoryLocation(1),
-					quantity: 1,
-				});
-
-				const placement = yield* placeDropForTestFx({
-					drop: configuredDrop({
-						itemId: "inventory-only",
-						placement: "random",
-						quantity: 3,
-					}),
-					originItemId: "runtime:origin",
-				});
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					placement,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		const placement = requirePlacement(result.placement);
-
-		expect(placement.placement.stack).toEqual([
-			{
-				item: expect.objectContaining({
-					id: "runtime:inventory-item",
-					quantity: 2,
-				}),
-				quantity: 1,
-			},
-		]);
-		expect(placement.placement.spawn).toEqual([
-			expect.objectContaining({
-				location: inventoryLocation(0),
-				quantity: 2,
-			}),
-		]);
-		expect(
-			result.runtime.items.some(
-				(item) => item.item.id === "inventory-only" && item.location.scope === "board",
-			),
-		).toBe(false);
-	});
-
-	it("rejects incomplete placement without committing partial stacks or spawns", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				for (const x of [
-					1,
-					2,
-					3,
-				]) {
-					yield* spawnItemFx({
-						id: `runtime:board:${x}`,
-						itemId: "blocker",
-						location: boardLocation(x),
-						quantity: 1,
-					});
-				}
-				for (const x of [
-					0,
-					1,
-				]) {
-					yield* spawnItemFx({
-						id: `runtime:inventory:${x}`,
-						itemId: "blocker",
-						location: inventoryLocation(x),
-						quantity: 1,
-					});
-				}
-				const before = yield* readRuntimeFx();
-				const placement = yield* Effect.result(
-					placeDropForTestFx({
-						drop: configuredDrop({
-							itemId: "log",
-							placement: "drop",
-							quantity: 1,
-						}),
-						originItemId: "runtime:origin",
-					}),
-				);
-				const after = yield* readRuntimeFx();
-
-				return {
-					after,
-					before,
-					placement,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.placement)).toBe(true);
-		if (Result.isFailure(result.placement)) {
-			expect(result.placement.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				itemId: "log",
-				reason: "inventory:full",
-				remainingQuantity: 1,
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
-
 	it("does not consume randomness for configured-origin drop placement", () => {
 		const nextRandom = Effect.runSync(
 			Effect.gen(function* () {
@@ -367,113 +154,6 @@ describe("drop placement transition", () => {
 		expect(result.nextRandom).toBe(0.5);
 	});
 
-	it("uses a fresh random Board origin per Board-only unit from Inventory", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const runtime = yield* readRuntimeFx();
-				const [placement] = yield* applyOutputPlacementFx({
-					origin: inventoryLocation(0),
-					output: {
-						drop: [
-							{
-								itemId: "board-only",
-								placement: "random",
-								quantity: 2,
-							},
-						],
-					},
-					runtime,
-				});
-				const nextRandom = yield* Random.next;
-
-				return {
-					nextRandom,
-					placement,
-				};
-			}).pipe(
-				Effect.provideServiceEffect(
-					Random.Random,
-					makeFixedRandomFx([
-						0,
-						0.75,
-						0.5,
-					]),
-				),
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(result.placement.drop[0]?.placement.spawn).toEqual([
-			expect.objectContaining({
-				location: boardLocation(0),
-			}),
-			expect.objectContaining({
-				location: boardLocation(3),
-			}),
-		]);
-		expect(result.nextRandom).toBe(0.5);
-	});
-
-	it("draws separately for every any-scope unit that falls through Inventory to Board", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:inventory:blocker",
-					itemId: "blocker",
-					location: inventoryLocation(0),
-					quantity: 1,
-				});
-				const runtime = yield* readRuntimeFx();
-				const [placement] = yield* applyOutputPlacementFx({
-					origin: inventoryLocation(0),
-					output: {
-						drop: [
-							{
-								itemId: "blocker",
-								placement: "random",
-								quantity: 3,
-							},
-						],
-					},
-					runtime,
-				});
-				const nextRandom = yield* Random.next;
-
-				return {
-					nextRandom,
-					placement,
-				};
-			}).pipe(
-				Effect.provideServiceEffect(
-					Random.Random,
-					makeFixedRandomFx([
-						0,
-						0.75,
-						0.5,
-					]),
-				),
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(result.placement.drop[0]?.placement.spawn).toEqual([
-			expect.objectContaining({
-				location: inventoryLocation(1),
-			}),
-			expect.objectContaining({
-				location: boardLocation(0),
-			}),
-			expect.objectContaining({
-				location: boardLocation(3),
-			}),
-		]);
-		expect(result.nextRandom).toBe(0.5);
-	});
-
 	it("orders stack-first placement around the random origin", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -593,4 +273,67 @@ describe("drop placement transition", () => {
 			1,
 		);
 	});
+});
+
+it("rejects incomplete placement without committing partial stacks or spawns", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "runtime:origin",
+				itemId: "origin",
+				location: boardLocation(0),
+				quantity: 1,
+			});
+			for (const x of [
+				1,
+				2,
+				3,
+			]) {
+				yield* spawnItemFx({
+					id: `runtime:board:${x}`,
+					itemId: "blocker",
+					location: boardLocation(x),
+					quantity: 1,
+				});
+			}
+			for (const {} of [
+				0,
+				1,
+			]) {
+			}
+			const before = yield* readRuntimeFx();
+			const placement = yield* Effect.result(
+				placeDropForTestFx({
+					drop: configuredDrop({
+						itemId: "log",
+						placement: "drop",
+						quantity: 1,
+					}),
+					originItemId: "runtime:origin",
+				}),
+			);
+			const after = yield* readRuntimeFx();
+
+			return {
+				after,
+				before,
+				placement,
+			};
+		}).pipe(
+			useGameFx({
+				config: placementTestConfig,
+			}),
+		),
+	);
+
+	expect(Result.isFailure(result.placement)).toBe(true);
+	if (Result.isFailure(result.placement)) {
+		expect(result.placement.failure).toMatchObject({
+			_tag: "PlacementUnavailableError",
+			itemId: "log",
+			reason: "board:full",
+			remainingQuantity: 1,
+		});
+	}
+	expect(result.after).toEqual(result.before);
 });

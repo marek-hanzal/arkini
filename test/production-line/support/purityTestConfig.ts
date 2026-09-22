@@ -11,7 +11,6 @@ const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number
 			`artwork:${id}`,
 		],
 	},
-	scope: "any" as const,
 	maxStackSize,
 });
 
@@ -24,10 +23,6 @@ export const purityTestConfig = GameConfigSchema.parse({
 		title: "Purity",
 		board: {
 			width: 4,
-			height: 1,
-		},
-		inventory: {
-			width: 2,
 			height: 1,
 		},
 	},
@@ -60,7 +55,7 @@ export const purityTestConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "material",
@@ -96,7 +91,7 @@ export const purityTestConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "material",

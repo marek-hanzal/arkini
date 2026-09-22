@@ -5,7 +5,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import {
@@ -20,7 +20,6 @@ const configFn = (mode: "reserve" | "consume") => {
 		...inputRuntimeTestConfig,
 		meta: {
 			...inputRuntimeTestConfig.meta,
-			toolbarSize: 2,
 		},
 		items: {
 			...inputRuntimeTestConfig.items,
@@ -37,7 +36,7 @@ const configFn = (mode: "reserve" | "consume") => {
 								type: "materials",
 								mode,
 								query: {
-									scope: "any",
+									distance: "far" as const,
 									selector: {
 										type: "item",
 										itemId: "workshop",
@@ -56,18 +55,16 @@ const configFn = (mode: "reserve" | "consume") => {
 	});
 };
 
-const originFn = (scope: "board" | "inventory" | "toolbar"): GridLocationSchema.Type =>
-	scope === "board"
-		? sourceLocation(2)
-		: {
-				scope,
-				position: {
-					x: 0,
-					y: 0,
-				},
-			};
+const originFn = (): BoardLocationSchema.Type => ({
+	scope: "board",
+	space: 0,
+	position: {
+		x: 2,
+		y: 0,
+	},
+});
 
-const stateFn = (origin: GridLocationSchema.Type): StateSchema.Type => ({
+const stateFn = (origin: BoardLocationSchema.Type): StateSchema.Type => ({
 	cheats: {
 		enabled: false,
 		everEnabled: false,
@@ -146,98 +143,6 @@ const settleDeliveryFx = Effect.fn("settleDeliveryFx")(function* () {
 });
 
 describe("Autofill material subtree ownership", () => {
-	it.each([
-		"board",
-		"inventory",
-		"toolbar",
-	] as const)(
-		"preserves a reserved producer and its buffer from %s through delivery and completion",
-		(scope) => {
-			const origin = originFn(scope);
-			Effect.runSync(
-				Effect.gen(function* () {
-					const dispatched = yield* settleDeliveryFx();
-					expect(dispatched.location.origin).toEqual(origin);
-					yield* advanceRuntimeElapsedFx({
-						elapsedMs: 100,
-					});
-					const started = yield* readRuntimeFx();
-					expect(started.items.find(({ id }) => id === "source")?.location.scope).toBe(
-						"reserved",
-					);
-					expect(started.items.find(({ id }) => id === "water")).toEqual(
-						dispatched.before.items.find(({ id }) => id === "water"),
-					);
-					yield* advanceRuntimeElapsedFx({
-						elapsedMs: 1_000,
-					});
-					const completed = yield* readRuntimeFx();
-					expect(completed.jobs).toEqual([]);
-					expect(completed.items.find(({ id }) => id === "source")).toMatchObject({
-						quantity: 1,
-						location: {
-							scope: "board",
-						},
-					});
-					expect(completed.items.find(({ id }) => id === "water")).toEqual(
-						dispatched.before.items.find(({ id }) => id === "water"),
-					);
-				}).pipe(
-					useGameFx({
-						config: configFn("reserve"),
-						state: stateFn(origin),
-					}),
-				),
-			);
-		},
-	);
-
-	it.each([
-		"board",
-		"inventory",
-		"toolbar",
-	] as const)(
-		"returns the same producer and buffer to its %s lease when the queue is cleared",
-		(scope) => {
-			const origin = originFn(scope);
-			Effect.runSync(
-				Effect.gen(function* () {
-					const dispatched = yield* dispatchFx();
-					yield* clearItemJobQueueFx({
-						ownerItemId: "receiver",
-					});
-					const canceled = yield* readRuntimeFx();
-					expect(
-						canceled.items.find(({ id }) => id === "source")?.location,
-					).toMatchObject({
-						scope: "delivery",
-						phase: "returning",
-						origin,
-					});
-					yield* advanceRuntimeElapsedFx({
-						elapsedMs: 1_000,
-					});
-					const returned = yield* readRuntimeFx();
-					expect(returned.jobQueue).toEqual([]);
-					expect(returned.jobs).toEqual([]);
-					expect(returned.items.find(({ id }) => id === "source")).toMatchObject({
-						quantity: 1,
-						location: origin,
-					});
-					expect(returned.items.find(({ id }) => id === "water")).toEqual(
-						dispatched.before.items.find(({ id }) => id === "water"),
-					);
-					expect(returned.items).toHaveLength(dispatched.before.items.length);
-				}).pipe(
-					useGameFx({
-						config: configFn("reserve"),
-						state: stateFn(origin),
-					}),
-				),
-			);
-		},
-	);
-
 	it("discards a consumed producer's buffer only when its job starts", () => {
 		Effect.runSync(
 			Effect.gen(function* () {
@@ -264,4 +169,79 @@ describe("Autofill material subtree ownership", () => {
 			),
 		);
 	});
+});
+
+it("preserves a reserved producer and its buffer from Board through delivery and completion", () => {
+	const origin = originFn();
+	Effect.runSync(
+		Effect.gen(function* () {
+			const dispatched = yield* settleDeliveryFx();
+			expect(dispatched.location.origin).toEqual(origin);
+			yield* advanceRuntimeElapsedFx({
+				elapsedMs: 100,
+			});
+			const started = yield* readRuntimeFx();
+			expect(started.items.find(({ id }) => id === "source")?.location.scope).toBe(
+				"reserved",
+			);
+			expect(started.items.find(({ id }) => id === "water")).toEqual(
+				dispatched.before.items.find(({ id }) => id === "water"),
+			);
+			yield* advanceRuntimeElapsedFx({
+				elapsedMs: 1_000,
+			});
+			const completed = yield* readRuntimeFx();
+			expect(completed.jobs).toEqual([]);
+			expect(completed.items.find(({ id }) => id === "source")).toMatchObject({
+				quantity: 1,
+				location: {
+					scope: "board",
+				},
+			});
+			expect(completed.items.find(({ id }) => id === "water")).toEqual(
+				dispatched.before.items.find(({ id }) => id === "water"),
+			);
+		}).pipe(
+			useGameFx({
+				config: configFn("reserve"),
+				state: stateFn(origin),
+			}),
+		),
+	);
+});
+it("returns the same producer and buffer to its Board lease when the queue is cleared", () => {
+	const origin = originFn();
+	Effect.runSync(
+		Effect.gen(function* () {
+			const dispatched = yield* dispatchFx();
+			yield* clearItemJobQueueFx({
+				ownerItemId: "receiver",
+			});
+			const canceled = yield* readRuntimeFx();
+			expect(canceled.items.find(({ id }) => id === "source")?.location).toMatchObject({
+				scope: "delivery",
+				phase: "returning",
+				origin,
+			});
+			yield* advanceRuntimeElapsedFx({
+				elapsedMs: 1_000,
+			});
+			const returned = yield* readRuntimeFx();
+			expect(returned.jobQueue).toEqual([]);
+			expect(returned.jobs).toEqual([]);
+			expect(returned.items.find(({ id }) => id === "source")).toMatchObject({
+				quantity: 1,
+				location: origin,
+			});
+			expect(returned.items.find(({ id }) => id === "water")).toEqual(
+				dispatched.before.items.find(({ id }) => id === "water"),
+			);
+			expect(returned.items).toHaveLength(dispatched.before.items.length);
+		}).pipe(
+			useGameFx({
+				config: configFn("reserve"),
+				state: stateFn(origin),
+			}),
+		),
+	);
 });

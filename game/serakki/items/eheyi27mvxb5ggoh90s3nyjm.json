@@ -13,7 +13,6 @@
 				"townhall-t1"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -38,7 +37,7 @@
 								"type": "item",
 								"itemId": "base-camp"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -57,7 +56,6 @@
 								"type": "item",
 								"itemId": "townhall-t1-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -68,7 +66,7 @@
 								"type": "item",
 								"itemId": "wood"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -83,7 +81,7 @@
 								"type": "item",
 								"itemId": "stone"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -98,7 +96,7 @@
 								"type": "item",
 								"itemId": "firewood"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -150,7 +148,7 @@
 										"type": "item",
 										"itemId": "campfire-burning"
 									},
-									"scope": "any"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

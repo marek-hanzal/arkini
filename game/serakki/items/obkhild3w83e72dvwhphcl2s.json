@@ -13,7 +13,6 @@
 				"empty-goose-pen"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -42,7 +41,6 @@
 								"type": "item",
 								"itemId": "empty-goose-pen"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -53,7 +51,7 @@
 								"type": "item",
 								"itemId": "animal-feed"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -68,7 +66,7 @@
 								"type": "item",
 								"itemId": "bucket-with-water"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

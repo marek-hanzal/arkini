@@ -172,7 +172,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 								{
 									type: "exists",
 									query: {
-										scope: "universe",
+										distance: "universe",
 										selector: {
 											type: "item",
 											itemId: "permit",

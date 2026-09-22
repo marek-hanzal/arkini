@@ -14,7 +14,6 @@
 				"grapes"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

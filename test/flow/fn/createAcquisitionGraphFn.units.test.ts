@@ -26,7 +26,6 @@ const spentUnits = (itemId: string, cost = 1) => ({
 	},
 	query: {
 		distance: "close" as const,
-		scope: "board" as const,
 		selector: {
 			itemId,
 			type: "item" as const,
@@ -98,8 +97,6 @@ describe("createAcquisitionGraphFn", () => {
 						y: 0,
 					},
 				],
-				inventory: [],
-				toolbar: [],
 			},
 		);
 
@@ -399,7 +396,6 @@ describe("createAcquisitionGraphFn", () => {
 			units: {
 				amount: 1,
 			},
-			scope: "board" as const,
 		};
 		const result = await Effect.runPromise(
 			compileGameSourcesFx([
@@ -532,7 +528,6 @@ describe("createAcquisitionGraphFn", () => {
 									{
 										query: {
 											distance: "close",
-											scope: "board",
 											selector: {
 												itemId: "condition",
 												type: "item",

@@ -468,7 +468,6 @@ describe("validateGameResourcesFn", () => {
 					targetAsset,
 				] as const,
 			},
-			scope: "any" as const,
 			maxStackSize: 1,
 			lines: [
 				{
@@ -540,7 +539,6 @@ describe("validateGameResourcesFn", () => {
 				"artwork:tree",
 				"artwork:log",
 				"artwork:lens",
-				"artwork:backpack",
 				"blueprint",
 			].map((id) => ({
 				id,

@@ -12,7 +12,6 @@
 				"mine-depleted"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -40,18 +39,17 @@
 								"type": "item",
 								"itemId": "empty-mine"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "resource-research"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -107,18 +105,17 @@
 								"type": "item",
 								"itemId": "empty-mine"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "resource-research"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {

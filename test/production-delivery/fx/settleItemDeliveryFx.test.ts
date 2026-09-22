@@ -1,7 +1,7 @@
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { settleItemDeliveryFx } from "~test/support/settleItemDeliveryFx";
@@ -38,7 +38,7 @@ const twoMaterialInputConfig = GameConfigSchema.parse({
 					{
 						type: "materials",
 						query: {
-							scope: "any",
+							distance: "far" as const,
 							selector: {
 								type: "item",
 								itemId: "water",
@@ -47,35 +47,6 @@ const twoMaterialInputConfig = GameConfigSchema.parse({
 						quantity: {
 							min: 2,
 							max: 2,
-						},
-					},
-					...line.input.slice(1),
-				],
-			})),
-		},
-	},
-});
-const rangeMaterialInputConfig = GameConfigSchema.parse({
-	...inputRuntimeTestConfig,
-	items: {
-		...inputRuntimeTestConfig.items,
-		workshop: {
-			...workshop,
-			lines: workshop.lines.map((line) => ({
-				...line,
-				input: [
-					{
-						type: "materials",
-						query: {
-							scope: "any",
-							selector: {
-								type: "item",
-								itemId: "water",
-							},
-						},
-						quantity: {
-							min: 1,
-							max: 4,
 						},
 					},
 					...line.input.slice(1),
@@ -269,105 +240,6 @@ describe("settleItemDeliveryFx", () => {
 		});
 	});
 
-	it("returns a settled stack remainder without stealing another in-flight range claim", () => {
-		const inventoryOrigin = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: ownerItemId,
-					itemId: "workshop",
-					location: workshopLocation,
-					quantity: 1,
-				});
-				// Inventory is deliberately earlier in runtime order while Board wins autofill
-				// priority. Settling Inventory first reproduces the live presentation race.
-				yield* spawnItemFx({
-					id: "runtime:inventory-water",
-					itemId: "water",
-					location: inventoryOrigin,
-					quantity: 6,
-				});
-				yield* spawnItemFx({
-					id: "runtime:board-water",
-					itemId: "water",
-					location: sourceLocation(1),
-					quantity: 2,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:inventory-water",
-					generation: 0,
-				});
-				const afterInventoryContact = yield* readRuntimeFx();
-				const staleRepeat = yield* settleItemDeliveryFx({
-					itemId: "runtime:inventory-water",
-					generation: 0,
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:board-water",
-					generation: 0,
-				});
-				return {
-					afterBoardContact: yield* readRuntimeFx(),
-					afterInventoryContact,
-					staleRepeat,
-				};
-			}).pipe(
-				useGameFx({
-					config: rangeMaterialInputConfig,
-				}),
-			),
-		);
-
-		expect(
-			result.afterInventoryContact.items.find(({ id }) => id === "runtime:inventory-water"),
-		).toMatchObject({
-			location: {
-				generation: 1,
-				origin: inventoryOrigin,
-				phase: "returning",
-				scope: "delivery",
-			},
-			quantity: 4,
-		});
-		expect(
-			result.afterInventoryContact.items.find(({ id }) => id === "runtime:board-water"),
-		).toMatchObject({
-			location: {
-				generation: 0,
-				phase: "outbound",
-				scope: "delivery",
-				target: {
-					input: [
-						{
-							inputIndex: 0,
-							quantity: 2,
-						},
-					],
-				},
-			},
-			quantity: 2,
-		});
-		expect(result.staleRepeat).toEqual({
-			acceptedQuantity: 0,
-			status: "ignored",
-		});
-		expect(
-			result.afterBoardContact.items
-				.filter(({ location }) => location.scope === "input")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(4);
-	});
-
 	it("persists outbound motion facts and keeps the origin lease occupied", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -427,60 +299,6 @@ describe("settleItemDeliveryFx", () => {
 			reason: DropItemRejectedReason.Occupied,
 			itemId: "runtime:mover",
 		});
-	});
-
-	it("leases an Inventory source slot with the same canonical contract", () => {
-		const inventoryOrigin = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: ownerItemId,
-					itemId: "workshop",
-					location: workshopLocation,
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: inventoryOrigin,
-					quantity: 3,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				const conflict = yield* Effect.result(
-					spawnItemFx({
-						id: "runtime:intruder",
-						itemId: "water",
-						location: inventoryOrigin,
-						quantity: 1,
-					}),
-				);
-				return {
-					conflict,
-					runtime: yield* readRuntimeFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(
-			result.runtime.items.find(({ id }) => id === "runtime:water")?.location,
-		).toMatchObject({
-			origin: inventoryOrigin,
-			scope: "delivery",
-		});
-		expect(Result.isFailure(result.conflict)).toBe(true);
 	});
 
 	it("redirects delivery home when its target owner is removed", () => {

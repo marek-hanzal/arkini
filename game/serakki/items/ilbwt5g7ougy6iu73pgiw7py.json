@@ -12,7 +12,6 @@
 				"homeland-portal"
 			]
 		},
-		"scope": "toolbar",
 		"maxStackSize": 1,
 		"action": {
 			"input": [],

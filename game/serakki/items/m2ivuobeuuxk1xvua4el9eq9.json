@@ -12,7 +12,6 @@
 				"british-shorthair-with-sack-on-head"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 5000,

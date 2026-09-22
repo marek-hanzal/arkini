@@ -34,7 +34,6 @@ const unitsInput = (
 ) => ({
 	type: "units" as const,
 	query: {
-		scope: "board" as const,
 		distance: "close" as const,
 		selector: {
 			type: "item" as const,
@@ -47,26 +46,9 @@ const unitsInput = (
 	},
 });
 
-const exactUnitsInput = (itemId: string, cost = 1) => ({
-	type: "units" as const,
-	query: {
-		scope: "board" as const,
-		distance: "close" as const,
-		selector: {
-			type: "item" as const,
-			itemId,
-		},
-	},
-	units: {
-		cost,
-		from: "target" as const,
-	},
-});
-
 const selfUnitsInput = (itemId: string, cost = 1) => ({
 	type: "units" as const,
 	query: {
-		scope: "board" as const,
 		distance: "self" as const,
 		selector: {
 			type: "item" as const,
@@ -116,7 +98,6 @@ describe("validateInputUnitsFn", () => {
 				{
 					type: "units",
 					query: {
-						scope: "board",
 						distance: "close",
 						selector: {
 							type: "item",
@@ -263,7 +244,7 @@ describe("validateInputUnitsFn", () => {
 				{
 					type: "materials",
 					query: {
-						scope: "any",
+						distance: "far" as const,
 						selector: {
 							type: "item",
 							itemId: "material",
@@ -290,7 +271,6 @@ describe("validateInputUnitsFn", () => {
 							from: "self",
 						}),
 						query: {
-							scope: "board" as const,
 							distance: "self" as const,
 							selector: {
 								type: "item" as const,
@@ -338,7 +318,6 @@ describe("validateInputUnitsFn", () => {
 		};
 		const payer = {
 			...createSimpleItem("payer"),
-			scope: "board" as const,
 			units: {
 				amount: 1,
 			},
@@ -352,102 +331,7 @@ describe("validateInputUnitsFn", () => {
 		).toEqual([]);
 	});
 
-	it("rejects an exact inventory-only external payer", async () => {
-		const producer = createProducerItem({
-			id: "exact-inventory-target",
-			input: [
-				exactUnitsInput("inventory-target"),
-			],
-		});
-		const target = {
-			...createSimpleItem("inventory-target"),
-			scope: "inventory" as const,
-			units: {
-				amount: 1,
-			},
-		};
-
-		expect(
-			await unitDiagnostics({
-				[producer.id]: producer,
-				[target.id]: target,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				reason: InvalidInputUnitsReasonEnumSchema.enum.TargetUnavailable,
-			}),
-		]);
-	});
-
-	it("rejects a selector that matches only inventory-only item with units", async () => {
-		const producer = createProducerItem({
-			id: "inventory-selector-target",
-			input: [
-				unitsInput("inventory-source"),
-			],
-		});
-		const target = {
-			...createSimpleItem("inventory-source"),
-			scope: "inventory" as const,
-			units: {
-				amount: 1,
-			},
-		};
-
-		expect(
-			await unitDiagnostics({
-				[producer.id]: producer,
-				[target.id]: target,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				reason: InvalidInputUnitsReasonEnumSchema.enum.TargetUnavailable,
-			}),
-		]);
-	});
-
-	it("accepts board and any external payer scopes", async () => {
-		const boardProducer = createProducerItem({
-			id: "board-capable-target",
-			input: [
-				unitsInput("board-source"),
-			],
-		});
-		const anyProducer = createProducerItem({
-			id: "any-capable-target",
-			input: [
-				unitsInput("any-source"),
-			],
-		});
-		const boardTarget = {
-			...createSimpleItem("board-source"),
-			scope: "board" as const,
-			units: {
-				amount: 1,
-			},
-		};
-		const anyTarget = {
-			...createSimpleItem("any-source"),
-			units: {
-				amount: 1,
-			},
-		};
-
-		expect(
-			await unitDiagnostics({
-				[boardProducer.id]: boardProducer,
-				[boardTarget.id]: boardTarget,
-			}),
-		).toEqual([]);
-		expect(
-			await unitDiagnostics({
-				[anyProducer.id]: anyProducer,
-				[anyTarget.id]: anyTarget,
-			}),
-		).toEqual([]);
-	});
-
-	it("requires a units selector to match at least one sufficiently item with units", async () => {
+	it("requires a units selector to match an item with sufficient units", async () => {
 		const producer = createProducerItem({
 			id: "producer",
 			input: [
@@ -458,7 +342,6 @@ describe("validateInputUnitsFn", () => {
 		});
 		const weak = {
 			...createSimpleItem("weak"),
-			scope: "board" as const,
 			units: {
 				amount: 1,
 			},

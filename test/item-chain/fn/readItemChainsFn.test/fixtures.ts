@@ -35,7 +35,6 @@ export const itemFn = (id: string, fields: Record<string, unknown> = {}) =>
 			],
 			scale: 1,
 		},
-		scope: "board",
 		maxStackSize: 1,
 		maxQueueSize: 1,
 		lines: [],

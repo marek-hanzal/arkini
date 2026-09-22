@@ -12,7 +12,6 @@
 				"wolf"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -108,7 +107,6 @@
 								"type": "item",
 								"itemId": "wolf"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -161,7 +159,6 @@
 								"type": "item",
 								"itemId": "wolf"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -191,7 +188,6 @@
 								"type": "item",
 								"itemId": "wolf"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}

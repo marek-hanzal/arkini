@@ -78,7 +78,8 @@ describe("createGameSessionFx / transition replay", () => {
 					id: "runtime:transition:ordered",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -142,7 +143,8 @@ describe("createGameSessionFx / transition replay", () => {
 					id: "runtime:react-subscriber:marker",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

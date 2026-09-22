@@ -12,7 +12,6 @@
 				"well-fed-chicken"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,

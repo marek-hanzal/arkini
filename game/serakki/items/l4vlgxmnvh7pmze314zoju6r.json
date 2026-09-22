@@ -13,7 +13,6 @@
 				"growers-guild"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 6,
 		"lines": [
@@ -35,7 +34,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -50,7 +49,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -65,7 +64,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -107,7 +106,7 @@
 										"type": "item",
 										"itemId": "gardener-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -122,7 +121,7 @@
 										"type": "item",
 										"itemId": "gardener"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -149,7 +148,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -164,7 +163,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -179,7 +178,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -221,7 +220,7 @@
 										"type": "item",
 										"itemId": "grain-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -236,7 +235,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -263,7 +262,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -278,7 +277,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -293,7 +292,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -335,7 +334,7 @@
 										"type": "item",
 										"itemId": "grass-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -350,7 +349,7 @@
 										"type": "item",
 										"itemId": "grass-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -377,7 +376,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -392,7 +391,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -407,7 +406,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -449,7 +448,7 @@
 										"type": "item",
 										"itemId": "corn-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -464,7 +463,7 @@
 										"type": "item",
 										"itemId": "corn-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -491,7 +490,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -506,7 +505,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -521,7 +520,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -563,7 +562,7 @@
 										"type": "item",
 										"itemId": "vegetable-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -578,7 +577,7 @@
 										"type": "item",
 										"itemId": "vegetable-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -605,7 +604,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -620,7 +619,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -635,7 +634,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -677,7 +676,7 @@
 										"type": "item",
 										"itemId": "fruit-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -692,7 +691,7 @@
 										"type": "item",
 										"itemId": "fruit-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -719,7 +718,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -734,7 +733,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -749,7 +748,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -791,7 +790,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -806,7 +805,7 @@
 										"type": "item",
 										"itemId": "farmers-market-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -821,7 +820,7 @@
 										"type": "item",
 										"itemId": "farmers-market"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -848,7 +847,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -863,7 +862,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -878,7 +877,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -920,7 +919,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -935,7 +934,7 @@
 										"type": "item",
 										"itemId": "herbalist-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -950,7 +949,7 @@
 										"type": "item",
 										"itemId": "herbalist"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -977,7 +976,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -992,7 +991,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1007,7 +1006,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1049,7 +1048,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1064,7 +1063,7 @@
 										"type": "item",
 										"itemId": "flower-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1079,7 +1078,7 @@
 										"type": "item",
 										"itemId": "flower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1106,7 +1105,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1121,7 +1120,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1136,7 +1135,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1178,7 +1177,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1193,7 +1192,7 @@
 										"type": "item",
 										"itemId": "pumpkin-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1208,7 +1207,7 @@
 										"type": "item",
 										"itemId": "pumpkin-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1235,7 +1234,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1250,7 +1249,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1265,7 +1264,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1307,7 +1306,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1322,7 +1321,7 @@
 										"type": "item",
 										"itemId": "flax-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1337,7 +1336,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1364,7 +1363,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1379,7 +1378,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1394,7 +1393,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1436,7 +1435,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1451,7 +1450,7 @@
 										"type": "item",
 										"itemId": "cotton-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1466,7 +1465,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1493,7 +1492,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1508,7 +1507,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1523,7 +1522,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1565,7 +1564,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1580,7 +1579,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1595,7 +1594,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1622,7 +1621,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1637,7 +1636,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1652,7 +1651,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1694,7 +1693,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1709,7 +1708,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1724,7 +1723,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1751,7 +1750,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1766,7 +1765,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1781,7 +1780,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1823,7 +1822,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1838,7 +1837,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1853,7 +1852,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1868,7 +1867,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1883,7 +1882,7 @@
 										"type": "item",
 										"itemId": "grape-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1898,7 +1897,7 @@
 										"type": "item",
 										"itemId": "grape-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1925,7 +1924,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -1940,7 +1939,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1955,7 +1954,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1997,7 +1996,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2012,7 +2011,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2027,7 +2026,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2042,7 +2041,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2057,7 +2056,7 @@
 										"type": "item",
 										"itemId": "hop-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2072,7 +2071,7 @@
 										"type": "item",
 										"itemId": "hop-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2099,7 +2098,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -2114,7 +2113,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2129,7 +2128,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2171,7 +2170,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2186,7 +2185,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2201,7 +2200,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2216,7 +2215,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2231,7 +2230,7 @@
 										"type": "item",
 										"itemId": "sugar-beet-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2246,7 +2245,7 @@
 										"type": "item",
 										"itemId": "sugar-beet-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2273,7 +2272,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -2288,7 +2287,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2303,7 +2302,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2345,7 +2344,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2360,7 +2359,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2375,7 +2374,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2390,7 +2389,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2405,7 +2404,7 @@
 										"type": "item",
 										"itemId": "sugar-cane-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2420,7 +2419,7 @@
 										"type": "item",
 										"itemId": "sugar-cane-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2447,7 +2446,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -2462,7 +2461,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2477,7 +2476,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2519,7 +2518,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2534,7 +2533,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2549,7 +2548,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2564,7 +2563,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2579,7 +2578,7 @@
 										"type": "item",
 										"itemId": "coffee-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2594,7 +2593,7 @@
 										"type": "item",
 										"itemId": "coffee-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2621,7 +2620,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -2636,7 +2635,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2651,7 +2650,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2693,7 +2692,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2708,7 +2707,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2723,7 +2722,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2738,7 +2737,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2753,7 +2752,7 @@
 										"type": "item",
 										"itemId": "cacao-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2768,7 +2767,7 @@
 										"type": "item",
 										"itemId": "cacao-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2795,7 +2794,7 @@
 								"type": "item",
 								"itemId": "quill"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "reserve",
 						"quantity": {
@@ -2810,7 +2809,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2825,7 +2824,7 @@
 								"type": "item",
 								"itemId": "knowledge-t1"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -2867,7 +2866,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2882,7 +2881,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2897,7 +2896,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2912,7 +2911,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2927,7 +2926,7 @@
 										"type": "item",
 										"itemId": "dye-farm-blueprint"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -2942,7 +2941,7 @@
 										"type": "item",
 										"itemId": "dye-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}

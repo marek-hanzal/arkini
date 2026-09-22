@@ -5,7 +5,6 @@ import { createRelationTraversalProject } from "./fixture";
 export const createSummaryProject = () => {
 	const base = createRelationTraversalProject();
 	const query = {
-		scope: "board",
 		distance: "close",
 		selector: {
 			type: "item",
@@ -170,7 +169,7 @@ export const createSummaryProject = () => {
 								{
 									type: "materials",
 									query: {
-										scope: "any",
+										distance: "far",
 										selector: {
 											type: "item",
 											itemId: "mill",
@@ -214,7 +213,6 @@ export const createRequirementSummaryProject = () => {
 							{
 								type: "units",
 								query: {
-									scope: "board",
 									distance: "close",
 									selector: {
 										type: "item",
@@ -266,7 +264,7 @@ export const createConditionalSummaryProject = () => {
 									{
 										type: "exists",
 										query: {
-											scope: "universe",
+											distance: "far",
 											selector: {
 												type: "item",
 												itemId: "tool",
@@ -294,7 +292,7 @@ export const createConditionalSummaryProject = () => {
 											{
 												type: "exists",
 												query: {
-													scope: "universe",
+													distance: "far",
 													selector: {
 														type: "item",
 														itemId: "tool",

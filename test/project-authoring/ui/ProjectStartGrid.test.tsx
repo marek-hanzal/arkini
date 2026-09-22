@@ -64,7 +64,6 @@ describe("ProjectStartGrid", () => {
 					height={2}
 					items={boardSpaceProject.config.items}
 					mode="detail"
-					scope="board"
 					projectId={boardSpaceProject.projectId}
 					width={2}
 				/>,

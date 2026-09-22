@@ -62,10 +62,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								value={item.maxQueueSize}
 							/>
 							<Fact
-								label={translator.textFn("Storage")}
-								value={translator.textFn(`Item storage scope - ${item.scope}`)}
-							/>
-							<Fact
 								label={translator.textFn("Stack capacity")}
 								value={
 									item.maxStackSize === 1

@@ -21,8 +21,6 @@ const readItemTitleFn = (project: Project, itemId: string) =>
 
 const startSurfaceTitles = {
 	board: "board",
-	inventory: "inventory",
-	toolbar: "toolbar",
 } as const;
 
 const ForceDeleteImpactList = ({

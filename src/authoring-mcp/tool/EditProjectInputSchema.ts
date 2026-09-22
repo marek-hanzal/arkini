@@ -29,7 +29,7 @@ export const EditProjectInputSchema = z
 					"Complete replacement of every named non-item resource role.",
 				),
 				start: StartSchema.optional().describe(
-					"Complete replacement of the initial board, inventory, and toolbar state.",
+					"Complete replacement of the initial board state.",
 				),
 			})
 			.strict()

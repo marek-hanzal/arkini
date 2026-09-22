@@ -6,7 +6,7 @@ import { Tx } from "~/translation/ui/Tx";
 
 interface ProjectStartItemPickerProps extends useProjectStartItemPickerController.Props {}
 
-/** Selects one canonical item allowed in the requested initial grid scope. */
+/** Selects one canonical item for the initial board. */
 export const ProjectStartItemPicker = (props: ProjectStartItemPickerProps) => {
 	const translator = useTranslator();
 	const controller = useProjectStartItemPickerController(props);

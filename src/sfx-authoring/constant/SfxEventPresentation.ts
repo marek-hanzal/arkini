@@ -20,7 +20,7 @@ export const SfxEventPresentation = [
 		event: PresentationSfxEventEnumSchema.enum.ItemDropRejected,
 		group: "Item",
 		label: "Item drop rejected",
-		description: "When an item cannot be dropped there, including into a portal or inventory.",
+		description: "When an item cannot be dropped there, including into a portal.",
 	},
 	{
 		event: GameEventEnumSchema.enum.ItemPortalTransferred,

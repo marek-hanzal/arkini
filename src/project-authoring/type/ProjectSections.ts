@@ -2,8 +2,6 @@ export const ProjectSectionIds = [
 	"general",
 	"images",
 	"board",
-	"toolbar",
-	"inventory",
 	"introduction",
 ] as const;
 
@@ -30,16 +28,6 @@ export const ProjectSections = [
 		id: "board",
 		label: "Board",
 		shortcut: "b",
-	},
-	{
-		id: "toolbar",
-		label: "Toolbar",
-		shortcut: "t",
-	},
-	{
-		id: "inventory",
-		label: "Inventory",
-		shortcut: "n",
 	},
 	{
 		id: "introduction",

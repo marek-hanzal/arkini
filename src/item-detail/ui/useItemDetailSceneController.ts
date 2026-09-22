@@ -22,7 +22,7 @@ export namespace useItemDetailSceneController {
 		readonly target: ItemDetailTarget;
 	}
 	export interface Detail
-		extends Pick<ItemSchema.Type, "description" | "scope" | "maxStackSize" | "lines" | "ui"> {
+		extends Pick<ItemSchema.Type, "description" | "maxStackSize" | "lines" | "ui"> {
 		readonly canMake: boolean;
 		readonly disabledLineIds: readonly string[];
 		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
@@ -156,7 +156,6 @@ export const useItemDetailSceneController = ({
 						? undefined
 						: game.getResourceUrlFn(item.artwork.default[1]),
 				description: item.description,
-				scope: item.scope,
 				maxStackSize: item.maxStackSize,
 				units:
 					item.units === undefined

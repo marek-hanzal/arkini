@@ -31,11 +31,6 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 				width: 15,
 				height: 9,
 			},
-			inventory: {
-				width: 15,
-				height: 9,
-			},
-			toolbarSize: 15,
 		},
 		resources: {
 			hero: "hero",
@@ -49,8 +44,6 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 		start: {
 			currentSpace: 0,
 			board: [],
-			inventory: [],
-			toolbar: [],
 		},
 		items: {},
 	});

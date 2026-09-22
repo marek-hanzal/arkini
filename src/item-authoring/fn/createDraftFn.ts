@@ -29,7 +29,6 @@ export const createDraftFn = ({
 				string,
 			],
 		},
-		scope: "any" as const,
 		maxStackSize: 1,
 		lines: [],
 		maxQueueSize: 1,

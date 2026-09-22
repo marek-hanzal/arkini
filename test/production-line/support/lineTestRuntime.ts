@@ -12,10 +12,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			width: 10,
 			height: 10,
 		},
-		inventory: {
-			width: 3,
-			height: 3,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -35,7 +31,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:source",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 		},
 		permit: {
@@ -52,7 +47,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:permit",
 				],
 			},
-			scope: "any",
 			maxStackSize: 1,
 		},
 		booster: {
@@ -69,7 +63,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:booster",
 				],
 			},
-			scope: "any",
 			maxStackSize: 1,
 		},
 		blocker: {
@@ -86,7 +79,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:blocker",
 				],
 			},
-			scope: "any",
 			maxStackSize: 1,
 		},
 	},
@@ -95,7 +87,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 export const existsWhen = (itemId: string) => {
 	return {
 		query: {
-			scope: "any" as const,
+			distance: "far" as const,
 			selector: {
 				itemId,
 				type: "item" as const,
@@ -132,7 +124,8 @@ export const placeLineTestItemFx = ({
 		id: itemId,
 		itemId,
 		location: {
-			scope: "inventory",
+			scope: "board" as const,
+			space: 0,
 			position: {
 				x,
 				y: 0,

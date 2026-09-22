@@ -6,7 +6,5 @@ export const readProjectSectionForPathFn = (path: ReadonlyArray<PropertyKey>): P
 	if (head === "introduction") return "introduction";
 	if (head === "hero" || head === "avatars") return "images";
 	if (head === "board" || (head === "start" && second === "board")) return "board";
-	if (head === "toolbarSize" || (head === "start" && second === "toolbar")) return "toolbar";
-	if (head === "inventory" || (head === "start" && second === "inventory")) return "inventory";
 	return "general";
 };

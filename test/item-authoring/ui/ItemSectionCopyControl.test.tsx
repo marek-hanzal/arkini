@@ -79,7 +79,6 @@ it("excludes the destination by UID and copies only the confirmed source snapsho
 				"art",
 			],
 		},
-		scope: "board",
 		maxStackSize: 1,
 		clock: {
 			durationMs: 300000,

@@ -56,13 +56,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const PickerHarness = ({
-	onSelect,
-	scope = "inventory",
-}: {
-	readonly onSelect: (itemId: string) => void;
-	readonly scope?: "board" | "inventory" | "toolbar";
-}) => {
+const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => void }) => {
 	const [open, setOpen] = useState(false);
 	return (
 		<>
@@ -77,7 +71,6 @@ const PickerHarness = ({
 				<ProjectStartItemPicker
 					onCloseFn={() => setOpen(false)}
 					onSelectFn={onSelect}
-					scope={scope}
 				/>
 			) : null}
 		</>
@@ -115,7 +108,7 @@ const renderPicker = async (
 };
 
 describe("ProjectStartItemPicker", () => {
-	it("admits only the requested scope and restores focus after exact selection", async () => {
+	it("lists board items and restores focus after exact selection", async () => {
 		const onSelect = vi.fn();
 		const { container, opener } = await renderPicker(onSelect);
 		const search = container.querySelector<HTMLInputElement>('input[type="search"]');
@@ -129,6 +122,7 @@ describe("ProjectStartItemPicker", () => {
 			"backpack",
 			"lens",
 			"log",
+			"tree",
 		]);
 
 		const lens = container.querySelector<HTMLButtonElement>('button[data-item-id="lens"]');

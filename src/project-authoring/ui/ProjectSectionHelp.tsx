@@ -27,22 +27,4 @@ export const ProjectSectionHelp: Record<ProjectSectionId, EditorPageHelpContent>
 			</>
 		),
 	},
-	toolbar: {
-		title: <Tx label="Toolbar" />,
-		content: (
-			<>
-				<Mx label="Toolbar editing help" />
-				<Mx label="Starting layout controls help" />
-			</>
-		),
-	},
-	inventory: {
-		title: <Tx label="Inventory" />,
-		content: (
-			<>
-				<Mx label="Inventory editing help" />
-				<Mx label="Starting layout controls help" />
-			</>
-		),
-	},
 };

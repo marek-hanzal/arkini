@@ -80,7 +80,7 @@ describe("editor MCP graph tool text", () => {
 															max: 3,
 															min: 1,
 															query: {
-																scope: "universe",
+																distance: "far",
 																selector: {
 																	itemId: "water",
 																	type: "item",

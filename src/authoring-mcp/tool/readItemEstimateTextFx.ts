@@ -59,7 +59,7 @@ const limitationTextFn = (limitation: ItemEstimate["limitations"][number]) => {
 		case "negative-availability-constraints-ignored":
 			return "positive enable prerequisites are acquired, but rule truth and disabling conditions are ignored";
 		case "spatial-requirements-approximated":
-			return "scope, distance, board capacity, and concrete placement are ignored";
+			return "query reach, board capacity, and concrete placement are ignored";
 	}
 };
 
@@ -102,13 +102,13 @@ const formatEstimateFn = (
 		`Quantity: ${formatNumberFn(estimate.quantity)}`,
 		"Method: approximate bounded-distribution authored dependency graph",
 		"Timing: approximate optimistic parallel critical path",
-		"Start facts: authored board, inventory, and toolbar",
+		"Start facts: authored board",
 		"Output accounting: bounded expected first-hitting time for individual and correlated joint outputs",
 		"Route choice: complete quantity-aware upstream critical-path cost with stable route identity ties",
 		"Demand: the larger of additive consumption and each route's simultaneous consumed-plus-reusable need",
 		"Enable prerequisites: acquired and included in time",
 		"Shared witness: finite authored roots and jointly selected co-product operations are credited once",
-		"Ignored: rule truth and disabling conditions, scope and placement, concrete item identity packing, renewable capacity",
+		"Ignored: rule truth and disabling conditions, query reach and placement, concrete item identity packing, renewable capacity",
 		"Limitations:",
 		...(estimate.limitations.length === 0
 			? [

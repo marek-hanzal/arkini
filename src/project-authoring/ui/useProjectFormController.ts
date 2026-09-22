@@ -32,13 +32,10 @@ const ProjectFormPathLabelBySegment = {
 	board: "Board",
 	height: "Height",
 	hero: "Hero image",
-	inventory: "Inventory",
 	quantity: "Quantity",
 	start: "Initial layout",
 	title: "Title",
 	introduction: "Introduction",
-	toolbar: "Toolbar",
-	toolbarSize: "Toolbar slots",
 	width: "Width",
 } as const satisfies Partial<Record<string, string>>;
 
@@ -58,23 +55,6 @@ const readProjectFormValidationLocationFn = (
 					.replace("{space}", String(entry.space))
 					.replace("{x}", String(entry.x + 1))
 					.replace("{y}", String(entry.y + 1));
-	}
-	if (head === "start" && second === "inventory" && typeof third === "number") {
-		const entry = values.start.inventory[third];
-		return entry === undefined
-			? textFn("Initial inventory → item {index}").replace("{index}", String(third + 1))
-			: textFn("Initial inventory → slot {x}, {y}")
-					.replace("{x}", String(entry.position.x + 1))
-					.replace("{y}", String(entry.position.y + 1));
-	}
-	if (head === "start" && second === "toolbar" && typeof third === "number") {
-		const entry = values.start.toolbar[third];
-		return entry === undefined
-			? textFn("Initial toolbar → item {index}").replace("{index}", String(third + 1))
-			: textFn("Initial toolbar → slot {index}").replace(
-					"{index}",
-					String(entry.position.x + 1),
-				);
 	}
 	const labels = path.flatMap((segment) => {
 		if (typeof segment !== "string") return [];
@@ -113,8 +93,6 @@ const createProjectConfigFn = (
 			title: value.title,
 			introduction: value.introduction.trim().length > 0 ? value.introduction : undefined,
 			board: value.board,
-			inventory: value.inventory,
-			toolbarSize: value.toolbarSize,
 		},
 		resources: {
 			hero: value.hero,
@@ -139,28 +117,10 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 	board: {
 		...project.config.meta.board,
 	},
-	inventory: {
-		...project.config.meta.inventory,
-	},
-	toolbarSize: project.config.meta.toolbarSize ?? 0,
 	start: {
 		currentSpace: project.config.start.currentSpace,
 		board: project.config.start.board.map((entry) => ({
 			...entry,
-			quantity: entry.quantity ?? 1,
-		})),
-		inventory: project.config.start.inventory.map((entry) => ({
-			...entry,
-			position: {
-				...entry.position,
-			},
-			quantity: entry.quantity ?? 1,
-		})),
-		toolbar: project.config.start.toolbar.map((entry) => ({
-			...entry,
-			position: {
-				...entry.position,
-			},
 			quantity: entry.quantity ?? 1,
 		})),
 	},

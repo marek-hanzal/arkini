@@ -152,7 +152,7 @@ it("reveals and removes each rule and condition level independently", async () =
 		expect(rules[0].when).toEqual([
 			{
 				query: {
-					scope: "any",
+					distance: "far",
 					selector: {
 						itemId: "",
 						type: "item",
@@ -163,7 +163,7 @@ it("reveals and removes each rule and condition level independently", async () =
 		await renderRulesFn(rules);
 		expect(container.textContent).toContain("Condition type");
 		expect(container.querySelector("[data-selector-item-id]")).toBeNull();
-		expect(container.textContent).not.toContain("Query scope");
+		expect(container.textContent).not.toContain("Query reach");
 
 		await act(async () => choiceButtonFn("Count range")?.click());
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
@@ -171,7 +171,7 @@ it("reveals and removes each rule and condition level independently", async () =
 		expect(container.querySelector('[data-selector-item-id=""]')).not.toBeNull();
 		expect(container.textContent).toContain("Minimum count");
 		expect(container.textContent).toContain("Maximum count");
-		expect(container.textContent).toContain("Query scope");
+		expect(container.textContent).toContain("Query reach");
 
 		await act(async () =>
 			container.querySelector<HTMLButtonElement>("[data-selector-item-id]")?.click(),
@@ -184,6 +184,7 @@ it("reveals and removes each rule and condition level independently", async () =
 			type: "count",
 			count: 1,
 			query: {
+				distance: "far",
 				selector: {
 					itemId: "selected-item",
 				},
@@ -238,7 +239,7 @@ it("duplicates the selected root rule with all of its conditions", async () => {
 					type: "count",
 					count: 2,
 					query: {
-						scope: "inventory",
+						distance: "far",
 						selector: {
 							type: "item",
 							itemId: "ore",

@@ -5,17 +5,13 @@ import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/RuleSchema";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
-import { QueryScopeControl } from "~/production-authoring/ui/QueryScopeControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
-import {
-	BoardDistancePresentation,
-	QueryScopePresentation,
-} from "~/item-query/ui/QueryPresentation";
+import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 import {
 	EditorChoiceControl,
 	EditorNumberControl,
@@ -113,11 +109,7 @@ const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: Dr
 };
 
 const readConditionSummaryFn = (when: DraftWhen, textFn: (key: string) => string): string => {
-	const scope = textFn(QueryScopePresentation[when.query.scope].label);
-	const querySummary =
-		when.query.scope === "board"
-			? `${scope} · ${textFn(BoardDistancePresentation[when.query.distance].label)}`
-			: scope;
+	const querySummary = textFn(BoardDistancePresentation[when.query.distance].label);
 	if (when.type === "count") return `${querySummary} · = ${when.count}`;
 	if (when.type === "range") return `${querySummary} · ${when.min}–${when.max}`;
 	return querySummary;
@@ -257,11 +249,11 @@ const WhenControl = ({
 						}
 					/>
 					<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-						<QueryScopeControl
+						<BoardDistanceControl
 							error={readEditorFormValidationErrorFn(
 								validationIssues,
 								"query",
-								"scope",
+								"distance",
 							)}
 							value={selectedValue.query}
 							onChangeFn={(query) =>
@@ -271,22 +263,6 @@ const WhenControl = ({
 								})
 							}
 						/>
-						{selectedValue.query.scope !== "board" ? null : (
-							<BoardDistanceControl
-								error={readEditorFormValidationErrorFn(
-									validationIssues,
-									"query",
-									"distance",
-								)}
-								value={selectedValue.query}
-								onChangeFn={(query) =>
-									onChangeFn({
-										...selectedValue,
-										query,
-									})
-								}
-							/>
-						)}
 					</div>
 					{match(selectedValue)
 						.with(

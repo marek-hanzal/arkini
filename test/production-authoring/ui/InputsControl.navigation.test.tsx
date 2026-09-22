@@ -96,7 +96,7 @@ it.each([
 							max: 1,
 						},
 						query: {
-							scope: "any",
+							distance: "far",
 							selector: {
 								type: "item",
 								itemId,
@@ -106,7 +106,6 @@ it.each([
 				: {
 						type: "units",
 						query: {
-							scope: "board",
 							distance: "far",
 							selector: {
 								type: "item",
@@ -209,7 +208,7 @@ it("duplicates the selected root input with its complete nested configuration", 
 				max: 4,
 			},
 			query: {
-				scope: "any",
+				distance: "far",
 				selector: {
 					type: "item",
 					itemId: "ore",

@@ -2,7 +2,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
+const baseItem = ({ id }: { id: string }) => {
 	return {
 		uid: id,
 		id,
@@ -14,7 +14,6 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 				`artwork:${id}`,
 			],
 		},
-		scope,
 		maxStackSize: 10,
 	} as const;
 };
@@ -23,7 +22,7 @@ const existsWhen = (itemId: string) => {
 	return {
 		type: "exists" as const,
 		query: {
-			scope: "any" as const,
+			distance: "far" as const,
 			selector: {
 				type: "item" as const,
 				itemId,
@@ -43,10 +42,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 			width: 5,
 			height: 2,
 		},
-		inventory: {
-			width: 5,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -55,7 +50,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 		workshop: {
 			...baseItem({
 				id: "workshop",
-				scope: "board",
 			}),
 			maxStackSize: 1,
 
@@ -72,7 +66,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "water",
@@ -144,7 +138,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "water",
-				scope: "any",
 			}),
 		},
 		permit: {
@@ -153,7 +146,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "permit",
-				scope: "any",
 			}),
 		},
 		booster: {
@@ -162,7 +154,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "booster",
-				scope: "any",
 			}),
 		},
 		adjuster: {
@@ -171,7 +162,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "adjuster",
-				scope: "any",
 			}),
 		},
 		floor: {
@@ -180,7 +170,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "floor",
-				scope: "any",
 			}),
 		},
 		blocker: {
@@ -189,7 +178,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "blocker",
-				scope: "any",
 			}),
 		},
 	},
@@ -223,10 +211,11 @@ const gridItem = ({
 		id,
 		item: lineRunTestConfig.items[itemId],
 		location: {
-			scope: "inventory",
+			scope: "board" as const,
+			space: 0,
 			position: {
 				x,
-				y: 0,
+				y: itemId === "blocker" ? 1 : 0,
 			},
 		},
 		quantity: 1,

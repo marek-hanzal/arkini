@@ -54,7 +54,8 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 					id: "runtime:reset-probe",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 1,
 						position: {
 							x: 0,
 							y: 0,

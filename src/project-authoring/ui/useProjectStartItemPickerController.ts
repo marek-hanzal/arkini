@@ -1,7 +1,3 @@
-import { useMemo } from "react";
-
-import type { ProjectStartScope } from "~/project-authoring/type/ProjectStartScope";
-import { readProjectStartItemIdsFn } from "~/project-authoring/fn/readProjectStartItemIdsFn";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobox";
@@ -10,7 +6,6 @@ export namespace useProjectStartItemPickerController {
 	export interface Props {
 		readonly onCloseFn: () => void;
 		readonly onSelectFn: (itemId: string) => void;
-		readonly scope: ProjectStartScope;
 	}
 
 	export interface Output {
@@ -20,33 +15,14 @@ export namespace useProjectStartItemPickerController {
 	}
 }
 
-/** Owns allowed-item admission and selection for one initial grid scope. */
+/** Owns item selection for the initial board. */
 export const useProjectStartItemPickerController = ({
 	onCloseFn,
 	onSelectFn,
-	scope,
 }: useProjectStartItemPickerController.Props): useProjectStartItemPickerController.Output => {
 	const { items, options } = useEditorItemSearchOptions();
-	const allowedItemIds = useMemo(
-		() =>
-			readProjectStartItemIdsFn({
-				items,
-				scope,
-			}),
-		[
-			items,
-			scope,
-		],
-	);
-	const allowedOptions = useMemo(
-		() => options.filter(({ id }) => allowedItemIds.has(id)),
-		[
-			allowedItemIds,
-			options,
-		],
-	);
 	const selectItemFn = (itemId: string) => {
-		const option = allowedOptions.find((option) => option.id === itemId);
+		const option = options.find((option) => option.id === itemId);
 		if (option === undefined) return;
 		onSelectFn(itemId);
 		onCloseFn();
@@ -54,7 +30,7 @@ export const useProjectStartItemPickerController = ({
 
 	return {
 		items,
-		options: allowedOptions,
+		options,
 		selectItemFn,
 	};
 };

@@ -10,7 +10,6 @@ const item = (id: string, title: string): ItemSchema.Type => ({
 		],
 		scale: 1,
 	},
-	scope: "any",
 	maxStackSize: 1,
 	maxQueueSize: 1,
 	ui: "default",

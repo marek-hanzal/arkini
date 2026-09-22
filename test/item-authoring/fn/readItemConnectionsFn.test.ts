@@ -21,7 +21,7 @@ const enableRuleFn = (itemId: string) => ({
 	when: [
 		{
 			query: {
-				scope: "universe" as const,
+				distance: "universe" as const,
 				selector: {
 					itemId,
 					type: "item" as const,
@@ -308,7 +308,6 @@ describe("readItemConnectionsFn", () => {
 								type: "units",
 								query: {
 									distance: "far",
-									scope: "board",
 									selector: {
 										itemId: "water",
 										type: "item",

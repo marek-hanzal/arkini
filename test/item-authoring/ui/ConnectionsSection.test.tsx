@@ -362,7 +362,6 @@ it("opens each overview preview's complete collection on the current item", asyn
 		id: "overview",
 		uid: "overview-uid",
 		title: "Overview",
-		scope: "any",
 		maxStackSize: 1,
 		artwork: {
 			scale: 0.8,

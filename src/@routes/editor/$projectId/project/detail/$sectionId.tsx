@@ -5,8 +5,6 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ProjectBoardDetail } from "~/project-authoring/ui/ProjectBoardDetail";
 import { ProjectImagesDetail } from "~/project-authoring/ui/ProjectImagesDetail";
 import { ProjectGeneralDetail } from "~/project-authoring/ui/ProjectGeneralDetail";
-import { ProjectInventoryDetail } from "~/project-authoring/ui/ProjectInventoryDetail";
-import { ProjectToolbarDetail } from "~/project-authoring/ui/ProjectToolbarDetail";
 import { type ProjectSectionId, ProjectSectionIds } from "~/project-authoring/type/ProjectSections";
 
 export const Route = createFileRoute("/editor/$projectId/project/detail/$sectionId")({
@@ -33,10 +31,6 @@ export const Route = createFileRoute("/editor/$projectId/project/detail/$section
 				return <ProjectImagesDetail project={project} />;
 			case "board":
 				return <ProjectBoardDetail project={project} />;
-			case "toolbar":
-				return <ProjectToolbarDetail project={project} />;
-			case "inventory":
-				return <ProjectInventoryDetail project={project} />;
 		}
 	},
 });

@@ -95,7 +95,6 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 const withoutUnitsUnitsInput = {
 	type: "units",
 	query: {
-		scope: "board",
 		distance: "close",
 		selector: {
 			type: "item",
@@ -134,7 +133,6 @@ const createSearchItem = (id: string, spent: boolean) =>
 				`artwork:${id}`,
 			],
 		},
-		scope: "any",
 		maxStackSize: 1,
 		...(spent
 			? {
@@ -159,7 +157,7 @@ describe("InputControl", () => {
 					max: 10,
 				},
 				query: {
-					scope: "any",
+					distance: "far",
 					selector: {
 						type: "item",
 						itemId: "stone",
@@ -216,7 +214,7 @@ describe("InputControl", () => {
 				max: 1,
 			},
 			query: {
-				scope: "any",
+				distance: "far",
 				selector: {
 					type: "item",
 					itemId: "stone",
@@ -238,7 +236,7 @@ describe("InputControl", () => {
 		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
 		const inputType = findChoiceControl(container, "Input type");
 		const paidBy = findChoiceControl(container, "Paid by");
-		const boardDistance = findChoiceControl(unitCost, "Board distance");
+		const boardDistance = findChoiceControl(unitCost, "Query reach");
 
 		expect(inputType.parentElement).toBe(paidBy.parentElement);
 		expect(unitCost.contains(paidBy)).toBe(false);
@@ -397,7 +395,6 @@ describe("InputControl", () => {
 				from: "self",
 			},
 			query: {
-				scope: "board",
 				distance: "self",
 				selector: {
 					type: "item",
@@ -476,7 +473,6 @@ describe("InputControl", () => {
 				from: "target",
 			},
 			query: {
-				scope: "board",
 				distance: "close",
 				selector: {
 					type: "item",

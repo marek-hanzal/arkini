@@ -32,7 +32,7 @@ const ProjectSectionValueLink = ({
 
 export const ProjectGeneralDetail = ({ project }: { readonly project: Project }) => {
 	const translator = useTranslator();
-	const { board, inventory, toolbarSize = 0 } = project.config.meta;
+	const { board } = project.config.meta;
 	const identityRename = useProjectIdentityRenameController({
 		project,
 	});
@@ -67,29 +67,6 @@ export const ProjectGeneralDetail = ({ project }: { readonly project: Project })
 									>
 										{board.width} × {board.height} ={" "}
 										{board.width * board.height}
-									</ProjectSectionValueLink>
-								}
-							/>
-							<DetailFact
-								label={translator.textFn("Inventory")}
-								value={
-									<ProjectSectionValueLink
-										projectId={project.projectId}
-										sectionId="inventory"
-									>
-										{inventory.width} × {inventory.height} ={" "}
-										{inventory.width * inventory.height}
-									</ProjectSectionValueLink>
-								}
-							/>
-							<DetailFact
-								label={translator.textFn("Toolbar")}
-								value={
-									<ProjectSectionValueLink
-										projectId={project.projectId}
-										sectionId="toolbar"
-									>
-										{toolbarSize}
 									</ProjectSectionValueLink>
 								}
 							/>

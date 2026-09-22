@@ -200,22 +200,10 @@ describe("editor MCP authoring schema registry", () => {
 						$ref: "start.BoardItemSchema",
 					},
 				},
-				inventory: {
-					items: {
-						$ref: "start.InventoryItemSchema",
-					},
-				},
-				toolbar: {
-					items: {
-						$ref: "start.ToolbarItemSchema",
-					},
-				},
 			},
 		});
 		for (const id of [
 			"start.BoardItemSchema",
-			"start.InventoryItemSchema",
-			"start.ToolbarItemSchema",
 		]) {
 			expect(await readSchemaDetail(id), id).toMatchObject({
 				additionalProperties: false,
@@ -270,8 +258,6 @@ describe("editor MCP authoring schema registry", () => {
 				"item.CompositionSchema",
 				"StartSchema",
 				"start.BoardItemSchema",
-				"start.InventoryItemSchema",
-				"start.ToolbarItemSchema",
 			]),
 		);
 
@@ -343,24 +329,6 @@ describe("editor MCP authoring schema registry", () => {
 		expect(
 			validateCreate({
 				...input,
-				action: {
-					type: "inventory",
-				},
-			}),
-			JSON.stringify(validateCreate.errors),
-		).toBe(true);
-		expect(
-			validateCreate({
-				...input,
-				action: {
-					type: "inventory",
-					space: 1,
-				},
-			}),
-		).toBe(false);
-		expect(
-			validateCreate({
-				...input,
 				lines: [],
 			}),
 			JSON.stringify(validateCreate.errors),
@@ -401,20 +369,12 @@ describe("editor MCP authoring schema registry", () => {
 			clock: {
 				intervalMs: 1000,
 			},
-			scope: "board",
 			maxStackSize: 1,
 			lines: [
 				createLine({}),
 			],
 		};
 		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);
-		expect(
-			validateCreate({
-				...scheduled,
-				scope: "inventory",
-			}),
-			JSON.stringify(validateCreate.errors),
-		).toBe(true);
 		for (const replacement of [
 			{
 				maxStackSize: 2,

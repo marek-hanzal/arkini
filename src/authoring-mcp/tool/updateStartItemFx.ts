@@ -1,52 +1,32 @@
 import { Effect } from "effect";
-
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { StartLocationSchema } from "~/game-start/schema/StartLocationSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
-import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { commitProjectConfigFx } from "./commitProjectConfigFx";
 
-interface StartItemAtLocation {
-	readonly itemId: IdSchema.Type;
-	readonly quantity: PositiveIntegerSchema.Type;
-}
+const readStartItemAtLocationFn = (start: StartSchema.Type, location: StartLocationSchema.Type) =>
+	start.board.find(
+		(entry) =>
+			entry.space === location.space &&
+			entry.x === location.position.x &&
+			entry.y === location.position.y,
+	);
 
-const readStartItemAtLocationFn = (
+const removeStartItemFn = (
 	start: StartSchema.Type,
 	location: StartLocationSchema.Type,
-): StartItemAtLocation | undefined => {
-	if (location.scope === LocationScopeEnumSchema.enum.Board) {
-		const entry = start.board.find(
-			(candidate) =>
-				candidate.space === location.space &&
-				candidate.x === location.position.x &&
-				candidate.y === location.position.y,
-		);
-		return entry === undefined
-			? undefined
-			: {
-					itemId: entry.itemId,
-					quantity: entry.quantity ?? 1,
-				};
-	}
-	const entries =
-		location.scope === LocationScopeEnumSchema.enum.Inventory ? start.inventory : start.toolbar;
-	const entry = entries.find(
-		(candidate) =>
-			candidate.position.x === location.position.x &&
-			candidate.position.y === location.position.y,
-	);
-	return entry === undefined
-		? undefined
-		: {
-				itemId: entry.itemId,
-				quantity: entry.quantity ?? 1,
-			};
-};
+): StartSchema.Type => ({
+	...start,
+	board: start.board.filter(
+		(entry) =>
+			entry.space !== location.space ||
+			entry.x !== location.position.x ||
+			entry.y !== location.position.y,
+	),
+});
 
 const setStartItemFn = ({
 	itemId,
@@ -59,84 +39,32 @@ const setStartItemFn = ({
 	readonly quantity: PositiveIntegerSchema.Type;
 	readonly start: StartSchema.Type;
 }): StartSchema.Type => {
-	if (location.scope === LocationScopeEnumSchema.enum.Board) {
-		const entry = {
-			itemId,
-			quantity,
-			space: location.space,
-			x: location.position.x,
-			y: location.position.y,
-		};
-		const index = start.board.findIndex(
-			(candidate) =>
-				candidate.space === location.space &&
-				candidate.x === location.position.x &&
-				candidate.y === location.position.y,
-		);
-		return {
-			...start,
-			board:
-				index === -1
-					? [
-							...start.board,
-							entry,
-						]
-					: start.board.map((candidate, candidateIndex) =>
-							candidateIndex === index ? entry : candidate,
-						),
-		};
-	}
 	const entry = {
 		itemId,
-		position: location.position,
 		quantity,
+		space: location.space,
+		x: location.position.x,
+		y: location.position.y,
 	};
-	const key = location.scope === LocationScopeEnumSchema.enum.Inventory ? "inventory" : "toolbar";
-	const entries = start[key];
-	const index = entries.findIndex(
+	const index = start.board.findIndex(
 		(candidate) =>
-			candidate.position.x === location.position.x &&
-			candidate.position.y === location.position.y,
+			candidate.space === location.space &&
+			candidate.x === location.position.x &&
+			candidate.y === location.position.y,
 	);
 	return {
 		...start,
-		[key]:
+		board:
 			index === -1
 				? [
-						...entries,
+						...start.board,
 						entry,
 					]
-				: entries.map((candidate, candidateIndex) =>
+				: start.board.map((candidate, candidateIndex) =>
 						candidateIndex === index ? entry : candidate,
 					),
 	};
 };
-
-const removeStartItemFn = (
-	start: StartSchema.Type,
-	location: StartLocationSchema.Type,
-): StartSchema.Type => {
-	if (location.scope === LocationScopeEnumSchema.enum.Board)
-		return {
-			...start,
-			board: start.board.filter(
-				(entry) =>
-					entry.space !== location.space ||
-					entry.x !== location.position.x ||
-					entry.y !== location.position.y,
-			),
-		};
-	const key = location.scope === LocationScopeEnumSchema.enum.Inventory ? "inventory" : "toolbar";
-	return {
-		...start,
-		[key]: start[key].filter(
-			(entry) =>
-				entry.position.x !== location.position.x ||
-				entry.position.y !== location.position.y,
-		),
-	};
-};
-
 const readStartItemSetErrorFn = ({
 	itemId,
 	location,
@@ -150,41 +78,17 @@ const readStartItemSetErrorFn = ({
 }) => {
 	const item = project.config.items[itemId];
 	if (item === undefined) return `Item ${itemId} does not exist in the open project.`;
-	if (
-		!isItemLocationScopeAllowedFn({
-			item,
-			locationScope: location.scope,
-		})
-	)
-		return `Item ${itemId} cannot be stored in ${location.scope}.`;
 	if (quantity > item.maxStackSize)
 		return `Item ${itemId} stack may contain at most ${item.maxStackSize}.`;
-	if (location.scope === LocationScopeEnumSchema.enum.Board) {
-		const { height, width } = project.config.meta.board;
-		if (location.position.x >= width || location.position.y >= height)
-			return `Board position ${location.position.x},${location.position.y} does not fit inside ${width}x${height}.`;
-	}
-	if (location.scope === LocationScopeEnumSchema.enum.Inventory) {
-		const { height, width } = project.config.meta.inventory;
-		if (location.position.x >= width || location.position.y >= height)
-			return `Inventory position ${location.position.x},${location.position.y} does not fit inside ${width}x${height}.`;
-	}
-	if (
-		location.scope === LocationScopeEnumSchema.enum.Toolbar &&
-		location.position.x >= (project.config.meta.toolbarSize ?? 0)
-	)
-		return `Toolbar position ${location.position.x} does not fit inside ${project.config.meta.toolbarSize ?? 0} slots.`;
+	const { height, width } = project.config.meta.board;
+	if (location.position.x >= width || location.position.y >= height)
+		return `Board position ${location.position.x},${location.position.y} does not fit inside ${width}x${height}.`;
 	return undefined;
 };
-
 const formatStartLocationFn = (location: StartLocationSchema.Type) =>
 	[
 		`Scope: ${location.scope}`,
-		...(location.scope === LocationScopeEnumSchema.enum.Board
-			? [
-					`Space: ${location.space}`,
-				]
-			: []),
+		`Space: ${location.space}`,
 		`Position: ${location.position.x},${location.position.y}`,
 	].join("\n");
 
@@ -258,7 +162,7 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 		`Project ID: ${project.projectId}`,
 		formatStartLocationFn(location),
 		`Item ID: ${change.type === "set" ? change.itemId : previous?.itemId}`,
-		`Quantity: ${change.type === "set" ? change.quantity : previous?.quantity}`,
+		`Quantity: ${change.type === "set" ? change.quantity : (previous?.quantity ?? 1)}`,
 		...(change.type === "set"
 			? [
 					`Replaced: ${previous === undefined ? "no" : "yes"}`,

@@ -92,12 +92,12 @@ export const ItemLineInputs = ({
 								<span className="block">{status}</span>
 								{input.canWithdraw && !disabled ? (
 									<span className="block">
-										{translator.textFn("Click to take one back.")}
+										{translator.textFn("Right click to take one back.")}
 									</span>
 								) : null}
 								{input.canAutofill && !disabled ? (
 									<span className="block">
-										{translator.textFn("Click to bring this here.")}
+										{translator.textFn("Left click to bring this here.")}
 									</span>
 								) : null}
 								{input.availableQuantity > 0 ? (
@@ -118,12 +118,16 @@ export const ItemLineInputs = ({
 								controller.pending ||
 								(!input.canWithdraw && !input.canAutofill)
 							}
-							onClick={() =>
-								controller.activateFn(
-									input.inputIndex,
-									input.canWithdraw ? "withdraw" : "autofill",
-								)
-							}
+							onClick={() => {
+								if (input.canAutofill)
+									controller.activateFn(input.inputIndex, "autofill");
+							}}
+							onContextMenu={(event) => {
+								event.preventDefault();
+								event.stopPropagation();
+								if (input.canWithdraw)
+									controller.activateFn(input.inputIndex, "withdraw");
+							}}
 							className="relative block cursor-pointer disabled:cursor-default"
 							data-input-index={input.inputIndex}
 						>

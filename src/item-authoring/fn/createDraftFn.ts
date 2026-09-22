@@ -20,7 +20,7 @@ export const createDraftFn = ({
 		id: itemId,
 		title: "",
 		draft,
-		ui: "default",
+		ui: "simple",
 		artwork: {
 			scale: 1,
 			default: [

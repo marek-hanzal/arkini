@@ -55,7 +55,7 @@ export const ItemSchema = z
 				"simple",
 				"default",
 			])
-			.default("default")
+			.default("simple")
 			.describe(
 				"Item interface and player production control: simple shows only information but allows Board clicks on the default line; default enables manual production and always shows all sections, even without production lines.",
 			),

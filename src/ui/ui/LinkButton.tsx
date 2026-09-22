@@ -10,10 +10,12 @@ import {
 	forwardRef,
 	type AnchorHTMLAttributes,
 	type ButtonHTMLAttributes,
+	type MouseEventHandler,
 } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { CursorClassName, type CursorSemantic } from "~/ui/type/CursorSemantic";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 type LinkButtonCursorIntent = Extract<
 	CursorSemantic,
@@ -49,14 +51,40 @@ export const LinkButton = forwardRef<HTMLButtonElement, LinkButtonProps>(
 );
 LinkButton.displayName = "LinkButton";
 
-const LinkButtonAnchor = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(
-	({ className, ...props }, ref) => (
-		<a
-			ref={ref}
-			className={twMerge(LinkButtonClassName, CursorClassName.pointer, className)}
-			{...props}
-		/>
-	),
+type LinkButtonAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+	readonly linkDisabled?: boolean;
+	readonly "data-ui"?: string;
+};
+
+const LinkButtonAnchor = forwardRef<HTMLAnchorElement, LinkButtonAnchorProps>(
+	({ className, linkDisabled = false, onClick: onClickFn, ...props }, ref) => {
+		const handleClickFn: MouseEventHandler<HTMLAnchorElement> = (event) => {
+			if (linkDisabled) {
+				event.preventDefault();
+				return;
+			}
+			onClickFn?.(event);
+		};
+		return (
+			<a
+				ref={ref}
+				className={twMerge(
+					LinkButtonClassName,
+					"data-[ui-disabled=true]:text-muted data-[ui-disabled=true]:hover:text-muted data-[ui-disabled=true]:hover:no-underline",
+					CursorClassName[linkDisabled ? "not-allowed" : "pointer"],
+					className,
+				)}
+				{...props}
+				onClick={handleClickFn}
+				{...readDataUiFn({
+					dataUi: props["data-ui"] ?? "LinkButtonLink",
+					state: {
+						disabled: linkDisabled,
+					},
+				})}
+			/>
+		);
+	},
 );
 LinkButtonAnchor.displayName = "LinkButtonAnchor";
 
@@ -74,5 +102,7 @@ export type LinkButtonLinkProps<
 export const LinkButtonLink = ((props: LinkButtonLinkProps) =>
 	createElement(CreatedLinkButtonLink, {
 		...props,
+		disabled: undefined,
+		linkDisabled: props.disabled,
 		preload: props.preload ?? "intent",
 	} as never)) as LinkComponent<typeof LinkButtonAnchor>;

@@ -15,8 +15,8 @@ import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandida
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import { createYourGamesRowsFn } from "~/serapack-selector/fn/createYourGamesRowsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
-import { LinkButton } from "~/ui/ui/LinkButton";
+import { PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
+import { LinkButton, LinkButtonLink } from "~/ui/ui/LinkButton";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -123,7 +123,7 @@ export const YourGamesList = ({
 				return (
 					<article
 						key={gameId}
-						className="ak-list-row flex min-w-0 items-center gap-3 px-4 py-3"
+						className="ak-list-row flex min-w-0 items-center gap-3 px-4 py-3 hover:bg-[var(--ak-list-row-interactive-surface)] hover:shadow-[inset_3px_0_0_var(--ak-accent)]"
 						data-row-kind={project === undefined ? "serapack" : "project"}
 						data-ui="YourGamesRow"
 					>
@@ -161,10 +161,22 @@ export const YourGamesList = ({
 								) : null}
 							</div>
 							<p className="mt-1 truncate text-xs text-subtle">
-								{row.type === "serapack"
-									? (row.serapack.filename ??
-										`${row.serapack.packageId} · ${row.serapack.serakki}`)
-									: `${row.candidate.project.projectId} · v${formatVersionFn(row.candidate.project.version)}`}
+								{row.type === "serapack" ? (
+									(row.serapack.filename ??
+									`${row.serapack.packageId} · ${row.serapack.serakki}`)
+								) : (
+									<>
+										{row.candidate.project.projectId} · v
+										{formatVersionFn(row.candidate.project.version)} ·{" "}
+										<time
+											dateTime={new Date(
+												row.candidate.project.updatedAtMs,
+											).toISOString()}
+										>
+											{formatter.format(row.candidate.project.updatedAtMs)}
+										</time>
+									</>
+								)}
 							</p>
 						</div>
 						<div className="flex shrink-0 items-center gap-4">
@@ -190,17 +202,17 @@ export const YourGamesList = ({
 									>
 										<Trash2 className="size-4" />
 									</button>
-									<ButtonLink
+									<LinkButtonLink
 										to="/editor/$projectId/editor/items/list"
 										params={{
 											projectId: row.candidate.project.projectId,
 										}}
 										disabled={blocked}
-										className="min-h-0 gap-1.5 px-2 py-1 text-xs"
+										className="inline-flex items-center gap-1.5 text-xs"
 									>
 										<Sparkles className="size-4" />
 										Editor
-									</ButtonLink>
+									</LinkButtonLink>
 								</>
 							) : (
 								<LinkButton
@@ -211,14 +223,6 @@ export const YourGamesList = ({
 									<Sparkles className="size-4" />
 									Editor
 								</LinkButton>
-							)}
-							{project === undefined ? null : (
-								<time
-									dateTime={new Date(project.updatedAtMs).toISOString()}
-									className="shrink-0 text-xs text-muted"
-								>
-									{formatter.format(project.updatedAtMs)}
-								</time>
 							)}
 							{row.type === "serapack" ? (
 								<PrimaryButtonLink

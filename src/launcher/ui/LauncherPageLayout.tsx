@@ -9,9 +9,9 @@ const launcherPagePresentation = {
 		viewTransitionName: "serakki-panel-about",
 	},
 	serapacks: {
-		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+		content: "flex min-h-0 flex-col overflow-hidden p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
-		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
+		panel: "flex max-h-full w-full max-w-5xl flex-col overflow-hidden border border-line bg-surface shadow-2xl",
 		viewTransitionName: "serakki-panel-serapacks",
 	},
 	"main-menu": {

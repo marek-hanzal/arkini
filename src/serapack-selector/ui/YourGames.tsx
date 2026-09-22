@@ -10,6 +10,7 @@ import { useYourGamesPlayController } from "~/serapack-selector/ui/useYourGamesP
 import { BackButton } from "~/ui/ui/BackButton";
 import { Button } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { Scrollable } from "~/ui/ui/Scrollable";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
 import { ProjectCreateDialog } from "~/project-authoring/ui/ProjectCreateDialog";
 import { useProjectCatalogActions } from "~/project-authoring/ui/useProjectCatalogActions";
@@ -60,7 +61,7 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 	return (
 		<LauncherPageLayout page="serapacks">
 			<div
-				className="grid min-h-0 gap-5"
+				className="flex min-h-0 flex-1 flex-col gap-5"
 				data-ui="SerapackSelector"
 			>
 				<header>
@@ -165,7 +166,10 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 					</p>
 				)}
 
-				<section className="grid gap-3 border-t border-line pt-5">
+				<Scrollable
+					className="flex-1 overflow-x-hidden border-t border-line pt-5"
+					data-ui="YourGamesRowsScroll"
+				>
 					<YourGamesList
 						blocked={blocked}
 						pendingProjectId={play.pendingProjectId}
@@ -181,7 +185,7 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 						onPlayProjectFn={play.playProjectFn}
 						onRemoveSerapackFn={actions.removeSerapackFn}
 					/>
-				</section>
+				</Scrollable>
 
 				<footer className="flex justify-center">
 					<BackButton

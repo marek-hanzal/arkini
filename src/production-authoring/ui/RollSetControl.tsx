@@ -253,24 +253,26 @@ const RollControl = ({
 	const translator = useTranslator();
 	return (
 		<div className="grid gap-4">
-			<EditorChoiceControl
-				error={readEditorFormValidationErrorFn(validationIssues, "type")}
-				label={translator.textFn("Roll type")}
-				value={value.type}
-				options={[
-					{
-						description: <Mx label="Guaranteed roll type help" />,
-						label: translator.textFn("Guaranteed"),
-						value: "guaranteed",
-					},
-					{
-						description: <Mx label="Chance roll type help" />,
-						label: translator.textFn("Chance"),
-						value: "chance",
-					},
-				]}
-				onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
-			/>
+			<div className="flex min-w-0 justify-end">
+				<EditorChoiceControl
+					error={readEditorFormValidationErrorFn(validationIssues, "type")}
+					label={translator.textFn("Roll type")}
+					value={value.type}
+					options={[
+						{
+							description: <Mx label="Guaranteed roll type help" />,
+							label: translator.textFn("Guaranteed"),
+							value: "guaranteed",
+						},
+						{
+							description: <Mx label="Chance roll type help" />,
+							label: translator.textFn("Chance"),
+							value: "chance",
+						},
+					]}
+					onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
+				/>
+			</div>
 			{value.type === undefined
 				? null
 				: match(value as RollSchema.Type)

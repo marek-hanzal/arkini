@@ -403,7 +403,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "animal-bones",
+											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 3,
 												"max": 5
@@ -504,7 +504,7 @@
 											"rules": []
 										},
 										{
-											"itemId": "animal-bones",
+											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 3,
 												"max": 5

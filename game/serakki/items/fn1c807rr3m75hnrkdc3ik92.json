@@ -95,7 +95,7 @@
 									"type": "guaranteed",
 									"drop": [
 										{
-											"itemId": "animal-bones",
+											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 2,
 												"max": 3

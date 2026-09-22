@@ -2,16 +2,27 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "v5d2dioqv0zxgjlr6wo2vgeh",
-		"id": "animal-bones",
-		"title": "Animal Bones",
-		"ui": "simple",
+		"id": "animal-bones---tier-1",
+		"title": "Animal Bones - Tier 1",
 		"draft": true,
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
 				"animal-bones"
 			]
 		},
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "animal-bones---tier-1"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "animal-bones---tier-2"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": []
 	}

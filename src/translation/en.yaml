@@ -367,10 +367,6 @@ Clear interval:
   value: Clear interval
 Clear lifetime:
   value: Clear lifetime
-Click to bring this here.:
-  value: Click to bring this here.
-Click to take one back.:
-  value: Click to take one back.
 Clock:
   value: Clock
 Clock expiry:
@@ -1098,6 +1094,8 @@ Keep at most {maximum} items.:
   dynamic: true
 Kill switch:
   value: Stop immediately
+Left click to bring this here.:
+  value: Left click to bring this here.
 Lifetime:
   value: Lifetime
 Lifetime (seconds):
@@ -1754,6 +1752,8 @@ Resources:
   value: Resources
 Retry loading notes:
   value: Retry loading notes
+Right click to take one back.:
+  value: Right click to take one back.
 Roll:
   value: Roll
 Roll type:

@@ -163,7 +163,7 @@ it("reveals and removes each rule and condition level independently", async () =
 		await renderRulesFn(rules);
 		expect(container.textContent).toContain("Condition type");
 		expect(container.querySelector("[data-selector-item-id]")).toBeNull();
-		expect(container.textContent).not.toContain("Query reach");
+		expect(container.textContent).not.toContain("Search area");
 
 		await act(async () => choiceButtonFn("Count range")?.click());
 		rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
@@ -171,7 +171,7 @@ it("reveals and removes each rule and condition level independently", async () =
 		expect(container.querySelector('[data-selector-item-id=""]')).not.toBeNull();
 		expect(container.textContent).toContain("Minimum count");
 		expect(container.textContent).toContain("Maximum count");
-		expect(container.textContent).toContain("Query reach");
+		expect(container.textContent).toContain("Search area");
 
 		await act(async () =>
 			container.querySelector<HTMLButtonElement>("[data-selector-item-id]")?.click(),

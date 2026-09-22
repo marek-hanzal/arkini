@@ -157,7 +157,7 @@ describe("Clock lifetime boundaries", () => {
 								{
 									type: "materials",
 									query: {
-										scope: "any",
+										distance: "far",
 										selector: {
 											type: "item",
 											itemId: "residue",

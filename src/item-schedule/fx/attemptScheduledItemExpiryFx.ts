@@ -8,7 +8,6 @@ import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/fn/isExpectedPlacementDeliveryBlockFn";
 
 interface AttemptScheduledItemExpiryProps {
 	itemId: IdSchema.Type;
@@ -103,13 +102,11 @@ export const attemptScheduledItemExpiryFx = Effect.fn("attemptScheduledItemExpir
 				}) satisfies AttemptScheduledItemExpiryResult,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) =>
-			isExpectedPlacementDeliveryBlockFn(error.reason)
-				? Effect.succeed({
-						type: "blocked",
-						error,
-						runtime,
-					} satisfies AttemptScheduledItemExpiryResult)
-				: Effect.fail(error),
+			Effect.succeed({
+				type: "blocked",
+				error,
+				runtime,
+			} satisfies AttemptScheduledItemExpiryResult),
 		),
 	);
 });

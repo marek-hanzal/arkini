@@ -316,7 +316,8 @@ describe("createGameFx", () => {
 				id: "runtime:old-major",
 				itemId: "water",
 				location: {
-					scope: "inventory",
+					scope: "board",
+					space: 0,
 					position: {
 						x: 0,
 						y: 0,
@@ -386,7 +387,8 @@ describe("createGameFx", () => {
 				id: "runtime:public-disposal-retry",
 				itemId: "water",
 				location: {
-					scope: "inventory",
+					scope: "board",
+					space: 0,
 					position: {
 						x: 0,
 						y: 0,
@@ -407,7 +409,8 @@ describe("createGameFx", () => {
 					id: "runtime:must-remain-frozen",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

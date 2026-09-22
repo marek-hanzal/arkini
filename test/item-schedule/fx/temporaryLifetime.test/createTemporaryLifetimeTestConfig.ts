@@ -11,7 +11,6 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize,
 });
 
@@ -85,10 +84,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 			title: "Temporary lifetime test",
 			board: {
 				width: 4,
-				height: 1,
-			},
-			inventory: {
-				width: 1,
 				height: 1,
 			},
 		},

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
-import { board, inventory, toolbar, run, spawnAndActivate } from "../support/spaceActionFixture";
+import { board, run, spawnAndActivate } from "../support/spaceActionFixture";
 
 describe("Space item activation admission", () => {
 	it("evaluates proximity-gated availability from the Space item's Board origin", () => {
@@ -68,41 +68,6 @@ describe("Space item activation admission", () => {
 		expect(far.after).toEqual(far.before);
 	});
 
-	it("rejects a zero-count Board rule without a real Board origin", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const portal = yield* spawnItemFx({
-					id: "runtime:passive-zero-rule-portal",
-					itemId: "passiveZeroBoardRulePortal",
-					location: toolbar(0),
-					quantity: 1,
-				});
-				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.result(
-					activateItemActionFx({
-						currentSpace: before.currentSpace,
-						itemId: portal.id,
-						location: portal.location,
-						revision: portal.revision,
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					attempt,
-					before,
-				};
-			}),
-		);
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "ItemActionUnavailableError",
-				itemId: "runtime:passive-zero-rule-portal",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
-
 	it("rejects a Board source outside the currently visible space", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -139,20 +104,20 @@ describe("Space item activation admission", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("rejects a passive command observed on a stale current space", () => {
+	it("rejects a command observed on a stale current space", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const item = yield* spawnItemFx({
-					id: "runtime:stale-passive-portal",
+					id: "runtime:stale-portal",
 					itemId: "spentPortal",
-					location: inventory(1),
+					location: board(1),
 					quantity: 1,
 				});
 				const observed = yield* readRuntimeFx();
 				yield* spawnAndActivate({
 					id: "runtime:navigator",
 					itemId: "portal",
-					location: toolbar(0),
+					location: board(0),
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(

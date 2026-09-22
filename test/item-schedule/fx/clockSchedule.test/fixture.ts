@@ -28,10 +28,6 @@ export const createClockConfig = (
 				width: 6,
 				height: 2,
 			},
-			inventory: {
-				width: 2,
-				height: 2,
-			},
 		},
 		start: {
 			currentSpace: 0,
@@ -67,8 +63,6 @@ export const createClockConfig = (
 						},
 					],
 				}),
-
-				scope: "board",
 				maxStackSize: 1,
 				maxQueueSize: 3,
 				ui: "default",
@@ -88,7 +82,6 @@ export const createClockConfig = (
 			},
 			expired: {
 				...createSimpleItem("expired"),
-				scope: "board",
 				maxStackSize: 1,
 			},
 		},

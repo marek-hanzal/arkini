@@ -63,8 +63,6 @@ const createClockGraph = async ({
 						...additionalLines,
 					],
 		}),
-
-		scope: "board",
 		maxStackSize: 1,
 		ui,
 		clock: {
@@ -98,8 +96,6 @@ const createClockGraph = async ({
 							quantity: 1,
 						},
 					],
-					inventory: [],
-					toolbar: [],
 				},
 			}),
 		]),
@@ -345,7 +341,7 @@ describe("Clock authored acquisition boundaries", () => {
 								{
 									type: "exists",
 									query: {
-										scope: "universe",
+										distance: "universe",
 										selector: {
 											type: "item",
 											itemId: "target",

@@ -8,7 +8,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 
-const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => ({
+const baseItem = (id: string) => ({
 	uid: `uid:${id}`,
 	id,
 	title: id,
@@ -21,7 +21,6 @@ const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => (
 			string,
 		],
 	},
-	scope,
 	maxStackSize: 4,
 });
 
@@ -60,11 +59,6 @@ const config = GameConfigSchema.parse({
 			width: 4,
 			height: 2,
 		},
-		inventory: {
-			width: 4,
-			height: 1,
-		},
-		toolbarSize: 4,
 	},
 	start: {
 		currentSpace: 0,
@@ -99,7 +93,7 @@ const config = GameConfigSchema.parse({
 							{
 								type: "exists",
 								query: {
-									scope: "universe",
+									distance: "universe",
 									selector: {
 										type: "item",
 										itemId: "permit",
@@ -124,34 +118,6 @@ const config = GameConfigSchema.parse({
 							{
 								type: "exists",
 								query: {
-									scope: "board",
-									distance: "close",
-									selector: {
-										type: "item",
-										itemId: "permit",
-									},
-								},
-							},
-						],
-					},
-				],
-			},
-		},
-		passiveZeroBoardRulePortal: {
-			...baseItem("passiveZeroBoardRulePortal"),
-
-			action: {
-				type: "space" as const,
-				space: 11,
-				rules: [
-					{
-						type: "enable",
-						when: [
-							{
-								type: "count",
-								count: 0,
-								query: {
-									scope: "board",
 									distance: "close",
 									selector: {
 										type: "item",
@@ -174,7 +140,6 @@ const config = GameConfigSchema.parse({
 					{
 						type: "units",
 						query: {
-							scope: "board",
 							distance: "close",
 							selector: {
 								type: "item",
@@ -199,7 +164,6 @@ const config = GameConfigSchema.parse({
 					{
 						type: "units",
 						query: {
-							scope: "board",
 							distance: "close",
 							selector: {
 								type: "item",
@@ -320,14 +284,36 @@ const config = GameConfigSchema.parse({
 
 			units: {
 				amount: 1,
-				output: depletionOutput("boardToken"),
+				output: {
+					set: [
+						{
+							rules: [],
+							roll: [
+								{
+									type: "guaranteed",
+									drop: [
+										{
+											itemId: "boardToken",
+											rules: [],
+											quantity: {
+												min: 2,
+												max: 2,
+											},
+											placement: "drop",
+										},
+									],
+								},
+							],
+						},
+					],
+				},
 			},
 		},
 		payer: {
 			maxQueueSize: 1,
 			lines: [],
 
-			...baseItem("payer", "board"),
+			...baseItem("payer"),
 
 			units: {
 				amount: 2,
@@ -343,13 +329,14 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [],
 
-			...baseItem("token", "inventory"),
+			...baseItem("token"),
 		},
 		boardToken: {
 			maxQueueSize: 1,
 			lines: [],
 
-			...baseItem("boardToken", "board"),
+			...baseItem("boardToken"),
+			maxStackSize: 1,
 		},
 	},
 });
@@ -363,23 +350,6 @@ export const board = (x: number, y = 0, space = 0) =>
 			y,
 		},
 	}) as const;
-export const inventory = (x: number) =>
-	({
-		scope: "inventory",
-		position: {
-			x,
-			y: 0,
-		},
-	}) as const;
-export const toolbar = (x: number) =>
-	({
-		scope: "toolbar",
-		position: {
-			x,
-			y: 0,
-		},
-	}) as const;
-
 export const run = <A, E>(
 	program: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
 ) =>

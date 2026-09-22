@@ -19,10 +19,6 @@ export const createBlockedCompletionTestConfig = () => {
 		...base,
 		meta: {
 			...base.meta,
-			inventory: {
-				width: 1,
-				height: 1,
-			},
 		},
 		items: {
 			...base.items,
@@ -33,7 +29,6 @@ export const createBlockedCompletionTestConfig = () => {
 				title: "Blocker",
 				description: "Occupies board delivery capacity.",
 				maxStackSize: 1,
-				scope: "board",
 			},
 			ingot: {
 				...base.items.tool,

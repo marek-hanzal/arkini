@@ -19,10 +19,6 @@ export const testSerapackConfig = GameConfigSchema.parse({
 			width: 2,
 			height: 2,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -51,7 +47,6 @@ export const testSerapackConfig = GameConfigSchema.parse({
 					"asset-water",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 	},

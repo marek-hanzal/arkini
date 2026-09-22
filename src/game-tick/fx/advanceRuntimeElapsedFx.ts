@@ -11,7 +11,6 @@ import type { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardEr
 import type { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import type { PlacementPlanInvalidError } from "~/item-placement/error/PlacementPlanInvalidError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import type { BoardQueryOriginUnavailableError } from "~/item-query/error/BoardQueryOriginUnavailableError";
 import type { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 import type { InputRunPlanInvalidError } from "~/production-input/error/InputRunPlanInvalidError";
 import type { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
@@ -45,7 +44,6 @@ export type AdvanceRuntimeElapsedError =
 	| ItemJobScopedError
 	| JobOwnerBusyError
 	| JobQueueFullError
-	| BoardQueryOriginUnavailableError
 	| InputRunPlanInvalidError
 	| JobNotFoundError
 	| JobNotReadyError;

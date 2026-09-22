@@ -40,7 +40,8 @@ describe("createGameSessionFx / fail-stop", () => {
 					id: "runtime:water:listener",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -133,7 +134,7 @@ describe("createGameSessionFx / fail-stop", () => {
 					lineId: "line:forge:run",
 				}),
 			);
-			delete (config.items as Record<string, unknown>).inventoryOutput;
+			delete (config.items as Record<string, unknown>).completionOutput;
 
 			await fatalDelivered;
 			const fatal = session.getFatalErrorFn();

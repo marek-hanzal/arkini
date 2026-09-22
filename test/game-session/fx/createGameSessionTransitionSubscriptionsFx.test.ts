@@ -37,7 +37,8 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 					id: "runtime:event:duplicate",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

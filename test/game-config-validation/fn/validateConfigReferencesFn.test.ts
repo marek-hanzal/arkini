@@ -19,8 +19,6 @@ const compileItems = (
 	start: StartSchema.Type = {
 		currentSpace: 0,
 		board: [],
-		inventory: [],
-		toolbar: [],
 	},
 ) =>
 	Effect.runPromise(
@@ -35,7 +33,6 @@ const compileItems = (
 const unitsInput = (itemId: string) => ({
 	type: "units" as const,
 	query: {
-		scope: "board" as const,
 		distance: "close" as const,
 		selector: {
 			type: "item" as const,
@@ -74,7 +71,7 @@ describe("completed config reference validation", () => {
 					{
 						type: "materials" as const,
 						query: {
-							scope: "any" as const,
+							distance: "far",
 							selector: {
 								type: "item" as const,
 								itemId: "item:missing-input",
@@ -108,8 +105,6 @@ describe("completed config reference validation", () => {
 						y: 0,
 					},
 				],
-				inventory: [],
-				toolbar: [],
 			},
 		);
 		const missing = result.diagnostics.filter(
@@ -151,7 +146,7 @@ describe("completed config reference validation", () => {
 							{
 								type: "exists" as const,
 								query: {
-									scope: "universe" as const,
+									distance: "universe",
 									selector: {
 										type: "item" as const,
 										itemId: "item:missing-rule",
@@ -194,7 +189,7 @@ describe("completed config reference validation", () => {
 								{
 									type: "exists" as const,
 									query: {
-										scope: "universe" as const,
+										distance: "universe",
 										selector: {
 											type: "item" as const,
 											itemId: "item:producer",
@@ -209,7 +204,7 @@ describe("completed config reference validation", () => {
 								{
 									type: "exists" as const,
 									query: {
-										scope: "universe" as const,
+										distance: "universe",
 										selector: {
 											type: "item" as const,
 											itemId: "item:missing-rule",
@@ -263,7 +258,7 @@ describe("completed config reference validation", () => {
 											{
 												type: "exists",
 												query: {
-													scope: "universe",
+													distance: "universe",
 													selector: {
 														type: "item",
 														itemId: "item:missing-set-rule",

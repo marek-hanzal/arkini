@@ -10,7 +10,7 @@ const ruleFn = (type: "enable" | "disable" | "show", hint?: string) =>
 			{
 				type: "exists",
 				query: {
-					scope: "any",
+					distance: "far",
 					selector: {
 						type: "item",
 						itemId: "tree",

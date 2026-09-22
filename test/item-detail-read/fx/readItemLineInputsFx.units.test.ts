@@ -27,7 +27,6 @@ const line: LineSchema.Type = {
 				cost: 1,
 			},
 			query: {
-				scope: "board",
 				distance: "close",
 				selector: {
 					type: "item",

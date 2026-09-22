@@ -5,7 +5,7 @@ import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const exists = (itemId: string): WhenSchema.Type => ({
 	query: {
-		scope: "universe",
+		distance: "universe",
 		selector: {
 			itemId,
 			type: "item",

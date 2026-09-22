@@ -153,26 +153,6 @@ describe("createSerakkiRouterFx", () => {
 				],
 			],
 			[
-				"/editor/serakki/board",
-				"/editor/serakki/board/inventory",
-				[
-					"serakki-route",
-					"board-to-board",
-					"editor-to-editor",
-					"editor-board-leaf",
-				],
-			],
-			[
-				"/editor/serakki/board/inventory",
-				"/editor/serakki/board",
-				[
-					"serakki-route",
-					"board-to-board",
-					"editor-to-editor",
-					"editor-board-leaf",
-				],
-			],
-			[
 				"/editor/serakki/project",
 				"/main-menu",
 				[
@@ -223,24 +203,6 @@ describe("createSerakkiRouterFx", () => {
 				[
 					"serakki-route",
 					"board-to-board",
-				],
-			],
-			[
-				"/game/built-in/board",
-				"/game/built-in/inventory",
-				[
-					"serakki-route",
-					"board-to-board",
-					"board-to-inventory",
-				],
-			],
-			[
-				"/game/built-in/inventory",
-				"/game/built-in/board",
-				[
-					"serakki-route",
-					"board-to-board",
-					"inventory-to-board",
 				],
 			],
 			[

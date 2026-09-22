@@ -46,9 +46,10 @@ it("separates obtainable material from the exact slot's stored fill and does not
 	const source = {
 		...water,
 		location: {
-			scope: "inventory",
+			scope: "board" as const,
+			space: 0,
 			position: {
-				x: 0,
+				x: 1,
 				y: 0,
 			},
 		},
@@ -109,10 +110,10 @@ it("separates obtainable material from the exact slot's stored fill and does not
 	const otherSpace = {
 		...source,
 		location: {
-			scope: "board",
+			scope: "board" as const,
 			space: 1,
 			position: {
-				x: 0,
+				x: 1,
 				y: 0,
 			},
 		},
@@ -137,9 +138,10 @@ it("keeps travelling material available but unfilled until canonical input settl
 			generation: 0,
 			remainingDurationMs: 100,
 			origin: {
-				scope: "inventory",
+				scope: "board" as const,
+				space: 0,
 				position: {
-					x: 0,
+					x: 1,
 					y: 0,
 				},
 			},
@@ -290,21 +292,23 @@ it("counts all obtainable stock beyond one job capacity without including other 
 		id: "free-water",
 		quantity: 12,
 		location: {
-			scope: "inventory",
+			scope: "board" as const,
+			space: 0,
 			position: {
-				x: 0,
+				x: 1,
 				y: 0,
 			},
 		},
 	} satisfies RuntimeItemSchema.Type;
-	const toolbar = {
+	const secondSource = {
 		...source,
-		id: "toolbar-water",
+		id: "secondSource-water",
 		quantity: 4,
 		location: {
-			scope: "toolbar",
+			scope: "board" as const,
+			space: 0,
 			position: {
-				x: 0,
+				x: 2,
 				y: 0,
 			},
 		},
@@ -314,10 +318,10 @@ it("counts all obtainable stock beyond one job capacity without including other 
 		id: "far-water",
 		quantity: 100,
 		location: {
-			scope: "board",
+			scope: "board" as const,
 			space: 1,
 			position: {
-				x: 0,
+				x: 1,
 				y: 0,
 			},
 		},
@@ -339,7 +343,7 @@ it("counts all obtainable stock beyond one job capacity without including other 
 				owner,
 				water,
 				source,
-				toolbar,
+				secondSource,
 				far,
 				claimed,
 			],
@@ -373,9 +377,10 @@ it("isolates active material and gives shared buffers only to the first same-lin
 		id: "free",
 		quantity: 5,
 		location: {
-			scope: "inventory",
+			scope: "board" as const,
+			space: 0,
 			position: {
-				x: 0,
+				x: 1,
 				y: 0,
 			},
 		},
@@ -524,9 +529,10 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 	const outside = {
 		...roots[1],
 		location: {
-			scope: "inventory" as const,
+			scope: "board" as const,
+			space: 0,
 			position: {
-				x: 0,
+				x: 1,
 				y: 0,
 			},
 		},
@@ -644,7 +650,6 @@ it("reports the selected external target's remaining units, including during an 
 					cost: 1,
 				},
 				query: {
-					scope: "board",
 					distance: "far",
 					selector: {
 						type: "item",
@@ -664,7 +669,7 @@ it("reports the selected external target's remaining units, including during an 
 			},
 		},
 		location: {
-			scope: "board",
+			scope: "board" as const,
 			space: 0,
 			position: {
 				x: 1,

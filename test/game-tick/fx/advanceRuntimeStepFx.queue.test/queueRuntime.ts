@@ -25,7 +25,7 @@ export const queueConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far",
 								selector: {
 									type: "item",
 									itemId: "tool",
@@ -61,7 +61,7 @@ export const queueConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far",
 								selector: {
 									type: "item",
 									itemId: "water",
@@ -106,7 +106,6 @@ export const createContendedQueueConfigFn = () => {
 									{
 										type: "units",
 										query: {
-											scope: "board",
 											selector: {
 												type: "item",
 												itemId: "payer",

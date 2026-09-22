@@ -594,44 +594,6 @@ describe("temporary item lifetime", () => {
 		expect(replaced?.revision).not.toBe(result.target.revision);
 	});
 
-	it("accepts Clock state in passive storage", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const temporary = yield* spawnTemporaryFx({});
-				const runtime = yield* readRuntimeFx();
-				return yield* checkRuntimeFx({
-					runtime: {
-						...runtime,
-						items: runtime.items.map((item) =>
-							item.id === temporary.id
-								? {
-										...item,
-										location: {
-											scope: "inventory",
-											position: {
-												x: 0,
-												y: 0,
-											},
-										},
-									}
-								: item,
-						),
-					},
-				});
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(
-			result.issues.filter(
-				(issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemSchedule,
-			),
-		).toEqual([]);
-	});
-
 	it("reports temporary duration state attached to a non-temporary item", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

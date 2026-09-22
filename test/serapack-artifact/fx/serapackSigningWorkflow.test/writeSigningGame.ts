@@ -41,10 +41,6 @@ export const writeSigningGame = async (root: string) => {
 					width: 2,
 					height: 2,
 				},
-				inventory: {
-					width: 1,
-					height: 1,
-				},
 			},
 			resources: {
 				hero: "hero",
@@ -73,7 +69,6 @@ export const writeSigningGame = async (root: string) => {
 						"item",
 					],
 				},
-				scope: "any",
 				maxStackSize: 1,
 			},
 		})}\n`,

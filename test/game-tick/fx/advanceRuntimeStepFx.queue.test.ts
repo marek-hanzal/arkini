@@ -250,46 +250,4 @@ describe("Tick queue progress priority", () => {
 			remainingUnits: 1,
 		});
 	});
-
-	it("does not dispatch any pending request for a stored owner", () => {
-		const queue = [
-			requestFn("request:older", "line:older"),
-			requestFn("request:later", "line:later"),
-		];
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const prepared = yield* prepareQueueFx(queue, [
-					itemFn("source:tool", "tool", boardFn(4), 2),
-				]);
-				const stored = {
-					...prepared,
-					items: prepared.items.map((item) =>
-						item.id === "owner:a"
-							? {
-									...item,
-									location: {
-										scope: "inventory" as const,
-										position: {
-											x: 0,
-											y: 0,
-										},
-									},
-								}
-							: item,
-					),
-				};
-				return {
-					stored,
-					stepped: yield* advanceRuntimeStepFx(stored),
-				};
-			}).pipe(
-				useGameFx({
-					config: queueConfig,
-				}),
-			),
-		);
-
-		expect(result.stepped.runtime).toEqual(result.stored);
-		expect(result.stepped.events).toEqual([]);
-	});
 });

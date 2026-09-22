@@ -58,7 +58,8 @@ describe("createGameSessionFx / unsubscribe and async delivery", () => {
 					id: "runtime:water:pending-listener",
 					itemId: "water",
 					location: {
-						scope: "inventory",
+						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

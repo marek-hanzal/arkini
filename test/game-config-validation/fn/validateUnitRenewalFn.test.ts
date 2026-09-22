@@ -112,7 +112,7 @@ describe("validateUnitRenewalFn", () => {
 						{
 							type: "exists" as const,
 							query: {
-								scope: "universe" as const,
+								distance: "universe",
 								selector: {
 									type: "item" as const,
 									itemId: units.id,

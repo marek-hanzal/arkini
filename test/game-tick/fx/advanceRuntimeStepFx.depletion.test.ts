@@ -37,7 +37,6 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 									cost: 1,
 								},
 								query: {
-									scope: "board",
 									distance: "close",
 									selector: {
 										type: "item",

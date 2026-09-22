@@ -122,18 +122,6 @@
 		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
 	);
 
-	--ak-toolbar-grid-hue: color-mix(in srgb, var(--ak-info) 52%, var(--ak-accent));
-	--ak-toolbar-grid-slot-surface-a: color-mix(
-		in srgb,
-		var(--ak-toolbar-grid-hue) 6%,
-		var(--ak-surface)
-	);
-	--ak-toolbar-grid-slot-surface-b: color-mix(
-		in srgb,
-		var(--ak-toolbar-grid-hue) 13%,
-		var(--ak-surface)
-	);
-
 	--ak-list-row-surface: light-dark(
 		color-mix(in srgb, var(--ak-surface-raised) 72%, var(--ak-surface)),
 		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))

@@ -1,14 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({
-	id,
-	maxStackSize = 1,
-	scope = "any",
-}: {
-	id: string;
-	maxStackSize?: number;
-	scope?: "any" | "board";
-}) => ({
+const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -19,7 +11,6 @@ const baseItem = ({
 			`artwork:${id}`,
 		],
 	},
-	scope,
 	maxStackSize,
 });
 
@@ -58,10 +49,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			width: 3,
 			height: 1,
 		},
-		inventory: {
-			width: 3,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -70,7 +57,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 		portal: {
 			...baseItem({
 				id: "portal",
-				scope: "board",
 			}),
 
 			action: {
@@ -84,7 +70,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "origin",
-				scope: "board",
 			}),
 		},
 		log: {
@@ -102,7 +87,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "blocker",
-				scope: "board",
 			}),
 		},
 		mergeSource: {
@@ -130,7 +114,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "mergeTarget",
-				scope: "board",
 			}),
 		},
 		payer: {
@@ -139,7 +122,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "payer",
-				scope: "board",
 			}),
 
 			units: {
@@ -149,7 +131,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 		workshop: {
 			...baseItem({
 				id: "workshop",
-				scope: "board",
 			}),
 
 			maxQueueSize: 1,
@@ -163,7 +144,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far",
 								selector: {
 									type: "item",
 									itemId: "log",
@@ -183,7 +164,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 		unitsProducer: {
 			...baseItem({
 				id: "unitsProducer",
-				scope: "board",
 			}),
 
 			maxQueueSize: 1,
@@ -197,7 +177,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 						{
 							type: "units",
 							query: {
-								scope: "board",
 								distance: "far",
 								selector: {
 									type: "item",
@@ -217,7 +196,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 		worker: {
 			...baseItem({
 				id: "worker",
-				scope: "board",
 			}),
 
 			maxQueueSize: 1,
@@ -240,7 +218,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 		temporary: {
 			...baseItem({
 				id: "temporary",
-				scope: "board",
 			}),
 
 			lines: [],
@@ -258,14 +235,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 export const boardLocation = (space: number, x: number) => ({
 	scope: "board" as const,
 	space,
-	position: {
-		x,
-		y: 0,
-	},
-});
-
-export const inventoryLocation = (x: number) => ({
-	scope: "inventory" as const,
 	position: {
 		x,
 		y: 0,

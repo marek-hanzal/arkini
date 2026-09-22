@@ -10,7 +10,6 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { createTemporaryMaterialLifecycleTestConfig } from "./temporaryMaterialLifecycle.test/createTemporaryMaterialLifecycleTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 
 const boardFn = (x: number) => ({
 	scope: "board" as const,
@@ -30,7 +29,6 @@ const configFn = () => {
 			...config.items,
 			owner: {
 				...owner,
-				scope: "any" as const,
 				lines: owner.lines.map((line) => ({
 					...line,
 					input: [
@@ -38,7 +36,7 @@ const configFn = () => {
 						{
 							type: "materials" as const,
 							query: {
-								scope: "any" as const,
+								distance: "far",
 								selector: {
 									type: "item" as const,
 									itemId: "blocker",
@@ -110,13 +108,6 @@ describe("kill-switch material expiry", () => {
 					ownerItemId: "owner",
 					lineId: "line:owner",
 				});
-				const running = yield* readRuntimeFx();
-				const runningOwner = running.items.find((item) => item.id === "owner")!;
-				yield* storeInventoryItemFx({
-					sourceItemId: runningOwner.id,
-					sourceRevision: runningOwner.revision,
-					sourceLocation: boardFn(0),
-				});
 				const before = yield* readRuntimeFx();
 				const committed = yield* modifyRuntimeWithTransitionFx((runtime) =>
 					Effect.gen(function* () {
@@ -140,7 +131,7 @@ describe("kill-switch material expiry", () => {
 			),
 		);
 		expect(result.before.items.find((item) => item.id === "owner")?.location.scope).toBe(
-			"inventory",
+			"board",
 		);
 		expect(result.after.jobs).toEqual([]);
 		expect(result.after.items.some((item) => item.id === "material")).toBe(false);

@@ -78,7 +78,13 @@ describe("weighted Clock admission", () => {
 									{
 										type: "disable",
 										when: [
-											existsWhen("clock"),
+											{
+												...existsWhen("clock"),
+												query: {
+													...existsWhen("clock").query,
+													distance: "self" as const,
+												},
+											},
 										],
 									},
 								],
@@ -92,7 +98,13 @@ describe("weighted Clock admission", () => {
 									{
 										type: "enable",
 										when: [
-											existsWhen("clock"),
+											{
+												...existsWhen("clock"),
+												query: {
+													...existsWhen("clock").query,
+													distance: "self" as const,
+												},
+											},
 										],
 									},
 								],

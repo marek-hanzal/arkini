@@ -31,7 +31,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 					{
 						type: "materials",
 						query: {
-							scope: "any",
+							distance: "far",
 							selector: {
 								type: "item",
 								itemId: "permit",

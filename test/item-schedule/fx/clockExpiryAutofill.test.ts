@@ -50,7 +50,7 @@ const runRangePulseFx = (durationMs: number) =>
 								{
 									type: "materials",
 									query: {
-										scope: "any",
+										distance: "far",
 										selector: {
 											type: "item",
 											itemId: "permit",

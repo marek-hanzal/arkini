@@ -8,7 +8,6 @@ const simpleItem = ({
 	id,
 	maxStackSize = 10,
 	merge,
-	scope = "any",
 }: {
 	units?: UnitsSchema.Type;
 	id: string;
@@ -17,7 +16,6 @@ const simpleItem = ({
 		MergeSchema.Type,
 		...MergeSchema.Type[],
 	];
-	scope?: "any" | "board" | "inventory";
 }) => ({
 	maxQueueSize: 1,
 	lines: [],
@@ -33,7 +31,6 @@ const simpleItem = ({
 			`artwork:${id}`,
 		],
 	},
-	scope,
 	maxStackSize,
 	merge,
 });
@@ -43,23 +40,14 @@ export const createMergeTestConfig = ({
 		width: 4,
 		height: 2,
 	},
-	inventory = {
-		width: 3,
-		height: 1,
-	},
 	outputMaxStackSize = 10,
 	rule,
 	sourceUnits,
 	sourceMaxStackSize = 10,
-	sourceScope = "any",
 	targetMaxStackSize = 10,
 	targetUnits,
 }: {
 	board?: {
-		width: number;
-		height: number;
-	};
-	inventory?: {
 		width: number;
 		height: number;
 	};
@@ -72,7 +60,6 @@ export const createMergeTestConfig = ({
 		  ];
 	sourceUnits?: UnitsSchema.Type;
 	sourceMaxStackSize?: number;
-	sourceScope?: "any" | "board" | "inventory";
 	targetMaxStackSize?: number;
 	targetUnits?: UnitsSchema.Type;
 }) =>
@@ -84,7 +71,6 @@ export const createMergeTestConfig = ({
 			id: "game:merge-test",
 			title: "Merge test",
 			board,
-			inventory,
 		},
 		start: {
 			currentSpace: 0,
@@ -102,7 +88,6 @@ export const createMergeTestConfig = ({
 					: [
 							rule as MergeSchema.Type,
 						],
-				scope: sourceScope,
 			}),
 			target: simpleItem({
 				units: targetUnits,

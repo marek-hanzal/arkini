@@ -5,7 +5,6 @@ import { useGameFx } from "~test/support/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/game-tick/fx/replayRuntimeStepsFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
@@ -35,23 +34,6 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 		ownerItemId: job.ownerItemId,
 		remainingMs: job.remainingMs,
 	})),
-});
-
-const moveOwnerToInventoryFx = Effect.fn("moveOwnerToInventoryFx")(function* () {
-	const runtime = yield* readRuntimeFx();
-	const owner = runtime.items.find((item) => item.id === ownerItemId);
-	if (owner === undefined) throw new Error("Expected forge owner.");
-	yield* moveRuntimeItemForTestFx({
-		itemId: owner.id,
-		location: {
-			scope: "inventory",
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-		revision: owner.revision,
-	});
 });
 
 const replayLiterallyFx = Effect.fn("replayLiterallyFx")(function* (
@@ -87,38 +69,6 @@ describe("replayRuntimeStepsFx", () => {
 
 		expect(result.replay.runtime).toBe(result.runtime);
 		expect(result.replay.events).toEqual([]);
-		expect(result.replay.isStable).toBe(true);
-		expect(result.replay.processedSteps).toBe(1);
-		expect(result.replay.skippedSteps).toBe(hourMs / SimulationStepMs - 1);
-	});
-
-	it("fast-forwards a stable inventory-paused job after one domain step", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* prepareJobLineFx();
-				yield* startLineFx({
-					ownerItemId,
-					lineId,
-				});
-				yield* moveOwnerToInventoryFx();
-				const runtime = yield* readRuntimeFx();
-				const replay = yield* replayRuntimeStepsFx({
-					elapsedMs: hourMs,
-					runtime,
-				});
-				return {
-					replay,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: createJobTestConfig(2, "any"),
-				}),
-			),
-		);
-
-		expect(result.replay.runtime).toBe(result.runtime);
-		expect(result.replay.runtime.jobs[0]?.remainingMs).toBe(1_000);
 		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(1);
 		expect(result.replay.skippedSteps).toBe(hourMs / SimulationStepMs - 1);

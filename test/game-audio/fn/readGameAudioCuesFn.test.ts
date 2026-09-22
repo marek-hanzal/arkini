@@ -26,7 +26,6 @@ const producer = ItemSchema.parse({
 	id: "producer",
 	title: "Producer",
 	ui: "default",
-	scope: "board",
 	maxStackSize: 1,
 	artwork: {
 		scale: 1,

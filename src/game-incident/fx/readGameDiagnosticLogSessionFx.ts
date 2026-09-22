@@ -5,6 +5,7 @@ import { parseGameDiagnosticLogLineFn } from "~/game-incident/fn/parseGameDiagno
 import { readGameDiagnosticSessionFn } from "~/game-incident/fn/readGameDiagnosticSessionFn";
 import type { GameDiagnosticLogRecord } from "~/game-incident/type/GameDiagnosticLogRecord";
 import type { GameDiagnosticSourceIssue } from "~/game-incident/type/GameDiagnosticSession";
+import { DiagnosticLogFiles } from "~shared/DiagnosticLogMetadata";
 
 const readDiagnosticLogPathsFx = Effect.fn("readDiagnosticLogPathsFx")(function* (input: string) {
 	const fileSystem = yield* FileSystem.FileSystem;
@@ -22,7 +23,11 @@ const readDiagnosticLogPathsFx = Effect.fn("readDiagnosticLogPathsFx")(function*
 		.readDirectory(input)
 		.pipe(
 			Effect.mapError(() => new Error("Could not list the diagnostic input directory.")),
-		)).filter((filename) => /^diagnostics\.jsonl(?:\.\d+)?$/.test(filename));
+		)).filter(
+		(filename) =>
+			filename === DiagnosticLogFiles.session ||
+			filename.startsWith(`${DiagnosticLogFiles.session}.`),
+	);
 	const dated = yield* Effect.forEach(candidates, (filename) =>
 		Effect.map(
 			fileSystem

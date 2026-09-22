@@ -49,6 +49,8 @@ const diagnostics = {
 	directoryPath: "/tmp/serakki-diagnostics",
 	writeFx: () => Effect.void,
 	writeApplicationFx: () => Effect.void,
+	readLastGameFx: Effect.succeed(null),
+	snapshotFx: Effect.succeed([]),
 	openDirectoryFx: Effect.void,
 	closeFx: Effect.void,
 } satisfies DiagnosticLog;

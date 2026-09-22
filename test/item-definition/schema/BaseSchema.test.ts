@@ -3,7 +3,25 @@ import { describe, expect, it } from "vitest";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 
-describe("BaseSchema draft status", () => {
+describe("ItemSchema defaults", () => {
+	it("defaults an omitted item interface to simple", () => {
+		const item = ItemSchema.parse({
+			maxQueueSize: 1,
+			lines: [],
+			uid: "simple-item",
+			id: "simple-item",
+			title: "Simple item",
+			artwork: {
+				scale: 0.8,
+				default: [
+					"simple-item",
+				],
+			},
+		});
+
+		expect(item.ui).toBe("simple");
+	});
+
 	it("accepts an omitted persisted draft status and resolves it as false", () => {
 		const item = ItemSchema.parse({
 			maxQueueSize: 1,

@@ -60,6 +60,7 @@ const config = GameConfigSchema.parse({
 
 			title: "Producer",
 			description: "Owns two lines.",
+			ui: "default",
 			artwork: {
 				scale: 0.8,
 				default: [

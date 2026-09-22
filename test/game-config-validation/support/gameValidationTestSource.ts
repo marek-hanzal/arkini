@@ -21,6 +21,7 @@ export const createItemBase = (id: string) => ({
 export const createSimpleItem = (id: string) =>
 	ItemSchema.parse({
 		...createItemBase(id),
+		ui: "simple",
 	});
 
 export const createLine = ({
@@ -65,6 +66,7 @@ export const createProducerItem = ({
 }) =>
 	ItemSchema.parse({
 		...createSimpleItem(id),
+		ui: "default",
 
 		lines: lines ?? [
 			createLine({

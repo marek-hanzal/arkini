@@ -1,4 +1,4 @@
-import { MapPinned } from "lucide-react";
+import { MousePointerClick } from "lucide-react";
 
 import type { InputSchema as ActionInputSchema } from "~/production-action/schema/InputSchema";
 import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
@@ -31,7 +31,7 @@ export const ActionSection = () => {
 						<EditorCapabilityStatus
 							actionLabel={translator.textFn("Enable")}
 							dataUi="EditorActionDisabled"
-							icon={MapPinned}
+							icon={MousePointerClick}
 							onEnableFn={enableActionFn}
 							size="large"
 							summary={translator.textFn("Item action empty title")}

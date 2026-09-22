@@ -18,6 +18,20 @@ interface Props {
 	readonly root: string;
 	readonly fileSystem?: FileSystem.FileSystem;
 }
+
+export interface FilesystemGameSaveFiles extends GameSaveStorage {
+	readonly snapshotFx: (
+		key: GameSaveStorage.Key,
+	) => Effect.Effect<readonly FilesystemGameSaveFiles.Snapshot[], unknown, never>;
+}
+
+export namespace FilesystemGameSaveFiles {
+	export interface Snapshot {
+		readonly slot: GameSaveSlotSchema.Type;
+		readonly savedAt: number;
+		readonly bytes: Uint8Array;
+	}
+}
 const intervals = {
 	"5-min": 300_000,
 	"30-min": 1_800_000,
@@ -168,6 +182,22 @@ export const createFilesystemGameSaveFilesFx = Effect.fn("createFilesystemGameSa
 					),
 				),
 			);
+		const snapshotFx = (key: GameSaveStorage.Key) =>
+			withKeyLockFx(key, (directory) =>
+				Effect.gen(function* () {
+					const snapshot: FilesystemGameSaveFiles.Snapshot[] = [];
+					for (const slot of GameSaveSlotSchema.options) {
+						const bytes = yield* readSlotFx(directory, slot);
+						if (bytes === null) continue;
+						snapshot.push({
+							slot,
+							savedAt: (yield* timestampFx(directory, slot)) ?? 0,
+							bytes,
+						});
+					}
+					return snapshot;
+				}),
+			);
 		const restoreFx = (key: GameSaveStorage.Key, bytes: Uint8Array) =>
 			withKeyLockFx(key, (directory) =>
 				Effect.gen(function* () {
@@ -185,8 +215,9 @@ export const createFilesystemGameSaveFilesFx = Effect.fn("createFilesystemGameSa
 			readFx,
 			writeFx,
 			listFx,
+			snapshotFx,
 			restoreFx,
 			clearFx,
-		} satisfies GameSaveStorage;
+		} satisfies FilesystemGameSaveFiles;
 	},
 );

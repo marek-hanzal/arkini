@@ -70,6 +70,7 @@ const craftItem = ({
 		},
 		description: id,
 		id,
+		ui: "default",
 		lines: [
 			{
 				description: `line:${id}`,
@@ -131,6 +132,7 @@ const simpleItem = (id: string) =>
 		},
 		description: id,
 		id,
+		ui: "simple",
 
 		title: id,
 

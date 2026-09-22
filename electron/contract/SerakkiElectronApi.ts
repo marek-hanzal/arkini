@@ -91,6 +91,7 @@ export namespace SerakkiElectronApi {
 		diagnosticsWrite: "serakki:diagnostics:write",
 		diagnosticsWriteApplication: "serakki:diagnostics:write-application",
 		diagnosticsOpenDirectory: "serakki:diagnostics:open-directory",
+		diagnosticsExport: "serakki:diagnostics:export",
 		incidentWrite: "serakki:incident:write",
 		userDataOpenDirectory: "serakki:user-data:open-directory",
 		userDataHardReset: "serakki:user-data:hard-reset",
@@ -322,6 +323,7 @@ export namespace SerakkiElectronApi {
 			readonly writeFn: (record: DiagnosticRecord) => Promise<void>;
 			readonly writeApplicationFn: (record: ApplicationLogRecordSchema.Type) => Promise<void>;
 			readonly openDirectoryFn: () => Promise<void>;
+			readonly exportFn: () => Promise<boolean>;
 		};
 		readonly incident: {
 			readonly writeFn: (incident: GameIncidentWrite) => Promise<void>;

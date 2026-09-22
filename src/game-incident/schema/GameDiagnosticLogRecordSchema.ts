@@ -30,6 +30,10 @@ export const GameDiagnosticSessionStartedDataSchema = z
 		applicationVersion: z.string().min(1),
 		packageId: z.string().min(1),
 		contentHash: z.string().min(1),
+		provenance: z.enum([
+			"official",
+			"community",
+		]),
 		serakki: z.string().min(1),
 		gameVersion: z.string().min(1),
 		restored: z.boolean(),

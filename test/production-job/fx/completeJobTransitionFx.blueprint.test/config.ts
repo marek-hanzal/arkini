@@ -15,6 +15,7 @@ const simpleItem = ({ id }: { id: string }) =>
 
 		title: id,
 		description: id,
+		ui: "simple",
 		artwork: {
 			scale: 0.8,
 			default: [
@@ -43,6 +44,7 @@ const blueprintItem = ({
 		},
 		title: id,
 		description: id,
+		ui: "default",
 		artwork: {
 			scale: 0.8,
 			default: [

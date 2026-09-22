@@ -104,6 +104,51 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		expect(await Effect.runPromise(repository.readFx(demo))).toBeNull();
 	});
 
+	it("snapshots every existing slot under one package lock", async () => {
+		const repository = await createRepository();
+		await Effect.runPromise(
+			repository.writeFx(
+				first,
+				new Uint8Array([
+					1,
+					2,
+				]),
+			),
+		);
+		await Effect.runPromise(
+			repository.writeFx(
+				first,
+				new Uint8Array([
+					3,
+					4,
+				]),
+				"manual",
+			),
+		);
+
+		const snapshot = await Effect.runPromise(repository.snapshotFx(first));
+		expect(snapshot.map(({ slot }) => slot)).toEqual([
+			"current",
+			"manual",
+			"5-min",
+			"30-min",
+			"4-hour",
+		]);
+		expect(snapshot.find(({ slot }) => slot === "current")?.bytes).toEqual(
+			new Uint8Array([
+				1,
+				2,
+			]),
+		);
+		expect(snapshot.find(({ slot }) => slot === "manual")?.bytes).toEqual(
+			new Uint8Array([
+				3,
+				4,
+			]),
+		);
+		expect(snapshot.every(({ savedAt }) => savedAt > 0)).toBe(true);
+	});
+
 	it("orders clear after an already admitted write", async () => {
 		const fileSystem = await readNodeFileSystem();
 		const writeEntered = Effect.runSync(Deferred.make<void>());

@@ -9,6 +9,7 @@ const baseItem = ({ id }: { id: string }) => ({
 	id,
 	title: id,
 	description: id,
+	ui: "default" as const,
 	artwork: {
 		scale: 0.8,
 		default: [

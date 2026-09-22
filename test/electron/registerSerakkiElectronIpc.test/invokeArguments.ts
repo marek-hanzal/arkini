@@ -170,6 +170,10 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		[],
 	],
 	[
+		SerakkiElectronApi.channels.diagnosticsExport,
+		[],
+	],
+	[
 		SerakkiElectronApi.channels.incidentWrite,
 		[
 			{

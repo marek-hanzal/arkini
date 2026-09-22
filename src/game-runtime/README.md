@@ -120,7 +120,7 @@ Merge owns the persisted per-item `mergeSequence` random-stream cursor. Successf
 
 ### Performance diagnostics
 
-Game and Editor Board keep `tick-performance` records in `~/.serakki/diagnostics/diagnostics.jsonl` (logger `serakki.game.performance`, correlated by `sessionId`). Tick aggregates numeric counters over wall-time windows of at least one second; there is no per-step IPC, full-runtime serialization, or extra sampling timer. Closing the diagnostic session detaches its listener. Diagnostic sink failures cannot stop gameplay.
+Official installed games keep `tick-performance` records in the support-ready `~/.serakki/diagnostics/support.jsonl` stream (logger `serakki.game.performance`, correlated by `sessionId`). Community and Editor Board sessions are discarded by the diagnostic sink. Tick aggregates numeric counters over wall-time windows of at least one second; there is no per-step IPC, full-runtime serialization, or extra sampling timer. Closing the diagnostic session detaches its listener. Diagnostic sink failures cannot stop gameplay.
 
 - `windowMs`, `wakes`, `advances`, `failedAdvances`: elapsed observation window, loop wakes, actual replay calls, and rejected advances. Stable no-op wakes need no replay call.
 - `advanceMs`, `maxAdvanceMs`: summed and peak Tick work in the window, measured with Effect Clock. This includes runtime acquisition/replay/commit, excludes the observer callback, and does not measure GPU rendering.

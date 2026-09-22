@@ -6,7 +6,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import {
-	buttonByText,
 	cleanupSerapackSelectorTests,
 	renderSerapackSelector,
 } from "~test/serapack-selector/ui/SerapackSelector.test/fixture";
@@ -35,6 +34,7 @@ describe("SerapackSelector pending actions", () => {
 					title: "Local package",
 					version: "1.0",
 					serakki: "1",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					} as const,
@@ -56,16 +56,15 @@ describe("SerapackSelector pending actions", () => {
 			catalog,
 		});
 		const removeButton = container.querySelector<HTMLButtonElement>(
-			'[data-ui="SerapackCatalogRow"] button',
+			'[data-ui="YourGamesRow"] button',
 		);
 		const playLink = container.querySelector<HTMLAnchorElement>(
 			'a[href="/action/load-game/package%3Alocal"]',
 		);
-		const importButton = buttonByText(
-			container,
-			"Import SerapackChoose an existing .serapack file",
+		const importButton = container.querySelector<HTMLButtonElement>(
+			'[data-ui="YourGamesSerapackImport"]',
 		);
-		if (removeButton === null || playLink === null) {
+		if (removeButton === null || playLink === null || importButton === null) {
 			throw new Error("Missing Serapack selector controls.");
 		}
 
@@ -108,6 +107,7 @@ describe("SerapackSelector pending actions", () => {
 			title: "Imported package",
 			version: "1.0",
 			serakki: "1",
+			projectRevision: 1,
 			provenance: {
 				type: "community",
 			},
@@ -139,16 +139,15 @@ describe("SerapackSelector pending actions", () => {
 			catalog,
 		});
 		const removeButton = container.querySelector<HTMLButtonElement>(
-			'[data-ui="SerapackCatalogRow"] button',
+			'[data-ui="YourGamesRow"] button',
 		);
 		const playLink = container.querySelector<HTMLAnchorElement>(
 			'a[href="/action/load-game/package%3Aimported"]',
 		);
-		const importButton = buttonByText(
-			container,
-			"Import SerapackChoose an existing .serapack file",
+		const importButton = container.querySelector<HTMLButtonElement>(
+			'[data-ui="YourGamesSerapackImport"]',
 		);
-		if (removeButton === null || playLink === null) {
+		if (removeButton === null || playLink === null || importButton === null) {
 			throw new Error("Missing Serapack selector controls.");
 		}
 

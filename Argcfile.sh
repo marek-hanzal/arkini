@@ -42,13 +42,7 @@ serapack-fingerprint() {
 		{
 			printf '%s\0' "$OSTYPE" "$HOSTTYPE"
 			cat
-			# The Editor revision is not build content; preserve every other manifest field.
-			node --input-type=module -e '
-				import { readFileSync } from "node:fs";
-				const marker = JSON.parse(readFileSync("game/serakki/project.json", "utf8"));
-				if (Number.isSafeInteger(marker.revision) && marker.revision >= 0) marker.revision = 0;
-				process.stdout.write(JSON.stringify(marker));
-			' || return $?
+			coreutils sha256sum --binary game/serakki/project.json || return $?
 		} |
 		coreutils sha256sum | coreutils cut -d ' ' -f 1
 }

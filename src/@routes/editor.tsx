@@ -21,7 +21,7 @@ export const Route = createFileRoute("/editor")({
 					packageId: resource.game.serapack.packageId,
 				},
 				search: {
-					destination: "editor",
+					destination: "serapacks",
 				},
 				replace: true,
 			});
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/editor")({
 		}
 		if (location.pathname === "/editor" || location.pathname === "/editor/") {
 			throw redirect({
-				to: "/editor/welcome",
+				to: "/serapacks",
 				replace: true,
 			});
 		}

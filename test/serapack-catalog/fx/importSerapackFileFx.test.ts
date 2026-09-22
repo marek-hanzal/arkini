@@ -13,6 +13,7 @@ describe("importSerapackFileFx", () => {
 			title: "Test",
 			version: "1.0",
 			serakki: "0.5.0",
+			projectRevision: 1,
 			provenance: {
 				type: "community",
 			},

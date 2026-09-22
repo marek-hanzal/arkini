@@ -8,7 +8,6 @@ type VisualRouteId =
 	| "board"
 	| "cheats"
 	| "editor"
-	| "editor-welcome"
 	| "main-menu"
 	| "settings"
 	| "startup";
@@ -16,8 +15,7 @@ type VisualRouteId =
 const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
 const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
 const gameCheatsPattern = /^\/game\/[^/]+\/cheats\/?$/;
-const editorWelcomePattern = /^\/editor(?:\/welcome)?\/?$/;
-const editorProjectPattern = /^\/editor\/(?!welcome(?:\/|$))[^/]+(?:\/.*)?$/;
+const editorProjectPattern = /^\/editor\/[^/]+(?:\/.*)?$/;
 const editorArtworkDetailLeafPattern =
 	/^\/editor\/([^/]+)\/artwork\/([^/]+)\/detail\/(?:overview|usage|notes|delete)\/?$/;
 const settingsPattern = /^\/settings(?:\/(?:common|game|sound|dev))?\/?$/;
@@ -39,7 +37,7 @@ const resolveVisualRouteIdFn = (pathname: string): VisualRouteId => {
 	if (settingsPattern.test(pathname)) return "settings";
 	if (pathname === "/about") return "about";
 	if (pathname === "/serapacks") return "serapacks";
-	if (editorWelcomePattern.test(pathname)) return "editor-welcome";
+	if (pathname === "/editor" || pathname === "/editor/") return "serapacks";
 	if (editorProjectPattern.test(pathname)) return "editor";
 	if (gameBoardPattern.test(pathname)) return "board";
 	if (gameCheatsPattern.test(pathname)) return "cheats";

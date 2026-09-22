@@ -13,11 +13,6 @@ export const GameLeaveDestinationSchema = z.discriminatedUnion("destination", [
 		.strict(),
 	z
 		.object({
-			destination: z.literal("editor"),
-		})
-		.strict(),
-	z
-		.object({
 			destination: z.literal("main-menu"),
 		})
 		.strict(),

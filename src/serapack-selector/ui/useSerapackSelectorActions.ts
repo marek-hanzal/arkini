@@ -1,5 +1,5 @@
 import { useAtomSet } from "@effect/atom-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { openEditorSerapackAtom } from "~/project-authoring/atom/openEditorSerapackAtom";
@@ -14,7 +14,7 @@ type BusyAction = "editor" | "import" | "open-directory" | "refresh" | "remove";
 type ActiveAction = BusyAction | "exit";
 
 /** Owns selector actions, exit navigation, mounted guards, and Escape lifecycle. */
-export const useSerapackSelectorActions = () => {
+export const useSerapackSelectorActions = ({ externallyBlocked = false } = {}) => {
 	const { state } = useSerapacks();
 	// TODO(#397): Revalidate stable promise-mode ownership, rejection, and interruption
 	// semantics; keep it only while this mounted selector owns the complete async action.
@@ -36,6 +36,7 @@ export const useSerapackSelectorActions = () => {
 		mode: "promise",
 	});
 	const navigateFn = useNavigate();
+	const router = useRouter();
 	const mountedRef = useRef(false);
 	const [actionError, setActionErrorFn] = useState<unknown>();
 	const { active, claimFn, releaseFn } = useExclusiveAction<ActiveAction>();
@@ -48,7 +49,7 @@ export const useSerapackSelectorActions = () => {
 	}, []);
 
 	const requestMainMenuFn = useCallback(() => {
-		if (state.type === "loading" || !claimFn("exit")) return;
+		if (externallyBlocked || state.type === "loading" || !claimFn("exit")) return;
 		setActionErrorFn(undefined);
 		void (async () => {
 			try {
@@ -63,6 +64,7 @@ export const useSerapackSelectorActions = () => {
 		})();
 	}, [
 		claimFn,
+		externallyBlocked,
 		navigateFn,
 		releaseFn,
 		state.type,
@@ -81,7 +83,7 @@ export const useSerapackSelectorActions = () => {
 	]);
 
 	const uploadFn = useCallback(async () => {
-		if (state.type === "loading" || !claimFn("import")) {
+		if (externallyBlocked || state.type === "loading" || !claimFn("import")) {
 			return;
 		}
 		setActionErrorFn(undefined);
@@ -101,6 +103,7 @@ export const useSerapackSelectorActions = () => {
 		}
 	}, [
 		claimFn,
+		externallyBlocked,
 		importFileFn,
 		navigateFn,
 		releaseFn,
@@ -109,7 +112,7 @@ export const useSerapackSelectorActions = () => {
 
 	const runBusyActionFn = useCallback(
 		(action: Exclude<BusyAction, "import">, operationFn: () => Promise<unknown>) => {
-			if (state.type === "loading" || !claimFn(action)) return;
+			if (externallyBlocked || state.type === "loading" || !claimFn(action)) return;
 			setActionErrorFn(undefined);
 			void operationFn()
 				.catch((error: unknown) => {
@@ -119,6 +122,7 @@ export const useSerapackSelectorActions = () => {
 		},
 		[
 			claimFn,
+			externallyBlocked,
 			releaseFn,
 			state.type,
 		],
@@ -133,9 +137,14 @@ export const useSerapackSelectorActions = () => {
 	);
 
 	const refreshSerapacksFn = useCallback(
-		() => runBusyActionFn("refresh", () => refreshFn()),
+		() =>
+			runBusyActionFn("refresh", async () => {
+				await refreshFn();
+				await router.invalidate();
+			}),
 		[
 			refreshFn,
+			router,
 			runBusyActionFn,
 		],
 	);
@@ -168,7 +177,7 @@ export const useSerapackSelectorActions = () => {
 
 	return {
 		state,
-		blocked: active !== null || state.type === "loading",
+		blocked: externallyBlocked || active !== null || state.type === "loading",
 		actionError,
 		uploadFn,
 		removeSerapackFn,

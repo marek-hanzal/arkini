@@ -6,8 +6,8 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EditorWelcomeCommandAtom } from "~/project-authoring/atom/EditorWelcomeCommandAtom";
-import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";
+import { ProjectCatalogCommandAtom } from "~/project-authoring/atom/ProjectCatalogCommandAtom";
+import { useProjectCatalogActions } from "~/project-authoring/ui/useProjectCatalogActions";
 
 (
 	globalThis as {
@@ -18,9 +18,6 @@ import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcome
 const navigation = vi.hoisted(() => ({
 	invalidate: vi.fn(async () => undefined),
 	navigate: vi.fn(),
-}));
-const serapackImport = vi.hoisted(() => ({
-	fails: false,
 }));
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
@@ -64,23 +61,6 @@ vi.mock("~/project-authoring/fx/createFreshProjectFx", async () => {
 	};
 });
 
-vi.mock("~/project-authoring/fx/importEditorSerapackFileFx", async () => {
-	const { Effect } = await import("effect");
-	return {
-		importEditorSerapackFileFx: () =>
-			serapackImport.fails
-				? Effect.fail(new Error("Broken import"))
-				: Effect.succeed({
-						projectId: "project-imported",
-						title: "Imported",
-						version: "1.0",
-						game: "imported",
-						createdAtMs: 2,
-						updatedAtMs: 2,
-					}),
-	};
-});
-
 const registries: AtomRegistry.AtomRegistry[] = [];
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
@@ -90,16 +70,16 @@ const makeRegistry = () => {
 		scheduleTask,
 	});
 	registries.push(registry);
-	registry.mount(EditorWelcomeCommandAtom);
+	registry.mount(ProjectCatalogCommandAtom);
 	return registry;
 };
 
 const waitForState = async (
 	registry: AtomRegistry.AtomRegistry,
-	predicate: (state: EditorWelcomeCommandAtom.State) => boolean,
+	predicate: (state: ProjectCatalogCommandAtom.State) => boolean,
 ) => {
-	await vi.waitFor(() => expect(predicate(registry.get(EditorWelcomeCommandAtom))).toBe(true));
-	return registry.get(EditorWelcomeCommandAtom);
+	await vi.waitFor(() => expect(predicate(registry.get(ProjectCatalogCommandAtom))).toBe(true));
+	return registry.get(ProjectCatalogCommandAtom);
 };
 
 afterEach(async () => {
@@ -109,73 +89,74 @@ afterEach(async () => {
 	for (const registry of registries.splice(0)) registry.dispose();
 	navigation.invalidate.mockClear();
 	navigation.navigate.mockReset();
-	serapackImport.fails = false;
 	document.body.replaceChildren();
 });
 
-describe("EditorWelcomeCommandAtom", () => {
+describe("ProjectCatalogCommandAtom", () => {
 	it("keeps domain work and navigation settlement in one synchronous authority", async () => {
 		const registry = makeRegistry();
 
-		registry.set(EditorWelcomeCommandAtom, {
-			action: "import-serapack",
+		registry.set(ProjectCatalogCommandAtom, {
+			action: "create",
+			projectId: "project-created",
 		});
 		const ready = await waitForState(registry, (state) => state.kind === "ready");
 		expect(ready).toMatchObject({
 			kind: "ready",
-			action: "import-serapack",
+			action: "create",
 			project: {
-				projectId: "project-imported",
+				projectId: "project-created",
 			},
 		});
 
-		registry.set(EditorWelcomeCommandAtom, {
+		registry.set(ProjectCatalogCommandAtom, {
 			action: "navigation-started",
 		});
-		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
+		expect(registry.get(ProjectCatalogCommandAtom)).toEqual({
 			kind: "navigating",
-			action: "import-serapack",
+			action: "create",
 		});
 
-		registry.set(EditorWelcomeCommandAtom, {
+		registry.set(ProjectCatalogCommandAtom, {
 			action: "create",
 			projectId: "ignored-while-busy",
 		});
-		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
+		expect(registry.get(ProjectCatalogCommandAtom)).toEqual({
 			kind: "navigating",
-			action: "import-serapack",
+			action: "create",
 		});
 
-		registry.set(EditorWelcomeCommandAtom, {
+		registry.set(ProjectCatalogCommandAtom, {
 			action: "navigation-complete",
 		});
-		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
+		expect(registry.get(ProjectCatalogCommandAtom)).toEqual({
 			kind: "idle",
 		});
 	});
 
 	it("keeps navigation failures recoverable without a callback command payload", async () => {
 		const registry = makeRegistry();
-		registry.set(EditorWelcomeCommandAtom, {
-			action: "exit",
+		registry.set(ProjectCatalogCommandAtom, {
+			action: "create",
+			projectId: "project-created",
 		});
 		await waitForState(registry, (state) => state.kind === "ready");
-		registry.set(EditorWelcomeCommandAtom, {
+		registry.set(ProjectCatalogCommandAtom, {
 			action: "navigation-started",
 		});
 		const error = new Error("Navigation failed");
-		registry.set(EditorWelcomeCommandAtom, {
+		registry.set(ProjectCatalogCommandAtom, {
 			action: "navigation-failed",
 			error,
 		});
 
-		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
+		expect(registry.get(ProjectCatalogCommandAtom)).toEqual({
 			kind: "error",
 			error,
 		});
 	});
 
-	it("settles caller-owned navigation after the welcome view unmounts", async () => {
+	it("settles caller-owned navigation after the game list unmounts", async () => {
 		const registry = makeRegistry();
 		let resolveNavigation: (() => void) | undefined;
 		navigation.navigate.mockReturnValue(
@@ -184,7 +165,7 @@ describe("EditorWelcomeCommandAtom", () => {
 			}),
 		);
 		const Probe = () => {
-			const actions = useEditorWelcomeActions();
+			const actions = useProjectCatalogActions();
 			return createElement(
 				"button",
 				{
@@ -221,7 +202,7 @@ describe("EditorWelcomeCommandAtom", () => {
 				sectionId: "general",
 			},
 		});
-		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
+		expect(registry.get(ProjectCatalogCommandAtom)).toEqual({
 			kind: "navigating",
 			action: "create",
 		});
@@ -231,23 +212,9 @@ describe("EditorWelcomeCommandAtom", () => {
 		resolveNavigation?.();
 
 		await vi.waitFor(() =>
-			expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
+			expect(registry.get(ProjectCatalogCommandAtom)).toEqual({
 				kind: "idle",
 			}),
 		);
-	});
-
-	it("publishes domain failures without entering navigation", async () => {
-		const registry = makeRegistry();
-		serapackImport.fails = true;
-		registry.set(EditorWelcomeCommandAtom, {
-			action: "import-serapack",
-		});
-
-		const state = await waitForState(registry, (current) => current.kind === "error");
-		expect(state.kind).toBe("error");
-		if (state.kind !== "error") throw new Error("Expected error state.");
-		expect(state.error).toBeInstanceOf(Error);
-		expect((state.error as Error).message).toBe("Broken import");
 	});
 });

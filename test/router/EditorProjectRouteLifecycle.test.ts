@@ -49,7 +49,7 @@ describe("editor project route lifecycle", () => {
 		expect(switched.resource.game.projectId).toBe("project-b");
 
 		await harness.router.navigate({
-			to: "/editor/welcome",
+			to: "/serapacks",
 		});
 		await expect
 			.poll(() =>
@@ -98,7 +98,7 @@ describe("editor project route lifecycle", () => {
 		]);
 
 		await harness.router.navigate({
-			to: "/editor/welcome",
+			to: "/serapacks",
 		});
 		expect(
 			await harness.rendererRuntime.runPromise(SubscriptionRef.get(harness.owner.state)),
@@ -155,7 +155,7 @@ describe("editor project route lifecycle", () => {
 		expect(state.resource.game.projectRevision).toBe(2);
 
 		await harness.router.navigate({
-			to: "/editor/welcome",
+			to: "/serapacks",
 		});
 		await expect
 			.poll(() =>

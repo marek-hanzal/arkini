@@ -63,6 +63,7 @@ export const readFileRecord = ({
 		title: "Test game",
 		version: source === "bundled" ? "1.0" : "1.1",
 		serakki: SerakkiAppVersion,
+		projectRevision: 1,
 		provenance: {
 			type: "community",
 		},

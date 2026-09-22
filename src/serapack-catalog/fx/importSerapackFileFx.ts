@@ -25,6 +25,7 @@ export const importSerapackFileFx = Effect.fn("importSerapackFileFx")(function* 
 				title: imported.title,
 				version: imported.version,
 				serakki: imported.serakki,
+				projectRevision: imported.projectRevision,
 				provenance: imported.provenance,
 				source: imported.source,
 				overridesBundled: imported.overridesBundled,

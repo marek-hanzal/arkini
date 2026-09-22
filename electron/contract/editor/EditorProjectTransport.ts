@@ -112,14 +112,11 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface BuildRequest {
-		readonly expectedVersion: BuildVersion;
-		readonly expectedRevision: number;
 		readonly projectId: string;
 	}
 
 	export interface SaveBuildVersionRequest {
 		readonly projectId: string;
-		readonly expectedRevision: number;
 		readonly version: BuildVersion;
 	}
 

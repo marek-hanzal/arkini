@@ -94,7 +94,6 @@ describe("BuildCommandAtoms", () => {
 		const unmount = registry.mount(buildAtom);
 
 		registry.set(buildAtom, {
-			expectedRevision: 3,
 			version: {
 				major: 2,
 				minor: 1,
@@ -118,14 +117,16 @@ describe("BuildCommandAtoms", () => {
 				suffix: "demo",
 			},
 		});
-		expect(state.buildProjectFx).toHaveBeenCalledWith({
+		expect(state.saveBuildVersionFx).toHaveBeenCalledWith({
 			projectId: "editor-test",
-			expectedRevision: 3,
-			expectedVersion: {
+			version: {
 				major: 2,
 				minor: 1,
 				suffix: "demo",
 			},
+		});
+		expect(state.buildProjectFx).toHaveBeenCalledWith({
+			projectId: "editor-test",
 		});
 		remount();
 		unmountProject();

@@ -51,6 +51,7 @@ export const importUserSerapackFx = Effect.fn("importUserSerapackFx")(function* 
 			title: extracted.config.meta.title,
 			version: extracted.version,
 			serakki: extracted.serakki,
+			projectRevision: extracted.projectRevision,
 			provenance: extracted.provenance,
 			source: "user",
 			overridesBundled: false,

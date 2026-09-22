@@ -115,6 +115,7 @@ describe("Serapack release provenance", () => {
 							manifest: {
 								version: "1.0",
 								serakki: SerakkiAppVersion,
+								projectRevision: 1,
 								length: 0,
 								resources: [],
 							},

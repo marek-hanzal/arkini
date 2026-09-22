@@ -6,6 +6,7 @@ import sharp from "sharp";
 import { decodeTestSerapackPayloadFx } from "~test/serapack-support/fx/testSerapackCodecFx";
 import { decodeTestSerapackEnvelopeFx } from "~test/serapack-support/fx/testSerapackCodecFx";
 import { packDirectoryFx } from "~/serapack-artifact/fx/packDirectoryFx";
+import { readSerapackFileLayoutFx } from "~/serapack-artifact/fx/readSerapackFileLayoutFx";
 import {
 	assetPng,
 	musicOgg,
@@ -15,6 +16,32 @@ import {
 } from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx game-project contract", () => {
+	it.effect("stamps the source revision so a new revision changes the package identity", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const before = yield* packDirectoryFx({
+				input,
+			});
+			const beforeLayout = yield* readSerapackFileLayoutFx(before.serapack);
+			yield* fileSystem.writeFileString(
+				path.join(input, "project.json"),
+				JSON.stringify({
+					serakki: beforeLayout.manifest.serakki,
+					revision: 2,
+				}),
+			);
+			const after = yield* packDirectoryFx({
+				input,
+			});
+			expect(after.contentHash).not.toBe(before.contentHash);
+			expect((yield* readSerapackFileLayoutFx(after.serapack)).manifest.projectRevision).toBe(
+				2,
+			);
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
 	it.effect("keeps the packed payload and content hash identical after audio names change", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
@@ -80,6 +107,8 @@ describe("packDirectoryFx game-project contract", () => {
 			const result = yield* packDirectoryFx({
 				input,
 			});
+			const layout = yield* readSerapackFileLayoutFx(result.serapack);
+			expect(layout.manifest.projectRevision).toBe(1);
 			const serapack = yield* fileSystem.readFile(result.serapack);
 			const envelope = yield* decodeTestSerapackEnvelopeFx(serapack);
 			const payload = yield* decodeTestSerapackPayloadFx(envelope.payload);

@@ -28,6 +28,7 @@ const testSerapack = {
 	title: "Test",
 	version: "1.0",
 	serakki: "1",
+	projectRevision: 1,
 	source: "bundled",
 	provenance: {
 		type: "official",

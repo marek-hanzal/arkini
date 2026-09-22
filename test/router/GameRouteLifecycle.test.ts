@@ -33,6 +33,7 @@ const createGame = (
 		title: testSerapackConfig.meta.title,
 		version: "1.0",
 		serakki: SerakkiAppVersion,
+		projectRevision: 1,
 		provenance: {
 			type: "community",
 		} as const,
@@ -207,7 +208,7 @@ describe("game route lifecycle", () => {
 		).toBe("package-route");
 	});
 
-	it("releases the active Game before opening the editor", async () => {
+	it("releases the active Game before opening Your games", async () => {
 		vi.useFakeTimers();
 		Object.defineProperty(window, "serakki", {
 			configurable: true,
@@ -233,7 +234,7 @@ describe("game route lifecycle", () => {
 		await router.load();
 
 		const navigation = router.navigate({
-			to: "/editor/welcome",
+			to: "/serapacks",
 		});
 		await vi.advanceTimersByTimeAsync(2_500);
 		await navigation;
@@ -244,7 +245,7 @@ describe("game route lifecycle", () => {
 				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
 			),
 		).toBeNull();
-		expect(router.state.location.pathname).toBe("/editor/welcome");
+		expect(router.state.location.pathname).toBe("/serapacks");
 	});
 
 	it("keeps one parent Game while moving from board into its action sibling", async () => {

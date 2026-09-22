@@ -16,6 +16,7 @@ const createFileFn = (
 	title: "Package",
 	version: "1.0",
 	serakki: SerakkiAppVersion,
+	projectRevision: 1,
 	config: {
 		...testSerapackConfig,
 		meta: {

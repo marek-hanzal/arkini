@@ -38,6 +38,7 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 		title: "Menu game",
 		version: "1.0",
 		serakki: "1.0",
+		projectRevision: 1,
 		provenance: {
 			type: "community",
 		} as const,

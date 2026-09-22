@@ -50,6 +50,7 @@ export const readSerapackFileFx = Effect.fn("readSerapackFileFx")(
 				title: config.meta.title,
 				version: layout.manifest.version,
 				serakki: layout.manifest.serakki,
+				projectRevision: layout.manifest.projectRevision,
 				provenance,
 				source,
 				overridesBundled: false,

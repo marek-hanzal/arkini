@@ -82,7 +82,7 @@ describe("editor project route publication", () => {
 		expect(harness.events).not.toContain("create-project-a-r2");
 
 		await harness.router.navigate({
-			to: "/editor/welcome",
+			to: "/serapacks",
 		});
 		await expect
 			.poll(() =>
@@ -148,7 +148,7 @@ it("keeps the refreshed Board when cached route data has a higher revision", asy
 		refreshed,
 	);
 	await harness.router.navigate({
-		to: "/editor/welcome",
+		to: "/serapacks",
 	});
 	await expect
 		.poll(() => harness.rendererRuntime.runPromise(SubscriptionRef.get(harness.owner.state)))

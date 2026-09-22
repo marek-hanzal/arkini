@@ -120,7 +120,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `serapack-artifact` | Package bytes, envelope, compression, signing and provenance | [`src/serapack-artifact/fx/packDirectoryFx.ts`](src/serapack-artifact/fx/packDirectoryFx.ts) |
 | `serapack-admission` | Bounded decode and semantic package admission | [`src/serapack-admission/fx/readSerapackFx.ts`](src/serapack-admission/fx/readSerapackFx.ts) |
 | `serapack-catalog` | Renderer catalog state, storage and mutation lifecycle | [`src/serapack-catalog/service/SerapackCatalog.ts`](src/serapack-catalog/service/SerapackCatalog.ts) |
-| `serapack-selector` | Catalog commands and package-list presentation | [`src/serapack-selector/ui/SerapackCatalogList.tsx`](src/serapack-selector/ui/SerapackCatalogList.tsx) |
+| `serapack-selector` | Launcher game-list projection across Editor projects and installed Serapacks | [`src/serapack-selector/ui/YourGamesList.tsx`](src/serapack-selector/ui/YourGamesList.tsx) |
 | `serakki-cli` | Product CLI, replay, diagnostic slicing and Node root | [`src/serakki-cli/serakki.ts`](src/serakki-cli/serakki.ts) |
 
 [`CONFIG.md`](CONFIG.md) owns portable authoring semantics. [`VERSION.md`](VERSION.md) owns compatibility and external envelopes.

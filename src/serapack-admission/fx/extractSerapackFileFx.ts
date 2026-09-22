@@ -116,5 +116,6 @@ export const extractSerapackFileFx = Effect.fn("extractSerapackFileFx")(function
 		provenance: yield* verifySerapackFileProvenanceFx(layout),
 		resources,
 		version: layout.manifest.version,
+		projectRevision: layout.manifest.projectRevision,
 	} satisfies ExtractedSerapack;
 });

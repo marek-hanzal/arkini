@@ -28,6 +28,7 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 		title: testSerapackConfig.meta.title,
 		version,
 		serakki: SerakkiAppVersion,
+		projectRevision: 1,
 		config: {
 			...testSerapackConfig,
 			meta: {

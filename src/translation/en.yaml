@@ -30,6 +30,8 @@ Action rules help:
     Rules decide whether players can use this action.
 
     Every **Enable** rule must pass. Any matching **Disable** rule blocks it. Costs are paid only after the rules pass.
+Add a game:
+  value: Add a game
 Add at least one condition.:
   value: Add at least one condition.
 Add at least one drop.:
@@ -276,6 +278,8 @@ Board editing help:
     Use **Space** to switch between Spaces 0–31. Changes stay with the selected Space, even before you save.
 Board placement:
   value: Where to place
+Bring in a Serapack to play or edit:
+  value: Bring in a Serapack to play or edit
 Build:
   value: Build
 Build blocked by validation:
@@ -359,8 +363,6 @@ Choose a track to listen to it here.:
 Choose a valid value.:
   value: Choose a valid value.
   dynamic: true
-Choose an existing .serapack file:
-  value: Create a project from an .serapack file
 Clear:
   value: Clear
 Clear interval:
@@ -642,8 +644,6 @@ Edit:
   value: Edit
 Edit artwork:
   value: Edit artwork
-Editor:
-  value: Editor
 Editor Board:
   value: Editor Board
 Editor Board help:
@@ -687,8 +687,6 @@ Editor project could not be opened:
   value: Editor project could not be opened
 Editor unsaved changes description:
   value: "**Save** your changes before leaving, or **Discard** them to return to the saved version. Choose **Cancel** to keep editing."
-Editor welcome:
-  value: Editor welcome
 Enable:
   value: Enable
 Enable Units on this item before selecting Self.:
@@ -814,8 +812,6 @@ Import images:
   value: Import images
 Import music:
   value: Import music
-Import serapack:
-  value: Import serapack
 Imported artwork:
   value: Imported artwork
 Imported image count:
@@ -1084,6 +1080,8 @@ Job completed:
 Job started:
   value: Job started
   dynamic: true
+Jump back into a game you're making:
+  value: Jump back into a game you're making
 Keep:
   value: Keep
 Keep at most one item.:
@@ -1135,6 +1133,8 @@ Main menu:
   value: Main menu
 Major:
   value: Major
+Make a new game:
+  value: Make a new game
 Make this recipe when you click the item on the board.:
   value: Make this recipe when you click the item on the board.
 Managed:
@@ -1273,8 +1273,6 @@ Near-Close:
   dynamic: true
 New item:
   value: New item
-New project:
-  value: New project
 New version:
   value: New version
 No About avatars configured.:
@@ -1406,6 +1404,8 @@ Open project images:
   value: Open project images
 Open project settings:
   value: Open project settings
+Open your project:
+  value: Open your project
 Optimize:
   value: Optimize
 Optimized:
@@ -1640,18 +1640,12 @@ Reading image…:
   value: Reading image…
 Ready for this job.:
   value: Ready for this job.
-Recent projects:
-  value: Recent projects
-Recent projects could not be refreshed.:
-  value: Recent projects could not be refreshed.
 Refresh:
   value: Refresh
 Refresh failed:
   value: Refresh failed
 Refresh from disk:
   value: Refresh from disk
-Refresh projects:
-  value: Refresh projects
 Relative set weight:
   value: Set weight
 Remains:
@@ -1903,8 +1897,8 @@ Start Local MCP:
   value: Start Local MCP
 Start Remote MCP:
   value: Start Remote MCP
-Start with an empty project:
-  value: Start with an empty project
+Start from scratch and make it yours:
+  value: Start from scratch and make it yours
 Starting layout controls help:
   value: |
     ### Editing the starting layout
@@ -2055,8 +2049,6 @@ Use:
   value: Use
 Use a port from 1024 to 65535.:
   value: Use a port from 1024 to 65535.
-Use an existing Editor project in place:
-  value: Edit a project in its existing folder
 Validation findings:
   value: Validation findings
 Version:

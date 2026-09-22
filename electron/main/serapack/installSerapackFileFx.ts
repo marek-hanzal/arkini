@@ -18,6 +18,7 @@ const InstallationSchema = z
 		serakki: z.string(),
 		config: GameConfigSchema,
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+		projectRevision: z.number().int().nonnegative(),
 		packageId: z.string().min(1),
 		resources: z.array(
 			z
@@ -121,6 +122,7 @@ export const installSerapackFileFx = Effect.fn("installSerapackFileFx")(function
 			serakki: extracted.serakki,
 			config: extracted.config,
 			contentHash: extracted.contentHash,
+			projectRevision: extracted.projectRevision,
 			packageId: extracted.packageId,
 			resources: extracted.resources.map((resource) => ({
 				id: resource.id,

@@ -19,6 +19,15 @@ const createArtifact = (
 	size: 2,
 });
 
+const buildSuccessFn = (
+	artifact: ReturnType<typeof createArtifact>,
+	mountedRevision = artifact.revision,
+) =>
+	AsyncResult.success({
+		artifact,
+		mountedRevision,
+	});
+
 const unusedResourceDiagnostic = {
 	code: "resource:unused" as const,
 	severity: "warning" as const,
@@ -426,7 +435,7 @@ describe("EditorBuild", () => {
 	});
 
 	it("hides an artifact as soon as the canonical project revision changes", async () => {
-		state.buildResult = AsyncResult.success(createArtifact("a".repeat(64), 0));
+		state.buildResult = buildSuccessFn(createArtifact("a".repeat(64), 0));
 		const render = await renderController();
 		expect(controller?.buildStatus).toBe("valid");
 		expect(controller?.artifact).toBeDefined();
@@ -440,6 +449,22 @@ describe("EditorBuild", () => {
 		expect(controller?.artifact).toBeUndefined();
 	});
 
+	it("keeps a completed disk build available when its marker differs from the mounted projection", async () => {
+		const artifact = createArtifact("a".repeat(64), 1);
+		state.buildResult = buildSuccessFn(artifact, 0);
+		const render = await renderController();
+		expect(controller?.artifact).toEqual(artifact);
+		expect(controller?.buildStatus).toBe("valid");
+
+		state.project = {
+			...(state.project as Record<string, unknown>),
+			revision: 2,
+		};
+		await render();
+		expect(controller?.artifact).toBeUndefined();
+		expect(controller?.buildStatus).toBe("stale");
+	});
+
 	it("presents the artifact version independently of saved output settings", async () => {
 		state.project = {
 			...(state.project as Record<string, unknown>),
@@ -449,7 +474,7 @@ describe("EditorBuild", () => {
 				minor: 2,
 			},
 		};
-		state.buildResult = AsyncResult.success({
+		state.buildResult = buildSuccessFn({
 			...createArtifact("a".repeat(64), 1_788_449_167_035, [
 				unusedResourceDiagnostic,
 			]),
@@ -465,7 +490,7 @@ describe("EditorBuild", () => {
 	});
 
 	it("dismisses the current validation while retaining its Build output", async () => {
-		state.buildResult = AsyncResult.success(
+		state.buildResult = buildSuccessFn(
 			createArtifact("a".repeat(64), 0, [
 				unusedResourceDiagnostic,
 			]),
@@ -495,7 +520,7 @@ describe("EditorBuild", () => {
 	it("does not show an install result from a different artifact hash", async () => {
 		const firstHash = "a".repeat(64);
 		const secondHash = "b".repeat(64);
-		state.buildResult = AsyncResult.success(createArtifact(firstHash, 0));
+		state.buildResult = buildSuccessFn(createArtifact(firstHash, 0));
 		state.installResults.set(
 			firstHash,
 			AsyncResult.success({
@@ -505,14 +530,14 @@ describe("EditorBuild", () => {
 		const render = await renderController();
 		expect(controller?.installedPackageId).toBe(firstHash);
 
-		state.buildResult = AsyncResult.success(createArtifact(secondHash, 0));
+		state.buildResult = buildSuccessFn(createArtifact(secondHash, 0));
 		await render();
 		expect(controller?.installedPackageId).toBeUndefined();
 	});
 
 	it("sends the exact current artifact to both output actions", async () => {
 		const artifact = createArtifact("a".repeat(64), 0);
-		state.buildResult = AsyncResult.success(artifact);
+		state.buildResult = buildSuccessFn(artifact);
 		const { container } = await renderBuild();
 
 		await act(async () => {
@@ -530,7 +555,7 @@ describe("EditorBuild", () => {
 
 	it("shows a settled install failure inside an open major-update confirmation", async () => {
 		const artifact = createArtifact("a".repeat(64), 0);
-		state.buildResult = AsyncResult.success(artifact);
+		state.buildResult = buildSuccessFn(artifact);
 		state.catalogState = {
 			type: "ready",
 			serapacks: [
@@ -540,6 +565,7 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "2.0",
 					serakki: "0.5.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},
@@ -564,7 +590,7 @@ describe("EditorBuild", () => {
 
 	it("keeps install compatibility bound to built bytes while a different major is drafted", async () => {
 		const artifact = createArtifact("b".repeat(64), 0);
-		state.buildResult = AsyncResult.success(artifact);
+		state.buildResult = buildSuccessFn(artifact);
 		state.catalogState = {
 			type: "ready",
 			serapacks: [
@@ -574,6 +600,7 @@ describe("EditorBuild", () => {
 					version: "1.8",
 					title: "Installed",
 					serakki: "0.5.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},
@@ -591,7 +618,6 @@ describe("EditorBuild", () => {
 		});
 		controller?.buildFn();
 		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
-			expectedRevision: 0,
 			version: {
 				major: 2,
 				minor: 0,
@@ -603,7 +629,6 @@ describe("EditorBuild", () => {
 		await renderController();
 		controller?.buildFn();
 		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
-			expectedRevision: 0,
 			version: {
 				major: 1,
 				minor: 0,
@@ -613,7 +638,7 @@ describe("EditorBuild", () => {
 
 	it("keeps a major bundled-package update cancellable before command admission", async () => {
 		const artifact = createArtifact("b".repeat(64), 0);
-		state.buildResult = AsyncResult.success(artifact);
+		state.buildResult = buildSuccessFn(artifact);
 		state.catalogState = {
 			type: "ready",
 			serapacks: [
@@ -623,6 +648,7 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "2.0",
 					serakki: "1.0.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},
@@ -653,7 +679,7 @@ describe("EditorBuild", () => {
 
 	it("admits a same-major user-package update without confirmation", async () => {
 		const artifact = createArtifact("b".repeat(64), 0);
-		state.buildResult = AsyncResult.success(artifact);
+		state.buildResult = buildSuccessFn(artifact);
 		state.catalogState = {
 			type: "ready",
 			serapacks: [
@@ -663,6 +689,7 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "1.9",
 					serakki: "1.0.0",
+					projectRevision: 1,
 					provenance: {
 						type: "community",
 					},

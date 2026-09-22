@@ -147,18 +147,21 @@ describe("repository Serapack build cache", () => {
 		await runFn("build");
 		expect((await runFn("build")).stdout).toContain("Serapack unchanged");
 		expect(await countFn()).toBe(1);
-		await appendFile(join(root, "src/builder.ts"), "changed");
+		await writeFile(join(root, "game/serakki/project.json"), '{"revision":1}');
 		await runFn("build");
 		expect(await countFn()).toBe(2);
-		await writeFile(join(root, artifact), "damaged");
+		await appendFile(join(root, "src/builder.ts"), "changed");
 		await runFn("build");
 		expect(await countFn()).toBe(3);
-		await writeFile(join(root, `${artifact}.cache`), "malformed");
+		await writeFile(join(root, artifact), "damaged");
 		await runFn("build");
 		expect(await countFn()).toBe(4);
-		await rm(join(root, artifact));
+		await writeFile(join(root, `${artifact}.cache`), "malformed");
 		await runFn("build");
 		expect(await countFn()).toBe(5);
+		await rm(join(root, artifact));
+		await runFn("build");
+		expect(await countFn()).toBe(6);
 	});
 
 	it("revalidates audio sidecar removal and corruption instead of reusing a valid build", async () => {

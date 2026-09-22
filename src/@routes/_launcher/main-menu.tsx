@@ -1,15 +1,14 @@
 import { useAtom, useAtomValue } from "@effect/atom-react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 import { Cause, Effect } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { SerakkiAppVersion, SerakkiDefaultPackageId } from "~shared/SerakkiAppMetadata";
 import { useSerapacks } from "~/serapack-selector/ui/useSerapacks";
-import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Button";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { MainMenuExitCommandAtom } from "~/launcher/atom/MainMenuExitCommandAtom";
@@ -32,6 +31,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			},
 		),
 	component: () => {
+		const navigateFn = useNavigate();
 		const saves = Route.useLoaderData();
 		const hasSave = saves.some((save) => save.savedAt !== null);
 		const canContinue = saves.some((save) => save.slot === "current" && save.savedAt !== null);
@@ -40,7 +40,6 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 		const startup = useAtomValue(LauncherStartupAtom);
 		const [exitState, requestExitFn] = useAtom(MainMenuExitCommandAtom);
 		const [diagnosticsExportState, exportDiagnosticsFn] = useAtom(ExportDiagnosticsAtom);
-		const editorStatus = useAtomValue(EditorServiceStatusAtom);
 		const exitPending = exitState.kind === "pending";
 		const diagnosticsExportPending = diagnosticsExportState.kind === "pending";
 		const defaultPackageAvailable =
@@ -55,6 +54,66 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			catalogState.type === "failed" ||
 			(AsyncResult.isFailure(startup) && !startup.waiting) ||
 			(catalogState.type === "ready" && AsyncResult.isSuccess(startup) && !startup.waiting);
+
+		useEffect(() => {
+			const onKeyDownFn = (event: KeyboardEvent) => {
+				if (
+					event.defaultPrevented ||
+					event.repeat ||
+					event.isComposing ||
+					event.altKey ||
+					event.ctrlKey ||
+					event.metaKey ||
+					(event.target instanceof HTMLElement &&
+						(event.target.isContentEditable ||
+							event.target.closest("input, textarea, select") !== null))
+				)
+					return;
+
+				switch (event.key) {
+					case "c":
+						if (!defaultPackageAvailable || !canContinue) return;
+						event.preventDefault();
+						void navigateFn({
+							to: "/action/load-game/$packageId",
+							params: {
+								packageId: SerakkiDefaultPackageId,
+							},
+						});
+						return;
+					case "g":
+						event.preventDefault();
+						void navigateFn({
+							to: "/serapacks",
+						});
+						return;
+					case "s":
+						event.preventDefault();
+						void navigateFn({
+							to: "/settings",
+						});
+						return;
+					case "a":
+						event.preventDefault();
+						void navigateFn({
+							to: "/about",
+						});
+						return;
+					case "e":
+						if (exitPending) return;
+						event.preventDefault();
+						requestExitFn(undefined);
+				}
+			};
+			window.addEventListener("keydown", onKeyDownFn);
+			return () => window.removeEventListener("keydown", onKeyDownFn);
+		}, [
+			canContinue,
+			defaultPackageAvailable,
+			exitPending,
+			navigateFn,
+			requestExitFn,
+		]);
 
 		return (
 			<LauncherPageLayout page="main-menu">
@@ -71,16 +130,16 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 									params={{
 										packageId: SerakkiDefaultPackageId,
 									}}
-									className="rounded-xl"
+									className="main-menu-continue rounded-xl"
 								>
-									Continue <ArrowRight className="ml-2 size-5" />
+									Continue <ArrowRight className="ml-2.5 size-[1.5625rem]" />
 								</PrimaryButtonLink>
 							)}
 							{hasSave ? (
 								<section data-ui="MainMenuNewGameConfirmation">
 									{confirmingNewGame ? (
 										<ButtonLink
-											className="w-full rounded-xl"
+											className="main-menu-tinted-action w-full rounded-xl"
 											to="/action/load-game/$packageId"
 											params={{
 												packageId: SerakkiDefaultPackageId,
@@ -94,7 +153,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 										</ButtonLink>
 									) : (
 										<Button
-											className="w-full rounded-xl"
+											className="main-menu-tinted-action w-full rounded-xl"
 											onClick={() => setConfirmingNewGameFn(true)}
 										>
 											New Game
@@ -124,7 +183,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 											>
 												<div className="pt-3">
 													<Button
-														className="w-full rounded-xl"
+														className="main-menu-tinted-action w-full rounded-xl"
 														onClick={() =>
 															setConfirmingNewGameFn(false)
 														}
@@ -160,45 +219,24 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 					)}
 					<ButtonLink
 						to="/serapacks"
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 					>
-						Serapacks
+						Your games
 					</ButtonLink>
-					{editorStatus.type === "ready" ? (
-						<ButtonLink
-							to="/editor/welcome"
-							preload={false}
-							className="rounded-xl"
-						>
-							Editor
-						</ButtonLink>
-					) : (
-						<Button
-							className="rounded-xl"
-							cursorIntent={
-								editorStatus.type === "starting" ? "progress" : "not-allowed"
-							}
-							disabled
-						>
-							{editorStatus.type === "starting"
-								? "Preparing Editor…"
-								: "Editor unavailable"}
-						</Button>
-					)}
 					<ButtonLink
 						to="/settings"
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 					>
 						Settings
 					</ButtonLink>
 					<ButtonLink
 						to="/about"
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 					>
 						About
 					</ButtonLink>
 					<Button
-						className="rounded-xl"
+						className="main-menu-tinted-action rounded-xl"
 						cursorIntent={exitPending ? "progress" : undefined}
 						disabled={exitPending}
 						onClick={() => requestExitFn(undefined)}
@@ -214,7 +252,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						</p>
 						<button
 							type="button"
-							className="inline-flex cursor-pointer items-center gap-2 text-xs font-normal text-white underline-offset-4 transition-colors hover:text-accent hover:underline disabled:cursor-progress disabled:opacity-70"
+							className="inline-flex cursor-pointer items-center gap-2 text-xs font-normal text-foreground underline-offset-4 transition-colors hover:text-accent hover:underline disabled:cursor-progress disabled:opacity-70"
 							data-ui="ExportDiagnostics"
 							disabled={diagnosticsExportPending}
 							onClick={() => exportDiagnosticsFn(undefined)}
@@ -233,8 +271,6 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 						<p className="text-center text-sm text-danger">
 							Startup failed: {String(Cause.squash(startup.cause))}
 						</p>
-					) : editorStatus.type === "unavailable" ? (
-						<p className="text-center text-sm text-danger">{editorStatus.message}</p>
 					) : exitState.kind === "error" ? (
 						<p className="text-center text-sm text-danger">
 							Exit failed: {String(exitState.error)}

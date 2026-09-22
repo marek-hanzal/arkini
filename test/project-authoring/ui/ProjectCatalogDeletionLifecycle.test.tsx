@@ -7,8 +7,8 @@ import { act, createElement, Fragment } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { EditorWelcomeCommandAtom } from "~/project-authoring/atom/EditorWelcomeCommandAtom";
-import { useEditorWelcomeActions } from "~/project-authoring/ui/useEditorWelcomeActions";
+import { ProjectCatalogCommandAtom } from "~/project-authoring/atom/ProjectCatalogCommandAtom";
+import { useProjectCatalogActions } from "~/project-authoring/ui/useProjectCatalogActions";
 
 (
 	globalThis as {
@@ -58,13 +58,6 @@ vi.mock("~/project-authoring/fx/createFreshProjectFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		createFreshProjectFx: () => Effect.die("Unexpected create."),
-	};
-});
-
-vi.mock("~/project-authoring/fx/importEditorSerapackFileFx", async () => {
-	const { Effect } = await import("effect");
-	return {
-		importEditorSerapackFileFx: () => Effect.die("Unexpected serapack import."),
 	};
 });
 
@@ -125,10 +118,10 @@ describe("editor project deletion lifecycle", () => {
 				scheduleTask,
 			});
 			registries.push(registry);
-			registry.mount(EditorWelcomeCommandAtom);
+			registry.mount(ProjectCatalogCommandAtom);
 
 			const Probe = () => {
-				const actions = useEditorWelcomeActions();
+				const actions = useProjectCatalogActions();
 				return createElement(
 					Fragment,
 					null,

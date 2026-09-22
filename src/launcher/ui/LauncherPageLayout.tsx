@@ -9,21 +9,15 @@ const launcherPagePresentation = {
 		viewTransitionName: "serakki-panel-about",
 	},
 	serapacks: {
-		content: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
+		content: "flex min-h-0 flex-col overflow-hidden p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
-		panel: "size-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
+		panel: "flex max-h-full w-full max-w-5xl flex-col overflow-hidden border border-line bg-surface shadow-2xl",
 		viewTransitionName: "serakki-panel-serapacks",
-	},
-	"editor-welcome": {
-		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
-		layout: "fixed-hero",
-		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
-		viewTransitionName: "serakki-panel-editor-welcome",
 	},
 	"main-menu": {
 		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
-		panel: "-mt-[5cqh] z-10 max-h-[calc(100%+5cqh)] w-full max-w-sm overflow-hidden border border-line/20 bg-surface/20 shadow-lg",
+		panel: "-mt-[5cqh] z-10 max-h-[calc(100%+5cqh)] w-full max-w-sm overflow-hidden",
 		viewTransitionName: "serakki-panel-main-menu",
 	},
 	settings: {

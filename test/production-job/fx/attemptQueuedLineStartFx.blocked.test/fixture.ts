@@ -17,7 +17,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 	const material = {
 		type: "materials",
 		query: {
-			scope: "any",
+			distance: "far" as const,
 			selector: {
 				type: "item",
 				itemId: "water",
@@ -81,14 +81,12 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				...base.items.tool,
 				id: "result",
 				uid: "result",
-				scope: "board",
 				maxStackSize: 1,
 			},
 			debris: {
 				...base.items.tool,
 				id: "debris",
 				uid: "debris",
-				scope: "board",
 				maxStackSize: 1,
 			},
 			payer: {
@@ -118,7 +116,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 										{
 											type: "materials",
 											query: {
-												scope: "any",
+												distance: "far" as const,
 												selector: {
 													type: "item",
 													itemId: "tool",
@@ -145,7 +143,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 										{
 											type: "units",
 											query: {
-												scope: "board",
 												selector: {
 													type: "item",
 													itemId: "payer",
@@ -276,7 +273,8 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			item: config.items.water,
 			quantity: 1,
 			location: {
-				scope: "inventory",
+				scope: "board" as const,
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,

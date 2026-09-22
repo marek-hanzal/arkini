@@ -1,3 +1,5 @@
+import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { createItemBase } from "~test/game-config-validation/support/gameValidationTestSource";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
@@ -5,7 +7,6 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
@@ -70,7 +71,7 @@ const createConfig = (scope: "any" | "universe") => {
 								{
 									type: "exists",
 									query: {
-										scope,
+										distance: scope === "universe" ? "universe" : "far",
 										selector: {
 											type: "item",
 											itemId: "permit",
@@ -110,20 +111,8 @@ const createConfig = (scope: "any" | "universe") => {
 };
 
 const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: number) {
-	let runtime = yield* readRuntimeFx();
-	let owner = runtime.items.find((item) => item.id === ownerItemId);
-	if (owner === undefined) throw new Error("Expected owner.");
-	yield* moveRuntimeItemForTestFx({
-		itemId: owner.id,
-		revision: owner.revision,
-		location: {
-			scope: "inventory",
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-	});
+	const runtime = yield* readRuntimeFx();
+	const owner = runtime.items.find((item) => item.id === ownerItemId)!;
 	const portal = yield* spawnItemFx({
 		id: "runtime:portal",
 		itemId: "portal",
@@ -131,33 +120,33 @@ const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: num
 			scope: "board",
 			space: runtime.currentSpace,
 			position: {
-				x: 0,
+				x: 4,
 				y: 0,
 			},
 		},
 		quantity: 1,
 	});
+	const result = yield* dropItemFx({
+		sourceItemId: owner.id,
+		sourceRevision: owner.revision,
+		sourceLocation: owner.location as BoardLocationSchema.Type,
+		target: {
+			kind: "slot",
+			location: portal.location as BoardLocationSchema.Type,
+			occupant: {
+				itemId: portal.id,
+				revision: portal.revision,
+			},
+		},
+	});
+	if (result.kind !== "move") throw new Error("Expected portal transfer.");
 	yield* activateItemActionFx({
 		currentSpace: runtime.currentSpace,
 		itemId: portal.id,
 		location: portal.location,
 		revision: portal.revision,
 	});
-	runtime = yield* readRuntimeFx();
-	owner = runtime.items.find((item) => item.id === ownerItemId);
-	if (owner === undefined) throw new Error("Expected owner in inventory.");
-	yield* moveRuntimeItemForTestFx({
-		itemId: owner.id,
-		revision: owner.revision,
-		location: {
-			scope: "board",
-			space,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-	});
+	if (space !== 1) throw new Error("Expected destination space.");
 });
 
 const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
@@ -183,43 +172,6 @@ const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
 		elapsedMs: 400,
 	});
 	yield* moveOwnerToSpaceFx(1);
-});
-
-const fillDestinationFx = Effect.fn("fillDestinationFx")(function* () {
-	let index = 0;
-	for (let y = 0; y < 2; y += 1) {
-		for (let x = 0; x < 5; x += 1) {
-			if (x === 0 && y === 0) continue;
-			yield* spawnItemFx({
-				id: `runtime:blocker:board:${index}`,
-				itemId: "blocker",
-				location: {
-					scope: "board",
-					space: 1,
-					position: {
-						x,
-						y,
-					},
-				},
-				quantity: 1,
-			});
-			index += 1;
-		}
-	}
-	for (let x = 0; x < 3; x += 1) {
-		yield* spawnItemFx({
-			id: `runtime:blocker:inventory:${x}`,
-			itemId: "blocker",
-			location: {
-				scope: "inventory",
-				position: {
-					x,
-					y: 0,
-				},
-			},
-			quantity: 1,
-		});
-	}
 });
 
 describe("multi-space owner ownership graph", () => {
@@ -285,30 +237,5 @@ describe("multi-space owner ownership graph", () => {
 					item.location.space === 0,
 			),
 		).toBe(false);
-	});
-
-	it("blocks completion when neither destination space nor inventory can accept survivors", () => {
-		const runtime = Effect.runSync(
-			Effect.gen(function* () {
-				yield* prepareTravelFx();
-				yield* fillDestinationFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: 600,
-				});
-				return yield* readRuntimeFx();
-			}).pipe(
-				useGameFx({
-					config: createConfig("universe"),
-				}),
-			),
-		);
-
-		expect(runtime.jobs).toEqual([
-			expect.objectContaining({
-				remainingMs: 0,
-			}),
-		]);
-		expect(runtime.items.some((item) => item.item.id === "ingot")).toBe(false);
-		expect(runtime.items.some((item) => item.location.scope === "reserved")).toBe(true);
 	});
 });

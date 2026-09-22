@@ -19,10 +19,6 @@ const config = GameConfigSchema.parse({
 			width: 3,
 			height: 3,
 		},
-		inventory: {
-			width: 2,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -42,7 +38,6 @@ const config = GameConfigSchema.parse({
 					"artwork:tree",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 	},
@@ -73,7 +68,8 @@ const state = StateSchema.parse({
 			id: "runtime:inventory:tree",
 			itemId: "tree",
 			location: {
-				scope: "inventory",
+				scope: "board" as const,
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -88,24 +84,6 @@ const state = StateSchema.parse({
 });
 
 describe("fromStateFx", () => {
-	it("builds every runtime item with the original canonical game object", () => {
-		const runtime = Effect.runSync(
-			fromStateFx({
-				state,
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-		const canonicalTree = config.items.tree;
-		const boardTree = runtime.items.find((item) => item.id === "runtime:board:tree");
-		const inventoryTree = runtime.items.find((item) => item.id === "runtime:inventory:tree");
-
-		expect(boardTree?.item).toBe(canonicalTree);
-		expect(inventoryTree?.item).toBe(canonicalTree);
-	});
-
 	it("round-trips gameplay state without persisting runtime revisions", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -228,4 +206,22 @@ describe("fromStateFx", () => {
 			});
 		}
 	});
+});
+
+it("builds every runtime item with the original canonical game object", () => {
+	const runtime = Effect.runSync(
+		fromStateFx({
+			state,
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+	const canonicalTree = config.items.tree;
+	const boardTree = runtime.items.find((item) => item.id === "runtime:board:tree");
+	const inventoryTree = runtime.items.find((item) => item.id === "runtime:inventory:tree");
+
+	expect(boardTree?.item).toBe(canonicalTree);
+	expect(inventoryTree?.item).toBe(canonicalTree);
 });

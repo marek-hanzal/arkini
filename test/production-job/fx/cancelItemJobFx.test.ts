@@ -111,7 +111,6 @@ it("preserves active work and its materials when a reservation cannot be returne
 			...clearItemJobQueueConfig.items,
 			tool: {
 				...clearItemJobQueueConfig.items.tool,
-				scope: "board",
 			},
 		},
 	});

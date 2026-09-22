@@ -1,8 +1,7 @@
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { spawnItemFx } from "~test/support/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import {
@@ -54,69 +53,6 @@ describe("craft stacked-owner lifecycle", () => {
 			]),
 		);
 		expect(runtime.items.filter((item) => item.item.id === "craft:drop")).toHaveLength(2);
-	});
-
-	it("rejects a stacked craft start atomically when its remainder cannot be placed", () => {
-		const result = runCraft(
-			Effect.gen(function* () {
-				const owner = yield* spawnCraftFx({
-					itemId: "craft:drop",
-					quantity: 2,
-				});
-				let blockerIndex = 0;
-				for (let y = 0; y < 2; y += 1) {
-					for (let x = 0; x < 3; x += 1) {
-						if (x === 0 && y === 0) continue;
-						yield* spawnItemFx({
-							id: `runtime:start-blocker:${blockerIndex}`,
-							itemId: "item:blocker",
-							location: {
-								scope: "board",
-								space: 0,
-								position: {
-									x,
-									y,
-								},
-							},
-							quantity: 1,
-						});
-						blockerIndex += 1;
-					}
-				}
-				yield* spawnItemFx({
-					id: "runtime:start-inventory-blocker",
-					itemId: "item:blocker",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.result(
-					startLineFx({
-						ownerItemId: owner.id,
-						lineId: "line:craft:drop",
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					attempt,
-					before,
-				};
-			}),
-		);
-
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-			});
-		}
-		expect(result.after).toEqual(result.before);
 	});
 
 	it("starts another craft from the separated stack while the first craft is running", () => {

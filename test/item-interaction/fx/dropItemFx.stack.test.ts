@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -70,7 +70,7 @@ const inputBeforeStackConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "producer",
@@ -107,7 +107,7 @@ const occupiedTarget = ({
 }: {
 	readonly itemId: string;
 	readonly revision: string;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 }) => ({
 	kind: "slot" as const,
 	location,

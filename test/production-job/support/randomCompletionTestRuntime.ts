@@ -24,10 +24,6 @@ export const createRandomCompletionConfig = () => {
 				width: 3,
 				height: 2,
 			},
-			inventory: {
-				width: 1,
-				height: 1,
-			},
 		},
 		items: {
 			...base.items,
@@ -150,18 +146,6 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 				blockerIndex += 1;
 			}
 		}
-		yield* spawnItemFx({
-			id: "runtime:random-inventory-blocker",
-			itemId: "blocker",
-			location: {
-				scope: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
-			quantity: 1,
-		});
 		yield* startLineFx({
 			ownerItemId: "runtime:random-forge",
 			lineId: "line:forge:run",

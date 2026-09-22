@@ -16,10 +16,6 @@ const config = GameConfigSchema.parse({
 			width: 2,
 			height: 2,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,

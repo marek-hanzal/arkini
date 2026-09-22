@@ -24,10 +24,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					width: 1,
 					height: 1,
 				},
-				inventory: {
-					width: 1,
-					height: 1,
-				},
 			},
 			start: {
 				currentSpace: 0,
@@ -53,7 +49,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							"artwork:workshop",
 						],
 					},
-					scope: "board",
 					maxStackSize: 1,
 					maxQueueSize: 1,
 					lines: [
@@ -81,7 +76,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 													{
 														type: "exists",
 														query: {
-															scope: "any",
+															distance: "far" as const,
 															selector: {
 																type: "item",
 																itemId: "workshop",
@@ -109,7 +104,8 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 																	{
 																		type: "exists",
 																		query: {
-																			scope: "any",
+																			distance:
+																				"far" as const,
 																			selector: {
 																				type: "item",
 																				itemId: "workshop",
@@ -166,7 +162,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							"artwork:wood",
 						],
 					},
-					scope: "any",
 					maxStackSize: 10,
 				},
 				gem: {
@@ -184,7 +179,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							"artwork:gem",
 						],
 					},
-					scope: "any",
 					maxStackSize: 10,
 				},
 			},

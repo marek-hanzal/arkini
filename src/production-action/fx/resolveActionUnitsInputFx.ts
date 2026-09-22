@@ -14,19 +14,28 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const compareTargetFn = (
- origin: BoardLocationSchema.Type,
- left: BoardRuntimeItemSchema.Type,
- right: BoardRuntimeItemSchema.Type,
+	origin: BoardLocationSchema.Type,
+	left: BoardRuntimeItemSchema.Type,
+	right: BoardRuntimeItemSchema.Type,
 ) => {
- const leftLocal = left.location.space === origin.space;
- const rightLocal = right.location.space === origin.space;
- if (leftLocal !== rightLocal) return leftLocal ? -1 : 1;
- if (leftLocal && rightLocal) {
-  const leftDistance = Math.abs(left.location.position.x - origin.position.x) + Math.abs(left.location.position.y - origin.position.y);
-  const rightDistance = Math.abs(right.location.position.x - origin.position.x) + Math.abs(right.location.position.y - origin.position.y);
-  if (leftDistance !== rightDistance) return leftDistance - rightDistance;
- }
- return left.location.space - right.location.space || left.location.position.y - right.location.position.y || left.location.position.x - right.location.position.x || left.id.localeCompare(right.id);
+	const leftLocal = left.location.space === origin.space;
+	const rightLocal = right.location.space === origin.space;
+	if (leftLocal !== rightLocal) return leftLocal ? -1 : 1;
+	if (leftLocal && rightLocal) {
+		const leftDistance =
+			Math.abs(left.location.position.x - origin.position.x) +
+			Math.abs(left.location.position.y - origin.position.y);
+		const rightDistance =
+			Math.abs(right.location.position.x - origin.position.x) +
+			Math.abs(right.location.position.y - origin.position.y);
+		if (leftDistance !== rightDistance) return leftDistance - rightDistance;
+	}
+	return (
+		left.location.space - right.location.space ||
+		left.location.position.y - right.location.position.y ||
+		left.location.position.x - right.location.position.x ||
+		left.id.localeCompare(right.id)
+	);
 };
 
 /** Selects one deterministic Board payer, or stays unavailable without a real Board origin. */

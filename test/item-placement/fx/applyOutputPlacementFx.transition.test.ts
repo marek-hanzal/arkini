@@ -10,85 +10,11 @@ import {
 	boardLocation,
 	configuredDrop,
 	configuredOutput,
-	inventoryLocation,
 	placementTestConfig,
 } from "~test/item-placement/support/placementTestConfig";
 import { placeOutputForTestFx } from "~test/item-placement/support/placeOutputForTestFx";
 
 describe("output placement transition", () => {
-	it("rolls back every earlier drop when a later drop cannot be placed", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker:2",
-					itemId: "blocker",
-					location: boardLocation(2),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker:3",
-					itemId: "blocker",
-					location: boardLocation(3),
-					quantity: 1,
-				});
-				for (const x of [
-					0,
-					1,
-				]) {
-					yield* spawnItemFx({
-						id: `runtime:inventory:${x}`,
-						itemId: "blocker",
-						location: inventoryLocation(x),
-						quantity: 1,
-					});
-				}
-				const before = yield* readRuntimeFx();
-				const placement = yield* Effect.result(
-					placeOutputForTestFx({
-						originItemId: "runtime:origin",
-						output: configuredOutput([
-							configuredDrop({
-								itemId: "board-only",
-								placement: "drop",
-								quantity: 1,
-							}),
-							configuredDrop({
-								itemId: "board-only",
-								placement: "drop",
-								quantity: 1,
-							}),
-						]),
-					}),
-				);
-				const after = yield* readRuntimeFx();
-
-				return {
-					after,
-					before,
-					placement,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.placement)).toBe(true);
-		if (Result.isFailure(result.placement)) {
-			expect(result.placement.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				reason: "board:full",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
 	it("lets later drops stack into items spawned by earlier drops", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -151,73 +77,140 @@ describe("output placement transition", () => {
 			1,
 		]);
 	});
+});
+it("resolves output rules from the same snapshot that it commits", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "runtime:origin",
+				itemId: "origin",
+				location: boardLocation(0),
+				quantity: 1,
+			});
+			const permit = yield* spawnItemFx({
+				id: "runtime:permit",
+				itemId: "permit",
+				location: boardLocation(1),
+				quantity: 1,
+			});
+			const staleRuntime = yield* readRuntimeFx();
+			yield* removeRuntimeItemForTestFx({
+				itemId: "runtime:permit",
+				revision: permit.revision,
+			});
 
-	it("resolves output rules from the same snapshot that it commits", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				const permit = yield* spawnItemFx({
-					id: "runtime:permit",
-					itemId: "permit",
-					location: inventoryLocation(0),
-					quantity: 1,
-				});
-				const staleRuntime = yield* readRuntimeFx();
-				yield* removeRuntimeItemForTestFx({
-					itemId: "runtime:permit",
-					revision: permit.revision,
-				});
+			const placement = yield* placeOutputForTestFx({
+				originItemId: "runtime:origin",
+				output: configuredOutput([
+					configuredDrop({
+						itemId: "log",
+						placement: "drop",
+						quantity: 1,
+						rules: [
+							{
+								type: "enable",
+								when: [
+									{
+										type: "exists",
+										query: {
+											distance: "far" as const,
+											selector: {
+												type: "item",
+												itemId: "permit",
+											},
+										},
+									},
+								],
+							},
+						],
+					}),
+				]),
+			}).pipe(
+				Effect.provideService(RuntimeFx, {
+					read: Effect.succeed(staleRuntime),
+				}),
+			);
+			const runtime = yield* readRuntimeFx();
 
-				const placement = yield* placeOutputForTestFx({
+			return {
+				placement,
+				runtime,
+			};
+		}).pipe(
+			useGameFx({
+				config: placementTestConfig,
+			}),
+		),
+	);
+
+	expect(result.placement.drop).toEqual([]);
+	expect(result.runtime.items.some((item) => item.item.id === "log")).toBe(false);
+});
+
+it("rolls back every earlier drop when a later drop cannot be placed", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "runtime:origin",
+				itemId: "origin",
+				location: boardLocation(0),
+				quantity: 1,
+			});
+			yield* spawnItemFx({
+				id: "runtime:blocker:2",
+				itemId: "blocker",
+				location: boardLocation(2),
+				quantity: 1,
+			});
+			yield* spawnItemFx({
+				id: "runtime:blocker:3",
+				itemId: "blocker",
+				location: boardLocation(3),
+				quantity: 1,
+			});
+			for (const {} of [
+				0,
+				1,
+			]) {
+			}
+			const before = yield* readRuntimeFx();
+			const placement = yield* Effect.result(
+				placeOutputForTestFx({
 					originItemId: "runtime:origin",
 					output: configuredOutput([
 						configuredDrop({
-							itemId: "log",
+							itemId: "board-only",
 							placement: "drop",
 							quantity: 1,
-							rules: [
-								{
-									type: "enable",
-									when: [
-										{
-											type: "exists",
-											query: {
-												scope: "any",
-												selector: {
-													type: "item",
-													itemId: "permit",
-												},
-											},
-										},
-									],
-								},
-							],
+						}),
+						configuredDrop({
+							itemId: "board-only",
+							placement: "drop",
+							quantity: 1,
 						}),
 					]),
-				}).pipe(
-					Effect.provideService(RuntimeFx, {
-						read: Effect.succeed(staleRuntime),
-					}),
-				);
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					placement,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
 				}),
-			),
-		);
+			);
+			const after = yield* readRuntimeFx();
 
-		expect(result.placement.drop).toEqual([]);
-		expect(result.runtime.items.some((item) => item.item.id === "log")).toBe(false);
-	});
+			return {
+				after,
+				before,
+				placement,
+			};
+		}).pipe(
+			useGameFx({
+				config: placementTestConfig,
+			}),
+		),
+	);
+
+	expect(Result.isFailure(result.placement)).toBe(true);
+	if (Result.isFailure(result.placement)) {
+		expect(result.placement.failure).toMatchObject({
+			_tag: "PlacementUnavailableError",
+			reason: "board:full",
+		});
+	}
+	expect(result.after).toEqual(result.before);
 });

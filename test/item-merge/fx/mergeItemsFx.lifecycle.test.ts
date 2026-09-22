@@ -7,7 +7,6 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
@@ -22,7 +21,6 @@ const baseItem = ({ id }: { id: string }) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "any" as const,
 	maxStackSize: 1,
 });
 
@@ -54,7 +52,7 @@ const producerItem = ({
 				{
 					type: "materials" as const,
 					query: {
-						scope: "any" as const,
+						distance: "far" as const,
 						selector: {
 							type: "item" as const,
 							itemId: selectorItemId,
@@ -159,7 +157,6 @@ const createLifecycleConfig = ({
 						durationMs: targetDurationMs,
 					},
 					maxStackSize: 1,
-					scope: "board" as const,
 				};
 
 	return GameConfigSchema.parse({
@@ -172,10 +169,6 @@ const createLifecycleConfig = ({
 			board: {
 				width: 6,
 				height: 2,
-			},
-			inventory: {
-				width: 3,
-				height: 1,
 			},
 		},
 		start: {
@@ -211,7 +204,6 @@ const createLifecycleConfig = ({
 								durationMs: resultDurationMs,
 							},
 							maxStackSize: 1,
-							scope: "board",
 						},
 			material: {
 				maxQueueSize: 1,
@@ -283,7 +275,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				const participantLocation =
 					scope === "input"
 						? {
-								scope,
+								scope: "input" as const,
 								ownerItemId: "runtime:owner",
 								lineId: "line:owner",
 								inputIndex: 0,
@@ -463,7 +455,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				if (runtimeSource === undefined || runtimeTarget === undefined) {
 					return yield* Effect.die(new Error("Expected merge participants."));
 				}
-				const source = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeSource));
+				const source = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSource));
 				const target = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeTarget));
 				const rule = source?.item.merge?.[0];
 				if (source === undefined || target === undefined || rule === undefined) {

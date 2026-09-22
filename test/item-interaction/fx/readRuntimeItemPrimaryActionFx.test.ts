@@ -19,10 +19,6 @@ const config = GameConfigSchema.parse({
 			width: 3,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -60,7 +56,6 @@ const config = GameConfigSchema.parse({
 					"artwork:producer",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
 			lines: [
@@ -94,16 +89,12 @@ const config = GameConfigSchema.parse({
 					"artwork:resource",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 		"satchel-control": {
 			uid: "satchel-control",
 			id: "satchel-control",
-			action: {
-				type: "inventory",
-			},
-			scope: "any",
+
 			maxStackSize: 1,
 			title: "Satchel",
 			description: "Opens the shared inventory.",
@@ -199,40 +190,6 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				expect(result.after).toEqual(result.before);
 			}
 		}
-	});
-
-	it("opens Inventory by its authored action from either Board or Toolbar", () => {
-		expect(
-			Effect.runSync(
-				readRuntimeItemPrimaryActionFx({
-					item: inventoryOpener,
-					runtime,
-				}),
-			),
-		).toEqual({
-			kind: "open-inventory",
-			currentSpace: 0,
-		});
-		expect(
-			Effect.runSync(
-				readRuntimeItemPrimaryActionFx({
-					item: {
-						...inventoryOpener,
-						location: {
-							scope: "toolbar",
-							position: {
-								x: 0,
-								y: 0,
-							},
-						},
-					},
-					runtime,
-				}),
-			),
-		).toEqual({
-			kind: "open-inventory",
-			currentSpace: 0,
-		});
 	});
 
 	it("enqueues only a valid save-backed default line", () => {

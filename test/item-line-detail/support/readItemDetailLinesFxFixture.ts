@@ -105,7 +105,6 @@ export const createUnitsConfig = (inputCount: number) =>
 			...lineRunTestConfig.items,
 			workshop: {
 				...unitsWorkshop,
-				scope: "any",
 				lines: [
 					{
 						...unitsWorkshop.lines[0],
@@ -125,7 +124,6 @@ export const createUnitsConfig = (inputCount: number) =>
 								},
 								query: {
 									distance: "close" as const,
-									scope: "board" as const,
 									selector: {
 										itemId: "tree",
 										type: "item" as const,

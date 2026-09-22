@@ -12,12 +12,8 @@ import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 export const createConfigFn = (small = false) =>
 	createMergeTestConfig({
 		board: {
-			width: small ? 2 : 20,
+			width: small ? 4 : 20,
 			height: small ? 1 : 20,
-		},
-		inventory: {
-			width: 2,
-			height: 1,
 		},
 		rule: {
 			target: {

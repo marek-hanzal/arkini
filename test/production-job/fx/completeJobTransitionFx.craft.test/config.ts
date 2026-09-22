@@ -99,7 +99,7 @@ const craftItem = ({
 										min: 1,
 									},
 									query: {
-										scope: "any",
+										distance: "far" as const,
 										selector: {
 											itemId: inputItemId,
 											type: "item",
@@ -115,13 +115,12 @@ const craftItem = ({
 			},
 		],
 		maxStackSize,
-		scope: "any",
 		title: id,
 
 		uid: id,
 	}) satisfies z.input<typeof ItemSchema>;
 
-const simpleItem = (id: string, scope: "any" | "board" = "any") =>
+const simpleItem = (id: string, _scope: "any" | "board" = "any") =>
 	({
 		maxQueueSize: 1,
 		lines: [],
@@ -135,7 +134,6 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 		description: id,
 		id,
 		maxStackSize: 1,
-		scope,
 		title: id,
 
 		uid: id,
@@ -180,10 +178,6 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 			width: 3,
 		},
 		id: "game:craft-completion",
-		inventory: {
-			height: 1,
-			width: 1,
-		},
 		title: "Craft completion",
 	},
 	resources: {

@@ -50,7 +50,7 @@ describe("readItemPhysicalContextFx", () => {
 								{
 									type: "materials",
 									query: {
-										scope: "any",
+										distance: "far" as const,
 										selector: {
 											type: "item",
 											itemId: "residue",

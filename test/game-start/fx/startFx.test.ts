@@ -9,87 +9,25 @@ import { startTestConfig } from "~test/game-start/support/startTestConfig";
 import { startFx } from "~/game-start/fx/startFx";
 
 describe("startFx", () => {
-	it("atomically creates the configured board and inventory runtime", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const started = yield* startFx();
-				const read = yield* readRuntimeFx();
-
-				return {
-					read,
-					started,
-				};
-			}).pipe(
-				useGameFx({
-					config: startTestConfig,
-				}),
-			),
-		);
-
-		expect(result.started).toBe(result.read);
-		expect(result.started.items).toHaveLength(3);
-		expect(result.started.items).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					item: startTestConfig.items.tree,
-					location: {
-						space: 0,
-						position: {
-							x: 1,
-							y: 1,
-						},
-						scope: "board",
-					},
-					quantity: 1,
-				}),
-				expect.objectContaining({
-					item: startTestConfig.items.log,
-					location: {
-						position: {
-							x: 0,
-							y: 0,
-						},
-						scope: "inventory",
-					},
-					quantity: 3,
-				}),
-				expect.objectContaining({
-					item: startTestConfig.items.log,
-					location: {
-						position: {
-							x: 1,
-							y: 0,
-						},
-						scope: "inventory",
-					},
-					quantity: 1,
-				}),
-			]),
-		);
-	});
-
 	it("commits the exact sequential runtime for repeated stackable entries", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			start: {
 				currentSpace: 0,
-				board: [],
-				inventory: [
+				board: [
 					{
 						itemId: "log",
-						position: {
-							x: 0,
-							y: 0,
-						},
 						quantity: 2,
+						space: 0,
+						x: 0,
+						y: 0,
 					},
 					{
 						itemId: "log",
-						position: {
-							x: 1,
-							y: 0,
-						},
 						quantity: 3,
+						space: 0,
+						x: 1,
+						y: 0,
 					},
 				],
 			},
@@ -171,43 +109,6 @@ describe("startFx", () => {
 						y: 0,
 					},
 				],
-				inventory: [],
-			},
-		});
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const started = yield* Effect.result(startFx());
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					runtime,
-					started,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.started)).toBe(true);
-		if (Result.isFailure(result.started)) {
-			expect(result.started.failure).toMatchObject({
-				_tag: "RuntimeInvalidError",
-			});
-		}
-		expect(result.runtime.items).toEqual([]);
-	});
-
-	it("rolls back the complete start when an exact inventory position is out of bounds", () => {
-		const config = GameConfigSchema.parse({
-			...startTestConfig,
-			meta: {
-				...startTestConfig.meta,
-				inventory: {
-					width: 1,
-					height: 1,
-				},
 			},
 		});
 		const result = Effect.runSync(
@@ -262,6 +163,6 @@ describe("startFx", () => {
 
 		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
 		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
-		expect(result.runtime.items).toHaveLength(3);
+		expect(result.runtime.items).toHaveLength(1);
 	});
 });

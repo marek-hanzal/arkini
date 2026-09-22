@@ -43,10 +43,6 @@ const config = GameConfigSchema.parse({
 			width: 1,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -72,7 +68,6 @@ const config = GameConfigSchema.parse({
 					"artwork:producer",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
 			lines: [
@@ -94,10 +89,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 				width: boardWidth,
 				height: 1,
 			},
-			inventory: {
-				width: 1,
-				height: 1,
-			},
 		},
 		start: {
 			currentSpace: 0,
@@ -115,7 +106,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 						"artwork:producer",
 					],
 				},
-				scope: "any",
 				maxStackSize: 3,
 				maxQueueSize: 1,
 				lines: [
@@ -137,7 +127,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 						"artwork:blocker",
 					],
 				},
-				scope: "any",
 				maxStackSize: 1,
 			},
 		},
@@ -490,64 +479,52 @@ describe("setLineSelectionFx", () => {
 		expect(result.remainderPure).toBe(true);
 		expect(result.clearedPure).toBe(false);
 	});
+});
 
-	it("rolls back the default mapping and split when the remainder cannot be placed", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:producer",
-					itemId: "producer",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 0,
-							y: 0,
-						},
+it("rolls back the default mapping and split when the remainder cannot be placed", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "runtime:producer",
+				itemId: "producer",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
 					},
-					quantity: 2,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker",
-					itemId: "blocker",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const before = yield* readRuntimeFx();
-				const selected = yield* Effect.result(
-					setLineSelectionFx({
-						selection: "default",
-						ownerItemId: "runtime:producer",
-						lineId: "line:only",
-					}),
-				);
-
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					selected,
-				};
-			}).pipe(
-				useGameFx({
-					config: createStackConfig({
-						boardWidth: 1,
-					}),
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.selected)).toBe(true);
-		if (Result.isFailure(result.selected)) {
-			expect(result.selected.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
+				},
+				quantity: 2,
 			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
+			const before = yield* readRuntimeFx();
+			const selected = yield* Effect.result(
+				setLineSelectionFx({
+					selection: "default",
+					ownerItemId: "runtime:producer",
+					lineId: "line:only",
+				}),
+			);
+
+			return {
+				after: yield* readRuntimeFx(),
+				before,
+				selected,
+			};
+		}).pipe(
+			useGameFx({
+				config: createStackConfig({
+					boardWidth: 1,
+				}),
+			}),
+		),
+	);
+
+	expect(Result.isFailure(result.selected)).toBe(true);
+	if (Result.isFailure(result.selected)) {
+		expect(result.selected.failure).toMatchObject({
+			_tag: "PlacementUnavailableError",
+		});
+	}
+	expect(result.after).toEqual(result.before);
 });

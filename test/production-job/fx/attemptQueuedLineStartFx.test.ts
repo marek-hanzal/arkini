@@ -106,49 +106,6 @@ describe("attemptQueuedLineStartFx", () => {
 		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
 	});
 
-	it("keeps an inventory owner as an explicit retryable block", () => {
-		const inventoryOwner = {
-			...owner,
-			location: {
-				scope: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
-		} satisfies RuntimeItemSchema.Type;
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				inventoryOwner,
-			],
-			jobs: [],
-			jobQueue: [
-				request,
-			],
-
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-
-		const result = runAttempt(runtime);
-
-		expect(result).toMatchObject({
-			_tag: "Success",
-			success: {
-				type: "blocked",
-				error: {
-					_tag: "ItemNotOnBoardError",
-				},
-			},
-		});
-		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
-	});
-
 	it("propagates a missing owner instead of retrying forever", () => {
 		const runtime = {
 			cheats: {

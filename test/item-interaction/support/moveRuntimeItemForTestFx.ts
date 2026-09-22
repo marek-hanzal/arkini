@@ -2,10 +2,10 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
-import { narrowGridRuntimeItemFn } from "~/game-runtime/fn/narrowGridRuntimeItemFn";
+import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 
@@ -16,12 +16,12 @@ export const moveRuntimeItemForTestFx = Effect.fn("moveRuntimeItemForTestFx")(fu
 	revision,
 }: {
 	readonly itemId: IdSchema.Type;
-	readonly location: GridLocationSchema.Type;
+	readonly location: BoardLocationSchema.Type;
 	readonly revision: RevisionSchema.Type;
 }) {
 	const runtime = yield* readRuntimeFx();
 	const source = Option.getOrUndefined(
-		narrowGridRuntimeItemFn(
+		narrowBoardRuntimeItemFn(
 			yield* readRuntimeItemByIdFx({
 				itemId,
 				runtime,

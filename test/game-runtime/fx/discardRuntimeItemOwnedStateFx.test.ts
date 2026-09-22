@@ -1,5 +1,5 @@
 import { Effect, Result } from "effect";
-import { describe, expect, it } from "vitest";
+import { expect, it } from "vitest";
 
 import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -36,8 +36,58 @@ const passiveChild = {
 	revision: "revision:child",
 };
 
-describe("discardRuntimeItemOwnedStateFx", () => {
-	it("discards passive input descendants and default-line intent while preserving the root", () => {
+it("discards passive input descendants and default-line intent while preserving the root", () => {
+	const runtime = {
+		cheats: {
+			enabled: false,
+			everEnabled: false,
+			speedUpGameplay: false,
+		},
+		currentSpace: 0,
+		items: [
+			root,
+			passiveChild,
+		],
+		jobs: [],
+		jobQueue: [],
+		defaultLineByOwnerItemId: {
+			[root.id]: "line:forge:run",
+			[passiveChild.id]: "line:missing",
+			"runtime:unrelated": "line:unrelated",
+		},
+	} satisfies RuntimeSchema.Type;
+	const result = Effect.runSync(
+		discardRuntimeItemOwnedStateFx({
+			ownerItemId: root.id,
+			runtime,
+		}),
+	);
+
+	expect(result.events).toEqual([
+		{
+			type: "item:removed",
+			snapshot: passiveChild,
+		},
+	]);
+	expect(result.runtime.items).toEqual([
+		root,
+	]);
+	expect(result.runtime.jobQueue).toEqual([]);
+	expect(result.runtime.defaultLineByOwnerItemId).toEqual({
+		"runtime:unrelated": "line:unrelated",
+	});
+});
+it("rejects active or queued work anywhere beneath the discarded ownership tree", () => {
+	for (const mode of [
+		"active",
+		"queued",
+	] as const) {
+		const busyId = mode === "active" ? "job:child" : "request:child";
+		const busyEntry = {
+			id: busyId,
+			ownerItemId: passiveChild.id,
+			lineId: "line:missing",
+		};
 		const runtime = {
 			cheats: {
 				enabled: false,
@@ -48,122 +98,69 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			items: [
 				root,
 				passiveChild,
+				...(mode === "active"
+					? [
+							{
+								id: "runtime:job-material",
+								item: config.items.tool,
+								location: {
+									scope: "reserved" as const,
+									jobId: busyId,
+									inputIndex: 1,
+								},
+								quantity: 1,
+								revision: "revision:job-material",
+							},
+						]
+					: []),
 			],
-			jobs: [],
-			jobQueue: [],
-			defaultLineByOwnerItemId: {
-				[root.id]: "line:forge:run",
-				[passiveChild.id]: "line:missing",
-				"runtime:unrelated": "line:unrelated",
-			},
+			jobs:
+				mode === "active"
+					? [
+							{
+								...busyEntry,
+								durationMs: 200,
+								remainingMs: 200,
+							},
+						]
+					: [],
+			jobQueue:
+				mode === "queued"
+					? [
+							busyEntry,
+						]
+					: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
-			discardRuntimeItemOwnedStateFx({
-				ownerItemId: root.id,
-				runtime,
-			}),
+			Effect.result(
+				discardRuntimeItemOwnedStateFx({
+					ownerItemId: root.id,
+					runtime,
+				}),
+			),
 		);
 
-		expect(result.events).toEqual([
-			{
-				type: "item:removed",
-				snapshot: passiveChild,
-			},
-		]);
-		expect(result.runtime.items).toEqual([
-			root,
-		]);
-		expect(result.runtime.jobQueue).toEqual([]);
-		expect(result.runtime.defaultLineByOwnerItemId).toEqual({
-			"runtime:unrelated": "line:unrelated",
-		});
-	});
-
-	it("rejects active or queued work anywhere beneath the discarded ownership tree", () => {
-		for (const mode of [
-			"active",
-			"queued",
-		] as const) {
-			const busyId = mode === "active" ? "job:child" : "request:child";
-			const busyEntry = {
-				id: busyId,
-				ownerItemId: passiveChild.id,
-				lineId: "line:missing",
-			};
-			const runtime = {
-				cheats: {
-					enabled: false,
-					everEnabled: false,
-					speedUpGameplay: false,
-				},
-				currentSpace: 0,
-				items: [
-					root,
-					passiveChild,
-					...(mode === "active"
-						? [
-								{
-									id: "runtime:job-material",
-									item: config.items.tool,
-									location: {
-										scope: "reserved" as const,
-										jobId: busyId,
-										inputIndex: 1,
-									},
-									quantity: 1,
-									revision: "revision:job-material",
-								},
-							]
-						: []),
-				],
-				jobs:
-					mode === "active"
-						? [
-								{
-									...busyEntry,
-									durationMs: 200,
-									remainingMs: 200,
-								},
-							]
-						: [],
-				jobQueue:
-					mode === "queued"
-						? [
-								busyEntry,
-							]
-						: [],
-				defaultLineByOwnerItemId: {},
-			} satisfies RuntimeSchema.Type;
-			const result = Effect.runSync(
-				Effect.result(
-					discardRuntimeItemOwnedStateFx({
-						ownerItemId: root.id,
-						runtime,
-					}),
-				),
-			);
-
-			expect(Result.isFailure(result)).toBe(true);
-			if (Result.isFailure(result)) {
-				expect(result.failure).toMatchObject({
-					_tag: "JobOwnerBusyError",
-					ownerItemId: root.id,
-					...(mode === "active"
-						? {
-								jobIds: [
-									busyId,
-								],
-							}
-						: {
-								requestIds: [
-									busyId,
-								],
-							}),
-				});
-			}
-			expect(runtime.items).toHaveLength(mode === "active" ? 3 : 2);
-			expect(runtime.jobs).toHaveLength(mode === "active" ? 1 : 0);
-			expect(runtime.jobQueue).toHaveLength(mode === "queued" ? 1 : 0);
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
+				_tag: "JobOwnerBusyError",
+				ownerItemId: root.id,
+				...(mode === "active"
+					? {
+							jobIds: [
+								busyId,
+							],
+						}
+					: {
+							requestIds: [
+								busyId,
+							],
+						}),
+			});
 		}
-	});
+		expect(runtime.items).toHaveLength(mode === "active" ? 3 : 2);
+		expect(runtime.jobs).toHaveLength(mode === "active" ? 1 : 0);
+		expect(runtime.jobQueue).toHaveLength(mode === "queued" ? 1 : 0);
+	}
 });

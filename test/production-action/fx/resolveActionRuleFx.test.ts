@@ -13,7 +13,8 @@ import {
 
 it("keeps rules inactive when a Board condition has no physical origin in either condition order", () => {
 	const origin = {
-		scope: "inventory",
+		scope: "board" as const,
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -22,7 +23,7 @@ it("keeps rules inactive when a Board condition has no physical origin in either
 	const missingPermit: WhenSchema.Type = {
 		type: "exists",
 		query: {
-			scope: "any",
+			distance: "far" as const,
 			selector: {
 				type: "item",
 				itemId: "permit",
@@ -33,7 +34,6 @@ it("keeps rules inactive when a Board condition has no physical origin in either
 		...missingPermit,
 		query: {
 			...missingPermit.query,
-			scope: "board",
 			distance: "self",
 		},
 	};

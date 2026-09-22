@@ -88,81 +88,83 @@ describe("readItemDetailLinesFx / delivery and autofill", () => {
 			},
 		});
 	});
-	it("keeps unclaimed and returning delivery quantities available while stacks travel", () => {
-		const runtime = lineRunRuntime({
-			permit: true,
-		});
-		const outbound = {
-			id: "runtime:delivery:outbound",
-			item: lineRunTestConfig.items.water,
-			location: {
-				scope: "delivery" as const,
-				phase: "outbound" as const,
-				generation: 0,
-				remainingDurationMs: 500,
-				origin: {
-					scope: "board" as const,
-					space: 0,
-					position: {
-						x: 4,
-						y: 0,
-					},
-				},
-				target: {
-					kind: "line-input" as const,
-					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
-					input: [
-						{
-							inputIndex: 0,
-							quantity: 3,
-						},
-					],
+});
+
+it("keeps unclaimed and returning delivery quantities available while stacks travel", () => {
+	const runtime = lineRunRuntime({
+		permit: true,
+	});
+	const outbound = {
+		id: "runtime:delivery:outbound",
+		item: lineRunTestConfig.items.water,
+		location: {
+			scope: "delivery" as const,
+			phase: "outbound" as const,
+			generation: 0,
+			remainingDurationMs: 500,
+			origin: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 4,
+					y: 0,
 				},
 			},
-			quantity: 7,
-			revision: "revision:delivery:outbound",
-		};
-		const returning = {
-			...outbound,
-			id: "runtime:delivery:returning",
-			location: {
-				scope: "delivery" as const,
-				phase: "returning" as const,
-				generation: 1,
-				remainingDurationMs: 500,
-				origin: {
-					scope: "toolbar" as const,
-					position: {
-						x: 0,
-						y: 0,
+			target: {
+				kind: "line-input" as const,
+				ownerItemId: "runtime:workshop",
+				lineId: "line:workshop:build",
+				input: [
+					{
+						inputIndex: 0,
+						quantity: 3,
 					},
-				},
-				returnFrom: {
-					scope: "board" as const,
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
+				],
+			},
+		},
+		quantity: 7,
+		revision: "revision:delivery:outbound",
+	};
+	const returning = {
+		...outbound,
+		id: "runtime:delivery:returning",
+		location: {
+			scope: "delivery" as const,
+			phase: "returning" as const,
+			generation: 1,
+			remainingDurationMs: 500,
+			origin: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 3,
+					y: 0,
 				},
 			},
-			quantity: 2,
-			revision: "revision:delivery:returning",
-		};
-		const lines = readLines({
-			...runtime,
-			items: [
-				...runtime.items,
-				outbound,
-				returning,
-			],
-		});
-		if (lines.kind !== "available") throw new Error("Expected available lines.");
-		expect(lines.line[0]?.input[0]).toMatchObject({
-			kind: "materials",
-			deliveryQuantity: 3,
-			autofillAvailableQuantity: 6,
-		});
+			returnFrom: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		},
+		quantity: 2,
+		revision: "revision:delivery:returning",
+	};
+	const lines = readLines({
+		...runtime,
+		items: [
+			...runtime.items,
+			outbound,
+			returning,
+		],
+	});
+	if (lines.kind !== "available") throw new Error("Expected available lines.");
+	expect(lines.line[0]?.input[0]).toMatchObject({
+		kind: "materials",
+		deliveryQuantity: 3,
+		autofillAvailableQuantity: 6,
 	});
 });

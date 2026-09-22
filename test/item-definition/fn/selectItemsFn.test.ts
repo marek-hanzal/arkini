@@ -18,7 +18,6 @@ const item = {
 			"artwork:tree",
 		],
 	},
-	scope: "board",
 	maxStackSize: 1,
 } satisfies ItemSchema.Type;
 

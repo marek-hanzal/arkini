@@ -53,7 +53,6 @@ describe("merge settlement against the evolving draft", () => {
 						type: "count",
 						count: 1,
 						query: {
-							scope: "board",
 							distance: "self",
 							selector: {
 								type: "item",

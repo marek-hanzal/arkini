@@ -7,7 +7,6 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({
 	id,
-	scope = "board",
 	maxStackSize = 1,
 }: {
 	id: string;
@@ -29,7 +28,6 @@ const simpleItem = ({
 				`artwork:${id}`,
 			],
 		},
-		scope,
 		maxStackSize,
 	});
 
@@ -59,7 +57,6 @@ const blueprintItem = ({
 				`artwork:${id}`,
 			],
 		},
-		scope: "board" as const,
 		maxStackSize: 1,
 		lines: [
 			{
@@ -76,7 +73,7 @@ const blueprintItem = ({
 									cost: 1,
 								},
 								query: {
-									scope: "any" as const,
+									distance: "far" as const,
 									selector: {
 										type: "item" as const,
 										itemId: "item:tool",
@@ -159,10 +156,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		board: {
 			width: 3,
 			height: 2,
-		},
-		inventory: {
-			width: 1,
-			height: 1,
 		},
 	},
 	start: {
@@ -303,7 +296,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:limited",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 2,
 			lines: [
@@ -342,7 +334,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:blueprint-source",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 2,
 			lines: [
@@ -373,7 +364,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:shared-source",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
 			lines: [
@@ -404,7 +394,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:shared-consumer",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
 			lines: [
@@ -417,7 +406,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "item:shared",
@@ -445,7 +434,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:recycler",
 				],
 			},
-			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
 			lines: [
@@ -458,7 +446,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: "item:target",
@@ -487,7 +475,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:spent-stack",
 				],
 			},
-			scope: "board",
 			maxStackSize: 3,
 			maxQueueSize: 1,
 			units: {

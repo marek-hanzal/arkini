@@ -16,7 +16,7 @@ describe("projectAuthoredOutputFn", () => {
 								{
 									type: "exists",
 									query: {
-										scope: "any",
+										distance: "far" as const,
 										selector: {
 											type: "item",
 											itemId: "item:key",
@@ -58,7 +58,7 @@ describe("projectAuthoredOutputFn", () => {
 												{
 													type: "exists",
 													query: {
-														scope: "universe",
+														distance: "universe" as const,
 														selector: {
 															type: "item",
 															itemId: "item:missing",

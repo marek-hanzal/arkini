@@ -10,7 +10,6 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
-import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
@@ -245,149 +244,89 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items.some((item) => item.id === "runtime:water")).toBe(false);
 	});
+});
 
-	it("rejects releasing buffered inputs from a passive inventory owner", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const owner = yield* prepareIdleOwnerInputsFx();
-				const moved = yield* moveRuntimeItemForTestFx({
-					itemId: owner.id,
+it("keeps the owner and every buffered input when one released item cannot be placed", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const owner = yield* prepareIdleOwnerInputsFx();
+			for (const [index, position] of [
+				{
+					x: 1,
+					y: 0,
+				},
+				{
+					x: 2,
+					y: 0,
+				},
+				{
+					x: 3,
+					y: 0,
+				},
+				{
+					x: 4,
+					y: 0,
+				},
+				{
+					x: 0,
+					y: 1,
+				},
+				{
+					x: 1,
+					y: 1,
+				},
+				{
+					x: 2,
+					y: 1,
+				},
+				{
+					x: 3,
+					y: 1,
+				},
+				{
+					x: 4,
+					y: 1,
+				},
+			].entries()) {
+				yield* spawnItemFx({
+					id: `runtime:board-fill:${index}`,
+					itemId: "water",
 					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
+						scope: "board",
+						space: 0,
+						position,
 					},
+					quantity: 10,
+				});
+			}
+			yield* setCheatEnabledFx({
+				enabled: true,
+			});
+			const before = yield* readRuntimeFx();
+			const attempt = yield* Effect.result(
+				removeCheatItemFx({
+					itemId: owner.id,
 					revision: owner.revision,
-				});
-				yield* setCheatEnabledFx({
-					enabled: true,
-				});
-				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.result(
-					removeCheatItemFx({
-						itemId: owner.id,
-						revision: moved.item.revision,
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					attempt,
-					before,
-				};
-			}).pipe(
-				useGameFx({
-					config: createJobTestConfig(2, "any"),
 				}),
-			),
-		);
+			);
+			const after = yield* readRuntimeFx();
+			return {
+				after,
+				attempt,
+				before,
+			};
+		}).pipe(
+			useGameFx({
+				config: createJobTestConfig(),
+			}),
+		),
+	);
 
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "ItemNotOnBoardError",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
-
-	it("keeps the owner and every buffered input when one released item cannot be placed", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const owner = yield* prepareIdleOwnerInputsFx();
-				for (const [index, position] of [
-					{
-						x: 1,
-						y: 0,
-					},
-					{
-						x: 2,
-						y: 0,
-					},
-					{
-						x: 3,
-						y: 0,
-					},
-					{
-						x: 4,
-						y: 0,
-					},
-					{
-						x: 0,
-						y: 1,
-					},
-					{
-						x: 1,
-						y: 1,
-					},
-					{
-						x: 2,
-						y: 1,
-					},
-					{
-						x: 3,
-						y: 1,
-					},
-					{
-						x: 4,
-						y: 1,
-					},
-				].entries()) {
-					yield* spawnItemFx({
-						id: `runtime:board-fill:${index}`,
-						itemId: "water",
-						location: {
-							scope: "board",
-							space: 0,
-							position,
-						},
-						quantity: 10,
-					});
-				}
-				for (let x = 0; x < 3; x += 1) {
-					yield* spawnItemFx({
-						id: `runtime:inventory-fill:${x}`,
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x,
-								y: 0,
-							},
-						},
-						quantity: 10,
-					});
-				}
-				yield* setCheatEnabledFx({
-					enabled: true,
-				});
-				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.result(
-					removeCheatItemFx({
-						itemId: owner.id,
-						revision: owner.revision,
-					}),
-				);
-				const after = yield* readRuntimeFx();
-				return {
-					after,
-					attempt,
-					before,
-				};
-			}).pipe(
-				useGameFx({
-					config: createJobTestConfig(),
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
+	expect(Result.isFailure(result.attempt)).toBe(true);
+	if (Result.isFailure(result.attempt)) {
+		expect(result.attempt.failure).toMatchObject({
+			_tag: "PlacementUnavailableError",
+		});
+	}
+	expect(result.after).toEqual(result.before);
 });

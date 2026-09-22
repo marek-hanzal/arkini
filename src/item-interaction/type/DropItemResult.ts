@@ -1,5 +1,4 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
@@ -9,7 +8,6 @@ export const DropItemResultKind = {
 	Move: "move",
 	Swap: "swap",
 	Merge: "merge",
-	StoreInput: "store-input",
 	Ignored: "ignored",
 	Reject: "reject",
 } as const;
@@ -41,15 +39,12 @@ interface DropActorState {
 	readonly location: BoardLocationSchema.Type;
 }
 
-interface DropTransferredActor {
+interface DropMergedActor {
 	readonly itemId: IdSchema.Type;
-	readonly canonicalItemId: IdSchema.Type;
 	readonly previousRevision: RevisionSchema.Type;
 	readonly previousLocation: BoardLocationSchema.Type;
 	readonly current: DropActorState | null;
 }
-
-type DropMergedActor = Omit<DropTransferredActor, "canonicalItemId">;
 
 interface DropMovedResult {
 	readonly kind: typeof DropItemResultKind.Move;
@@ -81,18 +76,6 @@ interface DropMergedResult {
 	readonly target: DropMergedActor;
 }
 
-interface DropStoredInputResult {
-	readonly kind: typeof DropItemResultKind.StoreInput;
-	readonly lineId: IdSchema.Type;
-	readonly inputIndex: NonNegativeIntegerSchema.Type;
-	readonly source: DropTransferredActor;
-	readonly owner: {
-		readonly itemId: IdSchema.Type;
-		readonly revision: RevisionSchema.Type;
-		readonly location: BoardLocationSchema.Type;
-	};
-}
-
 interface DropIgnoredResult {
 	readonly kind: typeof DropItemResultKind.Ignored;
 	readonly reason: DropItemIgnoredReason;
@@ -112,6 +95,5 @@ export type DropItemResult =
 	| DropMovedResult
 	| DropSwappedResult
 	| DropMergedResult
-	| DropStoredInputResult
 	| DropIgnoredResult
 	| DropRejectedResult;

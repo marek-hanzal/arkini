@@ -113,7 +113,7 @@ The canonical immutable Item vocabulary lives in [`src/item-definition`](src/ite
 - item `draft` is optional in source, defaults to `false` when omitted, and is only an Editor authoring status with no gameplay or Build filtering semantics;
 - An item has `lines` defaulting to an empty array and `maxQueueSize` defaulting to one. Items without lines cannot run production; adding lines enables the ordinary production contract. An item with `clock` may also have no lines;
 - line input is passive; Enqueue and Tick own execution;
-- material inputs require `query` (selector plus one explicit Autofill distance); there is no implicit reach or legacy top-level selector. Manual delivery uses its selector without the Autofill reach restriction;
+- material inputs require `query` (selector plus one explicit Autofill distance); there is no implicit reach or legacy top-level selector. Autofill owns material delivery;
 - material selectors may name any canonical item, including Clock identities whose interval and lifetime continue advancing in input and job storage while their Clock rules permit time;
 - each material input stores at most its authored `quantity.max`; there is no extra input capacity;
 - `units` defines a finite supply inside each item instance (health, resource stock, or uses), independently of authored input and Item outcome counts: passive and manually operated resources use ordinary items; scheduled production adds Item.clock;

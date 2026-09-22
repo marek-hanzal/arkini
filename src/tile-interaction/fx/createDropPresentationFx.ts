@@ -1,8 +1,6 @@
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
-import type { TileActorFeedbackCue } from "~/tile-presentation/type/TileActorFeedbackCue";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
@@ -20,10 +18,6 @@ interface SwapCandidate {
 }
 
 interface DropSnapshot {
-	readonly feedback: ReadonlyArray<{
-		readonly cues: ReadonlyArray<TileActorFeedbackCue>;
-		readonly generation: number;
-	}>;
 	readonly landingActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly swaps: ReadonlyArray<{
@@ -38,7 +32,6 @@ export interface DropPresentation {
 		readonly swapCandidate: SwapCandidate | null;
 	}) => Effect.Effect<number, never, never>;
 	readonly clearSwapFx: (generation: number) => Effect.Effect<void, never, never>;
-	readonly clearFeedbackFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly completeFx: (props: {
 		readonly generation: number;
 		readonly result: DropItemResult;
@@ -59,37 +52,6 @@ interface PendingSwap {
 	readonly generation: number;
 }
 
-interface PendingFeedback {
-	readonly cues: ReadonlyArray<TileActorFeedbackCue>;
-	readonly generation: number;
-}
-
-const readFeedbackCuesFn = (
-	generation: number,
-	result: DropItemResult,
-): ReadonlyArray<TileActorFeedbackCue> =>
-	match(result)
-
-		.with(
-			{
-				kind: DropItemResultKind.StoreInput,
-			},
-			({ owner, source }) =>
-				[
-					{
-						actorId: source.itemId,
-						key: `drop:${generation}:consume-source`,
-						kind: "consume-source",
-					},
-					{
-						actorId: owner.itemId,
-						key: `drop:${generation}:consume`,
-						kind: "consume",
-					},
-				] satisfies TileActorFeedbackCue[],
-		)
-		.otherwise(() => []);
-
 /**
  * Owns generation-safe presentation facts between pointer release and canonical reconciliation.
  *
@@ -99,7 +61,6 @@ const readFeedbackCuesFn = (
  */
 export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(() =>
 	Effect.sync((): DropPresentation => {
-		const feedback = new Map<number, PendingFeedback>();
 		const landingActorIds = new Set<string>();
 		let closed = false;
 		let nextGeneration = 0;
@@ -109,7 +70,6 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 		const clearGenerationFn = (generation: number) => {
 			pending.delete(generation);
 			swaps.delete(generation);
-			feedback.delete(generation);
 		};
 
 		return {
@@ -138,21 +98,9 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 					swaps.delete(generation);
 				}),
 			),
-			clearFeedbackFx: Effect.fn("DropPresentation.clearFeedbackFx")((generation) =>
-				Effect.sync(() => {
-					feedback.delete(generation);
-				}),
-			),
 			completeFx: Effect.fn("DropPresentation.completeFx")(({ generation, result }) =>
 				Effect.sync(() => {
 					if (closed || !pending.delete(generation)) return;
-					const cues = readFeedbackCuesFn(generation, result);
-					if (cues.length > 0) {
-						feedback.set(generation, {
-							cues,
-							generation,
-						});
-					}
 					if (result.kind === DropItemResultKind.Move) {
 						landingActorIds.add(result.itemId);
 					}
@@ -169,7 +117,6 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 			),
 			readSnapshotFx: Effect.sync(
 				(): DropSnapshot => ({
-					feedback: Array.from(feedback.values()),
 					landingActorIds: new Set(landingActorIds),
 					pendingActorIds: new Set(
 						Array.from(pending.values(), ({ sourceActorId }) => sourceActorId),
@@ -189,7 +136,6 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 				landingActorIds.clear();
 				pending.clear();
 				swaps.clear();
-				feedback.clear();
 			}),
 		};
 	}),

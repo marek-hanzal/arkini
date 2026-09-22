@@ -29,7 +29,7 @@ export const item: TileActorItem = testItem;
 export const createItem = (id: string, x: number) => createTestItem(id, x);
 
 const previewState = vi.hoisted(() => ({
-	actorKinds: new Map<string, "merge" | "move" | "reject" | "store-input" | "swap">(),
+	actorKinds: new Map<string, "merge" | "move" | "reject" | "swap">(),
 	kind: "move" as "ignored" | "move" | "reject" | "swap",
 	reads: 0,
 	readsByActorId: new Map<string, number>(),

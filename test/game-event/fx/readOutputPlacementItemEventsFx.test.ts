@@ -52,7 +52,6 @@ describe("readOutputPlacementItemEventsFx", () => {
 						placement: "drop",
 					},
 					placement: {
-						remove: [],
 						spawn: [
 							first,
 							spawned,

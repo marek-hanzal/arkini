@@ -4,7 +4,7 @@ import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledErro
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
-import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
+import { applyPlacementPlanFn } from "~/item-placement/fn/applyPlacementPlanFn";
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
@@ -61,12 +61,12 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 				quantity: 1,
 				reason: PlacementUnavailableError.Reason.BoardFull,
 			});
-			const [result, nextRuntime] = yield* applyPlacementPlanFx({
+			const nextRuntime = applyPlacementPlanFn({
 				plan,
 				runtime,
 			});
 			return [
-				result,
+				plan,
 				nextRuntime,
 			] as const;
 		}),

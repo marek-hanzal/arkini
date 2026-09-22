@@ -4,7 +4,6 @@ import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerS
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementPlanInvalidError } from "~/item-placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 interface AssertPlacementPlanCompleteProps {
@@ -23,9 +22,7 @@ export const assertPlacementPlanCompleteFx = Effect.fn("assertPlacementPlanCompl
 	quantity,
 	reason,
 }: AssertPlacementPlanCompleteProps) {
-	const placedQuantity = readPlacementPlanQuantityFn({
-		plan,
-	});
+	const placedQuantity = plan.spawn.length;
 	if (placedQuantity === quantity) {
 		return plan;
 	}

@@ -16,18 +16,15 @@ const drop = {
 
 const plan = (quantity: number) =>
 	({
-		remove: [],
 		spawn: Array.from(
 			{
 				length: quantity,
 			},
 			(_, index) => ({
-				item: {
-					id: `spawn-${index}`,
-					item: placementTestConfig.items.log,
-					revision: `revision-${index}`,
-					location: boardLocation(index),
-				},
+				id: `spawn-${index}`,
+				item: placementTestConfig.items.log,
+				revision: `revision-${index}`,
+				location: boardLocation(index),
 			}),
 		),
 	}) satisfies PlacementPlan;

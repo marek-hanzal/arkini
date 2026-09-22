@@ -102,7 +102,6 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	});
 
 	return {
-		remove: [],
 		spawn,
 	} satisfies PlacementPlan;
 });

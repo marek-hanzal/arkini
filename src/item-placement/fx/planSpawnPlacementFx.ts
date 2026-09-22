@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 
@@ -25,15 +24,11 @@ export const planSpawnPlacementFx = Effect.fn("planSpawnPlacementFx")(function* 
 
 	return yield* Effect.forEach(locations.slice(0, itemCount), (location) => {
 		return Effect.gen(function* () {
-			const runtimeItem = yield* createRuntimeItemFx({
+			return yield* createRuntimeItemFx({
 				id: yield* createRuntimeItemIdFx(),
 				item,
 				location,
 			});
-
-			return {
-				item: runtimeItem,
-			} satisfies PlacementPlan["spawn"][number];
 		});
 	});
 });

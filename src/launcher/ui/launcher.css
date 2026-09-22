@@ -50,19 +50,19 @@
 }
 
 [data-ui="LauncherPagePanel"][data-page="main-menu"]:has(.main-menu-continue) {
-	max-width: 34.5rem;
+	max-width: 30rem;
 }
 
 [data-ui="MainMenu"]:has(.main-menu-continue) {
-	width: 66.666667%;
+	max-width: 21rem;
 	margin-inline: auto;
 }
 
 [data-ui="MainMenu"] .main-menu-continue {
-	width: 120%;
-	margin-left: -10%;
-	min-height: calc(var(--ak-control-min-height) * 1.5);
-	font-size: calc(var(--ak-control-font-size) * 1.5);
+	width: 110%;
+	margin-left: -5%;
+	min-height: calc(var(--ak-control-min-height) * 1.25);
+	font-size: calc(var(--ak-control-font-size) * 1.25);
 }
 
 [data-ui="MainMenu"] .main-menu-tinted-action {

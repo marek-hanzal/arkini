@@ -71,7 +71,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 									}}
 									className="main-menu-continue rounded-xl"
 								>
-									Continue <ArrowRight className="ml-3 size-[1.875rem]" />
+									Continue <ArrowRight className="ml-2.5 size-[1.5625rem]" />
 								</PrimaryButtonLink>
 							)}
 							{hasSave ? (

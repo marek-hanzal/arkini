@@ -6,7 +6,6 @@ interface EditorFormSectionDividerProps {
 	readonly action?: ReactNode;
 	readonly description?: ReactNode;
 	readonly required?: boolean;
-	readonly separator?: boolean;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";
 }
@@ -16,7 +15,6 @@ export const EditorFormSectionDivider = ({
 	action,
 	description,
 	required = false,
-	separator = true,
 	title,
 	variant = "primary",
 }: EditorFormSectionDividerProps) => (
@@ -34,7 +32,7 @@ export const EditorFormSectionDivider = ({
 			{required ? <span className="size-1.5 shrink-0 rounded-full bg-accent" /> : null}
 			{description === undefined ? null : <EditorInfoTooltip content={description} />}
 		</div>
-		{separator ? <span className="min-w-0 flex-1 border-t border-line/70" /> : null}
+		<span className="min-w-0 flex-1 border-t border-line/70" />
 		{action === undefined ? null : <div className="shrink-0">{action}</div>}
 	</header>
 );

@@ -21,7 +21,7 @@ import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 
-const showSectionHeadingSeparatorFn = (sectionId: SectionId) => {
+const showSectionHeadingFn = (sectionId: SectionId) => {
 	switch (sectionId) {
 		case "merges":
 		case "units":
@@ -75,11 +75,8 @@ export const Detail = ({
 				: translator.textFn(section?.label ?? "Item details");
 	// Estimate owns its heading because its live summary and sort controls share that row.
 	const sectionHeading =
-		sectionId === "estimate" ? null : (
-			<EditorFormSectionDivider
-				separator={showSectionHeadingSeparatorFn(sectionId)}
-				title={sectionTitle}
-			/>
+		sectionId === "estimate" || !showSectionHeadingFn(sectionId) ? null : (
+			<EditorFormSectionDivider title={sectionTitle} />
 		);
 	return (
 		<EditorSectionPage
@@ -137,18 +134,16 @@ export const Detail = ({
 		>
 			{sectionId === "notes" ? (
 				<div
-					className="grid h-full min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)]"
+					className="grid h-full min-h-0 min-w-0 grid-rows-[minmax(0,1fr)]"
 					data-ui="EditorItemDetailPageContent"
 				>
-					<div className="px-3 pt-3">{sectionHeading}</div>
 					{children}
 				</div>
 			) : sectionId === "connections" ? (
 				<div
-					className="grid min-h-0 min-w-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
+					className="grid min-h-0 min-w-0 flex-1 grid-rows-[minmax(0,1fr)]"
 					data-ui="EditorItemDetailPageContent"
 				>
-					{sectionHeading}
 					{children}
 				</div>
 			) : (

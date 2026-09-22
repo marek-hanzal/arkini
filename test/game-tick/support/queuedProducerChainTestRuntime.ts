@@ -16,6 +16,7 @@ const simpleItem = (id: string) => ({
 
 	title: id,
 	description: id,
+	ui: "simple" as const,
 	artwork: {
 		scale: 0.8,
 		default: [
@@ -78,6 +79,7 @@ const producer = ({
 
 	title: id,
 	description: id,
+	ui: "default" as const,
 	artwork: {
 		scale: 0.8,
 		default: [

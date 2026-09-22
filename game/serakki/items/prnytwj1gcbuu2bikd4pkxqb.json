@@ -14,7 +14,6 @@
 				"fire"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 10000,

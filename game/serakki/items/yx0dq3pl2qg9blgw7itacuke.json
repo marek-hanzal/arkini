@@ -13,7 +13,6 @@
 				"corn-kernels"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

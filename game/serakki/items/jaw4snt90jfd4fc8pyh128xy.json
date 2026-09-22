@@ -11,7 +11,6 @@
 				"mana-reservoir"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

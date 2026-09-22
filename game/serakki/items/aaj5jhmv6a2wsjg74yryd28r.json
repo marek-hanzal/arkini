@@ -12,7 +12,6 @@
 				"cauldron-with-boiling-water"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 600000,

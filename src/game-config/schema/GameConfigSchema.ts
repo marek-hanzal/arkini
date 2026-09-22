@@ -40,11 +40,9 @@ export const GameConfigSchema = z
 		 */
 		sfx: SfxSchema.optional().describe("Optional SFX event assignments for this game."),
 		/**
-		 * Board and inventory contents created for a new game.
+		 * Board contents created for a new game.
 		 */
-		start: StartSchema.describe(
-			"The initial board, inventory, and toolbar contents created for a new game.",
-		),
+		start: StartSchema.describe("The initial Board contents created for a new game."),
 		/**
 		 * Canonical game items keyed by their unique identifier.
 		 */

@@ -12,7 +12,6 @@
 				"spoiled-cutting-board-with-raw-steak"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

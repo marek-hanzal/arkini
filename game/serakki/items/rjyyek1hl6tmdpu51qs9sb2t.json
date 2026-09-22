@@ -12,7 +12,6 @@
 				"wet-paper-drying-rack"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 300000,

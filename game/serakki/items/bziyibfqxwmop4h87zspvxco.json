@@ -13,7 +13,6 @@
 				"treasure-chest-t2"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -42,7 +41,6 @@
 								"type": "item",
 								"itemId": "townhall-t2-supply-chest"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}

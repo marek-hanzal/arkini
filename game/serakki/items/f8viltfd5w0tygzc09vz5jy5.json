@@ -12,7 +12,6 @@
 				"sugar"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 10,
 		"merge": [
 			{

@@ -12,7 +12,6 @@
 				"tummy-ache-british-shorthair-kitten"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 15000,

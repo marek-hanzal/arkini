@@ -13,7 +13,6 @@
 				"copper-mine"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 32,
@@ -66,18 +65,17 @@
 								"type": "item",
 								"itemId": "copper-mine"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "candle"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -135,18 +133,17 @@
 								"type": "item",
 								"itemId": "copper-mine"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "lantern"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

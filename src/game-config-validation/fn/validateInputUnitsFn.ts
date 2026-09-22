@@ -7,7 +7,6 @@ import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/Game
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { InvalidInputUnitsReasonEnumSchema } from "~/game-config-diagnostic/schema/InvalidInputUnitsReasonEnumSchema";
-import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -135,10 +134,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 				});
 				const available = matchedCandidates.some((candidate) => {
 					return (
-						(candidate.scope === StorageSchema.enum.Board ||
-							candidate.scope === StorageSchema.enum.Any) &&
-						candidate.units !== undefined &&
-						candidate.units.amount >= targetUnitCost
+						candidate.units !== undefined && candidate.units.amount >= targetUnitCost
 					);
 				});
 				if (!available) {
@@ -147,7 +143,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
-						message: `Units input ${inputIndex} of action ${actionId} cannot match any board-capable item with at least ${input.units.cost} units.`,
+						message: `Units input ${inputIndex} of action ${actionId} cannot match any item with at least ${input.units.cost} units.`,
 						ownerItemId: itemId,
 						lineId: actionId,
 						inputIndex,

@@ -12,7 +12,6 @@
 				"labor-t1"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 8,
 		"maxQueueSize": 1,
 		"lines": []

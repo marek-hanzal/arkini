@@ -13,7 +13,6 @@
 				"bakery"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 4,
 		"units": {
 			"amount": 1
@@ -42,7 +41,6 @@
 								"type": "item",
 								"itemId": "bakery-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}

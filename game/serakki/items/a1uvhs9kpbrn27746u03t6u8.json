@@ -12,7 +12,6 @@
 				"workshop-portal"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"action": {
 			"input": [],

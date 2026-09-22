@@ -12,7 +12,6 @@
 				"armored-beagle-with-sword-and-shield"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 300000,

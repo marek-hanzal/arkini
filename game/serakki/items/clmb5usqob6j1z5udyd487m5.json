@@ -12,7 +12,6 @@
 				"stonemason-camp"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 8,
 		"lines": [
@@ -38,7 +37,6 @@
 								"type": "item",
 								"itemId": "stone-deposit"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					}
@@ -77,7 +75,6 @@
 										"type": "item",
 										"itemId": "stone-deposit"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"

@@ -13,7 +13,6 @@
 				"chicken-coop"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 12,

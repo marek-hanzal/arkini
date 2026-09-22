@@ -14,7 +14,6 @@
 				"tree"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 2700000,

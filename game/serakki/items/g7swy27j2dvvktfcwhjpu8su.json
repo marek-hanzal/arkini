@@ -13,7 +13,6 @@
 				"flower-farm"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -38,7 +37,6 @@
 								"type": "item",
 								"itemId": "flower-field"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -49,7 +47,7 @@
 								"type": "item",
 								"itemId": "bucket-with-water"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -111,7 +109,7 @@
 								"type": "item",
 								"itemId": "stone"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -164,7 +162,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

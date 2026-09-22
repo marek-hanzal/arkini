@@ -12,7 +12,6 @@
 				"dye-workshop-washed"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 30000,

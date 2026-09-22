@@ -13,7 +13,6 @@
 				"spoiled-animal-fat"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

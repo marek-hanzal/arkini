@@ -12,7 +12,6 @@
 				"forester"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": [
@@ -35,7 +34,7 @@
 								"type": "item",
 								"itemId": "tree-seed"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -78,7 +77,6 @@
 										"type": "item",
 										"itemId": "forest"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -107,7 +105,7 @@
 								"type": "item",
 								"itemId": "sack-with-tree-seed"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -159,7 +157,6 @@
 										"type": "item",
 										"itemId": "forest"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -220,7 +217,6 @@
 										"type": "item",
 										"itemId": "forest"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -249,7 +245,6 @@
 								"type": "item",
 								"itemId": "tree"
 							},
-							"scope": "board",
 							"distance": "far"
 						},
 						"mode": "consume",

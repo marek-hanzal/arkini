@@ -14,7 +14,6 @@
 				"cacao-pod"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

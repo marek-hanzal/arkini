@@ -12,7 +12,6 @@
 				"book-t4"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 2,
 		"maxQueueSize": 1,
 		"lines": []

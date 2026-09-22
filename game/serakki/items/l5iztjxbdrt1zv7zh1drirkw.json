@@ -12,7 +12,6 @@
 				"gardener"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 8,
 		"lines": [
@@ -34,7 +33,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -76,7 +75,7 @@
 										"type": "item",
 										"itemId": "grain-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -103,7 +102,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -145,7 +144,7 @@
 										"type": "item",
 										"itemId": "corn-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -172,7 +171,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -214,7 +213,7 @@
 										"type": "item",
 										"itemId": "vegetable-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -241,7 +240,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -283,7 +282,7 @@
 										"type": "item",
 										"itemId": "fruit-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -310,7 +309,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -352,7 +351,7 @@
 										"type": "item",
 										"itemId": "cotton-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -379,7 +378,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -421,7 +420,7 @@
 										"type": "item",
 										"itemId": "flax-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -448,7 +447,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -490,7 +489,7 @@
 										"type": "item",
 										"itemId": "grass-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -517,7 +516,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -559,7 +558,7 @@
 										"type": "item",
 										"itemId": "herbalist"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -586,7 +585,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -628,7 +627,7 @@
 										"type": "item",
 										"itemId": "flower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -655,7 +654,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -697,7 +696,7 @@
 										"type": "item",
 										"itemId": "pumpkin-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -724,7 +723,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -766,7 +765,7 @@
 										"type": "item",
 										"itemId": "grape-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -793,7 +792,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -835,7 +834,7 @@
 										"type": "item",
 										"itemId": "hop-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -862,7 +861,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -904,7 +903,7 @@
 										"type": "item",
 										"itemId": "rapeseed-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -931,7 +930,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -973,7 +972,7 @@
 										"type": "item",
 										"itemId": "sunflower-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1000,7 +999,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1042,7 +1041,7 @@
 										"type": "item",
 										"itemId": "sugar-beet-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1069,7 +1068,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1111,7 +1110,7 @@
 										"type": "item",
 										"itemId": "sugar-cane-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1138,7 +1137,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1180,7 +1179,7 @@
 										"type": "item",
 										"itemId": "coffee-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1207,7 +1206,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1249,7 +1248,7 @@
 										"type": "item",
 										"itemId": "cacao-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1276,7 +1275,7 @@
 								"type": "item",
 								"itemId": "coin"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -1318,7 +1317,7 @@
 										"type": "item",
 										"itemId": "dye-farm"
 									},
-									"scope": "universe"
+									"distance": "universe"
 								},
 								"type": "exists"
 							}
@@ -1345,7 +1344,7 @@
 								"type": "item",
 								"itemId": "paper"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

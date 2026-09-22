@@ -12,7 +12,6 @@
 				"clay-bowl-with-cream"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

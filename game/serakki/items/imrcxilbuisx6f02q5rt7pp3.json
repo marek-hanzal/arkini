@@ -13,7 +13,6 @@
 				"grain-field"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 16,

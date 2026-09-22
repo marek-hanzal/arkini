@@ -12,7 +12,6 @@
 				"rapeseed-oil"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 900000,

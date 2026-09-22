@@ -12,7 +12,6 @@
 				"filter-bank"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 8,

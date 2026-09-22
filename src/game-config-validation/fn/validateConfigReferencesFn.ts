@@ -325,46 +325,6 @@ export const validateConfigReferencesFn = ({
 		});
 	}
 
-	for (const [index, value] of config.start.inventory.entries()) {
-		if (config.items[value.itemId] !== undefined) {
-			continue;
-		}
-		diagnostics.push({
-			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-			severity: DiagnosticSeverityEnumSchema.enum.Error,
-			path: [
-				"start",
-				"inventory",
-				index,
-				"itemId",
-			],
-			source: provenance.start,
-			message: `Initial inventory references missing item ${value.itemId}.`,
-			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-			referenceId: value.itemId,
-		});
-	}
-
-	for (const [index, value] of config.start.toolbar.entries()) {
-		if (config.items[value.itemId] !== undefined) {
-			continue;
-		}
-		diagnostics.push({
-			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-			severity: DiagnosticSeverityEnumSchema.enum.Error,
-			path: [
-				"start",
-				"toolbar",
-				index,
-				"itemId",
-			],
-			source: provenance.start,
-			message: `Initial toolbar references missing item ${value.itemId}.`,
-			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-			referenceId: value.itemId,
-		});
-	}
-
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
 		const action = item.action;

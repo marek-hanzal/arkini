@@ -12,7 +12,6 @@
 				"bakery"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -29,11 +28,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "bucket-with-water"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -44,11 +43,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "flour"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -59,11 +58,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "empty-basket"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

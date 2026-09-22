@@ -12,7 +12,6 @@
 				"laboratory-glassware-with-honey"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

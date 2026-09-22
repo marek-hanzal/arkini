@@ -12,7 +12,6 @@
 				"clay-vase-with-flowers"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 240000,

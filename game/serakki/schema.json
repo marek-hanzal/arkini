@@ -39,7 +39,7 @@
 					"$ref": "urn:serakki:schema:project#/$defs/sfx.SfxSchema"
 				},
 				"start": {
-					"description": "The initial board, inventory, and toolbar contents created for a new game.",
+					"description": "The initial Board contents created for a new game.",
 					"$ref": "urn:serakki:schema:project#/$defs/StartSchema"
 				},
 				"version": {
@@ -93,12 +93,6 @@
 			"additionalProperties": false,
 			"description": "The explicit width and height of a two-dimensional game grid."
 		},
-		"ToolbarSizeSchema": {
-			"type": "integer",
-			"minimum": 0,
-			"maximum": 64,
-			"description": "The optional toolbar slot count from zero through sixty-four."
-		},
 		"MetaSchema": {
 			"type": "object",
 			"properties": {
@@ -117,21 +111,12 @@
 				"board": {
 					"description": "The size of the board on which items are placed.",
 					"$ref": "urn:serakki:schema:project#/$defs/grid.SizeSchema"
-				},
-				"inventory": {
-					"description": "The size of the inventory grid available to the player.",
-					"$ref": "urn:serakki:schema:project#/$defs/grid.SizeSchema"
-				},
-				"toolbarSize": {
-					"description": "The optional one-row toolbar slot count; zero or undefined disables it.",
-					"$ref": "urn:serakki:schema:project#/$defs/ToolbarSizeSchema"
 				}
 			},
 			"required": [
 				"id",
 				"title",
-				"board",
-				"inventory"
+				"board"
 			],
 			"additionalProperties": false,
 			"description": "Core metadata and player-available layouts for a game."
@@ -277,73 +262,6 @@
 			"additionalProperties": false,
 			"description": "One canonical item placed at an explicit initial board coordinate."
 		},
-		"start.InventoryItemSchema": {
-			"type": "object",
-			"properties": {
-				"itemId": {
-					"description": "The canonical item ID added to the initial inventory.",
-					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-				},
-				"position": {
-					"description": "The exact initial inventory slot occupied by this stack.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositionSchema"
-				},
-				"quantity": {
-					"default": 1,
-					"description": "The positive initial inventory quantity; defaults to one.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
-				}
-			},
-			"required": [
-				"itemId",
-				"position",
-				"quantity"
-			],
-			"additionalProperties": false,
-			"description": "A positive quantity of one canonical item in the initial inventory."
-		},
-		"PositionSchema": {
-			"type": "object",
-			"properties": {
-				"x": {
-					"description": "The zero-based horizontal grid coordinate.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				},
-				"y": {
-					"description": "The zero-based vertical grid coordinate.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				}
-			},
-			"required": [
-				"x",
-				"y"
-			],
-			"additionalProperties": false,
-			"description": "One zero-based position in a two-dimensional game grid."
-		},
-		"start.ToolbarItemSchema": {
-			"type": "object",
-			"properties": {
-				"itemId": {
-					"description": "The canonical item ID placed in the initial toolbar.",
-					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-				},
-				"quantity": {
-					"description": "The optional stack quantity placed in this exact initial toolbar slot; omitted means one.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"position": {
-					"description": "The exact zero-based initial toolbar slot.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositionSchema"
-				}
-			},
-			"required": [
-				"itemId",
-				"position"
-			],
-			"additionalProperties": false,
-			"description": "One canonical item placed at an explicit initial toolbar slot."
-		},
 		"StartSchema": {
 			"type": "object",
 			"properties": {
@@ -358,29 +276,11 @@
 					"items": {
 						"$ref": "urn:serakki:schema:project#/$defs/start.BoardItemSchema"
 					}
-				},
-				"inventory": {
-					"default": [],
-					"description": "The item quantities added to inventory when a new game starts.",
-					"type": "array",
-					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/start.InventoryItemSchema"
-					}
-				},
-				"toolbar": {
-					"default": [],
-					"description": "The items placed at explicit slots when a new game starts.",
-					"type": "array",
-					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/start.ToolbarItemSchema"
-					}
 				}
 			},
 			"required": [
 				"currentSpace",
-				"board",
-				"inventory",
-				"toolbar"
+				"board"
 			],
 			"additionalProperties": false,
 			"description": "The initial board placements, inventory contents, and toolbar placements for a new game."
@@ -486,16 +386,6 @@
 			],
 			"additionalProperties": false,
 			"description": "The visual artwork definition for a game item."
-		},
-		"scope.StorageSchema": {
-			"type": "string",
-			"enum": [
-				"board",
-				"inventory",
-				"toolbar",
-				"any"
-			],
-			"description": "Where one canonical item may physically exist in grid state."
 		},
 		"UnitsSchema": {
 			"type": "object",
@@ -662,32 +552,6 @@
 			"additionalProperties": false,
 			"description": "A condition that checks whether an item query returns any quantity."
 		},
-		"query.BoardSchema": {
-			"type": "object",
-			"properties": {
-				"selector": {
-					"description": "The canonical item used to select query candidates.",
-					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
-				},
-				"scope": {
-					"type": "string",
-					"enum": [
-						"board"
-					],
-					"description": "Identifies this query as a board-only query."
-				},
-				"distance": {
-					"$ref": "urn:serakki:schema:project#/$defs/DistanceSchema"
-				}
-			},
-			"required": [
-				"selector",
-				"scope",
-				"distance"
-			],
-			"additionalProperties": false,
-			"description": "A board-only item query constrained by a required board distance."
-		},
 		"SelectorSchema": {
 			"type": "object",
 			"properties": {
@@ -714,117 +578,28 @@
 				"close",
 				"near-close",
 				"near",
-				"far"
+				"far",
+				"universe"
 			],
 			"description": "Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance."
 		},
-		"query.InventorySchema": {
-			"type": "object",
-			"properties": {
-				"selector": {
-					"description": "The canonical item used to select query candidates.",
-					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
-				},
-				"scope": {
-					"type": "string",
-					"enum": [
-						"inventory"
-					],
-					"description": "Identifies this query as an inventory-only query."
-				}
-			},
-			"required": [
-				"selector",
-				"scope"
-			],
-			"additionalProperties": false,
-			"description": "An inventory-only item query without a board distance."
-		},
-		"query.ToolbarSchema": {
-			"type": "object",
-			"properties": {
-				"selector": {
-					"description": "The canonical item used to select query candidates.",
-					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
-				},
-				"scope": {
-					"type": "string",
-					"enum": [
-						"toolbar"
-					],
-					"description": "Identifies this query as a toolbar-only query."
-				}
-			},
-			"required": [
-				"selector",
-				"scope"
-			],
-			"additionalProperties": false,
-			"description": "A toolbar-only item query without a board distance."
-		},
-		"query.AnySchema": {
-			"type": "object",
-			"properties": {
-				"selector": {
-					"description": "The canonical item used to select query candidates.",
-					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
-				},
-				"scope": {
-					"type": "string",
-					"enum": [
-						"any"
-					],
-					"description": "Identifies this query as one that searches the origin-space board, shared inventory, and toolbar."
-				}
-			},
-			"required": [
-				"selector",
-				"scope"
-			],
-			"additionalProperties": false,
-			"description": "An item query that searches the origin-space board, shared inventory, and toolbar without a distance."
-		},
-		"query.UniverseSchema": {
-			"type": "object",
-			"properties": {
-				"selector": {
-					"description": "The canonical item used to select query candidates.",
-					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
-				},
-				"scope": {
-					"type": "string",
-					"enum": [
-						"universe"
-					],
-					"description": "Searches every board space plus both passive storage surfaces."
-				}
-			},
-			"required": [
-				"selector",
-				"scope"
-			],
-			"additionalProperties": false,
-			"description": "A universe-wide item query across every board space and both passive storage surfaces without distance."
-		},
 		"QuerySchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/query.BoardSchema"
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
 				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/query.InventorySchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/query.ToolbarSchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/query.AnySchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/query.UniverseSchema"
+				"distance": {
+					"$ref": "urn:serakki:schema:project#/$defs/DistanceSchema"
 				}
+			},
+			"required": [
+				"selector",
+				"distance"
 			],
-			"description": "A board, exact passive-storage, local combined, or universe-wide item query selected by scope."
+			"additionalProperties": false,
+			"description": "An item selector and its spatial reach from self through the whole universe."
 		},
 		"when.CountSchema": {
 			"type": "object",
@@ -1359,50 +1134,7 @@
 			"description": "A rule that disables an immediate item action when its conditions pass."
 		},
 		"itemAction.ActionSchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/itemAction.SpaceActionSchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/itemAction.InventoryActionSchema"
-				}
-			],
-			"description": "One immediate item action selected by its type discriminator."
-		},
-		"itemAction.SpaceActionSchema": {
-			"type": "object",
-			"properties": {
-				"input": {
-					"default": [],
-					"type": "array",
-					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/action.InputSchema"
-					}
-				},
-				"rules": {
-					"default": [],
-					"type": "array",
-					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/action.RuleSchema"
-					}
-				},
-				"type": {
-					"type": "string",
-					"const": "space"
-				},
-				"space": {
-					"description": "The board space selected after successful activation.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				}
-			},
-			"required": [
-				"input",
-				"rules",
-				"type",
-				"space"
-			],
-			"additionalProperties": false,
-			"description": "An immediate action whose requirements settle atomically with navigation."
+			"$ref": "urn:serakki:schema:project#/$defs/itemAction.SpaceActionSchema"
 		},
 		"action.InputSchema": {
 			"oneOf": [
@@ -1479,7 +1211,7 @@
 				},
 				"query": {
 					"description": "The board query used to select one target with units for this input.",
-					"$ref": "urn:serakki:schema:project#/$defs/query.BoardSchema"
+					"$ref": "urn:serakki:schema:project#/$defs/QuerySchema"
 				}
 			},
 			"required": [
@@ -1489,7 +1221,7 @@
 			"additionalProperties": false,
 			"description": "A board query that resolves one Board item that can pay units."
 		},
-		"itemAction.InventoryActionSchema": {
+		"itemAction.SpaceActionSchema": {
 			"type": "object",
 			"properties": {
 				"input": {
@@ -1508,16 +1240,21 @@
 				},
 				"type": {
 					"type": "string",
-					"const": "inventory"
+					"const": "space"
+				},
+				"space": {
+					"description": "The board space selected after successful activation.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
 				}
 			},
 			"required": [
 				"input",
 				"rules",
-				"type"
+				"type",
+				"space"
 			],
 			"additionalProperties": false,
-			"description": "An immediate action opening the Inventory screen."
+			"description": "An immediate action whose requirements settle atomically with navigation."
 		},
 		"LineSchema": {
 			"type": "object",
@@ -1887,10 +1624,6 @@
 					"description": "The visual artwork definition used to render this item.",
 					"$ref": "urn:serakki:schema:project#/$defs/ArtworkSchema"
 				},
-				"scope": {
-					"description": "The part of game state in which this item may be stored.",
-					"$ref": "urn:serakki:schema:project#/$defs/scope.StorageSchema"
-				},
 				"maxStackSize": {
 					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
 					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
@@ -1939,7 +1672,6 @@
 				"title",
 				"ui",
 				"artwork",
-				"scope",
 				"maxStackSize",
 				"maxQueueSize",
 				"lines"

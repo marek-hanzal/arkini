@@ -23,7 +23,7 @@ The foundational schema direction is explicit:
 
 - `game-value` imports only Zod. It owns scalar meaning, not an aggregate, role, lifecycle or behavior.
 - Config, Item, Location, Production, queries and other authored contracts may compose those exact scalars directly.
-- `game-config → item-definition + game-start + game-value + item-location + sfx-event` because `GameConfigSchema` is the completed authored aggregate, `MetaSchema` composes Board/Toolbar layout schemas, and SFX assignments use the exact shared event vocabulary.
+- `game-config → item-definition + game-start + game-value + item-location + sfx-event` because `GameConfigSchema` is the completed authored aggregate, `MetaSchema` composes Board layout schema, and SFX assignments use the exact shared event vocabulary.
 - `item-definition → production-line + item-action + item-schedule + item-merge + game-value` because Item capabilities embed those authored contracts.
 - Production behavior reads Item definitions, so that domain-level pair still crosses schema composition in one direction and behavior in the other.
 

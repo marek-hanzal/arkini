@@ -50,7 +50,7 @@ export const GameSourceSchema = z
 		 * Optional new-game state contributed by this source fragment.
 		 */
 		start: StartSchema.optional().describe(
-			"The optional initial board, inventory, and toolbar state contributed by this source fragment.",
+			"The optional initial Board state contributed by this source fragment.",
 		),
 		/**
 		 * Optional canonical items contributed by this source fragment.

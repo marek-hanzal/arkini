@@ -12,7 +12,6 @@
 				"lit-base-camp"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 300000,

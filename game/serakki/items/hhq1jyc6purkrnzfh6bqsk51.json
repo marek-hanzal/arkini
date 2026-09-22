@@ -12,7 +12,6 @@
 				"ash"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 8,
 		"merge": [
 			{

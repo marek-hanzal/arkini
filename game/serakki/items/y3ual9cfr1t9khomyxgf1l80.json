@@ -12,7 +12,6 @@
 				"cauldron-with-coffee"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

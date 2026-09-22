@@ -14,7 +14,6 @@
 				"wool"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -142,7 +141,6 @@
 								"type": "item",
 								"itemId": "quest-wool-t1"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -153,7 +151,7 @@
 								"type": "item",
 								"itemId": "wool"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

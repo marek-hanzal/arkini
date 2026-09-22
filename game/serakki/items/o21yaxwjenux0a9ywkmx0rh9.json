@@ -12,7 +12,6 @@
 				"cut-grass"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"merge": [
 			{

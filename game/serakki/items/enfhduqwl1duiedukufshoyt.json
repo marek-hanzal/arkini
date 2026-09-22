@@ -12,7 +12,6 @@
 				"apiary"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
@@ -37,7 +36,6 @@
 								"type": "item",
 								"itemId": "beehive"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -52,7 +50,6 @@
 								"type": "item",
 								"itemId": "flower-field"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					}
@@ -91,7 +88,6 @@
 										"type": "item",
 										"itemId": "beehive"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -108,7 +104,6 @@
 										"type": "item",
 										"itemId": "flower-field"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"
@@ -135,7 +130,7 @@
 								"type": "item",
 								"itemId": "wood"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -150,7 +145,7 @@
 								"type": "item",
 								"itemId": "planks"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -165,7 +160,7 @@
 								"type": "item",
 								"itemId": "stone"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -222,7 +217,6 @@
 								"type": "item",
 								"itemId": "empty-beehive"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -233,7 +227,7 @@
 								"type": "item",
 								"itemId": "flowers"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

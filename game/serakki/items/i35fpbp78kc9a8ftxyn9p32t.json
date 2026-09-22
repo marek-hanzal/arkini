@@ -13,7 +13,6 @@
 				"cacao-seed"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

@@ -12,7 +12,6 @@
 				"beeswax"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 6,
 		"merge": [
 			{

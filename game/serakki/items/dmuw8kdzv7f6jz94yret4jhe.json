@@ -13,7 +13,6 @@
 				"stonemason-camp"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -42,7 +41,6 @@
 								"type": "item",
 								"itemId": "stonemason-camp-blueprint"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					},
@@ -53,7 +51,7 @@
 								"type": "item",
 								"itemId": "wood"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -68,7 +66,7 @@
 								"type": "item",
 								"itemId": "stone"
 							},
-							"scope": "any"
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

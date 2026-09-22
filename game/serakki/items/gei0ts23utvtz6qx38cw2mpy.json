@@ -12,7 +12,6 @@
 				"medicine-jar"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

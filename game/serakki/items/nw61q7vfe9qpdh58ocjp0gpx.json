@@ -12,7 +12,6 @@
 				"foundation-chest"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -41,7 +40,6 @@
 								"type": "item",
 								"itemId": "foundation-chest"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}

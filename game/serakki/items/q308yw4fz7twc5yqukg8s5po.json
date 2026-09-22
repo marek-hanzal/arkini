@@ -12,7 +12,6 @@
 				"clay-jug-with-water"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 3,
 		"maxQueueSize": 1,
 		"lines": []

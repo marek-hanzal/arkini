@@ -87,10 +87,6 @@ const readStartQuantityByItemIdFn = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<string, number>();
 	for (const item of config.start.board)
 		addStartQuantityFn(quantities, item.itemId, item.quantity);
-	for (const item of config.start.inventory)
-		addStartQuantityFn(quantities, item.itemId, item.quantity);
-	for (const item of config.start.toolbar)
-		addStartQuantityFn(quantities, item.itemId, item.quantity);
 	return quantities;
 };
 

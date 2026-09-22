@@ -12,7 +12,6 @@
 				"british-shorthair-in-sack"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 15000,

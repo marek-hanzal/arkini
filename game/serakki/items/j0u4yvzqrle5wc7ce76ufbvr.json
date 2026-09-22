@@ -13,7 +13,6 @@
 				"paper-shredded"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 16,
 		"merge": [
 			{

@@ -12,7 +12,6 @@
 				"wishing-well-with-wine"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 5000,

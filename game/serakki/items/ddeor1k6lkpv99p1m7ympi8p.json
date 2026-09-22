@@ -12,7 +12,6 @@
 				"pumpkin"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 1800000,

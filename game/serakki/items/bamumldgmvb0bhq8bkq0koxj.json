@@ -12,7 +12,6 @@
 				"british-shorthair-kitten"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -102,7 +101,6 @@
 								"type": "item",
 								"itemId": "british-shorthair-kitten"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -155,7 +153,6 @@
 								"type": "item",
 								"itemId": "british-shorthair-kitten"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -217,7 +214,6 @@
 								"type": "item",
 								"itemId": "british-shorthair-kitten"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -271,7 +267,6 @@
 								"type": "item",
 								"itemId": "british-shorthair-kitten"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -309,7 +304,6 @@
 										"type": "item",
 										"itemId": "disease"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -342,7 +336,6 @@
 								"type": "item",
 								"itemId": "british-shorthair-kitten"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -380,7 +373,6 @@
 										"type": "item",
 										"itemId": "plague"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -413,7 +405,6 @@
 								"type": "item",
 								"itemId": "british-shorthair"
 							},
-							"scope": "board",
 							"distance": "near-close"
 						}
 					},
@@ -428,7 +419,6 @@
 								"type": "item",
 								"itemId": "british-shorthair-kitten"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -466,7 +456,6 @@
 										"type": "item",
 										"itemId": "british-shorthair"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"

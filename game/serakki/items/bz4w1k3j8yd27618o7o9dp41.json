@@ -12,7 +12,6 @@
 				"sack-with-water"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,

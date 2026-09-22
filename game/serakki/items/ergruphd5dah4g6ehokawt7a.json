@@ -13,7 +13,6 @@
 				"grain-seed"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"merge": [
 			{

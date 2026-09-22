@@ -12,7 +12,6 @@
 				"luxury-clothes"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 2,
 		"maxQueueSize": 1,
 		"lines": []

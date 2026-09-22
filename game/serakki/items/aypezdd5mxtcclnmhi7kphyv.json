@@ -12,7 +12,6 @@
 				"inkwell"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 4,
 		"units": {
 			"amount": 8,

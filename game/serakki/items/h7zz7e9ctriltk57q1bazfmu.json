@@ -12,7 +12,6 @@
 				"recovering-cow"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -64,7 +63,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -117,7 +115,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -170,7 +167,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -224,7 +220,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -262,7 +257,6 @@
 										"type": "item",
 										"itemId": "disease"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -295,7 +289,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -333,7 +326,6 @@
 										"type": "item",
 										"itemId": "plague"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -366,7 +358,6 @@
 								"type": "item",
 								"itemId": "wolf"
 							},
-							"scope": "board",
 							"distance": "near"
 						}
 					},
@@ -381,7 +372,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -437,7 +427,6 @@
 										"type": "item",
 										"itemId": "wolf"
 									},
-									"scope": "board",
 									"distance": "near"
 								},
 								"type": "exists"
@@ -470,7 +459,6 @@
 								"type": "item",
 								"itemId": "wolf"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					},
@@ -485,7 +473,6 @@
 								"type": "item",
 								"itemId": "recovering-cow"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -541,7 +528,6 @@
 										"type": "item",
 										"itemId": "wolf"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"

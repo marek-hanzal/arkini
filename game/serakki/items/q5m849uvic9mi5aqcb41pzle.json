@@ -12,7 +12,6 @@
 				"bedding"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 4,
 		"merge": [
 			{

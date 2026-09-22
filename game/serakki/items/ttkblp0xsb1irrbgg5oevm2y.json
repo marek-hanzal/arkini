@@ -12,7 +12,6 @@
 				"paper"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 32,
 		"merge": [
 			{

@@ -12,7 +12,6 @@
 				"cocoa-beans"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 900000,

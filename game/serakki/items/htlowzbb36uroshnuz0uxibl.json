@@ -12,7 +12,6 @@
 				"glassworks"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 6,
 		"lines": [
@@ -29,11 +28,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "sand"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -44,11 +43,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "coal"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -96,11 +95,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "sand"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -111,11 +110,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "coal"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -126,11 +125,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "dye"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {

@@ -12,7 +12,6 @@
 				"hunted-game"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -69,7 +68,6 @@
 								"type": "item",
 								"itemId": "hunted-game"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}

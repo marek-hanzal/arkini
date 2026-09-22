@@ -12,7 +12,6 @@
 				"hungry-beagle"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"units": {
 			"amount": 1
@@ -64,7 +63,6 @@
 								"type": "item",
 								"itemId": "hungry-beagle"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -117,7 +115,6 @@
 								"type": "item",
 								"itemId": "hungry-beagle"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -171,7 +168,6 @@
 								"type": "item",
 								"itemId": "hungry-beagle"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -209,7 +205,6 @@
 										"type": "item",
 										"itemId": "disease"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -242,7 +237,6 @@
 								"type": "item",
 								"itemId": "hungry-beagle"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -280,7 +274,6 @@
 										"type": "item",
 										"itemId": "plague"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"
@@ -309,7 +302,6 @@
 								"type": "item",
 								"itemId": "raw-game-meat"
 							},
-							"scope": "board",
 							"distance": "near-close"
 						},
 						"mode": "consume",
@@ -329,7 +321,6 @@
 								"type": "item",
 								"itemId": "hungry-beagle"
 							},
-							"scope": "board",
 							"distance": "self"
 						}
 					}
@@ -367,7 +358,6 @@
 										"type": "item",
 										"itemId": "raw-game-meat"
 									},
-									"scope": "board",
 									"distance": "near-close"
 								},
 								"type": "exists"

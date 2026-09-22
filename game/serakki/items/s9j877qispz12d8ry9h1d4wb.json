@@ -12,7 +12,6 @@
 				"water-bucket"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 8,
 		"merge": [
 			{

@@ -63,11 +63,11 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-location` | Runtime locations, ownership-derived physical origins, grid claims, distances and location rejection | [`src/item-location/schema/LocationSchema.ts`](src/item-location/schema/LocationSchema.ts) |
 | `item-resolution` | Canonical configured Item lookup | [`src/item-resolution/fx/resolveItemFx.ts`](src/item-resolution/fx/resolveItemFx.ts) |
 | `item-query` | Authored query contracts and pinned-Runtime execution | [`src/item-query/fx/queryFx.ts`](src/item-query/fx/queryFx.ts) |
-| `item-placement` | Scope-aware stack, spawn and existing-item placement | [`src/item-placement/fx/planScopePlacementFx.ts`](src/item-placement/fx/planScopePlacementFx.ts) |
+| `item-placement` | Board stack, spawn and existing-item placement | [`src/item-placement/fx/planScopePlacementFx.ts`](src/item-placement/fx/planScopePlacementFx.ts) |
 | `item-merge` | Directional merge admission and atomic lifecycle | [`src/item-merge/fx/mergeItemsFx.ts`](src/item-merge/fx/mergeItemsFx.ts) |
 | `item-state-isolation` | Identity-bound owner isolation and remainder placement | [`src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts`](src/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx.ts) |
 | `item-interaction` | Drop preview/commit, release, split, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
-| `item-action` | Immediate inventory/space action admission and unit settlement | [`src/item-action/fx/activateItemActionFx.ts`](src/item-action/fx/activateItemActionFx.ts) |
+| `item-action` | Immediate space action admission and unit settlement | [`src/item-action/fx/activateItemActionFx.ts`](src/item-action/fx/activateItemActionFx.ts) |
 
 [`GAME.MD`](GAME.MD) owns gameplay meaning. The Runtime map owns state and lifecycle navigation.
 
@@ -92,7 +92,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `tile-rendering` | Pixi application, native actors, visuals and animation channels | [`src/tile-rendering/fx/createApplicationOwnerFx.ts`](src/tile-rendering/fx/createApplicationOwnerFx.ts) |
 | `tile-motion` | Cue lanes, choreography and playback | [`src/tile-motion/fx/createMotionRuntimeFx.ts`](src/tile-motion/fx/createMotionRuntimeFx.ts) |
 | `tile-interaction` | Pointer gestures, drop execution and command admission | [`src/tile-interaction/fx/createMainDragControllerFx.ts`](src/tile-interaction/fx/createMainDragControllerFx.ts) |
-| `game-scene` | Concrete retained Board, Toolbar and Inventory scenes | [`src/game-scene/README.md`](src/game-scene/README.md) |
+| `game-scene` | Concrete retained Board scene | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | `item-detail-read` | Shared framework-neutral detail reads | [`src/item-detail-read/fx/readItemDetailQueueFx.ts`](src/item-detail-read/fx/readItemDetailQueueFx.ts) |
 | `item-detail-frame` | Visible detail target and modal lifecycle | [`src/item-detail-frame/fx/createItemDetailControllerFx.ts`](src/item-detail-frame/fx/createItemDetailControllerFx.ts) |
 | `item-line-detail` | Framework-neutral Item Line reads | [`src/item-line-detail/fx/readItemDetailLinesFx.ts`](src/item-line-detail/fx/readItemDetailLinesFx.ts) |
@@ -102,7 +102,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `sfx-event` | Assignable SFX vocabulary across committed gameplay and explicit presentation interactions | [`src/sfx-event/schema/SfxEventEnumSchema.ts`](src/sfx-event/schema/SfxEventEnumSchema.ts) |
 | `game-menu` | Menu overlay, save/close command and navigation intent | [`src/game-menu/ui/GameMenu.tsx`](src/game-menu/ui/GameMenu.tsx) |
 | `game-cheat` | Save-scoped cheats, catalog and command UI | [`src/game-cheat/ui/Cheats.tsx`](src/game-cheat/ui/Cheats.tsx) |
-| `game-shell` | Board/Inventory leaves and gameplay overlay composition | [`src/game-shell/ui/GameShell.tsx`](src/game-shell/ui/GameShell.tsx) |
+| `game-shell` | Board leaves and gameplay overlay composition | [`src/game-shell/ui/GameShell.tsx`](src/game-shell/ui/GameShell.tsx) |
 
 ## Authored source and artifacts
 

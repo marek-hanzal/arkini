@@ -12,7 +12,6 @@
 				"flax"
 			]
 		},
-		"scope": "board",
 		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 3600000,

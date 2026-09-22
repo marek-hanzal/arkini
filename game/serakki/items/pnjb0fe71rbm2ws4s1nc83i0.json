@@ -13,7 +13,6 @@
 				"spoiled-sugar-cane-seed"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []

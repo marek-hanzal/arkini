@@ -12,7 +12,6 @@
 				"bubble-maker"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": [
@@ -37,7 +36,6 @@
 								"type": "item",
 								"itemId": "bubble-reservoir"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					}
@@ -76,7 +74,6 @@
 										"type": "item",
 										"itemId": "bubble-reservoir"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"

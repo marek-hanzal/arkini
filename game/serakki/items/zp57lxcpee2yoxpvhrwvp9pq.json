@@ -12,7 +12,6 @@
 				"air-purifier"
 			]
 		},
-		"scope": "any",
 		"maxStackSize": 1,
 		"maxQueueSize": 12,
 		"lines": [
@@ -29,11 +28,11 @@
 					{
 						"type": "materials",
 						"query": {
-							"scope": "any",
 							"selector": {
 								"type": "item",
 								"itemId": "air-pollution"
-							}
+							},
+							"distance": "far"
 						},
 						"mode": "consume",
 						"quantity": {
@@ -52,7 +51,6 @@
 								"type": "item",
 								"itemId": "filter-bank"
 							},
-							"scope": "board",
 							"distance": "close"
 						}
 					}
@@ -67,7 +65,6 @@
 										"type": "item",
 										"itemId": "filter-bank"
 									},
-									"scope": "board",
 									"distance": "close"
 								},
 								"type": "exists"

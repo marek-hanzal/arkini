@@ -49,6 +49,22 @@
 	transform: translateY(20%);
 }
 
+[data-ui="LauncherPagePanel"][data-page="main-menu"]:has(.main-menu-continue) {
+	max-width: 34.5rem;
+}
+
+[data-ui="MainMenu"]:has(.main-menu-continue) {
+	width: 66.666667%;
+	margin-inline: auto;
+}
+
+[data-ui="MainMenu"] .main-menu-continue {
+	width: 120%;
+	margin-left: -10%;
+	min-height: calc(var(--ak-control-min-height) * 1.5);
+	font-size: calc(var(--ak-control-font-size) * 1.5);
+}
+
 [data-ui="MainMenu"] .main-menu-tinted-action {
 	background-color: var(--ak-surface-raised);
 	background-image: linear-gradient(

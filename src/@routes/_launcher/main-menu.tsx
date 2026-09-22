@@ -69,9 +69,9 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 									params={{
 										packageId: SerakkiDefaultPackageId,
 									}}
-									className="rounded-xl"
+									className="main-menu-continue rounded-xl"
 								>
-									Continue <ArrowRight className="ml-2 size-5" />
+									Continue <ArrowRight className="ml-3 size-[1.875rem]" />
 								</PrimaryButtonLink>
 							)}
 							{hasSave ? (

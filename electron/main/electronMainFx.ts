@@ -73,6 +73,8 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 					directoryPath: "",
 					writeFx: () => Effect.void,
 					writeApplicationFx: () => Effect.void,
+					readLastGameFx: Effect.succeed(null),
+					snapshotFx: Effect.fail(new Error("Serakki diagnostic logs are unavailable.")),
 					openDirectoryFx: Effect.void,
 					closeFx: Effect.void,
 				};

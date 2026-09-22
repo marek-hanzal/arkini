@@ -238,6 +238,7 @@ const api: SerakkiElectronApi.Api = {
 			ipcRenderer.invoke(SerakkiElectronApi.channels.diagnosticsWriteApplication, record),
 		openDirectoryFn: () =>
 			ipcRenderer.invoke(SerakkiElectronApi.channels.diagnosticsOpenDirectory),
+		exportFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.diagnosticsExport),
 	},
 	incident: {
 		writeFn: (incident) =>

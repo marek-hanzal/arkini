@@ -82,6 +82,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 				? {
 						packageId: props.serapack.packageId,
 						contentHash: props.serapack.contentHash,
+						provenance: props.serapack.provenance.type,
 						serakki: props.serapack.serakki,
 						gameVersion: props.serapack.version,
 					}

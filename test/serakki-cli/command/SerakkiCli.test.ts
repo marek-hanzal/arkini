@@ -284,8 +284,8 @@ describe("game incident CLI", () => {
 	it("renders the latest failed session from the current rotating JSONL contract", async () => {
 		const logs = join(root, "logs");
 		await mkdir(logs);
-		const rotated = join(logs, "diagnostics.jsonl.1");
-		const current = join(logs, "diagnostics.jsonl");
+		const rotated = join(logs, "support.jsonl.1");
+		const current = join(logs, "support.jsonl");
 		await writeFile(
 			rotated,
 			`${diagnosticLogLine({
@@ -314,6 +314,7 @@ describe("game incident CLI", () => {
 					applicationVersion: "0.5.0",
 					packageId: "game:test",
 					contentHash: "hash:test",
+					provenance: "official",
 					gameVersion: "1.0",
 					serakki: "0.5.0",
 					restored: true,

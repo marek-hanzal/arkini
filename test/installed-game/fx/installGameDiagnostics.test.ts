@@ -74,6 +74,7 @@ describe("Game diagnostics", () => {
 						writeFn: write,
 						writeApplicationFn: () => Promise.resolve(),
 						openDirectoryFn: () => Promise.resolve(),
+						exportFn: () => Promise.resolve(false),
 					},
 					incident: {
 						writeFn: () => Promise.resolve(),

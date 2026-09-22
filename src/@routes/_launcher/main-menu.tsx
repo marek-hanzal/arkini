@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 import { Cause, Effect } from "effect";
@@ -14,6 +14,7 @@ import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/ui/Bu
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { MainMenuExitCommandAtom } from "~/launcher/atom/MainMenuExitCommandAtom";
 import { LauncherPageLayout } from "~/launcher/ui/LauncherPageLayout";
+import { ExportDiagnosticsAtom } from "~/application-diagnostics/atom/ExportDiagnosticsAtom";
 
 export const Route = createFileRoute("/_launcher/main-menu")({
 	staleTime: 0,
@@ -38,8 +39,10 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 		const { state: catalogState } = useSerapacks();
 		const startup = useAtomValue(LauncherStartupAtom);
 		const [exitState, requestExitFn] = useAtom(MainMenuExitCommandAtom);
+		const [diagnosticsExportState, exportDiagnosticsFn] = useAtom(ExportDiagnosticsAtom);
 		const editorStatus = useAtomValue(EditorServiceStatusAtom);
 		const exitPending = exitState.kind === "pending";
+		const diagnosticsExportPending = diagnosticsExportState.kind === "pending";
 		const defaultPackageAvailable =
 			AsyncResult.isSuccess(startup) &&
 			!startup.waiting &&
@@ -202,8 +205,20 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 					>
 						Exit
 					</Button>
+					<button
+						type="button"
+						className="mx-auto inline-flex items-center gap-2 pt-1 text-sm font-semibold text-white underline underline-offset-4 transition-colors hover:text-accent disabled:cursor-progress disabled:opacity-70"
+						data-ui="ExportDiagnostics"
+						disabled={diagnosticsExportPending}
+						onClick={() => exportDiagnosticsFn(undefined)}
+					>
+						{diagnosticsExportPending ? (
+							<LoaderCircle className="size-4 animate-spin" />
+						) : null}
+						Export diagnostics
+					</button>
 					<p
-						className="pt-1 text-center text-xs text-subtle"
+						className="text-center text-xs text-subtle"
 						data-ui="SerakkiAppVersion"
 					>
 						v{SerakkiAppVersion}
@@ -221,6 +236,10 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 					) : exitState.kind === "error" ? (
 						<p className="text-center text-sm text-danger">
 							Exit failed: {String(exitState.error)}
+						</p>
+					) : diagnosticsExportState.kind === "error" ? (
+						<p className="text-center text-sm text-danger">
+							Export failed: {String(diagnosticsExportState.error)}
 						</p>
 					) : exitState.kind === "requested" ? (
 						<p className="text-center text-sm text-muted">Exit requested.</p>

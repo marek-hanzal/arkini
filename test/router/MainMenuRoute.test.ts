@@ -48,6 +48,21 @@ describe("MainMenu", () => {
 		false,
 		true,
 	])("uses the effective default package and guards new game (saved=%s)", async (saved) => {
+		let resolveExportFn: ((saved: boolean) => void) | undefined;
+		const exportFn = vi.fn(
+			() =>
+				new Promise<boolean>((resolve) => {
+					resolveExportFn = resolve;
+				}),
+		);
+		Object.defineProperty(window, "serakki", {
+			configurable: true,
+			value: {
+				diagnostics: {
+					exportFn,
+				},
+			},
+		});
 		vi.spyOn(MainMenuRouteDefinition, "useLoaderData").mockReturnValue(
 			saved
 				? [
@@ -247,8 +262,26 @@ describe("MainMenu", () => {
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");
 		expect(
+			container.querySelector<HTMLElement>('[data-ui="ExportDiagnostics"]')?.textContent,
+		).toContain("Export diagnostics");
+		expect(
 			container.querySelector<HTMLElement>('[data-ui="SerakkiAppVersion"]')?.textContent,
 		).toBe(`v${SerakkiAppVersion}`);
+		const exportDiagnostics = container.querySelector<HTMLButtonElement>(
+			'[data-ui="ExportDiagnostics"]',
+		);
+		if (exportDiagnostics === null) throw new Error("Expected diagnostics export button.");
+		await act(async () => exportDiagnostics.click());
+		await vi.waitFor(() => {
+			expect(exportFn).toHaveBeenCalledOnce();
+			expect(exportDiagnostics.disabled).toBe(true);
+			expect(exportDiagnostics.querySelector(".animate-spin")).not.toBeNull();
+		});
+		await act(async () => {
+			resolveExportFn?.(false);
+			await Promise.resolve();
+		});
+		await vi.waitFor(() => expect(exportDiagnostics.disabled).toBe(false));
 
 		const exit = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Exit",

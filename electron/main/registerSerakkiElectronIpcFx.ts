@@ -6,6 +6,7 @@ import {
 	dialog,
 	ipcMain,
 	nativeTheme,
+	screen,
 	shell,
 	type IpcMainInvokeEvent,
 } from "electron";
@@ -35,6 +36,7 @@ import type { EditorProjectServiceOwnership } from "~/project-authoring/service/
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { z } from "zod";
 import { requestApplicationHardResetFx } from "./requestApplicationHardResetFx";
+import { exportDiagnosticsBundleFx } from "./diagnostics/exportDiagnosticsBundleFx";
 
 let registered = false;
 const maxClipboardTextLength = 65_536;
@@ -201,6 +203,29 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 				);
 				ipcMain.handle(SerakkiElectronApi.channels.diagnosticsOpenDirectory, (event) =>
 					runAuthorizedFn(event, diagnostics.openDirectoryFx),
+				);
+				ipcMain.handle(SerakkiElectronApi.channels.diagnosticsExport, (event) =>
+					runAuthorizedFn(
+						event,
+						Effect.gen(function* () {
+							const window = BrowserWindow.fromWebContents(event.sender);
+							if (window === null)
+								return yield* Effect.fail(
+									new Error("The diagnostics export window is unavailable."),
+								);
+							const display = screen.getDisplayMatching(window.getBounds());
+							return yield* exportDiagnosticsBundleFx({
+								diagnostics,
+								display: {
+									width: display.size.width,
+									height: display.size.height,
+									scaleFactor: display.scaleFactor,
+								},
+								saves,
+								window,
+							});
+						}),
+					),
 				);
 				ipcMain.handle(SerakkiElectronApi.channels.incidentWrite, (event, candidate) =>
 					runAuthorizedFn(
@@ -408,6 +433,7 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 						SerakkiElectronApi.channels.diagnosticsWrite,
 						SerakkiElectronApi.channels.diagnosticsWriteApplication,
 						SerakkiElectronApi.channels.diagnosticsOpenDirectory,
+						SerakkiElectronApi.channels.diagnosticsExport,
 						SerakkiElectronApi.channels.incidentWrite,
 						SerakkiElectronApi.channels.userDataOpenDirectory,
 						SerakkiElectronApi.channels.userDataHardReset,

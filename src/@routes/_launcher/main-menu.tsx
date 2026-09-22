@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue } from "@effect/atom-react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
 import { Cause, Effect } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			},
 		),
 	component: () => {
+		const navigateFn = useNavigate();
 		const saves = Route.useLoaderData();
 		const hasSave = saves.some((save) => save.savedAt !== null);
 		const canContinue = saves.some((save) => save.slot === "current" && save.savedAt !== null);
@@ -53,6 +54,66 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			catalogState.type === "failed" ||
 			(AsyncResult.isFailure(startup) && !startup.waiting) ||
 			(catalogState.type === "ready" && AsyncResult.isSuccess(startup) && !startup.waiting);
+
+		useEffect(() => {
+			const onKeyDownFn = (event: KeyboardEvent) => {
+				if (
+					event.defaultPrevented ||
+					event.repeat ||
+					event.isComposing ||
+					event.altKey ||
+					event.ctrlKey ||
+					event.metaKey ||
+					(event.target instanceof HTMLElement &&
+						(event.target.isContentEditable ||
+							event.target.closest("input, textarea, select") !== null))
+				)
+					return;
+
+				switch (event.key) {
+					case "c":
+						if (!defaultPackageAvailable || !canContinue) return;
+						event.preventDefault();
+						void navigateFn({
+							to: "/action/load-game/$packageId",
+							params: {
+								packageId: SerakkiDefaultPackageId,
+							},
+						});
+						return;
+					case "g":
+						event.preventDefault();
+						void navigateFn({
+							to: "/serapacks",
+						});
+						return;
+					case "s":
+						event.preventDefault();
+						void navigateFn({
+							to: "/settings",
+						});
+						return;
+					case "a":
+						event.preventDefault();
+						void navigateFn({
+							to: "/about",
+						});
+						return;
+					case "e":
+						if (exitPending) return;
+						event.preventDefault();
+						requestExitFn(undefined);
+				}
+			};
+			window.addEventListener("keydown", onKeyDownFn);
+			return () => window.removeEventListener("keydown", onKeyDownFn);
+		}, [
+			canContinue,
+			defaultPackageAvailable,
+			exitPending,
+			navigateFn,
+			requestExitFn,
+		]);
 
 		return (
 			<LauncherPageLayout page="main-menu">

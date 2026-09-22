@@ -6,7 +6,7 @@ import { PlayableGameResources } from "~/game-shell/ui/PlayableGameResources";
 import { GameShell } from "~/game-shell/ui/GameShell";
 
 /**
- * Lifetime boundary for playable Board and Inventory leaves. Exact-Game audio,
+ * Lifetime boundary for playable Board leaf. Exact-Game audio,
  * cheat admission, menu, Item Detail and renderer providers live here so leaf
  * navigation cannot recreate them or lose in-flight overlay/presentation state.
  * Action and Cheats routes intentionally sit outside this shell.

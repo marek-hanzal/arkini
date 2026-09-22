@@ -42,8 +42,6 @@ export const readScenePaletteFx = Effect.fn("readScenePaletteFx")((host: HTMLEle
 				overlayForeground: readFn("--ak-overlay-foreground"),
 				success: readFn("--ak-success"),
 				surface: readFn("--ak-surface"),
-				toolbarA: readFn("--ak-toolbar-grid-slot-surface-a"),
-				toolbarB: readFn("--ak-toolbar-grid-slot-surface-b"),
 			};
 		} finally {
 			probe.remove();

@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { PixiBoardToolbarSurface } from "~/game-scene/ui/PixiBoardToolbarSurface";
+import { PixiBoardSurface } from "~/game-scene/ui/PixiBoardSurface";
 import type { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
 
 type CreateMainRuntimeProps = Parameters<typeof createMainRuntimeFx>[0];
@@ -133,11 +133,7 @@ const renderSurface = async () => {
 	const root = createRoot(host);
 	roots.push(root);
 	await act(async () => {
-		root.render(
-			createElement(PixiBoardToolbarSurface, {
-				onOpenInventoryFn: boardState.navigate,
-			}),
-		);
+		root.render(createElement(PixiBoardSurface, {}));
 		await Promise.resolve();
 	});
 	return host;
@@ -164,7 +160,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("PixiBoardToolbarSurface", () => {
+describe("PixiBoardSurface", () => {
 	it("silently resets a failed primary action without opening Item Detail", async () => {
 		boardState.enqueueLineState = {
 			kind: "error",
@@ -226,7 +222,7 @@ describe("PixiBoardToolbarSurface", () => {
 
 	it("suppresses the native macOS Control-click context menu without dispatching a command", async () => {
 		const host = await renderSurface();
-		const surface = host.querySelector<HTMLElement>('[data-ui="PixiBoardToolbarSurface"]');
+		const surface = host.querySelector<HTMLElement>('[data-ui="PixiBoardSurface"]');
 		if (surface === null) throw new Error("Missing Board surface.");
 		const contextMenu = new MouseEvent("contextmenu", {
 			bubbles: true,
@@ -259,7 +255,7 @@ describe("PixiBoardToolbarSurface", () => {
 				},
 			},
 			primaryAction: {
-				kind: "open-inventory",
+				kind: "activate-space",
 				currentSpace: 0,
 			},
 			quantity: 5,
@@ -330,151 +326,7 @@ describe("PixiBoardToolbarSurface", () => {
 			kind: "fill",
 			ownerItemId: producer.id,
 		});
-		await createProps.onActivateFn(
-			{
-				...producer,
-				location: {
-					scope: "toolbar",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-			},
-			"fill-default-line-queue",
-			document.createElement("canvas"),
-		);
-
 		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
-	});
-
-	it("routes the open-inventory primary action to the sibling Inventory leaf", async () => {
-		await renderSurface();
-		const createProps = boardState.createProps;
-		if (createProps === null) throw new Error("Board scene did not create its runtime.");
-		const item = {
-			id: "runtime:inventory",
-			itemId: "inventory",
-
-			location: {
-				scope: "board",
-				space: 0,
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
-			primaryAction: {
-				kind: "open-inventory",
-				currentSpace: 0,
-			},
-			quantity: 1,
-			revision: "revision:inventory",
-			running: false,
-			activityEffect: false,
-			artworkScale: 0.8,
-			sourceUrl: "resource:inventory",
-		} satisfies TileActorItem;
-
-		await createProps.onActivateFn(item, "primary", document.createElement("canvas"));
-
-		expect(boardState.navigate).toHaveBeenCalledWith();
-		expect(boardState.registerInteraction).toHaveBeenCalledOnce();
-	});
-
-	it.each([
-		"rejected",
-		"unmounted",
-	] as const)("suppresses late Inventory navigation when %s", async (scenario) => {
-		await renderSurface();
-		const props = boardState.createProps;
-		if (props === null) throw new Error("Expected the Board runtime.");
-		let resolveAction!: (result: boolean | null) => void;
-		boardState.runSpaceActivation.mockReturnValueOnce(
-			new Promise<boolean | null>((resolve) => {
-				resolveAction = resolve;
-			}) as Promise<boolean>,
-		);
-		const pending = props.onActivateFn(
-			{
-				id: "inventory-action",
-				itemId: "inventory-action",
-				revision: "revision:1",
-				location: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				primaryAction: {
-					kind: "open-inventory",
-					currentSpace: 0,
-				},
-				quantity: 1,
-				running: false,
-				activityEffect: false,
-				artworkScale: 0.8,
-				sourceUrl: "asset",
-			},
-			"primary",
-			document.createElement("canvas"),
-		);
-		if (scenario === "unmounted")
-			await act(async () => {
-				roots.pop()?.unmount();
-			});
-		resolveAction(scenario === "rejected" ? null : true);
-		await pending;
-		expect(boardState.navigate).not.toHaveBeenCalled();
-	});
-
-	it("opens Inventory with an unmodified i key while the Board is idle", async () => {
-		await renderSurface();
-		const event = new KeyboardEvent("keydown", {
-			cancelable: true,
-			key: "i",
-		});
-
-		await act(async () => {
-			window.dispatchEvent(event);
-			await Promise.resolve();
-		});
-
-		expect(event.defaultPrevented).toBe(true);
-		expect(boardState.navigate).toHaveBeenCalledOnce();
-		expect(boardState.navigate).toHaveBeenCalledWith();
-	});
-
-	it("does not hijack modified, repeated, or editable i key input", async () => {
-		await renderSurface();
-		const input = document.createElement("input");
-		document.body.append(input);
-
-		await act(async () => {
-			window.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					ctrlKey: true,
-					key: "i",
-				}),
-			);
-			window.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					key: "i",
-					repeat: true,
-				}),
-			);
-			input.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					bubbles: true,
-					key: "i",
-				}),
-			);
-			await Promise.resolve();
-		});
-
-		expect(boardState.navigate).not.toHaveBeenCalled();
 	});
 });

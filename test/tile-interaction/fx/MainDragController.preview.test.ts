@@ -5,7 +5,6 @@ import { createDragActor } from "~test/tile-interaction/fx/MainDragController.te
 
 import {
 	createItem,
-	keyboard,
 	mountController,
 	pointer,
 	previewTestState as previewState,
@@ -141,7 +140,6 @@ describe("manual drop target feedback", () => {
 		"release",
 		"cancel",
 		"overlay",
-		"inventory",
 	] as const)("restores the target on %s", (ending) => {
 		const mounted = mountTarget();
 		switch (ending) {
@@ -153,9 +151,6 @@ describe("manual drop target feedback", () => {
 				break;
 			case "overlay":
 				Effect.runSync(mounted.controller.setInteractionBlockedFx(true));
-				break;
-			case "inventory":
-				mounted.keyboardTarget.emit(keyboard("i"));
 				break;
 		}
 		expect(

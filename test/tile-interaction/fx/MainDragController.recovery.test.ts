@@ -2,88 +2,15 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
-import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 import {
-	createItem,
 	flushMicrotasks,
 	mountController,
 	pointer,
 	releaseOrdinaryDrag,
-	setOrdinaryInventoryTarget,
 	samplePoseAnimation,
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: recovery", () => {
-	it("restores and settles the optimistic Inventory actor after a command error", async () => {
-		const inventory = createItem("runtime:inventory", 1);
-		const mounted = mountController({
-			targetItems: [
-				inventory,
-			],
-		});
-		setOrdinaryInventoryTarget(mounted, inventory);
-		const cause = new Error("drop failed");
-		mounted.onDrop.mockRejectedValueOnce(cause);
-
-		releaseOrdinaryDrag(mounted);
-		await flushMicrotasks();
-
-		expect(mounted.reportCriticalFailureFn).toHaveBeenCalledWith("game-presentation", cause);
-		expect(mounted.actor.lifecycleTargetAlpha).toBe(1);
-		expect(mounted.animations).toContainEqual(
-			expect.objectContaining({
-				actor: mounted.actor,
-				channel: "lifecycle-opacity",
-				durationMs: lifecycleDurationMs,
-				toAlpha: 1,
-			}),
-		);
-		expect(mounted.animations).toContainEqual(
-			expect.objectContaining({
-				actor: mounted.actor,
-				channel: "lifecycle-scale",
-				durationMs: lifecycleDurationMs,
-				toScale: 1,
-			}),
-		);
-		expect(
-			mounted.animations.some(
-				(animation) => animation.actor === mounted.actor && animation.channel === "pose",
-			),
-		).toBe(true);
-	});
-
-	it("ignores a pending Inventory result after the scene owners close", async () => {
-		const inventory = createItem("runtime:inventory", 1);
-		const mounted = mountController();
-		setOrdinaryInventoryTarget(mounted, inventory);
-		let resolveDrop!: (result: DropItemResult) => void;
-		mounted.onDrop.mockReturnValueOnce(
-			new Promise<DropItemResult>((resolve) => {
-				resolveDrop = resolve;
-			}) as never,
-		);
-
-		releaseOrdinaryDrag(mounted);
-		await Promise.resolve();
-		expect(mounted.onDrop).toHaveBeenCalledOnce();
-		Effect.runSync(mounted.controller.closeFx);
-		Effect.runSync(mounted.dropSubmission.closeFx);
-		resolveDrop({
-			kind: "reject",
-		} as DropItemResult);
-		await flushMicrotasks();
-
-		expect(mounted.onSettledDrop).not.toHaveBeenCalled();
-		expect(mounted.onRejectedDrop).not.toHaveBeenCalled();
-		expect(
-			mounted.animations.some(
-				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
-			),
-		).toBe(false);
-	});
-
 	it("freezes the command target and admits it before a later close", async () => {
 		const first = mountController();
 		const releaseTarget = {

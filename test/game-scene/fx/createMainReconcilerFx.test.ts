@@ -7,7 +7,6 @@ import {
 	createItem,
 	createReconcilerHarness,
 	__fixture_createdVisualState as createdVisualState,
-	inventoryLocation,
 	projectionProbeState as projectionState,
 	transition,
 } from "./createMainReconcilerFx.test/fixture";
@@ -28,9 +27,6 @@ describe("main reconciliation / snapshot ownership", () => {
 		projectionState.main = [
 			current,
 			added,
-		];
-		projectionState.inventory = [
-			createItem(removed.id, inventoryLocation),
 		];
 
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));

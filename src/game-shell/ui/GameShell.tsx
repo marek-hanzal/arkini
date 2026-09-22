@@ -115,7 +115,7 @@ const GameShellLayers = ({
 
 /**
  * React owner for route composition, focusable overlays and their precedence
- * across Board/Inventory navigation. The provider order is intentional: Item
+ * across Board navigation. The provider order is intentional: Item
  * Detail stays attached to the renderer scene, while Game Menu is the higher
  * interaction owner and the shell dismisses Detail before both overlays can
  * compete for focus.

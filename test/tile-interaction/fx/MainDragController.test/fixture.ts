@@ -29,23 +29,13 @@ export const item: TileActorItem = testItem;
 export const createItem = (id: string, x: number) => createTestItem(id, x);
 
 const previewState = vi.hoisted(() => ({
-	actorKinds: new Map<
-		string,
-		"merge" | "move" | "reject" | "stack" | "store-input" | "store-inventory" | "swap"
-	>(),
-	kind: "move" as "ignored" | "move" | "reject" | "store-inventory" | "swap",
+	actorKinds: new Map<string, "merge" | "move" | "reject" | "stack" | "store-input" | "swap">(),
+	kind: "move" as "ignored" | "move" | "reject" | "swap",
 	reads: 0,
 	readsByActorId: new Map<string, number>(),
 }));
 
 export const previewTestState = previewState;
-
-const storageState = vi.hoisted(() => ({
-	store: vi.fn(),
-}));
-vi.mock("~/item-interaction/fx/storeInventoryItemFx", () => ({
-	storeInventoryItemFx: (props: unknown) => Effect.sync(() => storageState.store(props)),
-}));
 
 const removalState = vi.hoisted(() => ({
 	remove: vi.fn(),
@@ -170,17 +160,6 @@ export const mountController = ({
 	previewState.reads = 0;
 	previewState.readsByActorId.clear();
 	removalState.remove.mockClear();
-	storageState.store.mockReset().mockReturnValue({
-		kind: "store-inventory",
-		source: {
-			itemId: item.id,
-			canonicalItemId: item.itemId,
-			previousQuantity: item.quantity,
-			previousRevision: item.revision,
-			previousLocation: item.location,
-			current: null,
-		},
-	});
 	const stageContainer = new Container();
 	const stage = new FakeEmitter(stageContainer);
 	const animateActor = vi.fn();
@@ -233,7 +212,7 @@ export const mountController = ({
 	};
 	const actorPoses = new Map<string, typeof currentActorPose>();
 	let currentDropTargetX = 1;
-	let currentTargetKind: "board" | "toolbar" | null = "board";
+	let currentTargetKind: "board" | null = "board";
 	let currentOccupant: TileActorItem | null = null;
 	let targetFactsFailure: unknown | null = null;
 	const targetRedirects: Array<Parameters<MotionRuntime["redirectTargetFx"]>[0]> = [];
@@ -495,7 +474,6 @@ export const mountController = ({
 		releasePointerCapture,
 		reportCriticalFailureFn,
 		removeDraggedItem: removalState.remove,
-		storeInventory: storageState.store,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
 		},
@@ -508,7 +486,7 @@ export const mountController = ({
 		setDropTargetX: (x: number) => {
 			currentDropTargetX = x;
 		},
-		setTargetKind: (kind: "board" | "toolbar" | null) => {
+		setTargetKind: (kind: "board" | null) => {
 			currentTargetKind = kind;
 		},
 		setOccupant: (occupant: TileActorItem | null) => {
@@ -528,18 +506,18 @@ export const mountController = ({
 	};
 };
 
-export const setOrdinaryInventoryTarget = (
+export const setStackTarget = (
 	mounted: ReturnType<typeof mountController>,
-	inventory: TileActorItem,
+	target: TileActorItem,
 ) => {
-	previewState.actorKinds.set(inventory.id, "stack");
-	mounted.setOccupant(inventory);
+	previewState.actorKinds.set(target.id, "stack");
+	mounted.setOccupant(target);
 	mounted.setCommandTarget({
 		kind: "slot",
-		location: inventory.location,
+		location: target.location,
 		occupant: {
-			itemId: inventory.id,
-			revision: inventory.revision,
+			itemId: target.id,
+			revision: target.revision,
 		},
 	});
 };

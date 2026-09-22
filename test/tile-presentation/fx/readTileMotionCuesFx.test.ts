@@ -146,63 +146,6 @@ describe("readTileMotionCuesFx", () => {
 		]);
 	});
 
-	it("does not invent a main-canvas origin for an Inventory input transfer", () => {
-		const inventorySourceLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const previousRuntime = {
-			...runtime,
-			items: runtime.items.map((item) =>
-				item.id === source.id
-					? {
-							...item,
-							location: inventorySourceLocation,
-							quantity: 2,
-						}
-					: item,
-			),
-		};
-		const currentRuntime = {
-			...previousRuntime,
-			items: previousRuntime.items.map((item) =>
-				item.id === source.id
-					? {
-							...item,
-							quantity: 1,
-							revision: `${item.revision}:remainder`,
-						}
-					: item,
-			),
-		};
-
-		expect(
-			Effect.runSync(
-				readCues({
-					sequence: 11,
-					previousRuntime,
-					runtime: currentRuntime,
-					events: [
-						{
-							type: GameEventEnumSchema.enum.ItemInputStored,
-							sourceItemId: source.id,
-							canonicalItemId: source.item.id,
-							previousSourceLocation: inventorySourceLocation,
-							previousQuantity: 2,
-							storedQuantity: 1,
-							resultingQuantity: 1,
-							ownerItemId: target.id,
-							lineId: "line:water",
-							inputIndex: 0,
-						},
-					],
-				}),
-			),
-		).toEqual([]);
-	});
 	it("degrades stale or missing visual identities to no choreography", () => {
 		const cues = Effect.runSync(
 			readCues({

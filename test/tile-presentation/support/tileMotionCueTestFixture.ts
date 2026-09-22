@@ -16,11 +16,6 @@ const config = GameConfigSchema.parse({
 			width: 3,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
-		toolbarSize: 1,
 	},
 	start: {
 		currentSpace: 0,
@@ -36,15 +31,6 @@ const config = GameConfigSchema.parse({
 				space: 0,
 				x: 2,
 				y: 0,
-			},
-		],
-		toolbar: [
-			{
-				itemId: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
 			},
 		],
 	},
@@ -64,25 +50,7 @@ const config = GameConfigSchema.parse({
 					"artwork:water",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
-		},
-		inventory: {
-			uid: "inventory",
-			id: "inventory",
-			action: {
-				type: "inventory",
-			},
-			scope: "any",
-			maxStackSize: 1,
-			title: "Inventory",
-			description: "Inventory",
-			artwork: {
-				scale: 0.8,
-				default: [
-					"artwork:inventory",
-				],
-			},
 		},
 	},
 });
@@ -101,14 +69,11 @@ const source = runtime.items.find(
 const target = runtime.items.find(
 	(item) => item.location.scope === "board" && item.location.position.x === 2,
 );
-const inventoryOpener = runtime.items.find((item) => item.item.id === "inventory");
 if (
 	source === undefined ||
 	target === undefined ||
-	inventoryOpener === undefined ||
 	source.location.scope !== "board" ||
-	target.location.scope !== "board" ||
-	inventoryOpener.location.scope !== "toolbar"
+	target.location.scope !== "board"
 ) {
 	throw new Error("Tile motion cue fixture is missing its board actors.");
 }
@@ -146,7 +111,6 @@ const swappedRuntime = {
 
 export const tileMotionCueTestFixture = {
 	committedRuntime,
-	inventoryOpener,
 	readCues: (transition: Parameters<typeof readTileMotionCuesFn>[0]["transition"]) =>
 		Effect.succeed(
 			readTileMotionCuesFn({

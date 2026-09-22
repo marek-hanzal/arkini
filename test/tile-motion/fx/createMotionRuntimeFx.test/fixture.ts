@@ -116,8 +116,9 @@ vi.mock("~/tile-rendering/fx/updateTileActorFx", async () => {
 	};
 });
 
-export const inventoryLocation = {
-	scope: "inventory" as const,
+export const originBoardLocation = {
+	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 0,
 		y: 0,
@@ -151,8 +152,6 @@ export const palette = {
 	overlayForeground: 0,
 	success: 0,
 	surface: 0,
-	toolbarA: 0,
-	toolbarB: 0,
 } satisfies PixiScenePalette;
 
 export const createItem = (

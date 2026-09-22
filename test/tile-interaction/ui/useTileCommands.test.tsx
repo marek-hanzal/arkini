@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { Deferred, Effect } from "effect";
+import { Effect } from "effect";
 import { beforeAll, expect, it, vi } from "vitest";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { validateGameConfigFx } from "~/game-config-validation/fx/validateGameConfigFx";
@@ -179,63 +179,6 @@ it("keeps rejected and committed overlapping Space activations distinct", async 
 	}
 });
 
-it("settles pending Inventory releases independently across exact Game replacement", async () => {
-	const gate = Effect.runSync(Deferred.make<void>());
-	const firstOutcome = {
-		itemId: "first",
-	};
-	const secondOutcome = {
-		itemId: "second",
-	};
-	const firstRun = vi
-		.fn()
-		.mockReturnValueOnce(Deferred.await(gate).pipe(Effect.as(firstOutcome)))
-		.mockReturnValueOnce(Effect.succeed(secondOutcome));
-	const secondRun = vi.fn(() =>
-		Effect.succeed({
-			itemId: "replacement",
-		}),
-	);
-	const firstGame = {
-		runFx: firstRun,
-	} as unknown as PlayableGame;
-	const secondGame = {
-		runFx: secondRun,
-	} as unknown as PlayableGame;
-	const mounted = await mountCommands(firstGame);
-	const command = {
-		itemId: "first",
-		revision: "revision",
-		location: {
-			scope: "inventory",
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
-	} as const;
-	try {
-		const original = mounted.getCommands();
-		const first = original.releaseInventoryItemFn(command);
-		const second = original.releaseInventoryItemFn({
-			...command,
-			itemId: "second",
-		});
-		expect(await second).toEqual(secondOutcome);
-		await mounted.render(secondGame);
-		expect(await mounted.getCommands().releaseInventoryItemFn(command)).toEqual({
-			itemId: "replacement",
-		});
-		Effect.runSync(Deferred.succeed(gate, undefined));
-		expect(await first).toEqual(firstOutcome);
-		expect(firstRun).toHaveBeenCalledTimes(2);
-		expect(secondRun).toHaveBeenCalledOnce();
-	} finally {
-		Effect.runSync(Deferred.succeed(gate, undefined));
-		await mounted.close();
-	}
-});
-
 it("keeps command rejections recoverable without swallowing defects", async () => {
 	const rejection = new Error("rejection");
 	const defect = new Error("defect");
@@ -253,7 +196,8 @@ it("keeps command rejections recoverable without swallowing defects", async () =
 		itemId: "portal",
 		revision: "revision",
 		location: {
-			scope: "inventory",
+			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,

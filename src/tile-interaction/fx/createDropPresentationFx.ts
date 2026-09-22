@@ -47,7 +47,6 @@ export interface DropPresentation {
 	readonly failFx: (generation: number) => Effect.Effect<void, never, never>;
 	readonly readSnapshotFx: Effect.Effect<DropSnapshot, never, never>;
 	readonly reconcileActorsFx: (props: {
-		readonly inventoryActorIds: ReadonlySet<string>;
 		readonly mainItems: ReadonlyArray<TileActorItem>;
 	}) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
@@ -106,19 +105,6 @@ const readFeedbackCuesFn = (
 						actorId: owner.itemId,
 						key: `drop:${generation}:consume`,
 						kind: "consume",
-					},
-				] satisfies TileActorFeedbackCue[],
-		)
-		.with(
-			{
-				kind: DropItemResultKind.StoreInventory,
-			},
-			({ source }) =>
-				[
-					{
-						actorId: source.itemId,
-						key: `drop:${generation}:consume-source`,
-						kind: "consume-source",
 					},
 				] satisfies TileActorFeedbackCue[],
 		)
@@ -189,8 +175,8 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 						});
 					}
 					if (
-						result.kind === DropItemResultKind.StoreInventory ||
-						(result.kind === DropItemResultKind.Stack && result.source.current === null)
+						result.kind === DropItemResultKind.Stack &&
+						result.source.current === null
 					) {
 						hiddenActorRevisions.set(
 							result.source.itemId,
@@ -222,22 +208,20 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 					swaps: Array.from(swaps.values()),
 				}),
 			),
-			reconcileActorsFx: Effect.fn("DropPresentation.reconcileActorsFx")(
-				({ inventoryActorIds, mainItems }) =>
-					Effect.sync(() => {
-						if (closed) return;
-						for (const [actorId, revision] of hiddenActorRevisions) {
-							if (
-								mainItems.some(
-									(item) => item.id === actorId && item.revision === revision,
-								) &&
-								!inventoryActorIds.has(actorId)
+			reconcileActorsFx: Effect.fn("DropPresentation.reconcileActorsFx")(({ mainItems }) =>
+				Effect.sync(() => {
+					if (closed) return;
+					for (const [actorId, revision] of hiddenActorRevisions) {
+						if (
+							mainItems.some(
+								(item) => item.id === actorId && item.revision === revision,
 							)
-								continue;
-							hiddenActorRevisions.delete(actorId);
-						}
-						landingActorIds.clear();
-					}),
+						)
+							continue;
+						hiddenActorRevisions.delete(actorId);
+					}
+					landingActorIds.clear();
+				}),
 			),
 			closeFx: Effect.sync(() => {
 				if (closed) return;

@@ -165,20 +165,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 	};
 
-	const removeActorImmediatelyFx = Effect.fn("MainReconciler.removeActorImmediatelyFx")(
-		function* (actorId: string) {
-			const actor = yield* releaseMainActorFx({
-				actorId,
-				actorStore,
-				animator,
-				drag,
-			});
-			if (actor === null) return;
-			yield* actorStore.destroyExitingActorFx(actor);
-			yield* application.frames.invalidateFx;
-		},
-	);
-
 	const releaseActorWithExitFx = Effect.fn("MainReconciler.releaseActorWithExitFx")(function* ({
 		adoptActiveLifecycleExit = false,
 		actorId,
@@ -245,19 +231,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			readTileActorsFx({
 				game,
 				runtime: transition.runtime,
-				surface: "main",
 			}),
-		);
-		const inventoryActorIds = new Set(
-			game
-				.readOrThrowFn(
-					readTileActorsFx({
-						game,
-						runtime: transition.runtime,
-						surface: "inventory",
-					}),
-				)
-				.map((item) => item.id),
 		);
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
@@ -268,8 +242,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				hiddenActorIds.add(actorId);
 				continue;
 			}
-			// An Inventory roundtrip can commit before its storage Promise settles. The
-			// newer Board identity owns visibility, including an earlier optimistic fade.
+			// A newer canonical identity owns visibility, including an earlier optimistic fade.
 			const actor = actorStore.actors.get(actorId);
 			if (
 				actor !== undefined &&
@@ -369,7 +342,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
 			feedbackCues,
 			hiddenActorIds,
-			inventoryActorIds,
 			motionRetainedActorIds: motionSnapshot.retainedActorIds,
 			pendingActorIds: dropSnapshot.pendingActorIds,
 			visibleActors: visibleItems,
@@ -382,10 +354,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					durationMs: feedbackExitDurationMs,
 					feedbackCues: [],
 				});
-				continue;
-			}
-			if (departure.kind === "remove-immediately") {
-				yield* removeActorImmediatelyFx(departure.actorId);
 				continue;
 			}
 			yield* releaseActorWithExitFx({
@@ -589,7 +557,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			yield* dropPresentation.clearFeedbackFx(feedback.generation);
 		}
 		yield* dropPresentation.reconcileActorsFx({
-			inventoryActorIds,
 			mainItems: nextItems,
 		});
 		yield* motion.syncPresentationFx;

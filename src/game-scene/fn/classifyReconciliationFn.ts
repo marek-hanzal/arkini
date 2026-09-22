@@ -20,10 +20,6 @@ type ActorArrival =
 type ActorDeparture =
 	| {
 			readonly actorId: string;
-			readonly kind: "remove-immediately";
-	  }
-	| {
-			readonly actorId: string;
 			readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
 			readonly kind: "release";
 			readonly style: "default" | "feedback" | "feedback-particles";
@@ -43,7 +39,6 @@ interface ClassifyReconciliationProps {
 	readonly deliveryRetainedActorIds: ReadonlySet<string>;
 	readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
 	readonly hiddenActorIds: ReadonlySet<string>;
-	readonly inventoryActorIds: ReadonlySet<string>;
 	readonly motionRetainedActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly visibleActors: ReadonlyMap<string, VisibleActor>;
@@ -58,7 +53,6 @@ export const classifyReconciliationFn = ({
 	deliveryRetainedActorIds,
 	feedbackCues,
 	hiddenActorIds,
-	inventoryActorIds,
 	motionRetainedActorIds,
 	pendingActorIds,
 	visibleActors,
@@ -89,13 +83,6 @@ export const classifyReconciliationFn = ({
 			departures.push({
 				actorId,
 				kind: "release-hidden",
-			});
-			continue;
-		}
-		if (inventoryActorIds.has(actorId)) {
-			departures.push({
-				actorId,
-				kind: "remove-immediately",
 			});
 			continue;
 		}

@@ -206,16 +206,6 @@ const readEventCueFn = ({
 			targetLocation: target.location,
 		} satisfies UnstaggeredTileMotionCue;
 	}
-	if (
-		event.type === GameEventEnumSchema.enum.ItemPlaced &&
-		event.previousLocation.scope === LocationScopeEnumSchema.enum.Inventory
-	) {
-		return readSpawnCueFn({
-			event,
-			eventIndex,
-			transition,
-		});
-	}
 	return null;
 };
 

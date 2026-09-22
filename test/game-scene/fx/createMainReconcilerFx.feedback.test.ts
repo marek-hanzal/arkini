@@ -1,7 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
-import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 
@@ -10,116 +8,11 @@ import {
 	createActor,
 	createItem,
 	createReconcilerHarness,
-	inventoryLocation,
 	projectionProbeState as projectionState,
 	transition,
 } from "./createMainReconcilerFx.test/fixture";
 
 describe("main reconciliation / feedback acknowledgements", () => {
-	it("retains a pending source, then fades it after direct Inventory storage", () => {
-		const now = vi.spyOn(performance, "now").mockReturnValue(1_000);
-		const source = createItem("runtime:water-source", boardLocation);
-		const inventorySpawn = createItem("runtime:water-inventory-new-id", inventoryLocation);
-		const inventory = createItem("runtime:backpack", boardLocation);
-		const actor = createActor(source);
-		const harness = createReconcilerHarness({
-			actor,
-		});
-		const inventoryActor = createActor(inventory);
-		harness.actors.set(inventory.id, inventoryActor);
-		harness.canonicalItems.set(inventory.id, inventory);
-		const dropGeneration = Effect.runSync(
-			harness.dropPresentation.beginFx({
-				sourceActorId: source.id,
-				swapCandidate: null,
-			}),
-		);
-		projectionState.inventory = [
-			inventorySpawn,
-		];
-		projectionState.main = [
-			inventory,
-		];
-		actor.container.alpha = 0.37;
-		actor.lifecycleDurationMs = lifecycleDurationMs;
-		actor.lifecycleTransitionStarted = true;
-		actor.lifecycleNotBeforeMs = 900;
-		actor.lifecycleTargetAlpha = 0;
-		const remainingLifecycleDurationMs =
-			actor.lifecycleNotBeforeMs + actor.lifecycleDurationMs - performance.now();
-
-		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
-		expect(harness.actors.get(source.id)).toBe(actor);
-		expect(harness.detached).toEqual([]);
-		expect(harness.animations).toEqual([]);
-		expect(actor.container.alpha).toBe(0.37);
-
-		const result = {
-			kind: "store-inventory",
-			source: {
-				itemId: source.id,
-				canonicalItemId: source.itemId,
-				previousRevision: source.revision,
-				previousLocation: source.location,
-				previousQuantity: source.quantity,
-				current: null,
-			},
-		} satisfies DropItemResult;
-		Effect.runSync(
-			harness.dropPresentation.completeFx({
-				generation: dropGeneration,
-				result,
-			}),
-		);
-		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
-
-		expect(harness.actors.has(source.id)).toBe(false);
-		expect(harness.detached).toEqual([
-			actor,
-		]);
-		expect(harness.canceledActors).toEqual([
-			actor,
-		]);
-		expect(actor.container.alpha).toBe(0.37);
-		expect(actor.container.destroyed).toBe(false);
-		expect(harness.animations).toContainEqual(
-			expect.objectContaining({
-				actor,
-				channel: "lifecycle-opacity",
-				durationMs: remainingLifecycleDurationMs,
-				toAlpha: 0,
-			}),
-		);
-		expect(harness.animations).toContainEqual(
-			expect.objectContaining({
-				actor,
-				channel: "lifecycle-scale",
-				durationMs: remainingLifecycleDurationMs,
-			}),
-		);
-		expect(harness.animations).not.toContainEqual(
-			expect.objectContaining({
-				actor: inventoryActor,
-				channel: "activity-particles",
-				durationMs: 720,
-			}),
-		);
-		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).feedback).toEqual([]);
-
-		const exit = harness.animations.find(
-			(animation) =>
-				animation.actor === actor &&
-				animation.channel === "lifecycle-opacity" &&
-				animation.toAlpha === 0,
-		);
-		const destroy = vi.spyOn(actor.container, "destroy");
-		exit?.onCompleteFn?.();
-		exit?.onCompleteFn?.();
-		expect(destroy).toHaveBeenCalledOnce();
-		expect(actor.container.destroyed).toBe(true);
-		expect(actor.visuals.size).toBe(0);
-		now.mockRestore();
-	});
 	it("bursts a surviving committed feedback receiver exactly once", () => {
 		const item = createItem("runtime:tree", boardLocation);
 		const actor = createActor(item);

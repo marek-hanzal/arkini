@@ -17,10 +17,6 @@ const config = GameConfigSchema.parse({
 			width: 2,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
 	},
 	start: {
 		currentSpace: 0,
@@ -41,7 +37,6 @@ const config = GameConfigSchema.parse({
 					"artwork:stone",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 		mud: {
@@ -59,7 +54,6 @@ const config = GameConfigSchema.parse({
 					"artwork:mud",
 				],
 			},
-			scope: "any",
 			maxStackSize: 10,
 		},
 	},

@@ -1,18 +1,17 @@
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const itemBase = (id: string, scope: "any" | "board" = "any") => ({
+const itemBase = (id: string) => ({
 	uid: id,
 	id,
 	title: id,
 	description: id,
-	scope,
 });
 
 const materialInput = (quantity: number) => ({
 	type: "materials",
 	query: {
-		scope: "any",
+		distance: "near",
 		selector: {
 			type: "item",
 			itemId: "material",
@@ -42,10 +41,6 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		title: "Tile actors",
 		board: {
 			width: 2,
-			height: 1,
-		},
-		inventory: {
-			width: 1,
 			height: 1,
 		},
 	},
@@ -112,7 +107,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 			],
 		},
 		temporary: {
-			...itemBase("temporary", "board"),
+			...itemBase("temporary"),
 			maxStackSize: 1,
 
 			lines: [],

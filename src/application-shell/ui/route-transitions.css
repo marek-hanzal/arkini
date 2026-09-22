@@ -391,29 +391,6 @@
 	opacity: 0;
 }
 
-/* The Editor Board toolbar stays fixed while only the routed Board/Inventory gameplay leaf moves. */
-:root:active-view-transition-type(editor-board-leaf)::view-transition-old(
-	serakki-editor-game-board
-) {
-	animation: serakki-vt-board-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
-}
-
-:root:active-view-transition-type(editor-board-leaf)::view-transition-new(
-	serakki-editor-game-board
-) {
-	animation: serakki-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-:root:active-view-transition-type(editor-board-leaf)::view-transition-old(serakki-editor-content) {
-	animation: none;
-	opacity: 1;
-}
-
-:root:active-view-transition-type(editor-board-leaf)::view-transition-new(serakki-editor-content) {
-	animation: none;
-	opacity: 0;
-}
-
 /* Routed section chrome updates immediately; only the section body crossfades. */
 :root:active-view-transition-type(editor-to-editor)::view-transition-group(
 	serakki-editor-section-navigation

@@ -1,4 +1,3 @@
-import { storeInventoryItemFx } from "~/item-interaction/fx/storeInventoryItemFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -26,11 +25,7 @@ export interface DropSubmission {
 	readonly isPendingActorFx: (actorId: string) => Effect.Effect<boolean, never, never>;
 	readonly submitFx: (request: {
 		readonly actor: PixiTileActor;
-		readonly commandTarget:
-			| DropItemCommand["target"]
-			| {
-					readonly kind: "inventory";
-			  };
+		readonly commandTarget: DropItemCommand["target"];
 		readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 		readonly onReturnSettledFn: () => void;
 		readonly sourceItem: TileActorItem;
@@ -54,12 +49,6 @@ interface Props {
 
 const readTargetRedirectFn = (result: DropItemResult): MotionRedirect | null =>
 	match(result)
-		.with(
-			{
-				kind: DropItemResultKind.StoreInventory,
-			},
-			() => null,
-		)
 		.with(
 			{
 				kind: DropItemResultKind.StoreInput,
@@ -132,11 +121,7 @@ const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 	sourceItem,
 	targetItem,
 }: {
-	readonly commandTarget:
-		| DropItemCommand["target"]
-		| {
-				readonly kind: "inventory";
-		  };
+	readonly commandTarget: DropItemCommand["target"];
 	readonly dropPresentation: DropPresentation;
 	readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 	readonly sourceItem: TileActorItem;
@@ -162,16 +147,10 @@ const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 		sourceLocation: sourceItem.location,
 		sourceRevision: sourceItem.revision,
 	};
-	const command =
-		commandTarget.kind === "inventory"
-			? {
-					...source,
-					kind: "inventory" as const,
-				}
-			: ({
-					...source,
-					target: commandTarget,
-				} satisfies DropItemCommand);
+	const command = {
+		...source,
+		target: commandTarget,
+	} satisfies DropItemCommand;
 	const generation = yield* dropPresentation.beginFx({
 		sourceActorId: sourceItem.id,
 		swapCandidate,
@@ -266,8 +245,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						}),
 					);
 					const optimisticRemoval =
-						commandTarget.kind === "inventory" ||
-						(previewKind === DropItemResultKind.Stack && sourceItem.quantity === 1)
+						previewKind === DropItemResultKind.Stack && sourceItem.quantity === 1
 							? {
 									actor,
 									lifecycleGeneration: actor.lifecycleIntentGeneration + 1,
@@ -330,9 +308,8 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								result.kind !== DropItemResultKind.Ignored
 							) {
 								const removalAccepted =
-									result.kind === DropItemResultKind.StoreInventory ||
-									(result.kind === DropItemResultKind.Stack &&
-										result.source.current === null);
+									result.kind === DropItemResultKind.Stack &&
+									result.source.current === null;
 								if (
 									!removalAccepted &&
 									optimisticRemoval !== null &&
@@ -381,13 +358,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 					startRemovalFn();
 					let submittedDrop: PromiseLike<DropItemResult | null>;
 					try {
-						submittedDrop = closed
-							? Promise.resolve(null)
-							: "kind" in drop.command
-								? RendererRuntime.runPromise(
-										game.runFx(storeInventoryItemFx(drop.command)),
-									)
-								: onDropFn(drop.command);
+						submittedDrop = closed ? Promise.resolve(null) : onDropFn(drop.command);
 					} catch (cause) {
 						submittedDrop = Promise.reject(cause);
 					}

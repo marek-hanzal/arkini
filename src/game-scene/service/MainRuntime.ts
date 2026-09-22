@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-/** Main Board and Toolbar canvas lifetime and interaction capability. */
+/** Main Board canvas lifetime and interaction capability. */
 export interface MainRuntime {
 	readonly canvas: HTMLCanvasElement;
 	readonly cancelInteractionFx: Effect.Effect<void, never, never>;

@@ -11,7 +11,7 @@ import {
 	createMotionHarness,
 	createActorMap,
 	createItemMap,
-	inventoryLocation,
+	originBoardLocation,
 	firstBoardLocation,
 	secondBoardLocation,
 	createActor,
@@ -23,8 +23,8 @@ import {
 } from "./createMotionRuntimeFx.test/fixture";
 
 describe("motion delivery batch", () => {
-	it("uses one retained Inventory opener across a delivery batch and fades a spawn in", () => {
-		const opener = createActor("runtime:inventory-origin");
+	it("uses one retained producer across a delivery batch and fades a spawn in", () => {
+		const opener = createActor("runtime:producer-origin");
 		opener.container.position.set(150, 170);
 		const spawned = createActor("runtime:spawned");
 		const stacked = createActor("runtime:stacked");
@@ -41,7 +41,7 @@ describe("motion delivery batch", () => {
 			y: 40,
 		};
 		const readLocationPose = (location: TileActorItem["location"]) =>
-			location.scope === "inventory"
+			location.position.x === 0
 				? null
 				: {
 						layer: boardActorLayer,
@@ -63,8 +63,8 @@ describe("motion delivery batch", () => {
 				actorId: spawned.item.id,
 				eventIndex: 0,
 				kind: "spawn",
-				originActorId: "runtime:inventory-origin",
-				originLocation: inventoryLocation,
+				originActorId: "runtime:producer-origin",
+				originLocation: originBoardLocation,
 				sequence: 7,
 				staggerIndex: 0,
 				targetLocation: firstBoardLocation,
@@ -73,8 +73,8 @@ describe("motion delivery batch", () => {
 				canonicalItemId: stacked.item.itemId,
 				eventIndex: 1,
 				kind: "stack",
-				originActorId: "runtime:inventory-origin",
-				originLocation: inventoryLocation,
+				originActorId: "runtime:producer-origin",
+				originLocation: originBoardLocation,
 				quantity: 1,
 				sequence: 7,
 				staggerIndex: 1,

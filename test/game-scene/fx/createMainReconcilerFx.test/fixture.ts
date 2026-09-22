@@ -41,7 +41,6 @@ import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 const projectionState = vi.hoisted(() => ({
 	cues: [] as unknown[],
 	feedback: [] as unknown[],
-	inventory: [] as unknown[],
 	main: [] as unknown[],
 	replacements: [] as unknown[],
 }));
@@ -59,9 +58,8 @@ const createdVisualState = vi.hoisted(() => ({
 export const __fixture_createdVisualState = createdVisualState;
 
 vi.mock("~/tile-presentation/fx/readTileActorsFx", () => ({
-	readTileActorsFx: ({ surface }: { readonly surface: "inventory" | "main" }) => ({
+	readTileActorsFx: () => ({
 		kind: "tile-actors",
-		surface,
 	}),
 }));
 
@@ -136,14 +134,6 @@ vi.mock("~/tile-rendering/fx/updateTileActorFx", async () => {
 export const boardLocation = {
 	scope: "board" as const,
 	space: 0,
-	position: {
-		x: 0,
-		y: 0,
-	},
-};
-
-export const inventoryLocation = {
-	scope: "inventory" as const,
 	position: {
 		x: 0,
 		y: 0,
@@ -501,11 +491,10 @@ export const createReconcilerHarness = ({
 		readOrThrowFn: (query: unknown) => {
 			const projection = query as {
 				readonly kind: "tile-actors" | "tile-deliveries";
-				readonly surface: "inventory" | "main";
 			};
 			if (projection.kind === "tile-deliveries") return viewedDeliveries;
 			if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
-			return projectionState[projection.surface];
+			return projectionState.main;
 		},
 	} as unknown as GameEngine;
 	const reconciler = Effect.runSync(
@@ -567,7 +556,6 @@ beforeEach(() => {
 	projectionState.cues = [];
 	projectionState.feedback = [];
 	projectionState.main = [];
-	projectionState.inventory = [];
 	projectionState.replacements = [];
 	createdVisualState.created = [];
 });

@@ -11,24 +11,19 @@ import { TileDefaultLineCommandAtom } from "~/tile-interaction/atom/TileDefaultL
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { useBoardRuntime } from "~/game-scene/ui/useBoardRuntime";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 
 /**
- * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
+ * Mounts the one Pixi-native Board scene into the React-owned game shell.
  *
  * Right click performs the canonical primary action, Ctrl+right click fills its default-line queue,
- * Shift+right click splits a Board stack, and left click opens Item Detail. Portals and inventory openers retain their original click mapping. React forwards commands
+ * Shift+right click splits a Board stack, and left click opens Item Detail. Portals retain their original click mapping. React forwards commands
  * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
-interface PixiBoardToolbarSurfaceProps {
-	readonly onOpenInventoryFn: () => void | PromiseLike<void>;
-}
-
-export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarSurfaceProps) => {
+export const PixiBoardSurface = () => {
 	const game = useGameEngine();
 	const { playSfxEventFn } = useGameAudioControl();
 	const onRejectedDropFn = useCallback(
@@ -41,16 +36,6 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 	const itemDetail = useItemDetailControl();
 	const { textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLineFn] = useAtom(TileDefaultLineCommandAtom(game));
-	const isInventoryShortcutKeyFn = useInventoryShortcutKey();
-	const actionGenerationRef = useRef(0);
-	useEffect(() => {
-		actionGenerationRef.current += 1;
-		return () => {
-			actionGenerationRef.current += 1;
-		};
-	}, [
-		game,
-	]);
 	const controlsRef = useRef({
 		itemDetail,
 	});
@@ -60,7 +45,6 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 
 	const activateFn = useCallback(
 		async (item: TileActorItem, intent: MainActivationIntent, origin: HTMLElement) => {
-			const actionGeneration = actionGenerationRef.current;
 			const { itemDetail: currentItemDetail } = controlsRef.current;
 			if (intent === "detail") {
 				RendererRuntime.runSync(
@@ -114,22 +98,6 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 				)
 				.with(
 					{
-						kind: "open-inventory",
-					},
-					(action) =>
-						runItemActionFn({
-							currentSpace: action.currentSpace,
-							itemId: item.id,
-							location: item.location,
-							revision: item.revision,
-						}).then((result) =>
-							result === null || actionGenerationRef.current !== actionGeneration
-								? undefined
-								: onOpenInventoryFn(),
-						),
-				)
-				.with(
-					{
 						kind: "enqueue-default-line",
 					},
 					() => {
@@ -143,7 +111,6 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 		},
 		[
 			enqueueLineFn,
-			onOpenInventoryFn,
 			runItemActionFn,
 			runSplitFn,
 		],
@@ -168,7 +135,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 			textures,
 		],
 	);
-	const { hostRef, blocked: interactionBlocked } = useBoardRuntime({
+	const { hostRef } = useBoardRuntime({
 		createRuntimeFx,
 		game,
 	});
@@ -183,29 +150,11 @@ export const PixiBoardToolbarSurface = ({ onOpenInventoryFn }: PixiBoardToolbarS
 		enqueueLineState,
 	]);
 
-	useEffect(() => {
-		const openInventoryFromKeyboardFn = (event: KeyboardEvent) => {
-			if (event.defaultPrevented || interactionBlocked || !isInventoryShortcutKeyFn(event)) {
-				return;
-			}
-			event.preventDefault();
-			event.stopPropagation();
-			void Promise.resolve(onOpenInventoryFn()).catch((cause) => {
-				console.error("Inventory failed to open from the Board.", cause);
-			});
-		};
-		window.addEventListener("keydown", openInventoryFromKeyboardFn);
-		return () => window.removeEventListener("keydown", openInventoryFromKeyboardFn);
-	}, [
-		interactionBlocked,
-		onOpenInventoryFn,
-	]);
-
 	return (
 		<div
 			ref={hostRef}
 			className="size-full min-h-0 min-w-0"
-			data-ui="PixiBoardToolbarSurface"
+			data-ui="PixiBoardSurface"
 			onContextMenu={(event) => event.preventDefault()}
 		/>
 	);

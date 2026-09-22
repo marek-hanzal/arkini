@@ -3,16 +3,14 @@ import { useCallback } from "react";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { CheatItemSpotlight } from "~/game-cheat/ui/CheatItemSpotlight";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
-import { PixiBoardToolbarSurface } from "~/game-scene/ui/PixiBoardToolbarSurface";
+import { PixiBoardSurface } from "~/game-scene/ui/PixiBoardSurface";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 
-/** Shared Board + Toolbar gameplay leaf with its exact cheat presentation. */
+/** Shared Board gameplay leaf with its exact cheat presentation. */
 export const PlayableBoard = ({
 	cheatAlwaysAvailable,
-	onOpenInventoryFn,
 }: {
 	readonly cheatAlwaysAvailable?: boolean;
-	readonly onOpenInventoryFn: () => void | PromiseLike<void>;
 }) => {
 	const game = useGameEngine();
 	const { interaction } = usePixiGameRuntime();
@@ -28,7 +26,7 @@ export const PlayableBoard = ({
 				className="size-full min-h-0 min-w-0"
 				data-ui="GameBoardLayout"
 			>
-				<PixiBoardToolbarSurface onOpenInventoryFn={onOpenInventoryFn} />
+				<PixiBoardSurface />
 			</div>
 			<CheatItemSpotlight
 				alwaysAvailable={cheatAlwaysAvailable}

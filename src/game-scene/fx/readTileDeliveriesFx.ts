@@ -24,12 +24,7 @@ interface ReadTileDeliveriesProps {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-/**
- * Projects canonical deliveries into main-scene motion facts.
- *
- * Inventory cells have no main-canvas pose. Their deliveries settle canonically without
- * inventing a visible portal or an unrelated source actor.
- */
+/** Projects canonical deliveries into main-scene motion facts. */
 export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 	game,
 	runtime,
@@ -50,26 +45,20 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 		} else {
 			const ownerItemId = current.location.target.ownerItemId;
 			const owner = runtime.items.find((candidate) => candidate.id === ownerItemId);
-			if (
-				owner?.location.scope === LocationScopeEnumSchema.enum.Board ||
-				owner?.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-				owner?.location.scope === LocationScopeEnumSchema.enum.Toolbar
-			) {
+			if (owner?.location.scope === LocationScopeEnumSchema.enum.Board) {
 				semanticTo = owner.location;
 			}
 		}
 		if (semanticTo === undefined) continue;
 		const from = semanticFrom;
 		const to = semanticTo;
-		if (from.scope === "inventory" || to.scope === "inventory") continue;
 		const visibleOnMain = [
 			from,
 			to,
 		].some(
 			(location) =>
-				location.scope === LocationScopeEnumSchema.enum.Toolbar ||
-				(location.scope === LocationScopeEnumSchema.enum.Board &&
-					location.space === runtime.currentSpace),
+				location.scope === LocationScopeEnumSchema.enum.Board &&
+				location.space === runtime.currentSpace,
 		);
 		if (!visibleOnMain) continue;
 

@@ -96,7 +96,6 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 				DropItemResultKind.Merge,
 				DropItemResultKind.Stack,
 				DropItemResultKind.StoreInput,
-				DropItemResultKind.StoreInventory,
 				() => false,
 			)
 			.exhaustive();

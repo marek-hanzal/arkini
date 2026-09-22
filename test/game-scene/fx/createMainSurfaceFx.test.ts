@@ -90,8 +90,6 @@ const palette = {
 	overlayForeground: 0xffffff,
 	success: 0x57d7b2,
 	surface: 0x555555,
-	toolbarA: 0x666666,
-	toolbarB: 0x777777,
 };
 
 const game = {
@@ -101,7 +99,6 @@ const game = {
 				height: 7,
 				width: 11,
 			},
-			toolbarSize: 8,
 		},
 	},
 	getTransitionSnapshotFn: () => ({
@@ -163,18 +160,10 @@ describe("main surface", () => {
 				y: 4,
 			},
 		});
-		const toolbarItem = item("runtime:toolbar", {
-			scope: "toolbar",
-			position: {
-				x: 3,
-				y: 0,
-			},
-		});
 		Effect.runSync(
 			actorStore.replaceCanonicalItemsFx([
 				boardSecond,
 				boardFar,
-				toolbarItem,
 				boardFirst,
 			]),
 		);
@@ -239,7 +228,6 @@ describe("main surface", () => {
 			actorStore.replaceCanonicalItemsFx([
 				boardSecond,
 				boardFar,
-				toolbarItem,
 				revisedFirst,
 			]),
 		);
@@ -251,9 +239,6 @@ describe("main surface", () => {
 		);
 		expect(revisedFacts.occupant).toBe(revisedFirst);
 		expect(revisedFacts.stableKey).not.toBe(firstFacts.stableKey);
-
-		const toolbarPose = Effect.runSync(surface.readActorPoseFx(toolbarItem));
-		if (toolbarPose === null) throw new Error("Expected Toolbar pose.");
 
 		screen.width = 900;
 		screen.height = 600;
@@ -335,7 +320,7 @@ describe("main surface", () => {
 		Effect.runSync(surface.closeFx);
 		Effect.runSync(surface.closeFx);
 
-		expect(owned).toHaveLength(9);
+		expect(owned).toHaveLength(6);
 		for (const displayObject of owned) {
 			if (displayObject === dropFeedbackDisplayObject) {
 				expect(displayObject.destroyed).toBe(false);

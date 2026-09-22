@@ -10,7 +10,6 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
-	inputRuntimeToolbarTestConfig,
 	sourceLocation,
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
@@ -94,44 +93,5 @@ describe("readTileDeliveriesFx", () => {
 				to: sourceLocation(2),
 			},
 		]);
-	});
-
-	it("keeps Inventory delivery leases off the main canvas without an opener", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:workshop",
-					itemId: "workshop",
-					location: workshopLocation,
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:inventory-water",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 3,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
-				});
-				return yield* readTileDeliveriesFx({
-					game,
-					runtime: yield* readRuntimeFx(),
-				});
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeToolbarTestConfig,
-				}),
-			),
-		);
-
-		expect(result).toEqual([]);
 	});
 });

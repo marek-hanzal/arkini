@@ -12,7 +12,6 @@ const base = (id: string) => ({
 	uid: `uid:${id}`,
 	title: id,
 	description: id,
-	scope: "any",
 	maxStackSize: 1,
 	artwork: {
 		scale: 0.8,
@@ -30,10 +29,6 @@ export const config = GameConfigSchema.parse({
 		title: "Commands",
 		board: {
 			width: 4,
-			height: 1,
-		},
-		inventory: {
-			width: 2,
 			height: 1,
 		},
 	},
@@ -66,7 +61,7 @@ export const config = GameConfigSchema.parse({
 							{
 								type: "exists",
 								query: {
-									scope: "universe",
+									distance: "universe",
 									selector: {
 										type: "item",
 										itemId: "permit",

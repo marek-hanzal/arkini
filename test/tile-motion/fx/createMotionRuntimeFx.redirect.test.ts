@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 
 import {
-	inventoryLocation,
+	originBoardLocation,
 	secondBoardLocation,
 	createItem,
 	createActor,
@@ -30,24 +30,24 @@ describe("motion target redirection", () => {
 		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
 		const transient = travel.actor;
 		const destroy = vi.spyOn(transient.container, "destroy");
-		const inventory = createActor("runtime:inventory");
-		inventory.item = createItem(inventory.item.id, inventoryLocation);
-		inventory.container.position.set(640, 320);
-		actors.set(inventory.item.id, inventory);
-		canonicalItems.set(inventory.item.id, inventory.item);
+		const sink = createActor("runtime:sink");
+		sink.item = createItem(sink.item.id, originBoardLocation);
+		sink.container.position.set(640, 320);
+		actors.set(sink.item.id, sink);
+		canonicalItems.set(sink.item.id, sink.item);
 
 		samplePoseAnimation(travel, 0.4);
 		Effect.runSync(
 			runtime.redirectTargetFx({
 				sourceActorId: target.item.id,
-				targetActorId: inventory.item.id,
-				targetLocation: inventory.item.location,
+				targetActorId: sink.item.id,
+				targetLocation: sink.item.location,
 			}),
 		);
 		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
 			new Map([
 				[
-					inventory.item.id,
+					sink.item.id,
 					{
 						kind: "subtract",
 						quantity: 1,

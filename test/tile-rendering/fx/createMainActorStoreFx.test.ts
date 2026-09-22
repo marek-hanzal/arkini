@@ -14,9 +14,10 @@ const board = (x: number, y: number, space = 0) =>
 		},
 	}) as const;
 
-const toolbar = (x: number) =>
+const otherBoard = (x: number) =>
 	({
-		scope: "toolbar",
+		scope: "board",
+		space: 1,
 		position: {
 			x,
 			y: 0,
@@ -44,37 +45,6 @@ const item = (
 });
 
 describe("main canonical occupancy", () => {
-	it("atomically replaces exact Board and Toolbar identities with their latest revisions", () => {
-		const store = Effect.runSync(createMainActorStoreFx());
-		const boardItem = item("runtime:board", board(2, 3));
-		const toolbarItem = item("runtime:toolbar", toolbar(1));
-		Effect.runSync(
-			store.replaceCanonicalItemsFx([
-				toolbarItem,
-				boardItem,
-			]),
-		);
-
-		expect(Effect.runSync(store.readCanonicalOccupantFx(board(2, 3)))).toBe(boardItem);
-		expect(Effect.runSync(store.readCanonicalOccupantFx(toolbar(1)))).toBe(toolbarItem);
-		expect(Effect.runSync(store.readCanonicalOccupantFx(board(3, 3)))).toBeNull();
-
-		const revised = {
-			...boardItem,
-			quantity: 4,
-			revision: "revision:board:2",
-		};
-		Effect.runSync(
-			store.replaceCanonicalItemsFx([
-				revised,
-			]),
-		);
-
-		expect(Effect.runSync(store.readCanonicalOccupantFx(board(2, 3)))).toBe(revised);
-		expect(Effect.runSync(store.readCanonicalOccupantFx(toolbar(1)))).toBeNull();
-		expect(store.canonicalItems.get(boardItem.id)).toBe(revised);
-	});
-
 	it("rejects impossible duplicate occupancy without publishing a partial replacement", () => {
 		const store = Effect.runSync(createMainActorStoreFx());
 		const retained = item("runtime:retained", board(0, 0));
@@ -104,14 +74,14 @@ describe("main canonical occupancy", () => {
 			Effect.exit(
 				store.replaceCanonicalItemsFx([
 					item("runtime:duplicate", board(1, 0)),
-					item("runtime:duplicate", toolbar(1)),
+					item("runtime:duplicate", otherBoard(1)),
 				]),
 			),
 		);
 		expect(Exit.isFailure(duplicateIdentity)).toBe(true);
 		expect(Effect.runSync(store.readCanonicalOccupantFx(board(0, 0)))).toBe(retained);
 		expect(Effect.runSync(store.readCanonicalOccupantFx(board(1, 0)))).toBeNull();
-		expect(Effect.runSync(store.readCanonicalOccupantFx(toolbar(1)))).toBeNull();
+		expect(Effect.runSync(store.readCanonicalOccupantFx(otherBoard(1)))).toBeNull();
 	});
 
 	it("clears old-space and teardown occupancy with the canonical projection", () => {

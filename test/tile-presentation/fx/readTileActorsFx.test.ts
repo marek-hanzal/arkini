@@ -10,14 +10,12 @@ import {
 import { readTileActorsFx } from "~/tile-presentation/fx/readTileActorsFx";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 
 const readMainActor = (runtime: RuntimeSchema.Type) =>
 	Effect.runSync(
 		readTileActorsFx({
 			game: tileActorGame,
 			runtime,
-			surface: "main",
 		}).pipe(Effect.provideService(GameConfigFx, tileActorTestConfig)),
 	)[0];
 
@@ -107,7 +105,6 @@ describe("readTileActorsFx", () => {
 							...item,
 							item: {
 								...item.item,
-								scope: "board",
 								clock: {
 									intervalMs: 10_000,
 								},
@@ -143,14 +140,22 @@ describe("readTileActorsFx", () => {
 							...item,
 							item: {
 								...item.item,
-								scope: "board",
 								clock: {
 									intervalMs: 10_000,
 									rules: [
 										{
 											type: "disable",
 											when: [
-												existsWhen(item.item.id),
+												{
+													type: "exists",
+													query: {
+														distance: "self",
+														selector: {
+															type: "item",
+															itemId: item.item.id,
+														},
+													},
+												},
 											],
 										},
 									],

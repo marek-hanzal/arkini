@@ -331,47 +331,7 @@ describe("validateInputUnitsFn", () => {
 		).toEqual([]);
 	});
 
-	it("accepts board and any external payer scopes", async () => {
-		const boardProducer = createProducerItem({
-			id: "board-capable-target",
-			input: [
-				unitsInput("board-source"),
-			],
-		});
-		const anyProducer = createProducerItem({
-			id: "any-capable-target",
-			input: [
-				unitsInput("any-source"),
-			],
-		});
-		const boardTarget = {
-			...createSimpleItem("board-source"),
-			units: {
-				amount: 1,
-			},
-		};
-		const anyTarget = {
-			...createSimpleItem("any-source"),
-			units: {
-				amount: 1,
-			},
-		};
-
-		expect(
-			await unitDiagnostics({
-				[boardProducer.id]: boardProducer,
-				[boardTarget.id]: boardTarget,
-			}),
-		).toEqual([]);
-		expect(
-			await unitDiagnostics({
-				[anyProducer.id]: anyProducer,
-				[anyTarget.id]: anyTarget,
-			}),
-		).toEqual([]);
-	});
-
-	it("requires a units selector to match at least one sufficiently item with units", async () => {
+	it("requires a units selector to match an item with sufficient units", async () => {
 		const producer = createProducerItem({
 			id: "producer",
 			input: [

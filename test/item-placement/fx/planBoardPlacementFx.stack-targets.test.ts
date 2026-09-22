@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
-import { planScopePlacementFx } from "~/item-placement/fx/planScopePlacementFx";
+import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
@@ -17,21 +17,7 @@ const board = (x: number) => ({
 	},
 });
 
-const inventory = (x: number) => ({
-	scope: "inventory" as const,
-	position: {
-		x,
-		y: 0,
-	},
-});
-
-const craft = ({
-	id,
-	location,
-}: {
-	id: string;
-	location: ReturnType<typeof board> | ReturnType<typeof inventory>;
-}) => ({
+const craft = ({ id, location }: { id: string; location: ReturnType<typeof board> }) => ({
 	id,
 	item: purityTestConfig.items.craft,
 	location,
@@ -94,13 +80,10 @@ describe("pure placement stack targets", () => {
 		} satisfies RuntimeSchema.Type;
 
 		const plan = Effect.runSync(
-			planScopePlacementFx({
+			planBoardPlacementFx({
 				item: purityTestConfig.items.craft,
-				locations: [
-					board(0),
-					board(1),
-					board(2),
-				],
+				origin: board(0),
+				placement: "drop",
 				quantity: 1,
 				runtime,
 			}).pipe(
@@ -113,58 +96,6 @@ describe("pure placement stack targets", () => {
 		expect(plan.stack).toEqual([
 			{
 				itemId: asciiIdle.id,
-				quantity: 1,
-			},
-		]);
-	});
-
-	it("excludes a paused active owner in inventory", () => {
-		const active = craft({
-			id: "runtime:active",
-			location: inventory(0),
-		});
-		const idle = craft({
-			id: "runtime:idle",
-			location: inventory(1),
-		});
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				active,
-				idle,
-			],
-			jobs: [
-				activeJob(active.id),
-			],
-
-			jobQueue: [],
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-
-		const plan = Effect.runSync(
-			planScopePlacementFx({
-				item: purityTestConfig.items.craft,
-				locations: [
-					inventory(0),
-					inventory(1),
-				],
-				quantity: 1,
-				runtime,
-			}).pipe(
-				useGameFx({
-					config: purityTestConfig,
-				}),
-			),
-		);
-
-		expect(plan.stack).toEqual([
-			{
-				itemId: idle.id,
 				quantity: 1,
 			},
 		]);

@@ -30,8 +30,6 @@ Action rules help:
     Rules decide whether players can use this action.
 
     Every **Enable** rule must pass. Any matching **Disable** rule blocks it. Costs are paid only after the rules pass.
-Action type:
-  value: Action type
 Add at least one condition.:
   value: Add at least one condition.
 Add at least one drop.:
@@ -62,9 +60,6 @@ Alternative set:
   value: Alternative set
 An unexpected error prevented the build. Try again.:
   value: An unexpected error prevented the build. Try again.
-Any local:
-  value: Any local
-  dynamic: true
 Artwork:
   value: Artwork
 Artwork ID:
@@ -158,7 +153,7 @@ Authored action summary help:
   value: |
     Runs when the player uses this item.
 
-    It checks **Rules**, pays every **Requirement**, then opens Inventory or enters the chosen Space.
+    It checks **Rules**, pays every **Requirement**, then enters the chosen Space.
 Authored artwork summary help:
   value: |
     Combines a base image and optional overlay at one shared scale.
@@ -274,23 +269,6 @@ Base tile scale help:
 Board:
   value: Board
   dynamic: true
-Board distance:
-  value: Board distance
-Board distance Close help:
-  value: |
-    Exactly **1 cell** from the starting item, including diagonals.
-Board distance Far help:
-  value: |
-    Anywhere else on the current Board. Only the starting item is excluded.
-Board distance Near help:
-  value: |
-    Exactly **2 cells** from the starting item, including diagonals.
-Board distance Near-Close help:
-  value: |
-    **1 or 2 cells** from the starting item, including diagonals. The starting item and anything farther away are excluded.
-Board distance Self help:
-  value: |
-    Only the item running this action or production line.
 Board editing help:
   value: |
     Every Space has its own Board; all Boards share the same **Width** and **Height**.
@@ -298,8 +276,6 @@ Board editing help:
     Use **Space** to switch between Spaces 0–31. Changes stay with the selected Space, even before you save.
 Board placement:
   value: Where to place
-Board, inventory and toolbar:
-  value: Board, inventory and toolbar
 Build:
   value: Build
 Build blocked by validation:
@@ -418,9 +394,9 @@ Clock kill-switch help:
     Reserved items return first, then unused materials, then expiry output. Anything that cannot fit is lost.
 Clock lifetime help:
   value: |
-    How long this item may spend on a Board before expiring.
+    How long this item remains alive before expiring.
 
-    Time pauses in Inventory, Toolbar, inputs and production. Leave empty for unlimited Lifetime.
+    Time advances in every location while Clock rules allow it, including inputs and production. Leave empty for unlimited Lifetime.
 Clock line:
   value: Clock line
 Clock loop:
@@ -862,22 +838,6 @@ Initial board → item {index}:
 Initial board → space {space} → slot {x}, {y}:
   value: Initial board → space {space} → slot {x}, {y}
   dynamic: true
-Initial inventory:
-  value: Initial inventory
-Initial inventory → item {index}:
-  value: Initial inventory → item {index}
-  dynamic: true
-Initial inventory → slot {x}, {y}:
-  value: Initial inventory → slot {x}, {y}
-  dynamic: true
-Initial toolbar:
-  value: Initial toolbar
-Initial toolbar → item {index}:
-  value: Initial toolbar → item {index}
-  dynamic: true
-Initial toolbar → slot {index}:
-  value: Initial toolbar → slot {index}
-  dynamic: true
 Initial units:
   value: Initial units
 Initial units help:
@@ -908,31 +868,6 @@ Interval (seconds):
   value: Interval (seconds)
 Introduction:
   value: Introduction
-Inventory:
-  value: Inventory
-  dynamic: true
-Inventory action:
-  value: Inventory action
-Inventory action help:
-  value: |
-    Opens Inventory after rules pass and Unit costs are paid.
-
-    It does not move the item or grant extra storage space.
-Inventory action summary help:
-  value: |
-    Opens Inventory after every rule and requirement passes.
-
-    It does not move the item or run production.
-Inventory action type help:
-  value: |
-    **Inventory** opens global Inventory after rules pass and Unit costs are paid.
-
-    It grants no extra storage space.
-Inventory editing help:
-  value: |
-    Inventory is shared storage available from every Space.
-
-    **Width** and **Height** set the same grid everywhere.
 Item:
   value: Item
 Item ID:
@@ -945,19 +880,16 @@ Item ID help:
 Item UID:
   value: Item UID
 Item action empty title:
-  value: Let a click open Inventory or move to another space.
+  value: Let a click move to another space.
 Item action help:
   value: |
     Action runs when the player uses this item.
 
     - **Space** enters a chosen Board Space.
-    - **Inventory** opens global Inventory.
     - Every Enable rule must pass; any matching Disable rule blocks the action.
     - Unit costs are paid only after the rules pass.
 
     Action cannot coexist with Production or Clock. Enabling it removes both from this draft.
-
-    Clicking an item inside Inventory releases it to Board or Toolbar; it does not run the item's Action.
 Item artwork help:
   value: |
     Artwork combines a base image with an optional overlay.
@@ -977,7 +909,7 @@ Item clock help:
     - **Stop immediately** cancels unfinished work at expiry; anything that cannot fit is lost.
     - Every Enable rule must pass; any matching Disable rule pauses the Clock.
 
-    Time advances only while the item is on a Board. Enabling Clock removes Action and sets maximum stack size to one.
+    Time advances in every location while Clock rules allow it; production pulses require a Board. Enabling Clock removes Action and sets maximum stack size to one.
 Item connections help:
   value: |
     Connections answers four quick questions:
@@ -1043,9 +975,8 @@ Item expired:
   dynamic: true
 Item identity help:
   value: |
-    The Item page is the overview: artwork, storage, Production, Merges, Units, Clock and Action in one place.
+    The Item page is the overview: artwork, Production, Merges, Units, Clock and Action in one place.
 
-    - **Allowed storage** chooses Board, Toolbar, Inventory or any of them.
     - **Maximum stack size** limits how many items share one cell.
     - **Show all** opens the full detail page for a section; **Edit** opens its form.
 
@@ -1136,23 +1067,6 @@ Item stack size help:
     How many items may share one cell.
 
     This is separate from **Units** inside each item. Clock requires a stack size of one.
-Item storage scope - any:
-  value: Any
-  dynamic: true
-Item storage scope - board:
-  value: Board only
-  dynamic: true
-Item storage scope - inventory:
-  value: Inventory only
-  dynamic: true
-Item storage scope - toolbar:
-  value: Toolbar only
-  dynamic: true
-Item storage scope help:
-  value: |
-    Where this item may be stored: **Board**, **Toolbar**, **Inventory**, or **Any**.
-
-    A compatible stack or empty cell is still required. Clock time pauses whenever the item is outside a Board.
 Item unavailable:
   value: Item unavailable
 Item units empty title:
@@ -1713,7 +1627,7 @@ Project general help:
   value: |
     Review the project's title, ID and storage sizes.
 
-    **Project ID** is also the name used by saved games. Renaming it makes a new game to existing saves. Board, Toolbar and Inventory open their sizes and starting layouts. **Export** saves the portable Editor sources.
+    **Project ID** is also the name used by saved games. Renaming it makes a new game to existing saves. Board opens its size and starting layout. **Export** saves the portable Editor sources.
 Project hero image help:
   value: |
     The Image shown by the launcher and game shell. Choose one from this project.
@@ -1726,38 +1640,14 @@ Project item count:
   value: "{count} item"
 Project items count:
   value: "{count} items"
-Project toolbar disabled help:
-  value: |
-    Toolbar is off. Set **Slots** above `0` to enable it and add starting items.
 Project unreachable item count:
   value: "{count} unreachable item"
 Project unreachable items count:
   value: "{count} unreachable items"
 Quantity:
   value: Quantity
-Query scope:
-  value: Search in
-Query scope Any local help:
-  value: |
-    Searches Inventory, Toolbar and the current Board Space.
-
-    Board distance is ignored; other Spaces are excluded.
-Query scope Board help:
-  value: |
-    Searches the current Board Space around the item running this action or production line.
-
-    Use **Board distance** to choose how far.
-Query scope Inventory help:
-  value: |
-    Searches global Inventory only.
-Query scope Toolbar help:
-  value: |
-    Searches Toolbar only.
-Query scope Universe help:
-  value: |
-    Searches Inventory, Toolbar and every Board Space in the game.
-
-    Use it when the current Space is too small a world.
+Query reach:
+  value: Query reach
 Queue capacity:
   value: Queue capacity
 Random:
@@ -1953,20 +1843,8 @@ Search item title, ID or type…:
   value: Search item title, ID or type…
 Search music…:
   value: Search music…
-Searches matching items on the current board at the selected distance from the action owner.:
-  value: Searches the current Board at the chosen distance from the item using this requirement.
-  dynamic: true
-Searches matching items stored anywhere in the inventory.:
-  value: Searches matching items stored anywhere in the inventory.
-  dynamic: true
-Searches matching items stored anywhere in the toolbar.:
-  value: Searches matching items stored anywhere in the toolbar.
-  dynamic: true
-Searches the inventory, toolbar, and every board space in the current game.:
-  value: Searches the inventory, toolbar, and every board space in the current game.
-  dynamic: true
-Searches the inventory, toolbar, and the current board space without a board-distance limit.:
-  value: Searches the inventory, toolbar, and the current board space without a board-distance limit.
+Searches matching items in every board space in the current game.:
+  value: Searches matching items in every board space in the current game.
   dynamic: true
 Select an item with Units enabled.:
   value: Select an item with Units enabled.
@@ -2010,8 +1888,6 @@ Single item:
   value: Single item
 Size:
   value: Size
-Slots:
-  value: Slots
 Slowest first:
   value: Slowest first
 Source:
@@ -2032,11 +1908,6 @@ Space action summary help:
     Enters the chosen Space after every rule and requirement passes.
 
     The number names a Board Space, not another item.
-Space action type help:
-  value: |
-    **Space** enters one chosen Board after rules pass and Unit costs are paid.
-
-    The item also acts as a portal for stacks dropped onto it.
 Space changed:
   value: Space changed
   dynamic: true
@@ -2075,10 +1946,6 @@ Stop making this recipe when you click the item on the board.:
   value: Stop making this recipe when you click the item on the board.
 Stop this batch and throw it away. Materials already used are lost.:
   value: Stop this batch and throw it away. Materials already used are lost.
-Storage:
-  value: Storage
-Storage scope:
-  value: Allowed storage
 Suffix:
   value: Suffix
 Target:
@@ -2142,14 +2009,6 @@ Timer:
   value: Timer
 Title:
   value: Title
-Toolbar:
-  value: Toolbar
-  dynamic: true
-Toolbar editing help:
-  value: |
-    Toolbar is one row of shared storage visible during play.
-
-    Set **Slots** to `0` to remove it.
 Try a different search or change the active filters.:
   value: Try another search or change the **active filters**.
 Try again:
@@ -2250,8 +2109,8 @@ When an existing item is placed in a new location.:
 When an item cannot be delivered and is discarded.:
   value: When an item cannot be delivered and is discarded.
   dynamic: true
-When an item cannot be dropped there, including into a portal or inventory.:
-  value: When an item cannot be dropped there, including into a portal or inventory.
+When an item cannot be dropped there, including into a portal.:
+  value: When an item cannot be dropped there, including into a portal.
   dynamic: true
 When an item disappears without creating a replacement.:
   value: When an item disappears without creating a replacement.
@@ -2289,8 +2148,6 @@ When the player switches to another Board space.:
 When two items swap places.:
   value: When two items swap places.
   dynamic: true
-Where you can keep it:
-  value: Where you can keep it
 Width:
   value: Width
 With note:
@@ -2361,8 +2218,6 @@ self:
   value: self
 simple:
   value: simple
-space:
-  value: space
 spend:
   value: spend
 starting:

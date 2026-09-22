@@ -10,9 +10,9 @@ Each Board cell holds one item stack or one delivery-origin lease. Birth, output
 
 A new game applies authored Board start entries against one evolving candidate Runtime. Space and coordinates are exact; every entry uses canonical placement, and `currentSpace` plus the complete initial state commit atomically or not at all.
 
-Spatial mechanics—distance, placement, merge, unit targeting, and output—remain in their origin space. Portal drops explicitly transfer items between spaces. Items have no authored storage scope.
+Board-relative distance, placement, merge and output remain in their origin space. Universe queries can select material and unit payers across Board spaces. Portal drops explicitly transfer items between spaces. Items have no authored storage scope.
 
-Queries have one `distance`: `self` matches the origin, `close` distance one, `near-close` one or two, `near` exactly two, `far` every positive distance in the origin's Board space, and `universe` all Board spaces including the origin. Board-relative distances require a physical Board origin; direct queries without one are invalid unless their distance is `universe`.
+Queries have one `distance`: `self` matches the origin, `close` distance one, `near-close` one or two, `near` exactly two, `far` every positive distance in the origin's Board space, and `universe` all Board spaces including the origin. Query callers supply a physical Board origin; `universe` ignores its distance and space when matching. Internal input, job, reserved and delivery locations are never direct query candidates.
 
 Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial unit count. An impure item has effective stack size `1`. Merge random-stream history does not restrict stacking: a surviving identity keeps its cursor, while a new identity starts its own stream.
 
@@ -36,7 +36,7 @@ Only after required material has settled may a later queue pass create the job a
 
 An item may own one optional `action`, discriminated by `type`. An action and nonempty production `lines` are mutually exclusive. Action availability is determined only by its `rules`: every Enable rule must pass, any matching Disable rule vetoes activation, and no rules means available. There is no authored action enable flag. Optional `input` requirements reuse immediate-action unit admission and settlement.
 
-The `space` action selects its authored `space`. Activation verifies the clicked identity, revision, location and current-space snapshot, then settles requirements and navigation in one transaction. Rejection or blocked depletion output changes neither units nor navigation. Actions activate on the current Board and use its physical origin for unit settlement.
+The `space` action selects its authored `space`. Activation verifies the clicked identity, revision, location and current-space snapshot, then settles requirements and navigation in one transaction. Rejection or blocked depletion output changes neither units nor navigation. Actions activate on the current Board. Their queries use the action origin, while each depleted payer settles output from its own physical Board origin.
 
 Dropping an item onto a `space` action item teleports the exact source stack to the first free compatible cell, in row-major order, on that action's authored Board. This occupied-target behavior takes precedence over input storage, merge, stack and swap without activating the portal, settling its inputs or changing the player's current space. The portal remains in place. A successful transfer emits `item:portal-transferred` for its assigned SFX; rejected drops emit no transfer event. The shared `item-drop:rejected` presentation SFX covers rejected Board drops, including portal transfers; ignored drops and cancelled gestures stay silent. Direction stays source-owned: a portal dropped onto another item may still use its own authored merge, while an item dropped onto the portal never merges into it. A full destination Board rejects the drop atomically. A successful swap emits one `item:swapped` event for both items, with their identities and original locations, instead of separate placement events.
 
@@ -55,7 +55,7 @@ remainingMs
 
 Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. Item Detail offers exact active-job cancellation on an interactive owner. Active-job cancellation consumes committed material without refunds or line output, returns reservations through ordinary placement, and preserves pending intent unless owner depletion removes the owner. Failed placement rolls the cancellation back; a stale job identity is a no-op. Material expiry and cheat-only forced owner removal also use the shared abort settlement.
 
-Items with `clock` are identity-bound and non-stackable, and may author any storage scope. A finite lifetime persists `schedule.remainingDurationMs`, initialized from `clock.durationMs`. Enabled identities present at both step boundaries age by that step in every location scope. Moving an identity between scopes neither pauses nor resets its schedule. Job output created in the current step starts at full duration.
+Items with `clock` are identity-bound and non-stackable. A finite lifetime persists `schedule.remainingDurationMs`, initialized from `clock.durationMs`. Enabled identities present at both step boundaries age by that step in every location scope. Moving an identity between scopes neither pauses nor resets its schedule. Job output created in the current step starts at full duration.
 
 Exhausted items expire after job completion in stable runtime-ID order, so a job completion tied with its material expiry wins. Expiry output follows ownership to the item's physical grid origin: its own Board cell; its delivery lease; its input owner; or its job owner. The expiry, optional deterministic output, affected-job abort, and reservation returns commit atomically. In the default loose-kill mode, failed placement leaves the same zero-duration item in place; an affected active job stays frozen until expiry can settle. Kill-switch uses the forced-removal policy below.
 
@@ -90,11 +90,11 @@ Neither mode remembers historical stack, slot, or position. Each committed root 
 
 When any committed material expires, the engine aborts that job and removes its remaining consumed roots before placing expiry output. It produces no line output and never refunds units spent at start. A depleted job owner settles its normal depletion lifecycle first: remove the owner and its queue, place depletion output, release its stored inputs, then return job reservations. A non-depleted owner preserves queued intent and returns every reservation from its physical grid origin. Material expiry output follows these returns; both outputs evaluate rules against the same pre-expiry Runtime snapshot. Loose-kill rolls the entire transition back if placement fails; kill-switch retains the forced-removal discard policy for depletion output and all returns. After a successful expiry pass, idle owners' queued requests are retried in global intent order against the resulting Runtime.
 
-Cheat removal of an authored idle Board owner releases its stored input roots through canonical existing-item placement in the same transition. A loaded passive owner must return to a Board before that cheat command because no passive coordinate is reinterpreted as a Board origin. Clock expiry is the explicit exception above: it removes the owner in its current scope and returns stored roots from that physical grid origin. Any blocked release rolls the removal back.
+Cheat removal of an authored idle Board owner releases its stored input roots through canonical existing-item placement in the same transition. Clock expiry can also remove an item from an internal ownership location and derives its physical Board origin through that ownership chain. Any blocked release rolls the removal back.
 
 ## Units and completion
 
-Units are an item capability available to every item: passive and manually operated resources use the same Item schema, and scheduled production adds Item.clock. A units input selects a Board item with a unit supply; it does not require a special item type.
+Units are an item capability available to every item: passive and manually operated resources use the same Item schema, and scheduled production adds Item.clock. A units input selects a Board item with a unit supply; it does not require a special item type. Its query may use `universe` to select a payer from another space. Eligible local payers come first, ordered by Manhattan distance, row, column and runtime ID; remote payers follow in space, row, column and runtime-ID order. Coordinates in different spaces are not compared as distances.
 
 `quantity` counts item instances in a stack; `units` is the finite supply inside each instance and can represent health, resource stock, or uses.
 
@@ -126,16 +126,16 @@ Each surviving merge source also persists a `mergeSequence` cursor (omission mea
 
 ## Placement and merge
 
-One scope-aware placement policy serves ordinary drops, line/depletion/expiry output, reserved-instance relocation, stored-input release, and initial placement:
+One Board placement policy serves ordinary drops, line/depletion/expiry output, reserved-instance relocation and stored-input release:
 
 ```text
-apply authored scope and Board strategy
+apply Board placement strategy
 → fill compatible pure stacks
 → spawn into empty locations
 → require the complete quantity
 ```
 
-Placement stays in the physical origin's Board space. Each placement stacks first against the evolving draft, then chooses empty cells nearest-first. `random` chooses a fresh Board origin for every resolved quantity unit, including occupied cells. No output falls back to another Board space. Existing pure items may normalize; impure items keep exact identity and require one empty cell. A full Board blocks the complete owning mutation; partial placement is forbidden.
+Initial placement uses exact authored Board cells. Runtime placement stays in the physical origin's Board space. Each placement stacks first against the evolving draft, then chooses empty cells nearest-first. `random` chooses a fresh Board origin for every resolved quantity unit, including occupied cells. No output falls back to another Board space. Existing pure items may normalize; impure items keep exact identity and require one empty cell. A full Board blocks the complete owning mutation; partial placement is forbidden.
 
 Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed, used, or has a unit spent through source `spend`; one Board target is kept, removed, replaced, or has a unit spent through target `spend`; and optional output uses ordinary placement. A pure replacement uses ordinary stack-first placement and retains the target identity only when it must create a new stack; an impure replacement never stacks and retains the target identity in an exclusive location. Replacing a finite-lifetime target discards its remaining lifetime and initializes the replacement through its own canonical item state. `use` returns the source through ordinary placement without spending units. Each `spend` spends one real unit from its respective participant and runs that item's standard depletion output when the last unit is spent. A depleted source returns buffered inputs from its physical Board origin through ordinary placement; a blocked return rolls the whole merge back. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
 

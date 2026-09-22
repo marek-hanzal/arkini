@@ -28,7 +28,6 @@ const prepareBlockedReserveQueueFx = Effect.fn("prepareBlockedReserveQueueFx")(f
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	const tool = yield* spawnItemFx({
 		id: "runtime:tool",
@@ -41,7 +40,6 @@ const prepareBlockedReserveQueueFx = Effect.fn("prepareBlockedReserveQueueFx")(f
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	const request = yield* enqueueLineFx({
 		ownerItemId: owner.id,

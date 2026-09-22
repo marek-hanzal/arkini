@@ -26,7 +26,7 @@ const owner = {
 			y: 0,
 		},
 	},
-	quantity: 1,
+
 	revision: "revision:owner",
 } satisfies RuntimeItemSchema.Type;
 

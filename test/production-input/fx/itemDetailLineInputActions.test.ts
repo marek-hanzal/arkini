@@ -140,35 +140,42 @@ const spawnOwnerFx = () =>
 		id: ownerItemId,
 		itemId: "workshop",
 		location: workshopLocation,
-		quantity: 1,
 	});
 
 const spawnWaterFx = ({
 	id,
 	location,
-	quantity,
 }: {
 	readonly id: string;
 	readonly location: ReturnType<typeof sourceLocation>;
-	readonly quantity: number;
 }) =>
 	spawnItemFx({
 		id,
 		itemId: "water",
 		location,
-		quantity,
 	});
+
+const spawnFourWaterFx = () =>
+	Effect.forEach(
+		[
+			1,
+			2,
+			3,
+			4,
+		],
+		(x) =>
+			spawnWaterFx({
+				id: x === 1 ? "runtime:water" : `runtime:water:${x}`,
+				location: sourceLocation(x),
+			}),
+	);
 
 describe("Item Detail line input actions", () => {
 	it("autofills a range input toward its maximum", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:water",
-					location: sourceLocation(1),
-					quantity: 7,
-				});
+				yield* spawnFourWaterFx();
 
 				const autofilled = yield* autofillLineInputsFx({
 					ownerItemId,
@@ -188,21 +195,18 @@ describe("Item Detail line input actions", () => {
 		expect(result.autofilled).toEqual({
 			deliveryItemIds: [
 				"runtime:water",
+				"runtime:water:2",
+				"runtime:water:3",
+				"runtime:water:4",
 			],
 			remainingMissingQuantity: 0,
 			scheduledQuantity: 4,
 		});
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			quantity: 7,
 			location: {
 				scope: "delivery",
 				target: {
-					input: [
-						{
-							inputIndex: 0,
-							quantity: 4,
-						},
-					],
+					inputIndex: 0,
 				},
 			},
 		});
@@ -212,11 +216,7 @@ describe("Item Detail line input actions", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:water",
-					location: sourceLocation(1),
-					quantity: 4,
-				});
+				yield* spawnFourWaterFx();
 
 				const autofilled = yield* autofillLineInputsFx({
 					ownerItemId,
@@ -237,33 +237,26 @@ describe("Item Detail line input actions", () => {
 			remainingMissingQuantity: 0,
 			scheduledQuantity: 4,
 		});
-		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			location: {
-				target: {
-					input: [
-						{
-							inputIndex: 0,
-							quantity: 2,
-						},
-						{
-							inputIndex: 1,
-							quantity: 2,
-						},
-					],
-				},
-			},
-		});
+		for (const inputIndex of [
+			0,
+			1,
+		])
+			expect(
+				result.runtime.items.filter(
+					(item) =>
+						item.location.scope === "delivery" &&
+						item.location.phase === "outbound" &&
+						item.location.target.kind === "line-input" &&
+						item.location.target.inputIndex === inputIndex,
+				),
+			).toHaveLength(2);
 	});
 
 	it("autofills only the missing quantity without consuming spare input capacity", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:water",
-					location: sourceLocation(1),
-					quantity: 7,
-				});
+				yield* spawnFourWaterFx();
 
 				const autofilled = yield* autofillLineInputsFx({
 					ownerItemId,
@@ -283,6 +276,8 @@ describe("Item Detail line input actions", () => {
 		expect(result.autofilled).toEqual({
 			deliveryItemIds: [
 				"runtime:water",
+				"runtime:water:2",
+				"runtime:water:3",
 			],
 			remainingMissingQuantity: 0,
 			scheduledQuantity: 3,
@@ -293,7 +288,6 @@ describe("Item Detail line input actions", () => {
 				phase: "outbound",
 				scope: "delivery",
 			},
-			quantity: 7,
 		});
 	});
 
@@ -312,7 +306,6 @@ describe("Item Detail line input actions", () => {
 							y: 0,
 						},
 					},
-					quantity: 3,
 				});
 
 				const autofilled = yield* autofillLineInputsFx({
@@ -369,7 +362,6 @@ describe("Item Detail line input actions", () => {
 				yield* spawnWaterFx({
 					id: "runtime:required-water",
 					location: sourceLocation(1),
-					quantity: 3,
 				});
 				const requiredWater = yield* getItemFx({
 					itemId: "runtime:required-water",
@@ -380,7 +372,6 @@ describe("Item Detail line input actions", () => {
 					inputIndex: 0,
 					sourceItemId: requiredWater.id,
 					sourceItemRevision: requiredWater.revision,
-					quantity: 3,
 				});
 				const withdrawn = yield* withdrawLineInputsFx({
 					ownerItemId,
@@ -405,7 +396,6 @@ describe("Item Detail line input actions", () => {
 
 		expect(result.withdrawn).toEqual({
 			withdrawnItemCount: 1,
-			withdrawnQuantity: 3,
 		});
 		expect(result.runtime.items).not.toContainEqual(
 			expect.objectContaining({
@@ -421,7 +411,7 @@ describe("Item Detail line input actions", () => {
 				item: expect.objectContaining({
 					id: "water",
 				}),
-				quantity: 3,
+
 				location: expect.objectContaining({
 					scope: "board",
 					space: 0,
@@ -444,43 +434,37 @@ describe("Item Detail line input actions", () => {
 		});
 	});
 
-	it("withdraws one exact input completely while preserving its filled sibling", () => {
+	it("withdraws one exact input completely while preserving its buffered sibling", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:water",
-					location: sourceLocation(1),
-					quantity: 3,
-				});
-				yield* spawnItemFx({
-					id: "runtime:stone",
-					itemId: "stone",
-					location: sourceLocation(2),
-					quantity: 2,
-				});
-				const water = yield* getItemFx({
-					itemId: "runtime:water",
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 0,
-					sourceItemId: water.id,
-					sourceItemRevision: water.revision,
-					quantity: 3,
-				});
-				const stone = yield* getItemFx({
-					itemId: "runtime:stone",
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 1,
-					sourceItemId: stone.id,
-					sourceItemRevision: stone.revision,
-					quantity: 2,
-				});
+				for (const [itemId, count, inputIndex] of [
+					[
+						"water",
+						3,
+						0,
+					],
+					[
+						"stone",
+						2,
+						1,
+					],
+				] as const) {
+					for (let index = 0; index < count; index++) {
+						const item = yield* spawnItemFx({
+							id: index === 0 ? `runtime:${itemId}` : `runtime:${itemId}:${index}`,
+							itemId,
+							location: sourceLocation(1),
+						});
+						yield* storeInputMaterialFx({
+							ownerItemId,
+							lineId,
+							inputIndex,
+							sourceItemId: item.id,
+							sourceItemRevision: item.revision,
+						});
+					}
+				}
 
 				const before = yield* readItemDetailLinesFx({
 					itemId: ownerItemId,
@@ -549,13 +533,12 @@ describe("Item Detail line input actions", () => {
 			],
 		});
 		expect(result.withdrawn).toEqual({
-			withdrawnItemCount: 1,
-			withdrawnQuantity: 3,
+			withdrawnItemCount: 3,
 		});
 		expect(result.runtime.items).toContainEqual(
 			expect.objectContaining({
 				id: "runtime:stone",
-				quantity: 2,
+
 				location: {
 					scope: "input",
 					ownerItemId,
@@ -584,8 +567,7 @@ describe("Item Detail line input actions", () => {
 			],
 		});
 		expect(result.withdrawnSibling).toEqual({
-			withdrawnItemCount: 1,
-			withdrawnQuantity: 2,
+			withdrawnItemCount: 2,
 		});
 		expect(result.afterBoth).toMatchObject({
 			kind: "available",
@@ -630,7 +612,6 @@ it("leaves the exact input and its queue unchanged when canonical placement fail
 						y: 0,
 					},
 				},
-				quantity: 3,
 			});
 			const water = yield* getItemFx({
 				itemId: "runtime:water",
@@ -641,13 +622,11 @@ it("leaves the exact input and its queue unchanged when canonical placement fail
 				inputIndex: 0,
 				sourceItemId: water.id,
 				sourceItemRevision: water.revision,
-				quantity: 3,
 			});
 			yield* spawnItemFx({
 				id: "runtime:blocker",
 				itemId: "stone",
 				location: sourceLocation(1),
-				quantity: 1,
 			});
 			yield* enqueueLineFx({
 				ownerItemId,

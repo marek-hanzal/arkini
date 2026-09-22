@@ -10,7 +10,6 @@ const sampleFx = () =>
 		itemId: "runtime:tree",
 		ownerItemId: "runtime:lumberjack",
 		program: Random.next,
-		quantity: 2,
 		remainingUnits: 1,
 	});
 

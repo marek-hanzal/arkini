@@ -26,7 +26,7 @@ const producer = ItemSchema.parse({
 	id: "producer",
 	title: "Producer",
 	ui: "default",
-	maxStackSize: 1,
+
 	artwork: {
 		scale: 1,
 		default: [
@@ -229,7 +229,6 @@ describe("readGameAudioCuesFn", () => {
 					canonicalItemId: "item:first",
 					originItemId: "runtime:producer",
 					location: boardLocation,
-					quantity: 1,
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
@@ -237,25 +236,6 @@ describe("readGameAudioCuesFn", () => {
 					canonicalItemId: "item:second",
 					originItemId: "runtime:producer",
 					location: boardLocation,
-					quantity: 4,
-				},
-				{
-					type: GameEventEnumSchema.enum.ItemStacked,
-					itemId: "runtime:stack",
-					canonicalItemId: "item:stack",
-					originItemId: "runtime:first",
-					location: boardLocation,
-					previousQuantity: 1,
-					quantity: 2,
-				},
-				{
-					type: GameEventEnumSchema.enum.ItemStacked,
-					itemId: "runtime:stack",
-					canonicalItemId: "item:stack",
-					originItemId: "runtime:second",
-					location: boardLocation,
-					previousQuantity: 2,
-					quantity: 4,
 				},
 			],
 		} satisfies GameEventBatchSchema.Type;
@@ -267,11 +247,7 @@ describe("readGameAudioCuesFn", () => {
 			},
 			{
 				event: GameEventEnumSchema.enum.ItemSpawned,
-				strength: 3,
-			},
-			{
-				event: GameEventEnumSchema.enum.ItemStacked,
-				strength: 2.25,
+				strength: 1.25,
 			},
 		]);
 	});
@@ -297,7 +273,6 @@ describe("readGameAudioCuesFn", () => {
 					canonicalItemId: "item:spawn",
 					originItemId: "runtime:producer",
 					location: boardLocation,
-					quantity: 1,
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemPlaced,
@@ -306,25 +281,13 @@ describe("readGameAudioCuesFn", () => {
 					originItemId: "runtime:producer",
 					previousLocation: inputLocation,
 					location: boardLocation,
-					quantity: 1,
 				},
-				{
-					type: GameEventEnumSchema.enum.ItemStacked,
-					itemId: "runtime:stack",
-					canonicalItemId: "item:stack",
-					originItemId: "runtime:spawn",
-					location: boardLocation,
-					previousQuantity: 1,
-					quantity: 2,
-				},
+
 				{
 					type: GameEventEnumSchema.enum.ItemConsumed,
 					sourceItemId: "runtime:source",
 					canonicalItemId: "item:source",
 					sourceLocation: inputLocation,
-					previousQuantity: 2,
-					consumedQuantity: 1,
-					resultingQuantity: 1,
 				},
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
@@ -338,15 +301,12 @@ describe("readGameAudioCuesFn", () => {
 					itemId: "runtime:spent",
 					canonicalItemId: "item:spent",
 					location: boardLocation,
-					previousQuantity: 1,
-					resultingQuantity: 0,
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemDisappeared,
 					itemId: "runtime:spent",
 					canonicalItemId: "item:spent",
 					location: boardLocation,
-					quantity: 1,
 				},
 			],
 		} satisfies GameEventBatchSchema.Type;

@@ -18,7 +18,7 @@ describe("Tick queue progress priority", () => {
 		const older = requestFn("request:older", "line:older");
 		const later = requestFn("request:later", "line:later");
 		const last = requestFn("request:last", "line:later");
-		const buffer = bufferFn(1);
+		const buffer = bufferFn();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const prepared = yield* prepareQueueFx(
@@ -36,9 +36,10 @@ describe("Tick queue progress priority", () => {
 				// Deliver the missing buffered unit while the younger job is still active.
 				let draft = {
 					...active.runtime,
-					items: active.runtime.items.map((item) =>
-						item.id === buffer.id ? bufferFn(2) : item,
-					),
+					items: [
+						...active.runtime.items,
+						bufferFn("buffer:second"),
+					],
 				};
 				for (let step = 0; step < 8; step += 1) {
 					draft = (yield* advanceRuntimeStepFx(draft)).runtime;
@@ -90,7 +91,6 @@ describe("Tick queue progress priority", () => {
 			last,
 		]);
 		expect(result.restored.items.find((item) => item.id === buffer.id)).toMatchObject({
-			quantity: 2,
 			location: {
 				scope: "job",
 				jobId: result.restored.jobs[0]?.id,
@@ -190,7 +190,6 @@ describe("Tick queue progress priority", () => {
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual(queue);
 		expect(result.runtime.items.find((item) => item.id === "source:water")).toMatchObject({
-			quantity: 1,
 			location: {
 				scope: "delivery",
 				phase: "outbound",

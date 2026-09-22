@@ -1,6 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) => {
+const baseItem = ({ id }: { id: string }) => {
 	return {
 		uid: id,
 		id,
@@ -12,7 +12,6 @@ const baseItem = ({ id, maxStackSize }: { id: string; maxStackSize: number }) =>
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize,
 	} as const;
 };
 
@@ -37,7 +36,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "workshop",
-				maxStackSize: 10,
 			}),
 
 			lines: [
@@ -75,7 +73,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "water",
-				maxStackSize: 10,
 			}),
 		},
 		stone: {
@@ -84,7 +81,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "stone",
-				maxStackSize: 10,
 			}),
 
 			units: {

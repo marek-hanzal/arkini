@@ -37,7 +37,6 @@ const config = GameConfigSchema.parse({
 					"artwork:source",
 				],
 			},
-			maxStackSize: 1,
 		},
 		tree: {
 			maxQueueSize: 1,
@@ -53,7 +52,6 @@ const config = GameConfigSchema.parse({
 					"artwork:tree",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });
@@ -61,29 +59,26 @@ const config = GameConfigSchema.parse({
 const placeItemFx = ({
 	id,
 	itemId,
-	quantity,
 	location,
 }: {
 	id: string;
 	itemId: "source" | "tree";
-	quantity: number;
 	location: BoardLocationSchema.Type;
 }) => {
 	return spawnItemFx({
 		id,
 		itemId,
 		location,
-		quantity,
 	});
 };
 
-it("evaluates exists, exact count, and inclusive range over query quantities", () => {
+it("evaluates exists, exact count, and inclusive range over matching identities", () => {
 	const result = Effect.runSync(
 		Effect.gen(function* () {
 			const origin = yield* placeItemFx({
 				id: "origin",
 				itemId: "source",
-				quantity: 1,
+
 				location: {
 					scope: "board",
 					space: 0,
@@ -96,7 +91,7 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 			yield* placeItemFx({
 				id: "board-close",
 				itemId: "tree",
-				quantity: 2,
+
 				location: {
 					scope: "board",
 					space: 0,
@@ -109,7 +104,7 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 			yield* placeItemFx({
 				id: "board-near",
 				itemId: "tree",
-				quantity: 4,
+
 				location: {
 					scope: "board",
 					space: 0,
@@ -122,7 +117,7 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 			yield* placeItemFx({
 				id: "board-far",
 				itemId: "tree",
-				quantity: 3,
+
 				location: {
 					scope: "board" as const,
 					space: 0,
@@ -156,7 +151,7 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 					position: origin.location.position,
 				},
 				when: {
-					count: 9,
+					count: 3,
 					query: {
 						distance: "far" as const,
 						selector: {
@@ -174,8 +169,8 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 					position: origin.location.position,
 				},
 				when: {
-					max: 2,
-					min: 2,
+					max: 1,
+					min: 1,
 					query: {
 						distance: "close",
 						selector: {
@@ -193,7 +188,7 @@ it("evaluates exists, exact count, and inclusive range over query quantities", (
 					position: origin.location.position,
 				},
 				when: {
-					count: 8,
+					count: 4,
 					query: {
 						distance: "far" as const,
 						selector: {

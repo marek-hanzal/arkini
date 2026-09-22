@@ -48,7 +48,6 @@ describe("blueprint completion placement", () => {
 					y: 1,
 				},
 			},
-			quantity: 1,
 		});
 		expect(target?.id).not.toBe(result.owner.id);
 	});
@@ -74,7 +73,6 @@ describe("blueprint completion placement", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
@@ -82,7 +80,6 @@ describe("blueprint completion placement", () => {
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

@@ -1,6 +1,6 @@
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number }) => ({
+const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -11,16 +11,15 @@ const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize,
 });
 
-export const purityTestConfig = GameConfigSchema.parse({
+export const lineSelectionTestConfig = GameConfigSchema.parse({
 	resources: {
 		hero: "hero",
 	},
 	meta: {
-		id: "game:purity",
-		title: "Purity",
+		id: "game:line-selection",
+		title: "Line selection",
 		board: {
 			width: 4,
 			height: 1,

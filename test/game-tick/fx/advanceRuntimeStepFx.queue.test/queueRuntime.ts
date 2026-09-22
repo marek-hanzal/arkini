@@ -139,12 +139,11 @@ export const itemFn = (
 	id: string,
 	itemId: string,
 	location: RuntimeItemSchema.Type["location"],
-	quantity = 1,
 ): RuntimeItemSchema.Type => ({
 	id,
 	item: queueConfig.items[itemId]!,
 	location,
-	quantity,
+
 	revision: `revision:${id}`,
 });
 
@@ -157,18 +156,13 @@ export const boardFn = (x: number): RuntimeItemSchema.Type["location"] => ({
 	},
 });
 
-export const bufferFn = (quantity: number) =>
-	itemFn(
-		"buffer:older",
-		"tool",
-		{
-			scope: "input",
-			ownerItemId: "owner:a",
-			lineId: "line:older",
-			inputIndex: 0,
-		},
-		quantity,
-	);
+export const bufferFn = (id = "buffer:older") =>
+	itemFn(id, "tool", {
+		scope: "input",
+		ownerItemId: "owner:a",
+		lineId: "line:older",
+		inputIndex: 0,
+	});
 
 // Explicit snapshots exercise immutable Tick drafts; start/projection operations pin their reads
 // to the supplied Runtime instead of the otherwise empty Runtime service provided by useGameFx.

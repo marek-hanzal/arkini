@@ -15,7 +15,6 @@ const baseItem = ({ id }: { id: string }) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 10,
 });
 
 export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
@@ -40,7 +39,6 @@ export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 					id: "forge",
 				}),
 
-				maxStackSize: 1,
 				maxQueueSize,
 				lines: [
 					{
@@ -115,50 +113,51 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
-	const water = yield* spawnItemFx({
-		id: "runtime:water",
-		itemId: "water",
-		location: {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 1,
-				y: 0,
+	for (let index = 0; index < 6; index += 1) {
+		const water = yield* spawnItemFx({
+			id: index === 0 ? "runtime:water" : `runtime:water:${index}`,
+			itemId: "water",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 1 + (index % 3),
+					y: Math.floor(index / 3),
+				},
 			},
-		},
-		quantity: 6,
-	});
-	const tool = yield* spawnItemFx({
-		id: "runtime:tool",
-		itemId: "tool",
-		location: {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 2,
-				y: 0,
+		});
+		if (index < 3)
+			yield* storeInputMaterialFx({
+				ownerItemId: owner.id,
+				lineId: "line:forge:run",
+				inputIndex: 0,
+				sourceItemId: water.id,
+				sourceItemRevision: water.revision,
+			});
+	}
+	for (let index = 0; index < 2; index += 1) {
+		const tool = yield* spawnItemFx({
+			id: index === 0 ? "runtime:tool" : `runtime:tool:${index}`,
+			itemId: "tool",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 2,
+					y: 0,
+				},
 			},
-		},
-		quantity: 2,
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId: owner.id,
-		lineId: "line:forge:run",
-		inputIndex: 0,
-		sourceItemId: water.id,
-		sourceItemRevision: water.revision,
-		quantity: 6,
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId: owner.id,
-		lineId: "line:forge:run",
-		inputIndex: 1,
-		sourceItemId: tool.id,
-		sourceItemRevision: tool.revision,
-		quantity: 2,
-	});
+		});
+		if (index === 0)
+			yield* storeInputMaterialFx({
+				ownerItemId: owner.id,
+				lineId: "line:forge:run",
+				inputIndex: 1,
+				sourceItemId: tool.id,
+				sourceItemRevision: tool.revision,
+			});
+	}
 
 	return owner;
 });

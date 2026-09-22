@@ -66,7 +66,6 @@ describe("Cheat item spawning", () => {
 					scope: "board",
 					space: 0,
 				}),
-				quantity: 1,
 			}),
 		);
 	});

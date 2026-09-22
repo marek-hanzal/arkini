@@ -32,21 +32,28 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 				y,
 			},
 		},
-		quantity: 1,
 	});
-	const water = yield* spawnItemFx({
-		id: `runtime:water:${id}`,
-		itemId: "water",
-		location: {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 1,
-				y,
+	for (let index = 0; index < 3; index += 1) {
+		const water = yield* spawnItemFx({
+			id: `runtime:water:${id}:${index}`,
+			itemId: "water",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: index + 1,
+					y,
+				},
 			},
-		},
-		quantity: 3,
-	});
+		});
+		yield* storeInputMaterialFx({
+			ownerItemId: owner.id,
+			lineId,
+			inputIndex: 0,
+			sourceItemId: water.id,
+			sourceItemRevision: water.revision,
+		});
+	}
 	const tool = yield* spawnItemFx({
 		id: `runtime:tool:${id}`,
 		itemId: "tool",
@@ -58,15 +65,6 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 				y,
 			},
 		},
-		quantity: 1,
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId: owner.id,
-		lineId,
-		inputIndex: 0,
-		sourceItemId: water.id,
-		sourceItemRevision: water.revision,
-		quantity: 3,
 	});
 	yield* storeInputMaterialFx({
 		ownerItemId: owner.id,
@@ -74,7 +72,6 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 		inputIndex: 1,
 		sourceItemId: tool.id,
 		sourceItemRevision: tool.revision,
-		quantity: 1,
 	});
 	return owner;
 });
@@ -177,21 +174,21 @@ describe("GameSession Speed up admission", () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
 					});
-					yield* spawnItemFx({
-						id: "runtime:water:partial",
-						itemId: "water",
-						location: {
-							scope: "board",
-							space: 0,
-							position: {
-								x: 1,
-								y: 0,
+					for (let index = 0; index < 2; index += 1) {
+						yield* spawnItemFx({
+							id: `runtime:water:partial:${index}`,
+							itemId: "water",
+							location: {
+								scope: "board",
+								space: 0,
+								position: {
+									x: index + 1,
+									y: 0,
+								},
 							},
-						},
-						quantity: 2,
-					});
+						});
+					}
 				}),
 			);
 
@@ -231,21 +228,8 @@ describe("GameSession Speed up admission", () => {
 			await session.runFn(
 				Effect.gen(function* () {
 					yield* spawnItemFx({
-						id: "runtime:water:remainder",
+						id: "runtime:water:late",
 						itemId: "water",
-						location: {
-							scope: "board",
-							space: 0,
-							position: {
-								x: 2,
-								y: 0,
-							},
-						},
-						quantity: 1,
-					});
-					yield* spawnItemFx({
-						id: "runtime:tool:late",
-						itemId: "tool",
 						location: {
 							scope: "board",
 							space: 0,
@@ -254,7 +238,18 @@ describe("GameSession Speed up admission", () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
+					});
+					yield* spawnItemFx({
+						id: "runtime:tool:late",
+						itemId: "tool",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 4,
+								y: 0,
+							},
+						},
 					});
 				}),
 			);

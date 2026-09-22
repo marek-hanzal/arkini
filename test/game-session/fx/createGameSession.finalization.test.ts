@@ -37,7 +37,6 @@ describe("createGameSessionFx / final save lifecycle", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 
@@ -57,7 +56,6 @@ describe("createGameSessionFx / final save lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			),
 		).rejects.toThrow("Game session is shutting down.");

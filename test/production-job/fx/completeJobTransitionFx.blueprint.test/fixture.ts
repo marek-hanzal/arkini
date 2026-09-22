@@ -37,7 +37,6 @@ export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 				y,
 			},
 		},
-		quantity: 1,
 	});
 });
 

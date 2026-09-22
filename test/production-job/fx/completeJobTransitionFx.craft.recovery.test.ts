@@ -48,7 +48,6 @@ describe("craft completion recovery", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
@@ -56,7 +55,6 @@ describe("craft completion recovery", () => {
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
@@ -107,7 +105,6 @@ it("keeps blocked craft completion unchanged and replays one deterministic outpu
 								y,
 							},
 						},
-						quantity: 1,
 					});
 					blockerIndex += 1;
 				}

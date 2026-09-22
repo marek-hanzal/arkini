@@ -24,10 +24,7 @@ describe("resolveLineRunFx", () => {
 				lineRunRuntime({
 					permit: true,
 					booster: true,
-					water: [
-						2,
-						2,
-					],
+					water: 4,
 				}),
 			),
 		);
@@ -51,11 +48,12 @@ describe("resolveLineRunFx", () => {
 						item: [
 							{
 								itemId: "runtime:water:0",
-								quantity: 2,
 							},
 							{
 								itemId: "runtime:water:1",
-								quantity: 1,
+							},
+							{
+								itemId: "runtime:water:2",
 							},
 						],
 					},
@@ -79,9 +77,7 @@ describe("resolveLineRunFx", () => {
 			resolveFx(
 				lineRunRuntime({
 					permit: true,
-					water: [
-						2,
-					],
+					water: 2,
 				}),
 			),
 		);
@@ -107,9 +103,7 @@ describe("resolveLineRunFx", () => {
 				lineRunRuntime({
 					permit: true,
 					blocker: true,
-					water: [
-						3,
-					],
+					water: 3,
 				}),
 			),
 		);
@@ -129,9 +123,7 @@ describe("resolveLineRunFx", () => {
 					adjuster: true,
 					booster: true,
 					permit: true,
-					water: [
-						3,
-					],
+					water: 3,
 				}),
 			),
 		);
@@ -142,9 +134,7 @@ describe("resolveLineRunFx", () => {
 					booster: true,
 					floor: true,
 					permit: true,
-					water: [
-						3,
-					],
+					water: 3,
 				}),
 			),
 		);
@@ -155,15 +145,11 @@ describe("resolveLineRunFx", () => {
 
 	it("forces nested rule queries to use the explicit snapshot", () => {
 		const explicitRuntime = lineRunRuntime({
-			water: [
-				3,
-			],
+			water: 3,
 		});
 		const conflictingOuterRuntime = lineRunRuntime({
 			permit: true,
-			water: [
-				3,
-			],
+			water: 3,
 		});
 		const result = Effect.runSync(
 			resolveFx(explicitRuntime).pipe(

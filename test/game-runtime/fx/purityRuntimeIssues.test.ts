@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
+import { lineSelectionTestConfig } from "~test/production-line/support/lineSelectionTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
 const board = (x: number) => ({
@@ -28,14 +28,14 @@ describe("runtime purity invariants", () => {
 			items: [
 				{
 					id: "runtime:craft",
-					item: purityTestConfig.items.craft,
+					item: lineSelectionTestConfig.items.craft,
 					location: board(0),
 
 					revision: "revision:craft",
 				},
 				{
 					id: "runtime:material",
-					item: purityTestConfig.items.material,
+					item: lineSelectionTestConfig.items.material,
 					location: {
 						scope: "input" as const,
 						ownerItemId: "runtime:craft",
@@ -65,7 +65,7 @@ describe("runtime purity invariants", () => {
 				runtime,
 			}).pipe(
 				useGameFx({
-					config: purityTestConfig,
+					config: lineSelectionTestConfig,
 				}),
 			),
 		);

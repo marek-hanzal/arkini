@@ -21,7 +21,6 @@ describe("item units / owner lifecycle", () => {
 					id: "runtime:self-well",
 					itemId: "units:self-well",
 					location: board(0),
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: well.id,
@@ -68,15 +67,12 @@ describe("item units / owner lifecycle", () => {
 			itemId: result.well.id,
 			canonicalItemId: "units:self-well",
 			location: board(0),
-			previousQuantity: 1,
-			resultingQuantity: 0,
 		});
 		expect(result.finalCompletion.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: result.well.id,
 			canonicalItemId: "units:self-well",
 			location: board(0),
-			quantity: 1,
 		});
 		expect(result.runtime.items.some((item) => item.id === result.well.id)).toBe(false);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(2);
@@ -88,7 +84,6 @@ describe("item units / owner lifecycle", () => {
 					id: "runtime:shrine",
 					itemId: "producer:shrine",
 					location: board(0),
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: shrine.id,
@@ -156,42 +151,5 @@ describe("item units / owner lifecycle", () => {
 		expect(runtime.runtime.items.filter((item) => item.item.id === "item:dust")).toHaveLength(
 			1,
 		);
-	});
-	it("isolates one partially spent target from a pure spent stack", () => {
-		const runtime = run(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:lumberjack",
-					itemId: "producer:lumberjack",
-					location: board(0),
-					quantity: 1,
-				});
-				const tree = yield* spawnItemFx({
-					id: "runtime:tree",
-					itemId: "units:tree",
-					location: board(1),
-					quantity: 2,
-				});
-				yield* startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:lumberjack:work",
-				});
-				return {
-					runtime: yield* readRuntimeFx(),
-					tree,
-				};
-			}),
-		);
-
-		const trees = runtime.runtime.items.filter((item) => item.item.id === "units:tree");
-		expect(trees).toHaveLength(2);
-		expect(trees.find((item) => item.id === runtime.tree.id)).toMatchObject({
-			quantity: 1,
-			remainingUnits: 1,
-		});
-		expect(trees.find((item) => item.id !== runtime.tree.id)).toMatchObject({
-			quantity: 1,
-			remainingUnits: undefined,
-		});
 	});
 });

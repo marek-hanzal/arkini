@@ -19,7 +19,6 @@ describe("item units / readiness and selection", () => {
 					id: "runtime:overdrawn",
 					itemId: "producer:overdrawn",
 					location: board(0),
-					quantity: 1,
 				});
 				return yield* readLineRunFx({
 					ownerItemId: owner.id,
@@ -40,13 +39,11 @@ describe("item units / readiness and selection", () => {
 					id: "runtime:double-target",
 					itemId: "producer:double-target",
 					location: board(0),
-					quantity: 1,
 				});
 				const tree = yield* spawnItemFx({
-					id: "runtime:tree-stack",
+					id: "runtime:tree",
 					itemId: "units:tree",
 					location: board(1),
-					quantity: 2,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
@@ -59,14 +56,8 @@ describe("item units / readiness and selection", () => {
 			}),
 		);
 
-		expect(result.runtime.items.filter((item) => item.item.id === "units:tree")).toEqual([
-			expect.objectContaining({
-				id: result.tree.id,
-				location: board(1),
-				quantity: 1,
-				remainingUnits: undefined,
-			}),
-		]);
+		expect(result.runtime.items.some((item) => item.id === result.tree.id)).toBe(false);
+		expect(result.runtime.jobs).toHaveLength(1);
 	});
 	it("reserves target units across inputs and selects the next eligible target", () => {
 		const runtime = run(
@@ -75,19 +66,16 @@ describe("item units / readiness and selection", () => {
 					id: "runtime:double-target",
 					itemId: "producer:double-target",
 					location: board(0),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:sapling:a",
 					itemId: "units:sapling",
 					location: board(1),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:sapling:b",
 					itemId: "units:sapling",
 					location: board(0, 1),
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

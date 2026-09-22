@@ -34,7 +34,7 @@ it("cancels exact active work without refunding consumed material or cancelling 
 			const job = before.jobs[0];
 			expect(job).toBeDefined();
 			const consumed = before.items.filter((item) => item.location.scope === "job");
-			expect(consumed.reduce((sum, item) => sum + item.quantity, 0)).toBe(3);
+			expect(consumed.length).toBe(3);
 			yield* cancelItemJobFx({
 				ownerItemId: owner.id,
 				jobId: job.id,
@@ -42,16 +42,8 @@ it("cancels exact active work without refunding consumed material or cancelling 
 			const after = yield* readRuntimeFx();
 			expect(after.jobs).toHaveLength(0);
 			expect(after.jobQueue).toEqual(before.jobQueue);
-			expect(
-				after.items
-					.filter((item) => item.item.id === "water")
-					.reduce((sum, item) => sum + item.quantity, 0),
-			).toBe(3);
-			expect(
-				after.items
-					.filter((item) => item.item.id === "tool")
-					.reduce((sum, item) => sum + item.quantity, 0),
-			).toBe(2);
+			expect(after.items.filter((item) => item.item.id === "water").length).toBe(3);
+			expect(after.items.filter((item) => item.item.id === "tool").length).toBe(2);
 			expect(
 				after.items.some(
 					(item) => item.location.scope === "job" || item.location.scope === "reserved",
@@ -121,7 +113,7 @@ it("preserves active work and its materials when a reservation cannot be returne
 			{
 				id: "consumed",
 				itemId: "water",
-				quantity: 3,
+
 				location: {
 					scope: "job",
 					jobId: "job:active",
@@ -131,7 +123,7 @@ it("preserves active work and its materials when a reservation cannot be returne
 			{
 				id: "reserved",
 				itemId: "tool",
-				quantity: 1,
+
 				location: {
 					scope: "reserved",
 					jobId: "job:active",

@@ -33,7 +33,6 @@ export const createRandomCompletionConfig = () => {
 				id: "blocker",
 				title: "Blocker",
 				description: "Fills completion capacity.",
-				maxStackSize: 1,
 			},
 			outputA: {
 				...base.items.tool,
@@ -124,7 +123,6 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 		let blockerIndex = 0;
 		for (let y = 0; y < 2; y += 1) {
@@ -141,7 +139,6 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 							y,
 						},
 					},
-					quantity: 1,
 				});
 				blockerIndex += 1;
 			}
@@ -183,6 +180,5 @@ export const projectRandomCompletionItems = (runtime: RuntimeSchema.Type) =>
 		.map((item) => ({
 			itemId: item.item.id,
 			location: item.location,
-			quantity: item.quantity,
 		}))
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second)));

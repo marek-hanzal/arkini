@@ -23,7 +23,6 @@ describe("item units / persistence", () => {
 					id: "runtime:shrine",
 					itemId: "producer:shrine",
 					location: board(0),
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: shrine.id,
@@ -67,7 +66,7 @@ describe("item units / persistence", () => {
 					id: "runtime:missing-config",
 					item: unitsConfig.items["producer:lumberjack"],
 					location: board(0),
-					quantity: 1,
+
 					remainingUnits: 1,
 					revision: "revision:missing-config",
 				},
@@ -75,7 +74,7 @@ describe("item units / persistence", () => {
 					id: "runtime:full-state",
 					item: unitsConfig.items["producer:shrine"],
 					location: board(1),
-					quantity: 1,
+
 					remainingUnits: 2,
 					revision: "revision:full-state",
 				},
@@ -83,7 +82,7 @@ describe("item units / persistence", () => {
 					id: "runtime:exceeds",
 					item: unitsConfig.items["producer:shrine"],
 					location: board(2),
-					quantity: 1,
+
 					remainingUnits: 3,
 					revision: "revision:exceeds",
 				},
@@ -91,7 +90,7 @@ describe("item units / persistence", () => {
 					id: "runtime:depleted",
 					item: unitsConfig.items["producer:shrine"],
 					location: board(3),
-					quantity: 1,
+
 					remainingUnits: 0,
 					revision: "revision:depleted",
 				},

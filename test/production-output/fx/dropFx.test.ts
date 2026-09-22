@@ -37,7 +37,6 @@ const config = GameConfigSchema.parse({
 					"artwork:source",
 				],
 			},
-			maxStackSize: 1,
 		},
 	},
 });
@@ -54,7 +53,6 @@ const createOriginFx = () => {
 				y: 5,
 			},
 		},
-		quantity: 1,
 	});
 };
 

@@ -16,7 +16,6 @@ const simpleItem = ({ id }: { id: string }) => {
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize: 10,
 	});
 };
 
@@ -32,11 +31,9 @@ export const inputTestItems = {
 export const runtimeInputTestItem = ({
 	id,
 	itemId,
-	quantity,
 }: {
 	id: string;
 	itemId: keyof typeof inputTestItems;
-	quantity: number;
 }) => {
 	return {
 		id,
@@ -49,7 +46,7 @@ export const runtimeInputTestItem = ({
 				y: 0,
 			},
 		},
-		quantity,
+
 		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };

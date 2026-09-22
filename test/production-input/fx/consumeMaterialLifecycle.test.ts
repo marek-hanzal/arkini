@@ -21,7 +21,6 @@ const base = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
 });
 
 const materialInput = (itemId: string) => ({
@@ -147,25 +146,21 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		id: "runtime:converter",
 		itemId: "producer:converter",
 		location: board(0),
-		quantity: 1,
 	});
 	const inner = yield* spawnItemFx({
 		id: "runtime:inner",
 		itemId: "producer:inner",
 		location: board(1),
-		quantity: 1,
 	});
 	const middle = yield* spawnItemFx({
 		id: "runtime:middle",
 		itemId: "producer:middle",
 		location: board(2),
-		quantity: 1,
 	});
 	const payload = yield* spawnItemFx({
 		id: "runtime:payload",
 		itemId: "item:payload",
 		location: board(3),
-		quantity: 1,
 	});
 
 	yield* setLineSelectionFx({
@@ -179,7 +174,6 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		inputIndex: 0,
 		sourceItemId: payload.id,
 		sourceItemRevision: payload.revision,
-		quantity: 1,
 	});
 	yield* storeInputMaterialFx({
 		ownerItemId: inner.id,
@@ -187,7 +181,6 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		inputIndex: 0,
 		sourceItemId: middle.id,
 		sourceItemRevision: middle.revision,
-		quantity: 1,
 	});
 	yield* storeInputMaterialFx({
 		ownerItemId: converter.id,
@@ -195,7 +188,6 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		inputIndex: 0,
 		sourceItemId: inner.id,
 		sourceItemRevision: inner.revision,
-		quantity: 1,
 	});
 
 	return converter;

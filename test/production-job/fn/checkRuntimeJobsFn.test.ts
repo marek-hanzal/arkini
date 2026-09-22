@@ -20,7 +20,7 @@ const owner = {
 			y: 0,
 		},
 	},
-	quantity: 1,
+
 	revision: "revision:owner",
 } satisfies RuntimeItemSchema.Type;
 const job = (id: string, overrides: Partial<RuntimeSchema.Type["jobs"][number]> = {}) => ({
@@ -61,7 +61,7 @@ describe("checkRuntimeJobsFn", () => {
 						jobId: "job:missing",
 						inputIndex: 1,
 					},
-					quantity: 1,
+
 					revision: "revision:tool:missing-job",
 				},
 				{
@@ -72,7 +72,7 @@ describe("checkRuntimeJobsFn", () => {
 						jobId: "job:third",
 						inputIndex: 0,
 					},
-					quantity: 1,
+
 					revision: "revision:tool:wrong-input",
 				},
 			],
@@ -185,7 +185,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 					lineId: "line:forge:run",
 					inputIndex: 0,
 				},
-				quantity: 1,
+
 				revision: "revision:owned-water",
 			},
 		],

@@ -332,7 +332,20 @@ it("counts all obtainable stock beyond one job capacity without including other 
 				water,
 				source,
 				secondSource,
- ...[3,4].map((x) => ({...source,id: `extra:${x}`,location: {...source.location,position:{x,y:0}}})),
+				...[
+					3,
+					4,
+				].map((x) => ({
+					...source,
+					id: `extra:${x}`,
+					location: {
+						...source.location,
+						position: {
+							x,
+							y: 0,
+						},
+					},
+				})),
 				far,
 				claimed,
 			],

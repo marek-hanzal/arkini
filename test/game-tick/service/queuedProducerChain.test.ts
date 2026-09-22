@@ -33,11 +33,7 @@ describe("queued producer chain", () => {
 		expect(result.completed.items.filter((item) => item.item.id === "intermediate")).toEqual(
 			[],
 		);
-		expect(
-			result.completed.items
-				.filter((item) => item.item.id === "final")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(1);
+		expect(result.completed.items.filter((item) => item.item.id === "final").length).toBe(1);
 		expect(
 			result.completed.items.some(
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
@@ -60,10 +56,6 @@ describe("queued producer chain", () => {
 		expect(result.completed.items.some((item) => item.location.scope === "delivery")).toBe(
 			false,
 		);
-		expect(
-			result.completed.items
-				.filter((item) => item.item.id === "final")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(1);
+		expect(result.completed.items.filter((item) => item.item.id === "final").length).toBe(1);
 	});
 });

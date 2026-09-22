@@ -100,7 +100,7 @@ export const targetUnitInput = (itemId: string) => ({
 	},
 });
 
-export const base = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
+export const base = ({ id }: { id: string }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -111,7 +111,6 @@ export const base = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: numb
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize,
 });
 
 export const unitsConfig = GameConfigSchema.parse({
@@ -133,7 +132,6 @@ export const unitsConfig = GameConfigSchema.parse({
 		"producer:shrine": {
 			...base({
 				id: "producer:shrine",
-				maxStackSize: 3,
 			}),
 
 			units: {
@@ -195,7 +193,6 @@ export const unitsConfig = GameConfigSchema.parse({
 		"producer:mixed-unit": {
 			...base({
 				id: "producer:mixed-unit",
-				maxStackSize: 2,
 			}),
 
 			units: {
@@ -354,7 +351,6 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			...base({
 				id: "units:tree",
-				maxStackSize: 3,
 			}),
 
 			units: {
@@ -367,7 +363,6 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			...base({
 				id: "units:sapling",
-				maxStackSize: 3,
 			}),
 
 			units: {

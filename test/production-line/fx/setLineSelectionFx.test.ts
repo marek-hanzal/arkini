@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
-import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
@@ -12,7 +11,6 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/fx/startFx";
-import { spawnItemFx } from "~test/support/spawnItemFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/DefaultLineIssueReasonEnumSchema";
 
@@ -68,7 +66,7 @@ const config = GameConfigSchema.parse({
 					"artwork:producer",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 1,
 			lines: [
 				line("line:first", "First", true),
@@ -77,60 +75,6 @@ const config = GameConfigSchema.parse({
 		},
 	},
 });
-const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
-	GameConfigSchema.parse({
-		resources: {
-			hero: "hero",
-		},
-		meta: {
-			id: `game:default-line-stack:${boardWidth}`,
-			title: "Default line stack",
-			board: {
-				width: boardWidth,
-				height: 1,
-			},
-		},
-		start: {
-			currentSpace: 0,
-		},
-		items: {
-			producer: {
-				uid: "producer",
-				id: "producer",
-
-				title: "Producer",
-				description: "Owns one line.",
-				artwork: {
-					scale: 0.8,
-					default: [
-						"artwork:producer",
-					],
-				},
-				maxStackSize: 3,
-				maxQueueSize: 1,
-				lines: [
-					line("line:only", "Only", true),
-				],
-			},
-			blocker: {
-				maxQueueSize: 1,
-				lines: [],
-
-				uid: "blocker",
-				id: "blocker",
-
-				title: "Blocker",
-				description: "Blocks placement.",
-				artwork: {
-					scale: 0.8,
-					default: [
-						"artwork:blocker",
-					],
-				},
-				maxStackSize: 1,
-			},
-		},
-	});
 
 describe("setLineSelectionFx", () => {
 	it("reads the authored fallback without creating runtime state", () => {
@@ -144,10 +88,7 @@ describe("setLineSelectionFx", () => {
 						itemId: owner.id,
 						runtime,
 					}),
-					pure: isItemPureFn({
-						item: owner,
-						runtime,
-					}),
+
 					runtime,
 				};
 			}).pipe(
@@ -158,7 +99,6 @@ describe("setLineSelectionFx", () => {
 		);
 
 		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
-		expect(result.pure).toBe(true);
 		expect(result.projection).toMatchObject({
 			kind: "available",
 			line: [
@@ -190,10 +130,6 @@ describe("setLineSelectionFx", () => {
 					itemId: owner.id,
 					runtime,
 				});
-				const pure = isItemPureFn({
-					item: runtime.items[0]!,
-					runtime,
-				});
 				const state = fromRuntimeFn({
 					runtime,
 				});
@@ -203,7 +139,7 @@ describe("setLineSelectionFx", () => {
 				return {
 					owner,
 					projection,
-					pure,
+
 					runtime,
 					state,
 					restored,
@@ -224,7 +160,6 @@ describe("setLineSelectionFx", () => {
 		expect(result.restored.defaultLineByOwnerItemId).toEqual(
 			result.runtime.defaultLineByOwnerItemId,
 		);
-		expect(result.pure).toBe(false);
 		expect(result.projection).toMatchObject({
 			kind: "available",
 			line: [
@@ -261,10 +196,6 @@ describe("setLineSelectionFx", () => {
 					itemId: owner.id,
 					runtime,
 				});
-				const pure = isItemPureFn({
-					item: runtime.items[0]!,
-					runtime,
-				});
 				const state = fromRuntimeFn({
 					runtime,
 				});
@@ -273,7 +204,7 @@ describe("setLineSelectionFx", () => {
 				});
 				return {
 					projection,
-					pure,
+
 					restored,
 					runtime,
 					state,
@@ -294,7 +225,6 @@ describe("setLineSelectionFx", () => {
 		expect(result.restored.defaultLineByOwnerItemId).toEqual(
 			result.runtime.defaultLineByOwnerItemId,
 		);
-		expect(result.pure).toBe(false);
 		expect(result.projection).toMatchObject({
 			kind: "available",
 			line: [
@@ -390,141 +320,4 @@ describe("setLineSelectionFx", () => {
 		expect(result.runtime.items).toEqual([]);
 		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 	});
-	it("atomically isolates one exact stacked owner before selecting its default", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:producer",
-					itemId: "producer",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 3,
-				});
-				yield* setLineSelectionFx({
-					selection: "default",
-					ownerItemId: owner.id,
-					lineId: "line:only",
-				});
-				const runtime = yield* readRuntimeFx();
-				const isolated = runtime.items.find((item) => item.id === owner.id);
-				const remainder = runtime.items.find(
-					(item) => item.item.id === "producer" && item.id !== owner.id,
-				);
-				if (isolated === undefined || remainder === undefined) {
-					throw new Error("Expected isolated default owner and pure remainder.");
-				}
-				const selectedPure = isItemPureFn({
-					item: isolated,
-					runtime,
-				});
-				const remainderPure = isItemPureFn({
-					item: remainder,
-					runtime,
-				});
-				yield* setLineSelectionFx({
-					lineId: null,
-					selection: "default",
-					ownerItemId: owner.id,
-				});
-				const clearedRuntime = yield* readRuntimeFx();
-				const clearedOwner = clearedRuntime.items.find((item) => item.id === owner.id);
-				if (clearedOwner === undefined) throw new Error("Expected cleared owner.");
-				const clearedPure = isItemPureFn({
-					item: clearedOwner,
-					runtime: clearedRuntime,
-				});
-
-				return {
-					clearedPure,
-					isolated,
-					remainder,
-					remainderPure,
-					runtime,
-					selectedPure,
-				};
-			}).pipe(
-				useGameFx({
-					config: createStackConfig({
-						boardWidth: 2,
-					}),
-				}),
-			),
-		);
-
-		expect(result.runtime.defaultLineByOwnerItemId).toEqual({
-			"runtime:producer": "line:only",
-		});
-		expect(result.isolated).toMatchObject({
-			id: "runtime:producer",
-			quantity: 1,
-		});
-		expect(result.remainder).toMatchObject({
-			location: {
-				scope: "board",
-				space: 0,
-				position: {
-					x: 1,
-					y: 0,
-				},
-			},
-			quantity: 2,
-		});
-		expect(result.selectedPure).toBe(false);
-		expect(result.remainderPure).toBe(true);
-		expect(result.clearedPure).toBe(false);
-	});
-});
-
-it("rolls back the default mapping and split when the remainder cannot be placed", () => {
-	const result = Effect.runSync(
-		Effect.gen(function* () {
-			yield* spawnItemFx({
-				id: "runtime:producer",
-				itemId: "producer",
-				location: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 2,
-			});
-			const before = yield* readRuntimeFx();
-			const selected = yield* Effect.result(
-				setLineSelectionFx({
-					selection: "default",
-					ownerItemId: "runtime:producer",
-					lineId: "line:only",
-				}),
-			);
-
-			return {
-				after: yield* readRuntimeFx(),
-				before,
-				selected,
-			};
-		}).pipe(
-			useGameFx({
-				config: createStackConfig({
-					boardWidth: 1,
-				}),
-			}),
-		),
-	);
-
-	expect(Result.isFailure(result.selected)).toBe(true);
-	if (Result.isFailure(result.selected)) {
-		expect(result.selected.failure).toMatchObject({
-			_tag: "PlacementUnavailableError",
-		});
-	}
-	expect(result.after).toEqual(result.before);
 });

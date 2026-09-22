@@ -50,12 +50,10 @@ const randomOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 const craftItem = ({
 	id,
 	inputItemId,
-	maxStackSize = 1,
 	output,
 }: {
 	readonly id: string;
 	readonly inputItemId?: string;
-	readonly maxStackSize?: number;
 	readonly output?: OutputInput;
 }) =>
 	({
@@ -114,7 +112,7 @@ const craftItem = ({
 				title: `line:${id}`,
 			},
 		],
-		maxStackSize,
+
 		title: id,
 
 		uid: id,
@@ -133,7 +131,7 @@ const simpleItem = (id: string) =>
 		},
 		description: id,
 		id,
-		maxStackSize: 1,
+
 		title: id,
 
 		uid: id,
@@ -144,12 +142,12 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 	items: {
 		"craft:drop": craftItem({
 			id: "craft:drop",
-			maxStackSize: 3,
+
 			output: guaranteedOutput("item:product"),
 		}),
 		"craft:ordered-output": craftItem({
 			id: "craft:ordered-output",
-			maxStackSize: 3,
+
 			output: guaranteedOutput("item:bonus", "item:result"),
 		}),
 		"craft:random": craftItem({

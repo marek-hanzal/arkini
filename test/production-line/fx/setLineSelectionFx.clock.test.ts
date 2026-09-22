@@ -51,7 +51,6 @@ const spawnOwnerFx = spawnItemFx({
 			y: 0,
 		},
 	},
-	quantity: 1,
 });
 
 describe("independent Clock line selection", () => {

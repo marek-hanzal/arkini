@@ -1,8 +1,5 @@
-import { describe } from "vitest";
-
 import {
 	Effect,
-	GameEventEnumSchema,
 	Result,
 	board,
 	expect,
@@ -11,55 +8,7 @@ import {
 	run,
 	spawnItemFx,
 	startLineFx,
-	startLineRuntimeFx,
 } from "./itemUnits.test/fixture";
-
-describe("item units / atomic depletion", () => {
-	it("reports one depleted stack quantity without falsely removing the surviving actor", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const owner = yield* spawnItemFx({
-					id: "runtime:lumberjack",
-					itemId: "producer:lumberjack",
-					location: board(0),
-					quantity: 1,
-				});
-				const sapling = yield* spawnItemFx({
-					id: "runtime:sapling",
-					itemId: "units:sapling",
-					location: board(1),
-					quantity: 2,
-				});
-				const [, runtime, events] = yield* startLineRuntimeFx({
-					ownerItemId: owner.id,
-					lineId: "line:lumberjack:sapling",
-					runtime: yield* readRuntimeFx(),
-				});
-				return {
-					events,
-					runtime,
-					sapling,
-				};
-			}),
-		);
-
-		expect(result.events).toContainEqual({
-			type: GameEventEnumSchema.enum.ItemDepleted,
-			itemId: result.sapling.id,
-			canonicalItemId: "units:sapling",
-			location: board(1),
-			previousQuantity: 2,
-			resultingQuantity: 1,
-		});
-		expect(
-			result.events.some((event) => event.type === GameEventEnumSchema.enum.ItemDisappeared),
-		).toBe(false);
-		expect(result.runtime.items.find((item) => item.id === result.sapling.id)).toMatchObject({
-			quantity: 1,
-			location: board(1),
-		});
-	});
-});
 
 it("rolls back the whole start when depletion output cannot be placed", () => {
 	const result = run(
@@ -68,13 +17,11 @@ it("rolls back the whole start when depletion output cannot be placed", () => {
 				id: "runtime:lumberjack",
 				itemId: "producer:lumberjack",
 				location: board(0),
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "runtime:messy",
 				itemId: "units:messy",
 				location: board(1),
-				quantity: 1,
 			});
 			for (const [id, location] of [
 				[
@@ -106,7 +53,6 @@ it("rolls back the whole start when depletion output cannot be placed", () => {
 					id,
 					itemId: "item:blocker",
 					location,
-					quantity: 1,
 				});
 			}
 			const before = yield* readRuntimeFx();
@@ -128,20 +74,18 @@ it("rolls back the whole start when depletion output cannot be placed", () => {
 	expect(result.after).toEqual(result.before);
 });
 
-it("resolves idle depletion before isolating a surviving owner with units", () => {
+it("resolves idle depletion while preserving the exact owner with remaining units", () => {
 	const result = run(
 		Effect.gen(function* () {
 			const owner = yield* spawnItemFx({
 				id: "runtime:mixed-owner",
 				itemId: "producer:mixed-unit",
 				location: board(0),
-				quantity: 2,
 			});
 			yield* spawnItemFx({
 				id: "runtime:empty-target",
 				itemId: "units:empty",
 				location: board(1),
-				quantity: 1,
 			});
 			for (const [id, location] of [
 				[
@@ -173,7 +117,6 @@ it("resolves idle depletion before isolating a surviving owner with units", () =
 					id,
 					itemId: "item:blocker",
 					location,
-					quantity: 1,
 				});
 			}
 			yield* startLineFx({
@@ -188,15 +131,9 @@ it("resolves idle depletion before isolating a surviving owner with units", () =
 	);
 
 	const owners = result.runtime.items.filter((item) => item.item.id === "producer:mixed-unit");
-	expect(owners).toHaveLength(2);
+	expect(owners).toHaveLength(1);
 	expect(owners.find((item) => item.id === result.owner.id)).toMatchObject({
-		quantity: 1,
 		remainingUnits: 1,
-	});
-	expect(owners.find((item) => item.id !== result.owner.id)).toMatchObject({
-		location: board(1),
-		quantity: 1,
-		remainingUnits: undefined,
 	});
 	expect(result.runtime.items.some((item) => item.item.id === "units:empty")).toBe(false);
 });

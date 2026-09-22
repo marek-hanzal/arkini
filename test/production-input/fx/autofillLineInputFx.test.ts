@@ -11,7 +11,6 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import {
 	inputRuntimeTestConfig,
-	sourceLocation,
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
 
@@ -47,15 +46,29 @@ const spawnOwnerFx = () =>
 		id: target.ownerItemId,
 		itemId: "workshop",
 		location: workshopLocation,
-		quantity: 1,
 	});
-const spawnWaterFx = (quantity: number) =>
-	spawnItemFx({
-		id: "runtime:water",
-		itemId: "water",
-		location: sourceLocation(1),
-		quantity,
-	});
+const spawnWaterFx = (count: number) =>
+	Effect.forEach(
+		Array.from(
+			{
+				length: count,
+			},
+			(_, index) => index,
+		),
+		(index) =>
+			spawnItemFx({
+				id: index === 0 ? "runtime:water" : `runtime:water:${index}`,
+				itemId: "water",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: (index + 1) % 5,
+						y: Math.floor((index + 1) / 5),
+					},
+				},
+			}),
+	);
 
 it("targets only the clicked reserve slot, accounts for incoming stock and settles via ordinary delivery without starting work", () => {
 	Effect.runSync(
@@ -69,19 +82,13 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 			expect(yield* autofillLineInputFx(target)).toBe(3);
 			const delivering = yield* readRuntimeFx();
 			expect(delivering.items.find((item) => item.id === "runtime:water")).toMatchObject({
-				quantity: 7,
 				location: {
 					scope: "delivery",
 					target: {
 						kind: "line-input",
 						ownerItemId: target.ownerItemId,
 						lineId: target.lineId,
-						input: [
-							{
-								inputIndex: 1,
-								quantity: 3,
-							},
-						],
+						inputIndex: 1,
 					},
 				},
 			});
@@ -89,8 +96,14 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 			yield* spawnItemFx({
 				id: "runtime:extra",
 				itemId: "water",
-				location: sourceLocation(2),
-				quantity: 5,
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 4,
+						y: 1,
+					},
+				},
 			});
 			const beforeRetry = yield* readRuntimeFx();
 			expect(yield* autofillLineInputFx(target)).toBe(0);
@@ -99,24 +112,17 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 				elapsedMs: 2000,
 			});
 			const settled = yield* readRuntimeFx();
-			expect(settled.items.filter((item) => item.location.scope === "input")).toMatchObject([
-				{
-					quantity: 3,
-					location: {
-						ownerItemId: target.ownerItemId,
-						lineId: target.lineId,
-						inputIndex: 1,
-					},
-				},
-			]);
+			const buffered = settled.items.filter((item) => item.location.scope === "input");
+			expect(buffered).toHaveLength(3);
+			for (const item of buffered)
+				expect(item.location).toMatchObject({
+					ownerItemId: target.ownerItemId,
+					lineId: target.lineId,
+					inputIndex: 1,
+				});
 			expect(settled.jobs).toEqual([]);
 			expect(settled.jobQueue).toEqual([]);
-			expect(
-				settled.items.reduce(
-					(sum, item) => sum + (item.item.id === "water" ? item.quantity : 0),
-					0,
-				),
-			).toBe(12);
+			expect(settled.items.filter((item) => item.item.id === "water")).toHaveLength(8);
 		}).pipe(
 			useGameFx({
 				config,
@@ -142,8 +148,14 @@ it("rejects a stale fill click after even one piece arrives and leaves all mater
 			yield* spawnItemFx({
 				id: "runtime:extra",
 				itemId: "water",
-				location: sourceLocation(2),
-				quantity: 5,
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 4,
+						y: 1,
+					},
+				},
 			});
 			const before = yield* readRuntimeFx();
 			expect(

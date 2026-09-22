@@ -47,7 +47,6 @@ describe("createGameSessionFx / fail-stop", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await Promise.all([
@@ -125,7 +124,6 @@ describe("createGameSessionFx / fail-stop", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await session.runFn(

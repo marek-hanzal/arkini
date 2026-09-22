@@ -47,7 +47,6 @@ const base = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
 });
 
 const lifecycleConfig = GameConfigSchema.parse({
@@ -258,7 +257,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 			units: {
 				amount: 2,
 			},
-			maxStackSize: 2,
 		},
 		"item:gift": {
 			maxQueueSize: 1,
@@ -293,7 +291,6 @@ describe("job completion unit lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const blockedOwner = yield* spawnItemFx({
 					id: "runtime:blocked-trader",
@@ -306,7 +303,6 @@ describe("job completion unit lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				for (let index = 0; index < 3; index += 1) {
 					yield* enqueueLineFx({
@@ -352,7 +348,6 @@ describe("job completion unit lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const material = yield* spawnItemFx({
 					id: "runtime:material",
@@ -365,7 +360,6 @@ describe("job completion unit lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 2,
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
@@ -373,8 +367,20 @@ describe("job completion unit lifecycle", () => {
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
-					quantity: 2,
 				});
+				yield* spawnItemFx({
+					id: "runtime:material:spare",
+					itemId: "item:material",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+				});
+
 				yield* startLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:trader:trade",
@@ -406,7 +412,6 @@ describe("job completion unit lifecycle", () => {
 					item: expect.objectContaining({
 						id: "item:material",
 					}),
-					quantity: 1,
 				}),
 			]),
 		);
@@ -433,7 +438,6 @@ describe("job completion unit lifecycle", () => {
 						},
 					},
 					remainingUnits: 0,
-					quantity: 1,
 				},
 				{
 					id: "runtime:consumed-material",
@@ -443,7 +447,6 @@ describe("job completion unit lifecycle", () => {
 						jobId: "job:trader",
 						inputIndex: 0,
 					},
-					quantity: 1,
 				},
 				{
 					id: "runtime:buffered-material",
@@ -455,7 +458,6 @@ describe("job completion unit lifecycle", () => {
 						inputIndex: 0,
 					},
 					remainingUnits: 1,
-					quantity: 1,
 				},
 			],
 			jobQueue: [],
@@ -523,7 +525,6 @@ describe("job completion unit lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
@@ -554,7 +555,6 @@ describe("job completion unit lifecycle", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

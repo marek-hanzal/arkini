@@ -20,21 +20,18 @@ const input = MaterialSchema.parse({
 });
 
 describe("planInputMaterialStoreFn", () => {
-	it("accepts only the remaining capacity from one matching stack", () => {
+	it("admits one matching identity into available capacity", () => {
 		expect(
 			planInputMaterialStoreFn({
 				input,
-				requestedQuantity: 10,
 				item: runtimeInputTestItem({
 					id: "runtime:water",
 					itemId: "water",
-					quantity: 4,
 				}),
 				storedQuantity: 1,
 			}),
 		).toEqual({
 			sourceItemId: "runtime:water",
-			quantity: 2,
 		});
 	});
 
@@ -42,11 +39,9 @@ describe("planInputMaterialStoreFn", () => {
 		expect(
 			planInputMaterialStoreFn({
 				input,
-				requestedQuantity: 10,
 				item: runtimeInputTestItem({
 					id: "runtime:log",
 					itemId: "log",
-					quantity: 4,
 				}),
 				storedQuantity: 0,
 			}),
@@ -57,11 +52,9 @@ describe("planInputMaterialStoreFn", () => {
 		expect(
 			planInputMaterialStoreFn({
 				input,
-				requestedQuantity: 10,
 				item: runtimeInputTestItem({
 					id: "runtime:water",
 					itemId: "water",
-					quantity: 1,
 				}),
 				storedQuantity: 3,
 			}),

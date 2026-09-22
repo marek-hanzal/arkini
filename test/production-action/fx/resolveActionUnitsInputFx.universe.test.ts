@@ -12,7 +12,7 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 			yield* spawnItemFx({
 				id: "owner",
 				itemId: "producer:double-target",
-				quantity: 1,
+
 				location: {
 					scope: "board",
 					space: 0,
@@ -51,7 +51,7 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 				yield* spawnItemFx({
 					id,
 					itemId: "units:tree",
-					quantity: 1,
+
 					location: {
 						scope: "board",
 						space,

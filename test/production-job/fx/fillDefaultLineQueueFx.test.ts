@@ -44,7 +44,6 @@ const spawnOwnerFx = spawnItemFx({
 			y: 0,
 		},
 	},
-	quantity: 1,
 });
 
 describe("fillDefaultLineQueueFx", () => {

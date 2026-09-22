@@ -72,7 +72,6 @@ describe("createGameSessionFx / subscription visibility", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			const unsubscribe = session.subscribeFn(() => {
@@ -101,7 +100,6 @@ describe("createGameSessionFx / subscription visibility", () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
 					}),
 				);
 				await afterSubscribeDelivered;
@@ -184,7 +182,6 @@ describe("createGameSessionFx / subscription visibility", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await markerDelivered;

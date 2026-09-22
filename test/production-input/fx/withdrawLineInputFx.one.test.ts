@@ -15,7 +15,7 @@ import {
 	queuedInputTestConfig,
 } from "~test/production-input/fx/withdrawLineInputsFx.queue.test/prepareQueuedBufferedLineFx";
 
-it("returns exactly one piece per click, retaining the stack and queue until the last piece leaves", () => {
+it("returns exactly one piece per click, retaining other identities and the queue", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* prepareQueuedBufferedLineFx();
@@ -28,19 +28,15 @@ it("returns exactly one piece per click, retaining the stack and queue until the
 					amount: "one",
 				});
 				const after = yield* readRuntimeFx();
-				expect(result.withdrawnQuantity).toBe(1);
+				expect(result.withdrawnItemCount).toBe(1);
 				expect(after.jobQueue).toEqual(before.jobQueue);
+				expect(after.items.filter((item) => item.location.scope === "input").length).toBe(
+					remaining,
+				);
 				expect(
-					after.items
-						.filter((item) => item.location.scope === "input")
-						.reduce((sum, item) => sum + item.quantity, 0),
-				).toBe(remaining);
-				expect(
-					after.items
-						.filter(
-							(item) => item.item.id === "water" && item.location.scope === "board",
-						)
-						.reduce((sum, item) => sum + item.quantity, 0),
+					after.items.filter(
+						(item) => item.item.id === "water" && item.location.scope === "board",
+					).length,
 				).toBe(3 - remaining);
 			}
 			const empty = yield* readRuntimeFx();
@@ -72,7 +68,7 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 			...queuedInputTestConfig.items,
 			water: {
 				...queuedInputTestConfig.items.water,
-				maxStackSize: 1,
+
 				clock: {
 					durationMs: 12000,
 				},
@@ -92,7 +88,6 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 						y: 0,
 					},
 				},
-				quantity: 1,
 			});
 			const buffered = yield* createRuntimeItemFx({
 				id: "timed-water",
@@ -103,7 +98,6 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 					lineId,
 					inputIndex: 0,
 				},
-				quantity: 1,
 			});
 			yield* modifyRuntimeFx((runtime) =>
 				Effect.succeed([
@@ -135,7 +129,6 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 			});
 			const after = yield* readRuntimeFx();
 			expect(after.items.find((item) => item.id === "timed-water")).toMatchObject({
-				quantity: 1,
 				location: {
 					scope: "board",
 				},
@@ -151,7 +144,7 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 	);
 });
 
-it("rolls back the retained stack and queue when no output position is available", () => {
+it("rolls back the buffered identities and queue when no output position is available", () => {
 	const config = GameConfigSchema.parse({
 		...queuedInputTestConfig,
 		meta: {
@@ -181,7 +174,6 @@ it("rolls back the retained stack and queue when no output position is available
 						y: 0,
 					},
 				},
-				quantity: 1,
 			});
 			const buffered = yield* createRuntimeItemFx({
 				id: "buffer",
@@ -192,7 +184,6 @@ it("rolls back the retained stack and queue when no output position is available
 					lineId,
 					inputIndex: 0,
 				},
-				quantity: 3,
 			});
 			yield* modifyRuntimeFx((runtime) =>
 				Effect.succeed([

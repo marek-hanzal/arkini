@@ -20,19 +20,11 @@ const owner = {
 			y: 0,
 		},
 	},
-	quantity: 1,
+
 	revision: "revision:owner",
 } as const;
 
-const bufferedItem = ({
-	id,
-	inputIndex,
-	quantity,
-}: {
-	id: string;
-	inputIndex: number;
-	quantity: number;
-}) => {
+const bufferedItem = ({ id, inputIndex }: { id: string; inputIndex: number }) => {
 	return {
 		id,
 		item: inputRuntimeTestConfig.items.water,
@@ -42,7 +34,7 @@ const bufferedItem = ({
 			lineId: "line:workshop:build",
 			inputIndex,
 		},
-		quantity,
+
 		revision: `revision:${id}`,
 	} satisfies InputRuntimeItemSchema.Type;
 };
@@ -98,17 +90,22 @@ describe("resolveInputRunFx", () => {
 				bufferedItem({
 					id: "runtime:water:a",
 					inputIndex: 0,
-					quantity: 2,
 				}),
 				bufferedItem({
 					id: "runtime:water:other-slot",
 					inputIndex: 1,
-					quantity: 10,
+				}),
+				bufferedItem({
+					id: "runtime:water:c",
+					inputIndex: 0,
+				}),
+				bufferedItem({
+					id: "runtime:water:d",
+					inputIndex: 0,
 				}),
 				bufferedItem({
 					id: "runtime:water:b",
 					inputIndex: 0,
-					quantity: 2,
 				}),
 			],
 			jobs: [],
@@ -137,11 +134,12 @@ describe("resolveInputRunFx", () => {
 			item: [
 				{
 					itemId: "runtime:water:a",
-					quantity: 2,
 				},
 				{
-					itemId: "runtime:water:b",
-					quantity: 1,
+					itemId: "runtime:water:c",
+				},
+				{
+					itemId: "runtime:water:d",
 				},
 			],
 		});
@@ -159,7 +157,7 @@ describe("resolveInputRunFx", () => {
 					y: 0,
 				},
 			},
-			quantity: 1,
+
 			revision: "revision:stone",
 		};
 		const result = Effect.runSync(

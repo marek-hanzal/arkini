@@ -21,13 +21,11 @@ describe("input state", () => {
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: workshopLocation,
-					quantity: 1,
 				});
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation(1),
-					quantity: 2,
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: "runtime:workshop",
@@ -35,7 +33,6 @@ describe("input state", () => {
 					inputIndex: 0,
 					sourceItemId: "runtime:water",
 					sourceItemRevision: source.revision,
-					quantity: 2,
 				});
 
 				const runtime = yield* readRuntimeFx();

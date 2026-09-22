@@ -18,7 +18,6 @@ const baseItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
 });
 
 const config = GameConfigSchema.parse({
@@ -100,7 +99,6 @@ describe("temporary material input eligibility", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			const temporary = await session.runFn(
@@ -115,7 +113,6 @@ describe("temporary material input eligibility", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await session.runFn(
@@ -125,7 +122,6 @@ describe("temporary material input eligibility", () => {
 					inputIndex: 0,
 					sourceItemId: temporary.id,
 					sourceItemRevision: temporary.revision,
-					quantity: 1,
 				}),
 			);
 			const stored = (await session.runFn(readRuntimeFx())).items.find(

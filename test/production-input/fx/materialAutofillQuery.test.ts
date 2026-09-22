@@ -82,14 +82,12 @@ const spawnFx = Effect.gen(function* () {
 		id: "owner",
 		itemId: "workshop",
 		location: workshopLocation,
-		quantity: 1,
 	});
 	for (const [id, location] of locations)
 		yield* spawnItemFx({
 			id,
 			itemId: "water",
 			location,
-			quantity: 2,
 		});
 });
 
@@ -106,7 +104,6 @@ it("delivers universe material from another board space through ordinary settlem
 				id: "owner",
 				itemId: "workshop",
 				location: workshopLocation,
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "remote",
@@ -115,7 +112,6 @@ it("delivers universe material from another board space through ordinary settlem
 					...sourceLocation(1),
 					space: 1,
 				},
-				quantity: 1,
 			});
 			expect(
 				yield* autofillLineInputFx({
@@ -206,14 +202,14 @@ it.each([
 				runtime,
 				query,
 			});
-			expect(availability.availableQuantity).toBe(expected.length * 2);
+			expect(availability.availableQuantity).toBe(expected.length);
 			const detail = yield* readItemLineInputsFx({
 				ownerItemId: "owner",
 				runtime,
 				line,
 			});
 			expect(detail[0]).toMatchObject({
-				availableQuantity: expected.length * 2,
+				availableQuantity: expected.length,
 				canAutofill: true,
 			});
 		}).pipe(
@@ -245,6 +241,18 @@ it("allocates same-definition instances by each slot's reach without double spen
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnFx;
+			yield* spawnItemFx({
+				id: "near:second",
+				itemId: "water",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 2,
+						y: 1,
+					},
+				},
+			});
 			const runtime = yield* readRuntimeFx();
 			const plan = yield* planLineInputAutofillFx({
 				...target,
@@ -254,17 +262,14 @@ it("allocates same-definition instances by each slot's reach without double spen
 				{
 					inputIndex: 0,
 					sourceItemId: "near",
-					quantity: 1,
 				},
 				{
 					inputIndex: 2,
-					sourceItemId: "near",
-					quantity: 1,
+					sourceItemId: "near:second",
 				},
 				{
 					inputIndex: 1,
 					sourceItemId: "close",
-					quantity: 1,
 				},
 			]);
 			expect(plan.remainingMissingQuantity).toBe(1);
@@ -275,7 +280,7 @@ it("allocates same-definition instances by each slot's reach without double spen
 		),
 	);
 });
-it("keeps delivery remainder visibility tied to its origin and accepts manual material outside autofill reach", () => {
+it("excludes an in-flight identity from availability and accepts manual material outside autofill reach", () => {
 	const query = {
 		distance: "close" as const,
 		selector,
@@ -299,7 +304,7 @@ it("keeps delivery remainder visibility tied to its origin and accepts manual ma
 					runtime,
 					query,
 				})).availableQuantity,
-			).toBe(1);
+			).toBe(0);
 			expect(
 				(yield* readItemDetailMaterialAutofillAvailabilityFx({
 					ownerItemId: "owner",
@@ -309,26 +314,26 @@ it("keeps delivery remainder visibility tied to its origin and accepts manual ma
 						selector,
 					},
 				})).availableQuantity,
-			).toBe(5);
+			).toBe(2);
 			const source = runtime.items.find((item) => item.id === "far")!;
 			yield* storeInputMaterialFx({
 				...target,
-				inputIndex: 0,
+				inputIndex: 1,
 				sourceItemId: source.id,
 				sourceItemRevision: source.revision,
-				quantity: 1,
 			});
 			const stored = yield* readRuntimeFx();
 			expect(
 				stored.items
 					.filter((item) => item.location.scope === "input")
-					.map((item) => item.quantity),
+					.map((item) => item.id),
 			).toEqual([
-				1,
+				"far",
 			]);
 		}).pipe(
 			useGameFx({
 				config: configFn([
+					query,
 					query,
 				]),
 			}),
@@ -352,19 +357,16 @@ it("fills a narrow minimum before a broad earlier slot can steal its only source
 				id: "owner",
 				itemId: "workshop",
 				location: workshopLocation,
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "close",
 				itemId: "water",
 				location: sourceLocation(1),
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "far",
 				itemId: "water",
 				location: sourceLocation(3),
-				quantity: 1,
 			});
 			const runtime = yield* readRuntimeFx();
 			const plan = yield* planLineInputAutofillFx({
@@ -375,12 +377,10 @@ it("fills a narrow minimum before a broad earlier slot can steal its only source
 				{
 					inputIndex: 1,
 					sourceItemId: "close",
-					quantity: 1,
 				},
 				{
 					inputIndex: 0,
 					sourceItemId: "far",
-					quantity: 1,
 				},
 			]);
 			expect(plan.remainingMissingQuantity).toBe(0);

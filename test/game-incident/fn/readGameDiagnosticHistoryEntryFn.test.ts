@@ -38,7 +38,7 @@ describe("readGameDiagnosticHistoryEntryFn", () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
+
 						revision: "revision:test",
 					},
 				],

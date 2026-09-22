@@ -24,7 +24,6 @@ const baseItem = (id: string) =>
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize: 1,
 	}) as const;
 
 const workerItemId = "producer:worker";
@@ -148,7 +147,6 @@ const item = (id: string, itemId: string, x: number) => ({
 			y: 0,
 		},
 	},
-	quantity: 1,
 });
 
 const state = ({
@@ -202,7 +200,6 @@ describe("line input source ownership", () => {
 						inputIndex: 0,
 						sourceItemId: source.id,
 						sourceItemRevision: source.revision,
-						quantity: 1,
 					}),
 				);
 				return {
@@ -290,7 +287,6 @@ describe("line input source ownership", () => {
 						inputIndex: 0,
 						sourceItemId: source.id,
 						sourceItemRevision: source.revision,
-						quantity: 1,
 					}),
 				);
 				return {

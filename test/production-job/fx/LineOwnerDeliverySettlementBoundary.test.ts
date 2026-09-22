@@ -26,7 +26,6 @@ const baseItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
 });
 
 const makeLine = (lineId: string) => ({
@@ -74,8 +73,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			...baseItem("material"),
-
-			maxStackSize: 10,
 		},
 		producer: {
 			...baseItem("producer"),
@@ -128,19 +125,16 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 		id: ownerItemId,
 		itemId: ownerKind,
 		location: boardLocation(0),
-		quantity: 1,
 	});
 	yield* spawnItemFx({
 		id: "runtime:material:a",
 		itemId: "material",
 		location: boardLocation(1),
-		quantity: 1,
 	});
 	yield* spawnItemFx({
 		id: "runtime:material:b",
 		itemId: "material",
 		location: boardLocation(2),
-		quantity: 1,
 	});
 	return {
 		lineId,

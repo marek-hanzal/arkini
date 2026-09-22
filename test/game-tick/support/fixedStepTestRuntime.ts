@@ -111,7 +111,6 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	const dependent = yield* spawnItemFx({
 		id: "runtime:dependent",
@@ -124,7 +123,6 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	const permit = yield* spawnItemFx({
 		id: "runtime:permit:initial",
@@ -137,7 +135,6 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	yield* startLineFx({
 		ownerItemId: dependent.id,
@@ -158,7 +155,5 @@ export const summarizeFixedStepRuntimeFn = (runtime: RuntimeSchema.Type) => ({
 	dependentRemainingMs: runtime.jobs.find((job) => job.ownerItemId === "runtime:dependent")
 		?.remainingMs,
 	enablerActive: runtime.jobs.some((job) => job.ownerItemId === "runtime:enabler"),
-	permitQuantity: runtime.items
-		.filter((item) => item.item.id === "permit")
-		.reduce((quantity, item) => quantity + item.quantity, 0),
+	permitQuantity: runtime.items.filter((item) => item.item.id === "permit").length,
 });

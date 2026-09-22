@@ -22,7 +22,6 @@ export const clearItemJobQueueState = {
 					y: 0,
 				},
 			},
-			quantity: 1,
 		},
 		{
 			id: "runtime:forge:other",
@@ -35,7 +34,6 @@ export const clearItemJobQueueState = {
 					y: 0,
 				},
 			},
-			quantity: 1,
 		},
 	],
 	jobs: [

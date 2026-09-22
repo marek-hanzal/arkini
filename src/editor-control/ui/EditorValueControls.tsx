@@ -23,6 +23,7 @@ interface EditorNamedValueControlProps extends EditorValueControlProps {
 interface EditorNumericControlProps extends EditorNamedValueControlProps {
 	readonly clearLabel?: string;
 	readonly children?: ReactNode;
+	readonly trailing?: ReactNode;
 	readonly disabled?: boolean;
 	readonly labelVisible?: boolean;
 	readonly max?: number;
@@ -35,6 +36,7 @@ interface EditorNumericControlProps extends EditorNamedValueControlProps {
 const EditorNumericControl = ({
 	clearLabel,
 	children,
+	trailing,
 	description,
 	disabled = false,
 	error,
@@ -88,6 +90,7 @@ const EditorNumericControl = ({
 						<Trash2 className="size-4" />
 					</EditorIconButton>
 				)}
+				{trailing === undefined ? null : <span className="shrink-0">{trailing}</span>}
 			</div>
 			{children}
 		</div>
@@ -188,6 +191,7 @@ export const EditorNumberControl = ({
 	...props
 }: {
 	readonly disabled?: boolean;
+	readonly trailing?: ReactNode;
 	readonly labelVisible?: boolean;
 	readonly max?: number;
 	readonly min?: number;

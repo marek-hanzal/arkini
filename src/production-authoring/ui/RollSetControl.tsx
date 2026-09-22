@@ -150,31 +150,32 @@ const OutcomeFields = ({
 					</div>
 				</>
 			) : (
-				<div className="flex items-end gap-3">
-					<EditorNumberControl
-						error={readEditorFormValidationErrorFn(validationIssues, "space")}
-						description={<Mx label="Target space help" />}
-						label={translator.textFn("Target space")}
-						min={0}
-						value={value.space}
-						onChangeFn={(space) =>
-							onChangeFn({
-								...value,
-								space,
-							})
-						}
-					/>
-					<LinkButton
-						onClick={() =>
-							onChangeFn({
-								...value,
-								space: Math.floor(Math.random() * 897) + 128,
-							})
-						}
-					>
-						{translator.textFn("Pick random space")}
-					</LinkButton>
-				</div>
+				<EditorNumberControl
+					error={readEditorFormValidationErrorFn(validationIssues, "space")}
+					description={<Mx label="Target space help" />}
+					label={translator.textFn("Target space")}
+					min={0}
+					value={value.space}
+					onChangeFn={(space) =>
+						onChangeFn({
+							...value,
+							space,
+						})
+					}
+					trailing={
+						<LinkButton
+							className="whitespace-nowrap"
+							onClick={() =>
+								onChangeFn({
+									...value,
+									space: Math.floor(Math.random() * 897) + 128,
+								})
+							}
+						>
+							{translator.textFn("Pick random space")}
+						</LinkButton>
+					}
+				/>
 			)}
 			<SectionEnd />
 			<RulesControl

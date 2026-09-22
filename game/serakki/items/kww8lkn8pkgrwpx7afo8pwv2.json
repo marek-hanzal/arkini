@@ -13,7 +13,6 @@
 				"charcoal"
 			]
 		},
-		"maxStackSize": 8,
 		"maxQueueSize": 1,
 		"lines": []
 	}

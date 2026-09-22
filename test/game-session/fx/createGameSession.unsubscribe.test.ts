@@ -65,7 +65,6 @@ describe("createGameSessionFx / unsubscribe and async delivery", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 

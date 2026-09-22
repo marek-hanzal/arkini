@@ -12,7 +12,6 @@
 				"empty-jar"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

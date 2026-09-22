@@ -9,7 +9,6 @@ import { applyInputMaterialStorePlanFx } from "~/production-input/fx/applyInputM
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
@@ -17,7 +16,6 @@ import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn"
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { narrowDeliveryRuntimeItemFn } from "~/game-runtime/fn/narrowDeliveryRuntimeItemFn";
-import type { DeliveryRuntimeItemSchema } from "~/game-runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace settleItemDeliveryRuntimeFx {
@@ -28,7 +26,6 @@ export namespace settleItemDeliveryRuntimeFx {
 	}
 
 	export interface SettlementResult {
-		readonly acceptedQuantity: number;
 		readonly status: "ignored" | "returned" | "stored";
 	}
 
@@ -54,7 +51,6 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 		const runtimeItem = runtime.items.find((candidate) => candidate.id === itemId);
 		if (runtimeItem === undefined) {
 			const result: settleItemDeliveryRuntimeFx.SettlementResult = {
-				acceptedQuantity: 0,
 				status: "ignored",
 			};
 			return [
@@ -65,7 +61,6 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 		const delivery = narrowDeliveryRuntimeItemFn(runtimeItem);
 		if (Option.isNone(delivery) || delivery.value.location.generation !== generation) {
 			const result: settleItemDeliveryRuntimeFx.SettlementResult = {
-				acceptedQuantity: 0,
 				status: "ignored",
 			};
 			return [
@@ -109,7 +104,6 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 				),
 			} satisfies RuntimeSchema.Type;
 			const result: settleItemDeliveryRuntimeFx.SettlementResult = {
-				acceptedQuantity: 0,
 				status: "returned",
 			};
 			return [
@@ -128,108 +122,84 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 						lineId: target.lineId,
 					});
 		let inputRuntime = runtime;
-		let source: DeliveryRuntimeItemSchema.Type | undefined = current;
-		let acceptedQuantity = 0;
-
-		if (owner?.location.scope === LocationScopeEnumSchema.enum.Board && line !== undefined) {
-			for (const allocation of target.input) {
-				if (source === undefined) break;
-				const input = line.input[allocation.inputIndex];
-				if (
-					input === undefined ||
-					input.type !== TypeSchema.enum.Materials ||
-					isLineInputClosedFn({
-						ownerItemId: owner.id,
-						lineId: line.id,
-						runtime: inputRuntime,
-					})
-				) {
-					continue;
-				}
-				const storedItems = filterInputSlotItemsFn({
-					inputIndex: allocation.inputIndex,
-					items: inputRuntime.items,
-					lineId: line.id,
-					ownerItemId: owner.id,
-				});
-				const plan: planInputMaterialStoreFn.Plan | undefined = planInputMaterialStoreFn({
-					input,
-					item: source,
-					requestedQuantity: allocation.quantity,
-					storedQuantity: storedItems.reduce((total, item) => total + item.quantity, 0),
-				});
-				if (plan === undefined) continue;
-				const applied: readonly [
-					applyInputMaterialStorePlanFx.Result<DeliveryRuntimeItemSchema.Type>,
-					RuntimeSchema.Type,
-				] = yield* applyInputMaterialStorePlanFx({
+		let accepted = false;
+		const input = line?.input[target.inputIndex];
+		if (
+			owner?.location.scope === LocationScopeEnumSchema.enum.Board &&
+			line !== undefined &&
+			input?.type === TypeSchema.enum.Materials &&
+			!isLineInputClosedFn({
+				ownerItemId: owner.id,
+				lineId: line.id,
+				runtime,
+			})
+		) {
+			const storedItems = filterInputSlotItemsFn({
+				inputIndex: target.inputIndex,
+				items: runtime.items,
+				lineId: line.id,
+				ownerItemId: owner.id,
+			});
+			const plan = planInputMaterialStoreFn({
+				input,
+				item: current,
+				storedQuantity: storedItems.length,
+			});
+			if (plan !== undefined) {
+				const [, nextRuntime] = yield* applyInputMaterialStorePlanFx({
 					location: {
 						scope: LocationScopeEnumSchema.enum.Input,
 						ownerItemId: owner.id,
 						lineId: line.id,
-						inputIndex: allocation.inputIndex,
+						inputIndex: target.inputIndex,
 					},
-					plan,
-					runtime: inputRuntime,
-					source,
+					runtime,
+					source: current,
 				});
-				const [storeResult, nextRuntime] = applied;
-				acceptedQuantity += storeResult.storedItem.quantity;
 				inputRuntime = nextRuntime;
-				source = storeResult.sourceItem;
+				accepted = true;
 			}
 		}
 
-		// One physical contact exhausts this delivery's authored allocations exactly once.
-		// A split source remainder must turn home before global reconciliation; otherwise
-		// runtime-order arbitration can let this already-settled identity reclaim its old
-		// allocation and preempt another delivery that is still physically approaching.
-		if (source !== undefined && owner?.location.scope === LocationScopeEnumSchema.enum.Board) {
+		// Contact either commits the whole identity or sends it home before claim reconciliation.
+		if (!accepted) {
+			const returnFrom =
+				owner?.location.scope === LocationScopeEnumSchema.enum.Board
+					? owner.location
+					: current.location.origin;
 			const returningSource = yield* reviseRuntimeItemFx({
 				item: {
-					...source,
+					...current,
 					location: {
 						scope: LocationScopeEnumSchema.enum.Delivery,
 						phase: "returning",
 						generation: current.location.generation + 1,
 						origin: current.location.origin,
 						remainingDurationMs: readDeliveryTravelDurationMsFn({
-							from: owner.location,
+							from: returnFrom,
 							to: current.location.origin,
 						}),
-						returnFrom: owner.location,
+						returnFrom,
 					},
 				},
 			});
 			inputRuntime = {
 				...inputRuntime,
 				items: inputRuntime.items.map((candidate) =>
-					candidate.id === returningSource.id ? returningSource : candidate,
+					candidate.id === current.id ? returningSource : candidate,
 				),
-			} satisfies RuntimeSchema.Type;
+			};
 		}
 
-		const isolation =
-			acceptedQuantity > 0 && owner !== undefined
-				? yield* isolateBoardStatefulOwnerTransitionFx({
-						ownerItemId: owner.id,
-						runtime: inputRuntime,
-					})
-				: {
-						events: [],
-						runtime: inputRuntime,
-					};
 		const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
-			runtime: isolation.runtime,
+			runtime: inputRuntime,
 		});
 		const result: settleItemDeliveryRuntimeFx.SettlementResult = {
-			acceptedQuantity,
-			status: acceptedQuantity > 0 ? "stored" : "returned",
+			status: accepted ? "stored" : "returned",
 		};
 		return [
 			result,
 			reconciledRuntime,
-			isolation.events,
 		] as const;
 	});
 });

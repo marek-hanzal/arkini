@@ -12,7 +12,6 @@
 				"plague"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 10000,
 			"durationMs": 15000,

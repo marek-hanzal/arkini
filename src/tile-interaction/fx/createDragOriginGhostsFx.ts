@@ -30,7 +30,7 @@ const restingAlpha = 0.24;
  * Mirrors a dragged actor at its committed origin without creating another gameplay actor.
  *
  * Ghosts live in the origin actor layer, below its interactive children. Their retained texture is
- * refreshed before every requested scene render so current Clock, job, quantity, and artwork state
+ * refreshed before every requested scene render so current Clock, job, and artwork state
  * remains visible. They never enter actor stores, hit testing, or drop preview,
  * and disappear only when presentation has settled the real actor or retired it from the main scene.
  */

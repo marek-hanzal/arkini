@@ -12,7 +12,6 @@ const base = (id: string) => ({
 	uid: `uid:${id}`,
 	title: id,
 	description: id,
-	maxStackSize: 1,
 	artwork: {
 		scale: 0.8,
 		default: [

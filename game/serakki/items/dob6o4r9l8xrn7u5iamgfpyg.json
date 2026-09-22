@@ -13,7 +13,6 @@
 				"school-t1"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 4,
 		"lines": [
 			{

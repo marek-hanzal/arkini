@@ -44,7 +44,6 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await expect(

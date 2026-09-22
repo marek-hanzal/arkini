@@ -15,7 +15,7 @@ it("rejects insufficient board capacity before allocating identities, including 
 	const item = {
 		id: "origin",
 		item: placementTestConfig.items.origin,
-		quantity: 1,
+
 		revision: "revision",
 	};
 	const runtime: RuntimeSchema.Type = {
@@ -85,7 +85,7 @@ it("rejects insufficient board capacity before allocating identities, including 
 				});
 			expect(identities).toBe(0);
 			const accepted = yield* planDropPlacementFx(props);
-			expect(accepted.spawn.map(({ item }) => item.location)).toEqual([
+			expect(accepted.spawn.map((item) => item.location)).toEqual([
 				boardLocation(2),
 				boardLocation(3),
 			]);

@@ -12,7 +12,6 @@
 				"paper-boat"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

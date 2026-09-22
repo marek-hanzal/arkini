@@ -22,7 +22,6 @@ const simpleItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 10,
 });
 
 const output = (itemId: string) => ({
@@ -85,7 +84,7 @@ const producer = ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
+
 	maxQueueSize: 4,
 	lines: [
 		{
@@ -182,7 +181,6 @@ export const runChain = (order: ReadonlyArray<keyof typeof owners>, space = 0) =
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 			}
 

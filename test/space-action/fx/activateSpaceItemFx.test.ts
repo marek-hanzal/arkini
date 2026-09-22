@@ -56,7 +56,6 @@ describe("Space item activation", () => {
 					id: "runtime:blocked",
 					itemId: "blockedPortal",
 					location: board(0),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
@@ -91,13 +90,11 @@ describe("Space item activation", () => {
 					id: "runtime:payer:far",
 					itemId: "payer",
 					location: board(0, 0),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:payer:near",
 					itemId: "payer",
 					location: board(1, 0),
-					quantity: 1,
 				});
 				return yield* spawnAndActivate({
 					id: "runtime:units-portal",
@@ -124,7 +121,6 @@ describe("Space item activation", () => {
 					id: "runtime:owner-paid-target",
 					itemId: "payer",
 					location: board(1),
-					quantity: 1,
 				});
 				const activated = yield* spawnAndActivate({
 					id: "runtime:owner-paid-portal",

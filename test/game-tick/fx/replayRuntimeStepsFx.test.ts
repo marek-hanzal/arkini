@@ -25,7 +25,6 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 		.map((item) => ({
 			itemId: item.item.id,
 			location: item.location,
-			quantity: item.quantity,
 		}))
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second))),
 	jobQueue: runtime.jobQueue,

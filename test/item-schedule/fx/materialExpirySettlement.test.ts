@@ -103,20 +103,17 @@ describe("committed material expiry settlement", () => {
 		expect(result.expired.runtime.items.some((item) => item.item.id === "product")).toBe(false);
 		expect(
 			result.expired.runtime.items.filter((item) => item.item.id === "residue"),
-		).toHaveLength(1);
+		).toHaveLength(2);
 		expect(
 			result.expired.events.filter((event) => event.type === "item:depleted"),
 		).toHaveLength(1);
 		expect(result.expired.events.filter((event) => event.type === "job:aborted")).toHaveLength(
 			1,
 		);
-		expect(
-			result.expired.runtime.items.find((item) => item.item.id === "residue")?.quantity,
-		).toBe(2);
 		expect(result.later.sequence).toBe(result.expired.sequence);
 		expect(
 			result.later.runtime.items.filter((item) => item.item.id === "residue"),
-		).toHaveLength(1);
+		).toHaveLength(2);
 	});
 	it("returns a reserved identity into the depleted owner's freed cell", () => {
 		const config = lastUnitConfigFn("loose-kill");
@@ -147,7 +144,7 @@ describe("committed material expiry settlement", () => {
 				const reserved = yield* spawnItemFx({
 					id: "reserved",
 					itemId: "blocker",
-					quantity: 1,
+
 					location: boardFn(1),
 				});
 				yield* storeInputMaterialFx({
@@ -156,7 +153,6 @@ describe("committed material expiry settlement", () => {
 					inputIndex: 1,
 					sourceItemId: reserved.id,
 					sourceItemRevision: reserved.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: "owner",
@@ -169,7 +165,7 @@ describe("committed material expiry settlement", () => {
 					yield* spawnItemFx({
 						id: `blocker:${x}`,
 						itemId: "blocker",
-						quantity: 1,
+
 						location: boardFn(x),
 					});
 				yield* runTickRuntimeByFx({

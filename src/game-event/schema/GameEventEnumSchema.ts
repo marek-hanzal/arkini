@@ -17,8 +17,6 @@ export const GameEventEnumSchema = z
 		ItemPortalTransferred: "item:portal-transferred",
 		ItemPlaced: "item:placed",
 		ItemSwapped: "item:swapped",
-		ItemStacked: "item:stacked",
-		ItemSplit: "item:split",
 		ItemConsumed: "item:consumed",
 		ItemInputStored: "item:input-stored",
 		ItemUnitSpent: "item:unit-spent",

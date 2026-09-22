@@ -32,15 +32,9 @@ describe("readItemDetailLinesFx / delivery and autofill", () => {
 					kind: "line-input" as const,
 					ownerItemId: "runtime:workshop",
 					lineId: "line:workshop:build",
-					input: [
-						{
-							inputIndex: 0,
-							quantity: 1,
-						},
-					],
+					inputIndex: 0,
 				},
 			},
-			quantity: 1,
 			revision: `revision:${id}`,
 		});
 		const lines = readLines({
@@ -90,7 +84,7 @@ describe("readItemDetailLinesFx / delivery and autofill", () => {
 	});
 });
 
-it("keeps unclaimed and returning delivery quantities available while stacks travel", () => {
+it("counts returning deliveries as available while outbound items remain claimed", () => {
 	const runtime = lineRunRuntime({
 		permit: true,
 	});
@@ -114,15 +108,9 @@ it("keeps unclaimed and returning delivery quantities available while stacks tra
 				kind: "line-input" as const,
 				ownerItemId: "runtime:workshop",
 				lineId: "line:workshop:build",
-				input: [
-					{
-						inputIndex: 0,
-						quantity: 3,
-					},
-				],
+				inputIndex: 0,
 			},
 		},
-		quantity: 7,
 		revision: "revision:delivery:outbound",
 	};
 	const returning = {
@@ -150,7 +138,6 @@ it("keeps unclaimed and returning delivery quantities available while stacks tra
 				},
 			},
 		},
-		quantity: 2,
 		revision: "revision:delivery:returning",
 	};
 	const lines = readLines({
@@ -164,7 +151,7 @@ it("keeps unclaimed and returning delivery quantities available while stacks tra
 	if (lines.kind !== "available") throw new Error("Expected available lines.");
 	expect(lines.line[0]?.input[0]).toMatchObject({
 		kind: "materials",
-		deliveryQuantity: 3,
-		autofillAvailableQuantity: 6,
+		deliveryQuantity: 1,
+		autofillAvailableQuantity: 1,
 	});
 });

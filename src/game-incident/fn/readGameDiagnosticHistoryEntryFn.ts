@@ -266,7 +266,6 @@ export const readGameDiagnosticHistoryEntryFn = ({
 						runtimeItemId: item.id,
 						runtimes,
 					}),
-					quantity: item.quantity,
 					generation: location.generation,
 					phase: location.phase,
 					origin: origin.value,

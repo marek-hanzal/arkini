@@ -50,7 +50,7 @@ const config = GameConfigSchema.parse({
 					"artwork:producer",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -83,7 +83,6 @@ const config = GameConfigSchema.parse({
 					"artwork:resource",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });

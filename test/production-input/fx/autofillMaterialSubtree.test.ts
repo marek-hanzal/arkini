@@ -75,19 +75,19 @@ const stateFn = (origin: BoardLocationSchema.Type): StateSchema.Type => ({
 		{
 			id: "receiver",
 			itemId: "recycler",
-			quantity: 1,
+
 			location: sourceLocation(0),
 		},
 		{
 			id: "source",
 			itemId: "workshop",
-			quantity: 1,
+
 			location: origin,
 		},
 		{
 			id: "water",
 			itemId: "water",
-			quantity: 1,
+
 			location: {
 				scope: "input",
 				ownerItemId: "source",
@@ -193,7 +193,6 @@ it("preserves a reserved producer and its buffer from Board through delivery and
 			const completed = yield* readRuntimeFx();
 			expect(completed.jobs).toEqual([]);
 			expect(completed.items.find(({ id }) => id === "source")).toMatchObject({
-				quantity: 1,
 				location: {
 					scope: "board",
 				},
@@ -230,7 +229,6 @@ it("returns the same producer and buffer to its Board lease when the queue is cl
 			expect(returned.jobQueue).toEqual([]);
 			expect(returned.jobs).toEqual([]);
 			expect(returned.items.find(({ id }) => id === "source")).toMatchObject({
-				quantity: 1,
 				location: origin,
 			});
 			expect(returned.items.find(({ id }) => id === "water")).toEqual(

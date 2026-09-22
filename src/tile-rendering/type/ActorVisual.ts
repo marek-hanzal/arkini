@@ -17,10 +17,8 @@ export interface ActorVisual {
 	readonly container: Container;
 	readonly primary: Sprite;
 	readonly composite: Sprite;
-	readonly stackQuantity: Text;
-	readonly stackQuantityBackground: Graphics;
-	readonly quantity: Text;
-	readonly quantityBackground: Graphics;
+	readonly badge: Text;
+	readonly badgeBackground: Graphics;
 	readonly readyListeners: Set<VisualReadyListener>;
 	readonly releaseTexturesFn: () => void;
 	readonly reportCriticalFailureFn: (cause: unknown) => void;

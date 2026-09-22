@@ -46,7 +46,6 @@ const spawnOwnerFx = Effect.fn("spawnTemporaryMaterialTestOwnerFx")(function* ()
 		id: "runtime:owner",
 		itemId: "owner",
 		location: board(0),
-		quantity: 1,
 	});
 });
 
@@ -61,7 +60,6 @@ const spawnTemporaryFx = Effect.fn("spawnTemporaryMaterialTestItemFx")(function*
 		id,
 		itemId: "temporary",
 		location: board(x),
-		quantity: 1,
 	});
 });
 
@@ -78,7 +76,6 @@ const storeTemporaryFx = Effect.fn("storeTemporaryMaterialTestItemFx")(function*
 		inputIndex: 0,
 		sourceItemId: id,
 		sourceItemRevision: revision,
-		quantity: 1,
 	});
 });
 
@@ -197,13 +194,11 @@ describe("temporary material lifecycle", () => {
 					id: "runtime:blocker:one",
 					itemId: "blocker",
 					location: board(1),
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:blocker:two",
 					itemId: "blocker",
 					location: board(2),
-					quantity: 1,
 				});
 				const blocked = yield* advanceStepsFx({
 					count: 6,

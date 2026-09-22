@@ -80,13 +80,12 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 	].sort(Order.String);
 };
 
-const addStartQuantityFn = (quantities: Map<string, number>, itemId: string, quantity = 1) =>
-	quantities.set(itemId, (quantities.get(itemId) ?? 0) + quantity);
+const addStartQuantityFn = (quantities: Map<string, number>, itemId: string) =>
+	quantities.set(itemId, (quantities.get(itemId) ?? 0) + 1);
 
 const readStartQuantityByItemIdFn = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<string, number>();
-	for (const item of config.start.board)
-		addStartQuantityFn(quantities, item.itemId, item.quantity);
+	for (const item of config.start.board) addStartQuantityFn(quantities, item.itemId);
 	return quantities;
 };
 

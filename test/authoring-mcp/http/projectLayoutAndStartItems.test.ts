@@ -188,7 +188,6 @@ describe("editor MCP project layout and start items", () => {
 					},
 				},
 				itemId: "water",
-				quantity: 2,
 			},
 		});
 		expect(setBoard.content).toMatchObject([
@@ -211,7 +210,6 @@ describe("editor MCP project layout and start items", () => {
 					},
 				},
 				itemId: "water",
-				quantity: 3,
 			},
 		});
 		expect(replacedBoard.content).toMatchObject([
@@ -233,7 +231,6 @@ describe("editor MCP project layout and start items", () => {
 					},
 				},
 				itemId: "water",
-				quantity: 1,
 			},
 		});
 		expect(missingBoardSpace.isError).toBe(true);
@@ -267,7 +264,6 @@ describe("editor MCP project layout and start items", () => {
 			},
 			{
 				itemId: "water",
-				quantity: 3,
 				space: 2,
 				x: 0,
 				y: 0,

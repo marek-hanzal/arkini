@@ -69,7 +69,6 @@ const config = GameConfigSchema.parse({
 					"item-water",
 				],
 			},
-			maxStackSize: 1,
 		},
 		water: {
 			maxQueueSize: 1,
@@ -86,7 +85,6 @@ const config = GameConfigSchema.parse({
 					"item-water",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });

@@ -29,7 +29,6 @@ describe("drop placement transition", () => {
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(0),
-					quantity: 1,
 				});
 				yield* placeDropForTestFx({
 					drop: configuredDrop({
@@ -63,7 +62,6 @@ describe("drop placement transition", () => {
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(0),
-					quantity: 1,
 				});
 
 				return yield* placeDropForTestFx({
@@ -103,7 +101,6 @@ describe("drop placement transition", () => {
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(0),
-					quantity: 1,
 				});
 				const placement = yield* placeDropForTestFx({
 					drop: {
@@ -154,62 +151,6 @@ describe("drop placement transition", () => {
 		expect(result.nextRandom).toBe(0.5);
 	});
 
-	it("orders stack-first placement around the random origin", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:log:left",
-					itemId: "log",
-					location: boardLocation(1),
-					quantity: 2,
-				});
-				yield* spawnItemFx({
-					id: "runtime:log:right",
-					itemId: "log",
-					location: boardLocation(3),
-					quantity: 2,
-				});
-
-				return yield* placeDropForTestFx({
-					drop: configuredDrop({
-						itemId: "log",
-						placement: "random",
-						quantity: 1,
-					}),
-					originItemId: "runtime:origin",
-				});
-			}).pipe(
-				Effect.provideServiceEffect(
-					Random.Random,
-					makeFixedRandomFx([
-						0.75,
-					]),
-				),
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		const placement = requirePlacement(result);
-
-		expect(placement.placement.stack).toEqual([
-			{
-				item: expect.objectContaining({
-					id: "runtime:log:right",
-					quantity: 3,
-				}),
-				quantity: 1,
-			},
-		]);
-	});
-
 	it("serializes concurrent drops competing for the last board cell", async () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
@@ -217,7 +158,6 @@ describe("drop placement transition", () => {
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(0),
-					quantity: 1,
 				});
 				for (const x of [
 					2,
@@ -227,7 +167,6 @@ describe("drop placement transition", () => {
 						id: `runtime:blocker:${x}`,
 						itemId: "blocker",
 						location: boardLocation(x),
-						quantity: 1,
 					});
 				}
 				const drop = configuredDrop({
@@ -275,14 +214,13 @@ describe("drop placement transition", () => {
 	});
 });
 
-it("rejects incomplete placement without committing partial stacks or spawns", () => {
+it("rejects incomplete placement without committing partial output identities", () => {
 	const result = Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "runtime:origin",
 				itemId: "origin",
 				location: boardLocation(0),
-				quantity: 1,
 			});
 			for (const x of [
 				1,
@@ -293,7 +231,6 @@ it("rejects incomplete placement without committing partial stacks or spawns", (
 					id: `runtime:board:${x}`,
 					itemId: "blocker",
 					location: boardLocation(x),
-					quantity: 1,
 				});
 			}
 			for (const {} of [

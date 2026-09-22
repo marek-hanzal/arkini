@@ -50,7 +50,6 @@ const config = GameConfigSchema.parse({
 					"artwork:water",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });
@@ -85,7 +84,6 @@ const committedRuntime = {
 		item.id === target.id
 			? {
 					...item,
-					quantity: 2,
 				}
 			: item,
 	),

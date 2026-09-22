@@ -33,7 +33,7 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 			id: item.id,
 			itemId: item.item.id,
 			location: item.location,
-			quantity: item.quantity,
+
 			remainingDurationMs: item.schedule?.remainingDurationMs,
 		}))
 		.sort((first, second) => first.id.localeCompare(second.id)),
@@ -61,7 +61,6 @@ const spawnTemporaryFx = Effect.fn("spawnTemporaryFx")(function* ({
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 });
 
@@ -77,7 +76,6 @@ const spawnBlockerFx = Effect.fn("spawnBlockerFx")(function* (id: string, x: num
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 });
 
@@ -140,7 +138,6 @@ describe("temporary item lifetime", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemDisappeared,
@@ -154,7 +151,6 @@ describe("temporary item lifetime", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			},
 		]);
 	});
@@ -342,7 +338,6 @@ describe("temporary item lifetime", () => {
 				itemId: result.temporary.id,
 				canonicalItemId: "temporaryOutput",
 				location: result.temporary.location,
-				quantity: 1,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
@@ -350,7 +345,6 @@ describe("temporary item lifetime", () => {
 				canonicalItemId: "result",
 				originItemId: result.temporary.id,
 				location: result.output.location,
-				quantity: 1,
 			},
 		]);
 		expect(
@@ -455,7 +449,6 @@ describe("temporary item lifetime", () => {
 				.filter((item) => item.item.id === "result")
 				.map((item) => ({
 					location: item.location,
-					quantity: item.quantity,
 				}))
 				.sort((first, second) =>
 					JSON.stringify(first.location).localeCompare(JSON.stringify(second.location)),
@@ -517,7 +510,6 @@ describe("temporary item lifetime", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: producer.id,
@@ -560,7 +552,6 @@ describe("temporary item lifetime", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const target = yield* spawnBlockerFx("runtime:target", 1);
 				yield* mergeItemsFx({

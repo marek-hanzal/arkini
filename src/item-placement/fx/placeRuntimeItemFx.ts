@@ -1,19 +1,16 @@
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
-import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { ItemJobScopedError } from "~/game-runtime/error/ItemJobScopedError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -22,8 +19,6 @@ import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnava
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
-import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
-import { planDropPlacementFx } from "./planDropPlacementFx";
 
 interface PlaceRuntimeItemProps {
 	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
@@ -90,9 +85,9 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 		new PlacementUnavailableError({
 			itemId: item.item.id,
 			placement: PlacementSchema.enum.Drop,
-			quantity: item.quantity,
+			quantity: 1,
 			reason,
-			remainingQuantity: item.quantity,
+			remainingQuantity: 1,
 		}),
 	);
 });
@@ -136,86 +131,11 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			runtime,
 		});
 	}
-	const pure = isItemPureFn({
-		item,
-		runtime,
-	});
 	const detachedRuntime = {
 		...runtime,
 		items: runtime.items.filter((candidate) => candidate.id !== item.id),
 	} satisfies RuntimeSchema.Type;
 
-	if (pure) {
-		const plan = yield* planDropPlacementFx({
-			drop: {
-				itemId: item.item.id,
-				placement: PlacementSchema.enum.Drop,
-				quantity: item.quantity,
-			},
-			excludedLocations,
-			origin,
-			runtime: detachedRuntime,
-		});
-		const [placement, placedRuntime] = yield* applyPlacementPlanFx({
-			plan,
-			runtime: detachedRuntime,
-		});
-		const events: GameEventSchema.Type[] = [
-			{
-				type: "item:removed",
-				snapshot: item,
-			},
-		];
-		for (const stack of placement.stack) {
-			const stackedItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(stack.item));
-			if (stackedItem === undefined) {
-				return yield* Effect.die(
-					new Error(
-						`Existing-item placement stacked ${stack.item.id} outside a visible grid scope.`,
-					),
-				);
-			}
-			events.push({
-				type: GameEventEnumSchema.enum.ItemStacked,
-				itemId: stackedItem.id,
-				canonicalItemId: stackedItem.item.id,
-				originItemId,
-				location: stackedItem.location,
-				previousQuantity: stackedItem.quantity - stack.quantity,
-				quantity: stackedItem.quantity,
-			});
-		}
-		for (const runtimeSpawnedItem of placement.spawn) {
-			const spawnedItem = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeSpawnedItem));
-			if (spawnedItem === undefined) {
-				return yield* Effect.die(
-					new Error(
-						`Existing-item placement spawned ${runtimeSpawnedItem.id} outside a visible grid scope.`,
-					),
-				);
-			}
-			events.push({
-				type: GameEventEnumSchema.enum.ItemSpawned,
-				itemId: spawnedItem.id,
-				canonicalItemId: spawnedItem.item.id,
-				originItemId,
-				location: spawnedItem.location,
-				quantity: spawnedItem.quantity,
-			});
-		}
-		return {
-			events,
-			runtime: placedRuntime,
-		} satisfies PlaceRuntimeItemResult;
-	}
-
-	if (item.quantity !== 1) {
-		return yield* Effect.fail(
-			new ItemStatefulError({
-				itemId: item.id,
-			}),
-		);
-	}
 	const location = yield* readRuntimeItemDropLocationFx({
 		excludedLocations,
 		item,
@@ -244,7 +164,6 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 				originItemId,
 				previousLocation: item.location,
 				location: placedItem.location,
-				quantity: placedItem.quantity,
 			},
 		],
 		runtime: placedRuntime,

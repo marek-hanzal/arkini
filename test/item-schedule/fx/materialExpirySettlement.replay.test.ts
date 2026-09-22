@@ -30,7 +30,6 @@ describe("aborted job depletion replay", () => {
 			min: 2,
 			max: 2,
 		};
-		config.items.residue!.maxStackSize = 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* startMaterialJobFx();
@@ -66,7 +65,7 @@ describe("aborted job depletion replay", () => {
 					yield* spawnItemFx({
 						id: `blocker:${x}`,
 						itemId: "blocker",
-						quantity: 1,
+
 						location: boardFn(x),
 					});
 				const full = {

@@ -12,7 +12,6 @@
 				"cotton-fiber"
 			]
 		},
-		"maxStackSize": 10,
 		"maxQueueSize": 1,
 		"lines": []
 	}

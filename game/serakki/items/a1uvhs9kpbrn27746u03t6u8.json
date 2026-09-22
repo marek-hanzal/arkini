@@ -12,7 +12,6 @@
 				"workshop-portal"
 			]
 		},
-		"maxStackSize": 1,
 		"action": {
 			"input": [],
 			"rules": [],

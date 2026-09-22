@@ -1,5 +1,4 @@
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
@@ -9,23 +8,20 @@ export namespace planInputMaterialStoreFn {
 	export interface Props {
 		input: MaterialSchema.Type;
 		item: RuntimeItemSchema.Type;
-		requestedQuantity: PositiveIntegerSchema.Type;
 		storedQuantity: NonNegativeIntegerSchema.Type;
 	}
 
 	export interface Plan {
 		readonly sourceItemId: RuntimeItemSchema.Type["id"];
-		readonly quantity: PositiveIntegerSchema.Type;
 	}
 }
 
 /**
- * Plans how much of one delivered runtime item a material input slot can accept.
+ * Admits one delivered identity when the material slot matches and has capacity.
  */
 export const planInputMaterialStoreFn = ({
 	input,
 	item,
-	requestedQuantity,
 	storedQuantity,
 }: planInputMaterialStoreFn.Props) => {
 	const matches = selectItemsFn({
@@ -48,6 +44,5 @@ export const planInputMaterialStoreFn = ({
 
 	return {
 		sourceItemId: item.id,
-		quantity: Math.min(item.quantity, requestedQuantity, resolution.availableCapacity),
 	} satisfies planInputMaterialStoreFn.Plan;
 };

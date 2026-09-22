@@ -12,7 +12,6 @@
 				"british-shorthair-kitten-with-sack-on-head"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 5000,
 			"enable": true,

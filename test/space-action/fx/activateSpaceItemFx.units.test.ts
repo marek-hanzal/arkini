@@ -16,7 +16,6 @@ describe("Space item unit settlement", () => {
 					id: "runtime:same-space",
 					itemId: "sameSpacePortal",
 					location: board(0),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const activation = yield* activateItemActionWithTransitionFx({
@@ -62,50 +61,36 @@ describe("Space item unit settlement", () => {
 		expect(success.runtime.items.find((item) => item.id === success.item.id)).toMatchObject({
 			remainingUnits: undefined,
 		});
-		const passiveStack = run(
+		const passiveItem = run(
 			spawnAndActivate({
-				id: "runtime:spent-stack",
+				id: "runtime:spent-item",
 				itemId: "spentPortal",
 				location: board(2),
-				quantity: 2,
 			}),
 		);
-		const stackItems = passiveStack.runtime.items.filter(
-			(item) => item.item.id === "spentPortal",
-		);
-		expect(stackItems).toEqual([
+		const items = passiveItem.runtime.items.filter((item) => item.item.id === "spentPortal");
+		expect(items).toEqual([
 			expect.objectContaining({
-				id: passiveStack.item.id,
+				id: passiveItem.item.id,
 				location: board(2),
-				quantity: 2,
+
 				remainingUnits: undefined,
 			}),
 		]);
-		const spentPassiveStack = run(
+		const spentPassiveItem = run(
 			spawnAndActivate({
-				id: "runtime:spent-passive-stack",
+				id: "runtime:spent-passive-item",
 				itemId: "passiveFinitePortal",
 				location: board(2),
-				quantity: 2,
 			}),
 		);
-		const spentStackItems = spentPassiveStack.runtime.items.filter(
+		const spentItems = spentPassiveItem.runtime.items.filter(
 			(item) => item.item.id === "passiveFinitePortal",
 		);
-		expect(spentStackItems).toHaveLength(2);
-		expect(spentStackItems.find((item) => item.id === spentPassiveStack.item.id)).toMatchObject(
-			{
-				quantity: 1,
-				remainingUnits: 1,
-			},
-		);
-		expect(spentStackItems.find((item) => item.id !== spentPassiveStack.item.id)).toMatchObject(
-			{
-				location: board(1),
-				quantity: 1,
-				remainingUnits: undefined,
-			},
-		);
+		expect(spentItems).toHaveLength(1);
+		expect(spentItems.find((item) => item.id === spentPassiveItem.item.id)).toMatchObject({
+			remainingUnits: 1,
+		});
 
 		const authored = run(
 			Effect.gen(function* () {
@@ -114,7 +99,6 @@ describe("Space item unit settlement", () => {
 					id: "runtime:cumulative",
 					itemId: "cumulativePortal",
 					location: board(0),
-					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
 				const activation = yield* activateItemActionWithTransitionFx({
@@ -128,7 +112,6 @@ describe("Space item unit settlement", () => {
 					id: "runtime:later-commit",
 					itemId: "token",
 					location: board(3),
-					quantity: 1,
 				});
 				return {
 					after,
@@ -173,7 +156,6 @@ describe("Space item unit settlement", () => {
 					id: "runtime:passive-failure",
 					itemId: "passiveFailurePortal",
 					location: board(0),
-					quantity: 1,
 				});
 				for (let y = 0; y < 2; y++) {
 					for (let x = 0; x < 4; x++) {
@@ -182,7 +164,6 @@ describe("Space item unit settlement", () => {
 							id: `runtime:board-blocker:${x}:${y}`,
 							itemId: "permit",
 							location: board(x, y),
-							quantity: 1,
 						});
 					}
 				}

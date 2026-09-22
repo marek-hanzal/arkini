@@ -17,17 +17,12 @@ type ActorArrival =
 			readonly visible: VisibleActor;
 	  };
 
-type ActorDeparture =
-	| {
-			readonly actorId: string;
-			readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
-			readonly kind: "release";
-			readonly style: "default" | "feedback" | "feedback-particles";
-	  }
-	| {
-			readonly actorId: string;
-			readonly kind: "release-hidden";
-	  };
+type ActorDeparture = {
+	readonly actorId: string;
+	readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
+	readonly kind: "release";
+	readonly style: "default" | "feedback" | "feedback-particles";
+};
 
 interface ReconciliationPlan {
 	readonly arrivals: ReadonlyArray<ActorArrival>;
@@ -38,7 +33,6 @@ interface ClassifyReconciliationProps {
 	readonly actorIds: Iterable<string>;
 	readonly deliveryRetainedActorIds: ReadonlySet<string>;
 	readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
-	readonly hiddenActorIds: ReadonlySet<string>;
 	readonly motionRetainedActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly visibleActors: ReadonlyMap<string, VisibleActor>;
@@ -52,7 +46,6 @@ export const classifyReconciliationFn = ({
 	actorIds,
 	deliveryRetainedActorIds,
 	feedbackCues,
-	hiddenActorIds,
 	motionRetainedActorIds,
 	pendingActorIds,
 	visibleActors,
@@ -79,13 +72,6 @@ export const classifyReconciliationFn = ({
 	for (const actorId of currentActorIds) {
 		if (visibleActors.has(actorId)) continue;
 		if (pendingActorIds.has(actorId)) continue;
-		if (hiddenActorIds.has(actorId)) {
-			departures.push({
-				actorId,
-				kind: "release-hidden",
-			});
-			continue;
-		}
 		if (deliveryRetainedActorIds.has(actorId)) continue;
 		if (motionRetainedActorIds.has(actorId)) continue;
 		const exitFeedbackCues = feedbackCues.filter(

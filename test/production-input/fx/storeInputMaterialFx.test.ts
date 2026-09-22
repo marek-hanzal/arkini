@@ -22,36 +22,26 @@ const spawnOwnerFx = () => {
 		id: "runtime:workshop",
 		itemId: "workshop",
 		location: workshopLocation,
-		quantity: 1,
 	});
 };
 
 const spawnSourceFx = ({
 	id = "runtime:water",
 	itemId = "water",
-	quantity,
 	x = 1,
 }: {
 	id?: string;
 	itemId?: "stone" | "water";
-	quantity: number;
 	x?: number;
 }) => {
 	return spawnItemFx({
 		id,
 		itemId,
 		location: sourceLocation(x),
-		quantity,
 	});
 };
 
-const storeFx = ({
-	quantity,
-	sourceItemId = "runtime:water",
-}: {
-	quantity: number;
-	sourceItemId?: string;
-}) => {
+const storeFx = ({ sourceItemId = "runtime:water" }: { sourceItemId?: string }) => {
 	return Effect.gen(function* () {
 		const source = yield* getItemFx({
 			itemId: sourceItemId,
@@ -63,7 +53,6 @@ const storeFx = ({
 			inputIndex: 0,
 			sourceItemId,
 			sourceItemRevision: source.revision,
-			quantity,
 		});
 	});
 };
@@ -80,18 +69,14 @@ const readBufferedInputItemsFx = Effect.fn("readBufferedInputItemsFx")(function*
 });
 
 describe("storeInputMaterialFx", () => {
-	it("moves a fully accepted stack into the exact input slot", () => {
+	it("moves one identity into the exact input slot", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const transitions = yield* CommittedTransitionsFx;
 				yield* spawnOwnerFx();
-				yield* spawnSourceFx({
-					quantity: 2,
-				});
+				yield* spawnSourceFx({});
 
-				const stored = yield* storeFx({
-					quantity: 2,
-				});
+				const stored = yield* storeFx({});
 				const item = yield* getItemFx({
 					itemId: "runtime:water",
 				});
@@ -122,13 +107,11 @@ describe("storeInputMaterialFx", () => {
 		expect(result.stored.sourceBefore).toMatchObject({
 			id: "runtime:water",
 			location: sourceLocation(1),
-			quantity: 2,
 		});
 		expect(result.stored.ownerItem).toMatchObject({
 			id: "runtime:workshop",
 			location: workshopLocation,
 		});
-		expect(result.stored.sourceItem).toBeUndefined();
 		expect(result.stored.storedItem.id).toBe("runtime:water");
 		expect(result.events).toEqual([
 			{
@@ -136,9 +119,6 @@ describe("storeInputMaterialFx", () => {
 				sourceItemId: "runtime:water",
 				canonicalItemId: "water",
 				previousSourceLocation: sourceLocation(1),
-				previousQuantity: 2,
-				storedQuantity: 2,
-				resultingQuantity: 0,
 				ownerItemId: "runtime:workshop",
 				lineId: "line:workshop:build",
 				inputIndex: 0,
@@ -157,12 +137,8 @@ describe("storeInputMaterialFx", () => {
 		const moved = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				yield* spawnSourceFx({
-					quantity: 2,
-				});
-				yield* storeFx({
-					quantity: 2,
-				});
+				yield* spawnSourceFx({});
+				yield* storeFx({});
 
 				const item = yield* getItemFx({
 					itemId: "runtime:water",
@@ -192,86 +168,40 @@ describe("storeInputMaterialFx", () => {
 		});
 	});
 
-	it("splits a partially accepted stack without changing the source location", () => {
-		const result = Effect.runSync(
+	it("rejects a fourth identity atomically after three deliveries fill the slot", () => {
+		Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
+				for (let index = 0; index < 3; index++) {
+					const id = `runtime:water:${index}`;
+					yield* spawnSourceFx({
+						id,
+					});
+					yield* storeFx({
+						sourceItemId: id,
+					});
+				}
 				yield* spawnSourceFx({
-					quantity: 5,
+					id: "runtime:overflow",
 				});
-
-				const stored = yield* storeFx({
-					quantity: 2,
+				const before = yield* readRuntimeFx();
+				expect(
+					yield* Effect.flip(
+						storeFx({
+							sourceItemId: "runtime:overflow",
+						}),
+					),
+				).toMatchObject({
+					_tag: "InputMaterialUnavailableError",
 				});
-				const source = yield* getItemFx({
-					itemId: "runtime:water",
-				});
-				const buffered = yield* readBufferedInputItemsFx();
-
-				return {
-					buffered,
-					source,
-					stored,
-				};
+				expect(yield* readRuntimeFx()).toEqual(before);
+				expect(yield* readBufferedInputItemsFx()).toHaveLength(3);
 			}).pipe(
 				useGameFx({
 					config: inputRuntimeTestConfig,
 				}),
 			),
 		);
-
-		expect(result.stored.sourceBefore).toMatchObject({
-			id: "runtime:water",
-			location: sourceLocation(1),
-			quantity: 5,
-		});
-		expect(result.source).toMatchObject({
-			id: "runtime:water",
-			location: sourceLocation(1),
-			quantity: 3,
-		});
-		expect(result.stored.sourceItem).toEqual(result.source);
-		expect(result.stored.storedItem.id).not.toBe("runtime:water");
-		expect(result.buffered).toEqual([
-			result.stored.storedItem,
-		]);
-	});
-
-	it("accepts only remaining slot capacity across multiple deliveries", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnSourceFx({
-					quantity: 4,
-				});
-				yield* spawnSourceFx({
-					id: "runtime:water:second",
-					quantity: 3,
-					x: 2,
-				});
-				yield* storeFx({
-					quantity: 2,
-				});
-				const second = yield* storeFx({
-					quantity: 3,
-					sourceItemId: "runtime:water:second",
-				});
-				const buffered = yield* readBufferedInputItemsFx();
-
-				return {
-					buffered,
-					second,
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(result.second.storedItem.quantity).toBe(1);
-		expect(result.second.sourceItem?.quantity).toBe(2);
-		expect(result.buffered.reduce((quantity, item) => quantity + item.quantity, 0)).toBe(3);
 	});
 
 	it("rejects unavailable material without partially changing runtime", () => {
@@ -281,11 +211,9 @@ describe("storeInputMaterialFx", () => {
 				yield* spawnSourceFx({
 					id: "runtime:stone",
 					itemId: "stone",
-					quantity: 2,
 				});
 				const stored = yield* Effect.result(
 					storeFx({
-						quantity: 2,
 						sourceItemId: "runtime:stone",
 					}),
 				);
@@ -313,17 +241,14 @@ describe("storeInputMaterialFx", () => {
 		expect(result.runtime.items[1]).toMatchObject({
 			id: "runtime:stone",
 			location: sourceLocation(1),
-			quantity: 2,
 		});
 	});
 
-	it("serializes concurrent deliveries from the same source stack", async () => {
+	it("serializes concurrent deliveries from the same source identity", async () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				const source = yield* spawnSourceFx({
-					quantity: 2,
-				});
+				const source = yield* spawnSourceFx({});
 				const attempts = yield* Effect.all(
 					[
 						Effect.result(
@@ -333,7 +258,6 @@ describe("storeInputMaterialFx", () => {
 								inputIndex: 0,
 								sourceItemId: source.id,
 								sourceItemRevision: source.revision,
-								quantity: 1,
 							}),
 						),
 						Effect.result(
@@ -343,7 +267,6 @@ describe("storeInputMaterialFx", () => {
 								inputIndex: 0,
 								sourceItemId: source.id,
 								sourceItemRevision: source.revision,
-								quantity: 1,
 							}),
 						),
 					],
@@ -368,16 +291,10 @@ describe("storeInputMaterialFx", () => {
 
 		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
 		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
-		expect(result.buffered.reduce((total, item) => total + item.quantity, 0)).toBe(1);
+		expect(result.buffered).toHaveLength(1);
 		expect(
-			result.runtime.items.some((item) => {
-				return (
-					item.id === "runtime:water" &&
-					item.location.scope !== "input" &&
-					item.quantity === 1
-				);
-			}),
-		).toBe(true);
+			result.runtime.items.find((item) => item.id === "runtime:water")?.location.scope,
+		).toBe("input");
 		const conflict = result.attempts.find(Result.isFailure);
 		if (conflict === undefined || Result.isSuccess(conflict)) {
 			throw new Error("Expected one stale input delivery conflict.");

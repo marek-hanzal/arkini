@@ -27,8 +27,8 @@ export namespace reconcileOutboundDeliveriesRuntimeFx {
 /**
  * Reconciles every outbound soft claim against current physical input truth.
  *
- * Earlier runtime order wins. Claims shrink but never grow; callers may invalidate exact owner-line
- * targets when their pending intent is removed. A delivery with no remaining useful allocation
+ * Earlier runtime order wins; callers may invalidate exact owner-line
+ * targets when their pending intent is removed. A delivery without available capacity
  * becomes a canonical return using the target owner's current board position as the persisted
  * return origin.
  */
@@ -57,11 +57,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 						item: owner.item,
 						lineId: target.lineId,
 					});
-		const retained: {
-			readonly inputIndex: number;
-			readonly quantity: number;
-		}[] = [];
-		let unallocatedQuantity = current.quantity;
+		let retained = false;
 		const returnRequested =
 			returnLineIdsByOwnerItemId?.get(target.ownerItemId)?.has(target.lineId) === true;
 
@@ -70,8 +66,8 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 			owner?.location.scope === LocationScopeEnumSchema.enum.Board &&
 			line !== undefined
 		) {
-			for (const allocation of target.input) {
-				const input = line.input[allocation.inputIndex];
+			do {
+				const input = line.input[target.inputIndex];
 				if (
 					input === undefined ||
 					input.type !== TypeSchema.enum.Materials ||
@@ -91,7 +87,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 				const key = JSON.stringify([
 					owner.id,
 					line.id,
-					allocation.inputIndex,
+					target.inputIndex,
 				]);
 				let remainingTarget = remainingTargetBySlot.get(key);
 				if (remainingTarget === undefined) {
@@ -99,8 +95,8 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 						return candidate.location.scope === LocationScopeEnumSchema.enum.Input &&
 							candidate.location.ownerItemId === owner.id &&
 							candidate.location.lineId === line.id &&
-							candidate.location.inputIndex === allocation.inputIndex
-							? total + candidate.quantity
+							candidate.location.inputIndex === target.inputIndex
+							? total + 1
 							: total;
 					}, 0);
 					const resolution = resolveInputMaterialFn({
@@ -109,31 +105,13 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 					});
 					remainingTarget = Math.max(0, resolution.required.max - storedQuantity);
 				}
-				const quantity = Math.min(
-					allocation.quantity,
-					remainingTarget,
-					unallocatedQuantity,
-				);
-				remainingTargetBySlot.set(key, remainingTarget - quantity);
-				if (quantity === 0) continue;
-				retained.push({
-					inputIndex: allocation.inputIndex,
-					quantity,
-				});
-				unallocatedQuantity -= quantity;
-			}
+				if (remainingTarget > 0) {
+					remainingTargetBySlot.set(key, remainingTarget - 1);
+					retained = true;
+				}
+			} while (false);
 		}
-
-		const unchanged =
-			retained.length === target.input.length &&
-			retained.every((allocation, index) => {
-				const previous = target.input[index];
-				return (
-					previous?.inputIndex === allocation.inputIndex &&
-					previous.quantity === allocation.quantity
-				);
-			});
-		if (unchanged) continue;
+		if (retained) continue;
 
 		const returnFrom =
 			owner?.location.scope === LocationScopeEnumSchema.enum.Board
@@ -142,27 +120,17 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 		const revised = yield* reviseRuntimeItemFx({
 			item: {
 				...current,
-				location:
-					retained.length === 0
-						? {
-								scope: LocationScopeEnumSchema.enum.Delivery,
-								phase: "returning" as const,
-								generation: current.location.generation + 1,
-								origin: current.location.origin,
-								remainingDurationMs: readDeliveryTravelDurationMsFn({
-									from: returnFrom,
-									to: current.location.origin,
-								}),
-								returnFrom,
-							}
-						: {
-								...current.location,
-								generation: current.location.generation + 1,
-								target: {
-									...target,
-									input: retained,
-								},
-							},
+				location: {
+					scope: LocationScopeEnumSchema.enum.Delivery,
+					phase: "returning" as const,
+					generation: current.location.generation + 1,
+					origin: current.location.origin,
+					remainingDurationMs: readDeliveryTravelDurationMsFn({
+						from: returnFrom,
+						to: current.location.origin,
+					}),
+					returnFrom,
+				},
 			},
 		});
 		nextRuntime = {

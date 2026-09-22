@@ -12,7 +12,6 @@
 				"beagle-puppy-tearing-pillow"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 5000,
 			"durationMs": 60000,

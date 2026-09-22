@@ -8,7 +8,6 @@ import {
 	boardLocation,
 	createActor,
 	createItem,
-	createMotion,
 	createReconcilerHarness,
 	projectionProbeState,
 	transition,
@@ -41,7 +40,6 @@ describe("main reconciliation / drop settlement", () => {
 					startFx: () => Effect.void,
 					closeFx: Effect.void,
 				},
-				motion: createMotion(),
 				game: {
 					reportCriticalFailureFn,
 				} as unknown as GameEngine,

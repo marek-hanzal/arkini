@@ -14,7 +14,7 @@ const owner = {
 	id: "runtime:workshop",
 	item: inputRuntimeTestConfig.items.workshop,
 	location: workshopLocation,
-	quantity: 1,
+
 	revision: "revision:owner",
 } as const;
 
@@ -24,14 +24,12 @@ const inputItem = ({
 	itemId = "water",
 	lineId = "line:workshop:build",
 	ownerItemId = "runtime:workshop",
-	quantity = 1,
 }: {
 	id?: string;
 	inputIndex?: number;
 	itemId?: "stone" | "water";
 	lineId?: string;
 	ownerItemId?: string;
-	quantity?: number;
 }) => {
 	return {
 		id,
@@ -42,7 +40,7 @@ const inputItem = ({
 			lineId,
 			inputIndex,
 		},
-		quantity,
+
 		revision: `revision:${id}`,
 	};
 };
@@ -86,12 +84,16 @@ describe("checkRuntimeInputLocationsFn", () => {
 						itemId: "stone",
 					}),
 					inputItem({
+						id: "runtime:overflow:c",
+					}),
+					inputItem({
+						id: "runtime:overflow:d",
+					}),
+					inputItem({
 						id: "runtime:overflow:a",
-						quantity: 3,
 					}),
 					inputItem({
 						id: "runtime:overflow:b",
-						quantity: 3,
 					}),
 				],
 				jobs: [],

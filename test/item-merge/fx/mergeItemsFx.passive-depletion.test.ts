@@ -43,7 +43,6 @@ const runDepletion = (blockReturn = false) => {
 			...base.items,
 			output: {
 				...base.items.output,
-				maxStackSize: 1,
 			},
 			source: {
 				...base.items.source,
@@ -93,19 +92,19 @@ const runDepletion = (blockReturn = false) => {
 			{
 				id: "source",
 				itemId: "source",
-				quantity: 1,
+
 				location: board(0),
 			},
 			{
 				id: "target",
 				itemId: "target",
-				quantity: 1,
+
 				location: board(1),
 			},
 			{
 				id: "material",
 				itemId: "output",
-				quantity: 1,
+
 				location: {
 					scope: "input",
 					ownerItemId: "source",
@@ -121,7 +120,7 @@ const runDepletion = (blockReturn = false) => {
 		state.items.push({
 			id: "material:second",
 			itemId: "output",
-			quantity: 1,
+
 			location: {
 				scope: "input",
 				ownerItemId: "source",
@@ -171,7 +170,6 @@ it.each([
 	expect(after.runtime.items).toHaveLength(2);
 	expect(after.runtime.items.find((item) => item.id === "source")).toBeUndefined();
 	expect(after.runtime.items.find((item) => item.item.id === "output")).toMatchObject({
-		quantity: 1,
 		location: {
 			scope: "board",
 			space: 0,
@@ -185,7 +183,6 @@ it.each([
 		expect.objectContaining({
 			type: "item:depleted",
 			itemId: "source",
-			resultingQuantity: 0,
 		}),
 	);
 });

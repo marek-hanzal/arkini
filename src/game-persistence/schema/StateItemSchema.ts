@@ -2,12 +2,11 @@ import { z } from "zod";
 import { ScheduleStateSchema } from "~/item-schedule/schema/ScheduleStateSchema";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /**
- * A persisted live item or item stack that owns its current location.
+ * A persisted live item that owns its current location.
  */
 export const StateItemSchema = z
 	.object({
@@ -16,9 +15,9 @@ export const StateItemSchema = z
 			"Successful source merges on this surviving identity; omitted means zero.",
 		),
 		/**
-		 * Stable identity of this live item or stack.
+		 * Stable identity of this live item.
 		 */
-		id: IdSchema.describe("The stable identity of this live item or stack."),
+		id: IdSchema.describe("The stable identity of this live item."),
 		/**
 		 * ID of the canonical item definition restored during hydration.
 		 */
@@ -39,17 +38,11 @@ export const StateItemSchema = z
 		remainingUnits: NonNegativeIntegerSchema.optional().describe(
 			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
-		/**
-		 * Number of canonical items represented by this live state entry.
-		 */
-		quantity: PositiveIntegerSchema.describe(
-			"The positive quantity represented by this live state entry.",
-		),
 	})
 	.strict()
 	.meta({
 		id: "StateItemSchema",
-		description: "A persisted live item or item stack that owns its current location.",
+		description: "A persisted live item that owns its current location.",
 	});
 
 export type StateItemSchema = typeof StateItemSchema;

@@ -13,7 +13,6 @@
 				"firewood"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

@@ -57,11 +57,9 @@ const moveCellFn = (
 
 const ProjectStartGridCellContent = ({
 	empty,
-	quantity,
 	resourceIds,
 }: {
 	readonly empty?: ReactNode;
-	readonly quantity?: number;
 	readonly resourceIds: ItemSchema.Type["artwork"]["default"] | undefined;
 }) => (
 	<>
@@ -74,24 +72,16 @@ const ProjectStartGridCellContent = ({
 				size="sm"
 			/>
 		)}
-		{quantity === undefined ? null : (
-			<span className="absolute right-[4cqw] bottom-[4cqw] rounded-md border border-line-strong bg-surface-raised/95 px-[5cqw] py-[1cqw] font-mono text-[min(0.65rem,18cqw)] font-bold text-foreground">
-				×{quantity}
-			</span>
-		)}
 	</>
 );
 
 const ProjectStartGridSlot = ({
 	cell,
-	full,
 	isDragSource,
 	isDragTarget,
 	invalid,
 	item,
-	onDecrementFn,
 	onDeleteFn,
-	onIncrementFn,
 	onMoveFn,
 	onOpenFn,
 	position,
@@ -99,14 +89,11 @@ const ProjectStartGridSlot = ({
 	suppressClickRef,
 }: {
 	readonly cell: ProjectStartGridCell | undefined;
-	readonly full: boolean;
 	readonly isDragSource: boolean;
 	readonly isDragTarget: boolean;
 	readonly invalid: boolean;
 	readonly item: ItemSchema.Type | undefined;
-	readonly onDecrementFn: () => void;
 	readonly onDeleteFn: () => void;
-	readonly onIncrementFn: () => void;
 	readonly onMoveFn: (offset: ProjectStartGridPosition) => void;
 	readonly onOpenFn: () => void;
 	readonly position: ProjectStartGridPosition;
@@ -133,23 +120,17 @@ const ProjectStartGridSlot = ({
 		})}
 		onClick={(event) => {
 			if (suppressClickRef.current || event.altKey || event.metaKey) return;
-			if (cell === undefined) onOpenFn();
-			else if (!full) onIncrementFn();
+			onOpenFn();
 		}}
 		onContextMenu={(event) => {
 			event.preventDefault();
-			if (cell !== undefined) onDecrementFn();
+			if (cell !== undefined) onDeleteFn();
 		}}
 		onKeyDown={(event) => {
 			if (cell === undefined) return;
 			if (event.key === "Delete" || event.key === "Backspace") {
 				event.preventDefault();
 				onDeleteFn();
-				return;
-			}
-			if (event.key === "-" || event.key === "_") {
-				event.preventDefault();
-				onDecrementFn();
 				return;
 			}
 			if (!event.altKey && !event.metaKey) return;
@@ -185,7 +166,6 @@ const ProjectStartGridSlot = ({
 	>
 		<ProjectStartGridCellContent
 			empty={<Plus className="size-[15%] opacity-35" />}
-			quantity={cell?.quantity}
 			resourceIds={item?.artwork.default}
 		/>
 	</button>
@@ -206,9 +186,7 @@ const ProjectStartGridSurface = ({
 		};
 		readonly gridRef: RefObject<HTMLDivElement | null>;
 		readonly invalidPositionKeys: ReadonlySet<string>;
-		readonly onDecrementFn: (position: ProjectStartGridPosition) => void;
 		readonly onDeleteFn: (position: ProjectStartGridPosition) => void;
-		readonly onIncrementFn: (position: ProjectStartGridPosition) => void;
 		readonly onMoveFn: (cell: ProjectStartGridCell, offset: ProjectStartGridPosition) => void;
 		readonly onOpenFn: (position: ProjectStartGridPosition) => void;
 		readonly startDragFn: (
@@ -258,10 +236,7 @@ const ProjectStartGridSurface = ({
 						const className =
 							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 p-0 text-subtle shadow-none";
 						const content = (
-							<ProjectStartGridCellContent
-								quantity={cell?.quantity}
-								resourceIds={item?.artwork.default}
-							/>
+							<ProjectStartGridCellContent resourceIds={item?.artwork.default} />
 						);
 						return cell !== undefined &&
 							item !== undefined &&
@@ -299,19 +274,12 @@ const ProjectStartGridSurface = ({
 					return (
 						<ProjectStartGridSlot
 							cell={cell}
-							full={
-								cell !== undefined &&
-								item !== undefined &&
-								cell.quantity >= item.maxStackSize
-							}
 							isDragSource={isDragSource}
 							isDragTarget={edit.dragVisual?.targetKey === key}
 							invalid={edit.invalidPositionKeys.has(key)}
 							item={item}
 							key={key}
-							onDecrementFn={() => edit.onDecrementFn(position)}
 							onDeleteFn={() => edit.onDeleteFn(position)}
-							onIncrementFn={() => edit.onIncrementFn(position)}
 							onMoveFn={(offset) => {
 								if (cell !== undefined) edit.onMoveFn(cell, offset);
 							}}
@@ -331,7 +299,6 @@ const ProjectStartGridDragPreview = ({
 	clientX,
 	clientY,
 	cellSize,
-	quantity,
 	resourceIds,
 	previewRef,
 }: {
@@ -339,7 +306,6 @@ const ProjectStartGridDragPreview = ({
 	readonly clientY: number;
 	readonly cellSize: number;
 	readonly previewRef: RefObject<HTMLDivElement | null>;
-	readonly quantity: number;
 	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
 }) => (
 	<div
@@ -352,10 +318,7 @@ const ProjectStartGridDragPreview = ({
 			height: cellSize,
 		}}
 	>
-		<ProjectStartGridCellContent
-			quantity={quantity}
-			resourceIds={resourceIds}
-		/>
+		<ProjectStartGridCellContent resourceIds={resourceIds} />
 	</div>
 );
 
@@ -395,26 +358,6 @@ const ProjectStartGridEdit = ({
 					: cells.map((cell, candidateIndex) => (candidateIndex === index ? next : cell)),
 		);
 	};
-	const incrementFn = (position: ProjectStartGridPosition) =>
-		changeCellFn(position, (cell) => {
-			if (cell === undefined) return cell;
-			const maxStackSize = items[cell.itemId]?.maxStackSize ?? 1;
-			return cell.quantity >= maxStackSize
-				? cell
-				: {
-						...cell,
-						quantity: cell.quantity + 1,
-					};
-		});
-	const decrementFn = (position: ProjectStartGridPosition) =>
-		changeCellFn(position, (cell) =>
-			cell === undefined || cell.quantity <= 1
-				? undefined
-				: {
-						...cell,
-						quantity: cell.quantity - 1,
-					},
-		);
 
 	return (
 		<>
@@ -424,9 +367,7 @@ const ProjectStartGridEdit = ({
 					dragVisual,
 					gridRef,
 					invalidPositionKeys,
-					onDecrementFn: decrementFn,
 					onDeleteFn: (position) => changeCellFn(position, () => undefined),
-					onIncrementFn: incrementFn,
 					onMoveFn: (cell, offset) => {
 						const target = {
 							x: cell.x + offset.x,
@@ -450,7 +391,6 @@ const ProjectStartGridEdit = ({
 					onSelectFn={(itemId) =>
 						changeCellFn(pickerCell, () => ({
 							itemId,
-							quantity: 1,
 							...pickerCell,
 						}))
 					}
@@ -462,7 +402,6 @@ const ProjectStartGridEdit = ({
 					clientY={dragVisual.clientY}
 					cellSize={dragVisual.cellSize}
 					previewRef={dragPreviewRef}
-					quantity={dragVisual.source.quantity}
 					resourceIds={items[dragVisual.source.itemId]?.artwork.default ?? []}
 				/>
 			)}

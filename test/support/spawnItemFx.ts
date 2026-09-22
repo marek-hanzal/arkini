@@ -1,7 +1,6 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
@@ -24,7 +23,6 @@ export namespace spawnItemFx {
 		id: IdSchema.Type;
 		itemId: IdSchema.Type;
 		location: BoardLocationSchema.Type;
-		quantity: PositiveIntegerSchema.Type;
 	}
 }
 
@@ -35,7 +33,6 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 	id,
 	itemId,
 	location,
-	quantity,
 }: spawnItemFx.Props) {
 	const item = yield* resolveItemFx({
 		itemId,
@@ -44,7 +41,6 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 		id,
 		item,
 		location,
-		quantity,
 	});
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {

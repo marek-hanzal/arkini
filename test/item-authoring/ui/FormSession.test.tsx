@@ -172,7 +172,6 @@ const item: ItemSchema.Type = {
 			"artwork:water",
 		],
 	},
-	maxStackSize: 1,
 };
 
 beforeEach(() => {
@@ -471,7 +470,6 @@ describe("item section form session", () => {
 						clock: {
 							intervalMs: 300000,
 						},
-						maxStackSize: 1,
 					}),
 		});
 		state.persisted = configured;
@@ -1492,7 +1490,6 @@ describe("item section form session", () => {
 	] as const)("enables a clock through the %s entry as one valid saved item", async (entry) => {
 		const common = {
 			...item,
-			maxStackSize: 9,
 			action: {
 				type: "space" as const,
 				space: 2,
@@ -1520,7 +1517,6 @@ describe("item section form session", () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
-			maxStackSize: 1,
 			action: undefined,
 			clock: {
 				durationMs: 900_000,
@@ -1536,7 +1532,6 @@ describe("item section form session", () => {
 				id: item.id,
 			}),
 			uid: item.uid,
-			maxStackSize: 1,
 			clock: {
 				intervalMs: 1500,
 				durationMs: 2000,
@@ -1839,7 +1834,6 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 				title: source.title,
 				ui: "simple",
 				clock: source.clock,
-				maxStackSize: 1,
 			}),
 		}),
 	);

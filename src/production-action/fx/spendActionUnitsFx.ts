@@ -8,7 +8,6 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isolateGridStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
@@ -35,7 +34,7 @@ export namespace spendActionUnitsFx {
 	}
 }
 
-/** Pays one resolved action unit and applies split, depletion, output, and events. */
+/** Pays one resolved action unit and applies depletion, output, and events. */
 export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	actionId,
 	cost,
@@ -83,10 +82,6 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 				candidate.id === item.id ? unitOwnerItem : candidate,
 			),
 		} satisfies RuntimeSchema.Type;
-		const isolation = yield* isolateGridStatefulOwnerTransitionFx({
-			ownerItemId: item.id,
-			runtime: spentRuntime,
-		});
 		return {
 			events: [
 				...(nextRemainingUnits === 0
@@ -101,42 +96,23 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 								resultingUnits: nextRemainingUnits,
 							} satisfies GameEventSchema.Type,
 						]),
-				...isolation.events,
 			],
-			runtime: isolation.runtime,
+			runtime: spentRuntime,
 		} satisfies spendActionUnitsFx.Result;
 	}
 
-	const resultingQuantity = item.quantity - 1;
-	let draft: RuntimeSchema.Type;
-	let removalEvents: readonly GameEventSchema.Type[] = [];
-	if (resultingQuantity > 0) {
-		const remainingStack = yield* reviseRuntimeItemFx({
-			item: {
-				...item,
-				quantity: resultingQuantity,
-			} satisfies RuntimeItemSchema.Type,
-		});
-		draft = {
-			...runtime,
-			items: runtime.items.map((candidate) =>
-				candidate.id === item.id ? remainingStack : candidate,
-			),
-		};
-	} else {
-		const depletedItem = yield* reviseRuntimeItemFx({
-			item: {
-				...item,
-				remainingUnits: nextRemainingUnits,
-			},
-		});
-		const removed = yield* removeRuntimeItemIdentityFx({
-			item: depletedItem,
-			runtime,
-		});
-		draft = removed.runtime;
-		removalEvents = removed.events;
-	}
+	const depletedItem = yield* reviseRuntimeItemFx({
+		item: {
+			...item,
+			remainingUnits: nextRemainingUnits,
+		},
+	});
+	const removed = yield* removeRuntimeItemIdentityFx({
+		item: depletedItem,
+		runtime,
+	});
+	let draft = removed.runtime;
+	const removalEvents = removed.events;
 
 	let placement: applyOutputPlacementFx.Result = {
 		drop: [],
@@ -159,7 +135,6 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 					runtime: draft,
 				});
 			}),
-			quantity: item.quantity,
 			remainingUnits,
 		});
 		placement = outputPlacement;
@@ -167,7 +142,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	}
 
 	let releasedInputEvents: readonly GameEventSchema.Type[] = [];
-	if (resultingQuantity === 0) {
+	{
 		const releasedInputs = yield* releaseOwnerInputsFx({
 			owner: item,
 			origin: item.location,
@@ -187,17 +162,14 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 				itemId: item.id,
 				canonicalItemId: item.item.id,
 				location: item.location,
-				previousQuantity: item.quantity,
-				resultingQuantity,
 			} satisfies GameEventSchema.Type,
-			...(resultingQuantity === 0 && placementEvents.length === 0
+			...(placementEvents.length === 0
 				? [
 						{
 							type: GameEventEnumSchema.enum.ItemDisappeared,
 							itemId: item.id,
 							canonicalItemId: item.item.id,
 							location: item.location,
-							quantity: item.quantity,
 						} satisfies GameEventSchema.Type,
 					]
 				: []),

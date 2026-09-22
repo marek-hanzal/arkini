@@ -60,7 +60,6 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 					"artwork:material-primary",
 				],
 			},
-			maxStackSize: 10,
 		},
 		craft: {
 			maxQueueSize: 1,
@@ -73,7 +72,6 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 					"artwork:craft",
 				],
 			},
-			maxStackSize: 1,
 			units: {
 				amount: 1,
 			},
@@ -93,7 +91,6 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 					"artwork:blueprint-overlay",
 				],
 			},
-			maxStackSize: 1,
 			units: {
 				amount: 1,
 			},
@@ -108,7 +105,6 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 		},
 		temporary: {
 			...itemBase("temporary"),
-			maxStackSize: 1,
 
 			lines: [],
 			maxQueueSize: 1,
@@ -172,7 +168,6 @@ export const createTileActorRuntime = ({
 					},
 				},
 				location: boardLocation,
-				quantity: 1,
 			},
 		],
 		jobs: active
@@ -218,7 +213,6 @@ export const createTemporaryTileActorRuntime = ({
 				revision: "revision:temporary",
 				item: tileActorTestConfig.items.temporary,
 				location: boardLocation,
-				quantity: 1,
 				schedule: {
 					remainingDurationMs,
 				},

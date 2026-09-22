@@ -46,7 +46,6 @@ describe("main reconciliation / replacement visuals", () => {
 					itemId: previous.itemId,
 					sourceUrl: previous.sourceUrl,
 				},
-				previousQuantity: previous.quantity,
 			},
 		];
 
@@ -139,7 +138,6 @@ describe("main reconciliation / replacement visuals", () => {
 					itemId: first.itemId,
 					sourceUrl: first.sourceUrl,
 				},
-				previousQuantity: first.quantity,
 			},
 		];
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
@@ -157,7 +155,6 @@ describe("main reconciliation / replacement visuals", () => {
 					itemId: second.itemId,
 					sourceUrl: second.sourceUrl,
 				},
-				previousQuantity: second.quantity,
 			},
 		];
 		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));

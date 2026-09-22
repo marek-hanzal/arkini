@@ -61,7 +61,7 @@ describe("GameLoopLayerFx", () => {
 			yield* spawnItemFx({
 				id: "runtime:loop-forge",
 				itemId: "forge",
-				quantity: 1,
+
 				location: {
 					scope: "board",
 					space: 0,
@@ -119,7 +119,6 @@ describe("GameLoopLayerFx", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			});
 			yield* startLineFx({
 				ownerItemId: owner.id,

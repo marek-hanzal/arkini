@@ -22,14 +22,12 @@ export const boardSpaceProject = {
 			board: [
 				{
 					itemId: "water",
-					quantity: 1,
 					space: 0,
 					x: 0,
 					y: 0,
 				},
 				{
 					itemId: "water",
-					quantity: 2,
 					space: 1,
 					x: 1,
 					y: 1,

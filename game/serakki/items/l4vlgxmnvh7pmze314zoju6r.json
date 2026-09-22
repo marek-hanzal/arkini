@@ -13,7 +13,6 @@
 				"growers-guild"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 6,
 		"lines": [
 			{

@@ -27,38 +27,38 @@ const props = {
 
 const removeAvailableWaterFx = Effect.fn("removeAvailableWaterFx")(function* () {
 	const runtime = yield* readRuntimeFx();
-	const water = runtime.items.find(
+	for (const water of runtime.items.filter(
 		(item) => item.item.id === "water" && item.location.scope === "board",
-	);
-	if (water === undefined) throw new Error("Expected available water.");
-	yield* removeRuntimeItemForTestFx({
-		itemId: water.id,
-		revision: water.revision,
-	});
+	)) {
+		yield* removeRuntimeItemForTestFx({
+			itemId: water.id,
+			revision: water.revision,
+		});
+	}
 });
 
 const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
-	const water = yield* spawnItemFx({
-		id: "runtime:water:refill",
-		itemId: "water",
-		location: {
-			scope: "board",
-			space: 0,
-			position: {
-				x: 3,
-				y: 0,
+	for (let index = 0; index < 3; index += 1) {
+		const water = yield* spawnItemFx({
+			id: `runtime:water:refill:${index}`,
+			itemId: "water",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 3,
+					y: 0,
+				},
 			},
-		},
-		quantity: 3,
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId: props.ownerItemId,
-		lineId: props.lineId,
-		inputIndex: 0,
-		sourceItemId: water.id,
-		sourceItemRevision: water.revision,
-		quantity: 3,
-	});
+		});
+		yield* storeInputMaterialFx({
+			ownerItemId: props.ownerItemId,
+			lineId: props.lineId,
+			inputIndex: 0,
+			sourceItemId: water.id,
+			sourceItemRevision: water.revision,
+		});
+	}
 });
 
 const createLiveRuleConfig = () => {
@@ -250,11 +250,7 @@ describe("runTickRuntimeByFx", () => {
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(result.runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "tool")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(2);
+		expect(result.runtime.items.filter((item) => item.item.id === "tool").length).toBe(2);
 		expect(
 			result.runtime.items.some(
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
@@ -311,7 +307,6 @@ describe("runTickRuntimeByFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
@@ -334,7 +329,6 @@ describe("runTickRuntimeByFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 500,
@@ -387,7 +381,6 @@ describe("fixed Tick steps", () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
 					});
 				}
 				yield* spawnItemFx({
@@ -401,7 +394,6 @@ describe("fixed Tick steps", () => {
 							y: 0,
 						},
 					},
-					quantity: 3,
 				});
 				yield* spawnItemFx({
 					id: "runtime:shared-tool",
@@ -414,7 +406,6 @@ describe("fixed Tick steps", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const prepared = yield* readRuntimeFx();
 				const stepped = yield* advanceRuntimeStepFx({

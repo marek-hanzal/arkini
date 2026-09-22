@@ -12,11 +12,10 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 	}: {
 		readonly cells: ReadonlyArray<{
 			readonly itemId: string;
-			readonly quantity: number;
 		}>;
 	}) =>
 		createElement("div", {
-			"data-items": cells.map((cell) => `${cell.itemId}:${cell.quantity}`).join(","),
+			"data-items": cells.map((cell) => cell.itemId).join(","),
 			"data-ui": "EditorProjectStartGrid",
 		}),
 }));
@@ -107,7 +106,7 @@ describe("project Board detail", () => {
 			"0",
 			"4",
 		]);
-		expect(preview()?.dataset.items).toBe("water:1");
+		expect(preview()?.dataset.items).toBe("water");
 
 		await act(async () => {
 			select.value = "4";
@@ -118,7 +117,7 @@ describe("project Board detail", () => {
 			);
 		});
 
-		expect(preview()?.dataset.items).toBe("water:2");
+		expect(preview()?.dataset.items).toBe("water");
 		expect(container.querySelectorAll('[data-ui="EditorProjectStartGrid"]')).toHaveLength(1);
 	});
 });

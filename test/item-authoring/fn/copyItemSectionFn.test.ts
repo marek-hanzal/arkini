@@ -14,7 +14,6 @@ const source = ItemSchema.parse({
 			"overlay",
 		],
 	},
-	maxStackSize: 1,
 	maxQueueSize: 3,
 	lines: [
 		{
@@ -121,7 +120,6 @@ describe("section copy ownership", () => {
 				title: "New title",
 				description: undefined,
 				clock: undefined,
-				maxStackSize: 20,
 			},
 			"identity",
 		);
@@ -131,7 +129,6 @@ describe("section copy ownership", () => {
 			title: "New title",
 			draft: true,
 			description: "",
-			maxStackSize: 1,
 		});
 		expect(result.lines).toBe(destination.lines);
 	});
@@ -227,13 +224,11 @@ describe("section copy ownership", () => {
 		const withClock = copyItemSectionFn(
 			{
 				...withAction,
-				maxStackSize: 5,
 			},
 			source,
 			"clock",
 		);
 		expect(withClock).toMatchObject({
-			maxStackSize: 1,
 			clock: source.clock,
 		});
 		expect(withClock.action).toBeUndefined();

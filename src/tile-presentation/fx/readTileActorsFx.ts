@@ -5,7 +5,7 @@ import { Array, Effect } from "effect";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { readTileActorBadgeCountFn } from "~/tile-presentation/fn/readTileActorBadgeCountFn";
+import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
@@ -86,7 +86,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				runtime,
 			});
 			const hasUnits = item.item.units !== undefined;
-			const badgeCount = queueBadgeCount ?? readTileActorBadgeCountFn(item);
+			const badgeCount = queueBadgeCount ?? readItemRemainingUnitsFn(item);
 			const badgeKind =
 				queueBadgeCount !== undefined
 					? ("queue" as const)
@@ -126,7 +126,6 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 						}),
 				id: item.id,
 				revision: item.revision,
-				quantity: item.quantity,
 				location: item.location,
 				...(activeJobStatus === undefined
 					? {}

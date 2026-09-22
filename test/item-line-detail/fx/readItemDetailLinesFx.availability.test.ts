@@ -19,7 +19,6 @@ it("reports material quantity available to autofill and a direct producer fallba
 				y: 0,
 			},
 		},
-		quantity: 4,
 		revision: "revision:water:board",
 	};
 	const secondWater = {
@@ -33,7 +32,6 @@ it("reports material quantity available to autofill and a direct producer fallba
 				y: 0,
 			},
 		},
-		quantity: 3,
 		revision: "revision:water:second",
 	};
 	const thirdWater = {
@@ -47,7 +45,6 @@ it("reports material quantity available to autofill and a direct producer fallba
 				y: 0,
 			},
 		},
-		quantity: 2,
 		revision: "revision:water:third",
 	};
 	const available = readLines({
@@ -66,7 +63,7 @@ it("reports material quantity available to autofill and a direct producer fallba
 	if (available.kind !== "available") throw new Error("Expected available lines.");
 	expect(available.line[0]?.input[0]).toMatchObject({
 		kind: "materials",
-		autofillAvailableQuantity: 9,
+		autofillAvailableQuantity: 3,
 	});
 	expect(available.line[0]?.input[0]).not.toHaveProperty("producerItemId");
 
@@ -135,7 +132,6 @@ it("reports material quantity available to autofill and a direct producer fallba
 				y: 0,
 			},
 		},
-		quantity: 1,
 		revision: "revision:pump",
 	};
 	const fallback = readLines(

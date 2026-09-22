@@ -13,7 +13,6 @@ export namespace InputRun {
 
 	export interface ItemPlan {
 		readonly itemId: IdSchema.Type;
-		readonly quantity: PositiveIntegerSchema.Type;
 	}
 
 	export interface SimplePlan {

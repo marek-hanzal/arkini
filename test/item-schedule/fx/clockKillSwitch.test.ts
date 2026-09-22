@@ -63,7 +63,7 @@ const fillBoardFx = Effect.fn("fillKillTestBoardFx")(function* () {
 		yield* spawnItemFx({
 			id: `blocker:${n}`,
 			itemId: "permit",
-			quantity: 1,
+
 			location: {
 				scope: "board",
 				space: 0,

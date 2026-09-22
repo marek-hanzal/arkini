@@ -15,7 +15,6 @@ import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
-import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,
@@ -24,50 +23,16 @@ import {
 
 const ownerItemId = "runtime:workshop";
 const lineId = "line:workshop:build";
-const workshop = inputRuntimeTestConfig.items.workshop;
-const twoMaterialInputConfig = GameConfigSchema.parse({
-	...inputRuntimeTestConfig,
-	items: {
-		...inputRuntimeTestConfig.items,
-		workshop: {
-			...workshop,
-			lines: workshop.lines.map((line) => ({
-				...line,
-				input: [
-					line.input[0],
-					{
-						type: "materials",
-						query: {
-							distance: "far" as const,
-							selector: {
-								type: "item",
-								itemId: "water",
-							},
-						},
-						quantity: {
-							min: 2,
-							max: 2,
-						},
-					},
-					...line.input.slice(1),
-				],
-			})),
-		},
-	},
-});
-
 const spawnOwnerAndWaterFx = Effect.gen(function* () {
 	yield* spawnItemFx({
 		id: ownerItemId,
 		itemId: "workshop",
 		location: workshopLocation,
-		quantity: 1,
 	});
 	yield* spawnItemFx({
 		id: "runtime:water",
 		itemId: "water",
 		location: sourceLocation(1),
-		quantity: 7,
 	});
 });
 
@@ -88,19 +53,22 @@ describe("settleItemDeliveryFx", () => {
 					enabled: true,
 				});
 				const enabled = yield* readRuntimeFx();
+
 				for (let step = 0; step < 2; step++) {
 					yield* runTickRuntimeByFx({
 						elapsedMs: 50,
 					});
 				}
 				const outbound = yield* readRuntimeFx();
-				for (let step = 0; step < 2; step++) {
-					yield* runTickRuntimeByFx({
-						elapsedMs: 50,
-					});
-				}
+				const owner = yield* getItemFx({
+					itemId: ownerItemId,
+				});
+				yield* removeRuntimeItemForTestFx({
+					itemId: owner.id,
+					revision: owner.revision,
+				});
 				const returning = yield* readRuntimeFx();
-				for (let step = 0; step < 2; step++) {
+				for (let step = 0; step < 3; step++) {
 					yield* runTickRuntimeByFx({
 						elapsedMs: 50,
 					});
@@ -124,58 +92,51 @@ describe("settleItemDeliveryFx", () => {
 			result.outbound.items.find((item) => item.id === "runtime:water")?.location,
 		).toMatchObject({
 			scope: "delivery",
+			phase: "outbound",
 			remainingDurationMs: 100,
 		});
 		expect(
 			result.returning.items.find((item) => item.id === "runtime:water")?.location,
 		).toMatchObject({
 			scope: "delivery",
-			remainingDurationMs: 200,
+			phase: "returning",
+			remainingDurationMs: 300,
 		});
 		expect(result.settled.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			quantity: 4,
 			location: sourceLocation(1),
 		});
 	});
 
-	it("stores only on outbound contact and returns the whole stack remainder to its lease", () => {
+	it("stores one identity only on contact and ignores stale settlement", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerAndWaterFx;
-				const autofill = yield* autofillLineInputsFx({
+				const admission = yield* autofillLineInputsFx({
 					ownerItemId,
 					lineId,
 				});
-				const outbound = yield* readRuntimeFx();
+				const before = yield* readRuntimeFx();
 				const settled = yield* settleItemDeliveryFx({
 					itemId: "runtime:water",
 					generation: 0,
 				});
-				const afterContact = yield* readRuntimeFx();
-				const returningState = fromRuntimeFn({
-					runtime: afterContact,
-				});
-				const hydratedReturning = yield* fromStateFx({
-					state: returningState,
+				const after = yield* readRuntimeFx();
+				const hydrated = yield* fromStateFx({
+					state: fromRuntimeFn({
+						runtime: after,
+					}),
 				});
 				const stale = yield* settleItemDeliveryFx({
 					itemId: "runtime:water",
 					generation: 0,
 				});
-				const returned = yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 1,
-				});
 				return {
-					afterContact,
-					autofill,
-					hydratedReturning,
-					outbound,
-					returned,
-					returningState,
+					admission,
+					before,
 					settled,
+					after,
+					hydrated,
 					stale,
-					runtime: yield* readRuntimeFx(),
 				};
 			}).pipe(
 				useGameFx({
@@ -183,60 +144,25 @@ describe("settleItemDeliveryFx", () => {
 				}),
 			),
 		);
-
-		expect(result.autofill).toEqual({
-			deliveryItemIds: [
-				"runtime:water",
-			],
-			remainingMissingQuantity: 0,
-			scheduledQuantity: 3,
-		});
-		expect(result.outbound.items.find(({ id }) => id === "runtime:water")).toMatchObject({
-			location: {
-				generation: 0,
-				origin: sourceLocation(1),
-				phase: "outbound",
-				scope: "delivery",
-			},
-			quantity: 7,
-		});
+		expect(result.admission.scheduledQuantity).toBe(1);
 		expect(
-			result.outbound.items.filter(({ location }) => location.scope === "input"),
-		).toHaveLength(0);
+			result.before.items.find((item) => item.id === "runtime:water")?.location.scope,
+		).toBe("delivery");
 		expect(result.settled).toMatchObject({
-			acceptedQuantity: 3,
 			status: "stored",
 		});
-		expect(result.afterContact.items.find(({ id }) => id === "runtime:water")).toMatchObject({
-			location: {
-				generation: 1,
-				phase: "returning",
-				returnFrom: workshopLocation,
-				scope: "delivery",
-			},
-			quantity: 4,
+		const item = result.after.items.find((item) => item.id === "runtime:water");
+		expect(item?.location).toMatchObject({
+			scope: "input",
+			ownerItemId,
+			lineId,
+			inputIndex: 0,
 		});
-		expect(
-			result.returningState.items.find(({ id }) => id === "runtime:water")?.location,
-		).toEqual(result.afterContact.items.find(({ id }) => id === "runtime:water")?.location);
-		expect(
-			result.hydratedReturning.items.find(({ id }) => id === "runtime:water")?.location,
-		).toEqual(result.afterContact.items.find(({ id }) => id === "runtime:water")?.location);
-		expect(
-			result.afterContact.items
-				.filter(({ location }) => location.scope === "input")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(3);
+		expect(result.hydrated.items.find((item) => item.id === "runtime:water")?.location).toEqual(
+			item?.location,
+		);
 		expect(result.stale).toEqual({
-			acceptedQuantity: 0,
 			status: "ignored",
-		});
-		expect(result.returned).toMatchObject({
-			status: "returned",
-		});
-		expect(result.runtime.items.find(({ id }) => id === "runtime:water")).toMatchObject({
-			location: sourceLocation(1),
-			quantity: 4,
 		});
 	});
 
@@ -259,7 +185,6 @@ describe("settleItemDeliveryFx", () => {
 					id: "runtime:mover",
 					itemId: "stone",
 					location: sourceLocation(2),
-					quantity: 1,
 				});
 				const conflictingMove = yield* dropItemFx({
 					sourceItemId: intruder.id,
@@ -331,69 +256,6 @@ describe("settleItemDeliveryFx", () => {
 				returnFrom: workshopLocation,
 				scope: "delivery",
 			},
-		});
-	});
-
-	it("keeps one physical stack identity while allocating its contact across several slots", () => {
-		const runtime = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerAndWaterFx;
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				const outbound = yield* readRuntimeFx();
-				expect(
-					outbound.items.find(({ id }) => id === "runtime:water")?.location,
-				).toMatchObject({
-					target: {
-						input: [
-							{
-								inputIndex: 0,
-								quantity: 3,
-							},
-							{
-								inputIndex: 1,
-								quantity: 2,
-							},
-						],
-					},
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
-				return yield* readRuntimeFx();
-			}).pipe(
-				useGameFx({
-					config: twoMaterialInputConfig,
-				}),
-			),
-		);
-
-		expect(
-			runtime.items
-				.filter(({ location }) => location.scope === "input")
-				.map(({ location, quantity }) => ({
-					inputIndex: location.scope === "input" ? location.inputIndex : -1,
-					quantity,
-				})),
-		).toEqual([
-			{
-				inputIndex: 0,
-				quantity: 3,
-			},
-			{
-				inputIndex: 1,
-				quantity: 2,
-			},
-		]);
-		expect(runtime.items.find(({ id }) => id === "runtime:water")).toMatchObject({
-			location: {
-				phase: "returning",
-				scope: "delivery",
-			},
-			quantity: 2,
 		});
 	});
 });

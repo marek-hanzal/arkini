@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 import type { Project } from "~/project-authoring/type/Project";
@@ -31,17 +30,14 @@ const removeStartItemFn = (
 const setStartItemFn = ({
 	itemId,
 	location,
-	quantity,
 	start,
 }: {
 	readonly itemId: IdSchema.Type;
 	readonly location: BoardLocationSchema.Type;
-	readonly quantity: PositiveIntegerSchema.Type;
 	readonly start: StartSchema.Type;
 }): StartSchema.Type => {
 	const entry = {
 		itemId,
-		quantity,
 		space: location.space,
 		x: location.position.x,
 		y: location.position.y,
@@ -69,17 +65,13 @@ const readStartItemSetErrorFn = ({
 	itemId,
 	location,
 	project,
-	quantity,
 }: {
 	readonly itemId: IdSchema.Type;
 	readonly location: BoardLocationSchema.Type;
 	readonly project: Project;
-	readonly quantity: PositiveIntegerSchema.Type;
 }) => {
 	const item = project.config.items[itemId];
 	if (item === undefined) return `Item ${itemId} does not exist in the open project.`;
-	if (quantity > item.maxStackSize)
-		return `Item ${itemId} stack may contain at most ${item.maxStackSize}.`;
 	const { height, width } = project.config.meta.board;
 	if (location.position.x >= width || location.position.y >= height)
 		return `Board position ${location.position.x},${location.position.y} does not fit inside ${width}x${height}.`;
@@ -92,7 +84,7 @@ const formatStartLocationFn = (location: BoardLocationSchema.Type) =>
 		`Position: ${location.position.x},${location.position.y}`,
 	].join("\n");
 
-/** Sets or removes one exact authored initial stack through a revision-pinned config commit. */
+/** Sets or removes one exact authored initial item through a revision-pinned config commit. */
 export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 	change,
 	location,
@@ -105,7 +97,6 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 		| {
 				readonly type: "set";
 				readonly itemId: IdSchema.Type;
-				readonly quantity: PositiveIntegerSchema.Type;
 		  }
 		| {
 				readonly type: "remove";
@@ -134,7 +125,6 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 			itemId: change.itemId,
 			location,
 			project,
-			quantity: change.quantity,
 		});
 		if (error !== undefined) return yield* Effect.fail(new Error(error));
 	}
@@ -143,7 +133,6 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 			? setStartItemFn({
 					itemId: change.itemId,
 					location,
-					quantity: change.quantity,
 					start: project.config.start,
 				})
 			: removeStartItemFn(project.config.start, location);
@@ -162,7 +151,6 @@ export const updateStartItemFx = Effect.fn("updateStartItemFx")(function* ({
 		`Project ID: ${project.projectId}`,
 		formatStartLocationFn(location),
 		`Item ID: ${change.type === "set" ? change.itemId : previous?.itemId}`,
-		`Quantity: ${change.type === "set" ? change.quantity : (previous?.quantity ?? 1)}`,
 		...(change.type === "set"
 			? [
 					`Replaced: ${previous === undefined ? "no" : "yes"}`,

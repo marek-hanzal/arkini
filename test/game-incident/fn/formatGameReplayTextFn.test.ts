@@ -21,19 +21,20 @@ const runtime = ({
 	},
 	currentSpace,
 	defaultLineId,
-	quantity = 1,
+	remainingUnits = 3,
 }: {
 	readonly cheats?: GameDiagnosticRuntime["cheats"];
 	readonly currentSpace: number;
 	readonly defaultLineId?: string;
-	readonly quantity?: number;
+	readonly remainingUnits?: number;
 }): GameDiagnosticRuntime => ({
 	currentSpace,
 	cheats,
 	items: [
 		{
 			item: itemReference,
-			quantity,
+			remainingUnits,
+
 			location: {
 				scope: "board",
 				space: 0,
@@ -106,12 +107,12 @@ describe("formatGameReplayTextFn", () => {
 				}),
 				finalRuntime: runtime({
 					currentSpace: 0,
-					quantity: 2,
+					remainingUnits: 2,
 				}),
 			}),
 		);
 
-		expect(text).toContain("quantity 1 → 2");
+		expect(text).toContain("units 3 → 2");
 	});
 
 	it("reports cheat changes instead of claiming that the runtime stayed unchanged", () => {

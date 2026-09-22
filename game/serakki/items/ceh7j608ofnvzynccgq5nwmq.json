@@ -13,7 +13,6 @@
 				"dye-field"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 20,
 			"output": {

@@ -12,7 +12,6 @@
 				"mouse-with-bandaged-tail"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 60000,
 			"enable": true,

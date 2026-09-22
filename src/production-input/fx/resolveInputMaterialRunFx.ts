@@ -1,4 +1,4 @@
-import { Array, Effect } from "effect";
+import { Effect } from "effect";
 
 import { resolveActionUnitFx } from "~/production-action/fx/resolveActionUnitFx";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
@@ -29,24 +29,10 @@ const planInputMaterialRunFn = ({
 }) => {
 	if (!resolution.ready) return undefined;
 
-	const [remainingQuantity, allocation] = Array.mapAccum(
-		items,
-		resolution.runQuantity,
-		(remaining, item) => {
-			const quantity = Math.min(remaining, item.quantity);
-			return [
-				remaining - quantity,
-				quantity > 0
-					? {
-							itemId: item.id,
-							quantity,
-						}
-					: undefined,
-			] as const;
-		},
-	);
-	const [firstItem, ...remainingItems] = allocation.filter((item) => item !== undefined);
-	if (remainingQuantity > 0 || firstItem === undefined) return undefined;
+	const [firstItem, ...remainingItems] = items.slice(0, resolution.runQuantity).map((item) => ({
+		itemId: item.id,
+	}));
+	if (items.length < resolution.runQuantity || firstItem === undefined) return undefined;
 
 	return {
 		type: resolution.type,
@@ -70,9 +56,7 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 	reservedUnits,
 	runtime,
 }: resolveInputMaterialRunFx.Props) {
-	const storedQuantity = items.reduce((quantity, item) => {
-		return quantity + item.quantity;
-	}, 0);
+	const storedQuantity = items.length;
 	const materialResolution = resolveInputMaterialFn({
 		input,
 		storedQuantity,

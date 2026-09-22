@@ -34,31 +34,30 @@ export const prepareQueuedBufferedLineFx = Effect.fn("prepareQueuedBufferedLineF
 		id: ownerItemId,
 		itemId: "workshop",
 		location: workshopLocation,
-		quantity: 1,
 	});
 	yield* spawnItemFx({
 		id: otherOwnerItemId,
 		itemId: "workshop",
 		location: sourceLocation(3),
-		quantity: 1,
 	});
-	yield* spawnItemFx({
-		id: "runtime:queued-water",
-		itemId: "water",
-		location: sourceLocation(1),
-		quantity: 3,
-	});
-	const water = yield* getItemFx({
-		itemId: "runtime:queued-water",
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId,
-		lineId,
-		inputIndex: 0,
-		sourceItemId: water.id,
-		sourceItemRevision: water.revision,
-		quantity: 3,
-	});
+	for (let index = 0; index < 3; index++) {
+		yield* spawnItemFx({
+			id: `runtime:queued-water:${index}`,
+			itemId: "water",
+			location: sourceLocation(1),
+		});
+		const water = yield* getItemFx({
+			itemId: `runtime:queued-water:${index}`,
+		});
+		yield* storeInputMaterialFx({
+			ownerItemId,
+			lineId,
+			inputIndex: 0,
+			sourceItemId: water.id,
+			sourceItemRevision: water.revision,
+		});
+	}
+
 	const first = yield* enqueueLineFx({
 		ownerItemId,
 		lineId,

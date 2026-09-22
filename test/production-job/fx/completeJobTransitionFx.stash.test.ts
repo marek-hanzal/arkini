@@ -73,7 +73,6 @@ const simpleItem = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
 });
 
 const stashItem = ({
@@ -101,7 +100,7 @@ const stashItem = ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 1,
+
 	lines: [
 		{
 			id: lineId,
@@ -214,7 +213,6 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	const key = yield* spawnItemFx({
 		id: "runtime:key",
@@ -227,7 +225,6 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	yield* storeInputMaterialFx({
 		ownerItemId: owner.id,
@@ -235,7 +232,6 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 		inputIndex: 0,
 		sourceItemId: key.id,
 		sourceItemRevision: key.revision,
-		quantity: 1,
 	});
 	const started = yield* startLineFx({
 		ownerItemId: owner.id,
@@ -325,7 +321,6 @@ describe("stash line completion transition", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,

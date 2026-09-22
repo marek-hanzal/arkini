@@ -12,7 +12,6 @@
 				"british-shorthair-kitten-with-mouse"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 15000,
 			"enable": true,

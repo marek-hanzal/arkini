@@ -73,7 +73,6 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 			}
 			yield* enqueueLineFx({

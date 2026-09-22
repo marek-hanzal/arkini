@@ -31,7 +31,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:source",
 				],
 			},
-			maxStackSize: 1,
 		},
 		permit: {
 			maxQueueSize: 1,
@@ -47,7 +46,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:permit",
 				],
 			},
-			maxStackSize: 1,
 		},
 		booster: {
 			maxQueueSize: 1,
@@ -63,7 +61,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:booster",
 				],
 			},
-			maxStackSize: 1,
 		},
 		blocker: {
 			maxQueueSize: 1,
@@ -79,7 +76,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 					"artwork:blocker",
 				],
 			},
-			maxStackSize: 1,
 		},
 	},
 });
@@ -109,7 +105,6 @@ export const createOriginFx = () => {
 				y: 5,
 			},
 		},
-		quantity: 1,
 	});
 };
 
@@ -131,6 +126,5 @@ export const placeLineTestItemFx = ({
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 };

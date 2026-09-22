@@ -17,7 +17,6 @@ describe("dropItemFx / stale and ignored identity", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const outcome = yield* dropItemFx({
 					sourceItemId: source.id,
@@ -58,7 +57,6 @@ describe("dropItemFx / stale and ignored identity", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const outcome = yield* dropItemFx({
 					sourceItemId: source.id,
@@ -95,13 +93,11 @@ describe("dropItemFx / stale and ignored identity", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
 					itemId: "stone",
 					location: occupiedLocation,
-					quantity: 1,
 				});
 				const outcome = yield* dropItemFx({
 					sourceItemId: source.id,
@@ -113,7 +109,6 @@ describe("dropItemFx / stale and ignored identity", () => {
 						inputStore: {
 							lineId: "line:missing",
 							inputIndex: 0,
-							quantity: 1,
 						},
 						occupant: {
 							itemId: target.id,

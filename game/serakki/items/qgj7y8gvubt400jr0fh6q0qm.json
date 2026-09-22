@@ -11,7 +11,6 @@
 				"sugar-cane"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 1800000,
 			"enable": true,

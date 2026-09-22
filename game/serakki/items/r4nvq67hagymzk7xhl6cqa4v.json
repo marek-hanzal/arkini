@@ -12,7 +12,6 @@
 				"paper-pulp-bucket"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

@@ -12,7 +12,6 @@
 				"wishing-well-with-coffee"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"intervalMs": 5000,
 			"durationMs": 60000,

@@ -201,7 +201,6 @@ export const commitPortalDropFx = Effect.fn("commitPortalDropFx")(function* ({
 						portalItemId: target.id,
 						previousLocation: source.location,
 						location: item.location,
-						quantity: item.quantity,
 					} satisfies GameEventSchema.Type,
 				],
 			] as const;

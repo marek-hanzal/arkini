@@ -3,7 +3,6 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -13,7 +12,6 @@ import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMateria
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/fx/readItemMaterialInputFx";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
@@ -40,14 +38,12 @@ export namespace storeInputMaterialFx {
 		sourceItemId: IdSchema.Type;
 		sourceItemRevision: RevisionSchema.Type;
 		expectedSourceLocation?: BoardLocationSchema.Type;
-		quantity: PositiveIntegerSchema.Type;
 	}
 
 	export interface Result {
 		readonly sourceBefore: BoardRuntimeItemSchema.Type;
 		readonly ownerItem: BoardRuntimeItemSchema.Type;
 		readonly storedItem: InputRuntimeItemSchema.Type;
-		readonly sourceItem?: BoardRuntimeItemSchema.Type;
 	}
 }
 
@@ -55,9 +51,8 @@ export namespace storeInputMaterialFx {
  * Atomically stores accepted material from one grid item in one owner line input.
  *
  * Optimistic owner/source facts, spatial scope, line availability, selector, and
- * capacity are all rechecked inside the serialized mutation. Once buffered state
- * attaches to the owner identity, a stacked owner is isolated to quantity one and
- * its pure remainder is delivered through canonical placement in the same commit.
+ * capacity are all rechecked inside the serialized mutation. The exact source identity
+ * and its passive owned state move together.
  */
 export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* ({
 	ownerItemId,
@@ -68,7 +63,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 	sourceItemId,
 	sourceItemRevision,
 	expectedSourceLocation,
-	quantity,
 }: storeInputMaterialFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
@@ -205,11 +199,10 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				lineId,
 				ownerItemId,
 			});
-			const storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
+			const storedQuantity = storedItems.length;
 			const plan = planInputMaterialStoreFn({
 				input,
 				item: source,
-				requestedQuantity: quantity,
 				storedQuantity,
 			});
 			if (plan === undefined) {
@@ -246,16 +239,11 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					lineId,
 					inputIndex,
 				},
-				plan,
 				runtime: inputSourceRuntime,
 				source,
 			});
-			const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
-				ownerItemId,
-				runtime: inputRuntime,
-			});
 			const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
-				runtime: isolation.runtime,
+				runtime: inputRuntime,
 			});
 			const runtimeOwnerItem = yield* readRuntimeItemByIdFx({
 				itemId: ownerItemId,
@@ -283,14 +271,10 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 						sourceItemId: source.id,
 						canonicalItemId: source.item.id,
 						previousSourceLocation: source.location,
-						previousQuantity: source.quantity,
-						storedQuantity: result.storedItem.quantity,
-						resultingQuantity: result.sourceItem?.quantity ?? 0,
 						ownerItemId,
 						lineId,
 						inputIndex,
 					} satisfies GameEventSchema.Type,
-					...isolation.events,
 				],
 			] as const;
 		});

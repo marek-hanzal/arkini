@@ -12,7 +12,6 @@
 				"empty-sack"
 			]
 		},
-		"maxStackSize": 12,
 		"merge": [
 			{
 				"target": {

@@ -271,7 +271,6 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project
 						"Description:",
 						...item.description.split("\n").map((line) => `  ${line}`),
 					]),
-			`Stack capacity: ${item.maxStackSize}`,
 		].join("\n");
 	}),
 );

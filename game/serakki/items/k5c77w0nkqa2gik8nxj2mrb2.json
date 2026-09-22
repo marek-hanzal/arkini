@@ -12,7 +12,6 @@
 				"bed-with-teddy-bear"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

@@ -38,7 +38,6 @@ const config = GameConfigSchema.parse({
 					"artwork:tree",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });
@@ -62,10 +61,9 @@ const state = StateSchema.parse({
 					y: 2,
 				},
 			},
-			quantity: 1,
 		},
 		{
-			id: "runtime:stack:tree",
+			id: "runtime:second-tree",
 			itemId: "tree",
 			location: {
 				scope: "board" as const,
@@ -75,7 +73,6 @@ const state = StateSchema.parse({
 					y: 0,
 				},
 			},
-			quantity: 3,
 		},
 	],
 
@@ -220,8 +217,8 @@ it("builds every runtime item with the original canonical game object", () => {
 	);
 	const canonicalTree = config.items.tree;
 	const boardTree = runtime.items.find((item) => item.id === "runtime:board:tree");
-	const stackedTree = runtime.items.find((item) => item.id === "runtime:stack:tree");
+	const secondTree = runtime.items.find((item) => item.id === "runtime:second-tree");
 
 	expect(boardTree?.item).toBe(canonicalTree);
-	expect(stackedTree?.item).toBe(canonicalTree);
+	expect(secondTree?.item).toBe(canonicalTree);
 });

@@ -369,16 +369,12 @@ describe("editor MCP authoring schema registry", () => {
 			clock: {
 				intervalMs: 1000,
 			},
-			maxStackSize: 1,
 			lines: [
 				createLine({}),
 			],
 		};
 		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);
 		for (const replacement of [
-			{
-				maxStackSize: 2,
-			},
 			{
 				action,
 			},

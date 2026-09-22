@@ -25,7 +25,6 @@ import { stopActivityParticlesFx } from "~/tile-rendering/fx/stopActivityParticl
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 import { prepareActorBirthFx } from "~/tile-rendering/fx/prepareActorBirthFx";
 import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
-import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
 import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
@@ -33,7 +32,6 @@ import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
 import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
-import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -235,26 +233,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
-		const hiddenActorIds = new Set<string>();
-		for (const [actorId, revision] of dropSnapshot.hiddenActorRevisions) {
-			const canonical = actorStore.canonicalItems.get(actorId);
-			if (canonical === undefined || canonical.revision === revision) {
-				hiddenActorIds.add(actorId);
-				continue;
-			}
-			// A newer canonical identity owns visibility, including an earlier optimistic fade.
-			const actor = actorStore.actors.get(actorId);
-			if (
-				actor !== undefined &&
-				!dropSnapshot.pendingActorIds.has(actorId) &&
-				actor.lifecycleTargetAlpha === 0
-			) {
-				yield* restoreActorExitFx({
-					actor,
-					animator,
-				});
-			}
-		}
 		const deliveries = game.readOrThrowFn(
 			readTileDeliveriesFx({
 				game,
@@ -322,7 +300,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const motionSnapshot = yield* motion.readSnapshotFx;
 		const visibleItems = new Map(
 			nextItems.flatMap((item) => {
-				if (hiddenActorIds.has(item.id)) return [];
 				const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
 				return pose === null
 					? []
@@ -341,21 +318,11 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			actorIds: actorStore.actors.keys(),
 			deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
 			feedbackCues,
-			hiddenActorIds,
 			motionRetainedActorIds: motionSnapshot.retainedActorIds,
 			pendingActorIds: dropSnapshot.pendingActorIds,
 			visibleActors: visibleItems,
 		});
 		for (const departure of reconciliationPlan.departures) {
-			if (departure.kind === "release-hidden") {
-				yield* releaseActorWithExitFx({
-					adoptActiveLifecycleExit: true,
-					actorId: departure.actorId,
-					durationMs: feedbackExitDurationMs,
-					feedbackCues: [],
-				});
-				continue;
-			}
 			yield* releaseActorWithExitFx({
 				actorId: departure.actorId,
 				durationMs:
@@ -372,10 +339,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			const {
 				visible: { item, pose },
 			} = arrival;
-			const displayItem = projectMotionItemFn(
-				item,
-				motionSnapshot.quantityPresentationByActorId.get(item.id),
-			);
+			const displayItem = item;
 			if (arrival.kind === "add") {
 				const created = RendererRuntime.runSync(
 					createTileActorFx({
@@ -556,10 +520,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		for (const feedback of dropSnapshot.feedback) {
 			yield* dropPresentation.clearFeedbackFx(feedback.generation);
 		}
-		yield* dropPresentation.reconcileActorsFx({
-			mainItems: nextItems,
-		});
-		yield* motion.syncPresentationFx;
+		yield* dropPresentation.reconcileActorsFx();
 		yield* motion.startFx;
 		yield* drag.requestRefreshFx;
 	});

@@ -11,7 +11,6 @@ import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { isolateBoardStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateBoardStatefulOwnerTransitionFx";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 export namespace enqueueLineRuntimeFx {
@@ -74,19 +73,9 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 		ownerItemId,
 		lineId,
 	} satisfies JobQueueRequestSchema.Type;
-	const isolation = yield* isolateBoardStatefulOwnerTransitionFx({
-		ownerItemId,
-		runtime: {
-			...runtime,
-			jobQueue: [
-				...runtime.jobQueue,
-				request,
-			],
-		},
-	});
+
 	return {
 		events: [
-			...isolation.events,
 			{
 				type: "job:queued",
 				requestId: request.id,
@@ -96,6 +85,12 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 			},
 		],
 		request,
-		runtime: isolation.runtime,
+		runtime: {
+			...runtime,
+			jobQueue: [
+				...runtime.jobQueue,
+				request,
+			],
+		},
 	} satisfies enqueueLineRuntimeFx.Result;
 });

@@ -259,12 +259,7 @@ describe("Game diagnostics", () => {
 										kind: "line-input",
 										ownerItemId: "runtime:item:upgrade",
 										lineId: "line:upgrade",
-										input: [
-											{
-												inputIndex: 0,
-												quantity: 1,
-											},
-										],
+										inputIndex: 0,
 									},
 								},
 							},

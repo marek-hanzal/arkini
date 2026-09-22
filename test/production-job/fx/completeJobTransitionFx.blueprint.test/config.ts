@@ -5,7 +5,7 @@ import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-const simpleItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) =>
+const simpleItem = ({ id }: { id: string }) =>
 	ItemSchema.parse({
 		maxQueueSize: 1,
 		lines: [],
@@ -21,7 +21,6 @@ const simpleItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: numbe
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize,
 	});
 
 const blueprintItem = ({
@@ -50,7 +49,7 @@ const blueprintItem = ({
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize: 1,
+
 		lines: [
 			{
 				id: lineId,
@@ -257,7 +256,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		}),
 		"item:byproduct": simpleItem({
 			id: "item:byproduct",
-			maxStackSize: 2,
 		}),
 		"item:limited": simpleItem({
 			id: "item:limited",
@@ -289,7 +287,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:limited",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 2,
 			lines: [
 				{
@@ -327,7 +325,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:blueprint-source",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 2,
 			lines: [
 				{
@@ -357,7 +355,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:shared-source",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -387,7 +385,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:shared-consumer",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -427,7 +425,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					"artwork:producer:recycler",
 				],
 			},
-			maxStackSize: 1,
+
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -456,26 +454,26 @@ export const blueprintConfig = GameConfigSchema.parse({
 				},
 			],
 		},
-		"producer:spent-stack": {
-			uid: "producer:spent-stack",
-			id: "producer:spent-stack",
+		"producer:depleted-owner": {
+			uid: "producer:depleted-owner",
+			id: "producer:depleted-owner",
 
-			title: "Finite stack",
-			description: "Replaces exactly one depleted stacked owner.",
+			title: "Finite owner",
+			description: "Replaces the depleted owner.",
 			artwork: {
 				scale: 0.8,
 				default: [
-					"artwork:producer:spent-stack",
+					"artwork:producer:depleted-owner",
 				],
 			},
-			maxStackSize: 3,
+
 			maxQueueSize: 1,
 			units: {
 				amount: 1,
 			},
 			lines: [
 				{
-					id: "line:producer:spent-stack",
+					id: "line:producer:depleted-owner",
 					title: "Renew one",
 					description: "Spend the final owner unit and replace one owner.",
 					runtimeMs: 200,
@@ -488,7 +486,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output: blueprintOutput("producer:spent-stack"),
+					output: blueprintOutput("producer:depleted-owner"),
 					rules: [],
 				},
 			],

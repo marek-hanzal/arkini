@@ -51,7 +51,6 @@ describe("startLineRuntimeFx", () => {
 				jobId: result.job.id,
 				scope: "job",
 			},
-			quantity: 3,
 		});
 		expect(
 			result.runtime.items.find(
@@ -62,16 +61,12 @@ describe("startLineRuntimeFx", () => {
 				jobId: result.job.id,
 				scope: "reserved",
 			},
-			quantity: 1,
 		});
 		expect(result.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemConsumed,
 			sourceItemId: result.consumedSource.id,
 			canonicalItemId: "water",
 			sourceLocation: result.consumedSource.location,
-			previousQuantity: 3,
-			consumedQuantity: 3,
-			resultingQuantity: 0,
 		});
 	});
 });

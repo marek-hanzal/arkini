@@ -9,7 +9,6 @@ export interface TileActorItem extends TileActorVisual {
 	readonly badgeKind?: "units" | "queue";
 	readonly id: string;
 	readonly revision: string;
-	readonly quantity: number;
 	readonly location: BoardLocationSchema.Type;
 	readonly jobStatus?: JobStatusEnumSchema.Type;
 	readonly progressRatio?: number;

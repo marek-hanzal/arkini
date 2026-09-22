@@ -125,7 +125,6 @@ describe("game incident CLI", () => {
 									y: 0,
 								},
 							},
-							quantity: 1,
 						},
 					],
 					jobs: [],

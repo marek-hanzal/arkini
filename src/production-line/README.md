@@ -14,7 +14,7 @@ This README maps the peer `production-*` roots. It lives beside Production Line 
 | `production-input` | Material resolution, buffers, autofill, withdrawal and storage mutation | [`resolveInputRunFx.ts`](../production-input/fx/resolveInputRunFx.ts), [`applyInputRunPlanFx.ts`](../production-input/fx/applyInputRunPlanFx.ts) |
 | `production-line` | Line definitions, rules, reads and one pinned-snapshot run plan | [`fx/resolveLineRunFx.ts`](fx/resolveLineRunFx.ts) |
 | `production-job` | Queue admission, reservation, start, completion and cancellation cleanup | [`../production-job/fx/enqueueLineFx.ts`](../production-job/fx/enqueueLineFx.ts), [`../production-job/fx/attemptQueuedLineStartFx.ts`](../production-job/fx/attemptQueuedLineStartFx.ts), [`../production-job/fx/attemptJobCompletionFx.ts`](../production-job/fx/attemptJobCompletionFx.ts) |
-| `production-delivery` | Outbound allocation, travel, reconciliation and input settlement | [`advanceDeliveriesRuntimeFx.ts`](../production-delivery/fx/advanceDeliveriesRuntimeFx.ts), [`settleItemDeliveryRuntimeFx.ts`](../production-delivery/fx/settleItemDeliveryRuntimeFx.ts) |
+| `production-delivery` | Single-item delivery, travel, reconciliation and input settlement | [`advanceDeliveriesRuntimeFx.ts`](../production-delivery/fx/advanceDeliveriesRuntimeFx.ts), [`settleItemDeliveryRuntimeFx.ts`](../production-delivery/fx/settleItemDeliveryRuntimeFx.ts) |
 | `production-authoring` | Shared controlled Editor fields for Line/Input/Rule/Output values | [`LineFields.tsx`](../production-authoring/ui/LineFields.tsx) |
 
 Gameplay consumers import these exact owners directly. Do not add a `production` barrel, coordinator, adapter or directory just to make the island look hierarchical.
@@ -90,7 +90,7 @@ Scheduled owners filter their selected Clock pool by line rules, draw by `clockW
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs. Explicit forced owner removal can abort active Jobs.
 - The engine can cancel an exact active job through [`cancelItemJobFx`](../production-job/fx/cancelItemJobFx.ts). Shared [`abortJobRuntimeFx`](../production-job/fx/abortJobRuntimeFx.ts) consumes committed material, returns reservations, and settles owner depletion atomically. Stale job IDs never cancel a replacement.
 - Clearing pending work returns its unused line-input material without cancelling active work. An optional line ID restricts clearing to that line. An exact request ID cancels only that pending request; stale IDs are no-ops. Shared line buffers and deliveries stay while another request for that line remains.
-- Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.
+- Start re-resolves all live facts and atomically applies input ownership, unit spending, reservation and Job creation.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.
 - Job, delivery and item-schedule advancement order belongs to Game Tick, not to any production root.
@@ -99,7 +99,7 @@ Scheduled owners filter their selected Clock pool by line rules, draw by `clockW
 
 Likely affected:
 
-- Runtime validation and stateful Item isolation.
+- Runtime validation and exact Item ownership.
 - Tick queue/start/completion/delivery order.
 - Item Detail Line projections and production commands.
 - Flow acquisition facts and Estimate route/cost semantics when authored inputs or outputs change.

@@ -62,14 +62,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								value={item.maxQueueSize}
 							/>
 							<Fact
-								label={translator.textFn("Stack capacity")}
-								value={
-									item.maxStackSize === 1
-										? translator.textFn("Single item")
-										: item.maxStackSize
-								}
-							/>
-							<Fact
 								label={translator.textFn("Item ID")}
 								mono
 								value={

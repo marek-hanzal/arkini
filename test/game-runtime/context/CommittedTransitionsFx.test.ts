@@ -29,7 +29,6 @@ describe("CommittedTransitionsFx", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			});
 			const [current, next] = Array.from(yield* Fiber.join(transitionsFiber));
 			if (current === undefined || next === undefined) {

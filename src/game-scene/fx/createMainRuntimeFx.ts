@@ -141,7 +141,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			cursorGrab,
 			dropPresentation,
 			game,
-			motion,
 			onSettledDropFn: () => replayCurrentTransitionFn(),
 			onDropFn,
 			onRejectedDropFn,
@@ -195,6 +194,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		});
 		registerRollbackFn(delivery.closeFx);
 		const reconciler = yield* createMainReconcilerFx({
+			motion,
 			actorStore,
 			animator,
 			application,
@@ -202,7 +202,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			delivery,
 			dropPresentation,
 			game,
-			motion,
 			particleTextures,
 			readPaletteFn: () => paletteState.current,
 			surface,

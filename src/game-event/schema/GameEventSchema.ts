@@ -145,7 +145,6 @@ const itemExpiredEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: BoardLocationSchema,
-		quantity: z.number().int().positive(),
 	})
 	.strict();
 
@@ -158,7 +157,6 @@ const itemSpawnedEventSchema = z
 		canonicalItemId: IdSchema,
 		originItemId: IdSchema,
 		location: BoardLocationSchema,
-		quantity: z.number().int().positive(),
 	})
 	.strict();
 
@@ -172,7 +170,6 @@ const itemPortalTransferredEventSchema = z
 		portalItemId: IdSchema,
 		previousLocation: BoardLocationSchema,
 		location: BoardLocationSchema,
-		quantity: PositiveIntegerSchema,
 	})
 	.strict();
 
@@ -204,50 +201,8 @@ const itemPlacedEventSchema = z
 			BoardLocationSchema,
 		]),
 		location: BoardLocationSchema,
-		quantity: z.number().int().positive(),
 	})
 	.strict();
-
-const itemStackedEventSchema = z
-	.object({
-		type: GameEventEnumSchema.extract([
-			"ItemStacked",
-		]),
-		itemId: IdSchema,
-		canonicalItemId: IdSchema,
-		originItemId: IdSchema,
-		location: BoardLocationSchema,
-		previousQuantity: z.number().int().positive(),
-		quantity: z.number().int().positive(),
-	})
-	.strict()
-	.refine((event) => event.quantity > event.previousQuantity, {
-		message: "quantity must be greater than previousQuantity",
-	});
-
-const itemSplitEventSchema = z
-	.object({
-		type: GameEventEnumSchema.extract([
-			"ItemSplit",
-		]),
-		itemId: IdSchema,
-		canonicalItemId: IdSchema,
-		location: BoardLocationSchema,
-		previousQuantity: z.number().int().min(2),
-		quantity: PositiveIntegerSchema,
-	})
-	.strict()
-	.superRefine((event, context) => {
-		if (event.quantity >= event.previousQuantity) {
-			context.addIssue({
-				code: "custom",
-				message: "Split identity must retain less than its previous quantity.",
-				path: [
-					"quantity",
-				],
-			});
-		}
-	});
 
 const itemConsumedEventSchema = z
 	.object({
@@ -257,9 +212,6 @@ const itemConsumedEventSchema = z
 		sourceItemId: IdSchema,
 		canonicalItemId: IdSchema,
 		sourceLocation: InputLocationSchema,
-		previousQuantity: z.number().int().positive(),
-		consumedQuantity: z.number().int().positive(),
-		resultingQuantity: z.number().int().nonnegative(),
 	})
 	.strict();
 
@@ -271,9 +223,6 @@ const itemInputStoredEventSchema = z
 		sourceItemId: IdSchema,
 		canonicalItemId: IdSchema,
 		previousSourceLocation: BoardLocationSchema,
-		previousQuantity: z.number().int().positive(),
-		storedQuantity: z.number().int().positive(),
-		resultingQuantity: z.number().int().nonnegative(),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),
@@ -304,8 +253,6 @@ const itemDepletedEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: BoardLocationSchema,
-		previousQuantity: z.number().int().positive(),
-		resultingQuantity: z.number().int().nonnegative(),
 	})
 	.strict();
 
@@ -317,7 +264,6 @@ const itemDisappearedEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: LocationSchema,
-		quantity: z.number().int().positive(),
 	})
 	.strict();
 
@@ -354,8 +300,6 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	itemPlacedEventSchema,
 	itemSwappedEventSchema,
 	itemPortalTransferredEventSchema,
-	itemStackedEventSchema,
-	itemSplitEventSchema,
 	itemConsumedEventSchema,
 	itemInputStoredEventSchema,
 	itemUnitSpentEventSchema,

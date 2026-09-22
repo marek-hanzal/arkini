@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { PositionSchema } from "~/item-location/schema/PositionSchema";
 
@@ -16,9 +15,6 @@ export const BoardItemSchema = z
 		 * Canonical item placed on the board.
 		 */
 		itemId: IdSchema.describe("The canonical item ID placed on the initial board."),
-		quantity: PositiveIntegerSchema.optional().describe(
-			"The optional stack quantity placed in this exact initial board cell; omitted means one.",
-		),
 	})
 	.strict()
 	.meta({

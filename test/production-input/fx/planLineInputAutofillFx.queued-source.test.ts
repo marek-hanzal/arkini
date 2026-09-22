@@ -55,13 +55,11 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 				id: "receiver",
 				itemId: "recycler",
 				location: sourceLocation(0),
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "queued",
 				itemId: "workshop",
 				location: sourceLocation(1),
-				quantity: 1,
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "receiver",
@@ -95,7 +93,6 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 				id: "idle",
 				itemId: "workshop",
 				location: sourceLocation(2),
-				quantity: 1,
 			});
 			yield* advanceRuntimeElapsedFx({
 				elapsedMs: 100,

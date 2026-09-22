@@ -39,19 +39,10 @@ describe("writeGameProjectJsonSchemaFx", () => {
 			| {
 					readonly properties?: Record<string, unknown>;
 					readonly required?: ReadonlyArray<string>;
-					readonly then?: {
-						readonly properties?: Record<string, unknown>;
-					};
 			  }
 			| undefined;
 		expect(itemSchema?.properties).toHaveProperty("draft");
 		expect(itemSchema?.required).not.toContain("draft");
-		expect(itemSchema?.then?.properties).toMatchObject({
-			maxStackSize: {
-				const: 1,
-			},
-		});
-		expect(itemSchema?.then?.properties).not.toHaveProperty("scope");
 	});
 
 	it.effect("writes the portable game-project JSON Schema", () =>

@@ -58,7 +58,6 @@ const createDeliveriesFx = Effect.gen(function* () {
 			id,
 			itemId,
 			location: sourceLocation(x),
-			quantity: itemId === "water" ? 4 : 1,
 		});
 	}
 	const runtime = yield* readRuntimeFx();
@@ -79,12 +78,7 @@ const createDeliveriesFx = Effect.gen(function* () {
 						kind: "line-input" as const,
 						ownerItemId: first ? "runtime:a" : "runtime:a:b",
 						lineId: first ? "b:c" : "c",
-						input: [
-							{
-								inputIndex: 0,
-								quantity: 3,
-							},
-						],
+						inputIndex: 0,
 					},
 				},
 			};
@@ -133,12 +127,7 @@ it("validates every distinct slot when owner and line identifiers contain separa
 									...item.location,
 									target: {
 										...item.location.target,
-										input: [
-											{
-												inputIndex: 0,
-												quantity: 4,
-											},
-										],
+										inputIndex: 9,
 									},
 								},
 							}
@@ -159,7 +148,7 @@ it("validates every distinct slot when owner and line identifiers contain separa
 			itemIds: [
 				"water:second",
 			],
-			reason: "claims-exceed-target",
+			reason: "slot-invalid",
 		},
 	]);
 });

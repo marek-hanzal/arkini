@@ -12,7 +12,6 @@
 				"blasting-machine"
 			]
 		},
-		"maxStackSize": 1,
 		"merge": [
 			{
 				"target": {

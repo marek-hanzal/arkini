@@ -19,7 +19,7 @@ const root = {
 	id: "runtime:root",
 	item: config.items.forge,
 	location: board,
-	quantity: 1,
+
 	revision: "revision:root",
 };
 
@@ -32,7 +32,7 @@ const passiveChild = {
 		lineId: "line:forge:run",
 		inputIndex: 0,
 	},
-	quantity: 1,
+
 	revision: "revision:child",
 };
 
@@ -108,7 +108,7 @@ it("rejects active or queued work anywhere beneath the discarded ownership tree"
 									jobId: busyId,
 									inputIndex: 1,
 								},
-								quantity: 1,
+
 								revision: "revision:job-material",
 							},
 						]

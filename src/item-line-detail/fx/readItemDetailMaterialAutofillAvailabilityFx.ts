@@ -15,15 +15,7 @@ interface MaterialAutofillAvailability {
 	readonly producerItemId?: IdSchema.Type;
 }
 
-/**
- * Reads uncommitted material quantity visible to autofill and one direct production shortcut.
- *
- * A delivery retains the whole physical source stack even when only part of it is claimed. Its
- * unclaimed remainder therefore stays available in this projection while the claimed cargo is
- * represented separately by the target input's delivery quantity. Returning cargo has no live
- * claim, so all of it remains visible. The producer shortcut reuses the visibility-aware Sources
- * projection and then follows runtime order to keep selection stable.
- */
+/** Counts available individual materials, including returning deliveries, and resolves a producer shortcut. */
 export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	"readItemDetailMaterialAutofillAvailabilityFx",
 )(function* ({
@@ -73,14 +65,9 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 				continue;
 			}
 			if (candidate.location.phase === "returning") {
-				availableQuantity += candidate.quantity;
+				availableQuantity += 1;
 				continue;
 			}
-			const claimedQuantity = candidate.location.target.input.reduce(
-				(quantity, allocation) => quantity + allocation.quantity,
-				0,
-			);
-			availableQuantity += Math.max(0, candidate.quantity - claimedQuantity);
 			continue;
 		}
 
@@ -94,7 +81,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		) {
 			continue;
 		}
-		availableQuantity += candidate.quantity;
+		availableQuantity += 1;
 	}
 
 	if (availableQuantity > 0) {

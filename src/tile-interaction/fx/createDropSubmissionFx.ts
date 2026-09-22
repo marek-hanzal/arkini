@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -12,13 +11,9 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
-import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
-import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
-import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
-import type { MotionRedirect } from "~/tile-motion/type/MotionTarget";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 
 export interface DropSubmission {
@@ -40,79 +35,11 @@ interface Props {
 	readonly cursorGrab: CursorGrabMotion;
 	readonly dropPresentation: DropPresentation;
 	readonly game: GameEngine;
-	readonly motion: MotionRuntime;
 	readonly onSettledDropFn: () => void;
 	readonly onRejectedDropFn?: () => void;
 	readonly onDropFn: (command: DropItemCommand) => PromiseLike<DropItemResult>;
 	readonly surface: MainInteractionSurface;
 }
-
-const readTargetRedirectFn = (result: DropItemResult): MotionRedirect | null =>
-	match(result)
-		.with(
-			{
-				kind: DropItemResultKind.StoreInput,
-			},
-			(store) =>
-				store.source.current === null
-					? {
-							sourceActorId: store.source.itemId,
-							targetActorId: store.owner.itemId,
-							targetLocation: store.owner.location,
-						}
-					: null,
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Stack,
-			},
-			(stack) =>
-				stack.source.current === null
-					? {
-							sourceActorId: stack.source.itemId,
-							targetActorId: stack.target.current.itemId,
-							targetLocation: stack.target.current.location,
-						}
-					: null,
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Merge,
-			},
-			(merge) =>
-				merge.source.current === null && merge.target.current !== null
-					? {
-							sourceActorId: merge.source.itemId,
-							targetActorId: merge.target.current.itemId,
-							targetLocation: merge.target.current.location,
-						}
-					: null,
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Move,
-			},
-			() => null,
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Swap,
-			},
-			() => null,
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Ignored,
-			},
-			() => null,
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Reject,
-			},
-			() => null,
-		)
-		.exhaustive();
 
 const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 	commandTarget,
@@ -174,7 +101,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	cursorGrab,
 	dropPresentation,
 	game,
-	motion,
 	onSettledDropFn,
 	onDropFn,
 	onRejectedDropFn,
@@ -189,31 +115,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 				animator,
 				onCompleteFn,
 				surface,
-			}),
-		);
-	};
-
-	const restoreOptimisticRemovalFn = ({
-		actor,
-		lifecycleGeneration,
-		sourceActorId,
-	}: {
-		readonly actor: PixiTileActor;
-		readonly lifecycleGeneration: number;
-		readonly sourceActorId: string;
-	}) => {
-		if (
-			closed ||
-			actor.container.destroyed ||
-			actorStore.actors.get(sourceActorId) !== actor ||
-			actor.lifecycleIntentGeneration !== lifecycleGeneration
-		) {
-			return;
-		}
-		RendererRuntime.runSync(
-			restoreActorExitFx({
-				actor,
-				animator,
 			}),
 		);
 	};
@@ -244,42 +145,12 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							targetItem,
 						}),
 					);
-					const optimisticRemoval =
-						previewKind === DropItemResultKind.Stack && sourceItem.quantity === 1
-							? {
-									actor,
-									lifecycleGeneration: actor.lifecycleIntentGeneration + 1,
-									sourceActorId: sourceItem.id,
-								}
-							: null;
-					let removalStarted = false;
 					let finalized = false;
-					let targetRedirected = false;
-
-					const startRemovalFn = () => {
-						if (optimisticRemoval === null || removalStarted) return;
-						removalStarted = true;
-						RendererRuntime.runSync(
-							startActorExitFx({
-								actor: optimisticRemoval.actor,
-								animator,
-							}),
-						);
-					};
 
 					const finalizeResultFn = (result: DropItemResult) => {
 						if (finalized || closed) return;
 						try {
 							if (result.kind === DropItemResultKind.Reject) onRejectedDropFn?.();
-							if (!targetRedirected) {
-								const targetRedirect = readTargetRedirectFn(result);
-								if (targetRedirect !== null) {
-									RendererRuntime.runSync(
-										motion.redirectTargetFx(targetRedirect),
-									);
-									targetRedirected = true;
-								}
-							}
 						} catch (cause) {
 							game.reportCriticalFailureFn("game-presentation", cause);
 							return;
@@ -307,21 +178,8 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								result.kind !== DropItemResultKind.Reject &&
 								result.kind !== DropItemResultKind.Ignored
 							) {
-								const removalAccepted =
-									result.kind === DropItemResultKind.Stack &&
-									result.source.current === null;
-								if (
-									!removalAccepted &&
-									optimisticRemoval !== null &&
-									removalStarted
-								) {
-									restoreOptimisticRemovalFn(optimisticRemoval);
-								}
 								onSettledDropFn();
 								return;
-							}
-							if (optimisticRemoval !== null && removalStarted) {
-								restoreOptimisticRemovalFn(optimisticRemoval);
 							}
 							if (
 								retainedSource !== null &&
@@ -345,9 +203,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							actorStore.actors.get(sourceItem.id) === actor ? actor : null;
 						if (retainedSource !== null) {
 							retainedSource.dragging = false;
-							if (optimisticRemoval !== null && removalStarted) {
-								restoreOptimisticRemovalFn(optimisticRemoval);
-							}
 							settleActorFn(retainedSource, onReturnSettledFn);
 						} else {
 							onReturnSettledFn();
@@ -355,7 +210,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						game.reportCriticalFailureFn("game-presentation", cause);
 					};
 
-					startRemovalFn();
 					let submittedDrop: PromiseLike<DropItemResult | null>;
 					try {
 						submittedDrop = closed ? Promise.resolve(null) : onDropFn(drop.command);

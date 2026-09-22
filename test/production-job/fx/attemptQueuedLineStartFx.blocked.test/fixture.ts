@@ -81,13 +81,11 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				...base.items.tool,
 				id: "result",
 				uid: "result",
-				maxStackSize: 1,
 			},
 			debris: {
 				...base.items.tool,
 				id: "debris",
 				uid: "debris",
-				maxStackSize: 1,
 			},
 			payer: {
 				...base.items.tool,
@@ -220,21 +218,21 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				id: "owner",
 				revision: "revision:owner",
 				item: config.items.forge,
-				quantity: 1,
+
 				location: board(0),
 			},
 			{
 				id: "result",
 				revision: "revision:result",
 				item: config.items.result,
-				quantity: 1,
+
 				location: board(2),
 			},
 			{
 				id: "buffer",
 				revision: "revision:buffer",
 				item: config.items.water,
-				quantity: blocker === "placement" ? 2 : 1,
+
 				location: {
 					scope: "input",
 					ownerItemId: "owner",
@@ -244,12 +242,18 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			},
 		],
 	};
+	if (blocker === "placement")
+		runtime.items.push({
+			...runtime.items[2]!,
+			id: "buffer:second",
+			revision: "revision:buffer:second",
+		});
 	if (blocker === "placement" || blocker === "aggregate-self-unit") {
 		runtime.items.push({
 			id: "tool",
 			revision: "revision:tool",
 			item: config.items.tool,
-			quantity: 1,
+
 			location: {
 				scope: "input",
 				ownerItemId: "owner",
@@ -263,7 +267,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			id: "payer",
 			revision: "revision:payer",
 			item: config.items.payer,
-			quantity: 1,
+
 			location: board(1),
 		});
 	} else if (blocker !== "missing-input") {
@@ -271,7 +275,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			id: "supply",
 			revision: "revision:supply",
 			item: config.items.water,
-			quantity: 1,
+
 			location: {
 				scope: "board" as const,
 				space: 0,

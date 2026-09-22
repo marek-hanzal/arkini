@@ -12,7 +12,6 @@
 				"coin"
 			]
 		},
-		"maxStackSize": 10,
 		"merge": [
 			{
 				"target": {

@@ -11,9 +11,7 @@ import {
 } from "~test/production-line/support/lineRunTestRuntime";
 
 const base = lineRunRuntime({
-	water: [
-		2,
-	],
+	water: 2,
 });
 const originalOwner = base.items[0];
 const line: LineSchema.Type = {
@@ -48,7 +46,6 @@ const owner: RuntimeItemSchema.Type = {
 const payer: RuntimeItemSchema.Type = {
 	...base.items[1],
 	id: "unit-payer",
-	quantity: 1,
 	item: {
 		...base.items[1].item,
 		units: {

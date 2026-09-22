@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 import { finalizeMotionActorsFx } from "~/tile-motion/fx/finalizeMotionActorsFx";
@@ -19,7 +19,6 @@ import {
 	createActor,
 	createRecordingAnimator,
 	samplePoseAnimation,
-	createStackHarness,
 	palette,
 	type PixiTileActor,
 	type ActorAnimation,
@@ -71,91 +70,6 @@ describe("spawn lifecycle", () => {
 		expect(actor.container.x).toBe(secondBoardLocation.position.x * 100);
 		expect(settledActors).toContain(actor);
 		Effect.runSync(runtime.closeFx);
-	});
-
-	it.each([
-		"dragging",
-		"new-pose",
-	] as const)("does not steal %s ownership when a retained producer is released", (ownership) => {
-		const actor = createActor("runtime:held-producer");
-		actor.dragging = ownership === "dragging";
-		actor.container.position.set(135, 47);
-		const animations: ActorAnimation[] = [];
-		const animator = createRecordingAnimator({
-			animations,
-		});
-		Effect.runSync(
-			finalizeMotionActorsFx({
-				actorIds: new Set([
-					actor.item.id,
-				]),
-				actorStore: createActorStore({
-					actors: createActorMap(actor),
-					canonicalItems: new Map([
-						[
-							actor.item.id,
-							actor.item,
-						],
-					]),
-				}),
-				animator: {
-					...animator,
-					isChannelActiveFx: () => Effect.succeed(ownership === "new-pose"),
-				},
-				application: createApplication(),
-				onActorSettledFn: () => {},
-				readPaletteFn: () => palette,
-				stillClaimedActorIds: new Set(),
-				surface: createSurface({
-					readLocationPose: () => ({
-						layer: actor.container,
-						x: 200,
-						y: 40,
-						size: 80,
-					}),
-				}),
-				textures: {} as never,
-			}),
-		);
-		expect(animations).toEqual([]);
-		expect(actor.container.x).toBe(135);
-		expect(actor.container.y).toBe(47);
-	});
-
-	it.each([
-		{
-			acquired: false,
-			label: "before",
-		},
-		{
-			acquired: true,
-			label: "after",
-		},
-	])("closes a stack payload exactly once $label its first travel update", ({ acquired }) => {
-		const { animations, canceledOwnerKeys, cue, runtime } = createStackHarness();
-		Effect.runSync(
-			runtime.enqueueFx([
-				cue,
-			]),
-		);
-		Effect.runSync(runtime.startFx);
-		const travel = animations.find(
-			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
-		);
-		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
-		const transient = travel.actor;
-		const destroy = vi.spyOn(transient.container, "destroy");
-		if (acquired) samplePoseAnimation(travel, 0.2);
-
-		Effect.runSync(runtime.closeFx);
-		Effect.runSync(runtime.closeFx);
-
-		expect(canceledOwnerKeys).toContain("motion:30:0");
-		expect(transient.container.destroyed).toBe(true);
-		expect(destroy).toHaveBeenCalledOnce();
-		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
-			new Map(),
-		);
 	});
 
 	it("supersedes an unfinished spawn fade when the actor disappears at settlement", () => {

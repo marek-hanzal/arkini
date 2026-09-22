@@ -13,7 +13,6 @@
 				"bakery"
 			]
 		},
-		"maxStackSize": 4,
 		"units": {
 			"amount": 1
 		},

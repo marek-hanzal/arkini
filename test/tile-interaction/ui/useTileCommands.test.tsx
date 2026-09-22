@@ -45,7 +45,6 @@ it("returns each overlapping Board drop's own committed actor", async () => {
 			spawnItemFx({
 				id: "a",
 				itemId: "first",
-				quantity: 1,
 				location: firstLocation,
 			}),
 		);
@@ -53,7 +52,6 @@ it("returns each overlapping Board drop's own committed actor", async () => {
 			spawnItemFx({
 				id: "b",
 				itemId: "second",
-				quantity: 1,
 				location: secondLocation,
 			}),
 		);
@@ -141,7 +139,6 @@ it("keeps rejected and committed overlapping Space activations distinct", async 
 			spawnItemFx({
 				id: "blocked",
 				itemId: "blocked",
-				quantity: 1,
 				location: firstLocation,
 			}),
 		);
@@ -149,7 +146,6 @@ it("keeps rejected and committed overlapping Space activations distinct", async 
 			spawnItemFx({
 				id: "ready",
 				itemId: "ready",
-				quantity: 1,
 				location: secondLocation,
 			}),
 		);
@@ -224,20 +220,6 @@ it("keeps command rejections recoverable without swallowing defects", async () =
 				},
 			}),
 		).rejects.toBe(rejection);
-		await expect(
-			mounted.getCommands().runSplitFn({
-				itemId: "item",
-				revision: "revision",
-				location: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-			}),
-		).rejects.toBe(defect);
 	} finally {
 		await mounted.close();
 	}

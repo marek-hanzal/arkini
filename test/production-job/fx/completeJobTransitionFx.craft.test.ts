@@ -29,7 +29,6 @@ describe("craft job completion transition", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
@@ -37,7 +36,6 @@ describe("craft job completion transition", () => {
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

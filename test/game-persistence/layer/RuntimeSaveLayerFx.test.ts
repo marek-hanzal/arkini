@@ -277,7 +277,6 @@ it.effect("does not deduplicate a snapshot skipped while saving is disabled", ()
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 		yield* TestClock.adjust(15);
 		yield* runtimeSave.flush;
@@ -318,7 +317,6 @@ it.effect("debounces committed snapshots and ignores failed mutations", () => {
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 		yield* spawnItemFx({
 			id: "runtime:save:second",
@@ -331,7 +329,6 @@ it.effect("debounces committed snapshots and ignores failed mutations", () => {
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 
 		yield* TestClock.adjust(15);
@@ -382,7 +379,6 @@ it.effect("does not let event-only traffic wake or postpone runtime autosave", (
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 
 		yield* TestClock.adjust(15);
@@ -449,7 +445,6 @@ it("serializes autosave and explicit flush so an older write cannot win", async 
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 		await firstSaveStarted;
@@ -465,7 +460,6 @@ it("serializes autosave and explicit flush so an older write cannot win", async 
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 
@@ -524,7 +518,6 @@ it("closes command admission before starting a slow final save", async () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
 					}),
 				),
 			),
@@ -574,7 +567,6 @@ it("flushes the latest committed runtime when the session is disposed", async ()
 					y: 0,
 				},
 			},
-			quantity: 1,
 		}),
 	);
 	await Effect.runPromise(session.disposeFx);

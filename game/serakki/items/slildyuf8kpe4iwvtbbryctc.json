@@ -13,7 +13,6 @@
 				"quest-shredded"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

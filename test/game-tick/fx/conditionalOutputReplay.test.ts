@@ -30,7 +30,7 @@ const run = (path: OutputPath, steps: readonly number[], markerDuration = 500) =
 				yield* spawnItemFx({
 					id: `runtime:${x}`,
 					itemId,
-					quantity: 1,
+
 					location: {
 						scope: "board",
 						space: 0,

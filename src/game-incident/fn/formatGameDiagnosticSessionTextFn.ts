@@ -192,7 +192,7 @@ export const formatGameDiagnosticHistoryTextFn = (history: GameDiagnosticHistory
 			lines.push("", "Active deliveries:");
 			for (const delivery of entry.deliveries) {
 				lines.push(
-					`- ${formatGameDiagnosticItemPointerTextFn(delivery.item)} · quantity ${delivery.quantity} · ${delivery.phase} generation ${delivery.generation}`,
+					`- ${formatGameDiagnosticItemPointerTextFn(delivery.item)} · ${delivery.phase} generation ${delivery.generation}`,
 				);
 			}
 		}

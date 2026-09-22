@@ -2,15 +2,12 @@ import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItem
 import { Effect } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { isItemPureWithIndexFn } from "~/game-runtime/fn/isItemPureWithIndexFn";
-import { readItemPurityIndexFn } from "~/game-runtime/fn/readItemPurityIndexFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/game-runtime/schema/DuplicateItemIdIssueSchema";
 import { ItemUnitsIssueReasonEnumSchema } from "~/game-runtime/schema/ItemUnitsIssueReasonEnumSchema";
 import type { ItemUnitsIssueSchema } from "~/game-runtime/schema/ItemUnitsIssueSchema";
-import type { ItemStackSizeIssueSchema } from "~/game-runtime/schema/ItemStackSizeIssueSchema";
 import type { LocationOccupiedIssueSchema } from "~/game-runtime/schema/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/game-runtime/schema/LocationOutOfBoundsIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
@@ -93,34 +90,6 @@ const checkRuntimeItemIdsFn = (runtime: RuntimeSchema.Type) => {
 	return issues;
 };
 
-const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitiesFx")(function* (
-	runtime: RuntimeSchema.Type,
-) {
-	const stackIssues: ItemStackSizeIssueSchema.Type[] = [];
-	const purityIndex = readItemPurityIndexFn(runtime);
-
-	for (const item of runtime.items) {
-		const maxStackSize = isItemPureWithIndexFn({
-			index: purityIndex,
-			item,
-			runtime,
-		})
-			? item.item.maxStackSize
-			: 1;
-		if (item.quantity > maxStackSize) {
-			stackIssues.push({
-				canonicalItemId: item.item.id,
-				itemId: item.id,
-				maxStackSize,
-				quantity: item.quantity,
-				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
-			});
-		}
-	}
-
-	return stackIssues;
-});
-
 const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: RuntimeSchema.Type) => {
 	const items: {
 		readonly item: RuntimeItemSchema.Type;
@@ -182,7 +151,6 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const config = yield* GameConfigFx;
 	const itemUnitIssues = checkRuntimeItemUnitsFn(runtime);
 	const itemIdIssues = checkRuntimeItemIdsFn(runtime);
-	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx(runtime);
 	const defaultLineIssues = checkRuntimeDefaultLinesFn({
 		runtime,
 	});
@@ -201,7 +169,6 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 		issues: [
 			...itemUnitIssues,
 			...itemIdIssues,
-			...itemQuantityIssues,
 			...checkRuntimeItemSchedulesFn(runtime),
 			...defaultLineIssues,
 			...inputLocationIssues,

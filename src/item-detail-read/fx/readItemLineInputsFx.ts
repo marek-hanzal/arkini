@@ -129,15 +129,15 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				location.lineId === line.id &&
 				location.inputIndex === inputIndex
 			) {
-				filled += item.quantity;
-				buffered += item.quantity;
+				filled += 1;
+				buffered += 1;
 			} else if (
 				(location.scope === "job" || location.scope === "reserved") &&
 				job !== undefined &&
 				location.jobId === job.id &&
 				location.inputIndex === inputIndex
 			) {
-				filled += item.quantity;
+				filled += 1;
 				committed = true;
 			} else continue;
 			const remaining =
@@ -186,9 +186,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 						query: input.query,
 					})
 				: [];
-		const availableQuantity =
-			sources.reduce((total, source) => total + source.quantity, 0) +
-			incoming.reduce((total, claim) => total + claim.quantity, 0);
+		const availableQuantity = sources.length + incoming.length;
 
 		inputs.push({
 			type: "materials",
@@ -209,7 +207,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 					lineId: line.id,
 					runtime,
 				}) &&
-				incoming.reduce((total, claim) => total + claim.quantity, 0) < input.quantity.max &&
+				incoming.length < input.quantity.max &&
 				sources.length > 0,
 			canWithdraw:
 				buffered > 0 &&

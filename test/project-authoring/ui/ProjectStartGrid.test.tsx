@@ -56,7 +56,6 @@ describe("ProjectStartGrid", () => {
 					cells={[
 						{
 							itemId: "water",
-							quantity: 2,
 							x: 0,
 							y: 0,
 						},

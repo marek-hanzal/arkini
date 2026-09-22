@@ -85,7 +85,6 @@ describe("createGameSessionFx / transition replay", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await session.runFn(emitCompletedEventFx("job:transition:ordered"));
@@ -150,7 +149,6 @@ describe("createGameSessionFx / transition replay", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			await runtimeDelivered;

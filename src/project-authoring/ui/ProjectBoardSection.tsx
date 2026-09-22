@@ -45,7 +45,6 @@ export const ProjectBoardSection = () => {
 		.filter((entry) => entry.space === selectedSpace)
 		.map((entry) => ({
 			itemId: entry.itemId,
-			quantity: entry.quantity,
 			x: entry.x,
 			y: entry.y,
 		}));

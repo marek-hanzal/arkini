@@ -468,7 +468,6 @@ describe("validateGameResourcesFn", () => {
 					targetAsset,
 				] as const,
 			},
-			maxStackSize: 1,
 			lines: [
 				{
 					id: `line:${id}:construct`,

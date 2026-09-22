@@ -107,18 +107,6 @@ export const SfxEventPresentation = [
 		description: "When an existing item is placed in a new location.",
 	},
 	{
-		event: GameEventEnumSchema.enum.ItemStacked,
-		group: "Item",
-		label: "Items stacked",
-		description: "When matching item quantities join.",
-	},
-	{
-		event: GameEventEnumSchema.enum.ItemSplit,
-		group: "Item",
-		label: "Item split",
-		description: "When part of an item stack is separated.",
-	},
-	{
 		event: GameEventEnumSchema.enum.ItemConsumed,
 		group: "Item",
 		label: "Item consumed",

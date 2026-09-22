@@ -12,7 +12,6 @@
 				"bio-waste-bucket"
 			]
 		},
-		"maxStackSize": 8,
 		"maxQueueSize": 1,
 		"lines": []
 	}

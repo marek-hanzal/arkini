@@ -105,7 +105,7 @@ describe("committed runtime removal snapshots", () => {
 		expect(event?.snapshot).toMatchObject({
 			item: result.initial.item,
 			location: result.initial.location,
-			quantity: 1,
+
 			remainingUnits: 0,
 			mergeSequence: 7,
 			schedule: {
@@ -182,7 +182,7 @@ describe("committed runtime removal snapshots", () => {
 			id: result.initial.id,
 			item: result.initial.item,
 			location: result.initial.location,
-			quantity: 1,
+
 			remainingUnits: 0,
 			schedule: {
 				remainingDurationMs: 0,

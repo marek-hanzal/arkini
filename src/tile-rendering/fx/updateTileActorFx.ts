@@ -35,7 +35,6 @@ const sameVisualRevisionFn = (left: TileActorItem, right: TileActorItem) =>
 	left.artworkScale === right.artworkScale &&
 	left.badgeCount === right.badgeCount &&
 	left.badgeKind === right.badgeKind &&
-	left.quantity === right.quantity &&
 	left.location.scope === right.location.scope &&
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl;

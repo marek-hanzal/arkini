@@ -28,7 +28,6 @@ export const createBlockedCompletionTestConfig = () => {
 				id: "blocker",
 				title: "Blocker",
 				description: "Occupies board delivery capacity.",
-				maxStackSize: 1,
 			},
 			ingot: {
 				...base.items.tool,
@@ -109,7 +108,6 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 		const freeOwner = yield* spawnItemFx({
 			id: freeCompletionOwnerId,
@@ -122,21 +120,28 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
-		const water = yield* spawnItemFx({
-			id: "runtime:blocked-water",
-			itemId: "water",
-			location: {
-				scope: "board",
-				space: 0,
-				position: {
-					x: 2,
-					y: 0,
+		for (let index = 0; index < 3; index += 1) {
+			const water = yield* spawnItemFx({
+				id: `runtime:blocked-water:${index}`,
+				itemId: "water",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 2,
+						y: 0,
+					},
 				},
-			},
-			quantity: 3,
-		});
+			});
+			yield* storeInputMaterialFx({
+				ownerItemId: blockedOwner.id,
+				lineId: "line:blocked-forge:run",
+				inputIndex: 0,
+				sourceItemId: water.id,
+				sourceItemRevision: water.revision,
+			});
+		}
 		const tool = yield* spawnItemFx({
 			id: "runtime:blocked-tool",
 			itemId: "tool",
@@ -148,24 +153,14 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 					y: 0,
 				},
 			},
-			quantity: 1,
 		});
 
-		yield* storeInputMaterialFx({
-			ownerItemId: blockedOwner.id,
-			lineId: "line:blocked-forge:run",
-			inputIndex: 0,
-			sourceItemId: water.id,
-			sourceItemRevision: water.revision,
-			quantity: 3,
-		});
 		yield* storeInputMaterialFx({
 			ownerItemId: blockedOwner.id,
 			lineId: "line:blocked-forge:run",
 			inputIndex: 1,
 			sourceItemId: tool.id,
 			sourceItemRevision: tool.revision,
-			quantity: 1,
 		});
 		yield* startLineFx({
 			ownerItemId: blockedOwner.id,
@@ -191,7 +186,6 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 							y,
 						},
 					},
-					quantity: 1,
 				});
 				blockerIndex += 1;
 			}

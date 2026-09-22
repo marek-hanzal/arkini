@@ -12,7 +12,6 @@
 				"waste-incinerator"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 8,
 		"lines": [
 			{

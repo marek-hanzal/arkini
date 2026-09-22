@@ -52,7 +52,6 @@ describe("blueprint completion rollback", () => {
 							space: 0,
 							position,
 						},
-						quantity: 1,
 					});
 				}
 				yield* startLineFx({
@@ -97,7 +96,6 @@ describe("blueprint completion rollback", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				for (const [index, position] of [
 					{
@@ -125,7 +123,6 @@ describe("blueprint completion rollback", () => {
 							space: 0,
 							position,
 						},
-						quantity: 1,
 					});
 				}
 				yield* storeInputMaterialFx({
@@ -134,7 +131,6 @@ describe("blueprint completion rollback", () => {
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

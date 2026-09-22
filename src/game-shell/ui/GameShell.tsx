@@ -122,7 +122,7 @@ const GameShellLayers = ({
  *
  * Gameplay remains outside this shell. Pixi surfaces present canonical game
  * projections and issue commands; neither React nor Pixi may infer committed
- * move/swap/stack outcomes. Tile input also stays immediate: each surface selects
+ * move/swap outcomes. Tile input also stays immediate: each surface selects
  * primary actions or Item Detail from its click mapping without introducing
  * delayed or double-click arbitration here.
  */

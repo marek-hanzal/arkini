@@ -3,7 +3,7 @@ import { z } from "zod";
 import { DeliveryLocationSchema } from "~/item-location/schema/DeliveryLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
-/** One live runtime item whose complete stack is owned by a canonical delivery. */
+/** One live runtime item whose identity is owned by a canonical delivery. */
 export const DeliveryRuntimeItemSchema = RuntimeItemSchema.extend({
 	location: DeliveryLocationSchema,
 }).meta({

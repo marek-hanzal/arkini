@@ -12,7 +12,6 @@
 				"badly-trimmed-beagle"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,
 			"enable": true,

@@ -21,9 +21,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 		origin,
 		query: when.query,
 	});
-	const quantity = items.reduce((total, item) => {
-		return total + item.quantity;
-	}, 0);
+	const quantity = items.length;
 
 	return match(when)
 		.with(

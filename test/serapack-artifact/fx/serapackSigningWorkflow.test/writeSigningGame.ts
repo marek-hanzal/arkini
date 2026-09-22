@@ -69,7 +69,6 @@ export const writeSigningGame = async (root: string) => {
 						"item",
 					],
 				},
-				maxStackSize: 1,
 			},
 		})}\n`,
 	);

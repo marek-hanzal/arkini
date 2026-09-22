@@ -12,7 +12,6 @@
 				"haunted-empty-bed-t1"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 30000,
 			"enable": true,

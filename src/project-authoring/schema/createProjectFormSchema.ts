@@ -45,7 +45,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			seenAvatars.add(avatar);
 		});
 
-		const validateItemFn = (itemId: string, quantity: number, path: (string | number)[]) => {
+		const validateItemFn = (itemId: string, path: (string | number)[]) => {
 			const item = project.config.items[itemId];
 			if (item === undefined) {
 				context.addIssue({
@@ -54,13 +54,6 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 					path,
 				});
 				return;
-			}
-			if (quantity > item.maxStackSize) {
-				context.addIssue({
-					code: "custom",
-					message: `${item.title} stack may contain at most ${item.maxStackSize}.`,
-					path,
-				});
 			}
 		};
 
@@ -71,7 +64,7 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 				"board",
 				index,
 			];
-			validateItemFn(startItem.itemId, startItem.quantity, path);
+			validateItemFn(startItem.itemId, path);
 			if (startItem.x >= value.board.width || startItem.y >= value.board.height) {
 				context.addIssue({
 					code: "custom",

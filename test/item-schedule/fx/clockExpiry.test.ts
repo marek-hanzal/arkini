@@ -209,7 +209,7 @@ describe("Clock expiry settlement", () => {
 				item: {
 					id: "permit",
 				},
-				quantity: 1,
+
 				location: {
 					scope: "board",
 				},
@@ -248,7 +248,7 @@ describe("Clock expiry settlement", () => {
 					yield* spawnItemFx({
 						id: `blocker:${position}`,
 						itemId: "permit",
-						quantity: 1,
+
 						location: {
 							scope: "board",
 							space: 0,
@@ -299,15 +299,13 @@ describe("Clock expiry settlement", () => {
 		).toBe(0);
 		expect(result.retry).toEqual(result.blocked);
 		expect(
-			result.first.runtime.items.map(({ item, quantity, location }) => ({
+			result.first.runtime.items.map(({ item, location }) => ({
 				itemId: item.id,
-				quantity,
 				location,
 			})),
 		).toEqual(
-			result.second.runtime.items.map(({ item, quantity, location }) => ({
+			result.second.runtime.items.map(({ item, location }) => ({
 				itemId: item.id,
-				quantity,
 				location,
 			})),
 		);

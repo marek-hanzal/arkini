@@ -12,7 +12,6 @@
 				"tummy-ache-british-shorthair"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 20000,
 			"enable": true,

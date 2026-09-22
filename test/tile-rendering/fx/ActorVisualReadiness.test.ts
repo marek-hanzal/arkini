@@ -76,7 +76,6 @@ const createItem = ({
 		primaryAction: {
 			kind: "none",
 		},
-		quantity: 1,
 		revision,
 		running: false,
 		activityEffect: false,

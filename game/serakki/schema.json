@@ -210,8 +210,6 @@
 				"item:portal-transferred",
 				"item:placed",
 				"item:swapped",
-				"item:stacked",
-				"item:split",
 				"item:consumed",
 				"item:input-stored",
 				"item:unit-spent",
@@ -247,10 +245,6 @@
 				"itemId": {
 					"description": "The canonical item ID placed on the initial board.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-				},
-				"quantity": {
-					"description": "The optional stack quantity placed in this exact initial board cell; omitted means one.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
 				}
 			},
 			"required": [
@@ -1625,10 +1619,6 @@
 					"description": "The visual artwork definition used to render this item.",
 					"$ref": "urn:serakki:schema:project#/$defs/ArtworkSchema"
 				},
-				"maxStackSize": {
-					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
-				},
 				"units": {
 					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion output of each item instance.",
 					"$ref": "urn:serakki:schema:project#/$defs/UnitsSchema"
@@ -1673,7 +1663,6 @@
 				"title",
 				"ui",
 				"artwork",
-				"maxStackSize",
 				"maxQueueSize",
 				"lines"
 			],
@@ -1684,11 +1673,6 @@
 				]
 			},
 			"then": {
-				"properties": {
-					"maxStackSize": {
-						"const": 1
-					}
-				},
 				"not": {
 					"required": [
 						"action"

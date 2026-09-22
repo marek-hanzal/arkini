@@ -1,6 +1,5 @@
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
@@ -11,7 +10,6 @@ export const DropItemResultKind = {
 	Swap: "swap",
 	Merge: "merge",
 	StoreInput: "store-input",
-	Stack: "stack",
 	Ignored: "ignored",
 	Reject: "reject",
 } as const;
@@ -41,7 +39,6 @@ interface DropActorState {
 	readonly canonicalItemId: IdSchema.Type;
 	readonly revision: RevisionSchema.Type;
 	readonly location: BoardLocationSchema.Type;
-	readonly quantity: PositiveIntegerSchema.Type;
 }
 
 interface DropTransferredActor {
@@ -49,7 +46,6 @@ interface DropTransferredActor {
 	readonly canonicalItemId: IdSchema.Type;
 	readonly previousRevision: RevisionSchema.Type;
 	readonly previousLocation: BoardLocationSchema.Type;
-	readonly previousQuantity: PositiveIntegerSchema.Type;
 	readonly current: DropActorState | null;
 }
 
@@ -87,7 +83,6 @@ interface DropMergedResult {
 
 interface DropStoredInputResult {
 	readonly kind: typeof DropItemResultKind.StoreInput;
-	readonly storedQuantity: PositiveIntegerSchema.Type;
 	readonly lineId: IdSchema.Type;
 	readonly inputIndex: NonNegativeIntegerSchema.Type;
 	readonly source: DropTransferredActor;
@@ -95,15 +90,6 @@ interface DropStoredInputResult {
 		readonly itemId: IdSchema.Type;
 		readonly revision: RevisionSchema.Type;
 		readonly location: BoardLocationSchema.Type;
-	};
-}
-
-interface DropStackedResult {
-	readonly kind: typeof DropItemResultKind.Stack;
-	readonly transferredQuantity: PositiveIntegerSchema.Type;
-	readonly source: DropTransferredActor;
-	readonly target: Omit<DropTransferredActor, "current"> & {
-		readonly current: DropActorState;
 	};
 }
 
@@ -127,6 +113,5 @@ export type DropItemResult =
 	| DropSwappedResult
 	| DropMergedResult
 	| DropStoredInputResult
-	| DropStackedResult
 	| DropIgnoredResult
 	| DropRejectedResult;

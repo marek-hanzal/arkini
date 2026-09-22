@@ -51,8 +51,6 @@
 			"item:input-stored": "uoimkyf8dxad8q4fvjoznz0j",
 			"item:consumed": "uoimkyf8dxad8q4fvjoznz0j",
 			"item:depleted": "l5ofxpvd9lywzbss6q2cb6tq",
-			"item:split": "gvuu9yvkdn51z9hwblyttyne",
-			"item:stacked": "huor6bfv03ctq6aj3xs7sudw",
 			"item-detail:closed": "jds2ufexkrwsd8d971fr167p",
 			"item-detail:opened": "v84lteiusbdwrd3f14lm94q8",
 			"job-queue:cleared": "avaxbsa7uaxoo01y9lfnc4qx",
@@ -72,295 +70,253 @@
 				"x": 1,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 1,
 				"y": 2,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 1,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 1,
 				"y": 4,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 1,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 2,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 3,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 2,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 2,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 3,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 5,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 5,
 				"y": 4,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 5,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 5,
 				"y": 2,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 5,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 6,
 				"y": 2,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 7,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 4,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 2,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 10,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 10,
 				"y": 2,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 10,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 10,
 				"y": 4,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 10,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 11,
 				"y": 5,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 12,
 				"y": 4,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 12,
 				"y": 3,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 12,
 				"y": 2,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 11,
 				"y": 1,
 				"space": 1,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 4,
 				"space": 0,
-				"itemId": "foundation-chest",
-				"quantity": 1
+				"itemId": "foundation-chest"
 			},
 			{
 				"x": 8,
 				"y": 5,
 				"space": 0,
-				"itemId": "base-camp",
-				"quantity": 1
+				"itemId": "base-camp"
 			},
 			{
 				"x": 6,
 				"y": 5,
 				"space": 0,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 7,
 				"y": 3,
 				"space": 0,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 9,
 				"y": 3,
 				"space": 0,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 10,
 				"y": 5,
 				"space": 0,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 7,
 				"space": 0,
-				"itemId": "tree",
-				"quantity": 1
+				"itemId": "tree"
 			},
 			{
 				"x": 8,
 				"y": 6,
 				"space": 0,
-				"itemId": "forest",
-				"quantity": 1
+				"itemId": "forest"
 			},
 			{
 				"x": 9,
 				"y": 4,
 				"space": 0,
-				"itemId": "stone-deposit",
-				"quantity": 1
+				"itemId": "stone-deposit"
 			},
 			{
 				"x": 7,
 				"y": 4,
 				"space": 0,
-				"itemId": "stone-deposit",
-				"quantity": 1
+				"itemId": "stone-deposit"
 			}
 		]
 	}

@@ -12,7 +12,6 @@
 				"bricks"
 			]
 		},
-		"maxStackSize": 4,
 		"maxQueueSize": 1,
 		"lines": []
 	}

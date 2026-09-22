@@ -9,7 +9,6 @@ export const readSectionForPathFn = (path: ReadonlyArray<PropertyKey>): SectionI
 			return "identity";
 		case "artwork":
 			return "artwork";
-		case "maxStackSize":
 			return "identity";
 		case "units":
 			return "units";

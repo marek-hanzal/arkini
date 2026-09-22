@@ -42,7 +42,6 @@ const createConfig = (distance: "far" | "universe") => {
 				id: "permit",
 				title: "Permit",
 				description: "Dependency left behind in the original space.",
-				maxStackSize: 1,
 			},
 			ingot: {
 				...base.items.tool,
@@ -50,7 +49,6 @@ const createConfig = (distance: "far" | "universe") => {
 				id: "ingot",
 				title: "Ingot",
 				description: "Completion output.",
-				maxStackSize: 1,
 			},
 			blocker: {
 				...base.items.tool,
@@ -58,7 +56,6 @@ const createConfig = (distance: "far" | "universe") => {
 				id: "blocker",
 				title: "Blocker",
 				description: "Fills destination capacity.",
-				maxStackSize: 1,
 			},
 			forge: {
 				...forge,
@@ -124,7 +121,6 @@ const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: num
 				y: 0,
 			},
 		},
-		quantity: 1,
 	});
 	const result = yield* dropItemFx({
 		sourceItemId: owner.id,
@@ -162,7 +158,6 @@ const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
 				y: 1,
 			},
 		},
-		quantity: 1,
 	});
 	yield* startLineFx({
 		ownerItemId,

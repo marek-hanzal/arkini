@@ -18,7 +18,6 @@ describe("BaseSchema draft status", () => {
 					"legacy-item",
 				],
 			},
-			maxStackSize: 1,
 		});
 
 		expect(item.draft).toBeUndefined();

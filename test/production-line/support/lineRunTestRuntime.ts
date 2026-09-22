@@ -14,7 +14,6 @@ const baseItem = ({ id }: { id: string }) => {
 				`artwork:${id}`,
 			],
 		},
-		maxStackSize: 10,
 	} as const;
 };
 
@@ -51,7 +50,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 			...baseItem({
 				id: "workshop",
 			}),
-			maxStackSize: 1,
 
 			maxQueueSize: 2,
 			lines: [
@@ -194,7 +192,7 @@ const ownerItem = {
 			y: 0,
 		},
 	},
-	quantity: 1,
+
 	revision: "revision:owner",
 } satisfies RuntimeItemSchema.Type;
 
@@ -218,12 +216,12 @@ const gridItem = ({
 				y: itemId === "blocker" ? 1 : 0,
 			},
 		},
-		quantity: 1,
+
 		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };
 
-const bufferedWater = ({ id, quantity }: { id: string; quantity: number }) => {
+const bufferedWater = ({ id }: { id: string }) => {
 	return {
 		id,
 		item: lineRunTestConfig.items.water,
@@ -233,7 +231,7 @@ const bufferedWater = ({ id, quantity }: { id: string; quantity: number }) => {
 			lineId: "line:workshop:build",
 			inputIndex: 0,
 		},
-		quantity,
+
 		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };
@@ -244,14 +242,14 @@ export const lineRunRuntime = ({
 	booster = false,
 	floor = false,
 	permit = false,
-	water = [],
+	water = 0,
 }: {
 	adjuster?: boolean;
 	blocker?: boolean;
 	booster?: boolean;
 	floor?: boolean;
 	permit?: boolean;
-	water?: number[];
+	water?: number;
 }) => {
 	const items: RuntimeItemSchema.Type[] = [
 		ownerItem,
@@ -302,14 +300,13 @@ export const lineRunRuntime = ({
 			}),
 		);
 	}
-	water.forEach((quantity, index) => {
+	for (let index = 0; index < water; index += 1) {
 		items.push(
 			bufferedWater({
 				id: `runtime:water:${index}`,
-				quantity,
 			}),
 		);
-	});
+	}
 
 	return {
 		cheats: {

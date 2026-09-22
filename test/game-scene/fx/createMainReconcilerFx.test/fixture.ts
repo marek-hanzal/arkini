@@ -153,7 +153,6 @@ export const createItem = (
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 3,
 	revision: `revision:${id}`,
 	running: false,
 	activityEffect: false,
@@ -434,15 +433,12 @@ export const createMotion = () =>
 		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
-		redirectTargetFx: () => Effect.void,
 		readSnapshotFx: Effect.succeed({
 			interactionClaimByActorId: new Map(),
 			retainedActorIds: new Set(),
 			spawnCueByActorId: new Map(),
-			quantityPresentationByActorId: new Map(),
 		}),
 		startFx: Effect.void,
-		syncPresentationFx: Effect.void,
 	}) satisfies MotionRuntime;
 
 export const createReconcilerHarness = ({

@@ -32,7 +32,6 @@ const ProjectFormPathLabelBySegment = {
 	board: "Board",
 	height: "Height",
 	hero: "Hero image",
-	quantity: "Quantity",
 	start: "Initial layout",
 	title: "Title",
 	introduction: "Introduction",
@@ -121,7 +120,6 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 		currentSpace: project.config.start.currentSpace,
 		board: project.config.start.board.map((entry) => ({
 			...entry,
-			quantity: entry.quantity ?? 1,
 		})),
 	},
 });

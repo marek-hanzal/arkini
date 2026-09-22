@@ -12,7 +12,6 @@
 				"cotton"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 3600000,
 			"enable": true,

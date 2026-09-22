@@ -13,7 +13,6 @@
 				"pumpkin-field"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 12,
 			"output": {

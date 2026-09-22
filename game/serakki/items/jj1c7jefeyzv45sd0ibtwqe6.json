@@ -12,7 +12,6 @@
 				"cauldron-with-soap"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 4,
 			"output": {

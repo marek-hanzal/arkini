@@ -15,14 +15,13 @@ import {
 import { placeOutputForTestFx } from "~test/item-placement/support/placeOutputForTestFx";
 
 describe("output placement transition", () => {
-	it("lets later drops stack into items spawned by earlier drops", () => {
+	it("places every output identity in its own cell across successive drops", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:origin",
 					itemId: "origin",
 					location: boardLocation(0),
-					quantity: 1,
 				});
 
 				const placement = yield* placeOutputForTestFx({
@@ -36,7 +35,7 @@ describe("output placement transition", () => {
 						configuredDrop({
 							itemId: "log",
 							placement: "drop",
-							quantity: 2,
+							quantity: 1,
 						}),
 					]),
 				});
@@ -53,29 +52,15 @@ describe("output placement transition", () => {
 			),
 		);
 
-		expect(result.placement.drop[0]?.placement.spawn).toHaveLength(1);
-		expect(result.placement.drop[1]?.placement.stack).toEqual([
-			{
-				item: expect.objectContaining({
-					quantity: 3,
-				}),
-				quantity: 1,
-			},
+		expect(result.placement.drop[0]?.placement.spawn).toHaveLength(2);
+		expect(result.placement.drop[1]?.placement.spawn).toHaveLength(1);
+		const logs = result.runtime.items.filter((item) => item.item.id === "log");
+		expect(logs.map((item) => item.location)).toEqual([
+			boardLocation(1),
+			boardLocation(2),
+			boardLocation(3),
 		]);
-		expect(result.placement.drop[1]?.placement.spawn).toEqual([
-			expect.objectContaining({
-				location: boardLocation(2),
-				quantity: 1,
-			}),
-		]);
-		expect(
-			result.runtime.items
-				.filter((item) => item.item.id === "log")
-				.map((item) => item.quantity),
-		).toEqual([
-			3,
-			1,
-		]);
+		expect(new Set(logs.map((item) => item.id)).size).toBe(3);
 	});
 });
 it("resolves output rules from the same snapshot that it commits", () => {
@@ -85,13 +70,11 @@ it("resolves output rules from the same snapshot that it commits", () => {
 				id: "runtime:origin",
 				itemId: "origin",
 				location: boardLocation(0),
-				quantity: 1,
 			});
 			const permit = yield* spawnItemFx({
 				id: "runtime:permit",
 				itemId: "permit",
 				location: boardLocation(1),
-				quantity: 1,
 			});
 			const staleRuntime = yield* readRuntimeFx();
 			yield* removeRuntimeItemForTestFx({
@@ -154,19 +137,16 @@ it("rolls back every earlier drop when a later drop cannot be placed", () => {
 				id: "runtime:origin",
 				itemId: "origin",
 				location: boardLocation(0),
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "runtime:blocker:2",
 				itemId: "blocker",
 				location: boardLocation(2),
-				quantity: 1,
 			});
 			yield* spawnItemFx({
 				id: "runtime:blocker:3",
 				itemId: "blocker",
 				location: boardLocation(3),
-				quantity: 1,
 			});
 			for (const {} of [
 				0,

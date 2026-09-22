@@ -13,7 +13,6 @@
 				"empty-pumpkin-field"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

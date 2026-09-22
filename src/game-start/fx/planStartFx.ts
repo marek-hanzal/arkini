@@ -1,107 +1,46 @@
-import { Data, Effect } from "effect";
-
-import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { Effect } from "effect";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
-import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
-import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
-import { planSpawnPlacementFx } from "~/item-placement/fx/planSpawnPlacementFx";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
-
-type StartGridLocation = BoardLocationSchema.Type;
-
-interface PlanStartProps {
+/** Builds one exact identity per authored Board cell, then validates the complete runtime. */
+export const planStartFx = Effect.fn("planStartFx")(function* ({
+	runtime,
+	start,
+}: {
 	readonly runtime: RuntimeSchema.Type;
 	readonly start: StartSchema.Type;
-}
-
-interface ApplyExactGridStackProps {
-	readonly runtime: RuntimeSchema.Type;
-	readonly itemId: IdSchema.Type;
-	readonly location: StartGridLocation;
-	readonly quantity: PositiveIntegerSchema.Type;
-}
-
-/** One exact initial grid slot cannot hold the complete requested stack quantity. */
-class StartSlotUnavailableError extends Data.TaggedError("StartSlotUnavailableError")<{
-	itemId: IdSchema.Type;
-	quantity: PositiveIntegerSchema.Type;
-	remainingQuantity: PositiveIntegerSchema.Type;
-	scope: typeof LocationScopeEnumSchema.enum.Board;
-}> {}
-
-const applyExactGridStackFx = Effect.fn("planStartFx.applyExactGridStackFx")(function* ({
-	runtime,
-	itemId,
-	location,
-	quantity,
-}: ApplyExactGridStackProps) {
-	const item = yield* resolveItemFx({
-		itemId,
-	});
-	const spawn = yield* planSpawnPlacementFx({
-		item,
-		locations: [
-			location,
-		],
-		quantity,
-	});
-	const plan = {
-		remove: [],
-		spawn,
-		stack: [],
-	} satisfies PlacementPlan;
-	const placedQuantity = readPlacementPlanQuantityFn({
-		plan,
-	});
-	if (placedQuantity !== quantity) {
-		return yield* Effect.fail(
-			new StartSlotUnavailableError({
-				itemId,
-				quantity,
-				remainingQuantity: quantity - placedQuantity,
-				scope: location.scope,
-			}),
-		);
-	}
-	const [, nextRuntime] = yield* applyPlacementPlanFx({
-		plan,
-		runtime,
-	});
-	return nextRuntime;
-});
-
-/** Builds the exact initial runtime by applying every start entry sequentially. */
-export const planStartFx = Effect.fn("planStartFx")(function* ({ runtime, start }: PlanStartProps) {
-	const board = yield* Effect.reduce(
-		start.board,
-		() => ({
-			...runtime,
-			currentSpace: start.currentSpace,
-		}),
-		(draft, item) =>
-			applyExactGridStackFx({
-				itemId: item.itemId,
+}) {
+	const items = yield* Effect.forEach(start.board, (entry) =>
+		Effect.gen(function* () {
+			return yield* createRuntimeItemFx({
+				id: yield* createRuntimeItemIdFx(),
+				item: yield* resolveItemFx({
+					itemId: entry.itemId,
+				}),
 				location: {
-					space: item.space,
+					scope: "board",
+					space: entry.space,
 					position: {
-						x: item.x,
-						y: item.y,
+						x: entry.x,
+						y: entry.y,
 					},
-					scope: LocationScopeEnumSchema.enum.Board,
 				},
-				quantity: item.quantity ?? 1,
-				runtime: draft,
-			}),
+			});
+		}),
 	);
+	const next = {
+		...runtime,
+		currentSpace: start.currentSpace,
+		items: [
+			...runtime.items,
+			...items,
+		],
+	};
 	yield* assertRuntimeFx({
-		runtime: board,
+		runtime: next,
 	});
-
-	return board;
+	return next;
 });

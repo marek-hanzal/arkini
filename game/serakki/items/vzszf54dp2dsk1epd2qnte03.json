@@ -12,7 +12,6 @@
 				"sawmill"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 6,
 		"lines": [
 			{

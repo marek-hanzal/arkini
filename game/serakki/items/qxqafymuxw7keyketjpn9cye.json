@@ -12,7 +12,6 @@
 				"feather"
 			]
 		},
-		"maxStackSize": 12,
 		"merge": [
 			{
 				"target": {

@@ -12,7 +12,6 @@
 				"knowledge-t3"
 			]
 		},
-		"maxStackSize": 4,
 		"maxQueueSize": 1,
 		"lines": []
 	}

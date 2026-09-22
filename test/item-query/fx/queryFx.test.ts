@@ -41,7 +41,6 @@ const config = GameConfigSchema.parse({
 					"artwork:tree",
 				],
 			},
-			maxStackSize: 10,
 		},
 	},
 });
@@ -50,7 +49,6 @@ const item = (id: string, location: LocationSchema.Type): RuntimeItemSchema.Type
 	id,
 	item: config.items.tree,
 	location,
-	quantity: 1,
 	revision: `revision:${id}`,
 });
 

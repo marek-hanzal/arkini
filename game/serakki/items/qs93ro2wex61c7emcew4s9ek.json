@@ -12,7 +12,6 @@
 				"herb-garden"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 16,
 			"output": {

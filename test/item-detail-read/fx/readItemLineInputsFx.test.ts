@@ -11,9 +11,7 @@ import {
 } from "~test/production-line/support/lineRunTestRuntime";
 
 const base = lineRunRuntime({
-	water: [
-		2,
-	],
+	water: 2,
 });
 const owner = base.items[0];
 const water = base.items[1];
@@ -65,7 +63,7 @@ it("separates obtainable material from the exact slot's stored fill and does not
 	).toMatchObject({
 		filled: 0,
 		available: true,
-		availableQuantity: 2,
+		availableQuantity: 1,
 		canAutofill: true,
 	});
 	expect(readFn(base)[0]).toMatchObject({
@@ -149,12 +147,7 @@ it("keeps travelling material available but unfilled until canonical input settl
 				kind: "line-input",
 				ownerItemId: owner.id,
 				lineId: line.id,
-				input: [
-					{
-						inputIndex: 0,
-						quantity: 2,
-					},
-				],
+				inputIndex: 0,
 			},
 		},
 	} satisfies RuntimeItemSchema.Type;
@@ -169,7 +162,7 @@ it("keeps travelling material available but unfilled until canonical input settl
 	).toMatchObject({
 		filled: 0,
 		available: true,
-		availableQuantity: 2,
+		availableQuantity: 1,
 		committed: false,
 	});
 	expect(readFn(base)[0]).toMatchObject({
@@ -214,7 +207,6 @@ it.each([
 		};
 		const committed = {
 			...water,
-			quantity: 3,
 			location: {
 				scope: mode === "consume" ? "job" : "reserved",
 				jobId: job.id,
@@ -251,7 +243,7 @@ it.each([
 				],
 			})[0],
 		).toMatchObject({
-			filled: 3,
+			filled: 1,
 			committed: true,
 		});
 		expect(
@@ -290,7 +282,6 @@ it("counts all obtainable stock beyond one job capacity without including other 
 	const source = {
 		...water,
 		id: "free-water",
-		quantity: 12,
 		location: {
 			scope: "board" as const,
 			space: 0,
@@ -303,7 +294,6 @@ it("counts all obtainable stock beyond one job capacity without including other 
 	const secondSource = {
 		...source,
 		id: "secondSource-water",
-		quantity: 4,
 		location: {
 			scope: "board" as const,
 			space: 0,
@@ -316,7 +306,6 @@ it("counts all obtainable stock beyond one job capacity without including other 
 	const far = {
 		...source,
 		id: "far-water",
-		quantity: 100,
 		location: {
 			scope: "board" as const,
 			space: 1,
@@ -329,7 +318,6 @@ it("counts all obtainable stock beyond one job capacity without including other 
 	const claimed = {
 		...source,
 		id: "claimed-water",
-		quantity: 100,
 		location: {
 			scope: "reserved",
 			jobId: "other-job",
@@ -344,13 +332,27 @@ it("counts all obtainable stock beyond one job capacity without including other 
 				water,
 				source,
 				secondSource,
+				...[
+					3,
+					4,
+				].map((x) => ({
+					...source,
+					id: `extra:${x}`,
+					location: {
+						...source.location,
+						position: {
+							x,
+							y: 0,
+						},
+					},
+				})),
 				far,
 				claimed,
 			],
 		})[0],
 	).toMatchObject({
-		filled: 2,
-		availableQuantity: 16,
+		filled: 1,
+		availableQuantity: 4,
 	});
 });
 
@@ -365,7 +367,6 @@ it("isolates active material and gives shared buffers only to the first same-lin
 	const committed = {
 		...water,
 		id: "committed",
-		quantity: 3,
 		location: {
 			scope: "reserved",
 			jobId: job.id,
@@ -375,7 +376,6 @@ it("isolates active material and gives shared buffers only to the first same-lin
 	const free = {
 		...water,
 		id: "free",
-		quantity: 5,
 		location: {
 			scope: "board" as const,
 			space: 0,
@@ -428,12 +428,12 @@ it("isolates active material and gives shared buffers only to the first same-lin
 		)[0];
 	expect(readWorkFn("active", "active")).toMatchObject({
 		canAutofill: false,
-		filled: 3,
+		filled: 1,
 		committed: true,
-		availableQuantity: 5,
+		availableQuantity: 1,
 	});
 	expect(readWorkFn("queued", "first")).toMatchObject({
-		filled: 2,
+		filled: 1,
 		committed: false,
 	});
 	expect(readWorkFn("queued", "second")).toMatchObject({
@@ -441,7 +441,7 @@ it("isolates active material and gives shared buffers only to the first same-lin
 		filled: 0,
 		committed: false,
 		available: true,
-		availableQuantity: 5,
+		availableQuantity: 1,
 	});
 	expect(readWorkFn("active", "missing")).toMatchObject({
 		canAutofill: false,
@@ -454,7 +454,7 @@ it("isolates active material and gives shared buffers only to the first same-lin
 			jobQueue: runtime.jobQueue.slice(1),
 		}),
 	).toMatchObject({
-		filled: 2,
+		filled: 1,
 		committed: false,
 	});
 	const empty = {
@@ -478,7 +478,6 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 	): RuntimeItemSchema.Type => ({
 		...water,
 		id,
-		quantity: 1,
 		item: {
 			...water.item,
 			clock: {
@@ -593,7 +592,6 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 it("shows interval-only Clock phase from stored material without borrowing an unfilled source's clock", () => {
 	const item: RuntimeItemSchema.Type = {
 		...water,
-		quantity: 1,
 		item: {
 			...water.item,
 			clock: {

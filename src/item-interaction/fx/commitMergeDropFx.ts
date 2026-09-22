@@ -57,7 +57,6 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 					itemId: result.sourceBefore.id,
 					previousRevision: result.sourceBefore.revision,
 					previousLocation: result.sourceBefore.location,
-					previousQuantity: result.sourceBefore.quantity,
 					current: sourceCurrent,
 				},
 				target,

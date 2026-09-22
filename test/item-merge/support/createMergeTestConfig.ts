@@ -6,12 +6,10 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 const simpleItem = ({
 	units,
 	id,
-	maxStackSize = 10,
 	merge,
 }: {
 	units?: UnitsSchema.Type;
 	id: string;
-	maxStackSize?: number;
 	merge?: readonly [
 		MergeSchema.Type,
 		...MergeSchema.Type[],
@@ -31,7 +29,6 @@ const simpleItem = ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize,
 	merge,
 });
 
@@ -40,18 +37,14 @@ export const createMergeTestConfig = ({
 		width: 4,
 		height: 2,
 	},
-	outputMaxStackSize = 10,
 	rule,
 	sourceUnits,
-	sourceMaxStackSize = 10,
-	targetMaxStackSize = 10,
 	targetUnits,
 }: {
 	board?: {
 		width: number;
 		height: number;
 	};
-	outputMaxStackSize?: number;
 	rule:
 		| MergeSchema.Type
 		| readonly [
@@ -59,8 +52,6 @@ export const createMergeTestConfig = ({
 				...MergeSchema.Type[],
 		  ];
 	sourceUnits?: UnitsSchema.Type;
-	sourceMaxStackSize?: number;
-	targetMaxStackSize?: number;
 	targetUnits?: UnitsSchema.Type;
 }) =>
 	GameConfigSchema.parse({
@@ -79,7 +70,7 @@ export const createMergeTestConfig = ({
 			source: simpleItem({
 				units: sourceUnits,
 				id: "source",
-				maxStackSize: sourceMaxStackSize,
+
 				merge: Array.isArray(rule)
 					? (rule as [
 							MergeSchema.Type,
@@ -92,26 +83,21 @@ export const createMergeTestConfig = ({
 			target: simpleItem({
 				units: targetUnits,
 				id: "target",
-				maxStackSize: targetMaxStackSize,
 			}),
 			result: simpleItem({
 				id: "result",
 			}),
 			output: simpleItem({
 				id: "output",
-				maxStackSize: outputMaxStackSize,
 			}),
 			"output:a": simpleItem({
 				id: "output:a",
-				maxStackSize: 1,
 			}),
 			"output:b": simpleItem({
 				id: "output:b",
-				maxStackSize: 1,
 			}),
 			blocker: simpleItem({
 				id: "blocker",
-				maxStackSize: 1,
 			}),
 		},
 	});

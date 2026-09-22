@@ -12,7 +12,6 @@
 				"hide"
 			]
 		},
-		"maxStackSize": 12,
 		"maxQueueSize": 1,
 		"lines": []
 	}

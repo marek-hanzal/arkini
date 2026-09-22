@@ -12,7 +12,6 @@
 				"fighting-british-shorthairs"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 20000,
 			"enable": true,

@@ -12,7 +12,6 @@
 				"bow-and-arrows"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 8,
 			"output": {

@@ -12,7 +12,6 @@
 				"cotton-fabric"
 			]
 		},
-		"maxStackSize": 6,
 		"merge": [
 			{
 				"target": {

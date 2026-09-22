@@ -12,7 +12,6 @@
 				"sugar-beet"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 2700000,
 			"enable": true,

@@ -12,7 +12,6 @@
 				"corrupted-british-shorthair-full-belly"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 60000,
 			"enable": true,

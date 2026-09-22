@@ -20,7 +20,6 @@ export const item = {
 	primaryAction: {
 		kind: "none",
 	},
-	quantity: 1,
 	revision: "revision:log",
 	running: false,
 	activityEffect: false,
@@ -52,14 +51,10 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		container: new Container(),
 		item: actorItem,
 		primary: new Sprite(Texture.EMPTY),
-		quantity: new Text({
-			text: String(actorItem.quantity),
-		}),
-		quantityBackground: new Graphics(),
-		stackQuantity: new Text({
+		badge: new Text({
 			text: "",
 		}),
-		stackQuantityBackground: new Graphics(),
+		badgeBackground: new Graphics(),
 		readyListeners: new Set(),
 		releaseTexturesFn: () => {},
 		reportCriticalFailureFn: () => {},

@@ -15,7 +15,6 @@ describe("main reconciliation / snapshot ownership", () => {
 	it("applies same-frame add, update, and removal from one classified snapshot", () => {
 		const previous = createItem("runtime:update", boardLocation);
 		const current = createItem(previous.id, boardLocation, {
-			quantity: 4,
 			revision: "revision:update:4",
 		});
 		const removed = createItem("runtime:removed", boardLocation);
@@ -62,7 +61,6 @@ describe("main reconciliation / snapshot ownership", () => {
 	it("keeps a closed owner inert while a remounted owner reconciles the current snapshot", () => {
 		const previous = createItem("runtime:remount", boardLocation);
 		const current = createItem(previous.id, boardLocation, {
-			quantity: 5,
 			revision: "revision:remount:5",
 		});
 		const closedHarness = createReconcilerHarness({

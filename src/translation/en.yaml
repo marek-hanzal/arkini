@@ -138,7 +138,7 @@ Authored Units amount summary help:
   value: |
     Units stored inside each new item.
 
-    A stack may hold several items, and each item keeps this amount separately.
+    Each item keeps its own supply.
 Authored Units depletion output summary help:
   value: |
     Runs when an item's Units reach zero.
@@ -148,7 +148,7 @@ Authored Units summary help:
   value: |
     Units are a spendable supply inside each item.
 
-    A stack of several items has several separate Unit supplies.
+    Spending Units affects only that item.
 Authored action summary help:
   value: |
     Runs when the player uses this item.
@@ -464,7 +464,7 @@ Copied:
   value: Copied
 Copy Clock section help:
   value: |
-    Copying a Clock removes the destination Action and sets maximum stack size to **1**.
+    Copying a Clock removes the destination Action.
 Copy URL:
   value: Copy URL
 Copy action section help:
@@ -476,7 +476,7 @@ Copy from…:
   value: Copy from…
 Copy identity section help:
   value: |
-    **Item ID**, **UID** and **Draft** stay unchanged. An existing Clock keeps maximum stack size at **1**.
+    **Item ID**, **UID** and **Draft** stay unchanged.
 Copy password:
   value: Copy password
 Copy production section help:
@@ -734,7 +734,7 @@ Exact count condition help:
   value: |
     Passes when matching items add up to exactly this number.
 
-    Example: a stack of 3 counts as **3**.
+    Each matching item counts as **1**.
 Exists:
   value: Exists
 Exists condition help:
@@ -842,7 +842,7 @@ Initial units:
   value: Initial units
 Initial units help:
   value: |
-    Units given to each new item, separate from stack quantity.
+    Units given to each new item.
 
     Unit costs and **Spend** merges reduce them. At zero, the item depletes and may create its depletion output.
 Input:
@@ -909,7 +909,7 @@ Item clock help:
     - **Stop immediately** cancels unfinished work at expiry; anything that cannot fit is lost.
     - Every Enable rule must pass; any matching Disable rule pauses the Clock.
 
-    Time advances in every location while Clock rules allow it; production pulses require a Board. Enabling Clock removes Action and sets maximum stack size to one.
+    Time advances in every location while Clock rules allow it; production pulses require a Board. Enabling Clock removes Action.
 Item connections help:
   value: |
     Connections answers four quick questions:
@@ -977,7 +977,7 @@ Item identity help:
   value: |
     The Item page is the overview: artwork, Production, Merges, Units, Clock and Action in one place.
 
-    - **Maximum stack size** limits how many items share one cell.
+    - Each cell holds one item.
     - **Show all** opens the full detail page for a section; **Edit** opens its form.
 
     Action cannot coexist with Production or Clock. Merges work independently.
@@ -1048,7 +1048,7 @@ Item section copy help:
 
     - **Item** keeps Item ID, UID and Draft.
     - **Production** copies every line and queue size; nonempty Production removes Action.
-    - **Clock** removes Action and sets maximum stack size to one.
+    - **Clock** removes Action.
     - **Action** removes Production and Clock.
     - Artwork, Merges and Units replace their complete section.
 
@@ -1059,14 +1059,6 @@ Item sent through portal:
 Item spawned:
   value: Item spawned
   dynamic: true
-Item split:
-  value: Item split
-  dynamic: true
-Item stack size help:
-  value: |
-    How many items may share one cell.
-
-    This is separate from **Units** inside each item. Clock requires a stack size of one.
 Item unavailable:
   value: Item unavailable
 Item units empty title:
@@ -1080,11 +1072,6 @@ Items:
   value: Items
 Items merged:
   value: Items merged
-  dynamic: true
-Items per stack:
-  value: Items per stack
-Items stacked:
-  value: Items stacked
   dynamic: true
 Items swapped:
   value: Items swapped
@@ -1141,7 +1128,7 @@ Local drop:
   value: Local drop
 Local drop placement help:
   value: |
-    Places output beside the item that produced it, filling compatible stacks and nearby empty cells first.
+    Places each output item in a nearby empty cell beside the item that produced it.
 Local server:
   value: Local server
 Loose-kill:
@@ -1199,8 +1186,6 @@ Maximum:
   value: Maximum
 Maximum count:
   value: Maximum count
-Maximum stack size:
-  value: Maximum stack size
 Merge:
   value: Merge
 Merge output:
@@ -1222,24 +1207,22 @@ Merge source spend help:
     At zero Units, that item depletes and may create its depletion output.
 Merge source use help:
   value: |
-    **Use** keeps the dragged item and places it back near the target.
+    **Use** keeps the dragged item in its original cell.
 
-    Items with spent Units, active time, stored inputs or production work cannot be split safely. A plain reusable tool works well.
+    Items with Units, Clock state, stored inputs or production work cannot be reused this way. A plain reusable tool works well.
 Merge target keep help:
   value: |
-    **Keep** leaves the complete target stack unchanged.
+    **Keep** leaves the target item unchanged.
 
     The dragged item and optional merge output still do their part. Useful for keys, tools or payments.
 Merge target remove help:
   value: |
     **Remove** deletes one target item.
-
-    If the target is a larger stack, the rest stays.
 Merge target replace help:
   value: |
     **Replace** swaps one target item for **Replace by** in the same cell.
 
-    Extra items in the target stack move nearby. Units transfer only to a compatible replacement.
+    Units transfer only to a compatible replacement.
 Merge target spend help:
   value: |
     **Spend** removes one Unit from the target and leaves it in place.
@@ -1654,7 +1637,7 @@ Random:
   value: Random
 Random drop placement help:
   value: |
-    Starts from a random cell on the current Board, then fills compatible stacks and nearby empty cells.
+    Starts from a random cell on the current Board, then places each item in a nearby empty cell.
 
     Useful when output should spread around instead of appearing beside its producer.
 Reading image…:
@@ -1884,8 +1867,6 @@ Simple input type help:
     Adds no Material or Unit cost.
 
     Other inputs on the same line or action must still be ready.
-Single item:
-  value: Single item
 Size:
   value: Size
 Slowest first:
@@ -1902,7 +1883,7 @@ Space action help:
   value: |
     After rules pass and Unit costs are paid, using the item enters the chosen Space.
 
-    The item stays where it is. Dropping another item onto this portal sends that stack to the target Board without moving the player.
+    The item stays where it is. Dropping another item onto this portal sends that item to the target Board without moving the player.
 Space action summary help:
   value: |
     Enters the chosen Space after every rule and requirement passes.
@@ -1918,8 +1899,6 @@ Spend:
 Spends one unit:
   value: Spends one unit
   dynamic: true
-Stack capacity:
-  value: Stack capacity
 Start Local MCP:
   value: Start Local MCP
 Start Remote MCP:
@@ -1930,10 +1909,10 @@ Starting layout controls help:
   value: |
     ### Editing the starting layout
 
-    - **Click** an empty cell to choose an item; click a stack to add one.
+    - **Click** an empty cell to choose an item.
     - **Right-click** removes one item.
-    - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move a stack and replace the destination.
-    - **Minus** removes one item; **Delete** removes the whole stack.
+    - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move an item and replace the destination.
+    - **Minus** or **Delete** removes the item.
 Status:
   value: Status
 Still missing a few ingredients. Bring them over to get things moving.:
@@ -1958,7 +1937,7 @@ Target space help:
   value: |
     The Board Space entered when the action succeeds.
 
-    Dropping an item onto this portal sends the stack there without moving the player. Spaces start at `0`.
+    Dropping an item onto this portal sends the item there without moving the player. Spaces start at `0`.
 Target unit cost help:
   value: |
     Choose a Board item that pays the Unit cost.
@@ -2130,14 +2109,8 @@ When an item spends one or more Units.:
 When an item's Lifetime reaches zero.:
   value: When an item's Lifetime reaches zero.
   dynamic: true
-When matching item quantities join.:
-  value: When matching item quantities join.
-  dynamic: true
 When one item is applied to another.:
   value: When one item is applied to another.
-  dynamic: true
-When part of an item stack is separated.:
-  value: When part of an item stack is separated.
   dynamic: true
 When production consumes an input.:
   value: When production consumes an input.

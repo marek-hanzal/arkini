@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { readTileDeliveriesFx } from "~/game-scene/fx/readTileDeliveriesFx";
-import { settleItemDeliveryFx } from "~test/support/settleItemDeliveryFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -26,13 +25,11 @@ describe("readTileDeliveriesFx", () => {
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: workshopLocation,
-					quantity: 1,
 				});
 				yield* spawnItemFx({
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation(2),
-					quantity: 7,
 				});
 				yield* autofillLineInputsFx({
 					ownerItemId: "runtime:workshop",
@@ -43,13 +40,26 @@ describe("readTileDeliveriesFx", () => {
 					game,
 					runtime: outboundRuntime,
 				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
 				const returning = yield* readTileDeliveriesFx({
 					game,
-					runtime: yield* readRuntimeFx(),
+					runtime: {
+						...outboundRuntime,
+						items: outboundRuntime.items.map((item) =>
+							item.location.scope === "delivery"
+								? {
+										...item,
+										location: {
+											scope: "delivery",
+											phase: "returning",
+											generation: 1,
+											remainingDurationMs: 300,
+											origin: item.location.origin,
+											returnFrom: workshopLocation,
+										},
+									}
+								: item,
+						),
+					},
 				});
 				return {
 					outbound,
@@ -73,7 +83,6 @@ describe("readTileDeliveriesFx", () => {
 					primaryAction: {
 						kind: "none",
 					},
-					quantity: 7,
 				},
 				phase: "outbound",
 				targetActorId: "runtime:workshop",
@@ -87,7 +96,6 @@ describe("readTileDeliveriesFx", () => {
 				remainingDurationMs: 300,
 				item: {
 					id: "runtime:water",
-					quantity: 4,
 				},
 				phase: "returning",
 				to: sourceLocation(2),

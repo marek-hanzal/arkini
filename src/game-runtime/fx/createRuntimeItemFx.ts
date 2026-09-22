@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
@@ -12,7 +11,6 @@ interface CreateRuntimeItemProps<Location extends LocationSchema.Type> {
 	id: IdSchema.Type;
 	item: ItemSchema.Type;
 	location: Location;
-	quantity: PositiveIntegerSchema.Type;
 	remainingUnits?: number;
 }
 
@@ -28,14 +26,13 @@ type CreateRuntimeItemResult<Location extends LocationSchema.Type> = Omit<
  */
 export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 	Location extends LocationSchema.Type,
->({ id, item, location, quantity, remainingUnits }: CreateRuntimeItemProps<Location>) {
+>({ id, item, location, remainingUnits }: CreateRuntimeItemProps<Location>) {
 	const revision = yield* createRevisionFx();
 	const schedule = readItemScheduleFn(item);
 	return {
 		id,
 		item,
 		location,
-		quantity,
 		schedule:
 			schedule === undefined
 				? undefined

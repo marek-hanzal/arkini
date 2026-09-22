@@ -12,7 +12,6 @@
 				"water-bucket"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

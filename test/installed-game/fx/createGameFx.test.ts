@@ -323,7 +323,6 @@ describe("createGameFx", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 		await Effect.runPromise(first.disposeFx);
@@ -394,7 +393,6 @@ describe("createGameFx", () => {
 						y: 0,
 					},
 				},
-				quantity: 1,
 			}),
 		);
 
@@ -416,7 +414,6 @@ describe("createGameFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			),
 		).rejects.toThrow("Game session is shutting down.");

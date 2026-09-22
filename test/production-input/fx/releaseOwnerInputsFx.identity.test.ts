@@ -9,7 +9,7 @@ import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/remov
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
-const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
+const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -20,7 +20,6 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize,
 });
 
 const materialInput = (itemId: string) => ({
@@ -118,7 +117,6 @@ const config = GameConfigSchema.parse({
 
 			...baseItem({
 				id: "material",
-				maxStackSize: 10,
 			}),
 		},
 		blocker: {
@@ -143,7 +141,6 @@ const boardOwner = {
 			y: 0,
 		},
 	},
-	quantity: 1,
 };
 
 const inputItem = ({
@@ -167,7 +164,7 @@ const inputItem = ({
 		lineId: ownerItemId === boardOwner.id ? "line:outer" : "line:worker",
 		inputIndex,
 	},
-	quantity: 1,
+
 	remainingUnits,
 });
 
@@ -200,7 +197,7 @@ const runRemoveFx = (state: StateSchema.Type) =>
 	);
 
 describe("releaseOwnerInputsFx existing identity", () => {
-	it("allows a pure buffered root to normalize into an existing stack", () => {
+	it("preserves a buffered identity beside an existing same-definition identity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
@@ -216,10 +213,9 @@ describe("releaseOwnerInputsFx existing identity", () => {
 						inputIndex: 2,
 						itemId: "material",
 					}),
-					quantity: 3,
 				},
 				{
-					id: "runtime:material-stack",
+					id: "runtime:material:existing",
 					itemId: "material",
 					location: {
 						scope: "board" as const,
@@ -229,7 +225,6 @@ describe("releaseOwnerInputsFx existing identity", () => {
 							y: 0,
 						},
 					},
-					quantity: 2,
 				},
 			],
 			jobQueue: [],
@@ -238,49 +233,26 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		const result = Effect.runSync(runRemoveFx(state));
 
 		expect(Result.isSuccess(result.attempt)).toBe(true);
-		expect(result.after.items.some((item) => item.id === "runtime:buffered-material")).toBe(
-			false,
-		);
+		expect(result.after.items).toHaveLength(2);
 		expect(
-			result.after.items.find((item) => item.id === "runtime:material-stack"),
-		).toMatchObject({
-			quantity: 5,
+			result.after.items.find((item) => item.id === "runtime:buffered-material")?.location,
+		).toEqual(boardOwner.location);
+		expect(
+			result.after.items.find((item) => item.id === "runtime:material:existing")?.location,
+		).toEqual({
+			scope: "board",
+			space: 2,
+			position: {
+				x: 1,
+				y: 0,
+			},
 		});
-		expect(result.events).toEqual([
-			{
-				type: GameEventEnumSchema.enum.ItemDisappeared,
-				itemId: boardOwner.id,
-				canonicalItemId: boardOwner.itemId,
-				location: boardOwner.location,
-				quantity: boardOwner.quantity,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				snapshot: result.before.items.find(
-					(item) => item.id === "runtime:buffered-material",
-				),
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemStacked,
-				itemId: "runtime:material-stack",
-				canonicalItemId: "material",
-				originItemId: boardOwner.id,
-				location: {
-					scope: "board",
-					space: 2,
-					position: {
-						x: 1,
-						y: 0,
-					},
-				},
-				previousQuantity: 2,
-				quantity: 5,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				snapshot: result.before.items.find((item) => item.id === boardOwner.id),
-			},
-		]);
+		expect(result.events).toContainEqual(
+			expect.objectContaining({
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				itemId: "runtime:buffered-material",
+			}),
+		);
 	});
 });
 
@@ -337,7 +309,6 @@ it("preserves one impure buffered root and its passive subtree", () => {
 			itemId: boardOwner.id,
 			canonicalItemId: boardOwner.itemId,
 			location: boardOwner.location,
-			quantity: boardOwner.quantity,
 		},
 		{
 			type: GameEventEnumSchema.enum.ItemPlaced,
@@ -358,7 +329,6 @@ it("preserves one impure buffered root and its passive subtree", () => {
 					y: 0,
 				},
 			},
-			quantity: 1,
 		},
 		{
 			type: GameEventEnumSchema.enum.ItemRemoved,
@@ -400,7 +370,6 @@ it("rolls back the whole removal when one impure root has no exclusive cell", ()
 						y: 0,
 					},
 				},
-				quantity: 1,
 			},
 			{
 				id: "runtime:other-space-blocker",
@@ -413,7 +382,6 @@ it("rolls back the whole removal when one impure root has no exclusive cell", ()
 						y: 0,
 					},
 				},
-				quantity: 1,
 			},
 		],
 		jobQueue: [],

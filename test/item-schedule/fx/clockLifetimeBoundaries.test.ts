@@ -78,13 +78,13 @@ describe("Clock lifetime boundaries", () => {
 				yield* spawnItemFx({
 					id: "owner",
 					itemId: "owner",
-					quantity: 1,
+
 					location: board(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
 					itemId: "temporary",
-					quantity: 1,
+
 					location: board(1),
 				});
 				yield* storeInputMaterialFx({
@@ -93,7 +93,6 @@ describe("Clock lifetime boundaries", () => {
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
-					quantity: 1,
 				});
 				const stored = yield* readRuntimeFx();
 				const aging = yield* advanceItemSchedulesFx({
@@ -180,19 +179,19 @@ describe("Clock lifetime boundaries", () => {
 				yield* spawnItemFx({
 					id: "owner",
 					itemId: "owner",
-					quantity: 1,
+
 					location: board(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
 					itemId: "temporary",
-					quantity: 1,
+
 					location: board(1),
 				});
 				const child = yield* spawnItemFx({
 					id: "child",
 					itemId: "residue",
-					quantity: 1,
+
 					location: board(2),
 				});
 				yield* storeInputMaterialFx({
@@ -201,7 +200,6 @@ describe("Clock lifetime boundaries", () => {
 					inputIndex: 0,
 					sourceItemId: child.id,
 					sourceItemRevision: child.revision,
-					quantity: 1,
 				});
 				const current = (yield* readRuntimeFx()).items.find(
 					(item) => item.id === material.id,
@@ -213,7 +211,6 @@ describe("Clock lifetime boundaries", () => {
 					inputIndex: 0,
 					sourceItemId: current.id,
 					sourceItemRevision: current.revision,
-					quantity: 1,
 				});
 				return yield* tickClockFx(100);
 			}).pipe(
@@ -276,13 +273,13 @@ describe("Clock lifetime boundaries", () => {
 				yield* spawnItemFx({
 					id: "owner",
 					itemId: "owner",
-					quantity: 1,
+
 					location: board(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
 					itemId: "temporary",
-					quantity: 1,
+
 					location: board(1),
 				});
 				yield* storeInputMaterialFx({
@@ -291,7 +288,6 @@ describe("Clock lifetime boundaries", () => {
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: "owner",

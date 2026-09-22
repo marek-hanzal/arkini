@@ -92,9 +92,6 @@ export const formatGameRuntimeDiffTextFn = ({
 		formatFn: (item) => formatGameDiagnosticItemReferenceTextFn(item.item),
 		formatChangeFn: (previous, item) =>
 			formatChangesFn([
-				previous.quantity === item.quantity
-					? null
-					: `quantity ${previous.quantity} → ${item.quantity}`,
 				previous.remainingUnits === item.remainingUnits
 					? null
 					: `units ${previous.remainingUnits ?? "none"} → ${item.remainingUnits ?? "none"}`,

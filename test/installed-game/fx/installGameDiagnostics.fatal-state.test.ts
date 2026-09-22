@@ -103,7 +103,7 @@ describe("Game fatal-state diagnostics", () => {
 								y: 2,
 							},
 						},
-						quantity: 1,
+
 						revision: "revision:depleted-owner",
 						remainingUnits: 0,
 					},

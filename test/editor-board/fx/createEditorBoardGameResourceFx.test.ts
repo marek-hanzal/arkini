@@ -42,13 +42,10 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 			const before = yield* SubscriptionRef.get(owner.state);
 			if (before.type !== "ready") throw new Error("Initial game is missing.");
 			const oldGame = before.resource.game;
-			const startItems = oldGame
-				.getSnapshotFn()
-				.items.map(({ item, location, quantity }) => ({
-					item,
-					location,
-					quantity,
-				}));
+			const startItems = oldGame.getSnapshotFn().items.map(({ item, location }) => ({
+				item,
+				location,
+			}));
 			yield* oldGame.runFx(
 				spawnItemFx({
 					id: "runtime:reset-probe",
@@ -61,7 +58,6 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 			yield* oldGame.runFx(
@@ -76,10 +72,9 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 			if (after.type !== "ready") throw new Error("Reset game is missing.");
 			expect(after.resource.game).not.toBe(oldGame);
 			expect(
-				after.resource.game.getSnapshotFn().items.map(({ item, location, quantity }) => ({
+				after.resource.game.getSnapshotFn().items.map(({ item, location }) => ({
 					item,
 					location,
-					quantity,
 				})),
 			).toEqual(startItems);
 			expect(after.resource.game.getSnapshotFn().cheats.speedUpGameplay).toBe(false);

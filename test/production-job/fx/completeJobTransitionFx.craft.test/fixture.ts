@@ -26,7 +26,6 @@ export const runCraft = <A, E>(
 
 export const spawnCraftFx = Effect.fn("spawnCraftFx")(function* ({
 	itemId,
-	quantity = 1,
 }: {
 	readonly itemId: CraftItemId;
 	readonly quantity?: number;
@@ -42,7 +41,6 @@ export const spawnCraftFx = Effect.fn("spawnCraftFx")(function* ({
 			scope: "board",
 			space: 0,
 		},
-		quantity,
 	});
 });
 
@@ -56,7 +54,6 @@ export const projectRandomCraftOutputFx = Effect.fn("projectRandomCraftOutputFx"
 		.map((item) => ({
 			itemId: item.item.id,
 			location: item.location,
-			quantity: item.quantity,
 		}))
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second)));
 });

@@ -33,7 +33,7 @@ describe("main drag controller: pointer", () => {
 			button: 2,
 			ctrlKey: false,
 			shiftKey: true,
-			intent: "split-stack",
+			intent: "primary",
 		},
 	])("maps ordinary item clicks to $intent", async ({ button, ctrlKey, shiftKey, intent }) => {
 		const mounted = mountController();

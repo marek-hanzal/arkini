@@ -12,7 +12,6 @@
 				"spoiled-clay-vase-with-flowers"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

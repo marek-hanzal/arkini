@@ -25,14 +25,13 @@ describe("autofillLineInputsFx transition", () => {
 					id: "runtime:workshop",
 					itemId: "workshop",
 					location: workshopLocation,
-					quantity: 1,
 				});
-				yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: sourceLocation(1),
-					quantity: 7,
-				});
+				for (let index = 0; index < 3; index++)
+					yield* spawnItemFx({
+						id: index === 0 ? "runtime:water" : `runtime:water:${index}`,
+						itemId: "water",
+						location: sourceLocation(index + 1),
+					});
 				if (mode === "queue")
 					yield* enqueueLineFx({
 						ownerItemId: "runtime:workshop",
@@ -103,7 +102,6 @@ describe("autofillLineInputsFx transition", () => {
 						phase: "outbound",
 						scope: "delivery",
 					},
-					quantity: 7,
 				});
 				expect(
 					committed[0]?.runtime.items.filter(

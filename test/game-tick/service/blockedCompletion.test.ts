@@ -77,16 +77,8 @@ describe("blocked job completion", () => {
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
 			),
 		).toBe(false);
-		expect(
-			result.recovered.items
-				.filter((item) => item.item.id === "tool")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(1);
-		expect(
-			result.recovered.items
-				.filter((item) => item.item.id === "ingot")
-				.reduce((quantity, item) => quantity + item.quantity, 0),
-		).toBe(1);
+		expect(result.recovered.items.filter((item) => item.item.id === "tool").length).toBe(1);
+		expect(result.recovered.items.filter((item) => item.item.id === "ingot").length).toBe(1);
 	});
 	it("consumes the attempted budget when output completion fatally fails", () => {
 		const config = createTickFailureTestConfig();
@@ -105,7 +97,6 @@ describe("blocked job completion", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

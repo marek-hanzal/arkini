@@ -26,15 +26,6 @@ type UnstaggeredTileMotionCue =
 				}
 			>,
 			"staggerIndex"
-	  >
-	| Omit<
-			Extract<
-				TileMotionCue,
-				{
-					readonly kind: "stack";
-				}
-			>,
-			"staggerIndex"
 	  >;
 
 const readOriginLocationFn = ({
@@ -141,47 +132,6 @@ const readEventCueFn = ({
 			transition,
 		});
 	}
-	if (event.type === GameEventEnumSchema.enum.ItemStacked) {
-		const originLocation = readOriginLocationFn({
-			originItemId: event.originItemId,
-			transition,
-		});
-		const target = readTargetFn({
-			canonicalItemId: event.canonicalItemId,
-			itemId: event.itemId,
-			location: event.location,
-			runtime: transition.runtime,
-		});
-		if (originLocation === null || target === null) return null;
-		const previousSource = readGridRuntimeItemFn({
-			itemId: event.originItemId,
-			runtime: transition.previousRuntime,
-		});
-		const sourceConsumed =
-			previousSource?.item.id === event.canonicalItemId &&
-			!transition.runtime.items.some((item) => item.id === event.originItemId) &&
-			!transition.events.some(
-				(fact) =>
-					fact.type === GameEventEnumSchema.enum.ItemMerged &&
-					fact.targetItemId === event.originItemId,
-			);
-		return {
-			kind: "stack",
-			...(sourceConsumed
-				? {
-						sourceActorId: event.originItemId,
-					}
-				: {}),
-			sequence: transition.sequence,
-			eventIndex,
-			targetActorId: target.id,
-			canonicalItemId: event.canonicalItemId,
-			quantity: event.quantity - event.previousQuantity,
-			originActorId: event.originItemId,
-			originLocation,
-			targetLocation: target.location,
-		} satisfies UnstaggeredTileMotionCue;
-	}
 	if (
 		event.type === GameEventEnumSchema.enum.ItemInputStored &&
 		event.previousSourceLocation.scope === LocationScopeEnumSchema.enum.Board
@@ -198,9 +148,6 @@ const readEventCueFn = ({
 			sourceActorId: event.sourceItemId,
 			targetActorId: event.ownerItemId,
 			canonicalItemId: event.canonicalItemId,
-			previousQuantity: event.previousQuantity,
-			storedQuantity: event.storedQuantity,
-			resultingQuantity: event.resultingQuantity,
 			originActorId: event.sourceItemId,
 			originLocation: event.previousSourceLocation,
 			targetLocation: target.location,

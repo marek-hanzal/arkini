@@ -67,15 +67,6 @@ export const ItemSchema = z
 		 */
 		artwork: ArtworkSchema.describe("The visual artwork definition used to render this item."),
 		/**
-		 * Maximum number of this item that one stack can hold.
-		 *
-		 * Runtime keeps an item with mutable state, such as production progress, in an
-		 * individual stack even when this configured limit is greater than one.
-		 */
-		maxStackSize: PositiveIntegerSchema.describe(
-			"The maximum number of this item that one stack can hold before it has mutable state.",
-		),
-		/**
 		 * Optional finite unit supply initialized separately for each fresh item instance.
 		 */
 		units: UnitsSchema.optional().describe(
@@ -118,11 +109,6 @@ export const ItemSchema = z
 		if (item.clock !== undefined) {
 			for (const [field, valid, message] of [
 				[
-					"maxStackSize",
-					item.maxStackSize === 1,
-					"Clock items cannot stack.",
-				],
-				[
 					"action",
 					item.action === undefined,
 					"An item cannot have both Clock and Action.",
@@ -157,11 +143,6 @@ export const ItemSchema = z
 			],
 		},
 		then: {
-			properties: {
-				maxStackSize: {
-					const: 1,
-				},
-			},
 			not: {
 				required: [
 					"action",

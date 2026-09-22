@@ -12,7 +12,6 @@
 				"knowledge-t4"
 			]
 		},
-		"maxStackSize": 2,
 		"maxQueueSize": 1,
 		"lines": []
 	}

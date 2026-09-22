@@ -25,7 +25,6 @@ const item = (id: string, title = id) => ({
 			`artwork:${id}`,
 		],
 	},
-	maxStackSize: 10,
 });
 
 const drop = (itemId: string, min = 1, max = min) => ({
@@ -134,7 +133,6 @@ const targetLine = ({
 
 const producer = (id: string, title: string, lines: readonly object[]) => ({
 	...item(id, title),
-	maxStackSize: 1,
 	maxQueueSize: 1,
 	lines,
 });
@@ -202,7 +200,6 @@ export const config = GameConfigSchema.parse({
 			units: {
 				amount: 1,
 			},
-			maxStackSize: 1,
 			lines: [
 				{
 					...acquisitionLine("line:blueprint", "product"),
@@ -236,7 +233,6 @@ export const runtimeItem = ({
 	id,
 	item: config.items[definition],
 	location,
-	quantity: 1,
 	revision: `revision:${id}`,
 });
 

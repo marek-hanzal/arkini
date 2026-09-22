@@ -80,21 +80,6 @@ const createExhaustedUnitJobConfig = () => {
 	});
 };
 
-const createStackedJobConfig = () => {
-	const base = createJobTestConfig(2);
-	const forge = base.items.forge;
-	return GameConfigSchema.parse({
-		...base,
-		items: {
-			...base.items,
-			forge: {
-				...forge,
-				maxStackSize: 2,
-			},
-		},
-	});
-};
-
 const createTimedQueueJobConfig = () => {
 	const base = createJobTestConfig(3);
 	const forge = base.items.forge;
@@ -140,7 +125,7 @@ describe("enqueueLineFx", () => {
 			result.request,
 		]);
 		expect(result.runtime.items.filter((item) => item.location.scope === "input")).toHaveLength(
-			2,
+			4,
 		);
 		expect(result.transition.events).toContainEqual({
 			type: "job:queued",
@@ -175,7 +160,6 @@ describe("enqueueLineFx", () => {
 								y: 0,
 							},
 						},
-						quantity: 1,
 					});
 				}
 
@@ -225,7 +209,6 @@ describe("enqueueLineFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const request = yield* enqueueLineFx(props);
 				return {
@@ -260,22 +243,21 @@ describe("enqueueLineFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const request = yield* enqueueLineFx(props);
-				yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 1,
-							y: 0,
+				for (let index = 0; index < 3; index += 1)
+					yield* spawnItemFx({
+						id: `runtime:water:${index}`,
+						itemId: "water",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: index + 1,
+								y: 0,
+							},
 						},
-					},
-					quantity: 3,
-				});
+					});
 				yield* spawnItemFx({
 					id: "runtime:tool",
 					itemId: "tool",
@@ -283,24 +265,24 @@ describe("enqueueLineFx", () => {
 						scope: "board",
 						space: 0,
 						position: {
-							x: 2,
-							y: 0,
+							x: 1,
+							y: 1,
 						},
 					},
-					quantity: 1,
 				});
+
 				yield* runTickRuntimeByFx({
 					elapsedMs: 100,
 				});
 				const delivering = yield* readRuntimeFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:tool",
-					generation: 0,
-				});
+				for (const item of delivering.items) {
+					if (item.location.scope === "delivery")
+						yield* settleItemDeliveryFx({
+							itemId: item.id,
+							generation: item.location.generation,
+						});
+				}
+
 				const settled = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
 					elapsedMs: 100,
@@ -379,7 +361,6 @@ describe("enqueueLineFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				return yield* Effect.result(enqueueLineFx(props));
 			}).pipe(
@@ -397,43 +378,6 @@ describe("enqueueLineFx", () => {
 				lineId: props.lineId,
 			});
 		}
-	});
-
-	it("isolates a stacked owner before attaching the queue intent", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: props.ownerItemId,
-					itemId: "forge",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 2,
-				});
-				const request = yield* enqueueLineFx(props);
-				return {
-					request,
-					runtime: yield* readRuntimeFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config: createStackedJobConfig(),
-				}),
-			),
-		);
-
-		expect(result.runtime.jobQueue).toEqual([
-			result.request,
-		]);
-		expect(result.runtime.items.filter((item) => item.item.id === "forge")).toHaveLength(2);
-		expect(result.runtime.items.find((item) => item.id === props.ownerItemId)).toMatchObject({
-			quantity: 1,
-		});
 	});
 
 	it("preserves authoritative queue capacity", () => {
@@ -478,7 +422,6 @@ describe("enqueueLineFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				yield* setSpeedUpGameplayFx({
 					enabled: true,

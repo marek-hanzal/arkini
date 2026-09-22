@@ -16,12 +16,11 @@ const runRangePulseFx = (durationMs: number) =>
 			inputIndex: 0,
 			sourceItemId: material.id,
 			sourceItemRevision: material.revision,
-			quantity: 1,
 		});
 		const spare = yield* spawnItemFx({
 			id: "spare",
 			itemId: "permit",
-			quantity: 1,
+
 			location: {
 				scope: "board",
 				space: 0,

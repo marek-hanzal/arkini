@@ -11,7 +11,6 @@
 				"fertilized-coffee-field"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 120000,
 			"enable": true,

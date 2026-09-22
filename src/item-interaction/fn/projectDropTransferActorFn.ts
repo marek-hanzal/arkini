@@ -17,7 +17,6 @@ export const projectDropTransferActorFn = ({ after, before }: projectDropTransfe
 		canonicalItemId: before.item.id,
 		previousRevision: before.revision,
 		previousLocation: before.location,
-		previousQuantity: before.quantity,
 		current: projectDropActorCurrentFn(after),
 	};
 };

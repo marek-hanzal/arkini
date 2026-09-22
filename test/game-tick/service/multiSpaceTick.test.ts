@@ -19,7 +19,6 @@ describe("multi-space simulation", () => {
 					id: "runtime:worker",
 					itemId: "worker",
 					location: boardLocation(2, 0),
-					quantity: 1,
 				});
 				yield* startLineFx({
 					ownerItemId: worker.id,
@@ -63,7 +62,6 @@ describe("multi-space simulation", () => {
 					id: "runtime:temporary",
 					itemId: "temporary",
 					location: boardLocation(3, 1),
-					quantity: 1,
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 600,

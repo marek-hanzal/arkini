@@ -12,7 +12,6 @@
 				"flour"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 720000,
 			"enable": true,

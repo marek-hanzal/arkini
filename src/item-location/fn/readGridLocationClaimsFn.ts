@@ -12,7 +12,7 @@ export interface GridLocationClaim {
  * Reads every canonical grid-cell owner, including the return leases implied by deliveries.
  *
  * A delivery origin stays claimed until the same transition either commits the complete item
- * elsewhere or places its returning remainder home. There are no placeholder runtime items.
+ * elsewhere or returns the item home. There are no placeholder runtime items.
  */
 export const readGridLocationClaimsFn = ({ runtime }: { readonly runtime: RuntimeSchema.Type }) => {
 	const claims: GridLocationClaim[] = [];

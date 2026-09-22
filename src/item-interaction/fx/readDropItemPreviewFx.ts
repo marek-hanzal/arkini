@@ -11,8 +11,6 @@ import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import { readDropItemStackRejectedReasonFn } from "~/item-interaction/fn/readDropItemStackRejectedReasonFn";
-import { readItemStackResolutionFn } from "~/item-interaction/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { DropItemIgnoredReason } from "~/item-interaction/type/DropItemResult";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
@@ -24,14 +22,12 @@ export namespace readDropItemPreviewFx {
 				readonly kind:
 					| typeof DropItemResultKind.Move
 					| typeof DropItemResultKind.Swap
-					| typeof DropItemResultKind.Merge
-					| typeof DropItemResultKind.Stack;
+					| typeof DropItemResultKind.Merge;
 		  }
 		| {
 				readonly kind: typeof DropItemResultKind.StoreInput;
 				readonly lineId: string;
 				readonly inputIndex: number;
-				readonly quantity: number;
 		  }
 		| {
 				readonly kind: typeof DropItemResultKind.Ignored;
@@ -51,12 +47,10 @@ const rejectedFn = (reason: DropItemRejectedReason): readDropItemPreviewFx.Resul
 const storeInputPreviewFn = ({
 	lineId,
 	inputIndex,
-	quantity,
 }: resolveLineInputStoreFn.Result): readDropItemPreviewFx.Result => ({
 	kind: DropItemResultKind.StoreInput,
 	lineId,
 	inputIndex,
-	quantity,
 });
 
 /** Reads the current authoritative semantic kind of one prospective item drop without mutating runtime. */
@@ -178,7 +172,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			lineId: target.inputStore.lineId,
 			inputIndex: target.inputStore.inputIndex,
 			owner: targetItem,
-			requestedQuantity: target.inputStore.quantity,
 			runtime,
 			source,
 		});
@@ -204,27 +197,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	});
 	if (inputStore !== undefined) {
 		return storeInputPreviewFn(inputStore);
-	}
-	const stackResolution = readItemStackResolutionFn({
-		runtime,
-		sourceItemId,
-		sourceRevision,
-		sourceLocation,
-		targetItemId: targetItem.id,
-		targetRevision: targetOccupant.revision,
-		targetLocation: target.location,
-	});
-	if (stackResolution.kind === "available") {
-		return {
-			kind: DropItemResultKind.Stack,
-		} satisfies readDropItemPreviewFx.Result;
-	}
-	if (stackResolution.kind === "blocked") {
-		return rejectedFn(
-			readDropItemStackRejectedReasonFn({
-				reason: stackResolution.reason,
-			}),
-		);
 	}
 	return {
 		kind: DropItemResultKind.Swap,

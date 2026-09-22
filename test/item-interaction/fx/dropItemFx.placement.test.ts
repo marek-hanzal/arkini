@@ -26,7 +26,6 @@ describe("dropItemFx / move storage and swap", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const outcome = yield* dropItemFx({
 					sourceItemId: source.id,
@@ -62,7 +61,6 @@ describe("dropItemFx / move storage and swap", () => {
 				originItemId: "runtime:water",
 				previousLocation: sourceLocation,
 				location: emptyLocation,
-				quantity: 1,
 			},
 		]);
 	});
@@ -74,7 +72,6 @@ describe("dropItemFx / move storage and swap", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const secondLocation = {
 					scope: "board" as const,
@@ -88,7 +85,6 @@ describe("dropItemFx / move storage and swap", () => {
 					id: "runtime:stone",
 					itemId: "stone",
 					location: secondLocation,
-					quantity: 1,
 				});
 				const target = {
 					kind: "slot" as const,
@@ -149,13 +145,11 @@ describe("dropItemFx / move storage and swap", () => {
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation,
-					quantity: 1,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
 					itemId: "stone",
 					location: occupiedLocation,
-					quantity: 1,
 				});
 				const outcome = yield* dropItemFx({
 					sourceItemId: source.id,

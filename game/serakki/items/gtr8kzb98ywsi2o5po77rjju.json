@@ -12,7 +12,6 @@
 				"spoiled-chopped-fruit"
 			]
 		},
-		"maxStackSize": 1,
 		"maxQueueSize": 1,
 		"lines": []
 	}

@@ -32,6 +32,5 @@ export const returnBufferedLineItemsFx = Effect.fn("returnBufferedLineItemsFx")(
 		events,
 		runtime: draft,
 		withdrawnItemCount: items.length,
-		withdrawnQuantity: items.reduce((total, item) => total + item.quantity, 0),
 	};
 });

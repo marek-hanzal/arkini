@@ -21,7 +21,6 @@ describe("blueprint depletion projection", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				const owner = yield* spawnItemFx({
 					id: "runtime:recycler",
@@ -34,7 +33,6 @@ describe("blueprint depletion projection", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				});
 				return yield* readItemDetailLinesFx({
 					itemId: owner.id,

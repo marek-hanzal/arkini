@@ -38,7 +38,7 @@ export const initialState = StateSchema.parse({
 		{
 			id: "reusable-source",
 			itemId: "source",
-			quantity: 2,
+
 			location: {
 				scope: "board",
 				space: 0,
@@ -51,7 +51,7 @@ export const initialState = StateSchema.parse({
 		{
 			id: "stable-target",
 			itemId: "target",
-			quantity: 1,
+
 			location: {
 				scope: "board",
 				space: 0,

@@ -97,9 +97,7 @@ describe("readItemDetailLinesFx / queue order and visibility", () => {
 			lineRunRuntime({
 				permit: true,
 				booster: true,
-				water: [
-					2,
-				],
+				water: 2,
 			}),
 		);
 		expect(blocked.kind).toBe("available");
@@ -132,10 +130,7 @@ describe("readItemDetailLinesFx / queue order and visibility", () => {
 			lineRunRuntime({
 				permit: true,
 				booster: true,
-				water: [
-					2,
-					1,
-				],
+				water: 3,
 			}),
 		);
 		expect(ready.kind).toBe("available");

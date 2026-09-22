@@ -11,7 +11,6 @@ import {
 const readControlledOwner = (ui: ItemSchema.Type["ui"], remainingDurationMs = 300) => {
 	const item = ItemSchema.parse({
 		...lineRunTestConfig.items.workshop,
-		maxStackSize: 1,
 		clock: {
 			intervalMs: 100,
 			durationMs: 300,
@@ -20,9 +19,7 @@ const readControlledOwner = (ui: ItemSchema.Type["ui"], remainingDurationMs = 30
 	});
 	const base = lineRunRuntime({
 		permit: true,
-		water: [
-			3,
-		],
+		water: 3,
 	});
 	const runtime = {
 		...base,

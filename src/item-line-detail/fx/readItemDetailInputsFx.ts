@@ -55,7 +55,7 @@ const readItemDetailAvailableUnitsFx = Effect.fn("readItemDetailAvailableUnitsFx
 	let availableUnits = 0;
 	for (const candidate of candidates) {
 		const remainingUnits = readItemRemainingUnitsFn(candidate);
-		availableUnits += (remainingUnits ?? 0) * candidate.quantity;
+		availableUnits += remainingUnits ?? 0;
 	}
 	return {
 		availableUnits,
@@ -103,13 +103,13 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 						const storedQuantity =
 							resolution?.type === TypeSchema.enum.Materials
 								? resolution.storedQuantity
-								: storedItems.reduce((total, item) => total + item.quantity, 0);
+								: storedItems.length;
 						const deliveryQuantity = readLineInputDeliveryClaimsFn({
 							inputIndex,
 							lineId,
 							ownerItemId,
 							runtime,
-						}).reduce((total, claim) => total + claim.quantity, 0);
+						}).length;
 						const maxStoredQuantity =
 							resolution?.type === TypeSchema.enum.Materials
 								? resolution.maxStoredQuantity

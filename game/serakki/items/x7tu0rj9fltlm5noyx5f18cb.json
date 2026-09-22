@@ -12,7 +12,6 @@
 				"dye-workshop-milk"
 			]
 		},
-		"maxStackSize": 1,
 		"clock": {
 			"durationMs": 90000,
 			"enable": true,

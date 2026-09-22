@@ -19,7 +19,6 @@ import { InputSelectorMismatchIssueSchema } from "~/production-input/schema/Inpu
 import { InputSlotInvalidIssueSchema } from "~/production-input/schema/InputSlotInvalidIssueSchema";
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemUnitsIssueSchema } from "./ItemUnitsIssueSchema";
-import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
 import { DefaultLineIssueSchema } from "~/production-line/schema/DefaultLineIssueSchema";
@@ -42,7 +41,6 @@ export const RuntimeCheckIssueSchema = z
 		JobConsumedMaterialStateIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemUnitsIssueSchema,
-		ItemStackSizeIssueSchema,
 		ItemScheduleIssueSchema,
 		InputOwnerMissingIssueSchema,
 		InputLineMissingIssueSchema,

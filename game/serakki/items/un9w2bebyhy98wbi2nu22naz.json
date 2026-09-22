@@ -12,7 +12,6 @@
 				"dynamite"
 			]
 		},
-		"maxStackSize": 8,
 		"merge": [
 			{
 				"target": {

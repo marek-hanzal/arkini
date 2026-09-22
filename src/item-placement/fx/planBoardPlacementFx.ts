@@ -1,4 +1,4 @@
-import { Array, Effect, Order, Random } from "effect";
+import { Effect, Random } from "effect";
 import { match } from "ts-pattern";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -10,77 +10,10 @@ import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { isItemPureFn } from "~/game-runtime/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
-import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
-import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
-import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
-
-const readAvailableStackItemsFn = ({
-	itemId,
-	locations,
-	origin,
-	runtime,
-}: {
-	readonly itemId: string;
-	readonly locations: ReadonlyArray<BoardLocationSchema.Type>;
-	readonly origin: PositionSchema.Type;
-	readonly runtime: RuntimeSchema.Type;
-}) => {
-	const locationKeys = new Set(locations.map(readGridLocationKeyFn));
-	return Array.getSomes(runtime.items.map(narrowBoardRuntimeItemFn))
-		.filter(
-			(item) =>
-				locationKeys.has(readGridLocationKeyFn(item.location)) &&
-				item.item.id === itemId &&
-				item.quantity < item.item.maxStackSize &&
-				isItemPureFn({
-					item,
-					runtime,
-				}),
-		)
-		.sort((left, right) => {
-			const scanOrder =
-				left.location.position.y - right.location.position.y ||
-				left.location.position.x - right.location.position.x ||
-				Order.String(left.id, right.id);
-
-			const leftDistance =
-				Math.abs(left.location.position.x - origin.x) +
-				Math.abs(left.location.position.y - origin.y);
-			const rightDistance =
-				Math.abs(right.location.position.x - origin.x) +
-				Math.abs(right.location.position.y - origin.y);
-			return leftDistance - rightDistance || scanOrder;
-		});
-};
-
-const planStackPlacementFn = ({
-	items,
-	quantity,
-}: {
-	readonly items: ReadonlyArray<BoardRuntimeItemSchema.Type>;
-	readonly quantity: PositiveIntegerSchema.Type;
-}) => {
-	const stack: PlacementPlan["stack"][number][] = [];
-	let remainingQuantity = quantity;
-	for (const item of items) {
-		const placedQuantity = Math.min(remainingQuantity, item.item.maxStackSize - item.quantity);
-		if (placedQuantity > 0) {
-			stack.push({
-				itemId: item.id,
-				quantity: placedQuantity,
-			});
-			remainingQuantity -= placedQuantity;
-		}
-		if (remainingQuantity === 0) break;
-	}
-	return stack;
-};
 
 interface PlanBoardPlacementProps {
 	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
@@ -118,7 +51,7 @@ const resolveBoardPlacementOriginFx = Effect.fn("resolveBoardPlacementOriginFx")
 		.exhaustive();
 });
 
-/** Plans stack-first placement in one Board space around its physical or randomized origin. */
+/** Plans single-item placement in one Board space around its physical or randomized origin. */
 export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* ({
 	excludedLocations = [],
 	item,
@@ -158,32 +91,6 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 		}
 		if (!excluded) eligibleLocations.push(location);
 	}
-	const availableStacks =
-		item.maxStackSize === 1
-			? []
-			: readAvailableStackItemsFn({
-					itemId: item.id,
-					locations: eligibleLocations,
-					origin: placementOrigin,
-					runtime,
-				});
-	const stack = planStackPlacementFn({
-		items: availableStacks,
-		quantity,
-	});
-	const stackPlan = {
-		remove: [],
-		spawn: [],
-		stack,
-	} satisfies PlacementPlan;
-	const stackedQuantity = readPlacementPlanQuantityFn({
-		plan: stackPlan,
-	});
-	const remainingQuantity = quantity - stackedQuantity;
-	if (remainingQuantity === 0) {
-		return stackPlan;
-	}
-
 	const emptyLocations = readEmptyLocationsFn({
 		locations: eligibleLocations,
 		runtime,
@@ -191,12 +98,10 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	const spawn = yield* planSpawnPlacementFx({
 		item,
 		locations: emptyLocations,
-		quantity: remainingQuantity,
+		quantity,
 	});
 
 	return {
-		remove: [],
 		spawn,
-		stack,
 	} satisfies PlacementPlan;
 });

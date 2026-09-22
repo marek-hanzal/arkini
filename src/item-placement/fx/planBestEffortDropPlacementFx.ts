@@ -70,9 +70,7 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 	}
 	return {
 		plan: {
-			remove: [],
 			spawn: [],
-			stack: [],
 		},
 		discarded,
 	} satisfies planBestEffortDropPlacementFx.Result;

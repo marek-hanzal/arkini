@@ -26,7 +26,6 @@ const owner = {
 			y: 0,
 		},
 	},
-	quantity: 1,
 };
 const consumedRoot = {
 	id: "runtime:consumed-root",
@@ -36,7 +35,6 @@ const consumedRoot = {
 		jobId: job.id,
 		inputIndex: 0,
 	},
-	quantity: 1,
 };
 
 describe("fromStateFx job material invariants", () => {
@@ -92,7 +90,6 @@ describe("fromStateFx job material invariants", () => {
 						lineId: "line:forge:run",
 						inputIndex: 0,
 					},
-					quantity: 1,
 				},
 			],
 			jobs: [
@@ -147,7 +144,6 @@ describe("fromStateFx job material invariants", () => {
 						lineId: "line:forge:run",
 						inputIndex: 1,
 					},
-					quantity: 1,
 				},
 				{
 					id: "runtime:nested-water",
@@ -158,7 +154,6 @@ describe("fromStateFx job material invariants", () => {
 						lineId: "line:forge:run",
 						inputIndex: 0,
 					},
-					quantity: 1,
 				},
 			],
 			jobs: [
@@ -225,7 +220,6 @@ describe("fromStateFx job material invariants", () => {
 						lineId: "line:forge:run",
 						inputIndex: 1,
 					},
-					quantity: 1,
 				},
 				{
 					id: "runtime:nested-material",
@@ -235,7 +229,6 @@ describe("fromStateFx job material invariants", () => {
 						jobId: childJob.id,
 						inputIndex: 1,
 					},
-					quantity: 1,
 				},
 			],
 			jobs: [
@@ -306,7 +299,6 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 					inputIndex: 1,
 				},
 				remainingUnits: 1,
-				quantity: 1,
 			},
 			{
 				id: "runtime:reserved-water",
@@ -317,7 +309,6 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 					lineId: "line:forge:run",
 					inputIndex: 0,
 				},
-				quantity: 1,
 			},
 		],
 		jobs: [

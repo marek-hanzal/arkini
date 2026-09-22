@@ -29,7 +29,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 				expect(result.runtime.items.find((item) => item.id === reserve.id)).toMatchObject({
 					id: reserve.id,
 					remainingUnits: 1,
-					quantity: 1,
+
 					location: boardFn(0),
 				});
 				expect(result.runtime.jobs).toEqual([]);
@@ -47,7 +47,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 						expect.objectContaining({
 							type: "item:discarded",
 							itemId: "consumed",
-							quantity: 3,
+							quantity: 1,
 							source: "consumed-input",
 							reason: "job-aborted",
 						}),
@@ -61,7 +61,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 						expect.objectContaining({
 							type: "item:discarded",
 							itemId: "child",
-							quantity: 3,
+							quantity: 1,
 							source: "buffer",
 							reason: "board:full",
 						}),
@@ -101,7 +101,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 			}).pipe(Effect.provideService(GameConfigFx, config)),
 		);
 	});
-	it("fits part of a pure buffered stack into existing and freed cells and records only the excess", () => {
+	it("returns one buffered identity to the freed cell and records the excess identity", () => {
 		const { config, runtime, owner, itemFn, inputFn } = fixtureFn();
 		const draft = {
 			...runtime,
@@ -110,9 +110,9 @@ describe("forceRemoveRuntimeItemFx", () => {
 			defaultLineByOwnerItemId: {},
 			items: [
 				owner,
-				itemFn("existing", "water", boardFn(1), 2),
-				itemFn("buffer-a", "water", inputFn(owner.id, 0, "line:forge:stored-water"), 3),
-				itemFn("buffer-b", "water", inputFn(owner.id, 0, "line:forge:stored-water"), 2),
+				itemFn("existing", "water", boardFn(1)),
+				itemFn("buffer-a", "water", inputFn(owner.id, 0, "line:forge:stored-water")),
+				itemFn("buffer-b", "water", inputFn(owner.id, 0, "line:forge:stored-water")),
 			],
 		};
 		Effect.runSync(
@@ -127,9 +127,9 @@ describe("forceRemoveRuntimeItemFx", () => {
 					origin: boardFn(0),
 					runtime: draft,
 				});
-				expect(result.runtime.items.map((item) => item.quantity).sort()).toEqual([
-					3,
-					3,
+				expect(result.runtime.items.map((item) => item.id).sort()).toEqual([
+					"buffer-a",
+					"existing",
 				]);
 				expect(result.events.filter((event) => event.type === "item:discarded")).toEqual([
 					expect.objectContaining({
@@ -159,12 +159,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 				kind: "line-input",
 				ownerItemId: owner.id,
 				lineId: "line:forge:stored-water",
-				input: [
-					{
-						inputIndex: 0,
-						quantity: 1,
-					},
-				],
+				inputIndex: 0,
 			},
 		});
 		const draft = {
@@ -191,7 +186,6 @@ describe("forceRemoveRuntimeItemFx", () => {
 					"reserve",
 				]);
 				expect(result.runtime.items.find((item) => item.id === delivery.id)).toMatchObject({
-					quantity: 1,
 					location: {
 						scope: "delivery",
 						phase: "returning",

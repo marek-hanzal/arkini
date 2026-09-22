@@ -173,7 +173,6 @@ describe("createGameSessionFx / synchronous admission", () => {
 							y: 0,
 						},
 					},
-					quantity: 1,
 				}),
 			);
 

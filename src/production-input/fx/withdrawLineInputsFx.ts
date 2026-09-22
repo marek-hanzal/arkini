@@ -15,7 +15,6 @@ export namespace withdrawLineInputsFx {
 
 	export interface Result {
 		readonly withdrawnItemCount: number;
-		readonly withdrawnQuantity: number;
 	}
 }
 
@@ -51,7 +50,6 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 			return [
 				{
 					withdrawnItemCount: returned.withdrawnItemCount,
-					withdrawnQuantity: returned.withdrawnQuantity,
 				} satisfies withdrawLineInputsFx.Result,
 				returned.runtime,
 				returned.events,

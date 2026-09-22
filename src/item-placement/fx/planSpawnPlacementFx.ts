@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 
@@ -14,27 +13,22 @@ interface PlanSpawnPlacementProps {
 }
 
 /**
- * Plans new runtime stacks across ordered empty locations.
+ * Plans new runtime identities across ordered empty locations.
  */
 export const planSpawnPlacementFx = Effect.fn("planSpawnPlacementFx")(function* ({
 	item,
 	locations,
 	quantity,
 }: PlanSpawnPlacementProps) {
-	const stackCount = Math.min(locations.length, Math.ceil(quantity / item.maxStackSize));
+	const itemCount = Math.min(locations.length, quantity);
 
-	return yield* Effect.forEach(locations.slice(0, stackCount), (location, index) => {
+	return yield* Effect.forEach(locations.slice(0, itemCount), (location) => {
 		return Effect.gen(function* () {
-			const runtimeItem = yield* createRuntimeItemFx({
+			return yield* createRuntimeItemFx({
 				id: yield* createRuntimeItemIdFx(),
 				item,
 				location,
-				quantity: Math.min(item.maxStackSize, quantity - index * item.maxStackSize),
 			});
-
-			return {
-				item: runtimeItem,
-			} satisfies PlacementPlan["spawn"][number];
 		});
 	});
 });

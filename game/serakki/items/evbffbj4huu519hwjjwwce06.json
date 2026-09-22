@@ -12,7 +12,6 @@
 				"wine-barrel"
 			]
 		},
-		"maxStackSize": 1,
 		"units": {
 			"amount": 24,
 			"output": {

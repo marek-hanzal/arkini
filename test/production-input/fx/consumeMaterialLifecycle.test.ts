@@ -21,14 +21,13 @@ const base = (id: string) => ({
 			`artwork:${id}`,
 		],
 	},
-	scope: "board" as const,
 	maxStackSize: 1,
 });
 
 const materialInput = (itemId: string) => ({
 	type: "materials" as const,
 	query: {
-		scope: "any" as const,
+		distance: "far" as const,
 		selector: {
 			type: "item" as const,
 			itemId,
@@ -88,10 +87,6 @@ const config = GameConfigSchema.parse({
 		board: {
 			width: 6,
 			height: 2,
-		},
-		inventory: {
-			width: 2,
-			height: 1,
 		},
 	},
 	start: {

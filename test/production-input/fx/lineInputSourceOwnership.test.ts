@@ -24,7 +24,6 @@ const baseItem = (id: string) =>
 				`artwork:${id}`,
 			],
 		},
-		scope: "any",
 		maxStackSize: 1,
 	}) as const;
 
@@ -51,10 +50,6 @@ const config = GameConfigSchema.parse({
 		board: {
 			width: 5,
 			height: 2,
-		},
-		inventory: {
-			width: 3,
-			height: 1,
 		},
 	},
 	start: {
@@ -87,7 +82,7 @@ const config = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: fuelItemId,
@@ -117,7 +112,7 @@ const config = GameConfigSchema.parse({
 						{
 							type: "materials",
 							query: {
-								scope: "any",
+								distance: "far" as const,
 								selector: {
 									type: "item",
 									itemId: workerItemId,
@@ -277,7 +272,7 @@ describe("line input source ownership", () => {
 					ownerItemId: upgradeOwnerItemId,
 					runtime: before,
 					query: {
-						scope: "any",
+						distance: "far" as const,
 						selector: {
 							type: "item",
 							itemId: workerItemId,

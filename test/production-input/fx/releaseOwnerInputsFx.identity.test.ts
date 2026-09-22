@@ -20,14 +20,13 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 			`artwork:${id}`,
 		],
 	},
-	scope: "any" as const,
 	maxStackSize,
 });
 
 const materialInput = (itemId: string) => ({
 	type: "materials" as const,
 	query: {
-		scope: "any" as const,
+		distance: "far" as const,
 		selector: {
 			type: "item" as const,
 			itemId,
@@ -49,10 +48,6 @@ const config = GameConfigSchema.parse({
 		title: "Release owner inputs",
 		board: {
 			width: 2,
-			height: 1,
-		},
-		inventory: {
-			width: 1,
 			height: 1,
 		},
 	},
@@ -205,89 +200,6 @@ const runRemoveFx = (state: StateSchema.Type) =>
 	);
 
 describe("releaseOwnerInputsFx existing identity", () => {
-	it("preserves one impure buffered root and its passive subtree", () => {
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				boardOwner,
-				inputItem({
-					id: "runtime:worker",
-					inputIndex: 0,
-					itemId: "worker",
-					remainingUnits: 1,
-				}),
-				inputItem({
-					id: "runtime:payload",
-					inputIndex: 0,
-					itemId: "payload",
-					ownerItemId: "runtime:worker",
-				}),
-			],
-			jobQueue: [],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const result = Effect.runSync(runRemoveFx(state));
-
-		expect(Result.isSuccess(result.attempt)).toBe(true);
-		const worker = result.after.items.find((item) => item.id === "runtime:worker");
-		expect(worker).toMatchObject({
-			remainingUnits: 1,
-			location: {
-				scope: "board",
-				space: 2,
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
-		});
-		expect(result.after.items.find((item) => item.id === "runtime:payload")).toMatchObject({
-			location: {
-				scope: "input",
-				ownerItemId: "runtime:worker",
-			},
-		});
-		expect(result.events).toEqual([
-			{
-				type: GameEventEnumSchema.enum.ItemDisappeared,
-				itemId: boardOwner.id,
-				canonicalItemId: boardOwner.itemId,
-				location: boardOwner.location,
-				quantity: boardOwner.quantity,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemPlaced,
-				itemId: "runtime:worker",
-				canonicalItemId: "worker",
-				originItemId: boardOwner.id,
-				previousLocation: {
-					scope: "input",
-					ownerItemId: boardOwner.id,
-					lineId: "line:outer",
-					inputIndex: 0,
-				},
-				location: {
-					scope: "board",
-					space: 2,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				snapshot: result.before.items.find((item) => item.id === boardOwner.id),
-			},
-		]);
-	});
-
 	it("allows a pure buffered root to normalize into an existing stack", () => {
 		const state = {
 			cheats: {
@@ -370,51 +282,74 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			},
 		]);
 	});
+});
 
-	it("preserves impure identities across board-first inventory fallback", () => {
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
+it("preserves one impure buffered root and its passive subtree", () => {
+	const state = {
+		cheats: {
+			enabled: false,
+			everEnabled: false,
+			speedUpGameplay: false,
+		},
+		currentSpace: 0,
+		items: [
+			boardOwner,
+			inputItem({
+				id: "runtime:worker",
+				inputIndex: 0,
+				itemId: "worker",
+				remainingUnits: 1,
+			}),
+			inputItem({
+				id: "runtime:payload",
+				inputIndex: 0,
+				itemId: "payload",
+				ownerItemId: "runtime:worker",
+			}),
+		],
+		jobQueue: [],
+		jobs: [],
+	} satisfies StateSchema.Type;
+	const result = Effect.runSync(runRemoveFx(state));
+
+	expect(Result.isSuccess(result.attempt)).toBe(true);
+	const worker = result.after.items.find((item) => item.id === "runtime:worker");
+	expect(worker).toMatchObject({
+		remainingUnits: 1,
+		location: {
+			scope: "board",
+			space: 2,
+			position: {
+				x: 0,
+				y: 0,
 			},
-			currentSpace: 0,
-			items: [
-				boardOwner,
-				inputItem({
-					id: "runtime:worker:a",
-					inputIndex: 0,
-					itemId: "worker",
-					remainingUnits: 1,
-				}),
-				inputItem({
-					id: "runtime:worker:b",
-					inputIndex: 1,
-					itemId: "worker",
-					remainingUnits: 1,
-				}),
-				{
-					id: "runtime:blocker",
-					itemId: "blocker",
-					location: {
-						scope: "board" as const,
-						space: 2,
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				},
-			],
-			jobQueue: [],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const result = Effect.runSync(runRemoveFx(state));
-
-		expect(Result.isSuccess(result.attempt)).toBe(true);
-		expect(result.after.items.find((item) => item.id === "runtime:worker:a")).toMatchObject({
-			remainingUnits: 1,
+		},
+	});
+	expect(result.after.items.find((item) => item.id === "runtime:payload")).toMatchObject({
+		location: {
+			scope: "input",
+			ownerItemId: "runtime:worker",
+		},
+	});
+	expect(result.events).toEqual([
+		{
+			type: GameEventEnumSchema.enum.ItemDisappeared,
+			itemId: boardOwner.id,
+			canonicalItemId: boardOwner.itemId,
+			location: boardOwner.location,
+			quantity: boardOwner.quantity,
+		},
+		{
+			type: GameEventEnumSchema.enum.ItemPlaced,
+			itemId: "runtime:worker",
+			canonicalItemId: "worker",
+			originItemId: boardOwner.id,
+			previousLocation: {
+				scope: "input",
+				ownerItemId: boardOwner.id,
+				lineId: "line:outer",
+				inputIndex: 0,
+			},
 			location: {
 				scope: "board",
 				space: 2,
@@ -423,79 +358,75 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					y: 0,
 				},
 			},
-		});
-		expect(result.after.items.find((item) => item.id === "runtime:worker:b")).toMatchObject({
-			remainingUnits: 1,
-			location: {
-				scope: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
-		});
-	});
+			quantity: 1,
+		},
+		{
+			type: GameEventEnumSchema.enum.ItemRemoved,
+			snapshot: result.before.items.find((item) => item.id === boardOwner.id),
+		},
+	]);
+});
 
-	it("rolls back the whole removal when one impure root has no exclusive cell", () => {
-		const state = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				speedUpGameplay: false,
+it("rolls back the whole removal when one impure root has no exclusive cell", () => {
+	const state = {
+		cheats: {
+			enabled: false,
+			everEnabled: false,
+			speedUpGameplay: false,
+		},
+		currentSpace: 0,
+		items: [
+			boardOwner,
+			inputItem({
+				id: "runtime:worker:a",
+				inputIndex: 0,
+				itemId: "worker",
+				remainingUnits: 1,
+			}),
+			inputItem({
+				id: "runtime:worker:b",
+				inputIndex: 1,
+				itemId: "worker",
+				remainingUnits: 1,
+			}),
+			{
+				id: "runtime:board-blocker",
+				itemId: "blocker",
+				location: {
+					scope: "board" as const,
+					space: 2,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				quantity: 1,
 			},
-			currentSpace: 0,
-			items: [
-				boardOwner,
-				inputItem({
-					id: "runtime:worker:a",
-					inputIndex: 0,
-					itemId: "worker",
-					remainingUnits: 1,
-				}),
-				inputItem({
-					id: "runtime:worker:b",
-					inputIndex: 1,
-					itemId: "worker",
-					remainingUnits: 1,
-				}),
-				{
-					id: "runtime:board-blocker",
-					itemId: "blocker",
-					location: {
-						scope: "board" as const,
-						space: 2,
-						position: {
-							x: 1,
-							y: 0,
-						},
+			{
+				id: "runtime:other-space-blocker",
+				itemId: "blocker",
+				location: {
+					scope: "board" as const,
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
 					},
-					quantity: 1,
 				},
-				{
-					id: "runtime:inventory-blocker",
-					itemId: "blocker",
-					location: {
-						scope: "inventory" as const,
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				},
-			],
-			jobQueue: [],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const result = Effect.runSync(runRemoveFx(state));
+				quantity: 1,
+			},
+		],
+		jobQueue: [],
+		jobs: [],
+	} satisfies StateSchema.Type;
+	const result = Effect.runSync(runRemoveFx(state));
 
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-		expect(result.events).toEqual([]);
-	});
+	expect(Result.isFailure(result.attempt)).toBe(true);
+	if (Result.isFailure(result.attempt)) {
+		expect(result.attempt.failure).toMatchObject({
+			_tag: "PlacementUnavailableError",
+		});
+	}
+	expect(result.after).toEqual(result.before);
+	expect(result.events).toEqual([]);
 });

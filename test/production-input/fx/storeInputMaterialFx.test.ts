@@ -98,7 +98,7 @@ describe("storeInputMaterialFx", () => {
 				const queried = yield* queryFx({
 					origin: workshopLocation,
 					query: {
-						scope: "any",
+						distance: "far" as const,
 						selector: {
 							type: "item",
 							itemId: "water",

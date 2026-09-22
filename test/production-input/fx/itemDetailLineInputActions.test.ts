@@ -14,7 +14,6 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
-	inputRuntimeToolbarTestConfig,
 	sourceLocation,
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
@@ -36,7 +35,7 @@ const twoInputTestConfig = GameConfigSchema.parse({
 					{
 						type: "materials",
 						query: {
-							scope: "any",
+							distance: "far" as const,
 							selector: {
 								type: "item",
 								itemId: "stone",
@@ -58,14 +57,9 @@ const blockedPlacementTestConfig = GameConfigSchema.parse({
 	meta: {
 		...inputRuntimeTestConfig.meta,
 		board: {
-			width: 1,
+			width: 2,
 			height: 1,
 		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
-		toolbarSize: 0,
 	},
 });
 const rangeInputTestConfig = GameConfigSchema.parse({
@@ -80,7 +74,7 @@ const rangeInputTestConfig = GameConfigSchema.parse({
 					{
 						type: "materials",
 						query: {
-							scope: "any",
+							distance: "far" as const,
 							selector: {
 								type: "item",
 								itemId: "water",
@@ -109,7 +103,7 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 					{
 						type: "materials",
 						query: {
-							scope: "any",
+							distance: "far" as const,
 							selector: {
 								type: "item",
 								itemId: "water",
@@ -123,7 +117,7 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 					{
 						type: "materials",
 						query: {
-							scope: "any",
+							distance: "far" as const,
 							selector: {
 								type: "item",
 								itemId: "water",
@@ -155,15 +149,7 @@ const spawnWaterFx = ({
 	quantity,
 }: {
 	readonly id: string;
-	readonly location:
-		| ReturnType<typeof sourceLocation>
-		| {
-				readonly scope: "inventory" | "toolbar";
-				readonly position: {
-					readonly x: number;
-					readonly y: number;
-				};
-		  };
+	readonly location: ReturnType<typeof sourceLocation>;
 	readonly quantity: number;
 }) =>
 	spawnItemFx({
@@ -266,121 +252,6 @@ describe("Item Detail line input actions", () => {
 					],
 				},
 			},
-		});
-	});
-
-	it("autofills deterministic board, Toolbar, and Inventory sources in physical priority", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:near",
-					location: sourceLocation(1),
-					quantity: 1,
-				});
-				yield* spawnWaterFx({
-					id: "runtime:toolbar",
-					location: {
-						scope: "toolbar",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				yield* spawnWaterFx({
-					id: "runtime:inventory",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 2,
-				});
-
-				const beforeRuntime = yield* readRuntimeFx();
-				const before = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime: beforeRuntime,
-				});
-				const autofilled = yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				const runtime = yield* readRuntimeFx();
-				const after = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime,
-				});
-
-				return {
-					after,
-					autofilled,
-					before,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeToolbarTestConfig,
-				}),
-			),
-		);
-
-		expect(result.before).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					actions: {
-						canWithdraw: false,
-					},
-				},
-			],
-		});
-		expect(result.autofilled).toEqual({
-			deliveryItemIds: [
-				"runtime:near",
-				"runtime:toolbar",
-				"runtime:inventory",
-			],
-			remainingMissingQuantity: 0,
-			scheduledQuantity: 3,
-		});
-		const buffered = result.runtime.items.filter(
-			(item) =>
-				item.location.scope === "input" &&
-				item.location.ownerItemId === ownerItemId &&
-				item.location.lineId === lineId,
-		);
-		expect(buffered).toHaveLength(0);
-		expect(result.runtime.items.find((item) => item.id === "runtime:inventory")).toMatchObject({
-			quantity: 2,
-			location: {
-				phase: "outbound",
-				scope: "delivery",
-			},
-		});
-		expect(result.runtime.items.find((item) => item.id === "runtime:toolbar")).toMatchObject({
-			location: {
-				phase: "outbound",
-				scope: "delivery",
-			},
-		});
-		expect(result.after).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					actions: {
-						canWithdraw: false,
-					},
-					availability: {
-						kind: "available",
-						readiness: "inputs",
-					},
-				},
-			],
 		});
 	});
 
@@ -743,70 +614,65 @@ describe("Item Detail line input actions", () => {
 			});
 		}
 	});
+});
 
-	it("leaves the exact input and its queue unchanged when canonical placement fails", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
+it("leaves the exact input and its queue unchanged when canonical placement fails", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnOwnerFx();
+			yield* spawnWaterFx({
+				id: "runtime:water",
+				location: {
+					scope: "board" as const,
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
 					},
-					quantity: 3,
-				});
-				const water = yield* getItemFx({
-					itemId: "runtime:water",
-				});
-				yield* storeInputMaterialFx({
+				},
+				quantity: 3,
+			});
+			const water = yield* getItemFx({
+				itemId: "runtime:water",
+			});
+			yield* storeInputMaterialFx({
+				ownerItemId,
+				lineId,
+				inputIndex: 0,
+				sourceItemId: water.id,
+				sourceItemRevision: water.revision,
+				quantity: 3,
+			});
+			yield* spawnItemFx({
+				id: "runtime:blocker",
+				itemId: "stone",
+				location: sourceLocation(1),
+				quantity: 1,
+			});
+			yield* enqueueLineFx({
+				ownerItemId,
+				lineId,
+			});
+			const before = yield* readRuntimeFx();
+			const withdrawal = yield* Effect.exit(
+				withdrawLineInputFx({
 					ownerItemId,
 					lineId,
 					inputIndex: 0,
-					sourceItemId: water.id,
-					sourceItemRevision: water.revision,
-					quantity: 3,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker",
-					itemId: "stone",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				yield* enqueueLineFx({
-					ownerItemId,
-					lineId,
-				});
-				const before = yield* readRuntimeFx();
-				const withdrawal = yield* Effect.exit(
-					withdrawLineInputFx({
-						ownerItemId,
-						lineId,
-						inputIndex: 0,
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					withdrawal,
-				};
-			}).pipe(
-				useGameFx({
-					config: blockedPlacementTestConfig,
 				}),
-			),
-		);
+			);
+			return {
+				after: yield* readRuntimeFx(),
+				before,
+				withdrawal,
+			};
+		}).pipe(
+			useGameFx({
+				config: blockedPlacementTestConfig,
+			}),
+		),
+	);
 
-		expect(Exit.isFailure(result.withdrawal)).toBe(true);
-		expect(result.after).toEqual(result.before);
-	});
+	expect(Exit.isFailure(result.withdrawal)).toBe(true);
+	expect(result.after).toEqual(result.before);
 });

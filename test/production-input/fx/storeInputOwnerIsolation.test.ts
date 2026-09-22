@@ -1,4 +1,4 @@
-import { Effect, Result } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
@@ -12,30 +12,13 @@ import {
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
 
-const spawnOwnerFx = (quantity: number, scope: "board" | "inventory" = "board") => {
-	return spawnItemFx({
+const spawnOwnerFx = (quantity: number) =>
+	spawnItemFx({
 		id: "runtime:workshop",
 		itemId: "workshop",
-		location:
-			scope === "board"
-				? {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 0,
-							y: 0,
-						},
-					}
-				: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
+		location: workshopLocation,
 		quantity,
 	});
-};
 
 const spawnSourceFx = (quantity: number) => {
 	return spawnItemFx({
@@ -59,69 +42,6 @@ const storeFx = Effect.fn("storeOwnerIsolationMaterialFx")(function* (quantity: 
 		sourceItemRevision: source.revision,
 		quantity,
 	});
-});
-
-const fillRemainingCapacityFx = Effect.fn("fillRemainingInputIsolationCapacityFx")(function* () {
-	for (const position of [
-		{
-			x: 2,
-			y: 0,
-		},
-		{
-			x: 3,
-			y: 0,
-		},
-		{
-			x: 4,
-			y: 0,
-		},
-		{
-			x: 0,
-			y: 1,
-		},
-		{
-			x: 1,
-			y: 1,
-		},
-		{
-			x: 2,
-			y: 1,
-		},
-		{
-			x: 3,
-			y: 1,
-		},
-		{
-			x: 4,
-			y: 1,
-		},
-	]) {
-		yield* spawnItemFx({
-			id: `runtime:blocker:board:${position.x}:${position.y}`,
-			itemId: "stone",
-			location: {
-				scope: "board",
-				space: 0,
-				position,
-			},
-			quantity: 1,
-		});
-	}
-
-	for (let x = 0; x < 3; x += 1) {
-		yield* spawnItemFx({
-			id: `runtime:blocker:inventory:${x}`,
-			itemId: "stone",
-			location: {
-				scope: "inventory",
-				position: {
-					x,
-					y: 0,
-				},
-			},
-			quantity: 1,
-		});
-	}
 });
 
 describe("input state owner isolation", () => {
@@ -184,70 +104,5 @@ describe("input state owner isolation", () => {
 			scope: "input",
 			ownerItemId: "runtime:workshop",
 		});
-	});
-
-	it("rolls back partial source storage when the remainder has no board or inventory capacity", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx(2);
-				yield* spawnSourceFx(2);
-				yield* fillRemainingCapacityFx();
-				const before = yield* readRuntimeFx();
-				const stored = yield* Effect.result(storeFx(1));
-
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					stored,
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.stored)).toBe(true);
-		if (Result.isFailure(result.stored)) {
-			expect(result.stored.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				itemId: "workshop",
-				reason: "inventory:full",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-	});
-
-	it("rejects state attachment while the owner is stored in inventory", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx(1, "inventory");
-				yield* spawnSourceFx(1);
-				const before = yield* readRuntimeFx();
-				const stored = yield* Effect.result(storeFx(1));
-
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					stored,
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.stored)).toBe(true);
-		if (Result.isFailure(result.stored)) {
-			expect(result.stored.failure).toMatchObject({
-				_tag: "ItemNotOnBoardError",
-				itemId: "runtime:workshop",
-				location: {
-					scope: "inventory",
-				},
-			});
-		}
-		expect(result.after).toEqual(result.before);
 	});
 });

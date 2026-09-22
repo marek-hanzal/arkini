@@ -6,7 +6,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SerapackDescriptor } from "~/serapack-catalog/type/SerapackDescriptor";
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import {
-	buttonByText,
 	cleanupSerapackSelectorTests,
 	renderSerapackSelector,
 } from "~test/serapack-selector/ui/SerapackSelector.test/fixture";
@@ -53,7 +52,7 @@ describe("SerapackSelector action recovery", () => {
 			catalog,
 		});
 		const removeButton = container.querySelector<HTMLButtonElement>(
-			'[data-ui="SerapackCatalogRow"] button',
+			'[data-ui="YourGamesRow"] button',
 		);
 		if (removeButton === null) throw new Error("Missing Remove action.");
 
@@ -113,10 +112,10 @@ describe("SerapackSelector action recovery", () => {
 		const navigate = vi
 			.spyOn(router, "navigate")
 			.mockRejectedValueOnce(new Error("load navigation rejected"));
-		const importButton = buttonByText(
-			container,
-			"Import SerapackChoose an existing .serapack file",
+		const importButton = container.querySelector<HTMLButtonElement>(
+			'[data-ui="YourGamesSerapackImport"]',
 		);
+		if (importButton === null) throw new Error("Missing Serapack import control.");
 
 		await act(async () => {
 			importButton.click();

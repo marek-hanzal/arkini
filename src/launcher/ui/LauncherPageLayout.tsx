@@ -9,9 +9,9 @@ const launcherPagePresentation = {
 		viewTransitionName: "serakki-panel-about",
 	},
 	serapacks: {
-		content: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
+		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
 		layout: "fixed-hero",
-		panel: "size-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
+		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
 		viewTransitionName: "serakki-panel-serapacks",
 	},
 	"editor-welcome": {

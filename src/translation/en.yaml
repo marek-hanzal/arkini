@@ -360,7 +360,7 @@ Choose a valid value.:
   value: Choose a valid value.
   dynamic: true
 Choose an existing .serapack file:
-  value: Create a project from an .serapack file
+  value: Choose an existing .serapack file
 Clear:
   value: Clear
 Clear interval:

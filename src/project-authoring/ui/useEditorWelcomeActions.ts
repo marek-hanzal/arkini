@@ -106,16 +106,6 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		],
 	);
 
-	const importSerapackFileFn = useCallback(() => {
-		if (blocked) return;
-		runCommandFn({
-			action: "import-serapack",
-		});
-	}, [
-		blocked,
-		runCommandFn,
-	]);
-
 	const importJsonDirectoryFn = useCallback(() => {
 		if (blocked) return;
 		runCommandFn({
@@ -202,7 +192,6 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		dismissedProjectRoots,
 		error: state.kind === "error" ? state.error : undefined,
 		exitFn,
-		importSerapackFileFn,
 		importJsonDirectoryFn,
 		openProjectFolderFn,
 		projectRefreshError,

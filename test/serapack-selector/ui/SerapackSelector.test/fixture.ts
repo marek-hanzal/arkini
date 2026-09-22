@@ -11,8 +11,10 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
+import type { ProjectCandidate } from "~/project-authoring/schema/ProjectCandidateSchema";
 import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
-import { Route as SerapackSelectorRouteDefinition } from "~/@routes/_launcher/serapacks";
+import { YourGames } from "~/serapack-selector/ui/YourGames";
+import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
 	globalThis as {
@@ -22,10 +24,6 @@ import { Route as SerapackSelectorRouteDefinition } from "~/@routes/_launcher/se
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
-const SerapackSelectorRoute = SerapackSelectorRouteDefinition.options.component;
-if (SerapackSelectorRoute === undefined)
-	throw new Error("Serapack selector route component is missing.");
-
 export const cleanupSerapackSelectorTests = async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
@@ -46,9 +44,11 @@ export const buttonByText = (container: ParentNode, text: string) => {
 export const renderSerapackSelector = async ({
 	catalog,
 	openUserDirectory = () => Promise.resolve(),
+	projects = [],
 }: {
 	readonly catalog: SerapackCatalog;
 	readonly openUserDirectory?: () => Promise<void>;
+	readonly projects?: ReadonlyArray<ProjectCandidate>;
 }) => {
 	Object.defineProperty(window, "serakki", {
 		configurable: true,
@@ -81,11 +81,17 @@ export const renderSerapackSelector = async ({
 		path: "/serapacks",
 		component: () =>
 			createElement(
-				RegistryContext.Provider,
-				{
-					value: registry,
-				},
-				createElement(SerapackSelectorRoute),
+				TranslationTestProvider,
+				undefined,
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: registry,
+					},
+					createElement(YourGames, {
+						projects,
+					}),
+				),
 			),
 	});
 	const mainMenuRoute = createRoute({

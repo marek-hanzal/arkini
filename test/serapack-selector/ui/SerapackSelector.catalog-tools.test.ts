@@ -142,4 +142,45 @@ describe("SerapackSelector catalog tools", () => {
 		expect(openEditorSerapack).toHaveBeenCalledWith("serakki");
 		expect(router.state.location.pathname).toBe("/editor/serakki/editor/items/list");
 	});
+
+	it("opens an existing Editor project folder from Your games", async () => {
+		const importJsonDirectoryFn = vi.fn(async () => ({
+			type: "success" as const,
+			value: {
+				projectId: "project-existing",
+				title: "Existing project",
+				version: {
+					major: 1,
+					minor: 0,
+				},
+				createdAtMs: 1,
+				updatedAtMs: 2,
+			},
+		}));
+		const { container, router } = await renderSerapackSelector({
+			catalog: createCatalog(),
+		});
+		Object.defineProperty(window.serakki, "editor", {
+			configurable: true,
+			value: {
+				importJsonDirectoryFn,
+			},
+		});
+		const openFolder = container.querySelector<HTMLButtonElement>(
+			'[data-ui="YourGamesOpenProjectFolder"]',
+		);
+		if (openFolder === null) throw new Error("Missing Editor folder action.");
+
+		await act(async () => {
+			openFolder.click();
+			await Promise.resolve();
+		});
+
+		await vi.waitFor(() => {
+			expect(importJsonDirectoryFn).toHaveBeenCalledOnce();
+			expect(router.state.location.pathname).toBe(
+				"/editor/project-existing/editor/items/list",
+			);
+		});
+	});
 });

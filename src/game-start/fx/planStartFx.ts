@@ -4,9 +4,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { ToolbarLocationSchema } from "~/item-location/schema/ToolbarLocationSchema";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
@@ -15,10 +13,7 @@ import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
 
-type StartGridLocation =
-	| BoardLocationSchema.Type
-	| InventoryLocationSchema.Type
-	| ToolbarLocationSchema.Type;
+type StartGridLocation = BoardLocationSchema.Type;
 
 interface PlanStartProps {
 	readonly runtime: RuntimeSchema.Type;
@@ -37,10 +32,7 @@ class StartSlotUnavailableError extends Data.TaggedError("StartSlotUnavailableEr
 	itemId: IdSchema.Type;
 	quantity: PositiveIntegerSchema.Type;
 	remainingQuantity: PositiveIntegerSchema.Type;
-	scope:
-		| typeof LocationScopeEnumSchema.enum.Board
-		| typeof LocationScopeEnumSchema.enum.Inventory
-		| typeof LocationScopeEnumSchema.enum.Toolbar;
+	scope: typeof LocationScopeEnumSchema.enum.Board;
 }> {}
 
 const applyExactGridStackFx = Effect.fn("planStartFx.applyExactGridStackFx")(function* ({
@@ -107,38 +99,9 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({ runtime, start 
 				runtime: draft,
 			}),
 	);
-	const inventory = yield* Effect.reduce(
-		start.inventory,
-		() => board,
-		(draft, item) =>
-			applyExactGridStackFx({
-				itemId: item.itemId,
-				location: {
-					position: item.position,
-					scope: LocationScopeEnumSchema.enum.Inventory,
-				},
-				quantity: item.quantity,
-				runtime: draft,
-			}),
-	);
-	const toolbar = yield* Effect.reduce(
-		start.toolbar,
-		() => inventory,
-		(draft, item) =>
-			applyExactGridStackFx({
-				itemId: item.itemId,
-				location: {
-					position: item.position,
-					scope: LocationScopeEnumSchema.enum.Toolbar,
-				},
-				quantity: item.quantity ?? 1,
-				runtime: draft,
-			}),
-	);
-
 	yield* assertRuntimeFx({
-		runtime: toolbar,
+		runtime: board,
 	});
 
-	return toolbar;
+	return board;
 });

@@ -202,16 +202,12 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 			const sourceAfter = nextRuntime.items.find(
 				(item): item is GridRuntimeItemSchema.Type =>
 					item.id === source.id &&
-					(item.location.scope === LocationScopeEnumSchema.enum.Board ||
-						item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-						item.location.scope === LocationScopeEnumSchema.enum.Toolbar),
+					item.location.scope === LocationScopeEnumSchema.enum.Board,
 			);
 			const targetAfter = nextRuntime.items.find(
 				(item): item is GridRuntimeItemSchema.Type =>
 					item.id === target.id &&
-					(item.location.scope === LocationScopeEnumSchema.enum.Board ||
-						item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-						item.location.scope === LocationScopeEnumSchema.enum.Toolbar),
+					item.location.scope === LocationScopeEnumSchema.enum.Board,
 			);
 			const result = {
 				event,

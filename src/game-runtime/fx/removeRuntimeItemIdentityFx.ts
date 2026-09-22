@@ -40,9 +40,7 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 		items: withoutIdentityState.items.filter((candidate) => candidate.id !== item.id),
 	} satisfies RuntimeSchema.Type;
 	const returnFromByOwnerItemId =
-		item.location.scope === LocationScopeEnumSchema.enum.Board ||
-		item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-		item.location.scope === LocationScopeEnumSchema.enum.Toolbar
+		item.location.scope === LocationScopeEnumSchema.enum.Board
 			? new Map([
 					[
 						item.id,

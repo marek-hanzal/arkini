@@ -118,8 +118,6 @@ const itemDiscardedEventSchema = z
 		reason: z.enum([
 			"job-aborted",
 			"board:full",
-			"inventory:full",
-			"toolbar:full",
 		]),
 	})
 	.strict();

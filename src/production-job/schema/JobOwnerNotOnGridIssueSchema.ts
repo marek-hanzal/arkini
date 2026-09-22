@@ -5,7 +5,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckI
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
 
-/** An active job owner no longer occupies a concrete board or inventory grid. */
+/** An active job owner no longer occupies a concrete board grid. */
 export const JobOwnerNotOnGridIssueSchema = z
 	.object({
 		jobId: IdSchema,

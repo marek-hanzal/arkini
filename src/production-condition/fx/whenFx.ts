@@ -20,10 +20,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 	const items = yield* queryFx({
 		origin,
 		query: when.query,
-	}).pipe(Effect.catchTag("BoardQueryOriginUnavailableError", () => Effect.succeed(undefined)));
-	// A missing physical Board origin makes the condition unavailable, not an
-	// empty query that could accidentally satisfy count: 0 or a zero-based range.
-	if (items === undefined) return false;
+	});
 	const quantity = items.reduce((total, item) => {
 		return total + item.quantity;
 	}, 0);

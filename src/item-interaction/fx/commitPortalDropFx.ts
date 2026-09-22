@@ -17,9 +17,7 @@ import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/t
 import { ItemLocationConflictError } from "~/item-location/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
@@ -158,18 +156,6 @@ export const commitPortalDropFx = Effect.fn("commitPortalDropFx")(function* ({
 				);
 			}
 			if (target.item.action?.type !== "space") {
-				return yield* Effect.fail(
-					new PortalDropRejectedError({
-						reason: DropItemRejectedReason.InvalidTarget,
-					}),
-				);
-			}
-			if (
-				!isItemLocationScopeAllowedFn({
-					item: source.item,
-					locationScope: LocationScopeEnumSchema.enum.Board,
-				})
-			) {
 				return yield* Effect.fail(
 					new PortalDropRejectedError({
 						reason: DropItemRejectedReason.InvalidTarget,

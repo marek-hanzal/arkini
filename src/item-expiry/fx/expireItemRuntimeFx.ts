@@ -117,10 +117,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 		events.push(...placed.events);
 		replacementPlaced = placed.replacementPlaced;
 	}
-	const itemWasVisible =
-		item.location.scope === LocationScopeEnumSchema.enum.Board ||
-		item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-		item.location.scope === LocationScopeEnumSchema.enum.Toolbar;
+	const itemWasVisible = item.location.scope === LocationScopeEnumSchema.enum.Board;
 	if (itemWasVisible && !replacementPlaced) {
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDisappeared,

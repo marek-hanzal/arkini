@@ -8,6 +8,7 @@ export const DistanceSchema = z
 		NearClose: "near-close",
 		Near: "near",
 		Far: "far",
+		Universe: "universe",
 	})
 	.meta({
 		id: "DistanceSchema",

@@ -59,11 +59,7 @@ const resolveItemActionFx = Effect.fn("resolveItemActionFx")(function* ({
 		runtime,
 	});
 	const owner = Option.getOrUndefined(narrowGridRuntimeItemFn(runtimeItem));
-	if (
-		owner === undefined ||
-		owner.location.scope === "inventory" ||
-		owner.item.action === undefined
-	) {
+	if (owner === undefined || owner.item.action === undefined) {
 		return yield* Effect.fail(
 			new ItemActionUnavailableError({
 				itemId,

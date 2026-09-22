@@ -87,7 +87,7 @@ Scheduled owners filter their selected Clock pool by line rules, draw by `clockW
 
 - Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.
 - A skipped request keeps its identity, line and valid stored inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
-- One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs and stored owners stay blocked. Explicit forced owner removal can abort active Jobs.
+- One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs. Explicit forced owner removal can abort active Jobs.
 - The engine can cancel an exact active job through [`cancelItemJobFx`](../production-job/fx/cancelItemJobFx.ts). Shared [`abortJobRuntimeFx`](../production-job/fx/abortJobRuntimeFx.ts) consumes committed material, returns reservations, and settles owner depletion atomically. Stale job IDs never cancel a replacement.
 - Clearing pending work returns its unused line-input material without cancelling active work. An optional line ID restricts clearing to that line. An exact request ID cancels only that pending request; stale IDs are no-ops. Shared line buffers and deliveries stay while another request for that line remains.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, stack isolation, reservation and Job creation.

@@ -10,7 +10,6 @@ export const DropItemResultKind = {
 	Move: "move",
 	Swap: "swap",
 	Merge: "merge",
-	StoreInventory: "store-inventory",
 	StoreInput: "store-input",
 	Stack: "stack",
 	Ignored: "ignored",
@@ -99,11 +98,6 @@ interface DropStoredInputResult {
 	};
 }
 
-interface DropStoredInventoryResult {
-	readonly kind: typeof DropItemResultKind.StoreInventory;
-	readonly source: DropTransferredActor;
-}
-
 interface DropStackedResult {
 	readonly kind: typeof DropItemResultKind.Stack;
 	readonly transferredQuantity: PositiveIntegerSchema.Type;
@@ -132,7 +126,6 @@ export type DropItemResult =
 	| DropMovedResult
 	| DropSwappedResult
 	| DropMergedResult
-	| DropStoredInventoryResult
 	| DropStoredInputResult
 	| DropStackedResult
 	| DropIgnoredResult

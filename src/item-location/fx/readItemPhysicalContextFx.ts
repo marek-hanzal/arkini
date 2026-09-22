@@ -27,8 +27,6 @@ export const readItemPhysicalContextFx = Effect.fn("readItemPhysicalContextFx")(
 		const location = current.location;
 		switch (location.scope) {
 			case "board":
-			case "inventory":
-			case "toolbar":
 				return {
 					origin: location,
 				} satisfies readItemPhysicalContextFx.Result;

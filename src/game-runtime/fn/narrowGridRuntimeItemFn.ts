@@ -4,12 +4,10 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
-/** Narrows one live runtime item to a board, inventory, or toolbar item. */
+/** Narrows one live runtime item to a board item. */
 export const narrowGridRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
 	Option.liftPredicate(
 		item,
 		(candidate): candidate is GridRuntimeItemSchema.Type =>
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board ||
-			candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar,
+			candidate.location.scope === LocationScopeEnumSchema.enum.Board,
 	);

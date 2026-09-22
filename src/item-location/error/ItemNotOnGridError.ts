@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /**
- * A grid-only runtime operation targeted an item outside Board, Inventory, or Toolbar.
+ * A grid-only runtime operation targeted an item outside Board.
  */
 export class ItemNotOnGridError extends Data.TaggedError("ItemNotOnGridError")<{
 	itemId: IdSchema.Type;

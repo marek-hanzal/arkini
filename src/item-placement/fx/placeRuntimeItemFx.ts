@@ -22,9 +22,6 @@ import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnava
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
-import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
-import { readPlacementRouteFn } from "~/item-placement/fn/readPlacementRouteFn";
-import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocationsFn";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
 
@@ -92,57 +89,9 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 					origin: origin.position,
 				})
 			: emptyBoard;
-	const inventory = excludeGridLocationsFn({
-		excludedLocations,
-		locations: readInventoryLocationsFn({
-			size: config.meta.inventory,
-		}),
-	});
-	const emptyInventory = readEmptyLocationsFn({
-		locations: inventory,
-		runtime,
-	});
-	const orderedInventory =
-		origin.scope === LocationScopeEnumSchema.enum.Inventory
-			? orderGridLocationsFn({
-					locations: emptyInventory,
-					origin: origin.position,
-				})
-			: emptyInventory;
-	const toolbar = excludeGridLocationsFn({
-		excludedLocations,
-		locations: readToolbarLocationsFn({
-			size: config.meta.toolbarSize ?? 0,
-		}),
-	});
-	const emptyToolbar = readEmptyLocationsFn({
-		locations: toolbar,
-		runtime,
-	});
-	const orderedToolbar =
-		origin.scope === LocationScopeEnumSchema.enum.Toolbar
-			? orderGridLocationsFn({
-					locations: emptyToolbar,
-					origin: origin.position,
-				})
-			: emptyToolbar;
-
-	const locationsByScope = {
-		board: orderedBoard,
-		inventory: orderedInventory,
-		toolbar: orderedToolbar,
-	} satisfies Record<readPlacementRouteFn.Scope, ReadonlyArray<GridLocationSchema.Type>>;
-	const route = readPlacementRouteFn({
-		itemScope: item.item.scope,
-		originScope: origin.scope,
-		toolbarEnabled: (config.meta.toolbarSize ?? 0) > 0,
-	});
-	for (const step of route) {
-		const location = locationsByScope[step.scope][0];
-		if (location !== undefined) return location;
-	}
-
-	const reason = route[route.length - 1].unavailableReason;
+	const location = orderedBoard[0];
+	if (location !== undefined) return location;
+	const reason = PlacementUnavailableError.Reason.BoardFull;
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
 			itemId: item.item.id,
@@ -155,7 +104,7 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 });
 
 /**
- * Returns one existing input-buffered, reserved, or Inventory item through the
+ * Returns one existing input-buffered or reserved item through the
  * canonical drop policy and reports the exact visible placement facts.
  */
 export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
@@ -179,16 +128,15 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	}
 	if (
 		item.location.scope !== LocationScopeEnumSchema.enum.Input &&
-		item.location.scope !== LocationScopeEnumSchema.enum.Reserved &&
-		item.location.scope !== LocationScopeEnumSchema.enum.Inventory
+		item.location.scope !== LocationScopeEnumSchema.enum.Reserved
 	) {
 		return yield* Effect.die(
 			new Error(
-				`Existing-item placement only accepts input, reserved, or Inventory items; ${item.id} is ${item.location.scope}.`,
+				`Existing-item placement only accepts input or reserved items; ${item.id} is ${item.location.scope}.`,
 			),
 		);
 	}
-	if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) {
+	{
 		yield* assertOwnerIdleFx({
 			ownerItemId: item.id,
 			runtime,

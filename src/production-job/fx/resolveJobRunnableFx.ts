@@ -4,9 +4,7 @@ import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 export namespace resolveJobRunnableFx {
 	export interface Props {
@@ -27,11 +25,7 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 			item.location.jobId === job.id,
 	);
 	if (hasReadyMaterial) return false;
-	const runtimeOwner = yield* readRuntimeItemByIdFx({
-		itemId: job.ownerItemId,
-		runtime,
-	});
-	if (isPassiveStorageLocationFn(runtimeOwner.location)) return false;
+
 	const { line, owner } = yield* readBoardItemLineFx({
 		lineId: job.lineId,
 		ownerItemId: job.ownerItemId,

@@ -17,11 +17,7 @@ export interface GridLocationClaim {
 export const readGridLocationClaimsFn = ({ runtime }: { readonly runtime: RuntimeSchema.Type }) => {
 	const claims: GridLocationClaim[] = [];
 	for (const item of runtime.items) {
-		if (
-			item.location.scope === LocationScopeEnumSchema.enum.Board ||
-			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
-		) {
+		if (item.location.scope === LocationScopeEnumSchema.enum.Board) {
 			claims.push({
 				itemId: item.id,
 				kind: "occupant",

@@ -1,6 +1,5 @@
 import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItemSchedulesFn";
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { isItemPureWithIndexFn } from "~/game-runtime/fn/isItemPureWithIndexFn";
@@ -14,11 +13,9 @@ import type { ItemUnitsIssueSchema } from "~/game-runtime/schema/ItemUnitsIssueS
 import type { ItemStackSizeIssueSchema } from "~/game-runtime/schema/ItemStackSizeIssueSchema";
 import type { LocationOccupiedIssueSchema } from "~/game-runtime/schema/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/game-runtime/schema/LocationOutOfBoundsIssueSchema";
-import type { LocationScopeIssueSchema } from "~/game-runtime/schema/LocationScopeIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import type { RuntimeCheckResultSchema } from "~/game-runtime/schema/RuntimeCheckResultSchema";
 import { indexGridLocationClaimsFn } from "~/item-location/fn/indexGridLocationClaimsFn";
-import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -130,11 +127,7 @@ const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: Runtime
 		readonly location: GridLocationSchema.Type;
 	}[] = [];
 	for (const item of runtime.items) {
-		if (
-			item.location.scope === LocationScopeEnumSchema.enum.Board ||
-			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
-		) {
+		if (item.location.scope === LocationScopeEnumSchema.enum.Board) {
 			items.push({
 				item,
 				location: item.location,
@@ -146,34 +139,11 @@ const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: Runtime
 			});
 		}
 	}
-	const scopeIssues: LocationScopeIssueSchema.Type[] = [];
 	const boundsIssues: LocationOutOfBoundsIssueSchema.Type[] = [];
 	const occupancyIssues: LocationOccupiedIssueSchema.Type[] = [];
 
 	for (const { item, location } of items) {
-		const configuredScope = item.item.scope;
-		if (
-			!isItemLocationScopeAllowedFn({
-				item: item.item,
-				locationScope: location.scope,
-			})
-		) {
-			scopeIssues.push({
-				configuredScope,
-				itemId: item.id,
-				location,
-				type: RuntimeCheckIssueEnumSchema.enum.LocationScope,
-			});
-		}
-
-		const size = match(location.scope)
-			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
-			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
-			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
-				width: config.meta.toolbarSize ?? 0,
-				height: 1,
-			}))
-			.exhaustive();
+		const size = config.meta.board;
 		if (location.position.x >= size.width || location.position.y >= size.height) {
 			boundsIssues.push({
 				itemId: item.id,
@@ -200,7 +170,6 @@ const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: Runtime
 	}
 
 	return [
-		...scopeIssues,
 		...boundsIssues,
 		...occupancyIssues,
 	];

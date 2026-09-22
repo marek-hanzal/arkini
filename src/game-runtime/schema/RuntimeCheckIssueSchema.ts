@@ -24,7 +24,6 @@ import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
 import { DefaultLineIssueSchema } from "~/production-line/schema/DefaultLineIssueSchema";
 import { LineInputClosedIssueSchema } from "~/production-line/schema/LineInputClosedIssueSchema";
-import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
 
 /**
  * One explicitly reported runtime invariant violation.
@@ -55,7 +54,6 @@ export const RuntimeCheckIssueSchema = z
 		DeliveryTargetIssueSchema,
 		LocationOccupiedIssueSchema,
 		LocationOutOfBoundsIssueSchema,
-		LocationScopeIssueSchema,
 	])
 	.meta({
 		id: "RuntimeCheckIssueSchema",

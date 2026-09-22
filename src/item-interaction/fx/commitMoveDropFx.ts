@@ -115,19 +115,6 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					}),
 				);
 			}
-			if (
-				(item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-					item.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
-				location.scope === LocationScopeEnumSchema.enum.Board &&
-				location.space !== runtime.currentSpace
-			) {
-				return yield* Effect.fail(
-					new CrossSpaceBoardOperationError({
-						fromSpace: runtime.currentSpace,
-						toSpace: location.space,
-					}),
-				);
-			}
 			const claim = readGridLocationClaimAtFn({
 				claims: readGridLocationClaimsFn({
 					runtime,

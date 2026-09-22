@@ -86,9 +86,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		}
 
 		if (
-			(candidate.location.scope !== LocationScopeEnumSchema.enum.Board &&
-				candidate.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
-				candidate.location.scope !== LocationScopeEnumSchema.enum.Toolbar) ||
+			candidate.location.scope !== LocationScopeEnumSchema.enum.Board ||
 			!matchesQueryLocationFn({
 				location: candidate.location,
 				origin,

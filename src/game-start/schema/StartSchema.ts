@@ -3,10 +3,8 @@ import { z } from "zod";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 
 import { BoardItemSchema } from "./BoardItemSchema";
-import { InventoryItemSchema } from "./InventoryItemSchema";
-import { ToolbarItemSchema } from "./ToolbarItemSchema";
 
-/** Defines the complete board, inventory, and toolbar state for a new game. */
+/** Defines the complete board state for a new game. */
 export const StartSchema = z
 	.object({
 		currentSpace: NonNegativeIntegerSchema.describe(
@@ -19,26 +17,11 @@ export const StartSchema = z
 			.array(BoardItemSchema)
 			.default([])
 			.describe("The items placed at explicit coordinates when a new game starts."),
-		/**
-		 * Items added to the initial inventory.
-		 */
-		inventory: z
-			.array(InventoryItemSchema)
-			.default([])
-			.describe("The item quantities added to inventory when a new game starts."),
-		/**
-		 * Items placed at explicit initial toolbar slots.
-		 */
-		toolbar: z
-			.array(ToolbarItemSchema)
-			.default([])
-			.describe("The items placed at explicit slots when a new game starts."),
 	})
 	.strict()
 	.meta({
 		id: "StartSchema",
-		description:
-			"The initial board placements, inventory contents, and toolbar placements for a new game.",
+		description: "The initial board placements for a new game.",
 	});
 
 export type StartSchema = typeof StartSchema;

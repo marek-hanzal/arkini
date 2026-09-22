@@ -1,4 +1,3 @@
-import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { DescriptionSchema } from "~/game-value/schema/DescriptionSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
@@ -67,10 +66,6 @@ export const ItemSchema = z
 		 * Visual artwork definition used to render this item.
 		 */
 		artwork: ArtworkSchema.describe("The visual artwork definition used to render this item."),
-		/**
-		 * Part of game state in which this item may be stored.
-		 */
-		scope: StorageSchema.describe("The part of game state in which this item may be stored."),
 		/**
 		 * Maximum number of this item that one stack can hold.
 		 *

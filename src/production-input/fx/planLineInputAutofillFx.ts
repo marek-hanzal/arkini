@@ -44,14 +44,7 @@ const candidateRankFn = ({
 	readonly owner: BoardRuntimeItemSchema.Type;
 }) => {
 	return {
-		scope:
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board
-				? candidate.location.space === owner.location.space
-					? 0
-					: 3
-				: candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar
-					? 1
-					: 2,
+		scope: candidate.location.space === owner.location.space ? 0 : 1,
 		distance:
 			candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
 			candidate.location.space === owner.location.space
@@ -87,8 +80,7 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Each input applies its query. Sources prefer the owner's board space by distance, then Toolbar,
- * Inventory and other board spaces in stable slot order.
+ * Each input applies its query. Sources prefer the owner's board space by distance, then other board spaces in stable slot order.
  * Required minima are allocated across every slot before compatible range inputs receive optional
  * top-ups toward their maximum. The planner does not mutate runtime truth itself.
  */

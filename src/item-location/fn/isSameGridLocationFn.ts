@@ -6,7 +6,7 @@ interface SameGridLocationProps {
 	readonly right: GridLocationSchema.Type;
 }
 
-/** Compares two concrete board/inventory/toolbar locations by their full identity. */
+/** Compares two concrete board locations by their full identity. */
 export const isSameGridLocationFn = ({ left, right }: SameGridLocationProps) => {
 	if (left.scope !== right.scope) return false;
 	if (left.position.x !== right.position.x || left.position.y !== right.position.y) {

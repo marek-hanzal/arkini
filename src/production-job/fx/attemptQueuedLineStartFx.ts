@@ -11,7 +11,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { autofillLineInputsRuntimeFx } from "~/production-input/fx/autofillLineInputsRuntimeFx";
 import { startQueuedLineRuntimeFx } from "./startQueuedLineRuntimeFx";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace attemptQueuedLineStartFx {
 	export interface Props {
@@ -133,15 +132,6 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 					error,
 					runtime,
 				} satisfies attemptQueuedLineStartFx.Result),
-			ItemNotOnBoardError: (error) =>
-				error.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-				error.location.scope === LocationScopeEnumSchema.enum.Toolbar
-					? Effect.succeed({
-							type: "blocked",
-							error,
-							runtime,
-						} satisfies attemptQueuedLineStartFx.Result)
-					: Effect.fail(error),
 		}),
 	);
 });

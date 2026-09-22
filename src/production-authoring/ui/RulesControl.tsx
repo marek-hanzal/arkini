@@ -184,50 +184,68 @@ const WhenControl = ({
 	const selectedValue = value.type === undefined ? undefined : value;
 	return (
 		<div className="grid min-w-0 gap-3">
-			<EditorChoiceControl
-				error={readEditorFormValidationErrorFn(validationIssues, "type")}
-				label={translator.textFn("Condition type")}
-				value={value.type}
-				options={[
-					{
-						description: <Mx label="Exists condition help" />,
-						label: translator.textFn("Exists"),
-						value: "exists",
-					},
-					{
-						description: <Mx label="Exact count condition help" />,
-						label: translator.textFn("Exact count"),
-						value: "count",
-					},
-					{
-						description: <Mx label="Count range condition help" />,
-						label: translator.textFn("Count range"),
-						value: "range",
-					},
-				]}
-				onChangeFn={(type) => {
-					const query = value.query;
-					onChangeFn(
-						type === "exists"
-							? {
-									type,
-									query,
-								}
-							: type === "count"
+			<div className="flex min-w-0 items-start justify-between gap-3">
+				<EditorChoiceControl
+					error={readEditorFormValidationErrorFn(validationIssues, "type")}
+					label={translator.textFn("Condition type")}
+					value={value.type}
+					options={[
+						{
+							description: <Mx label="Exists condition help" />,
+							label: translator.textFn("Exists"),
+							value: "exists",
+						},
+						{
+							description: <Mx label="Exact count condition help" />,
+							label: translator.textFn("Exact count"),
+							value: "count",
+						},
+						{
+							description: <Mx label="Count range condition help" />,
+							label: translator.textFn("Count range"),
+							value: "range",
+						},
+					]}
+					onChangeFn={(type) => {
+						const query = value.query;
+						onChangeFn(
+							type === "exists"
 								? {
 										type,
 										query,
-										count: 1,
 									}
-								: {
-										type,
-										query,
-										min: 1,
-										max: 1,
-									},
-					);
-				}}
-			/>
+								: type === "count"
+									? {
+											type,
+											query,
+											count: 1,
+										}
+									: {
+											type,
+											query,
+											min: 1,
+											max: 1,
+										},
+						);
+					}}
+				/>
+				{selectedValue === undefined ? null : (
+					<BoardDistanceControl
+						error={readEditorFormValidationErrorFn(
+							validationIssues,
+							"query",
+							"distance",
+						)}
+						value={selectedValue.query}
+						onChangeFn={(query) =>
+							onChangeFn({
+								...selectedValue,
+								query,
+							})
+						}
+					/>
+				)}
+			</div>
 			{selectedValue === undefined ? null : (
 				<>
 					<SelectorControl
@@ -248,22 +266,6 @@ const WhenControl = ({
 							})
 						}
 					/>
-					<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-						<BoardDistanceControl
-							error={readEditorFormValidationErrorFn(
-								validationIssues,
-								"query",
-								"distance",
-							)}
-							value={selectedValue.query}
-							onChangeFn={(query) =>
-								onChangeFn({
-									...selectedValue,
-									query,
-								})
-							}
-						/>
-					</div>
 					{match(selectedValue)
 						.with(
 							{

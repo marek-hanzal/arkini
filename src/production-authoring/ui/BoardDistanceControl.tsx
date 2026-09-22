@@ -44,7 +44,7 @@ export const BoardDistanceControl = ({
 	return (
 		<EditorChoiceControl
 			error={error}
-			label={translator.textFn("Query reach")}
+			label={translator.textFn("Search area")}
 			value={value.distance}
 			options={boardDistanceOptions.map((option) => ({
 				...option,

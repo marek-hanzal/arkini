@@ -1629,8 +1629,6 @@ Project unreachable items count:
   value: "{count} unreachable items"
 Quantity:
   value: Quantity
-Query reach:
-  value: Query reach
 Queue capacity:
   value: Queue capacity
 Random:
@@ -1818,6 +1816,8 @@ Search:
   value: Search
 Search SFX…:
   value: Search SFX…
+Search area:
+  value: Search area
 Search artwork…:
   value: Search artwork…
 Search item title or ID…:

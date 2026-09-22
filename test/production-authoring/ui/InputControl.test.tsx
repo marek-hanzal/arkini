@@ -235,7 +235,7 @@ describe("InputControl", () => {
 		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
 		const inputType = findChoiceControl(container, "Input type");
 		const paidBy = findChoiceControl(container, "Paid by");
-		const boardDistance = findChoiceControl(unitCost, "Query reach");
+		const boardDistance = findChoiceControl(unitCost, "Search area");
 
 		expect(inputType.parentElement).toBe(paidBy.parentElement);
 		expect(unitCost.contains(paidBy)).toBe(false);

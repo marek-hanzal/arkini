@@ -1,0 +1,58 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "sz71j0pw2csqio32j1eec2dw",
+		"title": "Haunted Bed With Teddy Bear",
+		"draft": true,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"qctli2iyk6s9ugaeuo86bi4e"
+			]
+		},
+		"clock": {
+			"durationMs": 180000,
+			"expiryMode": "kill-switch",
+			"enable": true,
+			"rules": [],
+			"onExpire": {
+				"set": [
+					{
+						"weight": 1,
+						"rules": [],
+						"roll": [
+							{
+								"type": "guaranteed",
+								"outcome": [
+									{
+										"type": "item",
+										"itemUid": "k5c77w0nkqa2gik8nxj2mrb2",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									},
+									{
+										"type": "item",
+										"itemUid": "ynro5iy60hlzcb1q3kd1an8l",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"lines": []
+	}
+}

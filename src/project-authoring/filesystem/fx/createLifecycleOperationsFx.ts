@@ -173,7 +173,12 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 			const root = yield* fileSystem.realPath(path.resolve(entry.root));
 			if (entry.ownership === "managed") {
 				const relative = path.relative(managedProjectsRoot, root);
-				if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative))
+				if (
+					relative === "" ||
+					relative === ".." ||
+					relative.startsWith(`..${path.sep}`) ||
+					path.isAbsolute(relative)
+				)
 					return yield* Effect.fail(
 						new Error(
 							`Managed Editor project root ${entry.root} is outside the managed projects directory.`,

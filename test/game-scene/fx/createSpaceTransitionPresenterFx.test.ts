@@ -125,12 +125,19 @@ describe("Space Action presenter", () => {
 		expect(applied).toEqual(appliedBeforeClose);
 	});
 
-	it("ignores duplicate live delivery after an immediate refresh", () => {
-		const applied: GameTransition[] = [];
+	it("deduplicates live delivery and hydrates a settled drop after the Space frame", () => {
+		const applied: Array<{
+			readonly mode: "hydrate" | "present" | undefined;
+			readonly transition: GameTransition;
+		}> = [];
 		let renderAcknowledgment: () => void = () => undefined;
 		const presenter = Effect.runSync(
 			createSpaceTransitionPresenterFx({
-				applyTransitionFn: (transition) => applied.push(transition),
+				applyTransitionFn: (transition, mode) =>
+					applied.push({
+						transition,
+						mode,
+					}),
 				initialSequence: 0,
 				scheduleAfterRenderFn: (work) => {
 					renderAcknowledgment = work;
@@ -143,7 +150,9 @@ describe("Space Action presenter", () => {
 
 		presenter.refreshFn(overtakingSpace);
 		presenter.presentFn(overtakingSpace);
-		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
+		expect(
+			applied.map(({ transition }) => transition.events.map((event) => event.type)),
+		).toEqual([
 			[
 				"item:unit-spent",
 			],
@@ -152,13 +161,24 @@ describe("Space Action presenter", () => {
 		renderAcknowledgment();
 		presenter.refreshFn(overtakingSpace);
 
-		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
+		expect(
+			applied.map(({ transition }) => transition.events.map((event) => event.type)),
+		).toEqual([
 			[
 				"item:unit-spent",
 			],
 			[
 				"current-space:changed",
 			],
+			[
+				"item:unit-spent",
+				"current-space:changed",
+			],
+		]);
+		expect(applied.map(({ mode }) => mode)).toEqual([
+			undefined,
+			undefined,
+			"hydrate",
 		]);
 	});
 

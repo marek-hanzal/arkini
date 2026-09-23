@@ -257,6 +257,20 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
 	});
 
+	it("creates and deletes a managed project whose valid ID begins with two dots", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository, "..leading");
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		expect(root).toContain("..leading-");
+
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
+		await Effect.runPromise(reopened.deleteProjectFx(created.projectId));
+		await expect(access(root)).rejects.toBeDefined();
+	});
+
 	it("reconciles healthy and incomplete managed directories when the catalog is missing", async () => {
 		const seedingRepository = await harness.openRepository();
 		const healthy = await harness.createProject(seedingRepository, "healthy-missing-catalog");

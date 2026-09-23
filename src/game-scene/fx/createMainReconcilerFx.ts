@@ -227,10 +227,15 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		readonly transition: GameTransition;
 	}) {
 		if (closed) return;
+		const previousSpace = transition.previousRuntime?.currentSpace;
+		const spaceChanged =
+			presentCommittedEffects &&
+			previousSpace !== undefined &&
+			previousSpace !== transition.runtime.currentSpace;
 		const boardEntrance =
 			!initialized ||
 			(presentCommittedEffects &&
-				(transition.previousRuntime?.currentSpace !== transition.runtime.currentSpace ||
+				(spaceChanged ||
 					transition.events.some(
 						(event) =>
 							event.type === "board:template-applied" &&
@@ -245,6 +250,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
+		if (spaceChanged) yield* motion.cancelSpaceFx(previousSpace);
 		if (presentCommittedEffects && transition.sequence > lastTemplateResetSequence) {
 			const resetSpaces = new Set(
 				transition.events.flatMap((event) =>
@@ -268,6 +274,37 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		yield* motion.handoffDeliveriesFx(new Set(deliveries.map((delivery) => delivery.item.id)));
 		yield* delivery.syncFx(deliveries);
+		if (spaceChanged) {
+			for (const item of nextItems) {
+				const actor = actorStore.actors.get(item.id);
+				if (
+					actor?.item.location.scope !== "board" ||
+					actor.item.location.space === transition.runtime.currentSpace
+				)
+					continue;
+				// A transported identity needs a fresh destination pose, even while its
+				// source actor is still owned by a pending drop.
+				const retired = yield* releaseMainActorFx({
+					actorId: item.id,
+					actorStore,
+					animator,
+					drag,
+				});
+				if (retired !== null) yield* actorStore.destroyExitingActorFx(retired);
+			}
+			// The old Board's retained and exiting actors share the destination's Pixi layers.
+			for (const actor of new Set([
+				...actorStore.actors.values(),
+				...actorStore.exitingActors,
+			])) {
+				if (
+					actor.item.location.scope === "board" &&
+					actor.item.location.space !== transition.runtime.currentSpace
+				)
+					actor.container.visible = false;
+			}
+			yield* application.frames.invalidateFx;
+		}
 		const deliverySnapshot = yield* delivery.readSnapshotFx;
 		const compiledCues = presentCommittedEffects
 			? readTileMotionCuesFn({
@@ -436,6 +473,10 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 
 			const actor = actorStore.actors.get(item.id);
 			if (actor === undefined) continue;
+			if (!actor.container.visible) {
+				actor.container.visible = true;
+				yield* application.frames.invalidateFx;
+			}
 			const updatePlan = classifyActorUpdateFn({
 				actor,
 				deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),

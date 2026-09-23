@@ -4,7 +4,7 @@ import type { GameTransition } from "~/game-session/type/GameSession";
 import { readSpaceTransitionPresentationPhasesFn } from "~/game-scene/fn/readSpaceTransitionPresentationPhasesFn";
 
 interface CreateSpaceTransitionPresenterProps {
-	readonly applyTransitionFn: (transition: GameTransition) => void;
+	readonly applyTransitionFn: (transition: GameTransition, mode?: "hydrate" | "present") => void;
 	readonly initialSequence: number;
 	readonly scheduleAfterRenderFn: (workFn: () => void) => () => void;
 	readonly setInteractionBlockedFn: (blocked: boolean) => void;
@@ -75,8 +75,10 @@ export const createSpaceTransitionPresenterFx = Effect.fn("createSpaceTransition
 					const isSpaceSwitch = transition.events.some(
 						(event) => event.type === "current-space:changed",
 					);
-					if (!awaitingSpaceSwitchProjection && !isSpaceSwitch) {
-						applyTransitionFn(transition);
+					if (!awaitingSpaceSwitchProjection) {
+						// A settled drop still needs actor reconciliation after the Space frame barrier.
+						// Replaying the Space event would present the switch and its cues twice.
+						applyTransitionFn(transition, isSpaceSwitch ? "hydrate" : "present");
 					}
 					return;
 				}

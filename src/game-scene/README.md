@@ -45,6 +45,8 @@ Before delivery takes an existing actor's pose, reconciliation retires its activ
 
 A committed template reset retires active and queued motion in the replaced space before new cues are admitted. Cancelled output actors use the normal exit fade; stale completion callbacks cannot restart their lanes. Other spaces retain their motion.
 
+Switching the viewed Space retires motion touching the departed Space and hides its retained or exiting actors before the destination is shown. A pending drop may settle after the switch; its refresh hydrates the final snapshot after the render barrier without replaying committed events. An item identity transported to the destination gets a fresh actor at its destination pose.
+
 Input contact retires the delivered item actor. The source and receiver remain claimed until consumption feedback finishes.
 
 A delivery reappearing during its exit replaces the old exit ownership before cancellation. Canonical settlement restores any unfinished exit; obsolete completion callbacks cannot remove or hide the surviving actor.

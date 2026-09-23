@@ -430,6 +430,7 @@ export const createDrag = () => {
 
 export const createMotion = () =>
 	({
+		cancelSpaceFx: () => Effect.void,
 		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,

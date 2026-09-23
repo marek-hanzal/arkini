@@ -276,6 +276,49 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	}
 
 	return {
+		cancelSpaceFx: Effect.fn("MotionRuntime.cancelSpaceFx")(function* (space: number) {
+			if (closed) return;
+			const canceled = readCuesFn().filter(
+				(cue) => cue.originLocation.space === space || cue.targetLocation.space === space,
+			);
+			if (canceled.length === 0) return;
+			const keys = new Set(canceled.map(readCueKeyFn));
+			const releasedActorIds = new Set<string>();
+			// Retire the entire batch before cancel callbacks can complete another cue in it.
+			for (const key of keys) cueLifecycleByKey.delete(key);
+			motionLanes = {
+				active: motionLanes.active.filter((cue) => !keys.has(readCueKeyFn(cue))),
+				pending: motionLanes.pending.filter((cue) => !keys.has(readCueKeyFn(cue))),
+			};
+			for (const cue of canceled) {
+				for (const actorId of readTileMotionActorClaimsFn(cue))
+					releasedActorIds.add(actorId);
+				for (const key of readMotionAnimationKeysFn({
+					cue,
+					cueKey: readCueKeyFn(cue),
+				})) {
+					yield* animator.cancelFx(key);
+				}
+			}
+			motionLanes = updateTileMotionLanesFn({
+				action: {
+					type: "enqueue",
+					cues: [],
+				},
+				state: motionLanes,
+			});
+			yield* finalizeMotionActorsFx({
+				actorIds: releasedActorIds,
+				actorStore,
+				animator,
+				application,
+				onActorSettledFn,
+				readPaletteFn,
+				stillClaimedActorIds: readRetainedActorIdsFn(),
+				surface,
+				textures,
+			});
+		}),
 		handoffDeliveriesFx: Effect.fn("MotionRuntime.handoffDeliveriesFx")(function* (
 			actorIds: ReadonlySet<string>,
 		) {

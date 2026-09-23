@@ -21,6 +21,8 @@ export interface MotionSnapshot {
 }
 
 export interface MotionRuntime {
+	/** Retires all presentation owned by a replaced space before its new cues are enqueued. */
+	readonly cancelSpaceFx: (space: number) => Effect.Effect<void, never, never>;
 	/** Retires spawn, input, and swap cues before canonical deliveries take their actors at the live pose. */
 	readonly handoffDeliveriesFx: (
 		actorIds: ReadonlySet<string>,

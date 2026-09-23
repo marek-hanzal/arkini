@@ -323,6 +323,7 @@ export const mountController = ({
 		runFx: (effect: Effect.Effect<unknown, unknown>) => effect,
 	} as never;
 	const motion = {
+		cancelSpaceFx: () => Effect.void,
 		handoffDeliveriesFx: () => Effect.void,
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,

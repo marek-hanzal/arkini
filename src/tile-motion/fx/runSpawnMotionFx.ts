@@ -20,6 +20,7 @@ export namespace runSpawnMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly onCompleteFn: () => void;
+		readonly isCueActiveFn: () => boolean;
 		readonly origin: ActorPose;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -34,6 +35,7 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	onCompleteFn,
+	isCueActiveFn,
 	origin,
 	surface,
 	target,
@@ -88,7 +90,9 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 		durationMs,
 		ownerKey: `motion:${cueKey}`,
 		onCompleteFn: () => {
+			if (!isCueActiveFn()) return;
 			const settleFn = () => {
+				if (!isCueActiveFn()) return;
 				const currentTarget =
 					RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ??
 					target;

@@ -4,6 +4,7 @@ import {
 	boardLocation,
 	createActor,
 	createItem,
+	createMotion,
 	createReconcilerHarness,
 	projectionProbeState,
 	transition,
@@ -117,4 +118,46 @@ it("reveals a late-mounted board in row order once and staggers a committed temp
 	);
 	expect(harness.actors.get("bottom:new")?.lifecycleIntentGeneration).toBe(generation);
 	vi.restoreAllMocks();
+});
+
+it("retires reset-space motion before new cues and never repeats it on refresh", () => {
+	const calls: string[] = [];
+	const motion = createMotion();
+	const harness = createReconcilerHarness({
+		actor: createActor(createItem("old", boardLocation)),
+		motion: {
+			...motion,
+			cancelSpaceFx: (space) =>
+				Effect.sync(() => {
+					calls.push(`cancel:${space}`);
+				}),
+			enqueueFx: () =>
+				Effect.sync(() => {
+					calls.push("enqueue");
+				}),
+		},
+	});
+	const applied = {
+		...transition(20),
+		events: [
+			{
+				type: "board:template-applied" as const,
+				space: 1,
+				templateUid: "next",
+			},
+		],
+	};
+	Effect.runSync(harness.reconciler.hydrateFx(applied));
+	expect(calls).toEqual([]);
+	Effect.runSync(harness.reconciler.reconcileFx(applied));
+	expect(calls).toEqual([
+		"cancel:1",
+		"enqueue",
+	]);
+	Effect.runSync(harness.reconciler.reconcileFx(applied));
+	expect(calls).toEqual([
+		"cancel:1",
+		"enqueue",
+		"enqueue",
+	]);
 });

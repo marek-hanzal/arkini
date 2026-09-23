@@ -43,6 +43,8 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 
 Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn/input/swap cues through `MotionRuntime.handoffDeliveriesFx`. The real actor keeps its live pose; released producers/receivers and remaining cue lanes settle normally. A superseded swap releases both writers and settles its other grid actor from the live pose. Cancelling the pose writer alone does not release cue ownership.
 
+A committed template reset retires active and queued motion in the replaced space before new cues are admitted. Cancelled output actors use the normal exit fade; stale completion callbacks cannot restart their lanes. Other spaces retain their motion.
+
 Input contact retires the delivered item actor. The source and receiver remain claimed until consumption feedback finishes.
 
 A delivery reappearing during its exit replaces the old exit ownership before cancellation. Canonical settlement restores any unfinished exit; obsolete completion callbacks cannot remove or hide the surviving actor.

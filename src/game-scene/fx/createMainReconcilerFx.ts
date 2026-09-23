@@ -110,6 +110,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	const processedFeedbackKeys = new Set<string>();
 	let closed = false;
 	let initialized = false;
+	let lastTemplateResetSequence = -1;
 
 	const retainNewestFeedbackKeysFn = () => {
 		while (processedFeedbackKeys.size > 256) {
@@ -244,6 +245,21 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 		yield* actorStore.replaceCanonicalItemsFx(nextItems);
+		if (presentCommittedEffects && transition.sequence > lastTemplateResetSequence) {
+			const resetSpaces = new Set(
+				transition.events.flatMap((event) =>
+					event.type === "board:template-applied"
+						? [
+								event.space,
+							]
+						: [],
+				),
+			);
+			if (resetSpaces.size > 0) {
+				lastTemplateResetSequence = transition.sequence;
+				for (const space of resetSpaces) yield* motion.cancelSpaceFx(space);
+			}
+		}
 		const deliveries = game.readOrThrowFn(
 			readTileDeliveriesFx({
 				game,

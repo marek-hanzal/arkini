@@ -26,6 +26,7 @@ export namespace runSwapMotionFx {
 		readonly cueKey: string;
 		readonly delayMs: number;
 		readonly onCompleteFn: () => void;
+		readonly isCueActiveFn: () => boolean;
 		readonly origin: ActorPose;
 		readonly surface: MainSurface;
 		readonly target: ActorPose;
@@ -40,6 +41,7 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 	cueKey,
 	delayMs,
 	onCompleteFn,
+	isCueActiveFn,
 	origin,
 	surface,
 	target,
@@ -113,7 +115,9 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 			durationMs,
 			ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
 			onCompleteFn: () => {
+				if (!isCueActiveFn()) return;
 				const settleFn = () => {
+					if (!isCueActiveFn()) return;
 					if (!pendingActorIds.delete(leg.actor.item.id)) return;
 					if (!leg.actor.container.destroyed) {
 						const canonical = actorStore.canonicalItems.get(leg.actor.item.id);

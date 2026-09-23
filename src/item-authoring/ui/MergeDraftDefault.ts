@@ -4,7 +4,7 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 export const MergeDraftDefault = {
 	target: {
 		type: "item",
-		itemId: "",
+		itemUid: "",
 	},
 	action: "use",
 	effect: "keep",

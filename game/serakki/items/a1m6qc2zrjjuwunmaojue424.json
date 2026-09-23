@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a1m6qc2zrjjuwunmaojue424",
-		"id": "sewn-pillow-with-coins",
 		"title": "Sewn Pillow With Coins",
 		"ui": "simple",
 		"draft": true,
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle-puppy"
+					"itemUid": "jml833htnpikvhdtswrnfn3a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-puppy-tearing-pillow-with-coins"
+				"result": "w4lh4pqnmanjo0e7jy6m3bas"
 			}
 		],
 		"maxQueueSize": 1,

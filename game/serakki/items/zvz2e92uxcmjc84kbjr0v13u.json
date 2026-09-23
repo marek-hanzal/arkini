@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zvz2e92uxcmjc84kbjr0v13u",
-		"id": "dirty-clay-plate",
 		"title": "Dirty Clay Plate",
 		"ui": "simple",
 		"artwork": {

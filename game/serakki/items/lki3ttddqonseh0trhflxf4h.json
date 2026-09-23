@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lki3ttddqonseh0trhflxf4h",
-		"id": "key-t2",
 		"title": "Key - Tier 2",
 		"ui": "simple",
 		"description": "Thing unlocker",

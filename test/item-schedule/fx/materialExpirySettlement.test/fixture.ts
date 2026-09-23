@@ -17,13 +17,13 @@ export const boardFn = (x: number) => ({
 export const prepareMaterialOwnerFx = Effect.fn("prepareMaterialOwnerFx")(function* () {
 	yield* spawnItemFx({
 		id: "owner",
-		itemId: "owner",
+		itemUid: "owner",
 
 		location: boardFn(0),
 	});
 	const input = yield* spawnItemFx({
 		id: "input",
-		itemId: "temporary",
+		itemUid: "temporary",
 
 		location: boardFn(1),
 	});

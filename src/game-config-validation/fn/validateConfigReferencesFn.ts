@@ -31,19 +31,19 @@ const validateSelectorReferenceFn = ({
 	path: DiagnosticPathSchema.Type;
 	source?: string;
 }) => {
-	if (config.items[selector.itemId] !== undefined) return [] as GameDiagnosticsSchema.Type;
+	if (config.items[selector.itemUid] !== undefined) return [] as GameDiagnosticsSchema.Type;
 	return [
 		{
 			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				...path,
-				"itemId",
+				"itemUid",
 			],
 			source,
-			message: `Selector references missing item ${selector.itemId}.`,
+			message: `Selector references missing item ${selector.itemUid}.`,
 			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-			referenceId: selector.itemId,
+			referenceId: selector.itemUid,
 		} satisfies GameDiagnosticSchema.Type,
 	];
 };
@@ -194,18 +194,18 @@ const validateOutcomeFn = ({
 	source?: string;
 }) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
-	if (drop.type === "item" && config.items[drop.itemId] === undefined) {
+	if (drop.type === "item" && config.items[drop.itemUid] === undefined) {
 		diagnostics.push({
 			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				...path,
-				"itemId",
+				"itemUid",
 			],
 			source,
-			message: `Item outcome references missing item ${drop.itemId}.`,
+			message: `Item outcome references missing item ${drop.itemUid}.`,
 			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-			referenceId: drop.itemId,
+			referenceId: drop.itemUid,
 		});
 	}
 
@@ -338,7 +338,7 @@ export const validateConfigReferencesFn = ({
 
 	for (const [templateIndex, template] of (config.templates ?? []).entries()) {
 		for (const [cellIndex, cell] of template.board.entries()) {
-			if (config.items[cell.itemId] !== undefined) continue;
+			if (config.items[cell.itemUid] !== undefined) continue;
 			diagnostics.push({
 				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
 				severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -347,12 +347,12 @@ export const validateConfigReferencesFn = ({
 					templateIndex,
 					"board",
 					cellIndex,
-					"itemId",
+					"itemUid",
 				],
 				source: provenance.templates,
-				message: `Template ${template.title} references missing item ${cell.itemId}.`,
+				message: `Template ${template.title} references missing item ${cell.itemUid}.`,
 				reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-				referenceId: cell.itemId,
+				referenceId: cell.itemUid,
 			});
 		}
 	}
@@ -375,8 +375,8 @@ export const validateConfigReferencesFn = ({
 		});
 	}
 
-	for (const [itemId, item] of Object.entries(config.items)) {
-		const source = provenance.items[itemId];
+	for (const [itemUid, item] of Object.entries(config.items)) {
+		const source = provenance.items[itemUid];
 		const clock = item.clock;
 		if (clock !== undefined) {
 			diagnostics.push(
@@ -385,7 +385,7 @@ export const validateConfigReferencesFn = ({
 					inputs: [],
 					path: [
 						"items",
-						itemId,
+						itemUid,
 						"clock",
 					],
 					rules: clock.rules.map((rule, index) => ({
@@ -404,7 +404,7 @@ export const validateConfigReferencesFn = ({
 						selector: merge.target,
 						path: [
 							"items",
-							itemId,
+							itemUid,
 							"merge",
 							mergeIndex,
 							"target",
@@ -433,7 +433,7 @@ export const validateConfigReferencesFn = ({
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [
 								"items",
-								itemId,
+								itemUid,
 								"merge",
 								mergeIndex,
 								"result",
@@ -461,7 +461,7 @@ export const validateConfigReferencesFn = ({
 		}
 
 		const lines = readItemLineEntriesFn({
-			itemId,
+			itemUid,
 			item,
 		});
 		for (const line of lines) {
@@ -476,7 +476,7 @@ export const validateConfigReferencesFn = ({
 		}
 
 		const outputs = readItemOutcomeEntriesFn({
-			itemId,
+			itemUid,
 			item,
 		});
 		for (const outcome of outputs) {

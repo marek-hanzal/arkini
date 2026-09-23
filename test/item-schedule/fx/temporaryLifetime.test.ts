@@ -32,7 +32,7 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 	items: runtime.items
 		.map((item) => ({
 			id: item.id,
-			itemId: item.item.id,
+			itemId: item.item.uid,
 			location: item.location,
 
 			remainingDurationMs: item.schedule?.remainingDurationMs,
@@ -53,7 +53,7 @@ const spawnTemporaryFx = Effect.fn("spawnTemporaryFx")(function* ({
 }) {
 	return yield* spawnItemFx({
 		id,
-		itemId,
+		itemUid: itemId,
 		location: {
 			scope: "board",
 			space: 0,
@@ -68,7 +68,7 @@ const spawnTemporaryFx = Effect.fn("spawnTemporaryFx")(function* ({
 const spawnBlockerFx = Effect.fn("spawnBlockerFx")(function* (id: string, x: number) {
 	return yield* spawnItemFx({
 		id,
-		itemId: "blocker",
+		itemUid: "blocker",
 		location: {
 			scope: "board",
 			space: 0,
@@ -130,7 +130,7 @@ describe("temporary item lifetime", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:temporary",
-				canonicalItemId: "temporaryPlain",
+				itemUid: "temporaryPlain",
 				location: {
 					scope: "board",
 					space: 0,
@@ -143,7 +143,7 @@ describe("temporary item lifetime", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemDisappeared,
 				itemId: "runtime:temporary",
-				canonicalItemId: "temporaryPlain",
+				itemUid: "temporaryPlain",
 				location: {
 					scope: "board",
 					space: 0,
@@ -309,7 +309,7 @@ describe("temporary item lifetime", () => {
 				const fourth = yield* advanceRuntimeStepFx(third.runtime);
 				const fifth = yield* advanceRuntimeStepFx(fourth.runtime);
 				const sixth = yield* advanceRuntimeStepFx(fifth.runtime);
-				const outcome = sixth.runtime.items.find((item) => item.item.id === "result");
+				const outcome = sixth.runtime.items.find((item) => item.item.uid === "result");
 				if (outcome === undefined) throw new Error("Expected expiry outcome.");
 				return {
 					outcome,
@@ -337,13 +337,13 @@ describe("temporary item lifetime", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: result.temporary.id,
-				canonicalItemId: "temporaryOutput",
+				itemUid: "temporaryOutput",
 				location: result.temporary.location,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: result.outcome.id,
-				canonicalItemId: "result",
+				itemUid: "result",
 				originItemId: result.temporary.id,
 				location: result.outcome.location,
 			},
@@ -378,7 +378,7 @@ describe("temporary item lifetime", () => {
 		expect(runtime.items).toEqual([
 			expect.objectContaining({
 				item: expect.objectContaining({
-					id: "result",
+					uid: "result",
 				}),
 				location: {
 					scope: "board",
@@ -447,7 +447,7 @@ describe("temporary item lifetime", () => {
 		);
 		const summarizeResults = (runtime: RuntimeSchema.Type) =>
 			runtime.items
-				.filter((item) => item.item.id === "result")
+				.filter((item) => item.item.uid === "result")
 				.map((item) => ({
 					location: item.location,
 				}))
@@ -493,7 +493,7 @@ describe("temporary item lifetime", () => {
 			"runtime:b",
 		]);
 		expect(
-			transition.runtime.items.filter((item) => item.item.id === "cappedResult"),
+			transition.runtime.items.filter((item) => item.item.uid === "cappedResult"),
 		).toHaveLength(2);
 	});
 
@@ -502,7 +502,7 @@ describe("temporary item lifetime", () => {
 			Effect.gen(function* () {
 				const producer = yield* spawnItemFx({
 					id: "runtime:producer",
-					itemId: "producer",
+					itemUid: "producer",
 					location: {
 						scope: "board",
 						space: 0,
@@ -530,7 +530,7 @@ describe("temporary item lifetime", () => {
 		expect(runtime.items).toContainEqual(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					id: "temporaryPlain",
+					uid: "temporaryPlain",
 				}),
 				schedule: {
 					remainingDurationMs: 600,
@@ -544,7 +544,7 @@ describe("temporary item lifetime", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:transformer",
-					itemId: "transformer",
+					itemUid: "transformer",
 					location: {
 						scope: "board",
 						space: 0,
@@ -576,7 +576,7 @@ describe("temporary item lifetime", () => {
 		expect(replaced).toMatchObject({
 			id: "runtime:target",
 			item: {
-				id: "temporaryPlain",
+				uid: "temporaryPlain",
 			},
 			location: result.target.location,
 			schedule: {

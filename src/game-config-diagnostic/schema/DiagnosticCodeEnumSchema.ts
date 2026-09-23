@@ -19,10 +19,9 @@ export const DiagnosticCodeEnumSchema = z
 		InputAcceptanceCycle: "input:acceptance-cycle",
 		SourceSchemaReferenceConflict: "source:schema-reference-conflict",
 		ConfigSchema: "config:schema",
-		ItemDuplicateUid: "item:duplicate-uid",
 		LineDuplicateId: "line:duplicate-id",
 		LineMultipleSelections: "line:multiple-selections",
-		ConfigKeyIdMismatch: "config:key-id-mismatch",
+		ConfigKeyUidMismatch: "config:key-uid-mismatch",
 		UnitRenewalMissing: "units:missing-renewal",
 	})
 	.meta({

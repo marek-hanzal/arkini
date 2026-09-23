@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "pwa7i4khtnmvijdvtfgdzyhj",
-		"id": "dye",
 		"title": "Dye",
 		"ui": "simple",
 		"description": "Wanna color something?",

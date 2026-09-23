@@ -84,7 +84,7 @@ describe("createGameSessionFx / callback ordering", () => {
 						[
 							{
 								type: GameEventEnumSchema.enum.JobCompleted,
-								canonicalItemId: "owner",
+								itemUid: "owner",
 								jobId: "job:combined",
 								ownerItemId: "owner:combined",
 								lineId: "line:combined",
@@ -153,7 +153,7 @@ describe("createGameSessionFx / callback ordering", () => {
 						[
 							{
 								type: GameEventEnumSchema.enum.JobCompleted,
-								canonicalItemId: "owner",
+								itemUid: "owner",
 								jobId: "job:nested:current",
 								ownerItemId: "owner:nested",
 								lineId: "line:nested",

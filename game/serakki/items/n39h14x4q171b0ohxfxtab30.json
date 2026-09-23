@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "n39h14x4q171b0ohxfxtab30",
-		"id": "wool",
 		"title": "Wool",
 		"ui": "simple",
 		"description": "Winter is comming",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "wolf-in-sheeps-clothing"
+				"result": "zvxjxnn1fthupm4tw4uxegq1"
 			}
 		],
 		"maxQueueSize": 1,

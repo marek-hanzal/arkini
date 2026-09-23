@@ -92,7 +92,7 @@ describe("ItemDraftToggle", () => {
 			config: state.project?.config,
 			draft: true,
 			expectedRevision: 7,
-			itemId: item.id,
+			itemUid: item.uid,
 		});
 
 		state.result = AsyncResult.fail(new Error("Write failed"), {

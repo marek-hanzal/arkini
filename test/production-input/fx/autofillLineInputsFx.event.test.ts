@@ -23,13 +23,13 @@ describe("autofillLineInputsFx transition", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:workshop",
-					itemId: "workshop",
+					itemUid: "workshop",
 					location: workshopLocation,
 				});
 				for (let index = 0; index < 3; index++)
 					yield* spawnItemFx({
 						id: index === 0 ? "runtime:water" : `runtime:water:${index}`,
-						itemId: "water",
+						itemUid: "water",
 						location: sourceLocation(index + 1),
 					});
 				if (mode === "queue")
@@ -63,7 +63,7 @@ describe("autofillLineInputsFx transition", () => {
 				expect(committed[0]?.events).toEqual([
 					{
 						type: "line-input:autofill-started",
-						canonicalItemId: "workshop",
+						itemUid: "workshop",
 						ownerItemId: "runtime:workshop",
 						lineId: "line:workshop:build",
 						scheduledQuantity: 3,

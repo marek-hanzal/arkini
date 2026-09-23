@@ -8,8 +8,7 @@ import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
 import { createTestGameSession } from "~test/support/createTestGameSession";
 
 const base = (id: string) => ({
-	id,
-	uid: `uid:${id}`,
+	uid: id,
 	title: id,
 	description: id,
 	artwork: {

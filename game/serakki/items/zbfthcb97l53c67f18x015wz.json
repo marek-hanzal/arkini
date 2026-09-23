@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zbfthcb97l53c67f18x015wz",
-		"id": "cauldron-with-lye",
 		"title": "Cauldron With Lye",
 		"ui": "simple",
 		"description": "First class of chemistry",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

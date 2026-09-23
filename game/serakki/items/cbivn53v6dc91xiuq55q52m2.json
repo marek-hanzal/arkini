@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cbivn53v6dc91xiuq55q52m2",
-		"id": "sack-with-coffee",
 		"title": "Sack With Coffee",
 		"ui": "simple",
 		"description": "You'd better drink it yourself",

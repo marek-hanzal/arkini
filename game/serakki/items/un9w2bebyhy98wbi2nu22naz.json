@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "un9w2bebyhy98wbi2nu22naz",
-		"id": "dynamite",
 		"title": "Dynamite",
 		"description": "Kaboom. You should be extremely careful as this may literally destroy your progress.",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bio-waste"
+					"itemUid": "l70n80ujrm55lpl6z2n4hcty"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 8,
 												"max": 16
@@ -49,7 +48,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fawn"
+					"itemUid": "aalsr85hfkjpg477l9h99xxb"
 				},
 				"action": "consume",
 				"outcome": {
@@ -63,7 +62,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 4,
 												"max": 8
@@ -73,7 +72,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -83,7 +82,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "spoiled-raw-game-meat",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
 											"quantity": {
 												"min": 5,
 												"max": 8
@@ -98,12 +97,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "cooked-steak"
+				"result": "nx2bqbrp0lh39a7qak6sh983"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "corn-field"
+					"itemUid": "om31d2frwk86m6dhiirx7kw6"
 				},
 				"action": "consume",
 				"outcome": {
@@ -117,7 +116,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "popcorn",
+											"itemUid": "vpyhpbdhao06m3rrz4hxy4da",
 											"quantity": {
 												"min": 5,
 												"max": 10
@@ -132,12 +131,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-corn-field"
+				"result": "hlhjwuirteft3l82uxiqrrnh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "forest"
+					"itemUid": "wqoijk2kx2c313gw99g507iw"
 				},
 				"action": "consume",
 				"outcome": {
@@ -151,7 +150,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -161,7 +160,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -171,7 +170,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "wood---tier-1",
+											"itemUid": "kwkucgj71atfynrxw5sugzpe",
 											"quantity": {
 												"min": 3,
 												"max": 5
@@ -181,7 +180,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "firewood",
+											"itemUid": "rwgifjjoffgcix5149b6q6v1",
 											"quantity": {
 												"min": 4,
 												"max": 6
@@ -196,12 +195,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "loose-ash"
+				"result": "rp06r6pjrhyhxxkujos2r1md"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "chicken"
+					"itemUid": "i767otw53htcjcc2y9zrw6it"
 				},
 				"action": "consume",
 				"outcome": {
@@ -215,7 +214,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "feather",
+											"itemUid": "qxqafymuxw7keyketjpn9cye",
 											"quantity": {
 												"min": 3,
 												"max": 5
@@ -230,7 +229,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "roasted-chicken"
+				"result": "gvbhsqk27twjr9q7ycq0ewqq"
 			}
 		],
 		"maxQueueSize": 1,

@@ -17,7 +17,7 @@ describe("Cheat item spawning", () => {
 				const before = yield* readRuntimeFx();
 				const disabled = yield* Effect.result(
 					spawnCheatItemFx({
-						itemId: "water",
+						itemUid: "water",
 					}),
 				);
 				const afterDisabled = yield* readRuntimeFx();
@@ -25,7 +25,7 @@ describe("Cheat item spawning", () => {
 					enabled: true,
 				});
 				const placement = yield* spawnCheatItemFx({
-					itemId: "water",
+					itemUid: "water",
 				});
 				const afterSpawn = yield* readRuntimeFx();
 				return {
@@ -43,7 +43,7 @@ describe("Cheat item spawning", () => {
 			),
 		);
 
-		expect(result.catalog.map((entry) => entry.itemId)).toEqual([
+		expect(result.catalog.map((entry) => entry.itemUid)).toEqual([
 			"forge",
 			"tool",
 			"water",
@@ -60,7 +60,7 @@ describe("Cheat item spawning", () => {
 		expect(result.afterSpawn.items).toContainEqual(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					id: "water",
+					uid: "water",
 				}),
 				location: expect.objectContaining({
 					scope: "board",
@@ -77,10 +77,10 @@ describe("Cheat item spawning", () => {
 					enabled: true,
 				});
 				yield* spawnCheatItemFx({
-					itemId: "water",
+					itemUid: "water",
 				});
 				const spawnedRuntime = yield* readRuntimeFx();
-				const spawned = spawnedRuntime.items.find((item) => item.item.id === "water");
+				const spawned = spawnedRuntime.items.find((item) => item.item.uid === "water");
 				if (spawned === undefined) return yield* Effect.die("Expected spawned Cheat item.");
 				yield* setCheatEnabledFx({
 					enabled: false,

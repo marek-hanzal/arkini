@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "di926lypctzw8e6a4twmyeme",
-		"id": "cotton-fabric",
 		"title": "Cotton Fabric",
 		"ui": "simple",
 		"draft": true,
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "leather-satchel"
+					"itemUid": "txeu4cnpp7fqele4z2i1jzzz"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bandage-satchel"
+				"result": "xrdeluarbzrl0z2uimh88olz"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "medicine-satchel"
+					"itemUid": "hv4d0oefoilgd2rsulbh8zaa"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "healing-kit"
+				"result": "jlom0d8vajo6b8gezlvoajmx"
 			}
 		],
 		"maxQueueSize": 1,

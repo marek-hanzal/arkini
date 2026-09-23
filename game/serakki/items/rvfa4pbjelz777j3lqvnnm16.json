@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rvfa4pbjelz777j3lqvnnm16",
-		"id": "confectionery",
 		"title": "Confectionery",
 		"ui": "default",
 		"description": "Yummies are available here",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "clay-plate"
+								"itemUid": "ubexhgyrqm23lx9qn734f385"
 							},
 							"distance": "far"
 						},
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay-plate-with-pancake",
+											"itemUid": "ahnxvwbyvk93qdnca7ak6uac",
 											"quantity": {
 												"min": 1,
 												"max": 1

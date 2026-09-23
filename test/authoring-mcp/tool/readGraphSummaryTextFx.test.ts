@@ -42,7 +42,7 @@ describe("compact MCP graph responses", () => {
 			};
 			const summary = Effect.runSync(
 				readItemRelationTextFx(project, {
-					itemId: "ingot",
+					itemUid: "ingot",
 					level: 1,
 					role: "output",
 					detail: "summary",
@@ -61,7 +61,7 @@ describe("compact MCP graph responses", () => {
 			const project = createSummaryProject();
 			const graphSpy = vi.spyOn(graphModule, "createAcquisitionGraphFn");
 			const request = {
-				itemId: role === "input" ? "water" : "ingot",
+				itemUid: role === "input" ? "water" : "ingot",
 				level: 3,
 				role,
 			};
@@ -238,7 +238,7 @@ describe("compact MCP graph responses", () => {
 		const project = createConditionalSummaryProject();
 		const summary = Effect.runSync(
 			readItemRelationTextFx(project, {
-				itemId: "ingot",
+				itemUid: "ingot",
 				level: 3,
 				role: "output",
 				detail: "summary",
@@ -255,7 +255,7 @@ describe("compact MCP graph responses", () => {
 	it("keeps independent depletion rolls explicit for both same-type merge participants", () => {
 		const summary = Effect.runSync(
 			readItemRelationTextFx(createSelfMergeSummaryProject(), {
-				itemId: "ingot",
+				itemUid: "ingot",
 				level: 1,
 				role: "output",
 				detail: "summary",

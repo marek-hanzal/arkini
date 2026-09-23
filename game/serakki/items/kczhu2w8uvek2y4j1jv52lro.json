@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kczhu2w8uvek2y4j1jv52lro",
-		"id": "bricks",
 		"title": "Bricks",
 		"ui": "simple",
 		"description": "Just building material",

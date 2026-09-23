@@ -16,11 +16,11 @@ describe("craft job completion transition", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:reserve",
+					itemUid: "craft:reserve",
 				});
 				const tool = yield* spawnItemFx({
 					id: "runtime:tool",
-					itemId: "item:tool",
+					itemUid: "item:tool",
 					location: {
 						scope: "board",
 						space: 0,
@@ -49,12 +49,12 @@ describe("craft job completion transition", () => {
 		);
 
 		expect(runtime.jobs).toEqual([]);
-		expect(runtime.items.some((item) => item.item.id === "craft:reserve")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "craft:reserve")).toBe(false);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:product",
+						uid: "item:product",
 					}),
 					location: {
 						scope: "board",
@@ -67,7 +67,7 @@ describe("craft job completion transition", () => {
 				}),
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:tool",
+						uid: "item:tool",
 					}),
 					location: {
 						scope: "board",
@@ -91,7 +91,7 @@ describe("craft job completion transition", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:ordered-outcome",
+					itemUid: "craft:ordered-outcome",
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
@@ -104,12 +104,12 @@ describe("craft job completion transition", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "craft:ordered-outcome")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "craft:ordered-outcome")).toBe(false);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:bonus",
+						uid: "item:bonus",
 					}),
 					location: {
 						scope: "board",
@@ -122,7 +122,7 @@ describe("craft job completion transition", () => {
 				}),
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:result",
+						uid: "item:result",
 					}),
 				}),
 			]),
@@ -133,7 +133,7 @@ describe("craft job completion transition", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:sink",
+					itemUid: "craft:sink",
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,

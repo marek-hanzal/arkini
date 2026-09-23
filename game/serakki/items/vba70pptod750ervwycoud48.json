@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vba70pptod750ervwycoud48",
-		"id": "rapeseed-farm-blueprint",
 		"title": "Rapeseed Farm Blueprint",
 		"draft": false,
 		"description": "Plans for Rapeseed Farm.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "rapeseed-farm-blueprint"
+								"itemUid": "vba70pptod750ervwycoud48"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -79,7 +78,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemUid": "ejcs57zv68bas7jmizm7286p"
 							},
 							"distance": "far"
 						},
@@ -101,7 +100,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "rapeseed-farm",
+											"itemUid": "bytaiaqvo87umpgxqr5s0d9n",
 											"quantity": {
 												"min": 1,
 												"max": 1

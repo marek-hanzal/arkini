@@ -28,7 +28,7 @@ it("replaces detail requests directly and releases them for missing music, vanis
 				{
 					id: "runtime:first",
 					item: {
-						id: "definition:first",
+						uid: "definition:first",
 						music: "track:b",
 					},
 				},
@@ -74,11 +74,18 @@ it("replaces detail requests directly and releases them for missing music, vanis
 	const openFn = (kind: "runtime" | "definition", itemId: string): ItemDetailState => ({
 		phase: "open",
 		generation: 1,
-		target: {
-			kind,
-			itemId,
-			origin: null,
-		},
+		target:
+			kind === "runtime"
+				? {
+						kind,
+						itemId,
+						origin: null,
+					}
+				: {
+						kind,
+						itemUid: itemId,
+						origin: null,
+					},
 	});
 	try {
 		await renderFn(openFn("runtime", "runtime:first"));
@@ -112,7 +119,7 @@ it("replaces detail requests directly and releases them for missing music, vanis
 			restoreFocus: true,
 			target: {
 				kind: "definition",
-				itemId: "definition:second",
+				itemUid: "definition:second",
 				origin: null,
 			},
 		});

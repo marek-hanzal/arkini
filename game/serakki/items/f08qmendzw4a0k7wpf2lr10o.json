@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f08qmendzw4a0k7wpf2lr10o",
-		"id": "spoiled-grape-seed",
 		"title": "Spoiled Grape Seed",
 		"draft": false,
 		"description": "Grape seed that spoiled before it ever reached the soil.",

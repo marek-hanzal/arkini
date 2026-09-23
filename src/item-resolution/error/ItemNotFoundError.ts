@@ -7,6 +7,7 @@ import type { LocationSchema } from "~/item-location/schema/LocationSchema";
  * An item lookup found no canonical item or no live item at one location.
  */
 export class ItemNotFoundError extends Data.TaggedError("ItemNotFoundError")<{
+	itemUid?: IdSchema.Type;
 	itemId?: IdSchema.Type;
 	location?: LocationSchema.Type;
 }> {}

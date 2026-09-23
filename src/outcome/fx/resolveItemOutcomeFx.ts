@@ -22,7 +22,7 @@ export const resolveItemOutcomeFx = Effect.fn("resolveItemOutcomeFx")(function* 
 		return undefined;
 	return {
 		type: "item",
-		itemId: outcome.itemId,
+		itemUid: outcome.itemUid,
 		placement: outcome.placement,
 		quantity: yield* rollQuantityFx({
 			quantity: outcome.quantity,

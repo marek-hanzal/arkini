@@ -26,7 +26,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 			height: 2,
 			board: [
 				{
-					itemId: "water",
+					itemUid: "water",
 					x: 0,
 					y: 0,
 				},
@@ -49,7 +49,6 @@ export const editorTestConfig = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "water",
-			id: "water",
 
 			title: "Water",
 			description: "Water",

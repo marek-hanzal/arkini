@@ -28,7 +28,7 @@ describe("editor MCP item editing", () => {
 				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
 				uid: "producer-uid",
 			}),
-			id: "producer:test",
+			uid: "producer:test",
 			title: "Test Producer",
 			description: "Existing item.",
 		};
@@ -46,7 +46,7 @@ describe("editor MCP item editing", () => {
 					},
 					items: {
 						...editorTestPayload.config.items,
-						[producer.id]: producer,
+						[producer.uid]: producer,
 						water: {
 							...water,
 							description: "Existing water.",
@@ -59,16 +59,16 @@ describe("editor MCP item editing", () => {
 		ownership.setProjectContextFn("edit-simple-project");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
-		const readConfig = async (itemId: string) => {
+		const readConfig = async (itemUid: string) => {
 			const result = await client.callTool({
 				name: "item_config",
 				arguments: {
-					itemId,
+					itemUid,
 				},
 			});
 			const content = result.content[0];
 			if (content?.type !== "text")
-				throw new Error(`Missing item_config text for ${itemId}.`);
+				throw new Error(`Missing item_config text for ${itemUid}.`);
 			return JSON.parse(content.text) as unknown;
 		};
 		const waterConfig = {
@@ -79,7 +79,7 @@ describe("editor MCP item editing", () => {
 			},
 		};
 		expect(await readConfig("water")).toEqual(waterConfig);
-		expect(await readConfig(producer.id)).toEqual({
+		expect(await readConfig(producer.uid)).toEqual({
 			revision: created.revision,
 			item: producer,
 		});
@@ -87,7 +87,7 @@ describe("editor MCP item editing", () => {
 		const edited = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId: "water",
+				itemUid: "water",
 				revision: waterConfig.revision,
 				patch: {
 					draft: true,
@@ -103,7 +103,6 @@ describe("editor MCP item editing", () => {
 				{
 					text: [
 						"Edited item.",
-						"ID: water",
 						"UID: water",
 						`Revision: ${project.revision}`,
 						"Replaced: description, draft, title",
@@ -121,7 +120,7 @@ describe("editor MCP item editing", () => {
 		const stale = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId: "water",
+				itemUid: "water",
 				revision: waterConfig.revision,
 				patch: {
 					title: "Stale title",
@@ -152,7 +151,7 @@ describe("editor MCP item editing", () => {
 			const rejected = await client.callTool({
 				name: "edit_item",
 				arguments: jsonToolInputFn({
-					itemId: "water",
+					itemUid: "water",
 					patch,
 				}),
 			});

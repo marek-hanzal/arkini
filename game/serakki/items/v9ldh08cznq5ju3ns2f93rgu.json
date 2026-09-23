@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "v9ldh08cznq5ju3ns2f93rgu",
-		"id": "spoiled-butter",
 		"title": "Spoiled Butter",
 		"ui": "simple",
 		"description": "You don't want this on your bread",

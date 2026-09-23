@@ -20,7 +20,7 @@ it("does not claim a complete acquisition through destructive template replaceme
 							{
 								type: "item",
 								rules: [],
-								itemId: "reward",
+								itemUid: "reward",
 								quantity: {
 									min: 1,
 									max: 1,

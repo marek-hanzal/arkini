@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wsseeyoomcb3j46h58plhr5p",
-		"id": "vegetable-crate",
 		"title": "Vegetable Crate",
 		"description": "Fresh vegetables you want to eat",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cutting-board"
+					"itemUid": "cfrqc6p65c4gh3lrjswv84zv"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-crate",
+											"itemUid": "oi2iydyb9hhf1nt7wdra2hg9",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "cutting-board-with-vegetables"
+				"result": "dxmdzdy9wuj7wv0cwt6gkrjh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pig"
+					"itemUid": "jx5gnntoo4aj7rxf3eq32lun"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-crate",
+											"itemUid": "oi2iydyb9hhf1nt7wdra2hg9",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "well-fed-pig"
+				"result": "fx0r01wptrxokr73p4iuez6d"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "hungry-pig"
+					"itemUid": "ozodhesinelkfcb414r390d2"
 				},
 				"action": "consume",
 				"outcome": {
@@ -98,7 +97,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-crate",
+											"itemUid": "oi2iydyb9hhf1nt7wdra2hg9",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "pig"
+				"result": "jx5gnntoo4aj7rxf3eq32lun"
 			}
 		],
 		"clock": {
@@ -131,7 +130,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-vegetable-crate",
+										"itemUid": "tir9q2bkepnsc8xybkhk3zk4",
 										"quantity": {
 											"min": 1,
 											"max": 1

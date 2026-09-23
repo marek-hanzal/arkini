@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mj9yqliwdhhry83a7mnv3sop",
-		"id": "beagles-sniffing-each-other",
 		"title": "Beagles Sniffing Each Other",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "beagle",
+										"itemUid": "upghscvjnnxzp09urbuh5x0a",
 										"quantity": {
 											"min": 2,
 											"max": 2
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "beagle-puppy",
+										"itemUid": "jml833htnpikvhdtswrnfn3a",
 										"quantity": {
 											"min": 1,
 											"max": 1

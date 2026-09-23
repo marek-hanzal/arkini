@@ -24,7 +24,7 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 	templateUidBySpace: {},
 	items: runtime.items
 		.map((item) => ({
-			itemId: item.item.id,
+			itemId: item.item.uid,
 			location: item.location,
 		}))
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second))),

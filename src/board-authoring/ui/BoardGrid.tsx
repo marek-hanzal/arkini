@@ -106,7 +106,7 @@ const BoardGridSlot = ({
 		data-board-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
-		title={item?.title || item?.id}
+		title={item?.title || item?.uid}
 		type="button"
 		{...readDataUiFn({
 			dataUi: "EditorBoardGridSlot",
@@ -233,7 +233,7 @@ const BoardGridSurface = ({
 				{positions.map((position) => {
 					const key = positionKeyFn(position);
 					const cell = cellsByPosition.get(key);
-					const item = cell === undefined ? undefined : items[cell.itemId];
+					const item = cell === undefined ? undefined : items[cell.itemUid];
 					if (edit === undefined) {
 						const className =
 							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center border-0 bg-transparent p-0 text-subtle shadow-none";
@@ -245,7 +245,7 @@ const BoardGridSurface = ({
 							projectId !== undefined ? (
 							<ButtonLink
 								className={`${className} hover:shadow-[inset_0_0_0_1px_var(--ak-accent)]`}
-								data-item-id={item.id}
+								data-item-uid={item.uid}
 								{...readDataUiFn({
 									dataUi: "EditorBoardGridSlot",
 									state: {
@@ -258,7 +258,7 @@ const BoardGridSurface = ({
 									projectId,
 									sectionId: "identity",
 								}}
-								title={item.title || item.id}
+								title={item.title || item.uid}
 								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 							>
 								{content}
@@ -273,7 +273,7 @@ const BoardGridSurface = ({
 									},
 								})}
 								key={key}
-								title={item?.title || item?.id}
+								title={item?.title || item?.uid}
 							>
 								{content}
 							</div>
@@ -400,9 +400,9 @@ const BoardGridEdit = ({
 			{pickerCell === undefined ? null : (
 				<BoardItemPicker
 					onCloseFn={() => setPickerCellFn(undefined)}
-					onSelectFn={(itemId) =>
+					onSelectFn={(itemUid) =>
 						changeCellFn(pickerCell, () => ({
-							itemId,
+							itemUid,
 							...pickerCell,
 						}))
 					}
@@ -414,7 +414,7 @@ const BoardGridEdit = ({
 					clientY={dragVisual.clientY}
 					cellSize={dragVisual.cellSize}
 					previewRef={dragPreviewRef}
-					resourceIds={items[dragVisual.source.itemId]?.artwork.default ?? []}
+					resourceIds={items[dragVisual.source.itemUid]?.artwork.default ?? []}
 				/>
 			)}
 		</>

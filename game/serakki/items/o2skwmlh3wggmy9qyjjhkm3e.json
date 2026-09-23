@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "o2skwmlh3wggmy9qyjjhkm3e",
-		"id": "sack-with-corn-kernels",
 		"title": "Sack With Corn Kernels",
 		"draft": false,
 		"description": "A sack of corn kernels, marked with the crop they are meant to grow.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "burned-sack-with-corn-kernels",
+											"itemUid": "ppoa1yckw7tdl1fb0kfqgs9d",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,12 +46,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire-extinguished"
+				"result": "fenhlvaj45ssocm5r935nqli"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-corn-field"
+					"itemUid": "xyf94kyi1jr5hlntp87egwcd"
 				},
 				"action": "consume",
 				"outcome": {
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -81,7 +80,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corn-field"
+				"result": "om31d2frwk86m6dhiirx7kw6"
 			}
 		],
 		"clock": {
@@ -99,7 +98,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c5z1mzklzgwyf52y6d04ol19",
-		"id": "cauldron-with-popcorn",
 		"title": "Cauldron With Popcorn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

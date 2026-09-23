@@ -63,7 +63,7 @@ export const NoteItemLinks = ({
 										resourceIds={item.artwork.default}
 										size="sm"
 									/>
-									<span className="truncate">{item.title || item.id}</span>
+									<span className="truncate">{item.title || item.uid}</span>
 								</Link>
 							)}
 

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f6g1qfue0p6bochjsgdtcnva",
-		"id": "pig-pen",
 		"title": "Pig Pen",
 		"description": "A populated pig pen holding pigs that can be released one at a time.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-pig-pen",
+										"itemUid": "tp8elp5lpun7bpz4evjysk2m",
 										"quantity": {
 											"min": 1,
 											"max": 1

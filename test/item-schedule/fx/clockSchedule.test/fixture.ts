@@ -45,7 +45,7 @@ export const createClockConfig = (
 								clock: true,
 								outcome: createOutput([
 									{
-										itemId: "result",
+										itemUid: "result",
 									},
 								]),
 							}),
@@ -56,7 +56,7 @@ export const createClockConfig = (
 								id: "b",
 								outcome: createOutput([
 									{
-										itemId: "result",
+										itemUid: "result",
 									},
 								]),
 							}),
@@ -87,7 +87,7 @@ export const createClockConfig = (
 export const spawnClockItemFx = (itemId = "clock", x = 0, y = 0) =>
 	spawnItemFx({
 		id: `runtime:${itemId}`,
-		itemId,
+		itemUid: itemId,
 
 		location: {
 			scope: "board",

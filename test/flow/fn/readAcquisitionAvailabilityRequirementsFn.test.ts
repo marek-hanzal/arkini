@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { readAcquisitionAvailabilityRequirementsFn } from "~/flow/fn/readAcquisitionAvailabilityRequirementsFn";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
-const exists = (itemId: string): WhenSchema.Type => ({
+const exists = (itemUid: string): WhenSchema.Type => ({
 	query: {
-		distance: "universe",
+		distance: "far",
 		selector: {
-			itemId,
+			itemUid,
 			type: "item",
 		},
 	},

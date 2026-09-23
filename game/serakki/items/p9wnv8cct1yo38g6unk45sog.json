@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "p9wnv8cct1yo38g6unk45sog",
-		"id": "steel-armor",
 		"title": "Steel Armor",
 		"ui": "simple",
 		"description": "You may be a bit better protected",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle-with-battle-axe-and-shield"
+					"itemUid": "i7unvc2otmcnyzljh9spq33d"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "armored-beagle-with-sword-and-shield"
+				"result": "z8gv8nfkz0iatnszvpol3duk"
 			}
 		],
 		"maxQueueSize": 1,

@@ -17,7 +17,7 @@ export const formatGameDiagnosticItemReferenceTextFn = (
 		reference.runtimeItemId === null ? "" : ` · runtime-id ${reference.runtimeItemId}`;
 	return reference.definition === null
 		? `Config identity unavailable${runtime}`
-		: `${reference.definition.title} · config-uid ${reference.definition.itemUid} · authored-id ${reference.definition.itemId}${runtime}`;
+		: `${reference.definition.title} · config-uid ${reference.definition.itemUid}${runtime}`;
 };
 
 /** Formats the shortest exact identity used after a text section defines its item catalog. */

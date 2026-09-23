@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dt8ll57a9j7i2bf2ui9q1k75",
-		"id": "cutting-board-with-raw-steak",
 		"title": "Cutting Board With Raw Steak",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cutting-board-with-raw-steak",
+										"itemUid": "kqjbaqbp2e4gfbuxe9r74306",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cb9s36hu9rogsoifm2aef25u",
-		"id": "well-with-coffee",
 		"title": "Well With Coffee",
 		"ui": "simple",
 		"description": "Source of coffee. Try it out",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1

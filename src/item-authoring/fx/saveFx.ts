@@ -31,7 +31,6 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 	const startedAtMs = yield* Clock.currentTimeMillis;
 	const context = {
 		projectId,
-		itemId: candidate.id,
 		itemUid: candidate.uid,
 		expectedRevision,
 		startedAtMs,
@@ -47,8 +46,7 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 		data: {
 			...context,
 			visibleRevision: before?.revision ?? null,
-			previousItemId:
-				Object.values(config.items).find((item) => item.uid === candidate.uid)?.id ?? null,
+			previousItemUid: config.items[candidate.uid]?.uid ?? null,
 			lineCount: candidate.lines.length,
 		},
 	});
@@ -59,7 +57,6 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 			Effect.uninterruptible(
 				Effect.gen(function* () {
 					const { commit, item } = yield* saveWithRepositoryFx({
-						config,
 						expectedRevision,
 						item: candidate,
 						projectId,
@@ -77,7 +74,7 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 							commitProjectId: commit.projectId,
 							previousRevision: commit.previousRevision,
 							committedRevision: commit.revision,
-							committedItemUid: commit.config.items[item.id]?.uid ?? null,
+							committedItemUid: commit.config.items[item.uid]?.uid ?? null,
 						},
 					});
 					yield* publishEditorProjectFx(projectId, {
@@ -85,11 +82,7 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 					});
 					const published = yield* Atom.get(EditorProjectAtom(projectId));
 					const publishedItem =
-						published === undefined
-							? undefined
-							: Object.values(published.config.items).find(
-									(existing) => existing.uid === item.uid,
-								);
+						published === undefined ? undefined : published.config.items[item.uid];
 					yield* writeDiagnosticRecordFx({
 						level: publishedItem === undefined ? "warning" : "info",
 						category: [
@@ -101,7 +94,7 @@ export const saveFx = Effect.fn("saveEditorItemFx")(function* ({
 							...context,
 							committedRevision: commit.revision,
 							visibleRevision: published?.revision ?? null,
-							visibleItemId: publishedItem?.id ?? null,
+							visibleItemUid: publishedItem?.uid ?? null,
 						},
 					});
 					return item;

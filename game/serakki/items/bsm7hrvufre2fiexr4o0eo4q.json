@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bsm7hrvufre2fiexr4o0eo4q",
-		"id": "burning-oven",
 		"title": "Burning Oven",
 		"description": "It's hot",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "oven-with-ash",
+										"itemUid": "drj72ef3yia0euytyg2e1jal",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "loose-ash",
+										"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 										"quantity": {
 											"min": 1,
 											"max": 2

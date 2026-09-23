@@ -38,11 +38,11 @@ export const CheatItemSpotlight = (props: CheatItemSpotlightProps) => {
 						sourceUrl={item.sourceUrl}
 					/>
 				),
-				itemId: item.itemId,
+				itemUid: item.itemUid,
 				label: item.title,
-				secondary: item.itemId,
+				secondary: item.itemUid,
 				terms: [
-					item.itemId,
+					item.itemUid,
 					item.title,
 				],
 			}))}

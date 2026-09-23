@@ -22,7 +22,7 @@ const outcome = {
 					outcome: [
 						{
 							type: "item" as const,
-							itemId: "item:gift",
+							itemUid: "item:gift",
 							quantity: {
 								min: 1,
 								max: 1,
@@ -39,7 +39,7 @@ const outcome = {
 
 const base = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -92,7 +92,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "item:material",
+									itemUid: "item:material",
 								},
 							},
 							quantity: {
@@ -116,7 +116,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "item:material",
+									itemUid: "item:material",
 								},
 							},
 							quantity: {
@@ -161,7 +161,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 										outcome: [
 											{
 												type: "item" as const,
-												itemId: "producer:phoenix",
+												itemUid: "producer:phoenix",
 												quantity: {
 													min: 1,
 													max: 1,
@@ -286,7 +286,7 @@ describe("job completion unit lifecycle", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:finite-queue",
-					itemId: "producer:finite-queue",
+					itemUid: "producer:finite-queue",
 					location: {
 						scope: "board",
 						space: 0,
@@ -298,7 +298,7 @@ describe("job completion unit lifecycle", () => {
 				});
 				const blockedOwner = yield* spawnItemFx({
 					id: "runtime:blocked-trader",
-					itemId: "producer:trader",
+					itemUid: "producer:trader",
 					location: {
 						scope: "board",
 						space: 0,
@@ -343,7 +343,7 @@ describe("job completion unit lifecycle", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:trader",
-					itemId: "producer:trader",
+					itemUid: "producer:trader",
 					location: {
 						scope: "board",
 						space: 0,
@@ -355,7 +355,7 @@ describe("job completion unit lifecycle", () => {
 				});
 				const material = yield* spawnItemFx({
 					id: "runtime:material",
-					itemId: "item:material",
+					itemUid: "item:material",
 					location: {
 						scope: "board",
 						space: 0,
@@ -374,7 +374,7 @@ describe("job completion unit lifecycle", () => {
 				});
 				yield* spawnItemFx({
 					id: "runtime:material:spare",
-					itemId: "item:material",
+					itemUid: "item:material",
 					location: {
 						scope: "board",
 						space: 0,
@@ -396,12 +396,12 @@ describe("job completion unit lifecycle", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "producer:trader")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "producer:trader")).toBe(false);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:gift",
+						uid: "item:gift",
 					}),
 					location: {
 						scope: "board",
@@ -414,7 +414,7 @@ describe("job completion unit lifecycle", () => {
 				}),
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:material",
+						uid: "item:material",
 					}),
 				}),
 			]),
@@ -433,7 +433,7 @@ describe("job completion unit lifecycle", () => {
 			items: [
 				{
 					id: "runtime:trader",
-					itemId: "producer:trader",
+					itemUid: "producer:trader",
 					location: {
 						scope: "board",
 						space: 0,
@@ -446,7 +446,7 @@ describe("job completion unit lifecycle", () => {
 				},
 				{
 					id: "runtime:consumed-material",
-					itemId: "item:material",
+					itemUid: "item:material",
 					location: {
 						scope: "job",
 						jobId: "job:trader",
@@ -455,7 +455,7 @@ describe("job completion unit lifecycle", () => {
 				},
 				{
 					id: "runtime:buffered-material",
-					itemId: "item:material",
+					itemUid: "item:material",
 					location: {
 						scope: "input",
 						ownerItemId: "runtime:trader",
@@ -491,7 +491,7 @@ describe("job completion unit lifecycle", () => {
 		);
 
 		expect(runtime.items.some((item) => item.id === "runtime:trader")).toBe(false);
-		expect(runtime.items.find((item) => item.item.id === "item:gift")).toMatchObject({
+		expect(runtime.items.find((item) => item.item.uid === "item:gift")).toMatchObject({
 			location: {
 				scope: "board",
 				space: 0,
@@ -521,7 +521,7 @@ describe("job completion unit lifecycle", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:empty-blueprint",
-					itemId: "blueprint:empty",
+					itemUid: "blueprint:empty",
 					location: {
 						scope: "board",
 						space: 0,
@@ -551,7 +551,7 @@ describe("job completion unit lifecycle", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:craft",
-					itemId: "craft:repeatable",
+					itemUid: "craft:repeatable",
 					location: {
 						scope: "board",
 						space: 0,
@@ -580,7 +580,11 @@ describe("job completion unit lifecycle", () => {
 		);
 
 		expect(result.restarted.type).toBe("started");
-		expect(result.runtime.items.some((item) => item.item.id === "craft:repeatable")).toBe(true);
-		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(1);
+		expect(result.runtime.items.some((item) => item.item.uid === "craft:repeatable")).toBe(
+			true,
+		);
+		expect(result.runtime.items.filter((item) => item.item.uid === "item:gift")).toHaveLength(
+			1,
+		);
 	});
 });

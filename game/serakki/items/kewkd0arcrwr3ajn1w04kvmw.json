@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kewkd0arcrwr3ajn1w04kvmw",
-		"id": "quest-pumpkin-t1",
 		"title": "Quest - Pumpkin - Tier 1",
 		"draft": false,
 		"description": "Someone elsewhere has developed an urgent and probably seasonal need for pumpkins.",
@@ -21,7 +20,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle"
+					"itemUid": "upghscvjnnxzp09urbuh5x0a"
 				},
 				"action": "consume",
 				"outcome": {
@@ -35,7 +34,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-shredded",
+											"itemUid": "slildyuf8kpe4iwvtbbryctc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -54,7 +53,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bucket-with-water"
+					"itemUid": "s9j877qispz12d8ry9h1d4wb"
 				},
 				"action": "consume",
 				"outcome": {
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -83,12 +82,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "wet-quest"
+				"result": "aa4ej7xbvxbi5twq6a8wbj5f"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -102,7 +101,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "burning-quest",
+											"itemUid": "prnytwj1gcbuu2bikd4pkxqb",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -141,7 +140,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quest-pumpkin-t1"
+								"itemUid": "kewkd0arcrwr3ajn1w04kvmw"
 							},
 							"distance": "self"
 						}
@@ -151,7 +150,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "pumpkin"
+								"itemUid": "ddeor1k6lkpv99p1m7ympi8p"
 							},
 							"distance": "far"
 						},
@@ -173,7 +172,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sack-with-salt",
+											"itemUid": "dd4q4ss6mjh85tvkw2tc39fv",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -183,7 +182,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "coin",
+											"itemUid": "s5z9wc6yevl1yzs693yr1z7z",
 											"quantity": {
 												"min": 2,
 												"max": 2

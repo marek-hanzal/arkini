@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "o1gor2xgnplb8ef4mn5lqwyl",
-		"id": "grape-field",
 		"title": "Grape Field",
 		"draft": false,
 		"description": "Grape field",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-grape-field",
+										"itemUid": "mctcyxqkk2gv0x6mflu1ssya",
 										"quantity": {
 											"min": 1,
 											"max": 1

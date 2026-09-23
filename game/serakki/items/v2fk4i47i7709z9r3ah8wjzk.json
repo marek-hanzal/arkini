@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "v2fk4i47i7709z9r3ah8wjzk",
-		"id": "honeyed-fruit",
 		"title": "Honeyed Fruit",
 		"ui": "simple",
 		"description": "Radiation of sweetness",
@@ -16,16 +15,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cauldron-with-boiling-water"
+					"itemUid": "aaj5jhmv6a2wsjg74yryd28r"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cauldron-with-jam"
+				"result": "juv888nrn88m3tn1c4o9ulnv"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "clay-plate-with-pancake"
+					"itemUid": "ahnxvwbyvk93qdnca7ak6uac"
 				},
 				"action": "consume",
 				"outcome": {
@@ -39,7 +38,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay-bowl",
+											"itemUid": "bqry0ngea4bhamfkgncovhgr",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -54,7 +53,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "honeyed-fruit-pancake"
+				"result": "y5xwsvtgyxy5npclxyzwngo2"
 			}
 		],
 		"clock": {
@@ -72,7 +71,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-bowl",
+										"itemUid": "c3vesqhj22ratn3fr8thfsax",
 										"quantity": {
 											"min": 1,
 											"max": 1

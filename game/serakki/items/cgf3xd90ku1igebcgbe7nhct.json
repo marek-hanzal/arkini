@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cgf3xd90ku1igebcgbe7nhct",
-		"id": "grain-farm",
 		"title": "Grain Farm",
 		"description": "Some food? Basic stuff here!",
 		"ui": "default",
@@ -33,7 +32,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grain-field"
+								"itemUid": "imrcxilbuisx6f02q5rt7pp3"
 							},
 							"distance": "close"
 						}
@@ -43,7 +42,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -65,7 +64,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grain",
+											"itemUid": "hh7v010v56myrya2gbysrru3",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -75,7 +74,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -96,7 +95,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "toxic-waste"
+										"itemUid": "wk8b9br2abcjn0fz4xsldfhx"
 									},
 									"distance": "far"
 								},
@@ -134,7 +133,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-grain-field",
+											"itemUid": "p9x1eqx05d197gb37okicf4s",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -166,7 +165,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -188,7 +187,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grain-farm-blueprint",
+											"itemUid": "gr30098zsatmrlc4vorfmjgm",
 											"quantity": {
 												"min": 1,
 												"max": 1

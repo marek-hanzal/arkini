@@ -24,7 +24,7 @@ const useTestGame = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 
 const drop = (placement: "drop" | "random", quantity = 1) => ({
 	type: "item" as const,
-	itemId: "log",
+	itemUid: "log",
 	placement,
 	quantity: {
 		min: quantity,
@@ -39,12 +39,12 @@ describe("multi-space spatial isolation", () => {
 			Effect.gen(function* () {
 				const first = yield* spawnItemFx({
 					id: "runtime:first",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(0, 1),
 				});
 				const second = yield* spawnItemFx({
 					id: "runtime:second",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(1, 1),
 				});
 				const runtime = yield* readRuntimeFx();
@@ -65,22 +65,22 @@ describe("multi-space spatial isolation", () => {
 		expect(result.second.id).toBe("runtime:second");
 	});
 
-	it("keeps far queries local while universe reaches every Board space", () => {
+	it("keeps far queries local to their origin space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(1, 0),
 				});
 				yield* spawnItemFx({
 					id: "runtime:local",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(1, 1),
 				});
 				yield* spawnItemFx({
 					id: "runtime:remote",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(0, 1),
 				});
 				if (origin.location.scope !== "board") {
@@ -93,23 +93,12 @@ describe("multi-space spatial isolation", () => {
 						distance: "far",
 						selector: {
 							type: "item",
-							itemId: "log",
-						},
-					},
-				});
-				const universe = yield* queryFx({
-					origin: origin.location,
-					query: {
-						distance: "universe",
-						selector: {
-							type: "item",
-							itemId: "log",
+							itemUid: "log",
 						},
 					},
 				});
 
 				return {
-					universe: universe.map((item) => item.id),
 					board: board.map((item) => item.id),
 				};
 			}).pipe(useTestGame),
@@ -118,10 +107,6 @@ describe("multi-space spatial isolation", () => {
 		expect(result.board).toEqual([
 			"runtime:local",
 		]);
-		expect(result.universe).toEqual([
-			"runtime:local",
-			"runtime:remote",
-		]);
 	});
 
 	it("keeps external unit targets inside the owner space", () => {
@@ -129,12 +114,12 @@ describe("multi-space spatial isolation", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:units-owner",
-					itemId: "unitsProducer",
+					itemUid: "unitsProducer",
 					location: boardLocation(1, 0),
 				});
 				yield* spawnItemFx({
 					id: "runtime:remote-payer",
-					itemId: "payer",
+					itemUid: "payer",
 					location: boardLocation(0, 1),
 				});
 				const remoteOnly = yield* resolveLineRunFx({
@@ -144,7 +129,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				yield* spawnItemFx({
 					id: "runtime:local-payer",
-					itemId: "payer",
+					itemUid: "payer",
 					location: boardLocation(1, 1),
 				});
 				const local = yield* resolveLineRunFx({
@@ -169,17 +154,17 @@ describe("multi-space spatial isolation", () => {
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(1, 0),
 				});
 				yield* spawnItemFx({
 					id: "runtime:local-item",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(1, 1),
 				});
 				yield* spawnItemFx({
 					id: "runtime:remote-item",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(0, 1),
 				});
 				yield* placeDropForTestFx({
@@ -192,7 +177,7 @@ describe("multi-space spatial isolation", () => {
 		expect(
 			placed.items.some(
 				(item) =>
-					item.item.id === "log" &&
+					item.item.uid === "log" &&
 					item.location.scope === "board" &&
 					item.location.space === 1 &&
 					item.location.position.x === 2,
@@ -203,7 +188,7 @@ describe("multi-space spatial isolation", () => {
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
 					id: "runtime:random-origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(4, 0),
 				});
 				yield* placeDropForTestFx({
@@ -224,7 +209,7 @@ describe("multi-space spatial isolation", () => {
 
 		expect(
 			randomized.items
-				.filter((item) => item.item.id === "log" && item.location.scope === "board")
+				.filter((item) => item.item.uid === "log" && item.location.scope === "board")
 				.every((item) => item.location.scope === "board" && item.location.space === 4),
 		).toBe(true);
 	});
@@ -234,7 +219,7 @@ describe("multi-space spatial isolation", () => {
 			Effect.gen(function* () {
 				const origin = yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(2, 0),
 				});
 				for (const x of [
@@ -243,7 +228,7 @@ describe("multi-space spatial isolation", () => {
 				]) {
 					yield* spawnItemFx({
 						id: `runtime:blocker:${x}`,
-						itemId: "blocker",
+						itemUid: "blocker",
 						location: boardLocation(2, x),
 					});
 				}
@@ -275,27 +260,27 @@ describe("multi-space spatial isolation", () => {
 			Effect.gen(function* () {
 				const movable = yield* spawnItemFx({
 					id: "runtime:movable",
-					itemId: "log",
+					itemUid: "log",
 					location: boardLocation(0, 0),
 				});
 				const remote = yield* spawnItemFx({
 					id: "runtime:remote",
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: boardLocation(1, 1),
 				});
 				const source = yield* spawnItemFx({
 					id: "runtime:merge-source",
-					itemId: "mergeSource",
+					itemUid: "mergeSource",
 					location: boardLocation(0, 2),
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:merge-target",
-					itemId: "mergeTarget",
+					itemUid: "mergeTarget",
 					location: boardLocation(1, 2),
 				});
 				const owner = yield* spawnItemFx({
 					id: "runtime:workshop",
-					itemId: "workshop",
+					itemUid: "workshop",
 					location: boardLocation(1, 0),
 				});
 

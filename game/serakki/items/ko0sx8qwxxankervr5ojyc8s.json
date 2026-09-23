@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ko0sx8qwxxankervr5ojyc8s",
-		"id": "arrowheads",
 		"title": "Arrowheads",
 		"description": "Arrow. Oh, just a tip",
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wooden-sticks"
+					"itemUid": "dct4u1aaljeect6n4e425654"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "unfinished-arrows"
+				"result": "kbjdar1ildhy9em7xli47k0l"
 			}
 		],
 		"maxQueueSize": 1,

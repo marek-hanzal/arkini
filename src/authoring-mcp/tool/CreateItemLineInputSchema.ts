@@ -4,7 +4,7 @@ import { CompleteItemLineSchema } from "./CompleteItemLineSchema";
 
 export const CreateItemLineInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact ID of the item that owns the line."),
+		itemUid: IdSchema.describe("The exact ID of the item that owns the line."),
 		revision: z
 			.number()
 			.int()

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ad0tzhtjqhxt6xn4xhiin2ig",
-		"id": "planks",
 		"title": "Planks",
 		"ui": "simple",
 		"description": "Really complex piece of wood. Just planks, I'm kidding.",

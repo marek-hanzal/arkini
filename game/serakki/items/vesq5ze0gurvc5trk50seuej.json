@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vesq5ze0gurvc5trk50seuej",
-		"id": "cotton-fiber",
 		"title": "Cotton Fiber",
 		"ui": "simple",
 		"description": "Fiber. Cotton",

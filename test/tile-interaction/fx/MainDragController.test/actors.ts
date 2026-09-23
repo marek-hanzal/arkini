@@ -7,7 +7,7 @@ import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 export const item = {
 	artworkScale: 0.8,
 	id: "runtime:log",
-	itemId: "log",
+	itemUid: "log",
 
 	location: {
 		scope: "board",
@@ -29,7 +29,7 @@ export const item = {
 export const createItem = (id: string, x: number): TileActorItem => ({
 	...item,
 	id,
-	itemId: id,
+	itemUid: id,
 	location: {
 		...item.location,
 		position: {

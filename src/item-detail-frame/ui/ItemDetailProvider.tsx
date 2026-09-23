@@ -111,15 +111,15 @@ export const ItemDetailProvider = ({
 
 	const openItemDefinitionDetailFx = useCallback(
 		({
-			itemId,
+			itemUid,
 			origin = null,
 		}: Parameters<ItemDetailControl["openItemDefinitionDetailFx"]>[0]) =>
 			Effect.suspend(() => {
-				const item = game.config.items[itemId];
+				const item = game.config.items[itemUid];
 				if (item === undefined) return Effect.succeed(false);
 				return openTargetFx({
 					kind: "definition",
-					itemId,
+					itemUid,
 					origin: controller.readOriginFn(origin),
 				});
 			}),

@@ -23,7 +23,7 @@ const owner = previous.items[0];
 const depleted = {
 	type: "item:depleted",
 	itemId: owner.id,
-	canonicalItemId: owner.item.id,
+	itemUid: owner.item.uid,
 	location: owner.location,
 };
 
@@ -90,7 +90,7 @@ it("reads the whole terminal snapshot without reconstructing it from the previou
 			{
 				type: "item:expired",
 				itemId: owner.id,
-				canonicalItemId: owner.item.id,
+				itemUid: owner.item.uid,
 				location: owner.location,
 			},
 		],

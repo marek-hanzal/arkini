@@ -102,7 +102,7 @@ const jobStartedBatch = {
 	events: [
 		{
 			type: GameEventEnumSchema.enum.JobStarted,
-			canonicalItemId: "producer",
+			itemUid: "producer",
 			jobId: "job:1",
 			ownerItemId: "runtime:producer",
 			lineId: "line:1",
@@ -114,7 +114,7 @@ const jobCompletedBatch = {
 	events: [
 		{
 			type: GameEventEnumSchema.enum.JobCompleted,
-			canonicalItemId: "producer",
+			itemUid: "producer",
 			jobId: "job:2",
 			ownerItemId: "runtime:producer",
 			lineId: "line:1",

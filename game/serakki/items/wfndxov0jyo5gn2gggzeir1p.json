@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wfndxov0jyo5gn2gggzeir1p",
-		"id": "empty-mine",
 		"title": "Empty Mine",
 		"ui": "default",
 		"description": "You need some new resources?",
@@ -36,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-mine"
+								"itemUid": "wfndxov0jyo5gn2gggzeir1p"
 							},
 							"distance": "self"
 						}
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "resource-research"
+								"itemUid": "bqf3op5bndkaqfgpap7lj7kq"
 							},
 							"distance": "far"
 						},
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-mine",
+											"itemUid": "m4j4yf9w0vdxvczjpmi0ruhv",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -103,7 +102,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-mine"
+								"itemUid": "wfndxov0jyo5gn2gggzeir1p"
 							},
 							"distance": "self"
 						}
@@ -113,7 +112,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "resource-research"
+								"itemUid": "bqf3op5bndkaqfgpap7lj7kq"
 							},
 							"distance": "far"
 						},
@@ -135,7 +134,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "iron-mine",
+											"itemUid": "yfvcyys393czmti5hav6inyc",
 											"quantity": {
 												"min": 1,
 												"max": 1

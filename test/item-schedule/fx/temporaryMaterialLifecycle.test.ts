@@ -44,7 +44,7 @@ const advanceStepsFx = Effect.fn("advanceTemporaryMaterialTestStepsFx")(function
 const spawnOwnerFx = Effect.fn("spawnTemporaryMaterialTestOwnerFx")(function* () {
 	return yield* spawnItemFx({
 		id: "runtime:owner",
-		itemId: "owner",
+		itemUid: "owner",
 		location: board(0),
 	});
 });
@@ -58,7 +58,7 @@ const spawnTemporaryFx = Effect.fn("spawnTemporaryMaterialTestItemFx")(function*
 }) {
 	return yield* spawnItemFx({
 		id,
-		itemId: "temporary",
+		itemUid: "temporary",
 		location: board(x),
 	});
 });
@@ -120,7 +120,7 @@ describe("temporary material lifecycle", () => {
 			),
 		);
 		expect(result.continued.runtime.jobs).toEqual([]);
-		expect(result.continued.runtime.items.some((item) => item.item.id === "temporary")).toBe(
+		expect(result.continued.runtime.items.some((item) => item.item.uid === "temporary")).toBe(
 			false,
 		);
 		expect(
@@ -134,10 +134,10 @@ describe("temporary material lifecycle", () => {
 			),
 		).toBe(false);
 		expect(result.completed.runtime.jobs).toEqual([]);
-		expect(result.completed.runtime.items.some((item) => item.item.id === "product")).toBe(
+		expect(result.completed.runtime.items.some((item) => item.item.uid === "product")).toBe(
 			false,
 		);
-		expect(result.completed.runtime.items.some((item) => item.item.id === "residue")).toBe(
+		expect(result.completed.runtime.items.some((item) => item.item.uid === "residue")).toBe(
 			true,
 		);
 	});
@@ -170,8 +170,8 @@ describe("temporary material lifecycle", () => {
 		);
 
 		expect(runtime.runtime.jobs).toEqual([]);
-		expect(runtime.runtime.items.some((item) => item.item.id === "product")).toBe(true);
-		expect(runtime.runtime.items.some((item) => item.item.id === "residue")).toBe(false);
+		expect(runtime.runtime.items.some((item) => item.item.uid === "product")).toBe(true);
+		expect(runtime.runtime.items.some((item) => item.item.uid === "residue")).toBe(false);
 		expect(
 			runtime.events.some((event) => event.type === GameEventEnumSchema.enum.ItemExpired),
 		).toBe(false);
@@ -192,12 +192,12 @@ describe("temporary material lifecycle", () => {
 				});
 				yield* spawnItemFx({
 					id: "runtime:blocker:one",
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: board(1),
 				});
 				yield* spawnItemFx({
 					id: "runtime:blocker:two",
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: board(2),
 				});
 				const blocked = yield* advanceStepsFx({
@@ -237,7 +237,7 @@ describe("temporary material lifecycle", () => {
 				},
 			}),
 		);
-		expect(result.stillBlocked.runtime.items.some((item) => item.item.id === "residue")).toBe(
+		expect(result.stillBlocked.runtime.items.some((item) => item.item.uid === "residue")).toBe(
 			false,
 		);
 	});

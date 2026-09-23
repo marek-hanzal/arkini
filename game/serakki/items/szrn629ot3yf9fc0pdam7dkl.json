@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "szrn629ot3yf9fc0pdam7dkl",
-		"id": "spoiled-bucket",
 		"title": "Spoiled Bucket",
 		"ui": "simple",
 		"description": "Ugly",

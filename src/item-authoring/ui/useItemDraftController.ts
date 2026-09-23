@@ -62,7 +62,7 @@ export const useItemDraftController = ({
 				config: project.config,
 				draft: !readDraftFn(item),
 				expectedRevision: project.revision,
-				itemId: item.id,
+				itemUid: item.uid,
 			});
 		} catch {
 			// The settled command error remains visible beside the action.

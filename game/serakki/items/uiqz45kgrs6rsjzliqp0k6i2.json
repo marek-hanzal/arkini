@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "uiqz45kgrs6rsjzliqp0k6i2",
-		"id": "townhall-t2",
 		"title": "Townhall II",
 		"draft": false,
 		"description": "A larger, more capable civic center. The settlement has clearly advanced. What exactly comes next is, for now, somebody else's paperwork.",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -61,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -83,7 +82,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "house-t2-blueprint",
+											"itemUid": "t3pxaejvpchlcp9mgmtjlza2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -104,9 +103,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t2-blueprint"
+										"itemUid": "t3pxaejvpchlcp9mgmtjlza2"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -119,9 +118,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t2"
+										"itemUid": "pn9804e3in9odnt9vkpt3lnd"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -146,7 +145,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -161,7 +160,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -176,7 +175,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -198,7 +197,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "school-t2-blueprint",
+											"itemUid": "v1vifmafan4fzqnr4tvpbz77",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -219,9 +218,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t2"
+										"itemUid": "pn9804e3in9odnt9vkpt3lnd"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -234,9 +233,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "school-t2-blueprint"
+										"itemUid": "v1vifmafan4fzqnr4tvpbz77"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -249,9 +248,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "school-t2"
+										"itemUid": "qzwbztaqvjk8uxqc8vhi38ql"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -276,7 +275,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -291,7 +290,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -306,7 +305,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -328,7 +327,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "composting-workshop-blueprint",
+											"itemUid": "wlh0um8wznn11o2qjwp5ua5k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -349,9 +348,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "composting-workshop-blueprint"
+										"itemUid": "wlh0um8wznn11o2qjwp5ua5k"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -364,9 +363,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "composting-workshop"
+										"itemUid": "yqu4itfme4lohxp6bxbito07"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -391,7 +390,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -406,7 +405,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -421,7 +420,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t2"
+								"itemUid": "yjpg011j6ltn534wgnbidtvj"
 							},
 							"distance": "far"
 						},
@@ -443,7 +442,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "growers-guild-blueprint",
+											"itemUid": "re0g8ylbu61xzc5ujevfhghe",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -464,9 +463,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "composting-workshop"
+										"itemUid": "yqu4itfme4lohxp6bxbito07"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -479,9 +478,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "growers-guild-blueprint"
+										"itemUid": "re0g8ylbu61xzc5ujevfhghe"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -494,9 +493,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "growers-guild"
+										"itemUid": "l4vlgxmnvh7pmze314zoju6r"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -521,7 +520,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -536,7 +535,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -551,7 +550,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -573,7 +572,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-feed-workshop-blueprint",
+											"itemUid": "a42msb58jii8onmjb8wvxkej",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -594,9 +593,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "growers-guild"
+										"itemUid": "l4vlgxmnvh7pmze314zoju6r"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -609,9 +608,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "animal-feed-workshop-blueprint"
+										"itemUid": "a42msb58jii8onmjb8wvxkej"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -624,9 +623,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "animal-feed-workshop"
+										"itemUid": "bfmcl2hvc9wou6td0lnv6c4e"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -651,7 +650,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -666,7 +665,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -681,7 +680,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t2"
+								"itemUid": "yjpg011j6ltn534wgnbidtvj"
 							},
 							"distance": "far"
 						},
@@ -703,7 +702,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "herders-guild-blueprint",
+											"itemUid": "c4bsq41uru5j76864rm4emkm",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -724,9 +723,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "animal-feed-workshop"
+										"itemUid": "bfmcl2hvc9wou6td0lnv6c4e"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -739,9 +738,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "herders-guild-blueprint"
+										"itemUid": "c4bsq41uru5j76864rm4emkm"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -754,9 +753,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "herders-guild"
+										"itemUid": "qorgowckp3327nlzyzincspi"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

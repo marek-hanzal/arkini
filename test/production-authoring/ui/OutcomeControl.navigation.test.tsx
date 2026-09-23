@@ -114,7 +114,7 @@ it("duplicates the selected root outcome set with its complete roll tree", async
 						type: "guaranteed",
 						outcome: [
 							{
-								itemId: "ore",
+								itemUid: "ore",
 								type: "item",
 								placement: "drop",
 								quantity: {
@@ -182,7 +182,7 @@ it("duplicates complete rolls and drops immediately after their source", async (
 						type: "guaranteed",
 						outcome: [
 							{
-								itemId: "ore",
+								itemUid: "ore",
 								type: "item",
 								placement: "drop",
 								quantity: {
@@ -313,7 +313,7 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 							distance: "self",
 							selector: {
 								type: "item",
-								itemId: "permit",
+								itemUid: "permit",
 							},
 						},
 					},
@@ -339,7 +339,7 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 								distance: "self",
 								selector: {
 									type: "item",
-									itemId: "permit",
+									itemUid: "permit",
 								},
 							},
 						},
@@ -355,7 +355,7 @@ it("reveals roll type and drops only after each deliberate authoring step", asyn
 		value = onChangeFn.mock.lastCall?.[0] as OutcomeTableSchema.Type;
 		expect(value.set[0].roll[0].outcome[0]).toMatchObject({
 			type: "item",
-			itemId: "",
+			itemUid: "",
 			quantity: {
 				min: 1,
 				max: 1,
@@ -417,8 +417,8 @@ it.each([
 	"guaranteed",
 	"chance",
 ] as const)("opens the exact drop in a %s roll on first form render", async (type) => {
-	const drop = (itemId: string) => ({
-		itemId,
+	const drop = (itemUid: string) => ({
+		itemUid,
 		type: "item" as const,
 		quantity: {
 			min: 1,
@@ -435,7 +435,7 @@ it.each([
 							distance: "far",
 							selector: {
 								type: "item",
-								itemId: "other",
+								itemUid: "other",
 							},
 						},
 					},
@@ -446,13 +446,13 @@ it.each([
 				when: [
 					"other",
 					"permit",
-				].map((itemId) => ({
+				].map((itemUid) => ({
 					type: "exists",
 					query: {
 						distance: "far",
 						selector: {
 							type: "item",
-							itemId,
+							itemUid,
 						},
 					},
 				})),
@@ -518,13 +518,13 @@ it.each([
 });
 
 it("focuses and edits a set rule without changing the selected set's drops", async () => {
-	const condition = (itemId: string) => ({
+	const condition = (itemUid: string) => ({
 		type: "exists",
 		query: {
 			distance: "far",
 			selector: {
 				type: "item",
-				itemId,
+				itemUid,
 			},
 		},
 	});
@@ -552,7 +552,7 @@ it("focuses and edits a set rule without changing the selected set's drops", asy
 						type: "guaranteed",
 						outcome: [
 							{
-								itemId: "ore",
+								itemUid: "ore",
 								type: "item",
 								quantity: {
 									min: 1,
@@ -605,7 +605,7 @@ it("focuses and edits a set rule without changing the selected set's drops", asy
 it.each([
 	{
 		type: "item" as const,
-		itemId: "ore",
+		itemUid: "ore",
 		quantity: {
 			min: 3,
 			max: 7,

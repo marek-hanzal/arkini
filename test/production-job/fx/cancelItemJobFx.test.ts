@@ -42,8 +42,8 @@ it("cancels exact active work without refunding consumed material or cancelling 
 			const after = yield* readRuntimeFx();
 			expect(after.jobs).toHaveLength(0);
 			expect(after.jobQueue).toEqual(before.jobQueue);
-			expect(after.items.filter((item) => item.item.id === "water").length).toBe(3);
-			expect(after.items.filter((item) => item.item.id === "tool").length).toBe(2);
+			expect(after.items.filter((item) => item.item.uid === "water").length).toBe(3);
+			expect(after.items.filter((item) => item.item.uid === "tool").length).toBe(2);
 			expect(
 				after.items.some(
 					(item) => item.location.scope === "job" || item.location.scope === "reserved",
@@ -52,7 +52,7 @@ it("cancels exact active work without refunding consumed material or cancelling 
 			const transition = yield* (yield* CommittedTransitionsFx).read;
 			expect(transition.events).toContainEqual({
 				type: "job:aborted",
-				canonicalItemId: owner.item.id,
+				itemUid: owner.item.uid,
 				jobId: job.id,
 				ownerItemId: owner.id,
 				lineId: job.lineId,
@@ -112,7 +112,7 @@ it("preserves active work and its materials when a reservation cannot be returne
 			clearItemJobQueueState.items[0],
 			{
 				id: "consumed",
-				itemId: "water",
+				itemUid: "water",
 
 				location: {
 					scope: "job",
@@ -122,7 +122,7 @@ it("preserves active work and its materials when a reservation cannot be returne
 			},
 			{
 				id: "reserved",
-				itemId: "tool",
+				itemUid: "tool",
 
 				location: {
 					scope: "reserved",

@@ -269,7 +269,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					{
 						type: GameEventEnumSchema.enum.ItemInputStored,
 						sourceItemId: source.id,
-						canonicalItemId: source.item.id,
+						itemUid: source.item.uid,
 						previousSourceLocation: source.location,
 						ownerItemId,
 						lineId,

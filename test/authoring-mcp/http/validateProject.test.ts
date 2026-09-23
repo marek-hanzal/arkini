@@ -33,7 +33,7 @@ describe("editor MCP project validation", () => {
 								{
 									x: 0,
 									y: 0,
-									itemId: "missing-item",
+									itemUid: "missing-item",
 								},
 							],
 						},
@@ -62,7 +62,7 @@ describe("editor MCP project validation", () => {
 		if (text?.type !== "text") throw new Error("Missing validation text.");
 		expect(text.text).toContain("Project validation");
 		expect(text.text).toContain("Errors:");
-		expect(text.text).toContain("Path: templates.0.board.0.itemId");
+		expect(text.text).toContain("Path: templates.0.board.0.itemUid");
 		expect(text.text).toContain("Template Initial references missing item missing-item.");
 		expect(text.text).toContain("[warning]");
 		expect(() => JSON.parse(text.text)).toThrow();

@@ -52,7 +52,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 				kind: DropItemResultKind.Merge,
 				action: result.event.action,
 				effect: result.event.effect,
-				resultCanonicalItemId: result.event.resultCanonicalItemId,
+				resultItemUid: result.event.resultItemUid,
 				source: {
 					itemId: result.sourceBefore.id,
 					previousRevision: result.sourceBefore.revision,

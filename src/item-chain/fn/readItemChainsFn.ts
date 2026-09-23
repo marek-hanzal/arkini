@@ -15,7 +15,7 @@ export namespace readItemChainsFn {
 	}
 	export interface Node {
 		readonly path: string;
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly quantity?: {
 			readonly min: number;
 			readonly max: number;
@@ -27,8 +27,8 @@ export namespace readItemChainsFn {
 	export interface Step {
 		readonly path: string;
 		readonly kind: "merge" | "expiry" | "pulse";
-		readonly ownerId: string;
-		readonly targetId?: string;
+		readonly ownerItemUid: string;
+		readonly targetItemUid?: string;
 		readonly mergeIndex?: number;
 		readonly lineId?: string;
 		readonly lineTitle?: string;
@@ -45,7 +45,7 @@ export namespace readItemChainsFn {
 		readonly branches: readonly Node[];
 	}
 	export interface Outcome {
-		readonly itemId?: string;
+		readonly itemUid?: string;
 		readonly stop: Stop | "no-output";
 		readonly periodic: boolean;
 		readonly conditional: boolean;
@@ -54,8 +54,8 @@ export namespace readItemChainsFn {
 		readonly id: string;
 		readonly kind: "merge" | "clock";
 		readonly space?: number;
-		readonly ownerId: string;
-		readonly targetId?: string;
+		readonly ownerItemUid: string;
+		readonly targetItemUid?: string;
 		readonly steps: readonly Step[];
 		readonly outcomes: readonly Outcome[];
 	}
@@ -88,7 +88,7 @@ export const readItemChainsFn = (
 	let omitted = 0;
 
 	const nodeFn = (
-		itemId: string,
+		itemUid: string,
 		path: string,
 		depth: number,
 		ancestors: readonly string[],
@@ -96,7 +96,7 @@ export const readItemChainsFn = (
 		output?: readItemChainsFn.OutputPath,
 		preserved?: "retained" | "spent",
 	): readItemChainsFn.Node => {
-		const item = items[itemId];
+		const item = items[itemUid];
 		const stop: readItemChainsFn.Stop | undefined =
 			item === undefined
 				? "missing"
@@ -104,13 +104,13 @@ export const readItemChainsFn = (
 					? preserved
 					: item.clock === undefined
 						? "final"
-						: ancestors.includes(itemId)
+						: ancestors.includes(itemUid)
 							? "cycle"
 							: depth >= depthLimit
 								? "depth"
 								: undefined;
 		return {
-			itemId,
+			itemUid,
 			path,
 			quantity,
 			output,
@@ -119,7 +119,7 @@ export const readItemChainsFn = (
 				stop === undefined && item !== undefined
 					? clockFn(item, path, depth, [
 							...ancestors,
-							itemId,
+							itemUid,
 						])
 					: [],
 		};
@@ -144,7 +144,7 @@ export const readItemChainsFn = (
 			}
 			remaining--;
 			nodes.push(
-				nodeFn(drop.itemId, `${path}/${suffix}`, depth, ancestors, drop.quantity, {
+				nodeFn(drop.itemUid, `${path}/${suffix}`, depth, ancestors, drop.quantity, {
 					...meta,
 					conditional: meta.conditional || drop.rules.length > 0,
 				}),
@@ -195,7 +195,7 @@ export const readItemChainsFn = (
 				steps.push({
 					path: nextPath,
 					kind: "pulse",
-					ownerId: item.id,
+					ownerItemUid: item.uid,
 					lineId: line.id,
 					lineTitle: line.title,
 					clockWeight: line.clockWeight,
@@ -225,7 +225,7 @@ export const readItemChainsFn = (
 			steps.push({
 				path: nextPath,
 				kind: "expiry",
-				ownerId: item.id,
+				ownerItemUid: item.uid,
 				timeMs: clock.durationMs,
 				conditional: clock.rules.length > 0,
 				disabled: !clock.enable,
@@ -260,7 +260,7 @@ export const readItemChainsFn = (
 						(node.output !== undefined && node.output.type !== "guaranteed");
 					if (node.stop !== undefined)
 						outcomes.push({
-							itemId: node.itemId,
+							itemUid: node.itemUid,
 							stop: node.stop,
 							periodic: repeated,
 							conditional: possible,
@@ -274,7 +274,7 @@ export const readItemChainsFn = (
 			(outcome, index) =>
 				outcomes.findIndex(
 					(other) =>
-						other.itemId === outcome.itemId &&
+						other.itemUid === outcome.itemUid &&
 						other.stop === outcome.stop &&
 						other.periodic === outcome.periodic &&
 						other.conditional === outcome.conditional,
@@ -289,11 +289,11 @@ export const readItemChainsFn = (
 			break;
 		}
 		remaining--;
-		const targetId = merge.action === "space" ? root.id : merge.target.itemId;
+		const targetItemUid = merge.action === "space" ? root.uid : merge.target.itemUid;
 		// Receiver-owned transport retains an anonymous source; only its concrete target consequences are projected.
 		if (merge.action !== "space") {
-			if (seenTargets.has(targetId)) continue;
-			seenTargets.add(targetId);
+			if (seenTargets.has(targetItemUid)) continue;
+			seenTargets.add(targetItemUid);
 		}
 		const path = `merge/${mergeIndex}`;
 		const before = omitted;
@@ -303,7 +303,7 @@ export const readItemChainsFn = (
 		else if (merge.effect === "keep" || merge.effect === "spend")
 			branches.push(
 				nodeFn(
-					targetId,
+					targetItemUid,
 					`${path}/target`,
 					1,
 					[],
@@ -315,7 +315,7 @@ export const readItemChainsFn = (
 		if (merge.action !== "consume" && merge.action !== "space")
 			branches.push(
 				nodeFn(
-					root.id,
+					root.uid,
 					`${path}/source`,
 					1,
 					[],
@@ -334,7 +334,7 @@ export const readItemChainsFn = (
 			],
 			[
 				"target",
-				merge.effect === "spend" ? items[targetId] : undefined,
+				merge.effect === "spend" ? items[targetItemUid] : undefined,
 			],
 		] as const) {
 			if (participant?.units?.outcome === undefined) continue;
@@ -357,8 +357,8 @@ export const readItemChainsFn = (
 			{
 				path,
 				kind: "merge",
-				ownerId: root.id,
-				targetId: targetId,
+				ownerItemUid: root.uid,
+				targetItemUid: targetItemUid,
 				mergeIndex,
 				sourceAction: merge.action,
 				targetEffect: merge.effect,
@@ -377,19 +377,19 @@ export const readItemChainsFn = (
 						space: merge.space,
 					}
 				: {}),
-			ownerId: root.id,
-			targetId: targetId,
+			ownerItemUid: root.uid,
+			targetItemUid: targetItemUid,
 			steps,
 		});
 	}
 	if (root.clock !== undefined) {
 		const steps = clockFn(root, "clock", 0, [
-			root.id,
+			root.uid,
 		]);
 		chains.push({
 			id: "clock",
 			kind: "clock",
-			ownerId: root.id,
+			ownerItemUid: root.uid,
 			steps,
 		});
 	}
@@ -400,7 +400,7 @@ export const readItemChainsFn = (
 				chain.kind === "clock" && root.clock?.durationMs === undefined
 					? [
 							{
-								itemId: root.id,
+								itemUid: root.uid,
 								stop: "ongoing",
 								periodic: false,
 								conditional:

@@ -14,7 +14,7 @@ import {
 
 const boardItem = (id: "source" | "target", itemId: "source" | "target", x: number) => ({
 	id: `runtime:${id}`,
-	itemId,
+	itemUid: itemId,
 	location: {
 		scope: "board" as const,
 		space: 0,
@@ -64,7 +64,7 @@ const blockedOutputState = (includeBlocker = true) =>
 				? [
 						{
 							id: "runtime:blocker",
-							itemId: "blocker",
+							itemUid: "blocker",
 							location: {
 								scope: "board" as const,
 								space: 0,
@@ -91,7 +91,7 @@ describe("mergeItemsFx atomicity", () => {
 			rule: {
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				action: "consume",
 				effect: "keep",
@@ -113,7 +113,7 @@ describe("mergeItemsFx atomicity", () => {
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
-				itemId: "output",
+				itemUid: "output",
 				remainingQuantity: 1,
 			});
 		}
@@ -129,7 +129,7 @@ describe("mergeItemsFx atomicity", () => {
 			rule: {
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				action: "consume",
 				effect: "keep",
@@ -176,8 +176,9 @@ describe("mergeItemsFx atomicity", () => {
 		);
 
 		const outputId = (runtime: typeof afterRetry) =>
-			runtime.items.find((item) => item.item.id === "output:a" || item.item.id === "output:b")
-				?.item.id;
+			runtime.items.find(
+				(item) => item.item.uid === "output:a" || item.item.uid === "output:b",
+			)?.item.uid;
 		expect(outputId(afterRetry)).toBeDefined();
 		expect(outputId(afterRetry)).toBe(outputId(firstTry));
 	});

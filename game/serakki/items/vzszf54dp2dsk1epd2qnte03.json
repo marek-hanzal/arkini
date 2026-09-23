@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vzszf54dp2dsk1epd2qnte03",
-		"id": "sawmill",
 		"title": "Sawmill",
 		"description": "You want to advance in your journey? Sawmill is your friend!",
 		"ui": "default",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "planks",
+											"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig",
 											"quantity": {
 												"min": 2,
 												"max": 2
@@ -83,7 +82,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -105,7 +104,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wood-fibers",
+											"itemUid": "vflhl5vs01pkh5xfbx8nup0s",
 											"quantity": {
 												"min": 1,
 												"max": 1

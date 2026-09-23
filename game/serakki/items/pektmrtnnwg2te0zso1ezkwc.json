@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "pektmrtnnwg2te0zso1ezkwc",
-		"id": "empty-oven",
 		"title": "Empty Oven",
 		"ui": "simple",
 		"description": "Heat source",

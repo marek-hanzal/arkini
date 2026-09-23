@@ -4,7 +4,6 @@ import type { OptionalCapability, SectionId } from "~/item-authoring/type/Sectio
 
 interface EditorItemFormSearch {
 	readonly defaultDraft?: boolean;
-	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enable?: OptionalCapability;
 	readonly create?: boolean;
@@ -66,11 +65,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						defaultDraft: search.defaultDraft,
 					}
 				: {}),
-			...(typeof search.defaultItemId === "string" && search.defaultItemId.length > 0
-				? {
-						defaultItemId: search.defaultItemId,
-					}
-				: {}),
 			...(typeof search.defaultTitle === "string" && search.defaultTitle.length > 0
 				? {
 						defaultTitle: search.defaultTitle,
@@ -110,7 +104,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		const { itemUid } = Route.useParams();
 		const {
 			defaultDraft,
-			defaultItemId,
 			defaultTitle,
 			enable,
 			create,
@@ -133,7 +126,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		return (
 			<Form
 				defaultDraft={defaultDraft}
-				defaultItemId={defaultItemId}
 				defaultTitle={defaultTitle}
 				enableCapability={enable}
 				create={create}

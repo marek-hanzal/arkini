@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hrf8sm66jzt3ru6knu93v8dp",
-		"id": "coffee-farm",
 		"title": "Coffee Farm",
 		"draft": false,
 		"description": "Operates nearby coffee fields and keeps seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coffee-field"
+								"itemUid": "ecjzsaixdj6tc96f20xp4uxz"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "coffee-plant",
+											"itemUid": "e4u0hep343mib8is2x1g8fbx",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-coffee-field",
+											"itemUid": "wln6dnpxroy1t45s2y516tnj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "coffee-farm-blueprint",
+											"itemUid": "w29ov7ajb5aphdi4t8oeggl6",
 											"quantity": {
 												"min": 1,
 												"max": 1

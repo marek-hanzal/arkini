@@ -8,10 +8,10 @@ export const createSummaryProject = () => {
 		distance: "close",
 		selector: {
 			type: "item",
-			itemId: "water",
+			itemUid: "water",
 		},
 	};
-	const output = (itemId: string) => ({
+	const output = (itemUid: string) => ({
 		set: [
 			{
 				rules: [],
@@ -21,7 +21,7 @@ export const createSummaryProject = () => {
 						outcome: [
 							{
 								type: "item",
-								itemId,
+								itemUid,
 								quantity: {
 									min: 1,
 									max: 2,
@@ -51,7 +51,7 @@ export const createSummaryProject = () => {
 									...query,
 									selector: {
 										type: "item",
-										itemId: "tool",
+										itemUid: "tool",
 									},
 								},
 								units: {
@@ -83,7 +83,7 @@ export const createSummaryProject = () => {
 											outcome: [
 												{
 													type: "item",
-													itemId: "ingot",
+													itemUid: "ingot",
 													quantity: {
 														min: 1,
 														max: 3,
@@ -102,7 +102,7 @@ export const createSummaryProject = () => {
 												},
 												{
 													type: "item",
-													itemId: "dust",
+													itemUid: "dust",
 													quantity: {
 														min: 2,
 														max: 2,
@@ -122,7 +122,7 @@ export const createSummaryProject = () => {
 											outcome: [
 												{
 													type: "item",
-													itemId: "plate",
+													itemUid: "plate",
 													quantity: {
 														min: 1,
 														max: 1,
@@ -155,7 +155,7 @@ export const createSummaryProject = () => {
 							action: "spend",
 							target: {
 								type: "item",
-								itemId: "water",
+								itemUid: "water",
 							},
 							effect: "remove",
 							outcome: output("ingot"),
@@ -176,7 +176,7 @@ export const createSummaryProject = () => {
 										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "mill",
+											itemUid: "mill",
 										},
 									},
 									mode: "consume",
@@ -220,7 +220,7 @@ export const createRequirementSummaryProject = () => {
 									distance: "close",
 									selector: {
 										type: "item",
-										itemId: "tool",
+										itemUid: "tool",
 									},
 								},
 								units: {
@@ -270,7 +270,7 @@ export const createConditionalSummaryProject = () => {
 											distance: "far",
 											selector: {
 												type: "item",
-												itemId: "tool",
+												itemUid: "tool",
 											},
 										},
 									},
@@ -298,7 +298,7 @@ export const createConditionalSummaryProject = () => {
 													distance: "far",
 													selector: {
 														type: "item",
-														itemId: "tool",
+														itemUid: "tool",
 													},
 												},
 											},
@@ -328,7 +328,7 @@ export const createSelfMergeSummaryProject = () => {
 							...base.config.items.tool.merge![0],
 							target: {
 								type: "item",
-								itemId: "tool",
+								itemUid: "tool",
 							},
 							effect: "spend",
 						},

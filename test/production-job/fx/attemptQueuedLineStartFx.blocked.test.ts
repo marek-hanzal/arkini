@@ -139,7 +139,7 @@ describe("queued blocked probes", () => {
 			"request:ready",
 		]);
 		expect(
-			result.started.runtime.items.filter((item) => item.item.id === "debris"),
+			result.started.runtime.items.filter((item) => item.item.uid === "debris"),
 		).toHaveLength(2);
 		expect(
 			result.started.runtime.items.find((item) => item.id === "owner")?.remainingUnits,

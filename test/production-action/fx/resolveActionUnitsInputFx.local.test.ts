@@ -6,16 +6,19 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { unitsConfig } from "./itemUnits.test/fixture";
 
-it("selects local universe unit payers before remote spaces and orders remote cells deterministically", () => {
+it.each([
+	0,
+	1,
+])("limits far unit payers to owner space %i regardless of the viewed space", (ownerSpace) => {
 	const result = Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "owner",
-				itemId: "producer:double-target",
+				itemUid: "producer:double-target",
 
 				location: {
 					scope: "board",
-					space: 0,
+					space: ownerSpace,
 					position: {
 						x: 0,
 						y: 0,
@@ -31,26 +34,26 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 				],
 				[
 					"remote-next",
-					1,
+					2,
 					0,
 					1,
 				],
 				[
 					"remote-first",
-					1,
+					2,
 					3,
 					0,
 				],
 				[
 					"local",
-					0,
+					ownerSpace,
 					3,
 					1,
 				],
 			] as const) {
 				yield* spawnItemFx({
 					id,
-					itemId: "units:tree",
+					itemUid: "units:tree",
 
 					location: {
 						scope: "board",
@@ -62,10 +65,13 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 					},
 				});
 			}
-			const runtime = yield* readRuntimeFx();
+			const runtime = {
+				...(yield* readRuntimeFx()),
+				currentSpace: 0,
+			};
 			const selected: string[] = [];
 			const reservedUnits = new Map<string, number>();
-			for (let index = 0; index < 4; index++) {
+			for (let index = 0; index < 2; index++) {
 				const result = yield* resolveActionUnitsInputFx({
 					ownerItemId: "owner",
 					reservedUnits,
@@ -73,10 +79,10 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 					input: {
 						type: "units",
 						query: {
-							distance: "universe",
+							distance: "far",
 							selector: {
 								type: "item",
-								itemId: "units:tree",
+								itemUid: "units:tree",
 							},
 						},
 						units: {
@@ -89,8 +95,11 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 					result.resolution.type !== "units" ||
 					!result.resolution.ready ||
 					result.resolution.targetItemId === undefined
-				)
-					throw new Error("Expected a payer");
+				) {
+					expect(result.plan).toBeUndefined();
+					selected.push("unavailable");
+					continue;
+				}
 				selected.push(result.resolution.targetItemId);
 				reservedUnits.set(result.resolution.targetItemId, 100);
 			}
@@ -103,8 +112,6 @@ it("selects local universe unit payers before remote spaces and orders remote ce
 	);
 	expect(result).toEqual([
 		"local",
-		"remote-first",
-		"remote-next",
-		"remote-last",
+		"unavailable",
 	]);
 });

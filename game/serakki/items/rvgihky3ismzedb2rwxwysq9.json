@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rvgihky3ismzedb2rwxwysq9",
-		"id": "mouse",
 		"title": "Mouse",
 		"ui": "simple",
 		"draft": true,
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cheese"
+					"itemUid": "rvrxgi8ol0hdiwa93d9zzes4"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "mouse-full-belly"
+				"result": "w7zcka55tb4o24bo6dfck1jh"
 			}
 		],
 		"maxQueueSize": 1,

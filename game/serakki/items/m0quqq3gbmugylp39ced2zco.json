@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "m0quqq3gbmugylp39ced2zco",
-		"id": "corn",
 		"title": "Corn",
 		"draft": false,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-corn",
+										"itemUid": "t3ms6btsehfibf9l0ld39zzr",
 										"quantity": {
 											"min": 1,
 											"max": 1

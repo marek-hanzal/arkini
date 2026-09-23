@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wxg5ic5fq27jq6hhu1953ruq",
-		"id": "waste-incinerator-blueprint",
 		"title": "Waste Incinerator Blueprint",
 		"draft": false,
 		"description": "Plans for a facility that solves one kind of pollution by creating another. Progress remains beautifully complicated.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "waste-incinerator-blueprint"
+								"itemUid": "wxg5ic5fq27jq6hhu1953ruq"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -86,7 +85,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "waste-incinerator",
+											"itemUid": "tacmmsi662wvdnoz6i21n1wp",
 											"quantity": {
 												"min": 1,
 												"max": 1

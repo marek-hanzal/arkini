@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gvnbpgtoo0lm8ty9ogp74ynk",
-		"id": "recovering-bear",
 		"title": "Recovering Bear",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "teddy-bear",
+										"itemUid": "hn2mp2xmdu9on72r0auz8h7t",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -5,8 +5,8 @@ import { DiagnosticPathSchema } from "~/game-config-diagnostic/schema/Diagnostic
 
 export const MaterialInputEdgeSchema = z
 	.object({
-		ownerItemId: IdSchema,
-		acceptedItemId: IdSchema,
+		ownerItemUid: IdSchema,
+		acceptedItemUid: IdSchema,
 		path: DiagnosticPathSchema,
 		source: z.string().min(1).optional(),
 	})

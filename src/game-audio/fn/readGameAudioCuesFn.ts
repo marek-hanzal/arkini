@@ -50,12 +50,12 @@ const cueFn = (event: AudibleGameEvent, strength: number): GameEventAudioCue => 
 const readJobAudioCueFn = (
 	event: {
 		readonly type: AudibleGameEvent;
-		readonly canonicalItemId: string;
+		readonly itemUid: string;
 	},
 	items: GameConfigSchema.Type["items"],
 	strength: number,
 ): GameEventAudioCue | undefined =>
-	items[event.canonicalItemId]?.ui === "simple" ? undefined : cueFn(event.type, strength);
+	items[event.itemUid]?.ui === "simple" ? undefined : cueFn(event.type, strength);
 
 const readGameAudioCueFn = (
 	event: GameEvent,

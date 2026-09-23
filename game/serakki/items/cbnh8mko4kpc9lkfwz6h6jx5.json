@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cbnh8mko4kpc9lkfwz6h6jx5",
-		"id": "construction-set-t1",
 		"title": "Construction Set - Tier 1",
 		"description": "A basic bundle of standardized building parts. Not exciting on its own, but larger construction starts becoming much easier once these stop being rare.",
 		"ui": "simple",

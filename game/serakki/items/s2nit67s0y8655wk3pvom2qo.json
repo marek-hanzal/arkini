@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "s2nit67s0y8655wk3pvom2qo",
-		"id": "wild-boar",
 		"title": "Wild Boar",
 		"ui": "simple",
 		"description": "An animal",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 2

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hdlk91uftu8kz25gohztvaqd",
-		"id": "glass",
 		"title": "Glass",
 		"ui": "simple",
 		"description": "A bit more complex buildings needs windows. They're quite useful, really.",

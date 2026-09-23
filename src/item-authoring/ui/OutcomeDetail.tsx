@@ -51,7 +51,7 @@ export const OutcomeDetail = ({
 				renderItemFn={(item, eyebrow) => (
 					<DetailReference
 						eyebrow={eyebrow}
-						itemId={item.itemId}
+						itemUid={item.itemUid}
 						description={<Tx label={item.placement === "random" ? "Random" : "Drop"} />}
 					/>
 				)}

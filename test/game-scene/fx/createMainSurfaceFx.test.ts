@@ -141,7 +141,7 @@ const item = (
 ): TileActorItem => ({
 	activityEffect: false,
 	id,
-	itemId: id,
+	itemUid: id,
 
 	location,
 	primaryAction: {

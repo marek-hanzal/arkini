@@ -9,7 +9,7 @@ export type ItemDetailTarget =
 	  }
 	| {
 			readonly kind: "definition";
-			readonly itemId: string;
+			readonly itemUid: string;
 			readonly origin: HTMLElement | null;
 	  };
 
@@ -44,7 +44,7 @@ interface OpenItemDetailProps {
 }
 
 interface OpenItemDefinitionDetailProps {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly origin?: HTMLElement | null;
 }
 

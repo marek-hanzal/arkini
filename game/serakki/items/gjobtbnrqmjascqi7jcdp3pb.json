@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gjobtbnrqmjascqi7jcdp3pb",
-		"id": "empty-cow-pen",
 		"title": "Empty Cow Pen",
 		"draft": false,
 		"description": "An empty enclosure waiting for the next group of animals to arrive.",
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-cow-pen"
+								"itemUid": "gjobtbnrqmjascqi7jcdp3pb"
 							},
 							"distance": "self"
 						}
@@ -48,7 +47,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "animal-feed"
+								"itemUid": "e2pone4zse5ngt9nass0nzfy"
 							},
 							"distance": "far"
 						},
@@ -63,7 +62,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -85,7 +84,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cow-pen",
+											"itemUid": "ekstw01ksb6lp64ums0563jk",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -95,7 +94,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1

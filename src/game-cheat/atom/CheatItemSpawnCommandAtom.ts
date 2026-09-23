@@ -13,7 +13,7 @@ export namespace CheatItemSpawnCommandAtom {
 		  }
 		| {
 				readonly kind: "spawn";
-				readonly itemId: string;
+				readonly itemUid: string;
 		  };
 
 	export type State =
@@ -67,7 +67,7 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 							Effect.andThen(
 								game.runFx(
 									spawnCheatItemFx({
-										itemId: command.itemId,
+										itemUid: command.itemUid,
 									}),
 								),
 							),

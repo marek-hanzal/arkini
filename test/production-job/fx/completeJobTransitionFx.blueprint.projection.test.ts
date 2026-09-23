@@ -12,7 +12,7 @@ describe("blueprint depletion projection", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:target",
-					itemId: "item:target",
+					itemUid: "item:target",
 					location: {
 						scope: "board",
 						space: 0,
@@ -24,7 +24,7 @@ describe("blueprint depletion projection", () => {
 				});
 				const owner = yield* spawnItemFx({
 					id: "runtime:recycler",
-					itemId: "producer:recycler",
+					itemUid: "producer:recycler",
 					location: {
 						scope: "board",
 						space: 0,

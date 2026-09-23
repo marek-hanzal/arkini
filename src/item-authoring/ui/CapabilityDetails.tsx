@@ -123,7 +123,7 @@ export const MergeDetail = ({
 				{"result" in merge ? (
 					<DetailFact
 						label={translator.textFn("Replacement item")}
-						value={<DetailReference itemId={merge.result} />}
+						value={<DetailReference itemUid={merge.result} />}
 					/>
 				) : null}
 				<DetailFact

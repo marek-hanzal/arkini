@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "czmjliygl2qrfhjah60xo2me",
-		"id": "tree",
 		"title": "Tree",
 		"description": "A tree. Ten useful units of wood, shade, and poor long-term planning. Fully depleting one returns a Tree Seed so forestry can be renewed instead of merely regretted.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "tree-seed",
+										"itemUid": "ewryv1f1y34haaa2rbje04fz",
 										"quantity": {
 											"min": 1,
 											"max": 1

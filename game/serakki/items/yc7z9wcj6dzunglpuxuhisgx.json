@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yc7z9wcj6dzunglpuxuhisgx",
-		"id": "dirty-cutting-board",
 		"title": "Dirty Cutting Board",
 		"ui": "simple",
 		"artwork": {

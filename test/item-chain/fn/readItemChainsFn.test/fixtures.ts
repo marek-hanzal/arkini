@@ -10,9 +10,9 @@ export const outputFn = (...ids: string[]) =>
 				roll: [
 					{
 						type: "guaranteed",
-						outcome: ids.map((itemId) => ({
+						outcome: ids.map((itemUid) => ({
 							type: "item",
-							itemId,
+							itemUid,
 							quantity: {
 								min: 1,
 								max: 1,
@@ -28,7 +28,6 @@ export const outputFn = (...ids: string[]) =>
 export const itemFn = (id: string, fields: Record<string, unknown> = {}) =>
 	ItemSchema.parse({
 		uid: id,
-		id,
 		title: id,
 		artwork: {
 			default: [
@@ -40,10 +39,10 @@ export const itemFn = (id: string, fields: Record<string, unknown> = {}) =>
 		lines: [],
 		...fields,
 	});
-export const mergeFn = (targetId: string, result: string) => ({
+export const mergeFn = (targetItemUid: string, result: string) => ({
 	target: {
 		type: "item",
-		itemId: targetId,
+		itemUid: targetItemUid,
 	},
 	action: "consume",
 	effect: "replace",
@@ -58,7 +57,7 @@ export const clockFn = (...ids: string[]) => ({
 export const catalogFn = (...items: ItemSchema.Type[]) =>
 	Object.fromEntries(
 		items.map((item) => [
-			item.id,
+			item.uid,
 			item,
 		]),
 	);
@@ -83,5 +82,5 @@ export const finalIdsFn = (result: readItemChainsFn.Result) =>
 	result.chains.flatMap((chain) =>
 		chain.outcomes
 			.filter((outcome) => outcome.stop === "final")
-			.map((outcome) => outcome.itemId),
+			.map((outcome) => outcome.itemUid),
 	);

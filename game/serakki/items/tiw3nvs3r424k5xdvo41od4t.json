@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tiw3nvs3r424k5xdvo41od4t",
-		"id": "haunted-empty-bed---tier-1",
 		"title": "Haunted Empty Bed - Tier 1",
 		"draft": true,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "ghost",
+										"itemUid": "ynro5iy60hlzcb1q3kd1an8l",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "empty-bed-t1",
+										"itemUid": "yoody7n37wf3xnufn46i2xne",
 										"quantity": {
 											"min": 1,
 											"max": 1

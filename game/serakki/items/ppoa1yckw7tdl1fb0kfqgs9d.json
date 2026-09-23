@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ppoa1yckw7tdl1fb0kfqgs9d",
-		"id": "burned-sack-with-corn-kernels",
 		"title": "Burned Sack With Corn Kernels",
 		"ui": "simple",
 		"draft": false,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "ash",
+										"itemUid": "hhq1jyc6purkrnzfh6bqsk51",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

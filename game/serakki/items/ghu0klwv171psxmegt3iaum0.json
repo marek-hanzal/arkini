@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ghu0klwv171psxmegt3iaum0",
-		"id": "copper-pan-with-fried-chicken",
 		"title": "Copper Pan With Fried Chicken",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-copper-pan",
+										"itemUid": "ogm52bsqfqk27a566mmabg3q",
 										"quantity": {
 											"min": 1,
 											"max": 1

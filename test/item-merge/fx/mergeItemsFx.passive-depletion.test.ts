@@ -28,7 +28,7 @@ const runDepletion = (blockReturn = false) => {
 		rule: {
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 			action: "spend",
 			effect: "keep",
@@ -59,7 +59,7 @@ const runDepletion = (blockReturn = false) => {
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "output",
+										itemUid: "output",
 									},
 								},
 								quantity: {
@@ -92,19 +92,19 @@ const runDepletion = (blockReturn = false) => {
 		items: [
 			{
 				id: "source",
-				itemId: "source",
+				itemUid: "source",
 
 				location: board(0),
 			},
 			{
 				id: "target",
-				itemId: "target",
+				itemUid: "target",
 
 				location: board(1),
 			},
 			{
 				id: "material",
-				itemId: "output",
+				itemUid: "output",
 
 				location: {
 					scope: "input",
@@ -120,7 +120,7 @@ const runDepletion = (blockReturn = false) => {
 	if (blockReturn)
 		state.items.push({
 			id: "material:second",
-			itemId: "output",
+			itemUid: "output",
 
 			location: {
 				scope: "input",
@@ -170,7 +170,7 @@ it.each([
 	expect(drop.kind).toBe("merge");
 	expect(after.runtime.items).toHaveLength(2);
 	expect(after.runtime.items.find((item) => item.id === "source")).toBeUndefined();
-	expect(after.runtime.items.find((item) => item.item.id === "output")).toMatchObject({
+	expect(after.runtime.items.find((item) => item.item.uid === "output")).toMatchObject({
 		location: {
 			scope: "board",
 			space: 0,
@@ -183,7 +183,7 @@ it.each([
 	expect(after.events).toContainEqual(
 		expect.objectContaining({
 			type: "item:depleted",
-			itemId: "source",
+			itemUid: "source",
 		}),
 	);
 });

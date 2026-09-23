@@ -14,7 +14,7 @@ export const BoardItemSchema = z
 		/**
 		 * Canonical item placed on the board.
 		 */
-		itemId: IdSchema.describe("The canonical item ID placed on the initial board."),
+		itemUid: IdSchema.describe("The canonical item ID placed on the initial board."),
 	})
 	.strict()
 	.meta({

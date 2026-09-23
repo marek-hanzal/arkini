@@ -5,35 +5,38 @@ import type { ItemEstimate } from "~/estimate/type/ItemEstimate";
 
 interface CreateItemEstimateIndexProps {
 	readonly estimates: ReadonlyMap<string, ItemEstimate>;
-	readonly itemIds: ReadonlyArray<string>;
+	readonly itemUids: ReadonlyArray<string>;
 }
 
 /** Projects the cached full-catalog estimates into list timing and aggregate item demand. */
 export const createItemEstimateIndexFn = ({
 	estimates,
-	itemIds,
+	itemUids,
 }: CreateItemEstimateIndexProps): ReadonlyArray<ItemEstimateIndexEntry> => {
-	const demandByItemId = new Map<string, number>();
+	const demandByItemUid = new Map<string, number>();
 	for (const estimate of estimates.values()) {
 		if (!estimate.obtainable) continue;
 		for (const step of estimate.routeSteps)
-			demandByItemId.set(step.factId, (demandByItemId.get(step.factId) ?? 0) + step.quantity);
+			demandByItemUid.set(
+				step.factId,
+				(demandByItemUid.get(step.factId) ?? 0) + step.quantity,
+			);
 	}
 
-	return itemIds
-		.flatMap((itemId): ReadonlyArray<ItemEstimateIndexEntry> => {
-			const estimate = estimates.get(itemId);
+	return itemUids
+		.flatMap((itemUid): ReadonlyArray<ItemEstimateIndexEntry> => {
+			const estimate = estimates.get(itemUid);
 			return estimate === undefined
 				? []
 				: [
 						{
-							demand: demandByItemId.get(itemId) ?? 0,
-							itemId,
+							demand: demandByItemUid.get(itemUid) ?? 0,
+							itemUid,
 							method: "static",
 							runtimeMs: estimate.obtainable ? estimate.durationMs : undefined,
 							status: estimate.status,
 						},
 					];
 		})
-		.sort((left, right) => Order.String(left.itemId, right.itemId));
+		.sort((left, right) => Order.String(left.itemUid, right.itemUid));
 };

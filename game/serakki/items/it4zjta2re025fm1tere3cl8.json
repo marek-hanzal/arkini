@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "it4zjta2re025fm1tere3cl8",
-		"id": "spoiled-hops",
 		"title": "Spoiled Hops",
 		"draft": false,
 		"description": "Hops that sat around long enough to lose most of the qualities anyone wanted from them.",

@@ -11,9 +11,9 @@ const state = vi.hoisted(() => ({
 vi.mock("~/item-authoring/ui/FormContext", () => ({
 	useFormSession: () => ({
 		initialItem: {
-			uid: "destination-uid",
+			uid: "destination",
 		},
-		itemId: "renamed",
+		itemUid: "renamed",
 		copySectionFn: state.copyFn,
 		isSaving: false,
 	}),
@@ -70,8 +70,7 @@ afterEach(async () => {
 });
 it("excludes the destination by UID and copies only the confirmed source snapshot", async () => {
 	const source = ItemSchema.parse({
-		uid: "source-uid",
-		id: "source",
+		uid: "source",
 		title: "Source",
 		artwork: {
 			scale: 1,
@@ -89,8 +88,7 @@ it("excludes the destination by UID and copies only the confirmed source snapsho
 		source,
 		destination: {
 			...source,
-			uid: "destination-uid",
-			id: "destination",
+			uid: "destination",
 		},
 	};
 	const root = createRoot(document.body.appendChild(document.createElement("div")));

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rlhzroboxe2mq3o17qp6xdii",
-		"id": "flax-seed",
 		"title": "Flax Seed",
 		"draft": false,
 		"description": "Loose flax seed. Plant it before it spoils.",
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-flax-seed"
+				"result": "j698416846si00nnp9w4nhua"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-flax-field"
+					"itemUid": "woaodxe7380pvd5iyrpf0egs"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "flax-field"
+				"result": "mp2maik3tk3jwvt78hwfjw9x"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-flax-seed",
+										"itemUid": "xb1u223naj2czagcc4ypkfx7",
 										"quantity": {
 											"min": 1,
 											"max": 1

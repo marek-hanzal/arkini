@@ -29,7 +29,7 @@ export const assertPlacementPlanCompleteFx = Effect.fn("assertPlacementPlanCompl
 	if (placedQuantity > quantity) {
 		return yield* Effect.fail(
 			new PlacementPlanInvalidError({
-				itemId: drop.itemId,
+				itemUid: drop.itemUid,
 				placement: drop.placement,
 				requestedQuantity: quantity,
 				placedQuantity,
@@ -39,7 +39,7 @@ export const assertPlacementPlanCompleteFx = Effect.fn("assertPlacementPlanCompl
 
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
-			itemId: drop.itemId,
+			itemUid: drop.itemUid,
 			placement: drop.placement,
 			quantity: drop.quantity,
 			reason,

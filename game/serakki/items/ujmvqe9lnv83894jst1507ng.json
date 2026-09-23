@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ujmvqe9lnv83894jst1507ng",
-		"id": "toxic-filter",
 		"title": "Toxic Filter",
 		"ui": "simple",
 		"description": "Your waste, my business",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "toxic-filter-depleted",
+										"itemUid": "aw747exlnxsxd6dw2q4022mj",
 										"quantity": {
 											"min": 1,
 											"max": 1

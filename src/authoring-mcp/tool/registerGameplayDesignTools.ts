@@ -57,28 +57,20 @@ const ValidateProjectInputSchema = z
 
 const RenameItemInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The current exact item ID."),
-		id: IdSchema.optional().describe("The replacement unique item ID."),
-		title: TitleSchema.optional(),
-		artwork: z
-			.boolean()
-			.optional()
-			.describe(
-				"Also rename the sole default Artwork to the supplied id. Requires id; ambiguous compositions fail.",
-			),
+		itemUid: IdSchema.describe("The current exact item UID."),
+		title: TitleSchema,
 		revision: RevisionSchema.optional(),
 	})
 	.strict()
 	.meta({
 		$id: "urn:serakki:schema:mcp:rename-item-input",
 		title: "Rename item tool input",
-		description:
-			"An item title and/or ID rename with optional Artwork synchronization and revision guard.",
+		description: "An item title change with immutable UID and revision guard.",
 	});
 
 const ItemDeleteImpactInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact item ID."),
+		itemUid: IdSchema.describe("The exact item UID."),
 	})
 	.strict()
 	.meta({
@@ -89,7 +81,7 @@ const ItemDeleteImpactInputSchema = z
 
 const DeleteItemInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact item ID inspected by item_delete_impact."),
+		itemUid: IdSchema.describe("The exact item UID inspected by item_delete_impact."),
 		revision: RevisionSchema,
 		force: z
 			.boolean()
@@ -163,12 +155,11 @@ const formatListFn = (values: ReadonlyArray<string>) =>
 
 const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(function* (
 	project: Project,
-	itemId: string,
+	itemUid: string,
 ) {
-	const { blockers, impact, item } = yield* readItemDeleteImpactFx(project, itemId);
+	const { blockers, impact, item } = yield* readItemDeleteImpactFx(project, itemUid);
 	const lines = [
 		"Item delete impact",
-		`ID: ${itemId}`,
 		`UID: ${item.uid}`,
 		`Revision: ${project.revision}`,
 		`References: ${blockers.length}`,
@@ -183,8 +174,8 @@ const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(funct
 		"Force cleanup:",
 		`- Unit outcomes removed from: ${formatListFn(impact.removedUnitOutcomeOwnerIds)}`,
 		`- Expiry outcomes removed from: ${formatListFn(impact.removedExpiryOutcomeOwnerIds)}`,
-		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemId, lineId }) => `${ownerItemId}/${lineId}`))}`,
-		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemId, ruleNumber }) => `${ownerItemId}#${ruleNumber}`))}`,
+		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemUid, lineId }) => `${ownerItemUid}/${lineId}`))}`,
+		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemUid, ruleNumber }) => `${ownerItemUid}#${ruleNumber}`))}`,
 		...impact.removedTemplateEntries.map(
 			(template) =>
 				`- Template ${template.title} (${template.templateUid}): ${template.count} placements removed`,
@@ -334,18 +325,16 @@ export const registerGameplayDesignToolsFn = ({
 		"rename_item",
 		{
 			description:
-				"Rename an item title and/or ID. Supply at least one of title or id. With artwork: true, id is required and the single artwork.default resource is renamed to that ID, including all resource and Note references. Missing or multiple default artworks and resource ID collisions fail before writing. The item UID is preserved. Uses one revision-guarded, locked best-effort project write; I/O failures have no aggregate rollback.",
+				"Rename an item title while preserving its immutable UID. Uses a revision-guarded project write",
 			inputSchema: RenameItemInputSchema,
 		},
-		async ({ itemId, id, title, artwork, revision }) =>
+		async ({ itemUid, title, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						renameItemFx({
-							itemId,
-							id,
+							itemUid,
 							title,
-							artwork,
 							notifyProjectChangedFn,
 							project,
 							repository,
@@ -362,10 +351,10 @@ export const registerGameplayDesignToolsFn = ({
 				"Preview whether an item can be safely deleted and every canonical structure a force delete would remove. Read this immediately before delete_item and copy its revision into the destructive request.",
 			inputSchema: ItemDeleteImpactInputSchema,
 		},
-		async ({ itemId }) =>
+		async ({ itemUid }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemDeleteImpactTextFx(project, itemId)),
+					Effect.flatMap((project) => readItemDeleteImpactTextFx(project, itemUid)),
 				),
 			),
 	);
@@ -376,13 +365,13 @@ export const registerGameplayDesignToolsFn = ({
 				"Delete one item at the exact revision returned by item_delete_impact. Safe mode rejects referenced items. Force mode removes the item and the referencing structures listed by that impact in one project write; it never guesses through stale state.",
 			inputSchema: DeleteItemInputSchema,
 		},
-		async ({ force, itemId, revision }) =>
+		async ({ force, itemUid, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						deleteItemFx({
 							force,
-							itemId,
+							itemUid,
 							notifyProjectChangedFn,
 							project,
 							repository,

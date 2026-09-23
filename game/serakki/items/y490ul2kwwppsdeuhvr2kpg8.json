@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y490ul2kwwppsdeuhvr2kpg8",
-		"id": "luxury-clothes",
 		"title": "Luxury Clothes",
 		"ui": "simple",
 		"description": "Nice",

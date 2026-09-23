@@ -30,13 +30,13 @@ const compileItems = (
 		]),
 	);
 
-const unitsInput = (itemId: string) => ({
+const unitsInput = (itemUid: string) => ({
 	type: "units" as const,
 	query: {
 		distance: "close" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid,
 		},
 	},
 	units: {
@@ -46,7 +46,7 @@ const unitsInput = (itemId: string) => ({
 });
 
 describe("completed config reference validation", () => {
-	it("reports canonical record key and embedded ID mismatches", async () => {
+	it("reports canonical record key and embedded UID mismatches", async () => {
 		const result = await compileItems({
 			"item:key": createSimpleItem("item:embedded"),
 		});
@@ -54,10 +54,10 @@ describe("completed config reference validation", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
+					code: DiagnosticCodeEnumSchema.enum.ConfigKeyUidMismatch,
 					entity: DiagnosticRecordEntityEnumSchema.enum.Item,
 					key: "item:key",
-					id: "item:embedded",
+					uid: "item:embedded",
 				}),
 			]),
 		);
@@ -74,7 +74,7 @@ describe("completed config reference validation", () => {
 							distance: "far",
 							selector: {
 								type: "item" as const,
-								itemId: "item:missing-input",
+								itemUid: "item:missing-input",
 							},
 						},
 						quantity: {
@@ -86,14 +86,14 @@ describe("completed config reference validation", () => {
 				],
 				outcome: createOutput([
 					{
-						itemId: "item:missing-output",
+						itemUid: "item:missing-output",
 					},
 				]),
 			}),
 		};
 		const result = await compileItems(
 			{
-				[producer.id]: producer,
+				[producer.uid]: producer,
 			},
 			{
 				currentSpace: 0,
@@ -156,10 +156,11 @@ describe("completed config reference validation", () => {
 															{
 																type: "exists" as const,
 																query: {
-																	distance: "universe",
+																	distance: "far",
 																	selector: {
 																		type: "item" as const,
-																		itemId: "item:missing-rule",
+																		itemUid:
+																			"item:missing-rule",
 																	},
 																},
 															},
@@ -177,7 +178,7 @@ describe("completed config reference validation", () => {
 			],
 		};
 		const result = await compileItems({
-			[portal.id]: portal,
+			[portal.uid]: portal,
 		});
 		const missing = result.diagnostics.filter(
 			({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
@@ -207,10 +208,10 @@ describe("completed config reference validation", () => {
 								{
 									type: "exists" as const,
 									query: {
-										distance: "universe",
+										distance: "far",
 										selector: {
 											type: "item" as const,
-											itemId: "item:producer",
+											itemUid: "item:producer",
 										},
 									},
 								},
@@ -222,10 +223,10 @@ describe("completed config reference validation", () => {
 								{
 									type: "exists" as const,
 									query: {
-										distance: "universe",
+										distance: "far",
 										selector: {
 											type: "item" as const,
-											itemId: "item:missing-rule",
+											itemUid: "item:missing-rule",
 										},
 									},
 								},
@@ -236,14 +237,14 @@ describe("completed config reference validation", () => {
 			],
 		});
 		const result = await compileItems({
-			[producer.id]: producer,
+			[producer.uid]: producer,
 		});
 
 		expect(result.diagnostics).toContainEqual(
 			expect.objectContaining({
 				path: [
 					"items",
-					producer.id,
+					producer.uid,
 					"lines",
 					0,
 					"rules",
@@ -252,7 +253,7 @@ describe("completed config reference validation", () => {
 					0,
 					"query",
 					"selector",
-					"itemId",
+					"itemUid",
 				],
 				referenceId: "item:missing-rule",
 			}),
@@ -276,10 +277,10 @@ describe("completed config reference validation", () => {
 											{
 												type: "exists",
 												query: {
-													distance: "universe",
+													distance: "far",
 													selector: {
 														type: "item",
-														itemId: "item:missing-set-rule",
+														itemUid: "item:missing-set-rule",
 													},
 												},
 											},
@@ -292,7 +293,7 @@ describe("completed config reference validation", () => {
 										outcome: [
 											{
 												type: "item",
-												itemId: "item:producer",
+												itemUid: "item:producer",
 												quantity: {
 													min: 1,
 													max: 1,
@@ -310,14 +311,14 @@ describe("completed config reference validation", () => {
 			],
 		});
 		const result = await compileItems({
-			[producer.id]: producer,
+			[producer.uid]: producer,
 		});
 
 		expect(result.diagnostics).toContainEqual(
 			expect.objectContaining({
 				path: [
 					"items",
-					producer.id,
+					producer.uid,
 					"lines",
 					0,
 					"outcome",
@@ -329,7 +330,7 @@ describe("completed config reference validation", () => {
 					0,
 					"query",
 					"selector",
-					"itemId",
+					"itemUid",
 				],
 				referenceId: "item:missing-set-rule",
 			}),

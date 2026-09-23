@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nqflnwavzbre8wshpgqa0qqv",
-		"id": "clay-bowl-with-lye",
 		"title": "Clay Bowl With Lye",
 		"ui": "simple",
 		"description": "Don't drink it.",

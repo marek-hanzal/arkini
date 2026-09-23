@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jks4vzcbr0q304mqyffs42ex",
-		"id": "wire-processing",
 		"title": "Wire Processing",
 		"ui": "default",
 		"description": "It's time for some electricity",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "copper-ingot"
+								"itemUid": "q68zwrmfnp4ld3hey4iph973"
 							},
 							"distance": "far"
 						},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "n4ziixdl1bdsefi26ncdjyy1",
-		"id": "bed-biowaste",
 		"title": "Bed Biowaste",
 		"ui": "simple",
 		"description": "You monster!",

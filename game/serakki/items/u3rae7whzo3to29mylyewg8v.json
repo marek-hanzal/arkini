@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "u3rae7whzo3to29mylyewg8v",
-		"id": "farmland-portal",
 		"title": "Farmland Portal",
 		"description": "Fields, animals, mud, food, and the recurring discovery that everything needs feeding.",
 		"ui": "simple",

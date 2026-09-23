@@ -32,17 +32,17 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 	const targets = new Set<string>();
 	const touched = new Map<string, number[]>();
 	for (const [index, operation] of operations.entries()) {
-		const { itemId } = operation;
+		const { itemUid } = operation;
 		const lineId = operation.operation === "create" ? operation.line.id : operation.lineId;
 		const failFx = (message: string) =>
 			Effect.fail(
 				new ProjectOperationError({
 					reason: "invalid-item",
-					message: `Operation ${index + 1} (${operation.operation}, item ${itemId}, line ${lineId}): ${message}`,
+					message: `Operation ${index + 1} (${operation.operation}, item ${itemUid}, line ${lineId}): ${message}`,
 				}),
 			);
-		const item = items[itemId];
-		if (item === undefined) return yield* failFx(`Item ${itemId} does not exist.`);
+		const item = items[itemUid];
+		if (item === undefined) return yield* failFx(`Item ${itemUid} does not exist.`);
 		if (revision !== project.revision)
 			return yield* Effect.fail(
 				new ProjectRepositoryError({
@@ -52,7 +52,7 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 				}),
 			);
 		const target = JSON.stringify([
-			itemId,
+			itemUid,
 			lineId,
 		]);
 		if (targets.has(target))
@@ -64,12 +64,12 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 			);
 		const matches = item.lines.filter((line) => line.id === lineId);
 		if (operation.operation === "create" && matches.length > 0)
-			return yield* failFx(`Line ${lineId} already exists on item ${itemId}.`);
+			return yield* failFx(`Line ${lineId} already exists on item ${itemUid}.`);
 		if (operation.operation !== "create" && matches.length === 0)
-			return yield* failFx(`Line ${lineId} does not exist on item ${itemId}.`);
+			return yield* failFx(`Line ${lineId} does not exist on item ${itemUid}.`);
 		if (operation.operation !== "create" && matches.length > 1)
 			return yield* failFx(
-				`Line ${lineId} is ambiguous on item ${itemId}; fix its duplicate line IDs before editing it.`,
+				`Line ${lineId} is ambiguous on item ${itemUid}; fix its duplicate line IDs before editing it.`,
 			);
 		const lines =
 			operation.operation === "create"
@@ -80,22 +80,22 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 				: operation.operation === "delete"
 					? item.lines.filter((line) => line !== matches[0])
 					: item.lines.map((line) => (line === matches[0] ? operation.line : line));
-		items[itemId] = {
+		items[itemUid] = {
 			...item,
 			lines,
 		};
-		const indices = touched.get(itemId) ?? [];
+		const indices = touched.get(itemUid) ?? [];
 		indices.push(index + 1);
-		touched.set(itemId, indices);
+		touched.set(itemUid, indices);
 	}
 	// Validate completed items, not intermediate states between edits on the same owner.
-	for (const [itemId, indices] of touched) {
-		items[itemId] = yield* Effect.try({
-			try: () => ItemSchema.parse(items[itemId]),
+	for (const [itemUid, indices] of touched) {
+		items[itemUid] = yield* Effect.try({
+			try: () => ItemSchema.parse(items[itemUid]),
 			catch: (cause) =>
 				new ProjectOperationError({
 					reason: "invalid-item",
-					message: `Operations ${indices.join(", ")} (item ${itemId}): the resulting item is invalid.`,
+					message: `Operations ${indices.join(", ")} (item ${itemUid}): the resulting item is invalid.`,
 					cause,
 				}),
 		});
@@ -114,18 +114,18 @@ export namespace editLinesFx {
 	export type Operation =
 		| {
 				readonly operation: "create";
-				readonly itemId: string;
+				readonly itemUid: string;
 				readonly line: LineSchema.Type;
 		  }
 		| {
 				readonly operation: "replace";
-				readonly itemId: string;
+				readonly itemUid: string;
 				readonly lineId: string;
 				readonly line: LineSchema.Type;
 		  }
 		| {
 				readonly operation: "delete";
-				readonly itemId: string;
+				readonly itemUid: string;
 				readonly lineId: string;
 		  };
 }

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rfb6208v8p0zyhbocehncios",
-		"id": "bio-waste-bucket",
 		"title": "Bio Waste Bucket",
 		"ui": "simple",
 		"description": "Grose",

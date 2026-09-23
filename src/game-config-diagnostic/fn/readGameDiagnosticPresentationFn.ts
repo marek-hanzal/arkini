@@ -18,28 +18,25 @@ const diagnosticTitles = {
 	"input:acceptance-cycle": "Circular material acceptance",
 	"source:schema-reference-conflict": "Conflicting schema references",
 	"config:schema": "Invalid project value",
-	"item:duplicate-uid": "Duplicate item UID",
 	"line:duplicate-id": "Duplicate production line ID",
 	"line:multiple-selections": "Multiple selected production lines",
-	"config:key-id-mismatch": "Item key and ID differ",
+	"config:key-uid-mismatch": "Item key and UID differ",
 	"units:missing-renewal": "Finite item cannot be recreated",
 } satisfies Record<DiagnosticCodeEnumSchema.Type, string>;
 
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
 	switch (diagnostic.code) {
 		case "input:units-invalid":
-			return `${diagnostic.ownerItemId} · ${diagnostic.lineId} · input ${diagnostic.inputIndex + 1}`;
+			return `${diagnostic.ownerItemUid} · ${diagnostic.lineId} · input ${diagnostic.inputIndex + 1}`;
 		case "merge:invalid":
-			return `${diagnostic.ownerItemId} · merge ${diagnostic.mergeIndex + 1}`;
+			return `${diagnostic.ownerItemUid} · merge ${diagnostic.mergeIndex + 1}`;
 		case "line:duplicate-id":
-			return `${diagnostic.ownerItemId} · ${diagnostic.lineId}`;
+			return `${diagnostic.ownerItemUid} · ${diagnostic.lineId}`;
 		case "line:multiple-selections":
-			return `${diagnostic.ownerItemId} · ${diagnostic.lineIds.join(" / ")}`;
-		case "item:duplicate-uid":
-			return diagnostic.itemIds.join(" / ");
+			return `${diagnostic.ownerItemUid} · ${diagnostic.lineIds.join(" / ")}`;
 		case "units:stochastic-renewal":
 		case "units:missing-renewal":
-			return diagnostic.itemId;
+			return diagnostic.itemUid;
 		case "resource:duplicate":
 		case "resource:missing":
 		case "resource:type-mismatch":
@@ -47,8 +44,8 @@ const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string 
 			return diagnostic.resourceId;
 		case "config:missing-reference":
 			return `${diagnostic.reference} · ${diagnostic.referenceId}`;
-		case "config:key-id-mismatch":
-			return `${diagnostic.key} / ${diagnostic.id}`;
+		case "config:key-uid-mismatch":
+			return `${diagnostic.key} / ${diagnostic.uid}`;
 		case "source:duplicate-record":
 			return `${diagnostic.entity} · ${diagnostic.key}`;
 		case "source:duplicate-provider":

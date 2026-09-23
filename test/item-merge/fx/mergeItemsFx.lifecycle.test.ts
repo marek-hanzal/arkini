@@ -12,7 +12,7 @@ import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	artwork: {
@@ -54,7 +54,7 @@ const producerItem = ({
 						distance: "far" as const,
 						selector: {
 							type: "item" as const,
-							itemId: selectorItemId,
+							itemUid: selectorItemId,
 						},
 					},
 					quantity: {
@@ -94,7 +94,7 @@ const createLifecycleConfig = ({
 } = {}) => {
 	const targetSelector = {
 		type: "item" as const,
-		itemId: "target",
+		itemUid: "target",
 	};
 	const merge: MergeSchema.Type =
 		effect === "replace"
@@ -224,7 +224,7 @@ const createLifecycleConfig = ({
 
 const boardItem = (id: "source" | "target" | "owner", x: number) => ({
 	id: `runtime:${id}`,
-	itemId: id,
+	itemUid: id,
 	location: {
 		scope: "board" as const,
 		space: 0,
@@ -421,7 +421,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				boardItem("target", 1),
 				{
 					id: "runtime:unrelated",
-					itemId: "child",
+					itemUid: "child",
 					location: {
 						scope: "board",
 						space: 0,
@@ -433,7 +433,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				},
 				{
 					id: "runtime:child",
-					itemId: "child",
+					itemUid: "child",
 					location: {
 						inputIndex: 0,
 						lineId: "line:source",
@@ -556,7 +556,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				expect(Result.isSuccess(result.attempt)).toBe(true);
 				expect(result.after.jobs).toEqual(result.before.jobs);
 				expect(
-					result.after.items.find((item) => item.id === "runtime:target")?.item.id,
+					result.after.items.find((item) => item.id === "runtime:target")?.item.uid,
 				).toBe("target");
 			} else {
 				expect(Result.isFailure(result.attempt)).toBe(true);
@@ -590,7 +590,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					boardItem("target", 1),
 					{
 						id: "runtime:source:material",
-						itemId: "material",
+						itemUid: "material",
 						location: {
 							scope: "input",
 							ownerItemId: "runtime:source",
@@ -662,7 +662,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 		expect(replaced).toMatchObject({
 			id: "runtime:target",
 			item: {
-				id: "result",
+				uid: "result",
 				units: {
 					amount: 2,
 				},
@@ -712,7 +712,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 		expect(Result.isSuccess(result.attempt)).toBe(true);
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
-				id: "result",
+				uid: "result",
 			},
 			schedule: {
 				remainingDurationMs: 10_000,
@@ -756,7 +756,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 		expect(Result.isSuccess(result.attempt)).toBe(true);
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
-				id: "result",
+				uid: "result",
 				units: {
 					amount: 36,
 				},
@@ -815,7 +815,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				const replacement = result.after.items.find((item) => item.id === "runtime:target");
 				expect(replacement).toMatchObject({
 					item: {
-						id: "result",
+						uid: "result",
 					},
 					location: {
 						scope: "board",
@@ -858,7 +858,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					boardItem("target", 1),
 					{
 						id: "runtime:target:material",
-						itemId: "material",
+						itemUid: "material",
 						location: {
 							scope: "input",
 							ownerItemId: "runtime:target",

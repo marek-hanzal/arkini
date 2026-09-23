@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cl9t76unhn41sy76zel9ygoj",
-		"id": "cocoa-beans",
 		"title": "Cocoa Beans",
 		"ui": "simple",
 		"description": "Fresh cocoa beans",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

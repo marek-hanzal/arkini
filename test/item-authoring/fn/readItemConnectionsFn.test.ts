@@ -12,18 +12,18 @@ import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/tempor
 
 const readIdsFn = (
 	config: GameConfigSchema.Type,
-	itemId: string,
+	itemUid: string,
 	filter: "required-by" | "inputs" | "produces",
-) => readItemConnectionsFn(config, itemId, filter).map(({ item }) => item.id);
+) => readItemConnectionsFn(config, itemUid, filter).map(({ item }) => item.uid);
 
-const enableRuleFn = (itemId: string) => ({
+const enableRuleFn = (itemUid: string) => ({
 	type: "enable" as const,
 	when: [
 		{
 			query: {
-				distance: "universe" as const,
+				distance: "far" as const,
 				selector: {
-					itemId,
+					itemUid,
 					type: "item" as const,
 				},
 			},
@@ -70,7 +70,7 @@ describe("readItemConnectionsFn", () => {
 				action: "use",
 				effect,
 				target: {
-					itemId: "target",
+					itemUid: "target",
 					type: "item",
 				},
 			},
@@ -91,7 +91,7 @@ describe("readItemConnectionsFn", () => {
 		const { lines: _lines, maxQueueSize: _queueSize, ...baseItem } = common;
 		const producer = base.items.producer;
 		const outcome = guaranteedMergeOutput({
-			itemId: "result",
+			itemUid: "result",
 		});
 		const line = {
 			...producer.lines[0],
@@ -113,7 +113,6 @@ describe("readItemConnectionsFn", () => {
 				},
 				blueprint: {
 					...baseItem,
-					id: "blueprint",
 					uid: "blueprint",
 					title: "blueprint",
 
@@ -125,7 +124,6 @@ describe("readItemConnectionsFn", () => {
 				},
 				craft: {
 					...common,
-					id: "craft",
 					uid: "craft",
 					title: "craft",
 
@@ -135,7 +133,6 @@ describe("readItemConnectionsFn", () => {
 				},
 				stash: {
 					...common,
-					id: "stash",
 					uid: "stash",
 					title: "stash",
 
@@ -145,7 +142,6 @@ describe("readItemConnectionsFn", () => {
 				},
 				spent: {
 					...common,
-					id: "spent",
 					uid: "spent",
 					title: "spent",
 
@@ -156,7 +152,6 @@ describe("readItemConnectionsFn", () => {
 				},
 				mergeSource: {
 					...common,
-					id: "mergeSource",
 					uid: "mergeSource",
 					title: "mergeSource",
 
@@ -166,7 +161,7 @@ describe("readItemConnectionsFn", () => {
 							effect: "replace",
 							result: "cappedResult",
 							target: {
-								itemId: "blocker",
+								itemUid: "blocker",
 								type: "item",
 							},
 							outcome,
@@ -176,7 +171,7 @@ describe("readItemConnectionsFn", () => {
 			},
 		});
 
-		for (const ownerItemId of [
+		for (const ownerItemUid of [
 			"producer",
 			"blueprint",
 			"craft",
@@ -185,7 +180,7 @@ describe("readItemConnectionsFn", () => {
 			"temporaryEmptyOutput",
 			"temporaryOutput",
 		])
-			expect(readIdsFn(config, ownerItemId, "produces")).toEqual([
+			expect(readIdsFn(config, ownerItemUid, "produces")).toEqual([
 				"result",
 			]);
 		expect(readIdsFn(config, "mergeSource", "produces")).toEqual([
@@ -193,7 +188,9 @@ describe("readItemConnectionsFn", () => {
 			"result",
 		]);
 		expect(
-			readItemConnectionFactsFn(config, "result", "produced-by").map(({ itemId }) => itemId),
+			readItemConnectionFactsFn(config, "result", "produced-by").map(
+				({ itemUid }) => itemUid,
+			),
 		).toEqual([
 			"blueprint",
 			"craft",
@@ -207,14 +204,14 @@ describe("readItemConnectionsFn", () => {
 		]);
 		expect(
 			readItemConnectionFactsFn(config, "cappedResult", "produced-by").map(
-				({ itemId }) => itemId,
+				({ itemUid }) => itemUid,
 			),
 		).toEqual([
 			"mergeSource",
 			"temporaryCappedOutput",
 		]);
 		const reverseOrigins = readItemConnectionFactsFn(config, "result", "produced-by").find(
-			(connection) => connection.itemId === "producer",
+			(connection) => connection.itemUid === "producer",
 		)?.origins;
 		expect(reverseOrigins).toEqual([
 			{
@@ -246,7 +243,7 @@ describe("readItemConnectionsFn", () => {
 		]);
 		expect(
 			readItemConnectionFactsFn(config, "producer", "produces").find(
-				(connection) => connection.itemId === "result",
+				(connection) => connection.itemUid === "result",
 			)?.origins,
 		).toEqual(reverseOrigins);
 	});
@@ -273,7 +270,7 @@ describe("readItemConnectionsFn", () => {
 											type: "guaranteed",
 											outcome: [
 												{
-													itemId: "result",
+													itemUid: "result",
 													type: "item",
 													placement: "drop",
 													quantity: {
@@ -297,7 +294,6 @@ describe("readItemConnectionsFn", () => {
 				},
 				portal: {
 					...baseItem,
-					id: "portal",
 					uid: "portal",
 					title: "portal",
 
@@ -334,7 +330,7 @@ describe("readItemConnectionsFn", () => {
 									query: {
 										distance: "far",
 										selector: {
-											itemId: "water",
+											itemUid: "water",
 											type: "item",
 										},
 									},
@@ -348,19 +344,16 @@ describe("readItemConnectionsFn", () => {
 				},
 				result: {
 					...common,
-					id: "result",
 					uid: "result",
 					title: "result",
 				},
 				"line-permit": {
 					...common,
-					id: "line-permit",
 					uid: "line-permit",
 					title: "line-permit",
 				},
 				"outcome-permit": {
 					...common,
-					id: "outcome-permit",
 					uid: "outcome-permit",
 					title: "outcome-permit",
 				},
@@ -382,12 +375,12 @@ describe("readItemConnectionsFn", () => {
 		]);
 		expect(
 			readItemConnectionFactsFn(config, "outcome-permit", "produced-by").map(
-				({ itemId }) => itemId,
+				({ itemUid }) => itemUid,
 			),
 		).toEqual([]);
 		expect(readItemConnectionFactsFn(config, "portal", "inputs")).toEqual([
 			{
-				itemId: "line-permit",
+				itemUid: "line-permit",
 				origins: [
 					{
 						source: {
@@ -404,7 +397,7 @@ describe("readItemConnectionsFn", () => {
 				],
 			},
 			{
-				itemId: "water",
+				itemUid: "water",
 				origins: [
 					{
 						source: {

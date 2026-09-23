@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fd26fuvxrqjzoib5sy4lo04u",
-		"id": "mining-portal",
 		"title": "Mining Portal",
 		"description": "Down toward stone, ore, darkness, and all the sensible reasons to bring a light.",
 		"ui": "simple",

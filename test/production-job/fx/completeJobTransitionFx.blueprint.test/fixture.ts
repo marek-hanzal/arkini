@@ -7,13 +7,13 @@ import { blueprintConfig } from "~test/production-job/fx/completeJobTransitionFx
 
 export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 	id,
-	itemId,
+	itemUid,
 	space,
 	x,
 	y,
 }: {
 	id: string;
-	itemId:
+	itemUid:
 		| "blueprint:depletion-capped"
 		| "blueprint:depletion-random"
 		| "blueprint:depletion-self"
@@ -28,7 +28,7 @@ export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 }) {
 	return yield* spawnItemFx({
 		id,
-		itemId,
+		itemUid,
 		location: {
 			scope: "board",
 			space,

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ygc2o7a5olfq37sgeqdiqk7u",
-		"id": "flax-farm",
 		"title": "Flax Farm",
 		"draft": false,
 		"description": "Operates nearby flax fields and keeps their seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "flax-field"
+								"itemUid": "mp2maik3tk3jwvt78hwfjw9x"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flax",
+											"itemUid": "i4io40cjq9y37k6in13szqjn",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-flax-field",
+											"itemUid": "y8a926c064v74l7gncur9clj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flax-farm-blueprint",
+											"itemUid": "fqoxhwzj85gkw3ckg3jm8rb5",
 											"quantity": {
 												"min": 1,
 												"max": 1

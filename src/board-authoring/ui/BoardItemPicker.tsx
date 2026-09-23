@@ -23,7 +23,7 @@ export const BoardItemPicker = (props: BoardItemPickerProps) => {
 			onSelectItemFn={controller.selectItemFn}
 			options={controller.options.map((option) => ({
 				artwork: <EditorItemSearchThumbnail item={controller.items[option.id]} />,
-				itemId: option.id,
+				itemUid: option.id,
 				label: option.label,
 				terms: option.terms,
 			}))}

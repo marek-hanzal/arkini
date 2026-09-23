@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "slildyuf8kpe4iwvtbbryctc",
-		"id": "quest-shredded",
 		"title": "Shredded Quest",
 		"draft": false,
 		"description": "A trade contract that has received the full administrative attention of a beagle.",
@@ -17,7 +16,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -31,7 +30,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -50,11 +49,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bucket-with-water"
+					"itemUid": "s9j877qispz12d8ry9h1d4wb"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "paper-pulp-bucket"
+				"result": "r4nvq67hagymzk7xhl6cqa4v"
 			}
 		],
 		"maxQueueSize": 1,

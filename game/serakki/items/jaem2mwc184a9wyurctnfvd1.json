@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jaem2mwc184a9wyurctnfvd1",
-		"id": "bakery",
 		"title": "Bakery",
 		"ui": "default",
 		"description": "Bake a thing. Yummi thing",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "flour"
+								"itemUid": "kbq806ubyrorojtlc7o9afki"
 							},
 							"distance": "far"
 						},
@@ -59,7 +58,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-basket"
+								"itemUid": "rxuto7em5kgig5hrgkqd5b9p"
 							},
 							"distance": "far"
 						},
@@ -81,7 +80,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bread-basket",
+											"itemUid": "p0deotdhek90rtgdkz7rb9c4",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -96,7 +95,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1

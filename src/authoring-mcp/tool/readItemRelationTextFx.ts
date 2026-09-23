@@ -14,7 +14,7 @@ import type {
 import { readItemOriginRelationsFn } from "~/flow/fn/readItemOriginRelationsFn";
 
 interface ItemOriginRelationSubgraph {
-	readonly itemIds: ReadonlySet<string>;
+	readonly itemUids: ReadonlySet<string>;
 	readonly relations: ReadonlyArray<
 		ItemOriginRelation & {
 			readonly level: number;
@@ -27,32 +27,32 @@ const readItemOriginRelationSubgraphFn = ({
 	level,
 	role,
 	sources,
-	targetItemId,
+	targetItemUid,
 }: {
 	readonly level: number;
 	readonly role: ItemOriginRelationRole;
 	readonly sources: ReadonlyArray<ItemOriginSource>;
-	readonly targetItemId: string;
+	readonly targetItemUid: string;
 }): ItemOriginRelationSubgraph => {
 	const relationsBySourceItem = new Map<string, ItemOriginRelation[]>();
 	const relationGroups = sources.map(readItemOriginRelationsFn);
 	for (const relation of relationGroups.flat()) {
 		if (relation.role !== role) continue;
-		const traversalSourceItemId = role === "input" ? relation.fromItemId : relation.toItemId;
-		const matches = relationsBySourceItem.get(traversalSourceItemId) ?? [];
+		const traversalSourceItemUid = role === "input" ? relation.fromItemUid : relation.toItemUid;
+		const matches = relationsBySourceItem.get(traversalSourceItemUid) ?? [];
 		matches.push(relation);
-		relationsBySourceItem.set(traversalSourceItemId, matches);
+		relationsBySourceItem.set(traversalSourceItemUid, matches);
 	}
 	for (const relations of relationsBySourceItem.values())
 		relations.sort(
 			(left, right) =>
 				Order.String(left.source.id, right.source.id) ||
-				Order.String(left.toItemId, right.toItemId) ||
+				Order.String(left.toItemUid, right.toItemUid) ||
 				(left.outcomeIndex ?? -1) - (right.outcomeIndex ?? -1),
 		);
 
-	const itemIds = new Set<string>([
-		targetItemId,
+	const itemUids = new Set<string>([
+		targetItemUid,
 	]);
 	const relationByKey = new Map<
 		string,
@@ -62,16 +62,16 @@ const readItemOriginRelationSubgraphFn = ({
 	>();
 	const reachedLevelByItem = new Map<string, number>([
 		[
-			targetItemId,
+			targetItemUid,
 			0,
 		],
 	]);
 	const pending: Array<{
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly level: number;
 	}> = [
 		{
-			itemId: targetItemId,
+			itemUid: targetItemUid,
 			level: 0,
 		},
 	];
@@ -79,13 +79,13 @@ const readItemOriginRelationSubgraphFn = ({
 		const current = pending[index];
 		if (current === undefined || current.level >= level) continue;
 		const nextLevel = current.level + 1;
-		for (const relation of relationsBySourceItem.get(current.itemId) ?? []) {
-			const reachedItemId = role === "input" ? relation.toItemId : relation.fromItemId;
+		for (const relation of relationsBySourceItem.get(current.itemUid) ?? []) {
+			const reachedItemUid = role === "input" ? relation.toItemUid : relation.fromItemUid;
 			const key = JSON.stringify([
 				relation.role,
 				relation.source.id,
-				relation.fromItemId,
-				relation.toItemId,
+				relation.fromItemUid,
+				relation.toItemUid,
 				relation.outcomeIndex ?? "input",
 			]);
 			const existing = relationByKey.get(key);
@@ -94,34 +94,34 @@ const readItemOriginRelationSubgraphFn = ({
 					...relation,
 					level: nextLevel,
 				});
-			itemIds.add(reachedItemId);
-			const reachedLevel = reachedLevelByItem.get(reachedItemId);
+			itemUids.add(reachedItemUid);
+			const reachedLevel = reachedLevelByItem.get(reachedItemUid);
 			if (reachedLevel !== undefined && reachedLevel <= nextLevel) continue;
-			reachedLevelByItem.set(reachedItemId, nextLevel);
+			reachedLevelByItem.set(reachedItemUid, nextLevel);
 			pending.push({
-				itemId: reachedItemId,
+				itemUid: reachedItemUid,
 				level: nextLevel,
 			});
 		}
 	}
 	return {
-		itemIds,
+		itemUids,
 		relations: [
 			...relationByKey.values(),
 		].sort(
 			(left, right) =>
 				left.level - right.level ||
 				Order.String(left.source.id, right.source.id) ||
-				Order.String(left.fromItemId, right.fromItemId) ||
-				Order.String(left.toItemId, right.toItemId) ||
+				Order.String(left.fromItemUid, right.fromItemUid) ||
+				Order.String(left.toItemUid, right.toItemUid) ||
 				(left.outcomeIndex ?? -1) - (right.outcomeIndex ?? -1),
 		),
 	};
 };
 
-const itemReferenceFn = (project: Project, itemId: string) => {
-	const item = project.config.items[itemId];
-	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}]`;
+const itemReferenceFn = (project: Project, itemUid: string) => {
+	const item = project.config.items[itemUid];
+	return item === undefined ? `${itemUid} [missing]` : `${item.uid} [${item.title}]`;
 };
 
 const formatQuantityFn = ({ max, min }: { readonly max: number; readonly min: number }) =>
@@ -146,23 +146,23 @@ const outputAnnotationFn = (output: ItemOriginOutputOccurrence) =>
 const outputRequirementLinesFn = (project: Project, output: ItemOriginOutputOccurrence) => [
 	...output.requirements.allOf.map(
 		(requirement) =>
-			`      requires all: ${itemReferenceFn(project, requirement.itemId)} (quantity ${formatQuantityFn(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
+			`      requires all: ${itemReferenceFn(project, requirement.itemUid)} (quantity ${formatQuantityFn(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
 	),
 	...output.requirements.anyOf.flatMap((clause, clauseIndex) => [
 		`      requires one of #${clauseIndex + 1}:`,
 		...clause.map(
 			(requirement) =>
-				`        - ${itemReferenceFn(project, requirement.itemId)} (quantity ${formatQuantityFn(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
+				`        - ${itemReferenceFn(project, requirement.itemUid)} (quantity ${formatQuantityFn(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
 		),
 	]),
 	...(output.requirements.unsupported ?? []).map(
 		(requirement) =>
-			`      unsupported requirement: ${itemReferenceFn(project, requirement.itemId)} (${requirement.reason}, ${requirement.source})`,
+			`      unsupported requirement: ${itemReferenceFn(project, requirement.itemUid)} (${requirement.reason}, ${requirement.source})`,
 	),
 ];
 
 const sourceReferenceLinesFn = (project: Project, source: ItemOriginSource) => [
-	`  Source item: ${itemReferenceFn(project, source.ownerItemId)}`,
+	`  Source item: ${itemReferenceFn(project, source.ownerItemUid)}`,
 	...(() => {
 		switch (source.reference.type) {
 			case "line":
@@ -189,27 +189,27 @@ const sourceReferenceLinesFn = (project: Project, source: ItemOriginSource) => [
 export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(function* (
 	project: Project,
 	{
-		itemId,
+		itemUid,
 		level,
 		role,
 		detail = "full",
 	}: {
 		readonly detail?: GraphDetailSchema.Type;
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly level: number;
 		readonly role: ItemOriginRelationRole;
 	},
 ) {
-	const item = project.config.items[itemId];
+	const item = project.config.items[itemUid];
 	if (item === undefined)
-		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
+		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
 	const graph = createAcquisitionGraphFn(project.config);
 	const sources = readItemOriginSourcesFn(graph);
 	const subgraph = readItemOriginRelationSubgraphFn({
 		level,
 		role,
 		sources,
-		targetItemId: itemId,
+		targetItemUid: itemUid,
 	});
 	const groups = new Map<
 		string,
@@ -251,7 +251,7 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 			byLevel.set(group.level, (byLevel.get(group.level) ?? 0) + 1);
 			byKind.set(source.kind, (byKind.get(source.kind) ?? 0) + 1);
 			operations.push(
-				`- Level ${group.level}: ${source.kind} "${source.label}" | ${itemReferenceFn(project, source.ownerItemId)}`,
+				`- Level ${group.level}: ${source.kind} "${source.label}" | ${itemReferenceFn(project, source.ownerItemUid)}`,
 				...readRelationOperationSummaryFn(
 					project,
 					source,
@@ -268,7 +268,7 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 		}
 		return [
 			`Item ${direction}`,
-			`Item ID: ${item.id}`,
+			`Item UID: ${item.uid}`,
 			`Title: ${item.title}`,
 			`Level: ${level}`,
 			"Detail: summary",
@@ -285,7 +285,7 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 	}
 	return [
 		`Item ${direction}`,
-		`Item ID: ${item.id}`,
+		`Item UID: ${item.uid}`,
 		`Title: ${item.title}`,
 		`Level: ${level}`,
 		"",
@@ -318,11 +318,11 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 						"  Traversed:",
 						...group.relations.map(
 							(relation) =>
-								`    - ${itemReferenceFn(project, relation.fromItemId)} -> ${itemReferenceFn(project, relation.toItemId)}`,
+								`    - ${itemReferenceFn(project, relation.fromItemUid)} -> ${itemReferenceFn(project, relation.toItemUid)}`,
 						),
 						"  Item acquisition witnesses:",
 						...source.outputs.flatMap((output) => [
-							`    - ${itemReferenceFn(project, output.itemId)} (${outputAnnotationFn(output)})`,
+							`    - ${itemReferenceFn(project, output.itemUid)} (${outputAnnotationFn(output)})`,
 							...outputRequirementLinesFn(project, output),
 						]),
 					];

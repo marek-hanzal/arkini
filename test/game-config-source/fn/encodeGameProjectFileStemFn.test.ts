@@ -49,6 +49,6 @@ describe("encodeGameProjectFileStemFn", () => {
 		);
 
 		expect(result.diagnostics).toEqual([]);
-		expect(result.source?.value.items?.water?.uid).toBe(uid);
+		expect(result.source?.value.items?.[uid]?.uid).toBe(uid);
 	});
 });

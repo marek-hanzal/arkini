@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "htlowzbb36uroshnuz0uxibl",
-		"id": "glassworks",
 		"title": "Glassworks",
 		"ui": "default",
 		"description": "Be careful, it's a bit britle",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sand"
+								"itemUid": "o119fbjvkgci3q5bylh0mr4b"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coal"
+								"itemUid": "ks3q0os5blwii5qaa299wlek"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "glass",
+											"itemUid": "hdlk91uftu8kz25gohztvaqd",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -97,7 +96,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sand"
+								"itemUid": "o119fbjvkgci3q5bylh0mr4b"
 							},
 							"distance": "far"
 						},
@@ -112,7 +111,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coal"
+								"itemUid": "ks3q0os5blwii5qaa299wlek"
 							},
 							"distance": "far"
 						},
@@ -127,7 +126,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "dye"
+								"itemUid": "pwa7i4khtnmvijdvtfgdzyhj"
 							},
 							"distance": "far"
 						},
@@ -149,7 +148,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "colored-glass",
+											"itemUid": "twpfil7h0753eumq0p5zh3ri",
 											"quantity": {
 												"min": 1,
 												"max": 1

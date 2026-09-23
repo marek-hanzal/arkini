@@ -23,7 +23,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 }) {
 	const owner = yield* spawnItemFx({
 		id: `runtime:forge:${id}`,
-		itemId: "forge",
+		itemUid: "forge",
 		location: {
 			scope: "board",
 			space: 0,
@@ -36,7 +36,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 	for (let index = 0; index < 3; index += 1) {
 		const water = yield* spawnItemFx({
 			id: `runtime:water:${id}:${index}`,
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board",
 				space: 0,
@@ -56,7 +56,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 	}
 	const tool = yield* spawnItemFx({
 		id: `runtime:tool:${id}`,
-		itemId: "tool",
+		itemUid: "tool",
 		location: {
 			scope: "board",
 			space: 0,
@@ -165,7 +165,7 @@ describe("GameSession Speed up admission", () => {
 					});
 					yield* spawnItemFx({
 						id: ownerItemId,
-						itemId: "forge",
+						itemUid: "forge",
 						location: {
 							scope: "board",
 							space: 0,
@@ -178,7 +178,7 @@ describe("GameSession Speed up admission", () => {
 					for (let index = 0; index < 2; index += 1) {
 						yield* spawnItemFx({
 							id: `runtime:water:partial:${index}`,
-							itemId: "water",
+							itemUid: "water",
 							location: {
 								scope: "board",
 								space: 0,
@@ -229,7 +229,7 @@ describe("GameSession Speed up admission", () => {
 				Effect.gen(function* () {
 					yield* spawnItemFx({
 						id: "runtime:water:late",
-						itemId: "water",
+						itemUid: "water",
 						location: {
 							scope: "board",
 							space: 0,
@@ -241,7 +241,7 @@ describe("GameSession Speed up admission", () => {
 					});
 					yield* spawnItemFx({
 						id: "runtime:tool:late",
-						itemId: "tool",
+						itemUid: "tool",
 						location: {
 							scope: "board",
 							space: 0,
@@ -257,7 +257,7 @@ describe("GameSession Speed up admission", () => {
 			const runtime = await wokenRuntime;
 			expect(runtime.jobs).toEqual([]);
 			expect(runtime.jobQueue).toHaveLength(4);
-			expect(runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
+			expect(runtime.items.filter((item) => item.item.uid === "water")).toEqual([]);
 			expect(session.getFatalErrorFn()).toBeNull();
 		} finally {
 			unsubscribe();

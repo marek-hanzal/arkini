@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gvbhsqk27twjr9q7ycq0ewqq",
-		"id": "roasted-chicken",
 		"title": "Roasted Chicken",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-chicken",
+										"itemUid": "qqdg51f7vcqr2v9l6u4fanpf",
 										"quantity": {
 											"min": 1,
 											"max": 1

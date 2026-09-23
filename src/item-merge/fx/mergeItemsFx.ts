@@ -55,10 +55,10 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 				`v${MergeRandomVersion}`,
 				source.id,
 				owner.mergeSequence ?? 0,
-				source.item.id,
+				source.item.uid,
 				readRemainingUnitsSeedFn(source),
 				target.id,
-				target.item.id,
+				target.item.uid,
 				readRemainingUnitsSeedFn(target),
 				ruleIndex,
 				actionSeed,
@@ -190,12 +190,12 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 			const event = {
 				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: source.id,
-				sourceCanonicalItemId: source.item.id,
+				sourceItemUid: source.item.uid,
 				targetItemId: target.id,
-				targetCanonicalItemId: target.item.id,
+				targetItemUid: target.item.uid,
 				action: resolved.rule.action,
 				effect: resolved.rule.effect,
-				resultCanonicalItemId:
+				resultItemUid:
 					resolved.rule.effect === TargetEffectSchema.enum.Replace
 						? resolved.rule.result
 						: undefined,

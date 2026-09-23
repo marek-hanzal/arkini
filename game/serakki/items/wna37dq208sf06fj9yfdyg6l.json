@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wna37dq208sf06fj9yfdyg6l",
-		"id": "treasure-chest-t6",
 		"title": "Treasure Chest - Tier 6",
 		"ui": "default",
 		"description": "Best quality chest ever",

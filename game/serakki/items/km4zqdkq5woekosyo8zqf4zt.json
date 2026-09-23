@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "km4zqdkq5woekosyo8zqf4zt",
-		"id": "sunflower",
 		"title": "Sunflower",
 		"draft": false,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sunflower",
+										"itemUid": "vyfuf85geftz9twwyfdteezh",
 										"quantity": {
 											"min": 1,
 											"max": 1

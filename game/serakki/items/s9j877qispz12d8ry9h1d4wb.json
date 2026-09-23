@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "s9j877qispz12d8ry9h1d4wb",
-		"id": "bucket-with-water",
 		"title": "Bucket with Water",
 		"description": "Everybody needs to drink.",
 		"ui": "simple",
@@ -16,34 +15,34 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "foundry"
+					"itemUid": "kpjqlrmcoc2c503wp1kr0m6v"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "foundry-extinguished"
+				"result": "prt6rkka0at1honkbw36rnd3"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dye-workshop"
+					"itemUid": "tdk2m5cvrgw56s4do7tc2wu9"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "dye-workshop-washed"
+				"result": "bi89dksa0k5at0g2z2277own"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub"
+					"itemUid": "ysdkouxd4qpd0ztziy07k2ss"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "copper-bathtub-with-water"
+				"result": "osmpflow443kpnve1hfl6x3e"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"outcome": {
@@ -57,7 +56,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -72,12 +71,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "sack-with-water"
+				"result": "bz4w1k3j8yd27618o7o9dp41"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "basecamp-on-fire"
+					"itemUid": "xkbphl0biiu4d5ar1s6hecvn"
 				},
 				"action": "consume",
 				"outcome": {
@@ -91,7 +90,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -110,7 +109,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-well"
+					"itemUid": "r171qefgjo6x0m7pnl3vgtfj"
 				},
 				"action": "consume",
 				"outcome": {
@@ -124,7 +123,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -139,12 +138,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-well-with-water-bucket"
+				"result": "f8s9c1veutq9268ocb1r5ind"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cauldron"
+					"itemUid": "oj9o0nu1zp9g79f1jqx11g9l"
 				},
 				"action": "consume",
 				"outcome": {
@@ -158,7 +157,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -173,12 +172,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "cauldron-with-water"
+				"result": "jjfr3hedbcr6v62xsf9z12zo"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -192,7 +191,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -207,12 +206,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire-extinguished"
+				"result": "fenhlvaj45ssocm5r935nqli"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "trimmed-tree"
+					"itemUid": "gwc1pmn13hdj0a7d166vp1gb"
 				},
 				"action": "consume",
 				"outcome": {
@@ -226,7 +225,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -241,7 +240,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "tree"
+				"result": "czmjliygl2qrfhjah60xo2me"
 			}
 		],
 		"maxQueueSize": 1,

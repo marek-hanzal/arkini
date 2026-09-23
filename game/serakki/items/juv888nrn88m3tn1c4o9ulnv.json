@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "juv888nrn88m3tn1c4o9ulnv",
-		"id": "cauldron-with-jam",
 		"title": "Cauldron With Jam",
 		"ui": "simple",
 		"description": "Yummi",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

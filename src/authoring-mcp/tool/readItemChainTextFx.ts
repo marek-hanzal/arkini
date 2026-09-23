@@ -14,9 +14,9 @@ const stopLabels = {
 	"no-output": "No items emitted",
 } as const;
 
-const itemReferenceFn = (project: Project, itemId: string) => {
-	const item = project.config.items[itemId];
-	return item === undefined ? `${itemId} [missing]` : `${item.title} [${itemId}]`;
+const itemReferenceFn = (project: Project, itemUid: string) => {
+	const item = project.config.items[itemUid];
+	return item === undefined ? `${itemUid} [missing]` : `${item.title} [${itemUid}]`;
 };
 const quantityFn = ({ min, max }: { readonly min: number; readonly max: number }) =>
 	min === max ? `×${min}` : `×${min}–${max}`;
@@ -48,11 +48,11 @@ const operationLabelFn = (step: readItemChainsFn.Step) =>
 /** Formats the complete bounded tree; no additional clipping or yield aggregation at the MCP boundary. */
 const stepLinesFn = (project: Project, step: readItemChainsFn.Step, indent: string): string[] => {
 	const lines = [
-		`${indent}- ${itemReferenceFn(project, step.ownerId)} · ${operationLabelFn(step)}`,
+		`${indent}- ${itemReferenceFn(project, step.ownerItemUid)} · ${operationLabelFn(step)}`,
 		`${indent}  Path: ${step.path}`,
 	];
-	if (step.targetId !== undefined)
-		lines.push(`${indent}  Drop onto: ${itemReferenceFn(project, step.targetId)}`);
+	if (step.targetItemUid !== undefined)
+		lines.push(`${indent}  Drop onto: ${itemReferenceFn(project, step.targetItemUid)}`);
 	if (step.timeMs !== undefined)
 		lines.push(
 			`${indent}  ${step.kind === "pulse" ? "Clock interval" : "After"}: ${durationFn(step.timeMs)}`,
@@ -77,7 +77,7 @@ const stepLinesFn = (project: Project, step: readItemChainsFn.Step, indent: stri
 	if (step.branches.length === 0 && !step.incomplete) lines.push(`${indent}  No items emitted`);
 	for (const node of step.branches) {
 		lines.push(
-			`${indent}  - ${itemReferenceFn(project, node.itemId)}${node.quantity === undefined ? "" : ` ${quantityFn(node.quantity)}`}${node.stop === undefined ? "" : ` · ${stopLabels[node.stop]}`}`,
+			`${indent}  - ${itemReferenceFn(project, node.itemUid)}${node.quantity === undefined ? "" : ` ${quantityFn(node.quantity)}`}${node.stop === undefined ? "" : ` · ${stopLabels[node.stop]}`}`,
 			`${indent}    Path: ${node.path}`,
 		);
 		if (node.output !== undefined) lines.push(`${indent}    ${outputTextFn(node.output)}`);
@@ -88,10 +88,10 @@ const stepLinesFn = (project: Project, step: readItemChainsFn.Step, indent: stri
 
 /** Preserve each initiating operation and immediate output branch without recursively repeating its descendants. */
 const summaryStepLinesFn = (project: Project, step: readItemChainsFn.Step): string[] => [
-	`- ${itemReferenceFn(project, step.ownerId)} · ${operationLabelFn(step)} (${step.path})${step.clockWeight === undefined ? "" : ` · Clock weight: ${step.clockWeight}`}${step.disabled ? " · Disabled by default" : ""}${step.conditional ? " · Depends on conditions" : ""}`,
+	`- ${itemReferenceFn(project, step.ownerItemUid)} · ${operationLabelFn(step)} (${step.path})${step.clockWeight === undefined ? "" : ` · Clock weight: ${step.clockWeight}`}${step.disabled ? " · Disabled by default" : ""}${step.conditional ? " · Depends on conditions" : ""}`,
 	...step.branches.map(
 		(node) =>
-			`  - ${itemReferenceFn(project, node.itemId)}${node.quantity === undefined ? "" : ` ${quantityFn(node.quantity)}`}${node.stop === undefined ? "" : ` · ${stopLabels[node.stop]}`}${node.output === undefined ? "" : ` · ${outputTextFn(node.output)}`}`,
+			`  - ${itemReferenceFn(project, node.itemUid)}${node.quantity === undefined ? "" : ` ${quantityFn(node.quantity)}`}${node.stop === undefined ? "" : ` · ${stopLabels[node.stop]}`}${node.output === undefined ? "" : ` · ${outputTextFn(node.output)}`}`,
 	),
 	...(step.incomplete
 		? [
@@ -108,16 +108,16 @@ const summaryStepLinesFn = (project: Project, step: readItemChainsFn.Step): stri
 /** Both detail levels use the same canonical bounded projection and outcome states. */
 export const readItemChainTextFx = Effect.fn("readItemChainTextFx")(function* (
 	project: Project,
-	itemId: string,
+	itemUid: string,
 	detail: GraphDetailSchema.Type = "full",
 	maxDepth = 5,
 ) {
-	if (project.config.items[itemId] === undefined)
-		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
-	const result = readItemChainsFn(project.config.items, itemId, maxDepth);
+	if (project.config.items[itemUid] === undefined)
+		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
+	const result = readItemChainsFn(project.config.items, itemUid, maxDepth);
 	const lines = [
 		"Item Chain",
-		`Item: ${itemReferenceFn(project, itemId)}`,
+		`Item: ${itemReferenceFn(project, itemUid)}`,
 		`Project revision: ${project.revision}`,
 		"Scope: the root item's own directional merges and Clock; after the first operation, only Clock expiry and Clock-selected line outcomes continue. Reverse merges, intermediate merges and production input acquisition are not traversed.",
 		`Limits: maximum depth of ${maxDepth} operations, cycle detection and 400-expansion safety budget. Depth/loop/ongoing states are not final items.`,
@@ -133,15 +133,15 @@ export const readItemChainTextFx = Effect.fn("readItemChainTextFx")(function* (
 		lines.push(
 			"",
 			`Chain ${index + 1}: ${chain.kind} [${chain.id}]`,
-			`Start: ${itemReferenceFn(project, chain.ownerId)}`,
-			chain.targetId === undefined
+			`Start: ${itemReferenceFn(project, chain.ownerItemUid)}`,
+			chain.targetItemUid === undefined
 				? "Trigger: Clock"
-				: `Drop onto: ${itemReferenceFn(project, chain.targetId)}`,
+				: `Drop onto: ${itemReferenceFn(project, chain.targetItemUid)}`,
 			"Results:",
 		);
 		for (const outcome of chain.outcomes)
 			lines.push(
-				`- ${outcome.itemId === undefined ? "" : `${itemReferenceFn(project, outcome.itemId)} · `}${stopLabels[outcome.stop]}${outcome.periodic ? " · Repeated output" : ""}${outcome.conditional ? " · Conditional or alternative" : ""}`,
+				`- ${outcome.itemUid === undefined ? "" : `${itemReferenceFn(project, outcome.itemUid)} · `}${stopLabels[outcome.stop]}${outcome.periodic ? " · Repeated output" : ""}${outcome.conditional ? " · Conditional or alternative" : ""}`,
 			);
 		lines.push(detail === "full" ? "Details:" : "Starting operations:");
 		for (const step of chain.steps)

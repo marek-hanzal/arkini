@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yrqgq01g1jnsd2k2tduv35qb",
-		"id": "hand-plane",
 		"title": "Hand Plane",
 		"draft": true,
 		"ui": "default",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "planks"
+					"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "cutting-board"
+				"result": "cfrqc6p65c4gh3lrjswv84zv"
 			}
 		],
 		"maxQueueSize": 1,

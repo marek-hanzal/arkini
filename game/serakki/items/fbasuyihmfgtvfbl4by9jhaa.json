@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fbasuyihmfgtvfbl4by9jhaa",
-		"id": "rapeseed",
 		"title": "Rapeseed",
 		"draft": false,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-rapeseed",
+										"itemUid": "wghio94hagi36tpo2kejt1yh",
 										"quantity": {
 											"min": 1,
 											"max": 1

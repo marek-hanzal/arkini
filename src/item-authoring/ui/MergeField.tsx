@@ -98,7 +98,7 @@ export const MergeField = ({
 												merge.action === "space"
 													? {
 															type: "item",
-															itemId: "",
+															itemUid: "",
 														}
 													: merge.target,
 											outcome: merge.outcome,

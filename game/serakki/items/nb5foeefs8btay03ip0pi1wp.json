@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nb5foeefs8btay03ip0pi1wp",
-		"id": "sack-with-wine",
 		"title": "Sack With Wine",
 		"ui": "simple",
 		"description": "True blood, oh, true wine",

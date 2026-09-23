@@ -60,6 +60,7 @@ Source, validation, Editor Build, CLI and packing must not create variants of th
 - Source reads exact allowlisted paths. Arbitrary recursive JSON is not game source.
 - Source descriptors derive semantic type from `artwork/`, `image/`, `music/`, or `sfx/`. The completed config owns the explicit global Music playlist and the mapping from exact SFX events to resources; those events comprise committed gameplay plus explicit presentation interactions without converting UI lifecycle into gameplay history. Validation resolves every assigned ID against the SFX semantic type. Item `music` is an exact Music reference for its open detail; validation and resource usage include it. Serapack compilation includes playlist-selected and item-requested Music and every SFX source. Artwork is normalized to bounded square RGBA while general Image and canonical Ogg/Opus bytes are preserved unless the author explicitly optimizes SFX silent edges.
 - The generated `schema.json` comes from the current project source-schema union and uses stable references.
+- Canonical Items have one immutable `uid`; completed `items` records are keyed by it and authored references use `itemUid`. Runtime instance IDs remain separate. Source assembly rejects duplicate UID providers before publishing a config.
 - Validation extends beyond Zod shape parsing and preserves source/entity provenance.
 - The compiler rejects blocking diagnostics and cannot publish a usable invalid result.
 - Gameplay meaning belongs to [`GAME.MD`](../../GAME.MD), not to source or validation convenience.

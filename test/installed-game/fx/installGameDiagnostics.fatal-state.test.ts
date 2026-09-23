@@ -62,15 +62,14 @@ describe("Game fatal-state diagnostics", () => {
 		const baseConfig = createJobTestConfig();
 		const ownerDefinition = {
 			...baseConfig.items.forge,
-			id: "producer:finite",
-			uid: "uid:producer:finite",
+			uid: "producer:finite",
 			title: "Finite producer",
 		};
 		const config = {
 			...baseConfig,
 			items: {
 				...baseConfig.items,
-				[ownerDefinition.id]: ownerDefinition,
+				[ownerDefinition.uid]: ownerDefinition,
 			},
 		};
 		const transition = {
@@ -79,7 +78,7 @@ describe("Game fatal-state diagnostics", () => {
 			events: [
 				{
 					type: "job:started",
-					canonicalItemId: ownerDefinition.id,
+					itemUid: ownerDefinition.uid,
 					jobId: "job:last",
 					ownerItemId,
 					lineId: "line:finite:work",
@@ -187,7 +186,7 @@ describe("Game fatal-state diagnostics", () => {
 					events: [
 						{
 							type: "job:started",
-							canonicalItemId: ownerDefinition.id,
+							itemUid: ownerDefinition.uid,
 							jobId: "job:last",
 							ownerItemId,
 						},
@@ -198,8 +197,7 @@ describe("Game fatal-state diagnostics", () => {
 								item: {
 									runtimeItemId: ownerItemId,
 									definition: {
-										itemId: "producer:finite",
-										itemUid: "uid:producer:finite",
+										itemUid: "producer:finite",
 									},
 								},
 								remainingUnits: 0,
@@ -223,8 +221,7 @@ describe("Game fatal-state diagnostics", () => {
 					{
 						runtimeItemId: ownerItemId,
 						definition: {
-							itemId: "producer:finite",
-							itemUid: "uid:producer:finite",
+							itemUid: "producer:finite",
 						},
 					},
 				],
@@ -237,8 +234,8 @@ describe("Game fatal-state diagnostics", () => {
 				}),
 				text: expect.objectContaining({
 					incident: expect.stringContaining("# Serakki game incident"),
-					failure: expect.stringContaining("config-uid uid:producer:finite"),
-					runtimeState: expect.stringContaining("config-uid uid:producer:finite"),
+					failure: expect.stringContaining("config-uid producer:finite"),
+					runtimeState: expect.stringContaining("config-uid producer:finite"),
 				}),
 			}),
 		);

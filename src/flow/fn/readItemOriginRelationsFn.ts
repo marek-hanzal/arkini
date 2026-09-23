@@ -7,21 +7,21 @@ const uniqueFn = <Value>(values: ReadonlyArray<Value>): Value[] => [
 ];
 
 const projectItemOriginRelationsFn = (source: ItemOriginSource): ItemOriginRelation[] => [
-	...uniqueFn(source.requirementItemIds)
-		.filter((itemId) => itemId !== source.ownerItemId)
+	...uniqueFn(source.requirementItemUids)
+		.filter((itemUid) => itemUid !== source.ownerItemUid)
 		.sort((left, right) => Order.String(left, right))
-		.map((itemId) => ({
-			fromItemId: itemId,
+		.map((itemUid) => ({
+			fromItemUid: itemUid,
 			role: "input" as const,
 			source,
-			toItemId: source.ownerItemId,
+			toItemUid: source.ownerItemUid,
 		})),
 	...source.outputs.map((output, outcomeIndex) => ({
-		fromItemId: source.ownerItemId,
+		fromItemUid: source.ownerItemUid,
 		outcomeIndex,
 		role: "output" as const,
 		source,
-		toItemId: output.itemId,
+		toItemUid: output.itemUid,
 	})),
 ];
 

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "loozw41u293jkxpjyg0v0gll",
-		"id": "dye-workshop-beer",
 		"title": "Dye Workshop Beer",
 		"ui": "simple",
 		"description": "Why you did this?",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "dye-workshop",
+										"itemUid": "tdk2m5cvrgw56s4do7tc2wu9",
 										"quantity": {
 											"min": 1,
 											"max": 1

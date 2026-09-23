@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "v1vifmafan4fzqnr4tvpbz77",
-		"id": "school-t2-blueprint",
 		"title": "School - Tier 2 Blueprint",
 		"draft": false,
 		"description": "Plans for an advanced school. Better education now needs better labor to build the place first.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "school-t2-blueprint"
+								"itemUid": "v1vifmafan4fzqnr4tvpbz77"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -79,7 +78,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t2"
+								"itemUid": "dgvhgu1xkv6m4igfdb2wnwxh"
 							},
 							"distance": "far"
 						},
@@ -101,7 +100,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "school-t2",
+											"itemUid": "qzwbztaqvjk8uxqc8vhi38ql",
 											"quantity": {
 												"min": 1,
 												"max": 1

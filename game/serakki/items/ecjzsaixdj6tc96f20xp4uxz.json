@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ecjzsaixdj6tc96f20xp4uxz",
-		"id": "coffee-field",
 		"title": "Coffee Field",
 		"draft": false,
 		"description": "Coffee",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-coffee-field",
+										"itemUid": "wln6dnpxroy1t45s2y516tnj",
 										"quantity": {
 											"min": 1,
 											"max": 1

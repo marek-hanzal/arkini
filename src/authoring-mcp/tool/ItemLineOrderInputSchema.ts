@@ -3,7 +3,7 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 
 export const ItemLineOrderInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact ID of the item whose lines should be reordered."),
+		itemUid: IdSchema.describe("The exact ID of the item whose lines should be reordered."),
 		lineIds: z
 			.array(IdSchema)
 			.describe(

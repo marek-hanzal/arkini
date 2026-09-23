@@ -22,7 +22,7 @@ const config = {
 			height: 1,
 			board: [
 				{
-					itemId: "lens",
+					itemUid: "lens",
 					x: 0,
 					y: 0,
 				},
@@ -50,7 +50,7 @@ const template: OutcomeSchema.Type = {
 };
 const item: OutcomeSchema.Type = {
 	type: "item",
-	itemId: "log",
+	itemUid: "log",
 	quantity: {
 		min: 1,
 		max: 1,
@@ -136,7 +136,7 @@ it("resets only the outcome origin space, preserving authored item/reset order a
 	expect(
 		result.after.items
 			.filter((entry) => entry.location.scope === "board" && entry.location.space === 1)
-			.map((entry) => entry.item.id),
+			.map((entry) => entry.item.uid),
 	).toEqual([
 		"lens",
 		"log",

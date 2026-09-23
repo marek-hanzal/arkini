@@ -49,23 +49,23 @@ describe("validateItemLineIdsFn", () => {
 
 		expect(
 			await lineDiagnostics({
-				[owner.id]: owner,
+				[owner.uid]: owner,
 			}),
 		).toEqual([
 			expect.objectContaining({
-				ownerItemId: owner.id,
+				ownerItemUid: owner.uid,
 				lineId: "line:plank",
 				paths: [
 					[
 						"items",
-						owner.id,
+						owner.uid,
 						"lines",
 						0,
 						"id",
 					],
 					[
 						"items",
-						owner.id,
+						owner.uid,
 						"lines",
 						1,
 						"id",
@@ -95,8 +95,8 @@ describe("validateItemLineIdsFn", () => {
 
 		expect(
 			await lineDiagnostics({
-				[first.id]: first,
-				[second.id]: second,
+				[first.uid]: first,
+				[second.uid]: second,
 			}),
 		).toEqual([]);
 	});
@@ -122,11 +122,11 @@ describe("validateItemLineIdsFn", () => {
 
 			expect(
 				await selectionDiagnostics({
-					[owner.id]: owner,
+					[owner.uid]: owner,
 				}),
 			).toEqual([
 				expect.objectContaining({
-					ownerItemId: owner.id,
+					ownerItemUid: owner.uid,
 					lineIds: [
 						"line:plank",
 						"line:beam",
@@ -134,14 +134,14 @@ describe("validateItemLineIdsFn", () => {
 					paths: [
 						[
 							"items",
-							owner.id,
+							owner.uid,
 							"lines",
 							0,
 							selection,
 						],
 						[
 							"items",
-							owner.id,
+							owner.uid,
 							"lines",
 							1,
 							selection,
@@ -174,7 +174,7 @@ describe("validateItemLineIdsFn", () => {
 		});
 		expect(
 			await selectionDiagnostics({
-				[owner.id]: owner,
+				[owner.uid]: owner,
 			}),
 		).toEqual([]);
 	});
@@ -196,11 +196,11 @@ describe("validateItemLineIdsFn", () => {
 
 		expect(
 			await selectionDiagnostics({
-				[owner.id]: owner,
+				[owner.uid]: owner,
 			}),
 		).toEqual([
 			expect.objectContaining({
-				ownerItemId: owner.id,
+				ownerItemUid: owner.uid,
 				lineIds: [
 					"line:plank",
 					"line:plank",
@@ -208,14 +208,14 @@ describe("validateItemLineIdsFn", () => {
 				paths: [
 					[
 						"items",
-						owner.id,
+						owner.uid,
 						"lines",
 						0,
 						"default",
 					],
 					[
 						"items",
-						owner.id,
+						owner.uid,
 						"lines",
 						1,
 						"default",

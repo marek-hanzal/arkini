@@ -61,7 +61,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDepleted,
 			itemId: context.owner.id,
-			canonicalItemId: context.owner.item.id,
+			itemUid: context.owner.item.uid,
 			location: context.owner.location,
 		});
 	}
@@ -114,7 +114,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 					(loss): GameEventSchema.Type => ({
 						type: GameEventEnumSchema.enum.ItemDiscarded,
 						ownerItemId: context.owner.id,
-						canonicalItemId: loss.itemId,
+						itemUid: loss.itemUid,
 						quantity: loss.quantity,
 						source: "depletion-outcome",
 						reason: loss.reason,
@@ -130,7 +130,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: context.owner.id,
-			canonicalItemId: context.owner.item.id,
+			itemUid: context.owner.item.uid,
 			location: context.owner.location,
 		});
 	}

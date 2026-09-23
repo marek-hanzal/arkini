@@ -24,7 +24,7 @@ export namespace readItemDetailSourcesFx {
 			  }
 			| {
 					readonly kind: "definition";
-					readonly itemId: IdSchema.Type;
+					readonly itemUid: IdSchema.Type;
 			  };
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -57,7 +57,7 @@ export namespace readItemDetailSourcesFx {
 
 	export interface Source {
 		readonly ownerItemId: IdSchema.Type;
-		readonly ownerDefinitionItemId: IdSchema.Type;
+		readonly ownerItemUid: IdSchema.Type;
 		readonly space?: number;
 		readonly line: readonly Line[];
 	}
@@ -65,8 +65,8 @@ export namespace readItemDetailSourcesFx {
 	export type Result =
 		| {
 				readonly kind: "available";
-				readonly itemId: IdSchema.Type;
-				readonly targetDefinitionItemId: IdSchema.Type;
+				readonly itemUid: IdSchema.Type;
+				readonly targetItemUid: IdSchema.Type;
 				readonly source: readonly Source[];
 		  }
 		| {
@@ -83,16 +83,16 @@ const quantityBoundsFn = (quantity: QuantitySchema.Type): readItemDetailSourcesF
 
 const targetQuantityFn = ({
 	outcome,
-	targetDefinitionItemId,
+	targetItemUid,
 }: {
 	readonly outcome: readonly OutcomeSchema.Type[];
-	readonly targetDefinitionItemId: IdSchema.Type;
+	readonly targetItemUid: IdSchema.Type;
 }): readItemDetailSourcesFx.QuantityBounds | undefined => {
 	let min = 0;
 	let max = 0;
 	let found = false;
 	for (const candidate of outcome) {
-		if (candidate.type !== "item" || candidate.itemId !== targetDefinitionItemId) continue;
+		if (candidate.type !== "item" || candidate.itemUid !== targetItemUid) continue;
 		const bounds = quantityBoundsFn(candidate.quantity);
 		min += bounds.min;
 		max += bounds.max;
@@ -108,10 +108,10 @@ const targetQuantityFn = ({
 
 const readMatchingFactsFn = ({
 	outcome,
-	targetDefinitionItemId,
+	targetItemUid,
 }: {
 	readonly outcome: OutcomeTableSchema.Type | undefined;
-	readonly targetDefinitionItemId: IdSchema.Type;
+	readonly targetItemUid: IdSchema.Type;
 }): readonly readItemDetailSourcesFx.OutcomeFact[] => {
 	if (outcome === undefined) return [];
 	const totalSetWeight = outcome.set.reduce((total, set) => total + set.weight, 0);
@@ -128,7 +128,7 @@ const readMatchingFactsFn = ({
 					({ outcome }) => {
 						const quantity = targetQuantityFn({
 							outcome,
-							targetDefinitionItemId,
+							targetItemUid,
 						});
 						if (quantity === undefined) return;
 						facts.push({
@@ -146,7 +146,7 @@ const readMatchingFactsFn = ({
 					({ chance, outcome }) => {
 						const quantity = targetQuantityFn({
 							outcome,
-							targetDefinitionItemId,
+							targetItemUid,
 						});
 						if (quantity === undefined) return;
 						facts.push({
@@ -171,10 +171,10 @@ interface OrderedSource extends readItemDetailSourcesFx.Source {
 
 const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* ({
 	runtime,
-	targetDefinitionItemId,
+	targetItemUid,
 }: {
 	readonly runtime: RuntimeSchema.Type;
-	readonly targetDefinitionItemId: IdSchema.Type;
+	readonly targetItemUid: IdSchema.Type;
 }) {
 	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineId}`));
 	const source: OrderedSource[] = [];
@@ -190,7 +190,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 		for (const line of lines) {
 			const outcome = readMatchingFactsFn({
 				outcome: line.outcome,
-				targetDefinitionItemId,
+				targetItemUid,
 			});
 			if (outcome.length === 0) continue;
 			if (boardLocation !== undefined) {
@@ -226,7 +226,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 		if (matchingLines.length === 0) continue;
 		source.push({
 			ownerItemId: owner.id,
-			ownerDefinitionItemId: owner.item.id,
+			ownerItemUid: owner.item.uid,
 			ownerTitle: owner.item.title,
 			...(boardLocation === undefined
 				? {}
@@ -244,9 +244,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 		if (!leftOnBoard || !rightOnBoard) {
 			const titleOrder = left.ownerTitle.localeCompare(right.ownerTitle);
 			if (titleOrder !== 0) return titleOrder;
-			const definitionOrder = left.ownerDefinitionItemId.localeCompare(
-				right.ownerDefinitionItemId,
-			);
+			const definitionOrder = left.ownerItemUid.localeCompare(right.ownerItemUid);
 			return definitionOrder === 0
 				? left.ownerItemId.localeCompare(right.ownerItemId)
 				: definitionOrder;
@@ -272,26 +270,26 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 			: undefined;
 	if (target.kind === "runtime" && targetItem === undefined) return unavailable;
 	const config = yield* GameConfigFx;
-	let targetDefinitionItemId =
-		target.kind === "runtime" ? targetItem?.item.id : config.items[target.itemId]?.id;
-	if (targetDefinitionItemId === undefined) return unavailable;
-	const requestedDefinitionItemId = targetDefinitionItemId;
+	let targetItemUid =
+		target.kind === "runtime" ? targetItem?.item.uid : config.items[target.itemUid]?.uid;
+	if (targetItemUid === undefined) return unavailable;
+	const requestedItemUid = targetItemUid;
 
 	let source = yield* readOwnedSourcesFx({
 		runtime,
-		targetDefinitionItemId,
+		targetItemUid,
 	});
 	if (source.length === 0) {
 		for (const candidate of Object.values(config.items)) {
 			const owner = Option.getOrUndefined(narrowLineOwnerItemFn(candidate));
-			if (owner === undefined || owner.id === targetDefinitionItemId) continue;
+			if (owner === undefined || owner.uid === targetItemUid) continue;
 			const lines = owner.lines;
 			if (
 				!lines.some(
 					(line) =>
 						readMatchingFactsFn({
 							outcome: line.outcome,
-							targetDefinitionItemId: requestedDefinitionItemId,
+							targetItemUid: requestedItemUid,
 						}).length > 0,
 				)
 			) {
@@ -299,10 +297,10 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 			}
 			const acquiredFrom = yield* readOwnedSourcesFx({
 				runtime,
-				targetDefinitionItemId: owner.id,
+				targetItemUid: owner.uid,
 			});
 			if (acquiredFrom.length === 0) continue;
-			targetDefinitionItemId = owner.id;
+			targetItemUid = owner.uid;
 			source = acquiredFrom;
 			break;
 		}
@@ -310,8 +308,8 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 
 	return {
 		kind: "available",
-		itemId: target.itemId,
-		targetDefinitionItemId,
+		itemUid: requestedItemUid,
+		targetItemUid,
 		source: source.map(({ ownerTitle: _, ...ordered }) => ordered),
 	} satisfies readItemDetailSourcesFx.Result;
 });

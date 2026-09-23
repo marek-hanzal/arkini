@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ueuxr2ac2q6p666r5wswv352",
-		"id": "well-fed-sarka",
 		"title": "Well Fed Sarka",
 		"ui": "simple",
 		"description": "Fully belly",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "sarka",
+										"itemUid": "kfvvgjva9p7io5s989tql3yw",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 2,
 											"max": 3

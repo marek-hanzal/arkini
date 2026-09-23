@@ -12,7 +12,6 @@ export const matchesQueryLocationFn = ({
 	readonly origin?: BoardLocationSchema.Type;
 	readonly query: QuerySchema.Type;
 }): boolean => {
-	if (query.distance === "universe") return true;
 	if (origin === undefined || location.space !== origin.space) return false;
 	const distance = Math.max(
 		Math.abs(location.position.x - origin.position.x),

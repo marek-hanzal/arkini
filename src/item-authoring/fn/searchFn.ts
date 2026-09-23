@@ -9,7 +9,7 @@ export const searchFn = (
 	const fuzzyFn = createFuzzySearchFn({
 		candidates: items.map((item) => ({
 			terms: [
-				item.id,
+				item.uid,
 				item.title,
 				item.description ?? "",
 			],

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "g6n0uojktw3jxzapewd3jpdt",
-		"id": "trimmed-dirty-scrubbing-brush",
 		"title": "Trimmed Dirty Scrubbing Brush",
 		"draft": false,
 		"ui": "simple",

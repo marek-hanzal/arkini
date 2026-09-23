@@ -21,8 +21,8 @@ vi.mock("~/editor-control/ui/EditorInfoTooltip", () => ({
 }));
 
 vi.mock("~/item-authoring/ui/DetailReference", () => ({
-	DetailReference: ({ itemId }: { readonly itemId: string }) =>
-		createElement("span", null, itemId),
+	DetailReference: ({ itemUid }: { readonly itemUid: string }) =>
+		createElement("span", null, itemUid),
 }));
 
 vi.mock("~/item-authoring/ui/SelectorDetail", () => ({
@@ -93,7 +93,7 @@ describe("MergesDetail", () => {
 					action: "consume",
 					effect: "keep",
 					target: {
-						itemId: "water",
+						itemUid: "water",
 						type: "item",
 					},
 				},
@@ -101,7 +101,7 @@ describe("MergesDetail", () => {
 					action: "use",
 					effect: "remove",
 					target: {
-						itemId: "water",
+						itemUid: "water",
 						type: "item",
 					},
 				},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aypezdd5mxtcclnmhi7kphyv",
-		"id": "inkwell",
 		"title": "Inkwell",
 		"description": "Civilization becomes official the moment somebody starts wasting ink on plans. Limited supply, surprisingly important.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-inkwell",
+										"itemUid": "fx9qxf18mvzb6k4ac5odktw1",
 										"quantity": {
 											"min": 1,
 											"max": 1

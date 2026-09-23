@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a4lsrsgb7kqchcpfnx8atn33",
-		"id": "compost",
 		"title": "Compost",
 		"description": "Nice thing, flowers would like it.",
 		"ui": "simple",
@@ -16,173 +15,173 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-grain-field"
+					"itemUid": "p9x1eqx05d197gb37okicf4s"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-grain-field"
+				"result": "iz7g7a4t9cusl70zjj99xq89"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-grape-field"
+					"itemUid": "mctcyxqkk2gv0x6mflu1ssya"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-grape-field"
+				"result": "c4hwa7v3nkbf2tqz6ph95ko9"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cotton-field"
+					"itemUid": "c45534f7e4eb3faf3e39c8d1"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-cotton-field"
+				"result": "88bff6e2676f6c42f80c1c7c"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-corn-field"
+					"itemUid": "hlhjwuirteft3l82uxiqrrnh"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-corn-field"
+				"result": "xyf94kyi1jr5hlntp87egwcd"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-flax-field"
+					"itemUid": "y8a926c064v74l7gncur9clj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-flax-field"
+				"result": "woaodxe7380pvd5iyrpf0egs"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-grass-field"
+					"itemUid": "p6wks4iknyp8b8v5qxhilm1x"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-grass-field"
+				"result": "puf5ixk1kcy1yr00ga44kyxr"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-herb-garden"
+					"itemUid": "atcdihdj87zfj52oagbqxcri"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-herb-garden"
+				"result": "n198za79imdvj0gms3hj78ep"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-flower-field"
+					"itemUid": "p21ekiw1otjy1iitpborymkq"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-flower-field"
+				"result": "pypgohew7ap0fwpe69mhbo69"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-pumpkin-field"
+					"itemUid": "daoqtlfotxv65rpxy99sg4ku"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-pumpkin-field"
+				"result": "mr4967ukrdbknheqdcr9pz3t"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-hop-field"
+					"itemUid": "wmo7luagikin3s157v4xk8wx"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-hop-field"
+				"result": "xrveg6fg2wxejn2bblbq5vi0"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-rapeseed-field"
+					"itemUid": "c4szzk4tv05cdwfgu3hip9mq"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-rapeseed-field"
+				"result": "pfpwon1x53qp5sgf1usb0zck"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sunflower-field"
+					"itemUid": "guzv8wmx0qxw28iqhch6g7lc"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-sunflower-field"
+				"result": "v9bujr50f5jjyhgiip75s72t"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sugar-beet-field"
+					"itemUid": "hap8h04cn4l4c60avf2b7il2"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-sugar-beet-field"
+				"result": "movf9wm3im26ycxo7jzfz4ww"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sugar-cane-field"
+					"itemUid": "ixlmt68f8h58octhzbt7jpkk"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-sugar-cane-field"
+				"result": "b8rjy59wi12w74pr2oo57far"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-coffee-field"
+					"itemUid": "wln6dnpxroy1t45s2y516tnj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-coffee-field"
+				"result": "aq82qezs72qbvxsq0lpc31qw"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-dye-field"
+					"itemUid": "ilfa6qy345vmj82d0lfgi0fo"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-dye-field"
+				"result": "ftogp74ztyaxvio5td1hbcvq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-fruit-garden"
+					"itemUid": "lidli1atre8yu8ew4avdkcf2"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-fruit-garden"
+				"result": "e8u31uowee4lrrenzoqrk9la"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-vegetable-garden"
+					"itemUid": "j6b9mom3g4b5mdrzfjh0en9p"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-vegetable-garden"
+				"result": "mrjxfxlc4d54d2bkse1ms9h4"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cacao-grove"
+					"itemUid": "au9mjqjzmm0v19870kt48pbw"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fertilized-cacao-grove"
+				"result": "kgdj8zyfh7eaeqxn7p4dnwiu"
 			}
 		],
 		"maxQueueSize": 1,

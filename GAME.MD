@@ -12,9 +12,9 @@ A new game expands each authored space-to-template assignment against one evolvi
 
 Applying a template replaces exactly one space atomically. All its physical items, deliveries, nested input buffers, consumed/reserved material, jobs, queued work, selected lines and item schedules are discarded without refunds or completion/expiry outputs. Fresh item identities are created from the template. Other spaces and global switches remain unchanged; an already admitted delivery whose producer travelled into the reset space returns to its original leased cell. New-game start uses this same operation for every initial assignment. Runtime and saves retain only each space’s active template UID; its dimensions remain Serapack-owned. A Template outcome invokes this operation in its origin space, even while another space is viewed. Outcomes retain authored order: earlier item outputs are discarded by a later reset; later item outputs settle on the replacement board. Captured cleanup obligations for identities destroyed by the reset are dropped, never resurrected.
 
-Board-relative distance, placement, merge and outcome remain in their origin space. Universe queries can select unit payers across Board spaces. Material Autofill always stays in its producer’s home space, independently of the currently viewed space. Items have no authored storage scope.
+Board-relative distance, placement, merge and outcome remain in their origin space. Unit payers always belong to their producer’s home space. Material Autofill always stays in its producer’s home space, independently of the currently viewed space. Items have no authored storage scope.
 
-Queries have one `distance`: `self` matches the origin, `close` distance one, `near-close` one or two, `near` exactly two, `far` every positive distance in the origin's Board space, and `universe` all Board spaces including the origin. Query callers supply a physical Board origin; `universe` ignores its distance and space when matching. Internal input, job, reserved and delivery locations are never direct query candidates.
+Queries have one `distance`: `self` matches the origin, `close` distance one, `near-close` one or two, `near` exactly two, `far` every positive distance in the origin's Board space. Query callers supply a physical Board origin; all queries stay in that space. Internal input, job, reserved and delivery locations are never direct query candidates.
 
 Every runtime item represents one instance. Each start entry creates one identity in its exact cell; authored input and outcome quantities count separate instances. Units, schedules and production ownership stay attached to that identity.
 
@@ -79,7 +79,7 @@ Forced removal places one identity per free Board cell. Each outcome creates as 
 
 ## Material ownership
 
-Material input requires a `query` containing the exact canonical item selector and the Autofill distance. `self`, `close`, `near-close`, `near`, and `far` search relative to the owner in its Board space; `universe` covers the whole producer Board for material Autofill, never other spaces. Automatic source selection and displayed availability apply this query independently for each input, while allocating each source identity to at most one input and excluding the owner and busy producers. Already admitted deliveries and buffered material remain accepted when the owner moves.
+Material input requires a `query` containing the exact canonical item selector and the Autofill distance. `self`, `close`, `near-close`, `near`, and `far` search relative to the owner in its Board space. Automatic source selection and displayed availability apply this query independently for each input, while allocating each source identity to at most one input and excluding the owner and busy producers. Already admitted deliveries and buffered material remain accepted when the owner moves.
 
 Material ownership uses one of two modes:
 
@@ -94,7 +94,7 @@ Cheat removal of an authored idle Board owner releases its stored input roots th
 
 ## Units and completion
 
-Units are an item capability available to every item: passive and manually operated resources use the same Item schema, and scheduled production adds Item.clock. A units input selects a Board item with a unit supply; it does not require a special item type. Its query may use `universe` to select a payer from another space. Eligible local payers come first, ordered by Manhattan distance, row, column and runtime ID; remote payers follow in space, row, column and runtime-ID order. Coordinates in different spaces are not compared as distances.
+Units are an item capability available to every item: passive and manually operated resources use the same Item schema, and scheduled production adds Item.clock. A units input selects a Board item with a unit supply; it does not require a special item type. Only payers in the owner’s space are eligible, independently of the currently viewed space. Payers are ordered by Manhattan distance, row, column and runtime ID.
 
 Authored `quantity` counts separate item instances; `units` is the finite supply inside one instance and can represent health, resource stock, or uses. Runtime items have no quantity field.
 

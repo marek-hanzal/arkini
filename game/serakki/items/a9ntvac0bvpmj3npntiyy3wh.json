@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a9ntvac0bvpmj3npntiyy3wh",
-		"id": "flax-fiber",
 		"title": "Flax Fiber",
 		"ui": "simple",
 		"description": "Fibers everywhre",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y8a926c064v74l7gncur9clj",
-		"id": "empty-flax-field",
 		"title": "Empty Flax Field",
 		"ui": "simple",
 		"artwork": {

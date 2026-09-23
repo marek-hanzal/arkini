@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rjyyek1hl6tmdpu51qs9sb2t",
-		"id": "wet-paper-drying-rack",
 		"title": "Wet Paper Drying Rack",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "paper-drying-rack",
+										"itemUid": "z7wnlhv495tvujpj3vpose01",
 										"quantity": {
 											"min": 1,
 											"max": 1

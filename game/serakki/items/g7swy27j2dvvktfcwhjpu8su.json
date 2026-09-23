@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "g7swy27j2dvvktfcwhjpu8su",
-		"id": "flower-farm",
 		"title": "Flower Farm",
 		"draft": false,
 		"description": "Operates nearby flower fields and keeps their seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "flower-field"
+								"itemUid": "cuao33ea066g975ysq1nu9fe"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flowers",
+											"itemUid": "wty33h4avbqmgblvysq7e3ql",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -108,7 +107,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-1"
+								"itemUid": "b1z61l4bbwdtc75nt189hzze"
 							},
 							"distance": "far"
 						},
@@ -130,7 +129,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-flower-field",
+											"itemUid": "p21ekiw1otjy1iitpborymkq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -162,7 +161,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -184,7 +183,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flower-farm-blueprint",
+											"itemUid": "cvkjlmb9s0b0hgn8zn9z6fp6",
 											"quantity": {
 												"min": 1,
 												"max": 1

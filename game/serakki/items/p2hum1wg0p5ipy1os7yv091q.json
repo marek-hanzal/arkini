@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "p2hum1wg0p5ipy1os7yv091q",
-		"id": "well-fed-beagle",
 		"title": "Well Fed Beagle",
 		"draft": true,
 		"ui": "simple",
@@ -60,7 +59,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-beagle"
+								"itemUid": "p2hum1wg0p5ipy1os7yv091q"
 							},
 							"distance": "self"
 						}
@@ -77,7 +76,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well-fed-beagle",
+											"itemUid": "p2hum1wg0p5ipy1os7yv091q",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-beagle"
+								"itemUid": "p2hum1wg0p5ipy1os7yv091q"
 							},
 							"distance": "self"
 						}
@@ -130,7 +129,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beagle",
+											"itemUid": "upghscvjnnxzp09urbuh5x0a",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -140,7 +139,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -176,7 +175,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-beagle"
+								"itemUid": "p2hum1wg0p5ipy1os7yv091q"
 							},
 							"distance": "self"
 						}
@@ -193,7 +192,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle",
+											"itemUid": "ejznmbmbn7inrmbk1iwyd2ao",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -230,7 +229,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-beagle"
+								"itemUid": "p2hum1wg0p5ipy1os7yv091q"
 							},
 							"distance": "self"
 						}
@@ -247,7 +246,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle",
+											"itemUid": "ejznmbmbn7inrmbk1iwyd2ao",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -268,7 +267,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -300,7 +299,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-beagle"
+								"itemUid": "p2hum1wg0p5ipy1os7yv091q"
 							},
 							"distance": "self"
 						}
@@ -317,7 +316,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle",
+											"itemUid": "ejznmbmbn7inrmbk1iwyd2ao",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -338,7 +337,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},

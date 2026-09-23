@@ -10,17 +10,17 @@ export const readOutcomeCollectionSummaryFn = ({
 }: {
 	readonly outcomes: readonly OutcomeSchema.Type[];
 	readonly templates: readonly TemplateSchema.Type[] | undefined;
-	readonly readItemLabelFn: (itemId: string, fallback: string) => string;
+	readonly readItemLabelFn: (itemUid: string, fallback: string) => string;
 	readonly textFn: (key: string) => string;
 }) => {
 	const entries = outcomes.map((outcome) => {
 		switch (outcome.type) {
 			case "item":
 				return {
-					label: readItemLabelFn(outcome.itemId, textFn("No item selected")),
+					label: readItemLabelFn(outcome.itemUid, textFn("No item selected")),
 					searchTerms: [
-						outcome.itemId,
-						readItemLabelFn(outcome.itemId, ""),
+						outcome.itemUid,
+						readItemLabelFn(outcome.itemUid, ""),
 					],
 				};
 			case "template": {

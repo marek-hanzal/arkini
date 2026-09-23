@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jk63xgwdyfiaoeoq9q7tn8s1",
-		"id": "shorn-sheep",
 		"title": "Shorn Sheep",
 		"ui": "simple",
 		"description": "No wool",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "sheep",
+										"itemUid": "wh5fvg4la9xioq59jj3tjv96",
 										"quantity": {
 											"min": 1,
 											"max": 1

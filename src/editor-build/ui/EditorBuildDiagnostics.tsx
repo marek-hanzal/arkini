@@ -37,26 +37,24 @@ interface EditorGameDiagnosticPresentation {
 	readonly targets: ReadonlyArray<EditorDiagnosticTarget>;
 }
 
-const readItemIdFromPathFn = (path: ReadonlyArray<PropertyKey>) =>
+const readItemUidFromPathFn = (path: ReadonlyArray<PropertyKey>) =>
 	path[0] === "items" && typeof path[1] === "string" ? path[1] : undefined;
 
-const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): ReadonlyArray<string> => {
+const readDiagnosticItemUidsFn = (diagnostic: GameDiagnosticSchema.Type): ReadonlyArray<string> => {
 	switch (diagnostic.code) {
 		case "input:units-invalid":
 		case "merge:invalid":
 		case "line:duplicate-id":
 		case "line:multiple-selections":
 			return [
-				diagnostic.ownerItemId,
+				diagnostic.ownerItemUid,
 			];
 		case "units:stochastic-renewal":
 		case "units:missing-renewal":
 			return [
-				diagnostic.itemId,
+				diagnostic.itemUid,
 			];
-		case "item:duplicate-uid":
-			return diagnostic.itemIds;
-		case "config:key-id-mismatch":
+		case "config:key-uid-mismatch":
 		case "source:duplicate-record":
 			return diagnostic.entity === "item"
 				? [
@@ -67,8 +65,8 @@ const readDiagnosticItemIdsFn = (diagnostic: GameDiagnosticSchema.Type): Readonl
 			return diagnostic.cycle;
 		default:
 			return [
-				readItemIdFromPathFn(diagnostic.path),
-			].filter((itemId): itemId is string => itemId !== undefined);
+				readItemUidFromPathFn(diagnostic.path),
+			].filter((itemUid): itemUid is string => itemUid !== undefined);
 	}
 };
 
@@ -97,9 +95,9 @@ const readEditorGameDiagnosticTargetsFn = (
 ): ReadonlyArray<EditorDiagnosticTarget> => {
 	const itemSection = readOwnedItemSectionFn(diagnostic);
 	const itemTargets = [
-		...new Set(readDiagnosticItemIdsFn(diagnostic)),
-	].flatMap((itemId) => {
-		const item = project.config.items[itemId];
+		...new Set(readDiagnosticItemUidsFn(diagnostic)),
+	].flatMap((itemUid) => {
+		const item = project.config.items[itemUid];
 		return item === undefined
 			? []
 			: [

@@ -111,7 +111,7 @@ export const readGameResourceUsagesFn = (
 			],
 		});
 	}
-	for (const [itemId, item] of Object.entries(config.items).sort(([left], [right]) =>
+	for (const [itemUid, item] of Object.entries(config.items).sort(([left], [right]) =>
 		Order.String(left, right),
 	)) {
 		if (item.music !== undefined) {
@@ -119,13 +119,13 @@ export const readGameResourceUsagesFn = (
 				resourceId: item.music,
 				resourceType: "music",
 				owner: "item",
-				ownerId: itemId,
+				ownerId: itemUid,
 				ownerUid: item.uid,
 				ownerLabel: item.title,
 				roleLabel: "Item detail music",
 				path: [
 					"items",
-					itemId,
+					itemUid,
 					"music",
 				],
 			});
@@ -135,13 +135,13 @@ export const readGameResourceUsagesFn = (
 				resourceId,
 				resourceType: "artwork",
 				owner: "item",
-				ownerId: itemId,
+				ownerId: itemUid,
 				ownerUid: item.uid,
 				ownerLabel: item.title,
 				roleLabel: `Default artwork ${index + 1}`,
 				path: [
 					"items",
-					itemId,
+					itemUid,
 					"artwork",
 					"default",
 					index,
@@ -154,13 +154,13 @@ export const readGameResourceUsagesFn = (
 				resourceId: line.artwork,
 				resourceType: "artwork",
 				owner: "item",
-				ownerId: itemId,
+				ownerId: itemUid,
 				ownerUid: item.uid,
 				ownerLabel: item.title,
 				roleLabel: `Production line artwork: ${line.title}`,
 				path: [
 					"items",
-					itemId,
+					itemUid,
 					"lines",
 					index,
 					"artwork",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rok1ie5bkngxk1qbyre9mssz",
-		"id": "fire",
 		"title": "Fire",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "air-pollution",
+										"itemUid": "nh9tf1n52h19igah115s36jk",
 										"quantity": {
 											"min": 2,
 											"max": 3

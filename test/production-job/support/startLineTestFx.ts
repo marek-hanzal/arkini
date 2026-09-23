@@ -56,7 +56,7 @@ export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 				[
 					{
 						type: GameEventEnumSchema.enum.JobStarted,
-						canonicalItemId: owner.item.id,
+						itemUid: owner.item.uid,
 						jobId: job.id,
 						ownerItemId: job.ownerItemId,
 						lineId: job.lineId,

@@ -68,7 +68,7 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 				type: GameEventEnumSchema.enum.JobStarted,
 				jobId: attempt.job.id,
 				ownerItemId: attempt.job.ownerItemId,
-				canonicalItemId: owner.item.id,
+				itemUid: owner.item.uid,
 				lineId: attempt.job.lineId,
 			} satisfies GameEventSchema.Type,
 			...attempt.events,
@@ -177,7 +177,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 			type: GameEventEnumSchema.enum.JobCompleted,
 			jobId: liveJob.id,
 			ownerItemId: liveJob.ownerItemId,
-			canonicalItemId: completedOwner.item.id,
+			itemUid: completedOwner.item.uid,
 			lineId: liveJob.lineId,
 		});
 		events.push(...completion.events);

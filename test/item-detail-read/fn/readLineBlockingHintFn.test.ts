@@ -13,7 +13,7 @@ const ruleFn = (type: "enable" | "disable" | "show", hint?: string) =>
 					distance: "far",
 					selector: {
 						type: "item",
-						itemId: "tree",
+						itemUid: "tree",
 					},
 				},
 			},

@@ -20,27 +20,27 @@ const collectMaterialInputEdgesFn = ({
 }: validateInputAcceptanceCyclesFn.Props) => {
 	const edges: MaterialInputEdgeSchema.Type[] = [];
 
-	for (const [ownerItemId, item] of Object.entries(config.items)) {
+	for (const [ownerItemUid, item] of Object.entries(config.items)) {
 		for (const { line, path } of readItemLineEntriesFn({
-			itemId: ownerItemId,
+			itemUid: ownerItemUid,
 			item,
 		})) {
 			for (const [inputIndex, input] of line.input.entries()) {
 				if (
 					input.type !== TypeSchema.enum.Materials ||
-					config.items[input.query.selector.itemId] === undefined
+					config.items[input.query.selector.itemUid] === undefined
 				)
 					continue;
 				edges.push({
-					ownerItemId,
-					acceptedItemId: input.query.selector.itemId,
+					ownerItemUid,
+					acceptedItemUid: input.query.selector.itemUid,
 					path: [
 						...path,
 						"input",
 						inputIndex,
 						"selector",
 					],
-					source: provenance.items[ownerItemId],
+					source: provenance.items[ownerItemUid],
 				});
 			}
 		}
@@ -60,7 +60,7 @@ export const validateInputAcceptanceCyclesFn = ({
 	});
 	const byPair = new Map(
 		edges.map((edge) => [
-			`${edge.ownerItemId}\u0000${edge.acceptedItemId}`,
+			`${edge.ownerItemUid}\u0000${edge.acceptedItemUid}`,
 			edge,
 		]),
 	);
@@ -68,8 +68,8 @@ export const validateInputAcceptanceCyclesFn = ({
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const edge of edges) {
-		if (edge.ownerItemId === edge.acceptedItemId) {
-			const key = `self:${edge.ownerItemId}`;
+		if (edge.ownerItemUid === edge.acceptedItemUid) {
+			const key = `self:${edge.ownerItemUid}`;
 			if (reported.has(key)) continue;
 			reported.add(key);
 			diagnostics.push({
@@ -77,10 +77,10 @@ export const validateInputAcceptanceCyclesFn = ({
 				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path: edge.path,
 				source: edge.source,
-				message: `Material input ${edge.ownerItemId} accepts itself.`,
+				message: `Material input ${edge.ownerItemUid} accepts itself.`,
 				cycle: [
-					edge.ownerItemId,
-					edge.ownerItemId,
+					edge.ownerItemUid,
+					edge.ownerItemUid,
 				],
 				edges: [
 					edge,
@@ -89,11 +89,11 @@ export const validateInputAcceptanceCyclesFn = ({
 			continue;
 		}
 
-		const reverse = byPair.get(`${edge.acceptedItemId}\u0000${edge.ownerItemId}`);
+		const reverse = byPair.get(`${edge.acceptedItemUid}\u0000${edge.ownerItemUid}`);
 		if (reverse === undefined) continue;
 		const pair = [
-			edge.ownerItemId,
-			edge.acceptedItemId,
+			edge.ownerItemUid,
+			edge.acceptedItemUid,
 		].sort();
 		const key = `pair:${pair.join("\u0000")}`;
 		if (reported.has(key)) continue;
@@ -103,11 +103,11 @@ export const validateInputAcceptanceCyclesFn = ({
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: edge.path,
 			source: edge.source,
-			message: `Material inputs directly accept each other: ${edge.ownerItemId} ↔ ${edge.acceptedItemId}.`,
+			message: `Material inputs directly accept each other: ${edge.ownerItemUid} ↔ ${edge.acceptedItemUid}.`,
 			cycle: [
-				edge.ownerItemId,
-				edge.acceptedItemId,
-				edge.ownerItemId,
+				edge.ownerItemUid,
+				edge.acceptedItemUid,
+				edge.ownerItemUid,
 			],
 			edges: [
 				edge,

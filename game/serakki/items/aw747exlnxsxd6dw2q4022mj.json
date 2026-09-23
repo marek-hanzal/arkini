@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aw747exlnxsxd6dw2q4022mj",
-		"id": "toxic-filter-depleted",
 		"title": "Toxic Filter Depleted",
 		"ui": "simple",
 		"description": "Ugly and toxic. You should burn it down",

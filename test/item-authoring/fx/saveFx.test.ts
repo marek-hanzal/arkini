@@ -62,7 +62,7 @@ const createFixture = () => {
 				...editorTestPayload.config,
 				items: {
 					...editorTestPayload.config.items,
-					[item.id]: item,
+					[item.uid]: item,
 				},
 			},
 		});
@@ -109,8 +109,7 @@ describe("saveFx", () => {
 		});
 		const item = {
 			...editorTestPayload.config.items.water,
-			id: "new-item",
-			uid: "new-uid",
+			uid: "new-item",
 		};
 		fixture.upsertItemFx.mockImplementationOnce(() => {
 			const { resources: _resources, ...commit } = createProject(2);
@@ -121,7 +120,7 @@ describe("saveFx", () => {
 					...commit.config,
 					items: {
 						...commit.config.items,
-						[item.id]: item,
+						[item.uid]: item,
 					},
 				},
 			});
@@ -147,17 +146,17 @@ describe("saveFx", () => {
 		).toMatchObject({
 			previousRevision: 1,
 			committedRevision: 2,
-			committedItemUid: "new-uid",
+			committedItemUid: "new-item",
 		});
 		expect(
 			diagnostics.records.find((record) => record.event === "item-save-published"),
 		).toMatchObject({
 			level: "warning",
 			data: {
-				itemUid: "new-uid",
+				itemUid: "new-item",
 				committedRevision: 2,
 				visibleRevision: 0,
-				visibleItemId: null,
+				visibleItemUid: null,
 			},
 		});
 	});
@@ -202,7 +201,7 @@ describe("saveFx", () => {
 		expect(fixture.registry.get(projectAtom)?.resources).toBe(resources);
 	});
 
-	it("renames one saved UID and every exact reference in one revision-pinned commit", async () => {
+	it("changes title without rewriting references", async () => {
 		const fixture = createFixture();
 		const projectAtom = EditorProjectAtom("project");
 		fixture.registry.mount(projectAtom);
@@ -216,7 +215,7 @@ describe("saveFx", () => {
 				projectId: "project",
 				item: {
 					...editorTestPayload.config.items.water,
-					id: "fresh-water",
+					title: "Fresh Water",
 				},
 			}).pipe(
 				Effect.provideService(ProjectRepository, fixture.repository),
@@ -228,19 +227,18 @@ describe("saveFx", () => {
 			),
 		);
 
-		expect(fixture.upsertItemFx).not.toHaveBeenCalled();
-		expect(fixture.replaceConfigFx).toHaveBeenCalledWith(
+		expect(fixture.replaceConfigFx).not.toHaveBeenCalled();
+		expect(fixture.upsertItemFx).toHaveBeenCalledWith(
 			expect.objectContaining({
 				expectedRevision: 0,
 				projectId: "project",
 			}),
 		);
 		expect(saved).toMatchObject({
-			id: "fresh-water",
-			uid: editorTestPayload.config.items.water?.uid,
+			title: "Fresh Water",
 		});
-		expect(fixture.registry.get(projectAtom)?.config.templates![0]!.board[0]?.itemId).toBe(
-			"fresh-water",
+		expect(fixture.registry.get(projectAtom)?.config.templates![0]!.board[0]?.itemUid).toBe(
+			"water",
 		);
 	});
 
@@ -254,7 +252,7 @@ describe("saveFx", () => {
 					projectId: "project",
 					item: {
 						...editorTestPayload.config.items.water,
-						id: "",
+						uid: "",
 					},
 				}).pipe(
 					Effect.provideService(ProjectRepository, fixture.repository),

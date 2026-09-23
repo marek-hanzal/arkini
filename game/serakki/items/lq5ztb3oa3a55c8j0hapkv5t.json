@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lq5ztb3oa3a55c8j0hapkv5t",
-		"id": "clay-mug-with-wine",
 		"title": "Clay Mug With Wine",
 		"ui": "simple",
 		"description": "Another way to drink it",

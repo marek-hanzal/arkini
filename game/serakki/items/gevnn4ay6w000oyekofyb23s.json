@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gevnn4ay6w000oyekofyb23s",
-		"id": "bobik",
 		"title": "Bobík",
 		"ui": "simple",
 		"description": "The less older son",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "tomasek"
+					"itemUid": "w1qvwvxxyfwoejpvxst2ykru"
 				},
 				"action": "use",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "toy-sloth",
+											"itemUid": "euu2hwd3wtw7cmmknt399w3o",
 											"quantity": {
 												"min": 1,
 												"max": 1

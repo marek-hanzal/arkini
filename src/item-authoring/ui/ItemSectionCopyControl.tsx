@@ -17,14 +17,14 @@ import { Mx } from "~/translation/ui/Mx";
 
 /** Holds an explicit source snapshot until the user confirms replacement of the active form section. */
 export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: SectionId }) => {
-	const { initialItem, itemId, copySectionFn, isSaving } = useFormSession();
+	const { initialItem, itemUid, copySectionFn, isSaving } = useFormSession();
 	const translator = useTranslator();
 	const [source, setSourceFn] = useState<ItemSchema.Type>();
 	const includeItemFn = useCallback(
-		(item: ItemSchema.Type) => item.uid !== initialItem.uid && item.id !== itemId,
+		(item: ItemSchema.Type) => item.uid !== initialItem.uid && item.uid !== itemUid,
 		[
 			initialItem.uid,
-			itemId,
+			itemUid,
 		],
 	);
 	const { items, options } = useEditorItemSearchOptions(includeItemFn);
@@ -47,7 +47,7 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 					labelVisible={false}
 					placeholder={translator.textFn("Copy from…")}
 					options={options}
-					value={source?.id ?? ""}
+					value={source?.uid ?? ""}
 					onChangeFn={(id) => {
 						const item = items[id ?? ""];
 						setSourceFn(

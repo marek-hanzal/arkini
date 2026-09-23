@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "uugdqcs2ghv34ol6rxal8fk5",
-		"id": "stone-deposit-deplated",
 		"title": "Once upon a time, here was stone",
 		"ui": "default",
 		"description": "Stone is no longer here, but you can use some tools to find a new deposit!",
@@ -36,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-deposit-deplated"
+								"itemUid": "uugdqcs2ghv34ol6rxal8fk5"
 							},
 							"distance": "self"
 						}
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "resource-research"
+								"itemUid": "bqf3op5bndkaqfgpap7lj7kq"
 							},
 							"distance": "far"
 						},
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stone-deposit",
+											"itemUid": "hds0v0xcckj5gcyzuwv8ujg8",
 											"quantity": {
 												"min": 1,
 												"max": 1

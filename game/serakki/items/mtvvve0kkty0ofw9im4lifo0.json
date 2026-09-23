@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mtvvve0kkty0ofw9im4lifo0",
-		"id": "sausage",
 		"title": "Sausage",
 		"ui": "simple",
 		"description": "Suasage",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sausage",
+										"itemUid": "pqpid50tthxuej5xtyn8i45d",
 										"quantity": {
 											"min": 1,
 											"max": 1

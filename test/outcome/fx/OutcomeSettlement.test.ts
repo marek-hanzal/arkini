@@ -24,7 +24,7 @@ const origin = {
 };
 const itemOutcome = {
 	type: "item",
-	itemId: "reward",
+	itemUid: "reward",
 	quantity: {
 		min: 1,
 		max: 1,
@@ -54,7 +54,7 @@ const spaceFn = (space: number): OutcomeSchema.Type => ({
 });
 const definitionFn = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	artwork: {
 		scale: 1,
@@ -109,7 +109,7 @@ const configFn = (outcome: OutcomeTableSchema.Type, width = 3) =>
 const spawnOwnerFx = () =>
 	spawnItemFx({
 		id: "owner-live",
-		itemId: "owner",
+		itemUid: "owner",
 		location: origin,
 	});
 
@@ -172,7 +172,7 @@ describe("Outcome settlement", () => {
 					},
 					{
 						type: "item",
-						itemId: "reward",
+						itemUid: "reward",
 						quantity: 1,
 						placement: "drop",
 					},
@@ -185,7 +185,7 @@ describe("Outcome settlement", () => {
 		]);
 		expect(result.transition.runtime.currentSpace).toBe(2);
 		expect(
-			result.transition.runtime.items.find((item) => item.item.id === "reward")?.location,
+			result.transition.runtime.items.find((item) => item.item.uid === "reward")?.location,
 		).toMatchObject({
 			scope: "board",
 			space: 0,
@@ -333,7 +333,7 @@ describe("Outcome settlement", () => {
 									distance: "far",
 									selector: {
 										type: "item",
-										itemId: "reward",
+										itemUid: "reward",
 									},
 								},
 							},

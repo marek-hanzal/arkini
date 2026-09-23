@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xaijv8bc7ljbonqgp1vzcxcc",
-		"id": "hunted-game",
 		"title": "Hunted Game",
 		"description": "Some raw hunted stuff you shall process",
 		"ui": "simple",
@@ -30,7 +29,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 2
@@ -66,7 +65,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hunted-game"
+								"itemUid": "xaijv8bc7ljbonqgp1vzcxcc"
 							},
 							"distance": "self"
 						}
@@ -83,7 +82,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -93,7 +92,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 2,
 												"max": 6
@@ -103,7 +102,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "raw-steak",
+											"itemUid": "yf53q9esw3j2x0tvnf2df5mo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "animal-fat",
+											"itemUid": "ppl5spzpzxthy5178h8u3l1a",
 											"quantity": {
 												"min": 1,
 												"max": 1

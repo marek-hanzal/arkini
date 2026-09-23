@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kfex38vvnfqn5iavk06en63s",
-		"id": "wooden-scoop",
 		"title": "Wooden Scoop",
 		"draft": true,
 		"ui": "simple",

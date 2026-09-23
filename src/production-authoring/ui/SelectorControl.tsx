@@ -35,11 +35,11 @@ export const SelectorControl = ({
 			includeItemFn={includeItemFn}
 			label={label ?? translator.textFn("Selected item")}
 			labelVisible={labelVisible}
-			value={value.itemId}
-			onChangeFn={(itemId) =>
+			value={value.itemUid}
+			onChangeFn={(itemUid) =>
 				onChangeFn({
 					...value,
-					itemId,
+					itemUid,
 				})
 			}
 		/>

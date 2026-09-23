@@ -63,7 +63,7 @@ const createItem = ({
 	({
 		compositeUrl,
 		id: "runtime:spawn",
-		itemId: "water",
+		itemUid: "water",
 
 		location: {
 			scope: "board",

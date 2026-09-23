@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lbyiwjest0kicpb3c1w5pen9",
-		"id": "bear",
 		"title": "Bear",
 		"ui": "simple",
 		"description": "A bit scary, but he will eventually go to otehr business",
@@ -16,16 +15,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bed-t1"
+					"itemUid": "ppvb7bkeybasw9j45yv9zk6n"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bed-with-teddy-bear"
+				"result": "k5c77w0nkqa2gik8nxj2mrb2"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beehive"
+					"itemUid": "vrrlriluo0tlef50wpl5q2bt"
 				},
 				"action": "consume",
 				"outcome": {
@@ -39,7 +38,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bear-chased-by-bees",
+											"itemUid": "b8r8k2te7o8bpd9hm7y2fo2s",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -58,11 +57,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "honey"
+					"itemUid": "qjzlwiulk3mpdsxs52nzpr8n"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bear-eating-honey"
+				"result": "mbi6nbxtdm8ttfalget74iwm"
 			}
 		],
 		"clock": {
@@ -81,7 +80,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 2,
 											"max": 3

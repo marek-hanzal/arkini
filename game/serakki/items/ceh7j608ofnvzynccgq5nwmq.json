@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ceh7j608ofnvzynccgq5nwmq",
-		"id": "dye-field",
 		"title": "Dye Field",
 		"draft": false,
 		"description": "Dye field. Da colors",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-dye-field",
+										"itemUid": "ilfa6qy345vmj82d0lfgi0fo",
 										"quantity": {
 											"min": 1,
 											"max": 1

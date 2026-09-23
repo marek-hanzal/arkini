@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "clmb5usqob6j1z5udyd487m5",
-		"id": "stonemason-camp",
 		"title": "Stonemason Camp",
 		"description": "Where large rocks stop being scenery and start becoming useful inventory. Crude, loud, and annoyingly essential.",
 		"ui": "default",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-deposit"
+								"itemUid": "hds0v0xcckj5gcyzuwv8ujg8"
 							},
 							"distance": "close"
 						}
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stone---tier-1",
+											"itemUid": "b1z61l4bbwdtc75nt189hzze",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -73,7 +72,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stone-deposit"
+										"itemUid": "hds0v0xcckj5gcyzuwv8ujg8"
 									},
 									"distance": "close"
 								},

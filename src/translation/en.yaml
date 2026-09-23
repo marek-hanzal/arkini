@@ -806,13 +806,6 @@ Introduction:
   value: Introduction
 Item:
   value: Item
-Item ID:
-  value: Item ID
-Item ID help:
-  value: |
-    The stable name used by production, merges, rules, Board layouts and MCP.
-
-    Renaming it updates project links when you **Save**. Keep it short, for example `healing-kit`. Text outside Serakki cannot be updated.
 Item UID:
   value: Item UID
 Item artwork help:
@@ -1683,8 +1676,6 @@ Reset password:
   value: Reset password
 Resource ID:
   value: Resource ID
-Resource type:
-  value: Resource type
 Resources:
   value: Resources
 Retry loading notes:
@@ -1765,9 +1756,6 @@ Search music…:
   value: Search music…
 Search templates...:
   value: Search templates...
-Searches matching items in every board space in the current game.:
-  value: Searches matching items in every board space in the current game.
-  dynamic: true
 Select a template for this Space. Unassigned spaces start empty.:
   value: Select a template for this Space. Unassigned spaces start empty.
 Select an item with Units enabled.:
@@ -1982,9 +1970,6 @@ Units per item:
   dynamic: true
 Units remaining:
   value: Units remaining
-Universe:
-  value: Universe
-  dynamic: true
 Unlimited:
   value: Unlimited
 Unreachable:

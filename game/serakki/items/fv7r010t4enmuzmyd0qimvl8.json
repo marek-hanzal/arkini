@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fv7r010t4enmuzmyd0qimvl8",
-		"id": "gem-mine",
 		"title": "Gem Mine",
 		"ui": "default",
 		"description": "If you wanna be rich, go into the depths",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-mine",
+										"itemUid": "wfndxov0jyo5gn2gggzeir1p",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -61,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "gem-mine"
+								"itemUid": "fv7r010t4enmuzmyd0qimvl8"
 							},
 							"distance": "self"
 						}
@@ -79,7 +78,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "emerald",
+											"itemUid": "sag14rytoixz9t1i2fy33v3m",
 											"quantity": {
 												"min": 1,
 												"max": 3

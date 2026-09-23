@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xdmw0tzjs2e7z2hti7sfah3g",
-		"id": "paper-boat",
 		"title": "Paper Boat",
 		"ui": "simple",
 		"description": "Just a boat",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub-with-water"
+					"itemUid": "osmpflow443kpnve1hfl6x3e"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "paper-boat-bath"
+				"result": "x23l6no189g91mguo82na9o9"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wine-bath"
+					"itemUid": "x2vm1uc63ibkyo338dhe35w3"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "paper-boat-wine-bath"
+				"result": "txi8gv2c3kbblv3x7pemuchc"
 			}
 		],
 		"maxQueueSize": 1,

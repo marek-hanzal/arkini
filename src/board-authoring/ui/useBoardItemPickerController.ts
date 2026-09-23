@@ -5,13 +5,13 @@ import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobo
 export namespace useBoardItemPickerController {
 	export interface Props {
 		readonly onCloseFn: () => void;
-		readonly onSelectFn: (itemId: string) => void;
+		readonly onSelectFn: (itemUid: string) => void;
 	}
 
 	export interface Output {
 		readonly items: GameConfigSchema.Type["items"];
 		readonly options: ReadonlyArray<EditorSearchOption>;
-		readonly selectItemFn: (itemId: string) => void;
+		readonly selectItemFn: (itemUid: string) => void;
 	}
 }
 
@@ -21,10 +21,10 @@ export const useBoardItemPickerController = ({
 	onSelectFn,
 }: useBoardItemPickerController.Props): useBoardItemPickerController.Output => {
 	const { items, options } = useEditorItemSearchOptions();
-	const selectItemFn = (itemId: string) => {
-		const option = options.find((option) => option.id === itemId);
+	const selectItemFn = (itemUid: string) => {
+		const option = options.find((option) => option.id === itemUid);
 		if (option === undefined) return;
-		onSelectFn(itemId);
+		onSelectFn(itemUid);
 		onCloseFn();
 	};
 

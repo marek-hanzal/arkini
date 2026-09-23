@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "oy7hz2unlgoos52f57q9tstx",
-		"id": "milk-mug",
 		"title": "Milk Mug",
 		"description": "Innocent mug of milk. Or foam on top of beer you can mask",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bed-t1"
+					"itemUid": "ppvb7bkeybasw9j45yv9zk6n"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-mug",
+											"itemUid": "nw60xpkc8pbay8tkriirlyw2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "bed-milk"
+				"result": "kosdcrjj4qnknxr7jwc1p0ew"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-mug",
+										"itemUid": "r26qlyj1gy45l0a2j4gx9of1",
 										"quantity": {
 											"min": 1,
 											"max": 1

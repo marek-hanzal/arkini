@@ -53,7 +53,7 @@ describe("readItemPhysicalContextFx", () => {
 										distance: "far" as const,
 										selector: {
 											type: "item",
-											itemId: "residue",
+											itemUid: "residue",
 										},
 									},
 									quantity: {
@@ -72,19 +72,19 @@ describe("readItemPhysicalContextFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "owner",
-					itemId: "owner",
+					itemUid: "owner",
 
 					location: boardFn(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
-					itemId: "temporary",
+					itemUid: "temporary",
 
 					location: boardFn(1),
 				});
 				const child = yield* spawnItemFx({
 					id: "child",
-					itemId: "residue",
+					itemUid: "residue",
 
 					location: boardFn(2),
 				});

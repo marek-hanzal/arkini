@@ -35,7 +35,7 @@ it("returns exactly one piece per click, retaining other identities and the queu
 				);
 				expect(
 					after.items.filter(
-						(item) => item.item.id === "water" && item.location.scope === "board",
+						(item) => item.item.uid === "water" && item.location.scope === "board",
 					).length,
 				).toBe(3 - remaining);
 			}
@@ -79,7 +79,7 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: ownerItemId,
-				itemId: "workshop",
+				itemUid: "workshop",
 				location: {
 					scope: "board",
 					space: 0,
@@ -165,7 +165,7 @@ it("rolls back the buffered identities and queue when no outcome position is ava
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: ownerItemId,
-				itemId: "workshop",
+				itemUid: "workshop",
 				location: {
 					scope: "board",
 					space: 0,

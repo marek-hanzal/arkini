@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dgvhgu1xkv6m4igfdb2wnwxh",
-		"id": "labor-t2",
 		"title": "Labor - Tier 2",
 		"description": "More capable organized labor, produced by combining several units of basic labor in a Tier 2 household.",
 		"ui": "simple",

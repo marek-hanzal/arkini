@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bziyibfqxwmop4h87zspvxco",
-		"id": "townhall-t2-supply-chest",
 		"title": "Townhall II Supply Chest",
 		"draft": false,
 		"description": "A small supply package for the second civic age. Mostly practical odds and ends that unlock systems before their own production chains come online.",
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "townhall-t2-supply-chest"
+								"itemUid": "bziyibfqxwmop4h87zspvxco"
 							},
 							"distance": "self"
 						}
@@ -55,7 +54,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-jar",
+											"itemUid": "w3x58j053qf9fgq90wqqtylq",
 											"quantity": {
 												"min": 4,
 												"max": 4

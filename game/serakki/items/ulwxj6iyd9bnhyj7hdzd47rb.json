@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ulwxj6iyd9bnhyj7hdzd47rb",
-		"id": "architect-t1-blueprint",
 		"title": "Architect - Tier 1 Blueprint",
 		"draft": true,
 		"description": "Plans for the first proper architect's office. Somebody has to redraw all those buildings once the Townhall stops doing favors.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "architect-t1-blueprint"
+								"itemUid": "ulwxj6iyd9bnhyj7hdzd47rb"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -86,7 +85,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "architect-t1",
+											"itemUid": "mhxzunsd89yww1hdkfb886e2",
 											"quantity": {
 												"min": 1,
 												"max": 1

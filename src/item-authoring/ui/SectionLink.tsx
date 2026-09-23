@@ -16,7 +16,6 @@ const inactiveProps = {
 
 export const SectionLink = ({
 	defaultDraft,
-	defaultItemId,
 	defaultTitle,
 	destination = "form",
 	create,
@@ -26,7 +25,6 @@ export const SectionLink = ({
 	section,
 }: {
 	readonly defaultDraft?: boolean;
-	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly destination?: "detail" | "form";
 	readonly create?: boolean;
@@ -54,11 +52,6 @@ export const SectionLink = ({
 					? {}
 					: {
 							defaultDraft,
-						}),
-				...(defaultItemId === undefined
-					? {}
-					: {
-							defaultItemId,
 						}),
 				...(defaultTitle === undefined
 					? {}

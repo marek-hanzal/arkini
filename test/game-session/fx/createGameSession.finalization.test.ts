@@ -28,7 +28,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 		await session.runFn(
 			spawnItemFx({
 				id: "runtime:retry-final-save",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -47,7 +47,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 			session.runFn(
 				spawnItemFx({
 					id: "runtime:must-not-change-after-shutdown",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,

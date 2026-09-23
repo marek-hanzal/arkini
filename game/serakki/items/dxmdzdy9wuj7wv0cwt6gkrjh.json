@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dxmdzdy9wuj7wv0cwt6gkrjh",
-		"id": "cutting-board-with-vegetables",
 		"title": "Cutting Board With Vegetables",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cutting-board-with-vegetables",
+										"itemUid": "u1mdrqt6xl58jbtesw7qride",
 										"quantity": {
 											"min": 1,
 											"max": 1

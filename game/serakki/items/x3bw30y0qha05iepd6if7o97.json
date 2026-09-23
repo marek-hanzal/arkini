@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "x3bw30y0qha05iepd6if7o97",
-		"id": "sack-with-coffee-seed",
 		"title": "Sack With Coffee Seed",
 		"draft": false,
 		"description": "A sack of coffee seed. The coffee plant on the sack is easier to recognize than a handful of suspicious little beans.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-coffee-field"
+					"itemUid": "aq82qezs72qbvxsq0lpc31qw"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "coffee-field"
+				"result": "ecjzsaixdj6tc96f20xp4uxz"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

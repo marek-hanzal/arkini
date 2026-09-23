@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zblgatsfi13wi1v8wboffcc6",
-		"id": "wood---tier-2",
 		"title": "Wood - Tier 2",
 		"draft": true,
 		"ui": "simple",
@@ -19,11 +18,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood---tier-2"
+					"itemUid": "zblgatsfi13wi1v8wboffcc6"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "wood---tier-3"
+				"result": "w2dirwgv1mpbylv15bptu8nl"
 			}
 		],
 		"maxQueueSize": 1,
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-2"
+								"itemUid": "zblgatsfi13wi1v8wboffcc6"
 							},
 							"distance": "self"
 						}
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wood---tier-1",
+											"itemUid": "kwkucgj71atfynrxw5sugzpe",
 											"quantity": {
 												"min": 2,
 												"max": 2

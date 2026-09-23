@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cpmdnqi63m2cql44na50d7vq",
-		"id": "scissors",
 		"title": "Scissors",
 		"description": "For wool, paper, bristles, and several things that absolutely did not ask for a haircut.",
 		"ui": "simple",
@@ -16,16 +15,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "paper---tier-1"
+					"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "paper-boat"
+				"result": "xdmw0tzjs2e7z2hti7sfah3g"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sheep"
+					"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 				},
 				"action": "use",
 				"outcome": {
@@ -39,7 +38,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wool",
+											"itemUid": "n39h14x4q171b0ohxfxtab30",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -54,12 +53,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "shorn-sheep"
+				"result": "jk63xgwdyfiaoeoq9q7tn8s1"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pillow-with-coins"
+					"itemUid": "qcg5xzpysvkh34ph5p4tckkx"
 				},
 				"action": "use",
 				"outcome": {
@@ -73,7 +72,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clutter",
+											"itemUid": "ubo4ux37gz2ya3qfsj78a9oq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -88,12 +87,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "coin-stack"
+				"result": "prjfkn0sxpy76c9bomvwjxl8"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair"
+					"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 				},
 				"action": "use",
 				"outcome": {
@@ -107,7 +106,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -122,21 +121,21 @@
 					]
 				},
 				"effect": "replace",
-				"result": "british-shorthair-shorn"
+				"result": "jmggi2oy53rccvchgd6j58ga"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse"
+					"itemUid": "rvgihky3ismzedb2rwxwysq9"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "mouse-with-cut-tail"
+				"result": "aimxjaohns3tfd68e2gfveeq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle"
+					"itemUid": "upghscvjnnxzp09urbuh5x0a"
 				},
 				"action": "use",
 				"outcome": {
@@ -150,7 +149,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -165,12 +164,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "badly-trimmed-beagle"
+				"result": "ot27atkde11q2qwas9p7gujj"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wild-boar"
+					"itemUid": "s2nit67s0y8655wk3pvom2qo"
 				},
 				"action": "use",
 				"outcome": {
@@ -184,7 +183,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "boar-bristles",
+											"itemUid": "k5r48n6qzhisc3rvpiko8yht",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -199,30 +198,30 @@
 					]
 				},
 				"effect": "replace",
-				"result": "shorn-wild-boar"
+				"result": "jzwbwsnxg7tbrr3oc97e1l48"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sewn-pillow-with-coins"
+					"itemUid": "a1m6qc2zrjjuwunmaojue424"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "pillow-with-coins"
+				"result": "qcg5xzpysvkh34ph5p4tckkx"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "cotton-fabric"
+				"result": "di926lypctzw8e6a4twmyeme"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bio-waste"
+					"itemUid": "l70n80ujrm55lpl6z2n4hcty"
 				},
 				"action": "consume",
 				"outcome": {
@@ -236,7 +235,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scissors",
+											"itemUid": "cdz4ufdk3nak07xep51oeva1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -255,16 +254,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "scrubbing-brush"
+					"itemUid": "im6k8omuik7imr85cq0bc750"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "trimmed-scrubbing-brush"
+				"result": "g1w4g5ccovd4q91eyaano0tp"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-scrubbing-brush"
+					"itemUid": "w61ftom9lbm4m70y9oagapuu"
 				},
 				"action": "consume",
 				"outcome": {
@@ -278,7 +277,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scissors",
+											"itemUid": "cdz4ufdk3nak07xep51oeva1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -293,12 +292,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "trimmed-dirty-scrubbing-brush"
+				"result": "g6n0uojktw3jxzapewd3jpdt"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "flower-field"
+					"itemUid": "cuao33ea066g975ysq1nu9fe"
 				},
 				"action": "use",
 				"outcome": {
@@ -312,7 +311,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flowers",
+											"itemUid": "wty33h4avbqmgblvysq7e3ql",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -331,7 +330,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "goose"
+					"itemUid": "tgz6nz84fwhbcyq5k02qcx2i"
 				},
 				"action": "use",
 				"outcome": {
@@ -345,7 +344,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "feather",
+											"itemUid": "qxqafymuxw7keyketjpn9cye",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -364,7 +363,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "chicken"
+					"itemUid": "i767otw53htcjcc2y9zrw6it"
 				},
 				"action": "use",
 				"outcome": {
@@ -378,7 +377,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "feather",
+											"itemUid": "qxqafymuxw7keyketjpn9cye",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -397,7 +396,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "tree"
+					"itemUid": "czmjliygl2qrfhjah60xo2me"
 				},
 				"action": "use",
 				"outcome": {
@@ -411,7 +410,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "leafs",
+											"itemUid": "zrl8i2n5f5a9ujjf8lujqdx4",
 											"quantity": {
 												"min": 2,
 												"max": 5
@@ -426,7 +425,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "trimmed-tree"
+				"result": "gwc1pmn13hdj0a7d166vp1gb"
 			}
 		],
 		"maxQueueSize": 1,

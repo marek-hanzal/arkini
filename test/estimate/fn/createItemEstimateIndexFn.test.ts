@@ -66,7 +66,7 @@ describe("createItemEstimateIndexFn", () => {
 					},
 				],
 			]),
-			itemIds: [
+			itemUids: [
 				"wood",
 				"target",
 				"water",
@@ -74,22 +74,22 @@ describe("createItemEstimateIndexFn", () => {
 		});
 
 		expect(
-			entries.map(({ demand, itemId }) => ({
+			entries.map(({ demand, itemUid }) => ({
 				demand,
-				itemId,
+				itemUid,
 			})),
 		).toEqual([
 			{
 				demand: 1,
-				itemId: "target",
+				itemUid: "target",
 			},
 			{
 				demand: 4,
-				itemId: "water",
+				itemUid: "water",
 			},
 			{
 				demand: 2,
-				itemId: "wood",
+				itemUid: "wood",
 			},
 		]);
 	});
@@ -99,20 +99,20 @@ describe("createItemEstimateIndexFn", () => {
 			[
 				"ä-item",
 				"z-item",
-			].map((itemId) => [
-				itemId,
-				completeFn(itemId, []),
+			].map((itemUid) => [
+				itemUid,
+				completeFn(itemUid, []),
 			]),
 		);
 
 		expect(
 			createItemEstimateIndexFn({
 				estimates,
-				itemIds: [
+				itemUids: [
 					"ä-item",
 					"z-item",
 				],
-			}).map(({ itemId }) => itemId),
+			}).map(({ itemUid }) => itemUid),
 		).toEqual([
 			"z-item",
 			"ä-item",

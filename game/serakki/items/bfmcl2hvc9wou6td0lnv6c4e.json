@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bfmcl2hvc9wou6td0lnv6c4e",
-		"id": "animal-feed-workshop",
 		"title": "Animal Feed Workshop",
 		"draft": false,
 		"ui": "default",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hay"
+								"itemUid": "bttupkw06zzxn8xuvb4d27uu"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sack-with-grain"
+								"itemUid": "g820g0sxzhyuon040x3j5qje"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-feed",
+											"itemUid": "e2pone4zse5ngt9nass0nzfy",
 											"quantity": {
 												"min": 1,
 												"max": 1

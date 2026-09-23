@@ -16,12 +16,12 @@ import {
 describe("main reconciliation / replacement visuals", () => {
 	it("keeps the current visual visible until a complete incoming slot can crossfade", () => {
 		const previous = createItem("runtime:producer", boardLocation, {
-			itemId: "producer:idle",
+			itemUid: "producer:idle",
 			revision: "revision:producer-idle",
 			sourceUrl: "resource:producer-idle",
 		});
 		const current = createItem(previous.id, boardLocation, {
-			itemId: "producer:running",
+			itemUid: "producer:running",
 			revision: "revision:producer-running",
 			running: true,
 			jobStatus: JobStatusEnumSchema.enum.Running,
@@ -43,7 +43,7 @@ describe("main reconciliation / replacement visuals", () => {
 				previous: {
 					artworkScale: 0.8,
 					compositeUrl: previous.compositeUrl,
-					itemId: previous.itemId,
+					itemUid: previous.itemUid,
 					sourceUrl: previous.sourceUrl,
 				},
 			},
@@ -135,7 +135,7 @@ describe("main reconciliation / replacement visuals", () => {
 				key: "2:0:replacement",
 				previous: {
 					artworkScale: 0.8,
-					itemId: first.itemId,
+					itemUid: first.itemUid,
 					sourceUrl: first.sourceUrl,
 				},
 			},
@@ -152,7 +152,7 @@ describe("main reconciliation / replacement visuals", () => {
 				key: "3:0:replacement",
 				previous: {
 					artworkScale: 0.8,
-					itemId: second.itemId,
+					itemUid: second.itemUid,
 					sourceUrl: second.sourceUrl,
 				},
 			},

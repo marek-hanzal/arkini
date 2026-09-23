@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ecihjakbzjlagfsrswt4cdji",
-		"id": "toilet",
 		"title": "Toilet",
 		"ui": "simple",
 		"description": "Universal bio remover",

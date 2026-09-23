@@ -8,7 +8,7 @@ import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const itemOutcome = {
 	type: "item",
-	itemId: "",
+	itemUid: "",
 	quantity: {
 		min: 1,
 		max: 1,
@@ -42,7 +42,7 @@ const query = {
 	distance: "far",
 	selector: {
 		type: "item",
-		itemId: "",
+		itemUid: "",
 	},
 } satisfies QuerySchema.Type;
 
@@ -71,7 +71,7 @@ export const DraftDefaults = {
 				distance: "close",
 				selector: {
 					type: "item",
-					itemId: "",
+					itemUid: "",
 				},
 			},
 		},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dhmd9wi0swh42400w73u3750",
-		"id": "glass-goblet-with-hot-chocolate",
 		"title": "Glass Goblet With Hot Chocolate",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "glass-goblet-spoiled",
+										"itemUid": "khhjiqer051bo8c6931ze935",
 										"quantity": {
 											"min": 1,
 											"max": 1

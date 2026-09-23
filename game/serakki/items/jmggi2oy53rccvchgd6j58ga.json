@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jmggi2oy53rccvchgd6j58ga",
-		"id": "british-shorthair-shorn",
 		"title": "British Shorthair Shorn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "british-shorthair",
+										"itemUid": "y0la7sb6dzzmf0581cel6hg0",
 										"quantity": {
 											"min": 1,
 											"max": 1

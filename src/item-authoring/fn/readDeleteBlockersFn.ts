@@ -11,19 +11,19 @@ export namespace readDeleteBlockersFn {
 
 	export interface Props {
 		readonly config: GameConfigSchema.Type;
-		readonly itemId: string;
+		readonly itemUid: string;
 	}
 }
 
 /** Finds references that would become invalid if one item disappeared. */
 export const readDeleteBlockersFn = ({
 	config,
-	itemId,
+	itemUid,
 }: readDeleteBlockersFn.Props): ReadonlyArray<readDeleteBlockersFn.Blocker> => {
 	const items = {
 		...config.items,
 	};
-	delete items[itemId];
+	delete items[itemUid];
 	const diagnostics = validateConfigReferencesFn({
 		config: {
 			...config,
@@ -37,11 +37,11 @@ export const readDeleteBlockersFn = ({
 		(diagnostic): ReadonlyArray<readDeleteBlockersFn.Blocker> =>
 			diagnostic.code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference &&
 			diagnostic.reference === DiagnosticRecordEntityEnumSchema.enum.Item &&
-			diagnostic.referenceId === itemId
+			diagnostic.referenceId === itemUid
 				? [
 						{
 							message: diagnostic.message.replace(
-								`missing item ${itemId}`,
+								`missing item ${itemUid}`,
 								"this item",
 							),
 							path: diagnostic.path,

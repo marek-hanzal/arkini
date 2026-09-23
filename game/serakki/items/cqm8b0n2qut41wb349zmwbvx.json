@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cqm8b0n2qut41wb349zmwbvx",
-		"id": "clay-vase-with-flowers",
 		"title": "Clay Vase With Flowers",
 		"ui": "simple",
 		"description": "It's nice. For a while",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-vase-with-flowers",
+										"itemUid": "xog8fv3y6so0rcfemho9hs80",
 										"quantity": {
 											"min": 1,
 											"max": 1

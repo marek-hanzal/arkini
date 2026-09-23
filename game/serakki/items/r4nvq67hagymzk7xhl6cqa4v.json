@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "r4nvq67hagymzk7xhl6cqa4v",
-		"id": "paper-pulp-bucket",
 		"title": "Paper Pulp Bucket",
 		"ui": "simple",
 		"draft": true,
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-paper-drying-rack"
+					"itemUid": "cl9so73ire9q7pa3vblqvi8g"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-bucket",
+											"itemUid": "i5fuhf30o5rwou8oydrm5v0b",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "wet-paper-drying-rack"
+				"result": "rjyyek1hl6tmdpu51qs9sb2t"
 			}
 		],
 		"maxQueueSize": 1,

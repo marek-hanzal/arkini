@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "o11xz4pk3e33wucuilh71ema",
-		"id": "grass-farm",
 		"title": "Grass Farm",
 		"draft": false,
 		"description": "Operates nearby grass fields and keeps their seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grass-field"
+								"itemUid": "bnkd4ndcnhsoge5e7s4uenm0"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cut-grass",
+											"itemUid": "o21yaxwjenux0a9ywkmx0rh9",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-grass-field",
+											"itemUid": "p6wks4iknyp8b8v5qxhilm1x",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grass-farm-blueprint",
+											"itemUid": "jh98fk50cuehudnol5gpzh4z",
 											"quantity": {
 												"min": 1,
 												"max": 1

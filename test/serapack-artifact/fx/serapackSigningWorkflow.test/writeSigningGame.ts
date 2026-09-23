@@ -74,7 +74,6 @@ export const writeSigningGame = async (root: string) => {
 				lines: [],
 
 				uid: "item",
-				id: "item",
 
 				title: "Item",
 				description: "Signing fixture item.",

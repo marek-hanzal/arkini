@@ -5,7 +5,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 const baseItem = ({ id }: { id: string }) => {
 	return {
 		uid: id,
-		id,
+
 		title: id,
 		description: id,
 		ui: "default" as const,
@@ -25,7 +25,7 @@ const existsWhen = (itemId: string) => {
 			distance: "far" as const,
 			selector: {
 				type: "item" as const,
-				itemId,
+				itemUid: itemId,
 			},
 		},
 	};
@@ -69,7 +69,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "water",
+									itemUid: "water",
 								},
 							},
 							quantity: {

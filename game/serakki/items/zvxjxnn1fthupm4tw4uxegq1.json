@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zvxjxnn1fthupm4tw4uxegq1",
-		"id": "wolf-in-sheeps-clothing",
 		"title": "Wolf In Sheeps Clothing",
 		"ui": "simple",
 		"draft": true,

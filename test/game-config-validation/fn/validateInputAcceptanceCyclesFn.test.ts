@@ -46,13 +46,13 @@ describe("validateInputAcceptanceCyclesFn", () => {
 			id: "item:a",
 			input: materials({
 				type: "item",
-				itemId: "item:a",
+				itemUid: "item:a",
 			}),
 		});
 
 		expect(
 			await cycleDiagnostics({
-				[item.id]: item,
+				[item.uid]: item,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -69,21 +69,21 @@ describe("validateInputAcceptanceCyclesFn", () => {
 			id: "item:a",
 			input: materials({
 				type: "item",
-				itemId: "item:b",
+				itemUid: "item:b",
 			}),
 		});
 		const b = createProducerItem({
 			id: "item:b",
 			input: materials({
 				type: "item",
-				itemId: "item:a",
+				itemUid: "item:a",
 			}),
 		});
 
 		expect(
 			await cycleDiagnostics({
-				[a.id]: a,
-				[b.id]: b,
+				[a.uid]: a,
+				[b.uid]: b,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -94,12 +94,12 @@ describe("validateInputAcceptanceCyclesFn", () => {
 				],
 				edges: expect.arrayContaining([
 					expect.objectContaining({
-						ownerItemId: "item:a",
-						acceptedItemId: "item:b",
+						ownerItemUid: "item:a",
+						acceptedItemUid: "item:b",
 					}),
 					expect.objectContaining({
-						ownerItemId: "item:b",
-						acceptedItemId: "item:a",
+						ownerItemUid: "item:b",
+						acceptedItemUid: "item:a",
 					}),
 				]),
 			}),
@@ -111,29 +111,29 @@ describe("validateInputAcceptanceCyclesFn", () => {
 			id: "item:a",
 			input: materials({
 				type: "item",
-				itemId: "item:b",
+				itemUid: "item:b",
 			}),
 		});
 		const b = createProducerItem({
 			id: "item:b",
 			input: materials({
 				type: "item",
-				itemId: "item:c",
+				itemUid: "item:c",
 			}),
 		});
 		const c = createProducerItem({
 			id: "item:c",
 			input: materials({
 				type: "item",
-				itemId: "item:a",
+				itemUid: "item:a",
 			}),
 		});
 
 		expect(
 			await cycleDiagnostics({
-				[a.id]: a,
-				[b.id]: b,
-				[c.id]: c,
+				[a.uid]: a,
+				[b.uid]: b,
+				[c.uid]: c,
 			}),
 		).toEqual([]);
 	});
@@ -143,23 +143,23 @@ describe("validateInputAcceptanceCyclesFn", () => {
 			id: "item:a",
 			input: materials({
 				type: "item",
-				itemId: "item:b",
+				itemUid: "item:b",
 			}),
 		});
 		const b = createProducerItem({
 			id: "item:b",
 			input: materials({
 				type: "item",
-				itemId: "item:c",
+				itemUid: "item:c",
 			}),
 		});
 		const c = createSimpleItem("item:c");
 
 		expect(
 			await cycleDiagnostics({
-				[a.id]: a,
-				[b.id]: b,
-				[c.id]: c,
+				[a.uid]: a,
+				[b.uid]: b,
+				[c.uid]: c,
 			}),
 		).toEqual([]);
 	});
@@ -169,14 +169,14 @@ describe("validateInputAcceptanceCyclesFn", () => {
 			id: "item:a",
 			input: materials({
 				type: "item",
-				itemId: "item:b",
+				itemUid: "item:b",
 			}),
 		});
 		const b = createProducerItem({
 			id: "item:b",
 			input: materials({
 				type: "item",
-				itemId: "item:a",
+				itemUid: "item:a",
 			}),
 		});
 		const result = await Effect.runPromise(
@@ -186,7 +186,7 @@ describe("validateInputAcceptanceCyclesFn", () => {
 					path: "/game/a.json",
 					value: {
 						items: {
-							[a.id]: a,
+							[a.uid]: a,
 						},
 					},
 				}),
@@ -194,7 +194,7 @@ describe("validateInputAcceptanceCyclesFn", () => {
 					path: "/game/b.json",
 					value: {
 						items: {
-							[b.id]: b,
+							[b.uid]: b,
 						},
 					},
 				}),

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f65ywbu3hbvt6027wrh4pr6l",
-		"id": "industrial-portal",
 		"title": "Industrial Portal",
 		"description": "Smoke, machinery, heat, and the comforting sound of progress damaging something.",
 		"ui": "simple",

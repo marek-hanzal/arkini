@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "k5r48n6qzhisc3rvpiko8yht",
-		"id": "boar-bristles",
 		"title": "Boar Bristles",
 		"ui": "simple",
 		"description": "Core item for making other things clean",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "trimmed-scrubbing-brush"
+					"itemUid": "g1w4g5ccovd4q91eyaano0tp"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "scrubbing-brush"
+				"result": "im6k8omuik7imr85cq0bc750"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "trimmed-dirty-scrubbing-brush"
+					"itemUid": "g6n0uojktw3jxzapewd3jpdt"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "scrubbing-brush"
+				"result": "im6k8omuik7imr85cq0bc750"
 			}
 		],
 		"maxQueueSize": 1,

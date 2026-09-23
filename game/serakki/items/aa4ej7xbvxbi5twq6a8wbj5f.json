@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aa4ej7xbvxbi5twq6a8wbj5f",
-		"id": "wet-quest",
 		"title": "Wet Quest",
 		"draft": false,
 		"description": "The contract is unreadable, but the paper is still perfectly recyclable.",
@@ -17,11 +16,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bucket-with-water"
+					"itemUid": "s9j877qispz12d8ry9h1d4wb"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "paper-pulp-bucket"
+				"result": "r4nvq67hagymzk7xhl6cqa4v"
 			}
 		],
 		"maxQueueSize": 1,

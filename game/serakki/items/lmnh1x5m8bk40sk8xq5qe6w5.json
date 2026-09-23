@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lmnh1x5m8bk40sk8xq5qe6w5",
-		"id": "rapeseed-field",
 		"title": "Rapeseed Field",
 		"draft": false,
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-rapeseed-field",
+										"itemUid": "c4szzk4tv05cdwfgu3hip9mq",
 										"quantity": {
 											"min": 1,
 											"max": 1

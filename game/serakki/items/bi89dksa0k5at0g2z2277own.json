@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bi89dksa0k5at0g2z2277own",
-		"id": "dye-workshop-washed",
 		"title": "Dye Workshop Washed",
 		"ui": "simple",
 		"description": "You washed it out",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "dye-workshop",
+										"itemUid": "tdk2m5cvrgw56s4do7tc2wu9",
 										"quantity": {
 											"min": 1,
 											"max": 1

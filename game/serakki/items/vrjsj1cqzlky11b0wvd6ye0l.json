@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vrjsj1cqzlky11b0wvd6ye0l",
-		"id": "lumer-camp",
 		"title": "Lumber camp",
 		"description": "A rough little operation for turning trees into a steady supply of wood and firewood. Not elegant, but neither is freezing.",
 		"ui": "default",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "tree"
+								"itemUid": "czmjliygl2qrfhjah60xo2me"
 							},
 							"distance": "close"
 						}
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wood---tier-1",
+											"itemUid": "kwkucgj71atfynrxw5sugzpe",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -73,7 +72,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "tree"
+										"itemUid": "czmjliygl2qrfhjah60xo2me"
 									},
 									"distance": "close"
 								},
@@ -100,7 +99,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -122,7 +121,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "firewood",
+											"itemUid": "rwgifjjoffgcix5149b6q6v1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -155,7 +154,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -177,7 +176,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wooden-sticks",
+											"itemUid": "dct4u1aaljeect6n4e425654",
 											"quantity": {
 												"min": 2,
 												"max": 2

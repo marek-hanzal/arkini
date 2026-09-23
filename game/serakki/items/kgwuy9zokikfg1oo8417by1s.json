@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kgwuy9zokikfg1oo8417by1s",
-		"id": "corruption",
 		"title": "Corruption",
 		"ui": "simple",
 		"artwork": {
@@ -15,29 +14,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "corrupted-faith-bear"
+				"result": "o1ro7ycrxhpdqqymi22q8p3b"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair-kitten"
+					"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "corrupted-british-shorthair-kitten"
+				"result": "qxhf92qz2l33xrlpcnfe4tyi"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "medicine-jar"
+					"itemUid": "gei0ts23utvtz6qx38cw2mpy"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "poison-jar"
+				"result": "m901w07a1x2ta0wbs4qa9pjd"
 			}
 		],
 		"clock": {
@@ -76,7 +75,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 2,
 												"max": 2

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "88bff6e2676f6c42f80c1c7c",
-		"id": "fertilized-cotton-field",
 		"title": "Fertilized Cotton Field",
 		"ui": "simple",
 		"description": "Ready for cotton seed.",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-cotton-field",
+										"itemUid": "c45534f7e4eb3faf3e39c8d1",
 										"quantity": {
 											"min": 1,
 											"max": 1

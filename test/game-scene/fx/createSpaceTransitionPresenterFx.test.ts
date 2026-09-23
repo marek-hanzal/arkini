@@ -26,7 +26,7 @@ const spaceTransition = (sequence: number, previousSpace: number, currentSpace: 
 		{
 			type: "item:unit-spent" as const,
 			itemId: `runtime:payer:${sequence}`,
-			canonicalItemId: "payer",
+			itemUid: "payer",
 			location: {
 				scope: "board" as const,
 				space: previousSpace,

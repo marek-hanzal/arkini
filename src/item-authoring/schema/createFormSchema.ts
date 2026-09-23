@@ -24,10 +24,10 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 };
 
 /** Adds project-local identity and selected-target validation to the canonical item form schema. */
-export const createFormSchema = (project: Pick<Project, "config">, itemUid: string) =>
+export const createFormSchema = (project: Pick<Project, "config">, _itemUid: string) =>
 	FormSchema.superRefine((item, context) => {
 		for (const entry of readItemOutcomeEntriesFn({
-			itemId: item.id,
+			itemUid: item.uid,
 			item,
 		})) {
 			for (const [setIndex, set] of entry.outcome.set.entries())
@@ -56,16 +56,6 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 						});
 					}
 		}
-		const existing = project.config.items[item.id];
-		if (existing !== undefined && existing.uid !== itemUid) {
-			context.addIssue({
-				code: "custom",
-				message: "This Item ID is already in use.",
-				path: [
-					"id",
-				],
-			});
-		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
 			if (merge.action === "spend" && item.units === undefined)
 				context.addIssue({
@@ -79,7 +69,7 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 				});
 			if (merge.effect !== "spend") continue;
 			const selectedItem =
-				merge.action === "space" ? item : project.config.items[merge.target.itemId];
+				merge.action === "space" ? item : project.config.items[merge.target.itemUid];
 			const target = selectedItem?.uid === item.uid ? item : selectedItem;
 			if (target === undefined || target.units !== undefined) continue;
 			context.addIssue({
@@ -111,7 +101,7 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 					continue;
 				}
 				if (input.units?.from !== "target") continue;
-				const selectedItem = project.config.items[input.query.selector.itemId];
+				const selectedItem = project.config.items[input.query.selector.itemUid];
 				const target = selectedItem?.uid === item.uid ? item : selectedItem;
 				if (target === undefined || target.units !== undefined) continue;
 				context.addIssue({
@@ -123,7 +113,7 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 						inputIndex,
 						"query",
 						"selector",
-						"itemId",
+						"itemUid",
 					],
 				});
 			}

@@ -5,20 +5,20 @@ import type { ItemLineEntrySchema } from "../schema/ItemLineEntrySchema";
 
 export namespace readItemLineEntriesFn {
 	export interface Props {
-		itemId: IdSchema.Type;
+		itemUid: IdSchema.Type;
 		item: ItemSchema.Type;
 	}
 }
 
 /** Reads every product line owned by one canonical item with stable authoring paths. */
-export const readItemLineEntriesFn = ({ itemId, item }: readItemLineEntriesFn.Props) =>
+export const readItemLineEntriesFn = ({ itemUid, item }: readItemLineEntriesFn.Props) =>
 	item.lines.map(
 		(line, index) =>
 			({
 				line,
 				path: [
 					"items",
-					itemId,
+					itemUid,
 					"lines",
 					index,
 				],

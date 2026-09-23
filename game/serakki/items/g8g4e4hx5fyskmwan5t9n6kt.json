@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "g8g4e4hx5fyskmwan5t9n6kt",
-		"id": "explosive-egg",
 		"title": "Explosive Egg",
 		"ui": "simple",
 		"draft": true,

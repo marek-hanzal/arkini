@@ -8,7 +8,7 @@ import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestC
 it("keeps exact drop positions including repeated identities in output sets", () => {
 	const drop = {
 		type: "item" as const,
-		itemId: "result",
+		itemUid: "result",
 		placement: "drop" as const,
 		quantity: {
 			min: 1,
@@ -22,7 +22,7 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 			effect: "keep",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 			outcome: {
 				set: [
@@ -103,13 +103,13 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 	}));
 	expect(readItemConnectionFactsFn(config, "source", "produces")).toEqual([
 		{
-			itemId: "result",
+			itemUid: "result",
 			origins,
 		},
 	]);
 	expect(readItemConnectionFactsFn(config, "result", "produced-by")).toEqual([
 		{
-			itemId: "source",
+			itemUid: "source",
 			origins,
 		},
 	]);
@@ -122,7 +122,7 @@ it("retains input and condition positions without turning absence-only guards in
 			effect: "keep",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 		},
 	});
@@ -130,7 +130,7 @@ it("retains input and condition positions without turning absence-only guards in
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
-			itemId: "target",
+			itemUid: "target",
 		},
 	};
 	const exists = {
@@ -249,13 +249,13 @@ it("retains input and condition positions without turning absence-only guards in
 	];
 	expect(readItemConnectionFactsFn(config, "result", "inputs")).toEqual([
 		{
-			itemId: "target",
+			itemUid: "target",
 			origins,
 		},
 	]);
 	expect(
 		readItemConnectionFactsFn(config, "target", "required-by").find(
-			(connection) => connection.itemId === "result",
+			(connection) => connection.itemUid === "result",
 		)?.origins,
 	).toEqual(origins);
 });
@@ -267,10 +267,10 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 			{
 				type: "exists" as const,
 				query: {
-					distance: "universe",
+					distance: "far",
 					selector: {
 						type: "item" as const,
-						itemId: "target",
+						itemUid: "target",
 					},
 				},
 			},
@@ -282,7 +282,7 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 			effect: "keep",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 			outcome: {
 				set: [
@@ -297,7 +297,7 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 								outcome: [
 									{
 										type: "item",
-										itemId: "result",
+										itemUid: "result",
 										quantity: {
 											min: 1,
 											max: 1,
@@ -316,7 +316,7 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 		},
 	});
 	const connection = readItemConnectionFactsFn(config, "source", "inputs").find(
-		({ itemId }) => itemId === "target",
+		({ itemUid }) => itemUid === "target",
 	);
 	expect(connection?.origins.filter(({ role }) => role === "condition")).toEqual([
 		{

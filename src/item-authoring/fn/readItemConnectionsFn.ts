@@ -5,12 +5,12 @@ import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
 /** Projects one canonical authored connection view to sorted items. */
 export const readItemConnectionsFn = (
 	config: GameConfigSchema.Type,
-	itemId: string,
+	itemUid: string,
 	filter: ItemConnectionFilter,
 ) =>
-	readItemConnectionFactsFn(config, itemId, filter)
-		.flatMap(({ itemId: connectionItemId, origins }) => {
-			const item = config.items[connectionItemId];
+	readItemConnectionFactsFn(config, itemUid, filter)
+		.flatMap(({ itemUid: connectionItemUid, origins }) => {
+			const item = config.items[connectionItemUid];
 			return item === undefined
 				? []
 				: [
@@ -23,5 +23,5 @@ export const readItemConnectionsFn = (
 		.sort(
 			(left, right) =>
 				left.item.title.localeCompare(right.item.title) ||
-				left.item.id.localeCompare(right.item.id),
+				left.item.uid.localeCompare(right.item.uid),
 		);

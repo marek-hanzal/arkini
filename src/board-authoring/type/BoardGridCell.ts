@@ -1,5 +1,5 @@
 export interface BoardGridCell {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly x: number;
 	readonly y: number;
 }

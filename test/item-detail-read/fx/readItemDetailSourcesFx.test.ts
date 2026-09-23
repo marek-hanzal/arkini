@@ -61,18 +61,18 @@ describe("readItemDetailSourcesFx", () => {
 			readSources(
 				{
 					kind: "definition",
-					itemId: "target",
+					itemUid: "target",
 				},
 				{
 					...runtime,
-					items: runtime.items.filter(({ item }) => item.id !== "target"),
+					items: runtime.items.filter(({ item }) => item.uid !== "target"),
 				},
 			),
 		);
 
 		expect(result).toMatchObject({
-			itemId: "target",
-			targetDefinitionItemId: "target",
+			itemUid: "target",
+			targetItemUid: "target",
 		});
 		expect(result.source.map(({ ownerItemId }) => ownerItemId)).toEqual([
 			"runtime:beta:current",
@@ -216,11 +216,11 @@ describe("readItemDetailSourcesFx", () => {
 			readSources(
 				{
 					kind: "definition",
-					itemId: "target",
+					itemUid: "target",
 				},
 				{
 					...runtime,
-					items: runtime.items.filter(({ item }) => item.id === "target"),
+					items: runtime.items.filter(({ item }) => item.uid === "target"),
 				},
 			),
 		);
@@ -245,7 +245,7 @@ describe("readItemDetailSourcesFx", () => {
 			readSources(
 				{
 					kind: "definition",
-					itemId: "product",
+					itemUid: "product",
 				},
 				{
 					...runtime,
@@ -259,7 +259,7 @@ describe("readItemDetailSourcesFx", () => {
 		expect(result.source).toMatchObject([
 			{
 				ownerItemId: blueprint.id,
-				ownerDefinitionItemId: "blueprint",
+				ownerItemUid: "blueprint",
 				line: [
 					{
 						lineId: "line:blueprint",
@@ -286,7 +286,7 @@ describe("readItemDetailSourcesFx", () => {
 			readSources(
 				{
 					kind: "definition",
-					itemId: "product",
+					itemUid: "product",
 				},
 				{
 					...runtime,
@@ -299,12 +299,12 @@ describe("readItemDetailSourcesFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			itemId: "product",
-			targetDefinitionItemId: "blueprint",
+			itemUid: "product",
+			targetItemUid: "blueprint",
 			source: [
 				{
 					ownerItemId: "runtime:town-hall",
-					ownerDefinitionItemId: "town-hall",
+					ownerItemUid: "town-hall",
 					line: [
 						{
 							lineId: "line:town-hall:blueprint",
@@ -319,7 +319,7 @@ describe("readItemDetailSourcesFx", () => {
 		expect(
 			readSources({
 				kind: "definition",
-				itemId: "definition:missing",
+				itemUid: "definition:missing",
 			}),
 		).toEqual({
 			kind: "unavailable",

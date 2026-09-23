@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "o9k395imr6ghqfd3a58ikir5",
-		"id": "key-t4",
 		"title": "Key - Tier 4",
 		"ui": "simple",
 		"description": "You want this one.",

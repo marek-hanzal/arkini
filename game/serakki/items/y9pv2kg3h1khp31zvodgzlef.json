@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y9pv2kg3h1khp31zvodgzlef",
-		"id": "well-with-wine",
 		"title": "Well With Wine",
 		"ui": "simple",
 		"description": "Wine for free",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1

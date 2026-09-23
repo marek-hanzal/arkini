@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ftnfkoxukanqeu8tjkah1z8k",
-		"id": "townhall-t1-supply-chest",
 		"title": "Townhall I Supply Chest",
 		"draft": true,
 		"description": "A small welcome package for the next stage of civilization. Most of its contents will make more sense slightly later, which is half the point.",
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "townhall-t1-supply-chest"
+								"itemUid": "ftnfkoxukanqeu8tjkah1z8k"
 							},
 							"distance": "self"
 						}
@@ -55,7 +54,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "construction-set-t1",
+											"itemUid": "cbnh8mko4kpc9lkfwz6h6jx5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -65,7 +64,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "grain",
+											"itemUid": "hh7v010v56myrya2gbysrru3",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -75,7 +74,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "book-t1",
+											"itemUid": "ooiwjpnx0wgz8wnhvgp342hj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -85,7 +84,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "knowledge-t1",
+											"itemUid": "inkvbfkqv4zu96xz2eiiu4dw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -95,7 +94,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "labor-t1",
+											"itemUid": "ejcs57zv68bas7jmizm7286p",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -105,7 +104,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-cauldron",
+											"itemUid": "oj9o0nu1zp9g79f1jqx11g9l",
 											"quantity": {
 												"min": 1,
 												"max": 1

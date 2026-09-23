@@ -39,7 +39,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 					expect.arrayContaining([
 						expect.objectContaining({
 							type: "job:aborted",
-							canonicalItemId: owner.item.id,
+							itemUid: owner.item.uid,
 							jobId: "job",
 							ownerItemId: owner.id,
 							reason: "owner-removed",
@@ -133,7 +133,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 				]);
 				expect(result.events.filter((event) => event.type === "item:discarded")).toEqual([
 					expect.objectContaining({
-						canonicalItemId: "water",
+						itemUid: "water",
 						quantity: 1,
 						source: "buffer",
 						reason: "board:full",

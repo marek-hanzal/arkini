@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "sf9cu8zd7zs8tn4j9ozq4vge",
-		"id": "sugar-beet-farm-blueprint",
 		"title": "Sugar Beet Farm Blueprint",
 		"draft": false,
 		"description": "Plans for Sugar Beet Farm.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sugar-beet-farm-blueprint"
+								"itemUid": "sf9cu8zd7zs8tn4j9ozq4vge"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -79,7 +78,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemUid": "ejcs57zv68bas7jmizm7286p"
 							},
 							"distance": "far"
 						},
@@ -101,7 +100,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sugar-beet-farm",
+											"itemUid": "qf0pynrjmeljpim50y9ufqf9",
 											"quantity": {
 												"min": 1,
 												"max": 1

@@ -9,7 +9,6 @@ const item = {
 	lines: [],
 
 	uid: "tree",
-	id: "tree",
 	title: "Tree",
 	description: "A living tree.",
 	artwork: {
@@ -23,7 +22,6 @@ const item = {
 const stone = {
 	...item,
 	uid: "stone",
-	id: "stone",
 	title: "Stone",
 } satisfies ItemSchema.Type;
 
@@ -32,7 +30,7 @@ describe("selectItemsFn", () => {
 		const selected = selectItemsFn({
 			selector: {
 				type: "item",
-				itemId: "tree",
+				itemUid: "tree",
 			},
 			items: [
 				item,

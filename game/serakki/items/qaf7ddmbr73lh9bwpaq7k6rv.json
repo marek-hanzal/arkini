@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qaf7ddmbr73lh9bwpaq7k6rv",
-		"id": "dye-seed",
 		"title": "Dye Seed",
 		"draft": false,
 		"description": "Loose dye plant seed. Plant it or pack it into a sack before it spoils.",
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-dye-seed"
+				"result": "p8p44vaadugd1238urrxcoyi"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-dye-field"
+					"itemUid": "ftogp74ztyaxvio5td1hbcvq"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "dye-field"
+				"result": "ceh7j608ofnvzynccgq5nwmq"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-dye-seed",
+										"itemUid": "reznm2a8z7wroju7vkqkqwn9",
 										"quantity": {
 											"min": 1,
 											"max": 1

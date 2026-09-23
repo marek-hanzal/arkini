@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qs41k4md44ei5bybbuq74dec",
-		"id": "hungry-goose",
 		"title": "Hungry Goose",
 		"draft": false,
 		"ui": "simple",
@@ -60,7 +59,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-goose"
+								"itemUid": "qs41k4md44ei5bybbuq74dec"
 							},
 							"distance": "self"
 						}
@@ -77,7 +76,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-goose",
+											"itemUid": "qs41k4md44ei5bybbuq74dec",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-goose"
+								"itemUid": "qs41k4md44ei5bybbuq74dec"
 							},
 							"distance": "self"
 						}
@@ -130,7 +129,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-goose",
+											"itemUid": "twqt3bjq5q1npnvan3vnkx2u",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -167,7 +166,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-goose"
+								"itemUid": "qs41k4md44ei5bybbuq74dec"
 							},
 							"distance": "self"
 						}
@@ -184,7 +183,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-goose",
+											"itemUid": "twqt3bjq5q1npnvan3vnkx2u",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -205,7 +204,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -237,7 +236,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-goose"
+								"itemUid": "qs41k4md44ei5bybbuq74dec"
 							},
 							"distance": "self"
 						}
@@ -254,7 +253,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-goose",
+											"itemUid": "twqt3bjq5q1npnvan3vnkx2u",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -275,7 +274,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},
@@ -303,7 +302,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "cut-grass"
+								"itemUid": "o21yaxwjenux0a9ywkmx0rh9"
 							},
 							"distance": "near-close"
 						},
@@ -322,7 +321,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hungry-goose"
+								"itemUid": "qs41k4md44ei5bybbuq74dec"
 							},
 							"distance": "self"
 						}
@@ -339,7 +338,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "goose",
+											"itemUid": "tgz6nz84fwhbcyq5k02qcx2i",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -360,7 +359,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "cut-grass"
+										"itemUid": "o21yaxwjenux0a9ywkmx0rh9"
 									},
 									"distance": "near-close"
 								},

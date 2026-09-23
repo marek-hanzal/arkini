@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cmx82bxkksin9kijenmoint2",
-		"id": "recovering-fawn",
 		"title": "Recovering Fawn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "fawn",
+										"itemUid": "aalsr85hfkjpg477l9h99xxb",
 										"quantity": {
 											"min": 1,
 											"max": 1

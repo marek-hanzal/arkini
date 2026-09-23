@@ -47,9 +47,9 @@ export const resolveMergeRuleFx = Effect.fn("resolveMergeRuleFx")(function* ({
 	return yield* Effect.fail(
 		new MergeRuleNotFoundError({
 			sourceItemId: source.id,
-			sourceCanonicalItemId: source.item.id,
+			sourceItemUid: source.item.uid,
 			targetItemId: target.id,
-			targetCanonicalItemId: target.item.id,
+			targetItemUid: target.item.uid,
 		}),
 	);
 });

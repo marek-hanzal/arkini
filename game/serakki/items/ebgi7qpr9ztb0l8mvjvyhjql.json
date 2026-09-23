@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ebgi7qpr9ztb0l8mvjvyhjql",
-		"id": "glass-goblet-with-wine",
 		"title": "Glass Goblet with Wine",
 		"ui": "simple",
 		"description": "Get drunk. Don't tell mom.",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "glass-goblet",
+											"itemUid": "fvwo0tr5mxt3lnw5mjz1x77h",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "wine-toilet"
+				"result": "nyzirc2a7v6tlaied9y0h0o4"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bed-t1"
+					"itemUid": "ppvb7bkeybasw9j45yv9zk6n"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "glass-goblet",
+											"itemUid": "fvwo0tr5mxt3lnw5mjz1x77h",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "bed-wine"
+				"result": "fbj07pw11dg44pnvdqwgm1dw"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"outcome": {
@@ -98,7 +97,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "glass-goblet",
+											"itemUid": "fvwo0tr5mxt3lnw5mjz1x77h",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "sack-with-wine"
+				"result": "nb5foeefs8btay03ip0pi1wp"
 			}
 		],
 		"clock": {
@@ -131,7 +130,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "glass-goblet-spoiled",
+										"itemUid": "khhjiqer051bo8c6931ze935",
 										"quantity": {
 											"min": 1,
 											"max": 1

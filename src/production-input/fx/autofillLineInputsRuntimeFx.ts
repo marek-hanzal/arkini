@@ -121,7 +121,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		events.push({
 			type: GameEventEnumSchema.enum.LineInputAutofillStarted,
 			ownerItemId,
-			canonicalItemId: owner.item.id,
+			itemUid: owner.item.uid,
 			lineId,
 			scheduledQuantity,
 		});

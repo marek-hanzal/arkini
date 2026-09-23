@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "r2y0wgdu2zxdboof3lqs4bg0",
-		"id": "sheep-pen",
 		"title": "Sheep Pen",
 		"draft": false,
 		"description": "A populated enclosure holding animals that can be released one at a time.",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-sheep-pen",
+										"itemUid": "mnlaqzcefea2pashxwbqvq6e",
 										"quantity": {
 											"min": 1,
 											"max": 1

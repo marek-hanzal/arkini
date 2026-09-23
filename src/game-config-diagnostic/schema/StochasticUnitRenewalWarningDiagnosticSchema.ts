@@ -15,7 +15,7 @@ export const StochasticUnitRenewalWarningDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Warning",
 		]),
-		itemId: IdSchema,
+		itemUid: IdSchema,
 	})
 	.strict()
 	.meta({

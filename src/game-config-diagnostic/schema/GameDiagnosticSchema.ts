@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { ConfigSchemaDiagnosticSchema } from "./ConfigSchemaDiagnosticSchema";
-import { DuplicateItemUidDiagnosticSchema } from "./DuplicateItemUidDiagnosticSchema";
 import { DuplicateLineIdDiagnosticSchema } from "./DuplicateLineIdDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./DuplicateProviderDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./UnusedResourceDiagnosticSchema";
@@ -12,7 +11,7 @@ import { DuplicateRecordDiagnosticSchema } from "./DuplicateRecordDiagnosticSche
 import { InputAcceptanceCycleDiagnosticSchema } from "./InputAcceptanceCycleDiagnosticSchema";
 import { InvalidInputUnitsDiagnosticSchema } from "./InvalidInputUnitsDiagnosticSchema";
 import { InvalidMergeDiagnosticSchema } from "./InvalidMergeDiagnosticSchema";
-import { KeyIdMismatchDiagnosticSchema } from "./KeyIdMismatchDiagnosticSchema";
+import { KeyUidMismatchDiagnosticSchema } from "./KeyUidMismatchDiagnosticSchema";
 import { MissingUnitRenewalWarningDiagnosticSchema } from "./MissingUnitRenewalWarningDiagnosticSchema";
 import { StochasticUnitRenewalWarningDiagnosticSchema } from "./StochasticUnitRenewalWarningDiagnosticSchema";
 import { MissingReferenceDiagnosticSchema } from "./MissingReferenceDiagnosticSchema";
@@ -32,7 +31,7 @@ export const GameDiagnosticSchema = z
 		UnusedResourceDiagnosticSchema,
 		SchemaReferenceConflictDiagnosticSchema,
 		ConfigSchemaDiagnosticSchema,
-		KeyIdMismatchDiagnosticSchema,
+		KeyUidMismatchDiagnosticSchema,
 		MissingReferenceDiagnosticSchema,
 		InputAcceptanceCycleDiagnosticSchema,
 		InvalidInputUnitsDiagnosticSchema,
@@ -42,7 +41,6 @@ export const GameDiagnosticSchema = z
 		StartInvalidDiagnosticSchema,
 		SourceJsonDiagnosticSchema,
 		SourceSchemaDiagnosticSchema,
-		DuplicateItemUidDiagnosticSchema,
 		DuplicateLineIdDiagnosticSchema,
 		MultipleLineSelectionsDiagnosticSchema,
 	])

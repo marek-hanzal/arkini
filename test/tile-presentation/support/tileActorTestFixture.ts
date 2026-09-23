@@ -3,7 +3,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const itemBase = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 });
@@ -14,7 +14,7 @@ const materialInput = (quantity: number) => ({
 		distance: "near",
 		selector: {
 			type: "item",
-			itemId: "material",
+			itemUid: "material",
 		},
 	},
 	quantity: {

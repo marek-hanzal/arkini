@@ -43,7 +43,7 @@ describe("readEstimateTextFn", () => {
 		expect(text).toContain("View: incomplete");
 		expect(text).toContain("Query: unused");
 		expect(text).toContain("Matched items: 1");
-		expect(text).toContain("- Unused\n  ID: unused");
+		expect(text).toContain("- Unused\n  UID: unused");
 		expect(text).toContain("Status: unreachable\n  Estimate: No path");
 	});
 });

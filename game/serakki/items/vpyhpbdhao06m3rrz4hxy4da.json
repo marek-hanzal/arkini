@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vpyhpbdhao06m3rrz4hxy4da",
-		"id": "popcorn",
 		"title": "Popcorn",
 		"ui": "simple",
 		"draft": true,
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-popcorn"
+				"result": "qgj1wz97xovk16cosnbq3mjx"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-popcorn",
+										"itemUid": "t4k0262ytjcke16i1ap3y0we",
 										"quantity": {
 											"min": 1,
 											"max": 1

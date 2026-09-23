@@ -25,7 +25,6 @@ import { useFormController } from "~/item-authoring/ui/useFormController";
 export const FormSession = ({
 	children,
 	defaultDraft,
-	defaultItemId,
 	defaultTitle,
 	enableCapability,
 	initialItem,
@@ -43,7 +42,6 @@ export const FormSession = ({
 	sectionId,
 }: PropsWithChildren<{
 	readonly defaultDraft?: boolean;
-	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
 	readonly initialItem: ItemSchema.Type;
@@ -71,7 +69,6 @@ export const FormSession = ({
 		sections: readSectionsFn("form"),
 		search: {
 			defaultDraft,
-			defaultItemId,
 			defaultTitle,
 			create,
 			resourceId,
@@ -92,11 +89,6 @@ export const FormSession = ({
 						? {}
 						: {
 								defaultDraft,
-							}),
-					...(defaultItemId === undefined
-						? {}
-						: {
-								defaultItemId,
 							}),
 					...(defaultTitle === undefined
 						? {}
@@ -122,7 +114,6 @@ export const FormSession = ({
 			}),
 		[
 			defaultDraft,
-			defaultItemId,
 			defaultTitle,
 			initialItem.uid,
 			create,
@@ -266,7 +257,7 @@ export const FormSession = ({
 									resourceIds={readCanonicalItemArtworkFn(artwork).default}
 									title={
 										title.trim() ||
-										(isNew ? translator.textFn("New item") : initialItem.id)
+										(isNew ? translator.textFn("New item") : initialItem.uid)
 									}
 								/>
 							)}
@@ -288,7 +279,6 @@ export const FormSession = ({
 							{sections.map((candidate) => (
 								<SectionLink
 									defaultDraft={defaultDraft}
-									defaultItemId={defaultItemId}
 									defaultTitle={defaultTitle}
 									key={candidate.id}
 									create={create}

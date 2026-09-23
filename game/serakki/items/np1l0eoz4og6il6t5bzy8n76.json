@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "np1l0eoz4og6il6t5bzy8n76",
-		"id": "spoiled-rum-barrel",
 		"title": "Spoiled Rum Barrel",
 		"ui": "simple",
 		"description": "Ages ago, it was a nice barrel",

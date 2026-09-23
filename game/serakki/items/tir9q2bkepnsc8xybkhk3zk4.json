@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tir9q2bkepnsc8xybkhk3zk4",
-		"id": "spoiled-vegetable-crate",
 		"title": "Spoiled Vegetable Crate",
 		"ui": "simple",
 		"description": "Not so healthy anymore",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ome444b3wwfhiuq8ec7aaa1d",
-		"id": "serakki-banknote",
 		"title": "Serakki Banknote",
 		"draft": true,
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sad-banknote-in-sack"
+				"result": "igsyhmzbx8s6kmrwjvzk05uk"
 			}
 		],
 		"maxQueueSize": 1,

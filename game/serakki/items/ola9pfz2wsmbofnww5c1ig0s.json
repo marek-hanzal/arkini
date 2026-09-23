@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ola9pfz2wsmbofnww5c1ig0s",
-		"id": "clay-bowl-with-chopped-fruit",
 		"title": "Clay Bowl With Chopped Fruit",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-bowl",
+										"itemUid": "c3vesqhj22ratn3fr8thfsax",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "oohijxpd9l43544ki7h6koaf",
-		"id": "explorer",
 		"title": "Explorer",
 		"description": "Point them at a nearby forest and, eventually, something interesting will come back. Sometimes it has teeth.",
 		"ui": "default",
@@ -41,7 +40,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "fawn",
+											"itemUid": "aalsr85hfkjpg477l9h99xxb",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -63,7 +62,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wild-boar",
+											"itemUid": "s2nit67s0y8655wk3pvom2qo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -85,7 +84,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wolf",
+											"itemUid": "lfxtap8427k9e4nn6uwjgxyo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -107,7 +106,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bear",
+											"itemUid": "lbyiwjest0kicpb3c1w5pen9",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -129,7 +128,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "forest"
+										"itemUid": "wqoijk2kx2c313gw99g507iw"
 									},
 									"distance": "close"
 								},

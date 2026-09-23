@@ -20,11 +20,11 @@ vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", async () => {
 		useEditorItemSearchOptions: () => ({
 			items,
 			options: Object.values(items).map((item) => ({
-				id: item.id,
+				id: item.uid,
 				label: item.title,
-				meta: item.id,
+				meta: item.uid,
 				terms: [
-					item.id,
+					item.uid,
 					item.title,
 				],
 			})),
@@ -51,7 +51,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => void }) => {
+const PickerHarness = ({ onSelect }: { readonly onSelect: (itemUid: string) => void }) => {
 	const [open, setOpen] = useState(false);
 	return (
 		<>
@@ -73,7 +73,7 @@ const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => vo
 };
 
 const renderPicker = async (
-	onSelect: (itemId: string) => void,
+	onSelect: (itemUid: string) => void,
 	props?: Omit<Parameters<typeof PickerHarness>[0], "onSelect">,
 ) => {
 	const container = document.createElement("div");
@@ -110,8 +110,8 @@ describe("BoardItemPicker", () => {
 		if (search === null) throw new Error("Expected Spotlight search input.");
 		expect(document.activeElement).toBe(search);
 		expect(
-			Array.from(container.querySelectorAll<HTMLButtonElement>("button[data-item-id]"))
-				.map((option) => option.dataset.itemId)
+			Array.from(container.querySelectorAll<HTMLButtonElement>("button[data-item-uid]"))
+				.map((option) => option.dataset.itemUid)
 				.sort(),
 		).toEqual([
 			"lens",
@@ -119,7 +119,7 @@ describe("BoardItemPicker", () => {
 			"tree",
 		]);
 
-		const lens = container.querySelector<HTMLButtonElement>('button[data-item-id="lens"]');
+		const lens = container.querySelector<HTMLButtonElement>('button[data-item-uid="lens"]');
 		if (lens === null) throw new Error("Expected admitted lens option.");
 		await act(async () => lens.click());
 

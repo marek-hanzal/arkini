@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "il5apu6wibw3i27yqdp0uwi6",
-		"id": "farmers-market-blueprint",
 		"title": "Farmers Market Blueprint",
 		"draft": false,
 		"description": "Plans for a Farmers Market and its suspiciously enthusiastic paperwork.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "farmers-market-blueprint"
+								"itemUid": "il5apu6wibw3i27yqdp0uwi6"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -79,7 +78,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemUid": "ejcs57zv68bas7jmizm7286p"
 							},
 							"distance": "far"
 						},
@@ -101,7 +100,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "farmers-market",
+											"itemUid": "akdfqjm4paxik6tsi93zurih",
 											"quantity": {
 												"min": 1,
 												"max": 1

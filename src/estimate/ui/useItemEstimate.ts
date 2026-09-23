@@ -26,7 +26,7 @@ const sameSnapshotFn = (left: ItemEstimateSnapshot | undefined, right: ItemEstim
 	left?.projectId === right.projectId && left.revision === right.revision;
 
 /** Reads a cached estimate or requests one from the renderer-owned estimate authority. */
-export const useItemEstimate = (project: Project, itemId: string): ItemEstimateState => {
+export const useItemEstimate = (project: Project, itemUid: string): ItemEstimateState => {
 	const snapshot = useItemEstimateEntrySnapshot(project);
 	const [state, requestEstimateFn] = useAtom(ItemEstimateCacheAtom);
 
@@ -46,7 +46,7 @@ export const useItemEstimate = (project: Project, itemId: string): ItemEstimateS
 			message: state.message ?? "Estimate calculation failed.",
 			status: "error",
 		};
-	const estimate = state.estimates.get(itemId);
+	const estimate = state.estimates.get(itemUid);
 	if (estimate !== undefined)
 		return {
 			config: snapshot.config,
@@ -55,7 +55,7 @@ export const useItemEstimate = (project: Project, itemId: string): ItemEstimateS
 		};
 	if (state.status === "ready")
 		return {
-			message: `The estimate batch did not return ${itemId}.`,
+			message: `The estimate batch did not return ${itemUid}.`,
 			status: "error",
 		};
 	return {

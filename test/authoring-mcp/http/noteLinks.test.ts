@@ -41,8 +41,7 @@ describe("editor MCP note item links", () => {
 						...editorTestPayload.config.items,
 						clay: {
 							...editorTestPayload.config.items.water,
-							uid: "clay-uid",
-							id: "clay",
+							uid: "clay",
 							title: "Potter's clay",
 						},
 					},
@@ -61,9 +60,6 @@ describe("editor MCP note item links", () => {
 			[
 				"water",
 				"water",
-			],
-			[
-				"clay",
 			],
 		]) {
 			const result = await client.callTool({
@@ -86,7 +82,7 @@ describe("editor MCP note item links", () => {
 				resourceIds: [],
 				itemUids: [
 					"water",
-					"clay-uid",
+					"clay",
 				],
 			},
 		});
@@ -103,7 +99,7 @@ describe("editor MCP note item links", () => {
 		);
 		for (const itemUid of [
 			"water",
-			"clay-uid",
+			"clay",
 		]) {
 			const result = readTextFn(
 				await client.callTool({
@@ -117,7 +113,7 @@ describe("editor MCP note item links", () => {
 			);
 			expect(result).toContain("Matched notes: 1");
 			expect(result).toContain(`- ${note.noteId}`);
-			expect(result).toContain('"uid":"clay-uid","id":"clay","title":"Potter\'s clay"');
+			expect(result).toContain('"uid":"clay","title":"Potter\'s clay"');
 		}
 		const global = readTextFn(
 			await client.callTool({
@@ -140,8 +136,8 @@ describe("editor MCP note item links", () => {
 		const renamed = await client.callTool({
 			name: "rename_item",
 			arguments: {
-				itemId: "clay",
-				id: "potters-clay",
+				itemUid: "clay",
+				title: "Potters clay",
 				revision: project.revision,
 			},
 		});
@@ -162,13 +158,11 @@ describe("editor MCP note item links", () => {
 			linkedItems: [
 				{
 					uid: "water",
-					id: "water",
 					title: "Water",
 				},
 				{
-					uid: "clay-uid",
-					id: "potters-clay",
-					title: "Potter's clay",
+					uid: "clay",
+					title: "Potters clay",
 				},
 			],
 		});
@@ -194,7 +188,7 @@ describe("editor MCP note item links", () => {
 				expectedUpdatedAtMs: note.updatedAtMs,
 				resourceIds: [],
 				itemUids: [
-					"clay-uid",
+					"clay",
 				],
 			},
 		});
@@ -206,7 +200,7 @@ describe("editor MCP note item links", () => {
 			...note,
 			resourceIds: [],
 			itemUids: [
-				"clay-uid",
+				"clay",
 			],
 			updatedAtMs: expect.any(Number),
 		});
@@ -239,7 +233,7 @@ describe("editor MCP note item links", () => {
 		const deleted = await client.callTool({
 			name: "delete_item",
 			arguments: {
-				itemId: "potters-clay",
+				itemUid: "clay",
 				revision: current.revision,
 			},
 		});

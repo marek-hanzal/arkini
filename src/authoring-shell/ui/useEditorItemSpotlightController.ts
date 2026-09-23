@@ -17,7 +17,7 @@ export namespace useEditorItemSpotlightController {
 		readonly items: GameConfigSchema.Type["items"];
 		readonly open: boolean;
 		readonly options: ReadonlyArray<EditorSearchOption>;
-		readonly selectItemFn: (itemId: string) => void;
+		readonly selectItemFn: (itemUid: string) => void;
 	}
 }
 
@@ -30,8 +30,8 @@ export const useEditorItemSpotlightController = ({
 	const { items, options } = useEditorItemSearchOptions();
 	const [open, setOpenFn] = useState(false);
 	const closeFn = () => setOpenFn(false);
-	const selectItemFn = (itemId: string) => {
-		const item = items[itemId];
+	const selectItemFn = (itemUid: string) => {
+		const item = items[itemUid];
 		if (item === undefined) return;
 		closeFn();
 		void router.navigate({

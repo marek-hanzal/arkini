@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qzwbztaqvjk8uxqc8vhi38ql",
-		"id": "school-t2",
 		"title": "School - Tier 2",
 		"draft": false,
 		"description": "An advanced school that turns experienced labor and established knowledge into Tier 2 knowledge.",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t2"
+								"itemUid": "dgvhgu1xkv6m4igfdb2wnwxh"
 							},
 							"distance": "far"
 						},
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -61,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -83,7 +82,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "knowledge-t2",
+											"itemUid": "yjpg011j6ltn534wgnbidtvj",
 											"quantity": {
 												"min": 1,
 												"max": 1

@@ -19,7 +19,7 @@ import {
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
-const spentUnits = (itemId: string, cost = 1) => ({
+const spentUnits = (itemUid: string, cost = 1) => ({
 	units: {
 		cost,
 		from: "target" as const,
@@ -27,7 +27,7 @@ const spentUnits = (itemId: string, cost = 1) => ({
 	query: {
 		distance: "close" as const,
 		selector: {
-			itemId,
+			itemUid,
 			type: "item" as const,
 		},
 	},
@@ -77,7 +77,7 @@ describe("createAcquisitionGraphFn", () => {
 						amount: 3,
 						outcome: createOutput([
 							{
-								itemId: "depleted-output",
+								itemUid: "depleted-output",
 							},
 						]),
 					},
@@ -92,7 +92,7 @@ describe("createAcquisitionGraphFn", () => {
 							],
 							outcome: createOutput([
 								{
-									itemId: "target",
+									itemUid: "target",
 								},
 							]),
 						}),
@@ -103,12 +103,12 @@ describe("createAcquisitionGraphFn", () => {
 			},
 			[
 				{
-					itemId: "payer",
+					itemUid: "payer",
 					x: 0,
 					y: 0,
 				},
 				{
-					itemId: "producer",
+					itemUid: "producer",
 					x: 1,
 					y: 0,
 				},
@@ -121,7 +121,7 @@ describe("createAcquisitionGraphFn", () => {
 				(route) =>
 					route.metadata.kind === "line-unit-depletion" &&
 					route.metadata.lineId === "line:spent-output" &&
-					route.metadata.unitOwnerItemId === "payer",
+					route.metadata.unitOwnerItemUid === "payer",
 			),
 		).toBe(false);
 		const threeRuns = estimateRequestsFn({
@@ -153,7 +153,7 @@ describe("createAcquisitionGraphFn", () => {
 		expect(divisible.routes).toContainEqual(
 			expect.objectContaining({
 				metadata: expect.objectContaining({
-					unitOwnerItemId: "payer",
+					unitOwnerItemUid: "payer",
 					kind: "line-unit-depletion",
 					lineId: "line:spent-output",
 				}),
@@ -178,11 +178,11 @@ describe("createAcquisitionGraphFn", () => {
 				effect: "keep",
 				outcome: createOutput([
 					{
-						itemId: "result",
+						itemUid: "result",
 					},
 				]),
 				target: {
-					itemId: "source",
+					itemUid: "source",
 					type: "item",
 				},
 			},
@@ -191,8 +191,8 @@ describe("createAcquisitionGraphFn", () => {
 		const selfMerge = graph.routes.find(
 			(route) =>
 				route.metadata.kind === "merge-output" &&
-				route.metadata.sourceItemId === "source" &&
-				route.metadata.targetItemId === "source",
+				route.metadata.sourceItemUid === "source" &&
+				route.metadata.targetItemUid === "source",
 		);
 
 		expect(selfMerge?.requirements.allOf).toEqual(
@@ -218,14 +218,14 @@ describe("createAcquisitionGraphFn", () => {
 				effect: "keep",
 				outcome: guaranteedMergeOutput(),
 				target: {
-					itemId: "target",
+					itemUid: "target",
 					type: "item",
 				},
 			},
 			sourceUnits: {
 				amount: 3,
 				outcome: guaranteedMergeOutput({
-					itemId: "output:a",
+					itemUid: "output:a",
 				}),
 			},
 		});
@@ -252,8 +252,8 @@ describe("createAcquisitionGraphFn", () => {
 			metadata: {
 				kind: "merge-unit-depletion",
 				mergeIndex: 0,
-				sourceItemId: "source",
-				targetItemId: "target",
+				sourceItemUid: "source",
+				targetItemUid: "target",
 			},
 			runMultiplier: 3,
 			requirements: {
@@ -275,14 +275,14 @@ describe("createAcquisitionGraphFn", () => {
 				effect: "spend",
 				outcome: guaranteedMergeOutput(),
 				target: {
-					itemId: "target",
+					itemUid: "target",
 					type: "item",
 				},
 			},
 			targetUnits: {
 				amount: 4,
 				outcome: guaranteedMergeOutput({
-					itemId: "output:a",
+					itemUid: "output:a",
 				}),
 			},
 		});
@@ -293,7 +293,7 @@ describe("createAcquisitionGraphFn", () => {
 		const depletionOutcome = graph.routes.find(
 			(route) =>
 				route.metadata.kind === "merge-unit-depletion" &&
-				route.metadata.unitOwnerItemId === "target" &&
+				route.metadata.unitOwnerItemUid === "target" &&
 				route.output.factId === "output:a",
 		);
 
@@ -317,11 +317,11 @@ describe("createAcquisitionGraphFn", () => {
 		});
 		expect(depletionOutcome).toMatchObject({
 			metadata: {
-				unitOwnerItemId: "target",
+				unitOwnerItemUid: "target",
 				kind: "merge-unit-depletion",
 				mergeIndex: 0,
-				sourceItemId: "source",
-				targetItemId: "target",
+				sourceItemUid: "source",
+				targetItemUid: "target",
 			},
 			runMultiplier: 4,
 			requirements: {
@@ -342,12 +342,12 @@ describe("createAcquisitionGraphFn", () => {
 				action: "consume",
 				effect: "replace",
 				outcome: guaranteedMergeOutput({
-					itemId: "result",
+					itemUid: "result",
 					quantity: 2,
 				}),
 				result: "result",
 				target: {
-					itemId: "target",
+					itemUid: "target",
 					type: "item",
 				},
 			},
@@ -400,7 +400,7 @@ describe("createAcquisitionGraphFn", () => {
 					],
 					outcome: createOutput([
 						{
-							itemId: "target",
+							itemUid: "target",
 						},
 					]),
 				}),
@@ -526,7 +526,7 @@ describe("createAcquisitionGraphFn", () => {
 			id: "line:conditional",
 			outcome: createOutput([
 				{
-					itemId: "target",
+					itemUid: "target",
 				},
 			]),
 		});
@@ -545,7 +545,7 @@ describe("createAcquisitionGraphFn", () => {
 										query: {
 											distance: "close",
 											selector: {
-												itemId: "condition",
+												itemUid: "condition",
 												type: "item",
 											},
 										},

@@ -112,7 +112,7 @@ describe("merge random stream lifecycle", () => {
 						{
 							target: {
 								type: "item",
-								itemId: "source",
+								itemUid: "source",
 							},
 							action: "consume",
 							effect: "replace",

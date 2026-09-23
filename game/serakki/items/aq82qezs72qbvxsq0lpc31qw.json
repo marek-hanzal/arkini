@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aq82qezs72qbvxsq0lpc31qw",
-		"id": "fertilized-coffee-field",
 		"title": "Fertilized Coffee Field",
 		"ui": "simple",
 		"artwork": {
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-coffee-field",
+										"itemUid": "wln6dnpxroy1t45s2y516tnj",
 										"quantity": {
 											"min": 1,
 											"max": 1

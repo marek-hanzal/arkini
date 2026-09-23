@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nq73xqq5xq0o2kusvgo6hek9",
-		"id": "campfire-burning",
 		"title": "Campfire Burning",
 		"description": "Warm, bright, and temporary. Good for cooking and morale; less good for nearby things with ambitious flammability.",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "campfire-extinguished",
+										"itemUid": "fenhlvaj45ssocm5r935nqli",
 										"quantity": {
 											"min": 1,
 											"max": 1

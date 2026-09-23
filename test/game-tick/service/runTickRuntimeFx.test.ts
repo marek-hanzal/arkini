@@ -28,7 +28,7 @@ const props = {
 const removeAvailableWaterFx = Effect.fn("removeAvailableWaterFx")(function* () {
 	const runtime = yield* readRuntimeFx();
 	for (const water of runtime.items.filter(
-		(item) => item.item.id === "water" && item.location.scope === "board",
+		(item) => item.item.uid === "water" && item.location.scope === "board",
 	)) {
 		yield* removeRuntimeItemForTestFx({
 			itemId: water.id,
@@ -41,7 +41,7 @@ const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
 	for (let index = 0; index < 3; index += 1) {
 		const water = yield* spawnItemFx({
 			id: `runtime:water:refill:${index}`,
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board",
 				space: 0,
@@ -71,7 +71,6 @@ const createLiveRuleConfig = () => {
 			permit: {
 				...base.items.tool,
 				uid: "permit",
-				id: "permit",
 				title: "Permit",
 				description: "Keeps the forge enabled.",
 			},
@@ -249,8 +248,8 @@ describe("runTickRuntimeByFx", () => {
 		expect(result.second).toMatchObject(props);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
-		expect(result.runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
-		expect(result.runtime.items.filter((item) => item.item.id === "tool").length).toBe(2);
+		expect(result.runtime.items.filter((item) => item.item.uid === "water")).toEqual([]);
+		expect(result.runtime.items.filter((item) => item.item.uid === "tool").length).toBe(2);
 		expect(
 			result.runtime.items.some(
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
@@ -298,7 +297,7 @@ describe("runTickRuntimeByFx", () => {
 			Effect.gen(function* () {
 				const permit = yield* spawnItemFx({
 					id: "runtime:permit",
-					itemId: "permit",
+					itemUid: "permit",
 					location: {
 						scope: "board",
 						space: 0,
@@ -320,7 +319,7 @@ describe("runTickRuntimeByFx", () => {
 				const paused = yield* readRuntimeFx();
 				yield* spawnItemFx({
 					id: "runtime:permit:return",
-					itemId: "permit",
+					itemUid: "permit",
 					location: {
 						scope: "board",
 						space: 0,
@@ -372,7 +371,7 @@ describe("fixed Tick steps", () => {
 				] as const) {
 					yield* spawnItemFx({
 						id,
-						itemId: "forge",
+						itemUid: "forge",
 						location: {
 							scope: "board",
 							space: 0,
@@ -385,7 +384,7 @@ describe("fixed Tick steps", () => {
 				}
 				yield* spawnItemFx({
 					id: "runtime:shared-water",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,
@@ -397,7 +396,7 @@ describe("fixed Tick steps", () => {
 				});
 				yield* spawnItemFx({
 					id: "runtime:shared-tool",
-					itemId: "tool",
+					itemUid: "tool",
 					location: {
 						scope: "board",
 						space: 0,

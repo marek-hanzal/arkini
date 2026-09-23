@@ -12,7 +12,7 @@ export namespace saveDraftStatusFx {
 		readonly config: GameConfigSchema.Type;
 		readonly draft: boolean;
 		readonly expectedRevision: number;
-		readonly itemId: ItemSchema.Type["id"];
+		readonly itemUid: ItemSchema.Type["uid"];
 		readonly projectId: string;
 	}
 }
@@ -22,15 +22,15 @@ export const saveDraftStatusFx = Effect.fn("saveEditorItemDraftStatusFx")(functi
 	config,
 	draft,
 	expectedRevision,
-	itemId,
+	itemUid,
 	projectId,
 }: saveDraftStatusFx.Props) {
 	const repository = yield* ProjectRepository;
 	const admission = yield* ProjectWriteAdmission;
-	const item = config.items[itemId];
+	const item = config.items[itemUid];
 	if (item === undefined)
 		return yield* Effect.fail(
-			new Error(`Item ${itemId} does not exist in the current project.`),
+			new Error(`Item ${itemUid} does not exist in the current project.`),
 		);
 	yield* Effect.yieldNow;
 	return yield* admission.admitWriteFx(
@@ -38,7 +38,6 @@ export const saveDraftStatusFx = Effect.fn("saveEditorItemDraftStatusFx")(functi
 		Effect.uninterruptible(
 			Effect.gen(function* () {
 				const saved = yield* saveWithRepositoryFx({
-					config,
 					expectedRevision,
 					item: {
 						...item,

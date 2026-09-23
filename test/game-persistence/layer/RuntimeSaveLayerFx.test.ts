@@ -21,7 +21,7 @@ const emitCompletedEventFx = (jobId: string) =>
 			[
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
-					canonicalItemId: "owner",
+					itemUid: "owner",
 					jobId,
 					ownerItemId: "owner:save",
 					lineId: "line:save",
@@ -268,7 +268,7 @@ it.effect("does not deduplicate a snapshot skipped while saving is disabled", ()
 		const runtimeSave = yield* RuntimeSaveFx;
 		yield* spawnItemFx({
 			id: "runtime:save:admission",
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board" as const,
 				space: 0,
@@ -308,7 +308,7 @@ it.effect("debounces committed snapshots and ignores failed mutations", () => {
 		const runtimeSave = yield* RuntimeSaveFx;
 		const first = yield* spawnItemFx({
 			id: "runtime:save:first",
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board" as const,
 				space: 0,
@@ -320,7 +320,7 @@ it.effect("debounces committed snapshots and ignores failed mutations", () => {
 		});
 		yield* spawnItemFx({
 			id: "runtime:save:second",
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board" as const,
 				space: 0,
@@ -370,7 +370,7 @@ it.effect("does not let event-only traffic wake or postpone runtime autosave", (
 
 		yield* spawnItemFx({
 			id: "runtime:save:event-isolation",
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board" as const,
 				space: 0,
@@ -436,7 +436,7 @@ it("serializes autosave and explicit flush so an older write cannot win", async 
 		await session.runFn(
 			spawnItemFx({
 				id: "runtime:save:race:first",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board" as const,
 					space: 0,
@@ -451,7 +451,7 @@ it("serializes autosave and explicit flush so an older write cannot win", async 
 		await session.runFn(
 			spawnItemFx({
 				id: "runtime:save:race:second",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board" as const,
 					space: 0,
@@ -509,7 +509,7 @@ it("closes command admission before starting a slow final save", async () => {
 				Effect.andThen(
 					spawnItemFx({
 						id: "runtime:save:command-during-flush",
-						itemId: "water",
+						itemUid: "water",
 						location: {
 							scope: "board" as const,
 							space: 0,
@@ -558,7 +558,7 @@ it("flushes the latest committed runtime when the session is disposed", async ()
 	await session.runFn(
 		spawnItemFx({
 			id: "runtime:save:dispose",
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board" as const,
 				space: 0,

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xe74iqtksvx9rc11dtz0w7qw",
-		"id": "trade-portal",
 		"title": "Trade Portal",
 		"ui": "simple",
 		"description": "Trader's land",

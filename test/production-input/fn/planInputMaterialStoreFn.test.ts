@@ -10,7 +10,7 @@ const input = MaterialSchema.parse({
 		distance: "far" as const,
 		selector: {
 			type: "item",
-			itemId: "item:water",
+			itemUid: "item:water",
 		},
 	},
 	quantity: {

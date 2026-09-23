@@ -136,13 +136,13 @@ const OutcomeFields = ({
 			{value.type === "item" ? (
 				<>
 					<EditorItemReferenceControl
-						error={readEditorFormValidationErrorFn(validationIssues, "itemId")}
+						error={readEditorFormValidationErrorFn(validationIssues, "itemUid")}
 						label={translator.textFn("Item")}
-						value={value.itemId}
-						onChangeFn={(itemId) =>
+						value={value.itemUid}
+						onChangeFn={(itemUid) =>
 							onChangeFn({
 								...value,
-								itemId,
+								itemUid,
 							})
 						}
 					/>
@@ -286,7 +286,10 @@ const OutcomeList = ({
 					const outcome = value[index];
 					const label =
 						outcome.type === "item"
-							? readItemLabelFn(outcome.itemId, translator.textFn("No item selected"))
+							? readItemLabelFn(
+									outcome.itemUid,
+									translator.textFn("No item selected"),
+								)
 							: outcome.type === "template"
 								? (project.config.templates?.find(
 										(template) => template.uid === outcome.templateUid,
@@ -296,7 +299,7 @@ const OutcomeList = ({
 				}}
 				itemSearchTermsFn={(index) => [
 					value[index].type === "item"
-						? value[index].itemId
+						? value[index].itemUid
 						: value[index].type === "template"
 							? value[index].templateUid
 							: `${translator.textFn("Space")} ${value[index].space}`,
@@ -318,7 +321,7 @@ const OutcomeList = ({
 							index === undefined
 								? undefined
 								: value[index].type === "item"
-									? items[value[index].itemId]
+									? items[value[index].itemUid]
 									: undefined
 						}
 						selected

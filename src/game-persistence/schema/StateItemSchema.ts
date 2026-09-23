@@ -19,10 +19,10 @@ export const StateItemSchema = z
 		 */
 		id: IdSchema.describe("The stable identity of this live item."),
 		/**
-		 * ID of the canonical item definition restored during hydration.
+		 * UID of the canonical item definition restored during hydration.
 		 */
-		itemId: IdSchema.describe(
-			"The ID of the canonical item definition restored during hydration.",
+		itemUid: IdSchema.describe(
+			"The UID of the canonical item definition restored during hydration.",
 		),
 		/**
 		 * Current concrete location owned by this persisted item.

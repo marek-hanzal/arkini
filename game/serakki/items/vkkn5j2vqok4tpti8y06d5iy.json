@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vkkn5j2vqok4tpti8y06d5iy",
-		"id": "book-t2",
 		"title": "Book - Tier 2",
 		"ui": "simple",
 		"description": "A better book. Maybe Hobbit",

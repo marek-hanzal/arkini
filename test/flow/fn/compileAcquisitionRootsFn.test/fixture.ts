@@ -19,7 +19,7 @@ const createRuledOutput = (type: "disable" | "enable") =>
 						outcome: [
 							{
 								type: "item",
-								itemId: `item:${type}`,
+								itemUid: `item:${type}`,
 								quantity: {
 									max: 1,
 									min: 1,
@@ -30,9 +30,9 @@ const createRuledOutput = (type: "disable" | "enable") =>
 										when: [
 											{
 												query: {
-													distance: "universe",
+													distance: "far",
 													selector: {
-														itemId: "item:condition",
+														itemUid: "item:condition",
 														type: "item",
 													},
 												},

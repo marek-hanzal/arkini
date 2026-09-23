@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "umbaslum2ylw4w0bysyhocou",
-		"id": "pumpkin-field",
 		"title": "Pumpkin Field",
 		"draft": false,
 		"description": "A planted pumpkin field.",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-pumpkin-field",
+										"itemUid": "daoqtlfotxv65rpxy99sg4ku",
 										"quantity": {
 											"min": 1,
 											"max": 1

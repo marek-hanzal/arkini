@@ -2,7 +2,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -24,7 +24,7 @@ const guaranteedOutput = (itemId: string) => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity: {
 								min: 1,
 								max: 1,
@@ -74,7 +74,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 									distance: "far",
 									selector: {
 										type: "item",
-										itemId: "temporary",
+										itemUid: "temporary",
 									},
 								},
 								quantity: {

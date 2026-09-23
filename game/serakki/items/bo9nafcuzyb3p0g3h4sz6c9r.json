@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bo9nafcuzyb3p0g3h4sz6c9r",
-		"id": "cauldron-with-boiling-beeswax",
 		"title": "Cauldron With Boiling Beeswax",
 		"ui": "simple",
 		"description": "Boiling beeswax. It could be useful, but keep it warm",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "cauldron-with-beeswax",
+										"itemUid": "j8d36shyw3d5sp0jd2bqtkd7",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "x7tu0rj9fltlm5noyx5f18cb",
-		"id": "dye-workshop-milk",
 		"title": "Dye Workshop Milk",
 		"ui": "simple",
 		"description": "Milky-way",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "dye-workshop",
+										"itemUid": "tdk2m5cvrgw56s4do7tc2wu9",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -23,7 +23,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "source",
-			id: "source",
 			title: "Source",
 			description: "A line origin.",
 			artwork: {
@@ -38,7 +37,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "permit",
-			id: "permit",
 			title: "Permit",
 			description: "Allows a product line.",
 			artwork: {
@@ -53,7 +51,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "booster",
-			id: "booster",
 			title: "Booster",
 			description: "Changes a product-line runtime.",
 			artwork: {
@@ -68,7 +65,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "blocker",
-			id: "blocker",
 			title: "Blocker",
 			description: "Disables and hides a product line.",
 			artwork: {
@@ -81,12 +77,12 @@ export const lineTestConfig = GameConfigSchema.parse({
 	},
 });
 
-export const existsWhen = (itemId: string) => {
+export const existsWhen = (itemUid: string) => {
 	return {
 		query: {
 			distance: "far" as const,
 			selector: {
-				itemId,
+				itemUid,
 				type: "item" as const,
 			},
 		},
@@ -97,7 +93,7 @@ export const existsWhen = (itemId: string) => {
 export const createOriginFx = () => {
 	return spawnItemFx({
 		id: "origin",
-		itemId: "source",
+		itemUid: "source",
 		location: {
 			scope: "board",
 			space: 0,
@@ -110,15 +106,15 @@ export const createOriginFx = () => {
 };
 
 export const placeLineTestItemFx = ({
-	itemId,
+	itemUid,
 	x,
 }: {
-	itemId: "permit" | "booster" | "blocker";
+	itemUid: "permit" | "booster" | "blocker";
 	x: number;
 }) => {
 	return spawnItemFx({
-		id: itemId,
-		itemId,
+		id: itemUid,
+		itemUid,
 		location: {
 			scope: "board" as const,
 			space: 0,

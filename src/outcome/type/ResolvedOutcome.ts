@@ -14,7 +14,7 @@ export namespace ResolvedOutcome {
 	}
 	export interface Item {
 		readonly type: "item";
-		readonly itemId: IdSchema.Type;
+		readonly itemUid: IdSchema.Type;
 		readonly quantity: PositiveIntegerSchema.Type;
 		readonly placement: PlacementSchema.Type;
 	}

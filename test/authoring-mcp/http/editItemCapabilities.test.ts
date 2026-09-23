@@ -13,7 +13,7 @@ import {
 } from "./support/createMcpHarness";
 
 const projectId = "edit-item-capabilities-project";
-const itemId = "item:workshop";
+const itemUid = "item:workshop";
 const resourceId = editorTestPayload.resources[0]?.id ?? "missing-asset";
 const productionLines = JSON.parse(
 	JSON.stringify([
@@ -28,12 +28,12 @@ const seededConfig = GameConfigSchema.parse({
 	},
 	items: {
 		...editorTestPayload.config.items,
-		[itemId]: {
+		[itemUid]: {
 			...createDraftFn({
 				resourceId,
 				uid: "uid:workshop",
 			}),
-			id: itemId,
+			uid: itemUid,
 			title: "Workshop",
 			description: "Existing workshop.",
 			maxQueueSize: 4,
@@ -77,7 +77,7 @@ describe("editor MCP optional item capabilities", {
 		const edited = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId: itemId,
+				itemUid: itemUid,
 				patch: {
 					lines: [],
 				},
@@ -85,15 +85,15 @@ describe("editor MCP optional item capabilities", {
 		});
 		expect(edited.isError).not.toBe(true);
 		const project = await Effect.runPromise(repository.readProjectFx(projectId));
-		expect(project?.config.items[itemId]).toMatchObject({
+		expect(project?.config.items[itemUid]).toMatchObject({
 			lines: [],
 			maxQueueSize: 4,
 		});
-		expect(project?.config.items[itemId]).toHaveProperty("clock.intervalMs", 1000);
+		expect(project?.config.items[itemUid]).toHaveProperty("clock.intervalMs", 1000);
 		const once = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId: itemId,
+				itemUid: itemUid,
 				patch: {
 					clock: {
 						durationMs: 2000,
@@ -103,7 +103,7 @@ describe("editor MCP optional item capabilities", {
 		});
 		expect(once.isError).not.toBe(true);
 		const saved = (await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
-			itemId
+			itemUid
 		];
 		expect(saved).toMatchObject({
 			lines: [],
@@ -142,7 +142,7 @@ describe("editor MCP optional item capabilities", {
 		const edited = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId,
+				itemUid,
 				patch: {
 					lines,
 				},
@@ -152,7 +152,7 @@ describe("editor MCP optional item capabilities", {
 		const changed = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId,
+				itemUid,
 				patch: {
 					title: "Portal workshop",
 				},
@@ -160,7 +160,7 @@ describe("editor MCP optional item capabilities", {
 		});
 		expect(changed.isError).not.toBe(true);
 		const saved = (await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
-			itemId
+			itemUid
 		];
 		expect(saved?.lines).toEqual(lines);
 		expect(saved?.clock).toMatchObject({

@@ -9,7 +9,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -56,7 +56,7 @@ const config = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "temporary",
+									itemUid: "temporary",
 								},
 							},
 							quantity: {
@@ -92,7 +92,7 @@ describe("temporary material input eligibility", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:owner",
-					itemId: "owner",
+					itemUid: "owner",
 					location: {
 						scope: "board",
 						space: 0,
@@ -106,7 +106,7 @@ describe("temporary material input eligibility", () => {
 			const temporary = await session.runFn(
 				spawnItemFx({
 					id: "runtime:temporary",
-					itemId: "temporary",
+					itemUid: "temporary",
 					location: {
 						scope: "board",
 						space: 0,

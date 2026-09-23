@@ -29,7 +29,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "source",
-			id: "source",
 			title: "Source",
 			description: "A query origin.",
 			artwork: {
@@ -44,7 +43,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "tree",
-			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			artwork: {
@@ -59,16 +57,16 @@ const config = GameConfigSchema.parse({
 
 const placeItemFx = ({
 	id,
-	itemId,
+	itemUid,
 	location,
 }: {
 	id: string;
-	itemId: "source" | "tree";
+	itemUid: "source" | "tree";
 	location: BoardLocationSchema.Type;
 }) => {
 	return spawnItemFx({
 		id,
-		itemId,
+		itemUid,
 		location,
 	});
 };
@@ -78,7 +76,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 		Effect.gen(function* () {
 			const origin = yield* placeItemFx({
 				id: "origin",
-				itemId: "source",
+				itemUid: "source",
 
 				location: {
 					scope: "board",
@@ -91,7 +89,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 			});
 			yield* placeItemFx({
 				id: "board-close",
-				itemId: "tree",
+				itemUid: "tree",
 
 				location: {
 					scope: "board",
@@ -104,7 +102,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 			});
 			yield* placeItemFx({
 				id: "board-near",
-				itemId: "tree",
+				itemUid: "tree",
 
 				location: {
 					scope: "board",
@@ -117,7 +115,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 			});
 			yield* placeItemFx({
 				id: "board-far",
-				itemId: "tree",
+				itemUid: "tree",
 
 				location: {
 					scope: "board" as const,
@@ -138,7 +136,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 					query: {
 						distance: "far" as const,
 						selector: {
-							itemId: "tree",
+							itemUid: "tree",
 							type: "item",
 						},
 					},
@@ -156,7 +154,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 					query: {
 						distance: "far" as const,
 						selector: {
-							itemId: "tree",
+							itemUid: "tree",
 							type: "item",
 						},
 					},
@@ -175,7 +173,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 					query: {
 						distance: "close",
 						selector: {
-							itemId: "tree",
+							itemUid: "tree",
 							type: "item",
 						},
 					},
@@ -193,7 +191,7 @@ it("evaluates exists, exact count, and inclusive range over matching identities"
 					query: {
 						distance: "far" as const,
 						selector: {
-							itemId: "tree",
+							itemUid: "tree",
 							type: "item",
 						},
 					},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "my9bfiki5q32m5rgvcmq66h1",
-		"id": "soapy-scrubbing-brush",
 		"title": "Soapy Scrubbing Brush",
 		"description": "A loaded cleaning brush. Use it on dirty tools, containers, cookware, and other washable messes; the cleaned item returns and the brush becomes dirty.",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet-biowaste"
+					"itemUid": "oo3wuqjngg5i21vwt4m5nz0s"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "toilet"
+				"result": "ecihjakbzjlagfsrswt4cdji"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-bottle"
+					"itemUid": "bpk4mu2dz3pcurcft0ojmq4s"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-bottle"
+				"result": "x0ehwt5wmhhdzg5s6915oioh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-bucket"
+					"itemUid": "i5fuhf30o5rwou8oydrm5v0b"
 				},
 				"action": "consume",
 				"outcome": {
@@ -98,7 +97,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,12 +112,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-bucket"
+				"result": "ww797h0lugbws2jsb61ldy7g"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-cauldron"
+					"itemUid": "gknt8tkntf6cx7a4vb5jre1j"
 				},
 				"action": "consume",
 				"outcome": {
@@ -132,7 +131,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -147,12 +146,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-cauldron"
+				"result": "oj9o0nu1zp9g79f1jqx11g9l"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-jar"
+					"itemUid": "wnz92z3wagysspwsyffvuo59"
 				},
 				"action": "consume",
 				"outcome": {
@@ -166,7 +165,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -181,12 +180,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-jar"
+				"result": "w3x58j053qf9fgq90wqqtylq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-knife"
+					"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt"
 				},
 				"action": "consume",
 				"outcome": {
@@ -200,7 +199,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -215,12 +214,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "knife"
+				"result": "wguid5c2feyy5ti9za1m3tsy"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-mug"
+					"itemUid": "r330zi9b8c8f5blsjatkc336"
 				},
 				"action": "consume",
 				"outcome": {
@@ -234,7 +233,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -249,12 +248,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-mug"
+				"result": "nw60xpkc8pbay8tkriirlyw2"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-pig"
+					"itemUid": "b1ihh5z72i0b4twuntnoaonj"
 				},
 				"action": "consume",
 				"outcome": {
@@ -268,7 +267,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -283,12 +282,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "pig"
+				"result": "jx5gnntoo4aj7rxf3eq32lun"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-pot"
+					"itemUid": "jmxqka9ts9p3opsnh7elkdkc"
 				},
 				"action": "consume",
 				"outcome": {
@@ -302,7 +301,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -317,12 +316,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "pot"
+				"result": "w5khsgl6koe2p6asgojn7g3q"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-scissors"
+					"itemUid": "cdz4ufdk3nak07xep51oeva1"
 				},
 				"action": "consume",
 				"outcome": {
@@ -336,7 +335,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -351,12 +350,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "scissors"
+				"result": "cpmdnqi63m2cql44na50d7vq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-clay-bowl"
+					"itemUid": "eess3433dtwp96mgo7j7m7w9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -370,7 +369,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -385,12 +384,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "clay-bowl"
+				"result": "bqry0ngea4bhamfkgncovhgr"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-clay-jug"
+					"itemUid": "n2q2az2f3m5mjmh3qonstb9z"
 				},
 				"action": "consume",
 				"outcome": {
@@ -404,7 +403,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -419,12 +418,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "clay-jug"
+				"result": "eyekjhm9lxz8oqjm2qa0a0x0"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-clay-mug"
+					"itemUid": "pee2vt58ud8qroy97qlcgacu"
 				},
 				"action": "consume",
 				"outcome": {
@@ -438,7 +437,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -453,12 +452,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "clay-mug"
+				"result": "ruholnpnxu05t2exd72esrn9"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-clay-plate"
+					"itemUid": "zvz2e92uxcmjc84kbjr0v13u"
 				},
 				"action": "consume",
 				"outcome": {
@@ -472,7 +471,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -487,12 +486,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "clay-plate"
+				"result": "ubexhgyrqm23lx9qn734f385"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-clay-vase"
+					"itemUid": "lg61am0b6qg38836uz6hoswa"
 				},
 				"action": "consume",
 				"outcome": {
@@ -506,7 +505,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -521,12 +520,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "clay-vase"
+				"result": "vuvhe03rrdltymtnhvznb48a"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-copper-bathtub"
+					"itemUid": "tgp697yrjspdxevg49699o5c"
 				},
 				"action": "consume",
 				"outcome": {
@@ -540,7 +539,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -555,12 +554,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "copper-bathtub"
+				"result": "ysdkouxd4qpd0ztziy07k2ss"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-copper-pan"
+					"itemUid": "g5xkc3f2hw5xr6iipq2wf9lj"
 				},
 				"action": "consume",
 				"outcome": {
@@ -574,7 +573,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -589,12 +588,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "copper-pan"
+				"result": "ap6ydtxwahg5cyki9g43shdo"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-cutting-board"
+					"itemUid": "yc7z9wcj6dzunglpuxuhisgx"
 				},
 				"action": "consume",
 				"outcome": {
@@ -608,7 +607,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -623,12 +622,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "cutting-board"
+				"result": "cfrqc6p65c4gh3lrjswv84zv"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "glass-goblet-dirty"
+					"itemUid": "zm9rndkb6xqkmkzs0uxhy1r2"
 				},
 				"action": "consume",
 				"outcome": {
@@ -642,7 +641,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -657,12 +656,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "glass-goblet"
+				"result": "fvwo0tr5mxt3lnw5mjz1x77h"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-laboratory-glassware"
+					"itemUid": "c8k56ppmzlav98mdhrqtkq5v"
 				},
 				"action": "consume",
 				"outcome": {
@@ -676,7 +675,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -691,12 +690,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "laboratory-glassware"
+				"result": "pz69k9ntwrqmycwiv4ocuij1"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dirty-scrubbing-brush"
+					"itemUid": "w61ftom9lbm4m70y9oagapuu"
 				},
 				"action": "consume",
 				"outcome": {
@@ -710,7 +709,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-scrubbing-brush",
+											"itemUid": "w61ftom9lbm4m70y9oagapuu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -725,7 +724,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "scrubbing-brush"
+				"result": "im6k8omuik7imr85cq0bc750"
 			}
 		],
 		"maxQueueSize": 1,

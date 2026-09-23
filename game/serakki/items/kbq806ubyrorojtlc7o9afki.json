@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kbq806ubyrorojtlc7o9afki",
-		"id": "flour",
 		"title": "Flour",
 		"ui": "simple",
 		"description": "Bread?",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

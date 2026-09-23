@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bnkd4ndcnhsoge5e7s4uenm0",
-		"id": "grass-field",
 		"title": "Grass Field",
 		"draft": false,
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-grass-field",
+										"itemUid": "p6wks4iknyp8b8v5qxhilm1x",
 										"quantity": {
 											"min": 1,
 											"max": 1

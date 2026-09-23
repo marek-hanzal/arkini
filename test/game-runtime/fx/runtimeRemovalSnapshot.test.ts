@@ -164,13 +164,13 @@ describe("committed runtime removal snapshots", () => {
 		expect(result.transition.events).toContainEqual(
 			expect.objectContaining({
 				type: "job:started",
-				canonicalItemId: result.initial.item.id,
+				itemUid: result.initial.item.uid,
 			}),
 		);
 		expect(result.transition.events).toContainEqual(
 			expect.objectContaining({
 				type: "job:aborted",
-				canonicalItemId: result.initial.item.id,
+				itemUid: result.initial.item.uid,
 			}),
 		);
 		expect(result.transition.events).toContainEqual(
@@ -218,7 +218,7 @@ describe("committed runtime removal snapshots", () => {
 			expect.objectContaining({
 				type: "job:completed",
 				ownerItemId: "runtime:clock",
-				canonicalItemId: "clock",
+				itemUid: "clock",
 			}),
 		);
 	});

@@ -17,7 +17,7 @@ export const createDeliveryActorItem = (
 	activityEffect: false,
 	compositeUrl: undefined,
 	id,
-	itemId: "water",
+	itemUid: "water",
 
 	location: boardLocation(0),
 	primaryAction: {

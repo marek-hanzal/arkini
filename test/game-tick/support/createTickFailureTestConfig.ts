@@ -15,7 +15,6 @@ export const createTickFailureTestConfig = () => {
 			completionOutput: {
 				...base.items.tool,
 				uid: "completionOutput",
-				id: "completionOutput",
 				title: "Tick failure outcome",
 				description: "Removed after start by the test.",
 			},
@@ -40,7 +39,7 @@ export const createTickFailureTestConfig = () => {
 											outcome: [
 												{
 													type: "item" as const,
-													itemId: "completionOutput",
+													itemUid: "completionOutput",
 													quantity: {
 														min: 1,
 														max: 1,

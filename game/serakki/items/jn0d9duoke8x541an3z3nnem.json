@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jn0d9duoke8x541an3z3nnem",
-		"id": "order-corn",
 		"title": "Order Corn",
 		"ui": "simple",
 		"draft": false,
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -51,7 +50,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "burning-oven"
+					"itemUid": "bsm7hrvufre2fiexr4o0eo4q"
 				},
 				"action": "consume",
 				"effect": "keep"

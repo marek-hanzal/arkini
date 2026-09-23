@@ -67,7 +67,7 @@ export namespace ItemDetailLines {
 
 	export interface OutcomeItem {
 		readonly type: "item";
-		readonly itemId: IdSchema.Type;
+		readonly itemUid: IdSchema.Type;
 		readonly quantity: Readonly<QuantitySchema.Type>;
 		readonly activeRuleHints: readonly string[];
 	}

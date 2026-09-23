@@ -6,7 +6,7 @@ const simpleItem = ({ id }: { id: string }) => {
 		lines: [],
 
 		uid: id,
-		id,
+
 		title: id,
 		description: id,
 		artwork: {
@@ -38,7 +38,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			height: 2,
 			board: [
 				{
-					itemId: "tree",
+					itemUid: "tree",
 					x: 1,
 					y: 1,
 				},

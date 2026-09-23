@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nw61q7vfe9qpdh58ocjp0gpx",
-		"id": "foundation-chest",
 		"title": "Foundation Chest",
 		"description": "A suspiciously convenient box of everything a fledgling settlement needs to make its first mistakes. Open carefully; some of this stuff is harder to replace than it looks.",
 		"ui": "simple",
@@ -37,7 +36,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "foundation-chest"
+								"itemUid": "nw61q7vfe9qpdh58ocjp0gpx"
 							},
 							"distance": "self"
 						}
@@ -54,7 +53,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "paper---tier-1",
+											"itemUid": "ttkblp0xsb1irrbgg5oevm2y",
 											"quantity": {
 												"min": 20,
 												"max": 20
@@ -64,7 +63,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "flint-and-steel",
+											"itemUid": "gbm8cfe7jwaqmy3egbxji16p",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -74,7 +73,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "unlit-candle",
+											"itemUid": "d7nii81w82pbs6y3cvfyprox",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -84,7 +83,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-lantern",
+											"itemUid": "gepmb31cvdse7u75q4i4p4ek",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -94,7 +93,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "resource-research",
+											"itemUid": "bqf3op5bndkaqfgpap7lj7kq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -104,7 +103,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 4,
 												"max": 4
@@ -114,7 +113,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "axe",
+											"itemUid": "qvjicvykpbmp1bdxxrscxnul",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -124,7 +123,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "pickaxe",
+											"itemUid": "ixw46s78kqk56j0h4utwgw5e",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -134,7 +133,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "inkwell",
+											"itemUid": "aypezdd5mxtcclnmhi7kphyv",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -144,7 +143,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "quill",
+											"itemUid": "h4jtpd5yoilq7pi0h7xm89yg",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -154,7 +153,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "knife",
+											"itemUid": "wguid5c2feyy5ti9za1m3tsy",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -164,7 +163,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "scissors",
+											"itemUid": "cpmdnqi63m2cql44na50d7vq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -174,7 +173,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "copper-pan",
+											"itemUid": "ap6ydtxwahg5cyki9g43shdo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -184,7 +183,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -194,7 +193,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "feather",
+											"itemUid": "qxqafymuxw7keyketjpn9cye",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -204,7 +203,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bow",
+											"itemUid": "j9ni85pox4gjt7uu3ud04kkj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -214,7 +213,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "arrows---tier-1",
+											"itemUid": "j3uy7jal3539u6u1zqup1mcz",
 											"quantity": {
 												"min": 8,
 												"max": 8

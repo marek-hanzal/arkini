@@ -64,7 +64,7 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
-			itemId: item.id,
+			itemUid: item.uid,
 			placement: drop.placement,
 			quantity: drop.quantity,
 			reason: PlacementUnavailableError.Reason.BoardFull,
@@ -81,7 +81,7 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	runtime,
 }: PlanDropPlacementProps) {
 	const item = yield* resolveItemFx({
-		itemId: drop.itemId,
+		itemUid: drop.itemUid,
 	});
 	yield* assertBoardOnlyCapacityFx({
 		drop,

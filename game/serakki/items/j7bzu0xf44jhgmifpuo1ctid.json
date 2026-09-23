@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "j7bzu0xf44jhgmifpuo1ctid",
-		"id": "copper-pan-with-green-coffee-beans",
 		"title": "Copper Pan With Green Coffee Beans",
 		"ui": "simple",
 		"description": "You can roast it.",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-pan-with-roasted-coffee-beans",
+											"itemUid": "bvau1dl21nueenr8ghftyxiw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire-extinguished"
+				"result": "fenhlvaj45ssocm5r935nqli"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "copper-pan",
+										"itemUid": "ap6ydtxwahg5cyki9g43shdo",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -73,7 +72,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

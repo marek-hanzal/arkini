@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "sxhiobnebf8wbp098iuyxtda",
-		"id": "shepherds-crook",
 		"title": "Shepherd's Crook",
 		"draft": false,
 		"description": "A reusable herding tool. Use it on a populated enclosure to release one animal immediately.",
@@ -17,7 +16,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cow-pen"
+					"itemUid": "ekstw01ksb6lp64ums0563jk"
 				},
 				"action": "use",
 				"outcome": {
@@ -31,7 +30,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cow",
+											"itemUid": "f5o2vqdxqh3zhg05fyd1xf1m",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -50,7 +49,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pig-pen"
+					"itemUid": "f6g1qfue0p6bochjsgdtcnva"
 				},
 				"action": "use",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "pig",
+											"itemUid": "jx5gnntoo4aj7rxf3eq32lun",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -83,7 +82,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sheep-pen"
+					"itemUid": "r2y0wgdu2zxdboof3lqs4bg0"
 				},
 				"action": "use",
 				"outcome": {
@@ -97,7 +96,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sheep",
+											"itemUid": "wh5fvg4la9xioq59jj3tjv96",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -116,7 +115,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "chicken-coop"
+					"itemUid": "ovdqj7txazzmjzi4kiq764sm"
 				},
 				"action": "use",
 				"outcome": {
@@ -130,7 +129,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "chicken",
+											"itemUid": "i767otw53htcjcc2y9zrw6it",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -149,7 +148,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "goose-pen"
+					"itemUid": "lqq2ce07cb38mmusi2oan07l"
 				},
 				"action": "use",
 				"outcome": {
@@ -163,7 +162,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "goose",
+											"itemUid": "tgz6nz84fwhbcyq5k02qcx2i",
 											"quantity": {
 												"min": 1,
 												"max": 1

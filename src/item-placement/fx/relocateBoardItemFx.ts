@@ -51,7 +51,7 @@ export const relocateBoardItemFx = Effect.fn("relocateBoardItemFx")(function* ({
 	if (location === undefined)
 		return yield* Effect.fail(
 			new PlacementUnavailableError({
-				itemId: item.item.id,
+				itemUid: item.item.uid,
 				placement: "drop",
 				quantity: 1,
 				remainingQuantity: 1,
@@ -73,7 +73,7 @@ export const relocateBoardItemFx = Effect.fn("relocateBoardItemFx")(function* ({
 			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 				itemId: item.id,
-				canonicalItemId: item.item.id,
+				itemUid: item.item.uid,
 				originItemId,
 				previousLocation: item.location,
 				location,

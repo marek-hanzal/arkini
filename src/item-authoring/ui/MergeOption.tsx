@@ -16,7 +16,7 @@ export const MergeOption = ({
 	readonly items: Readonly<Record<string, ItemSchema.Type>>;
 }) => {
 	const translator = useTranslator();
-	const target = merge.action === "space" ? undefined : items[merge.target.itemId];
+	const target = merge.action === "space" ? undefined : items[merge.target.itemUid];
 	const effects = {
 		keep: translator.textFn("Keep"),
 		remove: translator.textFn("Remove"),

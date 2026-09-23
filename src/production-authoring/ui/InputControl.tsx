@@ -44,13 +44,13 @@ const UnitsPaidByControl = ({
 	error,
 	input,
 	onChangeFn,
-	ownerItemId,
+	ownerItemUid,
 	selfUnitsEnabled,
 }: {
 	readonly error?: string;
 	readonly input: UnitsInput;
 	readonly onChangeFn: (input: UnitsInput) => void;
-	readonly ownerItemId: string;
+	readonly ownerItemUid: string;
 	readonly selfUnitsEnabled: boolean;
 }) => {
 	const translator = useTranslator();
@@ -93,7 +93,7 @@ const UnitsPaidByControl = ({
 									distance: "self",
 									selector: {
 										type: "item",
-										itemId: ownerItemId,
+										itemUid: ownerItemUid,
 									},
 								}
 							: switchingBackToTarget
@@ -258,7 +258,7 @@ const UnitsTargetUnitCostControl = ({
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const units = input.units ?? DraftDefaults.inputs.units.units;
-	const selectedItem = project.config.items[input.query.selector.itemId];
+	const selectedItem = project.config.items[input.query.selector.itemUid];
 	const selectedItemUnitAmount = selectedItem?.units?.amount;
 	const targetMissingUnits = selectedItem !== undefined && selectedItem.units === undefined;
 	const selectedItemError = readEditorFormValidationErrorFn(issues, "query", "selector");
@@ -277,7 +277,7 @@ const UnitsTargetUnitCostControl = ({
 				error={
 					targetMissingUnits
 						? translator.textFn("Selected target must have Units enabled.")
-						: input.query.selector.itemId === "" && selectedItemError !== undefined
+						: input.query.selector.itemUid === "" && selectedItemError !== undefined
 							? translator.textFn("Select an item with Units enabled.")
 							: selectedItemError
 				}
@@ -285,7 +285,8 @@ const UnitsTargetUnitCostControl = ({
 				labelVisible={false}
 				value={input.query.selector}
 				onChangeFn={(selector) => {
-					const selectedUnitAmount = project.config.items[selector.itemId]?.units?.amount;
+					const selectedUnitAmount =
+						project.config.items[selector.itemUid]?.units?.amount;
 					onChangeFn({
 						...input,
 						units: {
@@ -342,14 +343,14 @@ export const InputControl = ({
 	input,
 	issues = [],
 	onChangeFn,
-	ownerItemId,
+	ownerItemUid,
 	selfUnitsEnabled,
 }: {
 	readonly allowMaterials?: boolean;
 	readonly input: LineInputSchema.Type;
 	readonly issues?: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: LineInputSchema.Type) => void;
-	readonly ownerItemId: string;
+	readonly ownerItemUid: string;
 	readonly selfUnitsEnabled: boolean;
 }) => {
 	const translator = useTranslator();
@@ -408,7 +409,7 @@ export const InputControl = ({
 					<UnitsPaidByControl
 						error={readEditorFormValidationErrorFn(issues, "units", "from")}
 						input={input}
-						ownerItemId={ownerItemId}
+						ownerItemUid={ownerItemUid}
 						selfUnitsEnabled={selfUnitsEnabled}
 						onChangeFn={onChangeFn}
 					/>

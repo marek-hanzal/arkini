@@ -11,7 +11,7 @@ import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	artwork: {
@@ -28,7 +28,7 @@ const materialInput = (itemId: string) => ({
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid: itemId,
 		},
 	},
 	quantity: {
@@ -133,7 +133,7 @@ const config = GameConfigSchema.parse({
 
 const boardOwner = {
 	id: "runtime:outer",
-	itemId: "outer",
+	itemUid: "outer",
 	location: {
 		scope: "board" as const,
 		space: 2,
@@ -147,18 +147,18 @@ const boardOwner = {
 const inputItem = ({
 	id,
 	inputIndex,
-	itemId,
+	itemUid,
 	ownerItemId = boardOwner.id,
 	remainingUnits,
 }: {
 	id: string;
 	inputIndex: number;
-	itemId: string;
+	itemUid: string;
 	ownerItemId?: string;
 	remainingUnits?: number;
 }) => ({
 	id,
-	itemId,
+	itemUid,
 	location: {
 		scope: "input" as const,
 		ownerItemId,
@@ -213,12 +213,12 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					...inputItem({
 						id: "runtime:buffered-material",
 						inputIndex: 2,
-						itemId: "material",
+						itemUid: "material",
 					}),
 				},
 				{
 					id: "runtime:material:existing",
-					itemId: "material",
+					itemUid: "material",
 					location: {
 						scope: "board" as const,
 						space: 2,
@@ -272,13 +272,13 @@ it("preserves one impure buffered root and its passive subtree", () => {
 			inputItem({
 				id: "runtime:worker",
 				inputIndex: 0,
-				itemId: "worker",
+				itemUid: "worker",
 				remainingUnits: 1,
 			}),
 			inputItem({
 				id: "runtime:payload",
 				inputIndex: 0,
-				itemId: "payload",
+				itemUid: "payload",
 				ownerItemId: "runtime:worker",
 			}),
 		],
@@ -310,13 +310,13 @@ it("preserves one impure buffered root and its passive subtree", () => {
 		{
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: boardOwner.id,
-			canonicalItemId: boardOwner.itemId,
+			itemUid: boardOwner.itemUid,
 			location: boardOwner.location,
 		},
 		{
 			type: GameEventEnumSchema.enum.ItemPlaced,
 			itemId: "runtime:worker",
-			canonicalItemId: "worker",
+			itemUid: "worker",
 			originItemId: boardOwner.id,
 			previousLocation: {
 				scope: "input",
@@ -354,18 +354,18 @@ it("rolls back the whole removal when one impure root has no exclusive cell", ()
 			inputItem({
 				id: "runtime:worker:a",
 				inputIndex: 0,
-				itemId: "worker",
+				itemUid: "worker",
 				remainingUnits: 1,
 			}),
 			inputItem({
 				id: "runtime:worker:b",
 				inputIndex: 1,
-				itemId: "worker",
+				itemUid: "worker",
 				remainingUnits: 1,
 			}),
 			{
 				id: "runtime:board-blocker",
-				itemId: "blocker",
+				itemUid: "blocker",
 				location: {
 					scope: "board" as const,
 					space: 2,
@@ -377,7 +377,7 @@ it("rolls back the whole removal when one impure root has no exclusive cell", ()
 			},
 			{
 				id: "runtime:other-space-blocker",
-				itemId: "blocker",
+				itemUid: "blocker",
 				location: {
 					scope: "board" as const,
 					space: 0,

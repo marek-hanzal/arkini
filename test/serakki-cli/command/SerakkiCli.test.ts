@@ -117,7 +117,7 @@ describe("game incident CLI", () => {
 					items: [
 						{
 							id: "runtime:item:water",
-							itemId: "water",
+							itemUid: "water",
 							location: {
 								scope: "board",
 								space: 0,

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "uwc1lv69qqyj23egidhz6z9t",
-		"id": "treasure-chest-t2",
 		"title": "Treasure Chest - Tier 2",
 		"ui": "default",
 		"description": "Surprise lurks inside",

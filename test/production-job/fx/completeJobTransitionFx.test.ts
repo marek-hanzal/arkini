@@ -114,14 +114,14 @@ describe("job completion transition", () => {
 
 		if (result.type !== "completed") throw new Error("Expected completed job.");
 		const outputs = result.runtime.items.filter(
-			(item) => item.item.id === "outputA" || item.item.id === "outputB",
+			(item) => item.item.uid === "outputA" || item.item.uid === "outputB",
 		);
 		expect(outputs).not.toEqual([]);
 		for (const item of outputs) {
 			expect(result.events).toContainEqual({
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: item.id,
-				canonicalItemId: item.item.id,
+				itemUid: item.item.uid,
 				originItemId: "runtime:random-forge",
 				location: item.location,
 			});

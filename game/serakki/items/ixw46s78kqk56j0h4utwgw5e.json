@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ixw46s78kqk56j0h4utwgw5e",
-		"id": "pickaxe",
 		"title": "Pickaxe",
 		"description": "For persuading stone deposits that they were never meant to stay whole. Rocks remain unconvinced but eventually cooperate.",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone-excalibur"
+					"itemUid": "qs3o90ajldud08tpnx0wcxku"
 				},
 				"action": "use",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sword",
+											"itemUid": "i1uq4hi5j80c2fdgn1ockshg",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "stone-deposit"
+				"result": "hds0v0xcckj5gcyzuwv8ujg8"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone-excalixe"
+					"itemUid": "m5mszx67xwvasx9gjf92ejym"
 				},
 				"action": "use",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "axe",
+											"itemUid": "qvjicvykpbmp1bdxxrscxnul",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "stone-deposit"
+				"result": "hds0v0xcckj5gcyzuwv8ujg8"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone-deposit"
+					"itemUid": "hds0v0xcckj5gcyzuwv8ujg8"
 				},
 				"action": "use",
 				"outcome": {
@@ -98,7 +97,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stone---tier-1",
+											"itemUid": "b1z61l4bbwdtc75nt189hzze",
 											"quantity": {
 												"min": 1,
 												"max": 1

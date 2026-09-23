@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "p8p44vaadugd1238urrxcoyi",
-		"id": "sack-with-dye-seed",
 		"title": "Sack With Dye Seed",
 		"draft": false,
 		"description": "A sack of dye plant seed, marked with the plants it is meant to grow.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-dye-field"
+					"itemUid": "ftogp74ztyaxvio5td1hbcvq"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "dye-field"
+				"result": "ceh7j608ofnvzynccgq5nwmq"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

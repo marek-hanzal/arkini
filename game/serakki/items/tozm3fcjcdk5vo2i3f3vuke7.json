@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tozm3fcjcdk5vo2i3f3vuke7",
-		"id": "faith",
 		"title": "Faith",
 		"ui": "simple",
 		"artwork": {
@@ -15,52 +14,52 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bio-waste"
+					"itemUid": "l70n80ujrm55lpl6z2n4hcty"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "holy-shit"
+				"result": "odv5hvx21e1usihp2v027oau"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "faith-toilet"
+				"result": "aygivt7zvn1bhvhe7emo5g86"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "teddy-bear"
+				"result": "hn2mp2xmdu9on72r0auz8h7t"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-puppy"
+				"result": "jml833htnpikvhdtswrnfn3a"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cow"
+					"itemUid": "f5o2vqdxqh3zhg05fyd1xf1m"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "faith-cow"
+				"result": "d5rul9m8fhumjhsjw8uff2if"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cotton-field"
+					"itemUid": "c45534f7e4eb3faf3e39c8d1"
 				},
 				"action": "consume",
 				"outcome": {
@@ -74,7 +73,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cotton",
+											"itemUid": "ppyp6pjf6uqnjegb6q5l9d9o",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -89,7 +88,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "cotton-field"
+				"result": "sy01gwgqbum87oa96usrv67x"
 			}
 		],
 		"clock": {

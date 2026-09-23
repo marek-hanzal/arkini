@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c7iplno6v2eepclkna7b30m9",
-		"id": "laboratory-glassware-with-honey",
 		"title": "Laboratory Glassware With Honey",
 		"ui": "simple",
 		"draft": true,

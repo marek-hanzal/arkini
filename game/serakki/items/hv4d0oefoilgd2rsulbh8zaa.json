@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hv4d0oefoilgd2rsulbh8zaa",
-		"id": "medicine-satchel",
 		"title": "Medicine Satchel",
 		"ui": "simple",
 		"draft": true,

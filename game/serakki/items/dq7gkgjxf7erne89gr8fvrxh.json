@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dq7gkgjxf7erne89gr8fvrxh",
-		"id": "sack-with-rapeseed-seed",
 		"title": "Sack With Rapeseed Seed",
 		"draft": false,
 		"description": "A sack of rapeseed seed, marked with the crop it is meant to grow.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-rapeseed-field"
+					"itemUid": "pfpwon1x53qp5sgf1usb0zck"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "rapeseed-field"
+				"result": "lmnh1x5m8bk40sk8xq5qe6w5"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

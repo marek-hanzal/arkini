@@ -7,27 +7,27 @@ import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schem
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
-export const KeyIdMismatchDiagnosticSchema = z
+export const KeyUidMismatchDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
 		code: DiagnosticCodeEnumSchema.extract([
-			"ConfigKeyIdMismatch",
+			"ConfigKeyUidMismatch",
 		]),
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
 		entity: DiagnosticRecordEntityEnumSchema,
 		key: IdSchema,
-		id: IdSchema,
+		uid: IdSchema,
 	})
 	.strict()
 	.meta({
-		id: "KeyIdMismatchDiagnosticSchema",
-		description: "A canonical record key differs from its embedded immutable ID.",
+		id: "KeyUidMismatchDiagnosticSchema",
+		description: "A canonical record key differs from its embedded immutable UID.",
 	});
 
-export type KeyIdMismatchDiagnosticSchema = typeof KeyIdMismatchDiagnosticSchema;
+export type KeyUidMismatchDiagnosticSchema = typeof KeyUidMismatchDiagnosticSchema;
 
-export namespace KeyIdMismatchDiagnosticSchema {
-	export type Type = z.infer<KeyIdMismatchDiagnosticSchema>;
+export namespace KeyUidMismatchDiagnosticSchema {
+	export type Type = z.infer<KeyUidMismatchDiagnosticSchema>;
 }

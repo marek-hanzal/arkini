@@ -6,7 +6,6 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -55,7 +54,7 @@ export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "water",
+										itemUid: "water",
 									},
 								},
 								quantity: {
@@ -70,7 +69,7 @@ export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "tool",
+										itemUid: "tool",
 									},
 								},
 								quantity: {
@@ -106,7 +105,7 @@ export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 	const owner = yield* spawnItemFx({
 		id: "runtime:forge",
-		itemId: "forge",
+		itemUid: "forge",
 		location: {
 			scope: "board",
 			space: 0,
@@ -119,7 +118,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 	for (let index = 0; index < 6; index += 1) {
 		const water = yield* spawnItemFx({
 			id: index === 0 ? "runtime:water" : `runtime:water:${index}`,
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board",
 				space: 0,
@@ -141,7 +140,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 	for (let index = 0; index < 2; index += 1) {
 		const tool = yield* spawnItemFx({
 			id: index === 0 ? "runtime:tool" : `runtime:tool:${index}`,
-			itemId: "tool",
+			itemUid: "tool",
 			location: {
 				scope: "board",
 				space: 0,

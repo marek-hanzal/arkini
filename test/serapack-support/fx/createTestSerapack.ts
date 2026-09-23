@@ -28,7 +28,7 @@ export const testSerapackConfig = GameConfigSchema.parse({
 			height: 2,
 			board: [
 				{
-					itemId: "water",
+					itemUid: "water",
 					x: 1,
 					y: 0,
 				},
@@ -50,7 +50,6 @@ export const testSerapackConfig = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "water",
-			id: "water",
 
 			title: "Water",
 			description: "Water",

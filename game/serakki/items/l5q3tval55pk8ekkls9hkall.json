@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "l5q3tval55pk8ekkls9hkall",
-		"id": "well-with-milk",
 		"title": "Well With Milk",
 		"ui": "simple",
 		"description": "Cows are on vacation",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1

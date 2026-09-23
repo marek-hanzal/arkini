@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ektge0zdtcrfjhvyzz1rt2r1",
-		"id": "vegetable-seed",
 		"title": "Vegetable Seed",
 		"draft": false,
 		"description": "Loose vegetable seeds. Plant them or pack them into a sack before they spoil.",
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-vegetable-seed"
+				"result": "ouhetymctez7398vqukr9vhv"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-vegetable-garden"
+					"itemUid": "mrjxfxlc4d54d2bkse1ms9h4"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "vegetable-garden"
+				"result": "txlir5vk0o6iljcgv6tx1o1q"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-vegetable-seed",
+										"itemUid": "f00b34tuq72hhd676i2qzucv",
 										"quantity": {
 											"min": 1,
 											"max": 1

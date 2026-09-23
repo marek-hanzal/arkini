@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jml833htnpikvhdtswrnfn3a",
-		"id": "beagle-puppy",
 		"title": "Beagle Puppy",
 		"draft": true,
 		"ui": "simple",
@@ -19,29 +18,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bio-waste"
+					"itemUid": "l70n80ujrm55lpl6z2n4hcty"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle"
+				"result": "upghscvjnnxzp09urbuh5x0a"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fawn"
+					"itemUid": "aalsr85hfkjpg477l9h99xxb"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-puppy-with-fawn"
+				"result": "flicnek5qo71idlrr9y3czf1"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle"
+					"itemUid": "upghscvjnnxzp09urbuh5x0a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-cuddling-puppy"
+				"result": "h29vpb7xti4o0j2js9ypgnct"
 			}
 		],
 		"clock": {
@@ -89,7 +88,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "self"
 						}
@@ -106,7 +105,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beagle-puppy",
+											"itemUid": "jml833htnpikvhdtswrnfn3a",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -142,7 +141,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "self"
 						}
@@ -159,7 +158,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-beagle-puppy",
+											"itemUid": "kz6q5qvcmt55jnipynl1q0so",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -169,7 +168,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -205,7 +204,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "self"
 						}
@@ -222,7 +221,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle-puppy",
+											"itemUid": "zvs78k8506sfyq41p5iq44vg",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -259,7 +258,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "self"
 						}
@@ -276,7 +275,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle-puppy",
+											"itemUid": "zvs78k8506sfyq41p5iq44vg",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -297,7 +296,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -329,7 +328,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "self"
 						}
@@ -346,7 +345,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle-puppy",
+											"itemUid": "zvs78k8506sfyq41p5iq44vg",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -367,7 +366,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},
@@ -399,7 +398,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "near-close"
 						}
@@ -413,7 +412,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "self"
 						}
@@ -430,7 +429,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beagle-cuddling-puppy",
+											"itemUid": "h29vpb7xti4o0j2js9ypgnct",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -451,7 +450,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "beagle"
+										"itemUid": "upghscvjnnxzp09urbuh5x0a"
 									},
 									"distance": "near-close"
 								},

@@ -125,7 +125,7 @@ export const createUnitsConfig = (inputCount: number) =>
 								query: {
 									distance: "close" as const,
 									selector: {
-										itemId: "tree",
+										itemUid: "tree",
 										type: "item" as const,
 									},
 								},
@@ -139,7 +139,6 @@ export const createUnitsConfig = (inputCount: number) =>
 			tree: {
 				...lineRunTestConfig.items.water,
 				uid: "tree",
-				id: "tree",
 				title: "Tree",
 				description: "Finite units.",
 				units: {

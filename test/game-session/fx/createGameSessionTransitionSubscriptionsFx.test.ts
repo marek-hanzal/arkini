@@ -35,7 +35,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:event:duplicate",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,
@@ -61,7 +61,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 							[
 								{
 									type: GameEventEnumSchema.enum.JobCompleted,
-									canonicalItemId: "owner",
+									itemUid: "owner",
 									jobId: "job:fake",
 									ownerItemId: "owner:fake",
 									lineId: "line:fake",
@@ -79,7 +79,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 						[
 							{
 								type: GameEventEnumSchema.enum.JobCompleted,
-								canonicalItemId: "owner",
+								itemUid: "owner",
 								jobId: "job:event:validation-barrier",
 								ownerItemId: "owner:event:validation-barrier",
 								lineId: "line:event:validation-barrier",
@@ -142,7 +142,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 							[
 								{
 									type: GameEventEnumSchema.enum.JobCompleted,
-									canonicalItemId: "owner",
+									itemUid: "owner",
 									jobId: "job:event:first",
 									ownerItemId: "owner:event:first",
 									lineId: "line:event:first",
@@ -161,7 +161,7 @@ describe("createGameSessionTransitionSubscriptionsFx / event delivery", () => {
 						[
 							{
 								type: GameEventEnumSchema.enum.JobCompleted,
-								canonicalItemId: "owner",
+								itemUid: "owner",
 								jobId: "job:event:second",
 								ownerItemId: "owner:event:second",
 								lineId: "line:event:second",

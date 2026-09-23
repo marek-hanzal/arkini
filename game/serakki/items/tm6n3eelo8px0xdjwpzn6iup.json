@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tm6n3eelo8px0xdjwpzn6iup",
-		"id": "butter",
 		"title": "Butter",
 		"ui": "simple",
 		"description": "Fresh nice butter",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-butter",
+										"itemUid": "v9ldh08cznq5ju3ns2f93rgu",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -13,7 +13,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
 const base = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -31,7 +31,7 @@ const reserveInput = (itemId: string) => ({
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid: itemId,
 		},
 	},
 	quantity: {
@@ -191,12 +191,12 @@ describe("reserved material lifecycle", () => {
 			Effect.gen(function* () {
 				const employer = yield* spawnItemFx({
 					id: "runtime:employer",
-					itemId: "producer:employer",
+					itemUid: "producer:employer",
 					location: board(0),
 				});
 				const worker = yield* spawnItemFx({
 					id: "runtime:worker",
-					itemId: "producer:worker",
+					itemUid: "producer:worker",
 					location: board(1),
 				});
 				yield* startLineFx({
@@ -248,7 +248,7 @@ describe("reserved material lifecycle", () => {
 		expect(result.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemPlaced,
 			itemId: returnedWorker.id,
-			canonicalItemId: "producer:worker",
+			itemUid: "producer:worker",
 			originItemId: "runtime:employer",
 			previousLocation: {
 				scope: "reserved",
@@ -264,17 +264,17 @@ describe("reserved material lifecycle", () => {
 			Effect.gen(function* () {
 				const employer = yield* spawnItemFx({
 					id: "runtime:employer",
-					itemId: "producer:employer",
+					itemUid: "producer:employer",
 					location: board(0),
 				});
 				const worker = yield* spawnItemFx({
 					id: "runtime:worker",
-					itemId: "producer:worker",
+					itemUid: "producer:worker",
 					location: board(1),
 				});
 				const payload = yield* spawnItemFx({
 					id: "runtime:payload",
-					itemId: "item:payload",
+					itemUid: "item:payload",
 					location: board(2),
 				});
 				yield* storeInputMaterialFx({
@@ -337,17 +337,17 @@ it("keeps the whole completion blocked when an impure reservation has no exclusi
 		Effect.gen(function* () {
 			const employer = yield* spawnItemFx({
 				id: "runtime:employer",
-				itemId: "producer:employer",
+				itemUid: "producer:employer",
 				location: board(0),
 			});
 			const worker = yield* spawnItemFx({
 				id: "runtime:worker",
-				itemId: "producer:worker",
+				itemUid: "producer:worker",
 				location: board(1),
 			});
 			const payload = yield* spawnItemFx({
 				id: "runtime:payload",
-				itemId: "item:payload",
+				itemUid: "item:payload",
 				location: board(2),
 			});
 			yield* storeInputMaterialFx({
@@ -372,7 +372,7 @@ it("keeps the whole completion blocked when an impure reservation has no exclusi
 			].entries()) {
 				yield* spawnItemFx({
 					id: `runtime:blocker:${index}`,
-					itemId: "item:blocker",
+					itemUid: "item:blocker",
 					location,
 				});
 			}

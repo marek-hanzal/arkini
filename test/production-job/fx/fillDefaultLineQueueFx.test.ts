@@ -35,7 +35,7 @@ const createDefaultLineConfig = (capacity: number) => {
 
 const spawnOwnerFx = spawnItemFx({
 	id: ownerItemId,
-	itemId: "forge",
+	itemUid: "forge",
 	location: {
 		scope: "board",
 		space: 0,

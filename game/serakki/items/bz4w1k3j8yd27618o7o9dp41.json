@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bz4w1k3j8yd27618o7o9dp41",
-		"id": "sack-with-water",
 		"title": "Sack With Water",
 		"ui": "simple",
 		"description": "It's wet",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-sack",
+										"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 										"quantity": {
 											"min": 1,
 											"max": 1

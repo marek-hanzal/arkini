@@ -651,7 +651,7 @@ it("reports the selected external target's remaining units, including during an 
 					distance: "far",
 					selector: {
 						type: "item",
-						itemId: water.item.id,
+						itemUid: water.item.uid,
 					},
 				},
 			},

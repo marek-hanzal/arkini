@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zfe1uedywgk7jmtxlzk7wai4",
-		"id": "empty-bubble-reservoir",
 		"title": "Empty Bubble Reservoir",
 		"ui": "simple",
 		"description": "No more bubbles, you need refill.",

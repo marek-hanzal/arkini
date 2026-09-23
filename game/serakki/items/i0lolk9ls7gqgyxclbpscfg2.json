@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "i0lolk9ls7gqgyxclbpscfg2",
-		"id": "iron-ingot",
 		"title": "Iron Ingot",
 		"ui": "simple",
 		"description": "Heavy stuff, heavy machinery",

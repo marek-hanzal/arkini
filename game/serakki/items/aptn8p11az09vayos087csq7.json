@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aptn8p11az09vayos087csq7",
-		"id": "brickworks",
 		"title": "Brickworks",
 		"ui": "default",
 		"description": "Do bricks",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coal"
+								"itemUid": "ks3q0os5blwii5qaa299wlek"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "clay"
+								"itemUid": "awxyw9ell5u1clg4zbii8mmk"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bricks",
+											"itemUid": "kczhu2w8uvek2y4j1jv52lro",
 											"quantity": {
 												"min": 2,
 												"max": 2
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 1,
 												"max": 3

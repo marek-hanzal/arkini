@@ -38,7 +38,7 @@ describe("createGameSessionFx / fail-stop", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:water:listener",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,
@@ -115,7 +115,7 @@ describe("createGameSessionFx / fail-stop", () => {
 			const owner = await session.runFn(
 				spawnItemFx({
 					id: "runtime:tick-reporter-forge",
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "board",
 						space: 0,

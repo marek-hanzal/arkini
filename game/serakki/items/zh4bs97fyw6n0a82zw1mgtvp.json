@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zh4bs97fyw6n0a82zw1mgtvp",
-		"id": "golden-egg",
 		"title": "Golden Egg",
 		"ui": "simple",
 		"draft": true,

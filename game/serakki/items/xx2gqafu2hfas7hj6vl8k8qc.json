@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xx2gqafu2hfas7hj6vl8k8qc",
-		"id": "well-blueprint",
 		"title": "Well Blueprint",
 		"description": "Wanna some well?",
 		"ui": "default",
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-blueprint"
+								"itemUid": "xx2gqafu2hfas7hj6vl8k8qc"
 							},
 							"distance": "self"
 						}
@@ -48,7 +47,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "resource-research"
+								"itemUid": "bqf3op5bndkaqfgpap7lj7kq"
 							},
 							"distance": "far"
 						},
@@ -63,7 +62,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-1"
+								"itemUid": "b1z61l4bbwdtc75nt189hzze"
 							},
 							"distance": "far"
 						},
@@ -78,7 +77,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -93,7 +92,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-bucket"
+								"itemUid": "ww797h0lugbws2jsb61ldy7g"
 							},
 							"distance": "far"
 						},
@@ -115,7 +114,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well",
+											"itemUid": "fs7g7flliyj78y8bw6t3djrt",
 											"quantity": {
 												"min": 1,
 												"max": 1

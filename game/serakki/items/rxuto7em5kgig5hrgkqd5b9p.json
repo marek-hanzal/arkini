@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rxuto7em5kgig5hrgkqd5b9p",
-		"id": "empty-basket",
 		"title": "Empty Basket",
 		"ui": "simple",
 		"description": "Just basket",

@@ -65,12 +65,12 @@ it("rejects missing templates and failed replacement items without clearing the 
 				height: 2,
 				board: [
 					{
-						itemId: "log",
+						itemUid: "log",
 						x: 0,
 						y: 0,
 					},
 					{
-						itemId: "missing",
+						itemUid: "missing",
 						x: 1,
 						y: 0,
 					},

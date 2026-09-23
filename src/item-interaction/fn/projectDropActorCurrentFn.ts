@@ -3,7 +3,7 @@ import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSc
 export interface DropTransferActor {
 	readonly id: string;
 	readonly item: {
-		readonly id: string;
+		readonly uid: string;
 	};
 	readonly revision: string;
 	readonly location: BoardLocationSchema.Type;
@@ -15,7 +15,7 @@ export const projectDropActorCurrentFn = (item: DropTransferActor | undefined) =
 		? null
 		: {
 				itemId: item.id,
-				canonicalItemId: item.item.id,
+				itemUid: item.item.uid,
 				revision: item.revision,
 				location: item.location,
 			};

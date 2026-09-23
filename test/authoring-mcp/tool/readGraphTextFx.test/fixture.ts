@@ -5,7 +5,7 @@ import { createGraphProject, createToolProject } from "../support/createToolProj
 export const createRelationTraversalProject = () => {
 	const base = createGraphProject();
 	const forge = base.config.items.forge;
-	const readOutput = (itemId: string) => ({
+	const readOutput = (itemUid: string) => ({
 		set: [
 			{
 				rules: [],
@@ -14,7 +14,7 @@ export const createRelationTraversalProject = () => {
 						outcome: [
 							{
 								type: "item",
-								itemId,
+								itemUid,
 								placement: "drop" as const,
 								quantity: {
 									max: 1,
@@ -31,17 +31,17 @@ export const createRelationTraversalProject = () => {
 	});
 	const readProducer = ({
 		id,
-		inputItemId,
-		outputItemId,
+		inputItemUid,
+		outputItemUid,
 		title,
 	}: {
 		readonly id: string;
-		readonly inputItemId: string;
-		readonly outputItemId: string;
+		readonly inputItemUid: string;
+		readonly outputItemUid: string;
 		readonly title: string;
 	}) => ({
 		...forge,
-		id,
+
 		title,
 		uid: id,
 		lines: forge.lines.map((line) => ({
@@ -59,14 +59,14 @@ export const createRelationTraversalProject = () => {
 					query: {
 						distance: "far",
 						selector: {
-							itemId: inputItemId,
+							itemUid: inputItemUid,
 							type: "item" as const,
 						},
 					},
 					type: "materials" as const,
 				},
 			],
-			outcome: readOutput(outputItemId),
+			outcome: readOutput(outputItemUid),
 			title: `${title} Run`,
 		})),
 	});
@@ -77,31 +77,31 @@ export const createRelationTraversalProject = () => {
 				...base.config.items,
 				dust: {
 					...base.config.items.tool,
-					id: "dust",
+
 					title: "Dust",
 					uid: "dust",
 				},
 				ingot: readProducer({
 					id: "ingot",
-					inputItemId: "tool",
-					outputItemId: "plate",
+					inputItemUid: "tool",
+					outputItemUid: "plate",
 					title: "Ingot",
 				}),
 				kiln: readProducer({
 					id: "kiln",
-					inputItemId: "tool",
-					outputItemId: "ingot",
+					inputItemUid: "tool",
+					outputItemUid: "ingot",
 					title: "Kiln",
 				}),
 				mill: readProducer({
 					id: "mill",
-					inputItemId: "forge",
-					outputItemId: "dust",
+					inputItemUid: "forge",
+					outputItemUid: "dust",
 					title: "Mill",
 				}),
 				plate: {
 					...base.config.items.tool,
-					id: "plate",
+
 					title: "Plate",
 					uid: "plate",
 				},

@@ -21,7 +21,7 @@ it("replaces one space and its full ownership tree while retaining another space
 				height: 1,
 				board: [
 					{
-						itemId: "tool",
+						itemUid: "tool",
 						x: 1,
 						y: 0,
 					},
@@ -48,7 +48,7 @@ it("replaces one space and its full ownership tree while retaining another space
 									distance: "far",
 									selector: {
 										type: "item",
-										itemId: "tool",
+										itemUid: "tool",
 									},
 								},
 								quantity: {
@@ -73,11 +73,11 @@ it("replaces one space and its full ownership tree while retaining another space
 			});
 			const prepared = yield* readRuntimeFx();
 			const buffered = prepared.items.find(
-				(item) => item.item.id === "water" && item.location.scope === "board",
+				(item) => item.item.uid === "water" && item.location.scope === "board",
 			)!;
 			const travelling = prepared.items.find(
 				(item) =>
-					item.item.id === "water" &&
+					item.item.uid === "water" &&
 					item.location.scope === "board" &&
 					item.id !== buffered.id,
 			)!;
@@ -282,7 +282,7 @@ it("replaces one space and its full ownership tree while retaining another space
 	expect(created).toHaveLength(1);
 	expect(created[0]).toMatchObject({
 		item: {
-			id: "tool",
+			uid: "tool",
 		},
 		location: {
 			scope: "board",

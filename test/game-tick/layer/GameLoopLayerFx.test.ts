@@ -60,7 +60,7 @@ describe("GameLoopLayerFx", () => {
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "runtime:loop-forge",
-				itemId: "forge",
+				itemUid: "forge",
 
 				location: {
 					scope: "board",
@@ -88,7 +88,7 @@ describe("GameLoopLayerFx", () => {
 				const after = yield* readRuntimeFx();
 				expect(before.jobs[0]?.remainingMs).toBe(100);
 				expect(after.jobs).toEqual([]);
-				expect(after.items.some((item) => item.item.id === "completionOutput")).toBe(true);
+				expect(after.items.some((item) => item.item.uid === "completionOutput")).toBe(true);
 			}).pipe(
 				Effect.provide(GameLoopLayerFx()),
 				Effect.provide(
@@ -110,7 +110,7 @@ describe("GameLoopLayerFx", () => {
 		Effect.gen(function* () {
 			const owner = yield* spawnItemFx({
 				id: "runtime:loop-forge",
-				itemId: "forge",
+				itemUid: "forge",
 				location: {
 					scope: "board",
 					space: 0,
@@ -134,11 +134,13 @@ describe("GameLoopLayerFx", () => {
 			const transitionAtBoundary = yield* (yield* CommittedTransitionsFx).read;
 
 			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(SimulationStepMs);
-			expect(beforeBoundary.items.some((item) => item.item.id === "completionOutput")).toBe(
+			expect(beforeBoundary.items.some((item) => item.item.uid === "completionOutput")).toBe(
 				false,
 			);
 			expect(atBoundary.jobs).toEqual([]);
-			expect(atBoundary.items.some((item) => item.item.id === "completionOutput")).toBe(true);
+			expect(atBoundary.items.some((item) => item.item.uid === "completionOutput")).toBe(
+				true,
+			);
 			expect(transitionAtBoundary.sequence).toBe(transitionBeforeBoundary.sequence + 1);
 			expect(transitionAtBoundary.runtime).toBe(atBoundary);
 			expect(transitionAtBoundary.events.map((event) => event.type)).toEqual([

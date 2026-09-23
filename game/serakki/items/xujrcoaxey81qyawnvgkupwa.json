@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xujrcoaxey81qyawnvgkupwa",
-		"id": "spoiled-clay-mug",
 		"title": "Spoiled Clay Mug",
 		"ui": "simple",
 		"description": "It's spoiled",

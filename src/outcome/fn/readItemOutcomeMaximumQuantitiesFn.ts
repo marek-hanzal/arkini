@@ -16,7 +16,7 @@ export const readItemOutcomeMaximumQuantitiesFn = ({
 	for (const candidate of outcome) {
 		if (candidate.type !== "item") continue;
 		const quantity = candidate.quantity.max;
-		quantities.set(candidate.itemId, (quantities.get(candidate.itemId) ?? 0) + quantity);
+		quantities.set(candidate.itemUid, (quantities.get(candidate.itemUid) ?? 0) + quantity);
 	}
 
 	return quantities;

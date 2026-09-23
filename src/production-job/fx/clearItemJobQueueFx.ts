@@ -117,7 +117,7 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 					{
 						type: "job-queue:cleared",
 						ownerItemId,
-						canonicalItemId: owner.item.id,
+						itemUid: owner.item.uid,
 						clearedRequestCount: clearedRequests.length,
 					},
 					...returned.events,

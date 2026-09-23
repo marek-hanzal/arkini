@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zg25vgaju0u2p8o3alw8com9",
-		"id": "clay-bowl-with-water",
 		"title": "Clay Bowl With Water",
 		"ui": "simple",
 		"description": "Bit of water",

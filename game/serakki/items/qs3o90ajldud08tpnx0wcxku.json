@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qs3o90ajldud08tpnx0wcxku",
-		"id": "stone-excalibur",
 		"title": "Stone Excalibur",
 		"ui": "simple",
 		"draft": true,

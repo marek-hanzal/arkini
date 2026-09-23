@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "pvfsx02l7omudco7ntq9ajb5",
-		"id": "sunflower-farm",
 		"title": "Sunflower Farm",
 		"draft": false,
 		"description": "Operates nearby sunflower fields and keeps their seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sunflower-field"
+								"itemUid": "j1qvbr13f0cxd3ds0c642yjo"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sunflower",
+											"itemUid": "km4zqdkq5woekosyo8zqf4zt",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sunflower-field",
+											"itemUid": "guzv8wmx0qxw28iqhch6g7lc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sunflower-farm-blueprint",
+											"itemUid": "uefgic1o7ybhswej9m178vw5",
 											"quantity": {
 												"min": 1,
 												"max": 1

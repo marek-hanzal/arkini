@@ -22,7 +22,7 @@ it("serves bounded Chain views from one projection, retaining branch identities 
 	const noProject = await client.callTool({
 		name: "item_chain",
 		arguments: {
-			itemId: "root",
+			itemUid: "root",
 		},
 	});
 	expect(noProject.isError).toBe(true);
@@ -73,7 +73,7 @@ it("serves bounded Chain views from one projection, retaining branch identities 
 	const result = await client.callTool({
 		name: "item_chain",
 		arguments: {
-			itemId: "root",
+			itemUid: "root",
 		},
 	});
 	expect(result.isError).not.toBe(true);
@@ -93,7 +93,7 @@ it("serves bounded Chain views from one projection, retaining branch identities 
 	const missing = await client.callTool({
 		name: "item_chain",
 		arguments: {
-			itemId: "missing",
+			itemUid: "missing",
 		},
 	});
 	expect(missing.isError).toBe(true);
@@ -119,7 +119,7 @@ it("serves bounded Chain views from one projection, retaining branch identities 
 		await client.callTool({
 			name: "item_chain",
 			arguments: {
-				itemId: "root",
+				itemUid: "root",
 				detail: "summary",
 			},
 		}),
@@ -147,7 +147,7 @@ it("serves bounded Chain views from one projection, retaining branch identities 
 			await client.callTool({
 				name: "item_chain",
 				arguments: {
-					itemId: "root",
+					itemUid: "root",
 					detail,
 					maxDepth: 1,
 				},
@@ -159,7 +159,7 @@ it("serves bounded Chain views from one projection, retaining branch identities 
 			await client.callTool({
 				name: "item_chain",
 				arguments: {
-					itemId: "wide",
+					itemUid: "wide",
 					detail,
 				},
 			}),

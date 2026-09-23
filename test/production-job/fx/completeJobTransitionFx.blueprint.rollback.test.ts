@@ -18,7 +18,7 @@ describe("blueprint completion rollback", () => {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
 					space: 0,
-					itemId: "blueprint:outcome",
+					itemUid: "blueprint:outcome",
 					x: 0,
 					y: 0,
 				});
@@ -46,7 +46,7 @@ describe("blueprint completion rollback", () => {
 				].entries()) {
 					yield* spawnItemFx({
 						id: `runtime:byproduct-blocker:${index}`,
-						itemId: "item:blocker",
+						itemUid: "item:blocker",
 						location: {
 							scope: "board",
 							space: 0,
@@ -65,9 +65,9 @@ describe("blueprint completion rollback", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "blueprint:outcome")).toBe(true);
-		expect(runtime.items.some((item) => item.item.id === "item:target-unlimited")).toBe(false);
-		expect(runtime.items.some((item) => item.item.id === "item:byproduct")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "blueprint:outcome")).toBe(true);
+		expect(runtime.items.some((item) => item.item.uid === "item:target-unlimited")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "item:byproduct")).toBe(false);
 		expect(runtime.jobs).toEqual([
 			expect.objectContaining({
 				remainingMs: 0,
@@ -81,13 +81,13 @@ describe("blueprint completion rollback", () => {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
 					space: 0,
-					itemId: "blueprint:reserve",
+					itemUid: "blueprint:reserve",
 					x: 0,
 					y: 0,
 				});
 				const tool = yield* spawnItemFx({
 					id: "runtime:tool",
-					itemId: "item:tool",
+					itemUid: "item:tool",
 					location: {
 						scope: "board",
 						space: 0,
@@ -117,7 +117,7 @@ describe("blueprint completion rollback", () => {
 				].entries()) {
 					yield* spawnItemFx({
 						id: `runtime:blocker:${index}`,
-						itemId: "item:blocker",
+						itemUid: "item:blocker",
 						location: {
 							scope: "board",
 							space: 0,
@@ -143,9 +143,9 @@ describe("blueprint completion rollback", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "blueprint:reserve")).toBe(true);
-		expect(runtime.items.some((item) => item.item.id === "item:target-unlimited")).toBe(false);
-		expect(runtime.items.some((item) => item.item.id === "item:byproduct")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "blueprint:reserve")).toBe(true);
+		expect(runtime.items.some((item) => item.item.uid === "item:target-unlimited")).toBe(false);
+		expect(runtime.items.some((item) => item.item.uid === "item:byproduct")).toBe(false);
 		expect(runtime.jobs).toEqual([
 			expect.objectContaining({
 				remainingMs: 0,

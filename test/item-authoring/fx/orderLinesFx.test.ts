@@ -57,7 +57,7 @@ const fixtureFn = () => {
 				...project.config,
 				items: {
 					...project.config.items,
-					[item.id]: item,
+					[item.uid]: item,
 				},
 			},
 		}),
@@ -88,7 +88,7 @@ describe("exact item line ordering", () => {
 			orderLinesFx({
 				project,
 				repository,
-				itemId: "forge",
+				itemUid: "forge",
 				revision: 7,
 				lineIds: [
 					lines[2]!.id,
@@ -141,7 +141,7 @@ describe("exact item line ordering", () => {
 				orderLinesFx({
 					project,
 					repository,
-					itemId: "forge",
+					itemUid: "forge",
 					revision: 7,
 					lineIds,
 				}).pipe(Effect.result),
@@ -171,7 +171,7 @@ describe("exact item line ordering", () => {
 		for (const input of [
 			{
 				project: duplicateProject,
-				itemId: "forge",
+				itemUid: "forge",
 				revision: 7,
 				lineIds: [
 					lines[0]!.id,
@@ -179,13 +179,13 @@ describe("exact item line ordering", () => {
 			},
 			{
 				project,
-				itemId: "missing",
+				itemUid: "missing",
 				revision: 7,
 				lineIds: [],
 			},
 			{
 				project,
-				itemId: "forge",
+				itemUid: "forge",
 				revision: 6,
 				lineIds: lines.map((line) => line.id),
 			},
@@ -211,7 +211,7 @@ describe("exact item line ordering", () => {
 			orderLinesFx({
 				project,
 				repository,
-				itemId: "tool",
+				itemUid: "tool",
 				revision: 7,
 				lineIds: [],
 			}),

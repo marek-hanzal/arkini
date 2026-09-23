@@ -61,16 +61,16 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 		});
 		value.templates.forEach((template, index) => {
 			template.board.forEach((cell, cellIndex) => {
-				if (project.config.items[cell.itemId] === undefined)
+				if (project.config.items[cell.itemUid] === undefined)
 					context.addIssue({
 						code: "custom",
-						message: `Item ${cell.itemId} does not exist in this project.`,
+						message: `Item ${cell.itemUid} does not exist in this project.`,
 						path: [
 							"templates",
 							index,
 							"board",
 							cellIndex,
-							"itemId",
+							"itemUid",
 						],
 					});
 			});

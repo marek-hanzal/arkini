@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wc4n1z8e45jtsfpsojtu06n3",
-		"id": "animal-bones---tier-2",
 		"title": "Animal Bones - Tier 2",
 		"draft": true,
 		"ui": "simple",
@@ -19,11 +18,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "animal-bones---tier-2"
+					"itemUid": "wc4n1z8e45jtsfpsojtu06n3"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "animal-bones---tier-3"
+				"result": "uwa68bnfs02vfmssz9sy7y1q"
 			}
 		],
 		"maxQueueSize": 1,
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "animal-bones---tier-2"
+								"itemUid": "wc4n1z8e45jtsfpsojtu06n3"
 							},
 							"distance": "self"
 						}
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 2,
 												"max": 2

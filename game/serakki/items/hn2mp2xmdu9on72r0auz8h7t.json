@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hn2mp2xmdu9on72r0auz8h7t",
-		"id": "teddy-bear",
 		"title": "Teddy Bear",
 		"ui": "simple",
 		"draft": true,
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bear-with-teddy-bear"
+				"result": "vzgk10o2qt8tnp177g18ab34"
 			}
 		],
 		"maxQueueSize": 1,

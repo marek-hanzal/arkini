@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "akdfqjm4paxik6tsi93zurih",
-		"id": "farmers-market",
 		"title": "Farmers Market",
 		"draft": false,
 		"description": "A trade hub where outside demand turns local agricultural surplus into contracts, imports, and occasional valuables.",
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-grain-t1",
+											"itemUid": "gjo9f51k3xuq7kjkbng1p7n5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -85,9 +84,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "grain-farm"
+										"itemUid": "cgf3xd90ku1igebcgbe7nhct"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -123,7 +122,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-vegetables-t1",
+											"itemUid": "hqy2lvzpaqrmdfy3uchet5lk",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -144,9 +143,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "vegetable-farm"
+										"itemUid": "ybm9et9f0pph5amk9mml068q"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -182,7 +181,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-fruit-t1",
+											"itemUid": "i9yx4ix89kachdhflod81b7r",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -203,9 +202,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "fruit-farm"
+										"itemUid": "avzrwr1i9lmmjqc6i8cgxxsq"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -241,7 +240,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-wool-t1",
+											"itemUid": "a7501nhp6qdlp81jh6gpab2r",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -262,9 +261,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sheep-farm"
+										"itemUid": "cge5cvtkheqw9irq4gje6yn5"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -300,7 +299,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-pumpkin-t1",
+											"itemUid": "kewkd0arcrwr3ajn1w04kvmw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -321,9 +320,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "pumpkin-farm"
+										"itemUid": "liqtyae3co1o60pb9smqopbs"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -359,7 +358,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "quest-wool-t2",
+											"itemUid": "gmys7a2t78foxskdeoxdnmos",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -380,9 +379,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sheep-farm"
+										"itemUid": "cge5cvtkheqw9irq4gje6yn5"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -395,9 +394,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "cotton-farm"
+										"itemUid": "ijvxkfutjp5xaehjlrv6boze"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

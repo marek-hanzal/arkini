@@ -43,7 +43,7 @@ const makeRequirementFn = (
 	quantity: number,
 	source: "line-condition" | "output-condition",
 ): AcquisitionRequirement => ({
-	factId: when.query.selector.itemId,
+	factId: when.query.selector.itemUid,
 	quantity,
 	source,
 	usage: "ongoing",
@@ -56,7 +56,7 @@ const addUnsupportedRequirementFn = (
 	source: "line-condition" | "output-condition",
 ) =>
 	unsupported.push({
-		factId: when.query.selector.itemId,
+		factId: when.query.selector.itemUid,
 		reason,
 		source,
 	});

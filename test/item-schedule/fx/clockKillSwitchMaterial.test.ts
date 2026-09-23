@@ -39,7 +39,7 @@ const configFn = () => {
 								distance: "far",
 								selector: {
 									type: "item" as const,
-									itemId: "blocker",
+									itemUid: "blocker",
 								},
 							},
 							mode: "reserve" as const,
@@ -69,17 +69,17 @@ describe("kill-switch material expiry", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "owner",
-					itemId: "owner",
+					itemUid: "owner",
 					location: boardFn(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
-					itemId: "temporary",
+					itemUid: "temporary",
 					location: boardFn(1),
 				});
 				const reserve = yield* spawnItemFx({
 					id: "reserve",
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: boardFn(2),
 				});
 				for (const [inputIndex, source] of [
@@ -131,20 +131,20 @@ describe("kill-switch material expiry", () => {
 		);
 		expect(result.after.jobs).toEqual([]);
 		expect(result.after.items.some((item) => item.id === "material")).toBe(false);
-		expect(result.after.items.find((item) => item.item.id === "blocker")).toMatchObject({
+		expect(result.after.items.find((item) => item.item.uid === "blocker")).toMatchObject({
 			location: {
 				scope: "board",
 				space: 0,
 			},
 		});
-		expect(result.after.items.some((item) => item.item.id === "residue")).toBe(true);
+		expect(result.after.items.some((item) => item.item.uid === "residue")).toBe(true);
 		const transition = result.committed.transition!;
 		expect(transition.previousRuntime).toEqual(result.before);
 		expect(transition.runtime).toEqual(result.after);
 		expect(transition.events).toContainEqual(
 			expect.objectContaining({
 				type: GameEventEnumSchema.enum.JobAborted,
-				canonicalItemId: "owner",
+				itemUid: "owner",
 				ownerItemId: "owner",
 				reason: "material-expired",
 			}),

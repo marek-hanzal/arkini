@@ -35,11 +35,11 @@ const projectOutcomeFn = (
 			: {
 					type: "item",
 					activeRuleHints: [],
-					itemId: outcome.itemId,
+					itemUid: outcome.itemUid,
 					placement: outcome.placement,
 					quantity: outcome.quantity,
 					rules: outcome.rules,
-					title: items[outcome.itemId]?.title ?? outcome.itemId,
+					title: items[outcome.itemUid]?.title ?? outcome.itemUid,
 				};
 
 /** Projects canonical authored table into the shared visible table structure. */

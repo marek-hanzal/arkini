@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "inkvbfkqv4zu96xz2eiiu4dw",
-		"id": "knowledge-t1",
 		"title": "Knowledge - Tier 1",
 		"description": "Basic practical knowledge turned into something the settlement can actually use. Enough to understand better work, not enough to call anyone a master.",
 		"ui": "simple",

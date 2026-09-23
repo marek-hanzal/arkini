@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rwgifjjoffgcix5149b6q6v1",
-		"id": "firewood",
 		"title": "Firewood",
 		"draft": true,
 		"description": "Wood with a much clearer career plan: burn. Keeps camps warm, fires alive, and eyebrows occasionally negotiable.",
@@ -17,7 +16,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-extinguished"
+					"itemUid": "fenhlvaj45ssocm5r935nqli"
 				},
 				"action": "consume",
 				"outcome": {
@@ -31,7 +30,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -46,21 +45,21 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire"
+				"result": "our0pxaqz9ce08z8tdyhek44"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-oven"
+					"itemUid": "pektmrtnnwg2te0zso1ezkwc"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "oven-with-wood"
+				"result": "yofqa330f03b3dexsmde5aeu"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "oven-with-ash"
+					"itemUid": "drj72ef3yia0euytyg2e1jal"
 				},
 				"action": "consume",
 				"outcome": {
@@ -74,7 +73,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -89,7 +88,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "oven-with-wood"
+				"result": "yofqa330f03b3dexsmde5aeu"
 			}
 		],
 		"maxQueueSize": 1,

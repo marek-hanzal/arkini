@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wax6k29uqekpfg7f46qhnzi1",
-		"id": "spoiled-sugar-cane",
 		"title": "Spoiled Sugar Cane",
 		"ui": "simple",
 		"artwork": {

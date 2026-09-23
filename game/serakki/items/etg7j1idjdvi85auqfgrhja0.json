@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "etg7j1idjdvi85auqfgrhja0",
-		"id": "pillow",
 		"title": "Pillow",
 		"ui": "simple",
 		"description": "Your neck may thank you",
@@ -16,29 +15,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "duvet"
+					"itemUid": "ttrui5h42ip0i5019cwpgx82"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bedding"
+				"result": "q5m849uvic9mi5aqcb41pzle"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bow-and-arrows"
+					"itemUid": "i5fpduh7s05jm3hautorgz5k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "silenced-bow"
+				"result": "pdf7wsiugl78cqtmeym6tda7"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle-puppy"
+					"itemUid": "jml833htnpikvhdtswrnfn3a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-puppy-tearing-pillow"
+				"result": "qagnqtra7kf5dsfgb9wq71r0"
 			}
 		],
 		"maxQueueSize": 1,

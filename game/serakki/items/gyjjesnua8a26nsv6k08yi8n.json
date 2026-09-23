@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gyjjesnua8a26nsv6k08yi8n",
-		"id": "butcher",
 		"title": "Butcher",
 		"draft": true,
 		"ui": "default",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "pig"
+								"itemUid": "jx5gnntoo4aj7rxf3eq32lun"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "cutting-board"
+								"itemUid": "cfrqc6p65c4gh3lrjswv84zv"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "cutting-board-with-animal-fat",
+											"itemUid": "g8oi8iw4hidud9t24h8lv0p4",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -107,7 +106,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "raw-game-meat"
+								"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw"
 							},
 							"distance": "far"
 						},
@@ -129,7 +128,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sausage",
+											"itemUid": "mtvvve0kkty0ofw9im4lifo0",
 											"quantity": {
 												"min": 4,
 												"max": 4

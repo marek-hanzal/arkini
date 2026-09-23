@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "enfhduqwl1duiedukufshoyt",
-		"id": "apiary",
 		"title": "Apiary",
 		"description": "Bees",
 		"ui": "default",
@@ -33,7 +32,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beehive"
+								"itemUid": "vrrlriluo0tlef50wpl5q2bt"
 							},
 							"distance": "close"
 						}
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "flower-field"
+								"itemUid": "cuao33ea066g975ysq1nu9fe"
 							},
 							"distance": "close"
 						}
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "honeycomb",
+											"itemUid": "mkpze02hvznlf83rwf2xqefu",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -86,7 +85,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "beehive"
+										"itemUid": "vrrlriluo0tlef50wpl5q2bt"
 									},
 									"distance": "close"
 								},
@@ -102,7 +101,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "flower-field"
+										"itemUid": "cuao33ea066g975ysq1nu9fe"
 									},
 									"distance": "close"
 								},
@@ -128,7 +127,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -143,7 +142,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -158,7 +157,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-1"
+								"itemUid": "b1z61l4bbwdtc75nt189hzze"
 							},
 							"distance": "far"
 						},
@@ -180,7 +179,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beehive",
+											"itemUid": "vrrlriluo0tlef50wpl5q2bt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -216,7 +215,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-beehive"
+								"itemUid": "u429hy1jfrysyrnlsim8shyb"
 							},
 							"distance": "close"
 						}
@@ -226,7 +225,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "flowers"
+								"itemUid": "wty33h4avbqmgblvysq7e3ql"
 							},
 							"distance": "far"
 						},
@@ -248,7 +247,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beehive",
+											"itemUid": "vrrlriluo0tlef50wpl5q2bt",
 											"quantity": {
 												"min": 1,
 												"max": 1

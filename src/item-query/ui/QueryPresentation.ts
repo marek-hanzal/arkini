@@ -21,10 +21,6 @@ export const BoardDistancePresentation = {
 		description: "Matches any positive board distance and excludes only Self.",
 		label: "Far",
 	},
-	universe: {
-		description: "Searches matching items in every board space in the current game.",
-		label: "Universe",
-	},
 } as const satisfies Record<DistanceSchema.Type, Presentation>;
 
 interface Presentation {

@@ -48,7 +48,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 		{
 			type: GameEventEnumSchema.enum.ItemExpired,
 			itemId: item.id,
-			canonicalItemId: item.item.id,
+			itemUid: item.item.uid,
 			location: origin,
 		},
 	];
@@ -98,7 +98,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 						(loss): GameEventSchema.Type => ({
 							type: GameEventEnumSchema.enum.ItemDiscarded,
 							ownerItemId: item.id,
-							canonicalItemId: loss.itemId,
+							itemUid: loss.itemUid,
 							quantity: loss.quantity,
 							source: "expiry-outcome",
 							reason: loss.reason,
@@ -122,7 +122,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: item.id,
-			canonicalItemId: item.item.id,
+			itemUid: item.item.uid,
 			location: origin,
 		});
 	}

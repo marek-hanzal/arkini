@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hqrm0shkrcrp9i6d2m8ysr0t",
-		"id": "sugar-beet-field",
 		"title": "Sugar Beet Field",
 		"draft": false,
 		"description": "Here you go",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-sugar-beet-field",
+										"itemUid": "hap8h04cn4l4c60avf2b7il2",
 										"quantity": {
 											"min": 1,
 											"max": 1

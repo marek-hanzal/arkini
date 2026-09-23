@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nw60xpkc8pbay8tkriirlyw2",
-		"id": "empty-mug",
 		"title": "Empty Mug",
 		"description": "You can put something in there",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beer-barrel"
+					"itemUid": "wh01db4tsschuz3nf4xfr0pi"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beer-mug",
+											"itemUid": "wsxdo9qr3r9cl8s8ay0buttc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -49,7 +48,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "well"
+					"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 				},
 				"action": "consume",
 				"outcome": {
@@ -63,7 +62,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "water-mug",
+											"itemUid": "ul3bpq59ybg8xeq1uuvmto99",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -82,7 +81,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wine-barrel"
+					"itemUid": "evbffbj4huu519hwjjwwce06"
 				},
 				"action": "consume",
 				"outcome": {
@@ -96,7 +95,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wine-mug",
+											"itemUid": "z862wkp11q7pxv1ans0sjpl3",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -115,7 +114,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cafe"
+					"itemUid": "vtwdcl5ne53d9tyy5ijk76dg"
 				},
 				"action": "consume",
 				"outcome": {
@@ -129,7 +128,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "coffee-tankard",
+											"itemUid": "n9xn8uww85gxwob555vam6av",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -148,7 +147,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet-beer"
+					"itemUid": "bcsqwp1kcn3witslvys9yb1v"
 				},
 				"action": "consume",
 				"outcome": {
@@ -162,7 +161,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -177,12 +176,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "toilet"
+				"result": "ecihjakbzjlagfsrswt4cdji"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "well-with-coffee"
+					"itemUid": "cb9s36hu9rogsoifm2aef25u"
 				},
 				"action": "consume",
 				"outcome": {
@@ -196,7 +195,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "coffee-tankard",
+											"itemUid": "n9xn8uww85gxwob555vam6av",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -215,7 +214,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cow"
+					"itemUid": "f5o2vqdxqh3zhg05fyd1xf1m"
 				},
 				"action": "consume",
 				"outcome": {
@@ -229,7 +228,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "milk-mug",
+											"itemUid": "oy7hz2unlgoos52f57q9tstx",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -244,7 +243,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "hungry-cow"
+				"result": "zpb9k34bv9tafe0k3jg5pgdn"
 			}
 		],
 		"maxQueueSize": 1,

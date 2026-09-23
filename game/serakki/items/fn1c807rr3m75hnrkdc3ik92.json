@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fn1c807rr3m75hnrkdc3ik92",
-		"id": "scythe",
 		"title": "Scythe",
 		"draft": true,
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "corn-field"
+					"itemUid": "om31d2frwk86m6dhiirx7kw6"
 				},
 				"action": "use",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "corn",
+											"itemUid": "m0quqq3gbmugylp39ced2zco",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-corn-field"
+				"result": "hlhjwuirteft3l82uxiqrrnh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "flax-field"
+					"itemUid": "mp2maik3tk3jwvt78hwfjw9x"
 				},
 				"action": "use",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flax",
+											"itemUid": "i4io40cjq9y37k6in13szqjn",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-flax-field"
+				"result": "y8a926c064v74l7gncur9clj"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cow"
+					"itemUid": "f5o2vqdxqh3zhg05fyd1xf1m"
 				},
 				"action": "consume",
 				"outcome": {
@@ -98,7 +97,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -108,7 +107,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "spoiled-raw-game-meat",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -123,16 +122,16 @@
 					]
 				},
 				"effect": "replace",
-				"result": "grim-reaper"
+				"result": "bpm5udeivrvd39122nmndehq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "luxury-clothes"
+					"itemUid": "y490ul2kwwppsdeuhvr2kpg8"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "grim-reaper"
+				"result": "bpm5udeivrvd39122nmndehq"
 			}
 		],
 		"maxQueueSize": 1,

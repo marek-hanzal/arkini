@@ -47,12 +47,12 @@ const makeState = ({
 		items: [
 			{
 				id: "runtime:source",
-				itemId: "source",
+				itemUid: "source",
 				location: sourceLocation,
 			},
 			{
 				id: "runtime:target",
-				itemId: "target",
+				itemUid: "target",
 				location: targetLocation,
 			},
 		],
@@ -87,7 +87,7 @@ const runMergeFx = () =>
 const spendRule = {
 	target: {
 		type: "item",
-		itemId: "target",
+		itemUid: "target",
 	},
 	action: "spend",
 	effect: "keep",
@@ -96,7 +96,7 @@ const spendRule = {
 const targetSpendRule = {
 	target: {
 		type: "item",
-		itemId: "target",
+		itemUid: "target",
 	},
 	action: "consume",
 	effect: "spend",
@@ -137,7 +137,7 @@ describe("mergeItemsFx", () => {
 		it(`applies ${action} + ${effect} explicitly to one source and target identity`, () => {
 			const targetSelector = {
 				type: "item" as const,
-				itemId: "target",
+				itemUid: "target",
 			};
 			const rule: MergeSchema.Type =
 				effect === "replace"
@@ -165,7 +165,7 @@ describe("mergeItemsFx", () => {
 			);
 
 			const sourceQuantity = result.after.items.filter(
-				(item) => item.item.id === "source",
+				(item) => item.item.uid === "source",
 			).length;
 			expect(sourceQuantity).toBe(action === "use" ? 1 : 0);
 			if (action === "use") {
@@ -178,19 +178,19 @@ describe("mergeItemsFx", () => {
 			}
 
 			const target = result.after.items.find((item) => item.id === "runtime:target");
-			if (effect === "keep") expect(target?.item.id).toBe("target");
+			if (effect === "keep") expect(target?.item.uid).toBe("target");
 			if (effect === "remove") expect(target).toBeUndefined();
-			if (effect === "replace") expect(target?.item.id).toBe("result");
+			if (effect === "replace") expect(target?.item.uid).toBe("result");
 
 			expect(result.event).toEqual({
 				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: "runtime:source",
-				sourceCanonicalItemId: "source",
+				sourceItemUid: "source",
 				targetItemId: "runtime:target",
-				targetCanonicalItemId: "target",
+				targetItemUid: "target",
 				action,
 				effect,
-				resultCanonicalItemId: effect === "replace" ? "result" : undefined,
+				resultItemUid: effect === "replace" ? "result" : undefined,
 			});
 			expect(result.transition.events.map((event) => event.type)).toEqual(
 				effect === "remove"
@@ -224,7 +224,7 @@ describe("mergeItemsFx", () => {
 						rule: {
 							target: {
 								type: "item",
-								itemId: "target",
+								itemUid: "target",
 							},
 							action: "consume",
 							effect: "remove",
@@ -268,7 +268,7 @@ describe("mergeItemsFx", () => {
 		});
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
-				id: "target",
+				uid: "target",
 			},
 		});
 	});
@@ -319,7 +319,7 @@ describe("mergeItemsFx", () => {
 				}),
 			),
 		);
-		const output = result.after.items.find((item) => item.item.id === "output");
+		const output = result.after.items.find((item) => item.item.uid === "output");
 		if (output === undefined) throw new Error("Expected depletion output.");
 
 		expect(result.transition.events).toEqual([
@@ -327,7 +327,7 @@ describe("mergeItemsFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 				itemId: "runtime:source",
-				canonicalItemId: "source",
+				itemUid: "source",
 				location: result.before.items.find((item) => item.id === "runtime:source")
 					?.location,
 			},
@@ -342,7 +342,7 @@ describe("mergeItemsFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: output.id,
-				canonicalItemId: "output",
+				itemUid: "output",
 				originItemId: "runtime:source",
 				location: output.location,
 			},
@@ -379,7 +379,7 @@ describe("mergeItemsFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemUnitSpent,
 				itemId: "runtime:target",
-				canonicalItemId: "target",
+				itemUid: "target",
 				location: result.before.items.find((item) => item.id === "runtime:target")
 					?.location,
 				previousUnits: 2,
@@ -403,7 +403,7 @@ describe("mergeItemsFx", () => {
 				}),
 			),
 		);
-		const output = result.after.items.find((item) => item.item.id === "output");
+		const output = result.after.items.find((item) => item.item.uid === "output");
 		if (output === undefined) throw new Error("Expected target depletion output.");
 
 		expect(result.transition.events).toEqual([
@@ -417,7 +417,7 @@ describe("mergeItemsFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 				itemId: "runtime:target",
-				canonicalItemId: "target",
+				itemUid: "target",
 				location: result.before.items.find((item) => item.id === "runtime:target")
 					?.location,
 			},
@@ -432,7 +432,7 @@ describe("mergeItemsFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: output.id,
-				canonicalItemId: "output",
+				itemUid: "output",
 				originItemId: "runtime:target",
 				location: output.location,
 			},
@@ -477,7 +477,7 @@ describe("mergeItemsFx", () => {
 				{
 					target: {
 						type: "item",
-						itemId: "target",
+						itemUid: "target",
 					},
 					action: "use",
 					effect: "keep",
@@ -485,7 +485,7 @@ describe("mergeItemsFx", () => {
 				{
 					target: {
 						type: "item",
-						itemId: "target",
+						itemUid: "target",
 					},
 					action: "use",
 					effect: "replace",
@@ -528,7 +528,7 @@ describe("mergeItemsFx", () => {
 
 		expect(result.forward.event.effect).toBe("keep");
 		expect(
-			result.forward.after.items.find((item) => item.id === "runtime:target")?.item.id,
+			result.forward.after.items.find((item) => item.id === "runtime:target")?.item.uid,
 		).toBe("target");
 		expect(Result.isFailure(result.reverse)).toBe(true);
 		if (Result.isFailure(result.reverse)) {
@@ -545,7 +545,7 @@ describe("mergeItemsFx", () => {
 			rule: {
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				action: "consume",
 				effect: "keep",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "b3s2zbbcu7fggst61pzd762l",
-		"id": "hunter",
 		"title": "Hunter",
 		"description": "A manual hunting post. It can work a nearby Forest for simple meat outputs, or hunt specific wildlife when the player wants the whole animal route.",
 		"ui": "default",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "raw-steak",
+											"itemUid": "yf53q9esw3j2x0tvnf2df5mo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -90,7 +89,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "forest"
+										"itemUid": "wqoijk2kx2c313gw99g507iw"
 									},
 									"distance": "near-close"
 								},
@@ -118,7 +117,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -133,7 +132,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -155,7 +154,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -177,7 +176,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "forest"
+										"itemUid": "wqoijk2kx2c313gw99g507iw"
 									},
 									"distance": "near-close"
 								},
@@ -205,7 +204,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "fawn"
+								"itemUid": "aalsr85hfkjpg477l9h99xxb"
 							},
 							"distance": "far"
 						},
@@ -220,7 +219,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -235,7 +234,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -257,7 +256,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hunted-game",
+											"itemUid": "xaijv8bc7ljbonqgp1vzcxcc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -290,7 +289,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wild-boar"
+								"itemUid": "s2nit67s0y8655wk3pvom2qo"
 							},
 							"distance": "far"
 						},
@@ -305,7 +304,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -320,7 +319,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -342,7 +341,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hunted-game",
+											"itemUid": "xaijv8bc7ljbonqgp1vzcxcc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -375,7 +374,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "shorn-wild-boar"
+								"itemUid": "jzwbwsnxg7tbrr3oc97e1l48"
 							},
 							"distance": "far"
 						},
@@ -390,7 +389,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -405,7 +404,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -427,7 +426,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hunted-game",
+											"itemUid": "xaijv8bc7ljbonqgp1vzcxcc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -460,7 +459,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wolf"
+								"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 							},
 							"distance": "far"
 						},
@@ -475,7 +474,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -490,7 +489,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -512,7 +511,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hunted-game",
+											"itemUid": "xaijv8bc7ljbonqgp1vzcxcc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -545,7 +544,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bear"
+								"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 							},
 							"distance": "far"
 						},
@@ -560,7 +559,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bow"
+								"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 							},
 							"distance": "far"
 						},
@@ -575,7 +574,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-1"
+								"itemUid": "j3uy7jal3539u6u1zqup1mcz"
 							},
 							"distance": "far"
 						},
@@ -597,7 +596,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hunted-game",
+											"itemUid": "xaijv8bc7ljbonqgp1vzcxcc",
 											"quantity": {
 												"min": 1,
 												"max": 1

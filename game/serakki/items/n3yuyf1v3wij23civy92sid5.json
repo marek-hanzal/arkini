@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "n3yuyf1v3wij23civy92sid5",
-		"id": "sunflower-seed",
 		"title": "Sunflower Seed",
 		"draft": false,
 		"ui": "simple",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-sunflower-seed"
+				"result": "d94cb030fcniqallk6e6xmcz"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-sunflower-field"
+					"itemUid": "v9bujr50f5jjyhgiip75s72t"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sunflower-field"
+				"result": "j1qvbr13f0cxd3ds0c642yjo"
 			}
 		],
 		"clock": {
@@ -47,7 +46,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sunflower-seed",
+										"itemUid": "c4r9o6zzixta42uftef3te22",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ts8r14q70r8durrmu6c3o7vs",
-		"id": "bubble-maker",
 		"title": "Bubble Maker",
 		"ui": "default",
 		"description": "Make some bubbles",
@@ -33,7 +32,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bubble-reservoir"
+								"itemUid": "i4y31g4ivr6cetcs6zbgy2vf"
 							},
 							"distance": "close"
 						}
@@ -50,7 +49,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bubble",
+											"itemUid": "dqcrkfxcipwet0f0huqmi2cm",
 											"quantity": {
 												"min": 4,
 												"max": 8
@@ -72,7 +71,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "bubble-reservoir"
+										"itemUid": "i4y31g4ivr6cetcs6zbgy2vf"
 									},
 									"distance": "close"
 								},

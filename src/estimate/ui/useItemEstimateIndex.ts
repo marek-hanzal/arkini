@@ -59,7 +59,7 @@ export const useItemEstimateIndex = (
 	const selection = useMemo(() => {
 		const entries = createItemEstimateIndexFn({
 			estimates: state.estimates,
-			itemIds: Object.keys(snapshot.config.items),
+			itemUids: Object.keys(snapshot.config.items),
 		});
 		return {
 			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),

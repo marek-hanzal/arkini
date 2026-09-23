@@ -15,12 +15,12 @@ it("rolls back the whole start when depletion outcome cannot be placed", () => {
 		Effect.gen(function* () {
 			const owner = yield* spawnItemFx({
 				id: "runtime:lumberjack",
-				itemId: "producer:lumberjack",
+				itemUid: "producer:lumberjack",
 				location: board(0),
 			});
 			yield* spawnItemFx({
 				id: "runtime:messy",
-				itemId: "units:messy",
+				itemUid: "units:messy",
 				location: board(1),
 			});
 			for (const [id, location] of [
@@ -51,7 +51,7 @@ it("rolls back the whole start when depletion outcome cannot be placed", () => {
 			] as const) {
 				yield* spawnItemFx({
 					id,
-					itemId: "item:blocker",
+					itemUid: "item:blocker",
 					location,
 				});
 			}
@@ -79,12 +79,12 @@ it("resolves idle depletion while preserving the exact owner with remaining unit
 		Effect.gen(function* () {
 			const owner = yield* spawnItemFx({
 				id: "runtime:mixed-owner",
-				itemId: "producer:mixed-unit",
+				itemUid: "producer:mixed-unit",
 				location: board(0),
 			});
 			yield* spawnItemFx({
 				id: "runtime:empty-target",
-				itemId: "units:empty",
+				itemUid: "units:empty",
 				location: board(1),
 			});
 			for (const [id, location] of [
@@ -115,7 +115,7 @@ it("resolves idle depletion while preserving the exact owner with remaining unit
 			] as const) {
 				yield* spawnItemFx({
 					id,
-					itemId: "item:blocker",
+					itemUid: "item:blocker",
 					location,
 				});
 			}
@@ -130,10 +130,10 @@ it("resolves idle depletion while preserving the exact owner with remaining unit
 		}),
 	);
 
-	const owners = result.runtime.items.filter((item) => item.item.id === "producer:mixed-unit");
+	const owners = result.runtime.items.filter((item) => item.item.uid === "producer:mixed-unit");
 	expect(owners).toHaveLength(1);
 	expect(owners.find((item) => item.id === result.owner.id)).toMatchObject({
 		remainingUnits: 1,
 	});
-	expect(result.runtime.items.some((item) => item.item.id === "units:empty")).toBe(false);
+	expect(result.runtime.items.some((item) => item.item.uid === "units:empty")).toBe(false);
 });

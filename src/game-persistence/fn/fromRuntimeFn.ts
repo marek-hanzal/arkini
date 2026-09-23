@@ -4,7 +4,7 @@ import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 
 const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) => ({
 	id: item.id,
-	itemId: item.item.id,
+	itemUid: item.item.uid,
 	location: item.location,
 	...(item.mergeSequence === undefined
 		? {}

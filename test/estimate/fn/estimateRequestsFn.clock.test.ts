@@ -45,7 +45,7 @@ const createClockGraph = async ({
 								clock: true,
 								outcome: createOutput([
 									{
-										itemId: "target",
+										itemUid: "target",
 									},
 								]),
 							}),
@@ -56,7 +56,7 @@ const createClockGraph = async ({
 							default: true,
 							outcome: createOutput([
 								{
-									itemId: "other",
+									itemUid: "other",
 								},
 							]),
 						}),
@@ -70,7 +70,7 @@ const createClockGraph = async ({
 			enable,
 			onExpire: createOutput([
 				{
-					itemId: "expired",
+					itemUid: "expired",
 				},
 			]),
 		},
@@ -92,7 +92,7 @@ const createClockGraph = async ({
 						height: 3,
 						board: [
 							{
-								itemId: "clock",
+								itemUid: "clock",
 								x: 0,
 								y: 0,
 							},
@@ -299,7 +299,7 @@ describe("Clock authored acquisition boundaries", () => {
 	it.each([
 		"target",
 		"other",
-	])("does not assign independent timing to weighted Clock output %s", async (itemId) => {
+	])("does not assign independent timing to weighted Clock output %s", async (itemUid) => {
 		const graph = await createClockGraph({
 			additionalLines: [
 				{
@@ -308,7 +308,7 @@ describe("Clock authored acquisition boundaries", () => {
 						clock: true,
 						outcome: createOutput([
 							{
-								itemId,
+								itemUid,
 							},
 						]),
 					}),
@@ -352,10 +352,10 @@ describe("Clock authored acquisition boundaries", () => {
 								{
 									type: "exists",
 									query: {
-										distance: "universe",
+										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "target",
+											itemUid: "target",
 										},
 									},
 								},

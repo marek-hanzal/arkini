@@ -245,29 +245,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					const state = yield* readStateFx(projectId);
 					if (expectedRevision !== undefined)
 						yield* assertExpectedRevisionFx(state, expectedRevision, "upsert-item");
-					const collision = state.project.config.items[item.id];
-					if (collision !== undefined && collision.uid !== item.uid)
-						return yield* Effect.fail(
-							errorFn(
-								"upsert-item",
-								`Item ID ${item.id} is already used by another item.`,
-							),
-						);
-					const previous = Object.entries(state.project.config.items).find(
-						([, existing]) => existing.uid === item.uid,
-					);
-					if (previous !== undefined && previous[0] !== item.id)
-						return yield* Effect.fail(
-							errorFn(
-								"upsert-item",
-								`Saved item ${previous[0]} cannot be renamed without an explicit rename workflow.`,
-							),
-						);
 					const config = GameConfigSchema.parse({
 						...state.project.config,
 						items: {
 							...state.project.config.items,
-							[item.id]: item,
+							[item.uid]: item,
 						},
 					});
 					return asCommitFn(
@@ -285,7 +267,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			Effect.mapError((cause) =>
 				errorFn(
 					"upsert-item",
-					`Item ${candidateItem.id} could not be saved in project ${projectId}.`,
+					`Item ${candidateItem.uid} could not be saved in project ${projectId}.`,
 					cause,
 				),
 			),
@@ -310,28 +292,27 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						return yield* Effect.fail(
 							errorFn("delete-item", `Item UID ${itemUid} does not exist.`),
 						);
-					const [itemId] = entry;
 					const blockers = readDeleteBlockersFn({
 						config: state.project.config,
-						itemId,
+						itemUid,
 					});
 					if (blockers.length > 0 && !force)
 						return yield* Effect.fail(
 							errorFn(
 								"delete-item",
-								`Item ${itemId} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
+								`Item ${itemUid} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
 							),
 						);
 					const config = force
 						? (yield* forceDeleteFx({
 								config: state.project.config,
-								itemId,
+								itemUid,
 							})).config
 						: GameConfigSchema.parse({
 								...state.project.config,
 								items: Object.fromEntries(
 									Object.entries(state.project.config.items).filter(
-										([id]) => id !== itemId,
+										([id]) => id !== itemUid,
 									),
 								),
 							});

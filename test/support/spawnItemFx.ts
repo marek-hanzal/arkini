@@ -21,7 +21,7 @@ class TestLocationOccupiedError extends Data.TaggedError("TestLocationOccupiedEr
 export namespace spawnItemFx {
 	export interface Props {
 		id: IdSchema.Type;
-		itemId: IdSchema.Type;
+		itemUid: IdSchema.Type;
 		location: BoardLocationSchema.Type;
 	}
 }
@@ -31,11 +31,11 @@ export namespace spawnItemFx {
  */
 export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 	id,
-	itemId,
+	itemUid,
 	location,
 }: spawnItemFx.Props) {
 	const item = yield* resolveItemFx({
-		itemId,
+		itemUid,
 	});
 	const runtimeItem = yield* createRuntimeItemFx({
 		id,

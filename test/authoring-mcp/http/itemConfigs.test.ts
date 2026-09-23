@@ -41,7 +41,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 	const response = await client.callTool({
 		name: "item_configs",
 		arguments: {
-			itemIds: [
+			itemUids: [
 				"tool",
 				"missing",
 				"forge",
@@ -62,7 +62,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 						snapshot!.config.items.tool,
 						snapshot!.config.items.forge,
 					],
-					missingItemIds: [
+					missingItemUids: [
 						"missing",
 						"absent",
 					],
@@ -84,7 +84,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 	const duplicates = await client.callTool({
 		name: "item_configs",
 		arguments: {
-			itemIds: [
+			itemUids: [
 				...fiftyIds,
 				...fiftyIds,
 			],
@@ -98,7 +98,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 				{
 					revision: snapshot!.revision,
 					items: [],
-					missingItemIds: fiftyIds,
+					missingItemUids: fiftyIds,
 				},
 				null,
 				2,
@@ -111,7 +111,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 	const oversized = await client.callTool({
 		name: "item_configs",
 		arguments: {
-			itemIds: [
+			itemUids: [
 				...fiftyIds,
 				"one-too-many",
 			],

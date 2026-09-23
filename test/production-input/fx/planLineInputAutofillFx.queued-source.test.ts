@@ -22,7 +22,6 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 			...inputRuntimeTestConfig.items,
 			recycler: {
 				...workshop,
-				id: "recycler",
 				uid: "recycler",
 				lines: [
 					{
@@ -35,7 +34,7 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "workshop",
+										itemUid: "workshop",
 									},
 								},
 								quantity: {
@@ -53,12 +52,12 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "receiver",
-				itemId: "recycler",
+				itemUid: "recycler",
 				location: sourceLocation(0),
 			});
 			yield* spawnItemFx({
 				id: "queued",
-				itemId: "workshop",
+				itemUid: "workshop",
 				location: sourceLocation(1),
 			});
 			yield* enqueueLineFx({
@@ -83,7 +82,7 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 					distance: "far" as const,
 					selector: {
 						type: "item",
-						itemId: "workshop",
+						itemUid: "workshop",
 					},
 				},
 			});
@@ -91,7 +90,7 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 
 			yield* spawnItemFx({
 				id: "idle",
-				itemId: "workshop",
+				itemUid: "workshop",
 				location: sourceLocation(2),
 			});
 			yield* advanceRuntimeElapsedFx({

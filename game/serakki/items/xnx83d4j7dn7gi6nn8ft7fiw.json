@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xnx83d4j7dn7gi6nn8ft7fiw",
-		"id": "raw-game-meat",
 		"title": "Raw Game Meat",
 		"description": "Fresh game meat. Useful, perishable, and destined for animals, sausages, or some more deliberate cooking.",
 		"ui": "simple",
@@ -16,29 +15,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cauldron-with-vegetables"
+					"itemUid": "pnlt3psyz5n49b775otdclwz"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cauldron-with-vegetables-and-meat"
+				"result": "rwbvfj732t4e9h52n7ygf0y0"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "hungry-beagle-puppy"
+					"itemUid": "kz6q5qvcmt55jnipynl1q0so"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-puppy"
+				"result": "jml833htnpikvhdtswrnfn3a"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "hungry-beagle"
+					"itemUid": "ms0pjnyoteo96bt25xr8lk7z"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle"
+				"result": "upghscvjnnxzp09urbuh5x0a"
 			}
 		],
 		"clock": {
@@ -56,7 +55,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-game-meat",
+										"itemUid": "xf44x3an4an91b5xqmxevd11",
 										"quantity": {
 											"min": 2,
 											"max": 3

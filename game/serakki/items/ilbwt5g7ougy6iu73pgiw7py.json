@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ilbwt5g7ougy6iu73pgiw7py",
-		"id": "homeland-portal",
 		"title": "Homeland Portal",
 		"description": "Back to the place where this whole questionable enterprise began. Civilization, clutter, and unfinished projects included.",
 		"ui": "simple",

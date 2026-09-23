@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xoq42yfjdvrbu3a8lr1m61ar",
-		"id": "laboratory-glassware-with-wine",
 		"title": "Laboratory Glassware With Wine",
 		"ui": "simple",
 		"draft": true,
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bed-t1"
+					"itemUid": "ppvb7bkeybasw9j45yv9zk6n"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-laboratory-glassware",
+											"itemUid": "c8k56ppmzlav98mdhrqtkq5v",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "bed-wine"
+				"result": "fbj07pw11dg44pnvdqwgm1dw"
 			}
 		],
 		"maxQueueSize": 1,

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xxwklwezina4c0ejukf5fcpz",
-		"id": "sack-with-grain-seed",
 		"title": "Sack With Grain Seed",
 		"draft": false,
 		"description": "A sack of grain seed. The grain shown on the sack is considerably easier to identify than the individual seeds.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-grain-field"
+					"itemUid": "iz7g7a4t9cusl70zjj99xq89"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "grain-field"
+				"result": "imrcxilbuisx6f02q5rt7pp3"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

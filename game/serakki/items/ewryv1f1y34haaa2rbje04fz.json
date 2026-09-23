@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ewryv1f1y34haaa2rbje04fz",
-		"id": "tree-seed",
 		"title": "Tree Seed",
 		"draft": false,
 		"description": "A loose tree seed. Keep it, bag it, or hand it to a Forester before time turns ambition into compost.",
@@ -17,11 +16,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-tree-seed"
+				"result": "t8ein7cobnouj8bb2hek6jhy"
 			}
 		],
 		"clock": {
@@ -39,7 +38,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-tree-seed",
+										"itemUid": "dwzuz9t781terc5krgoi95k8",
 										"quantity": {
 											"min": 1,
 											"max": 1

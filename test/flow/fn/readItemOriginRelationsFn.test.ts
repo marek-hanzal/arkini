@@ -5,12 +5,12 @@ import { readItemOriginRelationsFn } from "~/flow/fn/readItemOriginRelationsFn";
 
 const source = ({
 	id,
-	outputItemId,
-	requirementItemId,
+	outputItemUid,
+	requirementItemUid,
 }: {
 	readonly id: string;
-	readonly outputItemId: string;
-	readonly requirementItemId: string;
+	readonly outputItemUid: string;
+	readonly requirementItemUid: string;
 }): ItemOriginSource => ({
 	id,
 	inputs: [],
@@ -18,7 +18,7 @@ const source = ({
 	label: id,
 	outputs: [
 		{
-			itemId: outputItemId,
+			itemUid: outputItemUid,
 			placement: undefined,
 			quantity: {
 				max: 1,
@@ -33,13 +33,13 @@ const source = ({
 			weightedSet: false,
 		},
 	],
-	ownerItemId: requirementItemId,
+	ownerItemUid: requirementItemUid,
 	reference: {
 		lineId: id,
 		type: "line",
 	},
-	requirementItemIds: [
-		requirementItemId,
+	requirementItemUids: [
+		requirementItemUid,
 	],
 	routeIds: [
 		id,
@@ -51,17 +51,17 @@ describe("item origin relations", () => {
 		const relations = readItemOriginRelationsFn({
 			...source({
 				id: "source:forge",
-				outputItemId: "ingot",
-				requirementItemId: "forge",
+				outputItemUid: "ingot",
+				requirementItemUid: "forge",
 			}),
-			requirementItemIds: [
+			requirementItemUids: [
 				"forge",
 				"ä-input",
 				"z-input",
 			],
 		});
 
-		expect(relations.map(({ fromItemId }) => fromItemId)).toEqual([
+		expect(relations.map(({ fromItemUid }) => fromItemUid)).toEqual([
 			"z-input",
 			"ä-input",
 			"forge",
@@ -72,10 +72,10 @@ describe("item origin relations", () => {
 		const forge: ItemOriginSource = {
 			...source({
 				id: "source:forge",
-				outputItemId: "ingot",
-				requirementItemId: "forge",
+				outputItemUid: "ingot",
+				requirementItemUid: "forge",
 			}),
-			requirementItemIds: [
+			requirementItemUids: [
 				"forge",
 				"water",
 			],
@@ -83,15 +83,15 @@ describe("item origin relations", () => {
 
 		expect(readItemOriginRelationsFn(forge)).toMatchObject([
 			{
-				fromItemId: "water",
+				fromItemUid: "water",
 				role: "input",
-				toItemId: "forge",
+				toItemUid: "forge",
 			},
 			{
-				fromItemId: "forge",
+				fromItemUid: "forge",
 				outcomeIndex: 0,
 				role: "output",
-				toItemId: "ingot",
+				toItemUid: "ingot",
 			},
 		]);
 	});

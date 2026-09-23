@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vooe5nxicrr6v6lcijgp3f4r",
-		"id": "spoiled-eggs",
 		"title": "Spoiled Eggs",
 		"ui": "simple",
 		"description": "No more Easter",

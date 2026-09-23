@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "euu2hwd3wtw7cmmknt399w3o",
-		"id": "toy-sloth",
 		"title": "Toy Sloth",
 		"ui": "simple",
 		"description": "This one gets lost too",

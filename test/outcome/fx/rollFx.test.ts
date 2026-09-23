@@ -7,7 +7,7 @@ import { rollFx } from "~/outcome/fx/rollFx";
 
 const logDrop: OutcomeSchema.Type = {
 	type: "item",
-	itemId: "item:log",
+	itemUid: "item:log",
 	quantity: {
 		min: 1,
 		max: 1,
@@ -53,7 +53,7 @@ describe("rollFx", () => {
 						logDrop,
 						{
 							...logDrop,
-							itemId: "item:stone",
+							itemUid: "item:stone",
 						},
 					],
 				},
@@ -73,7 +73,7 @@ describe("rollFx", () => {
 						logDrop,
 						{
 							...logDrop,
-							itemId: "item:stone",
+							itemUid: "item:stone",
 						},
 					]
 				: [],

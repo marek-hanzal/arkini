@@ -15,7 +15,7 @@ const item = (id: string, title: string): ItemSchema.Type => ({
 	lines: [],
 
 	description: `${title} description`,
-	id,
+
 	title,
 
 	uid: id,

@@ -13,7 +13,7 @@ vi.mock("~/item-authoring/ui/FormContext", () => ({
 		form: {
 			store: {},
 		},
-		itemId: "owner",
+		itemUid: "owner",
 	}),
 }));
 vi.mock("@tanstack/react-form", () => ({
@@ -45,9 +45,9 @@ vi.mock("~/production-authoring/ui/InputControl", () => ({
 	InputControl: ({ input }: { input: InputSchema.Type }) => (
 		<output data-input>
 			{input.type === "materials"
-				? input.query.selector.itemId
+				? input.query.selector.itemUid
 				: input.type === "units"
-					? input.query.selector.itemId
+					? input.query.selector.itemUid
 					: "simple"}
 		</output>
 	),
@@ -86,7 +86,7 @@ it.each([
 			"first",
 			"target",
 			"third",
-		].map((itemId) =>
+		].map((itemUid) =>
 			allowMaterials
 				? {
 						type: "materials",
@@ -99,7 +99,7 @@ it.each([
 							distance: "far",
 							selector: {
 								type: "item",
-								itemId,
+								itemUid,
 							},
 						},
 					}
@@ -109,7 +109,7 @@ it.each([
 							distance: "far",
 							selector: {
 								type: "item",
-								itemId,
+								itemUid,
 							},
 						},
 					},
@@ -211,7 +211,7 @@ it("duplicates the selected root input with its complete nested configuration", 
 				distance: "far",
 				selector: {
 					type: "item",
-					itemId: "ore",
+					itemUid: "ore",
 				},
 			},
 		},

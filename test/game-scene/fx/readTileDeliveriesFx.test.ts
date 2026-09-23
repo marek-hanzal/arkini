@@ -23,12 +23,12 @@ describe("readTileDeliveriesFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:workshop",
-					itemId: "workshop",
+					itemUid: "workshop",
 					location: workshopLocation,
 				});
 				yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation(2),
 				});
 				yield* autofillLineInputsFx({

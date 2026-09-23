@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bytaiaqvo87umpgxqr5s0d9n",
-		"id": "rapeseed-farm",
 		"title": "Rapeseed Farm",
 		"draft": false,
 		"description": "Operates nearby rapeseed fields and keeps their seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "rapeseed-field"
+								"itemUid": "lmnh1x5m8bk40sk8xq5qe6w5"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "rapeseed",
+											"itemUid": "fbasuyihmfgtvfbl4by9jhaa",
 											"quantity": {
 												"min": 1,
 												"max": 3
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-rapeseed-field",
+											"itemUid": "c4szzk4tv05cdwfgu3hip9mq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "rapeseed-farm-blueprint",
+											"itemUid": "vba70pptod750ervwycoud48",
 											"quantity": {
 												"min": 1,
 												"max": 1

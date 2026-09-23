@@ -68,30 +68,30 @@ export type AcquisitionRouteMetadata =
 			readonly kind: "line-output";
 			readonly lineId: string;
 			readonly lineTitle: string;
-			readonly ownerItemId: string;
+			readonly ownerItemUid: string;
 	  }
 	| {
-			readonly unitOwnerItemId: string;
+			readonly unitOwnerItemUid: string;
 			readonly kind: "line-unit-depletion";
 			readonly lineId: string;
 			readonly lineTitle: string;
-			readonly ownerItemId: string;
+			readonly ownerItemUid: string;
 	  }
 	| {
 			readonly kind: "merge-output";
 			readonly mergeIndex: number;
-			readonly sourceItemId: string;
-			readonly targetItemId: string;
+			readonly sourceItemUid: string;
+			readonly targetItemUid: string;
 	  }
 	| {
-			readonly unitOwnerItemId: string;
+			readonly unitOwnerItemUid: string;
 			readonly kind: "merge-unit-depletion";
 			readonly mergeIndex: number;
-			readonly sourceItemId: string;
-			readonly targetItemId: string;
+			readonly sourceItemUid: string;
+			readonly targetItemUid: string;
 	  }
 	| {
-			readonly itemId: string;
+			readonly itemUid: string;
 			readonly kind: "clock-expiry";
 	  };
 

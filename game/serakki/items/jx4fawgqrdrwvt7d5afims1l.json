@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jx4fawgqrdrwvt7d5afims1l",
-		"id": "dynamite-sticks",
 		"title": "Dynamite Sticks",
 		"ui": "simple",
 		"description": "Boom",

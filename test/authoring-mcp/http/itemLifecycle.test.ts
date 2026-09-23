@@ -1,4 +1,4 @@
-import { readFile, access } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -13,7 +13,7 @@ import {
 afterEach(cleanupMcpHarnesses);
 
 describe("editor MCP item lifecycle", () => {
-	it("renames references, previews deletion, and enforces revision-safe cleanup", async () => {
+	it("renames title, previews deletion, and enforces revision-safe cleanup", async () => {
 		const notifyProjectChanged = vi.fn();
 		const { ownership, port, repository } = await createMcpHarness(
 			Effect.runPromise,
@@ -40,7 +40,7 @@ describe("editor MCP item lifecycle", () => {
 									effect: "keep",
 									target: {
 										type: "item",
-										itemId: "water",
+										itemUid: "water",
 									},
 								},
 							],
@@ -72,59 +72,54 @@ describe("editor MCP item lifecycle", () => {
 		const renamed = await client.callTool({
 			name: "rename_item",
 			arguments: {
-				itemId: "water",
-				id: "fresh-water",
+				itemUid: "water",
 				title: "Fresh Water",
-				artwork: true,
 				revision: created.revision,
 			},
 		});
 		expect(renamed.content).toMatchObject([
 			{
-				text: expect.stringContaining("Updated references: 2"),
+				text: expect.stringContaining("Title: Fresh Water"),
 			},
 		]);
 		let project = await Effect.runPromise(repository.readProjectFx("item-lifecycle"));
 		if (project === null) throw new Error("Expected the renamed project.");
-		expect(project?.config.items.water).toBeUndefined();
-		expect(project?.config.items["fresh-water"]).toMatchObject({
-			id: "fresh-water",
+		expect(project?.config.items["water"]).toMatchObject({
 			uid: "water",
 			title: "Fresh Water",
 			artwork: {
 				default: [
-					"fresh-water",
+					"item-water",
 				],
 			},
 		});
-		expect(project?.config.templates![0]!.board[0]?.itemId).toBe("fresh-water");
+		expect(project?.config.templates![0]!.board[0]?.itemUid).toBe("water");
 
 		expect(project.revision).toBeGreaterThan(created.revision);
-		expect(await readFile(join(root, "artwork/fresh-water.png"))).toEqual(originalBytes);
-		await expect(access(join(root, "artwork/item-water.png"))).rejects.toThrow();
+		expect(await readFile(join(root, "artwork/item-water.png"))).toEqual(originalBytes);
 		expect(
 			(await Effect.runPromise(repository.listNotesFx("item-lifecycle")))[0]?.resourceIds,
 		).toEqual([
-			"fresh-water",
+			"item-water",
 		]);
 
 		const impact = await client.callTool({
 			name: "item_delete_impact",
 			arguments: {
-				itemId: "fresh-water",
+				itemUid: "water",
 			},
 		});
 		const impactContent = impact.content[0];
 		if (impactContent?.type !== "text") throw new Error("Missing delete impact text.");
 		expect(impactContent.text).toContain(`Revision: ${project.revision}`);
 		expect(impactContent.text).toContain("Safe delete: no");
-		expect(impactContent.text).toContain("templates.0.board.0.itemId");
+		expect(impactContent.text).toContain("templates.0.board.0.itemUid");
 		expect(() => JSON.parse(impactContent.text)).toThrow();
 
 		const safe = await client.callTool({
 			name: "delete_item",
 			arguments: {
-				itemId: "fresh-water",
+				itemUid: "water",
 				revision: project.revision,
 			},
 		});
@@ -138,7 +133,7 @@ describe("editor MCP item lifecycle", () => {
 		const deleted = await client.callTool({
 			name: "delete_item",
 			arguments: {
-				itemId: "fresh-water",
+				itemUid: "water",
 				revision: renamedRevision,
 				force: true,
 			},
@@ -150,7 +145,7 @@ describe("editor MCP item lifecycle", () => {
 		]);
 		project = await Effect.runPromise(repository.readProjectFx("item-lifecycle"));
 		expect(project?.revision).toBeGreaterThan(renamedRevision);
-		expect(project?.config.items["fresh-water"]).toBeUndefined();
+		expect(project?.config.items["water"]).toBeUndefined();
 		expect(project?.config.templates![0]!.board).toEqual([]);
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(2);
 		const notes = await Effect.runPromise(repository.listNotesFx("item-lifecycle"));
@@ -158,7 +153,7 @@ describe("editor MCP item lifecycle", () => {
 			{
 				...note,
 				resourceIds: [
-					"fresh-water",
+					"item-water",
 				],
 				itemUids: [],
 				updatedAtMs: expect.any(Number),
@@ -166,7 +161,7 @@ describe("editor MCP item lifecycle", () => {
 		]);
 		expect(notes[0]?.updatedAtMs).toBeGreaterThan(note.updatedAtMs);
 	});
-	it("rejects collisions and ambiguous artwork without partial edits; title and ID edits remain independent", async () => {
+	it("rejects incomplete and stale title edits without writing", async () => {
 		const notify = vi.fn();
 		const { ownership, port, repository } = await createMcpHarness(Effect.runPromise, notify);
 		const created = await Effect.runPromise(
@@ -186,22 +181,20 @@ describe("editor MCP item lifecycle", () => {
 			{
 				id: "hero",
 				title: "Must not persist",
-				artwork: true,
 			},
 			{
 				title: "Must not persist",
-				artwork: true,
+				revision: created.revision + 1,
 			},
 			{},
 			{
-				id: "fresh-water",
 				revision: created.revision + 1,
 			},
 		]) {
 			const result = await client.callTool({
 				name: "rename_item",
 				arguments: {
-					itemId: "water",
+					itemUid: "water",
 					...args,
 				},
 			});
@@ -214,7 +207,7 @@ describe("editor MCP item lifecycle", () => {
 		const titleOnly = await client.callTool({
 			name: "rename_item",
 			arguments: {
-				itemId: "water",
+				itemUid: "water",
 				title: "Fresh Water",
 			},
 		});
@@ -225,53 +218,5 @@ describe("editor MCP item lifecycle", () => {
 			title: "Fresh Water",
 		});
 		expect(project?.resources).toEqual(created.resources);
-		const idOnly = await client.callTool({
-			name: "rename_item",
-			arguments: {
-				itemId: "water",
-				id: "fresh-water",
-			},
-		});
-		expect(idOnly.isError).not.toBe(true);
-		project = await Effect.runPromise(repository.readProjectFx(created.projectId));
-		expect(project?.config.items["fresh-water"]?.artwork.default).toEqual([
-			"item-water",
-		]);
-		expect(project?.resources).toEqual(created.resources);
-		if (project === null) throw new Error("Missing project.");
-		await Effect.runPromise(
-			repository.replaceConfigFx({
-				projectId: project.projectId,
-				expectedRevision: project.revision,
-				config: {
-					...project.config,
-					items: {
-						"fresh-water": {
-							...project.config.items["fresh-water"]!,
-							artwork: {
-								scale: 1,
-								default: [
-									"item-water",
-									"item-water",
-								],
-							},
-						},
-					},
-				},
-			}),
-		);
-		const before = await Effect.runPromise(repository.readProjectFx(created.projectId));
-		const ambiguous = await client.callTool({
-			name: "rename_item",
-			arguments: {
-				itemId: "fresh-water",
-				id: "clear-water",
-				artwork: true,
-			},
-		});
-		expect(ambiguous.isError).toBe(true);
-		expect(await Effect.runPromise(repository.readProjectFx(created.projectId))).toEqual(
-			before,
-		);
 	});
 });

@@ -14,7 +14,7 @@ export const useItemDetailMusic = (game: GameEngine, state: ItemDetailState) => 
 		(runtime: RuntimeSchema.Type) => {
 			if (target === undefined) return undefined;
 			return target.kind === "definition"
-				? game.config.items[target.itemId]?.music
+				? game.config.items[target.itemUid]?.music
 				: runtime.items.find((item) => item.id === target.itemId)?.item.music;
 		},
 		[

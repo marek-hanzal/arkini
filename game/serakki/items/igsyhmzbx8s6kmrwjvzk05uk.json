@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "igsyhmzbx8s6kmrwjvzk05uk",
-		"id": "sad-banknote-in-sack",
 		"title": "Sad Banknote In Sack",
 		"draft": true,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-sack",
+										"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "serakki-banknote",
+										"itemUid": "ome444b3wwfhiuq8ec7aaa1d",
 										"quantity": {
 											"min": 1,
 											"max": 1

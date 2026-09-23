@@ -15,7 +15,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 const baseItem = (id: string) =>
 	({
 		uid: id,
-		id,
+
 		title: id,
 		description: id,
 		ui: "default" as const,
@@ -86,7 +86,7 @@ const config = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: fuelItemId,
+									itemUid: fuelItemId,
 								},
 							},
 							quantity: {
@@ -116,7 +116,7 @@ const config = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: workerItemId,
+									itemUid: workerItemId,
 								},
 							},
 							quantity: {
@@ -138,9 +138,9 @@ const config = GameConfigSchema.parse({
 	},
 });
 
-const item = (id: string, itemId: string, x: number) => ({
+const item = (id: string, itemUid: string, x: number) => ({
 	id,
-	itemId,
+	itemUid,
 	location: {
 		scope: "board" as const,
 		space: 0,
@@ -275,7 +275,7 @@ describe("line input source ownership", () => {
 						distance: "far" as const,
 						selector: {
 							type: "item",
-							itemId: workerItemId,
+							itemUid: workerItemId,
 						},
 					},
 				});

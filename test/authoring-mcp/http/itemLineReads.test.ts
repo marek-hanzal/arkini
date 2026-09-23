@@ -82,31 +82,31 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 	const readSpy = vi.spyOn(repository, "readProjectFx");
 	const references = [
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: "first",
 		},
 		{
-			itemId: "absent",
+			itemUid: "absent",
 			lineId: "first",
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: "missing",
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: "last",
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: "ambiguous",
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: "first",
 		},
 		{
-			itemId: "absent",
+			itemUid: "absent",
 			lineId: "first",
 		},
 	];
@@ -125,27 +125,27 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 					revision: snapshot.revision,
 					lines: [
 						{
-							itemId: "forge",
+							itemUid: "forge",
 							line: snapshot.config.items.forge!.lines[1],
 						},
 						{
-							itemId: "forge",
+							itemUid: "forge",
 							line: snapshot.config.items.forge!.lines[0],
 						},
 					],
 					issues: [
 						{
-							itemId: "absent",
+							itemUid: "absent",
 							lineId: "first",
 							reason: "item-not-found",
 						},
 						{
-							itemId: "forge",
+							itemUid: "forge",
 							lineId: "missing",
 							reason: "line-not-found",
 						},
 						{
-							itemId: "forge",
+							itemUid: "forge",
 							lineId: "ambiguous",
 							reason: "ambiguous-line",
 						},
@@ -163,7 +163,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 			length: 50,
 		},
 		(_, index) => ({
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: `missing-${index}`,
 		}),
 	);
@@ -186,7 +186,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 			lines: [
 				...fiftyPairs,
 				{
-					itemId: "other",
+					itemUid: "other",
 					lineId: "missing-0",
 				},
 			],
@@ -201,7 +201,7 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 	const response = await client.callTool({
 		name: "item_lines",
 		arguments: {
-			itemId: "forge",
+			itemUid: "forge",
 		},
 	});
 	expect(response.isError).not.toBe(true);
@@ -211,7 +211,7 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 			text: JSON.stringify(
 				{
 					revision: snapshot.revision,
-					itemId: "forge",
+					itemUid: "forge",
 					lines: snapshot.config.items.forge!.lines.map((entry) => ({
 						id: entry.id,
 						title: entry.title,
@@ -230,7 +230,7 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 	const detail = await client.callTool({
 		name: "item_detail",
 		arguments: {
-			id: "tool",
+			itemUid: "tool",
 		},
 	});
 	const content = detail.content[0];
@@ -240,7 +240,7 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 	const created = await client.callTool({
 		name: "create_item_line",
 		arguments: jsonToolInputFn({
-			itemId: "tool",
+			itemUid: "tool",
 			revision,
 			line: {
 				...line,

@@ -10,7 +10,7 @@ import {
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
-const createTargetPaidInput = (itemId: string) => ({
+const createTargetPaidInput = (itemUid: string) => ({
 	type: "units" as const,
 	units: {
 		cost: 1,
@@ -20,7 +20,7 @@ const createTargetPaidInput = (itemId: string) => ({
 		distance: "close" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid,
 		},
 	},
 });
@@ -43,7 +43,7 @@ describe("createFormSchema", () => {
 		const project = {
 			config: {
 				items: {
-					[source.id]: source,
+					[source.uid]: source,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -86,7 +86,7 @@ describe("createFormSchema", () => {
 					effect: "keep" as const,
 					target: {
 						type: "item" as const,
-						itemId: target.id,
+						itemUid: target.uid,
 					},
 				},
 			],
@@ -94,8 +94,8 @@ describe("createFormSchema", () => {
 		const project = {
 			config: {
 				items: {
-					[source.id]: source,
-					[target.id]: target,
+					[source.uid]: source,
+					[target.uid]: target,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -125,7 +125,7 @@ describe("createFormSchema", () => {
 					effect: "spend" as const,
 					target: {
 						type: "item" as const,
-						itemId: target.id,
+						itemUid: target.uid,
 					},
 				},
 			],
@@ -133,8 +133,8 @@ describe("createFormSchema", () => {
 		const project = {
 			config: {
 				items: {
-					[source.id]: source,
-					[target.id]: target,
+					[source.uid]: source,
+					[target.uid]: target,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -170,7 +170,7 @@ describe("createFormSchema", () => {
 					effect: "spend" as const,
 					target: {
 						type: "item" as const,
-						itemId: target.id,
+						itemUid: target.uid,
 					},
 				},
 			],
@@ -178,8 +178,8 @@ describe("createFormSchema", () => {
 		const project = {
 			config: {
 				items: {
-					[source.id]: source,
-					[target.id]: target,
+					[source.uid]: source,
+					[target.uid]: target,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -194,14 +194,14 @@ describe("createFormSchema", () => {
 		const producer = createProducerItem({
 			id: "producer",
 			input: [
-				createTargetPaidInput(target.id),
+				createTargetPaidInput(target.uid),
 			],
 		});
 		const project = {
 			config: {
 				items: {
-					[target.id]: target,
-					[producer.id]: producer,
+					[target.uid]: target,
+					[producer.uid]: producer,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -219,7 +219,7 @@ describe("createFormSchema", () => {
 					0,
 					"query",
 					"selector",
-					"itemId",
+					"itemUid",
 				],
 			}),
 		);
@@ -235,14 +235,14 @@ describe("createFormSchema", () => {
 		const producer = createProducerItem({
 			id: "producer",
 			input: [
-				createTargetPaidInput(target.id),
+				createTargetPaidInput(target.uid),
 			],
 		});
 		const project = {
 			config: {
 				items: {
-					[target.id]: target,
-					[producer.id]: producer,
+					[target.uid]: target,
+					[producer.uid]: producer,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -267,7 +267,7 @@ describe("createFormSchema", () => {
 							distance: "self" as const,
 							selector: {
 								type: "item" as const,
-								itemId: "producer",
+								itemUid: "producer",
 							},
 						},
 					},
@@ -280,7 +280,7 @@ describe("createFormSchema", () => {
 		const project = {
 			config: {
 				items: {
-					[producer.id]: producer,
+					[producer.uid]: producer,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -304,7 +304,7 @@ describe("createFormSchema", () => {
 						distance: "self" as const,
 						selector: {
 							type: "item" as const,
-							itemId: "producer",
+							itemUid: "producer",
 						},
 					},
 				},
@@ -313,7 +313,7 @@ describe("createFormSchema", () => {
 		const project = {
 			config: {
 				items: {
-					[producer.id]: producer,
+					[producer.uid]: producer,
 				},
 			} as GameConfigSchema.Type,
 		};
@@ -337,7 +337,7 @@ describe("createFormSchema", () => {
 		);
 	});
 
-	it("rebinds an empty self-paid Units selector when a new line owner's ID is entered", () => {
+	it("binds an empty self-paid Units selector to its immutable owner", () => {
 		const producer = {
 			...createProducerItem({
 				id: "draft-owner",
@@ -352,7 +352,7 @@ describe("createFormSchema", () => {
 							distance: "self" as const,
 							selector: {
 								type: "item" as const,
-								itemId: "draft-owner",
+								itemUid: "draft-owner",
 							},
 						},
 					},
@@ -374,7 +374,6 @@ describe("createFormSchema", () => {
 		if (line === undefined || firstInput?.type !== "units") return;
 		const result = createFormSchema(project, producer.uid).safeParse({
 			...formValues,
-			id: "final-owner",
 			lines: [
 				{
 					...line,
@@ -385,7 +384,7 @@ describe("createFormSchema", () => {
 								...firstInput.query,
 								selector: {
 									...firstInput.query.selector,
-									itemId: "",
+									itemUid: "",
 								},
 							},
 						},
@@ -404,7 +403,7 @@ describe("createFormSchema", () => {
 				query: expect.objectContaining({
 					distance: "self",
 					selector: expect.objectContaining({
-						itemId: "final-owner",
+						itemUid: producer.uid,
 					}),
 				}),
 			}),

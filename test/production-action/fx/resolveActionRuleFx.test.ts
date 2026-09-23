@@ -26,7 +26,7 @@ it("keeps rules inactive when a Board condition has no physical origin in either
 			distance: "far" as const,
 			selector: {
 				type: "item",
-				itemId: "permit",
+				itemUid: "permit",
 			},
 		},
 	};

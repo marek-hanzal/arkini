@@ -18,7 +18,7 @@ export namespace useItemSpotlightController {
 		readonly artwork: ReactNode;
 		readonly disabled?: boolean;
 		readonly disabledReason?: ReactNode;
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly label: string;
 		readonly secondary?: string;
 		readonly terms: ReadonlyArray<string>;
@@ -27,14 +27,14 @@ export namespace useItemSpotlightController {
 	export interface Props {
 		readonly onCloseFn: () => void;
 		readonly onQueryChangeFn?: (query: string) => void;
-		readonly onSelectItemFn: (itemId: string) => void;
+		readonly onSelectItemFn: (itemUid: string) => void;
 		readonly options: ReadonlyArray<Option>;
 		readonly resultLimit?: number;
 	}
 
 	export interface SelectItemProps {
 		readonly index: number;
-		readonly itemId: string;
+		readonly itemUid: string;
 	}
 
 	export interface Output {
@@ -69,8 +69,8 @@ export const useItemSpotlightController = ({
 	const [selectedIndex, setSelectedIndexFn] = useState(0);
 	const candidates = useMemo(
 		() =>
-			options.map(({ itemId, terms }) => ({
-				identity: itemId,
+			options.map(({ itemUid, terms }) => ({
+				identity: itemUid,
 				terms,
 			})),
 		[
@@ -84,7 +84,7 @@ export const useItemSpotlightController = ({
 		() =>
 			new Map(
 				options.map((option) => [
-					option.itemId,
+					option.itemUid,
 					option,
 				]),
 			),
@@ -93,8 +93,8 @@ export const useItemSpotlightController = ({
 		],
 	);
 	const results = useMemo(() => {
-		const matchingOptions = matchingIds.flatMap((itemId) => {
-			const option = optionsById.get(itemId);
+		const matchingOptions = matchingIds.flatMap((itemUid) => {
+			const option = optionsById.get(itemUid);
 			return option === undefined
 				? []
 				: [
@@ -135,12 +135,12 @@ export const useItemSpotlightController = ({
 		selectedIndex,
 	]);
 	const selectItemFn = useCallback(
-		({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
+		({ index, itemUid }: useItemSpotlightController.SelectItemProps) => {
 			if (searchPending) return;
 			const option = results[index];
-			if (option?.itemId !== itemId || option.disabled === true) return;
+			if (option?.itemUid !== itemUid || option.disabled === true) return;
 			setSelectedIndexFn(index);
-			onSelectItemFn(itemId);
+			onSelectItemFn(itemUid);
 		},
 		[
 			onSelectItemFn,
@@ -153,7 +153,7 @@ export const useItemSpotlightController = ({
 		if (selected === undefined) return;
 		selectItemFn({
 			index: selectedIndex,
-			itemId: selected.itemId,
+			itemUid: selected.itemUid,
 		});
 	};
 	const onKeyDownFn = (event: KeyboardEvent<HTMLDivElement>) => {

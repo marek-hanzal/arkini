@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "p7k5gkd5e6gufjoggz22acvx",
-		"id": "toxic-waste-purifier",
 		"title": "Toxic Waste Purifier",
 		"ui": "default",
 		"description": "Throw those ugly chemicals into the river... oh, filter it out in pure nature way",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "toxic-waste"
+								"itemUid": "wk8b9br2abcjn0fz4xsldfhx"
 							},
 							"distance": "far"
 						},
@@ -48,7 +47,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "toxic-filter"
+								"itemUid": "ujmvqe9lnv83894jst1507ng"
 							},
 							"distance": "close"
 						}
@@ -62,7 +61,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "toxic-filter"
+										"itemUid": "ujmvqe9lnv83894jst1507ng"
 									},
 									"distance": "close"
 								},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "k0yejygdsoyq8ttrky01olv5",
-		"id": "treasure-chest-t1",
 		"title": "Treasure Chest - Tier 1",
 		"ui": "default",
 		"description": "It may give you some basic loot",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kcvboi9av84x20m0butjrmtx",
-		"id": "arrows---tier-3",
 		"title": "Arrows - Tier 3",
 		"draft": true,
 		"ui": "simple",
@@ -19,11 +18,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-quiver"
+					"itemUid": "tuw5spl68vaof73aziz0ai1b"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "quiver"
+				"result": "c1zeixspb6o5u1mm5zpwl4gp"
 			}
 		],
 		"maxQueueSize": 1,
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-3"
+								"itemUid": "kcvboi9av84x20m0butjrmtx"
 							},
 							"distance": "self"
 						}
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "arrows---tier-2",
+											"itemUid": "cqrox9wwfhqhvlkxvc7vi505",
 											"quantity": {
 												"min": 2,
 												"max": 2

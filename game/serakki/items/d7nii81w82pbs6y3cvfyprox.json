@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "d7nii81w82pbs6y3cvfyprox",
-		"id": "unlit-candle",
 		"title": "Unlit Candle",
 		"description": "Wax, wick, potential. Currently excellent at not illuminating anything. Fire usually improves the situation.",
 		"ui": "simple",

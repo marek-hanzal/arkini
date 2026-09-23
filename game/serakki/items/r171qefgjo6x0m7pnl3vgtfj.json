@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "r171qefgjo6x0m7pnl3vgtfj",
-		"id": "empty-well",
 		"title": "Empty Well",
 		"description": "No more water. Yay.",
 		"ui": "default",
@@ -37,7 +36,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-well"
+								"itemUid": "r171qefgjo6x0m7pnl3vgtfj"
 							},
 							"distance": "self"
 						}
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "resource-research"
+								"itemUid": "bqf3op5bndkaqfgpap7lj7kq"
 							},
 							"distance": "far"
 						},
@@ -69,7 +68,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well",
+											"itemUid": "fs7g7flliyj78y8bw6t3djrt",
 											"quantity": {
 												"min": 1,
 												"max": 1

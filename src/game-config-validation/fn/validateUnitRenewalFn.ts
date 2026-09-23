@@ -23,16 +23,16 @@ export namespace validateUnitRenewalFn {
 
 const readItemOutcomeCertaintyFn = (
 	drops: ReadonlyArray<OutcomeSchema.Type>,
-	itemId: IdSchema.Type,
+	itemUid: IdSchema.Type,
 ): OutcomeRecreationCertainty => {
-	const matching = drops.filter((drop) => drop.type === "item" && drop.itemId === itemId);
+	const matching = drops.filter((drop) => drop.type === "item" && drop.itemUid === itemUid);
 	if (matching.length === 0) return "none";
 	return matching.some((drop) => drop.rules.length === 0) ? "guaranteed" : "stochastic";
 };
 
 const readOutcomeRecreationCertaintyFn = (
 	outcome: OutcomeTableSchema.Type,
-	itemId: IdSchema.Type,
+	itemUid: IdSchema.Type,
 ) => {
 	const sets = outcome.set.map((set) => {
 		const rolls = set.roll.map(
@@ -42,7 +42,7 @@ const readOutcomeRecreationCertaintyFn = (
 						{
 							type: RollTypeSchema.enum.Guaranteed,
 						},
-						(guaranteed) => readItemOutcomeCertaintyFn(guaranteed.outcome, itemId),
+						(guaranteed) => readItemOutcomeCertaintyFn(guaranteed.outcome, itemUid),
 					)
 					.with(
 						{
@@ -50,7 +50,7 @@ const readOutcomeRecreationCertaintyFn = (
 						},
 						(chance) => {
 							if (chance.chance === 0) return "none";
-							const drop = readItemOutcomeCertaintyFn(chance.outcome, itemId);
+							const drop = readItemOutcomeCertaintyFn(chance.outcome, itemUid);
 							if (drop === "none") return "none";
 							return chance.chance === 1 && drop === "guaranteed"
 								? "guaranteed"
@@ -86,32 +86,38 @@ const strongerCertaintyFn = (
 /** Warns when a item with units lacks a deterministic configured recreation path. */
 export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewalFn.Props) => {
 	const certainty = new Map<IdSchema.Type, OutcomeRecreationCertainty>();
-	for (const [itemId, item] of Object.entries(config.items)) {
+	for (const [itemUid, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
 			if (merge.effect === TargetEffectSchema.enum.Replace) {
 				certainty.set(merge.result, "guaranteed");
 			}
 		}
 		const outputs = readItemOutcomeEntriesFn({
-			itemId,
+			itemUid,
 			item,
 		});
 		for (const { outcome } of outputs) {
-			for (const unitOwnerItemId of Object.keys(config.items)) {
-				if (config.items[unitOwnerItemId]?.units === undefined) continue;
-				const outcomeCertainty = readOutcomeRecreationCertaintyFn(outcome, unitOwnerItemId);
+			for (const unitOwnerItemUid of Object.keys(config.items)) {
+				if (config.items[unitOwnerItemUid]?.units === undefined) continue;
+				const outcomeCertainty = readOutcomeRecreationCertaintyFn(
+					outcome,
+					unitOwnerItemUid,
+				);
 				certainty.set(
-					unitOwnerItemId,
-					strongerCertaintyFn(certainty.get(unitOwnerItemId) ?? "none", outcomeCertainty),
+					unitOwnerItemUid,
+					strongerCertaintyFn(
+						certainty.get(unitOwnerItemUid) ?? "none",
+						outcomeCertainty,
+					),
 				);
 			}
 		}
 	}
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
-	for (const [itemId, item] of Object.entries(config.items)) {
+	for (const [itemUid, item] of Object.entries(config.items)) {
 		if (item.units === undefined) continue;
-		const itemCertainty = certainty.get(itemId) ?? "none";
+		const itemCertainty = certainty.get(itemUid) ?? "none";
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {
 			diagnostics.push({
@@ -119,11 +125,11 @@ export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewa
 				severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				path: [
 					"items",
-					itemId,
+					itemUid,
 				],
-				source: provenance.items[itemId],
-				message: `Finite item ${itemId} is recreated only through probabilistic, weighted, or conditional outcome paths.`,
-				itemId,
+				source: provenance.items[itemUid],
+				message: `Finite item ${itemUid} is recreated only through probabilistic, weighted, or conditional outcome paths.`,
+				itemUid,
 			});
 			continue;
 		}
@@ -132,11 +138,11 @@ export const validateUnitRenewalFn = ({ config, provenance }: validateUnitRenewa
 			severity: DiagnosticSeverityEnumSchema.enum.Warning,
 			path: [
 				"items",
-				itemId,
+				itemUid,
 			],
-			source: provenance.items[itemId],
-			message: `Finite item ${itemId} has no configured outcome or merge path that recreates it.`,
-			itemId,
+			source: provenance.items[itemUid],
+			message: `Finite item ${itemUid} has no configured outcome or merge path that recreates it.`,
+			itemUid,
 		});
 	}
 

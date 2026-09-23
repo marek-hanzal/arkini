@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ld5rduazg59ttnnlf2npoe9v",
-		"id": "corrupted-beagle-puppy",
 		"title": "Corrupted Beagle Puppy",
 		"ui": "simple",
 		"draft": true,
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fawn"
+					"itemUid": "aalsr85hfkjpg477l9h99xxb"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "corrupted-beagle-puppy-with-fawn"
+				"result": "z6yx4tkwegdv9mr5sqk1gh2x"
 			}
 		],
 		"maxQueueSize": 1,

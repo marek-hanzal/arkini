@@ -18,27 +18,27 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 		switch (input.type) {
 			case "materials":
 			case "units":
-				inputs.add(input.query.selector.itemId);
+				inputs.add(input.query.selector.itemUid);
 				break;
 			case "simple":
 				break;
 		}
 	}
 	for (const rule of line.rules)
-		for (const when of rule.when) inputs.add(when.query.selector.itemId);
+		for (const when of rule.when) inputs.add(when.query.selector.itemUid);
 	for (const set of line.outcome?.set ?? []) {
 		for (const rule of set.rules)
-			for (const when of rule.when) outputs.add(when.query.selector.itemId);
+			for (const when of rule.when) outputs.add(when.query.selector.itemUid);
 		for (const roll of set.roll) {
 			const drops = readDraftRollOutcomesFn(roll);
 			for (const outcome of drops) {
-				if (outcome.type === "item") outputs.add(outcome.itemId);
+				if (outcome.type === "item") outputs.add(outcome.itemUid);
 				else if (outcome.type === "space") spaces.add(outcome.space);
 				else templates.add(outcome.templateUid);
 			}
 			for (const drop of drops)
 				for (const rule of drop.rules)
-					for (const when of rule.when) outputs.add(when.query.selector.itemId);
+					for (const when of rule.when) outputs.add(when.query.selector.itemUid);
 		}
 	}
 	return {

@@ -8,8 +8,7 @@ const unitOwnerItem = {
 	maxQueueSize: 1,
 	lines: [],
 
-	uid: "uid:tree",
-	id: "tree",
+	uid: "tree",
 	title: "Tree",
 	description: "A spent source",
 	artwork: {
@@ -67,7 +66,7 @@ describe("readSpaceTransitionPresentationPhasesFn", () => {
 				{
 					type: "item:unit-spent",
 					itemId: "runtime:tree",
-					canonicalItemId: "tree",
+					itemUid: "tree",
 					location: payerLocation,
 					previousUnits: 2,
 					resultingUnits: 1,

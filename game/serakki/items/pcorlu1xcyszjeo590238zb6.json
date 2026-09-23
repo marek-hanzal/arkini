@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "pcorlu1xcyszjeo590238zb6",
-		"id": "wishing-well-with-wine",
 		"title": "Wishing Well With Wine",
 		"ui": "default",
 		"draft": true,
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -71,7 +70,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay-jug-with-wine",
+											"itemUid": "xv5als38ucvnolkt4d7v9hdp",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -92,7 +91,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cauldron-with-wine",
+											"itemUid": "xvv2kwusarqo0m896u3ei1u0",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "paper-boat-wine-bath",
+											"itemUid": "txi8gv2c3kbblv3x7pemuchc",
 											"quantity": {
 												"min": 1,
 												"max": 1

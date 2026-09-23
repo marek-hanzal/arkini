@@ -20,7 +20,7 @@ describe("output placement transition", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(0),
 				});
 
@@ -54,7 +54,7 @@ describe("output placement transition", () => {
 
 		expect(result.placement.item[0]?.placement.spawn).toHaveLength(2);
 		expect(result.placement.item[1]?.placement.spawn).toHaveLength(1);
-		const logs = result.runtime.items.filter((item) => item.item.id === "log");
+		const logs = result.runtime.items.filter((item) => item.item.uid === "log");
 		expect(logs.map((item) => item.location)).toEqual([
 			boardLocation(1),
 			boardLocation(2),
@@ -68,12 +68,12 @@ it("resolves output rules from the same snapshot that it commits", () => {
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "runtime:origin",
-				itemId: "origin",
+				itemUid: "origin",
 				location: boardLocation(0),
 			});
 			const permit = yield* spawnItemFx({
 				id: "runtime:permit",
-				itemId: "permit",
+				itemUid: "permit",
 				location: boardLocation(1),
 			});
 			const staleRuntime = yield* readRuntimeFx();
@@ -99,7 +99,7 @@ it("resolves output rules from the same snapshot that it commits", () => {
 											distance: "far" as const,
 											selector: {
 												type: "item",
-												itemId: "permit",
+												itemUid: "permit",
 											},
 										},
 									},
@@ -127,7 +127,7 @@ it("resolves output rules from the same snapshot that it commits", () => {
 	);
 
 	expect(result.placement.item).toEqual([]);
-	expect(result.runtime.items.some((item) => item.item.id === "log")).toBe(false);
+	expect(result.runtime.items.some((item) => item.item.uid === "log")).toBe(false);
 });
 
 it("rolls back every earlier drop when a later drop cannot be placed", () => {
@@ -135,17 +135,17 @@ it("rolls back every earlier drop when a later drop cannot be placed", () => {
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "runtime:origin",
-				itemId: "origin",
+				itemUid: "origin",
 				location: boardLocation(0),
 			});
 			yield* spawnItemFx({
 				id: "runtime:blocker:2",
-				itemId: "blocker",
+				itemUid: "blocker",
 				location: boardLocation(2),
 			});
 			yield* spawnItemFx({
 				id: "runtime:blocker:3",
-				itemId: "blocker",
+				itemUid: "blocker",
 				location: boardLocation(3),
 			});
 			for (const {} of [

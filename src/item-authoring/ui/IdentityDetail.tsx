@@ -38,7 +38,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 			</section>
 			<section
 				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
-				data-ui="EditorItemIdentityDetail"
+				data-ui="EditorItemUidentityDetail"
 			>
 				<ItemDetailSectionHeader
 					itemUid={item.uid}
@@ -59,16 +59,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								label={translator.textFn("Queue capacity")}
 								description={<Mx label="Authored queue capacity summary help" />}
 								value={item.maxQueueSize}
-							/>
-							<Fact
-								label={translator.textFn("Item ID")}
-								mono
-								value={
-									<div className="flex items-center gap-2">
-										<span className="min-w-0">{item.id}</span>
-										<CopyButton value={item.id} />
-									</div>
-								}
 							/>
 						</FactList>
 						<div className="grid min-w-0 grid-cols-2 items-start gap-x-8">
@@ -161,7 +151,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 					title={translator.textFn("Estimate")}
 				/>
 				<ItemEstimateSection
-					itemId={item.id}
+					itemUid={item.uid}
 					previewItemUid={item.uid}
 				/>
 			</section>

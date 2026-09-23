@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "k09s8288fyyq6zhmho5xp9wm",
-		"id": "townhall-t1",
 		"title": "Townhall I",
 		"description": "The first proper civic upgrade. More blueprints, more organization, and the beginning of paperwork as infrastructure.",
 		"ui": "default",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well-blueprint",
+											"itemUid": "xx2gqafu2hfas7hj6vl8k8qc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -89,9 +88,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "well-blueprint"
+										"itemUid": "xx2gqafu2hfas7hj6vl8k8qc"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -104,9 +103,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "well"
+										"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -131,7 +130,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -146,7 +145,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -168,7 +167,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sawmill-blueprint",
+											"itemUid": "uoratu4uyxa3lg0eom8ubjcy",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -189,9 +188,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sawmill-blueprint"
+										"itemUid": "uoratu4uyxa3lg0eom8ubjcy"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -204,9 +203,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sawmill"
+										"itemUid": "vzszf54dp2dsk1epd2qnte03"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -231,7 +230,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -246,7 +245,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -268,7 +267,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stoneworks-blueprint",
+											"itemUid": "by7grm3nsxp00xfzn5f86hk7",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -289,9 +288,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stoneworks-blueprint"
+										"itemUid": "by7grm3nsxp00xfzn5f86hk7"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -304,9 +303,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stoneworks"
+										"itemUid": "dv790bcpr47j0c98uu8k89tf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -331,7 +330,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -346,7 +345,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -368,7 +367,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "carpenter-blueprint",
+											"itemUid": "rm4hf4i08di3fjfkw6arkmvp",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -389,9 +388,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sawmill"
+										"itemUid": "vzszf54dp2dsk1epd2qnte03"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -399,9 +398,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stoneworks"
+										"itemUid": "dv790bcpr47j0c98uu8k89tf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -414,9 +413,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "carpenter-blueprint"
+										"itemUid": "rm4hf4i08di3fjfkw6arkmvp"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -429,9 +428,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "carpenter"
+										"itemUid": "yc0am9mudbeggwjs6dzusk3j"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -456,7 +455,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -471,7 +470,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -493,7 +492,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "charcoal-kiln-blueprint",
+											"itemUid": "h1fch6nyd1nyzp03ffkjmtlh",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -514,9 +513,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sawmill"
+										"itemUid": "vzszf54dp2dsk1epd2qnte03"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -524,9 +523,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stoneworks"
+										"itemUid": "dv790bcpr47j0c98uu8k89tf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -539,9 +538,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "charcoal-kiln-blueprint"
+										"itemUid": "h1fch6nyd1nyzp03ffkjmtlh"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -554,9 +553,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "charcoal-kiln"
+										"itemUid": "cf5wj8sin5bzx02srb49u1sg"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -581,7 +580,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -596,7 +595,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -618,7 +617,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "waste-incinerator-blueprint",
+											"itemUid": "wxg5ic5fq27jq6hhu1953ruq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -639,9 +638,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "charcoal-kiln"
+										"itemUid": "cf5wj8sin5bzx02srb49u1sg"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -654,9 +653,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "waste-incinerator-blueprint"
+										"itemUid": "wxg5ic5fq27jq6hhu1953ruq"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -669,9 +668,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "waste-incinerator"
+										"itemUid": "tacmmsi662wvdnoz6i21n1wp"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -696,7 +695,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -711,7 +710,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -733,7 +732,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "school-t1-blueprint",
+											"itemUid": "uzg588l4bvievzp120kv9mpc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -754,9 +753,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t1"
+										"itemUid": "r37rbdbf8ntc3tt56yv1549n"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -764,9 +763,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "well"
+										"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -774,9 +773,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sawmill"
+										"itemUid": "vzszf54dp2dsk1epd2qnte03"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -784,9 +783,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stoneworks"
+										"itemUid": "dv790bcpr47j0c98uu8k89tf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -794,9 +793,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "carpenter"
+										"itemUid": "yc0am9mudbeggwjs6dzusk3j"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -804,9 +803,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "charcoal-kiln"
+										"itemUid": "cf5wj8sin5bzx02srb49u1sg"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -814,9 +813,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "waste-incinerator"
+										"itemUid": "tacmmsi662wvdnoz6i21n1wp"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -829,9 +828,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "school-t1-blueprint"
+										"itemUid": "uzg588l4bvievzp120kv9mpc"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -844,9 +843,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "school-t1"
+										"itemUid": "dob6o4r9l8xrn7u5iamgfpyg"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -871,7 +870,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -890,7 +889,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "inkwell"
+								"itemUid": "aypezdd5mxtcclnmhi7kphyv"
 							},
 							"distance": "far"
 						}
@@ -900,7 +899,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -922,7 +921,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "townhall-t2-blueprint",
+											"itemUid": "spkn18pn248fe91tsk0xlvkc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -944,9 +943,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t1"
+										"itemUid": "r37rbdbf8ntc3tt56yv1549n"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -960,9 +959,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "well"
+										"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -976,9 +975,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sawmill"
+										"itemUid": "vzszf54dp2dsk1epd2qnte03"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -992,9 +991,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stoneworks"
+										"itemUid": "dv790bcpr47j0c98uu8k89tf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1008,9 +1007,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "carpenter"
+										"itemUid": "yc0am9mudbeggwjs6dzusk3j"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1024,9 +1023,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "charcoal-kiln"
+										"itemUid": "cf5wj8sin5bzx02srb49u1sg"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1040,9 +1039,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "waste-incinerator"
+										"itemUid": "tacmmsi662wvdnoz6i21n1wp"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1056,9 +1055,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "school-t1"
+										"itemUid": "dob6o4r9l8xrn7u5iamgfpyg"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1071,9 +1070,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "townhall-t2-blueprint"
+										"itemUid": "spkn18pn248fe91tsk0xlvkc"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1086,9 +1085,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "townhall-t2"
+										"itemUid": "uiqz45kgrs6rsjzliqp0k6i2"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

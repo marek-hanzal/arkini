@@ -14,7 +14,7 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 		phase: state.phase,
 		origin: state.target.origin,
 		restoreFocus: state.phase === "exiting" ? state.restoreFocus : true,
-		focusKey: `${state.target.kind}:${state.target.itemId}`,
+		focusKey: `${state.target.kind}:${state.target.kind === "runtime" ? state.target.itemId : state.target.itemUid}`,
 	});
 	const disabled = state.phase === "exiting";
 	return (
@@ -45,7 +45,9 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 				}}
 				data-target-kind={state.target.kind}
 				data-runtime-id={state.target.kind === "runtime" ? state.target.itemId : undefined}
-				data-item-id={state.target.itemId}
+				data-item-uid={
+					state.target.kind === "definition" ? state.target.itemUid : undefined
+				}
 				initial={{
 					opacity: 0,
 					y: 10,

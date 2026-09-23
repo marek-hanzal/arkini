@@ -5,7 +5,6 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 
 export const GameDiagnosticItemDefinitionReferenceSchema = z
 	.object({
-		itemId: IdSchema,
 		itemUid: IdSchema,
 		title: z.string(),
 	})

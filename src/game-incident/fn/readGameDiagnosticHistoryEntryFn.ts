@@ -22,35 +22,31 @@ const readRuntimeItemIdsFn = (value: unknown, ids: Set<string>, seen = new WeakS
 		return;
 	}
 	for (const [key, entry] of Object.entries(value)) {
-		if (
-			typeof entry === "string" &&
-			(key === "itemId" || key.endsWith("ItemId")) &&
-			!key.toLowerCase().includes("canonical")
-		) {
+		if (typeof entry === "string" && (key === "itemId" || key.endsWith("ItemId"))) {
 			ids.add(entry);
 		}
 		readRuntimeItemIdsFn(entry, ids, seen);
 	}
 };
 
-const readCanonicalItemIdsFn = (value: unknown, ids: Set<string>, seen = new WeakSet<object>()) => {
+const readItemUidsFn = (value: unknown, ids: Set<string>, seen = new WeakSet<object>()) => {
 	if (value === null || typeof value !== "object" || seen.has(value)) return;
 	seen.add(value);
 	if (value instanceof Error && "cause" in value) {
-		readCanonicalItemIdsFn(value.cause, ids, seen);
+		readItemUidsFn(value.cause, ids, seen);
 	}
 	if (value instanceof AggregateError) {
-		for (const error of value.errors) readCanonicalItemIdsFn(error, ids, seen);
+		for (const error of value.errors) readItemUidsFn(error, ids, seen);
 	}
 	if (Array.isArray(value)) {
-		for (const entry of value) readCanonicalItemIdsFn(entry, ids, seen);
+		for (const entry of value) readItemUidsFn(entry, ids, seen);
 		return;
 	}
 	for (const [key, entry] of Object.entries(value)) {
-		if (typeof entry === "string" && key.toLowerCase().includes("canonicalitemid")) {
+		if (typeof entry === "string" && (key === "itemUid" || key.endsWith("ItemUid"))) {
 			ids.add(entry);
 		}
-		readCanonicalItemIdsFn(entry, ids, seen);
+		readItemUidsFn(entry, ids, seen);
 	}
 };
 
@@ -75,9 +71,9 @@ export const readGameDiagnosticRelatedItemsResultFn = ({
 				]),
 	];
 	const runtimeIds = new Set<string>();
-	const canonicalIds = new Set<string>();
+	const itemUids = new Set<string>();
 	readRuntimeItemIdsFn(value, runtimeIds);
-	readCanonicalItemIdsFn(value, canonicalIds);
+	readItemUidsFn(value, itemUids);
 	const references = Array.from(runtimeIds, (runtimeItemId) =>
 		readGameDiagnosticItemReferenceFn({
 			config,
@@ -90,16 +86,16 @@ export const readGameDiagnosticRelatedItemsResultFn = ({
 			definition === null
 				? []
 				: [
-						definition.itemId,
+						definition.itemUid,
 					],
 		),
 	);
-	for (const itemId of canonicalIds) {
-		if (referencedDefinitions.has(itemId)) continue;
+	for (const itemUid of itemUids) {
+		if (referencedDefinitions.has(itemUid)) continue;
 		references.push(
 			readGameDiagnosticItemReferenceFn({
 				config,
-				itemId,
+				itemUid,
 				runtimeItemId: null,
 				runtimes,
 			}),
@@ -118,7 +114,11 @@ const omitResolvedItemIdsFn = (
 	hasRelatedItems
 		? Object.fromEntries(
 				Object.entries(details).filter(
-					([key]) => key !== "itemId" && !key.endsWith("ItemId"),
+					([key]) =>
+						key !== "itemId" &&
+						!key.endsWith("ItemId") &&
+						key !== "itemUid" &&
+						!key.endsWith("ItemUid"),
 				),
 			)
 		: details;

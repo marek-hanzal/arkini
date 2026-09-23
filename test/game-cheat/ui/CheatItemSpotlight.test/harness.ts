@@ -36,8 +36,8 @@ vi.mock("~/game-cheat/ui/useGameCheats", () => ({
 vi.mock("~/game-cheat/fx/spawnCheatItemFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		spawnCheatItemFx: ({ itemId }: { readonly itemId: string }) => {
-			state.spawn(itemId);
+		spawnCheatItemFx: ({ itemUid }: { readonly itemUid: string }) => {
+			state.spawn(itemUid);
 			return Effect.void;
 		},
 	};
@@ -65,14 +65,14 @@ export const createGame = (): Game =>
 		readFn: () =>
 			Exit.succeed([
 				{
-					itemId: "item:alpha",
+					itemUid: "item:alpha",
 					sourceResourceIds: [
 						"alpha",
 					],
 					title: "Alpha",
 				},
 				{
-					itemId: "item:beta",
+					itemUid: "item:beta",
 					sourceResourceIds: [
 						"beta",
 						"beta-overlay",

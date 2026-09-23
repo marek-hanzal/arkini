@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xtxotfa57m3amgzqzscmaa0h",
-		"id": "explorer-blueprint",
 		"title": "Explorer Blueprint",
 		"draft": false,
 		"description": "Plans for a small explorer's outpost devoted to entering the forest and finding out what is making that noise.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "explorer-blueprint"
+								"itemUid": "xtxotfa57m3amgzqzscmaa0h"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-1"
+								"itemUid": "b1z61l4bbwdtc75nt189hzze"
 							},
 							"distance": "far"
 						},
@@ -86,7 +85,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "explorer",
+											"itemUid": "oohijxpd9l43544ki7h6koaf",
 											"quantity": {
 												"min": 1,
 												"max": 1

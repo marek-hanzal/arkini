@@ -32,7 +32,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "source",
-			id: "source",
 			title: "Source",
 			description: "An table origin.",
 			artwork: {
@@ -48,7 +47,7 @@ const config = GameConfigSchema.parse({
 const createOriginFx = () => {
 	return spawnItemFx({
 		id: "origin",
-		itemId: "source",
+		itemUid: "source",
 		location: {
 			scope: "board",
 			space: 0,
@@ -76,7 +75,7 @@ const createDrop = ({
 }): OutcomeSchema.Type => {
 	return {
 		type: "item",
-		itemId,
+		itemUid: itemId,
 		placement,
 		quantity,
 		rules,
@@ -136,7 +135,7 @@ const missingPermitWhen = {
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
-			itemId: "permit",
+			itemUid: "permit",
 		},
 	},
 };
@@ -202,13 +201,13 @@ describe("resolveOutcomeTableFx", () => {
 			outcome: [
 				{
 					type: "item",
-					itemId: "item:log",
+					itemUid: "item:log",
 					placement: "drop",
 					quantity: 2,
 				},
 				{
 					type: "item",
-					itemId: "item:stone",
+					itemUid: "item:stone",
 					placement: "random",
 					quantity: 1,
 				},
@@ -279,7 +278,7 @@ describe("resolveOutcomeTableFx", () => {
 			outcome: [
 				{
 					type: "item",
-					itemId: "item:accepted",
+					itemUid: "item:accepted",
 					placement: "random",
 					quantity: 4,
 				},
@@ -366,7 +365,7 @@ describe("resolveOutcomeTableFx", () => {
 					: [
 							{
 								type: "item",
-								itemId: "item:normal",
+								itemUid: "item:normal",
 								placement: "drop",
 								quantity: 1,
 							},
@@ -438,7 +437,7 @@ describe("resolveOutcomeTableFx", () => {
 				outcome: [
 					{
 						type: "item",
-						itemId: "item:selected",
+						itemUid: "item:selected",
 						placement: "drop",
 						quantity: 1,
 					},

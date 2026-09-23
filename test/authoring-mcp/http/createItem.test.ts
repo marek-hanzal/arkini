@@ -12,7 +12,7 @@ import {
 afterEach(cleanupMcpHarnesses);
 
 describe("editor MCP item creation", () => {
-	it("creates a passive item from the Editor draft defaults and rejects an ID collision", async () => {
+	it("creates a passive item from the Editor draft defaults with a generated immutable UID", async () => {
 		const notifyProjectChanged = vi.fn();
 		const { ownership, port, repository } = await createMcpHarness(
 			Effect.runPromise,
@@ -41,7 +41,6 @@ describe("editor MCP item creation", () => {
 		const created = await client.callTool({
 			name: "create_item",
 			arguments: jsonToolInputFn({
-				id: "item:mcp-simple",
 				title: "MCP Simple",
 				description: "Created through the editor MCP.",
 			}),
@@ -52,14 +51,15 @@ describe("editor MCP item creation", () => {
 			content: [
 				{
 					text: expect.stringMatching(
-						new RegExp(
-							`^Created item\\.\\nID: item:mcp-simple\\nUID: .+\\nRevision: ${project.revision}$`,
-						),
+						new RegExp(`^Created item\\.\\nUID: .+\\nRevision: ${project.revision}$`),
 					),
 				},
 			],
 		});
-		const item = project.config.items["item:mcp-simple"];
+		const item = Object.values(project.config.items).find(
+			(item) => item.title === "MCP Simple",
+		);
+		if (item === undefined) throw new Error("Missing created item");
 		expect(item).toMatchObject({
 			artwork: {
 				scale: 1,
@@ -69,19 +69,17 @@ describe("editor MCP item creation", () => {
 			},
 			description: "Created through the editor MCP.",
 			draft: false,
-			id: "item:mcp-simple",
 			title: "MCP Simple",
 
 			lines: [],
 			maxQueueSize: 1,
 		});
 		expect(item?.uid).toEqual(expect.any(String));
-		expect(item?.uid).not.toBe(item?.id);
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("create-item-project");
 		const detail = await client.callTool({
 			name: "item_detail",
 			arguments: {
-				id: "item:mcp-simple",
+				itemUid: item.uid,
 			},
 		});
 		expect(detail.content).toMatchObject([
@@ -95,7 +93,7 @@ describe("editor MCP item creation", () => {
 		});
 		expect(collection.content).toMatchObject([
 			{
-				text: expect.stringMatching(/ID: item:mcp-simple\n  Draft: false/),
+				text: expect.stringContaining(item.uid),
 			},
 		]);
 
@@ -115,30 +113,6 @@ describe("editor MCP item creation", () => {
 			},
 		});
 		expect(rejectedInvalidJson.isError).toBe(true);
-
-		const collision = await client.callTool({
-			name: "create_item",
-			arguments: jsonToolInputFn({
-				id: "item:mcp-simple",
-				title: "Duplicate",
-				description: "Must not replace the existing item.",
-			}),
-		});
-		expect(collision).toMatchObject({
-			isError: true,
-			content: [
-				{
-					text: expect.stringContaining(
-						"Item ID item:mcp-simple is already used by another item.",
-					),
-				},
-			],
-		});
-		expect(notifyProjectChanged).toHaveBeenCalledOnce();
-		expect(
-			(await Effect.runPromise(repository.readProjectFx("create-item-project")))?.config
-				.items["item:legacy-structured-input"],
-		).toBeUndefined();
 	});
 
 	it("creates a Space outcome line through the generic tool and permits Clock", async () => {
@@ -166,7 +140,6 @@ describe("editor MCP item creation", () => {
 		const created = await client.callTool({
 			name: "create_item",
 			arguments: jsonToolInputFn({
-				id: "bag",
 				title: "Bag",
 				lines: [
 					{
@@ -206,7 +179,10 @@ describe("editor MCP item creation", () => {
 		});
 		expect(created.isError, JSON.stringify(created.content)).not.toBe(true);
 		const project = await Effect.runPromise(repository.readProjectFx(projectId));
-		expect(project?.config.items.bag.lines[0]?.outcome?.set[0]?.roll[0]?.outcome).toEqual([
+		expect(
+			Object.values(project!.config.items).find((item) => item.title === "Bag")!.lines[0]
+				?.outcome?.set[0]?.roll[0]?.outcome,
+		).toEqual([
 			{
 				type: "space",
 				space: 0,
@@ -216,7 +192,8 @@ describe("editor MCP item creation", () => {
 		const rejected = await client.callTool({
 			name: "edit_item",
 			arguments: jsonToolInputFn({
-				itemId: "bag",
+				itemUid: Object.values(project!.config.items).find((item) => item.title === "Bag")!
+					.uid,
 				patch: {
 					clock: {
 						durationMs: 1000,
@@ -259,7 +236,6 @@ describe("editor MCP item creation", () => {
 		const created = await client.callTool({
 			name: "create_item",
 			arguments: jsonToolInputFn({
-				id: "item:committed",
 				title: "Committed",
 				description: "Persists before renderer notification.",
 			}),
@@ -271,8 +247,10 @@ describe("editor MCP item creation", () => {
 			},
 		]);
 		expect(
-			(await Effect.runPromise(repository.readProjectFx("notification-project")))?.config
-				.items["item:committed"],
+			Object.values(
+				(await Effect.runPromise(repository.readProjectFx("notification-project")))!.config
+					.items,
+			).find((item) => item.title === "Committed"),
 		).toBeDefined();
 		expect(consoleError).toHaveBeenCalledWith(
 			"Serakki editor could not announce an MCP project mutation.",

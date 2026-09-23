@@ -43,7 +43,7 @@ it("publishes one committed item:merged event with pre-merge identities", async 
 			rule: {
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				action: "consume",
 				effect: "replace",
@@ -61,7 +61,7 @@ it("publishes one committed item:merged event with pre-merge identities", async 
 			items: [
 				{
 					id: "runtime:source",
-					itemId: "source",
+					itemUid: "source",
 					location: {
 						scope: "board" as const,
 						space: 0,
@@ -73,7 +73,7 @@ it("publishes one committed item:merged event with pre-merge identities", async 
 				},
 				{
 					id: "runtime:target",
-					itemId: "target",
+					itemUid: "target",
 					location: {
 						scope: "board",
 						space: 0,
@@ -112,12 +112,12 @@ it("publishes one committed item:merged event with pre-merge identities", async 
 		expect(event).toEqual({
 			type: GameEventEnumSchema.enum.ItemMerged,
 			sourceItemId: "runtime:source",
-			sourceCanonicalItemId: "source",
+			sourceItemUid: "source",
 			targetItemId: "runtime:target",
-			targetCanonicalItemId: "target",
+			targetItemUid: "target",
 			action: "consume",
 			effect: "replace",
-			resultCanonicalItemId: "result",
+			resultItemUid: "result",
 		});
 		expect(published.batch.events).toEqual([
 			event,
@@ -126,7 +126,7 @@ it("publishes one committed item:merged event with pre-merge identities", async 
 				snapshot: source,
 			},
 		]);
-		expect(published.runtime.items.find((item) => item.id === "runtime:target")?.item.id).toBe(
+		expect(published.runtime.items.find((item) => item.id === "runtime:target")?.item.uid).toBe(
 			"result",
 		);
 	} finally {
@@ -141,7 +141,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 			rule: {
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				action: "consume",
 				effect: "keep",
@@ -159,7 +159,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 			items: [
 				{
 					id: "runtime:source",
-					itemId: "source",
+					itemUid: "source",
 					location: {
 						scope: "board" as const,
 						space: 0,
@@ -171,7 +171,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 				},
 				{
 					id: "runtime:target",
-					itemId: "target",
+					itemUid: "target",
 					location: {
 						scope: "board",
 						space: 0,
@@ -206,7 +206,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 			}),
 		);
 		const published = await publication.published;
-		const output = published.runtime.items.find((item) => item.item.id === "output");
+		const output = published.runtime.items.find((item) => item.item.uid === "output");
 		if (output === undefined) throw new Error("Expected merge output.");
 
 		expect(published.batch.events).toEqual([
@@ -218,7 +218,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: output.id,
-				canonicalItemId: "output",
+				itemUid: "output",
 				originItemId: "runtime:source",
 				location: output.location,
 			},

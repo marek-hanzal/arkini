@@ -25,12 +25,12 @@ const config = GameConfigSchema.parse({
 			height: 1,
 			board: [
 				{
-					itemId: "water",
+					itemUid: "water",
 					x: 0,
 					y: 0,
 				},
 				{
-					itemId: "water",
+					itemUid: "water",
 					x: 2,
 					y: 0,
 				},
@@ -52,7 +52,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "water",
-			id: "water",
 
 			title: "Water",
 			description: "Water",

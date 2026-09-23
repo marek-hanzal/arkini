@@ -26,11 +26,11 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						scale: 0.8,
 						default: [],
 					},
-					id: "consumer",
+
 					description: "Consumes the selected item.",
 					title: "Consumer",
 
-					uid: "consumer-uid",
+					uid: "consumer",
 				},
 				peer: {
 					maxQueueSize: 1,
@@ -45,10 +45,10 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						default: [],
 					},
 					description: "Also consumes the selected item.",
-					id: "peer",
+
 					title: "Peer",
 
-					uid: "peer-uid",
+					uid: "peer",
 				},
 				unrelated: {
 					maxQueueSize: 1,
@@ -63,10 +63,10 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 						default: [],
 					},
 					description: "Not connected.",
-					id: "unrelated",
+
 					title: "Unrelated",
 
-					uid: "unrelated-uid",
+					uid: "unrelated",
 				},
 			},
 		},
@@ -96,10 +96,10 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 					default: [],
 				},
 				description: "Consumes the selected item.",
-				id: "consumer",
+
 				title: "Consumer",
 
-				uid: "consumer-uid",
+				uid: "consumer",
 			},
 			{
 				maxQueueSize: 1,
@@ -114,10 +114,10 @@ vi.mock("~/item-authoring/fn/readItemConnectionsFn", () => ({
 					default: [],
 				},
 				description: "Also consumes the selected item.",
-				id: "peer",
+
 				title: "Peer",
 
-				uid: "peer-uid",
+				uid: "peer",
 			},
 		].map((item) => ({
 			item,
@@ -130,7 +130,7 @@ vi.mock("~/editor-control/ui/EditorSearchCombobox", () => ({
 		onChangeFn,
 		options,
 	}: {
-		onChangeFn: (itemId: string) => void;
+		onChangeFn: (itemUid: string) => void;
 		options: ReadonlyArray<{
 			readonly id: string;
 		}>;
@@ -214,7 +214,7 @@ describe("ConnectionsSection", () => {
 			root.render(
 				<ConnectionsSection
 					filter="inputs"
-					itemId="material"
+					itemUid="material"
 					onFilterChangeFn={onFilterChangeFn}
 				/>,
 			);
@@ -235,7 +235,7 @@ describe("ConnectionsSection", () => {
 		const link = container.querySelector<HTMLAnchorElement>("a");
 		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/detail/$sectionId");
 		expect(JSON.parse(link?.dataset.params ?? "null")).toEqual({
-			itemUid: "consumer-uid",
+			itemUid: "consumer",
 			projectId: "project-one",
 			sectionId: "identity",
 		});
@@ -251,7 +251,7 @@ it.each([
 			type: "expiry",
 		},
 		sectionId: "clock",
-		ownerUid: "consumer-uid",
+		ownerUid: "consumer",
 		search: {
 			outcomeSet: 1,
 			outcomeRoll: 2,
@@ -266,7 +266,7 @@ it.each([
 			title: "Line",
 		},
 		sectionId: "production",
-		ownerUid: "consumer-uid",
+		ownerUid: "consumer",
 		search: {
 			lineId: "specific-line",
 			outcomeSet: 1,
@@ -281,7 +281,7 @@ it.each([
 			mergeIndex: 2,
 		},
 		sectionId: "merges",
-		ownerUid: "unrelated-uid",
+		ownerUid: "unrelated",
 		search: {
 			merge: 2,
 			outcomeSet: 1,
@@ -297,7 +297,7 @@ it.each([
 			title: "Line",
 		},
 		sectionId: "production",
-		ownerUid: "unrelated-uid",
+		ownerUid: "unrelated",
 		search: {
 			lineId: "specific-line",
 			outcomeSet: 1,
@@ -328,7 +328,7 @@ it.each([
 			root.render(
 				<ConnectionsSection
 					filter={filter}
-					itemId="unrelated"
+					itemUid="unrelated"
 					onFilterChangeFn={() => {}}
 				/>,
 			),
@@ -340,7 +340,7 @@ it.each([
 		const detailLink = row?.querySelector<HTMLAnchorElement>("a");
 		expect(JSON.parse(detailLink?.dataset.params ?? "null")).toEqual({
 			projectId: "project-one",
-			itemUid: "consumer-uid",
+			itemUid: "consumer",
 			sectionId: "identity",
 		});
 		expect(JSON.parse(originLink?.dataset.params ?? "null")).toEqual({
@@ -359,8 +359,7 @@ it.each([
 
 it("opens each overview preview's complete collection on the current item", async () => {
 	const item = ItemSchema.parse({
-		id: "overview",
-		uid: "overview-uid",
+		uid: "overview",
 		title: "Overview",
 		artwork: {
 			scale: 0.8,
@@ -397,7 +396,7 @@ it("opens each overview preview's complete collection on the current item", asyn
 	for (const link of links) {
 		expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
 			projectId: "project-one",
-			itemUid: "overview-uid",
+			itemUid: "overview",
 			sectionId: "connections",
 		});
 	}
@@ -433,7 +432,7 @@ it("links each input or condition occurrence with its own selector coordinates",
 		root.render(
 			<ConnectionsSection
 				filter="required-by"
-				itemId="unrelated"
+				itemUid="unrelated"
 				onFilterChangeFn={() => {}}
 			/>,
 		),
@@ -452,7 +451,7 @@ it("links each input or condition occurrence with its own selector coordinates",
 		{
 			params: {
 				projectId: "project-one",
-				itemUid: "consumer-uid",
+				itemUid: "consumer",
 				sectionId: "production",
 			},
 			search: {
@@ -463,7 +462,7 @@ it("links each input or condition occurrence with its own selector coordinates",
 		{
 			params: {
 				projectId: "project-one",
-				itemUid: "consumer-uid",
+				itemUid: "consumer",
 				sectionId: "clock",
 			},
 			search: {

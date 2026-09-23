@@ -64,7 +64,7 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 			type: GameEventEnumSchema.enum.JobAborted,
 			jobId: job.id,
 			ownerItemId: owner.id,
-			canonicalItemId: owner.item.id,
+			itemUid: owner.item.uid,
 			lineId: job.lineId,
 			reason,
 		},

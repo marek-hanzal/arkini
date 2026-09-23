@@ -49,7 +49,7 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 			yield* oldGame.runFx(
 				spawnItemFx({
 					id: "runtime:reset-probe",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 1,

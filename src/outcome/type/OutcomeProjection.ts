@@ -7,7 +7,7 @@ import type { OutcomeRuleSchema } from "~/outcome/schema/OutcomeRuleSchema";
 export namespace OutcomeProjection {
 	export interface Item {
 		readonly type: "item";
-		readonly itemId: IdSchema.Type;
+		readonly itemUid: IdSchema.Type;
 		readonly title: string;
 		readonly quantity: Readonly<QuantitySchema.Type>;
 		readonly activeRuleHints: readonly string[];

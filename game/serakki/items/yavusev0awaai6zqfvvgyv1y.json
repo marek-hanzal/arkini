@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yavusev0awaai6zqfvvgyv1y",
-		"id": "chocolate",
 		"title": "Chocolate",
 		"ui": "simple",
 		"description": "Good chocolate",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-chocolate",
+										"itemUid": "k8oi3es3s9nnmuher20orcli",
 										"quantity": {
 											"min": 1,
 											"max": 1

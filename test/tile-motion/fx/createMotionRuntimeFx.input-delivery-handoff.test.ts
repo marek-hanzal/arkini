@@ -118,7 +118,7 @@ for (const phase of [
 			}),
 		);
 		const cue: TileInputMotionCue = {
-			canonicalItemId: source.item.itemId,
+			itemUid: source.item.itemUid,
 			eventIndex: 0,
 			kind: "input",
 			originActorId: source.item.id,

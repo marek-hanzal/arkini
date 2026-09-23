@@ -20,23 +20,23 @@ import {
 const spawnOwnerFx = () => {
 	return spawnItemFx({
 		id: "runtime:workshop",
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: workshopLocation,
 	});
 };
 
 const spawnSourceFx = ({
 	id = "runtime:water",
-	itemId = "water",
+	itemUid = "water",
 	x = 1,
 }: {
 	id?: string;
-	itemId?: "stone" | "water";
+	itemUid?: "stone" | "water";
 	x?: number;
 }) => {
 	return spawnItemFx({
 		id,
-		itemId,
+		itemUid,
 		location: sourceLocation(x),
 	});
 };
@@ -86,7 +86,7 @@ describe("storeInputMaterialFx", () => {
 						distance: "far" as const,
 						selector: {
 							type: "item",
-							itemId: "water",
+							itemUid: "water",
 						},
 					},
 				});
@@ -117,7 +117,7 @@ describe("storeInputMaterialFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemInputStored,
 				sourceItemId: "runtime:water",
-				canonicalItemId: "water",
+				itemUid: "water",
 				previousSourceLocation: sourceLocation(1),
 				ownerItemId: "runtime:workshop",
 				lineId: "line:workshop:build",
@@ -210,7 +210,7 @@ describe("storeInputMaterialFx", () => {
 				yield* spawnOwnerFx();
 				yield* spawnSourceFx({
 					id: "runtime:stone",
-					itemId: "stone",
+					itemUid: "stone",
 				});
 				const stored = yield* Effect.result(
 					storeFx({

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "whi66vmmh1gkexce0d9p47lv",
-		"id": "gear-t4",
 		"title": "Gear - Tier 4",
 		"ui": "simple",
 		"description": "Only masters can build this",

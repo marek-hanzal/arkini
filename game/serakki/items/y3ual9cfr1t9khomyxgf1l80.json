@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y3ual9cfr1t9khomyxgf1l80",
-		"id": "cauldron-with-coffee",
 		"title": "Cauldron With Coffee",
 		"ui": "simple",
 		"description": "A lot of coffee",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-well"
+					"itemUid": "r171qefgjo6x0m7pnl3vgtfj"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-cauldron",
+											"itemUid": "gknt8tkntf6cx7a4vb5jre1j",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "well-with-coffee"
+				"result": "cb9s36hu9rogsoifm2aef25u"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

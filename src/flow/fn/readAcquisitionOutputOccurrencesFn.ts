@@ -229,7 +229,7 @@ export const readAcquisitionOutputOccurrencesFn = (
 			],
 			source: "output-condition",
 		});
-		const key = `${drop.itemId}\u0000${requirementKeyFn(requirements)}`;
+		const key = `${drop.itemUid}\u0000${requirementKeyFn(requirements)}`;
 		const groupId = groupByKey.get(key) ?? `output:${groupByKey.size}`;
 		groupByKey.set(key, groupId);
 		const ids = occurrenceIdsByGroup.get(groupId) ?? [];
@@ -237,7 +237,7 @@ export const readAcquisitionOutputOccurrencesFn = (
 		occurrenceIdsByGroup.set(groupId, ids);
 		drafts.push({
 			annotation,
-			factId: drop.itemId,
+			factId: drop.itemUid,
 			id,
 			operationOutputGroupId: groupId,
 			requirements,

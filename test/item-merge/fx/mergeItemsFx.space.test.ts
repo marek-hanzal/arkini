@@ -24,7 +24,7 @@ const makeConfig = (
 			action: "consume",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 			effect: "keep",
 		},
@@ -38,7 +38,7 @@ const makeConfig = (
 
 const boardItem = (id: string, itemId: string, x: number, space = 0, y = 0) => ({
 	id,
-	itemId,
+	itemUid: itemId,
 	location: {
 		scope: "board" as const,
 		space,
@@ -133,7 +133,7 @@ describe("receiver-owned Space merge", () => {
 		expect(result.attempt._tag === "Success").toBe(true);
 		expect(result.after.items.find((item) => item.id === "runtime:source")).toMatchObject({
 			item: {
-				id: "source",
+				uid: "source",
 			},
 			mergeSequence: 9,
 			remainingUnits: 4,
@@ -174,7 +174,7 @@ describe("receiver-owned Space merge", () => {
 		expect(result.attempt._tag === "Success").toBe(true);
 		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
 			item: {
-				id: "result",
+				uid: "result",
 			},
 			location: {
 				space: 0,
@@ -184,7 +184,7 @@ describe("receiver-owned Space merge", () => {
 				},
 			},
 		});
-		const output = result.after.items.find((item) => item.item.id === "output");
+		const output = result.after.items.find((item) => item.item.uid === "output");
 		expect(output?.location).toMatchObject({
 			scope: "board",
 			space: 0,
@@ -218,7 +218,7 @@ describe("receiver-owned Space merge", () => {
 		);
 		expect(result.attempt._tag === "Success").toBe(true);
 		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
-		expect(result.after.items.find((item) => item.item.id === "output")?.location).toEqual({
+		expect(result.after.items.find((item) => item.item.uid === "output")?.location).toEqual({
 			scope: "board",
 			space: 0,
 			position: {
@@ -298,7 +298,7 @@ describe("receiver-owned Space merge", () => {
 							distance: "close",
 							selector: {
 								type: "item",
-								itemId: "blocker",
+								itemUid: "blocker",
 							},
 						},
 						quantity: {
@@ -313,7 +313,7 @@ describe("receiver-owned Space merge", () => {
 		const state = makeState();
 		state.items.push({
 			id: "buffer",
-			itemId: "blocker",
+			itemUid: "blocker",
 			location: {
 				scope: "input",
 				ownerItemId: "runtime:source",
@@ -399,7 +399,7 @@ describe("receiver-owned Space merge", () => {
 				action: "consume",
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				effect: "keep",
 			},
@@ -426,7 +426,7 @@ describe("receiver-owned Space merge", () => {
 				action: "use",
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				effect: "keep",
 			},

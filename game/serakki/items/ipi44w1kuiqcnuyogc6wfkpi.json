@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ipi44w1kuiqcnuyogc6wfkpi",
-		"id": "pig-farm",
 		"title": "Pig Farm",
 		"description": "Manages nearby pig pens, prepares empty ones, and releases pigs over time.",
 		"ui": "default",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "pig-pen"
+								"itemUid": "f6g1qfue0p6bochjsgdtcnva"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grain"
+								"itemUid": "hh7v010v56myrya2gbysrru3"
 							},
 							"distance": "far"
 						},
@@ -59,7 +58,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -81,7 +80,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "pig",
+											"itemUid": "jx5gnntoo4aj7rxf3eq32lun",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -91,7 +90,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -123,7 +122,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -145,7 +144,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-pig-pen",
+											"itemUid": "tp8elp5lpun7bpz4evjysk2m",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -177,7 +176,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -199,7 +198,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "pig-farm-blueprint",
+											"itemUid": "izkinuyv2w90izypkx53u26f",
 											"quantity": {
 												"min": 1,
 												"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zmwriqm945einhxbj2lcwa2h",
-		"id": "hops",
 		"title": "Hops",
 		"description": "Core ingredient for a beer.",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-hops",
+										"itemUid": "it4zjta2re025fm1tere3cl8",
 										"quantity": {
 											"min": 1,
 											"max": 1

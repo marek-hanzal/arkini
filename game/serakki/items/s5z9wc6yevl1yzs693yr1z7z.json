@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "s5z9wc6yevl1yzs693yr1z7z",
-		"id": "coin",
 		"title": "Coin",
 		"description": "Everybody wanna be rich.",
 		"ui": "simple",
@@ -16,56 +15,56 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pig"
+					"itemUid": "jx5gnntoo4aj7rxf3eq32lun"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "piggy-bank"
+				"result": "h0b9l3d36yl5whfxcfx1v6a0"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "paper---tier-1"
+					"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "serakki-banknote"
+				"result": "ome444b3wwfhiuq8ec7aaa1d"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "well"
+					"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "wishing-well"
+				"result": "ofhsiekjbyyxo0322xwmmwf2"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "well-with-beer"
+					"itemUid": "bdqyyzlbpwlsyt8i156e3ngm"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "wishing-well-with-beer"
+				"result": "yh0kf1gx4k2scf967qcko7xd"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "well-with-coffee"
+					"itemUid": "cb9s36hu9rogsoifm2aef25u"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "wishing-well-with-coffee"
+				"result": "ynywdebwovecgpbp3mvsu9ee"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cauldron"
+					"itemUid": "oj9o0nu1zp9g79f1jqx11g9l"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "leprechaun"
+				"result": "nvlo3kilska5d4nissd7qciu"
 			}
 		],
 		"maxQueueSize": 1,

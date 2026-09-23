@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yjpg011j6ltn534wgnbidtvj",
-		"id": "knowledge-t2",
 		"title": "Knowledge - Tier 2",
 		"description": "Advanced practical knowledge produced by a Tier 2 school. Required for founding the major agricultural guilds.",
 		"ui": "simple",

@@ -44,7 +44,7 @@ const createSet = (itemId: string, weight = 1): RollSetSchema.Type => {
 				outcome: [
 					{
 						type: "item",
-						itemId,
+						itemUid: itemId,
 						quantity: {
 							min: 1,
 							max: 1,

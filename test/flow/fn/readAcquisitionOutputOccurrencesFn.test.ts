@@ -19,7 +19,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "a",
+									itemUid: "a",
 									quantity: {
 										min: 1,
 										max: 2,
@@ -39,7 +39,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "b",
+									itemUid: "b",
 									quantity: {
 										min: 1,
 										max: 1,
@@ -82,7 +82,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "a",
+									itemUid: "a",
 									quantity: {
 										max: 1,
 										min: 1,
@@ -97,7 +97,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "a",
+									itemUid: "a",
 									quantity: {
 										max: 1,
 										min: 1,
@@ -106,7 +106,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 								},
 								{
 									type: "item",
-									itemId: "b",
+									itemUid: "b",
 									quantity: {
 										max: 1,
 										min: 1,
@@ -178,10 +178,10 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 								{
 									type: "exists",
 									query: {
-										distance: "universe",
+										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "permit",
+											itemUid: "permit",
 										},
 									},
 								},
@@ -194,7 +194,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "a",
+									itemUid: "a",
 									quantity: {
 										min: 1,
 										max: 1,
@@ -214,7 +214,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "b",
+									itemUid: "b",
 									quantity: {
 										min: 1,
 										max: 1,
@@ -247,7 +247,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 			outcome: [
 				{
 					type: "item",
-					itemId: `item:${index}`,
+					itemUid: `item:${index}`,
 					quantity: {
 						max: 1,
 						min: 1,
@@ -289,7 +289,7 @@ describe("readAcquisitionOutputOccurrencesFn", () => {
 								outcome: [
 									{
 										type: "item",
-										itemId: "huge",
+										itemUid: "huge",
 										quantity: {
 											max: 4_294_967_296,
 											min: 1,
@@ -342,7 +342,7 @@ it("keeps Space-only alternatives in item probability mass without creating acqu
 							},
 							{
 								type: "item",
-								itemId: "reward",
+								itemUid: "reward",
 								quantity: {
 									min: 1,
 									max: 1,

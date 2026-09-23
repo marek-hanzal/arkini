@@ -15,14 +15,14 @@ interface ItemConnectionFact {
 	readonly origin: readItemConnectionFactsFn.Origin;
 }
 
-const readInputItemIdFn = (input: LineInputSchema.Type | ActionInputSchema.Type) => {
+const readInputItemUidFn = (input: LineInputSchema.Type | ActionInputSchema.Type) => {
 	switch (input.type) {
 		case "simple":
 			return undefined;
 		case "materials":
-			return input.query.selector.itemId;
+			return input.query.selector.itemUid;
 		case "units":
-			return input.query.selector.itemId;
+			return input.query.selector.itemUid;
 	}
 };
 
@@ -93,7 +93,7 @@ const addOutputFactsFn = (
 				};
 				if (drop.type === "item")
 					facts.push({
-						factId: drop.itemId,
+						factId: drop.itemUid,
 						origin: {
 							source,
 							role: "output",
@@ -124,7 +124,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 			title: line.title,
 		};
 		for (const [inputIndex, input] of line.input.entries()) {
-			const factId = readInputItemIdFn(input);
+			const factId = readInputItemUidFn(input);
 			if (factId !== undefined)
 				facts.push({
 					factId,
@@ -153,7 +153,7 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 		} as const;
 		if (merge.action !== "space")
 			facts.push({
-				factId: merge.target.itemId,
+				factId: merge.target.itemUid,
 				origin: {
 					source,
 					role: "input",
@@ -210,12 +210,12 @@ export const readItemConnectionFactsFn = (
 		for (const fact of readOwnerFactsFn(owner)) {
 			const isOutput = fact.origin.role === "output" || fact.origin.role === "replacement";
 			if (isOutput !== outputs || (reverse && fact.factId !== factId)) continue;
-			const itemId = reverse ? owner.id : fact.factId;
-			if (itemId === factId) continue;
-			let origins = connections.get(itemId);
+			const itemUid = reverse ? owner.uid : fact.factId;
+			if (itemUid === factId) continue;
+			let origins = connections.get(itemUid);
 			if (origins === undefined) {
 				origins = new Map();
-				connections.set(itemId, origins);
+				connections.set(itemUid, origins);
 			}
 			origins.set(JSON.stringify(fact.origin), fact.origin);
 		}
@@ -224,8 +224,8 @@ export const readItemConnectionFactsFn = (
 		...connections,
 	]
 		.sort(([left], [right]) => Order.String(left, right))
-		.map(([itemId, origins]) => ({
-			itemId,
+		.map(([itemUid, origins]) => ({
+			itemUid,
 			origins: [
 				...origins.values(),
 			],
@@ -265,7 +265,7 @@ export namespace readItemConnectionFactsFn {
 	}
 
 	export interface Connection {
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly origins: readonly Origin[];
 	}
 }

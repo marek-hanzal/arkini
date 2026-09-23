@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cl9so73ire9q7pa3vblqvi8g",
-		"id": "empty-paper-drying-rack",
 		"title": "Empty Paper Drying Rack",
 		"ui": "simple",
 		"draft": true,

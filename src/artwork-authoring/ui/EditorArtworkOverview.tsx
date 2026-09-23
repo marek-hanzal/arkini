@@ -24,7 +24,7 @@ export const EditorArtworkOverview = ({ resourceId }: { readonly resourceId: str
 			data-ui="EditorArtworkOverview"
 		>
 			<EditorRootCard dataUi="EditorArtworkDetailsCard">
-				<FactList columns={4}>
+				<FactList columns={3}>
 					<Fact
 						label={translator.textFn("Resource ID")}
 						mono
@@ -37,11 +37,6 @@ export const EditorArtworkOverview = ({ resourceId }: { readonly resourceId: str
 								? translator.textFn("Reading image…")
 								: `${currentDimensions.width} × ${currentDimensions.height} px`
 						}
-					/>
-					<Fact
-						label={translator.textFn("Resource type")}
-						mono
-						value={resource.type}
 					/>
 					<Fact
 						label={translator.textFn("Byte size")}

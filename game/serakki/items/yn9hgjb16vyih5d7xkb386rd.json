@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yn9hgjb16vyih5d7xkb386rd",
-		"id": "beer-bath",
 		"title": "Beer Bath",
 		"ui": "simple",
 		"description": "Beer bath",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-copper-bathtub",
+										"itemUid": "y0p9s1c8s27yr1iytpyhluy1",
 										"quantity": {
 											"min": 1,
 											"max": 1

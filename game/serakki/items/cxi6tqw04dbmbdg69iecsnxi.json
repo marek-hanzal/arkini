@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cxi6tqw04dbmbdg69iecsnxi",
-		"id": "chopped-vegetables",
 		"title": "Chopped Vegetables",
 		"ui": "simple",
 		"draft": true,
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cauldron-with-boiling-water"
+					"itemUid": "aaj5jhmv6a2wsjg74yryd28r"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cauldron-with-vegetables"
+				"result": "pnlt3psyz5n49b775otdclwz"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-chopped-vegetables",
+										"itemUid": "dail5cu4taoh8pnt293uie0i",
 										"quantity": {
 											"min": 1,
 											"max": 1

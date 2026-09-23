@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ww797h0lugbws2jsb61ldy7g",
-		"id": "empty-bucket",
 		"title": "Empty Bucket",
 		"description": "A bucket containing absolutely nothing, which is what makes it useful. Water is the obvious idea. The game is under no obligation to stop you there.",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "well"
+					"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bucket-with-water",
+											"itemUid": "s9j877qispz12d8ry9h1d4wb",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -49,7 +48,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cauldron-with-soap"
+					"itemUid": "jj1c7jefeyzv45sd0ibtwqe6"
 				},
 				"action": "consume",
 				"outcome": {
@@ -63,7 +62,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bucket-with-soapy-water",
+											"itemUid": "ylpym7xm011uctpvbofzbhya",
 											"quantity": {
 												"min": 1,
 												"max": 1

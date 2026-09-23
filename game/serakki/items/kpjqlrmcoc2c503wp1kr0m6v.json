@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kpjqlrmcoc2c503wp1kr0m6v",
-		"id": "foundry",
 		"title": "Foundry",
 		"ui": "default",
 		"description": "Industrial",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "iron-ore"
+								"itemUid": "auytswhc89z64o4fm0f7swj7"
 							},
 							"distance": "far"
 						},
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "iron-ingot",
+											"itemUid": "i0lolk9ls7gqgyxclbpscfg2",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -82,7 +81,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "copper-ore"
+								"itemUid": "ahl16lhzbb05zw0kexi92r12"
 							},
 							"distance": "far"
 						},
@@ -104,7 +103,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-ingot",
+											"itemUid": "q68zwrmfnp4ld3hey4iph973",
 											"quantity": {
 												"min": 1,
 												"max": 2

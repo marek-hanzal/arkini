@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nh9tf1n52h19igah115s36jk",
-		"id": "air-pollution",
 		"title": "Air Pollution",
 		"description": "A cloud of airborne filth looking for somewhere else to be. It drifts across the board and eventually disperses on its own.",
 		"ui": "simple",
@@ -43,7 +42,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "air-pollution"
+								"itemUid": "nh9tf1n52h19igah115s36jk"
 							},
 							"distance": "self"
 						}
@@ -60,7 +59,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -96,7 +95,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "air-pollution"
+								"itemUid": "nh9tf1n52h19igah115s36jk"
 							},
 							"distance": "self"
 						}

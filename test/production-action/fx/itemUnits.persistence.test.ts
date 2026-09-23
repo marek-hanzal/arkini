@@ -21,7 +21,7 @@ describe("item units / persistence", () => {
 			Effect.gen(function* () {
 				const shrine = yield* spawnItemFx({
 					id: "runtime:shrine",
-					itemId: "producer:shrine",
+					itemUid: "producer:shrine",
 					location: board(0),
 				});
 				yield* startLineFx({

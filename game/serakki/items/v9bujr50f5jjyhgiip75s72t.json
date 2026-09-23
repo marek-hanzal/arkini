@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "v9bujr50f5jjyhgiip75s72t",
-		"id": "fertilized-sunflower-field",
 		"title": "Fertilized Sunflower Field",
 		"draft": false,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-sunflower-field",
+										"itemUid": "guzv8wmx0qxw28iqhch6g7lc",
 										"quantity": {
 											"min": 1,
 											"max": 1

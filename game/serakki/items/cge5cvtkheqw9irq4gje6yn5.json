@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cge5cvtkheqw9irq4gje6yn5",
-		"id": "sheep-farm",
 		"title": "Sheep Farm",
 		"draft": false,
 		"description": "Manages nearby sheep pens, prepares empty ones, and releases sheep over time.",
@@ -35,7 +34,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep-pen"
+								"itemUid": "r2y0wgdu2zxdboof3lqs4bg0"
 							},
 							"distance": "close"
 						}
@@ -45,7 +44,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hay"
+								"itemUid": "bttupkw06zzxn8xuvb4d27uu"
 							},
 							"distance": "far"
 						},
@@ -67,7 +66,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sheep",
+											"itemUid": "wh5fvg4la9xioq59jj3tjv96",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -99,7 +98,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -121,7 +120,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sheep-pen",
+											"itemUid": "mnlaqzcefea2pashxwbqvq6e",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -153,7 +152,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -175,7 +174,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sheep-farm-blueprint",
+											"itemUid": "a6nncq42511mwyom6yjiu7c1",
 											"quantity": {
 												"min": 1,
 												"max": 1

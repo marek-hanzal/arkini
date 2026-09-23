@@ -23,12 +23,12 @@ const board = (x: number) => ({
 const spawnParticipantsFx = Effect.gen(function* () {
 	const source = yield* spawnItemFx({
 		id: "source",
-		itemId: "source",
+		itemUid: "source",
 		location: board(0),
 	});
 	const target = yield* spawnItemFx({
 		id: "target",
-		itemId: "target",
+		itemUid: "target",
 		location: board(1),
 	});
 	return {
@@ -54,7 +54,7 @@ describe("merge settlement against the evolving draft", () => {
 							distance: "self",
 							selector: {
 								type: "item",
-								itemId: "source",
+								itemUid: "source",
 							},
 						},
 					},
@@ -65,13 +65,13 @@ describe("merge settlement against the evolving draft", () => {
 			sourceUnits: {
 				amount: 1,
 				outcome: guaranteedMergeOutput({
-					itemId: "target",
+					itemUid: "target",
 				}),
 			},
 			rule: {
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				action: "spend",
 				...(effect === "remove"
@@ -104,9 +104,9 @@ describe("merge settlement against the evolving draft", () => {
 				}),
 			),
 		);
-		expect(result.runtime.items.filter((item) => item.item.id === "target").length).toBe(1);
+		expect(result.runtime.items.filter((item) => item.item.uid === "target").length).toBe(1);
 		// Outcome rules use the pre-merge source owner even after its depletion removes it.
-		expect(result.runtime.items.filter((item) => item.item.id === "output").length).toBe(1);
+		expect(result.runtime.items.filter((item) => item.item.uid === "output").length).toBe(1);
 		expect(result.transition.events).not.toContainEqual(
 			expect.objectContaining({
 				type: "item:disappeared",

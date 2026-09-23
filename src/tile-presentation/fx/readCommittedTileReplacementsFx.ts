@@ -56,9 +56,9 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 							if (
 								previous === undefined ||
 								current === undefined ||
-								previous.item.id !== merged.targetCanonicalItemId ||
-								current.item.id !== merged.resultCanonicalItemId ||
-								previous.item.id === current.item.id ||
+								previous.item.uid !== merged.targetItemUid ||
+								current.item.uid !== merged.resultItemUid ||
+								previous.item.uid === current.item.uid ||
 								!isSameGridLocationFn({
 									left: previous.location,
 									right: current.location,

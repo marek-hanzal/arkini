@@ -28,7 +28,7 @@ const line: LineSchema.Type = {
 				distance: "close",
 				selector: {
 					type: "item",
-					itemId: "water",
+					itemUid: "water",
 				},
 			},
 		},
@@ -81,7 +81,7 @@ it("shows unit payers and excludes missing, reserved, exhausted, and out-of-reac
 	};
 	expect(readFn(runtime)[0]).toMatchObject({
 		type: "units",
-		itemId: "water",
+		itemUid: "water",
 		filled: 1,
 		available: true,
 		committed: false,
@@ -130,7 +130,7 @@ it("shows unit payers and excludes missing, reserved, exhausted, and out-of-reac
 				],
 			})[0],
 		).toMatchObject({
-			itemId: "water",
+			itemUid: "water",
 			filled: 0,
 			available: false,
 			availableQuantity: 0,

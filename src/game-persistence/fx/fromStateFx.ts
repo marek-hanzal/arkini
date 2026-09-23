@@ -13,7 +13,7 @@ interface FromStateProps {
 
 const fromStateItemFx = Effect.fn("fromStateItemFx")(function* (state: StateItemSchema.Type) {
 	const item = yield* resolveItemFx({
-		itemId: state.itemId,
+		itemUid: state.itemUid,
 	});
 
 	return {

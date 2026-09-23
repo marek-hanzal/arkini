@@ -8,7 +8,7 @@ export type ItemOriginOperationKind = "line" | "units" | "merge" | "expiry";
 type ItemOriginOutputKind = "guaranteed" | "chance" | "replace";
 
 export interface ItemOriginOutputOccurrence {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly placement: "drop" | "random" | undefined;
 	readonly quantity: QuantitySchema.Type;
 	/** Exact acquisition route represented by this output occurrence. */
@@ -19,7 +19,7 @@ export interface ItemOriginOutputOccurrence {
 }
 
 export interface ItemOriginInputOccurrence {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly quantity: QuantitySchema.Type;
 }
 
@@ -36,7 +36,7 @@ export interface ItemOriginOutputRequirements {
 }
 
 export interface ItemOriginUnsupportedRequirementOccurrence {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly reason: AcquisitionUnsupportedRequirement["reason"];
 	readonly source: AcquisitionUnsupportedRequirement["source"];
 }
@@ -63,10 +63,10 @@ export interface ItemOriginSource {
 	readonly kind: ItemOriginOperationKind;
 	readonly label: string;
 	readonly outputs: ReadonlyArray<ItemOriginOutputOccurrence>;
-	readonly ownerItemId: string;
+	readonly ownerItemUid: string;
 	readonly reference: ItemOriginSourceReference;
 	/** Convenience union for graph traversal; clause truth lives on each output occurrence. */
-	readonly requirementItemIds: ReadonlyArray<string>;
+	readonly requirementItemUids: ReadonlyArray<string>;
 	/** Acquisition occurrence routes represented by this authored operation. */
 	readonly routeIds: ReadonlyArray<string>;
 	readonly runtimeMs?: number;
@@ -75,9 +75,9 @@ export interface ItemOriginSource {
 export type ItemOriginRelationRole = "input" | "output";
 
 export interface ItemOriginRelation {
-	readonly fromItemId: string;
+	readonly fromItemUid: string;
 	readonly outcomeIndex?: number;
 	readonly role: ItemOriginRelationRole;
 	readonly source: ItemOriginSource;
-	readonly toItemId: string;
+	readonly toItemUid: string;
 }

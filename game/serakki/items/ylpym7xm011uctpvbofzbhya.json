@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ylpym7xm011uctpvbofzbhya",
-		"id": "bucket-with-soapy-water",
 		"title": "Bucket With Soapy Water",
 		"draft": false,
 		"description": "A bucket of soapy water, ready to turn an ordinary brush into something that can actually clean things.",

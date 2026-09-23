@@ -121,7 +121,7 @@ const template: TemplateSchema.Type = {
 	height: 2,
 	board: [
 		{
-			itemId: "water",
+			itemUid: "water",
 			x: 0,
 			y: 0,
 		},
@@ -336,7 +336,7 @@ describe("template draft and deletion settlement", () => {
 			...template,
 			board: [
 				{
-					itemId: "water",
+					itemUid: "water",
 					x: 2,
 					y: 1,
 				},
@@ -380,7 +380,7 @@ describe("template draft and deletion settlement", () => {
 			...template,
 			board: [
 				{
-					itemId: "water",
+					itemUid: "water",
 					x: 2,
 					y: 1,
 				},

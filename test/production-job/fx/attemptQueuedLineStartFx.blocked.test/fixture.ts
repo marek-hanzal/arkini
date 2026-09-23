@@ -20,7 +20,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			distance: "far" as const,
 			selector: {
 				type: "item",
-				itemId: "water",
+				itemUid: "water",
 			},
 		},
 		quantity: {
@@ -48,7 +48,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 						outcome: [
 							{
 								type: "item" as const,
-								itemId,
+								itemUid: itemId,
 								quantity: {
 									min: quantity,
 									max: quantity,
@@ -75,22 +75,18 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			...base.items,
 			permit: {
 				...base.items.tool,
-				id: "permit",
 				uid: "permit",
 			},
 			result: {
 				...base.items.tool,
-				id: "result",
 				uid: "result",
 			},
 			debris: {
 				...base.items.tool,
-				id: "debris",
 				uid: "debris",
 			},
 			payer: {
 				...base.items.tool,
-				id: "payer",
 				uid: "payer",
 				units: {
 					amount: 1,
@@ -118,7 +114,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 												distance: "far" as const,
 												selector: {
 													type: "item",
-													itemId: "tool",
+													itemUid: "tool",
 												},
 											},
 											quantity: {
@@ -144,7 +140,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 											query: {
 												selector: {
 													type: "item",
-													itemId: "payer",
+													itemUid: "payer",
 												},
 												distance: "close",
 											},

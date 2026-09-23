@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wh01db4tsschuz3nf4xfr0pi",
-		"id": "beer-barrel",
 		"title": "Beer Barrel",
 		"ui": "simple",
 		"description": "Beer source",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-beer-barrel",
+										"itemUid": "p4eokvczm0ulojypms10v81w",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -44,7 +43,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub"
+					"itemUid": "ysdkouxd4qpd0ztziy07k2ss"
 				},
 				"action": "consume",
 				"outcome": {
@@ -58,7 +57,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-beer-barrel",
+											"itemUid": "p4eokvczm0ulojypms10v81w",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -73,7 +72,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "beer-bath"
+				"result": "yn9hgjb16vyih5d7xkb386rd"
 			}
 		],
 		"clock": {
@@ -91,7 +90,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-beer-barrel",
+										"itemUid": "rhfumnzi3t8y75j9osu9mqrj",
 										"quantity": {
 											"min": 1,
 											"max": 1

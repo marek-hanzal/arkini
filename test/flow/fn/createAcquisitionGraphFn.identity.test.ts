@@ -55,7 +55,7 @@ it.each([
 											id: lineId,
 											outcome: createOutput([
 												{
-													itemId: "product",
+													itemUid: "product",
 												},
 											]),
 										}),
@@ -71,7 +71,7 @@ it.each([
 		if (compiled.config === undefined) throw new Error("Expected valid authored identifiers.");
 		const graph = createAcquisitionGraphFn(compiled.config);
 		const sources = readItemOriginSourcesFn(graph);
-		expect(sources.map((source) => source.ownerItemId).sort()).toEqual(
+		expect(sources.map((source) => source.ownerItemUid).sort()).toEqual(
 			owners.map(([id]) => id).sort(),
 		);
 		expect(

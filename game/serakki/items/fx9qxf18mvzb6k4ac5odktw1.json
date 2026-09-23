@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fx9qxf18mvzb6k4ac5odktw1",
-		"id": "empty-inkwell",
 		"title": "Empty Inkwell",
 		"ui": "simple",
 		"draft": true,

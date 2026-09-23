@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "k3p9zu3b6u3ax2qtzlmg6a2o",
-		"id": "steam-corn-processing",
 		"title": "Steam Corn Processing",
 		"ui": "default",
 		"draft": true,
@@ -30,7 +29,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "order-corn"
+								"itemUid": "jn0d9duoke8x541an3z3nnem"
 							},
 							"distance": "far"
 						},
@@ -45,7 +44,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -67,7 +66,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "corn",
+											"itemUid": "m0quqq3gbmugylp39ced2zco",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -82,7 +81,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 2,
 												"max": 2

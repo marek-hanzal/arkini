@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wty33h4avbqmgblvysq7e3ql",
-		"id": "flowers",
 		"title": "Flowers",
 		"description": "Flowers",
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "clay-vase"
+					"itemUid": "vuvhe03rrdltymtnhvznb48a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "clay-vase-with-flowers"
+				"result": "cqm8b0n2qut41wb349zmwbvx"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-flowers",
+										"itemUid": "uybh9b32oh77i0rgveffap0h",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -17,7 +17,7 @@ describe("item units / readiness and selection", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:overdrawn",
-					itemId: "producer:overdrawn",
+					itemUid: "producer:overdrawn",
 					location: board(0),
 				});
 				return yield* readLineRunFx({
@@ -37,12 +37,12 @@ describe("item units / readiness and selection", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:double-target",
-					itemId: "producer:double-target",
+					itemUid: "producer:double-target",
 					location: board(0),
 				});
 				const tree = yield* spawnItemFx({
 					id: "runtime:tree",
-					itemId: "units:tree",
+					itemUid: "units:tree",
 					location: board(1),
 				});
 				yield* startLineFx({
@@ -64,17 +64,17 @@ describe("item units / readiness and selection", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:double-target",
-					itemId: "producer:double-target",
+					itemUid: "producer:double-target",
 					location: board(0),
 				});
 				yield* spawnItemFx({
 					id: "runtime:sapling:a",
-					itemId: "units:sapling",
+					itemUid: "units:sapling",
 					location: board(1),
 				});
 				yield* spawnItemFx({
 					id: "runtime:sapling:b",
-					itemId: "units:sapling",
+					itemUid: "units:sapling",
 					location: board(0, 1),
 				});
 				yield* startLineFx({
@@ -85,7 +85,7 @@ describe("item units / readiness and selection", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "units:sapling")).toBe(false);
-		expect(runtime.items.filter((item) => item.item.id === "item:seed")).toHaveLength(2);
+		expect(runtime.items.some((item) => item.item.uid === "units:sapling")).toBe(false);
+		expect(runtime.items.filter((item) => item.item.uid === "item:seed")).toHaveLength(2);
 	});
 });

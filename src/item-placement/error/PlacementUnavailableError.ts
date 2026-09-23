@@ -14,7 +14,7 @@ type PlacementFailureReason = (typeof PlacementFailureReason)[keyof typeof Place
  * A resolved drop cannot be placed completely without violating placement rules.
  */
 export class PlacementUnavailableError extends Data.TaggedError("PlacementUnavailableError")<{
-	itemId: IdSchema.Type;
+	itemUid: IdSchema.Type;
 	placement: PlacementSchema.Type;
 	quantity: PositiveIntegerSchema.Type;
 	reason: PlacementFailureReason;

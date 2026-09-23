@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ms55wb7h8dlbtkuragbny6z5",
-		"id": "scriptorium",
 		"title": "Scriptorium",
 		"description": "Book maker",
 		"ui": "default",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "inkwell"
+								"itemUid": "aypezdd5mxtcclnmhi7kphyv"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "book-t1",
+											"itemUid": "ooiwjpnx0wgz8wnhvgp342hj",
 											"quantity": {
 												"min": 1,
 												"max": 1

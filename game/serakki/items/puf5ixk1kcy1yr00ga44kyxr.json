@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "puf5ixk1kcy1yr00ga44kyxr",
-		"id": "fertilized-grass-field",
 		"title": "Fertilized Grass Field",
 		"draft": false,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-grass-field",
+										"itemUid": "p6wks4iknyp8b8v5qxhilm1x",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -8,12 +8,12 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 export const SelectorSchema = z
 	.object({
 		type: z.literal("item"),
-		itemId: IdSchema.describe("The stable ID of the selected canonical item."),
+		itemUid: IdSchema.describe("The immutable UID of the selected canonical item."),
 	})
 	.strict()
 	.meta({
 		id: "SelectorSchema",
-		description: "A selector that resolves one canonical game item by stable ID.",
+		description: "A selector that resolves one canonical game item by immutable UID.",
 	});
 
 export type SelectorSchema = typeof SelectorSchema;

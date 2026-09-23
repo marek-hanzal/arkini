@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "m901w07a1x2ta0wbs4qa9pjd",
-		"id": "poison-jar",
 		"title": "Poison Jar",
 		"ui": "simple",
 		"draft": true,

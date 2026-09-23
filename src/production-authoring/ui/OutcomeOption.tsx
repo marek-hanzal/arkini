@@ -22,7 +22,7 @@ export const OutcomeOption = ({
 			outcomes.flatMap((outcome) =>
 				outcome.type === "item"
 					? [
-							outcome.itemId,
+							outcome.itemUid,
 						]
 					: [],
 			),

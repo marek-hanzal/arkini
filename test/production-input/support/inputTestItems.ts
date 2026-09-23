@@ -7,7 +7,7 @@ const simpleItem = ({ id }: { id: string }) => {
 		lines: [],
 
 		uid: id,
-		id,
+
 		title: id,
 		description: id,
 		artwork: {

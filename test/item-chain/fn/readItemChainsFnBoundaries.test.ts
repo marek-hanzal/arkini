@@ -95,10 +95,10 @@ describe("chain termination and authored output boundaries", () => {
 								{
 									type: "exists",
 									query: {
-										distance: "universe",
+										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "a",
+											itemUid: "a",
 										},
 									},
 								},
@@ -129,7 +129,7 @@ describe("chain termination and authored output boundaries", () => {
 			].map((id) => itemFn(id)),
 		);
 		const branches = readItemChainsFn(items, "root").chains[0].steps[0].branches;
-		expect(branches.map((node) => node.itemId)).toEqual([
+		expect(branches.map((node) => node.itemUid)).toEqual([
 			"a",
 			"b",
 			"c",
@@ -190,7 +190,7 @@ describe("chain termination and authored output boundaries", () => {
 					{
 						target: {
 							type: "item",
-							itemId: "target",
+							itemUid: "target",
 						},
 						action: "use",
 						effect: "keep",
@@ -209,7 +209,7 @@ describe("chain termination and authored output boundaries", () => {
 		expect(
 			result.chains[0].outcomes
 				.filter((outcome) => outcome.stop === "retained")
-				.map((outcome) => outcome.itemId),
+				.map((outcome) => outcome.itemUid),
 		).toEqual([
 			"target",
 			"root",

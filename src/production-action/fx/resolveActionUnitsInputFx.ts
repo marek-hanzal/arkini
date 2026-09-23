@@ -18,27 +18,21 @@ const compareTargetFn = (
 	left: BoardRuntimeItemSchema.Type,
 	right: BoardRuntimeItemSchema.Type,
 ) => {
-	const leftLocal = left.location.space === origin.space;
-	const rightLocal = right.location.space === origin.space;
-	if (leftLocal !== rightLocal) return leftLocal ? -1 : 1;
-	if (leftLocal && rightLocal) {
-		const leftDistance =
-			Math.abs(left.location.position.x - origin.position.x) +
-			Math.abs(left.location.position.y - origin.position.y);
-		const rightDistance =
-			Math.abs(right.location.position.x - origin.position.x) +
-			Math.abs(right.location.position.y - origin.position.y);
-		if (leftDistance !== rightDistance) return leftDistance - rightDistance;
-	}
+	const leftDistance =
+		Math.abs(left.location.position.x - origin.position.x) +
+		Math.abs(left.location.position.y - origin.position.y);
+	const rightDistance =
+		Math.abs(right.location.position.x - origin.position.x) +
+		Math.abs(right.location.position.y - origin.position.y);
+	if (leftDistance !== rightDistance) return leftDistance - rightDistance;
 	return (
-		left.location.space - right.location.space ||
 		left.location.position.y - right.location.position.y ||
 		left.location.position.x - right.location.position.x ||
 		left.id.localeCompare(right.id)
 	);
 };
 
-/** Selects one deterministic Board payer, or stays unavailable without a real Board origin. */
+/** Selects one deterministic payer on the owner’s Board, or stays unavailable without a real Board origin. */
 export const resolveActionUnitsInputFx = Effect.fn("resolveActionUnitsInputFx")(function* ({
 	input,
 	ownerItemId,
@@ -73,9 +67,9 @@ export const resolveActionUnitsInputFx = Effect.fn("resolveActionUnitsInputFx")(
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const boardCandidates = Array.getSomes(candidates.map(narrowBoardRuntimeItemFn)).sort(
-		(left, right) => compareTargetFn(owner.location, left, right),
-	);
+	const boardCandidates = Array.getSomes(candidates.map(narrowBoardRuntimeItemFn))
+		.filter((candidate) => candidate.location.space === owner.location.space)
+		.sort((left, right) => compareTargetFn(owner.location, left, right));
 
 	for (const target of boardCandidates) {
 		const units = yield* resolveActionUnitFx({

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yoody7n37wf3xnufn46i2xne",
-		"id": "empty-bed-t1",
 		"title": "Empty Bed T1",
 		"ui": "simple",
 		"description": "You can sleep, not so comfortably",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "o4neg1w4zbgzie6nr1oft9fu",
-		"id": "clay-jug-with-beer",
 		"title": "Clay Jug With Beer",
 		"ui": "simple",
 		"description": "Fresh beer",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-jug",
+										"itemUid": "as7cebumachej9xwfokqhkue",
 										"quantity": {
 											"min": 1,
 											"max": 1

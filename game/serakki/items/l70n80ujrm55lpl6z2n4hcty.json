@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "l70n80ujrm55lpl6z2n4hcty",
-		"id": "bio-waste",
 		"title": "Bio-Waste",
 		"ui": "simple",
 		"description": "Stuff produced by life. From the other side.",
@@ -16,38 +15,38 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "toilet-biowaste"
+				"result": "oo3wuqjngg5i21vwt4m5nz0s"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bed-t1"
+					"itemUid": "ppvb7bkeybasw9j45yv9zk6n"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bed-biowaste"
+				"result": "n4ziixdl1bdsefi26ncdjyy1"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub"
+					"itemUid": "ysdkouxd4qpd0ztziy07k2ss"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "copper-bathtub-with-bio-waste"
+				"result": "shp343joyeuwkqsic8viao7j"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-bucket"
+					"itemUid": "ww797h0lugbws2jsb61ldy7g"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bio-waste-bucket"
+				"result": "rfb6208v8p0zyhbocehncios"
 			}
 		],
 		"maxQueueSize": 1,

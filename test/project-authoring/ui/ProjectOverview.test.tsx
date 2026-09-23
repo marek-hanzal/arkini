@@ -132,7 +132,7 @@ describe("ProjectOverview", () => {
 				{
 					estimate: {
 						demand: 0,
-						itemId: editorTestPayload.config.items.water.id,
+						itemUid: editorTestPayload.config.items.water.uid,
 						method: "static",
 						status: "unreachable",
 					},

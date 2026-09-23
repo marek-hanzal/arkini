@@ -24,7 +24,7 @@ const target = {
 };
 const selector = {
 	type: "item",
-	itemId: "water",
+	itemUid: "water",
 } as const;
 const configFn = (queries: ReadonlyArray<QuerySchema.Type>) =>
 	GameConfigSchema.parse({
@@ -80,21 +80,21 @@ const locations: ReadonlyArray<
 const spawnFx = Effect.gen(function* () {
 	yield* spawnItemFx({
 		id: "owner",
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: workshopLocation,
 	});
 	for (const [id, location] of locations)
 		yield* spawnItemFx({
 			id,
-			itemId: "water",
+			itemUid: "water",
 			location,
 		});
 });
 
-it("keeps universe autofill on the producer board even when only remote stock exists", () => {
+it("keeps far autofill on the producer board even when only remote stock exists", () => {
 	const config = configFn([
 		{
-			distance: "universe" as const,
+			distance: "far" as const,
 			selector,
 		},
 	]);
@@ -102,12 +102,12 @@ it("keeps universe autofill on the producer board even when only remote stock ex
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "owner",
-				itemId: "workshop",
+				itemUid: "workshop",
 				location: workshopLocation,
 			});
 			yield* spawnItemFx({
 				id: "remote",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					...sourceLocation(1),
 					space: 1,
@@ -150,17 +150,6 @@ it.each([
 	[
 		{
 			distance: "far" as const,
-			selector,
-		},
-		[
-			"close",
-			"near",
-			"far",
-		],
-	],
-	[
-		{
-			distance: "universe" as const,
 			selector,
 		},
 		[
@@ -241,7 +230,7 @@ it("allocates same-definition instances by each slot's reach without double spen
 			yield* spawnFx;
 			yield* spawnItemFx({
 				id: "near:second",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -353,17 +342,17 @@ it("fills a narrow minimum before a broad earlier slot can steal its only source
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "owner",
-				itemId: "workshop",
+				itemUid: "workshop",
 				location: workshopLocation,
 			});
 			yield* spawnItemFx({
 				id: "close",
-				itemId: "water",
+				itemUid: "water",
 				location: sourceLocation(1),
 			});
 			yield* spawnItemFx({
 				id: "far",
-				itemId: "water",
+				itemUid: "water",
 				location: sourceLocation(3),
 			});
 			const runtime = yield* readRuntimeFx();

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hwsz6gzxqzbr7y3gxxk36btc",
-		"id": "sand-deposit",
 		"title": "Sand Deposit",
 		"ui": "simple",
 		"description": "Sandman.",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "earth-deposit-deplated",
+										"itemUid": "v57kyyd3onui8me4gpj1mpn0",
 										"quantity": {
 											"min": 1,
 											"max": 1

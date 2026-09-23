@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yx0dq3pl2qg9blgw7itacuke",
-		"id": "corn-kernels",
 		"title": "Corn Kernels",
 		"draft": false,
 		"description": "Fresh corn kernels. Plant them, cook them, or pack them into a seed sack before they spoil.",
@@ -17,29 +16,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cauldron"
+					"itemUid": "oj9o0nu1zp9g79f1jqx11g9l"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cauldron-with-corn"
+				"result": "hvsf0ob47k3znw2r08la7bgi"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-corn-kernels"
+				"result": "o2skwmlh3wggmy9qyjjhkm3e"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-corn-field"
+					"itemUid": "xyf94kyi1jr5hlntp87egwcd"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "corn-field"
+				"result": "om31d2frwk86m6dhiirx7kw6"
 			}
 		],
 		"clock": {
@@ -57,7 +56,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-corn-kernels",
+										"itemUid": "g67ob34lz7q83cuy0nit7dxg",
 										"quantity": {
 											"min": 1,
 											"max": 1

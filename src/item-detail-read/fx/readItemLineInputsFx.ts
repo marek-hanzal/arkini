@@ -28,7 +28,7 @@ export namespace readItemLineInputsFx {
 	export interface Input {
 		readonly type: "materials" | "units";
 		readonly inputIndex: number;
-		readonly itemId: IdSchema.Type;
+		readonly itemUid: IdSchema.Type;
 		readonly quantity: MaterialSchema.Type["quantity"];
 		readonly filled: number;
 		readonly available: boolean;
@@ -100,7 +100,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			inputs.push({
 				type: "units",
 				inputIndex,
-				itemId: input.query.selector.itemId,
+				itemUid: input.query.selector.itemUid,
 				quantity: {
 					min: 1,
 					max: 1,
@@ -191,7 +191,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 		inputs.push({
 			type: "materials",
 			inputIndex,
-			itemId: input.query.selector.itemId,
+			itemUid: input.query.selector.itemUid,
 			quantity: input.quantity,
 			filled,
 			committed,

@@ -9,7 +9,6 @@ describe("ItemSchema defaults", () => {
 			maxQueueSize: 1,
 			lines: [],
 			uid: "simple-item",
-			id: "simple-item",
 			title: "Simple item",
 			artwork: {
 				scale: 0.8,
@@ -28,7 +27,6 @@ describe("ItemSchema defaults", () => {
 			lines: [],
 
 			uid: "legacy-item",
-			id: "legacy-item",
 			title: "Legacy item",
 			artwork: {
 				scale: 0.8,

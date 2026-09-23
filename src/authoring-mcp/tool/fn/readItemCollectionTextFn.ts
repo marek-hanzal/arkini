@@ -25,7 +25,7 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 		.map((item) =>
 			[
 				`- ${item.title}`,
-				`  ID: ${item.id}`,
+				`  UID: ${item.uid}`,
 				`  Draft: ${readDraftFn(item)}`,
 				...(item.description === undefined
 					? []

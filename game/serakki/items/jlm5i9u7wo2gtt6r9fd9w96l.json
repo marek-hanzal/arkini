@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jlm5i9u7wo2gtt6r9fd9w96l",
-		"id": "spoiled-bread-slices",
 		"title": "Spoiled Bread Slices",
 		"ui": "simple",
 		"description": "Bread. Eaten by mould",

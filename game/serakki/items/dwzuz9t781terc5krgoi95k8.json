@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dwzuz9t781terc5krgoi95k8",
-		"id": "spoiled-tree-seed",
 		"title": "Spoiled Tree Seed",
 		"draft": false,
 		"description": "A tree seed that waited too long to become a tree.",

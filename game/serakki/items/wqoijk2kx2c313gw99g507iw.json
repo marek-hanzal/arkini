@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wqoijk2kx2c313gw99g507iw",
-		"id": "forest",
 		"title": "Forest",
 		"description": "Trees, tracks, noises, and things watching from between the trunks. Explorers tend to find more than wood here.",
 		"ui": "simple",

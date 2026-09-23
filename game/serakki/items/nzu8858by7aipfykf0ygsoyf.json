@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nzu8858by7aipfykf0ygsoyf",
-		"id": "lit-carved-pumpkin",
 		"title": "Lit Carved Pumpkin",
 		"draft": true,
 		"ui": "simple",
@@ -32,7 +31,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "carved-pumpkin",
+										"itemUid": "si6jbsgu4o7634isiae2iqio",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -66,7 +65,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "ghost"
+								"itemUid": "ynro5iy60hlzcb1q3kd1an8l"
 							},
 							"distance": "near-close"
 						},
@@ -85,7 +84,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "lit-carved-pumpkin"
+								"itemUid": "nzu8858by7aipfykf0ygsoyf"
 							},
 							"distance": "self"
 						}
@@ -102,7 +101,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "jack-o-lantern",
+											"itemUid": "o8sabovband91umj6szmhzza",
 											"quantity": {
 												"min": 1,
 												"max": 1

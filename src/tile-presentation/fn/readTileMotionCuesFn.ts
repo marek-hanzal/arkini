@@ -48,12 +48,12 @@ const readOriginLocationFn = ({
 };
 
 const readTargetFn = ({
-	canonicalItemId,
+	itemUid,
 	itemId,
 	location,
 	runtime,
 }: {
-	readonly canonicalItemId: string;
+	readonly itemUid: string;
 	readonly itemId: string;
 	readonly location: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
@@ -64,7 +64,7 @@ const readTargetFn = ({
 	});
 	if (
 		target === null ||
-		target.item.id !== canonicalItemId ||
+		target.item.uid !== itemUid ||
 		!isSameGridLocationFn({
 			left: target.location,
 			right: location,
@@ -82,7 +82,7 @@ type SpawnMotionEvent = Pick<
 			readonly type: typeof GameEventEnumSchema.enum.ItemSpawned;
 		}
 	>,
-	"canonicalItemId" | "itemId" | "location" | "originItemId"
+	"itemUid" | "itemId" | "location" | "originItemId"
 >;
 
 const readSpawnCueFn = ({
@@ -99,7 +99,7 @@ const readSpawnCueFn = ({
 		transition,
 	});
 	const target = readTargetFn({
-		canonicalItemId: event.canonicalItemId,
+		itemUid: event.itemUid,
 		itemId: event.itemId,
 		location: event.location,
 		runtime: transition.runtime,
@@ -147,7 +147,7 @@ const readEventCueFn = ({
 			eventIndex,
 			sourceActorId: event.sourceItemId,
 			targetActorId: event.ownerItemId,
-			canonicalItemId: event.canonicalItemId,
+			itemUid: event.itemUid,
 			originActorId: event.sourceItemId,
 			originLocation: event.previousSourceLocation,
 			targetLocation: target.location,

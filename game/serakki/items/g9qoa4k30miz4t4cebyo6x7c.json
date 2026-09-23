@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "g9qoa4k30miz4t4cebyo6x7c",
-		"id": "wolf-with-arrow",
 		"title": "Wolf With Arrow",
 		"draft": true,
 		"ui": "default",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "hunted-game",
+										"itemUid": "xaijv8bc7ljbonqgp1vzcxcc",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -24,7 +24,7 @@ describe("assertGameConfigValidFx", () => {
 			compileGameSourcesFx([
 				createRootSource({
 					items: {
-						[units.id]: units,
+						[units.uid]: units,
 					},
 				}),
 			]),
@@ -39,6 +39,6 @@ describe("assertGameConfigValidFx", () => {
 				}),
 			]),
 		);
-		expect(config.items[units.id]).toEqual(units);
+		expect(config.items[units.uid]).toEqual(units);
 	});
 });

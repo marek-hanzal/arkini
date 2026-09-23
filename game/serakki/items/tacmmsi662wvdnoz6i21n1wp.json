@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tacmmsi662wvdnoz6i21n1wp",
-		"id": "waste-incinerator",
 		"title": "Waste Incinerator",
 		"description": "A practical answer to accumulated Waste: feed it Charcoal, make the board cleaner, and move part of the problem into the atmosphere.",
 		"ui": "default",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "charcoal"
+								"itemUid": "kww8lkn8pkgrwpx7afo8pwv2"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "waste"
+								"itemUid": "adwkzsf6f7sy2mtg0rpi09wr"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -82,7 +81,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "charcoal"
+								"itemUid": "kww8lkn8pkgrwpx7afo8pwv2"
 							},
 							"distance": "far"
 						},
@@ -128,7 +127,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bio-waste"
+								"itemUid": "l70n80ujrm55lpl6z2n4hcty"
 							},
 							"distance": "far"
 						},
@@ -150,7 +149,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -166,7 +165,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "loose-ash",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 											"quantity": {
 												"min": 1,
 												"max": 1

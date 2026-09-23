@@ -58,7 +58,7 @@ const target = {
 };
 const item = {
 	id: "runtime:water",
-	itemId: "water",
+	itemUid: "water",
 
 	title: "Water",
 	artworkScale: 0.8,
@@ -101,7 +101,7 @@ describe("delivery runtime", () => {
 			const secondItem = {
 				...item,
 				id: "runtime:returning-stone",
-				itemId: "stone",
+				itemUid: "stone",
 				revision: "revision:returning-stone",
 				sourceUrl: "resource:stone",
 				title: "Stone",

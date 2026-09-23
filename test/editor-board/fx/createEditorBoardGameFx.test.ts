@@ -65,7 +65,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 		expect(game.getSnapshotFn().items).toEqual([
 			expect.objectContaining({
 				item: expect.objectContaining({
-					id: "water",
+					uid: "water",
 				}),
 			}),
 		]);
@@ -83,7 +83,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 		await game.runFn(
 			spawnItemFx({
 				id: "runtime:ephemeral",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 1,
@@ -129,7 +129,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 			game.runFn(
 				spawnItemFx({
 					id: "runtime:after-dispose",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 1,

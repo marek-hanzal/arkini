@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f8viltfd5w0tygzc09vz5jy5",
-		"id": "sack-with-sugar",
 		"title": "Sack With Sugar",
 		"description": "Pure sweetness",
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "honeyed-fruit-pancake-with-cream"
+					"itemUid": "sndowrk0b7wr11w8e2svbseu"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "honeyed-fruit-pancake-with-cream-and-sugar"
+				"result": "szc460rahffy43pnkp44drw7"
 			}
 		],
 		"maxQueueSize": 1,

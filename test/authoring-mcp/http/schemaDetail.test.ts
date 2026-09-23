@@ -70,7 +70,7 @@ describe("editor MCP authoring schema registry", () => {
 				},
 			},
 			required: [
-				"itemId",
+				"itemUid",
 				"lineId",
 				"revision",
 				"line",
@@ -339,7 +339,6 @@ describe("editor MCP authoring schema registry", () => {
 			}),
 		];
 		const input = {
-			id: "item:portal",
 			title: "Portal",
 			lines,
 		};
@@ -353,7 +352,6 @@ describe("editor MCP authoring schema registry", () => {
 
 		// The advertised Common graph must reject schedules that canonical saves reject.
 		const scheduled = {
-			id: "item:timer",
 			title: "Timer",
 			clock: {
 				intervalMs: 1000,

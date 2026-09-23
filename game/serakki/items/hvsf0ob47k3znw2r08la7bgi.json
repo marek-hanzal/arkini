@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hvsf0ob47k3znw2r08la7bgi",
-		"id": "cauldron-with-corn",
 		"title": "Cauldron With Corn",
 		"ui": "simple",
 		"draft": true,
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cauldron-with-popcorn",
+											"itemUid": "c5z1mzklzgwyf52y6d04ol19",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire-extinguished"
+				"result": "fenhlvaj45ssocm5r935nqli"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

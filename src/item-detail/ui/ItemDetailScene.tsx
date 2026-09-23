@@ -59,7 +59,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 			>
 				{fullInterface && controller.detail !== undefined ? (
 					<ItemLines
-						key={`${target.kind}:${target.itemId}`}
+						key={`${target.kind}:${target.kind === "runtime" ? target.itemId : target.itemUid}`}
 						lines={controller.detail.lines}
 						disabledLineIds={controller.detail.disabledLineIds}
 						lineBlockingHints={controller.detail.lineBlockingHints}

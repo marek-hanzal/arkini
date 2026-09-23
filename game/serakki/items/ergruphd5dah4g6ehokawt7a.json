@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ergruphd5dah4g6ehokawt7a",
-		"id": "grain-seed",
 		"title": "Grain Seed",
 		"draft": false,
 		"description": "Loose grain seed. Plant it before it spoils.",
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-grain-seed"
+				"result": "xxwklwezina4c0ejukf5fcpz"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-grain-field"
+					"itemUid": "iz7g7a4t9cusl70zjj99xq89"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "grain-field"
+				"result": "imrcxilbuisx6f02q5rt7pp3"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-grain-seed",
+										"itemUid": "s7qsiqftxoa846oliqd49ie6",
 										"quantity": {
 											"min": 1,
 											"max": 1

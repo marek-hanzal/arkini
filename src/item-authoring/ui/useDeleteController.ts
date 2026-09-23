@@ -111,10 +111,10 @@ export const useDeleteController = ({
 		() =>
 			readDeleteBlockersFn({
 				config: project.config,
-				itemId: item.id,
+				itemUid: item.uid,
 			}),
 		[
-			item.id,
+			item.uid,
 			project.config,
 		],
 	);
@@ -123,11 +123,11 @@ export const useDeleteController = ({
 			RendererRuntime.runSync(
 				forceDeleteFx({
 					config: project.config,
-					itemId: item.id,
+					itemUid: item.uid,
 				}),
 			).impact,
 		[
-			item.id,
+			item.uid,
 			project.config,
 		],
 	);

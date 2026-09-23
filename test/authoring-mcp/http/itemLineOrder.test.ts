@@ -56,7 +56,7 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 	const response = await client.callTool({
 		name: "item_line_order",
 		arguments: {
-			itemId: "forge",
+			itemUid: "forge",
 			lineIds: [
 				second.id,
 				first.id,
@@ -82,7 +82,7 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 	const rejected = await client.callTool({
 		name: "item_line_order",
 		arguments: {
-			itemId: "forge",
+			itemUid: "forge",
 			lineIds: [
 				first.id,
 			],
@@ -95,7 +95,7 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 		orderLinesFx({
 			project: snapshot,
 			repository,
-			itemId: "forge",
+			itemUid: "forge",
 			lineIds: [
 				first.id,
 				second.id,

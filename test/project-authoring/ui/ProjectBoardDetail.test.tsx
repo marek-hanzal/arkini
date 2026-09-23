@@ -16,11 +16,11 @@ vi.mock("~/board-authoring/ui/BoardGrid", () => ({
 		cells,
 	}: {
 		readonly cells: ReadonlyArray<{
-			readonly itemId: string;
+			readonly itemUid: string;
 		}>;
 	}) =>
 		createElement("div", {
-			"data-items": cells.map((cell) => cell.itemId).join(","),
+			"data-items": cells.map((cell) => cell.itemUid).join(","),
 			"data-ui": "EditorBoardGrid",
 		}),
 }));

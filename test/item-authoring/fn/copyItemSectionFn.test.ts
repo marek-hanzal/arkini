@@ -5,7 +5,6 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const source = ItemSchema.parse({
 	uid: "source",
-	id: "source",
 	title: "Source",
 	artwork: {
 		scale: 0.8,
@@ -35,7 +34,7 @@ const source = ItemSchema.parse({
 						distance: "self",
 						selector: {
 							type: "item",
-							itemId: "source",
+							itemUid: "source",
 						},
 					},
 				},
@@ -57,7 +56,7 @@ const source = ItemSchema.parse({
 			effect: "keep",
 			target: {
 				type: "item",
-				itemId: "other",
+				itemUid: "other",
 			},
 		},
 	],
@@ -65,7 +64,6 @@ const source = ItemSchema.parse({
 const destination: FormValues = {
 	...source,
 	uid: "destination",
-	id: "destination",
 	title: "Destination",
 	draft: true,
 	description: "Keep this unsaved description",
@@ -99,14 +97,14 @@ describe("section copy ownership", () => {
 		expect(result.artwork).toBe(destination.artwork);
 		expect(result.title).toBe(destination.title);
 		expect(result.description).toBe(destination.description);
-		expect(result.id).toBe(destination.id);
+		expect(result.uid).toBe(destination.uid);
 		expect(result.uid).toBe(destination.uid);
 		expect(result.draft).toBe(true);
 		expect(FormSchema.parse(result).lines[0].input[0]).toMatchObject({
 			query: {
 				distance: "self",
 				selector: {
-					itemId: "destination",
+					itemUid: "destination",
 				},
 			},
 		});
@@ -125,7 +123,6 @@ describe("section copy ownership", () => {
 		);
 		expect(result).toMatchObject({
 			uid: "destination",
-			id: "destination",
 			title: "New title",
 			draft: true,
 			description: "",

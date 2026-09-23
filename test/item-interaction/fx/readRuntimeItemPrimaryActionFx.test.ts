@@ -28,12 +28,12 @@ const config = GameConfigSchema.parse({
 			height: 1,
 			board: [
 				{
-					itemId: "producer",
+					itemUid: "producer",
 					x: 0,
 					y: 0,
 				},
 				{
-					itemId: "resource",
+					itemUid: "resource",
 					x: 1,
 					y: 0,
 				},
@@ -52,7 +52,6 @@ const config = GameConfigSchema.parse({
 	items: {
 		producer: {
 			uid: "producer",
-			id: "producer",
 
 			title: "Producer",
 			description: "Produces resources.",
@@ -85,7 +84,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "resource",
-			id: "resource",
 
 			title: "Resource",
 			description: "One resource.",
@@ -107,8 +105,8 @@ const runtime = Effect.runSync(
 	),
 );
 
-const producer = runtime.items.find((item) => item.item.id === "producer");
-const resource = runtime.items.find((item) => item.item.id === "resource");
+const producer = runtime.items.find((item) => item.item.uid === "producer");
+const resource = runtime.items.find((item) => item.item.uid === "resource");
 if (producer === undefined || resource === undefined) {
 	throw new Error("Missing fixtures.");
 }
@@ -124,7 +122,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			const result = Effect.runSync(
 				Effect.gen(function* () {
 					const started = yield* startFx();
-					const owner = started.items.find(({ item }) => item.id === "producer");
+					const owner = started.items.find(({ item }) => item.uid === "producer");
 					if (owner === undefined) throw new Error("Missing Common owner.");
 					const action = yield* readRuntimeItemPrimaryActionFx({
 						item: owner,

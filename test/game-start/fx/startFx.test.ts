@@ -24,7 +24,7 @@ describe("startFx", () => {
 					height: 1,
 					board: [
 						{
-							itemId: "log",
+							itemUid: "log",
 							x: 0,
 							y: 0,
 						},
@@ -80,7 +80,7 @@ describe("startFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:existing",
-					itemId: "tree",
+					itemUid: "tree",
 					location: {
 						space: 0,
 						position: {
@@ -127,12 +127,12 @@ describe("startFx", () => {
 					height: 1,
 					board: [
 						{
-							itemId: "tree",
+							itemUid: "tree",
 							x: 0,
 							y: 0,
 						},
 						{
-							itemId: "missing",
+							itemUid: "missing",
 							x: 1,
 							y: 0,
 						},
@@ -310,7 +310,7 @@ it("rejects drops that fit project defaults but exceed the destination space cap
 					},
 					drop: {
 						type: "item",
-						itemId: "log",
+						itemUid: "log",
 						quantity: 2,
 						placement: "drop",
 					},

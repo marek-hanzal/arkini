@@ -24,7 +24,7 @@ const unitDiagnostics = async (items: Record<string, unknown>) =>
 	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputUnitsInvalid);
 
 const unitsInput = (
-	itemId: string,
+	itemUid: string,
 	{
 		cost = 1,
 		from = "target",
@@ -38,7 +38,7 @@ const unitsInput = (
 		distance: "close" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid,
 		},
 	},
 	units: {
@@ -47,13 +47,13 @@ const unitsInput = (
 	},
 });
 
-const selfUnitsInput = (itemId: string, cost = 1) => ({
+const selfUnitsInput = (itemUid: string, cost = 1) => ({
 	type: "units" as const,
 	query: {
 		distance: "self" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid,
 		},
 	},
 	units: {
@@ -72,17 +72,17 @@ describe("validateInputUnitsFn", () => {
 		});
 		expect(
 			await unitDiagnostics({
-				[producer.id]: producer,
+				[producer.uid]: producer,
 			}),
 		).toEqual([
 			expect.objectContaining({
-				ownerItemId: producer.id,
+				ownerItemUid: producer.uid,
 				reason: InvalidInputUnitsReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 		expect(
 			await unitDiagnostics({
-				[producer.id]: {
+				[producer.uid]: {
 					...producer,
 					units: {
 						amount: 2,
@@ -102,7 +102,7 @@ describe("validateInputUnitsFn", () => {
 						distance: "close",
 						selector: {
 							type: "item",
-							itemId: "source",
+							itemUid: "source",
 						},
 					},
 				},
@@ -111,7 +111,7 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[producer.id]: producer,
+				[producer.uid]: producer,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -153,17 +153,17 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[missing.id]: missing,
-				[insufficient.id]: insufficient,
+				[missing.uid]: missing,
+				[insufficient.uid]: insufficient,
 			}),
 		).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					ownerItemId: missing.id,
+					ownerItemUid: missing.uid,
 					reason: InvalidInputUnitsReasonEnumSchema.enum.SelfMissingUnits,
 				}),
 				expect.objectContaining({
-					ownerItemId: insufficient.id,
+					ownerItemUid: insufficient.uid,
 					reason: InvalidInputUnitsReasonEnumSchema.enum.SelfInsufficientUnits,
 				}),
 			]),
@@ -198,7 +198,7 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[shrine.id]: shrine,
+				[shrine.uid]: shrine,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -254,7 +254,7 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[portal.id]: portal,
+				[portal.uid]: portal,
 			}),
 		).toEqual([]);
 	});
@@ -269,7 +269,7 @@ describe("validateInputUnitsFn", () => {
 						distance: "far" as const,
 						selector: {
 							type: "item",
-							itemId: "material",
+							itemUid: "material",
 						},
 					},
 					quantity: {
@@ -296,7 +296,7 @@ describe("validateInputUnitsFn", () => {
 							distance: "self" as const,
 							selector: {
 								type: "item" as const,
-								itemId: "units-self",
+								itemUid: "units-self",
 							},
 						},
 					},
@@ -309,8 +309,8 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[materialTarget.id]: materialTarget,
-				[unitsSelf.id]: unitsSelf,
+				[materialTarget.uid]: materialTarget,
+				[unitsSelf.uid]: unitsSelf,
 				material: createSimpleItem("material"),
 			}),
 		).toEqual([
@@ -368,8 +368,8 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[portal.id]: portal,
-				[payer.id]: payer,
+				[portal.uid]: portal,
+				[payer.uid]: payer,
 			}),
 		).toEqual([]);
 	});
@@ -392,8 +392,8 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[producer.id]: producer,
-				[weak.id]: weak,
+				[producer.uid]: producer,
+				[weak.uid]: weak,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -432,8 +432,8 @@ describe("validateInputUnitsFn", () => {
 
 		expect(
 			await unitDiagnostics({
-				[shrine.id]: shrine,
-				[target.id]: target,
+				[shrine.uid]: shrine,
+				[target.uid]: target,
 			}),
 		).toEqual([]);
 	});

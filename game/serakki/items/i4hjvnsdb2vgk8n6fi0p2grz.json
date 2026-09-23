@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "i4hjvnsdb2vgk8n6fi0p2grz",
-		"id": "lumber-camp-blueprint",
 		"title": "Lumber Camp Blueprint",
 		"draft": false,
 		"description": "Plans for a camp dedicated to turning nearby trees into a reliable supply of wood. Forestry, with fewer meetings.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "lumber-camp-blueprint"
+								"itemUid": "i4hjvnsdb2vgk8n6fi0p2grz"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -71,7 +70,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "lumer-camp",
+											"itemUid": "vrjsj1cqzlky11b0wvd6ye0l",
 											"quantity": {
 												"min": 1,
 												"max": 1

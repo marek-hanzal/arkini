@@ -44,7 +44,7 @@ const config = GameConfigSchema.parse({
 const spawnOwnerFx = () =>
 	spawnItemFx({
 		id: target.ownerItemId,
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: workshopLocation,
 	});
 const spawnWaterFx = (count: number) =>
@@ -58,7 +58,7 @@ const spawnWaterFx = (count: number) =>
 		(index) =>
 			spawnItemFx({
 				id: index === 0 ? "runtime:water" : `runtime:water:${index}`,
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -95,7 +95,7 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 			expect(delivering.items.some((item) => item.location.scope === "input")).toBe(false);
 			yield* spawnItemFx({
 				id: "runtime:extra",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -122,7 +122,7 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 				});
 			expect(settled.jobs).toEqual([]);
 			expect(settled.jobQueue).toEqual([]);
-			expect(settled.items.filter((item) => item.item.id === "water")).toHaveLength(8);
+			expect(settled.items.filter((item) => item.item.uid === "water")).toHaveLength(8);
 		}).pipe(
 			useGameFx({
 				config,
@@ -147,7 +147,7 @@ it("rejects a stale fill click after even one piece arrives and leaves all mater
 			});
 			yield* spawnItemFx({
 				id: "runtime:extra",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,

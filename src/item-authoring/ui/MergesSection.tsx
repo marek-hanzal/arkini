@@ -71,9 +71,9 @@ const MergeFields = ({
 							const merge = merges[index];
 							if (merge.action === "space")
 								return `${translator.textFn("Space")} ${merge.space}`;
-							const itemId = merge.target.itemId;
+							const itemUid = merge.target.itemUid;
 							return `${translator.textFn("Merge")} ${index + 1} — ${readItemLabelFn(
-								itemId,
+								itemUid,
 								translator.textFn("No item selected"),
 							)}`;
 						}}
@@ -86,7 +86,7 @@ const MergeFields = ({
 						)}
 						itemSearchTermsFn={(index) => [
 							"target" in merges[index]
-								? merges[index].target.itemId
+								? merges[index].target.itemUid
 								: String(merges[index].space),
 							merges[index].action,
 							merges[index].effect,
@@ -119,13 +119,13 @@ const MergeFields = ({
 										? sourceUnitsEnabled
 										: targetItems[
 													"target" in merges[index]
-														? merges[index].target.itemId
+														? merges[index].target.itemUid
 														: ""
 												]?.uid === currentItemUid
 											? sourceUnitsEnabled
 											: targetItems[
 													"target" in merges[index]
-														? merges[index].target.itemId
+														? merges[index].target.itemUid
 														: ""
 												]?.units !== undefined
 								}

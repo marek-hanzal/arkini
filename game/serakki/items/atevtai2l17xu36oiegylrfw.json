@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "atevtai2l17xu36oiegylrfw",
-		"id": "tummy-ache-british-shorthair",
 		"title": "Tummy Ache British Shorthair",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "british-shorthair",
+										"itemUid": "y0la7sb6dzzmf0581cel6hg0",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 5,
 											"max": 8

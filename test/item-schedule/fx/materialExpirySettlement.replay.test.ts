@@ -14,7 +14,7 @@ import {
 
 // Compare exact outcome locations while leaving fresh runtime identity generation opaque.
 const outputLocationsFn = (runtime: RuntimeSchema.Type) =>
-	runtime.items.filter((item) => item.item.id === "residue").map((item) => item.location);
+	runtime.items.filter((item) => item.item.uid === "residue").map((item) => item.location);
 
 describe("aborted job depletion replay", () => {
 	it.each([
@@ -65,7 +65,7 @@ describe("aborted job depletion replay", () => {
 				])
 					yield* spawnItemFx({
 						id: `blocker:${x}`,
-						itemId: "blocker",
+						itemUid: "blocker",
 
 						location: boardFn(x),
 					});
@@ -74,7 +74,7 @@ describe("aborted job depletion replay", () => {
 					items: [
 						...ready.items,
 						...(yield* readRuntimeFx()).items.filter(
-							(item) => item.item.id === "blocker",
+							(item) => item.item.uid === "blocker",
 						),
 					],
 				};

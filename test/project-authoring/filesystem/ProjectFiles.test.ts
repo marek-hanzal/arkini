@@ -160,8 +160,15 @@ describe("filesystem Editor project current tree", () => {
 			},
 			config: GameConfigSchema.parse({
 				...repaired.config,
+				templates: repaired.config.templates?.map((template) => ({
+					...template,
+					board: template.board.map((entry) => ({
+						...entry,
+						itemUid: "water.\ud800",
+					})),
+				})),
 				items: {
-					water: {
+					["water.\ud800"]: {
 						...initial.config.items.water,
 						uid: "water.\ud800",
 						title: "Fresh water",
@@ -195,7 +202,7 @@ describe("filesystem Editor project current tree", () => {
 			),
 		).toEqual({
 			$schema: GameProjectItemSchemaReference,
-			item: next.config.items.water,
+			item: next.config.items["water.\ud800"],
 		});
 		await expectCurrentTreeFn(next);
 	});

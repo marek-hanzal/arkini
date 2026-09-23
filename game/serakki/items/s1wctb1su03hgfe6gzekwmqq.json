@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "s1wctb1su03hgfe6gzekwmqq",
-		"id": "pancake",
 		"title": "Pancake",
 		"ui": "simple",
 		"description": "You can make it better",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "clay-plate"
+					"itemUid": "ubexhgyrqm23lx9qn734f385"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "clay-plate-with-pancake"
+				"result": "ahnxvwbyvk93qdnca7ak6uac"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-pancake",
+										"itemUid": "iyrlxmyyyzsd1jhlqzkfr0q2",
 										"quantity": {
 											"min": 1,
 											"max": 1

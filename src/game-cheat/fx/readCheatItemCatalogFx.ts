@@ -5,7 +5,7 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { ArtworkSchema } from "~/item-definition/schema/ArtworkSchema";
 
 interface CheatItemCatalogEntry {
-	readonly itemId: IdSchema.Type;
+	readonly itemUid: IdSchema.Type;
 	readonly sourceResourceIds: ArtworkSchema.Type["default"];
 	readonly title: string;
 }
@@ -16,7 +16,7 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 	return Object.values(config.items)
 		.map(
 			(item): CheatItemCatalogEntry => ({
-				itemId: item.id,
+				itemUid: item.uid,
 				sourceResourceIds: item.artwork.default,
 				title: item.title,
 			}),
@@ -24,6 +24,6 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 		.sort(
 			(first, second) =>
 				first.title.localeCompare(second.title) ||
-				first.itemId.localeCompare(second.itemId),
+				first.itemUid.localeCompare(second.itemUid),
 		);
 });

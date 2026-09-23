@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "evbffbj4huu519hwjjwwce06",
-		"id": "wine-barrel",
 		"title": "Wine Barrel",
 		"ui": "simple",
 		"description": "Over age of 18",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-wine-barrel",
+										"itemUid": "amf7agzxa9ic4em9hrzuue60",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -44,7 +43,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub"
+					"itemUid": "ysdkouxd4qpd0ztziy07k2ss"
 				},
 				"action": "consume",
 				"outcome": {
@@ -58,7 +57,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-wine-barrel",
+											"itemUid": "amf7agzxa9ic4em9hrzuue60",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -73,7 +72,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "wine-bath"
+				"result": "x2vm1uc63ibkyo338dhe35w3"
 			}
 		],
 		"clock": {
@@ -91,7 +90,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-wine-barrel",
+										"itemUid": "ysaolec07mflq4jonylq9h6v",
 										"quantity": {
 											"min": 1,
 											"max": 1

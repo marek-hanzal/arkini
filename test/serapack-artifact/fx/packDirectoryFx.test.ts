@@ -69,7 +69,7 @@ describe("packDirectoryFx game-project contract", () => {
 						{
 							x: 7,
 							y: 2,
-							itemId: "portal",
+							itemUid: "portal",
 						},
 					],
 				},

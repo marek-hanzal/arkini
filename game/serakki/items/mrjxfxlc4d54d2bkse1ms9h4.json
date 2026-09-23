@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mrjxfxlc4d54d2bkse1ms9h4",
-		"id": "fertilized-vegetable-garden",
 		"title": "Fertilized Vegetable Garden",
 		"draft": false,
 		"description": "Ready for vegetable seed.",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-vegetable-garden",
+										"itemUid": "j6b9mom3g4b5mdrzfjh0en9p",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -19,10 +19,10 @@ export const CheatItemSpawnProvider = ({
 	const [state, runCommandFn] = useAtom(commandAtom);
 	const pending = state.kind === "pending";
 	const requestFn = useCallback(
-		(itemId: string) => {
+		(itemUid: string) => {
 			runCommandFn({
 				kind: "spawn",
-				itemId,
+				itemUid,
 			});
 		},
 		[

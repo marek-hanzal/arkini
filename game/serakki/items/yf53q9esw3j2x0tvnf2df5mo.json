@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yf53q9esw3j2x0tvnf2df5mo",
-		"id": "raw-steak",
 		"title": "Raw Steak",
 		"description": "It's soooo tasty",
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-pan"
+					"itemUid": "ap6ydtxwahg5cyki9g43shdo"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "copper-pan-with-raw-steak"
+				"result": "kgxsxcqbi8ylj89t2og2cv7s"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-steak",
+										"itemUid": "ou19vzfm8kr9itlu8lxz1nhi",
 										"quantity": {
 											"min": 1,
 											"max": 1

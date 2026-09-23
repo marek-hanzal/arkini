@@ -10,7 +10,6 @@ export const CreateItemLink = ({
 	className,
 	dataUi,
 	defaultDraft,
-	defaultItemId,
 	defaultTitle,
 	resourceId,
 	variant = "default",
@@ -20,7 +19,6 @@ export const CreateItemLink = ({
 	readonly className?: string;
 	readonly dataUi?: string;
 	readonly defaultDraft?: boolean;
-	readonly defaultItemId?: string;
 	readonly defaultTitle?: string;
 	readonly resourceId?: string;
 	readonly variant?: "default" | "primary" | "link";
@@ -42,7 +40,6 @@ export const CreateItemLink = ({
 			search={{
 				create: true,
 				defaultDraft,
-				defaultItemId,
 				defaultTitle,
 				resourceId,
 			}}

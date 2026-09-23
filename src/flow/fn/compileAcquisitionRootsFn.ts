@@ -87,18 +87,18 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 	].sort(Order.String);
 };
 
-const addStartQuantityFn = (quantities: Map<string, number>, itemId: string) =>
-	quantities.set(itemId, (quantities.get(itemId) ?? 0) + 1);
+const addStartQuantityFn = (quantities: Map<string, number>, itemUid: string) =>
+	quantities.set(itemUid, (quantities.get(itemUid) ?? 0) + 1);
 
-const readStartQuantityByItemIdFn = (config: GameConfigSchema.Type) => {
+const readStartQuantityByItemUidFn = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<string, number>();
-	for (const item of readStartBoardFn(config)) addStartQuantityFn(quantities, item.itemId);
+	for (const item of readStartBoardFn(config)) addStartQuantityFn(quantities, item.itemUid);
 	return quantities;
 };
 
 /** Compiles authored starting quantities and static-analysis limitations. */
 export const compileAcquisitionRootsFn = (config: GameConfigSchema.Type) => {
-	const start = readStartQuantityByItemIdFn(config);
+	const start = readStartQuantityByItemUidFn(config);
 	return {
 		limitations: readLimitationsFn(config),
 		roots: [

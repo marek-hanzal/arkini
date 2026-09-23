@@ -167,7 +167,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					{
 						type: GameEventEnumSchema.enum.ItemPlaced,
 						itemId: movedItem.id,
-						canonicalItemId: movedItem.item.id,
+						itemUid: movedItem.item.uid,
 						originItemId: movedItem.id,
 						previousLocation: item.location,
 						location: movedItem.location,

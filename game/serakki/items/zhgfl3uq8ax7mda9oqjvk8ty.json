@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zhgfl3uq8ax7mda9oqjvk8ty",
-		"id": "spoiled-grass-seed",
 		"title": "Spoiled Grass Seed",
 		"draft": false,
 		"description": "Grass seed that spoiled before it ever reached the soil.",

@@ -35,11 +35,11 @@ export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.T
 		() =>
 			Views.map((view) => ({
 				...view,
-				connections: readItemConnectionsFn(project.config, item.id, view.filter),
+				connections: readItemConnectionsFn(project.config, item.uid, view.filter),
 			})),
 		[
 			project.config,
-			item.id,
+			item.uid,
 		],
 	);
 	return (
@@ -65,7 +65,7 @@ export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.T
 							<div className="ak-list grid content-start gap-2">
 								{connections.slice(0, 2).map(({ item: connectedItem, origins }) => (
 									<ItemConnectionRow
-										key={connectedItem.id}
+										key={connectedItem.uid}
 										item={connectedItem}
 										origins={origins}
 										owner={

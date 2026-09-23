@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gml8ikm3stjkm0kwaamcsu9r",
-		"id": "spoiled-leafs",
 		"title": "Spoiled Leafs",
 		"draft": true,
 		"ui": "default",

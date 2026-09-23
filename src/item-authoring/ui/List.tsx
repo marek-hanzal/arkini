@@ -198,7 +198,6 @@ export const List = ({
 							estimatesByUid.get(item.uid)?.status === "unreachable",
 					},
 				})}
-				data-item-id={item.id}
 				data-item-uid={item.uid}
 				label={item.title}
 				corner={

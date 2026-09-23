@@ -18,7 +18,7 @@ export interface TileInputMotionCue extends TileMotionCueBase {
 	readonly kind: "input";
 	readonly sourceActorId: string;
 	readonly targetActorId: string;
-	readonly canonicalItemId: string;
+	readonly itemUid: string;
 }
 
 export interface TileSwapMotionCue extends TileMotionCueBase {

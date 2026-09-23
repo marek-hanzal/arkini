@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ahl16lhzbb05zw0kexi92r12",
-		"id": "copper-ore",
 		"title": "Copper Ore",
 		"ui": "simple",
 		"description": "It wanna became a Copper Ingot!",

@@ -42,7 +42,7 @@ const config = GameConfigSchema.parse({
 });
 const spawnOwnerFx = spawnItemFx({
 	id: "owner",
-	itemId: "workshop",
+	itemUid: "workshop",
 	location: {
 		scope: "board",
 		space: 0,

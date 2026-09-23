@@ -59,7 +59,7 @@ it("rejects insufficient board capacity before allocating identities, including 
 	const props = {
 		drop: {
 			type: "item" as const,
-			itemId: "board-only",
+			itemUid: "board-only",
 			placement: "drop" as const,
 			quantity: 2,
 		},

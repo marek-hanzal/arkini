@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "sogbloy6favyawf7m7ww5cai",
-		"id": "laboratory-glassware-with-coffee",
 		"title": "Laboratory Glassware With Coffee",
 		"ui": "simple",
 		"draft": true,

@@ -254,7 +254,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						runtime,
 					});
 					const resultItem = yield* resolveItemFx({
-						itemId: result,
+						itemUid: result,
 					});
 					const replacementUnits = yield* resolveMergeReplacementUnitsFx({
 						resultItem,
@@ -356,7 +356,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 			events.push({
 				type: GameEventEnumSchema.enum.ItemDisappeared,
 				itemId: target.id,
-				canonicalItemId: target.item.id,
+				itemUid: target.item.uid,
 				location: target.location,
 			});
 		}
@@ -383,7 +383,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: target.id,
-			canonicalItemId: target.item.id,
+			itemUid: target.item.uid,
 			location: target.location,
 		});
 	}

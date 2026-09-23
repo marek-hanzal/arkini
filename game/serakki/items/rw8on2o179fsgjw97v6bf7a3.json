@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rw8on2o179fsgjw97v6bf7a3",
-		"id": "tummy-ache-british-shorthair-kitten",
 		"title": "Tummy Ache British Shorthair Kitten",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "british-shorthair-kitten",
+										"itemUid": "bamumldgmvb0bhq8bkq0koxj",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 3,
 											"max": 5

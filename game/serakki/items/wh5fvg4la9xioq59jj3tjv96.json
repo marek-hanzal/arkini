@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wh5fvg4la9xioq59jj3tjv96",
-		"id": "sheep",
 		"title": "Sheep",
 		"description": "Shaun the Sheep!",
 		"ui": "simple",
@@ -19,7 +18,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "consume",
 				"outcome": {
@@ -33,7 +32,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -43,7 +42,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -58,7 +57,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "well-fed-wolf"
+				"result": "c9xqjzqt8kbbd4rqnlhhfp58"
 			}
 		],
 		"clock": {
@@ -106,7 +105,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -123,7 +122,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sheep",
+											"itemUid": "wh5fvg4la9xioq59jj3tjv96",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -159,7 +158,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -176,7 +175,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-sheep",
+											"itemUid": "sabqmx16rrpryphsk3xbygeu",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -212,7 +211,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -229,7 +228,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-sheep",
+											"itemUid": "jlu06kwfr94yayli2fcooq86",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -266,7 +265,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -283,7 +282,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-sheep",
+											"itemUid": "jlu06kwfr94yayli2fcooq86",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -304,7 +303,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -336,7 +335,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -353,7 +352,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-sheep",
+											"itemUid": "jlu06kwfr94yayli2fcooq86",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -374,7 +373,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},
@@ -406,7 +405,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wolf"
+								"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 							},
 							"distance": "near"
 						}
@@ -420,7 +419,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -437,7 +436,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well-fed-wolf",
+											"itemUid": "c9xqjzqt8kbbd4rqnlhhfp58",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -447,7 +446,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -457,7 +456,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -478,7 +477,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "wolf"
+										"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 									},
 									"distance": "near"
 								},
@@ -510,7 +509,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wolf"
+								"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 							},
 							"distance": "close"
 						}
@@ -524,7 +523,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sheep"
+								"itemUid": "wh5fvg4la9xioq59jj3tjv96"
 							},
 							"distance": "self"
 						}
@@ -541,7 +540,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well-fed-wolf",
+											"itemUid": "c9xqjzqt8kbbd4rqnlhhfp58",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -551,7 +550,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -561,7 +560,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -582,7 +581,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "wolf"
+										"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 									},
 									"distance": "close"
 								},

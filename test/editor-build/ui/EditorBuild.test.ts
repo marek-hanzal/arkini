@@ -328,7 +328,7 @@ describe("EditorBuild", () => {
 					"inputs",
 					0,
 				],
-				ownerItemId: "producer:academy",
+				ownerItemUid: "producer:academy",
 				lineId: "line:academy:knowledge",
 				inputIndex: 0,
 				reason: "self-missing-units" as const,
@@ -344,31 +344,17 @@ describe("EditorBuild", () => {
 				resourceId: "unused-asset",
 			},
 			{
-				code: "item:duplicate-uid" as const,
+				code: "config:key-uid-mismatch" as const,
 				severity: "error" as const,
-				message: "Academy and Library share the same immutable UID.",
+				message: "The item key differs from its UID.",
 				path: [
 					"items",
 					"producer:library",
 					"uid",
 				],
-				uid: "duplicate-uid",
-				itemIds: [
-					"producer:academy",
-					"producer:library",
-				],
-				paths: [
-					[
-						"items",
-						"producer:academy",
-						"uid",
-					],
-					[
-						"items",
-						"producer:library",
-						"uid",
-					],
-				],
+				entity: "item" as const,
+				key: "producer:library",
+				uid: "library-uid",
 			},
 		] satisfies GameDiagnosticsSchema.Type;
 		state.project = {
@@ -413,11 +399,6 @@ describe("EditorBuild", () => {
 		expect(
 			container.querySelector(
 				'a[href="/editor/editor-test/artwork/unused-asset/detail/overview"]',
-			),
-		).not.toBeNull();
-		expect(
-			container.querySelector(
-				'a[href="/editor/editor-test/editor/items/academy-uid/form/identity"]',
 			),
 		).not.toBeNull();
 		expect(

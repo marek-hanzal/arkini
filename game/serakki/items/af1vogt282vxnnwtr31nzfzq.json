@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "af1vogt282vxnnwtr31nzfzq",
-		"id": "glass-goblet-with-coffee",
 		"title": "Glass Goblet with Coffee",
 		"ui": "simple",
 		"description": "Espresso Maximo",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "glass-goblet",
+										"itemUid": "fvwo0tr5mxt3lnw5mjz1x77h",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

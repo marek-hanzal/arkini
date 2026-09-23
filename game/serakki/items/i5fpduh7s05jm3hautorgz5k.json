@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "i5fpduh7s05jm3hautorgz5k",
-		"id": "bow-and-arrows",
 		"title": "Bow And Arrows",
 		"description": "You can hunt stuff yourself",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bow",
+										"itemUid": "j9ni85pox4gjt7uu3ud04kkj",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -35,7 +34,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "empty-quiver",
+										"itemUid": "tuw5spl68vaof73aziz0ai1b",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -54,20 +53,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "hunted-game"
+				"result": "xaijv8bc7ljbonqgp1vzcxcc"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "wolf-with-arrow"
+				"result": "g9qoa4k30miz4t4cebyo6x7c"
 			}
 		],
 		"maxQueueSize": 1,

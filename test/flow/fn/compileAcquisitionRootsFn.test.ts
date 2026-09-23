@@ -14,7 +14,7 @@ it("counts reused template inventory once per assigned space and ignores unassig
 				board: [
 					...initial.board,
 					{
-						itemId: "water",
+						itemUid: "water",
 						x: 1,
 						y: 1,
 					},

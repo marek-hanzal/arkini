@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "txe7uezwpl8qrky0bjtkpmov",
-		"id": "coffee-seed",
 		"title": "Coffee Seed",
 		"draft": false,
 		"description": "Loose coffee seed. Plant it or pack it into a sack before it spoils.",
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-coffee-seed"
+				"result": "x3bw30y0qha05iepd6if7o97"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-coffee-field"
+					"itemUid": "aq82qezs72qbvxsq0lpc31qw"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "coffee-field"
+				"result": "ecjzsaixdj6tc96f20xp4uxz"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-coffee-seed",
+										"itemUid": "ii4ho6r4ioui0aqyz8dctgdm",
 										"quantity": {
 											"min": 1,
 											"max": 1

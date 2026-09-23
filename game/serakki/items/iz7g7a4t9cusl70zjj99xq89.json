@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "iz7g7a4t9cusl70zjj99xq89",
-		"id": "fertilized-grain-field",
 		"title": "Fertilized Grain Field",
 		"ui": "simple",
 		"description": "Ready for grain seed.",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-grain-field",
+										"itemUid": "p9x1eqx05d197gb37okicf4s",
 										"quantity": {
 											"min": 1,
 											"max": 1

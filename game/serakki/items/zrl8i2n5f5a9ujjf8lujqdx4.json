@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zrl8i2n5f5a9ujjf8lujqdx4",
-		"id": "leafs",
 		"title": "Leafs",
 		"draft": true,
 		"ui": "default",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-leafs",
+										"itemUid": "gml8ikm3stjkm0kwaamcsu9r",
 										"quantity": {
 											"min": 1,
 											"max": 1

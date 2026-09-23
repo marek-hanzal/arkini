@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fj0lv7gedwxkby2myttgxdd5",
-		"id": "golden-goose",
 		"title": "Golden Goose",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "sick-goose",
+										"itemUid": "twqt3bjq5q1npnvan3vnkx2u",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "golden-egg",
+										"itemUid": "zh4bs97fyw6n0a82zw1mgtvp",
 										"quantity": {
 											"min": 1,
 											"max": 1

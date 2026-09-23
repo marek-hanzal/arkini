@@ -51,7 +51,7 @@ interface EditorItemReferenceControlProps {
 	readonly includeItemFn?: (item: ItemSchema.Type) => boolean;
 	readonly label: string;
 	readonly labelVisible?: boolean;
-	readonly onChangeFn: (itemId: string) => void;
+	readonly onChangeFn: (itemUid: string) => void;
 	readonly value: string;
 	readonly showSelectedPreview?: boolean;
 }

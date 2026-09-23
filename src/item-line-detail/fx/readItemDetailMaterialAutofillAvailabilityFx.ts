@@ -93,7 +93,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	}
 
 	const config = yield* GameConfigFx;
-	const matchingDefinitionIds: IdSchema.Type[] = [];
+	const matchingItemUids: IdSchema.Type[] = [];
 	for (const item of Object.values(config.items)) {
 		if (
 			matchesItemSelectorFn({
@@ -101,19 +101,19 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 				selector,
 			})
 		) {
-			matchingDefinitionIds.push(item.id);
+			matchingItemUids.push(item.uid);
 		}
 	}
 	const producerItemIds = new Set<IdSchema.Type>();
-	for (const itemId of matchingDefinitionIds) {
+	for (const itemUid of matchingItemUids) {
 		const sources = yield* readItemDetailSourcesFx({
 			runtime,
 			target: {
 				kind: "definition",
-				itemId,
+				itemUid,
 			},
 		});
-		if (sources.kind !== "available" || sources.targetDefinitionItemId !== itemId) continue;
+		if (sources.kind !== "available" || sources.targetItemUid !== itemUid) continue;
 		for (const source of sources.source) {
 			if (source.space === space) producerItemIds.add(source.ownerItemId);
 		}

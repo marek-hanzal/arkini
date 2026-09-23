@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "uah88pqw09ww21tpcoad8p9x",
-		"id": "faith-cauldron",
 		"title": "Faith Cauldron",
 		"ui": "simple",
 		"artwork": {

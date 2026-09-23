@@ -16,13 +16,13 @@ const queryItemsFn = ({
 	readonly items: ReadonlyArray<RuntimeItemSchema.Type>;
 	readonly selector: SelectorSchema.Type;
 }) => {
-	const selectedItemIds = new Set(
+	const selectedItemUids = new Set(
 		selectItemsFn({
 			items: items.map((item) => item.item),
 			selector,
-		}).map((item) => item.id),
+		}).map((item) => item.uid),
 	);
-	return items.filter((item) => selectedItemIds.has(item.item.id));
+	return items.filter((item) => selectedItemUids.has(item.item.uid));
 };
 
 interface Props {

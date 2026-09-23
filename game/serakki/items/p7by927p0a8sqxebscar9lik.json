@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "p7by927p0a8sqxebscar9lik",
-		"id": "hammer",
 		"title": "Hammer",
 		"ui": "simple",
 		"description": "Can break something",
@@ -16,25 +15,25 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-extinguished"
+					"itemUid": "fenhlvaj45ssocm5r935nqli"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "clutter"
+				"result": "ubo4ux37gz2ya3qfsj78a9oq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "broken-toilet"
+					"itemUid": "rlu8j1ab449tif0zotlwervi"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "clutter"
+				"result": "ubo4ux37gz2ya3qfsj78a9oq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pot-with-coins"
+					"itemUid": "rw4gsk55m78q58bresm6fcas"
 				},
 				"action": "consume",
 				"outcome": {
@@ -48,7 +47,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clutter",
+											"itemUid": "ubo4ux37gz2ya3qfsj78a9oq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -63,12 +62,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "coin-stack"
+				"result": "prjfkn0sxpy76c9bomvwjxl8"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "piggy-bank"
+					"itemUid": "h0b9l3d36yl5whfxcfx1v6a0"
 				},
 				"action": "use",
 				"outcome": {
@@ -82,7 +81,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clutter",
+											"itemUid": "ubo4ux37gz2ya3qfsj78a9oq",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -97,16 +96,16 @@
 					]
 				},
 				"effect": "replace",
-				"result": "coin-stack"
+				"result": "prjfkn0sxpy76c9bomvwjxl8"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "laboratory-glassware"
+					"itemUid": "pz69k9ntwrqmycwiv4ocuij1"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "clutter"
+				"result": "ubo4ux37gz2ya3qfsj78a9oq"
 			}
 		],
 		"maxQueueSize": 1,

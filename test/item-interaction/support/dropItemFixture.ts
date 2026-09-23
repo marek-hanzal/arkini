@@ -27,7 +27,6 @@ export const configInput = {
 			lines: [],
 
 			uid: "water",
-			id: "water",
 
 			title: "Water",
 			description: "Water",
@@ -43,7 +42,6 @@ export const configInput = {
 			lines: [],
 
 			uid: "stone",
-			id: "stone",
 
 			title: "Stone",
 			description: "Stone",
@@ -73,7 +71,7 @@ export const mergeConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "stone",
+						itemUid: "stone",
 					},
 					action: "consume",
 					effect: "keep",
@@ -97,7 +95,7 @@ export const removeMergeConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "stone",
+						itemUid: "stone",
 					},
 					action: "consume",
 					effect: "remove",
@@ -121,7 +119,7 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "stone",
+						itemUid: "stone",
 					},
 					action: "consume",
 					effect: "replace",
@@ -132,7 +130,6 @@ export const replaceMergeConfig = GameConfigSchema.parse({
 		mud: {
 			...configInput.items.stone,
 			uid: "mud",
-			id: "mud",
 			title: "Mud",
 			description: "Mud",
 			artwork: {

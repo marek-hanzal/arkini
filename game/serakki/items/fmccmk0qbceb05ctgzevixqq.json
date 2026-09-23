@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fmccmk0qbceb05ctgzevixqq",
-		"id": "spoiled-pralines",
 		"title": "Spoiled Pralines",
 		"ui": "simple",
 		"description": "You didn't like them?",

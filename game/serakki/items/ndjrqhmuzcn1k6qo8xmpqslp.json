@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ndjrqhmuzcn1k6qo8xmpqslp",
-		"id": "beeswax",
 		"title": "Beeswax",
 		"ui": "simple",
 		"description": "Candles are created using this",
@@ -16,16 +15,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-cauldron"
+					"itemUid": "oj9o0nu1zp9g79f1jqx11g9l"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cauldron-with-beeswax"
+				"result": "j8d36shyw3d5sp0jd2bqtkd7"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -39,7 +38,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 1,
 												"max": 1

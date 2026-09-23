@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ytzc2165q8w8o2w1cae8ocf5",
-		"id": "cacao-grove",
 		"title": "Cacao Grove",
 		"description": "A planted cacao grove harvested by a nearby Cacao Farm.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-cacao-grove",
+										"itemUid": "au9mjqjzmm0v19870kt48pbw",
 										"quantity": {
 											"min": 1,
 											"max": 1

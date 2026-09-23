@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bvau1dl21nueenr8ghftyxiw",
-		"id": "copper-pan-with-roasted-coffee-beans",
 		"title": "Copper Pan With Roasted Coffee Beans",
 		"ui": "simple",
 		"description": "Now you can grind it",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cafe"
+					"itemUid": "vtwdcl5ne53d9tyy5ijk76dg"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-pan",
+											"itemUid": "ap6ydtxwahg5cyki9g43shdo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -40,7 +39,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "clay-mug-with-coffee",
+											"itemUid": "q5dg0snrffh09fxp6gzmri5j",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -72,7 +71,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "copper-pan",
+										"itemUid": "ap6ydtxwahg5cyki9g43shdo",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -82,7 +81,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -77,13 +77,13 @@ describe("Clock lifetime boundaries", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "owner",
-					itemId: "owner",
+					itemUid: "owner",
 
 					location: board(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
-					itemId: "temporary",
+					itemUid: "temporary",
 
 					location: board(1),
 				});
@@ -159,7 +159,7 @@ describe("Clock lifetime boundaries", () => {
 										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "residue",
+											itemUid: "residue",
 										},
 									},
 									quantity: {
@@ -178,19 +178,19 @@ describe("Clock lifetime boundaries", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "owner",
-					itemId: "owner",
+					itemUid: "owner",
 
 					location: board(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
-					itemId: "temporary",
+					itemUid: "temporary",
 
 					location: board(1),
 				});
 				const child = yield* spawnItemFx({
 					id: "child",
-					itemId: "residue",
+					itemUid: "residue",
 
 					location: board(2),
 				});
@@ -220,7 +220,7 @@ describe("Clock lifetime boundaries", () => {
 			),
 		);
 		expect(result.items.some((item) => item.id === "material")).toBe(false);
-		expect(result.items.find((item) => item.item.id === "residue")).toMatchObject({
+		expect(result.items.find((item) => item.item.uid === "residue")).toMatchObject({
 			location: {
 				scope: "board",
 				space: 0,
@@ -272,13 +272,13 @@ describe("Clock lifetime boundaries", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "owner",
-					itemId: "owner",
+					itemUid: "owner",
 
 					location: board(0),
 				});
 				const material = yield* spawnItemFx({
 					id: "material",
-					itemId: "temporary",
+					itemUid: "temporary",
 
 					location: board(1),
 				});

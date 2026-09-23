@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "phhu5c11zowwjnv1b1rpmebx",
-		"id": "hop-field",
 		"title": "Hop Field",
 		"draft": false,
 		"description": "A planted hop field ready to be worked by a nearby Hop Farm.",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-hop-field",
+										"itemUid": "wmo7luagikin3s157v4xk8wx",
 										"quantity": {
 											"min": 1,
 											"max": 1

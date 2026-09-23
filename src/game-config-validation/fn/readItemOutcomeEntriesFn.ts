@@ -6,15 +6,15 @@ import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
 
 export namespace readItemOutcomeEntriesFn {
 	export interface Props {
-		itemId: IdSchema.Type;
+		itemUid: IdSchema.Type;
 		item: ItemSchema.Type;
 	}
 }
 
 /** Reads line, unit-depletion, lifetime-expiry, and merge outputs owned by one canonical item. */
-export const readItemOutcomeEntriesFn = ({ itemId, item }: readItemOutcomeEntriesFn.Props) => {
+export const readItemOutcomeEntriesFn = ({ itemUid, item }: readItemOutcomeEntriesFn.Props) => {
 	const lines = readItemLineEntriesFn({
-		itemId,
+		itemUid,
 		item,
 	});
 	const entries: ItemOutcomeEntrySchema.Type[] = lines.flatMap(({ line, path }) =>
@@ -36,7 +36,7 @@ export const readItemOutcomeEntriesFn = ({ itemId, item }: readItemOutcomeEntrie
 			outcome: item.units.outcome,
 			path: [
 				"items",
-				itemId,
+				itemUid,
 				"units",
 				"outcome",
 			],
@@ -48,7 +48,7 @@ export const readItemOutcomeEntriesFn = ({ itemId, item }: readItemOutcomeEntrie
 			outcome: item.clock.onExpire,
 			path: [
 				"items",
-				itemId,
+				itemUid,
 				"clock",
 				"onExpire",
 			],
@@ -64,7 +64,7 @@ export const readItemOutcomeEntriesFn = ({ itemId, item }: readItemOutcomeEntrie
 			outcome: merge.outcome,
 			path: [
 				"items",
-				itemId,
+				itemUid,
 				"merge",
 				index,
 				"outcome",

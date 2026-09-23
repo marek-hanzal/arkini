@@ -54,7 +54,7 @@ const state: StateSchema.Type = {
 		...clearItemJobQueueState.items,
 		{
 			id: "active:material",
-			itemId: "water",
+			itemUid: "water",
 
 			location: {
 				scope: "job",
@@ -64,7 +64,7 @@ const state: StateSchema.Type = {
 		},
 		{
 			id: "buffer:selected",
-			itemId: "tool",
+			itemUid: "tool",
 
 			location: {
 				scope: "input",
@@ -75,7 +75,7 @@ const state: StateSchema.Type = {
 		},
 		{
 			id: "buffer:other-line",
-			itemId: "tool",
+			itemUid: "tool",
 
 			location: {
 				scope: "input",
@@ -144,14 +144,14 @@ it("clears one owner's selected line atomically while retaining other lines, own
 	}
 	expect(
 		result.after.items
-			.filter((item) => item.item.id === "tool" && item.location.scope === "board")
+			.filter((item) => item.item.uid === "tool" && item.location.scope === "board")
 			.map((item) => item.id),
 	).toHaveLength(1);
 	expect(result.transition.sequence).toBe(result.previousSequence + 1);
 	expect(result.transition.events).toContainEqual({
 		type: "job-queue:cleared",
 		ownerItemId,
-		canonicalItemId: "forge",
+		itemUid: "forge",
 		clearedRequestCount: 2,
 	});
 	expect(result.repeated).toBe(result.after);

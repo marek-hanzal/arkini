@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nibpig4ozhbmnfic6uhtjiyk",
-		"id": "coin-bag",
 		"title": "Coin Bag",
 		"ui": "simple",
 		"description": "Small fortune",

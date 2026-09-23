@@ -16,7 +16,7 @@ export const MultipleLineSelectionsDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		ownerItemId: IdSchema,
+		ownerItemUid: IdSchema,
 		selection: z.literal("default"),
 		lineIds: z.tuple([
 			IdSchema,

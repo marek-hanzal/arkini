@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "imrcxilbuisx6f02q5rt7pp3",
-		"id": "grain-field",
 		"title": "Grain Field",
 		"draft": false,
 		"description": "A field. Of grain.",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-grain-field",
+										"itemUid": "p9x1eqx05d197gb37okicf4s",
 										"quantity": {
 											"min": 1,
 											"max": 1

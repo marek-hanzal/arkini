@@ -66,7 +66,7 @@ export const value = (value: number) => ({
 
 export const drop = (itemId: string) => ({
 	type: "item" as const,
-	itemId,
+	itemUid: itemId,
 	quantity: value(1),
 	placement: "drop" as const,
 	rules: [],
@@ -91,7 +91,7 @@ export const targetUnitInput = (itemId: string) => ({
 	query: {
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid: itemId,
 		},
 		distance: "close" as const,
 	},
@@ -103,7 +103,7 @@ export const targetUnitInput = (itemId: string) => ({
 
 export const base = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -221,7 +221,7 @@ export const unitsConfig = GameConfigSchema.parse({
 							query: {
 								selector: {
 									type: "item",
-									itemId: "units:empty",
+									itemUid: "units:empty",
 								},
 								distance: "close",
 							},
@@ -333,7 +333,7 @@ export const unitsConfig = GameConfigSchema.parse({
 							query: {
 								selector: {
 									type: "item",
-									itemId: "units:self-well",
+									itemUid: "units:self-well",
 								},
 								distance: "self",
 							},

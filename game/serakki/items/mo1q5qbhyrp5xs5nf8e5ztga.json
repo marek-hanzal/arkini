@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mo1q5qbhyrp5xs5nf8e5ztga",
-		"id": "rapeseed-seed",
 		"title": "Rapeseed Seed",
 		"draft": false,
 		"ui": "simple",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-rapeseed-seed"
+				"result": "dq7gkgjxf7erne89gr8fvrxh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-rapeseed-field"
+					"itemUid": "pfpwon1x53qp5sgf1usb0zck"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "rapeseed-field"
+				"result": "lmnh1x5m8bk40sk8xq5qe6w5"
 			}
 		],
 		"clock": {
@@ -47,7 +46,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-rapeseed-seed",
+										"itemUid": "szv3267zbloo4b16d4jmv5ay",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -45,7 +45,7 @@ export const selectClockLineFx = Effect.fn("selectClockLineFx")(function* ({
 			[
 				"serakki:clock:v1",
 				item.id,
-				item.item.id,
+				item.item.uid,
 				item.schedule?.pulseSequence ?? 0,
 			].join(":"),
 		),

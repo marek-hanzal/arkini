@@ -47,7 +47,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		type: "job:aborted",
 		jobId: job.id,
 		ownerItemId: item.id,
-		canonicalItemId: item.item.id,
+		itemUid: item.item.uid,
 		lineId: job.lineId,
 		reason: "owner-removed",
 	}));

@@ -80,7 +80,7 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 				type: "job:queued",
 				requestId: request.id,
 				ownerItemId,
-				canonicalItemId: owner.item.id,
+				itemUid: owner.item.uid,
 				lineId,
 			},
 		],

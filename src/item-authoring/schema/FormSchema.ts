@@ -47,7 +47,7 @@ export const readCanonicalItemArtworkFn = (
 /** Keeps the schema-required query deterministic while Self intentionally hides target controls. */
 const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchema.Type>>(
 	inputs: Inputs,
-	ownerItemId: string,
+	ownerItemUid: string,
 ): Inputs =>
 	inputs.map((input) =>
 		input.type === "units" && input.units?.from === "self"
@@ -57,7 +57,7 @@ const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchem
 						distance: "self" as const,
 						selector: {
 							type: "item" as const,
-							itemId: ownerItemId,
+							itemUid: ownerItemUid,
 						},
 					},
 				}
@@ -71,7 +71,7 @@ const bindSelfPaidUnitsInputsToOwnerFn = (candidate: FormValues): FormValues => 
 		: {
 				lines: candidate.lines.map((line) => ({
 					...line,
-					input: bindSelfPaidInputsToOwnerFn(line.input, candidate.id),
+					input: bindSelfPaidInputsToOwnerFn(line.input, candidate.uid),
 				})),
 			}),
 });

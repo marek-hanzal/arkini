@@ -113,13 +113,13 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 	});
 	const itemWrites = new Map<string, Write>();
 	const itemUids = new Set<string>();
-	for (const [itemId, item] of Object.entries(items).sort(([left], [right]) =>
+	for (const [itemUid, item] of Object.entries(items).sort(([left], [right]) =>
 		left.localeCompare(right),
 	)) {
-		if (item.id !== itemId) {
+		if (item.uid !== itemUid) {
 			return yield* Effect.fail(
 				new Error(
-					`Editor item record key ${JSON.stringify(itemId)} differs from item ID ${JSON.stringify(item.id)}.`,
+					`Editor item record key ${JSON.stringify(itemUid)} differs from item UID ${JSON.stringify(item.uid)}.`,
 				),
 			);
 		}

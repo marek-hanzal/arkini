@@ -64,7 +64,7 @@ export const ItemEstimateRouteGraph = ({
 								</span>
 							) : (
 								<DetailReference
-									itemId={route.factId}
+									itemUid={route.factId}
 									sectionId="estimate"
 									stretched
 								/>

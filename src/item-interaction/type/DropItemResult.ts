@@ -34,7 +34,7 @@ export type DropItemRejectedReason =
 
 interface DropActorState {
 	readonly itemId: IdSchema.Type;
-	readonly canonicalItemId: IdSchema.Type;
+	readonly itemUid: IdSchema.Type;
 	readonly revision: RevisionSchema.Type;
 	readonly location: BoardLocationSchema.Type;
 }
@@ -71,7 +71,7 @@ interface DropMergedResult {
 	readonly kind: typeof DropItemResultKind.Merge;
 	readonly action: SourceActionSchema.Type;
 	readonly effect: TargetEffectSchema.Type;
-	readonly resultCanonicalItemId?: IdSchema.Type;
+	readonly resultItemUid?: IdSchema.Type;
 	readonly source: DropMergedActor;
 	readonly target: DropMergedActor;
 }

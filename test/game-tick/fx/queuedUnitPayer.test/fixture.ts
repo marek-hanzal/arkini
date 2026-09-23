@@ -60,7 +60,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 								distance: "far",
 								selector: {
 									type: "item",
-									itemId: "absent",
+									itemUid: "absent",
 								},
 							},
 							quantity: {

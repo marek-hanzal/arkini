@@ -21,14 +21,14 @@ const value = (value: number) => ({
 
 const outcome = (
 	drops: ReadonlyArray<{
-		itemId: string;
+		itemUid: string;
 		type?: "chance" | "guaranteed";
 	}>,
 ) => ({
 	set: [
 		{
 			rules: [],
-			roll: drops.map(({ itemId, type = "guaranteed" }) =>
+			roll: drops.map(({ itemUid, type = "guaranteed" }) =>
 				type === "chance"
 					? {
 							type,
@@ -36,7 +36,7 @@ const outcome = (
 							outcome: [
 								{
 									type: "item" as const,
-									itemId,
+									itemUid,
 									quantity: value(1),
 									placement: "drop" as const,
 									rules: [],
@@ -48,7 +48,7 @@ const outcome = (
 							outcome: [
 								{
 									type: "item" as const,
-									itemId,
+									itemUid,
 									quantity: value(1),
 									placement: "drop" as const,
 									rules: [],
@@ -65,7 +65,6 @@ const simpleItem = (id: string) => ({
 	lines: [],
 
 	uid: id,
-	id,
 
 	title: id,
 	description: id,
@@ -90,7 +89,6 @@ const stashItem = ({
 	maxQueueSize: 1,
 
 	uid: id,
-	id,
 
 	units: {
 		amount: 1,
@@ -122,7 +120,7 @@ const stashItem = ({
 						distance: "far" as const,
 						selector: {
 							type: "item" as const,
-							itemId: "item:key",
+							itemUid: "item:key",
 						},
 					},
 					quantity: value(1),
@@ -156,7 +154,7 @@ const stashConfig = GameConfigSchema.parse({
 			lineId: "line:stash:guaranteed",
 			lineOutcome: outcome([
 				{
-					itemId: "item:coin",
+					itemUid: "item:coin",
 				},
 			]),
 		}),
@@ -165,7 +163,7 @@ const stashConfig = GameConfigSchema.parse({
 			lineId: "line:stash:chance",
 			lineOutcome: outcome([
 				{
-					itemId: "item:gem",
+					itemUid: "item:gem",
 					type: "chance",
 				},
 			]),
@@ -175,10 +173,10 @@ const stashConfig = GameConfigSchema.parse({
 			lineId: "line:stash:blocked",
 			lineOutcome: outcome([
 				{
-					itemId: "item:board-a",
+					itemUid: "item:board-a",
 				},
 				{
-					itemId: "item:board-b",
+					itemUid: "item:board-b",
 				},
 			]),
 		}),
@@ -201,15 +199,15 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 	);
 
 const startStashFx = Effect.fn("startStashFx")(function* ({
-	itemId,
+	itemUid,
 	lineId,
 }: {
-	itemId: "stash:blocked" | "stash:chance" | "stash:guaranteed";
+	itemUid: "stash:blocked" | "stash:chance" | "stash:guaranteed";
 	lineId: string;
 }) {
 	const owner = yield* spawnItemFx({
 		id: "runtime:stash",
-		itemId,
+		itemUid,
 		location: {
 			scope: "board",
 			space: 0,
@@ -221,7 +219,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 	});
 	const key = yield* spawnItemFx({
 		id: "runtime:key",
-		itemId: "item:key",
+		itemUid: "item:key",
 		location: {
 			scope: "board",
 			space: 0,
@@ -257,7 +255,7 @@ describe("stash line completion transition", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const started = yield* startStashFx({
-					itemId: "stash:guaranteed",
+					itemUid: "stash:guaranteed",
 					lineId: "line:stash:guaranteed",
 				});
 				yield* runTickRuntimeByFx({
@@ -278,10 +276,12 @@ describe("stash line completion transition", () => {
 		);
 
 		expect(result.runtime.jobs).toEqual([]);
-		expect(result.runtime.items.some((item) => item.item.id === "stash:guaranteed")).toBe(
+		expect(result.runtime.items.some((item) => item.item.uid === "stash:guaranteed")).toBe(
 			false,
 		);
-		expect(result.runtime.items.filter((item) => item.item.id === "item:coin")).toHaveLength(1);
+		expect(result.runtime.items.filter((item) => item.item.uid === "item:coin")).toHaveLength(
+			1,
+		);
 		expect(Result.isFailure(result.repeated)).toBe(true);
 		if (Result.isFailure(result.repeated)) {
 			expect(result.repeated.failure).toMatchObject({
@@ -294,7 +294,7 @@ describe("stash line completion transition", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				yield* startStashFx({
-					itemId: "stash:chance",
+					itemUid: "stash:chance",
 					lineId: "line:stash:chance",
 				});
 				yield* runTickRuntimeByFx({
@@ -304,20 +304,20 @@ describe("stash line completion transition", () => {
 			}),
 		);
 
-		expect(runtime.items.filter((item) => item.item.id === "item:gem")).toHaveLength(1);
-		expect(runtime.items.some((item) => item.item.id === "stash:chance")).toBe(false);
+		expect(runtime.items.filter((item) => item.item.uid === "item:gem")).toHaveLength(1);
+		expect(runtime.items.some((item) => item.item.uid === "stash:chance")).toBe(false);
 	});
 
 	it("rolls back owner removal and partial outcome when the full outcome cannot be placed", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const started = yield* startStashFx({
-					itemId: "stash:blocked",
+					itemUid: "stash:blocked",
 					lineId: "line:stash:blocked",
 				});
 				const blocker = yield* spawnItemFx({
 					id: "runtime:blocker",
-					itemId: "item:blocker",
+					itemUid: "item:blocker",
 					location: {
 						scope: "board",
 						space: 0,
@@ -352,20 +352,22 @@ describe("stash line completion transition", () => {
 				remainingMs: 0,
 			}),
 		]);
-		expect(result.blocked.items.some((item) => item.item.id === "stash:blocked")).toBe(true);
-		expect(result.blocked.items.some((item) => item.item.id === "item:board-a")).toBe(false);
-		expect(result.blocked.items.some((item) => item.item.id === "item:board-b")).toBe(false);
+		expect(result.blocked.items.some((item) => item.item.uid === "stash:blocked")).toBe(true);
+		expect(result.blocked.items.some((item) => item.item.uid === "item:board-a")).toBe(false);
+		expect(result.blocked.items.some((item) => item.item.uid === "item:board-b")).toBe(false);
 		expect(result.completed.jobs).toEqual([]);
-		expect(result.completed.items.some((item) => item.item.id === "stash:blocked")).toBe(false);
-		expect(result.completed.items.some((item) => item.item.id === "item:board-a")).toBe(true);
-		expect(result.completed.items.some((item) => item.item.id === "item:board-b")).toBe(true);
+		expect(result.completed.items.some((item) => item.item.uid === "stash:blocked")).toBe(
+			false,
+		);
+		expect(result.completed.items.some((item) => item.item.uid === "item:board-a")).toBe(true);
+		expect(result.completed.items.some((item) => item.item.uid === "item:board-b")).toBe(true);
 	});
 
 	it("round-trips an active stash job before completing it", () => {
 		const result = run(
 			Effect.gen(function* () {
 				yield* startStashFx({
-					itemId: "stash:guaranteed",
+					itemUid: "stash:guaranteed",
 					lineId: "line:stash:guaranteed",
 				});
 				const runtime = yield* readRuntimeFx();

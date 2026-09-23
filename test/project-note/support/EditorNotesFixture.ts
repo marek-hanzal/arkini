@@ -32,12 +32,11 @@ export const editorNotesTestProject: Project = {
 			wood: {
 				...editorTestConfig.items.water,
 				uid: "wood",
-				id: "wood",
 				title: "Timber",
 			},
-			"renamed-water": {
+			water: {
 				...editorTestConfig.items.water,
-				id: "renamed-water",
+				title: "Renamed Water",
 			},
 		},
 	},

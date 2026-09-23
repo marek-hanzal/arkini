@@ -13,7 +13,7 @@ export const SelectorDetail = ({
 	readonly eyebrow?: ReactNode;
 }) => (
 	<DetailReference
-		itemId={selector.itemId}
+		itemUid={selector.itemUid}
 		eyebrow={eyebrow}
 		description={description}
 	/>

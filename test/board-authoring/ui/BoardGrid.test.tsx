@@ -55,7 +55,7 @@ describe("BoardGrid", () => {
 				<BoardGrid
 					cells={[
 						{
-							itemId: "water",
+							itemUid: "water",
 							x: 0,
 							y: 0,
 						},

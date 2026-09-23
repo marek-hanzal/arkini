@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "x8z9v8tn5wa7qse7c7izy6b0",
-		"id": "base-camp",
 		"title": "Base Camp",
 		"draft": false,
 		"description": "Home, for a generous definition of home. Sketch your first blueprints here, build the basics, and try to turn a campsite into something that looks intentional.",
@@ -32,7 +31,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -69,7 +68,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "lumber-camp-blueprint",
+											"itemUid": "i4hjvnsdb2vgk8n6fi0p2grz",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -90,7 +89,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "lumber-camp-blueprint"
+										"itemUid": "i4hjvnsdb2vgk8n6fi0p2grz"
 									},
 									"distance": "far"
 								},
@@ -105,7 +104,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "lumer-camp"
+										"itemUid": "vrjsj1cqzlky11b0wvd6ye0l"
 									},
 									"distance": "far"
 								},
@@ -133,7 +132,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -148,7 +147,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -170,7 +169,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "forester-blueprint",
+											"itemUid": "j3ug02xyoiahhdt479zuuu07",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -191,9 +190,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "lumer-camp"
+										"itemUid": "vrjsj1cqzlky11b0wvd6ye0l"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -206,9 +205,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "forester-blueprint"
+										"itemUid": "j3ug02xyoiahhdt479zuuu07"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -221,9 +220,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "forester"
+										"itemUid": "emyfwxfa8g1gi9iwj7v9rzru"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -248,7 +247,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -263,7 +262,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -285,7 +284,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stonemason-camp-blueprint",
+											"itemUid": "dmuw8kdzv7f6jz94yret4jhe",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -306,7 +305,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stonemason-camp-blueprint"
+										"itemUid": "dmuw8kdzv7f6jz94yret4jhe"
 									},
 									"distance": "far"
 								},
@@ -321,7 +320,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stonemason-camp"
+										"itemUid": "clmb5usqob6j1z5udyd487m5"
 									},
 									"distance": "far"
 								},
@@ -348,7 +347,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -367,7 +366,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "inkwell"
+								"itemUid": "aypezdd5mxtcclnmhi7kphyv"
 							},
 							"distance": "far"
 						}
@@ -377,7 +376,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -399,7 +398,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "townhall-t1-blueprint",
+											"itemUid": "eheyi27mvxb5ggoh90s3nyjm",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -421,7 +420,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "lumer-camp"
+										"itemUid": "vrjsj1cqzlky11b0wvd6ye0l"
 									},
 									"distance": "far"
 								},
@@ -437,7 +436,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stonemason-camp"
+										"itemUid": "clmb5usqob6j1z5udyd487m5"
 									},
 									"distance": "far"
 								},
@@ -452,7 +451,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "townhall-t1-blueprint"
+										"itemUid": "eheyi27mvxb5ggoh90s3nyjm"
 									},
 									"distance": "far"
 								},
@@ -468,7 +467,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t1"
+										"itemUid": "r37rbdbf8ntc3tt56yv1549n"
 									},
 									"distance": "far"
 								},
@@ -484,9 +483,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "explorer"
+										"itemUid": "oohijxpd9l43544ki7h6koaf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -500,9 +499,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "hunter"
+										"itemUid": "b3s2zbbcu7fggst61pzd762l"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -527,7 +526,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -542,7 +541,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -564,7 +563,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "house-t1-blueprint",
+											"itemUid": "cqwmnos0386zfehpbx8iibfy",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -585,7 +584,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t1"
+										"itemUid": "r37rbdbf8ntc3tt56yv1549n"
 									},
 									"distance": "far"
 								},
@@ -600,7 +599,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "house-t1-blueprint"
+										"itemUid": "cqwmnos0386zfehpbx8iibfy"
 									},
 									"distance": "far"
 								},
@@ -627,7 +626,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "firewood"
+								"itemUid": "rwgifjjoffgcix5149b6q6v1"
 							},
 							"distance": "far"
 						},
@@ -642,7 +641,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-1"
+								"itemUid": "b1z61l4bbwdtc75nt189hzze"
 							},
 							"distance": "far"
 						},
@@ -664,7 +663,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "campfire",
+											"itemUid": "our0pxaqz9ce08z8tdyhek44",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -696,7 +695,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -711,7 +710,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -733,7 +732,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "explorer-blueprint",
+											"itemUid": "xtxotfa57m3amgzqzscmaa0h",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -754,9 +753,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "lumer-camp"
+										"itemUid": "vrjsj1cqzlky11b0wvd6ye0l"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -764,9 +763,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stonemason-camp"
+										"itemUid": "clmb5usqob6j1z5udyd487m5"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -779,9 +778,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "explorer-blueprint"
+										"itemUid": "xtxotfa57m3amgzqzscmaa0h"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -794,9 +793,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "explorer"
+										"itemUid": "oohijxpd9l43544ki7h6koaf"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -821,7 +820,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -836,7 +835,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -858,7 +857,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hunter-blueprint",
+											"itemUid": "aulg8pg44gswssomekfribtw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -879,9 +878,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "lumer-camp"
+										"itemUid": "vrjsj1cqzlky11b0wvd6ye0l"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							},
@@ -889,9 +888,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "stonemason-camp"
+										"itemUid": "clmb5usqob6j1z5udyd487m5"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -904,9 +903,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "hunter-blueprint"
+										"itemUid": "aulg8pg44gswssomekfribtw"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -919,9 +918,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "hunter"
+										"itemUid": "b3s2zbbcu7fggst61pzd762l"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xsy4q5tb13eivk2tmqhtrj4q",
-		"id": "spoiled-animal-bones",
 		"title": "Spoiled Animal Bones",
 		"ui": "simple",
 		"draft": true,

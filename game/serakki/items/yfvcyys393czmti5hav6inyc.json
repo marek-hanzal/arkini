@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yfvcyys393czmti5hav6inyc",
-		"id": "iron-mine",
 		"title": "Iron Mine",
 		"ui": "default",
 		"description": "We need raw ore, dudes",
@@ -37,7 +36,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "iron-mine"
+								"itemUid": "yfvcyys393czmti5hav6inyc"
 							},
 							"distance": "self"
 						}
@@ -54,7 +53,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "iron-ore",
+											"itemUid": "auytswhc89z64o4fm0f7swj7",
 											"quantity": {
 												"min": 1,
 												"max": 3

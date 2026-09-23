@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "i4y31g4ivr6cetcs6zbgy2vf",
-		"id": "bubble-reservoir",
 		"title": "Bubble Reservoir",
 		"ui": "simple",
 		"description": "Bubble world",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-bubble-reservoir",
+										"itemUid": "zfe1uedywgk7jmtxlzk7wai4",
 										"quantity": {
 											"min": 1,
 											"max": 1

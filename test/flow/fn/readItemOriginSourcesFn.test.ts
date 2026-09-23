@@ -11,9 +11,9 @@ import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestC
 const readItemOriginSources = (config: Parameters<typeof createAcquisitionGraphFn>[0]) =>
 	readItemOriginSourcesFn(createAcquisitionGraphFn(config));
 
-const dropOf = (itemId: string): OutcomeSchema.Type => ({
+const dropOf = (itemUid: string): OutcomeSchema.Type => ({
 	type: "item",
-	itemId,
+	itemUid,
 	placement: "drop",
 	quantity: {
 		max: 1,
@@ -22,14 +22,14 @@ const dropOf = (itemId: string): OutcomeSchema.Type => ({
 	rules: [],
 });
 
-const outputOf = (itemId: string): OutcomeTableSchema.Type => ({
+const outputOf = (itemUid: string): OutcomeTableSchema.Type => ({
 	set: [
 		{
 			rules: [],
 			roll: [
 				{
 					outcome: [
-						dropOf(itemId),
+						dropOf(itemUid),
 					],
 					type: "guaranteed",
 				},
@@ -43,16 +43,15 @@ describe("readItemOriginSourcesFn", () => {
 	it("uses canonical route IDs, conditions, and positive-probability outputs", () => {
 		const config = structuredClone(createJobTestConfig());
 		const forge = config.items.forge;
-		for (const itemId of [
+		for (const itemUid of [
 			"dust",
 			"ingot",
 			"permit",
 		])
-			config.items[itemId] = {
+			config.items[itemUid] = {
 				...config.items.tool,
-				id: itemId,
-				title: itemId,
-				uid: itemId,
+				title: itemUid,
+				uid: itemUid,
 			};
 		const line = forge.lines[0]!;
 		const ingotDrop = dropOf("ingot");
@@ -103,7 +102,7 @@ describe("readItemOriginSourcesFn", () => {
 
 		expect(sources).toHaveLength(1);
 		expect(sources[0]?.routeIds).toEqual(graph.routes.map(({ id }) => id));
-		expect(sources.flatMap(({ outputs }) => outputs.map(({ itemId }) => itemId))).toEqual([
+		expect(sources.flatMap(({ outputs }) => outputs.map(({ itemUid }) => itemUid))).toEqual([
 			"ingot",
 		]);
 		expect(sources[0]).toMatchObject({
@@ -118,7 +117,7 @@ describe("readItemOriginSourcesFn", () => {
 					requirements: {
 						allOf: expect.arrayContaining([
 							expect.objectContaining({
-								itemId: "permit",
+								itemUid: "permit",
 							}),
 						]),
 						anyOf: [],
@@ -137,7 +136,7 @@ describe("readItemOriginSourcesFn", () => {
 					effect: "replace",
 					result: "result",
 					target: {
-						itemId: "target",
+						itemUid: "target",
 						type: "item",
 					},
 				},
@@ -146,7 +145,7 @@ describe("readItemOriginSourcesFn", () => {
 					effect: "replace",
 					result: "output",
 					target: {
-						itemId: "target",
+						itemUid: "target",
 						type: "item",
 					},
 				},
@@ -157,7 +156,7 @@ describe("readItemOriginSourcesFn", () => {
 
 		expect(sources).toHaveLength(1);
 		expect(sources[0]?.routeIds).toEqual(graph.routes.map(({ id }) => id));
-		expect(sources.flatMap(({ outputs }) => outputs.map(({ itemId }) => itemId))).toEqual([
+		expect(sources.flatMap(({ outputs }) => outputs.map(({ itemUid }) => itemUid))).toEqual([
 			"result",
 		]);
 	});
@@ -165,19 +164,18 @@ describe("readItemOriginSourcesFn", () => {
 	it("keeps output-specific requirement clauses on their own occurrence", () => {
 		const config = structuredClone(createJobTestConfig());
 		const forge = config.items.forge;
-		for (const itemId of [
+		for (const itemUid of [
 			"permit-a",
 			"permit-b",
 			"slag",
 		])
-			config.items[itemId] = {
+			config.items[itemUid] = {
 				...config.items.tool,
-				id: itemId,
-				title: itemId,
-				uid: itemId,
+				title: itemUid,
+				uid: itemUid,
 			};
-		const conditionedDrop = (itemId: string, permitId: string): OutcomeSchema.Type => ({
-			...dropOf(itemId),
+		const conditionedDrop = (itemUid: string, permitId: string): OutcomeSchema.Type => ({
+			...dropOf(itemUid),
 			rules: [
 				{
 					type: "enable" as const,
@@ -208,13 +206,13 @@ describe("readItemOriginSourcesFn", () => {
 		const source = readItemOriginSources(config).find(
 			({ reference }) => reference.type === "line" && reference.lineId === "line:forge:run",
 		);
-		const ingot = source?.outputs.find(({ itemId }) => itemId === "ingot");
-		const slag = source?.outputs.find(({ itemId }) => itemId === "slag");
+		const ingot = source?.outputs.find(({ itemUid }) => itemUid === "ingot");
+		const slag = source?.outputs.find(({ itemUid }) => itemUid === "slag");
 
 		expect(ingot?.requirements.allOf).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					itemId: "permit-a",
+					itemUid: "permit-a",
 					sources: [
 						"output-condition",
 					],
@@ -224,14 +222,14 @@ describe("readItemOriginSourcesFn", () => {
 		expect(ingot?.requirements.allOf).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					itemId: "permit-b",
+					itemUid: "permit-b",
 				}),
 			]),
 		);
 		expect(slag?.requirements.allOf).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					itemId: "permit-b",
+					itemUid: "permit-b",
 					sources: [
 						"output-condition",
 					],
@@ -241,7 +239,7 @@ describe("readItemOriginSourcesFn", () => {
 		expect(slag?.requirements.allOf).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					itemId: "permit-a",
+					itemUid: "permit-a",
 				}),
 			]),
 		);
@@ -285,20 +283,20 @@ describe("readItemOriginSourcesFn", () => {
 		};
 		const alternativeSlag = readItemOriginSourcesFn(withAlternativeClause)
 			.flatMap(({ outputs }) => outputs)
-			.find(({ itemId }) => itemId === "slag");
+			.find(({ itemUid }) => itemUid === "slag");
 		expect(alternativeSlag?.requirements.anyOf).toEqual([
 			[
 				expect.objectContaining({
-					itemId: "permit-a",
+					itemUid: "permit-a",
 				}),
 				expect.objectContaining({
-					itemId: "permit-b",
+					itemUid: "permit-b",
 				}),
 			],
 		]);
 		expect(alternativeSlag?.requirements.unsupported).toEqual([
 			{
-				itemId: "permit-a",
+				itemUid: "permit-a",
 				reason: "upper-bound",
 				source: "output-condition",
 			},

@@ -63,7 +63,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:before-subscribe",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,
@@ -91,7 +91,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 				await session.runFn(
 					spawnItemFx({
 						id: "runtime:after-subscribe",
-						itemId: "water",
+						itemUid: "water",
 						location: {
 							scope: "board",
 							space: 0,
@@ -173,7 +173,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:no-op-tick:marker",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,

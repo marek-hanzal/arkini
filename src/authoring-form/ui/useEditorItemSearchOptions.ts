@@ -20,10 +20,10 @@ export const useEditorItemSearchOptions = (
 				.map(
 					(item) =>
 						({
-							id: item.id,
+							id: item.uid,
 							label: item.title,
 							terms: [
-								item.id,
+								item.uid,
 								item.title,
 								item.description ?? "",
 							],
@@ -45,9 +45,9 @@ export const useEditorItemOptionLabel = () => {
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};
 	return useCallback(
-		(itemId: string, fallback: string) => {
-			if (itemId.length === 0) return fallback;
-			const title = items[itemId]?.title;
+		(itemUid: string, fallback: string) => {
+			if (itemUid.length === 0) return fallback;
+			const title = items[itemUid]?.title;
 			return title === undefined || title.length === 0 ? fallback : title;
 		},
 		[

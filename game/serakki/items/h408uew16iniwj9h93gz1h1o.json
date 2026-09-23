@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "h408uew16iniwj9h93gz1h1o",
-		"id": "injured-fawn",
 		"title": "Injured Fawn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-game-meat",
+										"itemUid": "xf44x3an4an91b5xqmxevd11",
 										"quantity": {
 											"min": 3,
 											"max": 5

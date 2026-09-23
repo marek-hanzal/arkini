@@ -98,7 +98,7 @@ const state = vi.hoisted(() => ({
 }));
 
 interface TestStartGridCell {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly x: number;
 	readonly y: number;
 }
@@ -139,7 +139,7 @@ vi.mock("~/board-authoring/ui/BoardGrid", () => ({
 		createElement(
 			"button",
 			{
-				"data-cells": cells.map(({ itemId, x, y }) => `${itemId}:${x}:${y}`).join("|"),
+				"data-cells": cells.map(({ itemUid, x, y }) => `${itemUid}:${x}:${y}`).join("|"),
 				"data-invalid-cells": invalidCells.map(({ x, y }) => `${x}:${y}`).join("|"),
 				"data-ui": "EditorBoardGrid",
 				"data-width": width,
@@ -688,7 +688,7 @@ describe("project section form session", () => {
 			saved.templates.find((entry: { uid: string }) => entry.uid === "second").board,
 		).toEqual([
 			{
-				itemId: "water",
+				itemUid: "water",
 				x: 0,
 				y: 1,
 			},

@@ -42,7 +42,7 @@ const DeleteBlockerLink = ({
 				/>
 				<span className="min-w-0">
 					<span className="block truncate text-sm font-semibold">
-						{owner.title || owner.id} · {translator.textFn("Delete")}
+						{owner.title || owner.uid} · {translator.textFn("Delete")}
 					</span>
 					<span className="mt-1 block text-xs font-normal leading-5 text-muted">
 						{blocker.message}

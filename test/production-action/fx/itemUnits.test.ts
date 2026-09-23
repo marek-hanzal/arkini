@@ -19,7 +19,7 @@ describe("item units / owner lifecycle", () => {
 			Effect.gen(function* () {
 				const well = yield* spawnItemFx({
 					id: "runtime:self-well",
-					itemId: "units:self-well",
+					itemUid: "units:self-well",
 					location: board(0),
 				});
 				yield* startLineFx({
@@ -57,7 +57,7 @@ describe("item units / owner lifecycle", () => {
 		expect(result.firstStart.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemUnitSpent,
 			itemId: result.well.id,
-			canonicalItemId: "units:self-well",
+			itemUid: "units:self-well",
 			location: board(0),
 			previousUnits: 2,
 			resultingUnits: 1,
@@ -65,24 +65,26 @@ describe("item units / owner lifecycle", () => {
 		expect(result.finalCompletion.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemDepleted,
 			itemId: result.well.id,
-			canonicalItemId: "units:self-well",
+			itemUid: "units:self-well",
 			location: board(0),
 		});
 		expect(result.finalCompletion.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: result.well.id,
-			canonicalItemId: "units:self-well",
+			itemUid: "units:self-well",
 			location: board(0),
 		});
 		expect(result.runtime.items.some((item) => item.id === result.well.id)).toBe(false);
-		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(2);
+		expect(result.runtime.items.filter((item) => item.item.uid === "item:gift")).toHaveLength(
+			2,
+		);
 	});
 	it("keeps a limited producer after a partial spend and removes it after its last job", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const shrine = yield* spawnItemFx({
 					id: "runtime:shrine",
-					itemId: "producer:shrine",
+					itemUid: "producer:shrine",
 					location: board(0),
 				});
 				yield* startLineFx({
@@ -117,7 +119,7 @@ describe("item units / owner lifecycle", () => {
 		expect(runtime.firstStart.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemUnitSpent,
 			itemId: "runtime:shrine",
-			canonicalItemId: "producer:shrine",
+			itemUid: "producer:shrine",
 			location: board(0),
 			previousUnits: 2,
 			resultingUnits: 1,
@@ -145,10 +147,10 @@ describe("item units / owner lifecycle", () => {
 			),
 		).toBe(false);
 		expect(runtime.runtime.items.some((item) => item.id === "runtime:shrine")).toBe(false);
-		expect(runtime.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(
+		expect(runtime.runtime.items.filter((item) => item.item.uid === "item:gift")).toHaveLength(
 			2,
 		);
-		expect(runtime.runtime.items.filter((item) => item.item.id === "item:dust")).toHaveLength(
+		expect(runtime.runtime.items.filter((item) => item.item.uid === "item:dust")).toHaveLength(
 			1,
 		);
 	});

@@ -18,12 +18,12 @@ describe("dropItemFx / merge identity", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
-					itemId: "stone",
+					itemUid: "stone",
 					location: occupiedLocation,
 				});
 				const outcome = yield* dropItemFx({
@@ -65,7 +65,7 @@ describe("dropItemFx / merge identity", () => {
 				previousLocation: occupiedLocation,
 				current: {
 					itemId: "runtime:stone",
-					canonicalItemId: "stone",
+					itemUid: "stone",
 					location: occupiedLocation,
 				},
 			},
@@ -79,12 +79,12 @@ describe("dropItemFx / merge identity", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
-					itemId: "stone",
+					itemUid: "stone",
 					location: occupiedLocation,
 				});
 				const outcome = yield* dropItemFx({

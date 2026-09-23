@@ -7,7 +7,6 @@ import type { GameReplayReport } from "~/game-incident/type/GameReplayReport";
 const itemReference = {
 	runtimeItemId: "runtime:item:forge",
 	definition: {
-		itemId: "forge",
 		itemUid: "uid:forge",
 		title: "Forge",
 	},

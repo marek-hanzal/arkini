@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kfvvgjva9p7io5s989tql3yw",
-		"id": "sarka",
 		"title": "Šárka",
 		"ui": "simple",
 		"description": "The Author's Wife",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "marek"
+					"itemUid": "ovv04m3gxvmdrl88lalr4qn8"
 				},
 				"action": "use",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bobik",
+											"itemUid": "gevnn4ay6w000oyekofyb23s",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "tomasek",
+											"itemUid": "w1qvwvxxyfwoejpvxst2ykru",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -70,7 +69,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "coin-chest"
+					"itemUid": "xyq6bdlue0g54tn2zmmo44k6"
 				},
 				"action": "use",
 				"effect": "remove"
@@ -78,7 +77,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "honeyed-fruit-pancake"
+					"itemUid": "y5xwsvtgyxy5npclxyzwngo2"
 				},
 				"action": "consume",
 				"outcome": {
@@ -92,7 +91,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay-plate",
+											"itemUid": "ubexhgyrqm23lx9qn734f385",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -107,7 +106,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "well-fed-sarka"
+				"result": "ueuxr2ac2q6p666r5wswv352"
 			}
 		],
 		"maxQueueSize": 1,

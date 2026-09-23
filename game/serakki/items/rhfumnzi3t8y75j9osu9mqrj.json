@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rhfumnzi3t8y75j9osu9mqrj",
-		"id": "spoiled-beer-barrel",
 		"title": "Spoiled Beer Barrel",
 		"ui": "simple",
 		"description": "Beer Deluxe Edition",

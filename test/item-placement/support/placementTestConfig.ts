@@ -8,7 +8,7 @@ const simpleItem = ({ id }: { id: string }) => {
 		lines: [],
 
 		uid: id,
-		id,
+
 		title: id,
 		description: id,
 		artwork: {
@@ -85,7 +85,7 @@ export const configuredDrop = ({
 }) => {
 	return {
 		type: "item" as const,
-		itemId,
+		itemUid: itemId,
 		placement,
 		quantity: {
 			min: quantity,

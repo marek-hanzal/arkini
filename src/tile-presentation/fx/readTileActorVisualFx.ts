@@ -14,7 +14,7 @@ export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function
 }) {
 	const sourceIds = item.artwork.default;
 	return {
-		itemId: item.id,
+		itemUid: item.uid,
 		artworkScale: item.artwork.scale,
 		sourceUrl: game.getResourceUrlFn(sourceIds[0]),
 		...(sourceIds[1] === undefined

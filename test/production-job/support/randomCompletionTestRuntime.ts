@@ -30,21 +30,18 @@ export const createRandomCompletionConfig = () => {
 			blocker: {
 				...base.items.tool,
 				uid: "blocker",
-				id: "blocker",
 				title: "Blocker",
 				description: "Fills completion capacity.",
 			},
 			outputA: {
 				...base.items.tool,
 				uid: "outputA",
-				id: "outputA",
 				title: "Output A",
 				description: "First deterministic completion alternative.",
 			},
 			outputB: {
 				...base.items.tool,
 				uid: "outputB",
-				id: "outputB",
 				title: "Output B",
 				description: "Second deterministic completion alternative.",
 			},
@@ -70,7 +67,7 @@ export const createRandomCompletionConfig = () => {
 											outcome: [
 												{
 													type: "item" as const,
-													itemId: "outputA",
+													itemUid: "outputA",
 													placement: "random",
 													quantity: {
 														min: 1,
@@ -91,7 +88,7 @@ export const createRandomCompletionConfig = () => {
 											outcome: [
 												{
 													type: "item" as const,
-													itemId: "outputB",
+													itemUid: "outputB",
 													placement: "random",
 													quantity: {
 														min: 1,
@@ -116,7 +113,7 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 	function* () {
 		yield* spawnItemFx({
 			id: "runtime:random-forge",
-			itemId: "forge",
+			itemUid: "forge",
 			location: {
 				scope: "board",
 				space: 0,
@@ -132,7 +129,7 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 				if (x === 0 && y === 0) continue;
 				yield* spawnItemFx({
 					id: `runtime:random-blocker:${blockerIndex}`,
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: {
 						scope: "board",
 						space: 0,
@@ -165,7 +162,7 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 		} satisfies RuntimeSchema.Type;
 		const freeRuntime = {
 			...fullRuntime,
-			items: fullRuntime.items.filter((item) => item.item.id !== "blocker"),
+			items: fullRuntime.items.filter((item) => item.item.uid !== "blocker"),
 		} satisfies RuntimeSchema.Type;
 
 		return {
@@ -178,9 +175,9 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 
 export const projectRandomCompletionItems = (runtime: RuntimeSchema.Type) =>
 	runtime.items
-		.filter((item) => item.item.id === "outputA" || item.item.id === "outputB")
+		.filter((item) => item.item.uid === "outputA" || item.item.uid === "outputB")
 		.map((item) => ({
-			itemId: item.item.id,
+			itemId: item.item.uid,
 			location: item.location,
 		}))
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second)));

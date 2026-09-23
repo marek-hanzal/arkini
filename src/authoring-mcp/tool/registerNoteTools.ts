@@ -118,10 +118,9 @@ const readExcerptFn = (content: string) => {
 
 const readLinkedItemsFn = (note: NoteSchema.Type, project: Project) =>
 	note.itemUids.map((uid) => {
-		const item = Object.values(project.config.items).find((candidate) => candidate.uid === uid);
+		const item = project.config.items[uid];
 		return {
 			uid,
-			id: item?.id ?? null,
 			title: item?.title ?? null,
 		};
 	});
@@ -246,7 +245,7 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and resource links. Linked items include their current authored IDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Serapacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and resource links. Linked items include their immutable UIDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Serapacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
@@ -268,7 +267,7 @@ export const registerNoteToolsFn = ({
 		"note_detail",
 		{
 			description:
-				"Read one complete project note as JSON, including item UIDs, current authored IDs and human titles, resource IDs and resolved semantic resource types. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
+				"Read one complete project note as JSON, including item UIDs, immutable UIDs and human titles, resource IDs and resolved semantic resource types. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
 			inputSchema: NoteDetailInputSchema,
 		},
 		async ({ noteId }) =>

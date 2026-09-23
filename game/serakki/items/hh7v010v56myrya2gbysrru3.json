@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hh7v010v56myrya2gbysrru3",
-		"id": "grain",
 		"title": "Grain",
 		"description": "Loose harvested grain. Use it directly where appropriate or pack it into an empty sack for storage and transport.",
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-grain"
+				"result": "g820g0sxzhyuon040x3j5qje"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-grain",
+										"itemUid": "kzwt0gkhs7reqg7vt0xumgv6",
 										"quantity": {
 											"min": 1,
 											"max": 1

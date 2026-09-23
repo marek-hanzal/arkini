@@ -141,7 +141,7 @@ export const applyBoardTemplateRuntimeFx = Effect.fn("applyBoardTemplateRuntimeF
 			yield* createRuntimeItemFx({
 				id: yield* createRuntimeItemIdFx(),
 				item: yield* resolveItemFx({
-					itemId: cell.itemId,
+					itemUid: cell.itemUid,
 				}),
 				location: {
 					scope: "board",

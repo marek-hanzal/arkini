@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "py4l2gkn3baf614fxhkuykwq",
-		"id": "steam-dye-workshop",
 		"title": "Steam Dye Workshop",
 		"ui": "simple",
 		"description": "Dye",

@@ -6,8 +6,7 @@ import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
 
 const itemFn = (id: string, title: string, draft = false) =>
 	({
-		id,
-		uid: `uid-${id}`,
+		uid: id,
 		title,
 		draft,
 	}) as ItemSchema.Type;
@@ -17,7 +16,7 @@ const rowFn = (
 ): ItemEstimateIndexRow => ({
 	item,
 	estimate: {
-		itemId: item.id,
+		itemUid: item.uid,
 		status,
 		method: "static",
 		demand: 1,
@@ -141,7 +140,6 @@ describe("selectItemCollectionFn", () => {
 			beta.uid,
 			gamma.uid,
 			fresh.uid,
-			alpha.id,
 		]);
 		expect(
 			selectItemCollectionFn({

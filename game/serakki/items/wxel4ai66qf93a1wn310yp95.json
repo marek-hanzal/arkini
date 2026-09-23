@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wxel4ai66qf93a1wn310yp95",
-		"id": "fruit-garden",
 		"title": "Fruit Garden",
 		"description": "A planted fruit garden harvested by a nearby Fruit Farm.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-fruit-garden",
+										"itemUid": "lidli1atre8yu8ew4avdkcf2",
 										"quantity": {
 											"min": 1,
 											"max": 1

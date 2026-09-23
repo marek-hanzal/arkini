@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "q58d859r8h1ojnzk52gxk5qb",
-		"id": "spoiled-clay-plate",
 		"title": "Spoiled Clay Plate",
 		"ui": "simple",
 		"description": "A dinner for your enemy",

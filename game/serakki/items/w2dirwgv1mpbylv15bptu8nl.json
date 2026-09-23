@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "w2dirwgv1mpbylv15bptu8nl",
-		"id": "wood---tier-3",
 		"title": "Wood - Tier 3",
 		"draft": true,
 		"ui": "simple",
@@ -36,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-3"
+								"itemUid": "w2dirwgv1mpbylv15bptu8nl"
 							},
 							"distance": "self"
 						}
@@ -53,7 +52,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "wood---tier-2",
+											"itemUid": "zblgatsfi13wi1v8wboffcc6",
 											"quantity": {
 												"min": 2,
 												"max": 2

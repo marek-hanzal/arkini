@@ -28,7 +28,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "stone",
-			id: "stone",
 
 			title: "Stone",
 			description: "Stone",
@@ -44,7 +43,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "mud",
-			id: "mud",
 
 			title: "Mud",
 			description: "Mud",
@@ -79,7 +77,7 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 		items: [
 			{
 				id: "runtime:target",
-				revision: `revision:${item.id}`,
+				revision: `revision:${item.uid}`,
 				item,
 				location,
 			},
@@ -103,12 +101,12 @@ describe("readCommittedTileReplacementsFx", () => {
 				{
 					type: "item:merged",
 					sourceItemId: "runtime:source",
-					sourceCanonicalItemId: "water",
+					sourceItemUid: "water",
 					targetItemId: "runtime:target",
-					targetCanonicalItemId: "stone",
+					targetItemUid: "stone",
 					action: "consume",
 					effect: "replace",
-					resultCanonicalItemId: "mud",
+					resultItemUid: "mud",
 				},
 			],
 		} satisfies CommittedTransitionSchema.Type;
@@ -126,7 +124,7 @@ describe("readCommittedTileReplacementsFx", () => {
 				key: "7:0:replacement",
 				previous: {
 					artworkScale: 0.8,
-					itemId: "stone",
+					itemUid: "stone",
 					sourceUrl: "resource:artwork:stone",
 				},
 			},

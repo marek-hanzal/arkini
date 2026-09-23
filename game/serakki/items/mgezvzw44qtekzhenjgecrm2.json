@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mgezvzw44qtekzhenjgecrm2",
-		"id": "raw-sapphire",
 		"title": "Raw Sapphire",
 		"ui": "simple",
 		"description": "Nice night blue",

@@ -21,7 +21,7 @@ export const validateMergeViabilityFn = ({
 }: validateMergeViabilityFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
-	for (const [ownerItemId, owner] of Object.entries(config.items)) {
+	for (const [ownerItemUid, owner] of Object.entries(config.items)) {
 		for (const [mergeIndex, merge] of (owner.merge ?? []).entries()) {
 			if (merge.action === SourceActionSchema.enum.Spend && owner.units === undefined) {
 				diagnostics.push({
@@ -29,19 +29,19 @@ export const validateMergeViabilityFn = ({
 					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						"items",
-						ownerItemId,
+						ownerItemUid,
 						"merge",
 						mergeIndex,
 						"action",
 					],
-					source: provenance.items[ownerItemId],
-					message: `Merge ${mergeIndex} of item ${ownerItemId} spends a source unit, but the item has no units.`,
-					ownerItemId,
+					source: provenance.items[ownerItemUid],
+					message: `Merge ${mergeIndex} of item ${ownerItemUid} spends a source unit, but the item has no units.`,
+					ownerItemUid,
 					mergeIndex,
 					reason: InvalidMergeReasonEnumSchema.enum.SourceUnitsDisabled,
 				});
 			}
-			const targetId = merge.action === "space" ? ownerItemId : merge.target.itemId;
+			const targetId = merge.action === "space" ? ownerItemUid : merge.target.itemUid;
 			const exactTarget = config.items[targetId];
 			if (
 				merge.effect === TargetEffectSchema.enum.Spend &&
@@ -53,14 +53,14 @@ export const validateMergeViabilityFn = ({
 					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						"items",
-						ownerItemId,
+						ownerItemUid,
 						"merge",
 						mergeIndex,
 						"effect",
 					],
-					source: provenance.items[ownerItemId],
-					message: `Merge ${mergeIndex} of item ${ownerItemId} spends a target unit, but selected target ${targetId} has no units.`,
-					ownerItemId,
+					source: provenance.items[ownerItemUid],
+					message: `Merge ${mergeIndex} of item ${ownerItemUid} spends a target unit, but selected target ${targetId} has no units.`,
+					ownerItemUid,
 					mergeIndex,
 					reason: InvalidMergeReasonEnumSchema.enum.TargetUnitsDisabled,
 				});

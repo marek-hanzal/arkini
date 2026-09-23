@@ -38,7 +38,7 @@ const twoInputTestConfig = GameConfigSchema.parse({
 							distance: "far" as const,
 							selector: {
 								type: "item",
-								itemId: "stone",
+								itemUid: "stone",
 							},
 						},
 						quantity: {
@@ -77,7 +77,7 @@ const rangeInputTestConfig = GameConfigSchema.parse({
 							distance: "far" as const,
 							selector: {
 								type: "item",
-								itemId: "water",
+								itemUid: "water",
 							},
 						},
 						quantity: {
@@ -106,7 +106,7 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 							distance: "far" as const,
 							selector: {
 								type: "item",
-								itemId: "water",
+								itemUid: "water",
 							},
 						},
 						quantity: {
@@ -120,7 +120,7 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 							distance: "far" as const,
 							selector: {
 								type: "item",
-								itemId: "water",
+								itemUid: "water",
 							},
 						},
 						quantity: {
@@ -138,7 +138,7 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 const spawnOwnerFx = () =>
 	spawnItemFx({
 		id: ownerItemId,
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: workshopLocation,
 	});
 
@@ -151,7 +151,7 @@ const spawnWaterFx = ({
 }) =>
 	spawnItemFx({
 		id,
-		itemId: "water",
+		itemUid: "water",
 		location,
 	});
 
@@ -297,7 +297,7 @@ describe("Item Detail line input actions", () => {
 				yield* spawnOwnerFx();
 				yield* spawnItemFx({
 					id: "runtime:other-space",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 1,
@@ -409,7 +409,7 @@ describe("Item Detail line input actions", () => {
 		expect(result.runtime.items).toContainEqual(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					id: "water",
+					uid: "water",
 				}),
 
 				location: expect.objectContaining({
@@ -438,7 +438,7 @@ describe("Item Detail line input actions", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				for (const [itemId, count, inputIndex] of [
+				for (const [itemUid, count, inputIndex] of [
 					[
 						"water",
 						3,
@@ -452,8 +452,8 @@ describe("Item Detail line input actions", () => {
 				] as const) {
 					for (let index = 0; index < count; index++) {
 						const item = yield* spawnItemFx({
-							id: index === 0 ? `runtime:${itemId}` : `runtime:${itemId}:${index}`,
-							itemId,
+							id: index === 0 ? `runtime:${itemUid}` : `runtime:${itemUid}:${index}`,
+							itemUid,
 							location: sourceLocation(1),
 						});
 						yield* storeInputMaterialFx({
@@ -625,7 +625,7 @@ it("leaves the exact input and its queue unchanged when canonical placement fail
 			});
 			yield* spawnItemFx({
 				id: "runtime:blocker",
-				itemId: "stone",
+				itemUid: "stone",
 				location: sourceLocation(1),
 			});
 			yield* enqueueLineFx({

@@ -58,7 +58,7 @@ describe("saveDraftStatusFx", () => {
 					...editorTestPayload.config,
 					items: {
 						...editorTestPayload.config.items,
-						[saved.id]: saved,
+						[saved.uid]: saved,
 					},
 				},
 			});
@@ -111,7 +111,7 @@ describe("saveDraftStatusFx", () => {
 				config: editorTestPayload.config,
 				draft: true,
 				expectedRevision: 0,
-				itemId: item.id,
+				itemUid: item.uid,
 				projectId: "project",
 			}).pipe(
 				Effect.provideService(ProjectRepository, repository),

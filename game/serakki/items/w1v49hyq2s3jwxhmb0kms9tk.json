@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "w1v49hyq2s3jwxhmb0kms9tk",
-		"id": "lumber-camp-construction",
 		"title": "Lumber Camp Construction",
 		"draft": false,
 		"ui": "simple",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "awpu9dvi6tvpgnn9jgd52hek",
-		"id": "copper-pan-with-popcorn",
 		"title": "Copper Pan With Popcorn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-copper-pan",
+										"itemUid": "ogm52bsqfqk27a566mmabg3q",
 										"quantity": {
 											"min": 1,
 											"max": 1

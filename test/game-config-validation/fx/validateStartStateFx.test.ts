@@ -33,12 +33,12 @@ describe("validateStartStateFx", () => {
 					height: 2,
 					board: [
 						{
-							itemId: "tree",
+							itemUid: "tree",
 							x: 0,
 							y: 0,
 						},
 						{
-							itemId: "tree",
+							itemUid: "tree",
 							x: 0,
 							y: 0,
 						},

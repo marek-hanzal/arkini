@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aygivt7zvn1bhvhe7emo5g86",
-		"id": "faith-toilet",
 		"title": "Faith Toilet",
 		"ui": "simple",
 		"artwork": {

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rm4hf4i08di3fjfkw6arkmvp",
-		"id": "carpenter-blueprint",
 		"title": "Carpenter Blueprint",
 		"ui": "default",
 		"draft": false,
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "carpenter-blueprint"
+								"itemUid": "rm4hf4i08di3fjfkw6arkmvp"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -86,7 +85,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "carpenter",
+											"itemUid": "yc0am9mudbeggwjs6dzusk3j",
 											"quantity": {
 												"min": 1,
 												"max": 1

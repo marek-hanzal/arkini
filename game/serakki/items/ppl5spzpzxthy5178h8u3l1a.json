@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ppl5spzpzxthy5178h8u3l1a",
-		"id": "animal-fat",
 		"title": "Animal Fat",
 		"draft": false,
 		"description": "Fresh animal fat. Useful for early chemistry, less useful if you leave it lying around for too long.",
@@ -17,11 +16,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cutting-board"
+					"itemUid": "cfrqc6p65c4gh3lrjswv84zv"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cutting-board-with-animal-fat"
+				"result": "g8oi8iw4hidud9t24h8lv0p4"
 			}
 		],
 		"clock": {
@@ -39,7 +38,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-animal-fat",
+										"itemUid": "q0p4leoax0jeqwrmeevtjvn7",
 										"quantity": {
 											"min": 1,
 											"max": 1

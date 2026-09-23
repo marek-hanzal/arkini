@@ -32,18 +32,18 @@ export const queuedInputTestConfig = GameConfigSchema.parse({
 export const prepareQueuedBufferedLineFx = Effect.fn("prepareQueuedBufferedLineFx")(function* () {
 	yield* spawnItemFx({
 		id: ownerItemId,
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: workshopLocation,
 	});
 	yield* spawnItemFx({
 		id: otherOwnerItemId,
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: sourceLocation(3),
 	});
 	for (let index = 0; index < 3; index++) {
 		yield* spawnItemFx({
 			id: `runtime:queued-water:${index}`,
-			itemId: "water",
+			itemUid: "water",
 			location: sourceLocation(1),
 		});
 		const water = yield* getItemFx({

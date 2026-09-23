@@ -41,7 +41,7 @@ it("keeps a queued final-unit payer intact without freezing the session, then re
 			] as const) {
 				yield* spawnItemFx({
 					id,
-					itemId: id,
+					itemUid: id,
 					location: board(x),
 				});
 			}
@@ -136,7 +136,7 @@ it("counts earlier target costs and uses an alternate payer before depleting a q
 			] as const) {
 				yield* spawnItemFx({
 					id,
-					itemId,
+					itemUid: itemId,
 					location: board(x, y),
 				});
 			}
@@ -178,7 +178,7 @@ it("lets a self-targeted final unit start while the same owner still has queued 
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "payer",
-				itemId: "payer",
+				itemUid: "payer",
 				location: board(0),
 			});
 			yield* enqueueLineFx({
@@ -218,12 +218,12 @@ it("retains an active external payer at zero units until its job completes", () 
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "consumer",
-				itemId: "consumer",
+				itemUid: "consumer",
 				location: board(0),
 			});
 			yield* spawnItemFx({
 				id: "payer",
-				itemId: "payer",
+				itemUid: "payer",
 				location: board(1),
 			});
 			yield* enqueueLineFx({

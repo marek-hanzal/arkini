@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mbi6nbxtdm8ttfalget74iwm",
-		"id": "bear-eating-honey",
 		"title": "Bear Eating Honey",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "well-fed-bear",
+										"itemUid": "vnm48dyk7vw7v1ljbs0vfjhc",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 2,
 											"max": 3
@@ -47,7 +46,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "empty-jar",
+										"itemUid": "w3x58j053qf9fgq90wqqtylq",
 										"quantity": {
 											"min": 1,
 											"max": 1

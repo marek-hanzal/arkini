@@ -78,7 +78,6 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 				stone: {
 					...editorTestPayload.config.items.water!,
 					uid: "stone",
-					id: "stone",
 				},
 			},
 			templates: [

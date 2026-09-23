@@ -17,7 +17,7 @@ describe("blueprint completion lifecycle", () => {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
 					space: 0,
-					itemId: "blueprint:plain",
+					itemUid: "blueprint:plain",
 					x: 0,
 					y: 0,
 				});

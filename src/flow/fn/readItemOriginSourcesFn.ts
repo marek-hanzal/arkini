@@ -11,18 +11,18 @@ const uniqueFn = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
 ];
 
-const readOwnerItemIdFn = (route: AcquisitionRoute) => {
+const readOwnerItemUidFn = (route: AcquisitionRoute) => {
 	switch (route.metadata.kind) {
 		case "line-output":
-			return route.metadata.ownerItemId;
+			return route.metadata.ownerItemUid;
 		case "line-unit-depletion":
-			return route.metadata.unitOwnerItemId;
+			return route.metadata.unitOwnerItemUid;
 		case "merge-output":
-			return route.metadata.sourceItemId;
+			return route.metadata.sourceItemUid;
 		case "merge-unit-depletion":
-			return route.metadata.unitOwnerItemId;
+			return route.metadata.unitOwnerItemUid;
 		case "clock-expiry":
-			return route.metadata.itemId;
+			return route.metadata.itemUid;
 	}
 };
 
@@ -58,12 +58,12 @@ const readInputOccurrencesFn = (
 ): ItemOriginInputOccurrence[] => {
 	const inputs =
 		routes[0]?.operation?.inputs.map(({ factId, quantity }) => ({
-			itemId: factId,
+			itemUid: factId,
 			quantity,
 		})) ?? [];
 	const seen = new Set<string>();
-	return inputs.filter(({ itemId, quantity }) => {
-		const key = `${itemId}:${quantity.min}:${quantity.max}`;
+	return inputs.filter(({ itemUid, quantity }) => {
+		const key = `${itemUid}:${quantity.min}:${quantity.max}`;
 		if (seen.has(key)) return false;
 		seen.add(key);
 		return true;
@@ -73,7 +73,7 @@ const readInputOccurrencesFn = (
 const readRequirementOccurrenceFn = (
 	requirement: AcquisitionRoute["requirements"]["allOf"][number],
 ): ItemOriginRequirementOccurrence => ({
-	itemId: requirement.factId,
+	itemUid: requirement.factId,
 	quantity: {
 		max: requirement.quantity,
 		min: requirement.quantity,
@@ -96,7 +96,7 @@ const readOutputRequirementsFn = (route: AcquisitionRoute): ItemOriginOutputRequ
 		? {}
 		: {
 				unsupported: route.requirements.unsupported.map(({ factId, reason, source }) => ({
-					itemId: factId,
+					itemUid: factId,
 					reason,
 					source,
 				})),
@@ -140,9 +140,9 @@ const readRuntimeMsFn = (route: AcquisitionRoute) =>
 		? undefined
 		: route.durationMs;
 
-const readRequirementItemIdsFn = (ownerItemId: string, routes: ReadonlyArray<AcquisitionRoute>) =>
+const readRequirementItemUidsFn = (ownerItemUid: string, routes: ReadonlyArray<AcquisitionRoute>) =>
 	uniqueFn([
-		ownerItemId,
+		ownerItemUid,
 		...routes.flatMap((route) => route.operation?.inputs.map(({ factId }) => factId) ?? []),
 		...routes.flatMap((route) => (route.unitUses ?? []).map(({ payerFactId }) => payerFactId)),
 		...routes.flatMap((route) => route.requirements.allOf.map(({ factId }) => factId)),
@@ -158,7 +158,7 @@ const readOutputsFn = (routes: ReadonlyArray<AcquisitionRoute>) => {
 	const seen = new Set<string>();
 	return routes.flatMap((route) => {
 		const output = {
-			itemId: route.output.factId,
+			itemUid: route.output.factId,
 			placement: route.output.annotation.placement,
 			quantity: route.output.annotation.quantity,
 			routeId: route.id,
@@ -182,7 +182,7 @@ type AcquisitionRouteGroup = [
 
 const projectRoutesFn = (routes: AcquisitionRouteGroup): ItemOriginSource => {
 	const route = routes[0];
-	const ownerItemId = readOwnerItemIdFn(route);
+	const ownerItemUid = readOwnerItemUidFn(route);
 	const runtimeMs = readRuntimeMsFn(route);
 	return {
 		id: route.operation?.id ?? route.id,
@@ -190,9 +190,9 @@ const projectRoutesFn = (routes: AcquisitionRouteGroup): ItemOriginSource => {
 		kind: readKindFn(route),
 		label: readLabelFn(route),
 		outputs: readOutputsFn(routes),
-		ownerItemId,
+		ownerItemUid,
 		reference: readReferenceFn(route),
-		requirementItemIds: readRequirementItemIdsFn(ownerItemId, routes),
+		requirementItemUids: readRequirementItemUidsFn(ownerItemUid, routes),
 		routeIds: routes.map(({ id }) => id),
 		...(runtimeMs === undefined
 			? {}

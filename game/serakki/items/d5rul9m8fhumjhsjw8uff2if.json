@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "d5rul9m8fhumjhsjw8uff2if",
-		"id": "faith-cow",
 		"title": "Faith Cow",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "cow",
+										"itemUid": "f5o2vqdxqh3zhg05fyd1xf1m",
 										"quantity": {
 											"min": 1,
 											"max": 1

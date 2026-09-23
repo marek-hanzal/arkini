@@ -6,9 +6,9 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 type OutputInput = z.input<typeof OutcomeTableSchema>;
 
-const fixedDrop = (itemId: string, quantity = 1) => ({
+const fixedDrop = (itemUid: string, quantity = 1) => ({
 	type: "item" as const,
-	itemId,
+	itemUid,
 	placement: "drop" as const,
 	quantity: {
 		max: quantity,
@@ -17,14 +17,14 @@ const fixedDrop = (itemId: string, quantity = 1) => ({
 	rules: [],
 });
 
-const guaranteedOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
+const guaranteedOutput = (...itemUids: ReadonlyArray<string>): OutputInput =>
 	OutcomeTableSchema.parse({
 		set: [
 			{
 				rules: [],
 				roll: [
 					{
-						outcome: itemIds.map((itemId) => fixedDrop(itemId)),
+						outcome: itemUids.map((itemUid) => fixedDrop(itemUid)),
 						type: "guaranteed",
 					},
 				],
@@ -32,14 +32,14 @@ const guaranteedOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 		],
 	});
 
-const randomOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
+const randomOutput = (...itemUids: ReadonlyArray<string>): OutputInput =>
 	OutcomeTableSchema.parse({
-		set: itemIds.map((itemId) => ({
+		set: itemUids.map((itemUid) => ({
 			rules: [],
 			roll: [
 				{
 					outcome: [
-						fixedDrop(itemId, 2),
+						fixedDrop(itemUid, 2),
 					],
 					type: "guaranteed" as const,
 				},
@@ -50,11 +50,11 @@ const randomOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 
 const craftItem = ({
 	id,
-	inputItemId,
+	inputItemUid,
 	outcome,
 }: {
 	readonly id: string;
-	readonly inputItemId?: string;
+	readonly inputItemUid?: string;
 	readonly outcome?: OutputInput;
 }) =>
 	({
@@ -70,14 +70,13 @@ const craftItem = ({
 			amount: 1,
 		},
 		description: id,
-		id,
 		ui: "default",
 		lines: [
 			{
 				description: `line:${id}`,
 				id: `line:${id}`,
 				input:
-					inputItemId === undefined
+					inputItemUid === undefined
 						? [
 								{
 									units: {
@@ -101,7 +100,7 @@ const craftItem = ({
 									query: {
 										distance: "far" as const,
 										selector: {
-											itemId: inputItemId,
+											itemUid: inputItemUid,
 											type: "item",
 										},
 									},
@@ -132,7 +131,6 @@ const simpleItem = (id: string) =>
 			],
 		},
 		description: id,
-		id,
 		ui: "simple",
 
 		title: id,
@@ -159,7 +157,7 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 		}),
 		"craft:reserve": craftItem({
 			id: "craft:reserve",
-			inputItemId: "item:tool",
+			inputItemUid: "item:tool",
 			outcome: guaranteedOutput("item:product"),
 		}),
 		"craft:sink": craftItem({

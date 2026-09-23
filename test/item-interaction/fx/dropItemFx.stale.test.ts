@@ -15,7 +15,7 @@ describe("dropItemFx / stale and ignored identity", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const outcome = yield* dropItemFx({
@@ -55,7 +55,7 @@ describe("dropItemFx / stale and ignored identity", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const outcome = yield* dropItemFx({
@@ -91,12 +91,12 @@ describe("dropItemFx / stale and ignored identity", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
-					itemId: "stone",
+					itemUid: "stone",
 					location: occupiedLocation,
 				});
 				const outcome = yield* dropItemFx({

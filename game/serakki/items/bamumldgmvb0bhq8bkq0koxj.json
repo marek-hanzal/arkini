@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bamumldgmvb0bhq8bkq0koxj",
-		"id": "british-shorthair-kitten",
 		"title": "British Shorthair Kitten",
 		"draft": true,
 		"ui": "simple",
@@ -19,38 +18,38 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse"
+					"itemUid": "rvgihky3ismzedb2rwxwysq9"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-kitten-with-mouse"
+				"result": "yei2n86sg9mor1ufk58xh4oz"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-kitten-in-sack"
+				"result": "v3c530qx6wx7obxtbwvadw4s"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair"
+					"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-cuddling-kitten"
+				"result": "m8rio7lvocuaoqhix5p5nvy5"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair-kitten"
+					"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "playing-british-shorthair-kittens"
+				"result": "fexshws7tg2zgrobtfs7hi1b"
 			}
 		],
 		"clock": {
@@ -98,7 +97,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "self"
 						}
@@ -115,7 +114,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "british-shorthair-kitten",
+											"itemUid": "bamumldgmvb0bhq8bkq0koxj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -151,7 +150,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "self"
 						}
@@ -168,7 +167,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-british-shorthair-kitten",
+											"itemUid": "b5117rwx5goej42l900iwcf1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -178,7 +177,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -214,7 +213,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "self"
 						}
@@ -231,7 +230,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-british-shorthair-kitten",
+											"itemUid": "pv3fcc60h1u1m99b7afj5jtd",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -268,7 +267,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "self"
 						}
@@ -285,7 +284,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-british-shorthair-kitten",
+											"itemUid": "pv3fcc60h1u1m99b7afj5jtd",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -306,7 +305,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -338,7 +337,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "self"
 						}
@@ -355,7 +354,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-british-shorthair-kitten",
+											"itemUid": "pv3fcc60h1u1m99b7afj5jtd",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -376,7 +375,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},
@@ -408,7 +407,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "near-close"
 						}
@@ -422,7 +421,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "self"
 						}
@@ -439,7 +438,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "british-shorthair-cuddling-kitten",
+											"itemUid": "m8rio7lvocuaoqhix5p5nvy5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -460,7 +459,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "british-shorthair"
+										"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 									},
 									"distance": "near-close"
 								},

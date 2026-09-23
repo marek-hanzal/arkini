@@ -22,7 +22,7 @@ describe("readDropItemPreviewFx / preview", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const preview = yield* readDropItemPreviewFx({
@@ -53,12 +53,12 @@ describe("readDropItemPreviewFx / preview", () => {
 				Effect.gen(function* () {
 					const source = yield* spawnItemFx({
 						id: "runtime:water",
-						itemId: "water",
+						itemUid: "water",
 						location: sourceLocation,
 					});
 					const target = yield* spawnItemFx({
 						id: "runtime:stone",
-						itemId: "stone",
+						itemUid: "stone",
 						location: occupiedLocation,
 					});
 					return yield* readDropItemPreviewFx({
@@ -90,7 +90,7 @@ describe("readDropItemPreviewFx / preview", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				return yield* readDropItemPreviewFx({

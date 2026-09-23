@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "inm21cafxarakspk26baeduh",
-		"id": "haunted-bed-beer",
 		"title": "Haunted Bed Beer",
 		"draft": true,
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bed-t1",
+										"itemUid": "ppvb7bkeybasw9j45yv9zk6n",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "ghost",
+										"itemUid": "ynro5iy60hlzcb1q3kd1an8l",
 										"quantity": {
 											"min": 1,
 											"max": 1

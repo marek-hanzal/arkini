@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "j3ug02xyoiahhdt479zuuu07",
-		"id": "forester-blueprint",
 		"title": "Forester Blueprint",
 		"draft": false,
 		"description": "Plans for a small forestry post that keeps trees renewable instead of treating the map as a one-time lumber coupon.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "forester-blueprint"
+								"itemUid": "j3ug02xyoiahhdt479zuuu07"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "wood---tier-1"
+								"itemUid": "kwkucgj71atfynrxw5sugzpe"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-1"
+								"itemUid": "b1z61l4bbwdtc75nt189hzze"
 							},
 							"distance": "far"
 						},
@@ -86,7 +85,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "forester",
+											"itemUid": "emyfwxfa8g1gi9iwj7v9rzru",
 											"quantity": {
 												"min": 1,
 												"max": 1

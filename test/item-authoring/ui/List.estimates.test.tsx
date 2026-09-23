@@ -64,7 +64,7 @@ vi.mock("~/ui/ui/ArtworkCardLink", () => ({
 		createElement(
 			"a",
 			{
-				"data-uid": params.itemUid,
+				data: params.itemUid,
 				"data-section": params.sectionId,
 			},
 			label,
@@ -98,8 +98,7 @@ afterEach(async () => {
 it("keeps live item identity while rejecting a completed estimate from an older config", async () => {
 	const item = {
 		...editorTestConfig.items.water,
-		id: "ore",
-		uid: "ore-uid",
+		uid: "ore",
 		title: "Old ore",
 		artwork: {
 			scale: 1,
@@ -139,7 +138,7 @@ it("keeps live item identity while rejecting a completed estimate from an older 
 			{
 				item,
 				estimate: {
-					itemId: item.id,
+					itemUid: item.uid,
 					method: "static",
 					status: "complete",
 					demand: 1,
@@ -192,7 +191,7 @@ it("keeps live item identity while rejecting a completed estimate from an older 
 		...completed,
 	};
 	await renderFn();
-	const card = container.querySelector('[data-uid="ore-uid"]');
+	const card = container.querySelector('[data="ore"]');
 	expect(card?.textContent).toBe("Current ore");
 	expect(card?.getAttribute("data-section")).toBe("identity");
 	expect(container.querySelector("[data-runtime]")).toBeNull();

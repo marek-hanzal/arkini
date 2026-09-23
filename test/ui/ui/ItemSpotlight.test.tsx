@@ -31,7 +31,7 @@ it("keeps keyboard-selected results visible without moving focus or the outer pa
 						"gamma",
 					].map((id) => ({
 						artwork: <span />,
-						itemId: id,
+						itemUid: id,
 						label: id,
 						secondary: id,
 						terms: [

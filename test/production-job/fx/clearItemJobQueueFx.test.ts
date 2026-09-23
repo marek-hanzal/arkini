@@ -19,7 +19,7 @@ const queuedAutofillConfig = createJobTestConfig(1);
 const prepareBlockedReserveQueueFx = Effect.fn("prepareBlockedReserveQueueFx")(function* () {
 	const owner = yield* spawnItemFx({
 		id: "runtime:forge",
-		itemId: "forge",
+		itemUid: "forge",
 		location: {
 			scope: "board",
 			space: 0,
@@ -31,7 +31,7 @@ const prepareBlockedReserveQueueFx = Effect.fn("prepareBlockedReserveQueueFx")(f
 	});
 	const tool = yield* spawnItemFx({
 		id: "runtime:tool",
-		itemId: "tool",
+		itemUid: "tool",
 		location: {
 			scope: "board",
 			space: 0,
@@ -86,7 +86,7 @@ describe("clearItemJobQueueFx", () => {
 		]);
 		expect(result.transition.events).toContainEqual({
 			type: "job-queue:cleared",
-			canonicalItemId: "forge",
+			itemUid: "forge",
 			ownerItemId: "runtime:forge:primary",
 			clearedRequestCount: 2,
 		});
@@ -191,9 +191,11 @@ describe("clearItemJobQueueFx", () => {
 			result.prepared.request.id,
 		]);
 		expect(result.after.jobQueue).toEqual([]);
-		expect(result.after.items.find((item) => item.item.id === "tool")?.location).toMatchObject({
-			scope: "board",
-		});
+		expect(result.after.items.find((item) => item.item.uid === "tool")?.location).toMatchObject(
+			{
+				scope: "board",
+			},
+		);
 	});
 
 	it("returns an in-flight reserve input when clearing before delivery settlement", () => {

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jjfr3hedbcr6v62xsf9z12zo",
-		"id": "cauldron-with-water",
 		"title": "Cauldron With Water",
 		"ui": "simple",
 		"description": "Water is good",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cauldron-with-boiling-water",
+											"itemUid": "aaj5jhmv6a2wsjg74yryd28r",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire-extinguished"
+				"result": "fenhlvaj45ssocm5r935nqli"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub"
+					"itemUid": "ysdkouxd4qpd0ztziy07k2ss"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-cauldron",
+											"itemUid": "oj9o0nu1zp9g79f1jqx11g9l",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "copper-bathtub-with-water"
+				"result": "osmpflow443kpnve1hfl6x3e"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet-biowaste"
+					"itemUid": "oo3wuqjngg5i21vwt4m5nz0s"
 				},
 				"action": "consume",
 				"outcome": {
@@ -98,7 +97,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-cauldron",
+											"itemUid": "oj9o0nu1zp9g79f1jqx11g9l",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "toilet"
+				"result": "ecihjakbzjlagfsrswt4cdji"
 			}
 		],
 		"maxQueueSize": 1,

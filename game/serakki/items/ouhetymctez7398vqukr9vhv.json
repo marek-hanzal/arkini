@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ouhetymctez7398vqukr9vhv",
-		"id": "sack-with-vegetable-seed",
 		"title": "Sack With Vegetable Seed",
 		"draft": false,
 		"description": "A sack of vegetable seed, marked with the produce it is meant to grow.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-vegetable-garden"
+					"itemUid": "mrjxfxlc4d54d2bkse1ms9h4"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "vegetable-garden"
+				"result": "txlir5vk0o6iljcgv6tx1o1q"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

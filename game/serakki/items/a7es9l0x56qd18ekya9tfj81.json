@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a7es9l0x56qd18ekya9tfj81",
-		"id": "recovering-wolf",
 		"title": "Recovering Wolf",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "beagle-puppy",
+										"itemUid": "jml833htnpikvhdtswrnfn3a",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "k6get8gbhd8d0yxh38bbow0q",
-		"id": "clay-bowl-with-milk",
 		"title": "Clay Bowl With Milk",
 		"description": "Milk",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair-kitten"
+					"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-clay-bowl",
+											"itemUid": "eess3433dtwp96mgo7j7m7w9",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "tummy-ache-british-shorthair-kitten"
+				"result": "rw8on2o179fsgjw97v6bf7a3"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair"
+					"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-clay-bowl",
+											"itemUid": "eess3433dtwp96mgo7j7m7w9",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,7 +78,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "tummy-ache-british-shorthair"
+				"result": "atevtai2l17xu36oiegylrfw"
 			}
 		],
 		"clock": {
@@ -97,7 +96,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-bowl",
+										"itemUid": "c3vesqhj22ratn3fr8thfsax",
 										"quantity": {
 											"min": 1,
 											"max": 1

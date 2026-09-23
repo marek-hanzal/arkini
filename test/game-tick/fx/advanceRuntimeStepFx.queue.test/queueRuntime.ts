@@ -28,7 +28,7 @@ export const queueConfig = GameConfigSchema.parse({
 								distance: "far",
 								selector: {
 									type: "item",
-									itemId: "tool",
+									itemUid: "tool",
 								},
 							},
 							quantity: {
@@ -64,7 +64,7 @@ export const queueConfig = GameConfigSchema.parse({
 								distance: "far",
 								selector: {
 									type: "item",
-									itemId: "water",
+									itemUid: "water",
 								},
 							},
 							quantity: {
@@ -89,7 +89,6 @@ export const createContendedQueueConfigFn = () => {
 			...queueConfig.items,
 			payer: {
 				...queueConfig.items.water,
-				id: "payer",
 				uid: "payer",
 				units: {
 					amount: 3,
@@ -108,7 +107,7 @@ export const createContendedQueueConfigFn = () => {
 										query: {
 											selector: {
 												type: "item",
-												itemId: "payer",
+												itemUid: "payer",
 											},
 											distance: "close",
 										},

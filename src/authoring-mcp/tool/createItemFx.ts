@@ -26,7 +26,6 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 		uid: createId(),
 	});
 	const { commit, item } = yield* saveWithRepositoryFx({
-		config: project.config,
 		item: {
 			...draft,
 			...input,
@@ -37,7 +36,6 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		"Created item.",
-		`ID: ${item.id}`,
 		`UID: ${item.uid}`,
 		`Revision: ${commit.revision}`,
 	].join("\n");

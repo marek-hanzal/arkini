@@ -35,7 +35,7 @@ export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 				estimate,
 			]),
 		),
-		itemIds: Object.keys(project.config.items),
+		itemUids: Object.keys(project.config.items),
 	});
 	const rows = selectItemEstimateIndexFn({
 		entries,
@@ -87,7 +87,7 @@ export const readEstimateTextFn = (project: Project, input: EstimateInput) => {
 					.map(({ estimate, item }) =>
 						[
 							`- ${item.title}`,
-							`  ID: ${item.id}`,
+							`  UID: ${item.uid}`,
 							`  Status: ${estimate.status}`,
 							`  Estimate: ${estimateLabelFn(estimate)}`,
 							`  Demand: ${formatNumberFn(estimate.demand)} (${demandRatioLabelFn(estimate.demand, maximumDemand)})`,

@@ -58,7 +58,7 @@ const route = ({
 		kind: "line-output",
 		lineId: id,
 		lineTitle: id,
-		ownerItemId: "owner",
+		ownerItemUid: "owner",
 	},
 	...(operation === undefined
 		? {}

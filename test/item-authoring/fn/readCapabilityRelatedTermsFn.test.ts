@@ -6,8 +6,8 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 
-const dropFn = (itemId: string): OutcomeSchema.Type => ({
-	itemId,
+const dropFn = (itemUid: string): OutcomeSchema.Type => ({
+	itemUid,
 	type: "item" as const,
 	quantity: {
 		min: 1,
@@ -27,7 +27,7 @@ it("finds inputs, rule dependencies and every authored outcome alternative witho
 					distance: "far",
 					selector: {
 						type: "item",
-						itemId: "water",
+						itemUid: "water",
 					},
 				},
 				mode: "consume",
@@ -42,7 +42,7 @@ it("finds inputs, rule dependencies and every authored outcome alternative witho
 					distance: "close",
 					selector: {
 						type: "item",
-						itemId: "fuel",
+						itemUid: "fuel",
 					},
 				},
 			},
@@ -57,7 +57,7 @@ it("finds inputs, rule dependencies and every authored outcome alternative witho
 							distance: "far",
 							selector: {
 								type: "item",
-								itemId: "permit",
+								itemUid: "permit",
 							},
 						},
 					},
@@ -97,7 +97,7 @@ it("finds inputs, rule dependencies and every authored outcome alternative witho
 										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "set-permit",
+											itemUid: "set-permit",
 										},
 									},
 								},
@@ -121,7 +121,7 @@ it("finds inputs, rule dependencies and every authored outcome alternative witho
 														distance: "far",
 														selector: {
 															type: "item",
-															itemId: "outcome-permit",
+															itemUid: "outcome-permit",
 														},
 													},
 												},
@@ -165,7 +165,7 @@ it("finds merge targets, replacement items and extra outcome by ID and title", (
 				effect: "replace",
 				target: {
 					type: "item",
-					itemId: "target",
+					itemUid: "target",
 				},
 				result: "water",
 				outcome: {

@@ -13,7 +13,7 @@ const quantityFn = ({ min, max }: { readonly min: number; readonly max: number }
 	min === max ? String(min) : `${min}–${max}`;
 
 const queryFn = (project: Project, query: QuerySchema.Type) =>
-	`${itemFn(project, query.selector.itemId)} @${query.distance}`;
+	`${itemFn(project, query.selector.itemUid)} @${query.distance}`;
 const whenFn = (project: Project, when: WhenSchema.Type): string => {
 	switch (when.type) {
 		case "exists":
@@ -44,7 +44,7 @@ const outcomeLinesFn = (project: Project, outcome: OutcomeTableSchema.Type | und
 				roll.type === "chance" && roll.chance === 0
 					? []
 					: [
-							`  ${simpleSet ? "Outcomes" : `Roll ${rollIndex + 1}`}: ${roll.type === "chance" ? `chance ${roll.chance * 100}%` : "guaranteed"} ${roll.outcome.map((drop) => (drop.type === "template" ? `Template ${project.config.templates?.find((template) => template.uid === drop.templateUid)?.title ?? drop.templateUid}${rulesFn(project, drop.rules)}` : drop.type === "space" ? `Space ${drop.space}${rulesFn(project, drop.rules)}` : `${itemFn(project, drop.itemId)} x${quantityFn(drop.quantity)}${drop.placement === "random" ? " random placement" : ""}${rulesFn(project, drop.rules)}`)).join("; ")}`,
+							`  ${simpleSet ? "Outcomes" : `Roll ${rollIndex + 1}`}: ${roll.type === "chance" ? `chance ${roll.chance * 100}%` : "guaranteed"} ${roll.outcome.map((drop) => (drop.type === "template" ? `Template ${project.config.templates?.find((template) => template.uid === drop.templateUid)?.title ?? drop.templateUid}${rulesFn(project, drop.rules)}` : drop.type === "space" ? `Space ${drop.space}${rulesFn(project, drop.rules)}` : `${itemFn(project, drop.itemUid)} x${quantityFn(drop.quantity)}${drop.placement === "random" ? " random placement" : ""}${rulesFn(project, drop.rules)}`)).join("; ")}`,
 						],
 			),
 		];
@@ -111,7 +111,7 @@ const mergeLinesFn = (
 				`  Merge: ${includeOwner ? `${itemFn(project, sourceId)} / ` : ""}rule ${mergeIndex + 1}; Runtime: instant`,
 				merge.action === "space"
 					? `  Inputs: any dragged item transported to space ${merge.space}; receiver ${itemFn(project, sourceId)} x1 ${merge.effect}`
-					: `  Inputs: source x1 ${merge.action}; target ${itemFn(project, merge.target.itemId)} x1 ${merge.effect}${sourceId === merge.target.itemId ? "; distinct source/target instances" : ""}`,
+					: `  Inputs: source x1 ${merge.action}; target ${itemFn(project, merge.target.itemUid)} x1 ${merge.effect}${sourceId === merge.target.itemUid ? "; distinct source/target instances" : ""}`,
 			];
 };
 
@@ -121,7 +121,7 @@ export const readRelationOperationSummaryFn = (
 	source: ItemOriginSource,
 	routes: ReadonlyArray<AcquisitionRoute>,
 ): ReadonlyArray<string> => {
-	const owner = project.config.items[source.ownerItemId];
+	const owner = project.config.items[source.ownerItemUid];
 	const reference = source.reference;
 	switch (reference.type) {
 		case "line": {
@@ -129,14 +129,14 @@ export const readRelationOperationSummaryFn = (
 			return line === undefined
 				? []
 				: [
-						...lineLinesFn(project, source.ownerItemId, line),
+						...lineLinesFn(project, source.ownerItemUid, line),
 						...outcomeLinesFn(project, line.outcome),
 					];
 		}
 		case "merge": {
 			const merge = owner?.merge?.[reference.ruleNumber - 1];
 			return [
-				...mergeLinesFn(project, source.ownerItemId, reference.ruleNumber - 1),
+				...mergeLinesFn(project, source.ownerItemUid, reference.ruleNumber - 1),
 				...(merge?.effect === "replace"
 					? [
 							`  Replacement outcome: ${itemFn(project, merge.result)} x1`,
@@ -147,7 +147,7 @@ export const readRelationOperationSummaryFn = (
 		}
 		case "expiry":
 			return [
-				`  Inputs: ${itemFn(project, source.ownerItemId)} x1 expires; Runtime: ${(source.runtimeMs ?? 0) / 1_000} s`,
+				`  Inputs: ${itemFn(project, source.ownerItemUid)} x1 expires; Runtime: ${(source.runtimeMs ?? 0) / 1_000} s`,
 				`  Clock gates: enabled=${owner?.clock?.enable}${rulesFn(project, owner?.clock?.rules ?? [])}`,
 				...outcomeLinesFn(project, owner?.clock?.onExpire),
 			];
@@ -156,33 +156,33 @@ export const readRelationOperationSummaryFn = (
 			const triggers = new Map<string, AcquisitionRoute>();
 			for (const route of routes) triggers.set(JSON.stringify(route.metadata), route);
 			return [
-				`  Depletion: ${itemFn(project, source.ownerItemId)}; capacity ${owner?.units?.amount} units`,
+				`  Depletion: ${itemFn(project, source.ownerItemUid)}; capacity ${owner?.units?.amount} units`,
 				...Array.from(triggers.values()).flatMap((route) => {
 					const metadata = route.metadata;
 					const header = `  Trigger (${route.runMultiplier} actions per depletion):`;
 					if (metadata.kind === "line-unit-depletion") {
-						const line = project.config.items[metadata.ownerItemId]?.lines.find(
+						const line = project.config.items[metadata.ownerItemUid]?.lines.find(
 							({ id }) => id === metadata.lineId,
 						);
 						return line === undefined
 							? []
 							: [
 									header,
-									...lineLinesFn(project, metadata.ownerItemId, line, true),
+									...lineLinesFn(project, metadata.ownerItemUid, line, true),
 								];
 					}
 					if (metadata.kind !== "merge-unit-depletion") return [];
 					const merge =
-						project.config.items[metadata.sourceItemId]?.merge?.[metadata.mergeIndex];
+						project.config.items[metadata.sourceItemUid]?.merge?.[metadata.mergeIndex];
 					const participants = [
 						...(merge?.action === "spend" &&
-						metadata.sourceItemId === source.ownerItemId
+						metadata.sourceItemUid === source.ownerItemUid
 							? [
 									"source",
 								]
 							: []),
 						...(merge?.effect === "spend" &&
-						metadata.targetItemId === source.ownerItemId
+						metadata.targetItemUid === source.ownerItemUid
 							? [
 									"target",
 								]
@@ -191,7 +191,7 @@ export const readRelationOperationSummaryFn = (
 					return [
 						header,
 						`  Depletion participants: ${participants.join(" and ")}${participants.length === 2 ? " (distinct instances)" : ""}`,
-						...mergeLinesFn(project, metadata.sourceItemId, metadata.mergeIndex, true),
+						...mergeLinesFn(project, metadata.sourceItemUid, metadata.mergeIndex, true),
 					];
 				}),
 				"  Outcomes per depleted instance; each participant rolls separately:",

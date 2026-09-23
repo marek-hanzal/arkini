@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zr32zq8n2t1ddvbk4sh9wjf2",
-		"id": "pumpkin-seed",
 		"title": "Pumpkin Seed",
 		"draft": false,
 		"ui": "simple",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-pumpkin-seed"
+				"result": "atlbi8a0w49gaab8ws1dpix7"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-pumpkin-field"
+					"itemUid": "mr4967ukrdbknheqdcr9pz3t"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "pumpkin-field"
+				"result": "umbaslum2ylw4w0bysyhocou"
 			}
 		],
 		"clock": {
@@ -47,7 +46,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-pumpkin-seed",
+										"itemUid": "ibo1e4dph36ymqv8xlvac7x3",
 										"quantity": {
 											"min": 1,
 											"max": 1

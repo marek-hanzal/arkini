@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kgdj8zyfh7eaeqxn7p4dnwiu",
-		"id": "fertilized-cacao-grove",
 		"title": "Fertilized Cacao Grove",
 		"draft": false,
 		"description": "Ready for cacao seed.",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-cacao-grove",
+										"itemUid": "au9mjqjzmm0v19870kt48pbw",
 										"quantity": {
 											"min": 1,
 											"max": 1

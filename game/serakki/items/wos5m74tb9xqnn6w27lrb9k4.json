@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wos5m74tb9xqnn6w27lrb9k4",
-		"id": "british-shorthair-stabbed-with-sword",
 		"title": "British Shorthair Stabbed With Sword",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-game-meat",
+										"itemUid": "xf44x3an4an91b5xqmxevd11",
 										"quantity": {
 											"min": 2,
 											"max": 3
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "spoiled-animal-bones",
+										"itemUid": "xsy4q5tb13eivk2tmqhtrj4q",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -47,7 +46,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "corruption",
+										"itemUid": "kgwuy9zokikfg1oo8417by1s",
 										"quantity": {
 											"min": 1,
 											"max": 2
@@ -57,7 +56,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "sword",
+										"itemUid": "i1uq4hi5j80c2fdgn1ockshg",
 										"quantity": {
 											"min": 1,
 											"max": 1

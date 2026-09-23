@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "so2sd6a2wb8g5xp5lretg7ma",
-		"id": "toilet-toxic-waste",
 		"title": "Toilet Toxic Waste",
 		"ui": "simple",
 		"description": "It's quite radioactive",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "toilet",
+										"itemUid": "ecihjakbzjlagfsrswt4cdji",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -26,12 +26,12 @@ const lineId = "line:workshop:build";
 const spawnOwnerAndWaterFx = Effect.gen(function* () {
 	yield* spawnItemFx({
 		id: ownerItemId,
-		itemId: "workshop",
+		itemUid: "workshop",
 		location: workshopLocation,
 	});
 	yield* spawnItemFx({
 		id: "runtime:water",
-		itemId: "water",
+		itemUid: "water",
 		location: sourceLocation(1),
 	});
 });
@@ -183,7 +183,7 @@ describe("settleItemDeliveryFx", () => {
 				});
 				const intruder = yield* spawnItemFx({
 					id: "runtime:mover",
-					itemId: "stone",
+					itemUid: "stone",
 					location: sourceLocation(2),
 				});
 				const conflictingMove = yield* dropItemFx({

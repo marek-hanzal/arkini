@@ -11,7 +11,6 @@ const simpleItem = ({ id }: { id: string }) =>
 		lines: [],
 
 		uid: id,
-		id,
 
 		title: id,
 		description: id,
@@ -37,7 +36,6 @@ const blueprintItem = ({
 }) =>
 	ItemSchema.parse({
 		uid: id,
-		id,
 
 		units: {
 			amount: 1,
@@ -70,7 +68,7 @@ const blueprintItem = ({
 									distance: "far" as const,
 									selector: {
 										type: "item" as const,
-										itemId: "item:tool",
+										itemUid: "item:tool",
 									},
 								},
 								mode: "reserve" as const,
@@ -111,7 +109,7 @@ const guaranteedOutput = (
 						type: "guaranteed" as const,
 						outcome: drops.map(({ itemId, quantity, placement = "drop" }) => ({
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity,
 							placement,
 							rules: [],
@@ -281,7 +279,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		}),
 		"producer:limited": {
 			uid: "producer:limited",
-			id: "producer:limited",
 
 			title: "Limited producer",
 			description: "Produces one singleton outcome.",
@@ -319,7 +316,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		},
 		"producer:blueprint-source": {
 			uid: "producer:blueprint-source",
-			id: "producer:blueprint-source",
 
 			title: "Blueprint source",
 			description: "Produces one purpose-bound blueprint.",
@@ -349,7 +345,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		},
 		"producer:shared-source": {
 			uid: "producer:shared-source",
-			id: "producer:shared-source",
 
 			title: "Shared source",
 			description: "Produces the shared capped item.",
@@ -379,7 +374,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		},
 		"producer:shared-consumer": {
 			uid: "producer:shared-consumer",
-			id: "producer:shared-consumer",
 
 			title: "Shared consumer",
 			description: "Consumes the shared capped item without producing it.",
@@ -404,7 +398,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "item:shared",
+									itemUid: "item:shared",
 								},
 							},
 							quantity: {
@@ -419,7 +413,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		},
 		"producer:recycler": {
 			uid: "producer:recycler",
-			id: "producer:recycler",
 
 			title: "Recycler",
 			description: "Replaces one capped item with one capped item.",
@@ -444,7 +437,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "item:target",
+									itemUid: "item:target",
 								},
 							},
 							quantity: {
@@ -460,7 +453,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 		},
 		"producer:depleted-owner": {
 			uid: "producer:depleted-owner",
-			id: "producer:depleted-owner",
 
 			title: "Finite owner",
 			description: "Replaces the depleted owner.",

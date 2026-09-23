@@ -24,14 +24,14 @@ const quantityFn = (quantity: { readonly min: number; readonly max: number }) =>
 const durationFn = (ms: number) =>
 	ms >= 60000 ? `${Math.round(ms / 600) / 100} min` : `${Math.round(ms / 10) / 100} s`;
 
-export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
+export const ItemChain = ({ itemUid }: { readonly itemUid: string }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const projection = useMemo(
-		() => readItemChainsFn(project.config.items, itemId),
+		() => readItemChainsFn(project.config.items, itemUid),
 		[
 			project.config.items,
-			itemId,
+			itemUid,
 		],
 	);
 	return (
@@ -59,10 +59,10 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 						<div className="flex min-w-0 flex-col gap-2">
 							{chain.space !== undefined ? (
 								<ItemReference
-									itemId={chain.ownerId}
+									itemUid={chain.ownerItemUid}
 									description={`${translator.textFn("Space")} ${chain.space}`}
 								/>
-							) : chain.targetId === undefined ? (
+							) : chain.targetItemUid === undefined ? (
 								<ItemReference
 									description={
 										<span className="inline-flex items-center gap-2 text-sm text-muted">
@@ -70,13 +70,13 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 											{translator.textFn("Clock")}
 										</span>
 									}
-									itemId={chain.ownerId}
+									itemUid={chain.ownerItemUid}
 								/>
 							) : (
 								<div className="flex min-w-0 flex-wrap items-center gap-3">
-									<ItemReference itemId={chain.ownerId} />
+									<ItemReference itemUid={chain.ownerItemUid} />
 									<Plus className="size-4 shrink-0 text-muted" />
-									<ItemReference itemId={chain.targetId} />
+									<ItemReference itemUid={chain.targetItemUid} />
 								</div>
 							)}
 						</div>
@@ -136,12 +136,12 @@ const ChainOutcome = ({ outcome }: { readonly outcome: readItemChainsFn.Outcome 
 			className="p-2"
 			data-ui="EditorChainOutcome"
 		>
-			{outcome.itemId === undefined ? (
+			{outcome.itemUid === undefined ? (
 				description
 			) : (
 				<ItemReference
 					description={description}
-					itemId={outcome.itemId}
+					itemUid={outcome.itemUid}
 					sectionId="chain"
 				/>
 			)}
@@ -151,19 +151,19 @@ const ChainOutcome = ({ outcome }: { readonly outcome: readItemChainsFn.Outcome 
 
 const ItemReference = ({
 	description,
-	itemId,
+	itemUid,
 	sectionId = "identity",
 }: {
 	readonly description?: ReactNode;
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly sectionId?: "identity" | "chain";
 }) => {
 	const project = useEditorProject();
-	const item = project.config.items[itemId];
+	const item = project.config.items[itemUid];
 	if (item === undefined)
 		return (
 			<span className="flex min-w-0 flex-col gap-1 text-muted">
-				<span>{itemId}</span>
+				<span>{itemUid}</span>
 				{description}
 			</span>
 		);
@@ -228,7 +228,7 @@ const ChainBranchReference = ({ node }: { readonly node: readItemChainsFn.Node }
 					)}
 				</>
 			}
-			itemId={node.itemId}
+			itemUid={node.itemUid}
 		/>
 	);
 };
@@ -236,7 +236,7 @@ const ChainBranchReference = ({ node }: { readonly node: readItemChainsFn.Node }
 const ChainStep = ({ step }: { readonly step: readItemChainsFn.Step }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const owner = project.config.items[step.ownerId];
+	const owner = project.config.items[step.ownerItemUid];
 	const title =
 		step.kind === "merge"
 			? `${translator.textFn("Merge")} ${(step.mergeIndex ?? 0) + 1}`

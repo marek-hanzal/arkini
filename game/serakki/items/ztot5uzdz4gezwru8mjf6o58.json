@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ztot5uzdz4gezwru8mjf6o58",
-		"id": "cacao-pod",
 		"title": "Cacao Pod",
 		"description": "You shall Cocoa!",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cacao-pod",
+										"itemUid": "z9kmevssxxawg1tbaz1o14wp",
 										"quantity": {
 											"min": 1,
 											"max": 1

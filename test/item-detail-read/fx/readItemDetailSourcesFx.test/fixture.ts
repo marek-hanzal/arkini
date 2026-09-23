@@ -15,7 +15,6 @@ const item = (id: string, title = id) => ({
 	lines: [],
 
 	uid: id,
-	id,
 
 	title,
 	description: id,
@@ -27,9 +26,9 @@ const item = (id: string, title = id) => ({
 	},
 });
 
-const drop = (itemId: string, min = 1, max = min) => ({
+const drop = (itemUid: string, min = 1, max = min) => ({
 	type: "item" as const,
-	itemId,
+	itemUid,
 	quantity: {
 		min,
 		max,
@@ -37,7 +36,7 @@ const drop = (itemId: string, min = 1, max = min) => ({
 	rules: [],
 });
 
-const guaranteedOutput = (itemId: string) => ({
+const guaranteedOutput = (itemUid: string) => ({
 	set: [
 		{
 			rules: [],
@@ -45,7 +44,7 @@ const guaranteedOutput = (itemId: string) => ({
 				{
 					type: "guaranteed" as const,
 					outcome: [
-						drop(itemId),
+						drop(itemUid),
 					],
 				},
 			],
@@ -123,7 +122,7 @@ const targetLine = ({
 									distance: "far",
 									selector: {
 										type: "item" as const,
-										itemId: showWhen,
+										itemUid: showWhen,
 									},
 								},
 							},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c43ij1yu1c9lfbhjc7gbc7dd",
-		"id": "soap",
 		"title": "Soap",
 		"ui": "simple",
 		"description": "You can clean yourself",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub-with-water"
+					"itemUid": "osmpflow443kpnve1hfl6x3e"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "copper-bathtub-with-soapy-water"
+				"result": "osvxwuyh6iy0achwcuujk97b"
 			}
 		],
 		"maxQueueSize": 1,

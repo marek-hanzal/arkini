@@ -17,7 +17,7 @@ const ownerKinds = [
 
 const baseItem = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -41,7 +41,7 @@ const makeLine = (lineId: string) => ({
 				distance: "far" as const,
 				selector: {
 					type: "item" as const,
-					itemId: "material",
+					itemUid: "material",
 				},
 			},
 			quantity: {
@@ -125,17 +125,17 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 	const lineId = `line:${ownerKind}`;
 	yield* spawnItemFx({
 		id: ownerItemId,
-		itemId: ownerKind,
+		itemUid: ownerKind,
 		location: boardLocation(0),
 	});
 	yield* spawnItemFx({
 		id: "runtime:material:a",
-		itemId: "material",
+		itemUid: "material",
 		location: boardLocation(1),
 	});
 	yield* spawnItemFx({
 		id: "runtime:material:b",
-		itemId: "material",
+		itemUid: "material",
 		location: boardLocation(2),
 	});
 	return {

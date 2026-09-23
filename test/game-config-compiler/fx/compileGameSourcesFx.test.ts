@@ -54,7 +54,7 @@ describe("compileGameSourcesFx", () => {
 							{
 								x: 1,
 								y: 1,
-								itemId: "missing",
+								itemUid: "missing",
 							},
 						],
 					},
@@ -70,7 +70,7 @@ describe("compileGameSourcesFx", () => {
 					0,
 					"board",
 					0,
-					"itemId",
+					"itemUid",
 				],
 				referenceId: "missing",
 			}),
@@ -83,7 +83,7 @@ describe("compileGameSourcesFx", () => {
 				{
 					x: 2,
 					y: 0,
-					itemId: "item:a",
+					itemUid: "item:a",
 				},
 			],
 			message: "Template item is outside its board dimensions.",
@@ -93,12 +93,12 @@ describe("compileGameSourcesFx", () => {
 				{
 					x: 0,
 					y: 0,
-					itemId: "item:a",
+					itemUid: "item:a",
 				},
 				{
 					x: 0,
 					y: 0,
-					itemId: "item:a",
+					itemUid: "item:a",
 				},
 			],
 			message: "Template items must occupy distinct cells.",
@@ -135,12 +135,12 @@ describe("compileGameSourcesFx", () => {
 		const result = await compile(
 			createRootSource({
 				items: {
-					[item.id]: item,
+					[item.uid]: item,
 				},
 			}),
 		);
 
-		expect(result.config?.items[item.id]).toEqual(item);
+		expect(result.config?.items[item.uid]).toEqual(item);
 		expect(result.diagnostics).toEqual([]);
 	});
 
@@ -181,12 +181,12 @@ describe("compileGameSourcesFx", () => {
 		const result = await compile(
 			createRootSource({
 				items: {
-					[item.id]: item,
+					[item.uid]: item,
 				},
 			}),
 		);
 
-		expect(result.config?.items[item.id]?.artwork).toEqual(item.artwork);
+		expect(result.config?.items[item.uid]?.artwork).toEqual(item.artwork);
 		expect(result.diagnostics).toEqual([]);
 	});
 
@@ -203,11 +203,11 @@ describe("compileGameSourcesFx", () => {
 		const result = await compile(
 			createRootSource({
 				items: {
-					[item.id]: item,
+					[item.uid]: item,
 				},
 			}),
 		);
-		const compiled = result.config?.items[item.id];
+		const compiled = result.config?.items[item.uid];
 		if (compiled === undefined) {
 			throw new Error("Expected compiled producer.");
 		}
@@ -252,14 +252,14 @@ describe("compileGameSourcesFx", () => {
 		const result = await compile(
 			createRootSource({
 				items: {
-					[item.id]: item,
+					[item.uid]: item,
 				},
 			}),
 			GameSourceFileSchema.parse({
 				path: "/game/items/a.json",
 				value: {
 					items: {
-						[item.id]: item,
+						[item.uid]: item,
 					},
 				},
 			}),
@@ -270,7 +270,7 @@ describe("compileGameSourcesFx", () => {
 				expect.objectContaining({
 					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
 					entity: DiagnosticRecordEntityEnumSchema.enum.Item,
-					key: item.id,
+					key: item.uid,
 					sources: [
 						"/game/game.json",
 						"/game/items/a.json",

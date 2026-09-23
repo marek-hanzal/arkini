@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dmyk5kfjm1ck1pv34g5vvgz5",
-		"id": "clay-mug-with-beer",
 		"title": "Clay Mug With Beer",
 		"ui": "simple",
 		"description": "Beer in quite a strange form",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-mug",
+										"itemUid": "xujrcoaxey81qyawnvgkupwa",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -12,7 +12,6 @@ const simpleItem = (id: string) => ({
 	lines: [],
 
 	uid: id,
-	id,
 
 	title: id,
 	description: id,
@@ -35,7 +34,7 @@ const outcome = (itemId: string) => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity: {
 								min: 1,
 								max: 1,
@@ -56,7 +55,7 @@ const materialInput = (itemId: string) => ({
 		distance: "far",
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid: itemId,
 		},
 	},
 	quantity: {
@@ -76,7 +75,6 @@ const producer = ({
 	outputItemId: string;
 }) => ({
 	uid: id,
-	id,
 
 	title: id,
 	description: id,
@@ -176,7 +174,7 @@ export const runChain = (order: ReadonlyArray<keyof typeof owners>, space = 0) =
 			).entries()) {
 				yield* spawnItemFx({
 					id: owners[key].ownerItemId,
-					itemId: `producer${key}`,
+					itemUid: `producer${key}`,
 					location: {
 						scope: "board",
 						space,

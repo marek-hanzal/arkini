@@ -15,7 +15,7 @@ export const MissingUnitRenewalWarningDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Warning",
 		]),
-		itemId: IdSchema,
+		itemUid: IdSchema,
 	})
 	.strict()
 	.meta({

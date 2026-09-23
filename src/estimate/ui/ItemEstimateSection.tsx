@@ -147,15 +147,15 @@ const ItemEstimateResult = ({
 
 /** Shares the captured estimate between the full section and its two-entry overview. */
 export const ItemEstimateSection = ({
-	itemId,
+	itemUid,
 	previewItemUid,
 }: {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly previewItemUid?: string;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const state = useItemEstimate(project, itemId);
+	const state = useItemEstimate(project, itemUid);
 	const [sort, setSortFn] = useState<ItemEstimateSort>("time");
 	// Item Detail owns every letter in Time, including E for Edit; nested sorting uses Shift.
 	const sortOptions = [

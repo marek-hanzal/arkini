@@ -32,8 +32,8 @@ describe("root-owned interaction chains", () => {
 			"rubble",
 		]);
 		expect(result.chains[0].steps[0]).toMatchObject({
-			ownerId: "portal",
-			targetId: "portal",
+			ownerItemUid: "portal",
+			targetItemUid: "portal",
 			sourceAction: "space",
 			targetEffect: "replace",
 		});
@@ -112,15 +112,17 @@ describe("root-owned interaction chains", () => {
 			"puppy",
 		]);
 		expect(result.chains[0].outcomes).toContainEqual({
-			itemId: "cotton",
+			itemUid: "cotton",
 			stop: "final",
 			periodic: true,
 			conditional: false,
 		});
 		expect(result.chains[0].outcomes.some((outcome) => outcome.stop === "cycle")).toBe(false);
-		expect(readItemChainsFn(items, "puppy").chains.map((chain) => chain.targetId)).toEqual([
-			"food",
-		]);
+		expect(readItemChainsFn(items, "puppy").chains.map((chain) => chain.targetItemUid)).toEqual(
+			[
+				"food",
+			],
+		);
 	});
 
 	it("follows Clock on periodic outputs without tracing the producing line's inputs", () => {
@@ -133,7 +135,7 @@ describe("root-owned interaction chains", () => {
 						distance: "far",
 						selector: {
 							type: "item",
-							itemId: "input",
+							itemUid: "input",
 						},
 					},
 					quantity: {
@@ -168,13 +170,13 @@ describe("root-owned interaction chains", () => {
 			"spoiled",
 		]);
 		expect(result.chains[0].outcomes).toContainEqual({
-			itemId: "source",
+			itemUid: "source",
 			stop: "ongoing",
 			periodic: false,
 			conditional: false,
 		});
 		expect(
-			result.chains[0].outcomes.find((outcome) => outcome.itemId === "spoiled")?.periodic,
+			result.chains[0].outcomes.find((outcome) => outcome.itemUid === "spoiled")?.periodic,
 		).toBe(true);
 	});
 
@@ -221,13 +223,13 @@ describe("root-owned interaction chains", () => {
 		expect(new Set(chains[0].steps.map(({ path }) => path)).size).toBe(2);
 		expect(chains[0].outcomes.filter(({ periodic }) => periodic)).toEqual([
 			{
-				itemId: "one",
+				itemUid: "one",
 				stop: "final",
 				periodic: true,
 				conditional: true,
 			},
 			{
-				itemId: "two",
+				itemUid: "two",
 				stop: "final",
 				periodic: true,
 				conditional: true,

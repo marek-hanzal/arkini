@@ -41,7 +41,6 @@ describe("incremental write admission", () => {
 							water,
 							other: {
 								...water,
-								id: "other",
 							},
 						};
 			await expect(

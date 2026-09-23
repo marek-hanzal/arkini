@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fexshws7tg2zgrobtfs7hi1b",
-		"id": "playing-british-shorthair-kittens",
 		"title": "Playing British Shorthair Kittens",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "british-shorthair-kitten",
+										"itemUid": "bamumldgmvb0bhq8bkq0koxj",
 										"quantity": {
 											"min": 2,
 											"max": 2

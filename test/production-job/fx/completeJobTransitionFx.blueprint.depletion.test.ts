@@ -17,13 +17,13 @@ describe("blueprint depleted-owner accounting", () => {
 				const noOutput = yield* spawnBlueprintFx({
 					id: "runtime:depletion-self-no-outcome",
 					space: 0,
-					itemId: "blueprint:depletion-self-no-outcome",
+					itemUid: "blueprint:depletion-self-no-outcome",
 					x: 0,
 					y: 0,
 				});
 				const owner = yield* spawnItemFx({
 					id: "runtime:depleted-owner",
-					itemId: "producer:depleted-owner",
+					itemUid: "producer:depleted-owner",
 					location: {
 						scope: "board",
 						space: 0,

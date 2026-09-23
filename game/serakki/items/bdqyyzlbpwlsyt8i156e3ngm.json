@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bdqyyzlbpwlsyt8i156e3ngm",
-		"id": "well-with-beer",
 		"title": "Well With Beer",
 		"ui": "simple",
 		"description": "Source of beer, if you want",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1

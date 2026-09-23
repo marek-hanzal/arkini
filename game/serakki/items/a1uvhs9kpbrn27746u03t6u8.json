@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a1uvhs9kpbrn27746u03t6u8",
-		"id": "workshop-portal",
 		"title": "Workshop Portal",
 		"description": "Where raw materials become useful objects, strange contraptions, and occasionally a much more complicated problem.",
 		"ui": "simple",

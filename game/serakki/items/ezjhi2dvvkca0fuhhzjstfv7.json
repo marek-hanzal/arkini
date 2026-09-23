@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ezjhi2dvvkca0fuhhzjstfv7",
-		"id": "dye-farm",
 		"title": "Dye Farm",
 		"draft": false,
 		"description": "Operates nearby dye fields and keeps seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "dye-field"
+								"itemUid": "ceh7j608ofnvzynccgq5nwmq"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dye-plants",
+											"itemUid": "g72br1worveoduk5pejp15j4",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-dye-field",
+											"itemUid": "ilfa6qy345vmj82d0lfgi0fo",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dye-farm-blueprint",
+											"itemUid": "ulbgqthrpxzmylz1bxfgjseu",
 											"quantity": {
 												"min": 1,
 												"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gzvncsdsx93m5qu88erwdqln",
-		"id": "cauldron-with-molasses",
 		"title": "Cauldron With Molasses",
 		"ui": "simple",
 		"description": "Useful.",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

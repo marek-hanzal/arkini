@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hds0v0xcckj5gcyzuwv8ujg8",
-		"id": "stone-deposit",
 		"title": "Stone deposit",
 		"description": "A generous lump of stone waiting to become walls, tools, and several regrettably heavy projects. Bring the right tool and start removing geology.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "stone-deposit-deplated",
+										"itemUid": "uugdqcs2ghv34ol6rxal8fk5",
 										"quantity": {
 											"min": 1,
 											"max": 1

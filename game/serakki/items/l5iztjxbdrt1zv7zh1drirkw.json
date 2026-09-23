@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "l5iztjxbdrt1zv7zh1drirkw",
-		"id": "gardener",
 		"title": "Gardener",
 		"description": "Sells loose crop seed as the corresponding farms become available. Players can pack seed into sacks for longer storage.",
 		"ui": "default",
@@ -30,7 +29,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -52,7 +51,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grain-seed",
+											"itemUid": "ergruphd5dah4g6ehokawt7a",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -73,9 +72,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "grain-farm"
+										"itemUid": "cgf3xd90ku1igebcgbe7nhct"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -100,7 +99,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -122,7 +121,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "corn-kernels",
+											"itemUid": "yx0dq3pl2qg9blgw7itacuke",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -143,9 +142,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "corn-farm"
+										"itemUid": "kz9bl0anw4tlxc5zcdakoex9"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -170,7 +169,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -192,7 +191,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "vegetable-seed",
+											"itemUid": "ektge0zdtcrfjhvyzz1rt2r1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -213,9 +212,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "vegetable-farm"
+										"itemUid": "ybm9et9f0pph5amk9mml068q"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -240,7 +239,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -262,7 +261,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "fruit-seed",
+											"itemUid": "rt5kdthl4xt8l0i7eawdrz2p",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -283,9 +282,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "fruit-farm"
+										"itemUid": "avzrwr1i9lmmjqc6i8cgxxsq"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -310,7 +309,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -332,7 +331,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cotton-seed",
+											"itemUid": "gfzjzpvbuiim4xvsdjbmgmad",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -353,9 +352,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "cotton-farm"
+										"itemUid": "ijvxkfutjp5xaehjlrv6boze"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -380,7 +379,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -402,7 +401,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flax-seed",
+											"itemUid": "rlhzroboxe2mq3o17qp6xdii",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -423,9 +422,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "flax-farm"
+										"itemUid": "ygc2o7a5olfq37sgeqdiqk7u"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -450,7 +449,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -472,7 +471,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grass-seed",
+											"itemUid": "ozfmqxgjf5bi773f5eevbmjv",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -493,9 +492,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "grass-farm"
+										"itemUid": "o11xz4pk3e33wucuilh71ema"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -520,7 +519,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -542,7 +541,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "herb-seed",
+											"itemUid": "bliodqquuhc197cofsqoivwi",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -563,9 +562,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "herbalist"
+										"itemUid": "m3vmxky6ih04sumyrmlja6jz"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -590,7 +589,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -612,7 +611,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flower-seed",
+											"itemUid": "wnid4hnj4otsi08b33m3k53n",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -633,9 +632,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "flower-farm"
+										"itemUid": "g7swy27j2dvvktfcwhjpu8su"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -660,7 +659,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -682,7 +681,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "pumpkin-seed",
+											"itemUid": "zr32zq8n2t1ddvbk4sh9wjf2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -703,9 +702,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "pumpkin-farm"
+										"itemUid": "liqtyae3co1o60pb9smqopbs"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -730,7 +729,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -752,7 +751,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grape-seed",
+											"itemUid": "o2y57smpozsjnhr8gvpleec5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -773,9 +772,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "grape-farm"
+										"itemUid": "rb7pnj8nmrfjg8bpj68iwxe2"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -800,7 +799,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -822,7 +821,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hop-seed",
+											"itemUid": "cyb3k6i7mw89cl2yzcdmr68h",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -843,9 +842,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "hop-farm"
+										"itemUid": "kdm0eok43ogyliq9vrkt4f48"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -870,7 +869,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -892,7 +891,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "rapeseed-seed",
+											"itemUid": "mo1q5qbhyrp5xs5nf8e5ztga",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -913,9 +912,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "rapeseed-farm"
+										"itemUid": "bytaiaqvo87umpgxqr5s0d9n"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -940,7 +939,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -962,7 +961,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sunflower-seed",
+											"itemUid": "n3yuyf1v3wij23civy92sid5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -983,9 +982,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sunflower-farm"
+										"itemUid": "pvfsx02l7omudco7ntq9ajb5"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1010,7 +1009,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -1032,7 +1031,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sugar-beet-seed",
+											"itemUid": "ld7ruv60530ce3ckgm7xt9v5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -1053,9 +1052,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sugar-beet-farm"
+										"itemUid": "qf0pynrjmeljpim50y9ufqf9"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1080,7 +1079,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -1102,7 +1101,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sugar-cane-seed",
+											"itemUid": "bks5ojvarsvotmt0kxwzq2dw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -1123,9 +1122,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sugar-cane-farm"
+										"itemUid": "yu3m37mc19ntqnxfcyp998g1"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1150,7 +1149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -1172,7 +1171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "coffee-seed",
+											"itemUid": "txe7uezwpl8qrky0bjtkpmov",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -1193,9 +1192,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "coffee-farm"
+										"itemUid": "hrf8sm66jzt3ru6knu93v8dp"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1220,7 +1219,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -1242,7 +1241,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cacao-seed",
+											"itemUid": "i35fpbp78kc9a8ftxyn9p32t",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -1263,9 +1262,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "cacao-farm"
+										"itemUid": "g4i7nd7bcrw4at87w3qrb0ze"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1290,7 +1289,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "coin"
+								"itemUid": "s5z9wc6yevl1yzs693yr1z7z"
 							},
 							"distance": "far"
 						},
@@ -1312,7 +1311,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dye-seed",
+											"itemUid": "qaf7ddmbr73lh9bwpaq7k6rv",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -1333,9 +1332,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "dye-farm"
+										"itemUid": "ezjhi2dvvkca0fuhhzjstfv7"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -1360,7 +1359,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -1382,7 +1381,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "gardener-blueprint",
+											"itemUid": "v5zba4p6b0dvsiikbp9ahnc8",
 											"quantity": {
 												"min": 1,
 												"max": 1

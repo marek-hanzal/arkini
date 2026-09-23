@@ -204,7 +204,7 @@ describe("createGameFx", () => {
 		);
 		try {
 			expect(restored.getSnapshotFn().items).toHaveLength(1);
-			expect(restored.getSnapshotFn().items[0]?.item.id).toBe("water");
+			expect(restored.getSnapshotFn().items[0]?.item.uid).toBe("water");
 		} finally {
 			await Effect.runPromise(restored.disposeFx);
 		}
@@ -315,7 +315,7 @@ describe("createGameFx", () => {
 		await first.runFn(
 			spawnItemFx({
 				id: "runtime:old-major",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -385,7 +385,7 @@ describe("createGameFx", () => {
 		await game.runFn(
 			spawnItemFx({
 				id: "runtime:public-disposal-retry",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -406,7 +406,7 @@ describe("createGameFx", () => {
 			game.runFn(
 				spawnItemFx({
 					id: "runtime:must-remain-frozen",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,

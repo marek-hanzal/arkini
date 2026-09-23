@@ -8,7 +8,6 @@ import type { StartSchema } from "~/game-start/schema/StartSchema";
 
 export const createItemBase = (id: string) => ({
 	uid: id,
-	id,
 	title: id,
 	description: id,
 	artwork: {
@@ -79,7 +78,7 @@ export const createProducerItem = ({
 
 export const createOutput = (
 	drops: ReadonlyArray<{
-		itemId: string;
+		itemUid: string;
 		placement?: "drop" | "random";
 	}>,
 ) =>
@@ -90,9 +89,9 @@ export const createOutput = (
 				roll: [
 					{
 						type: "guaranteed",
-						outcome: drops.map(({ itemId, placement = "drop" }) => ({
+						outcome: drops.map(({ itemUid, placement = "drop" }) => ({
 							type: "item",
-							itemId,
+							itemUid,
 							quantity: {
 								min: 1,
 								max: 1,

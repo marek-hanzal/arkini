@@ -139,7 +139,6 @@ describe("editor MCP note asset links", () => {
 			linkedItems: [
 				{
 					uid: "water",
-					id: "water",
 					title: "Water",
 				},
 			],

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "whgs98b1abnac63cfsm022z8",
-		"id": "corrupted-beagle",
 		"title": "Corrupted Beagle",
 		"ui": "simple",
 		"draft": true,

@@ -2,7 +2,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -59,7 +59,7 @@ export const lineSelectionTestConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "material",
+									itemUid: "material",
 								},
 							},
 							quantity: {
@@ -95,7 +95,7 @@ export const lineSelectionTestConfig = GameConfigSchema.parse({
 								distance: "far" as const,
 								selector: {
 									type: "item",
-									itemId: "material",
+									itemUid: "material",
 								},
 							},
 							quantity: {

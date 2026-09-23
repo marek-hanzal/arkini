@@ -60,7 +60,7 @@ describe("editor MCP item line replacement", () => {
 		const read = await client.callTool({
 			name: "item_line_config",
 			arguments: {
-				itemId: "forge",
+				itemUid: "forge",
 				lineId: firstLine.id,
 			},
 		});
@@ -68,14 +68,14 @@ describe("editor MCP item line replacement", () => {
 		if (readContent?.type !== "text") throw new Error("Missing item_line_config text.");
 		expect(JSON.parse(readContent.text)).toEqual({
 			revision: created.revision,
-			itemId: "forge",
+			itemUid: "forge",
 			line: firstLine,
 		});
 
 		const incomplete = await client.callTool({
 			name: "replace_item_line",
 			arguments: jsonToolInputFn({
-				itemId: "forge",
+				itemUid: "forge",
 				lineId: firstLine.id,
 				revision: created.revision,
 				line: {
@@ -99,7 +99,7 @@ describe("editor MCP item line replacement", () => {
 		const replaced = await client.callTool({
 			name: "replace_item_line",
 			arguments: jsonToolInputFn({
-				itemId: "forge",
+				itemUid: "forge",
 				lineId: firstLine.id,
 				revision: created.revision,
 				line: replacement,
@@ -112,7 +112,7 @@ describe("editor MCP item line replacement", () => {
 				{
 					text: [
 						"Replaced item line.",
-						"Item ID: forge",
+						"Item UID: forge",
 						`Line ID: ${firstLine.id}`,
 						`Revision: ${project.revision}`,
 					].join("\n"),
@@ -127,7 +127,7 @@ describe("editor MCP item line replacement", () => {
 
 		for (const input of [
 			{
-				itemId: "forge",
+				itemUid: "forge",
 				lineId: firstLine.id,
 				revision: project.revision,
 				line: {
@@ -136,7 +136,7 @@ describe("editor MCP item line replacement", () => {
 				},
 			},
 			{
-				itemId: "forge",
+				itemUid: "forge",
 				lineId: "line:forge:missing",
 				revision: project.revision,
 				line: {
@@ -145,7 +145,7 @@ describe("editor MCP item line replacement", () => {
 				},
 			},
 			{
-				itemId: "forge",
+				itemUid: "forge",
 				lineId: firstLine.id,
 				revision: created.revision,
 				line: replacement,
@@ -182,14 +182,14 @@ describe("editor MCP item line replacement", () => {
 			{
 				name: "item_line_config",
 				arguments: {
-					itemId: "forge",
+					itemUid: "forge",
 					lineId: replacement.id,
 				},
 			},
 			{
 				name: "replace_item_line",
 				arguments: jsonToolInputFn({
-					itemId: "forge",
+					itemUid: "forge",
 					lineId: replacement.id,
 					revision: ambiguousCommit.revision,
 					line: replacement,

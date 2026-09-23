@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mroh4s4rsygi6qlncjqbqu2k",
-		"id": "empty-sack",
 		"title": "Empty Sack",
 		"ui": "simple",
 		"description": "You can put things inside",
@@ -16,29 +15,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "loose-ash"
+					"itemUid": "rp06r6pjrhyhxxkujos2r1md"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "ash"
+				"result": "hhq1jyc6purkrnzfh6bqsk51"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair-kitten"
+					"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-kitten-with-sack-on-head"
+				"result": "i6kbz9l3jkgwkmcterllhocr"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair"
+					"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-in-sack"
+				"result": "lh79rb1fm0wk2l6fkn6gqjgq"
 			}
 		],
 		"maxQueueSize": 1,

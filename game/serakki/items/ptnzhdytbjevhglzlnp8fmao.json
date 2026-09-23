@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ptnzhdytbjevhglzlnp8fmao",
-		"id": "pralines",
 		"title": "Pralines",
 		"ui": "simple",
 		"description": "So tasty",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-pralines",
+										"itemUid": "fmccmk0qbceb05ctgzevixqq",
 										"quantity": {
 											"min": 1,
 											"max": 1

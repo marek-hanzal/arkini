@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "s73fhh4zxbnufyn0ze6y4f8t",
-		"id": "raw-amethyst",
 		"title": "Raw Amethyst",
 		"ui": "simple",
 		"description": "Purple",

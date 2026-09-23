@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gei0ts23utvtz6qx38cw2mpy",
-		"id": "medicine-jar",
 		"title": "Medicine Jar",
 		"draft": false,
 		"ui": "simple",
@@ -16,25 +15,25 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "leather-satchel"
+					"itemUid": "txeu4cnpp7fqele4z2i1jzzz"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "medicine-satchel"
+				"result": "hv4d0oefoilgd2rsulbh8zaa"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bandage-satchel"
+					"itemUid": "xrdeluarbzrl0z2uimh88olz"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "healing-kit"
+				"result": "jlom0d8vajo6b8gezlvoajmx"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-cow"
+					"itemUid": "wgmee4fsxq9pwljx0gcbucom"
 				},
 				"action": "consume",
 				"outcome": {
@@ -48,7 +47,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -63,12 +62,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-cow"
+				"result": "h7zz7e9ctriltk57q1bazfmu"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-pig"
+					"itemUid": "dam5m08hg2zeru2qjfrwyqeq"
 				},
 				"action": "consume",
 				"outcome": {
@@ -82,7 +81,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -97,12 +96,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-pig"
+				"result": "cj2ljy46efdsbaqcayifl5op"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-sheep"
+					"itemUid": "jlu06kwfr94yayli2fcooq86"
 				},
 				"action": "consume",
 				"outcome": {
@@ -116,7 +115,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -131,12 +130,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-sheep"
+				"result": "zrk8s65y5kxc6r6urcl1lnnh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-goose"
+					"itemUid": "twqt3bjq5q1npnvan3vnkx2u"
 				},
 				"action": "consume",
 				"outcome": {
@@ -150,7 +149,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -165,12 +164,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-goose"
+				"result": "eitnm7bsjhbh3mclqdakkfxz"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-chicken"
+					"itemUid": "iod02z80dgxlbkm3inzi84gp"
 				},
 				"action": "consume",
 				"outcome": {
@@ -184,7 +183,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -199,12 +198,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-chicken"
+				"result": "h1q7vphvvo93368us1sa52il"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-wolf"
+					"itemUid": "k38iwxi6ciqjf2h5qa9xvyvq"
 				},
 				"action": "consume",
 				"outcome": {
@@ -218,7 +217,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -233,12 +232,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-wolf"
+				"result": "a7es9l0x56qd18ekya9tfj81"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-bear"
+					"itemUid": "a2hrbbn05j5g5f01as0sipp7"
 				},
 				"action": "consume",
 				"outcome": {
@@ -252,7 +251,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -267,12 +266,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-bear"
+				"result": "gvnbpgtoo0lm8ty9ogp74ynk"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-beagle"
+					"itemUid": "ejznmbmbn7inrmbk1iwyd2ao"
 				},
 				"action": "consume",
 				"outcome": {
@@ -286,7 +285,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -301,12 +300,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-beagle"
+				"result": "seslkflgpo7qxnzs0ga32tvo"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-beagle-puppy"
+					"itemUid": "zvs78k8506sfyq41p5iq44vg"
 				},
 				"action": "consume",
 				"outcome": {
@@ -320,7 +319,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -335,12 +334,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-beagle-puppy"
+				"result": "uqd5nooox7pprqdmsa0jld21"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-british-shorthair"
+					"itemUid": "zfyzc3defzvpdhz1fn0fsk95"
 				},
 				"action": "consume",
 				"outcome": {
@@ -354,7 +353,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -369,12 +368,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-british-shorthair"
+				"result": "rme9mo1oofz51wxog23520sz"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "sick-british-shorthair-kitten"
+					"itemUid": "pv3fcc60h1u1m99b7afj5jtd"
 				},
 				"action": "consume",
 				"outcome": {
@@ -388,7 +387,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-jar",
+											"itemUid": "wnz92z3wagysspwsyffvuo59",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -403,7 +402,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "recovering-british-shorthair-kitten"
+				"result": "sai5thegm85dr4fptu7689bz"
 			}
 		],
 		"maxQueueSize": 1,

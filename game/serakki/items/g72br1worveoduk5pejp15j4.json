@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "g72br1worveoduk5pejp15j4",
-		"id": "dye-plants",
 		"title": "Dye Plants",
 		"description": "Colors everywhere",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-dye-plants",
+										"itemUid": "jb0oofz4p45ukg7zigziiq5y",
 										"quantity": {
 											"min": 1,
 											"max": 1

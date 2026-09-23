@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "uwa68bnfs02vfmssz9sy7y1q",
-		"id": "animal-bones---tier-3",
 		"title": "Animal Bones - Tier 3",
 		"draft": true,
 		"ui": "simple",
@@ -36,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "animal-bones---tier-3"
+								"itemUid": "uwa68bnfs02vfmssz9sy7y1q"
 							},
 							"distance": "self"
 						}
@@ -53,7 +52,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-2",
+											"itemUid": "wc4n1z8e45jtsfpsojtu06n3",
 											"quantity": {
 												"min": 2,
 												"max": 2

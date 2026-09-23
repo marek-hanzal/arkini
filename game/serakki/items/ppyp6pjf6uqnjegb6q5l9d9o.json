@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ppyp6pjf6uqnjegb6q5l9d9o",
-		"id": "cotton",
 		"title": "Cotton",
 		"description": "Fluffy",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cotton",
+										"itemUid": "jrzbpt7rltb9xv6olz8hbhsw",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -29,12 +29,12 @@ const prepareFx = Effect.fn("prepareClosedLineInputTestFx")(function* ({
 }) {
 	yield* spawnItemFx({
 		id: ownerItemId,
-		itemId: "producer",
+		itemUid: "producer",
 		location: board(0),
 	});
 	const source = yield* spawnItemFx({
 		id: `${sourceItemId}:buffered`,
-		itemId: "material",
+		itemUid: "material",
 		location: board(1),
 	});
 	yield* storeInputMaterialFx({
@@ -46,7 +46,7 @@ const prepareFx = Effect.fn("prepareClosedLineInputTestFx")(function* ({
 	});
 	yield* spawnItemFx({
 		id: sourceItemId,
-		itemId: "material",
+		itemUid: "material",
 		location: board(1),
 	});
 

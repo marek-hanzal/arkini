@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c8jy20r1oxohcln7xmrhv46c",
-		"id": "dynamite-fed-fawn",
 		"title": "Dynamite Fed Fawn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "fire-farting-fawn",
+										"itemUid": "hr6zbysztsb6yc0ztc3wjeop",
 										"quantity": {
 											"min": 1,
 											"max": 1

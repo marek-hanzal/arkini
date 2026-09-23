@@ -76,7 +76,7 @@ describe("createGameSessionFx / transition replay", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:transition:ordered",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,
@@ -140,7 +140,7 @@ describe("createGameSessionFx / transition replay", () => {
 			await session.runFn(
 				spawnItemFx({
 					id: "runtime:react-subscriber:marker",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,

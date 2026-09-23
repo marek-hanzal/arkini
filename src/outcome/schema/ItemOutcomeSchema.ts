@@ -21,7 +21,7 @@ export const ItemOutcomeSchema = z
 		/**
 		 * ID of the canonical game item emitted by this outcome.
 		 */
-		itemId: IdSchema.describe("The ID of the canonical game item emitted by this outcome."),
+		itemUid: IdSchema.describe("The ID of the canonical game item emitted by this outcome."),
 		/**
 		 * Number of this item emitted by the outcome.
 		 */

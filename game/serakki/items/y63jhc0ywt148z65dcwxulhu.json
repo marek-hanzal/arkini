@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y63jhc0ywt148z65dcwxulhu",
-		"id": "toilet-golem",
 		"title": "Toilet Golem",
 		"ui": "simple",
 		"description": "This is real danger",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 4,
 											"max": 8

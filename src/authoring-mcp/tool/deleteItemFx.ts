@@ -8,14 +8,14 @@ import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 /** Deletes one item against the exact revision previously inspected by the caller. */
 export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 	force,
-	itemId,
+	itemUid,
 	notifyProjectChangedFn,
 	project,
 	repository,
 	revision,
 }: {
 	readonly force: boolean;
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly notifyProjectChangedFn: (projectId: string) => void;
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
@@ -27,7 +27,7 @@ export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_delete_impact again before deleting the item.`,
 			),
 		);
-	const { blockers, item } = yield* readItemDeleteImpactFx(project, itemId);
+	const { blockers, item } = yield* readItemDeleteImpactFx(project, itemUid);
 	const commit = yield* repository.deleteItemFx({
 		expectedRevision: revision,
 		force,
@@ -37,7 +37,6 @@ export const deleteItemFx = Effect.fn("deleteItemFx")(function* ({
 	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		"Deleted item.",
-		`ID: ${itemId}`,
 		`UID: ${item.uid}`,
 		`Revision: ${commit.revision}`,
 		`Mode: ${force ? "force" : "safe"}`,

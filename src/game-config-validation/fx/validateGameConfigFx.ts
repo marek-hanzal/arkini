@@ -10,7 +10,6 @@ import { validateConfigReferencesFn } from "../fn/validateConfigReferencesFn";
 import { validateInputAcceptanceCyclesFn } from "../fn/validateInputAcceptanceCyclesFn";
 import { validateInputUnitsFn } from "../fn/validateInputUnitsFn";
 import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
-import { validateItemUidsFn } from "../fn/validateItemUidsFn";
 import { validateUnitRenewalFn } from "../fn/validateUnitRenewalFn";
 import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "./validateStartStateFx";
@@ -25,20 +24,20 @@ const validateCanonicalIdsFn = ({
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [key, item] of Object.entries(config.items)) {
-		if (item.id === key) continue;
+		if (item.uid === key) continue;
 		diagnostics.push({
-			code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
+			code: DiagnosticCodeEnumSchema.enum.ConfigKeyUidMismatch,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"items",
 				key,
-				"id",
+				"uid",
 			],
 			source: provenance.items[key],
-			message: `Item record key ${key} differs from embedded ID ${item.id}.`,
+			message: `Item record key ${key} differs from embedded UID ${item.uid}.`,
 			entity: DiagnosticRecordEntityEnumSchema.enum.Item,
 			key,
-			id: item.id,
+			uid: item.uid,
 		});
 	}
 
@@ -71,10 +70,6 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateItemLineIdsFn({
-			config,
-			provenance,
-		}),
-		validateItemUidsFn({
 			config,
 			provenance,
 		}),

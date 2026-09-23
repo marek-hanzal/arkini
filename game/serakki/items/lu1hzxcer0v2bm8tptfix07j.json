@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lu1hzxcer0v2bm8tptfix07j",
-		"id": "bathhouse",
 		"title": "Bathhouse",
 		"ui": "simple",
 		"description": "Luxury bathing.",

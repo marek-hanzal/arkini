@@ -88,7 +88,7 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 	const reason = PlacementUnavailableError.Reason.BoardFull;
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
-			itemId: item.item.id,
+			itemUid: item.item.uid,
 			placement: PlacementSchema.enum.Drop,
 			quantity: 1,
 			reason,
@@ -165,7 +165,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 				itemId: item.id,
-				canonicalItemId: item.item.id,
+				itemUid: item.item.uid,
 				originItemId,
 				previousLocation: item.location,
 				location: placedItem.location,

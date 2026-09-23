@@ -50,7 +50,7 @@ const config = GameConfigSchema.parse({
 			height: 1,
 			board: [
 				{
-					itemId: "producer",
+					itemUid: "producer",
 					x: 0,
 					y: 0,
 				},
@@ -69,7 +69,6 @@ const config = GameConfigSchema.parse({
 	items: {
 		producer: {
 			uid: "producer",
-			id: "producer",
 
 			title: "Producer",
 			description: "Owns two lines.",

@@ -13,7 +13,7 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
 
-const createConfig = (distance: "far" | "universe") => {
+const createConfig = () => {
 	const base = createJobTestConfig(2);
 	const forge = base.items.forge;
 
@@ -24,21 +24,18 @@ const createConfig = (distance: "far" | "universe") => {
 			permit: {
 				...base.items.tool,
 				uid: "permit",
-				id: "permit",
 				title: "Permit",
 				description: "Dependency left behind in the original space.",
 			},
 			ingot: {
 				...base.items.tool,
 				uid: "ingot",
-				id: "ingot",
 				title: "Ingot",
 				description: "Completion outcome.",
 			},
 			blocker: {
 				...base.items.tool,
 				uid: "blocker",
-				id: "blocker",
 				title: "Blocker",
 				description: "Fills destination capacity.",
 			},
@@ -53,10 +50,10 @@ const createConfig = (distance: "far" | "universe") => {
 								{
 									type: "exists",
 									query: {
-										distance,
+										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "permit",
+											itemUid: "permit",
 										},
 									},
 								},
@@ -73,7 +70,7 @@ const createConfig = (distance: "far" | "universe") => {
 										outcome: [
 											{
 												type: "item" as const,
-												itemId: "ingot",
+												itemUid: "ingot",
 												quantity: {
 													min: 1,
 													max: 1,
@@ -125,7 +122,7 @@ const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
 	yield* prepareJobLineFx();
 	yield* spawnItemFx({
 		id: "runtime:permit",
-		itemId: "permit",
+		itemUid: "permit",
 		location: {
 			scope: "board",
 			space: 0,
@@ -156,7 +153,7 @@ describe("multi-space owner ownership graph", () => {
 				return yield* readRuntimeFx();
 			}).pipe(
 				useGameFx({
-					config: createConfig("far"),
+					config: createConfig(),
 				}),
 			),
 		);
@@ -168,17 +165,29 @@ describe("multi-space owner ownership graph", () => {
 		]);
 	});
 
-	it("keeps universe dependencies and materializes outcome plus reservations in the destination space", () => {
+	it("resumes with a destination dependency and materializes outcomes plus reservations there", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareTravelFx();
+				yield* spawnItemFx({
+					id: "runtime:destination-permit",
+					itemUid: "permit",
+					location: {
+						scope: "board",
+						space: 1,
+						position: {
+							x: 4,
+							y: 1,
+						},
+					},
+				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 600,
 				});
 				return yield* readRuntimeFx();
 			}).pipe(
 				useGameFx({
-					config: createConfig("universe"),
+					config: createConfig(),
 				}),
 			),
 		);
@@ -187,7 +196,7 @@ describe("multi-space owner ownership graph", () => {
 		expect(
 			runtime.items.some(
 				(item) =>
-					item.item.id === "ingot" &&
+					item.item.uid === "ingot" &&
 					item.location.scope === "board" &&
 					item.location.space === 1,
 			),
@@ -195,7 +204,7 @@ describe("multi-space owner ownership graph", () => {
 		expect(
 			runtime.items.some(
 				(item) =>
-					item.item.id === "tool" &&
+					item.item.uid === "tool" &&
 					item.location.scope === "board" &&
 					item.location.space === 1,
 			),
@@ -203,7 +212,7 @@ describe("multi-space owner ownership graph", () => {
 		expect(
 			runtime.items.some(
 				(item) =>
-					item.item.id === "ingot" &&
+					item.item.uid === "ingot" &&
 					item.location.scope === "board" &&
 					item.location.space === 0,
 			),

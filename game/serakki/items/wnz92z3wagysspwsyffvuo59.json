@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wnz92z3wagysspwsyffvuo59",
-		"id": "dirty-jar",
 		"title": "Dirty Jar",
 		"ui": "simple",
 		"description": "Bleh",

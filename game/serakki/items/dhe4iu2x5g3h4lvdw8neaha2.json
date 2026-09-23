@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dhe4iu2x5g3h4lvdw8neaha2",
-		"id": "wick",
 		"title": "Wick",
 		"ui": "simple",
 		"description": "I heard - a candle?",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cauldron-with-boiling-beeswax"
+					"itemUid": "bo9nafcuzyb3p0g3h4sz6c9r"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "unlit-candle",
+											"itemUid": "d7nii81w82pbs6y3cvfyprox",
 											"quantity": {
 												"min": 2,
 												"max": 4
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "dirty-cauldron"
+				"result": "gknt8tkntf6cx7a4vb5jre1j"
 			}
 		],
 		"maxQueueSize": 1,

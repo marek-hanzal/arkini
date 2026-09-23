@@ -110,7 +110,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 					value: {
 						$schema: itemFile.$schema,
 						items: {
-							[itemFile.item.id]: itemFile.item,
+							[itemFile.item.uid]: itemFile.item,
 						},
 					},
 				},

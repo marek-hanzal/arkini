@@ -26,7 +26,7 @@ const palette: PixiScenePalette = {
 const createItemFn = (artworkScale: number): TileActorItem => ({
 	artworkScale,
 	id: "runtime:tile",
-	itemId: "tile",
+	itemUid: "tile",
 
 	location: {
 		scope: "board",

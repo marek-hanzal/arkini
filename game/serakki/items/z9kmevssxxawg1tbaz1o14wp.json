@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "z9kmevssxxawg1tbaz1o14wp",
-		"id": "spoiled-cacao-pod",
 		"title": "Spoiled Cacao Pod",
 		"ui": "simple",
 		"description": "Bleh",

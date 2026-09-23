@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lbywa0vlgeivrdl6sp63bfo9",
-		"id": "needle",
 		"title": "Needle",
 		"ui": "simple",
 		"draft": true,

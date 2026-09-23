@@ -87,7 +87,7 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 							{
 								type: GameEventEnumSchema.enum.ItemConsumed,
 								sourceItemId: item.id,
-								canonicalItemId: item.item.id,
+								itemUid: item.item.uid,
 								sourceLocation: item.location,
 							} satisfies GameEventSchema.Type,
 						],

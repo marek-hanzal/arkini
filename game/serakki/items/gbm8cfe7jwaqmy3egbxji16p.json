@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gbm8cfe7jwaqmy3egbxji16p",
-		"id": "flint-and-steel",
 		"title": "Flint And Steel",
 		"draft": false,
 		"description": "A tiny machine for turning friction into poor decisions. Makes fire. Keep it away from anything you would prefer to remain unburned.",
@@ -20,65 +19,65 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "unlit-candle"
+					"itemUid": "d7nii81w82pbs6y3cvfyprox"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "candle"
+				"result": "sedm9fb8symnti4s3w25u751"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire"
+					"itemUid": "our0pxaqz9ce08z8tdyhek44"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "campfire-burning"
+				"result": "nq73xqq5xq0o2kusvgo6hek9"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "foundry-extinguished"
+					"itemUid": "prt6rkka0at1honkbw36rnd3"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "foundry"
+				"result": "kpjqlrmcoc2c503wp1kr0m6v"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "oven-with-wood"
+					"itemUid": "yofqa330f03b3dexsmde5aeu"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "burning-oven"
+				"result": "bsm7hrvufre2fiexr4o0eo4q"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "paper---tier-1"
+					"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "burning-paper"
+				"result": "ujbr1vgj1ymehr3gedjdajug"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "base-camp"
+					"itemUid": "x8z9v8tn5wa7qse7c7izy6b0"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "basecamp-on-fire"
+				"result": "xkbphl0biiu4d5ar1s6hecvn"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "lit-base-camp"
+					"itemUid": "usw9wmorxa8p3tl3wchthc6q"
 				},
 				"action": "spend",
 				"effect": "replace",
-				"result": "basecamp-on-fire"
+				"result": "xkbphl0biiu4d5ar1s6hecvn"
 			}
 		],
 		"maxQueueSize": 1,

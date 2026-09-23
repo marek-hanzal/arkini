@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "r8tf0spk6xl9vlkv80jebrxr",
-		"id": "cotton-wool",
 		"title": "Cotton Wool",
 		"ui": "simple",
 		"draft": true,

@@ -37,7 +37,7 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 						const merge = merges[index];
 						if (merge.action === "space")
 							return `${translator.textFn("Space")} ${merge.space}`;
-						const targetId = merge.target.itemId;
+						const targetId = merge.target.itemUid;
 						return `${translator.textFn("Merge")} ${index + 1} — ${project.config.items[targetId]?.title || targetId}`;
 					}}
 					renderItemContentFn={(index, label) => (
@@ -49,7 +49,7 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 					)}
 					itemSearchTermsFn={(index) => [
 						"target" in merges[index]
-							? merges[index].target.itemId
+							? merges[index].target.itemUid
 							: String(merges[index].space),
 						merges[index].action,
 						merges[index].effect,

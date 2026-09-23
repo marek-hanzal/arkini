@@ -34,7 +34,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 		)
 	).diagnostics.filter(({ code }) => code.startsWith("units:"));
 
-const chanceOutput = (itemId: string, chance: number) =>
+const chanceOutput = (itemUid: string, chance: number) =>
 	OutcomeTableSchema.parse({
 		set: [
 			{
@@ -46,7 +46,7 @@ const chanceOutput = (itemId: string, chance: number) =>
 						outcome: [
 							{
 								type: "item",
-								itemId,
+								itemUid,
 								quantity: {
 									min: 1,
 									max: 1,
@@ -67,13 +67,13 @@ describe("validateUnitRenewalFn", () => {
 
 		expect(
 			await diagnostics({
-				[units.id]: units,
+				[units.uid]: units,
 			}),
 		).toEqual([
 			expect.objectContaining({
 				code: DiagnosticCodeEnumSchema.enum.UnitRenewalMissing,
 				severity: DiagnosticSeverityEnumSchema.enum.Warning,
-				itemId: units.id,
+				itemUid: units.uid,
 			}),
 		]);
 	});
@@ -82,13 +82,13 @@ describe("validateUnitRenewalFn", () => {
 		const units = createFiniteItem("item:units");
 		const producer = createProducerItem({
 			id: "item:producer",
-			outcome: chanceOutput(units.id, 0),
+			outcome: chanceOutput(units.uid, 0),
 		});
 
 		expect(
 			await diagnostics({
-				[units.id]: units,
-				[producer.id]: producer,
+				[units.uid]: units,
+				[producer.uid]: producer,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -101,7 +101,7 @@ describe("validateUnitRenewalFn", () => {
 		const units = createFiniteItem("item:units");
 		const output = createOutput([
 			{
-				itemId: units.id,
+				itemUid: units.uid,
 			},
 		]);
 		const conditionalSet: RollSetSchema.Type = {
@@ -113,10 +113,10 @@ describe("validateUnitRenewalFn", () => {
 						{
 							type: "exists" as const,
 							query: {
-								distance: "universe",
+								distance: "far",
 								selector: {
 									type: "item" as const,
-									itemId: units.id,
+									itemUid: units.uid,
 								},
 							},
 						},
@@ -134,8 +134,8 @@ describe("validateUnitRenewalFn", () => {
 		});
 		expect(
 			await diagnostics({
-				[units.id]: units,
-				[producer.id]: producer,
+				[units.uid]: units,
+				[producer.uid]: producer,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -143,7 +143,7 @@ describe("validateUnitRenewalFn", () => {
 			}),
 		]);
 		const fallback = createProducerItem({
-			id: producer.id,
+			id: producer.uid,
 			outcome: {
 				set: [
 					conditionalSet,
@@ -153,8 +153,8 @@ describe("validateUnitRenewalFn", () => {
 		});
 		expect(
 			await diagnostics({
-				[units.id]: units,
-				[fallback.id]: fallback,
+				[units.uid]: units,
+				[fallback.uid]: fallback,
 			}),
 		).toEqual([]);
 	});
@@ -163,13 +163,13 @@ describe("validateUnitRenewalFn", () => {
 		const units = createFiniteItem("item:units");
 		const producer = createProducerItem({
 			id: "item:producer",
-			outcome: chanceOutput(units.id, 0.5),
+			outcome: chanceOutput(units.uid, 0.5),
 		});
 
 		expect(
 			await diagnostics({
-				[units.id]: units,
-				[producer.id]: producer,
+				[units.uid]: units,
+				[producer.uid]: producer,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -184,20 +184,20 @@ describe("validateUnitRenewalFn", () => {
 			id: "item:guaranteed",
 			outcome: createOutput([
 				{
-					itemId: units.id,
+					itemUid: units.uid,
 				},
 			]),
 		});
 		const stochastic = createProducerItem({
 			id: "item:stochastic",
-			outcome: chanceOutput(units.id, 0.5),
+			outcome: chanceOutput(units.uid, 0.5),
 		});
 
 		expect(
 			await diagnostics({
-				[units.id]: units,
-				[guaranteed.id]: guaranteed,
-				[stochastic.id]: stochastic,
+				[units.uid]: units,
+				[guaranteed.uid]: guaranteed,
+				[stochastic.uid]: stochastic,
 			}),
 		).toEqual([]);
 	});

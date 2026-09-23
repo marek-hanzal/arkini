@@ -169,7 +169,7 @@ describe("resolveInputRunFx", () => {
 					query: {
 						selector: {
 							type: "item",
-							itemId: "stone",
+							itemUid: "stone",
 						},
 						distance: "close",
 					},

@@ -152,7 +152,7 @@ describe("readTileActorsFx", () => {
 														distance: "self",
 														selector: {
 															type: "item",
-															itemId: item.item.id,
+															itemUid: item.item.uid,
 														},
 													},
 												},

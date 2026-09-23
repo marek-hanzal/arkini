@@ -23,7 +23,7 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 					default: true,
 					outcome: createOutput([
 						{
-							itemId: "result",
+							itemUid: "result",
 						},
 					]),
 				}),
@@ -36,13 +36,13 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 			intervalMs: 100,
 			onExpire: createOutput([
 				{
-					itemId: "expired",
+					itemUid: "expired",
 				},
 				{
-					itemId: "expired",
+					itemUid: "expired",
 				},
 				{
-					itemId: "expired",
+					itemUid: "expired",
 				},
 			]),
 		},
@@ -62,7 +62,7 @@ const fillBoardFx = Effect.fn("fillKillTestBoardFx")(function* () {
 	for (let n = 1; n < 12; n++)
 		yield* spawnItemFx({
 			id: `blocker:${n}`,
-			itemId: "permit",
+			itemUid: "permit",
 
 			location: {
 				scope: "board",
@@ -119,9 +119,11 @@ describe("Clock kill switch", () => {
 				false,
 			);
 			expect(
-				result.step.runtime.items.filter((item) => item.item.id === "expired"),
+				result.step.runtime.items.filter((item) => item.item.uid === "expired"),
 			).toHaveLength(1);
-			expect(result.step.runtime.items.some((item) => item.item.id === "result")).toBe(false);
+			expect(result.step.runtime.items.some((item) => item.item.uid === "result")).toBe(
+				false,
+			);
 			expect(result.step.events).toContainEqual(
 				expect.objectContaining({
 					type: "job:aborted",
@@ -172,7 +174,7 @@ describe("Clock kill switch", () => {
 		);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
-		expect(result.runtime.items.filter((item) => item.item.id === "result")).toHaveLength(1);
+		expect(result.runtime.items.filter((item) => item.item.uid === "result")).toHaveLength(1);
 		expect(result.events.filter((event) => event.type === "job:completed")).toHaveLength(1);
 		expect(
 			result.events.some(
@@ -197,7 +199,7 @@ describe("Clock kill switch", () => {
 			),
 		);
 		expect(result.runtime.jobs).toEqual([]);
-		expect(result.runtime.items.some((item) => item.item.id === "result")).toBe(false);
+		expect(result.runtime.items.some((item) => item.item.uid === "result")).toBe(false);
 		expect(result.events.filter((event) => event.type === "job:aborted")).toHaveLength(1);
 	});
 
@@ -226,7 +228,7 @@ describe("Clock kill switch", () => {
 								removalMode: "kill-switch",
 								outcome: createOutput([
 									{
-										itemId: "missing-outcome",
+										itemUid: "missing-outcome",
 									},
 								]),
 								randomSeed: "rollback",

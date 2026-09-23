@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xue30oaxm08atgyr1sqxlej3",
-		"id": "clay-camp",
 		"title": "Clay Camp",
 		"ui": "default",
 		"description": "Gives you a clay",
@@ -33,7 +32,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "clay-deposit"
+								"itemUid": "fgt515l3fvcj1yqzhmb2xjkb"
 							},
 							"distance": "close"
 						}
@@ -50,7 +49,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay",
+											"itemUid": "awxyw9ell5u1clg4zbii8mmk",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -72,7 +71,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "clay-deposit"
+										"itemUid": "fgt515l3fvcj1yqzhmb2xjkb"
 									},
 									"distance": "close"
 								},

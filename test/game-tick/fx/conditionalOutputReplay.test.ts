@@ -29,7 +29,7 @@ const run = (path: OutputPath, steps: readonly number[], markerDuration = 500) =
 			for (const [x, itemId] of itemIds.entries()) {
 				yield* spawnItemFx({
 					id: `runtime:${x}`,
-					itemId,
+					itemUid: itemId,
 
 					location: {
 						scope: "board",
@@ -55,7 +55,7 @@ const run = (path: OutputPath, steps: readonly number[], markerDuration = 500) =
 				yield* runTickRuntimeByFx({
 					elapsedMs,
 				});
-			return (yield* readRuntimeFx()).items.map((item) => item.item.id).sort();
+			return (yield* readRuntimeFx()).items.map((item) => item.item.uid).sort();
 		}).pipe(
 			useGameFx({
 				config,

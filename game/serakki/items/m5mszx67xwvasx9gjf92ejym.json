@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "m5mszx67xwvasx9gjf92ejym",
-		"id": "stone-excalixe",
 		"title": "Stone Excalixe",
 		"ui": "simple",
 		"draft": true,

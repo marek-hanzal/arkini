@@ -86,15 +86,15 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 			case "merges":
 				return <MergesCollectionDetail item={item} />;
 			case "chain":
-				return <ItemChain itemId={item.id} />;
+				return <ItemChain itemUid={item.uid} />;
 			case "estimate":
-				return <ItemEstimateSection itemId={item.id} />;
+				return <ItemEstimateSection itemUid={item.uid} />;
 			case "connections": {
 				const filter = search.filter ?? "required-by";
 				return (
 					<ConnectionsSection
 						filter={filter}
-						itemId={item.id}
+						itemUid={item.uid}
 						onFilterChangeFn={(nextFilter) =>
 							void navigateFn({
 								replace: true,

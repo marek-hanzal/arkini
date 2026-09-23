@@ -114,7 +114,7 @@ describe("ItemEstimateSection", () => {
 					TranslationTestProvider,
 					null,
 					createElement(ItemEstimateSection, {
-						itemId: "tool",
+						itemUid: "tool",
 					}),
 				),
 			);
@@ -131,7 +131,7 @@ describe("ItemEstimateSection", () => {
 					TranslationTestProvider,
 					null,
 					createElement(ItemEstimateSection, {
-						itemId: "tool",
+						itemUid: "tool",
 					}),
 				),
 			);

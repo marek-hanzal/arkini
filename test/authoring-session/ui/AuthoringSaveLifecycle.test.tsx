@@ -56,7 +56,6 @@ const createFixture = async (kind: "item" | "project") => {
 				...editorTestConfig.items,
 				stone: {
 					...editorTestConfig.items.water!,
-					id: "stone",
 					uid: "stone",
 				},
 			},

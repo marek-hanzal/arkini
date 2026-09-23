@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a42msb58jii8onmjb8wvxkej",
-		"id": "animal-feed-workshop-blueprint",
 		"title": "Animal Feed Workshop Blueprint",
 		"draft": false,
 		"description": "Plans for Animal Feed Workshop.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "animal-feed-workshop-blueprint"
+								"itemUid": "a42msb58jii8onmjb8wvxkej"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -79,7 +78,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemUid": "ejcs57zv68bas7jmizm7286p"
 							},
 							"distance": "far"
 						},
@@ -101,7 +100,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-feed-workshop",
+											"itemUid": "bfmcl2hvc9wou6td0lnv6c4e",
 											"quantity": {
 												"min": 1,
 												"max": 1

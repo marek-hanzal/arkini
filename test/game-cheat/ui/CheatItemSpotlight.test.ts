@@ -59,7 +59,7 @@ describe("CheatItemSpotlight", () => {
 		await vi.waitFor(() =>
 			expect(
 				container.querySelector<HTMLButtonElement>('button[data-ui-selected="true"]')
-					?.dataset.itemId,
+					?.dataset.itemUid,
 			).toBe("item:beta"),
 		);
 		await act(async () => {
@@ -138,7 +138,7 @@ describe("CheatItemSpotlight", () => {
 			),
 		);
 		expect(options).toHaveLength(1);
-		expect(options[0]?.dataset.itemId).toBe("item:beta");
+		expect(options[0]?.dataset.itemUid).toBe("item:beta");
 		await act(async () => options[0]?.click());
 		expect(spotlightState.spawn).toHaveBeenCalledExactlyOnceWith("item:beta");
 	});
@@ -147,7 +147,7 @@ describe("CheatItemSpotlight", () => {
 		const { container } = await renderSpotlight();
 		await toggleSpotlight();
 
-		const images = container.querySelectorAll('[data-item-id="item:beta"] img');
+		const images = container.querySelectorAll('[data-item-uid="item:beta"] img');
 		expect(Array.from(images, (image) => image.getAttribute("src"))).toEqual([
 			"blob:beta",
 			"blob:beta-overlay",

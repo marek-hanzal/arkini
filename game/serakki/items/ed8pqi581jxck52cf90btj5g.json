@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ed8pqi581jxck52cf90btj5g",
-		"id": "raw-emerald",
 		"title": "Raw Emerald",
 		"ui": "simple",
 		"description": "This one still remembers it's home",

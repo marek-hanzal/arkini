@@ -14,7 +14,7 @@ export namespace projectDropTransferActorFn {
 export const projectDropTransferActorFn = ({ after, before }: projectDropTransferActorFn.Props) => {
 	return {
 		itemId: before.id,
-		canonicalItemId: before.item.id,
+		itemUid: before.item.uid,
 		previousRevision: before.revision,
 		previousLocation: before.location,
 		current: projectDropActorCurrentFn(after),

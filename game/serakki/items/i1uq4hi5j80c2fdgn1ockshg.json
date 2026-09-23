@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "i1uq4hi5j80c2fdgn1ockshg",
-		"id": "sword",
 		"title": "Sword",
 		"ui": "simple",
 		"description": "Just a sword. You can cut a bread using it",
@@ -16,25 +15,25 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "hunted-game"
+				"result": "xaijv8bc7ljbonqgp1vzcxcc"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "hunted-game"
+				"result": "xaijv8bc7ljbonqgp1vzcxcc"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "corrupted-faith-bear"
+					"itemUid": "o1ro7ycrxhpdqqymi22q8p3b"
 				},
 				"action": "use",
 				"outcome": {
@@ -49,7 +48,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -68,16 +67,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle"
+					"itemUid": "upghscvjnnxzp09urbuh5x0a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-with-sword"
+				"result": "rsuelogiw40sc1p2sxa2ptik"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle-puppy"
+					"itemUid": "jml833htnpikvhdtswrnfn3a"
 				},
 				"action": "consume",
 				"outcome": {
@@ -91,7 +90,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "spoiled-raw-game-meat",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
 											"quantity": {
 												"min": 4,
 												"max": 6
@@ -101,7 +100,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -116,21 +115,21 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corrupted-beagle-puppy"
+				"result": "ld5rduazg59ttnnlf2npoe9v"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair"
+					"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-stabbed-with-sword"
+				"result": "wos5m74tb9xqnn6w27lrb9k4"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fighting-british-shorthairs"
+					"itemUid": "kqhuptuolwx1u0uy6opco9xt"
 				},
 				"action": "use",
 				"outcome": {
@@ -144,7 +143,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-british-shorthair",
+											"itemUid": "hzr73hamdo1zd7ulet4v3hb2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -159,25 +158,25 @@
 					]
 				},
 				"effect": "replace",
-				"result": "hungry-british-shorthair"
+				"result": "hzr73hamdo1zd7ulet4v3hb2"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair-kitten"
+					"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-kitten-on-sword"
+				"result": "zvnxyu8zrm905pmg1c29vv5l"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone-deposit"
+					"itemUid": "hds0v0xcckj5gcyzuwv8ujg8"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "stone-excalibur"
+				"result": "qs3o90ajldud08tpnx0wcxku"
 			}
 		],
 		"maxQueueSize": 1,

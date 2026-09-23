@@ -25,21 +25,18 @@ export const createBlockedCompletionTestConfig = () => {
 			blocker: {
 				...base.items.tool,
 				uid: "blocker",
-				id: "blocker",
 				title: "Blocker",
 				description: "Occupies board delivery capacity.",
 			},
 			ingot: {
 				...base.items.tool,
 				uid: "ingot",
-				id: "ingot",
 				title: "Ingot",
 				description: "Blocked forge outcome.",
 			},
 			blockedForge: {
 				...forge,
 				uid: "blockedForge",
-				id: "blockedForge",
 				title: "Blocked forge",
 				description: "Cannot deliver while capacity is full.",
 				lines: [
@@ -56,7 +53,7 @@ export const createBlockedCompletionTestConfig = () => {
 											outcome: [
 												{
 													type: "item" as const,
-													itemId: "ingot",
+													itemUid: "ingot",
 													quantity: {
 														min: 1,
 														max: 1,
@@ -76,7 +73,6 @@ export const createBlockedCompletionTestConfig = () => {
 			freeForge: {
 				...forge,
 				uid: "freeForge",
-				id: "freeForge",
 				title: "Free forge",
 				description: "Completes without delivery placement.",
 				lines: [
@@ -100,7 +96,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 	function* () {
 		const blockedOwner = yield* spawnItemFx({
 			id: blockedCompletionOwnerId,
-			itemId: "blockedForge",
+			itemUid: "blockedForge",
 			location: {
 				scope: "board",
 				space: 0,
@@ -112,7 +108,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 		});
 		const freeOwner = yield* spawnItemFx({
 			id: freeCompletionOwnerId,
-			itemId: "freeForge",
+			itemUid: "freeForge",
 			location: {
 				scope: "board",
 				space: 0,
@@ -125,7 +121,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 		for (let index = 0; index < 3; index += 1) {
 			const water = yield* spawnItemFx({
 				id: `runtime:blocked-water:${index}`,
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,
@@ -145,7 +141,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 		}
 		const tool = yield* spawnItemFx({
 			id: "runtime:blocked-tool",
-			itemId: "tool",
+			itemUid: "tool",
 			location: {
 				scope: "board",
 				space: 0,
@@ -178,7 +174,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 				if (y === 0 && (x === 0 || x === 1)) continue;
 				yield* spawnItemFx({
 					id: `runtime:completion-blocker:${blockerIndex}`,
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: {
 						scope: "board",
 						space: 0,

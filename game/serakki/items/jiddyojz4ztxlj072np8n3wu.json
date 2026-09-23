@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jiddyojz4ztxlj072np8n3wu",
-		"id": "clay-bowl-with-cream",
 		"title": "Clay Bowl With Cream",
 		"ui": "simple",
 		"description": "Creammy thing",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "honeyed-fruit-pancake"
+					"itemUid": "y5xwsvtgyxy5npclxyzwngo2"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay-bowl",
+											"itemUid": "bqry0ngea4bhamfkgncovhgr",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "honeyed-fruit-pancake-with-cream"
+				"result": "sndowrk0b7wr11w8e2svbseu"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "clay-bowl",
+										"itemUid": "bqry0ngea4bhamfkgncovhgr",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -73,7 +72,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

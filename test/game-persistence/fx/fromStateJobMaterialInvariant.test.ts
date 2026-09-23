@@ -17,7 +17,7 @@ const job = {
 };
 const owner = {
 	id: "runtime:owner",
-	itemId: "forge",
+	itemUid: "forge",
 	location: {
 		scope: "board" as const,
 		space: 0,
@@ -29,7 +29,7 @@ const owner = {
 };
 const consumedRoot = {
 	id: "runtime:consumed-root",
-	itemId: "water",
+	itemUid: "water",
 	location: {
 		scope: "job" as const,
 		jobId: job.id,
@@ -85,7 +85,7 @@ describe("fromStateFx job material invariants", () => {
 				consumedRoot,
 				{
 					id: "runtime:owned-water",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "input" as const,
 						ownerItemId: consumedRoot.id,
@@ -140,7 +140,7 @@ describe("fromStateFx job material invariants", () => {
 				consumedRoot,
 				{
 					id: "runtime:nested-owner",
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "input" as const,
 						ownerItemId: consumedRoot.id,
@@ -150,7 +150,7 @@ describe("fromStateFx job material invariants", () => {
 				},
 				{
 					id: "runtime:nested-water",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "input" as const,
 						ownerItemId: "runtime:nested-owner",
@@ -217,7 +217,7 @@ describe("fromStateFx job material invariants", () => {
 				consumedRoot,
 				{
 					id: "runtime:nested-owner",
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "input" as const,
 						ownerItemId: consumedRoot.id,
@@ -227,7 +227,7 @@ describe("fromStateFx job material invariants", () => {
 				},
 				{
 					id: "runtime:nested-material",
-					itemId: "tool",
+					itemUid: "tool",
 					location: {
 						scope: "reserved" as const,
 						jobId: childJob.id,
@@ -280,7 +280,7 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 	if (reservedInput.type !== "materials") throw new Error("Expected material fixture.");
 	reservedInput.query.selector = {
 		type: "item",
-		itemId: "forge",
+		itemUid: "forge",
 	};
 	worker.units = {
 		amount: 2,
@@ -297,7 +297,7 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 			owner,
 			{
 				id: "runtime:reserved-worker",
-				itemId: "forge",
+				itemUid: "forge",
 				location: {
 					scope: "reserved" as const,
 					jobId: job.id,
@@ -307,7 +307,7 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 			},
 			{
 				id: "runtime:reserved-water",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "input" as const,
 					ownerItemId: "runtime:reserved-worker",

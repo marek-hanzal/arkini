@@ -85,6 +85,6 @@ describe("renameGameResourceFx", () => {
 		expect(renamed.items.water?.lines[0]?.artwork).toBe("cover");
 		expect(renamed.items.water?.lines[1]).not.toHaveProperty("artwork");
 		expect(config.items.water.lines[0]?.artwork).toBe("hero");
-		expect(renamed.items.water?.id).toBe("water");
+		expect(renamed.items.water?.uid).toBe("water");
 	});
 });

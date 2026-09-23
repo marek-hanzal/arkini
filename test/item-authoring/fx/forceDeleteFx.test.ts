@@ -13,7 +13,7 @@ import {
 
 const waterOutput = createOutput([
 	{
-		itemId: "water",
+		itemUid: "water",
 	},
 ]);
 
@@ -28,7 +28,7 @@ describe("forceDeleteFx", () => {
 				{
 					x: 7,
 					y: 2,
-					itemId: "water",
+					itemUid: "water",
 				},
 			],
 		};
@@ -40,7 +40,7 @@ describe("forceDeleteFx", () => {
 						template,
 					],
 				},
-				itemId: "water",
+				itemUid: "water",
 			}),
 		);
 		expect(result.config.templates).toEqual([
@@ -74,7 +74,7 @@ describe("forceDeleteFx", () => {
 									distance: "far",
 									selector: {
 										type: "item",
-										itemId: "water",
+										itemUid: "water",
 									},
 								},
 							},
@@ -91,7 +91,6 @@ describe("forceDeleteFx", () => {
 				clock,
 				"clock-with-line": {
 					...clock,
-					id: "clock-with-line",
 					uid: "clock-with-line",
 					lines: [
 						createLine({
@@ -104,7 +103,7 @@ describe("forceDeleteFx", () => {
 		const result = Effect.runSync(
 			forceDeleteFx({
 				config,
-				itemId: "water",
+				itemUid: "water",
 			}),
 		);
 		expect(result.config.items.clock).toMatchObject({
@@ -140,7 +139,7 @@ describe("forceDeleteFx", () => {
 							effect: "keep",
 							target: {
 								type: "item",
-								itemId: "water",
+								itemUid: "water",
 							},
 						},
 					],
@@ -160,7 +159,7 @@ describe("forceDeleteFx", () => {
 							id: "oil-line",
 							outcome: createOutput([
 								{
-									itemId: "oil",
+									itemUid: "oil",
 								},
 							]),
 						}),
@@ -172,7 +171,7 @@ describe("forceDeleteFx", () => {
 		const result = Effect.runSync(
 			forceDeleteFx({
 				config,
-				itemId: "water",
+				itemUid: "water",
 			}),
 		);
 
@@ -207,14 +206,14 @@ describe("forceDeleteFx", () => {
 			removedExpiryOutcomeOwnerIds: [],
 			removedLines: [
 				{
-					ownerItemId: "producer",
+					ownerItemUid: "producer",
 					lineId: "water-line",
 					title: "water-line",
 				},
 			],
 			removedMergeRules: [
 				{
-					ownerItemId: "oil",
+					ownerItemUid: "oil",
 					ruleNumber: 1,
 				},
 			],
@@ -232,7 +231,7 @@ describe("forceDeleteFx", () => {
 					height: 2,
 					board: [
 						{
-							itemId: "producer",
+							itemUid: "producer",
 							x: 0,
 							y: 0,
 						},
@@ -251,7 +250,7 @@ describe("forceDeleteFx", () => {
 		const result = Effect.runSync(
 			forceDeleteFx({
 				config,
-				itemId: "water",
+				itemUid: "water",
 			}),
 		);
 

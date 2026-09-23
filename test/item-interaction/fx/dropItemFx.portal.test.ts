@@ -32,7 +32,7 @@ const portalConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "portal",
+						itemUid: "portal",
 					},
 					action: "consume",
 					effect: "keep",
@@ -42,7 +42,6 @@ const portalConfig = GameConfigSchema.parse({
 		portal: {
 			...configInput.items.stone,
 			uid: "portal",
-			id: "portal",
 			title: "Portal",
 			description: "Portal",
 			lines: [
@@ -84,7 +83,7 @@ const portalConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "stone",
+						itemUid: "stone",
 					},
 					action: "consume",
 					effect: "keep",
@@ -144,12 +143,12 @@ it.each([
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "source",
-					itemId,
+					itemUid: itemId,
 					location: board(0, 0, 0),
 				});
 				const target = yield* spawnItemFx({
 					id: "destination",
-					itemId: "portal",
+					itemUid: "portal",
 					location: board(1, 0, 0),
 				});
 				const outcome = yield* dropOntoFx({

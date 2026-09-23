@@ -90,7 +90,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 							{
 								type: GameEventEnumSchema.enum.ItemUnitSpent,
 								itemId: item.id,
-								canonicalItemId: item.item.id,
+								itemUid: item.item.uid,
 								location: item.location,
 								previousUnits: remainingUnits,
 								resultingUnits: nextRemainingUnits,
@@ -160,7 +160,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 				itemId: item.id,
-				canonicalItemId: item.item.id,
+				itemUid: item.item.uid,
 				location: item.location,
 			} satisfies GameEventSchema.Type,
 			...(placementEvents.length === 0
@@ -168,7 +168,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 						{
 							type: GameEventEnumSchema.enum.ItemDisappeared,
 							itemId: item.id,
-							canonicalItemId: item.item.id,
+							itemUid: item.item.uid,
 							location: item.location,
 						} satisfies GameEventSchema.Type,
 					]

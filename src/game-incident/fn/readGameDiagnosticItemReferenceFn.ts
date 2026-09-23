@@ -6,7 +6,7 @@ export namespace readGameDiagnosticItemReferenceFn {
 	export interface Props {
 		readonly config: GameConfigSchema.Type;
 		readonly runtimeItemId: string | null;
-		readonly itemId?: string;
+		readonly itemUid?: string;
 		readonly runtimes: readonly RuntimeSchema.Type[];
 	}
 }
@@ -15,7 +15,7 @@ export namespace readGameDiagnosticItemReferenceFn {
 export const readGameDiagnosticItemReferenceFn = ({
 	config,
 	runtimeItemId,
-	itemId,
+	itemUid,
 	runtimes,
 }: readGameDiagnosticItemReferenceFn.Props): GameDiagnosticItemReferenceSchema.Type => {
 	const runtimeItem =
@@ -24,16 +24,17 @@ export const readGameDiagnosticItemReferenceFn = ({
 			: runtimes
 					.flatMap((runtime) => runtime.items)
 					.find((candidate) => candidate.id === runtimeItemId);
-	const definitionId = runtimeItem?.item.id ?? itemId;
+	const definitionUid = runtimeItem?.item.uid ?? itemUid;
 	const definition =
-		definitionId === undefined ? undefined : (config.items[definitionId] ?? runtimeItem?.item);
+		definitionUid === undefined
+			? undefined
+			: (config.items[definitionUid] ?? runtimeItem?.item);
 	return {
 		runtimeItemId,
 		definition:
 			definition === undefined
 				? null
 				: {
-						itemId: definition.id,
 						itemUid: definition.uid,
 						title: definition.title,
 					},

@@ -29,27 +29,27 @@ export const createGraphProject = () => {
 					...base.meta.board,
 					board: [
 						{
-							itemId: "water",
+							itemUid: "water",
 							x: 3,
 							y: 0,
 						},
 						{
-							itemId: "water",
+							itemUid: "water",
 							x: 4,
 							y: 0,
 						},
 						{
-							itemId: "water",
+							itemUid: "water",
 							x: 1,
 							y: 0,
 						},
 						{
-							itemId: "tool",
+							itemUid: "tool",
 							x: 2,
 							y: 0,
 						},
 						{
-							itemId: "forge",
+							itemUid: "forge",
 							x: 0,
 							y: 0,
 						},
@@ -80,7 +80,7 @@ export const createGraphProject = () => {
 											outcome: [
 												{
 													type: "item",
-													itemId: "ingot",
+													itemUid: "ingot",
 													placement: "drop",
 													quantity: {
 														max: 1,
@@ -99,13 +99,13 @@ export const createGraphProject = () => {
 				},
 				ingot: {
 					...base.items.tool,
-					id: "ingot",
+
 					title: "Ingot",
 					uid: "ingot",
 				},
 				unused: {
 					...base.items.tool,
-					id: "unused",
+
 					title: "Unused",
 					uid: "unused",
 				},

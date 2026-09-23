@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dd4q4ss6mjh85tvkw2tc39fv",
-		"id": "sack-with-salt",
 		"title": "Sack With Salt",
 		"draft": false,
 		"description": "Imported salt packed for storage and trade. Useful precisely because the settlement cannot casually make more of it.",

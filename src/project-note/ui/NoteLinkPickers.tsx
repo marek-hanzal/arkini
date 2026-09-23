@@ -48,8 +48,8 @@ export const NoteLinkPickers = ({
 				label={translator.textFn("Link item")}
 				value=""
 				includeItemFn={includeItemFn}
-				onChangeFn={(itemId) => {
-					const item = project.config.items[itemId];
+				onChangeFn={(itemUid) => {
+					const item = project.config.items[itemUid];
 					if (disabled || item === undefined || itemUids.includes(item.uid)) return;
 					onItemUidsChangeFn([
 						...itemUids,

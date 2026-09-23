@@ -19,7 +19,7 @@ const errorMessageFn = (error: unknown) =>
 export namespace useCheatItemSpotlightController {
 	export interface Item {
 		readonly compositeUrl?: string;
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly sourceUrl: string;
 		readonly title: string;
 	}
@@ -35,7 +35,7 @@ export namespace useCheatItemSpotlightController {
 		readonly items: ReadonlyArray<Item>;
 		readonly open: boolean;
 		readonly resetSpawnStatusFn: () => void;
-		readonly selectItemFn: (itemId: string) => void;
+		readonly selectItemFn: (itemUid: string) => void;
 		readonly spawnStatus: "error" | "idle" | "pending" | "success";
 		readonly spawnStatusMessage: string;
 	}
@@ -55,13 +55,13 @@ export const useCheatItemSpotlightController = ({
 	const items = useMemo(() => {
 		const exit = game.readFn(readCheatItemCatalogFx());
 		if (Exit.isFailure(exit)) throw exit.cause;
-		return exit.value.map(({ itemId, sourceResourceIds, title }) => ({
+		return exit.value.map(({ itemUid, sourceResourceIds, title }) => ({
 			...(sourceResourceIds[1] === undefined
 				? {}
 				: {
 						compositeUrl: game.getResourceUrlFn(sourceResourceIds[1]),
 					}),
-			itemId,
+			itemUid,
 			sourceUrl: game.getResourceUrlFn(sourceResourceIds[0]),
 			title,
 		}));
@@ -115,8 +115,8 @@ export const useCheatItemSpotlightController = ({
 			.exhaustive();
 		setOpenFn(true);
 	};
-	const selectItemFn = (itemId: string) => {
-		spawn.requestFn(itemId);
+	const selectItemFn = (itemUid: string) => {
+		spawn.requestFn(itemUid);
 	};
 
 	useHotkey("Mod+P", toggleFn, {

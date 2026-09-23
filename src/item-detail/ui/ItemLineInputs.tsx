@@ -65,7 +65,7 @@ export const ItemLineInputs = ({
 			data-ui="ItemLineInputs"
 		>
 			{inputs.map((input) => {
-				const item = game.config.items[input.itemId];
+				const item = game.config.items[input.itemUid];
 				const total = input.quantity.max;
 				const unavailable =
 					input.filled === 0 && input.availableQuantity === 0 && !input.committed;

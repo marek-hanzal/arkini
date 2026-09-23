@@ -19,7 +19,7 @@ const runRangePulseFx = (durationMs: number) =>
 		});
 		const spare = yield* spawnItemFx({
 			id: "spare",
-			itemId: "permit",
+			itemUid: "permit",
 
 			location: {
 				scope: "board",
@@ -52,7 +52,7 @@ const runRangePulseFx = (durationMs: number) =>
 										distance: "far",
 										selector: {
 											type: "item",
-											itemId: "permit",
+											itemUid: "permit",
 										},
 									},
 									mode: "consume",

@@ -29,7 +29,6 @@ const createDisabledJobConfig = () => {
 			permit: {
 				...base.items.tool,
 				uid: "permit",
-				id: "permit",
 			},
 			forge: {
 				...forge,
@@ -130,7 +129,7 @@ describe("enqueueLineFx", () => {
 		expect(result.transition.events).toContainEqual({
 			type: "job:queued",
 			requestId: result.request.id,
-			canonicalItemId: "forge",
+			itemUid: "forge",
 			ownerItemId: props.ownerItemId,
 			lineId: props.lineId,
 		});
@@ -151,7 +150,7 @@ describe("enqueueLineFx", () => {
 				] as const) {
 					yield* spawnItemFx({
 						id,
-						itemId: "forge",
+						itemUid: "forge",
 						location: {
 							scope: "board",
 							space: 0,
@@ -200,7 +199,7 @@ describe("enqueueLineFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: props.ownerItemId,
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "board",
 						space: 0,
@@ -234,7 +233,7 @@ describe("enqueueLineFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: props.ownerItemId,
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "board",
 						space: 0,
@@ -248,7 +247,7 @@ describe("enqueueLineFx", () => {
 				for (let index = 0; index < 3; index += 1)
 					yield* spawnItemFx({
 						id: `runtime:water:${index}`,
-						itemId: "water",
+						itemUid: "water",
 						location: {
 							scope: "board",
 							space: 0,
@@ -260,7 +259,7 @@ describe("enqueueLineFx", () => {
 					});
 				yield* spawnItemFx({
 					id: "runtime:tool",
-					itemId: "tool",
+					itemUid: "tool",
 					location: {
 						scope: "board",
 						space: 0,
@@ -352,7 +351,7 @@ describe("enqueueLineFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: props.ownerItemId,
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "board",
 						space: 0,
@@ -413,7 +412,7 @@ describe("enqueueLineFx", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: props.ownerItemId,
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "board",
 						space: 0,

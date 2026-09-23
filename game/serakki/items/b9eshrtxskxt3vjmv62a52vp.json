@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "b9eshrtxskxt3vjmv62a52vp",
-		"id": "mouse-with-bandaged-tail",
 		"title": "Mouse With Bandaged Tail",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "mouse",
+										"itemUid": "rvgihky3ismzedb2rwxwysq9",
 										"quantity": {
 											"min": 1,
 											"max": 1

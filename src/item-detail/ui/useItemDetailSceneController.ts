@@ -45,13 +45,15 @@ export const useItemDetailSceneController = ({
 	target,
 }: useItemDetailSceneController.Props): useItemDetailSceneController.Output => {
 	const game = useGameEngine();
-	const { kind, itemId } = target;
+	const { kind } = target;
+	const itemId = target.kind === "runtime" ? target.itemId : undefined;
+	const itemUid = target.kind === "definition" ? target.itemUid : undefined;
 	const [removal, setRemoval] = useState<{
 		readonly itemId: string;
 		readonly snapshot: readItemDetailRemovalFn.Snapshot;
 	}>();
 	useLayoutEffect(() => {
-		if (kind !== "runtime") return;
+		if (itemId === undefined) return;
 		// Observe every commit, even when React batches several runtime renders together.
 		return game.subscribeTransitionsFn((transition) => {
 			const snapshot = readItemDetailRemovalFn(transition, itemId);
@@ -69,7 +71,7 @@ export const useItemDetailSceneController = ({
 		itemId,
 	]);
 	const finalSnapshot =
-		kind === "runtime" && removal?.itemId === itemId ? removal.snapshot : undefined;
+		removal !== undefined && removal.itemId === itemId ? removal.snapshot : undefined;
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailSceneController.Detail | undefined => {
 			const runtimeItem =
@@ -77,7 +79,7 @@ export const useItemDetailSceneController = ({
 					? (runtime.items.find((candidate) => candidate.id === itemId) ??
 						finalSnapshot?.snapshot)
 					: undefined;
-			const item = kind === "definition" ? game.config.items[itemId] : runtimeItem?.item;
+			const item = itemUid === undefined ? runtimeItem?.item : game.config.items[itemUid];
 			if (item === undefined) return undefined;
 			const lineStates = game.readFn(
 				Effect.forEach(item.lines, (line) => {
@@ -172,13 +174,14 @@ export const useItemDetailSceneController = ({
 			game,
 			kind,
 			itemId,
+			itemUid,
 			finalSnapshot,
 		],
 	);
 	const detail = useRuntimeSelector(game, selectorFn, Equal.equals);
 	const retained = useRetainedItemDetailProjection({
 		available: detail !== undefined,
-		targetKey: `${kind}:${itemId}`,
+		targetKey: `${kind}:${itemId ?? itemUid}`,
 		value: detail,
 	});
 	return {

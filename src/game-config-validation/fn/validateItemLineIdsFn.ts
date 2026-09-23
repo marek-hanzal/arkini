@@ -17,7 +17,7 @@ export namespace validateItemLineIdsFn {
 /** Enforces owner-local line identity and one authored Default. */
 export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineIdsFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
-	for (const [ownerItemId, item] of Object.entries(config.items)) {
+	for (const [ownerItemUid, item] of Object.entries(config.items)) {
 		const firstById = new Map<IdSchema.Type, DiagnosticPathSchema.Type>();
 		let firstDefault:
 			| {
@@ -26,7 +26,7 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 			  }
 			| undefined;
 		const entries = readItemLineEntriesFn({
-			itemId: ownerItemId,
+			itemUid: ownerItemUid,
 			item,
 		});
 		for (const entry of entries) {
@@ -50,10 +50,10 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 						code: DiagnosticCodeEnumSchema.enum.LineMultipleSelections,
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path,
-						source: provenance.items[ownerItemId],
+						source: provenance.items[ownerItemUid],
 						selection: "default",
-						message: `Item ${ownerItemId} marks both ${first.lineId} and ${entry.line.id} as authored default lines.`,
-						ownerItemId,
+						message: `Item ${ownerItemUid} marks both ${first.lineId} and ${entry.line.id} as authored default lines.`,
+						ownerItemUid,
 						lineIds: [
 							first.lineId,
 							entry.line.id,
@@ -70,9 +70,9 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 					code: DiagnosticCodeEnumSchema.enum.LineDuplicateId,
 					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: lineIdPath,
-					source: provenance.items[ownerItemId],
-					message: `Item ${ownerItemId} owns more than one line with ID ${entry.line.id}.`,
-					ownerItemId,
+					source: provenance.items[ownerItemUid],
+					message: `Item ${ownerItemUid} owns more than one line with ID ${entry.line.id}.`,
+					ownerItemUid,
 					lineId: entry.line.id,
 					paths: [
 						previousPath,

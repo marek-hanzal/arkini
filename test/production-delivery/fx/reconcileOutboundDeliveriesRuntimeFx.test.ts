@@ -32,7 +32,7 @@ const config = GameConfigSchema.parse({
 });
 
 const createDeliveriesFx = Effect.gen(function* () {
-	for (const [id, itemId, x] of [
+	for (const [id, itemUid, x] of [
 		[
 			"runtime:a",
 			"workshop",
@@ -56,7 +56,7 @@ const createDeliveriesFx = Effect.gen(function* () {
 	] as const) {
 		yield* spawnItemFx({
 			id,
-			itemId,
+			itemUid,
 			location: sourceLocation(x),
 		});
 	}
@@ -64,7 +64,7 @@ const createDeliveriesFx = Effect.gen(function* () {
 	return {
 		...runtime,
 		items: runtime.items.map((item) => {
-			if (item.item.id !== "water") return item;
+			if (item.item.uid !== "water") return item;
 			const first = item.id === "water:first";
 			return {
 				...item,

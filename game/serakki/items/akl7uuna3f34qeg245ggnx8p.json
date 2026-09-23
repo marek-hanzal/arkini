@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "akl7uuna3f34qeg245ggnx8p",
-		"id": "stone---tier-3",
 		"title": "Stone - Tier 3",
 		"draft": true,
 		"ui": "simple",
@@ -36,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-3"
+								"itemUid": "akl7uuna3f34qeg245ggnx8p"
 							},
 							"distance": "self"
 						}
@@ -53,7 +52,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stone---tier-2",
+											"itemUid": "t39jwpoa9w53pbwcn1jfppyp",
 											"quantity": {
 												"min": 2,
 												"max": 2

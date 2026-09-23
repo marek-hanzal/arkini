@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lknmzmrbwrl2401n3vozrgbs",
-		"id": "shield",
 		"title": "Shield",
 		"ui": "simple",
 		"description": "It may protect you",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle-with-sword"
+					"itemUid": "rsuelogiw40sc1p2sxa2ptik"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-with-battle-axe-and-shield"
+				"result": "i7unvc2otmcnyzljh9spq33d"
 			}
 		],
 		"maxQueueSize": 1,

@@ -21,7 +21,7 @@ it("creates a detached complete state that constructs one fresh session", async 
 		await first.runFn(
 			spawnItemFx({
 				id: "runtime:later",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board" as const,
 					space: 0,

@@ -48,7 +48,7 @@ describe("readOutcomePlacementItemEventsFx", () => {
 				{
 					outcome: {
 						type: "item",
-						itemId: "water",
+						itemUid: "water",
 						quantity: 2,
 						placement: "drop",
 					},
@@ -73,14 +73,14 @@ describe("readOutcomePlacementItemEventsFx", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: first.id,
-				canonicalItemId: "water",
+				itemUid: "water",
 				originItemId: "runtime:origin",
 				location: first.location,
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: spawned.id,
-				canonicalItemId: "water",
+				itemUid: "water",
 				originItemId: "runtime:origin",
 				location: spawned.location,
 			},

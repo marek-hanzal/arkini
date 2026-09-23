@@ -35,7 +35,7 @@ const mergeSource = ({
 	result?: string;
 	target: {
 		type: "item";
-		itemId: string;
+		itemUid: string;
 	};
 }) => ({
 	...createSimpleItem("source"),
@@ -99,15 +99,15 @@ describe("validateMergeViabilityFn", () => {
 			action: "spend",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 		});
 		const target = createSimpleItem("target");
 
 		expect(
 			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
+				[source.uid]: source,
+				[target.uid]: target,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -131,15 +131,15 @@ describe("validateMergeViabilityFn", () => {
 			},
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 		});
 		const target = createSimpleItem("target");
 
 		expect(
 			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
+				[source.uid]: source,
+				[target.uid]: target,
 			}),
 		).toEqual([]);
 	});
@@ -149,15 +149,15 @@ describe("validateMergeViabilityFn", () => {
 			effect: "spend",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 		});
 		const target = createSimpleItem("target");
 
 		expect(
 			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
+				[source.uid]: source,
+				[target.uid]: target,
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -178,7 +178,7 @@ describe("validateMergeViabilityFn", () => {
 			effect: "spend",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 		});
 		const target = {
@@ -190,8 +190,8 @@ describe("validateMergeViabilityFn", () => {
 
 		expect(
 			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
+				[source.uid]: source,
+				[target.uid]: target,
 			}),
 		).toEqual([]);
 	});
@@ -200,13 +200,13 @@ describe("validateMergeViabilityFn", () => {
 		const source = mergeSource({
 			target: {
 				type: "item",
-				itemId: "source",
+				itemUid: "source",
 			},
 		});
 
 		expect(
 			await mergeDiagnostics({
-				[source.id]: source,
+				[source.uid]: source,
 			}),
 		).toEqual([]);
 	});
@@ -217,7 +217,7 @@ describe("validateMergeViabilityFn", () => {
 			result: "result",
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 		});
 		const target = createSimpleItem("target");
@@ -227,9 +227,9 @@ describe("validateMergeViabilityFn", () => {
 
 		expect(
 			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
-				[result.id]: result,
+				[source.uid]: source,
+				[target.uid]: target,
+				[result.uid]: result,
 			}),
 		).toEqual([]);
 	});
@@ -240,11 +240,11 @@ describe("validateMergeViabilityFn", () => {
 			result: "missing:result",
 			target: {
 				type: "item",
-				itemId: "missing:target",
+				itemUid: "missing:target",
 			},
 		});
 		const diagnostics = await compileDiagnostics({
-			[source.id]: source,
+			[source.uid]: source,
 		});
 
 		expect(

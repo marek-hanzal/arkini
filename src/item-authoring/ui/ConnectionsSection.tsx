@@ -35,50 +35,50 @@ const ConnectionFilterOptions = [
 
 interface ConnectionsSectionProps {
 	readonly filter: ItemConnectionFilter;
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly onFilterChangeFn: (filter: ItemConnectionFilter) => void;
 }
 
 /** Explores one explicit authored connection projection for any project item. */
 export const ConnectionsSection = ({
 	filter,
-	itemId,
+	itemUid,
 	onFilterChangeFn,
 }: ConnectionsSectionProps) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const connectionsByFilter = useMemo(
 		() => ({
-			"required-by": readItemConnectionsFn(project.config, itemId, "required-by"),
-			inputs: readItemConnectionsFn(project.config, itemId, "inputs"),
-			produces: readItemConnectionsFn(project.config, itemId, "produces"),
-			"produced-by": readItemConnectionsFn(project.config, itemId, "produced-by"),
+			"required-by": readItemConnectionsFn(project.config, itemUid, "required-by"),
+			inputs: readItemConnectionsFn(project.config, itemUid, "inputs"),
+			produces: readItemConnectionsFn(project.config, itemUid, "produces"),
+			"produced-by": readItemConnectionsFn(project.config, itemUid, "produced-by"),
 		}),
 		[
-			itemId,
+			itemUid,
 			project.config,
 		],
 	);
 	const connectionItems = connectionsByFilter[filter];
-	const searchScope = `${itemId}:${filter}`;
+	const searchScope = `${itemUid}:${filter}`;
 	const [searchSelection, setSearchSelectionFn] = useState({
-		itemId: "",
+		itemUid: "",
 		scope: searchScope,
 	});
 	const selectedConnectionId =
 		searchSelection.scope === searchScope &&
-		connectionItems.some(({ item }) => item.id === searchSelection.itemId)
-			? searchSelection.itemId
+		connectionItems.some(({ item }) => item.uid === searchSelection.itemUid)
+			? searchSelection.itemUid
 			: "";
 	const searchOptions = useMemo(
 		() =>
 			connectionItems.map(
 				({ item }) =>
 					({
-						id: item.id,
+						id: item.uid,
 						label: item.title,
 						terms: [
-							item.id,
+							item.uid,
 							item.title,
 							item.description ?? "",
 						],
@@ -91,7 +91,7 @@ export const ConnectionsSection = ({
 	const visibleConnectionItems =
 		selectedConnectionId.length === 0
 			? connectionItems
-			: connectionItems.filter(({ item }) => item.id === selectedConnectionId);
+			: connectionItems.filter(({ item }) => item.uid === selectedConnectionId);
 
 	return (
 		<div
@@ -107,16 +107,16 @@ export const ConnectionsSection = ({
 							key={searchScope}
 							label={translator.textFn("Item")}
 							labelVisible={false}
-							onChangeFn={(nextItemId) =>
+							onChangeFn={(nextItemUid) =>
 								setSearchSelectionFn({
-									itemId: nextItemId,
+									itemUid: nextItemUid,
 									scope: searchScope,
 								})
 							}
 							onInputChangeFn={(query) => {
 								if (query.length > 0) return;
 								setSearchSelectionFn({
-									itemId: "",
+									itemUid: "",
 									scope: searchScope,
 								});
 							}}
@@ -167,13 +167,13 @@ export const ConnectionsSection = ({
 				>
 					{visibleConnectionItems.map(({ item, origins }) => (
 						<ItemConnectionRow
-							key={item.id}
+							key={item.uid}
 							item={item}
 							origins={origins}
 							owner={
 								filter === "required-by" || filter === "produced-by"
 									? item
-									: project.config.items[itemId]
+									: project.config.items[itemUid]
 							}
 						/>
 					))}

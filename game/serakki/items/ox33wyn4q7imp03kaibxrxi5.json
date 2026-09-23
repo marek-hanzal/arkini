@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ox33wyn4q7imp03kaibxrxi5",
-		"id": "clay-bowl-with-coffee",
 		"title": "Clay Bowl With Coffee",
 		"ui": "simple",
 		"description": "Flateticano",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-bowl",
+										"itemUid": "c3vesqhj22ratn3fr8thfsax",
 										"quantity": {
 											"min": 1,
 											"max": 1

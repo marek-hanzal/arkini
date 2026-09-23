@@ -16,8 +16,8 @@ const DeleteError = ({ error }: { readonly error: unknown }) =>
 		</p>
 	);
 
-const readItemTitleFn = (project: Project, itemId: string) =>
-	project.config.items[itemId]?.title || itemId;
+const readItemTitleFn = (project: Project, itemUid: string) =>
+	project.config.items[itemUid]?.title || itemUid;
 
 const ForceDeleteImpactList = ({
 	impact,
@@ -32,25 +32,25 @@ const ForceDeleteImpactList = ({
 		entries.push(
 			`${translator.textFn("Remove")} ${count} ${translator.textFn("entries")} · ${translator.textFn("Template")} ${title}`,
 		);
-	for (const { ownerItemId, ruleNumber } of impact.removedMergeRules)
+	for (const { ownerItemUid, ruleNumber } of impact.removedMergeRules)
 		entries.push(
-			`${translator.textFn("Remove merge rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove merge rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemUid)}`,
 		);
-	for (const { ownerItemId, ruleNumber } of impact.removedClockRules)
+	for (const { ownerItemUid, ruleNumber } of impact.removedClockRules)
 		entries.push(
-			`${translator.textFn("Remove Clock rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove Clock rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemUid)}`,
 		);
-	for (const { ownerItemId, title } of impact.removedLines)
+	for (const { ownerItemUid, title } of impact.removedLines)
 		entries.push(
-			`${translator.textFn("Remove production line")} “${title}” ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove production line")} “${title}” ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemUid)}`,
 		);
-	for (const ownerItemId of impact.removedUnitOutcomeOwnerIds)
+	for (const ownerItemUid of impact.removedUnitOutcomeOwnerIds)
 		entries.push(
-			`${translator.textFn("Remove the unit depletion outcome from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove the unit depletion outcome from")} ${readItemTitleFn(project, ownerItemUid)}`,
 		);
-	for (const ownerItemId of impact.removedExpiryOutcomeOwnerIds)
+	for (const ownerItemUid of impact.removedExpiryOutcomeOwnerIds)
 		entries.push(
-			`${translator.textFn("Remove the expiry outcome from")} ${readItemTitleFn(project, ownerItemId)}`,
+			`${translator.textFn("Remove the expiry outcome from")} ${readItemTitleFn(project, ownerItemUid)}`,
 		);
 
 	return (
@@ -100,7 +100,7 @@ export const DeleteDialog = ({
 				</h2>
 				<p className="mt-2 text-sm leading-6 text-muted">
 					{translator.textFn("Delete")}{" "}
-					<strong className="text-foreground">{item.title || item.id}</strong>{" "}
+					<strong className="text-foreground">{item.title || item.uid}</strong>{" "}
 					{translator.textFn("from the game.")}
 				</p>
 				{force ? <Mx label="Force delete reference removal help" /> : null}

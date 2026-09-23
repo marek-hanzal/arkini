@@ -68,7 +68,6 @@ const config = GameConfigSchema.parse({
 	items: {
 		portal: {
 			uid: "portal",
-			id: "portal",
 
 			lines: [
 				{
@@ -119,7 +118,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "water",
-			id: "water",
 
 			title: "Water",
 			description: "Water",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "our0pxaqz9ce08z8tdyhek44",
-		"id": "campfire",
 		"title": "Campfire",
 		"description": "A pile of stone and firewood waiting for a spark. Useful for warmth, cooking, and several bad ideas.",
 		"ui": "simple",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cauldron-with-beeswax"
+					"itemUid": "j8d36shyw3d5sp0jd2bqtkd7"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cauldron-with-boiling-beeswax"
+				"result": "bo9nafcuzyb3p0g3h4sz6c9r"
 			}
 		],
 		"maxQueueSize": 1,

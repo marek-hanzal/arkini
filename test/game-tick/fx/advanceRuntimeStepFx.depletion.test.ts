@@ -40,7 +40,7 @@ it("preserves the full lifetime of temporary depletion outcome created by queue 
 									distance: "close",
 									selector: {
 										type: "item",
-										itemId: "blocker",
+										itemUid: "blocker",
 									},
 								},
 							},
@@ -64,7 +64,7 @@ it("preserves the full lifetime of temporary depletion outcome created by queue 
 			] as const) {
 				yield* spawnItemFx({
 					id: `runtime:${itemId}`,
-					itemId,
+					itemUid: itemId,
 					location: {
 						scope: "board",
 						space: 0,
@@ -92,13 +92,13 @@ it("preserves the full lifetime of temporary depletion outcome created by queue 
 		),
 	);
 
-	expect(result.first.runtime.items.some((item) => item.item.id === "blocker")).toBe(false);
+	expect(result.first.runtime.items.some((item) => item.item.uid === "blocker")).toBe(false);
 	expect(
-		result.first.runtime.items.find((item) => item.item.id === "temporaryPlain")?.schedule
+		result.first.runtime.items.find((item) => item.item.uid === "temporaryPlain")?.schedule
 			?.remainingDurationMs,
 	).toBe(600);
 	expect(
-		result.second.runtime.items.find((item) => item.item.id === "temporaryPlain")?.schedule
+		result.second.runtime.items.find((item) => item.item.uid === "temporaryPlain")?.schedule
 			?.remainingDurationMs,
 	).toBe(500);
 });

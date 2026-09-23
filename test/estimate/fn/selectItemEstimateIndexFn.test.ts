@@ -7,7 +7,6 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 const item = (id: string, title: string) =>
 	({
 		description: `${title} description`,
-		id,
 		title,
 		uid: id,
 	}) as ItemSchema.Type;
@@ -15,27 +14,27 @@ const item = (id: string, title: string) =>
 const entries: ReadonlyArray<ItemEstimateIndexEntry> = [
 	{
 		demand: 0.05,
-		itemId: "bakery",
+		itemUid: "bakery",
 		method: "static",
 		runtimeMs: 120_000,
 		status: "complete",
 	},
 	{
 		demand: 64_429.17,
-		itemId: "water",
+		itemUid: "water",
 		method: "static",
 		runtimeMs: 0,
 		status: "complete",
 	},
 	{
 		demand: 50,
-		itemId: "well",
+		itemUid: "well",
 		method: "static",
 		status: "partial",
 	},
 	{
 		demand: 10,
-		itemId: "unused",
+		itemUid: "unused",
 		method: "static",
 		status: "unreachable",
 	},
@@ -48,29 +47,29 @@ const items = [
 	item("unused", "Unused"),
 ];
 
-const readItemIds = (view: "demand" | "fastest" | "incomplete" | "slowest", query = "") =>
+const readItemUids = (view: "demand" | "fastest" | "incomplete" | "slowest", query = "") =>
 	selectItemEstimateIndexFn({
 		entries,
 		items,
 		query,
 		view,
-	}).map(({ item }) => item.id);
+	}).map(({ item }) => item.uid);
 
 describe("selectItemEstimateIndexFn", () => {
 	it("owns the global Estimate ordering and keeps indeterminate estimates last", () => {
-		expect(readItemIds("fastest")).toEqual([
+		expect(readItemUids("fastest")).toEqual([
 			"water",
 			"bakery",
 			"unused",
 			"well",
 		]);
-		expect(readItemIds("slowest")).toEqual([
+		expect(readItemUids("slowest")).toEqual([
 			"bakery",
 			"water",
 			"unused",
 			"well",
 		]);
-		expect(readItemIds("demand")).toEqual([
+		expect(readItemUids("demand")).toEqual([
 			"water",
 			"well",
 			"unused",
@@ -79,17 +78,17 @@ describe("selectItemEstimateIndexFn", () => {
 	});
 
 	it("applies the authored-item fuzzy query before ordering", () => {
-		expect(readItemIds("demand", "wel")).toEqual([
+		expect(readItemUids("demand", "wel")).toEqual([
 			"well",
 		]);
 	});
 
 	it("returns only partial and unreachable estimates without changing query semantics", () => {
-		expect(readItemIds("incomplete")).toEqual([
+		expect(readItemUids("incomplete")).toEqual([
 			"unused",
 			"well",
 		]);
-		expect(readItemIds("incomplete", "unus")).toEqual([
+		expect(readItemUids("incomplete", "unus")).toEqual([
 			"unused",
 		]);
 	});
@@ -113,7 +112,7 @@ describe("selectItemEstimateIndexFn", () => {
 				items: tiedItems,
 				query: "",
 				view: "fastest",
-			}).map(({ item }) => item.id),
+			}).map(({ item }) => item.uid),
 		).toEqual([
 			"water",
 			"unused",

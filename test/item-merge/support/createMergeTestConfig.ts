@@ -19,7 +19,6 @@ const simpleItem = ({
 	lines: [],
 
 	uid: id,
-	id,
 	title: id,
 	description: id,
 	units,
@@ -104,11 +103,11 @@ export const createMergeTestConfig = ({
 	});
 
 export const guaranteedMergeOutput = ({
-	itemId = "output",
+	itemUid = "output",
 	placement = "drop",
 	quantity = 1,
 }: {
-	itemId?: string;
+	itemUid?: string;
 	placement?: "drop" | "random";
 	quantity?: number;
 } = {}): OutcomeTableSchema.Type => ({
@@ -122,7 +121,7 @@ export const guaranteedMergeOutput = ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid,
 							placement,
 							quantity: {
 								min: quantity,
@@ -148,7 +147,7 @@ export const weightedMergeOutput = (): OutcomeTableSchema.Type => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId: "output:a",
+							itemUid: "output:a",
 							placement: "drop",
 							quantity: {
 								min: 2,
@@ -169,7 +168,7 @@ export const weightedMergeOutput = (): OutcomeTableSchema.Type => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId: "output:b",
+							itemUid: "output:b",
 							placement: "drop",
 							quantity: {
 								min: 2,

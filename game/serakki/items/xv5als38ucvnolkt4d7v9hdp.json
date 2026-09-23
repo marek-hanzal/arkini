@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xv5als38ucvnolkt4d7v9hdp",
-		"id": "clay-jug-with-wine",
 		"title": "Clay Jug With Wine",
 		"ui": "simple",
 		"description": "Fresh wine",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-jug",
+										"itemUid": "as7cebumachej9xwfokqhkue",
 										"quantity": {
 											"min": 1,
 											"max": 1

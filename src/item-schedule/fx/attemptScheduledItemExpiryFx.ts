@@ -57,7 +57,7 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 			"serakki:scheduled-expiry",
 			"v1",
 			item.id,
-			item.item.id,
+			item.item.uid,
 		].join(":"),
 		runtime: {
 			...runtime,

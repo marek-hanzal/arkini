@@ -81,11 +81,9 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 });
 
 const readFormValidationMessageFn = (issue: z.core.$ZodIssue, textFn: (key: string) => string) => {
-	if (issue.path.at(-1) === "itemId" && issue.code === "too_small")
+	if (issue.path.at(-1) === "itemUid" && issue.code === "too_small")
 		return textFn("Select an item.");
 	switch (issue.message) {
-		case "This Item ID is already in use.":
-			return textFn("This Item ID is already in use.");
 		case "Enable Units on this item before selecting Spend.":
 			return textFn("Enable Units on this item before selecting Spend.");
 		case "Selected target must have Units enabled before choosing Spend.":
@@ -244,7 +242,7 @@ export const useFormController = ({
 	const dirty = useStore(form.store, (state) => state.isDirty);
 	const touched = useStore(form.store, (state) => state.isTouched);
 	const draftRevision = useAuthoringDraftRevision(project.revision, touched);
-	const itemId = useStore(form.store, (state) => state.values.id);
+	const itemUid = useStore(form.store, (state) => state.values.uid);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 	const currentValues = useStore(form.store, (state) => state.values);
@@ -345,7 +343,7 @@ export const useFormController = ({
 			isSaving: submitting,
 			form,
 			initialItem,
-			itemId,
+			itemUid,
 			project,
 			saveFn,
 			validationIssues,
@@ -359,7 +357,7 @@ export const useFormController = ({
 			persistenceError,
 			form,
 			initialItem,
-			itemId,
+			itemUid,
 			project,
 			saveFn,
 			submitting,

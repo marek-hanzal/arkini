@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aalsr85hfkjpg477l9h99xxb",
-		"id": "fawn",
 		"title": "Fawn",
 		"ui": "simple",
 		"description": "It's cute, isn't it?",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dynamite"
+					"itemUid": "un9w2bebyhy98wbi2nu22naz"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "dynamite-fed-fawn"
+				"result": "c8jy20r1oxohcln7xmrhv46c"
 			}
 		],
 		"clock": {
@@ -39,7 +38,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

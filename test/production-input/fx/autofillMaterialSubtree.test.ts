@@ -25,7 +25,6 @@ const configFn = (mode: "reserve" | "consume") => {
 			...inputRuntimeTestConfig.items,
 			recycler: {
 				...workshop,
-				id: "recycler",
 				uid: "recycler",
 				lines: [
 					{
@@ -39,7 +38,7 @@ const configFn = (mode: "reserve" | "consume") => {
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "workshop",
+										itemUid: "workshop",
 									},
 								},
 								quantity: {
@@ -75,19 +74,19 @@ const stateFn = (origin: BoardLocationSchema.Type): StateSchema.Type => ({
 	items: [
 		{
 			id: "receiver",
-			itemId: "recycler",
+			itemUid: "recycler",
 
 			location: sourceLocation(0),
 		},
 		{
 			id: "source",
-			itemId: "workshop",
+			itemUid: "workshop",
 
 			location: origin,
 		},
 		{
 			id: "water",
-			itemId: "water",
+			itemUid: "water",
 
 			location: {
 				scope: "input",

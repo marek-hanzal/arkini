@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dh9e0g2vwxg9hlgxozha1046",
-		"id": "marek-smelly",
 		"title": "Marek Smelly",
 		"ui": "simple",
 		"description": "I should take some wash",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub-with-soapy-water"
+					"itemUid": "osvxwuyh6iy0achwcuujk97b"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "marek",
+											"itemUid": "ovv04m3gxvmdrl88lalr4qn8",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "copper-bathtub-with-bio-waste"
+				"result": "shp343joyeuwkqsic8viao7j"
 			}
 		],
 		"maxQueueSize": 1,

@@ -17,7 +17,7 @@ export const InvalidInputUnitsDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		ownerItemId: IdSchema,
+		ownerItemUid: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),
 		reason: InvalidInputUnitsReasonEnumSchema,

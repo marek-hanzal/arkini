@@ -21,7 +21,7 @@ const startProps = {
 const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function* () {
 	const owner = yield* spawnItemFx({
 		id: "runtime:forge",
-		itemId: "forge",
+		itemUid: "forge",
 		location: {
 			scope: "board",
 			space: 0,
@@ -34,7 +34,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 	for (let index = 0; index < 3; index++) {
 		const water = yield* spawnItemFx({
 			id: `runtime:water:${index}`,
-			itemId: "water",
+			itemUid: "water",
 			location: {
 				scope: "board",
 				space: 0,
@@ -55,7 +55,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 
 	const tool = yield* spawnItemFx({
 		id: "runtime:tool",
-		itemId: "tool",
+		itemUid: "tool",
 		location: {
 			scope: "board",
 			space: 0,
@@ -152,7 +152,7 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 		expect(result.transition.events[0]).toEqual({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: startProps.ownerItemId,
-			canonicalItemId: "forge",
+			itemUid: "forge",
 			location: {
 				scope: "board",
 				space: 0,
@@ -170,12 +170,12 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 		).toBe(false);
 		expect(result.runtime.items.some((item) => item.id === startProps.ownerItemId)).toBe(false);
 		expect(result.runtime.items.some((item) => item.location.scope === "input")).toBe(false);
-		expect(result.runtime.items.filter((item) => item.item.id === "water").length).toBe(3);
-		expect(result.runtime.items.filter((item) => item.item.id === "tool").length).toBe(1);
+		expect(result.runtime.items.filter((item) => item.item.uid === "water").length).toBe(3);
+		expect(result.runtime.items.filter((item) => item.item.uid === "tool").length).toBe(1);
 		expect(result.runtime.items.every((item) => item.location.scope !== "input")).toBe(true);
 		expect(
 			result.runtime.items
-				.filter((item) => item.item.id === "water" || item.item.id === "tool")
+				.filter((item) => item.item.uid === "water" || item.item.uid === "tool")
 				.every((item) => item.location.scope === "board"),
 		).toBe(true);
 	});
@@ -185,7 +185,7 @@ describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
 			Effect.gen(function* () {
 				const item = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,
@@ -278,7 +278,7 @@ it("keeps the owner and every buffered input when one released item cannot be pl
 			].entries()) {
 				yield* spawnItemFx({
 					id: `runtime:board-fill:${index}`,
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,

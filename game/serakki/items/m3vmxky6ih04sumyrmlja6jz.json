@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "m3vmxky6ih04sumyrmlja6jz",
-		"id": "herbalist",
 		"title": "Herbalist",
 		"draft": false,
 		"ui": "default",
@@ -33,7 +32,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "herb-garden"
+								"itemUid": "qs93ro2wex61c7emcew4s9ek"
 							},
 							"distance": "close"
 						}
@@ -43,7 +42,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -65,7 +64,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "herbs",
+											"itemUid": "ilv0xhu2ahank1uv1r8yptvf",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -75,7 +74,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -106,7 +105,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "herbs"
+								"itemUid": "ilv0xhu2ahank1uv1r8yptvf"
 							},
 							"distance": "far"
 						},
@@ -121,7 +120,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-jar"
+								"itemUid": "w3x58j053qf9fgq90wqqtylq"
 							},
 							"distance": "far"
 						},
@@ -143,7 +142,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "medicine-jar",
+											"itemUid": "gei0ts23utvtz6qx38cw2mpy",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -174,7 +173,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "herbs"
+								"itemUid": "ilv0xhu2ahank1uv1r8yptvf"
 							},
 							"distance": "far"
 						},
@@ -189,7 +188,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-jar"
+								"itemUid": "w3x58j053qf9fgq90wqqtylq"
 							},
 							"distance": "far"
 						},
@@ -211,7 +210,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "poison-jar",
+											"itemUid": "m901w07a1x2ta0wbs4qa9pjd",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -253,7 +252,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-herb-garden",
+											"itemUid": "atcdihdj87zfj52oagbqxcri",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -285,7 +284,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -307,7 +306,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "herbalist-blueprint",
+											"itemUid": "ri5f01a3bc0dextioq61r9qj",
 											"quantity": {
 												"min": 1,
 												"max": 1

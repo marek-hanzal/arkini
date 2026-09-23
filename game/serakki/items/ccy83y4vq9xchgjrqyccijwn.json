@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ccy83y4vq9xchgjrqyccijwn",
-		"id": "linen-thread",
 		"title": "Linen Thread",
 		"ui": "simple",
 		"description": "Something to make other things tangled.",

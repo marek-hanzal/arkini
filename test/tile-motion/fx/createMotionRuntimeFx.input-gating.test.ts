@@ -53,7 +53,7 @@ describe("input-gated owner output", () => {
 			canonicalItems,
 		});
 		const cue = {
-			canonicalItemId: source.item.itemId,
+			itemUid: source.item.itemUid,
 			eventIndex: 0,
 			kind: "input",
 			originActorId: source.item.id,

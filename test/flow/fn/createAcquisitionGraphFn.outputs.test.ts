@@ -25,7 +25,7 @@ describe("createAcquisitionGraphFn output distributions", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: `chance:${index}`,
+									itemUid: `chance:${index}`,
 									quantity: {
 										max: 1,
 										min: 1,

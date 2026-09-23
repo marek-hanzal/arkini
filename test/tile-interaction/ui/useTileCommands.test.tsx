@@ -44,14 +44,14 @@ it("returns each overlapping Board drop's own committed actor", async () => {
 		const a = await session.runFn(
 			spawnItemFx({
 				id: "a",
-				itemId: "first",
+				itemUid: "first",
 				location: firstLocation,
 			}),
 		);
 		const b = await session.runFn(
 			spawnItemFx({
 				id: "b",
-				itemId: "second",
+				itemUid: "second",
 				location: secondLocation,
 			}),
 		);

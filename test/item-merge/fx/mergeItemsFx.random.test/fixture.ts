@@ -18,7 +18,7 @@ export const createConfigFn = (small = false) =>
 		rule: {
 			target: {
 				type: "item",
-				itemId: "target",
+				itemUid: "target",
 			},
 			action: "use",
 			effect: "keep",
@@ -38,7 +38,7 @@ export const initialState = StateSchema.parse({
 	items: [
 		{
 			id: "reusable-source",
-			itemId: "source",
+			itemUid: "source",
 
 			location: {
 				scope: "board",
@@ -51,7 +51,7 @@ export const initialState = StateSchema.parse({
 		},
 		{
 			id: "stable-target",
-			itemId: "target",
+			itemUid: "target",
 
 			location: {
 				scope: "board",
@@ -78,7 +78,7 @@ export const mergeFx = () =>
 		const after = yield* readRuntimeFx();
 		return after.items
 			.filter((item) => !before.items.some((previous) => previous.id === item.id))
-			.map((item) => item.item.id);
+			.map((item) => item.item.uid);
 	});
 export const repeatFx = (count: number) =>
 	Effect.forEach(
@@ -103,7 +103,7 @@ export const saveFx = () =>
 export const removeOutputsFx = () =>
 	Effect.gen(function* () {
 		const runtime = yield* readRuntimeFx();
-		for (const item of runtime.items.filter((item) => item.item.id.startsWith("output:"))) {
+		for (const item of runtime.items.filter((item) => item.item.uid.startsWith("output:"))) {
 			yield* removeRuntimeItemForTestFx({
 				itemId: item.id,
 				revision: item.revision,

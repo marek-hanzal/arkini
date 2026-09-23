@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "eczq2cnuql13r4lalarm6kgt",
-		"id": "eggs",
 		"title": "Eggs",
 		"description": "Some eggs you may cook.",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-eggs",
+										"itemUid": "vooe5nxicrr6v6lcijgp3f4r",
 										"quantity": {
 											"min": 1,
 											"max": 1

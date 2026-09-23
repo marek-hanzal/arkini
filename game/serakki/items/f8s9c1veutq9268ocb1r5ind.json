@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f8s9c1veutq9268ocb1r5ind",
-		"id": "empty-well-with-water-bucket",
 		"title": "Empty Well With Water Bucket",
 		"ui": "simple",
 		"draft": true,

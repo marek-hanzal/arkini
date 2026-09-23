@@ -16,7 +16,7 @@ export const DuplicateLineIdDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		ownerItemId: IdSchema,
+		ownerItemUid: IdSchema,
 		lineId: IdSchema,
 		paths: z.tuple([
 			DiagnosticPathSchema,

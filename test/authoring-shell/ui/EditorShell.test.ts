@@ -38,8 +38,7 @@ vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", () => ({
 	useEditorItemSearchOptions: () => ({
 		items: {
 			"item:beta": {
-				id: "item:beta",
-				uid: "item-beta-uid",
+				uid: "item:beta",
 			},
 		},
 		options: [
@@ -282,7 +281,7 @@ describe("EditorShell", () => {
 
 		await vi.waitFor(() =>
 			expect(router.state.location.pathname).toBe(
-				"/editor/editor-test/editor/items/item-beta-uid/detail/identity",
+				"/editor/editor-test/editor/items/item%3Abeta/detail/identity",
 			),
 		);
 		expect(container.querySelector('[data-ui="EditorItemSpotlight"]')).toBeNull();

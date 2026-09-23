@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ubo4ux37gz2ya3qfsj78a9oq",
-		"id": "clutter",
 		"title": "Clutter",
 		"ui": "simple",
 		"description": "Just broken stuff. You should take care of you clutter.",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet-toxic-waste"
+					"itemUid": "so2sd6a2wb8g5xp5lretg7ma"
 				},
 				"action": "consume",
 				"effect": "keep"
@@ -24,11 +23,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "broken-toilet"
+				"result": "rlu8j1ab449tif0zotlwervi"
 			}
 		],
 		"maxQueueSize": 1,

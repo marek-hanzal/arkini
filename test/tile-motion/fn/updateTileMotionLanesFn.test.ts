@@ -49,7 +49,7 @@ const inputCue = ({
 	readonly sourceActorId?: string;
 	readonly targetActorId?: string;
 }): TileInputMotionCue => ({
-	canonicalItemId: "water",
+	itemUid: "water",
 	eventIndex: 0,
 	kind: "input",
 	originActorId: sourceActorId,

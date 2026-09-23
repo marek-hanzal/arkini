@@ -15,7 +15,7 @@ export const TemplateSchema = z
 			z
 				.object({
 					...PositionSchema.shape,
-					itemId: IdSchema,
+					itemUid: IdSchema,
 				})
 				.strict(),
 		),

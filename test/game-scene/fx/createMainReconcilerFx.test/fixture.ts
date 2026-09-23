@@ -147,7 +147,7 @@ export const createItem = (
 ): TileActorItem => ({
 	compositeUrl: undefined,
 	id,
-	itemId: "water",
+	itemUid: "water",
 
 	location,
 	primaryAction: {

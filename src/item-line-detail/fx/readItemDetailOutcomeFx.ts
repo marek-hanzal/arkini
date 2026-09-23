@@ -83,7 +83,7 @@ const readItemDetailOutcomeEntriesFx = Effect.fn("readItemDetailOutcomeEntriesFx
 						}
 					: {
 							type: "item",
-							itemId: entry.itemId,
+							itemUid: entry.itemUid,
 							quantity: entry.quantity,
 							activeRuleHints,
 						},

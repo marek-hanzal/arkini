@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vzgk10o2qt8tnp177g18ab34",
-		"id": "bear-with-teddy-bear",
 		"title": "Bear With Teddy Bear",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "bear",
+										"itemUid": "lbyiwjest0kicpb3c1w5pen9",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "cotton-wool",
+										"itemUid": "r8tf0spk6xl9vlkv80jebrxr",
 										"quantity": {
 											"min": 3,
 											"max": 5
@@ -47,7 +46,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "cotton-fabric",
+										"itemUid": "di926lypctzw8e6a4twmyeme",
 										"quantity": {
 											"min": 1,
 											"max": 2

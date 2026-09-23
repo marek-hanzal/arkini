@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "q308yw4fz7twc5yqukg8s5po",
-		"id": "clay-jug-with-water",
 		"title": "Clay Jug With Water",
 		"ui": "simple",
 		"description": "Another day, another water",

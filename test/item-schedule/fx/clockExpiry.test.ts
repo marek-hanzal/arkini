@@ -14,7 +14,7 @@ import { createClockConfig, spawnClockItemFx, tickClockFx } from "./clockSchedul
 
 const expiryOutput = createOutput([
 	{
-		itemId: "expired",
+		itemUid: "expired",
 	},
 ]);
 const materialLine = createLine({
@@ -28,7 +28,7 @@ const materialLine = createLine({
 				distance: "far",
 				selector: {
 					type: "item",
-					itemId: "permit",
+					itemUid: "permit",
 				},
 			},
 			mode: "consume",
@@ -87,7 +87,7 @@ describe("Clock expiry settlement", () => {
 				),
 			);
 			expect(
-				result.expired.items.find((item) => item.item.id === "clock")?.schedule
+				result.expired.items.find((item) => item.item.uid === "clock")?.schedule
 					?.remainingDurationMs,
 			).toBe(0);
 			expect(result.expired.jobs).toHaveLength(1);
@@ -103,11 +103,13 @@ describe("Clock expiry settlement", () => {
 				},
 			]);
 			expect(result.nextJob.jobQueue).toHaveLength(0);
-			expect(result.settled.items.filter((item) => item.item.id === "clock")).toHaveLength(0);
-			expect(result.settled.items.filter((item) => item.item.id === "result")).toHaveLength(
+			expect(result.settled.items.filter((item) => item.item.uid === "clock")).toHaveLength(
+				0,
+			);
+			expect(result.settled.items.filter((item) => item.item.uid === "result")).toHaveLength(
 				2,
 			);
-			expect(result.settled.items.filter((item) => item.item.id === "expired")).toHaveLength(
+			expect(result.settled.items.filter((item) => item.item.uid === "expired")).toHaveLength(
 				1,
 			);
 		},
@@ -137,8 +139,8 @@ describe("Clock expiry settlement", () => {
 		);
 		expect(result.expired.jobs).toHaveLength(1);
 		expect(result.expired.jobQueue).toHaveLength(0);
-		expect(result.settled.items.filter((item) => item.item.id === "result")).toHaveLength(1);
-		expect(result.settled.items.filter((item) => item.item.id === "clock")).toHaveLength(0);
+		expect(result.settled.items.filter((item) => item.item.uid === "result")).toHaveLength(1);
+		expect(result.settled.items.filter((item) => item.item.uid === "clock")).toHaveLength(0);
 	});
 
 	it("does not start Autofill for incomplete final-pulse work", () => {
@@ -200,14 +202,14 @@ describe("Clock expiry settlement", () => {
 			),
 		);
 		expect(
-			result.inFlight.items.find((item) => item.item.id === "permit")?.location.scope,
+			result.inFlight.items.find((item) => item.item.uid === "permit")?.location.scope,
 		).toBe("delivery");
-		expect(result.expired.items.some((item) => item.item.id === "clock")).toBe(false);
+		expect(result.expired.items.some((item) => item.item.uid === "clock")).toBe(false);
 		expect(result.expired.jobQueue).toHaveLength(0);
 		expect(result.returned.items).toMatchObject([
 			{
 				item: {
-					id: "permit",
+					uid: "permit",
 				},
 
 				location: {
@@ -228,7 +230,7 @@ describe("Clock expiry settlement", () => {
 							outcome: [
 								{
 									type: "item" as const,
-									itemId: "expired",
+									itemUid: "expired",
 									quantity: {
 										min: 2,
 										max: 3,
@@ -248,7 +250,7 @@ describe("Clock expiry settlement", () => {
 				for (let position = 1; position < 12; position++)
 					yield* spawnItemFx({
 						id: `blocker:${position}`,
-						itemId: "permit",
+						itemUid: "permit",
 
 						location: {
 							scope: "board",
@@ -295,22 +297,22 @@ describe("Clock expiry settlement", () => {
 			),
 		);
 		expect(
-			result.blocked.items.find((item) => item.item.id === "clock")?.schedule
+			result.blocked.items.find((item) => item.item.uid === "clock")?.schedule
 				?.remainingDurationMs,
 		).toBe(0);
 		expect(result.retry).toEqual(result.blocked);
 		expect(
 			result.first.runtime.items.map(({ item, location }) => ({
-				itemId: item.id,
+				itemId: item.uid,
 				location,
 			})),
 		).toEqual(
 			result.second.runtime.items.map(({ item, location }) => ({
-				itemId: item.id,
+				itemId: item.uid,
 				location,
 			})),
 		);
-		expect(result.first.runtime.items.some((item) => item.item.id === "clock")).toBe(false);
+		expect(result.first.runtime.items.some((item) => item.item.uid === "clock")).toBe(false);
 		expect(result.first.runtime.items.length).toBeGreaterThanOrEqual(2);
 	});
 });

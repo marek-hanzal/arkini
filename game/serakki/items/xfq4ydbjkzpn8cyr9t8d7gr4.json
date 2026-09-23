@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xfq4ydbjkzpn8cyr9t8d7gr4",
-		"id": "marble-block",
 		"title": "Marble Block",
 		"ui": "simple",
 		"description": "Nicer marble stuff",

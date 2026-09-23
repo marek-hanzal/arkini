@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kbjdar1ildhy9em7xli47k0l",
-		"id": "unfinished-arrows",
 		"title": "Unfinished Arrows",
 		"draft": true,
 		"ui": "default",

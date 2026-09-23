@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y5xwsvtgyxy5npclxyzwngo2",
-		"id": "honeyed-fruit-pancake",
 		"title": "Honeyed Fruit Pancake",
 		"ui": "simple",
 		"description": "Yammi",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-plate",
+										"itemUid": "q58d859r8h1ojnzk52gxk5qb",
 										"quantity": {
 											"min": 1,
 											"max": 1

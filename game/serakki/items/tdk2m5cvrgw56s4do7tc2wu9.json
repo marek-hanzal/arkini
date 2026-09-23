@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tdk2m5cvrgw56s4do7tc2wu9",
-		"id": "dye-workshop",
 		"title": "Dye Workshop",
 		"ui": "default",
 		"description": "Produces colors",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "dye-plants"
+								"itemUid": "g72br1worveoduk5pejp15j4"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dye",
+											"itemUid": "pwa7i4khtnmvijdvtfgdzyhj",
 											"quantity": {
 												"min": 1,
 												"max": 2

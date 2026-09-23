@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zp57lxcpee2yoxpvhrwvp9pq",
-		"id": "air-purifier",
 		"title": "Air Purifier",
 		"ui": "default",
 		"description": "Fresh air",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "air-pollution"
+								"itemUid": "nh9tf1n52h19igah115s36jk"
 							},
 							"distance": "far"
 						},
@@ -48,7 +47,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "filter-bank"
+								"itemUid": "ezgt6azowldg68m4m0j3wwy8"
 							},
 							"distance": "close"
 						}
@@ -62,7 +61,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "filter-bank"
+										"itemUid": "ezgt6azowldg68m4m0j3wwy8"
 									},
 									"distance": "close"
 								},

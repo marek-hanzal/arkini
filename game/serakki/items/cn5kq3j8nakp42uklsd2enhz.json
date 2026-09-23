@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cn5kq3j8nakp42uklsd2enhz",
-		"id": "battle-axe",
 		"title": "Battle Axe",
 		"description": "Slice through things",
 		"ui": "simple",
@@ -16,38 +15,38 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "hunted-game"
+				"result": "xaijv8bc7ljbonqgp1vzcxcc"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "hunted-game"
+				"result": "xaijv8bc7ljbonqgp1vzcxcc"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood---tier-1"
+					"itemUid": "kwkucgj71atfynrxw5sugzpe"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "firewood"
+				"result": "rwgifjjoffgcix5149b6q6v1"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone-deposit"
+					"itemUid": "hds0v0xcckj5gcyzuwv8ujg8"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "stone-excalixe"
+				"result": "m5mszx67xwvasx9gjf92ejym"
 			}
 		],
 		"maxQueueSize": 1,

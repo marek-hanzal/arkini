@@ -3,7 +3,7 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 
 export const DeleteItemLineInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact ID of the item that owns the line."),
+		itemUid: IdSchema.describe("The exact ID of the item that owns the line."),
 		revision: z
 			.number()
 			.int()

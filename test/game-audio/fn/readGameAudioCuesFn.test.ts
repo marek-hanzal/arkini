@@ -23,7 +23,6 @@ const inputLocation = {
 
 const producer = ItemSchema.parse({
 	uid: "producer",
-	id: "producer",
 	title: "Producer",
 	ui: "default",
 
@@ -37,7 +36,6 @@ const producer = ItemSchema.parse({
 const simpleProducer = {
 	...producer,
 	uid: "simple",
-	id: "simple",
 	ui: "simple" as const,
 };
 const items = {
@@ -54,13 +52,13 @@ describe("readGameAudioCuesFn", () => {
 						{
 							type: "job:queued",
 							requestId: "request:1",
-							canonicalItemId: "producer",
+							itemUid: "producer",
 							ownerItemId: "runtime:producer",
 							lineId: "line:1",
 						},
 						{
 							type: "job-queue:cleared",
-							canonicalItemId: "producer",
+							itemUid: "producer",
 							ownerItemId: "runtime:producer",
 							clearedRequestCount: 4,
 						},
@@ -83,7 +81,7 @@ describe("readGameAudioCuesFn", () => {
 	it("silences the simple-item job family before coalescing mixed-owner cues", () => {
 		const owner = {
 			ownerItemId: "runtime:producer",
-			canonicalItemId: "producer",
+			itemUid: "producer",
 		};
 		const job = {
 			...owner,
@@ -126,7 +124,7 @@ describe("readGameAudioCuesFn", () => {
 		} satisfies GameEventBatchSchema.Type;
 		const simpleEvents = batch.events.map((event) => ({
 			...event,
-			canonicalItemId: "simple",
+			itemUid: "simple",
 			ownerItemId: "runtime:simple",
 		}));
 		const expected = [
@@ -184,7 +182,7 @@ describe("readGameAudioCuesFn", () => {
 					events: [
 						{
 							type: "job:aborted",
-							canonicalItemId: "producer",
+							itemUid: "producer",
 							jobId: "job:1",
 							ownerItemId: "runtime:producer",
 							lineId: "line:1",
@@ -193,7 +191,7 @@ describe("readGameAudioCuesFn", () => {
 						{
 							type: "item:discarded",
 							ownerItemId: "runtime:producer",
-							canonicalItemId: "item:output",
+							itemUid: "item:output",
 							quantity: 2,
 							source: "expiry-outcome",
 							reason: "board:full",
@@ -218,7 +216,7 @@ describe("readGameAudioCuesFn", () => {
 			events: [
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
-					canonicalItemId: "producer",
+					itemUid: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",
@@ -226,14 +224,14 @@ describe("readGameAudioCuesFn", () => {
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: "runtime:first",
-					canonicalItemId: "item:first",
+					itemUid: "item:first",
 					originItemId: "runtime:producer",
 					location: boardLocation,
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: "runtime:second",
-					canonicalItemId: "item:second",
+					itemUid: "item:second",
 					originItemId: "runtime:producer",
 					location: boardLocation,
 				},
@@ -262,7 +260,7 @@ describe("readGameAudioCuesFn", () => {
 				},
 				{
 					type: GameEventEnumSchema.enum.JobStarted,
-					canonicalItemId: "producer",
+					itemUid: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",
@@ -270,14 +268,14 @@ describe("readGameAudioCuesFn", () => {
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: "runtime:spawn",
-					canonicalItemId: "item:spawn",
+					itemUid: "item:spawn",
 					originItemId: "runtime:producer",
 					location: boardLocation,
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemPlaced,
 					itemId: "runtime:placed",
-					canonicalItemId: "item:placed",
+					itemUid: "item:placed",
 					originItemId: "runtime:producer",
 					previousLocation: inputLocation,
 					location: boardLocation,
@@ -286,12 +284,12 @@ describe("readGameAudioCuesFn", () => {
 				{
 					type: GameEventEnumSchema.enum.ItemConsumed,
 					sourceItemId: "runtime:source",
-					canonicalItemId: "item:source",
+					itemUid: "item:source",
 					sourceLocation: inputLocation,
 				},
 				{
 					type: GameEventEnumSchema.enum.JobCompleted,
-					canonicalItemId: "producer",
+					itemUid: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",
@@ -299,13 +297,13 @@ describe("readGameAudioCuesFn", () => {
 				{
 					type: GameEventEnumSchema.enum.ItemDepleted,
 					itemId: "runtime:spent",
-					canonicalItemId: "item:spent",
+					itemUid: "item:spent",
 					location: boardLocation,
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemDisappeared,
 					itemId: "runtime:spent",
-					canonicalItemId: "item:spent",
+					itemUid: "item:spent",
 					location: boardLocation,
 				},
 			],

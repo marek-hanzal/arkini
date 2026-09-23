@@ -20,7 +20,7 @@ describe("CommittedTransitionsFx", () => {
 			yield* Deferred.await(replaySeen);
 			const item = yield* spawnItemFx({
 				id: "runtime:subscription:first-tail",
-				itemId: "water",
+				itemUid: "water",
 				location: {
 					scope: "board",
 					space: 0,

@@ -79,7 +79,7 @@ clear pending owner queue
 → commit all or nothing
 ```
 
-Autofill sources always belong to the producer’s board space, including `universe` queries. Authored reach still filters sources within that board; general queries and unit payments retain their own reach semantics. All outbound deliveries are admitted by the same autofill planner.
+Autofill sources always belong to the producer’s board space. Authored reach still filters sources within that board; unit payments have the same home-space boundary, all query ranges stay within the origin board. All outbound deliveries are admitted by the same autofill planner.
 
 A queued request owns no time, material or units. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 

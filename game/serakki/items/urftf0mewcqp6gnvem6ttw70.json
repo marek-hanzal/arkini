@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "urftf0mewcqp6gnvem6ttw70",
-		"id": "copper-pan-with-corn-kernels",
 		"title": "Copper Pan With Corn Kernels",
 		"ui": "simple",
 		"draft": true,
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "burning-oven"
+					"itemUid": "bsm7hrvufre2fiexr4o0eo4q"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-pan-with-popcorn",
+											"itemUid": "awpu9dvi6tvpgnn9jgd52hek",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "oven-with-ash"
+				"result": "drj72ef3yia0euytyg2e1jal"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-copper-pan",
+										"itemUid": "ogm52bsqfqk27a566mmabg3q",
 										"quantity": {
 											"min": 1,
 											"max": 1

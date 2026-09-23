@@ -32,13 +32,13 @@ export const selectItemEstimateIndexFn = ({
 }) => {
 	const estimates = new Map(
 		entries.map((entry) => [
-			entry.itemId,
+			entry.itemUid,
 			entry,
 		]),
 	);
 	return searchFn(items, query)
 		.flatMap((item): ReadonlyArray<ItemEstimateIndexRow> => {
-			const estimate = estimates.get(item.id);
+			const estimate = estimates.get(item.uid);
 			return estimate === undefined ||
 				(view === "incomplete" && estimate.status === "complete")
 				? []

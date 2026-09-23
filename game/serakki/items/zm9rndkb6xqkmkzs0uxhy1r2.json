@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zm9rndkb6xqkmkzs0uxhy1r2",
-		"id": "glass-goblet-dirty",
 		"title": "Dirty Glass Goblet",
 		"ui": "simple",
 		"artwork": {

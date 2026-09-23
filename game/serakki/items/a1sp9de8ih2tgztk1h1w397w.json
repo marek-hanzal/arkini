@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a1sp9de8ih2tgztk1h1w397w",
-		"id": "cauldron-with-milk",
 		"title": "Cauldron With Milk",
 		"ui": "simple",
 		"description": "A lot of milk",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

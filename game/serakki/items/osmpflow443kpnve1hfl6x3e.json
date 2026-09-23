@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "osmpflow443kpnve1hfl6x3e",
-		"id": "copper-bathtub-with-water",
 		"title": "Copper Bathtub With Water",
 		"ui": "simple",
 		"description": "Water. In a bathtub",

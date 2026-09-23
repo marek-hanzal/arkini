@@ -19,12 +19,12 @@ describe("input state", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:workshop",
-					itemId: "workshop",
+					itemUid: "workshop",
 					location: workshopLocation,
 				});
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation(1),
 				});
 				yield* storeInputMaterialFx({

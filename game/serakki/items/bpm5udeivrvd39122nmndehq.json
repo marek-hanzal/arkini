@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bpm5udeivrvd39122nmndehq",
-		"id": "grim-reaper",
 		"title": "Grim Reaper",
 		"ui": "default",
 		"draft": true,
@@ -48,7 +47,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "ghost",
+											"itemUid": "ynro5iy60hlzcb1q3kd1an8l",
 											"quantity": {
 												"min": 1,
 												"max": 1

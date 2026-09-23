@@ -19,14 +19,12 @@ export const createFixedStepTestConfig = () => {
 			permit: {
 				...base.items.tool,
 				uid: "permit",
-				id: "permit",
 				title: "Permit",
 				description: "Enables the dependent producer.",
 			},
 			enabler: {
 				...forge,
 				uid: "enabler",
-				id: "enabler",
 				title: "Enabler",
 				description: "Produces the permit at the end of one step.",
 				lines: [
@@ -50,7 +48,7 @@ export const createFixedStepTestConfig = () => {
 											outcome: [
 												{
 													type: "item" as const,
-													itemId: "permit",
+													itemUid: "permit",
 													quantity: {
 														min: 1,
 														max: 1,
@@ -71,7 +69,6 @@ export const createFixedStepTestConfig = () => {
 			dependent: {
 				...forge,
 				uid: "dependent",
-				id: "dependent",
 				title: "Dependent",
 				description: "Runs only while the permit exists.",
 				lines: [
@@ -103,7 +100,7 @@ export const createFixedStepTestConfig = () => {
 export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(function* () {
 	const enabler = yield* spawnItemFx({
 		id: "runtime:enabler",
-		itemId: "enabler",
+		itemUid: "enabler",
 		location: {
 			scope: "board",
 			space: 0,
@@ -115,7 +112,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 	});
 	const dependent = yield* spawnItemFx({
 		id: "runtime:dependent",
-		itemId: "dependent",
+		itemUid: "dependent",
 		location: {
 			scope: "board",
 			space: 0,
@@ -127,7 +124,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 	});
 	const permit = yield* spawnItemFx({
 		id: "runtime:permit:initial",
-		itemId: "permit",
+		itemUid: "permit",
 		location: {
 			scope: "board",
 			space: 0,
@@ -156,5 +153,5 @@ export const summarizeFixedStepRuntimeFn = (runtime: RuntimeSchema.Type) => ({
 	dependentRemainingMs: runtime.jobs.find((job) => job.ownerItemId === "runtime:dependent")
 		?.remainingMs,
 	enablerActive: runtime.jobs.some((job) => job.ownerItemId === "runtime:enabler"),
-	permitQuantity: runtime.items.filter((item) => item.item.id === "permit").length,
+	permitQuantity: runtime.items.filter((item) => item.item.uid === "permit").length,
 });

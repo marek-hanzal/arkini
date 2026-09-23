@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dklkl7eyajzg2ago6dvmzn49",
-		"id": "spoiled-cauldron",
 		"title": "Spoiled Cauldron",
 		"ui": "simple",
 		"description": "Bada-fuj",

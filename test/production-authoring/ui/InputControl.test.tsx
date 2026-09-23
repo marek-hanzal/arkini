@@ -71,7 +71,7 @@ const renderInput = async (
 		root.render(
 			<InputControl
 				input={input}
-				ownerItemId="owner"
+				ownerItemUid="owner"
 				selfUnitsEnabled={selfUnitsEnabled}
 				onChangeFn={onChangeFn}
 			/>,
@@ -98,7 +98,7 @@ const withoutUnitsUnitsInput = {
 		distance: "close",
 		selector: {
 			type: "item",
-			itemId: "stone-units",
+			itemUid: "stone-units",
 		},
 	},
 } as const satisfies InputSchema.Type;
@@ -122,8 +122,7 @@ const createSearchItem = (id: string, spent: boolean) =>
 		ui: "default",
 		lines: [],
 
-		uid: `uid:${id}`,
-		id,
+		uid: id,
 
 		title: id,
 		description: id,
@@ -159,7 +158,7 @@ describe("InputControl", () => {
 					distance: "far",
 					selector: {
 						type: "item",
-						itemId: "stone",
+						itemUid: "stone",
 					},
 				},
 			},
@@ -216,7 +215,7 @@ describe("InputControl", () => {
 				distance: "far",
 				selector: {
 					type: "item",
-					itemId: "stone",
+					itemUid: "stone",
 				},
 			},
 		});
@@ -275,7 +274,7 @@ describe("InputControl", () => {
 			},
 		} satisfies ItemSchema.Type;
 		state.items = {
-			[payer.id]: payer,
+			[payer.uid]: payer,
 		};
 		const { container, root } = createContainer();
 		const onChangeFn = vi.fn();
@@ -291,7 +290,7 @@ describe("InputControl", () => {
 					...withoutUnitsUnitsInput.query,
 					selector: {
 						type: "item",
-						itemId: "",
+						itemUid: "",
 					},
 				},
 			},
@@ -332,7 +331,7 @@ describe("InputControl", () => {
 					...withoutUnitsUnitsInput.query,
 					selector: {
 						type: "item",
-						itemId: payer.id,
+						itemUid: payer.uid,
 					},
 				},
 			},
@@ -397,7 +396,7 @@ describe("InputControl", () => {
 				distance: "self",
 				selector: {
 					type: "item",
-					itemId: "owner",
+					itemUid: "owner",
 				},
 			},
 		});
@@ -415,12 +414,12 @@ describe("InputControl", () => {
 							path: [
 								"query",
 								"selector",
-								"itemId",
+								"itemUid",
 							],
 						},
 					]}
 					onChangeFn={() => undefined}
-					ownerItemId="owner"
+					ownerItemUid="owner"
 					selfUnitsEnabled
 				/>,
 			);
@@ -475,7 +474,7 @@ describe("InputControl", () => {
 				distance: "close",
 				selector: {
 					type: "item",
-					itemId: "",
+					itemUid: "",
 				},
 			},
 		});
@@ -485,8 +484,8 @@ describe("InputControl", () => {
 		const spent = createSearchItem("battery-target", true);
 		const withoutUnits = createSearchItem("plain-target", false);
 		state.items = {
-			[spent.id]: spent,
-			[withoutUnits.id]: withoutUnits,
+			[spent.uid]: spent,
+			[withoutUnits.uid]: withoutUnits,
 		};
 		const { container, root } = createContainer();
 		await renderInput(root, {
@@ -499,7 +498,7 @@ describe("InputControl", () => {
 				...withoutUnitsUnitsInput.query,
 				selector: {
 					type: "item",
-					itemId: withoutUnits.id,
+					itemUid: withoutUnits.uid,
 				},
 			},
 		});

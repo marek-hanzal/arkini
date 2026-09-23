@@ -32,7 +32,7 @@ const mergeBeforeInputConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "workshop",
+						itemUid: "workshop",
 					},
 					action: "consume",
 					effect: "keep",
@@ -81,12 +81,12 @@ const setupFx = () =>
 	Effect.gen(function* () {
 		yield* spawnItemFx({
 			id: "runtime:workshop",
-			itemId: "workshop",
+			itemUid: "workshop",
 			location: workshopLocation,
 		});
 		yield* spawnItemFx({
 			id: "runtime:water",
-			itemId: "water",
+			itemUid: "water",
 			location: sourceLocation(1),
 		});
 		yield* setLineSelectionFx({
@@ -164,12 +164,12 @@ describe("dropItemFx production targets", () => {
 							: {
 									owner: yield* spawnItemFx({
 										id: "runtime:workshop",
-										itemId: "workshop",
+										itemUid: "workshop",
 										location: workshopLocation,
 									}),
 									source: yield* spawnItemFx({
 										id: "runtime:water",
-										itemId: "water",
+										itemUid: "water",
 										location: sourceLocation(1),
 									}),
 								};

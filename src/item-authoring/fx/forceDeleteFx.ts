@@ -15,18 +15,18 @@ interface ItemCleanup {
 export namespace forceDeleteFx {
 	export interface Impact {
 		readonly removedClockRules: ReadonlyArray<{
-			readonly ownerItemId: string;
+			readonly ownerItemUid: string;
 			readonly ruleNumber: number;
 		}>;
 		readonly removedUnitOutcomeOwnerIds: ReadonlyArray<string>;
 		readonly removedExpiryOutcomeOwnerIds: ReadonlyArray<string>;
 		readonly removedLines: ReadonlyArray<{
-			readonly ownerItemId: string;
+			readonly ownerItemUid: string;
 			readonly lineId: string;
 			readonly title: string;
 		}>;
 		readonly removedMergeRules: ReadonlyArray<{
-			readonly ownerItemId: string;
+			readonly ownerItemUid: string;
 			readonly ruleNumber: number;
 		}>;
 		readonly removedTemplateEntries: ReadonlyArray<{
@@ -38,7 +38,7 @@ export namespace forceDeleteFx {
 
 	export interface Props {
 		readonly config: GameConfigSchema.Type;
-		readonly itemId: string;
+		readonly itemUid: string;
 	}
 
 	export interface Result {
@@ -58,11 +58,11 @@ const createItemCleanupFn = (): ItemCleanup => ({
 /** Mechanically removes one item and every authored structure that directly references it. */
 export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	config,
-	itemId,
+	itemUid,
 }: forceDeleteFx.Props) {
 	const blockers = readDeleteBlockersFn({
 		config,
-		itemId,
+		itemUid,
 	});
 	const itemCleanups = new Map<string, ItemCleanup>();
 	for (const blocker of blockers) {
@@ -100,27 +100,27 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	}
 
 	const removedClockRules: Array<{
-		ownerItemId: string;
+		ownerItemUid: string;
 		ruleNumber: number;
 	}> = [];
 	const removedUnitOutcomeOwnerIds: string[] = [];
 	const removedExpiryOutcomeOwnerIds: string[] = [];
 	const removedLines: Array<{
-		ownerItemId: string;
+		ownerItemUid: string;
 		lineId: string;
 		title: string;
 	}> = [];
 	const removedMergeRules: Array<{
-		ownerItemId: string;
+		ownerItemUid: string;
 		ruleNumber: number;
 	}> = [];
 	const items: Record<string, unknown> = {
 		...config.items,
 	};
-	delete items[itemId];
+	delete items[itemUid];
 
-	for (const [ownerItemId, cleanup] of itemCleanups) {
-		const owner = config.items[ownerItemId];
+	for (const [ownerItemUid, cleanup] of itemCleanups) {
+		const owner = config.items[ownerItemUid];
 		if (owner === undefined) continue;
 		const candidate: Record<string, unknown> = {
 			...owner,
@@ -134,7 +134,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			};
 		for (const index of cleanup.clockRuleIndexes)
 			removedClockRules.push({
-				ownerItemId,
+				ownerItemUid,
 				ruleNumber: index + 1,
 			});
 
@@ -145,7 +145,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			candidate.merge = merge.length === 0 ? undefined : merge;
 			for (const index of cleanup.mergeIndexes)
 				removedMergeRules.push({
-					ownerItemId,
+					ownerItemUid,
 					ruleNumber: index + 1,
 				});
 		}
@@ -158,7 +158,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 				const line = owner.lines?.[index];
 				if (line !== undefined)
 					removedLines.push({
-						ownerItemId,
+						ownerItemUid,
 						lineId: line.id,
 						title: line.title,
 					});
@@ -169,7 +169,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 				...owner.units,
 				outcome: undefined,
 			};
-			removedUnitOutcomeOwnerIds.push(ownerItemId);
+			removedUnitOutcomeOwnerIds.push(ownerItemUid);
 		}
 		if (cleanup.removeExpiryOutcome) {
 			if (owner.clock !== undefined)
@@ -177,9 +177,9 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					...(candidate.clock as typeof owner.clock),
 					onExpire: undefined,
 				};
-			removedExpiryOutcomeOwnerIds.push(ownerItemId);
+			removedExpiryOutcomeOwnerIds.push(ownerItemUid);
 		}
-		items[ownerItemId] = candidate;
+		items[ownerItemUid] = candidate;
 	}
 
 	return {
@@ -187,13 +187,13 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			...config,
 			templates: config.templates?.map((template) => ({
 				...template,
-				board: template.board.filter((cell) => cell.itemId !== itemId),
+				board: template.board.filter((cell) => cell.itemUid !== itemUid),
 			})),
 			items,
 		}),
 		impact: {
 			removedTemplateEntries: (config.templates ?? []).flatMap((template) => {
-				const count = template.board.filter((cell) => cell.itemId === itemId).length;
+				const count = template.board.filter((cell) => cell.itemUid === itemUid).length;
 				return count === 0
 					? []
 					: [

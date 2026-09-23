@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c8k56ppmzlav98mdhrqtkq5v",
-		"id": "dirty-laboratory-glassware",
 		"title": "Dirty Laboratory Glassware",
 		"ui": "simple",
 		"draft": true,

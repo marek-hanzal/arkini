@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "oh4b7a0sm9bzhbwmlasap3ci",
-		"id": "chopped-fruit",
 		"title": "Chopped Fruit",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-chopped-fruit",
+										"itemUid": "gtr8kzb98ywsi2o5po77rjju",
 										"quantity": {
 											"min": 1,
 											"max": 1

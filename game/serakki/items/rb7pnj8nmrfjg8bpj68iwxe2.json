@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rb7pnj8nmrfjg8bpj68iwxe2",
-		"id": "grape-farm",
 		"title": "Grape Farm",
 		"draft": false,
 		"description": "Operates nearby grape fields and keeps seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "grape-field"
+								"itemUid": "o1gor2xgnplb8ef4mn5lqwyl"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grapes",
+											"itemUid": "dosjodbfv31m8cj01rp02l6y",
 											"quantity": {
 												"min": 1,
 												"max": 3
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-grape-field",
+											"itemUid": "mctcyxqkk2gv0x6mflu1ssya",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "grape-farm-blueprint",
+											"itemUid": "ekuudc37wkcru1go4daqjmt1",
 											"quantity": {
 												"min": 1,
 												"max": 1

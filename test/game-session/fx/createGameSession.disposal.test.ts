@@ -33,7 +33,7 @@ describe("createGameSessionFx / planner disposal", () => {
 						[
 							{
 								type: GameEventEnumSchema.enum.JobCompleted,
-								canonicalItemId: "owner",
+								itemUid: "owner",
 								jobId: "job:dispose:pending",
 								ownerItemId: "owner:dispose:pending",
 								lineId: "line:dispose:pending",

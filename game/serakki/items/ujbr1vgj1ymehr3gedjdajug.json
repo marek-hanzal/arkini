@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ujbr1vgj1ymehr3gedjdajug",
-		"id": "burning-paper",
 		"title": "Burning Paper",
 		"ui": "simple",
 		"draft": false,
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "base-camp"
+					"itemUid": "x8z9v8tn5wa7qse7c7izy6b0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "basecamp-on-fire"
+				"result": "xkbphl0biiu4d5ar1s6hecvn"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "lit-base-camp"
+					"itemUid": "usw9wmorxa8p3tl3wchthc6q"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "basecamp-on-fire"
+				"result": "xkbphl0biiu4d5ar1s6hecvn"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "loose-ash",
+										"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 										"quantity": {
 											"min": 1,
 											"max": 1

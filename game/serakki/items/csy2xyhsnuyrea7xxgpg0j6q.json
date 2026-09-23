@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "csy2xyhsnuyrea7xxgpg0j6q",
-		"id": "corrupted-well-fed-beagle",
 		"title": "Corrupted Well Fed Beagle",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "corrupted-beagle",
+										"itemUid": "whgs98b1abnac63cfsm022z8",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "corruption",
+										"itemUid": "kgwuy9zokikfg1oo8417by1s",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -47,7 +46,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

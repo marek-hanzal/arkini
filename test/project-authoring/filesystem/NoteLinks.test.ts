@@ -14,7 +14,7 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("repository note item relationships", () => {
-	it("persists UID links across authored-ID rename and freshness-guarded unlink without changing authoring revision", async () => {
+	it("persists UID links across title rename and freshness-guarded unlink without changing authoring revision", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		const created = await Effect.runPromise(
@@ -42,9 +42,9 @@ describe("repository note item relationships", () => {
 					},
 					templates: [],
 					items: {
-						renamed: {
+						water: {
 							...project.config.items.water!,
-							id: "renamed",
+							title: "Renamed",
 						},
 					},
 				},
@@ -146,8 +146,7 @@ describe("repository note item relationships", () => {
 						...project.config.items,
 						oil: {
 							...project.config.items.water!,
-							uid: "stable-oil",
-							id: "oil",
+							uid: "oil",
 						},
 					},
 				},
@@ -159,7 +158,7 @@ describe("repository note item relationships", () => {
 				content: "Shared",
 				itemUids: [
 					"water",
-					"stable-oil",
+					"oil",
 				],
 				resourceIds: [],
 			}),
@@ -185,7 +184,7 @@ describe("repository note item relationships", () => {
 			{
 				...linked,
 				itemUids: [
-					"stable-oil",
+					"oil",
 				],
 				updatedAtMs: expect.any(Number),
 			},

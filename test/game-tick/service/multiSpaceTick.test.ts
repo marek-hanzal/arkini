@@ -14,7 +14,7 @@ describe("multi-space simulation", () => {
 			Effect.gen(function* () {
 				const worker = yield* spawnItemFx({
 					id: "runtime:worker",
-					itemId: "worker",
+					itemUid: "worker",
 					location: boardLocation(2, 0),
 				});
 				yield* startLineFx({
@@ -37,7 +37,7 @@ describe("multi-space simulation", () => {
 		expect(
 			runtime.items.some(
 				(item) =>
-					item.item.id === "log" &&
+					item.item.uid === "log" &&
 					item.location.scope === "board" &&
 					item.location.space === 2,
 			),
@@ -45,7 +45,7 @@ describe("multi-space simulation", () => {
 		expect(
 			runtime.items.some(
 				(item) =>
-					item.item.id === "log" &&
+					item.item.uid === "log" &&
 					item.location.scope === "board" &&
 					item.location.space === 0,
 			),
@@ -57,7 +57,7 @@ describe("multi-space simulation", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:temporary",
-					itemId: "temporary",
+					itemUid: "temporary",
 					location: boardLocation(3, 1),
 				});
 				yield* runTickRuntimeByFx({
@@ -76,7 +76,7 @@ describe("multi-space simulation", () => {
 		expect(
 			runtime.items.some(
 				(item) =>
-					item.item.id === "log" &&
+					item.item.uid === "log" &&
 					item.location.scope === "board" &&
 					item.location.space === 3,
 			),

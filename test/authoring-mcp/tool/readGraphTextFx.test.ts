@@ -13,20 +13,20 @@ describe("editor MCP graph tool text", () => {
 		const project = createRelationTraversalProject();
 		const inputText = Effect.runSync(
 			readItemRelationTextFx(project, {
-				itemId: "water",
+				itemUid: "water",
 				level: 2,
 				role: "input",
 			}),
 		);
 		const outputText = Effect.runSync(
 			readItemRelationTextFx(project, {
-				itemId: "plate",
+				itemUid: "plate",
 				level: 2,
 				role: "output",
 			}),
 		);
 
-		expect(inputText).toContain("Item input\nItem ID: water");
+		expect(inputText).toContain("Item input\nItem UID: water");
 		expect(inputText).toContain("Level: 2");
 		expect(inputText.match(/^- Level \d+:.*$/gm)).toEqual([
 			'- Level 1: line "Run"',
@@ -82,7 +82,7 @@ describe("editor MCP graph tool text", () => {
 															query: {
 																distance: "far",
 																selector: {
-																	itemId: "water",
+																	itemUid: "water",
 																	type: "item",
 																},
 															},
@@ -102,7 +102,7 @@ describe("editor MCP graph tool text", () => {
 		});
 		const text = Effect.runSync(
 			readItemRelationTextFx(createToolProject(config), {
-				itemId: "ingot",
+				itemUid: "ingot",
 				level: 1,
 				role: "output",
 			}),
@@ -157,7 +157,7 @@ it.each([
 	});
 	const text = Effect.runSync(
 		readItemRelationTextFx(project, {
-			itemId: "water",
+			itemUid: "water",
 			level: 1,
 			role: "input",
 			detail,

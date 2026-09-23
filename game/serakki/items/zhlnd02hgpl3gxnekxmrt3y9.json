@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zhlnd02hgpl3gxnekxmrt3y9",
-		"id": "sack-with-beer",
 		"title": "Sack With Beer",
 		"ui": "simple",
 		"description": "Oh god...",

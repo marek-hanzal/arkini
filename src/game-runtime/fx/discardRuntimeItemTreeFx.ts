@@ -63,7 +63,7 @@ export const discardRuntimeItemTreeFx = Effect.fn("discardRuntimeItemTreeFx")(fu
 					type: "item:discarded",
 					ownerItemId,
 					itemId: lost.id,
-					canonicalItemId: lost.item.id,
+					itemUid: lost.item.uid,
 					quantity: 1,
 					source,
 					reason,

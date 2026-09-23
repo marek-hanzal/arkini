@@ -29,11 +29,11 @@ describe("queued producer chain", () => {
 		expect(result.settledSteps).toBeLessThan(100);
 		expect(result.completed.jobs).toEqual([]);
 		expect(result.completed.jobQueue).toEqual([]);
-		expect(result.completed.items.filter((item) => item.item.id === "raw")).toEqual([]);
-		expect(result.completed.items.filter((item) => item.item.id === "intermediate")).toEqual(
+		expect(result.completed.items.filter((item) => item.item.uid === "raw")).toEqual([]);
+		expect(result.completed.items.filter((item) => item.item.uid === "intermediate")).toEqual(
 			[],
 		);
-		expect(result.completed.items.filter((item) => item.item.id === "final").length).toBe(1);
+		expect(result.completed.items.filter((item) => item.item.uid === "final").length).toBe(1);
 		expect(
 			result.completed.items.some(
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
@@ -56,6 +56,6 @@ describe("queued producer chain", () => {
 		expect(result.completed.items.some((item) => item.location.scope === "delivery")).toBe(
 			false,
 		);
-		expect(result.completed.items.filter((item) => item.item.id === "final").length).toBe(1);
+		expect(result.completed.items.filter((item) => item.item.uid === "final").length).toBe(1);
 	});
 });

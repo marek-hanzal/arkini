@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hr6zbysztsb6yc0ztc3wjeop",
-		"id": "fire-farting-fawn",
 		"title": "Fire Farting Fawn",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "injured-fawn",
+										"itemUid": "h408uew16iniwj9h93gz1h1o",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "dynamite-sticks",
+										"itemUid": "jx4fawgqrdrwvt7d5afims1l",
 										"quantity": {
 											"min": 1,
 											"max": 2
@@ -47,7 +46,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 4,
 											"max": 8

@@ -165,9 +165,9 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					{
 						type: GameEventEnumSchema.enum.ItemSwapped,
 						sourceItemId: first.id,
-						sourceCanonicalItemId: first.item.id,
+						sourceItemUid: first.item.uid,
 						targetItemId: second.id,
-						targetCanonicalItemId: second.item.id,
+						targetItemUid: second.item.uid,
 						sourceLocation: first.location,
 						targetLocation: second.location,
 					} satisfies GameEventSchema.Type,

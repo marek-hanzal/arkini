@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vcceh6gomf1xsmww1z0juf2n",
-		"id": "cauldron-with-beer",
 		"title": "Cauldron With Beer",
 		"ui": "simple",
 		"description": "Beer. In cauldron. A lot of beer",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

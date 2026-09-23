@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "e65gc6c7vad2myus9kn7gl7x",
-		"id": "lantern",
 		"title": "Lantern",
 		"ui": "simple",
 		"description": "Better light source",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "base-camp"
+					"itemUid": "x8z9v8tn5wa7qse7c7izy6b0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "lit-base-camp"
+				"result": "usw9wmorxa8p3tl3wchthc6q"
 			}
 		],
 		"clock": {
@@ -38,7 +37,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-lantern",
+										"itemUid": "gepmb31cvdse7u75q4i4p4ek",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -10,9 +10,9 @@ import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 const formatNumberFn = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
-const itemReferenceFn = (project: Project, itemId: string) => {
-	const item = project.config.items[itemId];
-	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}]`;
+const itemReferenceFn = (project: Project, itemUid: string) => {
+	const item = project.config.items[itemUid];
+	return item === undefined ? `${itemUid} [missing]` : `${item.uid} [${item.title}]`;
 };
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
@@ -101,7 +101,7 @@ const formatEstimateFn = (
 ) => {
 	const header = [
 		"Item estimate",
-		`Item ID: ${target.id}`,
+		`Item UID: ${target.uid}`,
 		`Title: ${target.title}`,
 		`Quantity: ${formatNumberFn(estimate.quantity)}`,
 		"Method: approximate bounded-distribution authored dependency graph",
@@ -177,7 +177,7 @@ const formatSummaryFn = (
 	}
 	return [
 		"Item estimate",
-		`Item ID: ${target.id}`,
+		`Item UID: ${target.uid}`,
 		`Title: ${target.title}`,
 		`Quantity: ${formatNumberFn(estimate.quantity)}`,
 		"Detail: summary",
@@ -226,19 +226,19 @@ const formatSummaryFn = (
 /** Computes and formats one approximate static item estimate for MCP. */
 export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(function* (
 	project: Project,
-	itemId: string,
+	itemUid: string,
 	quantity: number,
 	detail: GraphDetailSchema.Type = "full",
 ) {
-	const target = project.config.items[itemId];
+	const target = project.config.items[itemUid];
 	if (target === undefined)
-		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
+		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
 	const graph = createAcquisitionGraphFn(project.config);
 	const estimate = estimateRequestsFn({
 		graph,
 		requests: [
 			{
-				factId: itemId,
+				factId: itemUid,
 				quantity,
 			},
 		],

@@ -18,7 +18,7 @@ describe("blueprint completion placement", () => {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
 					space: 0,
-					itemId: "blueprint:plain",
+					itemUid: "blueprint:plain",
 					x: 1,
 					y: 1,
 				});
@@ -36,7 +36,7 @@ describe("blueprint completion placement", () => {
 			}),
 		);
 
-		const target = result.runtime.items.find((item) => item.item.id === "item:target");
+		const target = result.runtime.items.find((item) => item.item.uid === "item:target");
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.items.some((item) => item.id === result.owner.id)).toBe(false);
 		expect(target).toMatchObject({
@@ -58,13 +58,13 @@ describe("blueprint completion placement", () => {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
 					space: 0,
-					itemId: "blueprint:reserve",
+					itemUid: "blueprint:reserve",
 					x: 0,
 					y: 0,
 				});
 				const tool = yield* spawnItemFx({
 					id: "runtime:tool",
-					itemId: "item:tool",
+					itemUid: "item:tool",
 					location: {
 						scope: "board",
 						space: 0,
@@ -92,7 +92,7 @@ describe("blueprint completion placement", () => {
 			}),
 		);
 
-		expect(runtime.items.map((item) => item.item.id)).toEqual(
+		expect(runtime.items.map((item) => item.item.uid)).toEqual(
 			expect.arrayContaining([
 				"item:target-unlimited",
 				"item:byproduct",

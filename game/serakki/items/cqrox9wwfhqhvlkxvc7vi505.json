@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cqrox9wwfhqhvlkxvc7vi505",
-		"id": "arrows---tier-2",
 		"title": "Arrows - Tier 2",
 		"draft": true,
 		"ui": "simple",
@@ -19,11 +18,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "arrows---tier-2"
+					"itemUid": "cqrox9wwfhqhvlkxvc7vi505"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "arrows---tier-3"
+				"result": "kcvboi9av84x20m0butjrmtx"
 			}
 		],
 		"maxQueueSize": 1,
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "arrows---tier-2"
+								"itemUid": "cqrox9wwfhqhvlkxvc7vi505"
 							},
 							"distance": "self"
 						}
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "arrows---tier-1",
+											"itemUid": "j3uy7jal3539u6u1zqup1mcz",
 											"quantity": {
 												"min": 2,
 												"max": 2

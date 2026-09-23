@@ -24,11 +24,11 @@ describe("estimateRequestsFn", () => {
 				output: "target",
 			}),
 			metadata: {
-				unitOwnerItemId: "payer",
+				unitOwnerItemUid: "payer",
 				kind: "line-unit-depletion",
 				lineId: "line",
 				lineTitle: "Line",
-				ownerItemId: "owner",
+				ownerItemUid: "owner",
 			},
 			runMultiplier: 3,
 		};

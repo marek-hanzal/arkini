@@ -15,21 +15,21 @@ import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnava
 
 export namespace spawnCheatItemFx {
 	export interface Props {
-		readonly itemId: IdSchema.Type;
+		readonly itemUid: IdSchema.Type;
 	}
 }
 
 /** Authorizes and atomically places one ordinary item through canonical Board placement. */
 export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
-	itemId,
+	itemUid,
 }: spawnCheatItemFx.Props) {
 	const config = yield* GameConfigFx;
 	const item = yield* resolveItemFx({
-		itemId,
+		itemUid,
 	});
 	const drop = {
 		type: "item" as const,
-		itemId,
+		itemUid,
 		placement: PlacementSchema.enum.Drop,
 		quantity: 1 as const,
 	};

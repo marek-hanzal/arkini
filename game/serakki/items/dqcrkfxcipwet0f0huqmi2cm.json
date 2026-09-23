@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dqcrkfxcipwet0f0huqmi2cm",
-		"id": "bubble",
 		"title": "Bubble",
 		"ui": "simple",
 		"description": "Bubble. No use for it",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "coin",
+										"itemUid": "s5z9wc6yevl1yzs693yr1z7z",
 										"quantity": {
 											"min": 1,
 											"max": 1

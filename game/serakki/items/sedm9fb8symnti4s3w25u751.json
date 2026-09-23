@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "sedm9fb8symnti4s3w25u751",
-		"id": "candle",
 		"title": "Candle",
 		"ui": "simple",
 		"description": "Warm, nice light source; be careful, it will fade over time.",
@@ -16,38 +15,38 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-lantern"
+					"itemUid": "gepmb31cvdse7u75q4i4p4ek"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "lantern"
+				"result": "e65gc6c7vad2myus9kn7gl7x"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "base-camp"
+					"itemUid": "x8z9v8tn5wa7qse7c7izy6b0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "basecamp-on-fire"
+				"result": "xkbphl0biiu4d5ar1s6hecvn"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "lit-base-camp"
+					"itemUid": "usw9wmorxa8p3tl3wchthc6q"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "basecamp-on-fire"
+				"result": "xkbphl0biiu4d5ar1s6hecvn"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "carved-pumpkin"
+					"itemUid": "si6jbsgu4o7634isiae2iqio"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "lit-carved-pumpkin"
+				"result": "nzu8858by7aipfykf0ygsoyf"
 			}
 		],
 		"clock": {

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ty3th2ozuiclpe5crg1nn7yd",
-		"id": "toilet-milk",
 		"title": "Toilet Milk",
 		"ui": "simple",
 		"description": "Milk included",

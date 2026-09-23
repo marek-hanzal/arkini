@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "p0deotdhek90rtgdkz7rb9c4",
-		"id": "bread-basket",
 		"title": "Bread Basket",
 		"ui": "simple",
 		"description": "Some fresh bread and stuff",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-bread-basket",
+										"itemUid": "qxziaconnw1irnftluliqm4x",
 										"quantity": {
 											"min": 1,
 											"max": 1

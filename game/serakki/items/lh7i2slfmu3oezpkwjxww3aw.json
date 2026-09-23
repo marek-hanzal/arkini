@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lh7i2slfmu3oezpkwjxww3aw",
-		"id": "copper-wire",
 		"title": "Copper Wire",
 		"ui": "simple",
 		"description": "Another variant of copper ore",

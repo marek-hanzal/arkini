@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "szc460rahffy43pnkp44drw7",
-		"id": "honeyed-fruit-pancake-with-cream-and-sugar",
 		"title": "Honeyed Fruit Pancake With Cream And Sugar",
 		"ui": "simple",
 		"description": "Very nammy",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "clay-plate",
+										"itemUid": "ubexhgyrqm23lx9qn734f385",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

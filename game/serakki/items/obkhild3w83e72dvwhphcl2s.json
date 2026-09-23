@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "obkhild3w83e72dvwhphcl2s",
-		"id": "empty-goose-pen",
 		"title": "Empty Goose Pen",
 		"draft": false,
 		"description": "An empty enclosure waiting for the next group of animals to arrive.",
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-goose-pen"
+								"itemUid": "obkhild3w83e72dvwhphcl2s"
 							},
 							"distance": "self"
 						}
@@ -48,7 +47,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "animal-feed"
+								"itemUid": "e2pone4zse5ngt9nass0nzfy"
 							},
 							"distance": "far"
 						},
@@ -63,7 +62,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -85,7 +84,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "goose-pen",
+											"itemUid": "lqq2ce07cb38mmusi2oan07l",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -95,7 +94,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1

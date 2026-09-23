@@ -19,7 +19,7 @@ describe("projectAuthoredOutcomeFn", () => {
 										distance: "far" as const,
 										selector: {
 											type: "item",
-											itemId: "item:key",
+											itemUid: "item:key",
 										},
 									},
 								},
@@ -32,7 +32,7 @@ describe("projectAuthoredOutcomeFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "item:known",
+									itemUid: "item:known",
 									quantity: {
 										min: 1,
 										max: 1,
@@ -47,7 +47,7 @@ describe("projectAuthoredOutcomeFn", () => {
 							outcome: [
 								{
 									type: "item",
-									itemId: "item:missing",
+									itemUid: "item:missing",
 									placement: "random",
 									quantity: {
 										min: 2,
@@ -60,10 +60,10 @@ describe("projectAuthoredOutcomeFn", () => {
 												{
 													type: "exists",
 													query: {
-														distance: "universe" as const,
+														distance: "far" as const,
 														selector: {
 															type: "item",
-															itemId: "item:missing",
+															itemUid: "item:missing",
 														},
 													},
 												},
@@ -73,7 +73,7 @@ describe("projectAuthoredOutcomeFn", () => {
 								},
 								{
 									type: "item",
-									itemId: "item:known",
+									itemUid: "item:known",
 									quantity: {
 										min: 1,
 										max: 1,
@@ -101,7 +101,7 @@ describe("projectAuthoredOutcomeFn", () => {
 						kind: "guaranteed",
 						outcome: [
 							{
-								itemId: "item:known",
+								itemUid: "item:known",
 								title: "Known item",
 								rules: [],
 							},
@@ -113,7 +113,7 @@ describe("projectAuthoredOutcomeFn", () => {
 						outcome: [
 							{
 								type: "item",
-								itemId: "item:missing",
+								itemUid: "item:missing",
 								title: "item:missing",
 								placement: "random",
 								quantity: {
@@ -123,7 +123,7 @@ describe("projectAuthoredOutcomeFn", () => {
 								rules: table.set[0].roll[1].outcome[0].rules,
 							},
 							{
-								itemId: "item:known",
+								itemUid: "item:known",
 								title: "Known item",
 							},
 						],
@@ -151,7 +151,7 @@ it("preserves mixed outcome ordering and Space-only sets in the authored project
 								},
 								{
 									type: "item",
-									itemId: "reward",
+									itemUid: "reward",
 									quantity: {
 										min: 1,
 										max: 2,

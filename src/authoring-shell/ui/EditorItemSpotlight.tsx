@@ -27,7 +27,7 @@ export const EditorItemSpotlight = ({
 			onSelectItemFn={selectItemFn}
 			options={options.map((option) => ({
 				artwork: <EditorItemSearchThumbnail item={items[option.id]} />,
-				itemId: option.id,
+				itemUid: option.id,
 				label: option.label,
 				terms: option.terms,
 			}))}

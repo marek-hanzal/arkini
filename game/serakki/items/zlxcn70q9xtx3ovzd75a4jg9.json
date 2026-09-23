@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zlxcn70q9xtx3ovzd75a4jg9",
-		"id": "hand-saw",
 		"title": "Hand Saw",
 		"draft": true,
 		"ui": "default",
@@ -16,29 +15,29 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood---tier-1"
+					"itemUid": "kwkucgj71atfynrxw5sugzpe"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "planks"
+				"result": "ad0tzhtjqhxt6xn4xhiin2ig"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "planks"
+					"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "wood-fibers"
+				"result": "vflhl5vs01pkh5xfbx8nup0s"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "firewood"
+					"itemUid": "rwgifjjoffgcix5149b6q6v1"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "wood-fibers"
+				"result": "vflhl5vs01pkh5xfbx8nup0s"
 			}
 		],
 		"maxQueueSize": 1,

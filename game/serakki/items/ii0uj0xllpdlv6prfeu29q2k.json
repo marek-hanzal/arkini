@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ii0uj0xllpdlv6prfeu29q2k",
-		"id": "magic-sawmill-blueprint",
 		"title": "Magic Sawmill Blueprint",
 		"ui": "default",
 		"description": "Can you smell fresh wood... and magic?",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "lumer-camp"
+								"itemUid": "vrjsj1cqzlky11b0wvd6ye0l"
 							},
 							"distance": "far"
 						},
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sawmill"
+								"itemUid": "vzszf54dp2dsk1epd2qnte03"
 							},
 							"distance": "far"
 						},
@@ -68,7 +67,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "magic-sawmill-blueprint"
+								"itemUid": "ii0uj0xllpdlv6prfeu29q2k"
 							},
 							"distance": "self"
 						}
@@ -85,7 +84,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "magic-sawmill",
+											"itemUid": "oryldez7t6fhoaa0hgxhd27l",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -106,9 +105,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "mage-lodge"
+										"itemUid": "gsowtc0rzpubbqkaam67fz85"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

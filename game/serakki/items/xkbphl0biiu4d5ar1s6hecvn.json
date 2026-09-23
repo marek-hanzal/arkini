@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xkbphl0biiu4d5ar1s6hecvn",
-		"id": "basecamp-on-fire",
 		"title": "Basecamp on Fire",
 		"ui": "simple",
 		"draft": false,
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "base-camp",
+										"itemUid": "x8z9v8tn5wa7qse7c7izy6b0",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -57,7 +56,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "loose-ash",
+										"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 										"quantity": {
 											"min": 3,
 											"max": 4
@@ -67,7 +66,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "clutter",
+										"itemUid": "ubo4ux37gz2ya3qfsj78a9oq",
 										"quantity": {
 											"min": 2,
 											"max": 3
@@ -110,7 +109,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "air-pollution",
+											"itemUid": "nh9tf1n52h19igah115s36jk",
 											"quantity": {
 												"min": 1,
 												"max": 1

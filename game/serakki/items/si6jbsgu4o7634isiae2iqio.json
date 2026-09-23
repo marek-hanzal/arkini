@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "si6jbsgu4o7634isiae2iqio",
-		"id": "carved-pumpkin",
 		"title": "Carved Pumpkin",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-carved-pumpkin",
+										"itemUid": "hmry3jdkf0s11ktnnyegd21q",
 										"quantity": {
 											"min": 1,
 											"max": 1

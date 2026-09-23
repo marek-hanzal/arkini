@@ -12,7 +12,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
 const base = (id: string) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -30,7 +30,7 @@ const materialInput = (itemId: string) => ({
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
-			itemId,
+			itemUid: itemId,
 		},
 	},
 	quantity: {
@@ -61,7 +61,7 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 									outcome: [
 										{
 											type: "item" as const,
-											itemId: outputItemId,
+											itemUid: outputItemId,
 											quantity: {
 												min: 1,
 												max: 1,
@@ -147,22 +147,22 @@ const board = (x: number) => ({
 const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () {
 	const converter = yield* spawnItemFx({
 		id: "runtime:converter",
-		itemId: "producer:converter",
+		itemUid: "producer:converter",
 		location: board(0),
 	});
 	const inner = yield* spawnItemFx({
 		id: "runtime:inner",
-		itemId: "producer:inner",
+		itemUid: "producer:inner",
 		location: board(1),
 	});
 	const middle = yield* spawnItemFx({
 		id: "runtime:middle",
-		itemId: "producer:middle",
+		itemUid: "producer:middle",
 		location: board(2),
 	});
 	const payload = yield* spawnItemFx({
 		id: "runtime:payload",
-		itemId: "item:payload",
+		itemUid: "item:payload",
 		location: board(3),
 	});
 
@@ -245,7 +245,7 @@ describe("consume material lifecycle", () => {
 		expect(result.running.defaultLineByOwnerItemId?.["runtime:inner"]).toBeUndefined();
 		expect(result.completed.items.some((item) => item.id === "runtime:inner")).toBe(false);
 		expect(
-			result.completed.items.filter((item) => item.item.id === "item:product"),
+			result.completed.items.filter((item) => item.item.uid === "item:product"),
 		).toHaveLength(1);
 	});
 });

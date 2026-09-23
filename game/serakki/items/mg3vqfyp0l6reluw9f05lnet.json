@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mg3vqfyp0l6reluw9f05lnet",
-		"id": "bed-beer",
 		"title": "Bed Beer",
 		"ui": "simple",
 		"description": "Bleh",

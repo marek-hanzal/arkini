@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "rp06r6pjrhyhxxkujos2r1md",
-		"id": "loose-ash",
 		"title": "Loose Ash",
 		"draft": false,
 		"description": "Loose ash scattered around after burning. Collect it into a sack before using it for anything civilized.",
@@ -17,11 +16,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "ash"
+				"result": "hhq1jyc6purkrnzfh6bqsk51"
 			}
 		],
 		"maxQueueSize": 1,

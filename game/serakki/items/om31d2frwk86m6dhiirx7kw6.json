@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "om31d2frwk86m6dhiirx7kw6",
-		"id": "corn-field",
 		"title": "Corn Field",
 		"draft": false,
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-corn-field",
+										"itemUid": "hlhjwuirteft3l82uxiqrrnh",
 										"quantity": {
 											"min": 1,
 											"max": 1

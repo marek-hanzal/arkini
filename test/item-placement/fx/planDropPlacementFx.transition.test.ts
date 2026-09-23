@@ -27,7 +27,7 @@ describe("drop placement transition", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(0),
 				});
 				yield* placeDropForTestFx({
@@ -60,7 +60,7 @@ describe("drop placement transition", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(0),
 				});
 
@@ -99,7 +99,7 @@ describe("drop placement transition", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(0),
 				});
 				const placement = yield* placeDropForTestFx({
@@ -156,7 +156,7 @@ describe("drop placement transition", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:origin",
-					itemId: "origin",
+					itemUid: "origin",
 					location: boardLocation(0),
 				});
 				for (const x of [
@@ -165,7 +165,7 @@ describe("drop placement transition", () => {
 				]) {
 					yield* spawnItemFx({
 						id: `runtime:blocker:${x}`,
-						itemId: "blocker",
+						itemUid: "blocker",
 						location: boardLocation(x),
 					});
 				}
@@ -208,7 +208,7 @@ describe("drop placement transition", () => {
 
 		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
 		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
-		expect(result.runtime.items.filter((item) => item.item.id === "board-only")).toHaveLength(
+		expect(result.runtime.items.filter((item) => item.item.uid === "board-only")).toHaveLength(
 			1,
 		);
 	});
@@ -219,7 +219,7 @@ it("rejects incomplete placement without committing partial output identities", 
 		Effect.gen(function* () {
 			yield* spawnItemFx({
 				id: "runtime:origin",
-				itemId: "origin",
+				itemUid: "origin",
 				location: boardLocation(0),
 			});
 			for (const x of [
@@ -229,7 +229,7 @@ it("rejects incomplete placement without committing partial output identities", 
 			]) {
 				yield* spawnItemFx({
 					id: `runtime:board:${x}`,
-					itemId: "blocker",
+					itemUid: "blocker",
 					location: boardLocation(x),
 				});
 			}
@@ -267,7 +267,7 @@ it("rejects incomplete placement without committing partial output identities", 
 	if (Result.isFailure(result.placement)) {
 		expect(result.placement.failure).toMatchObject({
 			_tag: "PlacementUnavailableError",
-			itemId: "log",
+			itemUid: "log",
 			reason: "board:full",
 			remainingQuantity: 1,
 		});

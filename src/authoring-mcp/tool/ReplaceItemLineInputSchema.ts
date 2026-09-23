@@ -6,7 +6,7 @@ import { CompleteItemLineSchema } from "./CompleteItemLineSchema";
 /** Revision-pinned complete replacement of one existing item line. */
 export const ReplaceItemLineInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact ID of the item that owns the line."),
+		itemUid: IdSchema.describe("The exact ID of the item that owns the line."),
 		lineId: IdSchema.describe("The exact existing line ID to replace."),
 		revision: z
 			.number()

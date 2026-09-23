@@ -8,14 +8,14 @@ import { Tx } from "~/translation/ui/Tx";
 
 /** Links one known item reference to the requested detail section. */
 export const DetailReference = ({
-	itemId,
+	itemUid,
 	description,
 	eyebrow,
 	search = {},
 	sectionId = "identity",
 	stretched = false,
 }: {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly description?: ReactNode;
 	readonly eyebrow?: ReactNode;
 	readonly search?: {
@@ -25,12 +25,12 @@ export const DetailReference = ({
 	readonly stretched?: boolean;
 }) => {
 	const project = useEditorProject();
-	const item = project.config.items[itemId];
+	const item = project.config.items[itemUid];
 	if (item === undefined)
 		return (
 			<span className="min-w-0 break-all font-mono text-sm font-medium text-muted">
 				{eyebrow}
-				{itemId} <Tx label="Missing item marker" />
+				{itemUid} <Tx label="Missing item marker" />
 			</span>
 		);
 	return (

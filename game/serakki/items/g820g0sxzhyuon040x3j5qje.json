@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "g820g0sxzhyuon040x3j5qje",
-		"id": "sack-with-grain",
 		"title": "Sack With Grain",
 		"description": "All you can eat!",
 		"ui": "simple",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "chicken"
+					"itemUid": "i767otw53htcjcc2y9zrw6it"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "well-fed-chicken"
+				"result": "mj7bg5up2xlr0wvy9hfb9zb6"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "hungry-chicken"
+					"itemUid": "nk9t46yrhwek7h4u2cin27ip"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "chicken"
+				"result": "i767otw53htcjcc2y9zrw6it"
 			}
 		],
 		"clock": {
@@ -47,7 +46,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nyzirc2a7v6tlaied9y0h0o4",
-		"id": "wine-toilet",
 		"title": "Wine Toilet",
 		"ui": "simple",
 		"description": "Sommelier's dream",

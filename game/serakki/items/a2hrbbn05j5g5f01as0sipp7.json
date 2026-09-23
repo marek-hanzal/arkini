@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a2hrbbn05j5g5f01as0sipp7",
-		"id": "sick-bear",
 		"title": "Sick Bear",
 		"draft": true,
 		"ui": "simple",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-game-meat",
+										"itemUid": "xf44x3an4an91b5xqmxevd11",
 										"quantity": {
 											"min": 4,
 											"max": 6
@@ -38,7 +37,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "spoiled-animal-bones",
+										"itemUid": "xsy4q5tb13eivk2tmqhtrj4q",
 										"quantity": {
 											"min": 2,
 											"max": 3
@@ -99,7 +98,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "disease",
+											"itemUid": "siugkd1lhwym2fqb49j4z0r5",
 											"quantity": {
 												"min": 1,
 												"max": 1

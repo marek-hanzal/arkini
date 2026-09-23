@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aaj5jhmv6a2wsjg74yryd28r",
-		"id": "cauldron-with-boiling-water",
 		"title": "Cauldron With Boiling Water",
 		"ui": "simple",
 		"description": "Keep it hot",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "cauldron-with-water",
+										"itemUid": "jjfr3hedbcr6v62xsf9z12zo",
 										"quantity": {
 											"min": 1,
 											"max": 1

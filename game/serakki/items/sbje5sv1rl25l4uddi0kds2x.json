@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "sbje5sv1rl25l4uddi0kds2x",
-		"id": "order",
 		"title": "Order",
 		"draft": true,
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle"
+					"itemUid": "upghscvjnnxzp09urbuh5x0a"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "order-shredded",
+											"itemUid": "lxg8p8zb8msiduu6e2zrzmkq",
 											"quantity": {
 												"min": 1,
 												"max": 1

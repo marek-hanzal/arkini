@@ -8,7 +8,7 @@ describe("readDeleteBlockersFn", () => {
 	it("reports the exact project path that still references the item", () => {
 		const blockers = readDeleteBlockersFn({
 			config: editorTestConfig,
-			itemId: "water",
+			itemUid: "water",
 		});
 
 		expect(blockers).toEqual([
@@ -18,7 +18,7 @@ describe("readDeleteBlockersFn", () => {
 					0,
 					"board",
 					0,
-					"itemId",
+					"itemUid",
 				],
 			}),
 		]);
@@ -30,7 +30,7 @@ describe("readDeleteBlockersFn", () => {
 			effect: "keep" as const,
 			target: {
 				type: "item" as const,
-				itemId: "water",
+				itemUid: "water",
 			},
 		};
 		const config = GameConfigSchema.parse({
@@ -51,7 +51,6 @@ describe("readDeleteBlockersFn", () => {
 				oil: {
 					...editorTestConfig.items.water,
 					uid: "oil",
-					id: "oil",
 					title: "Oil",
 					merge: [
 						merge,
@@ -63,7 +62,7 @@ describe("readDeleteBlockersFn", () => {
 		expect(
 			readDeleteBlockersFn({
 				config,
-				itemId: "water",
+				itemUid: "water",
 			}),
 		).toEqual([
 			expect.objectContaining({
@@ -73,7 +72,7 @@ describe("readDeleteBlockersFn", () => {
 					"merge",
 					0,
 					"target",
-					"itemId",
+					"itemUid",
 				],
 			}),
 		]);

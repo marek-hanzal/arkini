@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "hqsdpwtasbqnxlu9w2b13l42",
-		"id": "molasses-jar",
 		"title": "Molasses Jar",
 		"ui": "simple",
 		"description": "Rum time",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-jar",
+										"itemUid": "cpvz27g6e3h6wgwjfmkeihd6",
 										"quantity": {
 											"min": 1,
 											"max": 1

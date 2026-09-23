@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qxqafymuxw7keyketjpn9cye",
-		"id": "feather",
 		"title": "Feather",
 		"description": "Piece of arrow. Or piece of writing tool",
 		"ui": "simple",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pig"
+					"itemUid": "jx5gnntoo4aj7rxf3eq32lun"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "flying-pig"
+				"result": "mqmvl8hdiena7ezt7ivuleze"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "unfinished-arrows"
+					"itemUid": "kbjdar1ildhy9em7xli47k0l"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "arrows---tier-1"
+				"result": "j3uy7jal3539u6u1zqup1mcz"
 			}
 		],
 		"maxQueueSize": 1,

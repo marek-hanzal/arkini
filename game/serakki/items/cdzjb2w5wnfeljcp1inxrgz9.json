@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cdzjb2w5wnfeljcp1inxrgz9",
-		"id": "plague",
 		"title": "Plague",
 		"ui": "simple",
 		"draft": true,
@@ -47,7 +46,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "disease",
+											"itemUid": "siugkd1lhwym2fqb49j4z0r5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "plague",
+											"itemUid": "cdzjb2w5wnfeljcp1inxrgz9",
 											"quantity": {
 												"min": 1,
 												"max": 1

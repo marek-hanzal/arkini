@@ -9,7 +9,7 @@ import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
 
 export namespace planBestEffortDropPlacementFx {
 	export interface Discarded {
-		readonly itemId: string;
+		readonly itemUid: string;
 		readonly quantity: number;
 		readonly reason: PlacementUnavailableError.Reason;
 	}
@@ -62,7 +62,7 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 			} satisfies planBestEffortDropPlacementFx.Result;
 		const lost = Math.min(quantity, attempt.error.remainingQuantity);
 		discarded.push({
-			itemId: drop.itemId,
+			itemUid: drop.itemUid,
 			quantity: lost,
 			reason: attempt.error.reason,
 		});

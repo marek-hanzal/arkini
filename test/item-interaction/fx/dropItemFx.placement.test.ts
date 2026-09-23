@@ -25,7 +25,7 @@ describe("dropItemFx / move storage and swap", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const outcome = yield* dropItemFx({
@@ -58,7 +58,7 @@ describe("dropItemFx / move storage and swap", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 				itemId: "runtime:water",
-				canonicalItemId: "water",
+				itemUid: "water",
 				originItemId: "runtime:water",
 				previousLocation: sourceLocation,
 				location: emptyLocation,
@@ -71,7 +71,7 @@ describe("dropItemFx / move storage and swap", () => {
 			Effect.gen(function* () {
 				const first = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const secondLocation = {
@@ -84,7 +84,7 @@ describe("dropItemFx / move storage and swap", () => {
 				};
 				const second = yield* spawnItemFx({
 					id: "runtime:stone",
-					itemId: "stone",
+					itemUid: "stone",
 					location: secondLocation,
 				});
 				const target = {
@@ -144,12 +144,12 @@ describe("dropItemFx / move storage and swap", () => {
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "water",
+					itemUid: "water",
 					location: sourceLocation,
 				});
 				const target = yield* spawnItemFx({
 					id: "runtime:stone",
-					itemId: "stone",
+					itemUid: "stone",
 					location: occupiedLocation,
 				});
 				const outcome = yield* dropItemFx({
@@ -177,9 +177,9 @@ describe("dropItemFx / move storage and swap", () => {
 			{
 				type: GameEventEnumSchema.enum.ItemSwapped,
 				sourceItemId: "runtime:water",
-				sourceCanonicalItemId: "water",
+				sourceItemUid: "water",
 				targetItemId: "runtime:stone",
-				targetCanonicalItemId: "stone",
+				targetItemUid: "stone",
 				sourceLocation,
 				targetLocation: occupiedLocation,
 			},
@@ -217,7 +217,7 @@ it("rejects a new move outside configured bounds at commit without rejecting exi
 		Effect.gen(function* () {
 			const source = yield* spawnItemFx({
 				id: "runtime:water",
-				itemId: "water",
+				itemUid: "water",
 				location: sourceLocation,
 			});
 			const before = yield* readRuntimeFx();

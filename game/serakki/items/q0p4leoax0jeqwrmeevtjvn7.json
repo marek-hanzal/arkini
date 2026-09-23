@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "q0p4leoax0jeqwrmeevtjvn7",
-		"id": "spoiled-animal-fat",
 		"title": "Spoiled Animal Fat",
 		"draft": false,
 		"description": "Animal fat that missed its appointment with chemistry.",
@@ -17,11 +16,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cutting-board"
+					"itemUid": "cfrqc6p65c4gh3lrjswv84zv"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "cutting-board-with-spoiled-animal-fat"
+				"result": "l9c8km1gdhcxenap24mjja7q"
 			}
 		],
 		"maxQueueSize": 1,

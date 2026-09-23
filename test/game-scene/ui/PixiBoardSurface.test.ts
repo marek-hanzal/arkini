@@ -177,7 +177,7 @@ describe("PixiBoardSurface", () => {
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const owner = {
 			id: "runtime:producer",
-			itemId: "producer",
+			itemUid: "producer",
 
 			location: {
 				scope: "board",
@@ -237,7 +237,7 @@ describe("PixiBoardSurface", () => {
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const producer = {
 			id: "runtime:producer",
-			itemId: "producer",
+			itemUid: "producer",
 
 			location: {
 				scope: "board",

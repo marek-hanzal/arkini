@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "kgxsxcqbi8ylj89t2og2cv7s",
-		"id": "copper-pan-with-raw-steak",
 		"title": "Copper Pan With Raw Steak",
 		"ui": "simple",
 		"description": "Wanna eat this",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "campfire-burning"
+					"itemUid": "nq73xqq5xq0o2kusvgo6hek9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-pan-with-cooked-steak",
+											"itemUid": "u01lk6hlpgr9j5w0agm446x5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,7 +44,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "campfire-extinguished"
+				"result": "fenhlvaj45ssocm5r935nqli"
 			}
 		],
 		"clock": {
@@ -63,7 +62,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-copper-pan",
+										"itemUid": "ogm52bsqfqk27a566mmabg3q",
 										"quantity": {
 											"min": 1,
 											"max": 1

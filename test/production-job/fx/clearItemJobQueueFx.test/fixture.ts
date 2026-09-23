@@ -14,7 +14,7 @@ export const clearItemJobQueueState = {
 	items: [
 		{
 			id: "runtime:forge:primary",
-			itemId: "forge",
+			itemUid: "forge",
 			location: {
 				scope: "board",
 				space: 0,
@@ -26,7 +26,7 @@ export const clearItemJobQueueState = {
 		},
 		{
 			id: "runtime:forge:other",
-			itemId: "forge",
+			itemUid: "forge",
 			location: {
 				scope: "board",
 				space: 0,

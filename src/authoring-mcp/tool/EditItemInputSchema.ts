@@ -5,7 +5,6 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 const itemPatch = z
 	.object(ItemSchema.shape)
 	.omit({
-		id: true,
 		uid: true,
 	})
 	.partial()
@@ -29,7 +28,7 @@ const itemPatch = z
 /** Strict replace patches; omitted fields stay unchanged and null clears optional fields. */
 export const EditItemInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The immutable item ID returned by item_collection."),
+		itemUid: IdSchema.describe("The immutable item UID returned by item_collection."),
 		revision: z
 			.number()
 			.int()

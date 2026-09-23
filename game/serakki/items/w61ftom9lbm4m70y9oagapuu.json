@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "w61ftom9lbm4m70y9oagapuu",
-		"id": "dirty-scrubbing-brush",
 		"title": "Dirty Scrubbing Brush",
 		"description": "A dirty brush. It cannot clean anything, but it can absolutely make other brushes share the problem.",
 		"ui": "simple",
@@ -16,16 +15,16 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "toilet-biowaste"
+				"result": "oo3wuqjngg5i21vwt4m5nz0s"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bucket-with-water"
+					"itemUid": "s9j877qispz12d8ry9h1d4wb"
 				},
 				"action": "consume",
 				"outcome": {
@@ -39,7 +38,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "scrubbing-brush",
+											"itemUid": "im6k8omuik7imr85cq0bc750",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -54,43 +53,43 @@
 					]
 				},
 				"effect": "replace",
-				"result": "bio-waste-bucket"
+				"result": "rfb6208v8p0zyhbocehncios"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cutting-board"
+					"itemUid": "cfrqc6p65c4gh3lrjswv84zv"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "dirty-cutting-board"
+				"result": "yc7z9wcj6dzunglpuxuhisgx"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "scrubbing-brush"
+					"itemUid": "im6k8omuik7imr85cq0bc750"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "dirty-scrubbing-brush"
+				"result": "w61ftom9lbm4m70y9oagapuu"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "soapy-scrubbing-brush"
+					"itemUid": "my9bfiki5q32m5rgvcmq66h1"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "dirty-scrubbing-brush"
+				"result": "w61ftom9lbm4m70y9oagapuu"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "trimmed-scrubbing-brush"
+					"itemUid": "g1w4g5ccovd4q91eyaano0tp"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "trimmed-dirty-scrubbing-brush"
+				"result": "g6n0uojktw3jxzapewd3jpdt"
 			}
 		],
 		"maxQueueSize": 1,

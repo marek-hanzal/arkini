@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "vrrlriluo0tlef50wpl5q2bt",
-		"id": "beehive",
 		"title": "Beehive",
 		"description": "An active colony supplying honey production. Each Honeycomb job consumes one hive unit; once exhausted, the structure remains as an Empty Beehive.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-beehive",
+										"itemUid": "u429hy1jfrysyrnlsim8shyb",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "tuw5spl68vaof73aziz0ai1b",
-		"id": "empty-quiver",
 		"title": "Empty Quiver",
 		"ui": "simple",
 		"description": "Put arrows inside",

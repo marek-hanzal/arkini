@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "x23l6no189g91mguo82na9o9",
-		"id": "paper-boat-bath",
 		"title": "Paper Boat Bath",
 		"ui": "simple",
 		"description": "It floats",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "copper-bathtub-with-water",
+										"itemUid": "osmpflow443kpnve1hfl6x3e",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -37,7 +36,7 @@
 									},
 									{
 										"type": "item",
-										"itemId": "bio-waste",
+										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 										"quantity": {
 											"min": 1,
 											"max": 1

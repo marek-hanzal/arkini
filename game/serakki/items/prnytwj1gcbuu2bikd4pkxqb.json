@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "prnytwj1gcbuu2bikd4pkxqb",
-		"id": "burning-quest",
 		"title": "Burning Quest",
 		"draft": false,
 		"description": "A declined business opportunity undergoing rapid archival processing.",
@@ -29,7 +28,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "loose-ash",
+										"itemUid": "rp06r6pjrhyhxxkujos2r1md",
 										"quantity": {
 											"min": 1,
 											"max": 1

@@ -100,7 +100,7 @@ describe("readItemDetailQueue", () => {
 			...base,
 			items: base.items.map((item) => ({
 				...item,
-				item: config.items[item.item.id],
+				item: config.items[item.item.uid],
 			})),
 			jobQueue: [
 				...base.jobQueue,

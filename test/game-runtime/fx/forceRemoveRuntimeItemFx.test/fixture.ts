@@ -39,7 +39,7 @@ export const fixtureFn = (width = 2) => {
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "holder",
+										itemUid: "holder",
 									},
 								},
 								quantity: {
@@ -61,7 +61,7 @@ export const fixtureFn = (width = 2) => {
 									distance: "far" as const,
 									selector: {
 										type: "item",
-										itemId: "water",
+										itemUid: "water",
 									},
 								},
 								quantity: {
@@ -87,7 +87,6 @@ export const fixtureFn = (width = 2) => {
 			holder: {
 				...base.items.forge,
 				uid: "holder",
-				id: "holder",
 				lines: base.items.forge.lines,
 			},
 		},

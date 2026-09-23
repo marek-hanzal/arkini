@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ijvxkfutjp5xaehjlrv6boze",
-		"id": "cotton-farm",
 		"title": "Cotton Farm",
 		"draft": false,
 		"description": "Operates nearby cotton fields and keeps their seed stock moving.",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "cotton-field"
+								"itemUid": "sy01gwgqbum87oa96usrv67x"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -66,7 +65,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cotton",
+											"itemUid": "ppyp6pjf6uqnjegb6q5l9d9o",
 											"quantity": {
 												"min": 1,
 												"max": 3
@@ -76,7 +75,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -118,7 +117,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-cotton-field",
+											"itemUid": "c45534f7e4eb3faf3e39c8d1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -150,7 +149,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -172,7 +171,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cotton-farm-blueprint",
+											"itemUid": "aq65u7scy2h4tzfgqjaopyt6",
 											"quantity": {
 												"min": 1,
 												"max": 1

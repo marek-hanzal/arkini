@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "t39jwpoa9w53pbwcn1jfppyp",
-		"id": "stone---tier-2",
 		"title": "Stone - Tier 2",
 		"draft": true,
 		"ui": "simple",
@@ -19,11 +18,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone---tier-2"
+					"itemUid": "t39jwpoa9w53pbwcn1jfppyp"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "stone---tier-3"
+				"result": "akl7uuna3f34qeg245ggnx8p"
 			}
 		],
 		"maxQueueSize": 1,
@@ -47,7 +46,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone---tier-2"
+								"itemUid": "t39jwpoa9w53pbwcn1jfppyp"
 							},
 							"distance": "self"
 						}
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "stone---tier-1",
+											"itemUid": "b1z61l4bbwdtc75nt189hzze",
 											"quantity": {
 												"min": 2,
 												"max": 2

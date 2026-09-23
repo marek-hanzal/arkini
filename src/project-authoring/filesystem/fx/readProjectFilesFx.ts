@@ -66,7 +66,6 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 			value: game,
 		},
 	];
-	const itemIds = new Set<string>();
 	const itemUids = new Set<string>();
 
 	for (const relativeFile of itemFiles) {
@@ -81,14 +80,10 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 			"Editor item file",
 		);
 		const item = source.item;
-		const itemId = item.id;
-		if (itemIds.has(itemId)) {
-			return yield* failInvalidItemFileFx(sourcePath, `item ID ${itemId} is duplicated.`);
-		}
+		const itemUid = item.uid;
 		if (itemUids.has(item.uid)) {
 			return yield* failInvalidItemFileFx(sourcePath, `item UID ${item.uid} is duplicated.`);
 		}
-		itemIds.add(itemId);
 		itemUids.add(item.uid);
 		const expectedPath = yield* paths.itemFileFx({
 			uid: item.uid,
@@ -104,7 +99,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 			value: {
 				$schema: source.$schema,
 				items: {
-					[itemId]: item,
+					[itemUid]: item,
 				},
 			},
 		});

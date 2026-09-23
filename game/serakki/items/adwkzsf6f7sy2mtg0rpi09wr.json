@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "adwkzsf6f7sy2mtg0rpi09wr",
-		"id": "waste",
 		"title": "Waste",
 		"ui": "simple",
 		"description": "Not a useful stuff. You should get rid of it.",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "broken-toilet"
+				"result": "rlu8j1ab449tif0zotlwervi"
 			}
 		],
 		"maxQueueSize": 1,

@@ -13,30 +13,30 @@ export const readCapabilityRelatedTermsFn = (
 		for (const input of capability.input) {
 			switch (input.type) {
 				case "materials":
-					ids.add(input.query.selector.itemId);
+					ids.add(input.query.selector.itemUid);
 					break;
 				case "units":
-					ids.add(input.query.selector.itemId);
+					ids.add(input.query.selector.itemUid);
 					break;
 				case "simple":
 					break;
 			}
 		}
 		for (const rule of capability.rules)
-			for (const when of rule.when) ids.add(when.query.selector.itemId);
+			for (const when of rule.when) ids.add(when.query.selector.itemUid);
 	} else {
-		if (capability.action !== "space") ids.add(capability.target.itemId);
+		if (capability.action !== "space") ids.add(capability.target.itemUid);
 		if (capability.effect === "replace") ids.add(capability.result);
 	}
 	for (const set of capability.outcome?.set ?? []) {
 		for (const rule of set.rules)
-			for (const when of rule.when) ids.add(when.query.selector.itemId);
+			for (const when of rule.when) ids.add(when.query.selector.itemUid);
 		for (const roll of set.roll) {
 			const drops = readDraftRollOutcomesFn(roll);
 			for (const drop of drops) {
-				if (drop.type === "item") ids.add(drop.itemId);
+				if (drop.type === "item") ids.add(drop.itemUid);
 				for (const rule of drop.rules)
-					for (const when of rule.when) ids.add(when.query.selector.itemId);
+					for (const when of rule.when) ids.add(when.query.selector.itemUid);
 			}
 		}
 	}

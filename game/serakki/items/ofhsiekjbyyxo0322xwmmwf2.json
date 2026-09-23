@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ofhsiekjbyyxo0322xwmmwf2",
-		"id": "wishing-well",
 		"title": "Wishing Well",
 		"ui": "simple",
 		"draft": true,
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -71,7 +70,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "amethyst",
+											"itemUid": "laqx08cmv2c9mqs5qz5tv8yj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -92,7 +91,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sapphire",
+											"itemUid": "kzsmr5zujn6exn5tsrx84405",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "diamond",
+											"itemUid": "hqqtqugyyvkvinxwebfelmsg",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -134,7 +133,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "emerald",
+											"itemUid": "sag14rytoixz9t1i2fy33v3m",
 											"quantity": {
 												"min": 1,
 												"max": 1

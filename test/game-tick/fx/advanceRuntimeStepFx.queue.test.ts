@@ -218,7 +218,7 @@ describe("Tick queue progress priority", () => {
 					items: [
 						...prepared.items.map((item) => ({
 							...item,
-							item: config.items[item.item.id]!,
+							item: config.items[item.item.uid]!,
 						})),
 						{
 							...itemFn("payer", "water", boardFn(1)),

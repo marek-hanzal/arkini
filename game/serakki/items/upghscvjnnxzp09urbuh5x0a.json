@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "upghscvjnnxzp09urbuh5x0a",
-		"id": "beagle",
 		"title": "Beagle",
 		"draft": true,
 		"ui": "simple",
@@ -19,7 +18,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fawn"
+					"itemUid": "aalsr85hfkjpg477l9h99xxb"
 				},
 				"action": "use",
 				"outcome": {
@@ -34,7 +33,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hide",
+											"itemUid": "hohe1cgesvcpvak5dh9ewti2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -49,7 +48,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "animal-bones---tier-1",
+											"itemUid": "v5d2dioqv0zxgjlr6wo2vgeh",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -64,43 +63,43 @@
 					]
 				},
 				"effect": "replace",
-				"result": "raw-game-meat"
+				"result": "xnx83d4j7dn7gi6nn8ft7fiw"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "raw-game-meat"
+					"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "well-fed-beagle"
+				"result": "p2hum1wg0p5ipy1os7yv091q"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "spoiled-sausage"
+					"itemUid": "pqpid50tthxuej5xtyn8i45d"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sick-beagle"
+				"result": "ejznmbmbn7inrmbk1iwyd2ao"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle-puppy"
+					"itemUid": "jml833htnpikvhdtswrnfn3a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagle-cuddling-puppy"
+				"result": "h29vpb7xti4o0j2js9ypgnct"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "beagle"
+					"itemUid": "upghscvjnnxzp09urbuh5x0a"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "beagles-sniffing-each-other"
+				"result": "mj9yqliwdhhry83a7mnv3sop"
 			}
 		],
 		"clock": {
@@ -148,7 +147,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "self"
 						}
@@ -165,7 +164,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beagle",
+											"itemUid": "upghscvjnnxzp09urbuh5x0a",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -201,7 +200,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "self"
 						}
@@ -218,7 +217,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-beagle",
+											"itemUid": "ms0pjnyoteo96bt25xr8lk7z",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -228,7 +227,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -264,7 +263,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "self"
 						}
@@ -281,7 +280,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle",
+											"itemUid": "ejznmbmbn7inrmbk1iwyd2ao",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -318,7 +317,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "self"
 						}
@@ -335,7 +334,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle",
+											"itemUid": "ejznmbmbn7inrmbk1iwyd2ao",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -356,7 +355,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -388,7 +387,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "self"
 						}
@@ -405,7 +404,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-beagle",
+											"itemUid": "ejznmbmbn7inrmbk1iwyd2ao",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -426,7 +425,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},
@@ -458,7 +457,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle-puppy"
+								"itemUid": "jml833htnpikvhdtswrnfn3a"
 							},
 							"distance": "near-close"
 						}
@@ -472,7 +471,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "beagle"
+								"itemUid": "upghscvjnnxzp09urbuh5x0a"
 							},
 							"distance": "self"
 						}
@@ -489,7 +488,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "beagle-cuddling-puppy",
+											"itemUid": "h29vpb7xti4o0j2js9ypgnct",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -510,7 +509,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "beagle-puppy"
+										"itemUid": "jml833htnpikvhdtswrnfn3a"
 									},
 									"distance": "near-close"
 								},

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jd94d2oozljzhtlwmijg1o8g",
-		"id": "cow-farm",
 		"title": "Cow Farm",
 		"description": "Manages nearby cow pens, prepares empty ones, and releases cows over time.",
 		"ui": "default",
@@ -34,7 +33,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "cow-pen"
+								"itemUid": "ekstw01ksb6lp64ums0563jk"
 							},
 							"distance": "close"
 						}
@@ -44,7 +43,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "hay"
+								"itemUid": "bttupkw06zzxn8xuvb4d27uu"
 							},
 							"distance": "far"
 						},
@@ -59,7 +58,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bucket-with-water"
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
 							},
 							"distance": "far"
 						},
@@ -81,7 +80,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cow",
+											"itemUid": "f5o2vqdxqh3zhg05fyd1xf1m",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -91,7 +90,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-bucket",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -123,7 +122,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -145,7 +144,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-cow-pen",
+											"itemUid": "gjobtbnrqmjascqi7jcdp3pb",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -177,7 +176,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -199,7 +198,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cow-farm-blueprint",
+											"itemUid": "s5a9uulb6fimbylb01npp8du",
 											"quantity": {
 												"min": 1,
 												"max": 1

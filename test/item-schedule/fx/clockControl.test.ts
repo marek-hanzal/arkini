@@ -34,7 +34,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 							distance: "far",
 							selector: {
 								type: "item",
-								itemId: "permit",
+								itemUid: "permit",
 							},
 						},
 						quantity: {
@@ -131,7 +131,7 @@ it("does not age a Clock created by a job completion until the next simulation b
 					clock: true,
 					outcome: createOutput([
 						{
-							itemId: "clock",
+							itemUid: "clock",
 						},
 					]),
 				}),

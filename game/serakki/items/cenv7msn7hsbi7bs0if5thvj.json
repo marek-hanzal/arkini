@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cenv7msn7hsbi7bs0if5thvj",
-		"id": "sack-with-grape-seed",
 		"title": "Sack With Grape Seed",
 		"draft": false,
 		"description": "A sack of grape seed. The grapes on the sack prevent future winemakers from having to identify seeds by squinting.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-grape-field"
+					"itemUid": "c4hwa7v3nkbf2tqz6ph95ko9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "grape-field"
+				"result": "o1gor2xgnplb8ef4mn5lqwyl"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

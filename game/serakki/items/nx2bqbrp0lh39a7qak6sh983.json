@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nx2bqbrp0lh39a7qak6sh983",
-		"id": "cooked-steak",
 		"title": "Cooked Steak",
 		"description": "Yammy",
 		"ui": "simple",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-steak",
+										"itemUid": "ou19vzfm8kr9itlu8lxz1nhi",
 										"quantity": {
 											"min": 1,
 											"max": 1

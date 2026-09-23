@@ -160,8 +160,7 @@ const item: ItemSchema.Type = {
 	ui: "default",
 	lines: [],
 
-	uid: "q12cmsx5ussy30wyjiea8yaw",
-	id: "item:water",
+	uid: "item:water",
 
 	title: "Water",
 	description: "Fresh water.",
@@ -193,7 +192,7 @@ beforeEach(() => {
 				spaces: [],
 			},
 			items: {
-				[item.id]: item,
+				[item.uid]: item,
 			},
 		},
 	};
@@ -241,7 +240,6 @@ const render = async (
 					{...(newItem
 						? {
 								defaultDraft,
-								defaultItemId: "dirty-bucket",
 								defaultTitle: "Dirty Bucket",
 								create: true as const,
 							}
@@ -456,7 +454,7 @@ describe("item section form session", () => {
 			lines: [],
 		});
 		state.persisted = configured;
-		(state.project as Project).config.items[item.id] = configured;
+		(state.project as Project).config.items[item.uid] = configured;
 		const { container, renderSection } = await render(
 			<IdentitySection />,
 			false,
@@ -494,7 +492,6 @@ describe("item section form session", () => {
 
 		expect(JSON.parse(artworkLink.dataset.search ?? "null")).toMatchObject({
 			defaultDraft: true,
-			defaultItemId: "dirty-bucket",
 			defaultTitle: "Dirty Bucket",
 			create: true,
 		});
@@ -518,7 +515,7 @@ describe("item section form session", () => {
 		expect(state.saveItem).toHaveBeenCalledWith(
 			expect.objectContaining({
 				item: expect.objectContaining({
-					id: "dirty-bucket",
+					uid: item.uid,
 					title: "Dirty Bucket",
 				}),
 			}),
@@ -635,37 +632,6 @@ describe("item section form session", () => {
 		expect(state.navigate).toHaveBeenCalledOnce();
 	});
 
-	it("marks the item ID field when another UID already owns the draft ID", async () => {
-		const duplicate = {
-			...item,
-			id: "item:duplicate",
-			uid: "duplicate-uid",
-		};
-		(
-			state.project as {
-				config: {
-					items: Record<string, ItemSchema.Type>;
-				};
-			}
-		).config.items[duplicate.id] = duplicate;
-		const { container } = await render(<IdentitySection />);
-		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
-		if (id === null) throw new Error("Missing item ID input.");
-
-		await changeInput(id, duplicate.id);
-		const saveButton = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Save");
-		await act(async () => {
-			saveButton?.click();
-			await Promise.resolve();
-		});
-
-		expect(state.saveItem).not.toHaveBeenCalled();
-		expect(id.dataset.uiInvalid).toBe("true");
-		expect(container.textContent).toContain("This Item ID is already in use.");
-	});
-
 	it("discards the local draft and returns an existing item to detail without saving", async () => {
 		const { container } = await render(<IdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
@@ -760,7 +726,7 @@ describe("item section form session", () => {
 					action: "consume",
 					effect: "keep",
 					target: {
-						itemId: item.id,
+						itemUid: item.uid,
 						type: "item",
 					},
 				},
@@ -768,7 +734,7 @@ describe("item section form session", () => {
 					action: "use",
 					effect: "remove",
 					target: {
-						itemId: item.id,
+						itemUid: item.uid,
 						type: "item",
 					},
 				},
@@ -781,13 +747,13 @@ describe("item section form session", () => {
 					items: Record<string, ItemSchema.Type>;
 				};
 			}
-		).config.items[item.id] = itemWithMerges;
+		).config.items[item.uid] = itemWithMerges;
 		const InvalidMergeProbe = () => {
 			const { form } = useFormSession();
 			return (
 				<button
 					type="button"
-					onClick={() => form.setFieldValue("merge[1].target.itemId", "")}
+					onClick={() => form.setFieldValue("merge[1].target.itemUid", "")}
 				>
 					Invalidate second merge
 				</button>
@@ -829,7 +795,7 @@ describe("item section form session", () => {
 			id: "producer",
 			outcome: createOutput([
 				{
-					itemId: item.id,
+					itemUid: item.uid,
 				},
 			]),
 		});
@@ -847,7 +813,7 @@ describe("item section form session", () => {
 									distance: "far",
 									selector: {
 										type: "item" as const,
-										itemId: item.id,
+										itemUid: item.uid,
 									},
 								},
 							},
@@ -862,7 +828,7 @@ describe("item section form session", () => {
 									distance: "far",
 									selector: {
 										type: "item" as const,
-										itemId: "",
+										itemUid: "",
 									},
 								},
 							},
@@ -880,8 +846,8 @@ describe("item section form session", () => {
 			}
 		).config;
 		config.items = {
-			[item.id]: item,
-			[producer.id]: producer,
+			[item.uid]: item,
+			[producer.uid]: producer,
 		};
 		const { container } = await render(<ProductionSection />);
 		const addOutputSet = container.querySelector<HTMLButtonElement>(
@@ -974,7 +940,7 @@ describe("item section form session", () => {
 						effect: "keep",
 						target: {
 							type: "item",
-							itemId: item.id,
+							itemUid: item.uid,
 						},
 					},
 					{
@@ -982,13 +948,13 @@ describe("item section form session", () => {
 						effect: "remove",
 						target: {
 							type: "item",
-							itemId: item.id,
+							itemUid: item.uid,
 						},
 					},
 				],
 			});
 			state.persisted = configured;
-			(state.project as Project).config.items[item.id] = configured;
+			(state.project as Project).config.items[item.uid] = configured;
 			const section = {
 				merges: <MergesSection />,
 				production: <ProductionSection />,
@@ -1010,7 +976,7 @@ describe("item section form session", () => {
 			expect(state.saveItem).toHaveBeenLastCalledWith(
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: configured.id,
+						uid: configured.uid,
 						maxQueueSize: configured.maxQueueSize,
 						clock: capability === "clock" ? undefined : configured.clock,
 						units: capability === "units" ? undefined : configured.units,
@@ -1048,12 +1014,12 @@ describe("item section form session", () => {
 	it("saves a passive Common after removing its last production line", async () => {
 		const common = {
 			...createProducerItem({
-				id: item.id,
+				id: item.uid,
 			}),
 			uid: item.uid,
 		};
 		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
+		(state.project as Project).config.items[item.uid] = common;
 		const { container } = await render(<ProductionSection />);
 		const removeLine = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionRemove"]',
@@ -1075,17 +1041,17 @@ describe("item section form session", () => {
 	it("saves and clears optional line artwork without changing the owning item's artwork", async () => {
 		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
 			state.persisted = item;
-			(state.project as Project).config.items[item.id] = item;
+			(state.project as Project).config.items[item.uid] = item;
 			return item;
 		});
 		const common = {
 			...createProducerItem({
-				id: item.id,
+				id: item.uid,
 			}),
 			uid: item.uid,
 		};
 		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
+		(state.project as Project).config.items[item.uid] = common;
 		const { container, renderSection } = await render(<ProductionSection />);
 		const artwork = container.querySelector<HTMLInputElement>(
 			'input[data-resource-label="Artwork"]',
@@ -1123,7 +1089,7 @@ describe("item section form session", () => {
 		};
 		const common = {
 			...createProducerItem({
-				id: item.id,
+				id: item.uid,
 				lines: [
 					source,
 				],
@@ -1131,7 +1097,7 @@ describe("item section form session", () => {
 			uid: item.uid,
 		};
 		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
+		(state.project as Project).config.items[item.uid] = common;
 		const { container } = await render(<ProductionSection />);
 		const duplicate = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionDuplicate"]',
@@ -1152,28 +1118,17 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("derives the item ID only from title edits and saves the same item UID", async () => {
+	it("changes a title while preserving the immutable item UID", async () => {
 		const { container } = await render(<IdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
-		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
-		if (title === null || id === null) throw new Error("Missing item identity fields.");
-		expect(id.value).toBe(item.id);
-		await changeInput(title, "  Foo   Bar  ");
-		expect(id.value).toBe("foo-bar");
-		await changeInput(id, "manual-id");
-		expect(title.value).toBe("  Foo   Bar  ");
-		await changeInput(title, "");
-		expect(id.value).toBe("");
+		if (title === null) throw new Error("Missing title field.");
 		await changeInput(title, "Next Title");
-		expect(id.value).toBe("next-title");
-		expect(state.saveItem).not.toHaveBeenCalled();
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item).toEqual({
 			...item,
 			title: "Next Title",
-			id: "next-title",
 		});
 	});
 
@@ -1183,7 +1138,7 @@ describe("item section form session", () => {
 		});
 		const common = {
 			...createProducerItem({
-				id: item.id,
+				id: item.uid,
 				lines: [
 					{
 						...createLine({
@@ -1197,7 +1152,7 @@ describe("item section form session", () => {
 			uid: item.uid,
 		};
 		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
+		(state.project as Project).config.items[item.uid] = common;
 		const { container } = await render(<ProductionSection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="lines[0].title"]');
 		const id = container.querySelector<HTMLInputElement>('input[name="lines[0].id"]');
@@ -1225,12 +1180,12 @@ describe("item section form session", () => {
 	it("keeps Default exclusive and independent Clock lines through the saved form", async () => {
 		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
 			state.persisted = item;
-			(state.project as Project).config.items[item.id] = item;
+			(state.project as Project).config.items[item.uid] = item;
 			return item;
 		});
 		const common = {
 			...createProducerItem({
-				id: item.id,
+				id: item.uid,
 			}),
 			uid: item.uid,
 			lines: [
@@ -1246,7 +1201,7 @@ describe("item section form session", () => {
 			],
 		};
 		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
+		(state.project as Project).config.items[item.uid] = common;
 		const { container, renderSection } = await render(<ProductionSection />);
 		const toggle = async (label: string) => {
 			const button = [
@@ -1323,7 +1278,7 @@ describe("item section form session", () => {
 			...item,
 		};
 		state.persisted = common;
-		(state.project as Project).config.items[item.id] = common;
+		(state.project as Project).config.items[item.uid] = common;
 		const { container } = await render(
 			<ClockSection />,
 			false,
@@ -1353,7 +1308,7 @@ describe("item section form session", () => {
 	it("saves a Clock with a cleared optional lifetime while retaining its interval and production lines", async () => {
 		const clock = ItemSchema.parse({
 			...createProducerItem({
-				id: item.id,
+				id: item.uid,
 			}),
 			uid: item.uid,
 			clock: {
@@ -1368,7 +1323,7 @@ describe("item section form session", () => {
 					items: Record<string, ItemSchema.Type>;
 				};
 			}
-		).config.items[item.id] = clock;
+		).config.items[item.uid] = clock;
 		const { container } = await render(<ClockSection />);
 		const duration = container.querySelector<HTMLInputElement>(
 			'input[name="clock.durationMs"]',
@@ -1414,7 +1369,7 @@ describe("item section form session", () => {
 	it("clears the Clock interval while preserving the edited lifetime and expiry outcome", async () => {
 		const onExpire = createOutput([
 			{
-				itemId: item.id,
+				itemUid: item.uid,
 			},
 		]);
 		const scheduled = ItemSchema.parse({
@@ -1425,7 +1380,7 @@ describe("item section form session", () => {
 			},
 		});
 		state.persisted = scheduled;
-		(state.project as Project).config.items[item.id] = scheduled;
+		(state.project as Project).config.items[item.uid] = scheduled;
 		const { container } = await render(<ClockSection />);
 		const interval = container.querySelector<HTMLInputElement>(
 			'input[name="clock.intervalMs"]',
@@ -1468,7 +1423,7 @@ describe("item section form session", () => {
 					items: Record<string, ItemSchema.Type>;
 				};
 			}
-		).config.items[item.id] = once;
+		).config.items[item.uid] = once;
 		const { container } = await render(<ClockSection />);
 		const duration = container.querySelector<HTMLInputElement>(
 			'input[name="clock.durationMs"]',
@@ -1528,7 +1483,7 @@ describe("item section form session", () => {
 					config: {
 						...project.config,
 						items: {
-							[canonical.id]: canonical,
+							[canonical.uid]: canonical,
 						},
 					},
 				};
@@ -1619,8 +1574,7 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 	await render(<CopyProbe />);
 	const source = ItemSchema.parse({
 		...item,
-		uid: "source-uid",
-		id: "source",
+		uid: "source",
 		title: "Source",
 		ui: "simple",
 		clock: {
@@ -1653,7 +1607,6 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 	expect(state.saveItem).toHaveBeenCalledExactlyOnceWith(
 		expect.objectContaining({
 			item: expect.objectContaining({
-				id: item.id,
 				uid: item.uid,
 				title: source.title,
 				ui: "simple",

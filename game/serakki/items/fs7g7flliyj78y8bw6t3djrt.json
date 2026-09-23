@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fs7g7flliyj78y8bw6t3djrt",
-		"id": "well",
 		"title": "Well",
 		"ui": "default",
 		"description": "Source of water. This one is full.",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -61,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well"
+								"itemUid": "fs7g7flliyj78y8bw6t3djrt"
 							},
 							"distance": "self"
 						}
@@ -71,7 +70,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "empty-bucket"
+								"itemUid": "ww797h0lugbws2jsb61ldy7g"
 							},
 							"distance": "far"
 						},
@@ -93,7 +92,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bucket-with-water",
+											"itemUid": "s9j877qispz12d8ry9h1d4wb",
 											"quantity": {
 												"min": 1,
 												"max": 1

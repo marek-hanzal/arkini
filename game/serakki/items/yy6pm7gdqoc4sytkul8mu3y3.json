@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yy6pm7gdqoc4sytkul8mu3y3",
-		"id": "windmill",
 		"title": "Windmill",
 		"description": "Mill some flour",
 		"ui": "default",
@@ -29,7 +28,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "sack-with-grain"
+								"itemUid": "g820g0sxzhyuon040x3j5qje"
 							},
 							"distance": "far"
 						},
@@ -51,7 +50,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "flour",
+											"itemUid": "kbq806ubyrorojtlc7o9afki",
 											"quantity": {
 												"min": 1,
 												"max": 1

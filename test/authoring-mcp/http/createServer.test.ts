@@ -160,13 +160,13 @@ describe("editor MCP server", () => {
 		]) {
 			const properties = tools.tools.find(({ name }) => name === toolName)?.inputSchema
 				.properties;
-			expect(properties).toHaveProperty("itemId");
+			expect(properties).toHaveProperty("itemUid");
 			expect(properties).toHaveProperty("level");
 		}
 		expect(
 			tools.tools.find(({ name }) => name === "item_estimate")?.inputSchema.properties,
 		).toMatchObject({
-			itemId: expect.any(Object),
+			itemUid: expect.any(Object),
 			quantity: expect.any(Object),
 		});
 		const missing = await client.callTool({
@@ -286,7 +286,7 @@ describe("editor MCP server", () => {
 		const relation = await client.callTool({
 			name: "item_input",
 			arguments: {
-				itemId: "water",
+				itemUid: "water",
 				level: 2,
 			},
 		});
@@ -300,7 +300,7 @@ describe("editor MCP server", () => {
 		const estimate = await client.callTool({
 			name: "item_estimate",
 			arguments: {
-				itemId: "tool",
+				itemUid: "tool",
 			},
 		});
 		for (const name of [
@@ -309,7 +309,7 @@ describe("editor MCP server", () => {
 			"item_estimate",
 		]) {
 			const argumentsBase = {
-				itemId: "tool",
+				itemUid: "tool",
 			};
 			const defaultResult = await client.callTool({
 				name,
@@ -348,7 +348,7 @@ describe("editor MCP server", () => {
 		const missingEstimate = await client.callTool({
 			name: "item_estimate",
 			arguments: {
-				itemId: "missing",
+				itemUid: "missing",
 			},
 		});
 
@@ -356,7 +356,7 @@ describe("editor MCP server", () => {
 		expect(relation).not.toHaveProperty("structuredContent");
 		expect(relation.content).toMatchObject([
 			{
-				text: expect.stringContaining("Item input\nItem ID: water"),
+				text: expect.stringContaining("Item input\nItem UID: water"),
 			},
 		]);
 		expect(globalEstimate.isError).not.toBe(true);
@@ -370,7 +370,7 @@ describe("editor MCP server", () => {
 		expect(estimate).not.toHaveProperty("structuredContent");
 		expect(estimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("Item estimate\nItem ID: tool"),
+				text: expect.stringContaining("Item estimate\nItem UID: tool"),
 			},
 		]);
 		expect(missingEstimate).toMatchObject({

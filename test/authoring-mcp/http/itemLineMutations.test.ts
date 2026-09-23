@@ -65,7 +65,7 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 			arguments: jsonToolInputFn(input),
 		});
 	const created = await callFn("create_item_line", {
-		itemId: "forge",
+		itemUid: "forge",
 		revision: before.revision,
 		line: added,
 	});
@@ -86,12 +86,12 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 	});
 	for (const input of [
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			revision: afterCreate.revision,
 			line: added,
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			revision: before.revision,
 			line: {
 				...added,
@@ -99,7 +99,7 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 			},
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			revision: afterCreate.revision,
 			line: {
 				...added,
@@ -108,7 +108,7 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 			},
 		},
 		{
-			itemId: "missing",
+			itemUid: "missing",
 			revision: afterCreate.revision,
 			line: added,
 		},
@@ -116,12 +116,12 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 		expect((await callFn("create_item_line", input)).isError).toBe(true);
 	for (const input of [
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			revision: afterCreate.revision,
 			lineId: "missing",
 		},
 		{
-			itemId: "forge",
+			itemUid: "forge",
 			revision: before.revision,
 			lineId: first.id,
 		},
@@ -131,7 +131,7 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 	expect(notifyFn).toHaveBeenCalledTimes(1);
 
 	const deleted = await callFn("delete_item_line", {
-		itemId: "forge",
+		itemUid: "forge",
 		revision: afterCreate.revision,
 		lineId: first.id,
 	});
@@ -166,7 +166,7 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 	expect(
 		(
 			await callFn("delete_item_line", {
-				itemId: "forge",
+				itemUid: "forge",
 				revision: ambiguous.revision,
 				lineId: added.id,
 			})
@@ -194,7 +194,7 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 	const commands: mutateItemLineFx.Command[] = [
 		{
 			operation: "create",
-			itemId: "forge",
+			itemUid: "forge",
 			revision: snapshot.revision,
 			line: {
 				...first,
@@ -203,7 +203,7 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 		},
 		{
 			operation: "replace",
-			itemId: "forge",
+			itemUid: "forge",
 			revision: snapshot.revision,
 			lineId: first.id,
 			line: {
@@ -213,7 +213,7 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 		},
 		{
 			operation: "delete",
-			itemId: "forge",
+			itemUid: "forge",
 			revision: snapshot.revision,
 			lineId: first.id,
 		},
@@ -260,7 +260,7 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 				clockWeight: undefined,
 			};
 			const input = {
-				itemId: "forge",
+				itemUid: "forge",
 				revision: before.revision,
 				...(name === "replace_item_line"
 					? {

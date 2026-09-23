@@ -74,7 +74,6 @@ it("reports material quantity available to autofill and a direct producer fallba
 			pump: {
 				...lineRunTestConfig.items.workshop,
 				uid: "pump",
-				id: "pump",
 				title: "Pump",
 				description: "Produces water.",
 				lines: [
@@ -100,7 +99,7 @@ it("reports material quantity available to autofill and a direct producer fallba
 											outcome: [
 												{
 													type: "item",
-													itemId: "water",
+													itemUid: "water",
 													quantity: {
 														min: 1,
 														max: 1,

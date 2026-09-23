@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "dob6o4r9l8xrn7u5iamgfpyg",
-		"id": "school-t1",
 		"title": "School - Tier 1",
 		"draft": false,
 		"description": "A modest place for turning spare time, paper, and willing hands into useful knowledge. Civilization has discovered homework.",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemUid": "ejcs57zv68bas7jmizm7286p"
 							},
 							"distance": "far"
 						},
@@ -68,7 +67,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "knowledge-t1",
+											"itemUid": "inkvbfkqv4zu96xz2eiiu4dw",
 											"quantity": {
 												"min": 1,
 												"max": 1

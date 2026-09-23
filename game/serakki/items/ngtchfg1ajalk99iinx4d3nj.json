@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ngtchfg1ajalk99iinx4d3nj",
-		"id": "raw-steak-slices",
 		"title": "Raw Steak Slices",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-steak-slices",
+										"itemUid": "t8bk8bl5437quwhm12emi57c",
 										"quantity": {
 											"min": 1,
 											"max": 1

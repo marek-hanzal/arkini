@@ -7,23 +7,23 @@ import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
 
 export namespace resolveItemFx {
 	export interface Props {
-		itemId: IdSchema.Type;
+		itemUid: IdSchema.Type;
 	}
 }
 
 /**
- * Resolves one item ID to its canonical object in the loaded game context.
+ * Resolves one item UID to its canonical object in the loaded game context.
  */
 export const resolveItemFx = Effect.fn("resolveItemFx")(function* ({
-	itemId,
+	itemUid,
 }: resolveItemFx.Props) {
 	const config = yield* GameConfigFx;
-	const item = config.items[itemId];
+	const item = config.items[itemUid];
 
 	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotFoundError({
-				itemId,
+				itemUid,
 			}),
 		);
 	}

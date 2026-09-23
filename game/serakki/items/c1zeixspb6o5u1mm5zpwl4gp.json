@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "c1zeixspb6o5u1mm5zpwl4gp",
-		"id": "quiver",
 		"title": "Quiver",
 		"draft": true,
 		"ui": "default",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bow"
+					"itemUid": "j9ni85pox4gjt7uu3ud04kkj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "bow-and-arrows"
+				"result": "i5fpduh7s05jm3hautorgz5k"
 			}
 		],
 		"maxQueueSize": 1,

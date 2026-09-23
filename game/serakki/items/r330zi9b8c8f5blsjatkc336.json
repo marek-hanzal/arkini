@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "r330zi9b8c8f5blsjatkc336",
-		"id": "dirty-mug",
 		"title": "Dirty Mug",
 		"ui": "simple",
 		"artwork": {

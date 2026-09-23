@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "aimxjaohns3tfd68e2gfveeq",
-		"id": "mouse-with-cut-tail",
 		"title": "Mouse With Cut Tail",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-raw-game-meat",
+										"itemUid": "xf44x3an4an91b5xqmxevd11",
 										"quantity": {
 											"min": 2,
 											"max": 3

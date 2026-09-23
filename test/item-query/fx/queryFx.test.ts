@@ -33,7 +33,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "tree",
-			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			artwork: {
@@ -93,7 +92,7 @@ const origin = {
 } as const;
 
 const selector = {
-	itemId: "tree",
+	itemUid: "tree",
 	type: "item",
 } as const;
 
@@ -177,11 +176,12 @@ describe("queryFx", () => {
 	});
 });
 
-it("universe includes the origin and remote Board spaces while excluding buffered and reserved material", () => {
+it("far excludes the origin, remote spaces, buffered and reserved material", () => {
 	const snapshot = runtime({
 		currentSpace: 9,
 		items: [
 			board("self", 0, 0),
+			board("local", 0, 1),
 			board("remote", 2, 0),
 			item("buffer", {
 				scope: "input",
@@ -199,14 +199,13 @@ it("universe includes the origin and remote Board spaces while excluding buffere
 	const selected = Effect.runSync(
 		runQuery({
 			query: {
-				distance: "universe",
+				distance: "far",
 				selector,
 			},
 			runtime: snapshot,
 		}),
 	);
 	expect(readIds(selected)).toEqual([
-		"self",
-		"remote",
+		"local",
 	]);
 });

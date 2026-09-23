@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wsxdo9qr3r9cl8s8ay0buttc",
-		"id": "beer-mug",
 		"title": "Beer Bug",
 		"ui": "simple",
 		"description": "Good cold beer, ach!",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dye-workshop"
+					"itemUid": "tdk2m5cvrgw56s4do7tc2wu9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-mug",
+											"itemUid": "nw60xpkc8pbay8tkriirlyw2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "dye-workshop-beer"
+				"result": "loozw41u293jkxpjyg0v0gll"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "toilet"
+					"itemUid": "ecihjakbzjlagfsrswt4cdji"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-mug",
+											"itemUid": "nw60xpkc8pbay8tkriirlyw2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,7 +78,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "toilet-beer"
+				"result": "bcsqwp1kcn3witslvys9yb1v"
 			}
 		],
 		"clock": {
@@ -97,7 +96,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-mug",
+										"itemUid": "r26qlyj1gy45l0a2j4gx9of1",
 										"quantity": {
 											"min": 1,
 											"max": 1

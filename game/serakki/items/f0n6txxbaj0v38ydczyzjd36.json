@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "f0n6txxbaj0v38ydczyzjd36",
-		"id": "food-portal",
 		"title": "Food Portal",
 		"ui": "simple",
 		"description": "Food stuff",

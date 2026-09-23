@@ -25,7 +25,7 @@ describe("blocked job completion", () => {
 				});
 				const blocked = yield* readRuntimeFx();
 				const blockers = blocked.items
-					.filter((item) => item.item.id === "blocker")
+					.filter((item) => item.item.uid === "blocker")
 					.slice(0, 2);
 				for (const blocker of blockers) {
 					yield* removeRuntimeItemForTestFx({
@@ -69,7 +69,7 @@ describe("blocked job completion", () => {
 				"reserved",
 			]),
 		);
-		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
+		expect(result.blocked.items.filter((item) => item.item.uid === "ingot")).toEqual([]);
 
 		expect(result.recovered.jobs).toEqual([]);
 		expect(
@@ -77,8 +77,8 @@ describe("blocked job completion", () => {
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
 			),
 		).toBe(false);
-		expect(result.recovered.items.filter((item) => item.item.id === "tool").length).toBe(1);
-		expect(result.recovered.items.filter((item) => item.item.id === "ingot").length).toBe(1);
+		expect(result.recovered.items.filter((item) => item.item.uid === "tool").length).toBe(1);
+		expect(result.recovered.items.filter((item) => item.item.uid === "ingot").length).toBe(1);
 	});
 	it("consumes the attempted budget when outcome completion fatally fails", () => {
 		const config = createTickFailureTestConfig();
@@ -88,7 +88,7 @@ describe("blocked job completion", () => {
 				if (outcome === undefined) throw new Error("Expected failure outcome fixture.");
 				const owner = yield* spawnItemFx({
 					id: "runtime:invalid-outcome-forge",
-					itemId: "forge",
+					itemUid: "forge",
 					location: {
 						scope: "board",
 						space: 0,
@@ -136,7 +136,7 @@ describe("blocked job completion", () => {
 		if (Result.isSuccess(result.attempt)) throw new Error("Expected Tick failure.");
 		expect(result.attempt.failure).toMatchObject({
 			_tag: "ItemNotFoundError",
-			itemId: "completionOutput",
+			itemUid: "completionOutput",
 		});
 		expect(result.afterFailure).toEqual(result.before);
 		expect(result.afterNoRetry).toEqual(result.before);

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "pn9804e3in9odnt9vkpt3lnd",
-		"id": "house-t2",
 		"title": "House - Tier 2",
 		"draft": false,
 		"description": "A larger, better organized household capable of turning several ordinary hands into higher-tier labor.",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "labor-t1"
+								"itemUid": "ejcs57zv68bas7jmizm7286p"
 							},
 							"distance": "far"
 						},
@@ -53,7 +52,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "labor-t2",
+											"itemUid": "dgvhgu1xkv6m4igfdb2wnwxh",
 											"quantity": {
 												"min": 1,
 												"max": 1

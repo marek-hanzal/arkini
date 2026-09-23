@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xmp1ftujrlq53w1lac0k73nb",
-		"id": "rapeseed-oil",
 		"title": "Rapeseed Oil",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-jar",
+										"itemUid": "cpvz27g6e3h6wgwjfmkeihd6",
 										"quantity": {
 											"min": 1,
 											"max": 1

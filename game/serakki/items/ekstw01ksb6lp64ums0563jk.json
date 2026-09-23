@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ekstw01ksb6lp64ums0563jk",
-		"id": "cow-pen",
 		"title": "Cow Pen",
 		"draft": false,
 		"description": "A populated enclosure holding animals that can be released one at a time.",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-cow-pen",
+										"itemUid": "gjobtbnrqmjascqi7jcdp3pb",
 										"quantity": {
 											"min": 1,
 											"max": 1

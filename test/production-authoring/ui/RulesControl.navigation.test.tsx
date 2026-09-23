@@ -25,28 +25,28 @@ vi.mock("~/translation/ui/Mx", () => ({
 	Mx: ({ label }: { label: string }) => createElement("span", null, label),
 }));
 vi.mock("~/authoring-form/ui/useEditorItemSearchOptions", () => ({
-	useEditorItemOptionLabel: () => (itemId: string, fallback: string) => itemId || fallback,
+	useEditorItemOptionLabel: () => (itemUid: string, fallback: string) => itemUid || fallback,
 }));
 vi.mock("~/production-authoring/ui/SelectorControl", () => ({
 	SelectorControl: ({
 		onChangeFn,
 		value,
 	}: {
-		readonly onChangeFn: (value: { readonly itemId: string; readonly type: "item" }) => void;
+		readonly onChangeFn: (value: { readonly itemUid: string; readonly type: "item" }) => void;
 		readonly value: {
-			readonly itemId: string;
+			readonly itemUid: string;
 			readonly type: "item";
 		};
 	}) =>
 		createElement(
 			"button",
 			{
-				"data-selector-item-id": value.itemId,
+				"data-selector-item-id": value.itemUid,
 				type: "button",
 				onClick: () =>
 					onChangeFn({
 						...value,
-						itemId: "selected-item",
+						itemUid: "selected-item",
 					}),
 			},
 			"Item selector",
@@ -154,7 +154,7 @@ it("reveals and removes each rule and condition level independently", async () =
 				query: {
 					distance: "far",
 					selector: {
-						itemId: "",
+						itemUid: "",
 						type: "item",
 					},
 				},
@@ -186,7 +186,7 @@ it("reveals and removes each rule and condition level independently", async () =
 			query: {
 				distance: "far",
 				selector: {
-					itemId: "selected-item",
+					itemUid: "selected-item",
 				},
 			},
 		});
@@ -242,7 +242,7 @@ it("duplicates the selected root rule with all of its conditions", async () => {
 						distance: "far",
 						selector: {
 							type: "item",
-							itemId: "ore",
+							itemUid: "ore",
 						},
 					},
 				},

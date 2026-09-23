@@ -54,7 +54,7 @@ const ItemMetaInputSchema = z.object({}).strict().meta({
 
 const ItemDetailInputSchema = z
 	.object({
-		id: IdSchema.describe("The exact item ID returned by item_collection."),
+		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
 	})
 	.strict()
 	.meta({
@@ -65,7 +65,7 @@ const ItemDetailInputSchema = z
 
 const ItemConfigInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact item ID returned by item_collection."),
+		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
 	})
 	.strict()
 	.meta({
@@ -76,7 +76,7 @@ const ItemConfigInputSchema = z
 
 const ItemLineConfigInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact item ID returned by item_collection."),
+		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
 		lineId: IdSchema.describe("The exact line ID returned by item_lines or item_config."),
 	})
 	.strict()
@@ -88,7 +88,7 @@ const ItemLineConfigInputSchema = z
 
 const ItemLinesInputSchema = z
 	.object({
-		itemId: IdSchema,
+		itemUid: IdSchema,
 	})
 	.strict()
 	.meta({
@@ -98,13 +98,13 @@ const ItemLinesInputSchema = z
 	});
 
 interface ItemLineReference {
-	readonly itemId: string;
+	readonly itemUid: string;
 	readonly lineId: string;
 }
 
-const lineReferenceKeyFn = ({ itemId, lineId }: ItemLineReference) =>
+const lineReferenceKeyFn = ({ itemUid, lineId }: ItemLineReference) =>
 	JSON.stringify([
-		itemId,
+		itemUid,
 		lineId,
 	]);
 
@@ -130,12 +130,15 @@ const ItemLineConfigsInputSchema = z
 
 const ItemConfigsInputSchema = z
 	.object({
-		itemIds: z
+		itemUids: z
 			.array(IdSchema)
 			.min(1)
-			.refine((itemIds) => new Set(itemIds).size <= 50, "Request at most 50 unique item IDs.")
+			.refine(
+				(itemUids) => new Set(itemUids).size <= 50,
+				"Request at most 50 unique item UIDs.",
+			)
 			.describe(
-				"Up to 50 unique item IDs; duplicate IDs are read only once, in request order.",
+				"Up to 50 unique item UIDs; duplicate IDs are read only once, in request order.",
 			),
 	})
 	.strict()
@@ -148,7 +151,7 @@ const ItemConfigsInputSchema = z
 const itemRelationInputSchema = (role: "input" | "output") =>
 	z
 		.object({
-			itemId: IdSchema.describe("The exact root item ID returned by item_collection."),
+			itemUid: IdSchema.describe("The exact root item UID returned by item_collection."),
 			detail: GraphDetailSchema.default("full"),
 			level: z
 				.number()
@@ -166,7 +169,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 
 const ItemChainInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact starting item ID returned by item_collection."),
+		itemUid: IdSchema.describe("The exact starting item UID returned by item_collection."),
 		detail: GraphDetailSchema.default("full").describe(
 			"Summary keeps starting operations, their immediate branches and all outcome states; full includes the complete bounded Details tree.",
 		),
@@ -188,7 +191,7 @@ const ItemChainInputSchema = z
 
 const ItemEstimateInputSchema = z
 	.object({
-		itemId: IdSchema.describe("The exact target item ID returned by item_collection."),
+		itemUid: IdSchema.describe("The exact target item UID returned by item_collection."),
 		quantity: ItemEstimateQuantitySchema.default(1),
 		detail: GraphDetailSchema.default("full"),
 	})
@@ -251,71 +254,72 @@ const readProjectTextFn = (project: Project) => {
 const readItemMetaTextFn = (project: Project) =>
 	`Total: ${Object.keys(project.config.items).length}`;
 
-const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")((project: Project, itemId: string) =>
-	Effect.gen(function* () {
-		const item = project.config.items[itemId];
-		if (item === undefined)
-			return yield* Effect.fail(
-				new Error(`Item ${itemId} does not exist in the open project.`),
-			);
-		return [
-			`Item: ${item.title}`,
-			`Revision: ${project.revision}`,
-			`ID: ${item.id}`,
-			`UID: ${item.uid}`,
-			`Draft: ${readDraftFn(item)}`,
-			`UI: ${item.ui}`,
-			...(item.description === undefined
-				? []
-				: [
-						"Description:",
-						...item.description.split("\n").map((line) => `  ${line}`),
-					]),
-		].join("\n");
-	}),
+const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
+	(project: Project, itemUid: string) =>
+		Effect.gen(function* () {
+			const item = project.config.items[itemUid];
+			if (item === undefined)
+				return yield* Effect.fail(
+					new Error(`Item ${itemUid} does not exist in the open project.`),
+				);
+			return [
+				`Item: ${item.title}`,
+				`Revision: ${project.revision}`,
+				`UID: ${item.uid}`,
+				`Draft: ${readDraftFn(item)}`,
+				`UI: ${item.ui}`,
+				...(item.description === undefined
+					? []
+					: [
+							"Description:",
+							...item.description.split("\n").map((line) => `  ${line}`),
+						]),
+			].join("\n");
+		}),
 );
 
-const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")((project: Project, itemId: string) =>
-	Effect.gen(function* () {
-		const item = project.config.items[itemId];
-		if (item === undefined)
-			return yield* Effect.fail(
-				new Error(`Item ${itemId} does not exist in the open project.`),
+const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
+	(project: Project, itemUid: string) =>
+		Effect.gen(function* () {
+			const item = project.config.items[itemUid];
+			if (item === undefined)
+				return yield* Effect.fail(
+					new Error(`Item ${itemUid} does not exist in the open project.`),
+				);
+			return JSON.stringify(
+				{
+					revision: project.revision,
+					item,
+				},
+				null,
+				2,
 			);
-		return JSON.stringify(
-			{
-				revision: project.revision,
-				item,
-			},
-			null,
-			2,
-		);
-	}),
+		}),
 );
 
 const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
-	(project: Project, itemId: string, lineId: string) =>
+	(project: Project, itemUid: string, lineId: string) =>
 		Effect.gen(function* () {
-			const item = project.config.items[itemId];
+			const item = project.config.items[itemUid];
 			if (item === undefined)
 				return yield* Effect.fail(
-					new Error(`Item ${itemId} does not exist in the open project.`),
+					new Error(`Item ${itemUid} does not exist in the open project.`),
 				);
 			const matchingLines = item.lines.filter(({ id }) => id === lineId);
 			if (matchingLines.length === 0)
 				return yield* Effect.fail(
-					new Error(`Line ${lineId} does not exist on item ${itemId}.`),
+					new Error(`Line ${lineId} does not exist on item ${itemUid}.`),
 				);
 			if (matchingLines.length > 1)
 				return yield* Effect.fail(
 					new Error(
-						`Line ${lineId} is ambiguous on item ${itemId}; fix its duplicate line IDs before reading it.`,
+						`Line ${lineId} is ambiguous on item ${itemUid}; fix its duplicate line IDs before reading it.`,
 					),
 				);
 			return JSON.stringify(
 				{
 					revision: project.revision,
-					itemId,
+					itemUid,
 					line: matchingLines[0],
 				},
 				null,
@@ -324,17 +328,17 @@ const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
 		}),
 );
 
-const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, itemId: string) =>
+const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, itemUid: string) =>
 	Effect.gen(function* () {
-		const item = project.config.items[itemId];
+		const item = project.config.items[itemUid];
 		if (item === undefined)
 			return yield* Effect.fail(
-				new Error(`Item ${itemId} does not exist in the open project.`),
+				new Error(`Item ${itemUid} does not exist in the open project.`),
 			);
 		return JSON.stringify(
 			{
 				revision: project.revision,
-				itemId,
+				itemUid,
 				lines: item.lines.map(
 					({ id, title, default: isDefault, clock, clockWeight, show, enable }) => ({
 						id,
@@ -359,7 +363,7 @@ const readItemLineConfigsTextFn = (
 ) => {
 	const seen = new Set<string>();
 	const lines: Array<{
-		itemId: string;
+		itemUid: string;
 		line: LineSchema.Type;
 	}> = [];
 	const issues: Array<
@@ -371,7 +375,7 @@ const readItemLineConfigsTextFn = (
 		const key = lineReferenceKeyFn(reference);
 		if (seen.has(key)) continue;
 		seen.add(key);
-		const item = project.config.items[reference.itemId];
+		const item = project.config.items[reference.itemUid];
 		if (item === undefined) {
 			issues.push({
 				...reference,
@@ -388,7 +392,7 @@ const readItemLineConfigsTextFn = (
 			continue;
 		}
 		lines.push({
-			itemId: reference.itemId,
+			itemUid: reference.itemUid,
 			line: matches[0]!,
 		});
 	}
@@ -403,23 +407,23 @@ const readItemLineConfigsTextFn = (
 	);
 };
 
-const readItemConfigsTextFn = (project: Project, itemIds: ReadonlyArray<string>) => {
-	const uniqueItemIds = [
-		...new Set(itemIds),
+const readItemConfigsTextFn = (project: Project, itemUids: ReadonlyArray<string>) => {
+	const uniqueItemUids = [
+		...new Set(itemUids),
 	];
 	return JSON.stringify(
 		{
 			revision: project.revision,
-			items: uniqueItemIds.flatMap((itemId) => {
-				const item = project.config.items[itemId];
+			items: uniqueItemUids.flatMap((itemUid) => {
+				const item = project.config.items[itemUid];
 				return item === undefined
 					? []
 					: [
 							item,
 						];
 			}),
-			missingItemIds: uniqueItemIds.filter(
-				(itemId) => project.config.items[itemId] === undefined,
+			missingItemUids: uniqueItemUids.filter(
+				(itemUid) => project.config.items[itemUid] === undefined,
 			),
 		},
 		null,
@@ -646,7 +650,7 @@ const createServerFn = (
 						`Revision: ${commit.revision}`,
 						...decoded.operations.map(
 							(operation, index) =>
-								`${index + 1}. ${operation.operation}: ${operation.itemId} / ${operation.operation === "create" ? operation.line.id : operation.lineId}`,
+								`${index + 1}. ${operation.operation}: ${operation.itemUid} / ${operation.operation === "create" ? operation.line.id : operation.lineId}`,
 						),
 					].join("\n");
 				}),
@@ -672,7 +676,7 @@ const createServerFn = (
 					yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 					return [
 						"Reordered item lines.",
-						`Item ID: ${input.itemId}`,
+						`Item UID: ${input.itemUid}`,
 						`Line IDs: ${input.lineIds.join(", ")}`,
 						`Revision: ${commit.revision}`,
 					].join("\n");
@@ -758,10 +762,10 @@ const createServerFn = (
 				"Read the project revision and simplified identity, Editor draft status, UI mode, and storage detail of one item in the open project. Use this lightweight revision before create_item_line.",
 			inputSchema: ItemDetailInputSchema,
 		},
-		async ({ id }) =>
+		async ({ itemUid }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemDetailTextFx(project, id)),
+					Effect.flatMap((project) => readItemDetailTextFx(project, itemUid)),
 				),
 			),
 	);
@@ -772,10 +776,10 @@ const createServerFn = (
 				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the write request. Use item_line_config for one production line.",
 			inputSchema: ItemConfigInputSchema,
 		},
-		async ({ itemId }) =>
+		async ({ itemUid }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemConfigTextFx(project, itemId)),
+					Effect.flatMap((project) => readItemConfigTextFx(project, itemUid)),
 				),
 			),
 	);
@@ -783,16 +787,16 @@ const createServerFn = (
 		"item_configs",
 		{
 			description:
-				"Read complete canonical JSON configurations for up to 50 unique item IDs from one project snapshot. Returns revision, items in first-request order, and missingItemIds. Duplicate IDs appear once. Copy revision into subsequent write requests.",
+				"Read complete canonical JSON configurations for up to 50 unique item UIDs from one project snapshot. Returns revision, items in first-request order, and missingItemUids. Duplicate IDs appear once. Copy revision into subsequent write requests.",
 			inputSchema: ItemConfigsInputSchema,
 			annotations: {
 				readOnlyHint: true,
 			},
 		},
-		async ({ itemIds }) =>
+		async ({ itemUids }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.map((project) => readItemConfigsTextFn(project, itemIds)),
+					Effect.map((project) => readItemConfigsTextFn(project, itemUids)),
 				),
 			),
 	);
@@ -806,10 +810,10 @@ const createServerFn = (
 				readOnlyHint: true,
 			},
 		},
-		async ({ itemId }) =>
+		async ({ itemUid }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemLinesTextFx(project, itemId)),
+					Effect.flatMap((project) => readItemLinesTextFx(project, itemUid)),
 				),
 			),
 	);
@@ -837,10 +841,10 @@ const createServerFn = (
 				"Read the complete canonical JSON configuration of one production line and its project revision. Use this immediately before replace_item_line and copy the revision and every unchanged line value into the replacement request.",
 			inputSchema: ItemLineConfigInputSchema,
 		},
-		async ({ itemId, lineId }) =>
+		async ({ itemUid, lineId }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemLineConfigTextFx(project, itemId, lineId)),
+					Effect.flatMap((project) => readItemLineConfigTextFx(project, itemUid, lineId)),
 				),
 			),
 	);
@@ -858,12 +862,12 @@ const createServerFn = (
 						: "Read where one item is produced as an Item outcome. Level 1 returns every operation that directly produces it; higher levels repeat outcome lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outcomes. Use detail=summary for compact operations with authored gates and outcome odds; omitted detail or full retains detailed dependency witnesses.",
 				inputSchema: itemRelationInputSchema(role),
 			},
-			async ({ itemId, level, detail }) =>
+			async ({ itemUid, level, detail }) =>
 				runToolFn(
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
 							readItemRelationTextFx(project, {
-								itemId,
+								itemUid,
 								level,
 								detail,
 								role,
@@ -880,11 +884,11 @@ const createServerFn = (
 				"Approximate one item against the authored dependency graph. The estimator uses bounded per-output and correlated joint-output distributions to compute expected first-hitting time, ranks complete quantity-aware routes with stable route-ID ties, and times the selected-fact witness as an optimistic parallel critical path. Demand uses the larger of additive consumption and each selected route's simultaneous consumed-plus-reusable need; finite authored roots and jointly selected co-products are shared. Unsupported bounded state space returns partial. Runtime rule truth, concrete item identity packing, placement, renewable capacity, and engine execution are not simulated. Use detail=summary for totals and every requirement without the selected fact DAG; omitted detail or full retains the full diagnostic presentation.",
 			inputSchema: ItemEstimateInputSchema,
 		},
-		async ({ itemId, quantity, detail }) =>
+		async ({ itemUid, quantity, detail }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
-						readItemEstimateTextFx(project, itemId, quantity, detail),
+						readItemEstimateTextFx(project, itemUid, quantity, detail),
 					),
 				),
 			),
@@ -899,11 +903,11 @@ const createServerFn = (
 				readOnlyHint: true,
 			},
 		},
-		async ({ itemId, detail, maxDepth }) =>
+		async ({ itemUid, detail, maxDepth }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
-						readItemChainTextFx(project, itemId, detail, maxDepth),
+						readItemChainTextFx(project, itemUid, detail, maxDepth),
 					),
 				),
 			),

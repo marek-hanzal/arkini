@@ -78,7 +78,6 @@ describe("Form", () => {
 			container.querySelector("outcome")?.textContent ?? "null",
 		) as ItemSchema.Type;
 		expect(draft).toMatchObject({
-			id: "",
 			maxQueueSize: 1,
 			lines: [],
 
@@ -104,7 +103,6 @@ describe("Form", () => {
 			root.render(
 				createElement(Form, {
 					defaultDraft: true,
-					defaultItemId: "selected_asset-name",
 					defaultTitle: "Selected Asset Name",
 					create: true,
 					resourceId: "selected_asset-name",
@@ -123,7 +121,7 @@ describe("Form", () => {
 				],
 			},
 			draft: true,
-			id: "selected_asset-name",
+			uid: "draft-with-selected-asset",
 			lines: [],
 			title: "Selected Asset Name",
 		});

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gwc1pmn13hdj0a7d166vp1gb",
-		"id": "trimmed-tree",
 		"title": "Trimmed Tree",
 		"draft": true,
 		"ui": "default",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "tree",
+										"itemUid": "czmjliygl2qrfhjah60xo2me",
 										"quantity": {
 											"min": 1,
 											"max": 1

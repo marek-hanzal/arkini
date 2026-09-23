@@ -6,7 +6,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 export const useItemByUid = (uid: string) => {
 	const project = useEditorProject();
 	return useMemo(
-		() => Object.values(project.config.items).find((item) => item.uid === uid),
+		() => project.config.items[uid],
 		[
 			project.config.items,
 			uid,

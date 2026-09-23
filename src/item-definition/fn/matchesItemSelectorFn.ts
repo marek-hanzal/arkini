@@ -8,4 +8,4 @@ export const matchesItemSelectorFn = ({
 }: {
 	readonly item: ItemSchema.Type;
 	readonly selector: SelectorSchema.Type;
-}) => selector.itemId === item.id;
+}) => selector.itemUid === item.uid;

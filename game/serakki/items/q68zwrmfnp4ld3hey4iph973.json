@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "q68zwrmfnp4ld3hey4iph973",
-		"id": "copper-ingot",
 		"title": "Copper Ingot",
 		"ui": "simple",
 		"description": "Quite shiny piece of metal",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "h1fch6nyd1nyzp03ffkjmtlh",
-		"id": "charcoal-kiln-blueprint",
 		"title": "Charcoal Kiln Blueprint",
 		"draft": false,
 		"description": "Plans for a compact kiln that turns firewood into the fuel needed for dirtier and more useful ambitions.",
@@ -39,7 +38,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "charcoal-kiln-blueprint"
+								"itemUid": "h1fch6nyd1nyzp03ffkjmtlh"
 							},
 							"distance": "self"
 						}
@@ -49,7 +48,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "planks"
+								"itemUid": "ad0tzhtjqhxt6xn4xhiin2ig"
 							},
 							"distance": "far"
 						},
@@ -64,7 +63,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "stone-block"
+								"itemUid": "yye90ax5ubh1szpy9clzp3o9"
 							},
 							"distance": "far"
 						},
@@ -86,7 +85,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "charcoal-kiln",
+											"itemUid": "cf5wj8sin5bzx02srb49u1sg",
 											"quantity": {
 												"min": 1,
 												"max": 1

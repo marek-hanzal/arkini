@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "j54ldb5jngob3doi7jqmue5g",
-		"id": "bakery-blueprint",
 		"title": "Bakery Blueprint",
 		"ui": "default",
 		"draft": false,
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "bakery-blueprint"
+								"itemUid": "j54ldb5jngob3doi7jqmue5g"
 							},
 							"distance": "self"
 						}
@@ -55,7 +54,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bakery",
+											"itemUid": "jaem2mwc184a9wyurctnfvd1",
 											"quantity": {
 												"min": 1,
 												"max": 1

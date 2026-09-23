@@ -32,7 +32,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "tree",
-			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			artwork: {
@@ -56,7 +55,7 @@ const state = StateSchema.parse({
 	items: [
 		{
 			id: "runtime:board:tree",
-			itemId: "tree",
+			itemUid: "tree",
 			location: {
 				scope: "board",
 				space: 0,
@@ -68,7 +67,7 @@ const state = StateSchema.parse({
 		},
 		{
 			id: "runtime:second-tree",
-			itemId: "tree",
+			itemUid: "tree",
 			location: {
 				scope: "board" as const,
 				space: 0,
@@ -135,7 +134,7 @@ describe("fromStateFx", () => {
 
 				return {
 					...item,
-					itemId: "missing",
+					itemUid: "missing",
 				};
 			}),
 			jobQueue: [],
@@ -157,7 +156,7 @@ describe("fromStateFx", () => {
 		if (Result.isFailure(result)) {
 			expect(result.failure).toMatchObject({
 				_tag: "ItemNotFoundError",
-				itemId: "missing",
+				itemUid: "missing",
 			});
 		}
 	});

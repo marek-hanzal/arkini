@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "nsbgasysnnxph53jr0bre5hz",
-		"id": "spoiled-fruit-seed",
 		"title": "Spoiled Fruit Seed",
 		"draft": false,
 		"description": "Fruit seed that spoiled before it ever reached the soil.",

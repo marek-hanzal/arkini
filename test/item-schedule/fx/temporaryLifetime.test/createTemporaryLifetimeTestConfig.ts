@@ -2,7 +2,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	ui: "default" as const,
@@ -38,7 +38,7 @@ const guaranteedOutput = ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity,
 							placement,
 							rules: [],
@@ -61,7 +61,7 @@ const emptyChanceOutput = (itemId: string) => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity: {
 								min: 1,
 								max: 1,
@@ -106,7 +106,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 					{
 						target: {
 							type: "item",
-							itemId: "blocker",
+							itemUid: "blocker",
 						},
 						action: "consume",
 						effect: "replace",

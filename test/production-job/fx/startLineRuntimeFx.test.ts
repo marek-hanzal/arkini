@@ -14,7 +14,7 @@ describe("startLineRuntimeFx", () => {
 				yield* prepareJobLineFx();
 				const before = yield* readRuntimeFx();
 				const consumedSource = before.items.find(
-					(item) => item.item.id === "water" && item.location.scope === "input",
+					(item) => item.item.uid === "water" && item.location.scope === "input",
 				);
 				if (consumedSource === undefined) {
 					return yield* Effect.die(new Error("Expected stored water input."));
@@ -44,7 +44,7 @@ describe("startLineRuntimeFx", () => {
 		]);
 		expect(
 			result.runtime.items.find(
-				(item) => item.item.id === "water" && item.location.scope === "job",
+				(item) => item.item.uid === "water" && item.location.scope === "job",
 			),
 		).toMatchObject({
 			location: {
@@ -54,7 +54,7 @@ describe("startLineRuntimeFx", () => {
 		});
 		expect(
 			result.runtime.items.find(
-				(item) => item.item.id === "tool" && item.location.scope === "reserved",
+				(item) => item.item.uid === "tool" && item.location.scope === "reserved",
 			),
 		).toMatchObject({
 			location: {
@@ -65,7 +65,7 @@ describe("startLineRuntimeFx", () => {
 		expect(result.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemConsumed,
 			sourceItemId: result.consumedSource.id,
-			canonicalItemId: "water",
+			itemUid: "water",
 			sourceLocation: result.consumedSource.location,
 		});
 	});

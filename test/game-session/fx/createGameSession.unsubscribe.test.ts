@@ -56,7 +56,7 @@ describe("createGameSessionFx / unsubscribe and async delivery", () => {
 			const item = await session.runFn(
 				spawnItemFx({
 					id: "runtime:water:pending-listener",
-					itemId: "water",
+					itemUid: "water",
 					location: {
 						scope: "board",
 						space: 0,

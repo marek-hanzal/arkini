@@ -49,7 +49,7 @@ const merge = {
 	action: "use",
 	effect: "keep",
 	target: {
-		itemId: "target",
+		itemUid: "target",
 		type: "item",
 	},
 } satisfies MergeSchema.Type;
@@ -88,7 +88,7 @@ describe("MergeField", () => {
 			action: "consume",
 			target: {
 				type: "item",
-				itemId: "",
+				itemUid: "",
 			},
 			effect: "replace",
 			result: "replacement",

@@ -24,7 +24,7 @@ export const boardSpaceProject = {
 				height: 3,
 				board: [
 					{
-						itemId: "water",
+						itemUid: "water",
 						x: 0,
 						y: 0,
 					},
@@ -37,7 +37,7 @@ export const boardSpaceProject = {
 				height: 2,
 				board: [
 					{
-						itemId: "water",
+						itemUid: "water",
 						x: 1,
 						y: 1,
 					},

@@ -33,7 +33,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					height: 1,
 					board: [
 						{
-							itemId: "workshop",
+							itemUid: "workshop",
 							x: 0,
 							y: 0,
 						},
@@ -52,7 +52,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 			items: {
 				workshop: {
 					uid: "workshop",
-					id: "workshop",
 
 					title: "Workshop",
 					description: "Produces grouped output.",
@@ -91,7 +90,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 															distance: "far" as const,
 															selector: {
 																type: "item",
-																itemId: "workshop",
+																itemUid: "workshop",
 															},
 														},
 													},
@@ -104,7 +103,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 												outcome: [
 													{
 														type: "item",
-														itemId: "wood",
+														itemUid: "wood",
 														quantity: {
 															min: 2,
 															max: 2,
@@ -121,7 +120,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 																				"far" as const,
 																			selector: {
 																				type: "item",
-																				itemId: "workshop",
+																				itemUid: "workshop",
 																			},
 																		},
 																	},
@@ -131,7 +130,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 													},
 													{
 														type: "item",
-														itemId: "wood",
+														itemUid: "wood",
 														quantity: {
 															min: 1,
 															max: 3,
@@ -146,7 +145,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 												outcome: [
 													{
 														type: "item",
-														itemId: "gem",
+														itemUid: "gem",
 														quantity: {
 															min: 1,
 															max: 1,
@@ -167,7 +166,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					lines: [],
 
 					uid: "wood",
-					id: "wood",
 
 					title: "Wood",
 					description: "Wood.",
@@ -183,7 +181,6 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					lines: [],
 
 					uid: "gem",
-					id: "gem",
 
 					title: "Gem",
 					description: "Gem.",
@@ -218,7 +215,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 						outcome: [
 							{
 								type: "item",
-								itemId: "wood",
+								itemUid: "wood",
 								quantity: {
 									min: 2,
 									max: 2,
@@ -227,7 +224,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 							},
 							{
 								type: "item",
-								itemId: "wood",
+								itemUid: "wood",
 								quantity: {
 									min: 1,
 									max: 3,
@@ -242,7 +239,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 						outcome: [
 							{
 								type: "item",
-								itemId: "gem",
+								itemUid: "gem",
 								quantity: {
 									min: 1,
 									max: 1,
@@ -261,7 +258,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 			kind: "unavailable",
 		});
 		const water = runtime.items.find(
-			(item) => item.item.id === lineRunTestConfig.items.water.id,
+			(item) => item.item.uid === lineRunTestConfig.items.water.uid,
 		);
 		if (water !== undefined) {
 			expect(readLines(runtime, water.id)).toEqual({

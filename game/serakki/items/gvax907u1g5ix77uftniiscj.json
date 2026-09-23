@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "gvax907u1g5ix77uftniiscj",
-		"id": "window",
 		"title": "Window",
 		"ui": "simple",
 		"description": "Just a window(s)",

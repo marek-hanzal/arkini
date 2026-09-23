@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "cdz4ufdk3nak07xep51oeva1",
-		"id": "dirty-scissors",
 		"title": "Dirty Scissors",
 		"draft": false,
 		"ui": "simple",

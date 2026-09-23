@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yl42uqsjtjk4tkyw29y4z005",
-		"id": "corrupted-british-shorthair",
 		"title": "Corrupted British Shorthair",
 		"ui": "simple",
 		"draft": true,
@@ -19,20 +18,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "corrupted-mouse"
+					"itemUid": "t9b6dl6c7h3ob49clqys3uit"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "corrupted-british-shorthair-full-belly"
+				"result": "hqvhoocjviebxa6iudptr4is"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse"
+					"itemUid": "rvgihky3ismzedb2rwxwysq9"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "corrupted-british-shorthair-full-belly"
+				"result": "hqvhoocjviebxa6iudptr4is"
 			}
 		],
 		"maxQueueSize": 1,

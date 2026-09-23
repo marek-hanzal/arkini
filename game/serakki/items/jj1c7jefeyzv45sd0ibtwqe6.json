@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "jj1c7jefeyzv45sd0ibtwqe6",
-		"id": "cauldron-with-soap",
 		"title": "Cauldron With Soap",
 		"description": "A fresh batch of soap. Fill buckets from it while it lasts; when the last portion is gone, somebody gets to clean the cauldron.",
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "dirty-cauldron",
+										"itemUid": "gknt8tkntf6cx7a4vb5jre1j",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -44,7 +43,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "copper-bathtub"
+					"itemUid": "ysdkouxd4qpd0ztziy07k2ss"
 				},
 				"action": "consume",
 				"outcome": {
@@ -58,7 +57,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-cauldron",
+											"itemUid": "gknt8tkntf6cx7a4vb5jre1j",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -73,7 +72,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "copper-bathtub-with-soapy-water"
+				"result": "osvxwuyh6iy0achwcuujk97b"
 			}
 		],
 		"clock": {
@@ -91,7 +90,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cauldron",
+										"itemUid": "dklkl7eyajzg2ago6dvmzn49",
 										"quantity": {
 											"min": 1,
 											"max": 1

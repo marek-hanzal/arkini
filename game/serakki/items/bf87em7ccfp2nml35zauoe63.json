@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bf87em7ccfp2nml35zauoe63",
-		"id": "toy-sheep",
 		"title": "Toy Sheep",
 		"ui": "simple",
 		"description": "It get lost, a lot of times",

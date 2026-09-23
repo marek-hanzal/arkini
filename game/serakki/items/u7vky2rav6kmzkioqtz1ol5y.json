@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "u7vky2rav6kmzkioqtz1ol5y",
-		"id": "harmless-air-pollution",
 		"title": "Harmless Air Pollution",
 		"ui": "simple",
 		"description": "It does nothing. It's innocent",

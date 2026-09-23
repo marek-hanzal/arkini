@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lv5rn0f5cfwm0rddqmk5gk2i",
-		"id": "bowstring",
 		"title": "Bowstring",
 		"ui": "simple",
 		"description": "You can make a bow",

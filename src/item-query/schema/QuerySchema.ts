@@ -11,7 +11,7 @@ export const QuerySchema = z
 	.strict()
 	.meta({
 		id: "QuerySchema",
-		description: "An item selector and its spatial reach from self through the whole universe.",
+		description: "An item selector and its spatial reach within the origin Board.",
 	});
 export type QuerySchema = typeof QuerySchema;
 export namespace QuerySchema {

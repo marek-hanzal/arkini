@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "a41p89q81k2xnaw2q9xc9zi2",
-		"id": "paper---tier-3",
 		"title": "Paper - Tier 3",
 		"draft": true,
 		"ui": "simple",
@@ -36,7 +35,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-3"
+								"itemUid": "a41p89q81k2xnaw2q9xc9zi2"
 							},
 							"distance": "self"
 						}
@@ -53,7 +52,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "paper---tier-2",
+											"itemUid": "ks8nux30bplu55zxfv9voz41",
 											"quantity": {
 												"min": 2,
 												"max": 2

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lt9eot99t8k8tviy3jwnk7nm",
-		"id": "cutting-board-with-fruit",
 		"title": "Cutting Board With Fruit",
 		"ui": "simple",
 		"draft": true,
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-cutting-board-with-fruit",
+										"itemUid": "dlou40mod7l8b6d93dt9cwzy",
 										"quantity": {
 											"min": 1,
 											"max": 1

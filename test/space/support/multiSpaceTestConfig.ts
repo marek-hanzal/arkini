@@ -2,7 +2,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
-	id,
+
 	title: id,
 	description: id,
 	artwork: {
@@ -23,7 +23,7 @@ const guaranteedOutput = (itemId: string) => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity: {
 								min: 1,
 								max: 1,
@@ -91,7 +91,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				{
 					target: {
 						type: "item",
-						itemId: "mergeTarget",
+						itemUid: "mergeTarget",
 					},
 					action: "consume",
 					effect: "keep",
@@ -137,7 +137,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 								distance: "far",
 								selector: {
 									type: "item",
-									itemId: "log",
+									itemUid: "log",
 								},
 							},
 							quantity: {
@@ -170,7 +170,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 								distance: "far",
 								selector: {
 									type: "item",
-									itemId: "payer",
+									itemUid: "payer",
 								},
 							},
 							units: {

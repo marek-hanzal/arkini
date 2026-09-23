@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "zygshmrxtoabonzd79aqw7hg",
-		"id": "dairy-blueprint",
 		"title": "Dairy Blueprint",
 		"ui": "default",
 		"description": "Cheese!",
@@ -38,7 +37,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "dairy-blueprint"
+								"itemUid": "zygshmrxtoabonzd79aqw7hg"
 							},
 							"distance": "self"
 						}
@@ -55,7 +54,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dairy",
+											"itemUid": "huxn6bqwibau9kkoqkk1e5zx",
 											"quantity": {
 												"min": 1,
 												"max": 1

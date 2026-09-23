@@ -35,11 +35,11 @@ describe("craft completion recovery", () => {
 		const result = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:reserve",
+					itemUid: "craft:reserve",
 				});
 				const tool = yield* spawnItemFx({
 					id: "runtime:roundtrip-tool",
-					itemId: "item:tool",
+					itemUid: "item:tool",
 					location: {
 						scope: "board",
 						space: 0,
@@ -88,7 +88,7 @@ it("keeps blocked craft completion unchanged and replays one deterministic outco
 	const result = runCraft(
 		Effect.gen(function* () {
 			const owner = yield* spawnCraftFx({
-				itemId: "craft:random",
+				itemUid: "craft:random",
 			});
 			let blockerIndex = 0;
 			for (let y = 0; y < 2; y += 1) {
@@ -96,7 +96,7 @@ it("keeps blocked craft completion unchanged and replays one deterministic outco
 					if (x === 0 && y === 0) continue;
 					yield* spawnItemFx({
 						id: `runtime:blocker:${blockerIndex}`,
-						itemId: "item:blocker",
+						itemUid: "item:blocker",
 						location: {
 							scope: "board",
 							space: 0,
@@ -183,7 +183,7 @@ it("keeps blocked craft completion unchanged and replays one deterministic outco
 	});
 	if (result.blocked.type === "blocked") {
 		expect(result.blocked.runtime).toBe(result.fullRuntime);
-		expect(result.blocked.runtime.items.some((item) => item.item.id === "craft:random")).toBe(
+		expect(result.blocked.runtime.items.some((item) => item.item.uid === "craft:random")).toBe(
 			true,
 		);
 		expect(result.blocked.runtime.jobs).toHaveLength(1);

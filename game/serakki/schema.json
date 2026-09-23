@@ -258,14 +258,14 @@
 								"description": "The zero-based vertical grid coordinate.",
 								"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
 							},
-							"itemId": {
+							"itemUid": {
 								"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 							}
 						},
 						"required": [
 							"x",
 							"y",
-							"itemId"
+							"itemUid"
 						],
 						"additionalProperties": false
 					}
@@ -595,17 +595,17 @@
 					"type": "string",
 					"const": "item"
 				},
-				"itemId": {
-					"description": "The stable ID of the selected canonical item.",
+				"itemUid": {
+					"description": "The immutable UID of the selected canonical item.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				}
 			},
 			"required": [
 				"type",
-				"itemId"
+				"itemUid"
 			],
 			"additionalProperties": false,
-			"description": "A selector that resolves one canonical game item by stable ID."
+			"description": "A selector that resolves one canonical game item by immutable UID."
 		},
 		"DistanceSchema": {
 			"type": "string",
@@ -614,10 +614,9 @@
 				"close",
 				"near-close",
 				"near",
-				"far",
-				"universe"
+				"far"
 			],
-			"description": "Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance within the origin Board. Universe includes all Board spaces and the origin."
+			"description": "Chebyshev distance: self is 0, close is 1, near-close is 1 or 2, near is 2, and far is any positive distance within the origin Board."
 		},
 		"QuerySchema": {
 			"type": "object",
@@ -635,7 +634,7 @@
 				"distance"
 			],
 			"additionalProperties": false,
-			"description": "An item selector and its spatial reach from self through the whole universe."
+			"description": "An item selector and its spatial reach within the origin Board."
 		},
 		"when.CountSchema": {
 			"type": "object",
@@ -795,7 +794,7 @@
 						"item"
 					]
 				},
-				"itemId": {
+				"itemUid": {
 					"description": "The ID of the canonical game item emitted by this outcome.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				},
@@ -818,7 +817,7 @@
 			},
 			"required": [
 				"type",
-				"itemId",
+				"itemUid",
 				"quantity",
 				"placement",
 				"rules"
@@ -1795,11 +1794,7 @@
 			"type": "object",
 			"properties": {
 				"uid": {
-					"description": "The immutable CUID2 identity of this canonical game item.",
-					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-				},
-				"id": {
-					"description": "The stable authoring ID of this canonical game item.",
+					"description": "The immutable UID of this canonical game item.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				},
 				"title": {
@@ -1867,7 +1862,6 @@
 			},
 			"required": [
 				"uid",
-				"id",
 				"title",
 				"ui",
 				"artwork",

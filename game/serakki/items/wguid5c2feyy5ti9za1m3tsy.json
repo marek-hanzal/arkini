@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "wguid5c2feyy5ti9za1m3tsy",
-		"id": "knife",
 		"title": "Knife",
 		"description": "Small, sharp, and alarmingly versatile. If something looks sliceable, Serakki is unlikely to stop you.",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fawn"
+					"itemUid": "aalsr85hfkjpg477l9h99xxb"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -45,12 +44,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "injured-fawn"
+				"result": "h408uew16iniwj9h93gz1h1o"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "corn"
+					"itemUid": "m0quqq3gbmugylp39ced2zco"
 				},
 				"action": "consume",
 				"outcome": {
@@ -64,7 +63,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -79,12 +78,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corn-kernels"
+				"result": "yx0dq3pl2qg9blgw7itacuke"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "teddy-bear"
+					"itemUid": "hn2mp2xmdu9on72r0auz8h7t"
 				},
 				"action": "use",
 				"outcome": {
@@ -99,7 +98,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hide",
+											"itemUid": "hohe1cgesvcpvak5dh9ewti2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -114,12 +113,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "cotton-wool"
+				"result": "r8tf0spk6xl9vlkv80jebrxr"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "injured-fawn"
+					"itemUid": "h408uew16iniwj9h93gz1h1o"
 				},
 				"action": "consume",
 				"outcome": {
@@ -133,7 +132,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -143,7 +142,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 2,
 												"max": 3
@@ -158,12 +157,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corrupted-deer"
+				"result": "ucn64xjdrhaqucacp07bm6kh"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse-with-cut-tail"
+					"itemUid": "aimxjaohns3tfd68e2gfveeq"
 				},
 				"action": "consume",
 				"outcome": {
@@ -177,7 +176,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -187,7 +186,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -202,12 +201,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corrupted-mouse"
+				"result": "t9b6dl6c7h3ob49clqys3uit"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse-with-bandaged-tail"
+					"itemUid": "b9eshrtxskxt3vjmv62a52vp"
 				},
 				"action": "consume",
 				"outcome": {
@@ -221,7 +220,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -231,7 +230,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 3,
 												"max": 4
@@ -241,7 +240,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "spoiled-raw-game-meat",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -256,12 +255,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corrupted-mouse"
+				"result": "t9b6dl6c7h3ob49clqys3uit"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cutting-board-with-vegetables"
+					"itemUid": "dxmdzdy9wuj7wv0cwt6gkrjh"
 				},
 				"action": "consume",
 				"outcome": {
@@ -275,7 +274,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -285,7 +284,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "dirty-cutting-board",
+											"itemUid": "yc7z9wcj6dzunglpuxuhisgx",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -300,12 +299,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "chopped-vegetables"
+				"result": "cxi6tqw04dbmbdg69iecsnxi"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "chicken"
+					"itemUid": "i767otw53htcjcc2y9zrw6it"
 				},
 				"action": "consume",
 				"outcome": {
@@ -319,7 +318,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -334,7 +333,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "feather",
+											"itemUid": "qxqafymuxw7keyketjpn9cye",
 											"quantity": {
 												"min": 3,
 												"max": 5
@@ -349,12 +348,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "raw-chicken"
+				"result": "otxagqoj8czp1houud3rbqvb"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "cutting-board-with-fruit"
+					"itemUid": "lt9eot99t8k8tviy3jwnk7nm"
 				},
 				"action": "consume",
 				"outcome": {
@@ -368,7 +367,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "chopped-fruit",
+											"itemUid": "oh4b7a0sm9bzhbwmlasap3ci",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -378,7 +377,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -393,12 +392,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "dirty-cutting-board"
+				"result": "yc7z9wcj6dzunglpuxuhisgx"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bear"
+					"itemUid": "lbyiwjest0kicpb3c1w5pen9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -412,7 +411,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -427,12 +426,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "sick-bear"
+				"result": "a2hrbbn05j5g5f01as0sipp7"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "bio-waste"
+					"itemUid": "l70n80ujrm55lpl6z2n4hcty"
 				},
 				"action": "consume",
 				"outcome": {
@@ -446,7 +445,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -465,7 +464,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "pumpkin"
+					"itemUid": "ddeor1k6lkpv99p1m7ympi8p"
 				},
 				"action": "consume",
 				"outcome": {
@@ -479,7 +478,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "dirty-knife",
+											"itemUid": "tuxpnq2m8g5kjnl4n2lu8znt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -489,7 +488,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "pumpkin-seed",
+											"itemUid": "zr32zq8n2t1ddvbk4sh9wjf2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -504,12 +503,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "carved-pumpkin"
+				"result": "si6jbsgu4o7634isiae2iqio"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "paper-drying-rack"
+					"itemUid": "z7wnlhv495tvujpj3vpose01"
 				},
 				"action": "use",
 				"outcome": {
@@ -523,7 +522,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "paper---tier-1",
+											"itemUid": "ttkblp0xsb1irrbgg5oevm2y",
 											"quantity": {
 												"min": 4,
 												"max": 4
@@ -538,25 +537,25 @@
 					]
 				},
 				"effect": "replace",
-				"result": "empty-paper-drying-rack"
+				"result": "cl9so73ire9q7pa3vblqvi8g"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "feather"
+					"itemUid": "qxqafymuxw7keyketjpn9cye"
 				},
 				"action": "use",
 				"effect": "replace",
-				"result": "quill"
+				"result": "h4jtpd5yoilq7pi0h7xm89yg"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "knife"
+					"itemUid": "wguid5c2feyy5ti9za1m3tsy"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "scissors"
+				"result": "cpmdnqi63m2cql44na50d7vq"
 			}
 		],
 		"maxQueueSize": 1,

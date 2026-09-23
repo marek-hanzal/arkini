@@ -25,14 +25,14 @@ export const runCraft = <A, E>(
 	);
 
 export const spawnCraftFx = Effect.fn("spawnCraftFx")(function* ({
-	itemId,
+	itemUid,
 }: {
-	readonly itemId: CraftItemId;
+	readonly itemUid: CraftItemId;
 	readonly quantity?: number;
 }) {
 	return yield* spawnItemFx({
-		id: `runtime:${itemId}`,
-		itemId,
+		id: `runtime:${itemUid}`,
+		itemUid,
 		location: {
 			position: {
 				x: 0,
@@ -50,9 +50,9 @@ export const projectRandomCraftOutputFx = Effect.fn("projectRandomCraftOutputFx"
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	return runtime.items
-		.filter((item) => item.item.id === "item:random-a" || item.item.id === "item:random-b")
+		.filter((item) => item.item.uid === "item:random-a" || item.item.uid === "item:random-b")
 		.map((item) => ({
-			itemId: item.item.id,
+			itemUid: item.item.uid,
 			location: item.location,
 		}))
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second)));

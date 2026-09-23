@@ -26,7 +26,6 @@ it("returns locally admitted deliveries after their transported owner is erased 
 			...inputRuntimeTestConfig.items,
 			portal: {
 				...inputRuntimeTestConfig.items.stone,
-				id: "portal",
 				uid: "portal",
 				merge: [
 					{
@@ -80,7 +79,7 @@ it("returns locally admitted deliveries after their transported owner is erased 
 			] as const)
 				yield* spawnItemFx({
 					id,
-					itemId,
+					itemUid: itemId,
 					location: {
 						scope: "board",
 						space,

@@ -6,17 +6,17 @@ import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 
 export const readItemDeleteImpactFx = Effect.fn("readItemDeleteImpactFx")(function* (
 	project: Project,
-	itemId: string,
+	itemUid: string,
 ) {
-	const item = project.config.items[itemId];
-	if (item === undefined) return yield* Effect.fail(new Error(`Item ${itemId} does not exist.`));
+	const item = project.config.items[itemUid];
+	if (item === undefined) return yield* Effect.fail(new Error(`Item ${itemUid} does not exist.`));
 	const blockers = readDeleteBlockersFn({
 		config: project.config,
-		itemId,
+		itemUid,
 	});
 	const forced = yield* forceDeleteFx({
 		config: project.config,
-		itemId,
+		itemUid,
 	});
 	return {
 		blockers,

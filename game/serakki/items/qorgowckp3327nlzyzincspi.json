@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qorgowckp3327nlzyzincspi",
-		"id": "herders-guild",
 		"title": "Herders Guild",
 		"draft": false,
 		"description": "The livestock and beekeeping guild for discovering animal farms and Apiary infrastructure after animal-feed production is established.",
@@ -31,7 +30,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -46,7 +45,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -61,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -83,7 +82,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "chicken-farm-blueprint",
+											"itemUid": "d4eane5974300y21vayhuubs",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -104,9 +103,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "chicken-farm-blueprint"
+										"itemUid": "d4eane5974300y21vayhuubs"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -119,9 +118,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "chicken-farm"
+										"itemUid": "u7ewet2noa354ctarpe429q6"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -146,7 +145,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -161,7 +160,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -176,7 +175,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -198,7 +197,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "pig-farm-blueprint",
+											"itemUid": "izkinuyv2w90izypkx53u26f",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -219,9 +218,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "pig-farm-blueprint"
+										"itemUid": "izkinuyv2w90izypkx53u26f"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -234,9 +233,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "pig-farm"
+										"itemUid": "ipi44w1kuiqcnuyogc6wfkpi"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -261,7 +260,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -276,7 +275,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -291,7 +290,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -313,7 +312,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "goose-farm-blueprint",
+											"itemUid": "a87hnmxy7vhb0n64ldemdjhp",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -334,9 +333,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "goose-farm-blueprint"
+										"itemUid": "a87hnmxy7vhb0n64ldemdjhp"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -349,9 +348,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "goose-farm"
+										"itemUid": "df32zwifoidxaudl9bklofok"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -376,7 +375,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -391,7 +390,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -406,7 +405,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -428,7 +427,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sheep-farm-blueprint",
+											"itemUid": "a6nncq42511mwyom6yjiu7c1",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -449,9 +448,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sheep-farm-blueprint"
+										"itemUid": "a6nncq42511mwyom6yjiu7c1"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -464,9 +463,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "sheep-farm"
+										"itemUid": "cge5cvtkheqw9irq4gje6yn5"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -491,7 +490,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -506,7 +505,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -521,7 +520,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -543,7 +542,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cow-farm-blueprint",
+											"itemUid": "s5a9uulb6fimbylb01npp8du",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -564,9 +563,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "cow-farm-blueprint"
+										"itemUid": "s5a9uulb6fimbylb01npp8du"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -579,9 +578,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "cow-farm"
+										"itemUid": "jd94d2oozljzhtlwmijg1o8g"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -606,7 +605,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "quill"
+								"itemUid": "h4jtpd5yoilq7pi0h7xm89yg"
 							},
 							"distance": "far"
 						},
@@ -621,7 +620,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "paper---tier-1"
+								"itemUid": "ttkblp0xsb1irrbgg5oevm2y"
 							},
 							"distance": "far"
 						},
@@ -636,7 +635,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "knowledge-t1"
+								"itemUid": "inkvbfkqv4zu96xz2eiiu4dw"
 							},
 							"distance": "far"
 						},
@@ -658,7 +657,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "apiary-blueprint",
+											"itemUid": "h7kzzbfb39z2h795d7cq1yqc",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -679,9 +678,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "flower-farm"
+										"itemUid": "g7swy27j2dvvktfcwhjpu8su"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -694,9 +693,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "apiary-blueprint"
+										"itemUid": "h7kzzbfb39z2h795d7cq1yqc"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}
@@ -709,9 +708,9 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "apiary"
+										"itemUid": "enfhduqwl1duiedukufshoyt"
 									},
-									"distance": "universe"
+									"distance": "far"
 								},
 								"type": "exists"
 							}

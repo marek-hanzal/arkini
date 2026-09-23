@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "pdf7wsiugl78cqtmeym6tda7",
-		"id": "silenced-bow",
 		"title": "Silenced Bow",
 		"description": "It makes less noise",
 		"ui": "simple",
@@ -16,7 +15,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wolf"
+					"itemUid": "lfxtap8427k9e4nn6uwjgxyo"
 				},
 				"action": "consume",
 				"outcome": {
@@ -30,7 +29,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "bow",
+											"itemUid": "j9ni85pox4gjt7uu3ud04kkj",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -40,7 +39,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "cotton-fabric",
+											"itemUid": "di926lypctzw8e6a4twmyeme",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -50,7 +49,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "cotton-wool",
+											"itemUid": "r8tf0spk6xl9vlkv80jebrxr",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -60,7 +59,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-quiver",
+											"itemUid": "tuw5spl68vaof73aziz0ai1b",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -75,7 +74,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "wolf-with-arrow"
+				"result": "g9qoa4k30miz4t4cebyo6x7c"
 			}
 		],
 		"maxQueueSize": 1,

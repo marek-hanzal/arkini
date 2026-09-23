@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mr4967ukrdbknheqdcr9pz3t",
-		"id": "fertilized-pumpkin-field",
 		"title": "Fertilized Pumpkin Field",
 		"draft": false,
 		"description": "Ready for pumpkin seed.",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-pumpkin-field",
+										"itemUid": "daoqtlfotxv65rpxy99sg4ku",
 										"quantity": {
 											"min": 1,
 											"max": 1

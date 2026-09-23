@@ -17,7 +17,7 @@ export const InvalidMergeDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		ownerItemId: IdSchema,
+		ownerItemUid: IdSchema,
 		mergeIndex: z.number().int().nonnegative(),
 		reason: InvalidMergeReasonEnumSchema,
 	})

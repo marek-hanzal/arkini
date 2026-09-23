@@ -33,7 +33,7 @@ export const mutateItemLineFx = Effect.fn("mutateItemLineFx")(function* ({
 	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		`${input.operation === "create" ? "Created" : input.operation === "delete" ? "Deleted" : "Replaced"} item line.`,
-		`Item ID: ${input.itemId}`,
+		`Item UID: ${input.itemUid}`,
 		`Line ID: ${lineId}`,
 		`Revision: ${commit.revision}`,
 	].join("\n");

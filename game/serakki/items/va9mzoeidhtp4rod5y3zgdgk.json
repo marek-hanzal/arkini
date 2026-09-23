@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "va9mzoeidhtp4rod5y3zgdgk",
-		"id": "blasting-machine",
 		"title": "Blasting Machine",
 		"ui": "simple",
 		"description": "This will make kaboom if connected properly",
@@ -16,11 +15,11 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "dynamite-sticks"
+					"itemUid": "jx4fawgqrdrwvt7d5afims1l"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "dynamite"
+				"result": "un9w2bebyhy98wbi2nu22naz"
 			}
 		],
 		"maxQueueSize": 1,

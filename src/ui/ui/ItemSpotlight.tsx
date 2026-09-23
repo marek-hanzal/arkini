@@ -33,13 +33,13 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 				controller.results.map((option, index) => (
 					<button
 						className="ak-spotlight-option grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-lg border px-3 py-2 text-left disabled:cursor-not-allowed"
-						data-item-id={option.itemId}
+						data-item-uid={option.itemUid}
 						disabled={option.disabled || controller.searchPending}
-						key={option.itemId}
+						key={option.itemUid}
 						onClick={() =>
 							controller.selectItemFn({
 								index,
-								itemId: option.itemId,
+								itemUid: option.itemUid,
 							})
 						}
 						onMouseEnter={() => controller.setSelectedIndexFn(index)}

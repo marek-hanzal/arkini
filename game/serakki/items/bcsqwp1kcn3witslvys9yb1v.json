@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bcsqwp1kcn3witslvys9yb1v",
-		"id": "toilet-beer",
 		"title": "Toilet Beer",
 		"ui": "simple",
 		"description": "You ...!!",

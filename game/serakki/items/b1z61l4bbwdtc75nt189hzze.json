@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "b1z61l4bbwdtc75nt189hzze",
-		"id": "stone---tier-1",
 		"title": "Stone - Tier 1",
 		"description": "Heavy, stubborn, useful. Civilization likes to pretend stone becomes architecture through planning rather than lifting.",
 		"ui": "simple",
@@ -16,20 +15,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "stone---tier-1"
+					"itemUid": "b1z61l4bbwdtc75nt189hzze"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "stone---tier-2"
+				"result": "t39jwpoa9w53pbwcn1jfppyp"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "wood---tier-2"
+					"itemUid": "zblgatsfi13wi1v8wboffcc6"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "lumber-camp-construction"
+				"result": "w1v49hyq2s3jwxhmb0kms9tk"
 			}
 		],
 		"maxQueueSize": 1,

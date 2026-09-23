@@ -39,7 +39,7 @@ const lineInputAutofillStartedEventSchema = z
 			"LineInputAutofillStarted",
 		]),
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		lineId: IdSchema,
 		scheduledQuantity: PositiveIntegerSchema,
 	})
@@ -52,7 +52,7 @@ const jobQueuedEventSchema = z
 		]),
 		requestId: IdSchema,
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		lineId: IdSchema,
 	})
 	.strict();
@@ -63,7 +63,7 @@ const jobQueueClearedEventSchema = z
 			"JobQueueCleared",
 		]),
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		clearedRequestCount: PositiveIntegerSchema,
 	})
 	.strict();
@@ -75,7 +75,7 @@ const jobStartedEventSchema = z
 		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		lineId: IdSchema,
 	})
 	.strict();
@@ -87,7 +87,7 @@ const jobCompletedEventSchema = z
 		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		lineId: IdSchema,
 	})
 	.strict();
@@ -99,7 +99,7 @@ const jobAbortedEventSchema = z
 		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		lineId: IdSchema,
 		reason: z.enum([
 			"owner-removed",
@@ -115,7 +115,7 @@ const itemDiscardedEventSchema = z
 			"ItemDiscarded",
 		]),
 		ownerItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		itemId: IdSchema.optional(),
 		quantity: PositiveIntegerSchema,
 		source: z.enum([
@@ -138,12 +138,12 @@ const itemMergedEventSchema = z
 			"ItemMerged",
 		]),
 		sourceItemId: IdSchema,
-		sourceCanonicalItemId: IdSchema,
+		sourceItemUid: IdSchema,
 		targetItemId: IdSchema,
-		targetCanonicalItemId: IdSchema,
+		targetItemUid: IdSchema,
 		action: SourceActionSchema,
 		effect: TargetEffectSchema,
-		resultCanonicalItemId: IdSchema.optional(),
+		resultItemUid: IdSchema.optional(),
 	})
 	.strict();
 
@@ -153,7 +153,7 @@ const itemExpiredEventSchema = z
 			"ItemExpired",
 		]),
 		itemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		location: BoardLocationSchema,
 	})
 	.strict();
@@ -164,7 +164,7 @@ const itemSpawnedEventSchema = z
 			"ItemSpawned",
 		]),
 		itemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		originItemId: IdSchema,
 		location: BoardLocationSchema,
 	})
@@ -176,9 +176,9 @@ const itemSwappedEventSchema = z
 			"ItemSwapped",
 		]),
 		sourceItemId: IdSchema,
-		sourceCanonicalItemId: IdSchema,
+		sourceItemUid: IdSchema,
 		targetItemId: IdSchema,
-		targetCanonicalItemId: IdSchema,
+		targetItemUid: IdSchema,
 		sourceLocation: BoardLocationSchema,
 		targetLocation: BoardLocationSchema,
 	})
@@ -190,7 +190,7 @@ const itemPlacedEventSchema = z
 			"ItemPlaced",
 		]),
 		itemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		originItemId: IdSchema,
 		previousLocation: z.union([
 			InputLocationSchema,
@@ -207,7 +207,7 @@ const itemConsumedEventSchema = z
 			"ItemConsumed",
 		]),
 		sourceItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		sourceLocation: InputLocationSchema,
 	})
 	.strict();
@@ -218,7 +218,7 @@ const itemInputStoredEventSchema = z
 			"ItemInputStored",
 		]),
 		sourceItemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		previousSourceLocation: BoardLocationSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
@@ -232,7 +232,7 @@ const itemUnitSpentEventSchema = z
 			"ItemUnitSpent",
 		]),
 		itemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		location: BoardLocationSchema,
 		previousUnits: z.number().int().positive(),
 		resultingUnits: z.number().int().positive(),
@@ -248,7 +248,7 @@ const itemDepletedEventSchema = z
 			"ItemDepleted",
 		]),
 		itemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		location: BoardLocationSchema,
 	})
 	.strict();
@@ -259,7 +259,7 @@ const itemDisappearedEventSchema = z
 			"ItemDisappeared",
 		]),
 		itemId: IdSchema,
-		canonicalItemId: IdSchema,
+		itemUid: IdSchema,
 		location: LocationSchema,
 	})
 	.strict();

@@ -16,17 +16,8 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
  */
 export const ItemSchema = z
 	.object({
-		/**
-		 * Stable low-level identity of this canonical game item.
-		 *
-		 * The editor generates this CUID2 exactly once. Renaming the human-readable
-		 * `id` never changes this identity.
-		 */
-		uid: IdSchema.describe("The immutable CUID2 identity of this canonical game item."),
-		/**
-		 * Stable authoring ID of this canonical game item.
-		 */
-		id: IdSchema.describe("The stable authoring ID of this canonical game item."),
+		/** Immutable identity used by every canonical item reference. */
+		uid: IdSchema.describe("The immutable UID of this canonical game item."),
 		/**
 		 * Human-readable title of this item.
 		 */

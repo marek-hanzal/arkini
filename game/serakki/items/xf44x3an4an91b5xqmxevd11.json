@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xf44x3an4an91b5xqmxevd11",
-		"id": "spoiled-raw-game-meat",
 		"title": "Spoiled Raw Game Meat",
 		"ui": "simple",
 		"description": "Not good anymore",

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "m4j4yf9w0vdxvczjpmi0ruhv",
-		"id": "copper-mine",
 		"title": "Copper Mine",
 		"ui": "default",
 		"description": "Source of the raw copper",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-mine",
+										"itemUid": "wfndxov0jyo5gn2gggzeir1p",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -63,7 +62,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "copper-mine"
+								"itemUid": "m4j4yf9w0vdxvczjpmi0ruhv"
 							},
 							"distance": "self"
 						}
@@ -73,7 +72,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "candle"
+								"itemUid": "sedm9fb8symnti4s3w25u751"
 							},
 							"distance": "far"
 						},
@@ -95,7 +94,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-ore",
+											"itemUid": "ahl16lhzbb05zw0kexi92r12",
 											"quantity": {
 												"min": 3,
 												"max": 3
@@ -132,7 +131,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "copper-mine"
+								"itemUid": "m4j4yf9w0vdxvczjpmi0ruhv"
 							},
 							"distance": "self"
 						}
@@ -142,7 +141,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "lantern"
+								"itemUid": "e65gc6c7vad2myus9kn7gl7x"
 							},
 							"distance": "far"
 						},
@@ -164,7 +163,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "copper-ore",
+											"itemUid": "ahl16lhzbb05zw0kexi92r12",
 											"quantity": {
 												"min": 3,
 												"max": 5
@@ -174,7 +173,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "empty-lantern",
+											"itemUid": "gepmb31cvdse7u75q4i4p4ek",
 											"quantity": {
 												"min": 1,
 												"max": 1

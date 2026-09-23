@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "yofqa330f03b3dexsmde5aeu",
-		"id": "oven-with-wood",
 		"title": "Oven With Wood",
 		"ui": "simple",
 		"description": "Ready to be fired!",

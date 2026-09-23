@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "qs93ro2wex61c7emcew4s9ek",
-		"id": "herb-garden",
 		"title": "Herb Garden",
 		"draft": false,
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-herb-garden",
+										"itemUid": "atcdihdj87zfj52oagbqxcri",
 										"quantity": {
 											"min": 1,
 											"max": 1

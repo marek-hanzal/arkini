@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "h4fiiy56wmk6tv2o9qddn0a6",
-		"id": "sack-with-sugar-cane-seed",
 		"title": "Sack With Sugar Cane Seed",
 		"draft": false,
 		"description": "A sack of sugar cane seed, marked with the crop it is meant to grow.",
@@ -18,7 +17,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-sugar-cane-field"
+					"itemUid": "b8rjy59wi12w74pr2oo57far"
 				},
 				"action": "consume",
 				"outcome": {
@@ -32,7 +31,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "empty-sack",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -47,7 +46,7 @@
 					]
 				},
 				"effect": "replace",
-				"result": "sugar-cane-field"
+				"result": "bwa5v4j1546dw6utogyygd4x"
 			}
 		],
 		"clock": {
@@ -65,7 +64,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sack",
+										"itemUid": "ebepo6ezk56mp0419gksd5hz",
 										"quantity": {
 											"min": 1,
 											"max": 1

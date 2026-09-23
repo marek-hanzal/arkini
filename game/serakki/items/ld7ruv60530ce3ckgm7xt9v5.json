@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ld7ruv60530ce3ckgm7xt9v5",
-		"id": "sugar-beet-seed",
 		"title": "Sugar Beet Seed",
 		"draft": false,
 		"description": "Loose sugar beet seed. Plant it or pack it into a sack before it spoils.",
@@ -17,20 +16,20 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sack-with-sugar-beet-seed"
+				"result": "zrx3ur1uwi28j3c7ps254er2"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "fertilized-sugar-beet-field"
+					"itemUid": "movf9wm3im26ycxo7jzfz4ww"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "sugar-beet-field"
+				"result": "hqrm0shkrcrp9i6d2m8ysr0t"
 			}
 		],
 		"clock": {
@@ -48,7 +47,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-sugar-beet-seed",
+										"itemUid": "wvkwlz7rrjdf5z6rynxwy7tn",
 										"quantity": {
 											"min": 1,
 											"max": 1

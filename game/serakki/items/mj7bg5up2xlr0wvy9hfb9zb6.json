@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mj7bg5up2xlr0wvy9hfb9zb6",
-		"id": "well-fed-chicken",
 		"title": "Well Fed Chicken",
 		"draft": false,
 		"description": "A very satisfied chicken.",
@@ -61,7 +60,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-chicken"
+								"itemUid": "mj7bg5up2xlr0wvy9hfb9zb6"
 							},
 							"distance": "self"
 						}
@@ -78,7 +77,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "well-fed-chicken",
+											"itemUid": "mj7bg5up2xlr0wvy9hfb9zb6",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -114,7 +113,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-chicken"
+								"itemUid": "mj7bg5up2xlr0wvy9hfb9zb6"
 							},
 							"distance": "self"
 						}
@@ -131,7 +130,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "chicken",
+											"itemUid": "i767otw53htcjcc2y9zrw6it",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -141,7 +140,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -177,7 +176,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-chicken"
+								"itemUid": "mj7bg5up2xlr0wvy9hfb9zb6"
 							},
 							"distance": "self"
 						}
@@ -194,7 +193,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-chicken",
+											"itemUid": "iod02z80dgxlbkm3inzi84gp",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -231,7 +230,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-chicken"
+								"itemUid": "mj7bg5up2xlr0wvy9hfb9zb6"
 							},
 							"distance": "self"
 						}
@@ -248,7 +247,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-chicken",
+											"itemUid": "iod02z80dgxlbkm3inzi84gp",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -269,7 +268,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -301,7 +300,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "well-fed-chicken"
+								"itemUid": "mj7bg5up2xlr0wvy9hfb9zb6"
 							},
 							"distance": "self"
 						}
@@ -318,7 +317,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-chicken",
+											"itemUid": "iod02z80dgxlbkm3inzi84gp",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -339,7 +338,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},

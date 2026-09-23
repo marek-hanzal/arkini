@@ -14,7 +14,7 @@ const outcome = (itemId: string, conditional = false) => ({
 					outcome: [
 						{
 							type: "item" as const,
-							itemId,
+							itemUid: itemId,
 							quantity: {
 								min: 1,
 								max: 1,
@@ -31,7 +31,7 @@ const outcome = (itemId: string, conditional = false) => ({
 														distance: "far",
 														selector: {
 															type: "item",
-															itemId: "blocker",
+															itemUid: "blocker",
 														},
 													},
 												},
@@ -89,7 +89,6 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			payer: {
 				...base.items.blocker,
 				uid: "payer",
-				id: "payer",
 				units: {
 					amount: 1,
 					outcome: outcome("result", true),
@@ -134,7 +133,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 									distance: "close",
 									selector: {
 										type: "item",
-										itemId: "payer",
+										itemUid: "payer",
 									},
 								},
 								units: {

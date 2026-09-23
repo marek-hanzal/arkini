@@ -49,8 +49,7 @@ const setupFn = async () => {
 					},
 					other: {
 						...config.items.forge,
-						id: "other",
-						uid: "other-uid",
+						uid: "other",
 					},
 				},
 			},
@@ -100,18 +99,18 @@ it("commits mixed edits across items from one snapshot with one revision and one
 	const response = await callFn(before.revision, [
 		{
 			operation: "create",
-			itemId: "forge",
+			itemUid: "forge",
 			line: added,
 		},
 		{
 			operation: "replace",
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: first.id,
 			line: replacement,
 		},
 		{
 			operation: "delete",
-			itemId: "other",
+			itemUid: "other",
 			lineId: first.id,
 		},
 	]);
@@ -150,7 +149,7 @@ it("rejects an entire batch before writing when a later operation or resulting i
 	const writeSpy = vi.spyOn(repository, "replaceConfigFx");
 	const valid = {
 		operation: "create",
-		itemId: "forge",
+		itemUid: "forge",
 		line: {
 			...first,
 			id: "added",
@@ -160,17 +159,17 @@ it("rejects an entire batch before writing when a later operation or resulting i
 	for (const invalid of [
 		{
 			operation: "delete",
-			itemId: "other",
+			itemUid: "other",
 			lineId: "missing",
 		},
 		{
 			operation: "create",
-			itemId: "other",
+			itemUid: "other",
 			line: first,
 		},
 		{
 			operation: "replace",
-			itemId: "other",
+			itemUid: "other",
 			lineId: first.id,
 			line: {
 				...first,
@@ -179,12 +178,12 @@ it("rejects an entire batch before writing when a later operation or resulting i
 		},
 		{
 			operation: "create",
-			itemId: "missing",
+			itemUid: "missing",
 			line: first,
 		},
 		{
 			operation: "delete",
-			itemId: "forge",
+			itemUid: "forge",
 			lineId: "added",
 		},
 	]) {
@@ -219,7 +218,7 @@ it("accepts 20 edits in one commit but rejects larger batches without writes", a
 		},
 		(_, index) => ({
 			operation: "create",
-			itemId: "forge",
+			itemUid: "forge",
 			line: {
 				...first,
 				id: `batch-${index}`,
@@ -256,7 +255,7 @@ it("rejects all batch edits when a concurrent save overtakes its snapshot", asyn
 	const response = await callFn(before.revision, [
 		{
 			operation: "create",
-			itemId: "forge",
+			itemUid: "forge",
 			line: {
 				...first,
 				id: "never-added",
@@ -265,7 +264,7 @@ it("rejects all batch edits when a concurrent save overtakes its snapshot", asyn
 		},
 		{
 			operation: "delete",
-			itemId: "other",
+			itemUid: "other",
 			lineId: first.id,
 		},
 	]);

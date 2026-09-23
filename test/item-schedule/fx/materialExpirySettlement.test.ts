@@ -59,13 +59,13 @@ describe("committed material expiry settlement", () => {
 		expect(result.expired.runtime.jobs).toEqual([]);
 		expect(result.expired.runtime.items.some((item) => item.id === "input")).toBe(false);
 		expect(
-			result.expired.runtime.items.filter((item) => item.item.id === "product"),
+			result.expired.runtime.items.filter((item) => item.item.uid === "product"),
 		).toHaveLength(1);
 		expect(result.expired.events.filter((event) => event.type === "job:aborted")).toHaveLength(
 			1,
 		);
 		expect(
-			result.later.runtime.items.filter((item) => item.item.id === "product"),
+			result.later.runtime.items.filter((item) => item.item.uid === "product"),
 		).toHaveLength(1);
 	});
 
@@ -85,7 +85,7 @@ describe("committed material expiry settlement", () => {
 							distance: "self",
 							selector: {
 								type: "item",
-								itemId: "owner",
+								itemUid: "owner",
 							},
 						},
 					},
@@ -100,9 +100,11 @@ describe("committed material expiry settlement", () => {
 		expect(
 			result.expired.runtime.items.some((item) => item.id === "owner" || item.id === "input"),
 		).toBe(false);
-		expect(result.expired.runtime.items.some((item) => item.item.id === "product")).toBe(false);
+		expect(result.expired.runtime.items.some((item) => item.item.uid === "product")).toBe(
+			false,
+		);
 		expect(
-			result.expired.runtime.items.filter((item) => item.item.id === "residue"),
+			result.expired.runtime.items.filter((item) => item.item.uid === "residue"),
 		).toHaveLength(2);
 		expect(
 			result.expired.events.filter((event) => event.type === "item:depleted"),
@@ -112,7 +114,7 @@ describe("committed material expiry settlement", () => {
 		);
 		expect(result.later.sequence).toBe(result.expired.sequence);
 		expect(
-			result.later.runtime.items.filter((item) => item.item.id === "residue"),
+			result.later.runtime.items.filter((item) => item.item.uid === "residue"),
 		).toHaveLength(2);
 	});
 	it("returns a reserved identity into the depleted owner's freed cell", () => {
@@ -124,7 +126,7 @@ describe("committed material expiry settlement", () => {
 				distance: "self",
 				selector: {
 					type: "item",
-					itemId: "blocker",
+					itemUid: "blocker",
 				},
 			},
 			mode: "reserve",
@@ -143,7 +145,7 @@ describe("committed material expiry settlement", () => {
 				yield* prepareMaterialOwnerFx();
 				const reserved = yield* spawnItemFx({
 					id: "reserved",
-					itemId: "blocker",
+					itemUid: "blocker",
 
 					location: boardFn(1),
 				});
@@ -164,7 +166,7 @@ describe("committed material expiry settlement", () => {
 				])
 					yield* spawnItemFx({
 						id: `blocker:${x}`,
-						itemId: "blocker",
+						itemUid: "blocker",
 
 						location: boardFn(x),
 					});

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "bwa5v4j1546dw6utogyygd4x",
-		"id": "sugar-cane-field",
 		"title": "Sugar Cane Field",
 		"draft": false,
 		"ui": "simple",
@@ -25,7 +24,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-sugar-cane-field",
+										"itemUid": "ixlmt68f8h58octhzbt7jpkk",
 										"quantity": {
 											"min": 1,
 											"max": 1

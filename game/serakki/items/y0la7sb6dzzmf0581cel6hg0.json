@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "y0la7sb6dzzmf0581cel6hg0",
-		"id": "british-shorthair",
 		"title": "British Shorthair",
 		"draft": true,
 		"ui": "simple",
@@ -19,7 +18,7 @@
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse"
+					"itemUid": "rvgihky3ismzedb2rwxwysq9"
 				},
 				"action": "consume",
 				"outcome": {
@@ -33,7 +32,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "raw-game-meat",
+											"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -48,21 +47,21 @@
 					]
 				},
 				"effect": "replace",
-				"result": "british-shorthair-full-belly"
+				"result": "c2m64oinuo00fq91tqcw5shs"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "raw-game-meat"
+					"itemUid": "xnx83d4j7dn7gi6nn8ft7fiw"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-full-belly"
+				"result": "c2m64oinuo00fq91tqcw5shs"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse-with-cut-tail"
+					"itemUid": "aimxjaohns3tfd68e2gfveeq"
 				},
 				"action": "consume",
 				"outcome": {
@@ -76,7 +75,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "spoiled-raw-game-meat",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -91,12 +90,12 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corrupted-british-shorthair"
+				"result": "yl42uqsjtjk4tkyw29y4z005"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "mouse-with-bandaged-tail"
+					"itemUid": "b9eshrtxskxt3vjmv62a52vp"
 				},
 				"action": "consume",
 				"outcome": {
@@ -110,7 +109,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "spoiled-raw-game-meat",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -126,7 +125,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "corruption",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
 											"quantity": {
 												"min": 1,
 												"max": 2
@@ -141,34 +140,34 @@
 					]
 				},
 				"effect": "replace",
-				"result": "corrupted-british-shorthair"
+				"result": "yl42uqsjtjk4tkyw29y4z005"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "empty-sack"
+					"itemUid": "mroh4s4rsygi6qlncjqbqu2k"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-in-sack"
+				"result": "lh79rb1fm0wk2l6fkn6gqjgq"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair-kitten"
+					"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "british-shorthair-cuddling-kitten"
+				"result": "m8rio7lvocuaoqhix5p5nvy5"
 			},
 			{
 				"target": {
 					"type": "item",
-					"itemId": "british-shorthair"
+					"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 				},
 				"action": "consume",
 				"effect": "replace",
-				"result": "fighting-british-shorthairs"
+				"result": "kqhuptuolwx1u0uy6opco9xt"
 			}
 		],
 		"clock": {
@@ -216,7 +215,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -233,7 +232,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "british-shorthair",
+											"itemUid": "y0la7sb6dzzmf0581cel6hg0",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -269,7 +268,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -286,7 +285,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "hungry-british-shorthair",
+											"itemUid": "hzr73hamdo1zd7ulet4v3hb2",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -296,7 +295,7 @@
 										},
 										{
 											"type": "item",
-											"itemId": "bio-waste",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -332,7 +331,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -349,7 +348,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-british-shorthair",
+											"itemUid": "zfyzc3defzvpdhz1fn0fsk95",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -386,7 +385,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -403,7 +402,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-british-shorthair",
+											"itemUid": "zfyzc3defzvpdhz1fn0fsk95",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -424,7 +423,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "disease"
+										"itemUid": "siugkd1lhwym2fqb49j4z0r5"
 									},
 									"distance": "near-close"
 								},
@@ -456,7 +455,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -473,7 +472,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "sick-british-shorthair",
+											"itemUid": "zfyzc3defzvpdhz1fn0fsk95",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -494,7 +493,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "plague"
+										"itemUid": "cdzjb2w5wnfeljcp1inxrgz9"
 									},
 									"distance": "near-close"
 								},
@@ -526,7 +525,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair-kitten"
+								"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 							},
 							"distance": "near-close"
 						}
@@ -540,7 +539,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -557,7 +556,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "british-shorthair-cuddling-kitten",
+											"itemUid": "m8rio7lvocuaoqhix5p5nvy5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -578,7 +577,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "british-shorthair-kitten"
+										"itemUid": "bamumldgmvb0bhq8bkq0koxj"
 									},
 									"distance": "near-close"
 								},
@@ -610,7 +609,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "near-close"
 						}
@@ -624,7 +623,7 @@
 						"query": {
 							"selector": {
 								"type": "item",
-								"itemId": "british-shorthair"
+								"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 							},
 							"distance": "self"
 						}
@@ -641,7 +640,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "fighting-british-shorthairs",
+											"itemUid": "kqhuptuolwx1u0uy6opco9xt",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -662,7 +661,7 @@
 								"query": {
 									"selector": {
 										"type": "item",
-										"itemId": "british-shorthair"
+										"itemUid": "y0la7sb6dzzmf0581cel6hg0"
 									},
 									"distance": "near-close"
 								},

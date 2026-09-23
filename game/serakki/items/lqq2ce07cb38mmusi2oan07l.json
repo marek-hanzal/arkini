@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "lqq2ce07cb38mmusi2oan07l",
-		"id": "goose-pen",
 		"title": "Goose Pen",
 		"draft": false,
 		"description": "A populated enclosure holding animals that can be released one at a time.",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-goose-pen",
+										"itemUid": "obkhild3w83e72dvwhphcl2s",
 										"quantity": {
 											"min": 1,
 											"max": 1

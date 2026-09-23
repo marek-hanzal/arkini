@@ -122,7 +122,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 								runtime,
 								query: materialInput.query,
 							});
-						const selectorKey = `item:${materialInput.query.selector.itemId}`;
+						const selectorKey = `item:${materialInput.query.selector.itemUid}`;
 						const unitKey = readItemDetailUnitKeyFn(materialInput.units);
 						const key = `${inputIndex}:${selectorKey}:${materialInput.mode}:${unitKey}`;
 						materials.set(key, {
@@ -158,7 +158,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 				},
 				(unitsInput) =>
 					Effect.gen(function* () {
-						const selectorKey = `item:${unitsInput.query.selector.itemId}`;
+						const selectorKey = `item:${unitsInput.query.selector.itemUid}`;
 						const unitKey = readItemDetailUnitKeyFn(unitsInput.units);
 						const key = `${selectorKey}:${unitsInput.query.distance}:${unitKey}`;
 						const previous = unitInputs.get(key);

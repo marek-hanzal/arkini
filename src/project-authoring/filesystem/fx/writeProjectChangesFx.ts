@@ -89,11 +89,11 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				]),
 			);
 			const itemUids = new Set<string>();
-			for (const [itemId, item] of Object.entries(nextItems)) {
-				if (item.id !== itemId)
+			for (const [itemUid, item] of Object.entries(nextItems)) {
+				if (item.uid !== itemUid)
 					return yield* Effect.fail(
 						new Error(
-							`Editor item record key ${JSON.stringify(itemId)} differs from item ID ${JSON.stringify(item.id)}.`,
+							`Editor item record key ${JSON.stringify(itemUid)} differs from item UID ${JSON.stringify(item.uid)}.`,
 						),
 					);
 				if (itemUids.has(item.uid))

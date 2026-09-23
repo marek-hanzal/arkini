@@ -36,7 +36,7 @@ export const InputsControl = ({
 	const translator = useTranslator();
 	const project = useEditorProject();
 	const readItemLabelFn = useEditorItemOptionLabel();
-	const { form, itemId, inputIndex } = useFormSession();
+	const { form, itemUid, inputIndex } = useFormSession();
 	const selfUnitsEnabled = useStore(form.store, (state) => state.values.units !== undefined);
 	const validationIssues = useFormValidationIssues(value);
 	const issuesByInput = value.map((_input, index) =>
@@ -79,14 +79,14 @@ export const InputsControl = ({
 					const input = value[index];
 					if (input.type === "materials")
 						return `${translator.textFn("Material input")} ${index + 1} — ${readItemLabelFn(
-							input.query.selector.itemId,
+							input.query.selector.itemUid,
 							translator.textFn("No item selected"),
 						)}`;
 					if (input.type === "units" && input.units?.from === "self")
 						return `${translator.textFn("Self-paid units input")} ${index + 1}`;
 					if (input.type === "units")
 						return `${translator.textFn("Units input")} ${index + 1} — ${readItemLabelFn(
-							input.query.selector.itemId,
+							input.query.selector.itemUid,
 							translator.textFn("No item selected"),
 						)}`;
 					return `${translator.textFn("Simple input")} ${index + 1}`;
@@ -95,14 +95,14 @@ export const InputsControl = ({
 					const input = value[index];
 					if (input.type === "materials")
 						return [
-							input.query.selector.itemId,
+							input.query.selector.itemUid,
 						];
 					if (input.type === "units") {
-						const itemId = input.query.selector.itemId;
-						if (itemId.length === 0) return [];
+						const itemUid = input.query.selector.itemUid;
+						if (itemUid.length === 0) return [];
 						return [
-							itemId,
-							readItemLabelFn(itemId, ""),
+							itemUid,
+							readItemLabelFn(itemUid, ""),
 						];
 					}
 					return [];
@@ -129,7 +129,7 @@ export const InputsControl = ({
 									size="md"
 									className="rounded-md"
 									resourceIds={
-										project.config.items[input.query.selector.itemId]?.artwork
+										project.config.items[input.query.selector.itemUid]?.artwork
 											.default ?? [
 											"",
 										]
@@ -140,7 +140,7 @@ export const InputsControl = ({
 					}
 					if (input.type === "units") {
 						const units = input.units ?? DraftDefaults.inputs.units.units;
-						const itemId = input.query.selector.itemId;
+						const itemUid = input.query.selector.itemUid;
 						return (
 							<EditorCollectionOption
 								label={label}
@@ -157,11 +157,11 @@ export const InputsControl = ({
 									</span>
 								}
 							>
-								{itemId.length === 0 ? null : (
+								{itemUid.length === 0 ? null : (
 									<EditorItemThumbnail
 										className="rounded-md"
 										resourceIds={
-											project.config.items[itemId]?.artwork.default ?? [
+											project.config.items[itemUid]?.artwork.default ?? [
 												"",
 											]
 										}
@@ -197,7 +197,7 @@ export const InputsControl = ({
 						allowMaterials={allowMaterials}
 						input={value[index]}
 						issues={issuesByInput[index]}
-						ownerItemId={itemId}
+						ownerItemUid={itemUid}
 						selfUnitsEnabled={selfUnitsEnabled}
 						onChangeFn={(next) => replaceAtFn(index, next)}
 					/>

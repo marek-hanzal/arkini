@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "j6b9mom3g4b5mdrzfjh0en9p",
-		"id": "empty-vegetable-garden",
 		"title": "Empty Vegetable Garden",
 		"draft": false,
 		"description": "Ready for another vegetable-growing cycle.",

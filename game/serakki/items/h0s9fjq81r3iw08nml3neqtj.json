@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "h0s9fjq81r3iw08nml3neqtj",
-		"id": "adventurers-guild",
 		"title": "Adventurers Guild",
 		"ui": "default",
 		"draft": false,
@@ -39,7 +38,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "treasure-chest-t1",
+											"itemUid": "k0yejygdsoyq8ttrky01olv5",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -80,7 +79,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "treasure-chest-t2",
+											"itemUid": "uwc1lv69qqyj23egidhz6z9t",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -121,7 +120,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "treasure-chest-t3",
+											"itemUid": "ofe43lszjm0p4ks6q3mfjvqw",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -162,7 +161,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "treasure-chest-t4",
+											"itemUid": "ruht6f6f1ow2fb908xuvt9as",
 											"quantity": {
 												"min": 1,
 												"max": 1

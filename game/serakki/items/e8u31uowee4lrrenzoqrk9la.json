@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "e8u31uowee4lrrenzoqrk9la",
-		"id": "fertilized-fruit-garden",
 		"title": "Fertilized Fruit Garden",
 		"draft": false,
 		"description": "Ready for fruit seed.",
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-fruit-garden",
+										"itemUid": "lidli1atre8yu8ew4avdkcf2",
 										"quantity": {
 											"min": 1,
 											"max": 1

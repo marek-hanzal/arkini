@@ -30,7 +30,7 @@ export const readOutcomePlacementItemEventsFx = Effect.fn("readOutcomePlacementI
 				events.push({
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: item.id,
-					canonicalItemId: item.item.id,
+					itemUid: item.item.uid,
 					originItemId,
 					location: item.location,
 				});

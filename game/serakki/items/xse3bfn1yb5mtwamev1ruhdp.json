@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "xse3bfn1yb5mtwamev1ruhdp",
-		"id": "spoiled-cacao-seed",
 		"title": "Spoiled Cacao Seed",
 		"draft": false,
 		"description": "Cacao seed that spoiled before it ever reached the soil.",

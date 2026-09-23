@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "ynywdebwovecgpbp3mvsu9ee",
-		"id": "wishing-well-with-coffee",
 		"title": "Wishing Well With Coffee",
 		"ui": "simple",
 		"draft": true,
@@ -28,7 +27,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-well",
+										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 										"quantity": {
 											"min": 1,
 											"max": 1
@@ -71,7 +70,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "clay-mug-with-coffee",
+											"itemUid": "q5dg0snrffh09fxp6gzmri5j",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -92,7 +91,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "roasted-coffee-bag",
+											"itemUid": "a9i5s9979b9r2e0ga4ch4vte",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -113,7 +112,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "cauldron-with-coffee",
+											"itemUid": "y3ual9cfr1t9khomyxgf1l80",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -134,7 +133,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "roasted-coffee-beans",
+											"itemUid": "vsu2oyprm67kibermpkvidk4",
 											"quantity": {
 												"min": 1,
 												"max": 1
@@ -155,7 +154,7 @@
 									"outcome": [
 										{
 											"type": "item",
-											"itemId": "coffee-tankard",
+											"itemUid": "n9xn8uww85gxwob555vam6av",
 											"quantity": {
 												"min": 1,
 												"max": 1

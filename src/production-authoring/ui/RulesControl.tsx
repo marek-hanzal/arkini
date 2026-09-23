@@ -84,11 +84,13 @@ const RuleTypeTranslationKey = {
 	show: "Show",
 } as const satisfies Record<RuleType, string>;
 
-const readConditionItemIdFn = (when: DraftWhen): string => when.query.selector.itemId;
+const readConditionItemUidFn = (when: DraftWhen): string => when.query.selector.itemUid;
 
-const readRuleItemIdsFn = (rule: DraftRule): ReadonlyArray<string> => [
+const readRuleItemUidsFn = (rule: DraftRule): ReadonlyArray<string> => [
 	...new Set(
-		rule.when.map((when) => readConditionItemIdFn(when)).filter((itemId) => itemId.length > 0),
+		rule.when
+			.map((when) => readConditionItemUidFn(when))
+			.filter((itemUid) => itemUid.length > 0),
 	),
 ];
 
@@ -102,7 +104,7 @@ const readRuleSummaryFn = (rule: DraftRule, textFn: (key: string) => string): st
 const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: DraftRule }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const itemIds = readRuleItemIdsFn(rule);
+	const itemUids = readRuleItemUidsFn(rule);
 	return (
 		<EditorCollectionOption
 			label={label}
@@ -112,12 +114,12 @@ const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: Dr
 				</span>
 			}
 		>
-			{itemIds.map((itemId) => (
+			{itemUids.map((itemUid) => (
 				<EditorItemThumbnail
-					key={itemId}
+					key={itemUid}
 					className="rounded-md"
 					resourceIds={
-						project.config.items[itemId]?.artwork.default ?? [
+						project.config.items[itemUid]?.artwork.default ?? [
 							"",
 						]
 					}
@@ -138,7 +140,7 @@ const readConditionSummaryFn = (when: DraftWhen, textFn: (key: string) => string
 const ConditionOption = ({ label, when }: { readonly label: string; readonly when: DraftWhen }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const itemId = readConditionItemIdFn(when);
+	const itemUid = readConditionItemUidFn(when);
 	return (
 		<EditorCollectionOption
 			label={label}
@@ -148,11 +150,11 @@ const ConditionOption = ({ label, when }: { readonly label: string; readonly whe
 				</span>
 			}
 		>
-			{itemId.length === 0 ? null : (
+			{itemUid.length === 0 ? null : (
 				<EditorItemThumbnail
 					className="rounded-md"
 					resourceIds={
-						project.config.items[itemId]?.artwork.default ?? [
+						project.config.items[itemUid]?.artwork.default ?? [
 							"",
 						]
 					}
@@ -484,12 +486,12 @@ const RuleControl = ({
 									)}`
 						}
 						itemSearchTermsFn={(whenIndex) => {
-							const itemId = readConditionItemIdFn(rule.when[whenIndex]);
-							return itemId.length === 0
+							const itemUid = readConditionItemUidFn(rule.when[whenIndex]);
+							return itemUid.length === 0
 								? []
 								: [
-										itemId,
-										readItemLabelFn(itemId, ""),
+										itemUid,
+										readItemLabelFn(itemUid, ""),
 									];
 						}}
 						label={`${translator.textFn("Rule")} ${ruleIndex + 1} ${translator.textFn("conditions")}`}
@@ -603,9 +605,9 @@ export const RulesControl = ({
 							)}`
 				}
 				itemSearchTermsFn={(ruleIndex) =>
-					readRuleItemIdsFn(draftRules[ruleIndex]).flatMap((itemId) => [
-						itemId,
-						readItemLabelFn(itemId, ""),
+					readRuleItemUidsFn(draftRules[ruleIndex]).flatMap((itemUid) => [
+						itemUid,
+						readItemLabelFn(itemUid, ""),
 					])
 				}
 				label={collectionLabel}

@@ -20,12 +20,12 @@ const readResourceTypeFn = (id: string) => (projectImageIds.has(id) ? "image" : 
 
 describe("validateGameResourcesFn", () => {
 	it("validates optional production line artwork with exact item and line provenance", () => {
-		const [itemId, item] = Object.entries(startTestConfig.items)[0]!;
+		const [itemUid, item] = Object.entries(startTestConfig.items)[0]!;
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			items: {
 				...startTestConfig.items,
-				[itemId]: {
+				[itemUid]: {
 					...item,
 					lines: [
 						{
@@ -76,24 +76,24 @@ describe("validateGameResourcesFn", () => {
 								: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
 						path: [
 							"items",
-							itemId,
+							itemUid,
 							"lines",
 							0,
 							"artwork",
 						],
-						source: `${itemId}.json`,
+						source: `${itemUid}.json`,
 					}),
 				]);
 		}
 	});
 
 	it("validates item detail music against Music sources with item provenance", () => {
-		const [itemId, item] = Object.entries(startTestConfig.items)[0]!;
+		const [itemUid, item] = Object.entries(startTestConfig.items)[0]!;
 		const config = {
 			...startTestConfig,
 			items: {
 				...startTestConfig.items,
-				[itemId]: {
+				[itemUid]: {
 					...item,
 					music: "detail-track",
 				},
@@ -123,10 +123,10 @@ describe("validateGameResourcesFn", () => {
 					resourceId: "detail-track",
 					path: [
 						"items",
-						itemId,
+						itemUid,
 						"music",
 					],
-					source: `${itemId}.json`,
+					source: `${itemUid}.json`,
 				}),
 			);
 		}
@@ -392,13 +392,13 @@ describe("validateGameResourcesFn", () => {
 	});
 
 	it("reports the exact missing default layer entries", () => {
-		const [itemId, item] = Object.entries(startTestConfig.items)[0] ?? [];
-		if (itemId === undefined || item === undefined) throw new Error("Missing test item.");
+		const [itemUid, item] = Object.entries(startTestConfig.items)[0] ?? [];
+		if (itemUid === undefined || item === undefined) throw new Error("Missing test item.");
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			items: {
 				...startTestConfig.items,
-				[itemId]: {
+				[itemUid]: {
 					...item,
 					artwork: {
 						scale: 0.8,
@@ -422,7 +422,7 @@ describe("validateGameResourcesFn", () => {
 					resourceId: "missing:base",
 					path: [
 						"items",
-						itemId,
+						itemUid,
 						"artwork",
 						"default",
 						0,
@@ -432,7 +432,7 @@ describe("validateGameResourcesFn", () => {
 					resourceId: "missing:overlay",
 					path: [
 						"items",
-						itemId,
+						itemUid,
 						"artwork",
 						"default",
 						1,
@@ -453,7 +453,6 @@ describe("validateGameResourcesFn", () => {
 			targetAsset: string;
 		}) => ({
 			uid: id,
-			id,
 			maxQueueSize: 1,
 
 			units: {
@@ -489,7 +488,7 @@ describe("validateGameResourcesFn", () => {
 										outcome: [
 											{
 												type: "item",
-												itemId: targetId,
+												itemUid: targetId,
 												quantity: {
 													min: 1,
 													max: 1,

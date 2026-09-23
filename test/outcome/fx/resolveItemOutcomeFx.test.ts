@@ -29,7 +29,6 @@ const config = GameConfigSchema.parse({
 			lines: [],
 
 			uid: "source",
-			id: "source",
 			title: "Source",
 			description: "A outcome origin.",
 			artwork: {
@@ -45,7 +44,7 @@ const config = GameConfigSchema.parse({
 const createOriginFx = () => {
 	return spawnItemFx({
 		id: "origin",
-		itemId: "source",
+		itemUid: "source",
 		location: {
 			scope: "board",
 			space: 0,
@@ -63,7 +62,7 @@ const missingPermitWhen = {
 		distance: "far" as const,
 		selector: {
 			type: "item" as const,
-			itemId: "permit",
+			itemUid: "permit",
 		},
 	},
 };
@@ -74,7 +73,7 @@ const sourceExistsWhen = {
 		distance: "self" as const,
 		selector: {
 			type: "item" as const,
-			itemId: "source",
+			itemUid: "source",
 		},
 	},
 };
@@ -87,7 +86,7 @@ describe("resolveItemOutcomeFx", () => {
 				const accepted = yield* resolveItemOutcomeFx({
 					outcome: {
 						type: "item",
-						itemId: "item:accepted",
+						itemUid: "item:accepted",
 						placement: "drop",
 						quantity: {
 							min: 1,
@@ -117,7 +116,7 @@ describe("resolveItemOutcomeFx", () => {
 				const rejected = yield* resolveItemOutcomeFx({
 					outcome: {
 						type: "item",
-						itemId: "item:rejected",
+						itemUid: "item:rejected",
 						placement: "drop",
 						quantity: {
 							min: 1,
@@ -159,7 +158,7 @@ describe("resolveItemOutcomeFx", () => {
 		expect(result).toEqual({
 			accepted: {
 				type: "item",
-				itemId: "item:accepted",
+				itemUid: "item:accepted",
 				placement: "drop",
 				quantity: 1,
 			},
@@ -174,7 +173,7 @@ describe("resolveItemOutcomeFx", () => {
 				const rejected = yield* resolveItemOutcomeFx({
 					outcome: {
 						type: "item",
-						itemId: "item:rejected",
+						itemUid: "item:rejected",
 						placement: "drop",
 						quantity: {
 							min: 2,
@@ -198,7 +197,7 @@ describe("resolveItemOutcomeFx", () => {
 				const accepted = yield* resolveItemOutcomeFx({
 					outcome: {
 						type: "item",
-						itemId: "item:accepted",
+						itemUid: "item:accepted",
 						placement: "random",
 						quantity: {
 							min: 2,
@@ -234,7 +233,7 @@ describe("resolveItemOutcomeFx", () => {
 		expect(result).toEqual({
 			accepted: {
 				type: "item",
-				itemId: "item:accepted",
+				itemUid: "item:accepted",
 				placement: "random",
 				quantity: 2,
 			},

@@ -25,7 +25,7 @@ const selectedRouteFn = (
 		durationMs,
 		id: `make-${factId}`,
 		metadata: {
-			itemId: factId,
+			itemUid: factId,
 			kind: "clock-expiry",
 		},
 		output: {

@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "mp2maik3tk3jwvt78hwfjw9x",
-		"id": "flax-field",
 		"title": "Flax Field",
 		"draft": false,
 		"description": "Flax field",
@@ -26,7 +25,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "empty-flax-field",
+										"itemUid": "y8a926c064v74l7gncur9clj",
 										"quantity": {
 											"min": 1,
 											"max": 1

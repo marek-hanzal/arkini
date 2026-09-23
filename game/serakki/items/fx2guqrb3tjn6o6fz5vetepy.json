@@ -2,7 +2,6 @@
 	"$schema": "../schema.json",
 	"item": {
 		"uid": "fx2guqrb3tjn6o6fz5vetepy",
-		"id": "clay-bowl-with-wine",
 		"title": "Clay Bowl With Wine",
 		"ui": "simple",
 		"description": "God may like this",
@@ -27,7 +26,7 @@
 								"outcome": [
 									{
 										"type": "item",
-										"itemId": "spoiled-clay-bowl",
+										"itemUid": "c3vesqhj22ratn3fr8thfsax",
 										"quantity": {
 											"min": 1,
 											"max": 1

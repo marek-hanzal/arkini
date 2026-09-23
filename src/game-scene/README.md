@@ -1,115 +1,64 @@
-# Game Scene map
+# Game Scene
 
-Game Scene is Serakki's concrete retained Pixi executor. `src/tile-presentation` owns semantic actor projections, `src/tile-rendering` owns native actors and animation capabilities, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution.
-
-The engine remains gameplay truth. React owns routes, pages and menus; `src/item-detail` owns Item Detail dialog composition. Start at `fx/createMainRuntimeFx.ts` for Board.
-
-The root has only direct grammar layers: `ui/` for React canvas composition, `fx/` for lifecycle and retained mutation, `fn/` for shared explicit-input calculations, `service/` for readonly scene capabilities, and `type/` for cross-owner geometry values. No layer contains semantic filing subdirectories.
+Game Scene owns the visible Pixi Board. The Engine publishes canonical Runtime and ordered events;
+scene code projects them, never decides gameplay. [ARCHITECTURE.md](../../ARCHITECTURE.md)
+defines that direction.
 
 ## Owners
 
-| Area | Owner |
+| Concern | Public owner |
 | --- | --- |
-| Board camera, zoom and pan | `fx/createBoardCameraFx.ts` |
-| Routed canvas acquisition, overlay blocking and teardown | `ui/useBoardRuntime.ts` |
-| Canvas, resize, demand rendering | `src/tile-rendering/fx/createApplicationOwnerFx.ts` |
-| Semantic actors, feedback, replacements, motion intents | `src/tile-presentation/{type,fn,fx}` |
-| Native actors, visuals, readiness and particles | `src/tile-rendering/{type,service,fn,fx}` |
-| Surface geometry, layers, masks, feedback | `fx/create*SurfaceFx.ts`, `fx/draw*Fx.ts`, and `fn/read*LayoutFn.ts` |
-| Main retained identity | `src/tile-rendering/service/MainActorStore.ts` |
-| Canonical reconciliation | `fx/createMainReconcilerFx.ts` |
-| Pointer gestures, activation and frozen release facts | `src/tile-interaction/{atom,fn,fx,type}` |
-| Drop submission/presentation | `src/tile-interaction/fx/createDrop*Fx.ts` |
-| Engine-delivery presentation | `fx/readTileDeliveriesFx.ts` + `fx/createDeliveryRuntimeFx.ts` |
-| Cue lanes, choreography and handoffs | `src/tile-motion/{service,type,fn,fx}` |
-| Interpolation/springs | `src/tile-rendering/fx/createAnimationDriverFx.ts` |
-| Typed actor-channel writes | `src/tile-rendering/fx/createActorAnimatorFx.ts` |
+| Acquisition, teardown, transition subscription | [createMainRuntimeFx.ts](fx/createMainRuntimeFx.ts) |
+| Board geometry, layers, mask and canonical hit testing | [createMainSurfaceFx.ts](fx/createMainSurfaceFx.ts) |
+| Current-space actor identity and visual reconciliation | [createMainReconcilerFx.ts](fx/createMainReconcilerFx.ts) |
+| Space and Template exit, render barrier and arrival | [createBoardTransitionPresenterFx.ts](fx/createBoardTransitionPresenterFx.ts) |
+| Replaceable item and Board feedback requests | [createPresentationRuntimeFx.ts](fx/createPresentationRuntimeFx.ts) |
+| Camera fit, pan, zoom and edge navigation | [createBoardCameraFx.ts](fx/createBoardCameraFx.ts) |
+| Semantic visible actors | [readTileActorsFx.ts](../tile-presentation/fx/readTileActorsFx.ts) |
+| Native actors, texture readiness, interpolation | [createTileActorFx.ts](../tile-rendering/fx/createTileActorFx.ts), [createAnimationDriverFx.ts](../tile-rendering/fx/createAnimationDriverFx.ts) |
+| Pointer gestures, preview and drop submission | [createMainDragControllerFx.ts](../tile-interaction/fx/createMainDragControllerFx.ts), [createDropSubmissionFx.ts](../tile-interaction/fx/createDropSubmissionFx.ts) |
 
-## Dependency shape
+## Flow
 
-- Game Scene executes Tile Presentation, Rendering, Motion, and Interaction behavior to compose concrete retained scenes.
-- Tile Motion imports only Game Scene capability and geometry types (`MainSurface`, `ActorPose`); it does not execute scene behavior.
-- Tile Interaction imports only Game Scene surface/actor-store types; Game Scene executes its drag and command controllers.
-- `game-shell → game-scene` composes the public Board surface.
+- An ordinary commit updates canonical actor identities and presentation requests. The reconciler
+  requests pop on arrival, fade and shrink on departure, crossfade for different identities in one
+  slot, or travel toward a live target. Artwork replacement waits for a complete texture and then
+  publishes atomically. Progress and Clock rings follow the current snapshot.
+- Committed `item:input-stored` and `item:spawned` events request flights only when the final
+  visible actor identity still matches. A consumed input follows its receiver's live pose; a new
+  output starts at its producer's rendered pose. Missing visuals simply use the final snapshot.
+- Space and Template use the same sequential transition. The visible Board and its items exit
+  together. Until it vanishes, later commits may update that visible Space. After a render barrier,
+  the latest snapshot replaces its geometry and actors, the camera fits the new Board immediately,
+  and the Board fades in with staggered item arrivals. Only one Board is mounted at a time.
+- Tick and jobs continue in the Engine while a Board is hidden. Their completed results are
+  projected from the latest snapshot when shown; hidden feedback is not replayed. A new Space
+  requested during a transition is coalesced to the latest destination.
+- Interaction is blocked until the Board has settled. Pointer drag, target preview, camera
+  gestures and exact drop commands retain their own owners and remain available during ordinary
+  item feedback. A pending drop is keyed by its exact generation; late results cannot claim a
+  different actor. Dragged items keep their live pose through canonical updates.
 
-The concrete module graph remains acyclic. These edge labels describe why the top-level domains are mutually reachable without pretending every reverse type contract is runtime behavior.
+## Interaction and lifetime
 
-## Flows
+The Board uses fixed 512 px world cells. The camera supports wheel and pinch zoom anchored at the
+pointer, right drag pan, left drag pan starting on an empty canonical cell, edge pan while dragging,
+`0` to fit, and resize that preserves the viewed center. Engine preview owns drop validity;
+Pixi hit testing supplies coordinates and the exact canonical target. Hover feedback never changes
+hit geometry or admission.
 
-- Committed transition: game projection and current presentation claims → reconciler plan → Tile Rendering actor allocation/reconciliation → Tile Motion lanes/choreography → rendering animation channels → demand-frame invalidation.
-- Pointer gesture: fresh engine preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
+The scene owns one actor per visible runtime identity. A transported identity receives a fresh
+Pixi actor in its destination Space. Animation requests can be replaced or cancelled without
+changing Engine truth. Async texture generations and scene teardown prevent late callbacks from
+publishing into destroyed actors. The animation driver invalidates demand frames; Pixi has no
+second animation clock.
 
-Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
+## Changing this island
 
-Before delivery takes an existing actor's pose, reconciliation retires its active or pending spawn/input/swap cues through `MotionRuntime.handoffDeliveriesFx`. The real actor keeps its live pose; released producers/receivers and remaining cue lanes settle normally. A superseded swap releases both writers and settles its other grid actor from the live pose. Cancelling the pose writer alone does not release cue ownership.
+Likely affected: Game Shell mount/teardown, Tile Presentation actor values, Tile Rendering
+visuals/animation channels, Tile Interaction gestures, and focused `test/game-scene` or
+`test/tile-*` behavior.
 
-A committed template reset retires active and queued motion in the replaced space before new cues are admitted. Cancelled output actors use the normal exit fade; stale completion callbacks cannot restart their lanes. Other spaces retain their motion.
-
-Switching the viewed Space retires motion touching the departed Space and hides its retained or exiting actors before the destination is shown. A pending drop may settle after the switch; its refresh hydrates the final snapshot after the render barrier without replaying committed events. An item identity transported to the destination gets a fresh actor at its destination pose.
-
-Input contact retires the delivered item actor. The source and receiver remain claimed until consumption feedback finishes.
-
-A delivery reappearing during its exit replaces the old exit ownership before cancellation. Canonical settlement restores any unfinished exit; obsolete completion callbacks cannot remove or hide the surviving actor.
-
-Moving items cannot be clicked or dragged until they land. Pointer admission and release both check current motion ownership and pose animation, so an item that starts moving after pointer-down cannot be activated from stale gesture state. Once the last cue releases an actor, any remaining positional correction targets its latest canonical location without interrupting another pose owner.
-
-## Interaction
-
-- Board uses fixed 512 px world cells under the same camera implementation, with one camera per canvas, including masks, feedback and transient actors. The initial camera fits the whole scene; wheel/pinch zoom anchors at the pointer and right drag pans freely. Left drag starting on an empty Board cell also pans; admission uses canonical slot occupancy at pointer-down, while item drags keep their existing ownership. A short right click still runs its tile action; crossing the screen-space drag threshold gives the gesture to the camera. `0` restores the fitted default view for the mounted Board in both Game and Editor. Resize preserves the viewed world center and zoom. A changed board size updates canonical surface geometry immediately and animates the camera to the new fitted frame through the shared animation driver. A newer fit starts from the live camera; user gestures and teardown retire the old fit. Pointer coordinates enter world space before tile gestures; the drag threshold stays in screen pixels. Camera gestures cancel tile gestures, and overlays block both.
-- When the complete canvas scene exceeds its viewport on an axis, hovering near that viewport edge pans the shared camera, bounded to one scaled world cell beyond the scene. The Board activates edge navigation. Left-button item dragging keeps edge navigation active and refreshes the held actor and drop target after camera movement. Right-button camera gestures, overlays, pointer exit, blur, resize and teardown stop it; demand frames run only while the camera moves.
-- Board right click runs the primary action; `Ctrl+right click` fills remaining default-line queue capacity; left click opens Item Detail. Space-producing items use the same default-line activation as every other producer. Item dragging remains on the left button and camera dragging on the right.
-- Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented without allocating a second gameplay actor or triggering pointer-frequency React renders. A non-interactive snapshot marks its committed origin below the actor layer until the real actor settles or leaves the scene; it never participates in hit testing or drop preview. Travel settles into the single Board actor layer. Canonical slot occupancy selects pointer hits and drop targets.
-- During manual drag, the hovered target artwork shrinks and fades to 0.8 for rejected drops or swaps, then returns on target change or gesture end. Merge acceptance keeps its normal appearance. This response has its own animation channel and never changes placement, hit geometry, lifecycle or running opacity.
-- The Engine drop preview owns validity. Pixi geometry never infers merge, swap, or placement behavior.
-- Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown. [`useTileCommands`](../tile-interaction/ui/useTileCommands.ts) binds each submission to its exact Game and returns an independent Promise; concurrent callers never share an Atom result.
-
-## Invariants
-
-- One reconciler owns actor allocation, visual generations, store mutation, and presentation-claim settlement.
-- One animator owns each typed presentation channel; ownership keys may cancel work but cannot create a competing writer. Motion is the only interpolation clock, and the Pixi ticker is not a second loop.
-- Root pose, grab offset, lifecycle, crowd, particles, and visual revision remain independent channels. Tuning belongs in implementation, not this contract.
-- `TileActorVisual.artworkScale` projects the required authored `artwork.scale` once. Retained faces, layers, badges, progress and activity geometry use it on Board, including Editor Board. Every crossfade slot keeps its own revision's ratio. The slot anchor, hit area and placement geometry remain full-size; transient actor/container motion still settles to its own neutral scale.
-- Actor stores follow exact runtime identities within their canvas. Placement and return preserve existing identities; presentation reconciles committed runtime state rather than inferring continuity from intent.
-- Birth scale is allowed only over visually empty artwork space. Main arrivals and produced items inspect rendered artwork at their birth pose, including exiting and transient actors; occupied births fade in at full size and freeze any overlapping outgoing scale. Canonical occupancy alone cannot choose this feedback.
-- A removed output producer starts its exit with output dispatch, including output into its own slot; output travel and artwork readiness never delay that exit. Its retained actor supplies origin geometry until queued outputs release their claims.
-- Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
-- Board Clock rings project the canonical interval phase and Clock enable/rules independently of jobs and queue admission. They have no pointer interaction; the existing job/lifetime bar retains its precedence. Exhausted finite Clocks have no upcoming pulse ring.
-- Async texture completion is generation-guarded. A complete current visual remains until a complete replacement is ready; superseded work cannot publish or destroy the surviving generation.
-- Every physical visual generation owns reference-counted texture leases. Active visuals pin their shared textures; released textures enter the route-local decoded-byte LRU, and the texture store evicts idle entries without unloading a texture behind another visual. Backing texture ownership and per-URL unload ordering are shared across route stores to match the global Pixi Assets cache, so an old provider cannot destroy a reopened Board's textures.
-- Teardown cancels gestures, subscriptions, animation, and async readiness before destroying actors, layers, textures, or the application.
-
-## Navigation
-
-| Change | Start at |
-| --- | --- |
-| Scene composition/teardown | `fx/create*RuntimeFx.ts` |
-| Actor identity/appearance | `src/tile-presentation` + `src/tile-rendering` + main reconciler |
-| Click/drag/drop | `src/tile-interaction` |
-| Spawn/swap/replacement cue projection | `src/tile-presentation` |
-| Cue execution and playback lifecycle | `src/tile-motion` |
-| Autofill delivery | `fx/createDeliveryRuntimeFx.ts`; canonical behavior is `production-delivery/` + Tick |
-| Geometry/hit testing | `fx/create*SurfaceFx.ts`, `fn/read*LayoutFn.ts`, `fn/readSlotFn.ts` |
-| Frame/interpolation | `src/tile-rendering` |
-
-Focused proofs follow the exact owner:
-
-- Semantic projection: `test/tile-presentation`.
-- Native actors and animation capabilities: `test/tile-rendering`.
-- Playback policy and lifecycle: `test/tile-motion`.
-- Gestures and drop execution: `test/tile-interaction`.
-- Concrete scene behavior: `test/game-scene/{fn,fx,ui}`.
-
-## Changing this island?
-
-Likely affected:
-
-- Game Shell composition and route-owned teardown.
-- Tile actor projection, native rendering, motion, or interaction at the exact changed capability.
-- Item Interaction and production commands only when command admission or committed projection changes.
-- Focused tests under the changed `test/game-scene`, `test/tile-*`, or Game Shell owner.
-
-Usually not affected:
-
-- Runtime, Tick, persistence, or production decisions for presentation-only work.
-- Config authoring, Editor project persistence, Versions, Flow, or Estimate.
-- Electron security and IPC unless native window or route lifecycle changes.
+Usually not affected: Engine Tick, production outcomes, project persistence, Editor authoring,
+Flow, Estimate, and Electron IPC. Follow an Engine owner only if canonical Runtime or command
+semantics change.

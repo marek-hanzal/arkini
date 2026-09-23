@@ -143,7 +143,6 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					: {
 							progressRatio,
 						}),
-				activityEffect: running,
 				primaryAction: yield* readRuntimeItemPrimaryActionFx({
 					item,
 					runtime,

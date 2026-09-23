@@ -5,10 +5,8 @@ import { CanvasTextMetrics, Texture } from "pixi.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { classifyActorUpdateFn } from "~/game-scene/fn/classifyActorUpdateFn";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
-import type { ActorAnimation, ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 
 const palette: PixiScenePalette = {
@@ -42,12 +40,11 @@ const createItemFn = (artworkScale: number): TileActorItem => ({
 	badgeCount: 3,
 	revision: "revision:tile",
 	running: true,
-	activityEffect: true,
+
 	progressRatio: 0.5,
 	sourceUrl: "resource:tile",
 });
 const createHarnessFn = (item: TileActorItem) => {
-	const animations: ActorAnimation[] = [];
 	const frames = {
 		addBeforeRenderListenerFx: () => Effect.succeed(() => {}),
 		closeFx: Effect.void,
@@ -63,18 +60,6 @@ const createHarnessFn = (item: TileActorItem) => {
 		}),
 		closeFx: Effect.void,
 	};
-	const animator: ActorAnimator = {
-		animateFx: (animation) =>
-			Effect.sync(() => {
-				if (animation.channel === "visual-mix") animations.push(animation);
-			}),
-		cancelActorFx: () => Effect.void,
-		cancelChannelFx: () => Effect.void,
-		cancelFx: () => Effect.void,
-		closeFx: Effect.void,
-		isChannelActiveFx: () => Effect.succeed(false),
-		setFx: () => Effect.void,
-	};
 	const actor = Effect.runSync(
 		createTileActorFx({
 			frames,
@@ -87,7 +72,6 @@ const createHarnessFn = (item: TileActorItem) => {
 		Effect.runSync(
 			updateTileActorFx({
 				actor,
-				animator,
 				frames,
 				item: nextItem,
 				palette,
@@ -97,7 +81,6 @@ const createHarnessFn = (item: TileActorItem) => {
 		);
 	return {
 		actor,
-		animations,
 		updateFn,
 	};
 };
@@ -128,7 +111,7 @@ beforeEach(() => {
 });
 
 describe("authored tile artwork scale", () => {
-	it("keeps the centered authored face, badges, progress and activity inside unchanged full-slot geometry", async () => {
+	it("keeps the centered authored face, badges and progress inside unchanged full-slot geometry", async () => {
 		for (const scale of [
 			0.8,
 			1,
@@ -170,44 +153,23 @@ describe("authored tile artwork scale", () => {
 						expect(bounds.maxX).toBeLessThanOrEqual(size);
 						expect(bounds.maxY).toBeLessThanOrEqual(size);
 					}
-					expect(actor.activityParticles.centerX).toBe(size / 2);
-					expect(actor.activityParticles.particles[0].particle.scaleX).toBeCloseTo(
-						size * scale * 0.18,
-					);
 				}
 			}
 		}
 	});
 
-	it("updates scale without a runtime revision and retains each face scale through layered/progress crossfades and resize", async () => {
+	it("updates scale without a runtime revision and keeps complete faces through layered revisions and resize", async () => {
 		const item = createItemFn(0.8);
-		const { actor, animations, updateFn } = createHarnessFn(item);
+		const { actor, updateFn } = createHarnessFn(item);
 		await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
 		updateFn(item, 512);
 		const full = {
 			...item,
 			artworkScale: 1,
 		};
-		expect(
-			classifyActorUpdateFn({
-				actor,
-				displayItem: full,
-				deliveryRetained: false,
-				directLanding: false,
-				motionClaimed: false,
-				pose: {
-					layer: actor.container,
-					x: 0,
-					y: 0,
-					size: 512,
-				},
-				poseChannelActive: false,
-				preserveVisual: false,
-			}).item.kind,
-		).toBe("visual");
+
 		updateFn(full, 512);
 		expect(actor.currentVisual.primary.width).toBe(512);
-		expect(animations).toHaveLength(0);
 
 		const layered = {
 			...full,
@@ -215,13 +177,11 @@ describe("authored tile artwork scale", () => {
 			compositeUrl: "resource:overlay",
 		};
 		updateFn(layered, 512);
-		await vi.waitFor(() => expect(animations).toHaveLength(1));
+		await vi.waitFor(() => expect(actor.currentVisual.item).toBe(layered));
 		updateFn(layered, 256);
-		expect(actor.currentVisual.primary.width).toBe(256);
-		expect(actor.pendingVisual?.primary.width).toBe(120);
-		expect(actor.pendingVisual?.primary.x).toBe(48);
-		expect(actor.pendingVisual?.composite.x).toBe(88);
-		animations[0].onCompleteFn?.();
+		expect(actor.currentVisual.primary.width).toBe(120);
+		expect(actor.currentVisual.primary.x).toBe(48);
+		expect(actor.currentVisual.composite.x).toBe(88);
 
 		const progress = {
 			...full,
@@ -229,11 +189,9 @@ describe("authored tile artwork scale", () => {
 			sourceUrl: "resource:progress",
 		};
 		updateFn(progress, 256);
-		await vi.waitFor(() => expect(animations).toHaveLength(2));
-		expect(actor.currentVisual.primary.width).toBe(120);
-		expect(actor.pendingVisual?.primary.width).toBe(160);
-		expect(actor.pendingVisual?.primary.x).toBe(48);
-		animations[1].onCompleteFn?.();
+		await vi.waitFor(() => expect(actor.currentVisual.item).toBe(progress));
+		expect(actor.currentVisual.primary.width).toBe(160);
+		expect(actor.currentVisual.primary.x).toBe(48);
 		expect(actor.currentVisual.item.artworkScale).toBe(0.625);
 		expect(actor.container.scale.x).toBe(1);
 	});

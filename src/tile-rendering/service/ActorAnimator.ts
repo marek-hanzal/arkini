@@ -1,18 +1,15 @@
 import type { Effect } from "effect";
-import type { Container } from "pixi.js";
 
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
 
 export type AnimationChannel =
-	| "activity-particles"
 	| "crowd-opacity"
 	| "drop-target"
 	| "grab-offset"
 	| "lifecycle-opacity"
 	| "lifecycle-scale"
-	| "pose"
-	| "visual-mix";
+	| "pose";
 
 interface AnimationBase {
 	readonly actor: PixiTileActor;
@@ -54,15 +51,6 @@ export type ActorAnimation =
 	| (AnimationBase & {
 			readonly channel: "crowd-opacity";
 			readonly toCrowdAlpha: number;
-	  })
-	| (AnimationBase & {
-			readonly channel: "activity-particles";
-			readonly renderFn: (progress: number) => void;
-	  })
-	| (AnimationBase & {
-			readonly channel: "visual-mix";
-			readonly incoming: Container;
-			readonly outgoing: Container;
 	  });
 
 export type PresentationWrite =
@@ -91,12 +79,6 @@ export type PresentationWrite =
 			readonly channel: "grab-offset";
 			readonly pivotX: number;
 			readonly pivotY: number;
-	  }
-	| {
-			readonly actor: PixiTileActor;
-			readonly channel: "activity-particles";
-			readonly reset?: boolean;
-			readonly visible: boolean;
 	  }
 	| {
 			readonly actor: PixiTileActor;

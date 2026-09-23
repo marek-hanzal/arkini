@@ -77,38 +77,27 @@ describe("main drag controller: motion", () => {
 		Effect.runSync(mounted.controller.closeFx);
 	});
 
-	it.each([
-		"cue",
-		"pose",
-	] as const)(
-		"blocks clicks and drags while %s motion owns the item, then admits a new gesture after landing",
-		async (kind) => {
-			const claims = new Map<string, "blocked">();
-			if (kind === "cue") claims.set(item.id, "blocked");
-			const mounted = mountController({
-				interactionClaimByActorId: claims,
-			});
-			mounted.isPoseActive.mockReturnValue(kind === "pose");
+	it("blocks clicks and drags while a pose settles, then admits a new gesture", async () => {
+		const mounted = mountController();
+		mounted.isPoseActive.mockReturnValue(true);
 
-			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-			mounted.stage.emit("pointerup", pointer(10, 20));
-			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-			mounted.stage.emit("globalpointermove", pointer(30, 20));
-			mounted.stage.emit("pointerup", pointer(30, 20));
-			await flushMicrotasks();
-			expect(mounted.onActivate).not.toHaveBeenCalled();
-			expect(mounted.onDrop).not.toHaveBeenCalled();
-			expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-			expect(mounted.cancelAnimation).not.toHaveBeenCalled();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+		expect(mounted.cancelAnimation).not.toHaveBeenCalled();
 
-			claims.clear();
-			mounted.isPoseActive.mockReturnValue(false);
-			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-			mounted.stage.emit("pointerup", pointer(10, 20));
-			await flushMicrotasks();
-			expect(mounted.onActivate).toHaveBeenCalledOnce();
-		},
-	);
+		mounted.isPoseActive.mockReturnValue(false);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+		expect(mounted.onActivate).toHaveBeenCalledOnce();
+	});
 
 	it.each([
 		false,
@@ -127,32 +116,6 @@ describe("main drag controller: motion", () => {
 			expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
 		},
 	);
-
-	it("does not submit a manual drop onto a receiver still in flight", async () => {
-		const receiver = {
-			...item,
-			id: "runtime:flying-receiver",
-		};
-		const claims = new Map<string, "blocked">([
-			[
-				receiver.id,
-				"blocked",
-			],
-		]);
-		const mounted = mountController({
-			interactionClaimByActorId: claims,
-			targetItems: [
-				receiver,
-			],
-		});
-		mounted.setOccupant(receiver);
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.stage.emit("pointerup", pointer(30, 20));
-		await flushMicrotasks();
-		expect(mounted.onDrop).not.toHaveBeenCalled();
-		expect(mounted.actor.dragging).toBe(false);
-	});
 
 	it("activates the latest projected item and immediately admits another click", async () => {
 		const mounted = mountController();

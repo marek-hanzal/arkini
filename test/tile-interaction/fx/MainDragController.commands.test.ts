@@ -15,10 +15,6 @@ describe("main drag controller: commands", () => {
 		releaseOrdinaryDrag(mounted);
 
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
-		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
-			new Set([
-				item.id,
-			]),
-		);
+		expect(Effect.runSync(mounted.dropPresentation.isPendingActorFx(item.id))).toBe(true);
 	});
 });

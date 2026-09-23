@@ -9,7 +9,6 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
-import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import { createMainDragPreviewFx } from "~/tile-interaction/fx/createMainDragPreviewFx";
 import { createPointerFrameSamplerFx } from "~/tile-interaction/fx/createPointerFrameSamplerFx";
@@ -17,7 +16,6 @@ import { readPointerOffsetFn } from "~/tile-interaction/fn/readPointerOffsetFn";
 import { setDraggedActorPoseFx } from "~/tile-interaction/fx/setDraggedActorPoseFx";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 import type { DropSubmission } from "~/tile-interaction/fx/createDropSubmissionFx";
-import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type {
 	MainInteractionSurface,
@@ -52,13 +50,11 @@ interface Props {
 	readonly dragOriginGhosts: DragOriginGhosts;
 	readonly dropSubmission: DropSubmission;
 	readonly game: GameEngine;
-	readonly motion: MotionRuntime;
 	readonly onActivateFn: (
 		item: TileActorItem,
 		intent: MainActivationIntent,
 		origin: HTMLElement,
 	) => void | PromiseLike<void>;
-	readonly readAckTintFn: () => number;
 	readonly surface: MainInteractionSurface;
 }
 
@@ -120,9 +116,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	dragOriginGhosts,
 	dropSubmission,
 	game,
-	motion,
 	onActivateFn,
-	readAckTintFn,
 	surface,
 }: Props) {
 	let activeDrag: ActiveDrag | null = null;
@@ -142,9 +136,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	});
 
 	const isMovingFn = (actor: PixiTileActor) =>
-		RendererRuntime.runSync(motion.readSnapshotFx).interactionClaimByActorId.get(
-			actor.item.id,
-		) === "blocked" || RendererRuntime.runSync(animator.isChannelActiveFx(actor, "pose"));
+		RendererRuntime.runSync(animator.isChannelActiveFx(actor, "pose"));
 
 	const isTargetMovingFn = (facts: MainInteractionTargetFacts) => {
 		if (facts.occupant === null) return false;
@@ -362,17 +354,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			activeDrag = null;
 			const currentActor = actorStore.actors.get(drag.sourceItem.id);
 			if (currentActor === undefined || currentActor.container.destroyed) return;
-			try {
-				RendererRuntime.runSync(
-					burstFeedbackParticlesFx({
-						actor: currentActor,
-						animator,
-						tint: readAckTintFn(),
-					}),
-				);
-			} catch (cause) {
-				game.reportCriticalFailureFn("game-presentation", cause);
-			}
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
@@ -416,9 +397,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					commandTarget: targetFacts.commandTarget,
 					onReturnSettledFn: () =>
 						RendererRuntime.runSync(dragOriginGhosts.settleFx(drag.actor)),
-					previewKind: drag.previewKind,
 					sourceItem,
-					targetItem: drag.targetItem,
 				}),
 			);
 		} catch (cause) {

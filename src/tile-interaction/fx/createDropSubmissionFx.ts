@@ -5,7 +5,6 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
-import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -21,10 +20,8 @@ export interface DropSubmission {
 	readonly submitFx: (request: {
 		readonly actor: PixiTileActor;
 		readonly commandTarget: DropItemCommand["target"];
-		readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 		readonly onReturnSettledFn: () => void;
 		readonly sourceItem: TileActorItem;
-		readonly targetItem: TileActorItem | null;
 	}) => Effect.Effect<void, never, never>;
 	readonly closeFx: Effect.Effect<void, never, never>;
 }
@@ -44,31 +41,12 @@ interface Props {
 const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 	commandTarget,
 	dropPresentation,
-	previewKind,
 	sourceItem,
-	targetItem,
 }: {
 	readonly commandTarget: DropItemCommand["target"];
 	readonly dropPresentation: DropPresentation;
-	readonly previewKind: readDropItemPreviewFx.Result["kind"] | null;
 	readonly sourceItem: TileActorItem;
-	readonly targetItem: TileActorItem | null;
 }) {
-	const swapCandidate =
-		previewKind === DropItemResultKind.Swap && targetItem !== null
-			? {
-					source: {
-						id: sourceItem.id,
-						location: sourceItem.location,
-						revision: sourceItem.revision,
-					},
-					target: {
-						id: targetItem.id,
-						location: targetItem.location,
-						revision: targetItem.revision,
-					},
-				}
-			: null;
 	const source = {
 		sourceItemId: sourceItem.id,
 		sourceLocation: sourceItem.location,
@@ -78,10 +56,7 @@ const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
 		...source,
 		target: commandTarget,
 	} satisfies DropItemCommand;
-	const generation = yield* dropPresentation.beginFx({
-		sourceActorId: sourceItem.id,
-		swapCandidate,
-	});
+	const generation = yield* dropPresentation.beginFx(sourceItem.id);
 	return {
 		command,
 		generation,
@@ -120,13 +95,9 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	};
 
 	return {
-		isPendingActorFx: Effect.fn("DropSubmission.isPendingActorFx")((actorId) =>
-			Effect.map(dropPresentation.readSnapshotFx, ({ pendingActorIds }) =>
-				pendingActorIds.has(actorId),
-			),
-		),
+		isPendingActorFx: dropPresentation.isPendingActorFx,
 		submitFx: Effect.fn("DropSubmission.submitFx")(
-			({ actor, commandTarget, onReturnSettledFn, previewKind, sourceItem, targetItem }) =>
+			({ actor, commandTarget, onReturnSettledFn, sourceItem }) =>
 				Effect.sync(() => {
 					if (closed) return;
 					RendererRuntime.runSync(cursorGrab.finishFx(actor));
@@ -139,9 +110,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						beginDropFx({
 							commandTarget,
 							dropPresentation,
-							previewKind,
 							sourceItem,
-							targetItem,
 						}),
 					);
 					let finalized = false;
@@ -156,12 +125,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						}
 						finalized = true;
 						try {
-							RendererRuntime.runSync(
-								dropPresentation.completeFx({
-									generation: drop.generation,
-									result,
-								}),
-							);
+							RendererRuntime.runSync(dropPresentation.settleFx(drop.generation));
 							const retainedSource =
 								actorStore.actors.get(sourceItem.id) === actor ? actor : null;
 							if (retainedSource !== null) {
@@ -196,7 +160,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 					const failDropFn = (cause: unknown) => {
 						if (closed || finalized) return;
 						finalized = true;
-						RendererRuntime.runSync(dropPresentation.failFx(drop.generation));
+						RendererRuntime.runSync(dropPresentation.settleFx(drop.generation));
 						const retainedSource =
 							actorStore.actors.get(sourceItem.id) === actor ? actor : null;
 						if (retainedSource !== null) {

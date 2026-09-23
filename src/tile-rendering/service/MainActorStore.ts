@@ -7,12 +7,7 @@ export interface MainActorStore {
 	readonly actors: ReadonlyMap<string, PixiTileActor>;
 	readonly exitingActors: ReadonlySet<PixiTileActor>;
 	readonly canonicalItems: ReadonlyMap<string, TileActorItem>;
-	readonly deleteActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null, never, never>;
 	readonly destroyExitingActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
-	readonly readActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null, never, never>;
-	readonly readCanonicalItemFx: (
-		actorId: string,
-	) => Effect.Effect<TileActorItem | null, never, never>;
 	/** Reads one canonical active-scene anchor without scanning the retained projection. */
 	readonly readCanonicalOccupantFx: (
 		location: TileActorItem["location"],

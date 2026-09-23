@@ -15,7 +15,6 @@ import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMot
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 import { createDropSubmissionFx } from "~/tile-interaction/fx/createDropSubmissionFx";
-import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 import type { DragOriginGhosts } from "~/tile-interaction/type/DragOriginGhosts";
@@ -148,11 +147,9 @@ export const pointer = (x: number, y: number, button = 0): FakePointerEvent => (
 
 export const mountController = ({
 	cheatsEnabled = false,
-	interactionClaimByActorId = new Map(),
 	targetItems = [],
 }: {
 	readonly cheatsEnabled?: boolean;
-	readonly interactionClaimByActorId?: ReadonlyMap<string, "blocked">;
 	readonly targetItems?: ReadonlyArray<TileActorItem>;
 } = {}) => {
 	previewState.kind = "move";
@@ -238,20 +235,12 @@ export const mountController = ({
 		canonicalItems,
 		exitingActors: new Set(),
 		closeFx: Effect.void,
-		deleteActorFx: (actorId) =>
-			Effect.sync(() => {
-				const deleted = actors.get(actorId) ?? null;
-				actors.delete(actorId);
-				return deleted;
-			}),
 		destroyExitingActorFx: (exitingActor) =>
 			Effect.sync(() => {
 				exitingActor.container.destroy({
 					children: true,
 				});
 			}),
-		readActorFx: (actorId) => Effect.sync(() => actors.get(actorId) ?? null),
-		readCanonicalItemFx: (actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
 		readCanonicalOccupantFx: () => Effect.succeed(null),
 		releaseActorFx: (actorId) =>
 			Effect.sync(() => {
@@ -292,10 +281,6 @@ export const mountController = ({
 		setFx: (write) =>
 			Effect.sync(() => {
 				presentationWrites.push(write);
-				if (write.channel === "activity-particles") {
-					write.actor.activityParticles.container.visible = write.visible;
-					return;
-				}
 				if (write.channel !== "pose") return;
 				write.actor.container.position.set(write.x, write.y);
 				if (write.scale !== undefined) {
@@ -322,18 +307,6 @@ export const mountController = ({
 		reportCriticalFailureFn,
 		runFx: (effect: Effect.Effect<unknown, unknown>) => effect,
 	} as never;
-	const motion = {
-		cancelSpaceFx: () => Effect.void,
-		handoffDeliveriesFx: () => Effect.void,
-		closeFx: Effect.void,
-		enqueueFx: () => Effect.void,
-		readSnapshotFx: Effect.succeed({
-			interactionClaimByActorId,
-			retainedActorIds: new Set(interactionClaimByActorId.keys()),
-			spawnCueByActorId: new Map(),
-		}),
-		startFx: Effect.void,
-	} satisfies MotionRuntime;
 	const surface = {
 		readActorPoseFx: (actorItem: TileActorItem) =>
 			Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
@@ -424,9 +397,7 @@ export const mountController = ({
 				dragOriginGhosts,
 				dropSubmission,
 				game,
-				motion,
 				onActivateFn: onActivate,
-				readAckTintFn: () => 0x57d7b2,
 				surface,
 			}),
 		);

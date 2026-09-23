@@ -5,7 +5,7 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { animateRetargetablePoseFx } from "~/tile-rendering/fx/animateRetargetablePoseFx";
-import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
+import { readSettleDurationMsFn } from "~/tile-interaction/fn/readSettleDurationMsFn";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 
 interface Props {

@@ -33,7 +33,12 @@ export namespace createBoardCameraFx {
 	export interface Output {
 		readonly cancelInteractionFx: Effect.Effect<void>;
 		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
-		readonly setSurfacesFx: (surfaces: Props["surfaces"]) => Effect.Effect<void>;
+		readonly setSurfacesFx: (
+			surfaces: Props["surfaces"],
+			options: {
+				readonly animate: boolean;
+			},
+		) => Effect.Effect<void>;
 		readonly closeFx: Effect.Effect<void>;
 	}
 }
@@ -355,7 +360,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 
 	return {
 		cancelInteractionFx: Effect.sync(cancelFn),
-		setSurfacesFx: (nextSurfaces) =>
+		setSurfacesFx: (nextSurfaces, options) =>
 			Effect.sync(() => {
 				cancelFn();
 				left = Math.min(...nextSurfaces.map((surface) => surface.x));
@@ -369,10 +374,11 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 					width: right - left,
 					height: bottom - top,
 				};
-				fitFn(true);
+				fitFn(options.animate);
 			}),
 		setInteractionBlockedFx: (nextBlocked: boolean) =>
 			Effect.sync(() => {
+				if (blocked === nextBlocked) return;
 				blocked = nextBlocked;
 				if (blocked) cancelFn();
 				else updateInteractionFn();

@@ -57,7 +57,6 @@ describe("tile actor destruction", () => {
 			item: {
 				id: "runtime:tile",
 			} as TileActorItem,
-			lifecycleIntentGeneration: 3,
 			pendingVisual: pending.visual,
 			visuals: new Set([
 				current.visual,
@@ -69,7 +68,6 @@ describe("tile actor destruction", () => {
 		Effect.runSync(destroyTileActorFx(actor));
 		Effect.runSync(destroyTileActorFx(actor));
 
-		expect(actor.lifecycleIntentGeneration).toBe(4);
 		expect(actor.visualTransitionGeneration).toBe(8);
 		expect(actor.visuals.size).toBe(0);
 		expect(actor.pendingVisual).toBeNull();

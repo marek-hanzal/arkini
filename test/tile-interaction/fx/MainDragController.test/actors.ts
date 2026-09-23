@@ -1,4 +1,4 @@
-import { Container, Graphics, Particle, ParticleContainer, Sprite, Text, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -22,7 +22,7 @@ export const item = {
 	},
 	revision: "revision:log",
 	running: false,
-	activityEffect: false,
+
 	sourceUrl: "resource:log",
 } satisfies TileActorItem;
 
@@ -62,36 +62,7 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		textureGeneration: 0,
 		textureState: "ready",
 	} satisfies ActorVisual;
-	const particle = new Particle(Texture.EMPTY);
-	const activityParticleContainer = new ParticleContainer({
-		particles: [
-			particle,
-		],
-		texture: Texture.EMPTY,
-	});
-	activityParticleContainer.visible = false;
 	return {
-		activityParticles: {
-			centerX: 40,
-			container: activityParticleContainer,
-			feedbackPhase: null,
-			lastProgress: 0,
-			lightSurface: false,
-			particles: [
-				{
-					alphaScale: 1,
-					particle,
-					phaseOffset: 0,
-					spreadOffset: 0,
-					speedCycles: 1,
-					waveOffset: 0,
-				},
-			],
-			startY: 68,
-			topHalfWidth: 24,
-			topY: -18,
-			workingTint: 0xf05bb8,
-		},
 		container,
 		crowdLayer: new Container(),
 		currentVisual: visual,
@@ -101,12 +72,6 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		instanceId: `test:${actorItem.id}`,
 		item: actorItem,
 		lifecycleLayer,
-		lifecycleDurationMs: 0,
-		lifecycleAnimateScale: true,
-		lifecycleTransitionStarted: false,
-		lifecycleIntentGeneration: 0,
-		lifecycleNotBeforeMs: 0,
-		lifecycleTargetAlpha: 1,
 		onPointerDownFn: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),

@@ -26,24 +26,11 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 			actors,
 			exitingActors,
 			canonicalItems,
-			deleteActorFx: Effect.fn("MainActorStore.deleteActorFx")((actorId) =>
-				Effect.sync(() => {
-					const actor = actors.get(actorId) ?? null;
-					actors.delete(actorId);
-					return actor;
-				}),
-			),
 			destroyExitingActorFx: Effect.fn("MainActorStore.destroyExitingActorFx")((actor) =>
 				Effect.gen(function* () {
 					exitingActors.delete(actor);
 					yield* destroyTileActorFx(actor);
 				}),
-			),
-			readActorFx: Effect.fn("MainActorStore.readActorFx")((actorId) =>
-				Effect.sync(() => actors.get(actorId) ?? null),
-			),
-			readCanonicalItemFx: Effect.fn("MainActorStore.readCanonicalItemFx")((actorId) =>
-				Effect.sync(() => canonicalItems.get(actorId) ?? null),
 			),
 			readCanonicalOccupantFx: Effect.fn("MainActorStore.readCanonicalOccupantFx")(
 				(location) =>

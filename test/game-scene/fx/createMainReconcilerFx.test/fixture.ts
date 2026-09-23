@@ -6,7 +6,7 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
 import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 
-import { Container, Graphics, Particle, ParticleContainer, Texture } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 import { Effect } from "effect";
 
@@ -23,33 +23,23 @@ import type {
 
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 
-import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
-
 import type { MainSurface } from "~/game-scene/service/MainSurface";
 
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 
 import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
+import type { PresentationRuntime } from "~/game-scene/service/PresentationRuntime";
 
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 
-import type { TileDelivery } from "~/game-scene/fx/readTileDeliveriesFx";
-import type { DeliveryRuntime } from "~/game-scene/service/DeliveryRuntime";
-
 const projectionState = vi.hoisted(() => ({
-	cues: [] as unknown[],
-	feedback: [] as unknown[],
 	main: [] as unknown[],
-	replacements: [] as unknown[],
 }));
 
 export const projectionProbeState = projectionState;
-
-vi.mock("~/tile-presentation/fn/readTileActorFeedbackCuesFn", () => ({
-	readTileActorFeedbackCuesFn: () => projectionState.feedback,
-}));
 
 const createdVisualState = vi.hoisted(() => ({
 	created: [] as unknown[],
@@ -62,25 +52,6 @@ vi.mock("~/tile-presentation/fx/readTileActorsFx", () => ({
 		kind: "tile-actors",
 	}),
 }));
-
-vi.mock("~/game-scene/fx/readTileDeliveriesFx", () => ({
-	readTileDeliveriesFx: () => ({
-		kind: "tile-deliveries",
-	}),
-}));
-
-vi.mock("~/tile-presentation/fx/readCommittedTileReplacementsFx", async () => {
-	const { Effect: EffectModule } = await import("effect");
-	return {
-		readCommittedTileReplacementsFx: () => EffectModule.succeed(projectionState.replacements),
-	};
-});
-
-vi.mock("~/tile-presentation/fn/readTileMotionCuesFn", async () => {
-	return {
-		readTileMotionCuesFn: () => projectionState.cues,
-	};
-});
 
 vi.mock("~/tile-rendering/fx/createActorVisualFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
@@ -155,7 +126,7 @@ export const createItem = (
 	},
 	revision: `revision:${id}`,
 	running: false,
-	activityEffect: false,
+
 	artworkScale: 0.8,
 	sourceUrl: "resource:water",
 	...overrides,
@@ -187,19 +158,11 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 	const lifecycleLayer = new Container();
 	const crowdLayer = new Container();
 	const visualLayer = new Container();
-	const particle = new Particle(Texture.EMPTY);
-	const activityParticleContainer = new ParticleContainer({
-		particles: [
-			particle,
-		],
-		texture: Texture.EMPTY,
-	});
-	activityParticleContainer.visible = false;
 	const progressBar = new Graphics();
 	const currentVisual = createVisual(item);
 	visualLayer.addChild(currentVisual.container);
 	crowdLayer.addChild(visualLayer);
-	lifecycleLayer.addChild(activityParticleContainer, crowdLayer);
+	lifecycleLayer.addChild(crowdLayer);
 	container.addChild(lifecycleLayer);
 	return {
 		instanceId: `test:${item.id}`,
@@ -207,27 +170,6 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		lifecycleLayer,
 		crowdLayer,
 		visualLayer,
-		activityParticles: {
-			centerX: 40,
-			container: activityParticleContainer,
-			feedbackPhase: null,
-			lastProgress: 0,
-			lightSurface: false,
-			particles: [
-				{
-					alphaScale: 1,
-					particle,
-					phaseOffset: 0,
-					spreadOffset: 0,
-					speedCycles: 1,
-					waveOffset: 0,
-				},
-			],
-			startY: 68,
-			topHalfWidth: 24,
-			topY: -18,
-			workingTint: 0xf05bb8,
-		},
 		progressBar,
 		clockRing: new Graphics(),
 		visuals: new Set([
@@ -238,12 +180,6 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		item,
 		size: 80,
 		visualTransitionGeneration: 0,
-		lifecycleIntentGeneration: 0,
-		lifecycleTransitionStarted: false,
-		lifecycleTargetAlpha: 1,
-		lifecycleNotBeforeMs: 0,
-		lifecycleDurationMs: 0,
-		lifecycleAnimateScale: true,
 		dragging: false,
 		dragOffsetX: 0,
 		dragOffsetY: 0,
@@ -273,20 +209,11 @@ export const createActorStore = (actor: PixiTileActor) => {
 			exitingActors,
 			canonicalItems,
 			closeFx: Effect.void,
-			deleteActorFx: (actorId: string) =>
-				Effect.sync(() => {
-					const deleted = actors.get(actorId) ?? null;
-					actors.delete(actorId);
-					return deleted;
-				}),
 			destroyExitingActorFx: (exitingActor: PixiTileActor) =>
 				Effect.gen(function* () {
 					exitingActors.delete(exitingActor);
 					yield* destroyTileActorFx(exitingActor);
 				}),
-			readActorFx: (actorId: string) => Effect.succeed(actors.get(actorId) ?? null),
-			readCanonicalItemFx: (actorId: string) =>
-				Effect.succeed(canonicalItems.get(actorId) ?? null),
 			readCanonicalOccupantFx: (location: TileActorItem["location"]) =>
 				Effect.succeed(
 					Array.from(canonicalItems.values()).find(
@@ -392,9 +319,6 @@ export const createAnimator = () => {
 						case "crowd-opacity":
 							write.actor.crowdLayer.alpha = write.alpha;
 							break;
-						case "activity-particles":
-							write.actor.activityParticles.container.visible = write.visible;
-							break;
 					}
 				}),
 		} satisfies ActorAnimator,
@@ -428,25 +352,57 @@ export const createDrag = () => {
 	};
 };
 
-export const createMotion = () =>
-	({
-		cancelSpaceFx: () => Effect.void,
-		handoffDeliveriesFx: () => Effect.void,
-		closeFx: Effect.void,
-		enqueueFx: () => Effect.void,
-		readSnapshotFx: Effect.succeed({
-			interactionClaimByActorId: new Map(),
-			retainedActorIds: new Set(),
-			spawnCueByActorId: new Map(),
-		}),
-		startFx: Effect.void,
-	}) satisfies MotionRuntime;
+const createPresentation = (animator: ActorAnimator) => {
+	const appears: Parameters<PresentationRuntime["appearFx"]>[0][] = [];
+	const disappears: Parameters<PresentationRuntime["disappearFx"]>[0][] = [];
+	const crossfades: Parameters<PresentationRuntime["crossfadeFx"]>[0][] = [];
+	const travels: Parameters<PresentationRuntime["travelFx"]>[0][] = [];
+	const traveling = new Set<PixiTileActor>();
+	return {
+		appears,
+		disappears,
+		crossfades,
+		travels,
+		presentation: {
+			appearFx: (props) =>
+				Effect.sync(() => {
+					appears.push(props);
+				}),
+			disappearFx: (props) =>
+				Effect.sync(() => {
+					disappears.push(props);
+				}),
+			crossfadeFx: (props) =>
+				Effect.sync(() => {
+					crossfades.push(props);
+				}),
+			travelFx: (props) =>
+				Effect.gen(function* () {
+					travels.push(props);
+					traveling.add(props.actor);
+					yield* animator.animateFx({
+						actor: props.actor,
+						channel: "pose",
+						durationMs: 180,
+						toX: props.target.x,
+						toY: props.target.y,
+					});
+				}),
+			isTravelingFx: (actor) => Effect.sync(() => traveling.has(actor)),
+			exitBoardFx: () => Effect.void,
+			enterBoardFx: () => Effect.void,
+			cancelActorFx: (actor) =>
+				Effect.sync(() => {
+					traveling.delete(actor);
+				}),
+			cancelAllFx: Effect.void,
+			closeFx: Effect.void,
+		} satisfies PresentationRuntime,
+	};
+};
 
 export const createReconcilerHarness = ({
 	actor,
-	viewedDeliveries = [],
-	syncDeliveryFx = () => Effect.void,
-	motion = createMotion(),
 	pose = {
 		size: 80,
 		x: 40,
@@ -455,9 +411,6 @@ export const createReconcilerHarness = ({
 	readPose = true,
 }: {
 	readonly actor: PixiTileActor;
-	readonly viewedDeliveries?: ReadonlyArray<TileDelivery>;
-	readonly syncDeliveryFx?: DeliveryRuntime["syncFx"];
-	readonly motion?: MotionRuntime;
 	readonly pose?: {
 		readonly size: number;
 		readonly x: number;
@@ -468,6 +421,7 @@ export const createReconcilerHarness = ({
 	const { actors, canonicalItems, store } = createActorStore(actor);
 	const animatorHarness = createAnimator();
 	const dragHarness = createDrag();
+	const presentationHarness = createPresentation(animatorHarness.animator);
 	const invalidate = vi.fn();
 	const layer = new Container();
 	const transientActorLayer = new Container();
@@ -487,9 +441,8 @@ export const createReconcilerHarness = ({
 	const game = {
 		readOrThrowFn: (query: unknown) => {
 			const projection = query as {
-				readonly kind: "tile-actors" | "tile-deliveries";
+				readonly kind: "tile-actors";
 			};
-			if (projection.kind === "tile-deliveries") return viewedDeliveries;
 			if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
 			return projectionState.main;
 		},
@@ -504,20 +457,8 @@ export const createReconcilerHarness = ({
 				},
 			} as unknown as PixiApplicationOwner,
 			drag: dragHarness.drag,
-			delivery: {
-				closeFx: Effect.void,
-				readSnapshotFx: Effect.succeed({
-					retainedActorIds: new Set(),
-				}),
-				syncFx: syncDeliveryFx,
-			},
-			dropPresentation,
 			game,
-			motion,
-			particleTextures: {
-				closeFx: Effect.void,
-				star: Texture.EMPTY,
-			},
+			presentation: presentationHarness.presentation,
 			readPaletteFn: () =>
 				({
 					success: 0x57d7b2,
@@ -529,6 +470,7 @@ export const createReconcilerHarness = ({
 	return {
 		...animatorHarness,
 		...dragHarness,
+		...presentationHarness,
 		actors,
 		canonicalItems,
 		dropPresentation,
@@ -541,18 +483,15 @@ export const createReconcilerHarness = ({
 	};
 };
 
-export const transition = (sequence: number) =>
+export const transition = (sequence: number, events: GameTransition["events"] = []) =>
 	({
-		events: [],
+		events,
 		previousRuntime: {},
 		runtime: {},
 		sequence,
 	}) as unknown as ReturnType<GameEngine["getTransitionSnapshotFn"]>;
 
 beforeEach(() => {
-	projectionState.cues = [];
-	projectionState.feedback = [];
 	projectionState.main = [];
-	projectionState.replacements = [];
 	createdVisualState.created = [];
 });

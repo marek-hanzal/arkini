@@ -103,18 +103,6 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 				x: 1,
 			},
 		},
-		activityParticles: {
-			container: {
-				visible: true,
-			},
-			particles: [
-				{
-					particle: {
-						alpha: 0.28,
-					},
-				},
-			],
-		},
 		instanceId,
 		item: {
 			id,
@@ -137,7 +125,7 @@ const createAnimator = () => {
 };
 
 describe("actor animator", () => {
-	it("keeps pose, lifecycle, crowd, and activity-particle channels physically isolated", () => {
+	it("keeps pose, lifecycle, and crowd channels physically isolated", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();
 
@@ -161,7 +149,6 @@ describe("actor animator", () => {
 		});
 		expect(actor.container.scale.x).toBe(1);
 		expect(actor.crowdLayer.alpha).toBe(1);
-		expect(actor.activityParticles.particles[0]?.particle.alpha).toBe(0.28);
 
 		Effect.runSync(
 			animator.animateFx({
@@ -181,35 +168,10 @@ describe("actor animator", () => {
 				toCrowdAlpha: 0.82,
 			}),
 		);
-		Effect.runSync(
-			animator.animateFx({
-				actor,
-				channel: "activity-particles",
-				curve: {
-					kind: "linear",
-				},
-				durationMs: 640,
-				ownerKey: "particles:actor",
-				repeat: Number.POSITIVE_INFINITY,
-				renderFn: (progress) => {
-					const particle = actor.activityParticles.particles[0]?.particle;
-					if (particle !== undefined) particle.alpha = progress;
-				},
-			}),
-		);
 		tweens[1]?.update(0.5);
 		tweens[2]?.update(0.5);
-		tweens[3]?.update(0.5);
-
-		expect(tweens[3]?.props).toMatchObject({
-			curve: {
-				kind: "linear",
-			},
-			repeat: Number.POSITIVE_INFINITY,
-		});
 		expect(actor.container.alpha).toBeCloseTo(0.91);
 		expect(actor.crowdLayer.alpha).toBeCloseTo(0.91);
-		expect(actor.activityParticles.particles[0]?.particle.alpha).toBeCloseTo(0.5);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
 	});
@@ -217,10 +179,6 @@ describe("actor animator", () => {
 	it("reverses drop feedback from live progress without interrupting other visual channels", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();
-		const incoming = new Container({
-			alpha: 0,
-		});
-		const outgoing = new Container();
 
 		for (const animation of [
 			{
@@ -240,11 +198,6 @@ describe("actor animator", () => {
 			{
 				channel: "crowd-opacity",
 				toCrowdAlpha: 0.5,
-			},
-			{
-				channel: "visual-mix",
-				incoming,
-				outgoing,
 			},
 			{
 				channel: "drop-target",
@@ -271,13 +224,13 @@ describe("actor animator", () => {
 				toFactor: 1,
 			}),
 		);
-		for (const tween of tweens.slice(0, 5)) {
+		for (const tween of tweens.slice(0, 4)) {
 			expect(tween.stop).not.toHaveBeenCalled();
 			tween.update(1);
 		}
-		expect(tweens[5]?.stop).toHaveBeenCalledOnce();
-		tweens[5]?.update(1);
-		tweens[6]?.update(0.5);
+		expect(tweens[4]?.stop).toHaveBeenCalledOnce();
+		tweens[4]?.update(1);
+		tweens[5]?.update(0.5);
 		expect(actor.visualLayer.scale.x).toBeCloseTo(0.95);
 		expect(actor.visualLayer.alpha).toBeCloseTo(0.95);
 		expect(actor.container.x).toBe(100);
@@ -286,8 +239,6 @@ describe("actor animator", () => {
 		expect(actor.container.alpha).toBeCloseTo(0.4);
 		expect(actor.lifecycleLayer.scale.x).toBeCloseTo(0.6);
 		expect(actor.crowdLayer.alpha).toBeCloseTo(0.5);
-		expect(incoming.alpha).toBe(1);
-		expect(outgoing.alpha).toBe(0);
 
 		Effect.runSync(
 			animator.setFx({
@@ -296,7 +247,7 @@ describe("actor animator", () => {
 				factor: 1,
 			}),
 		);
-		expect(tweens[6]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[5]?.stop).toHaveBeenCalledOnce();
 		expect(actor.visualLayer.scale.x).toBe(1);
 		expect(actor.visualLayer.alpha).toBe(1);
 	});
@@ -634,10 +585,10 @@ describe("actor animator", () => {
 		Effect.runSync(
 			animator.animateFx({
 				actor: secondActor,
-				channel: "activity-particles",
+				channel: "crowd-opacity",
 				durationMs: 300,
-				ownerKey: "second-actor-particles",
-				renderFn: () => undefined,
+				ownerKey: "second-actor-crowd",
+				toCrowdAlpha: 0.6,
 			}),
 		);
 		Effect.runSync(

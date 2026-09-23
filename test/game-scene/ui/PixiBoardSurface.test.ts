@@ -192,7 +192,7 @@ describe("PixiBoardSurface", () => {
 			},
 			revision: "revision:producer",
 			running: false,
-			activityEffect: false,
+
 			artworkScale: 0.8,
 			sourceUrl: "resource:producer",
 		} satisfies TileActorItem;
@@ -258,7 +258,7 @@ describe("PixiBoardSurface", () => {
 			},
 			revision: "revision:producer:running",
 			running: true,
-			activityEffect: true,
+
 			artworkScale: 0.8,
 			sourceUrl: "resource:producer",
 		} satisfies TileActorItem;

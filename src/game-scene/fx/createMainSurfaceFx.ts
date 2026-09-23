@@ -57,6 +57,10 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				boardWidth: initialSize.width,
 			});
 
+			const boardPresentationLayer = new Container({
+				eventMode: "passive",
+				label: "BoardPresentationLayer",
+			});
 			const gridLayer = new Container({
 				eventMode: "none",
 				label: "GridLayer",
@@ -81,13 +85,14 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			gridLayer.addChild(boardGrid);
 			boardGrid.mask = boardMask;
 			boardActorLayer.mask = boardMask;
-			application.stage.addChild(
+			boardPresentationLayer.addChild(
 				gridLayer,
 				dropFeedback.container,
 				boardMask,
 				boardActorLayer,
 				transientActorLayer,
 			);
+			application.stage.addChild(boardPresentationLayer);
 			application.stage.eventMode = "static";
 			let closed = false;
 
@@ -180,18 +185,17 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			};
 
 			return {
+				boardPresentationLayer,
 				transientActorLayer,
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
-					for (const displayObject of [
-						transientActorLayer,
-						boardActorLayer,
-						boardMask,
-						gridLayer,
-					]) {
-						if (displayObject.destroyed) continue;
-						displayObject.destroy({
+					// Drop feedback owns its own cleanup after the surface closes.
+					if (dropFeedback.container.parent === boardPresentationLayer) {
+						boardPresentationLayer.removeChild(dropFeedback.container);
+					}
+					if (!boardPresentationLayer.destroyed) {
+						boardPresentationLayer.destroy({
 							children: true,
 						});
 					}
@@ -201,9 +205,6 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				),
 				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
 					readTargetFactsFromTargetFx(readDropTargetFn(x, y)),
-				),
-				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
-					Effect.sync(() => readLocationPoseFn(location)),
 				),
 				redrawFx: Effect.gen(function* () {
 					layoutRevision += 1;

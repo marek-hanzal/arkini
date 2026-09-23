@@ -18,7 +18,7 @@ The densest islands have local maps:
 | --- | --- | --- |
 | Runtime and session | Runtime, events, Tick, persistence, playable and installed Game | [`src/game-runtime/README.md`](src/game-runtime/README.md) |
 | Production | Condition, input, line, job, delivery and outcomes | [`src/production-line/README.md`](src/production-line/README.md) |
-| Retained scene | Game Scene, Tile Presentation, Rendering, Motion and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
+| Retained scene | Game Scene, Tile Presentation, Rendering and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Acquisition and Estimate | Shared acquisition graph and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
 | Editor persistence | Project Authoring filesystem repository, transactions, renderer projection, MCP and Electron IPC | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
@@ -86,11 +86,10 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 
 | Domain | Role | First read |
 | --- | --- | --- |
-| `tile-presentation` | Semantic actor values, feedback and motion intents | [`src/tile-presentation/fx/readTileActorsFx.ts`](src/tile-presentation/fx/readTileActorsFx.ts) |
+| `tile-presentation` | Semantic visible actor values | [`src/tile-presentation/fx/readTileActorsFx.ts`](src/tile-presentation/fx/readTileActorsFx.ts) |
 | `tile-rendering` | Pixi application, native actors, visuals and animation channels | [`src/tile-rendering/fx/createApplicationOwnerFx.ts`](src/tile-rendering/fx/createApplicationOwnerFx.ts) |
-| `tile-motion` | Cue lanes, choreography and playback | [`src/tile-motion/fx/createMotionRuntimeFx.ts`](src/tile-motion/fx/createMotionRuntimeFx.ts) |
 | `tile-interaction` | Pointer gestures, drop execution and command admission | [`src/tile-interaction/fx/createMainDragControllerFx.ts`](src/tile-interaction/fx/createMainDragControllerFx.ts) |
-| `game-scene` | Concrete retained Board scene | [`src/game-scene/README.md`](src/game-scene/README.md) |
+| `game-scene` | Concrete Board scene, transition sequencing and feedback requests | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | `item-detail-read` | Shared framework-neutral detail reads | [`src/item-detail-read/fx/readItemDetailQueueFx.ts`](src/item-detail-read/fx/readItemDetailQueueFx.ts) |
 | `item-detail-frame` | Visible detail target and modal lifecycle | [`src/item-detail-frame/fx/createItemDetailControllerFx.ts`](src/item-detail-frame/fx/createItemDetailControllerFx.ts) |
 | `item-detail` | Item Detail shell, live Lines and Info in one scroll | [`src/item-detail/ui/ItemDetailModal.tsx`](src/item-detail/ui/ItemDetailModal.tsx), [`ItemLines.tsx`](src/item-detail/ui/ItemLines.tsx) |

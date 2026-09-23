@@ -8,17 +8,14 @@ import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createMainActorStoreFx } from "~/tile-rendering/fx/createMainActorStoreFx";
-import { createParticleTexturesFx } from "~/tile-rendering/fx/createParticleTexturesFx";
 import { createAnimationDriverFx } from "~/tile-rendering/fx/createAnimationDriverFx";
 import { createDropFeedbackFx } from "~/game-scene/fx/createDropFeedbackFx";
 import { createActorAnimatorFx } from "~/tile-rendering/fx/createActorAnimatorFx";
 import { readScenePaletteFx } from "~/tile-rendering/fx/readScenePaletteFx";
 import { createCursorGrabMotionFx } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import { createMainDragControllerFx } from "~/tile-interaction/fx/createMainDragControllerFx";
-import { createDeliveryRuntimeFx } from "~/game-scene/fx/createDeliveryRuntimeFx";
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 import { createDropSubmissionFx } from "~/tile-interaction/fx/createDropSubmissionFx";
-import { createMotionRuntimeFx } from "~/tile-motion/fx/createMotionRuntimeFx";
 import { createApplicationOwnerFx } from "~/tile-rendering/fx/createApplicationOwnerFx";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
@@ -26,7 +23,8 @@ import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
-import { createSpaceTransitionPresenterFx } from "~/game-scene/fx/createSpaceTransitionPresenterFx";
+import { createBoardTransitionPresenterFx } from "~/game-scene/fx/createBoardTransitionPresenterFx";
+import { createPresentationRuntimeFx } from "~/game-scene/fx/createPresentationRuntimeFx";
 import type { MainRuntime } from "~/game-scene/service/MainRuntime";
 import { createDragOriginGhostsFx } from "~/tile-interaction/fx/createDragOriginGhostsFx";
 
@@ -84,8 +82,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		const paletteState = {
 			current: yield* readScenePaletteFx(host),
 		};
-		const particleTextures = yield* createParticleTexturesFx();
-		registerRollbackFn(particleTextures.closeFx);
 		const actorStore = yield* createMainActorStoreFx();
 		const animationDriver = yield* createAnimationDriverFx({
 			frames: application.frames,
@@ -117,16 +113,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(dragOriginGhosts.closeFx);
-		const motion = yield* createMotionRuntimeFx({
-			actorStore,
-			animator,
-			application,
-			onActorSettledFn: (actor) => RendererRuntime.runSync(dragOriginGhosts.settleFx(actor)),
-			readPaletteFn: () => paletteState.current,
-			surface,
-			textures,
-		});
-		registerRollbackFn(motion.closeFx);
 		const cursorGrab = yield* createCursorGrabMotionFx({
 			animationDriver,
 			animator,
@@ -156,9 +142,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			dragOriginGhosts,
 			dropSubmission,
 			game,
-			motion,
 			onActivateFn,
-			readAckTintFn: () => paletteState.current.success,
 			surface,
 		});
 		registerRollbackFn(drag.closeFx);
@@ -186,27 +170,20 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			],
 		});
 		registerRollbackFn(camera.closeFx);
-		const delivery = yield* createDeliveryRuntimeFx({
-			actorStore,
+		const presentation = yield* createPresentationRuntimeFx({
 			animator,
-			application,
-			drag,
-			particleTextures,
-			readPaletteFn: () => paletteState.current,
+			animationDriver,
+			frames: application.frames,
 			surface,
-			textures,
 		});
-		registerRollbackFn(delivery.closeFx);
+		registerRollbackFn(presentation.closeFx);
 		const reconciler = yield* createMainReconcilerFx({
-			motion,
 			actorStore,
 			animator,
 			application,
 			drag,
-			delivery,
-			dropPresentation,
 			game,
-			particleTextures,
+			presentation,
 			readPaletteFn: () => paletteState.current,
 			surface,
 			textures,
@@ -217,7 +194,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 
 		const applyTransitionFn = (
 			transition: GameTransition,
-			delivery: "hydrate" | "present" = "present",
+			mode: "hydrate" | "present" | "board-arrive",
 		) => {
 			if (closed) return;
 			const previousSize = readBoardSizeFn({
@@ -233,27 +210,41 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			latestTransition = transition;
 			// Surface hit testing and actor reconciliation must observe one committed snapshot.
 			RendererRuntime.runSync(surface.setTransitionFx(transition));
-			if (previousSize.width !== nextSize.width || previousSize.height !== nextSize.height) {
+			if (
+				mode === "board-arrive" ||
+				previousSize.width !== nextSize.width ||
+				previousSize.height !== nextSize.height
+			) {
 				RendererRuntime.runSync(surface.redrawFx);
 				const nextLayout = readMainLayoutFn({
 					boardHeight: nextSize.height,
 					boardWidth: nextSize.width,
 				});
 				RendererRuntime.runSync(
-					camera.setSurfacesFx([
-						nextLayout,
-					]),
+					camera.setSurfacesFx(
+						[
+							nextLayout,
+						],
+						{
+							animate: mode !== "board-arrive",
+						},
+					),
 				);
 			}
 			RendererRuntime.runSync(
-				delivery === "hydrate"
+				mode === "hydrate"
 					? reconciler.hydrateFx(transition)
-					: reconciler.reconcileFx(transition),
+					: mode === "board-arrive"
+						? reconciler.boardArriveFx(transition)
+						: reconciler.reconcileFx(transition),
 			);
 		};
-		const transitionPresenter = yield* createSpaceTransitionPresenterFx({
+		const transitionPresenter = yield* createBoardTransitionPresenterFx({
 			applyTransitionFn,
-			initialSequence: latestTransition.sequence,
+			exitVisibleItemsFn: () => RendererRuntime.runSync(reconciler.exitVisibleItemsFx),
+			initialTransition: latestTransition,
+			presentation,
+			readLatestTransitionFn: game.getTransitionSnapshotFn,
 			scheduleAfterRenderFn: (workFn) =>
 				RendererRuntime.runSync(application.frames.scheduleAfterRenderFx(workFn)),
 			setInteractionBlockedFn: (blocked) =>

@@ -29,7 +29,6 @@ const item = (
 	location: TileActorItem["location"],
 	revision = `revision:${id}:1`,
 ): TileActorItem => ({
-	activityEffect: false,
 	id,
 	itemUid: id,
 

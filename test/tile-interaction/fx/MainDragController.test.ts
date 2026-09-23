@@ -252,40 +252,4 @@ describe("main drag controller: pointer", () => {
 		expect(mounted.actor.container.cursor).toBe("grab");
 		expect(mounted.actor.onPointerDownFn).not.toBeNull();
 	});
-
-	it("acknowledges activation synchronously before async command admission", () => {
-		const mounted = mountController();
-		mounted.onActivate.mockReturnValueOnce(new Promise(() => undefined));
-
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("pointerup", pointer(10, 20));
-
-		expect(mounted.onActivate).not.toHaveBeenCalled();
-		expect(mounted.actor.activityParticles.feedbackPhase).toBe("burst");
-		expect(mounted.presentationWrites).toContainEqual({
-			actor: mounted.actor,
-			channel: "activity-particles",
-			reset: true,
-			visible: true,
-		});
-		expect(mounted.animations).toContainEqual(
-			expect.objectContaining({
-				actor: mounted.actor,
-				channel: "activity-particles",
-				durationMs: 720,
-				ownerKey: `activity-particles:${mounted.actor.instanceId}`,
-			}),
-		);
-		const burst = mounted.animations.find(
-			(animation) =>
-				animation.actor === mounted.actor && animation.channel === "activity-particles",
-		);
-		if (burst?.channel === "activity-particles") burst.renderFn(0.5);
-		const tint = mounted.actor.activityParticles.particles[0]?.particle.tint ?? 0;
-		const red = (tint >> 16) & 0xff;
-		const green = (tint >> 8) & 0xff;
-		const blue = tint & 0xff;
-		expect(green).toBeGreaterThan(blue);
-		expect(blue).toBeGreaterThan(red);
-	});
 });

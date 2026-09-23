@@ -4,15 +4,10 @@ import { Effect } from "effect";
 import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import { classifyActorUpdateFn } from "~/game-scene/fn/classifyActorUpdateFn";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { destroyActorVisualFx } from "~/tile-rendering/fx/destroyActorVisualFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
-import type { ActorAnimation, ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
-import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
-import { lifecycleDurationMs, runActorLifecycleFx } from "~/tile-rendering/fx/runActorLifecycleFx";
-import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 
@@ -78,7 +73,7 @@ const createItem = ({
 		},
 		revision,
 		running: false,
-		activityEffect: false,
+
 		artworkScale: 0.8,
 		sourceUrl,
 	}) satisfies TileActorItem;
@@ -126,32 +121,6 @@ const createFrames = () => {
 		},
 		invalidate,
 		reportCriticalFailureFn,
-	};
-};
-
-const createAnimator = () => {
-	const animations: ActorAnimation[] = [];
-	return {
-		animations,
-		animator: {
-			animateFx: (animation) =>
-				Effect.sync(() => {
-					animations.push(animation);
-				}),
-			cancelActorFx: () => Effect.void,
-			cancelChannelFx: () => Effect.void,
-			cancelFx: () => Effect.void,
-			closeFx: Effect.void,
-			isChannelActiveFx: () => Effect.succeed(false),
-			setFx: (write) =>
-				Effect.sync(() => {
-					if (write.channel === "lifecycle-opacity") {
-						write.actor.container.alpha = write.alpha;
-					} else if (write.channel === "lifecycle-scale") {
-						write.actor.lifecycleLayer.scale.set(write.scale);
-					}
-				}),
-		} satisfies ActorAnimator,
 	};
 };
 
@@ -203,7 +172,6 @@ describe("texture readiness", () => {
 		const { actor, frames } = createActor({
 			textures,
 		});
-		const { animations, animator } = createAnimator();
 		const oldVisual = actor.currentVisual;
 		const oldTexture = new Texture();
 		const nextTexture = new Texture();
@@ -219,7 +187,6 @@ describe("texture readiness", () => {
 		Effect.runSync(
 			updateTileActorFx({
 				actor,
-				animator,
 				frames,
 				item: createItem({
 					revision: "revision:next",
@@ -243,11 +210,17 @@ describe("texture readiness", () => {
 		expect(actor.pendingVisual?.primary.texture).toBe(Texture.EMPTY);
 		const pendingVisual = actor.pendingVisual;
 		const transitionGeneration = actor.visualTransitionGeneration;
+		const publishedBeforeCancel = vi.fn(() => {
+			expect(actor.currentVisual).toBe(pendingVisual);
+		});
+		oldVisual.readyListeners.add({
+			onCancelFn: publishedBeforeCancel,
+			onReadyFn: () => {},
+		});
 
 		Effect.runSync(
 			updateTileActorFx({
 				actor,
-				animator,
 				frames,
 				item: createItem({
 					revision: "revision:next",
@@ -263,23 +236,13 @@ describe("texture readiness", () => {
 
 		resolves.get("resource:next")?.(nextTexture);
 		await vi.waitFor(() => {
-			expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true);
+			expect(actor.currentVisual.primary.texture).toBe(nextTexture);
 		});
-		const visualMix = animations.find(({ channel }) => channel === "visual-mix");
-		expect(visualMix).toMatchObject({
-			actor,
-			channel: "visual-mix",
-			durationMs: 950,
-		});
-		expect(actor.currentVisual).toBe(oldVisual);
-		expect(oldVisual.container.destroyed).toBe(false);
-		expect(actor.pendingVisual?.primary.texture).toBe(nextTexture);
-
-		visualMix?.onCompleteFn?.();
 		expect(actor.currentVisual.primary.texture).toBe(nextTexture);
 		expect(actor.currentVisual.container.alpha).toBe(1);
 		expect(actor.pendingVisual).toBeNull();
 		expect(oldVisual.container.destroyed).toBe(true);
+		expect(publishedBeforeCancel).toHaveBeenCalledOnce();
 
 		actor.container.destroy({
 			children: true,
@@ -288,242 +251,47 @@ describe("texture readiness", () => {
 		nextTexture.destroy();
 	});
 
-	it.each([
-		"fading",
-		"loading",
-	] as const)(
-		"reconciles a reversal to the current artwork while the superseded face is %s",
-		async (replacementState) => {
-			const { resolves, textures } = createControlledTextures();
-			const canonical = createItem();
-			const next = {
-				...canonical,
-				sourceUrl: "resource:next",
-			};
-			const { actor, frames } = createActor({
-				item: canonical,
-				textures,
-			});
-			const { animations, animator } = createAnimator();
-			const refreshFn = (item: TileActorItem) => {
-				const plan = classifyActorUpdateFn({
-					actor,
-					deliveryRetained: false,
-					directLanding: false,
-					displayItem: item,
-					motionClaimed: false,
-					pose: {
-						layer: actor.container,
-						size: 80,
-						x: 0,
-						y: 0,
-					},
-					poseChannelActive: false,
-					preserveVisual: false,
-				});
-				if (plan.item.kind === "visual") {
-					Effect.runSync(
-						updateTileActorFx({
-							actor,
-							animator,
-							frames,
-							item,
-							palette,
-							size: 80,
-							textures,
-						}),
-					);
-				} else {
-					actor.item = item;
-				}
-				return plan.item.kind;
-			};
-			await vi.waitFor(() => expect(resolves.has("resource:old")).toBe(true));
-			const originalResolveFn = resolves.get("resource:old");
-			originalResolveFn?.(Texture.WHITE);
-			await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
-			const original = actor.currentVisual;
-			refreshFn(next);
-			const replacement = actor.pendingVisual;
-			expect(replacement?.item.sourceUrl).toBe("resource:next");
-			expect(replacement?.container.alpha).toBe(0);
-			expect(actor.currentVisual).toBe(original);
-			expect(actor.item).toBe(next);
-			await vi.waitFor(() => expect(resolves.has("resource:next")).toBe(true));
-			if (replacementState === "fading") {
-				resolves.get("resource:next")?.(Texture.WHITE);
-				await vi.waitFor(() =>
-					expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true),
-				);
-				const fade = animations.find(({ channel }) => channel === "visual-mix");
-				expect(fade?.durationMs).toBe(950);
-				if (fade?.channel !== "visual-mix") throw new Error("Expected a visual crossfade");
-				fade.incoming.alpha = 0.4;
-				fade.outgoing.alpha = 0.6;
-				expect(actor.currentVisual).toBe(original);
-			}
-			const previousFadeCount = animations.filter(
-				({ channel }) => channel === "visual-mix",
-			).length;
-			// The desired artwork has reverted to the still-current A while B is pending.
-			expect(refreshFn(canonical)).toBe("visual");
-			const restored = actor.pendingVisual;
-			expect(restored?.item.sourceUrl).toBe("resource:old");
-			expect(actor.item).toBe(canonical);
-			if (replacementState === "fading") {
-				expect(original.container.alpha).toBe(0.6);
-				expect(replacement?.container.alpha).toBe(0.4);
-				animations.find(({ channel }) => channel === "visual-mix")?.onCompleteFn?.();
-				expect(actor.pendingVisual).toBe(restored);
-			}
-			expect(restored?.container.alpha).toBe(0);
-			if (replacementState === "loading") {
-				resolves.get("resource:next")?.(Texture.WHITE);
-				await vi.waitFor(() => expect(replacement?.textureState).toBe("ready"));
-				expect(animations.filter(({ channel }) => channel === "visual-mix")).toHaveLength(
-					previousFadeCount,
-				);
-				expect(actor.pendingVisual).toBe(restored);
-			}
-			await vi.waitFor(() =>
-				expect(resolves.get("resource:old")).not.toBe(originalResolveFn),
-			);
-			resolves.get("resource:old")?.(Texture.WHITE);
-			await vi.waitFor(() =>
-				expect(animations.filter(({ channel }) => channel === "visual-mix")).toHaveLength(
-					previousFadeCount + 1,
-				),
-			);
-			const restoredFade = animations
-				.filter(({ channel }) => channel === "visual-mix")
-				.at(-1);
-			expect(restoredFade?.durationMs).toBe(950);
-			expect(actor.currentVisual).not.toBe(restored);
-			restoredFade?.onCompleteFn?.();
-			expect(actor.currentVisual).toBe(restored);
-			expect(replacement?.container.destroyed).toBe(true);
-			actor.container.destroy({
-				children: true,
-			});
-		},
-	);
+	it("ignores a superseded texture load after the desired artwork reverses", async () => {
+		const { resolves, textures } = createControlledTextures();
+		const canonical = createItem();
+		const next = {
+			...canonical,
+			sourceUrl: "resource:next",
+		};
+		const { actor, frames } = createActor({
+			item: canonical,
+			textures,
+		});
+		await vi.waitFor(() => expect(resolves.has("resource:old")).toBe(true));
+		const firstOldResolveFn = resolves.get("resource:old");
+		firstOldResolveFn?.(Texture.WHITE);
+		await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
+		const original = actor.currentVisual;
 
-	it.each([
-		true,
-		false,
-	])(
-		"keeps enter scale policy durable when its original visual is superseded (scale: %s)",
-		async (animateScale) => {
-			const { resolves, textures } = createControlledTextures();
-			const { actor, frames } = createActor({
-				textures,
-			});
-			const originalVisual = actor.currentVisual;
-			const { animations, animator } = createAnimator();
-			const nextTexture = new Texture();
-			actor.container.alpha = 0;
-
-			Effect.runSync(
-				runActorLifecycleFx({
-					actor,
-					animator,
-					kind: "prepare-enter",
-					animateScale,
-				}),
-			);
-			Effect.runSync(
-				startActorEnterFx({
-					actor,
-					animator,
-				}),
-			);
-			expect(actor.container.alpha).toBe(0);
-			expect(actor.lifecycleLayer.scale.x).toBe(animateScale ? 0.8 : 1);
-			expect(animations).toEqual([]);
-
+		const updateFn = (item: TileActorItem) =>
 			Effect.runSync(
 				updateTileActorFx({
 					actor,
-					animator,
 					frames,
-					item: createItem({
-						revision: "revision:next",
-						sourceUrl: "resource:next",
-					}),
+					item,
 					palette,
 					size: 80,
 					textures,
 				}),
 			);
-			await vi.waitFor(() => {
-				expect(resolves.has("resource:next")).toBe(true);
-			});
-			resolves.get("resource:next")?.(nextTexture);
-
-			await vi.waitFor(() => {
-				expect(animations.some(({ channel }) => channel === "lifecycle-opacity")).toBe(
-					true,
-				);
-				expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true);
-			});
-			const lifecycleFade = animations.find(({ channel }) => channel === "lifecycle-opacity");
-			const lifecycleScale = animations.find(({ channel }) => channel === "lifecycle-scale");
-			const visualMix = animations.find(({ channel }) => channel === "visual-mix");
-			expect(actor.currentVisual).toBe(originalVisual);
-			visualMix?.onCompleteFn?.();
-			expect(originalVisual.container.destroyed).toBe(true);
-			expect(actor.lifecycleTargetAlpha).toBe(1);
-			expect(actor.lifecycleTransitionStarted).toBe(true);
-			expect(lifecycleFade).toMatchObject({
-				actor,
-				channel: "lifecycle-opacity",
-				durationMs: lifecycleDurationMs,
-				toAlpha: 1,
-			});
-			if (animateScale) {
-				expect(lifecycleScale).toMatchObject({
-					actor,
-					channel: "lifecycle-scale",
-					durationMs: lifecycleDurationMs,
-					toScale: 1,
-				});
-			} else {
-				expect(lifecycleScale).toBeUndefined();
-				expect(actor.lifecycleLayer.scale.x).toBe(1);
-			}
-
-			actor.container.destroy({
-				children: true,
-			});
-			nextTexture.destroy();
-		},
-	);
-
-	it("cancels an older lifecycle scale when exiting by crossfade only", () => {
-		const { textures } = createControlledTextures();
-		const { actor } = createActor({
-			textures,
-		});
-		const { animations, animator } = createAnimator();
-		const cancelChannelFx = vi.fn(animator.cancelChannelFx);
-		actor.lifecycleLayer.scale.set(0.93);
-		Effect.runSync(
-			startActorExitFx({
-				actor,
-				animator: {
-					...animator,
-					cancelChannelFx,
-				},
-				animateScale: false,
-			}),
-		);
-		expect(cancelChannelFx).toHaveBeenCalledWith(actor, "lifecycle-scale");
-		expect(animations).toHaveLength(1);
-		expect(animations[0]).toMatchObject({
-			channel: "lifecycle-opacity",
-			toAlpha: 0,
-		});
-		expect(actor.lifecycleLayer.scale.x).toBe(0.93);
+		updateFn(next);
+		const superseded = actor.pendingVisual;
+		await vi.waitFor(() => expect(resolves.has("resource:next")).toBe(true));
+		updateFn(canonical);
+		expect(superseded?.container.destroyed).toBe(true);
+		expect(actor.currentVisual).toBe(original);
+		expect(actor.pendingVisual).toBeNull();
+		expect(resolves.get("resource:old")).toBe(firstOldResolveFn);
+		resolves.get("resource:next")?.(Texture.WHITE);
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(actor.currentVisual).toBe(original);
+		expect(original.container.destroyed).toBe(false);
 		actor.container.destroy({
 			children: true,
 		});

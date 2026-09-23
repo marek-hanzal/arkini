@@ -24,7 +24,7 @@ The important dense clusters are:
 | --- | --- | --- |
 | Runtime and Production | Real behavior in both directions for aggregate validation/cleanup and canonical Runtime mutation | [`src/game-runtime/README.md`](src/game-runtime/README.md), [`src/production-line/README.md`](src/production-line/README.md) |
 | Authored schemas | Game Value is foundational; Config, Item, Location and Production compose its scalar contracts | [`src/game-config/README.md`](src/game-config/README.md) |
-| Retained scene | Game Scene executes Tile Motion/Interaction; their reverse edges are type-only. Game Shell and Game Scene also share one explicit UI behavior seam. | [`src/game-scene/README.md`](src/game-scene/README.md) |
+| Retained scene | Game Scene owns Board transitions and feedback requests; Tile Rendering draws actors and Tile Interaction owns gestures. Game Shell and Game Scene also share one explicit UI behavior seam. | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Editor persistence | Renderer products, filesystem Project Repository, MCP and Electron IPC cross through exact capability, transport and replacement lifecycles | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 | Acquisition and Estimate | Estimate and MCP consume the shared authored acquisition graph | [`src/estimate/README.md`](src/estimate/README.md) |
 
@@ -119,10 +119,9 @@ Retained gameplay rendering is downstream:
 
 ```text
 Runtime + committed events
-→ Tile Presentation semantic facts
-→ Tile Rendering actors/capabilities
-→ Tile Motion choreography
-→ Game Scene composition
+→ Tile Presentation visible actor values
+→ Game Scene reconciliation and replaceable feedback requests
+→ Tile Rendering actors and interpolation
 ```
 
 Tile Interaction owns pointer gestures and submits exact Item Interaction commands. Runtime commits immediately; animation and audio may lag, redirect, collapse or skip without gating gameplay, Tick, publication or save. See [`src/game-scene/README.md`](src/game-scene/README.md).

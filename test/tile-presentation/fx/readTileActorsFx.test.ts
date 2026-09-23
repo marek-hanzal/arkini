@@ -44,7 +44,6 @@ describe("readTileActorsFx", () => {
 				}),
 			),
 		).toMatchObject({
-			activityEffect: true,
 			badgeCount: 3,
 			badgeKind: "queue",
 			progressRatio: 0.5,
@@ -87,7 +86,6 @@ describe("readTileActorsFx", () => {
 
 	it("projects temporary lifetime without an activity effect", () => {
 		expect(readMainActor(createTemporaryTileActorRuntime())).toMatchObject({
-			activityEffect: false,
 			progressRatio: 0.6,
 		});
 	});

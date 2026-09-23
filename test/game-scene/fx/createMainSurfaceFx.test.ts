@@ -25,10 +25,22 @@ vi.mock("pixi.js", () => {
 		eventMode = "auto";
 		hitArea: unknown = null;
 		mask: Container | null = null;
+		parent: Container | null = null;
 		visible = true;
 
 		addChild(...children: Container[]) {
-			this.children.push(...children);
+			for (const child of children) {
+				child.parent?.removeChild(child);
+				this.children.push(child);
+				child.parent = this;
+			}
+		}
+
+		removeChild(child: Container) {
+			const index = this.children.indexOf(child);
+			if (index >= 0) this.children.splice(index, 1);
+			child.parent = null;
+			return child;
 		}
 
 		destroy(options?: { readonly children?: boolean }) {
@@ -139,7 +151,6 @@ const item = (
 	location: TileActorItem["location"],
 	revision = `revision:${id}:1`,
 ): TileActorItem => ({
-	activityEffect: false,
 	id,
 	itemUid: id,
 
@@ -356,7 +367,6 @@ describe("main surface", () => {
 		Effect.runSync(surface.closeFx);
 		Effect.runSync(surface.closeFx);
 
-		expect(owned).toHaveLength(6);
 		for (const displayObject of owned) {
 			if (displayObject === dropFeedbackDisplayObject) {
 				expect(displayObject.destroyed).toBe(false);

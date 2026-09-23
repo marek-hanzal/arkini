@@ -14,7 +14,7 @@ import {
 } from "./createMainReconcilerFx.test/fixture";
 
 describe("main reconciliation / drop settlement", () => {
-	it("retires a source removed while its drop was pending as soon as rejection settles", async () => {
+	it("does not resurrect a source removed while its drop was pending", async () => {
 		const source = createItem("runtime:expired-source", boardLocation);
 		const actor = createActor(source);
 		const harness = createReconcilerHarness({
@@ -68,15 +68,18 @@ describe("main reconciliation / drop settlement", () => {
 					occupant: null,
 				},
 				onReturnSettledFn,
-				previewKind: "move",
 				sourceItem: source,
-				targetItem: null,
 			}),
 		);
 		projectionProbeState.main = [];
 		Effect.runSync(harness.reconciler.reconcileFx(transition(1)));
 		expect(harness.canonicalItems.has(source.id)).toBe(false);
-		expect(harness.actors.get(source.id)).toBe(actor);
+		expect(harness.actors.has(source.id)).toBe(false);
+		expect(harness.disappears).toHaveLength(1);
+		expect(actor.container.destroyed).toBe(false);
+		expect(harness.detached).toEqual([
+			actor,
+		]);
 
 		resolveDrop({
 			kind: "reject",
@@ -85,15 +88,15 @@ describe("main reconciliation / drop settlement", () => {
 		});
 		await drop;
 
-		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).pendingActorIds.size).toBe(
-			0,
-		);
+		expect(Effect.runSync(harness.dropPresentation.isPendingActorFx(source.id))).toBe(false);
 		expect(harness.actors.has(source.id)).toBe(false);
 		expect(harness.detached).toEqual([
 			actor,
 		]);
 		expect(onReturnSettledFn).toHaveBeenCalledOnce();
 		expect(reportCriticalFailureFn).not.toHaveBeenCalled();
+		harness.disappears[0]?.onCompleteFn?.();
+		expect(actor.container.destroyed).toBe(true);
 		Effect.runSync(submission.closeFx);
 		Effect.runSync(harness.reconciler.closeFx);
 	});

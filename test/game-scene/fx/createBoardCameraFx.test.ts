@@ -393,9 +393,14 @@ it("refits the camera and reset bounds when the current board dimensions change"
 		boardHeight: 1,
 	});
 	Effect.runSync(
-		mounted.camera.setSurfacesFx([
-			next,
-		]),
+		mounted.camera.setSurfacesFx(
+			[
+				next,
+			],
+			{
+				animate: true,
+			},
+		),
 	);
 	expect(mounted.tweens).toHaveLength(1);
 	const tween = mounted.tweens[0]!;
@@ -429,17 +434,27 @@ it("retargets size fitting from the live camera and retires callbacks on close",
 		boardHeight: 1,
 	});
 	Effect.runSync(
-		mounted.camera.setSurfacesFx([
-			small,
-		]),
+		mounted.camera.setSurfacesFx(
+			[
+				small,
+			],
+			{
+				animate: true,
+			},
+		),
 	);
 	const first = mounted.tweens[0]!;
 	first.onUpdateFn(0.4);
 	const liveScale = mounted.stage.scale.x;
 	Effect.runSync(
-		mounted.camera.setSurfacesFx([
-			mainLayout,
-		]),
+		mounted.camera.setSurfacesFx(
+			[
+				mainLayout,
+			],
+			{
+				animate: true,
+			},
+		),
 	);
 	const second = mounted.tweens[1]!;
 	first.onUpdateFn(1);

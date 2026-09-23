@@ -80,14 +80,6 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 						write.actor.visualLayer.scale.set(write.factor);
 						write.actor.visualLayer.alpha = write.factor;
 						break;
-					case "activity-particles":
-						if (write.reset) {
-							for (const { particle } of write.actor.activityParticles.particles) {
-								particle.alpha = 0;
-							}
-						}
-						write.actor.activityParticles.container.visible = write.visible;
-						break;
 					case "pose":
 						write.actor.container.x = write.x;
 						write.actor.container.y = write.y;
@@ -130,10 +122,6 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const fromCrowdAlpha = actor.crowdLayer.alpha;
 					const fromDropScale = channel === "drop-target" ? actor.visualLayer.scale.x : 1;
 					const fromDropAlpha = channel === "drop-target" ? actor.visualLayer.alpha : 1;
-					const fromIncomingAlpha =
-						animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
-					const fromOutgoingAlpha =
-						animation.channel === "visual-mix" ? animation.outgoing.alpha : 0;
 					const active: ActiveAnimation = {
 						actor,
 						channel,
@@ -163,9 +151,6 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 											actor.visualLayer.alpha =
 												fromDropAlpha +
 												(animation.toFactor - fromDropAlpha) * progress;
-											break;
-										case "activity-particles":
-											animation.renderFn(progress);
 											break;
 										case "pose": {
 											const pose = animation.readPoseFn?.(progress);
@@ -202,13 +187,6 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 												fromCrowdAlpha +
 												(animation.toCrowdAlpha - fromCrowdAlpha) *
 													progress;
-											break;
-										case "visual-mix":
-											animation.incoming.alpha =
-												fromIncomingAlpha +
-												(1 - fromIncomingAlpha) * progress;
-											animation.outgoing.alpha =
-												fromOutgoingAlpha * (1 - progress);
 											break;
 									}
 								},

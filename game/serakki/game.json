@@ -316,6 +316,18 @@
 				"y": 4,
 				"space": 0,
 				"itemId": "stone-deposit"
+			},
+			{
+				"x": 8,
+				"y": 8,
+				"space": 0,
+				"itemId": "forest-portal"
+			},
+			{
+				"x": 7,
+				"y": 5,
+				"space": 2,
+				"itemId": "homeland-portal"
 			}
 		]
 	}

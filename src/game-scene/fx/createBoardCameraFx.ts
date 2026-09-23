@@ -188,7 +188,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			animationDriver.startTweenFx({
 				from: 0,
 				to: 1,
-				durationMs: 260,
+				durationMs: 650,
 				curve: {
 					kind: "ease-in-out",
 				},

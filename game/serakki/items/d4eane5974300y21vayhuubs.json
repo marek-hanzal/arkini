@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"chicken-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"t00oswv00ifkupq0qr67cb53"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "chicken-farm",
 				"title": "Build Chicken Farm",
-				"artwork": "chicken-farm",
+				"artwork": "t00oswv00ifkupq0qr67cb53",
 				"description": "Build Chicken Farm.",
 				"clockWeight": 1,
 				"default": true,

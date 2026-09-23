@@ -123,26 +123,21 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 	const sourceFiles = yield* collectSourceFilesFx({
 		input: paths.root,
 	});
-	const audioPaths = new Set(
-		descriptors
-			.filter(({ type }) => type === "music" || type === "sfx")
-			.map(({ path }) => path),
-	);
-	for (const metadataPath of sourceFiles.audioMetadata) {
-		const audioPath = `${metadataPath.slice(0, -5)}.ogg`;
-		if (!audioPaths.has(audioPath))
+	const metadataPaths = new Set(descriptors.map(({ path }) => `${path.slice(0, -4)}.json`));
+	for (const metadataPath of sourceFiles.resourceMetadata) {
+		if (!metadataPaths.has(metadataPath))
 			return yield* Effect.fail(
-				new Error(`Audio metadata ${metadataPath} requires its paired file ${audioPath}.`),
+				new Error(`Resource metadata ${metadataPath} has no paired resource.`),
 			);
 	}
-	const resourceIds = new Set<string>();
+	const resourceUids = new Set<string>();
 	for (const descriptor of descriptors) {
-		if (resourceIds.has(descriptor.id)) {
+		if (resourceUids.has(descriptor.uid)) {
 			return yield* Effect.fail(
-				new Error(`Editor resource ID ${descriptor.id} is duplicated.`),
+				new Error(`Editor resource ID ${descriptor.uid} is duplicated.`),
 			);
 		}
-		resourceIds.add(descriptor.id);
+		resourceUids.add(descriptor.uid);
 		const expectedPath = yield* paths.resourceFileFx(descriptor);
 		if (path.resolve(descriptor.path) !== expectedPath) {
 			return yield* Effect.fail(
@@ -156,11 +151,12 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 		[
 			...descriptors,
 		].sort((left, right) =>
-			left.id === right.id
+			left.uid === right.uid
 				? left.path.localeCompare(right.path)
-				: left.id.localeCompare(right.id),
+				: left.uid.localeCompare(right.uid),
 		),
-		({ id, type, path: resourcePath }) => readProjectResourceMetadataFx(id, type, resourcePath),
+		({ uid, type, path: resourcePath }) =>
+			readProjectResourceMetadataFx(uid, type, resourcePath),
 	);
 	yield* admitSerakkiVersionFx("Editor project", marker.serakki);
 

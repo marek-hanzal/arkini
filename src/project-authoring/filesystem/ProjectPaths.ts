@@ -15,15 +15,15 @@ export interface ProjectPaths {
 	readonly image: string;
 	readonly notes: string;
 	readonly itemFileFx: (props: { readonly uid: string }) => Effect.Effect<string, never, never>;
-	readonly artworkFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
-	readonly imageFileFx: (resourceId: string) => Effect.Effect<string, Error, never>;
+	readonly artworkFileFx: (resourceUid: string) => Effect.Effect<string, Error, never>;
+	readonly imageFileFx: (resourceUid: string) => Effect.Effect<string, Error, never>;
 	readonly resourceFileFx: (props: {
-		readonly id: string;
+		readonly uid: string;
 		readonly type: ResourceTypeSchema.Type;
 	}) => Effect.Effect<string, Error, never>;
-	readonly audioMetadataFileFx: (props: {
-		readonly id: string;
-		readonly type: "music" | "sfx";
+	readonly resourceMetadataFileFx: (props: {
+		readonly uid: string;
+		readonly type: ResourceTypeSchema.Type;
 	}) => Effect.Effect<string, Error, never>;
 	readonly noteFileFx: (noteId: string) => Effect.Effect<string, never, never>;
 }

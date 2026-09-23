@@ -31,7 +31,7 @@ describe("Artwork Authoring importEditorArtworkFx from Serapack", () => {
 				type: "success",
 				value: {
 					project,
-					resourceIds: [
+					resourceUids: [
 						"hero",
 					],
 				},

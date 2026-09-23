@@ -124,19 +124,19 @@ export const readSerapackFileLayoutFx = Effect.fn("readSerapackFileLayoutFx")(fu
 				if (configEnd > payloadEnd)
 					return yield* Effect.fail(new Error("Invalid pack: truncated config."));
 				let resourceOffset = configEnd;
-				const resourceIds = new Set<string>();
+				const resourceUids = new Set<string>();
 				const resources = [];
 				for (const resource of manifest.resources) {
-					if (resourceIds.has(resource.id))
+					if (resourceUids.has(resource.uid))
 						return yield* Effect.fail(
-							new Error(`Invalid pack: duplicate resource ${resource.id}.`),
+							new Error(`Invalid pack: duplicate resource ${resource.uid}.`),
 						);
-					resourceIds.add(resource.id);
+					resourceUids.add(resource.uid);
 					const offset = resourceOffset;
 					resourceOffset += resource.length;
 					if (resourceOffset > payloadEnd)
 						return yield* Effect.fail(
-							new Error(`Invalid pack: truncated resource ${resource.id}.`),
+							new Error(`Invalid pack: truncated resource ${resource.uid}.`),
 						);
 					resources.push({
 						...resource,

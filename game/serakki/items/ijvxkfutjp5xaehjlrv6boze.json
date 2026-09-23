@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"cotton-farm"
+				"g68kq5f65zhx8bdaj9ln5dti"
 			]
 		},
 		"maxQueueSize": 4,
@@ -94,7 +94,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Cotton Field",
-				"artwork": "empty-cotton-field",
+				"artwork": "mws33depcge623z30ry7sng1",
 				"description": "Prepare a new cotton field for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -136,7 +136,7 @@
 			{
 				"id": "blueprint",
 				"title": "Cotton Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Cotton Farm.",
 				"clockWeight": 1,
 				"default": false,

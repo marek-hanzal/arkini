@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
@@ -23,6 +24,7 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 				cause,
 			}),
 	});
+	const heroUid = createId();
 	const config = GameConfigSchema.parse({
 		meta: {
 			id: projectId,
@@ -33,7 +35,7 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 			},
 		},
 		resources: {
-			hero: "hero",
+			hero: heroUid,
 		},
 		music: {
 			playlist: [],
@@ -56,7 +58,7 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 		config,
 		resources: [
 			{
-				id: "hero",
+				uid: heroUid,
 				type: "image",
 				bytes: placeholderHeroBytes.slice(),
 			},

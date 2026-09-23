@@ -35,9 +35,9 @@ export const EditorMusicManager = () => {
 		readonly value: useEditorMusicManagerController.View;
 	}>;
 	const renderResourceActionFn = (resource: Project.Resource) => {
-		const inPlaylist = controller.playlistResourceIds.has(resource.id);
+		const inPlaylist = controller.playlistResourceUids.has(resource.uid);
 		const togglingPlaylist =
-			controller.playlistPending && controller.togglingPlaylistResourceId === resource.id;
+			controller.playlistPending && controller.togglingPlaylistResourceUid === resource.uid;
 		return (
 			<Tooltip
 				content={translator.textFn(inPlaylist ? "Remove from playlist" : "Add to playlist")}
@@ -49,7 +49,7 @@ export const EditorMusicManager = () => {
 					disabled={controller.playlistPending}
 					onClick={(event) => {
 						event.stopPropagation();
-						controller.togglePlaylistFn(resource.id);
+						controller.togglePlaylistFn(resource.uid);
 					}}
 					{...readDataUiFn({
 						dataUi: "EditorMusicPlaylist",

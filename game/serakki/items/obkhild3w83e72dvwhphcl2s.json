@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"empty-goose-pen"
+				"iemj1plgthrak61dsn4yrrxx"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "stock",
 				"title": "Stock Goose Pen",
-				"artwork": "goose-pen",
+				"artwork": "daow1b3ak47qy8z4cjfjcbp6",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
 				"clockWeight": 1,
 				"default": true,

@@ -14,7 +14,7 @@ import {
 
 const projectId = "edit-item-capabilities-project";
 const itemUid = "item:workshop";
-const resourceId = editorTestPayload.resources[0]?.id ?? "missing-asset";
+const resourceUid = editorTestPayload.resources[0]?.uid ?? "missing-asset";
 const productionLines = JSON.parse(
 	JSON.stringify([
 		createLine({}),
@@ -30,7 +30,7 @@ const seededConfig = GameConfigSchema.parse({
 		...editorTestPayload.config.items,
 		[itemUid]: {
 			...createDraftFn({
-				resourceId,
+				resourceUid,
 				uid: "uid:workshop",
 			}),
 			uid: itemUid,

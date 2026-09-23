@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"hop-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"fs5g5vup2as9dpzqlmghj1os"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "hop-farm",
 				"title": "Build Hop Farm",
-				"artwork": "hop-farm",
+				"artwork": "fs5g5vup2as9dpzqlmghj1os",
 				"description": "Build Hop Farm.",
 				"clockWeight": 1,
 				"default": true,

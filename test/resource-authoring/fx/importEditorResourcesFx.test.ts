@@ -31,7 +31,7 @@ const response = {
 	type: "success",
 	value: {
 		project,
-		resourceIds: [
+		resourceUids: [
 			"item-water",
 		],
 	},

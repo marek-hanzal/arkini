@@ -1,4 +1,4 @@
-import { unlink } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -16,10 +16,10 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("repository note asset relationships", () => {
-	it("validates mixed links and rewrites only the affected resource relationship", async () => {
+	it("preserves links across resource title changes and removes only deleted resource links", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
-		const hero = editorTestPayload.resources.find((resource) => resource.id === "hero");
+		const hero = editorTestPayload.resources.find((resource) => resource.uid === "hero");
 		if (hero === undefined) throw new Error("Expected the hero fixture resource.");
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
 		if (root === null) throw new Error("Managed project root missing.");
@@ -30,15 +30,16 @@ describe("repository note asset relationships", () => {
 					"spare",
 					"cover",
 					"future",
-				].map((id) => ({
-					id,
+				].map((uid) => ({
+					uid,
+					title: uid,
 					path: join(root, "image", "hero.png"),
 					size: hero.bytes.byteLength,
 					type: "image" as const,
 				})),
 			}),
 		);
-		for (const resourceIds of [
+		for (const resourceUids of [
 			[
 				"hero",
 				"hero",
@@ -53,7 +54,7 @@ describe("repository note asset relationships", () => {
 						projectId: project.projectId,
 						content: "Rejected asset links",
 						itemUids: [],
-						resourceIds,
+						resourceUids,
 					}),
 				),
 			).rejects.toBeDefined();
@@ -65,7 +66,7 @@ describe("repository note asset relationships", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [
+				resourceUids: [
 					"hero",
 					"cover",
 					"future",
@@ -78,7 +79,7 @@ describe("repository note asset relationships", () => {
 				projectId: project.projectId,
 				content: "Global",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		await expect(
@@ -86,60 +87,54 @@ describe("repository note asset relationships", () => {
 				repository.updateNoteFx({
 					...linked,
 					expectedUpdatedAtMs: linked.updatedAtMs,
-					resourceIds: [
+					resourceUids: [
 						"missing",
 					],
 				}),
 			),
 		).rejects.toBeDefined();
-		await unlink(join(root, "image", "cover.png"));
-		await unlink(join(root, "image", "future.png"));
-		const restored = await Effect.runPromise(repository.refreshProjectFx(project.projectId));
-
+		const restored = await Effect.runPromise(repository.readProjectFx(project.projectId));
+		if (restored === null) throw new Error("Missing project");
+		const beforeBytes = await readFile(join(root, "image", "hero.png"));
 		const renamed = await Effect.runPromise(
-			repository.replaceResourceFx({
-				config: {
-					...restored.config,
-					resources: {
-						...restored.config.resources,
-						hero: "cover",
-					},
-				},
-				currentId: "hero",
-				expectedRevision: restored.revision,
+			repository.saveResourceMetadataFx({
 				projectId: project.projectId,
-				resource: {
-					type: "image",
-					id: "cover",
-				},
+				expectedRevision: restored.revision,
+				resourceUid: "hero",
+				title: "Cover",
 			}),
 		);
+		expect(renamed.config).toEqual(restored.config);
+		expect(await readFile(join(root, "image", "hero.png"))).toEqual(beforeBytes);
+		expect(renamed.resources.find(({ uid }) => uid === "hero")?.title).toBe("Cover");
 		const afterRename = (
 			await Effect.runPromise(repository.listNotesFx(project.projectId))
 		).find((note) => note.noteId === linked.noteId);
 		expect(afterRename).toEqual({
 			...linked,
-			resourceIds: [
+			resourceUids: [
+				"hero",
 				"cover",
 				"future",
 				"spare",
 			],
 			updatedAtMs: expect.any(Number),
 		});
-		expect(afterRename!.updatedAtMs).toBeGreaterThan(global.updatedAtMs);
+		expect(afterRename!.updatedAtMs).toBe(linked.updatedAtMs);
 
 		await Effect.runPromise(
 			repository.deleteResourceFx({
 				expectedRevision: renamed.revision,
 				projectId: project.projectId,
-				resourceId: "spare",
+				resourceUid: "spare",
 			}),
 		);
 		const afterDelete = await Effect.runPromise(repository.listNotesFx(project.projectId));
 		expect(afterDelete).toEqual([
 			{
 				...afterRename,
-				resourceIds: [
+				resourceUids: [
+					"hero",
 					"cover",
 					"future",
 				],

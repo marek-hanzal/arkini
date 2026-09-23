@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"fruit-farm"
+				"pwz8m2ffgyrsrfopn2bmm8w1"
 			]
 		},
 		"maxQueueSize": 4,
@@ -109,7 +109,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Fruit Garden",
-				"artwork": "empty-fruit-garden",
+				"artwork": "xwzvezb9ewectwm016e5vln7",
 				"description": "Prepare a new empty growing plot.",
 				"clockWeight": 1,
 				"default": false,
@@ -151,7 +151,7 @@
 			{
 				"id": "blueprint",
 				"title": "Fruit Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Fruit Farm.",
 				"clockWeight": 1,
 				"default": false,

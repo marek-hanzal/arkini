@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"stoneworks"
+				"fz36qa41hs9xro6g0jp08592"
 			]
 		},
 		"maxQueueSize": 4,
@@ -16,7 +16,7 @@
 			{
 				"id": "stone-block",
 				"title": "Stone Block",
-				"artwork": "stone-block",
+				"artwork": "bu70ua4etisvo6qz4lv1jz61",
 				"description": "You'll get better stone from simple good old stone boulder.",
 				"clockWeight": 1,
 				"default": true,

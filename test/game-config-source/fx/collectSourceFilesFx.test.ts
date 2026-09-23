@@ -51,8 +51,8 @@ describe("collectSourceFilesFx", () => {
 				collectSourceFilesFx({
 					input: directory,
 				}).pipe(
-					Effect.map(({ json, resources, audioMetadata }) => ({
-						audioMetadata: audioMetadata.map((file) =>
+					Effect.map(({ json, resources, resourceMetadata }) => ({
+						resourceMetadata: resourceMetadata.map((file) =>
 							path.relative(directory, file).split(path.sep).join("/"),
 						),
 						json: json.map((file) =>
@@ -68,7 +68,7 @@ describe("collectSourceFilesFx", () => {
 			const result = yield* collectRelative(project);
 
 			expect(result).toEqual({
-				audioMetadata: [
+				resourceMetadata: [
 					"music/theme.json",
 					"sfx/job-start.json",
 				],

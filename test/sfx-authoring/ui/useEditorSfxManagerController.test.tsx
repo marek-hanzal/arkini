@@ -72,19 +72,22 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		revision: 7,
 		resources: [
 			{
-				id: "old-start",
+				uid: "old-start",
+				title: "old-start",
 				size: 47,
 				type: "sfx",
 				version: "1",
 			},
 			{
-				id: "shared-sfx",
+				uid: "shared-sfx",
+				title: "shared-sfx",
 				size: 48,
 				type: "sfx",
 				version: "1",
 			},
 			{
-				id: "unused-sfx",
+				uid: "unused-sfx",
+				title: "unused-sfx",
 				size: 49,
 				type: "sfx",
 				version: "1",
@@ -134,20 +137,20 @@ afterEach(async () => {
 
 describe("useEditorSfxManagerController", () => {
 	it("filters searched SFX by assignment usage", async () => {
-		expect(controller?.sfx.map(({ id }) => id)).toEqual([
+		expect(controller?.sfx.map(({ uid }) => uid)).toEqual([
 			"old-start",
 			"shared-sfx",
 			"unused-sfx",
 		]);
 
 		await act(async () => controller?.setViewFn("assigned"));
-		expect(controller?.sfx.map(({ id }) => id)).toEqual([
+		expect(controller?.sfx.map(({ uid }) => uid)).toEqual([
 			"old-start",
 			"shared-sfx",
 		]);
 
 		await act(async () => controller?.setViewFn("unused"));
-		expect(controller?.sfx.map(({ id }) => id)).toEqual([
+		expect(controller?.sfx.map(({ uid }) => uid)).toEqual([
 			"unused-sfx",
 		]);
 	});
@@ -199,7 +202,7 @@ describe("useEditorSfxManagerController", () => {
 		await act(async () => controller?.revealResourceFn("old-start"));
 		expect(controller?.view).toBe("all");
 		expect(controller?.query).toBe("");
-		expect(controller?.sfx.some(({ id }) => id === "old-start")).toBe(true);
+		expect(controller?.sfx.some(({ uid }) => uid === "old-start")).toBe(true);
 		const firstRequest = controller?.revealedResource;
 		await act(async () => controller?.revealResourceFn("old-start"));
 		expect(controller?.revealedResource).toEqual({
@@ -305,7 +308,7 @@ describe("useEditorSfxManagerController", () => {
 		expect(state.optimizeResourcesFn).toHaveBeenCalledWith({
 			expectedRevision: 7,
 			kind: "optimize",
-			resourceIds: [
+			resourceUids: [
 				"old-start",
 				"shared-sfx",
 				"unused-sfx",

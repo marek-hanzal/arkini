@@ -28,7 +28,7 @@ describe("readGameSourceFilesFx", () => {
 					],
 					[
 						"music/valid.json",
-						'{"name":"Dusty Plains"}',
+						'{"title":"Dusty Plains"}',
 					],
 					[
 						"music/missing.ogg",
@@ -36,7 +36,7 @@ describe("readGameSourceFilesFx", () => {
 					],
 					[
 						"sfx/orphan.json",
-						'{"name":"Lost Bell"}',
+						'{"title":"Lost Bell"}',
 					],
 					[
 						"sfx/invalid.ogg",
@@ -44,7 +44,7 @@ describe("readGameSourceFilesFx", () => {
 					],
 					[
 						"sfx/invalid.json",
-						'{"name":"  "}',
+						'{"title":"  "}',
 					],
 					[
 						"sfx/malformed.ogg",
@@ -60,7 +60,7 @@ describe("readGameSourceFilesFx", () => {
 					],
 					[
 						"music/unknown.json",
-						'{"name":"Track","extra":true}',
+						'{"title":"Track","extra":true}',
 					],
 				] as const)
 					yield* fileSystem.writeFileString(path.join(input, relative), source);
@@ -89,16 +89,16 @@ describe("readGameSourceFilesFx", () => {
 					expect.arrayContaining([
 						expect.objectContaining({
 							source: path.join(input, "music/missing.json"),
-							issueCode: "audio-resource-metadata-missing",
+							issueCode: "resource-metadata-missing",
 						}),
 						expect.objectContaining({
 							source: path.join(input, "sfx/orphan.json"),
-							issueCode: "audio-resource-body-missing",
+							issueCode: "resource-body-missing",
 						}),
 						expect.objectContaining({
 							source: path.join(input, "sfx/invalid.json"),
 							path: [
-								"name",
+								"title",
 							],
 							code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
 						}),

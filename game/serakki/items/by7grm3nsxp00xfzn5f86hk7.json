@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"stoneworks"
+				"so7r094glj6wfe6yoveiclrg",
+				"fz36qa41hs9xro6g0jp08592"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "stoneworks",
 				"title": "Build Stoneworks",
-				"artwork": "stoneworks",
+				"artwork": "fz36qa41hs9xro6g0jp08592",
 				"description": "Build a Stoneworks.",
 				"clockWeight": 1,
 				"default": true,

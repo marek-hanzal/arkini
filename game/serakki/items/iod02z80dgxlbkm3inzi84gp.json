@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sick-chicken"
+				"gzw9pd0xcl2a5kg6zqzr0zly"
 			]
 		},
 		"units": {
@@ -41,7 +41,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "sick-chicken",
+				"artwork": "gzw9pd0xcl2a5kg6zqzr0zly",
 				"description": "Wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 2,
@@ -148,7 +148,7 @@
 			{
 				"id": "spread-disease",
 				"title": "Spread Disease",
-				"artwork": "disease",
+				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "The sick animal may contaminate its immediate surroundings.",
 				"clock": true,
 				"clockWeight": 4,

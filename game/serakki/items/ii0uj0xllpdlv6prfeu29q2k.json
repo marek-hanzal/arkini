@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"magic-sawmill"
+				"so7r094glj6wfe6yoveiclrg",
+				"hi0uz4x3434ealyz05xk7bwb"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "magic-sawmill",
 				"title": "Magic Sawmill",
-				"artwork": "magic-sawmill",
+				"artwork": "hi0uz4x3434ealyz05xk7bwb",
 				"description": "Better sawmill-jack",
 				"default": true,
 				"clockWeight": 1,

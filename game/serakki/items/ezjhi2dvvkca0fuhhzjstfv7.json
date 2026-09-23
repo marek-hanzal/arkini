@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"dye-farm"
+				"wd9pts2jmrb76pkx47xjq499"
 			]
 		},
 		"maxQueueSize": 4,
@@ -94,7 +94,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Dye Field",
-				"artwork": "empty-dye-field",
+				"artwork": "p44npmtdzw2xjxl2ce2assca",
 				"description": "Prepare a new dye field for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -136,7 +136,7 @@
 			{
 				"id": "blueprint",
 				"title": "Dye Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Dye Farm.",
 				"clockWeight": 1,
 				"default": false,

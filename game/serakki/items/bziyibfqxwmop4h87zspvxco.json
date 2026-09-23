@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"treasure-chest-t2"
+				"w0es5pxxoq5f5yz4x0sow9jq"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "open-supplies",
 				"title": "Open the Townhall II Supplies",
-				"artwork": "treasure-chest-t2",
+				"artwork": "w0es5pxxoq5f5yz4x0sow9jq",
 				"description": "Unpack a few reusable containers for the first proper medicine batches.",
 				"clockWeight": 1,
 				"default": true,

@@ -16,8 +16,8 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 		templates: source,
 		start: source,
 		items: Object.fromEntries(
-			Object.keys(project.config.items).map((id) => [
-				id,
+			Object.keys(project.config.items).map((uid) => [
+				uid,
 				source,
 			]),
 		),
@@ -30,9 +30,9 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 		...validateGameResourcesFn({
 			config: project.config,
 			provenance,
-			resources: project.resources.map(({ id, type }) => ({
-				id,
-				path: `${source}/${type}/${id}.png`,
+			resources: project.resources.map(({ uid, type }) => ({
+				uid,
+				path: `${source}/${type}/${uid}.png`,
 				type,
 			})),
 		}),

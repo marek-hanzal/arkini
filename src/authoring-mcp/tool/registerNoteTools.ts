@@ -30,7 +30,7 @@ const NoteCollectionInputSchema = z
 			.default(25)
 			.describe("Maximum notes per page; defaults to 25 and is capped at 100."),
 		itemUid: IdSchema.optional().describe("Only notes linked to this immutable item UID."),
-		resourceId: IdSchema.optional().describe(
+		resourceUid: IdSchema.optional().describe(
 			"Only notes linked to this resource ID; all supplied filters must match.",
 		),
 		query: z
@@ -63,7 +63,7 @@ const CreateNoteInputSchema = z
 		itemUids: NoteSchema.shape.itemUids.describe(
 			"Complete unique list of existing immutable item UIDs; use [] for no item links.",
 		),
-		resourceIds: NoteSchema.shape.resourceIds.describe(
+		resourceUids: NoteSchema.shape.resourceUids.describe(
 			"Complete unique list of existing resource IDs; use [] for no resource links.",
 		),
 	})
@@ -89,7 +89,7 @@ const EditNoteInputSchema = noteMutationSchema
 		itemUids: NoteSchema.shape.itemUids.describe(
 			"Complete replacement list of immutable item UIDs; omitting a previous UID unlinks it.",
 		),
-		resourceIds: NoteSchema.shape.resourceIds.describe(
+		resourceUids: NoteSchema.shape.resourceUids.describe(
 			"Complete replacement list of resource IDs; omitting a previous ID unlinks it.",
 		),
 	})
@@ -126,15 +126,15 @@ const readLinkedItemsFn = (note: NoteSchema.Type, project: Project) =>
 	});
 
 const readLinkedResourcesFn = (note: NoteSchema.Type, project: Project) =>
-	note.resourceIds.map((id) => {
-		const resource = project.resources.find((candidate) => candidate.id === id);
+	note.resourceUids.map((uid) => {
+		const resource = project.resources.find((candidate) => candidate.uid === uid);
 		return {
-			id,
+			uid,
 			type: resource?.type ?? null,
-			...(resource?.name === undefined
+			...(resource?.title === undefined
 				? {}
 				: {
-						name: resource.name,
+						title: resource.title,
 					}),
 		};
 	});
@@ -148,7 +148,7 @@ const readNoteCollectionTextFn = (
 	const matches = notes.filter(
 		(note) =>
 			(input.itemUid === undefined || note.itemUids.includes(input.itemUid)) &&
-			(input.resourceId === undefined || note.resourceIds.includes(input.resourceId)) &&
+			(input.resourceUid === undefined || note.resourceUids.includes(input.resourceUid)) &&
 			(query === undefined ||
 				query.length === 0 ||
 				note.content.toLowerCase().includes(query)),
@@ -186,7 +186,7 @@ const readNoteCollectionTextFn = (
 						[
 							`- ${note.noteId}`,
 							`  Linked items: ${JSON.stringify(readLinkedItemsFn(note, project))}`,
-							`  Resource IDs: ${JSON.stringify(note.resourceIds)}`,
+							`  Resource UIDs: ${JSON.stringify(note.resourceUids)}`,
 							`  Linked resources: ${JSON.stringify(readLinkedResourcesFn(note, project))}`,
 							`  Created: ${new Date(note.createdAtMs).toISOString()}`,
 							`  Updated: ${new Date(note.updatedAtMs).toISOString()}`,
@@ -245,7 +245,7 @@ export const registerNoteToolsFn = ({
 		"note_collection",
 		{
 			description:
-				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceId filters require matching item and resource links. Linked items include their immutable UIDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Serapacks.",
+				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceUid filters require matching item and resource links. Linked items include their immutable UIDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Serapacks.",
 			inputSchema: NoteCollectionInputSchema,
 		},
 		async (input) =>
@@ -298,7 +298,7 @@ export const registerNoteToolsFn = ({
 				"Create and persist one Markdown note in the open project. Notes remain outside Serapacks.",
 			inputSchema: CreateNoteInputSchema,
 		},
-		async ({ content, itemUids, resourceIds }) =>
+		async ({ content, itemUids, resourceUids }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
@@ -307,7 +307,7 @@ export const registerNoteToolsFn = ({
 								projectId: project.projectId,
 								content,
 								itemUids,
-								resourceIds,
+								resourceUids,
 							})
 							.pipe(
 								Effect.tap(() =>
@@ -329,7 +329,7 @@ export const registerNoteToolsFn = ({
 				"Replace complete Markdown content, item and resource links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
 			inputSchema: EditNoteInputSchema,
 		},
-		async ({ content, expectedUpdatedAtMs, itemUids, resourceIds, noteId }) =>
+		async ({ content, expectedUpdatedAtMs, itemUids, resourceUids, noteId }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
@@ -338,7 +338,7 @@ export const registerNoteToolsFn = ({
 								projectId: project.projectId,
 								content,
 								itemUids,
-								resourceIds,
+								resourceUids,
 								expectedUpdatedAtMs,
 								noteId,
 							})

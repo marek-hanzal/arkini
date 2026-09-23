@@ -14,15 +14,15 @@ import { ProjectImageLibrary } from "~/project-authoring/ui/ProjectImageLibrary"
 /** Presents the project-wide launcher hero and About portraits. */
 export const ProjectImagesDetail = ({ project }: { readonly project: Project }) => {
 	const translator = useTranslator();
-	const heroResourceId = project.config.resources.hero;
-	const heroUrl = useResourceUrl(heroResourceId);
+	const heroResourceUid = project.config.resources.hero;
+	const heroUrl = useResourceUrl(heroResourceUid);
 	const avatars = ProjectAvatarKeys.flatMap((slot) => {
-		const resourceId = project.config.resources[slot];
-		return resourceId === undefined
+		const resourceUid = project.config.resources[slot];
+		return resourceUid === undefined
 			? []
 			: [
 					{
-						resourceId,
+						resourceUid,
 						slot,
 					},
 				];
@@ -37,7 +37,7 @@ export const ProjectImagesDetail = ({ project }: { readonly project: Project }) 
 				dataUi="EditorProjectHeroDetailCard"
 			>
 				{heroUrl === undefined ? (
-					<span className="font-mono text-sm text-muted">{heroResourceId}</span>
+					<span className="font-mono text-sm text-muted">{heroResourceUid}</span>
 				) : (
 					<img
 						className="max-h-[45dvh] w-full max-w-3xl object-contain"
@@ -69,13 +69,13 @@ export const ProjectImagesDetail = ({ project }: { readonly project: Project }) 
 					/>
 				) : (
 					<ul className="grid grid-cols-2 gap-x-6 gap-y-3">
-						{avatars.map(({ resourceId, slot }) => (
+						{avatars.map(({ resourceUid, slot }) => (
 							<li
 								className="flex min-w-0 justify-center"
 								key={slot}
 							>
 								<div className="flex min-w-0 items-center gap-3 text-foreground">
-									<EditorResourceThumbnail resourceId={resourceId} />
+									<EditorResourceThumbnail resourceUid={resourceUid} />
 									<span className="truncate font-mono text-sm font-semibold">
 										{slot}
 									</span>

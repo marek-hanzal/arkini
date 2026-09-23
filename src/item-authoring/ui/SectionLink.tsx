@@ -21,7 +21,7 @@ export const SectionLink = ({
 	create,
 	itemUid,
 	projectId,
-	resourceId,
+	resourceUid,
 	section,
 }: {
 	readonly defaultDraft?: boolean;
@@ -30,7 +30,7 @@ export const SectionLink = ({
 	readonly create?: boolean;
 	readonly itemUid: string;
 	readonly projectId: string;
-	readonly resourceId?: string;
+	readonly resourceUid?: string;
 	readonly section: SectionDescriptor;
 }) => {
 	const translator = useTranslator();
@@ -63,10 +63,10 @@ export const SectionLink = ({
 					: {
 							create,
 						}),
-				...(resourceId === undefined
+				...(resourceUid === undefined
 					? {}
 					: {
-							resourceId,
+							resourceUid,
 						}),
 			}}
 			activeProps={activeProps}

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"rapeseed-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"w9p7m4v0s8q3pjmbvpc7xda4"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "rapeseed-farm",
 				"title": "Build Rapeseed Farm",
-				"artwork": "rapeseed-farm",
+				"artwork": "w9p7m4v0s8q3pjmbvpc7xda4",
 				"description": "Build Rapeseed Farm.",
 				"clockWeight": 1,
 				"default": true,

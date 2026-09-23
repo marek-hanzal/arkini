@@ -54,8 +54,9 @@ it("filters by live resource note links rather than matching item links and pres
 			"forge",
 			"forge-overlay",
 			"item-only",
-		].map((id) => ({
-			id,
+		].map((uid) => ({
+			uid,
+			title: uid,
 			type: "artwork",
 			size: 0,
 			version: "1",
@@ -73,7 +74,7 @@ it("filters by live resource note links rather than matching item links and pres
 			noteId: "note",
 			projectId: "sample",
 			content: "Refine the artwork",
-			resourceIds: [
+			resourceUids: [
 				"forge",
 				"forge-overlay",
 			],
@@ -86,23 +87,23 @@ it("filters by live resource note links rather than matching item links and pres
 	];
 	state.loading = false;
 	await act(async () => root?.render(<Probe query="" />));
-	expect(library?.resources.map(({ id }) => id)).toEqual([
+	expect(library?.resources.map(({ uid }) => uid)).toEqual([
 		"forge",
 		"forge-overlay",
 	]);
 	expect(library?.notesLoading).toBe(false);
 	await act(async () => root?.render(<Probe query="forge-overlay" />));
-	expect(library?.resources[0]?.id).toBe("forge-overlay");
+	expect(library?.resources[0]?.uid).toBe("forge-overlay");
 	state.notes = [
 		{
 			...state.notes[0]!,
-			resourceIds: [
+			resourceUids: [
 				"item-only",
 			],
 		},
 	];
 	await act(async () => root?.render(<Probe query="" />));
-	expect(library?.resources.map(({ id }) => id)).toEqual([
+	expect(library?.resources.map(({ uid }) => uid)).toEqual([
 		"item-only",
 	]);
 });

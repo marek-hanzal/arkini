@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"cow-farm"
+				"idjjruev1o20fc0k5r90nppr"
 			]
 		},
 		"maxQueueSize": 4,
@@ -16,7 +16,7 @@
 			{
 				"id": "cow",
 				"title": "Cow",
-				"artwork": "cow",
+				"artwork": "cu5g8wg1z1z5egmgcf3x02jb",
 				"description": "Feed and water a cow before releasing it from a nearby populated pen.",
 				"clockWeight": 1,
 				"default": true,
@@ -109,7 +109,7 @@
 			{
 				"id": "empty-cow-pen",
 				"title": "Prepare Cow Pen",
-				"artwork": "empty-cow-pen",
+				"artwork": "gb89ubbwj3xq884llit16hyw",
 				"description": "Prepare a new empty enclosure using 3 planks.",
 				"clockWeight": 1,
 				"default": false,
@@ -163,7 +163,7 @@
 			{
 				"id": "blueprint",
 				"title": "Cow Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Cow Farm.",
 				"clockWeight": 1,
 				"default": false,

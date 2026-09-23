@@ -10,7 +10,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"base-camp"
+				"qtxp6ohylrzr12j45nvjl8fu"
 			]
 		},
 		"maxQueueSize": 1,
@@ -18,7 +18,7 @@
 			{
 				"id": "lumber-camp-blueprint",
 				"title": "Lumber Camp Blueprint",
-				"artwork": "lumber-camp",
+				"artwork": "vmfdb9sa06isuopjs1kqn7n2",
 				"description": "Sketch a place dedicated to turning nearby trees into a steady supply of wood. Civilization rarely begins elegantly, but it often begins with lumber.",
 				"clockWeight": 1,
 				"default": false,
@@ -118,7 +118,7 @@
 			{
 				"id": "forester-blueprint",
 				"title": "Forester Blueprint",
-				"artwork": "forester",
+				"artwork": "fg49qoxb45alma2nc715rspz",
 				"description": "Sketch a small forestry post for keeping the settlement supplied with renewable trees instead of slowly deleting the map.",
 				"clock": false,
 				"clockWeight": 1,
@@ -234,7 +234,7 @@
 			{
 				"id": "stonemason-camp-blueprint",
 				"title": "Stonemason Camp Blueprint",
-				"artwork": "stonemason-camp",
+				"artwork": "u0ugyubcxh6gng4hljmts53j",
 				"description": "Draw plans for a rough stone-working camp. Heavy rocks become much more useful once somebody agrees where to put them.",
 				"clockWeight": 1,
 				"default": false,
@@ -334,7 +334,7 @@
 			{
 				"id": "townhall-t1-blueprint",
 				"title": "Townhall I Blueprint",
-				"artwork": "townhall-t1",
+				"artwork": "c7uw765u5c2hqnjvv3zmwkgn",
 				"description": "The campsite is starting to look suspiciously permanent. Put the settlement on paper and give all this chaos an address.",
 				"clockWeight": 1,
 				"default": false,
@@ -513,7 +513,7 @@
 			{
 				"id": "house-t1-blueprint",
 				"title": "House - Tier 1 Blueprint",
-				"artwork": "house-t1",
+				"artwork": "ucep41zyvgbrif6rlcqdabk1",
 				"description": "Four walls, a roof, and the radical idea that people should not sleep next to the wood pile forever.",
 				"clockWeight": 1,
 				"default": false,
@@ -613,7 +613,7 @@
 			{
 				"id": "campfire",
 				"title": "Campfire",
-				"artwork": "campfire",
+				"artwork": "gjqw5dyec2yuimlommt648er",
 				"description": "A proper camp needs somewhere warm to gather, cook, and accidentally test the flammability of nearby objects.",
 				"clockWeight": 1,
 				"default": false,
@@ -682,7 +682,7 @@
 			{
 				"id": "explorer-blueprint",
 				"title": "Explorer Blueprint",
-				"artwork": "explorer",
+				"artwork": "u79x20w1h96ptfjkdcyv8ojp",
 				"description": "Plans for someone whose job is to walk into the forest and return with tracks, wildlife, stories, or occasionally problems.",
 				"clockWeight": 1,
 				"default": false,
@@ -807,7 +807,7 @@
 			{
 				"id": "hunter-blueprint",
 				"title": "Hunter Blueprint",
-				"artwork": "hunter",
+				"artwork": "rev9r1cphdn05gqh3wj4w7pj",
 				"description": "Plans for someone who solves wildlife opportunities with considerably less diplomacy. Efficient, messy, useful.",
 				"clockWeight": 1,
 				"default": false,

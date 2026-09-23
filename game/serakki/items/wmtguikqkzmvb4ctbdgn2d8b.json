@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"sugar-cane-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"qpfdqjecb4rrkyaxjxcdo3hc"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "sugar-cane-farm",
 				"title": "Build Sugar Cane Farm",
-				"artwork": "sugar-cane-farm",
+				"artwork": "qpfdqjecb4rrkyaxjxcdo3hc",
 				"description": "Build Sugar Cane Farm.",
 				"clockWeight": 1,
 				"default": true,

@@ -14,13 +14,13 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		projectId: "project",
 		resources: [
 			{
-				id: "track-a",
-				name: "Forest",
+				uid: "track-a",
+				title: "Forest",
 				type: "music",
 			},
 			{
-				id: "track-b",
-				name: "Tavern",
+				uid: "track-b",
+				title: "Tavern",
 				type: "music",
 			},
 		],

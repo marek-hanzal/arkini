@@ -34,14 +34,15 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		revision: 7,
 		resources: [
 			{
-				id: "opening-theme",
+				uid: "opening-theme",
+				title: "opening-theme",
 				size: 47,
 				type: "music",
 				version: "1",
 			},
 			{
-				id: "job-start",
-				name: "Gentle bell",
+				uid: "job-start",
+				title: "Gentle bell",
 				size: 23,
 				type: "sfx",
 				version: "1",
@@ -55,7 +56,7 @@ vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
 		new Map([
 			[
 				"job-start",
-				"serakki://app/editor/resource?resourceId=job-start",
+				"serakki://app/editor/resource?resourceUid=job-start",
 			],
 		]),
 }));
@@ -127,7 +128,7 @@ afterEach(async () => {
 
 describe("useEditorAudioResourceManagerController", () => {
 	it("owns SFX import, name filtering and lazy preview", async () => {
-		expect(controller?.resources.map(({ id }) => id)).toEqual([
+		expect(controller?.resources.map(({ uid }) => uid)).toEqual([
 			"job-start",
 		]);
 
@@ -163,11 +164,11 @@ describe("useEditorAudioResourceManagerController", () => {
 		expect(input.value).toBe("");
 
 		await act(async () => controller?.togglePlaybackFn("job-start"));
-		expect(AudioStub.instances[0]?.src).toContain("resourceId=job-start");
+		expect(AudioStub.instances[0]?.src).toContain("resourceUid=job-start");
 		expect(AudioStub.instances[0]?.volume).toBeCloseTo(0.8);
 
 		await act(async () => controller?.setQueryFn("Gentle bell"));
-		expect(controller?.resources.map(({ id }) => id)).toEqual([
+		expect(controller?.resources.map(({ uid }) => uid)).toEqual([
 			"job-start",
 		]);
 		await act(async () => controller?.setQueryFn("opening"));

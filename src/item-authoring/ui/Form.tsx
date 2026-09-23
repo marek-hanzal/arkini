@@ -11,15 +11,15 @@ const useDraft = (
 	defaultDraft: boolean | undefined,
 	defaultTitle: string | undefined,
 	uid: string,
-	resourceId?: string,
+	resourceUid?: string,
 ): ItemSchema.Type => {
 	const project = useEditorProject();
 	return useMemo(() => {
 		const draft = createDraftFn({
 			draft: defaultDraft,
-			resourceId:
-				resourceId ??
-				project.resources.find(({ type }) => type === "artwork")?.id ??
+			resourceUid:
+				resourceUid ??
+				project.resources.find(({ type }) => type === "artwork")?.uid ??
 				"missing-artwork",
 			uid,
 		});
@@ -35,7 +35,7 @@ const useDraft = (
 		defaultDraft,
 		defaultTitle,
 		project.resources,
-		resourceId,
+		resourceUid,
 		uid,
 	]);
 };
@@ -53,7 +53,7 @@ interface FormProps extends PropsWithChildren {
 	readonly outcomeRollIndex?: number;
 	readonly outcomeIndex?: number;
 	readonly productionLineId?: string;
-	readonly resourceId?: string;
+	readonly resourceUid?: string;
 	readonly sectionId?: SectionId;
 	readonly uid: string;
 }
@@ -73,11 +73,11 @@ export const Form = ({
 	outcomeRollIndex,
 	outcomeIndex,
 	productionLineId,
-	resourceId,
+	resourceUid,
 	sectionId = "identity",
 	uid,
 }: FormProps) => {
-	const draft = useDraft(defaultDraft, defaultTitle, uid, resourceId);
+	const draft = useDraft(defaultDraft, defaultTitle, uid, resourceUid);
 	const persistedItem = useItemByUid(uid);
 	if (persistedItem === undefined && create !== true) return <NotFound uid={uid} />;
 	const initialItem = persistedItem ?? draft;
@@ -99,7 +99,7 @@ export const Form = ({
 			outcomeRollIndex={outcomeRollIndex}
 			outcomeIndex={outcomeIndex}
 			productionLineId={productionLineId}
-			resourceId={resourceId}
+			resourceUid={resourceUid}
 			sectionId={sectionId}
 		>
 			{children}

@@ -23,7 +23,7 @@ const InstallationSchema = z
 		resources: z.array(
 			z
 				.object({
-					id: z.string().min(1),
+					uid: z.string().min(1),
 					type: ResourceTypeSchema,
 					path: z.string().min(1),
 					size: z.number().int().nonnegative(),
@@ -125,7 +125,7 @@ export const installSerapackFileFx = Effect.fn("installSerapackFileFx")(function
 			projectRevision: extracted.projectRevision,
 			packageId: extracted.packageId,
 			resources: extracted.resources.map((resource) => ({
-				id: resource.id,
+				uid: resource.uid,
 				type: resource.type,
 				path: relative(pending, resource.path),
 				size: resource.size,

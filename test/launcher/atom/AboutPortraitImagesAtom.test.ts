@@ -45,17 +45,17 @@ const payload = {
 	}),
 	resources: [
 		{
-			id: "hero",
+			uid: "hero",
 			type: "image",
 			url: "serakki://game/resource/hero",
 		},
 		{
-			id: "avatar:one",
+			uid: "avatar:one",
 			type: "image",
 			url: "serakki://game/resource/avatar-one",
 		},
 		{
-			id: "avatar:two",
+			uid: "avatar:two",
 			type: "image",
 			url: "serakki://game/resource/avatar-two",
 		},

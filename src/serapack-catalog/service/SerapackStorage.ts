@@ -22,7 +22,7 @@ export namespace SerapackStorage {
 	export interface InstalledFile extends FilesystemFile {
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<{
-			readonly id: string;
+			readonly uid: string;
 			readonly type: ResourceTypeSchema.Type;
 			readonly url: string;
 		}>;

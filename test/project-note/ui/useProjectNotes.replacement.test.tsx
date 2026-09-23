@@ -50,7 +50,7 @@ it("rereads retained Notes after hard Refresh without an authoring revision chan
 			projectId: project.projectId,
 			content: "Original note",
 			itemUids: [],
-			resourceIds: [],
+			resourceUids: [],
 			createdAtMs: 1,
 			updatedAtMs: 1,
 		},

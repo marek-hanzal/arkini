@@ -72,13 +72,13 @@ const createProjectConfigFn = (
 ): GameConfigSchema.Type => {
 	const avatarResources = Object.fromEntries(
 		ProjectAvatarKeys.flatMap((key, index) => {
-			const resourceId = value.avatars[index];
-			return resourceId === undefined
+			const resourceUid = value.avatars[index];
+			return resourceUid === undefined
 				? []
 				: [
 						[
 							key,
-							resourceId,
+							resourceUid,
 						],
 					];
 		}),
@@ -105,11 +105,11 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 	introduction: project.config.meta.introduction ?? "",
 	hero: project.config.resources.hero,
 	avatars: ProjectAvatarKeys.flatMap((key) => {
-		const resourceId = project.config.resources[key];
-		return resourceId === undefined
+		const resourceUid = project.config.resources[key];
+		return resourceUid === undefined
 			? []
 			: [
-					resourceId,
+					resourceUid,
 				];
 	}),
 	board: {

@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"pig-farm"
+				"mg241ly73avd22s3ncv4e5q9"
 			]
 		},
 		"maxQueueSize": 4,
@@ -16,7 +16,7 @@
 			{
 				"id": "pig",
 				"title": "Pig",
-				"artwork": "pig",
+				"artwork": "hklguucs52jngeyhf2cmmz0b",
 				"description": "Feed and water a pig before releasing it from a nearby populated pen.",
 				"clockWeight": 1,
 				"default": true,
@@ -109,7 +109,7 @@
 			{
 				"id": "empty-pig-pen",
 				"title": "Prepare Pig Pen",
-				"artwork": "empty-pig-pen",
+				"artwork": "dmyisodmydlf80356hcvpsra",
 				"description": "Prepare a new empty enclosure using 2 planks.",
 				"clockWeight": 1,
 				"default": false,
@@ -163,7 +163,7 @@
 			{
 				"id": "blueprint",
 				"title": "Pig Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Pig Farm.",
 				"clockWeight": 1,
 				"default": false,

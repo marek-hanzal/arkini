@@ -23,38 +23,38 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 
 	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
 		directory: string,
-		resourceId: string,
+		resourceUid: string,
 		extension: ".ogg" | ".png" | ".json",
 	) {
 		if (
-			path.basename(resourceId) !== resourceId ||
-			resourceId.includes("\\") ||
-			resourceId.includes("\0") ||
-			resourceId === "." ||
-			resourceId === ".."
+			path.basename(resourceUid) !== resourceUid ||
+			resourceUid.includes("\\") ||
+			resourceUid.includes("\0") ||
+			resourceUid === "." ||
+			resourceUid === ".."
 		) {
 			return yield* Effect.fail(
 				new Error(
-					`Resource ${JSON.stringify(resourceId)} cannot be represented by a source filename.`,
+					`Resource ${JSON.stringify(resourceUid)} cannot be represented by a source filename.`,
 				),
 			);
 		}
-		return path.join(directory, `${resourceId}${extension}`);
+		return path.join(directory, `${resourceUid}${extension}`);
 	});
 	const resourceFileFx = ({
-		id,
+		uid,
 		type,
 	}: {
-		readonly id: string;
+		readonly uid: string;
 		readonly type: ResourceTypeSchema.Type;
 	}) =>
 		type === "artwork"
-			? readResourceFileFx(artwork, id, ".png")
+			? readResourceFileFx(artwork, uid, ".png")
 			: type === "image"
-				? readResourceFileFx(image, id, ".png")
+				? readResourceFileFx(image, uid, ".png")
 				: type === "music"
-					? readResourceFileFx(music, id, ".ogg")
-					: readResourceFileFx(sfx, id, ".ogg");
+					? readResourceFileFx(music, uid, ".ogg")
+					: readResourceFileFx(sfx, uid, ".ogg");
 
 	return {
 		root,
@@ -70,11 +70,21 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		notes,
 		itemFileFx: ({ uid }) =>
 			Effect.succeed(path.join(items, `${encodeGameProjectFileStemFn(uid)}.json`)),
-		artworkFileFx: (resourceId) => readResourceFileFx(artwork, resourceId, ".png"),
-		imageFileFx: (resourceId) => readResourceFileFx(image, resourceId, ".png"),
+		artworkFileFx: (resourceUid) => readResourceFileFx(artwork, resourceUid, ".png"),
+		imageFileFx: (resourceUid) => readResourceFileFx(image, resourceUid, ".png"),
 		resourceFileFx,
-		audioMetadataFileFx: ({ id, type }) =>
-			readResourceFileFx(type === "music" ? music : sfx, id, ".json"),
+		resourceMetadataFileFx: ({ uid, type }) =>
+			readResourceFileFx(
+				type === "artwork"
+					? artwork
+					: type === "image"
+						? image
+						: type === "music"
+							? music
+							: sfx,
+				uid,
+				".json",
+			),
 		noteFileFx: (noteId) =>
 			Effect.succeed(path.join(notes, `${encodeGameProjectFileStemFn(noteId)}.json`)),
 	} satisfies ProjectPaths;

@@ -11,7 +11,7 @@ import {
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/GameDiagnosticsSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { readRequiredGameProjectJsonFx } from "~/game-config-source/fx/readRequiredGameProjectJsonFx";
 import { gameSourceSchemaDiagnosticsFn } from "~/game-config-source/fn/gameSourceSchemaDiagnosticsFn";
 
@@ -74,35 +74,37 @@ export const readGameSourceFilesFx = Effect.fn("readGameSourceFilesFx")(function
 				]),
 	];
 	const sources = [];
-	const audioPaths = new Set(
-		sourceFiles.resources
-			.filter(({ type }) => type === "music" || type === "sfx")
-			.map(({ path }) => path),
-	);
+	const resourcePaths = new Set(sourceFiles.resources.map(({ path }) => path));
 	const metadataPaths = new Set([
-		...sourceFiles.audioMetadata,
-		...Array.from(audioPaths, (path) => `${path.slice(0, -4)}.json`),
+		...sourceFiles.resourceMetadata,
+		...Array.from(resourcePaths, (path) => `${path.slice(0, -4)}.json`),
 	]);
 	for (const metadataPath of [
 		...metadataPaths,
 	].sort()) {
-		const audioPath = `${metadataPath.slice(0, -5)}.ogg`;
-		if (!audioPaths.has(audioPath))
+		const extension = [
+			"music",
+			"sfx",
+		].includes(pathService.basename(pathService.dirname(metadataPath)))
+			? ".ogg"
+			: ".png";
+		const resourcePath = `${metadataPath.slice(0, -5)}${extension}`;
+		if (!resourcePaths.has(resourcePath))
 			diagnostics.push({
 				code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
 				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path: [],
 				source: metadataPath,
-				message: `Audio metadata requires its paired file ${audioPath}.`,
-				issueCode: "audio-resource-body-missing",
+				message: `Resource metadata requires its paired file ${resourcePath}.`,
+				issueCode: "resource-body-missing",
 			});
 		diagnostics.push(
 			...(yield* readRequiredGameProjectJsonFx({
 				path: metadataPath,
-				missingIssueCode: "audio-resource-metadata-missing",
-				missingMessage: `Audio resource ${audioPath} requires metadata ${metadataPath}.`,
+				missingIssueCode: "resource-metadata-missing",
+				missingMessage: `Resource ${resourcePath} requires metadata ${metadataPath}.`,
 				validateFn: (json) => {
-					const result = AudioResourceMetadataSchema.safeParse(json);
+					const result = ResourceMetadataSchema.safeParse(json);
 					return result.success
 						? []
 						: gameSourceSchemaDiagnosticsFn(metadataPath, result.error);

@@ -73,7 +73,7 @@ export const ProductionLineDetail = ({
 					<div className="flex flex-wrap items-center gap-2">
 						{line.artwork === undefined ? null : (
 							<EditorResourceThumbnail
-								resourceId={line.artwork}
+								resourceUid={line.artwork}
 								size="sm"
 							/>
 						)}

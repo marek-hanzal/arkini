@@ -2,14 +2,14 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 interface CreateDraftFnProps {
 	readonly draft?: boolean;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly uid: string;
 }
 
 /** Creates the canonical starting shape shared by UI and MCP. */
 export const createDraftFn = ({
 	draft = false,
-	resourceId,
+	resourceUid,
 	uid,
 }: CreateDraftFnProps): ItemSchema.Type => {
 	return {
@@ -20,7 +20,7 @@ export const createDraftFn = ({
 		artwork: {
 			scale: 1,
 			default: [
-				resourceId,
+				resourceUid,
 			] as [
 				string,
 			],

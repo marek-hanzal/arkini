@@ -140,36 +140,40 @@ describe("packDirectoryFx game-project contract", () => {
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
-	it.effect("keeps the packed payload and content hash identical after audio names change", () =>
-		Effect.gen(function* () {
-			const fileSystem = yield* FileSystem.FileSystem;
-			const path = yield* Path.Path;
-			const input = yield* writeGameProjectFixtureFx();
-			const before = yield* packDirectoryFx({
-				input,
-			});
-			const beforeEnvelope = yield* decodeTestSerapackEnvelopeFx(
-				yield* fileSystem.readFile(before.serapack),
-			);
-			for (const relative of [
-				"music/theme.json",
-				"sfx/job-start.json",
-			])
-				yield* fileSystem.writeFileString(
-					path.join(input, relative),
-					JSON.stringify({
-						name: "A completely different Editor name",
-					}),
+	it.effect(
+		"keeps the packed payload and content hash identical after resource titles change",
+		() =>
+			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
+				const path = yield* Path.Path;
+				const input = yield* writeGameProjectFixtureFx();
+				const before = yield* packDirectoryFx({
+					input,
+				});
+				const beforeEnvelope = yield* decodeTestSerapackEnvelopeFx(
+					yield* fileSystem.readFile(before.serapack),
 				);
-			const after = yield* packDirectoryFx({
-				input,
-			});
-			const afterEnvelope = yield* decodeTestSerapackEnvelopeFx(
-				yield* fileSystem.readFile(after.serapack),
-			);
-			expect(afterEnvelope.payload).toEqual(beforeEnvelope.payload);
-			expect(after.contentHash).toBe(before.contentHash);
-		}).pipe(Effect.provide(NodeServices.layer)),
+				for (const relative of [
+					"image/hero.json",
+					"artwork/item-water.json",
+					"music/theme.json",
+					"sfx/job-start.json",
+				])
+					yield* fileSystem.writeFileString(
+						path.join(input, relative),
+						JSON.stringify({
+							title: "A completely different Editor title",
+						}),
+					);
+				const after = yield* packDirectoryFx({
+					input,
+				});
+				const afterEnvelope = yield* decodeTestSerapackEnvelopeFx(
+					yield* fileSystem.readFile(after.serapack),
+				);
+				expect(afterEnvelope.payload).toEqual(beforeEnvelope.payload);
+				expect(after.contentHash).toBe(before.contentHash);
+			}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
 	it.effect("rejects missing metadata even for Music excluded from the playlist", () =>
@@ -189,7 +193,7 @@ describe("packDirectoryFx game-project contract", () => {
 					_tag: "GameValidationError",
 					diagnostics: expect.arrayContaining([
 						expect.objectContaining({
-							issueCode: "audio-resource-metadata-missing",
+							issueCode: "resource-metadata-missing",
 							source: expect.stringMatching(/unused-theme\.json$/),
 						}),
 					]),
@@ -228,27 +232,27 @@ describe("packDirectoryFx game-project contract", () => {
 					},
 				},
 			});
-			const hero = payload.resources.find(({ id }) => id === "hero");
-			const itemWater = payload.resources.find(({ id }) => id === "item-water");
+			const hero = payload.resources.find(({ uid }) => uid === "hero");
+			const itemWater = payload.resources.find(({ uid }) => uid === "item-water");
 			if (itemWater === undefined) throw new Error("Missing packed item-water asset.");
 			expect(hero).toEqual({
-				id: "hero",
+				uid: "hero",
 				type: "image",
 				bytes: png,
 			});
 			expect(payload.resources).toContainEqual({
-				id: "theme",
+				uid: "theme",
 				type: "music",
 				bytes: musicOgg,
 			});
-			expect(payload.resources.some(({ id }) => id === "unused-theme")).toBe(false);
+			expect(payload.resources.some(({ uid }) => uid === "unused-theme")).toBe(false);
 			expect(payload.resources).toContainEqual({
-				id: "job-start",
+				uid: "job-start",
 				type: "sfx",
 				bytes: sfxOgg,
 			});
 			expect(itemWater).toMatchObject({
-				id: "item-water",
+				uid: "item-water",
 				type: "artwork",
 			});
 			expect(itemWater.bytes).not.toEqual(assetPng);

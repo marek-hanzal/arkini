@@ -15,7 +15,7 @@ export const UnusedResourceDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Warning",
 		]),
-		resourceId: IdSchema,
+		resourceUid: IdSchema,
 	})
 	.strict()
 	.meta({

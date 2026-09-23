@@ -96,7 +96,7 @@ export const ArtworkSection = () => {
 						artwork.default[0] ? (
 							<ArtworkTilePreview
 								className="size-[min(80cqh,100cqw)] rounded-2xl border-2 border-accent"
-								resourceIds={
+								resourceUids={
 									artwork.default[1]
 										? [
 												artwork.default[0],

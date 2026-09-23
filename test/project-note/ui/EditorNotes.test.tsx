@@ -108,7 +108,7 @@ beforeEach(() => {
 			projectId: "project-one",
 			content: "Existing note",
 			itemUids: [],
-			resourceIds: [],
+			resourceUids: [],
 			createdAtMs: 1,
 			updatedAtMs: 1,
 		},
@@ -128,7 +128,7 @@ const ItemNotes = ({ itemUid }: { readonly itemUid: string }) => {
 	const collection = useProjectNotes("project-one");
 	return (
 		<ProjectNotes
-			defaultResourceIds={[]}
+			defaultResourceUids={[]}
 			collection={collection}
 			notes={collection.notes.filter((note) => note.itemUids.includes(itemUid))}
 			requiredCurrentItemUid={itemUid}
@@ -218,7 +218,7 @@ describe("EditorNotes", () => {
 		});
 		expect(state.notes[0]).toMatchObject({
 			itemUids: [],
-			resourceIds: [],
+			resourceUids: [],
 			content: "Existing note",
 			noteId: "note-one",
 		});
@@ -300,7 +300,7 @@ describe("EditorNotes", () => {
 		state.notes[0] = {
 			...state.notes[0],
 			itemUids: [],
-			resourceIds: [],
+			resourceUids: [],
 			updatedAtMs: 2,
 		};
 		await act(async () => {

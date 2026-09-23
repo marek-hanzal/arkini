@@ -82,7 +82,7 @@ const createAudioHarness = ({
 		unlockFx: unlockFx ?? Effect.sync(() => unlock()),
 		playFx: playFx ?? ((cues) => Effect.sync(() => play(cues))),
 		playMusicFx: () => Effect.void,
-		requestDetailMusicFx: (resourceId) => Effect.sync(() => requestDetailMusic(resourceId)),
+		requestDetailMusicFx: (resourceUid) => Effect.sync(() => requestDetailMusic(resourceUid)),
 		setSoundFx: (sound) => Effect.sync(() => setSound(sound)),
 		closeFx: closeFx ?? Effect.sync(() => close()),
 	} satisfies createGameAudioRuntimeFx.Result;

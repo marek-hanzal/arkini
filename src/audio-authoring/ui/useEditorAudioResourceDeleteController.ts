@@ -7,7 +7,7 @@ import { deleteEditorResourceFx } from "~/resource-authoring/fx/deleteEditorReso
 
 export namespace useEditorAudioResourceDeleteController {
 	export interface Props {
-		readonly resourceId: string;
+		readonly resourceUid: string;
 		readonly type: "music" | "sfx";
 	}
 	export interface Output {
@@ -22,7 +22,7 @@ export namespace useEditorAudioResourceDeleteController {
 
 /** Confirms audio deletion and leaves its original detail before canonical publication removes it. */
 export const useEditorAudioResourceDeleteController = ({
-	resourceId,
+	resourceUid,
 	type,
 }: useEditorAudioResourceDeleteController.Props): useEditorAudioResourceDeleteController.Output => {
 	const project = useEditorProject();
@@ -38,7 +38,7 @@ export const useEditorAudioResourceDeleteController = ({
 		},
 		[
 			project.projectId,
-			resourceId,
+			resourceUid,
 		],
 	);
 	const openFn = useCallback(() => {
@@ -58,7 +58,7 @@ export const useEditorAudioResourceDeleteController = ({
 				deleteEditorResourceFx({
 					projectId: project.projectId,
 					expectedRevision: project.revision,
-					resourceId,
+					resourceUid,
 					onDeletedFn: async () => {
 						if (sessionRef.current !== session) return;
 						await navigateFn({
@@ -85,7 +85,7 @@ export const useEditorAudioResourceDeleteController = ({
 		navigateFn,
 		project.projectId,
 		project.revision,
-		resourceId,
+		resourceUid,
 		type,
 	]);
 	return {

@@ -104,12 +104,12 @@ const EditorArtworkImageDropZone = ({
 	);
 };
 
-export const EditorArtworkEdit = ({ filter, query, resourceId }: EditorArtworkEditProps) => {
+export const EditorArtworkEdit = ({ filter, query, resourceUid }: EditorArtworkEditProps) => {
 	const translator = useTranslator();
 	const controller = useEditorArtworkEditController({
 		filter,
 		query,
-		resourceId,
+		resourceUid,
 	});
 	if (!controller.resourceFound)
 		return (
@@ -130,7 +130,7 @@ export const EditorArtworkEdit = ({ filter, query, resourceId }: EditorArtworkEd
 						}
 						title={
 							<h1 className="truncate text-xl font-semibold">
-								<Tx label="Edit" /> {resourceId}
+								<Tx label="Edit" /> {resourceUid}
 							</h1>
 						}
 					/>
@@ -155,18 +155,18 @@ export const EditorArtworkEdit = ({ filter, query, resourceId }: EditorArtworkEd
 			tabs={undefined}
 			title={
 				<ItemHeaderTitle
-					resourceIds={[
-						resourceId,
+					resourceUids={[
+						resourceUid,
 					]}
-					title={resourceId}
+					title={controller.title}
 				/>
 			}
 			leading={
 				<EditorHistoryBackButton
-					to="/editor/$projectId/artwork/$resourceId/detail/overview"
+					to="/editor/$projectId/artwork/$resourceUid/detail/overview"
 					params={{
 						projectId: controller.projectId,
-						resourceId,
+						resourceUid,
 					}}
 					search={{
 						filter,
@@ -177,11 +177,10 @@ export const EditorArtworkEdit = ({ filter, query, resourceId }: EditorArtworkEd
 		>
 			<div className="grid w-full max-w-3xl gap-6">
 				<EditorTextControl
-					error={controller.artworkIdError}
-					label={translator.textFn("Artwork ID")}
-					description={<Mx label="Artwork ID help" />}
-					onChangeFn={controller.setNextIdFn}
-					value={controller.nextId}
+					error={controller.titleError}
+					label={translator.textFn("Title")}
+					onChangeFn={controller.setTitleFn}
+					value={controller.title}
 				/>
 				<EditorValueField
 					as="div"

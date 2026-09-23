@@ -22,13 +22,15 @@ const EditorArtworkDeleteError = ({ error }: { readonly error: unknown }) =>
 const EditorArtworkDeleteDialog = ({
 	error,
 	pending,
-	resourceId,
+	resourceUid,
+	title,
 	onCancelFn,
 	onConfirmFn,
 }: {
 	readonly error: unknown;
 	readonly pending: boolean;
-	readonly resourceId: string;
+	readonly resourceUid: string;
+	readonly title: string;
 	readonly onCancelFn: () => void;
 	readonly onConfirmFn: () => void;
 }) => (
@@ -45,14 +47,13 @@ const EditorArtworkDeleteDialog = ({
 				<Tx label="Delete artwork?" />
 			</h2>
 			<p className="mt-2 text-sm leading-6 text-muted">
-				<Tx label="Delete artwork" />:{" "}
-				<strong className="text-foreground">{resourceId}</strong>
+				<Tx label="Delete artwork" />: <strong className="text-foreground">{title}</strong>
 			</p>
 			<div className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 				<Mx label="Artwork delete confirmation warning" />
 			</div>
 			<p className="mt-2 text-xs text-subtle">
-				<Tx label="Artwork ID" />: {resourceId}
+				<Tx label="Resource UID" />: {resourceUid}
 			</p>
 			<EditorArtworkDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
@@ -91,7 +92,7 @@ const EditorArtworkDeleteBlockerLink = ({
 					dataUi="EditorArtworkDeleteBlocker"
 					leading={
 						<EditorItemThumbnail
-							resourceIds={owner.artwork.default}
+							resourceUids={owner.artwork.default}
 							size="sm"
 						/>
 					}
@@ -117,13 +118,13 @@ interface EditorArtworkDeleteSectionProps extends useEditorArtworkDeleteControll
 export const EditorArtworkDeleteSection = ({
 	filter,
 	query,
-	resourceId,
+	resourceUid,
 }: EditorArtworkDeleteSectionProps) => {
 	const translator = useTranslator();
 	const controller = useEditorArtworkDeleteController({
 		filter,
 		query,
-		resourceId,
+		resourceUid,
 	});
 	const blocked = controller.blockers.length > 0;
 	return (
@@ -184,7 +185,12 @@ export const EditorArtworkDeleteSection = ({
 				<EditorArtworkDeleteDialog
 					error={controller.error}
 					pending={controller.deleting}
-					resourceId={resourceId}
+					resourceUid={resourceUid}
+					title={
+						controller.project.resources.find(
+							(resource) => resource.uid === resourceUid,
+						)?.title ?? resourceUid
+					}
 					onCancelFn={controller.cancelFn}
 					onConfirmFn={() => void controller.confirmFn()}
 				/>

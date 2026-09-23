@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"dairy"
+				"so7r094glj6wfe6yoveiclrg",
+				"o5a8h86dercjapbx577ohapv"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "dairy",
 				"title": "Dairy",
-				"artwork": "dairy",
+				"artwork": "o5a8h86dercjapbx577ohapv",
 				"description": "Build a Dairy",
 				"default": true,
 				"clockWeight": 1,

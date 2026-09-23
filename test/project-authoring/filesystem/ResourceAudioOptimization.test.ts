@@ -18,10 +18,10 @@ vi.mock("~/game-config-resource/fx/optimizeOggOpusResourceFileFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		optimizeOggOpusResourceFileFx: Effect.fn("test.optimizeOggOpusResourceFileFx")(
-			(source: string, target: string, resourceId: string) =>
+			(source: string, target: string, resourceUid: string) =>
 				Effect.tryPromise({
 					try: async () => {
-						optimizer.callFn(source, target, resourceId);
+						optimizer.callFn(source, target, resourceUid);
 						const original = await readFile(source);
 						const optimized = Buffer.concat([
 							original,
@@ -62,10 +62,10 @@ describe("filesystem Editor SFX optimization", () => {
 				projectId: project.projectId,
 				resources: [
 					{
-						id: "click",
+						uid: "click",
 						path: source,
 						size: bytes.byteLength,
-						name: "Test audio",
+						title: "Test audio",
 						type: "sfx",
 					},
 				],
@@ -78,7 +78,7 @@ describe("filesystem Editor SFX optimization", () => {
 			repository.optimizeResourcesFx({
 				expectedRevision: imported.revision,
 				projectId: project.projectId,
-				resourceIds: [
+				resourceUids: [
 					"click",
 				],
 				type: "sfx",
@@ -97,12 +97,12 @@ describe("filesystem Editor SFX optimization", () => {
 			processedResourceCount: 1,
 		});
 		expect(result.project.revision).toBeGreaterThan(imported.revision);
-		expect(result.project.resources.find(({ id }) => id === "click")).toMatchObject({
-			id: "click",
-			name: "Test audio",
+		expect(result.project.resources.find(({ uid }) => uid === "click")).toMatchObject({
+			uid: "click",
+			title: "Test audio",
 		});
 		expect(JSON.parse(await readFile(join(root, "sfx", "click.json"), "utf8"))).toEqual({
-			name: "Test audio",
+			title: "Test audio",
 		});
 		expect(await readFile(join(root, "sfx", "click.ogg"))).toEqual(
 			Buffer.concat([
@@ -116,7 +116,7 @@ describe("filesystem Editor SFX optimization", () => {
 				repository.optimizeResourcesFx({
 					expectedRevision: result.project.revision,
 					projectId: project.projectId,
-					resourceIds: [
+					resourceUids: [
 						"click",
 					],
 					type: "artwork",

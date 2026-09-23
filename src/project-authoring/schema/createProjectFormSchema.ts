@@ -4,8 +4,8 @@ import { ProjectFormBaseSchema } from "~/project-authoring/schema/ProjectFormSch
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */
 export const createProjectFormSchema = (project: Pick<Project, "config" | "resources">) => {
 	const resourceTypes = new Map(
-		project.resources.map(({ id, type }) => [
-			id,
+		project.resources.map(({ uid, type }) => [
+			uid,
 			type,
 		]),
 	);

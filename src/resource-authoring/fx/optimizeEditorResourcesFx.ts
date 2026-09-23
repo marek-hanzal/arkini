@@ -8,7 +8,7 @@ interface OptimizeEditorResourcesProps {
 	readonly expectedRevision: number;
 	readonly onProgressFn?: ProjectRepository.OptimizeResourcesProps["onProgressFn"];
 	readonly projectId: string;
-	readonly resourceIds: ProjectRepository.OptimizeResourcesProps["resourceIds"];
+	readonly resourceUids: ProjectRepository.OptimizeResourcesProps["resourceUids"];
 	readonly type: ProjectRepository.OptimizeResourcesProps["type"];
 }
 

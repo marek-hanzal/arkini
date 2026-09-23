@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"wolf"
+				"ng6ysy8poe1dwz906gbmxons"
 			]
 		},
 		"units": {
@@ -87,7 +87,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "wolf",
+				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "The wolf roams to another part of the board.",
 				"clock": true,
 				"clockWeight": 5,
@@ -169,7 +169,7 @@
 			{
 				"id": "leave-biowaste",
 				"title": "Leave",
-				"artwork": "bio-waste",
+				"artwork": "cepf602vecdhm30jmqhqe2am",
 				"description": "The wolf leaves the area and leaves something behind.",
 				"clock": true,
 				"clockWeight": 1,

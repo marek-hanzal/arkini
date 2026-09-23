@@ -16,9 +16,9 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 export const NoteForm = ({
 	content,
 	itemUids,
-	resourceIds,
+	resourceUids,
 	requiredItemUid,
-	requiredResourceId,
+	requiredResourceUid,
 	artworkFilter,
 	artworkQuery,
 	pending,
@@ -26,15 +26,15 @@ export const NoteForm = ({
 	saveLabel,
 	onContentChangeFn,
 	onItemUidsChangeFn,
-	onResourceIdsChangeFn,
+	onResourceUidsChangeFn,
 	onSaveFn,
 	onCancelFn,
 }: {
 	readonly content: string;
 	readonly itemUids: ReadonlyArray<string>;
-	readonly resourceIds: ReadonlyArray<string>;
+	readonly resourceUids: ReadonlyArray<string>;
 	readonly requiredItemUid?: string;
-	readonly requiredResourceId?: string;
+	readonly requiredResourceUid?: string;
 	readonly artworkFilter?: ArtworkCatalogFilterSchema.Type;
 	readonly artworkQuery?: string;
 	readonly pending: boolean;
@@ -42,7 +42,7 @@ export const NoteForm = ({
 	readonly saveLabel: "Create note" | "Save";
 	readonly onContentChangeFn: (content: string) => void;
 	readonly onItemUidsChangeFn: (itemUids: ReadonlyArray<string>) => void;
-	readonly onResourceIdsChangeFn: (resourceIds: ReadonlyArray<string>) => void;
+	readonly onResourceUidsChangeFn: (resourceUids: ReadonlyArray<string>) => void;
 	readonly onSaveFn: () => void;
 	readonly onCancelFn?: () => void;
 }) => {
@@ -70,10 +70,10 @@ export const NoteForm = ({
 			/>
 			<NoteLinkPickers
 				itemUids={itemUids}
-				resourceIds={resourceIds}
+				resourceUids={resourceUids}
 				disabled={pending}
 				onItemUidsChangeFn={onItemUidsChangeFn}
-				onResourceIdsChangeFn={onResourceIdsChangeFn}
+				onResourceUidsChangeFn={onResourceUidsChangeFn}
 			/>
 			<NoteItemLinks
 				itemUids={itemUids}
@@ -82,10 +82,10 @@ export const NoteForm = ({
 				onChangeFn={onItemUidsChangeFn}
 			/>
 			<NoteResourceLinks
-				resourceIds={resourceIds}
-				requiredResourceId={requiredResourceId}
+				resourceUids={resourceUids}
+				requiredResourceUid={requiredResourceUid}
 				disabled={pending}
-				onChangeFn={onResourceIdsChangeFn}
+				onChangeFn={onResourceUidsChangeFn}
 				filter={artworkFilter}
 				query={artworkQuery}
 			/>

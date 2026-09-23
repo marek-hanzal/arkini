@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"crop-market"
+				"ffbzxdufwade6ssq81so5b9z"
 			]
 		},
 		"clock": {
@@ -39,7 +39,7 @@
 			{
 				"id": "quest-grain-t1",
 				"title": "Grain Tier 1",
-				"artwork": "grain",
+				"artwork": "dymcjezdhim4qja2uftf90l6",
 				"description": "A possible grain tier 1 contract arrives from outside the settlement.",
 				"clock": true,
 				"clockWeight": 4,
@@ -98,7 +98,7 @@
 			{
 				"id": "quest-vegetables-t1",
 				"title": "Vegetables Tier 1",
-				"artwork": "vegetable-crate",
+				"artwork": "np1dwla0c2u3ym90ufqmfnzu",
 				"description": "A possible vegetables tier 1 contract arrives from outside the settlement.",
 				"clock": true,
 				"clockWeight": 3,
@@ -157,7 +157,7 @@
 			{
 				"id": "quest-fruit-t1",
 				"title": "Fruit Tier 1",
-				"artwork": "fruit-crate",
+				"artwork": "uy7kf2yffldzm1s74bjzt85n",
 				"description": "A possible fruit tier 1 contract arrives from outside the settlement.",
 				"clock": true,
 				"clockWeight": 3,
@@ -216,7 +216,7 @@
 			{
 				"id": "quest-wool-t1",
 				"title": "Wool Tier 1",
-				"artwork": "wool",
+				"artwork": "ji2qow3knphzdbb40vgh7lef",
 				"description": "A possible wool tier 1 contract arrives from outside the settlement.",
 				"clock": true,
 				"clockWeight": 3,
@@ -275,7 +275,7 @@
 			{
 				"id": "quest-pumpkin-t1",
 				"title": "Pumpkin Tier 1",
-				"artwork": "pumpkin",
+				"artwork": "vmdthjji13y50ytd2sfxqkfk",
 				"description": "A possible pumpkin tier 1 contract arrives from outside the settlement.",
 				"clock": true,
 				"clockWeight": 2,
@@ -334,7 +334,7 @@
 			{
 				"id": "quest-wool-t2",
 				"title": "Wool Tier 2",
-				"artwork": "wool",
+				"artwork": "ji2qow3knphzdbb40vgh7lef",
 				"description": "A possible wool tier 2 contract arrives from outside the settlement.",
 				"clock": true,
 				"clockWeight": 1,

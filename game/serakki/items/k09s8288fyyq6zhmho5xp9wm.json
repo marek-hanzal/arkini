@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"townhall-t1"
+				"c7uw765u5c2hqnjvv3zmwkgn"
 			]
 		},
 		"maxQueueSize": 1,
@@ -17,7 +17,7 @@
 			{
 				"id": "well-blueprint",
 				"title": "Well Blueprint",
-				"artwork": "well",
+				"artwork": "hki2ifgb69fb84zyd2ct3ied",
 				"description": "Water is highly needed resource, believe me",
 				"clockWeight": 1,
 				"default": false,
@@ -117,7 +117,7 @@
 			{
 				"id": "sawmill-blueprint",
 				"title": "Sawmill Blueprint",
-				"artwork": "sawmill",
+				"artwork": "oo4txpzczam6kt5jue7vhf1a",
 				"description": "Sawmill blueprint",
 				"clockWeight": 1,
 				"default": false,
@@ -217,7 +217,7 @@
 			{
 				"id": "stoneworks-blueprint",
 				"title": "Stoneworks Blueprint",
-				"artwork": "stoneworks",
+				"artwork": "fz36qa41hs9xro6g0jp08592",
 				"description": "Draw plans for a workshop that turns rough stone into proper building blocks.",
 				"clockWeight": 1,
 				"default": false,
@@ -317,7 +317,7 @@
 			{
 				"id": "carpenter-blueprint",
 				"title": "Carpenter Blueprint",
-				"artwork": "carpenter",
+				"artwork": "xu2pifv4mgpkrm75kej8c6sb",
 				"description": "Draw plans for a workshop that turns processed wood into practical tools, containers, and papermaking gear.",
 				"clockWeight": 1,
 				"default": false,
@@ -442,7 +442,7 @@
 			{
 				"id": "charcoal-kiln-blueprint",
 				"title": "Charcoal Kiln Blueprint",
-				"artwork": "charcoal-kiln",
+				"artwork": "f5k76d90k3ibro2tzlio4znd",
 				"description": "Draw plans for a kiln that turns Firewood into the first proper industrial fuel.",
 				"clockWeight": 1,
 				"default": false,
@@ -567,7 +567,7 @@
 			{
 				"id": "waste-incinerator-blueprint",
 				"title": "Waste Incinerator Blueprint",
-				"artwork": "waste-incinerator",
+				"artwork": "mo6y7oa1ipuwt7pycm9s521t",
 				"description": "Draw plans for a facility that burns accumulated Waste using Charcoal. Cleaner ground, dirtier air.",
 				"clockWeight": 1,
 				"default": false,
@@ -682,7 +682,7 @@
 			{
 				"id": "school-t1-blueprint",
 				"title": "School - Tier 1 Blueprint",
-				"artwork": "school-t1",
+				"artwork": "e8h5l2j4tq4tu8uskz5aqd8e",
 				"description": "Draw plans for the settlement's first school. Education is the final step before the settlement can seriously consider another Townhall upgrade.",
 				"clockWeight": 1,
 				"default": false,
@@ -857,7 +857,7 @@
 			{
 				"id": "townhall-t2-blueprint",
 				"title": "Townhall II Blueprint",
-				"artwork": "townhall-t2",
+				"artwork": "dtuzdkf4lo7h6azmdgpv059f",
 				"description": "The next civic upgrade is already visible on the horizon. Finish the settlement's first era before trying to draw it.",
 				"clockWeight": 1,
 				"default": false,

@@ -326,8 +326,9 @@ describe("item section form session", () => {
 			resources: [
 				"artwork:water",
 				"artwork:overlay",
-			].map((id) => ({
-				id,
+			].map((uid) => ({
+				uid,
+				title: uid,
 				type: "artwork" as const,
 				size: 1,
 				version: "1",
@@ -370,7 +371,7 @@ describe("item section form session", () => {
 				container.querySelectorAll<HTMLImageElement>(
 					'[data-ui="EditorItemHeaderTitle"] img',
 				),
-				(image) => new URL(image.src).searchParams.get("resourceId"),
+				(image) => new URL(image.src).searchParams.get("resourceUid"),
 			);
 		expect(headerResourcesFn()).toEqual([
 			"artwork:water",

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"quest",
-				"pumpkin"
+				"lr8i4gjiyumr5s2lzvvv13ov",
+				"vmdthjji13y50ytd2sfxqkfk"
 			]
 		},
 		"units": {
@@ -123,7 +123,7 @@
 			{
 				"id": "complete",
 				"title": "Complete Contract",
-				"artwork": "pumpkin",
+				"artwork": "vmdthjji13y50ytd2sfxqkfk",
 				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",
 				"clockWeight": 1,
 				"default": true,

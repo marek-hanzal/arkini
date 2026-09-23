@@ -15,7 +15,7 @@ const pngMagic = [
 
 /** Admits one bounded PNG resource and releases the temporary browser bitmap. */
 export const validatePngResourceFx = Effect.fn("validatePngResourceFx")(
-	(bytes: Uint8Array, resourceId: string) =>
+	(bytes: Uint8Array, resourceUid: string) =>
 		Effect.scoped(
 			Effect.gen(function* () {
 				const hasPngEnvelope =
@@ -24,7 +24,7 @@ export const validatePngResourceFx = Effect.fn("validatePngResourceFx")(
 					pngMagic.every((byte, index) => bytes[index] === byte);
 				if (!hasPngEnvelope) {
 					return yield* Effect.fail(
-						new Error(`Resource ${resourceId} must be a valid bounded PNG image.`),
+						new Error(`Resource ${resourceUid} must be a valid bounded PNG image.`),
 					);
 				}
 				const bitmap = yield* Effect.acquireRelease(
@@ -41,7 +41,7 @@ export const validatePngResourceFx = Effect.fn("validatePngResourceFx")(
 								),
 							),
 						catch: (cause) =>
-							new Error(`Resource ${resourceId} must decode as a valid PNG image.`, {
+							new Error(`Resource ${resourceUid} must decode as a valid PNG image.`, {
 								cause,
 							}),
 					}),
@@ -56,7 +56,7 @@ export const validatePngResourceFx = Effect.fn("validatePngResourceFx")(
 					width * height > PngResourceLimits.maxPixels
 				) {
 					return yield* Effect.fail(
-						new Error(`Resource ${resourceId} exceeds the supported PNG dimensions.`),
+						new Error(`Resource ${resourceUid} exceeds the supported PNG dimensions.`),
 					);
 				}
 			}),

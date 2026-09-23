@@ -13,7 +13,8 @@ describe("readArtworkCollectionFn", () => {
 			{
 				size: 0,
 				version: "1",
-				id: "forge-image",
+				uid: "forge-image",
+				title: "forge-image",
 				type: "artwork" as const,
 			},
 		];
@@ -24,7 +25,7 @@ describe("readArtworkCollectionFn", () => {
 				filter: "unused",
 				query: "frge",
 				resources,
-			}).map(({ id }) => id),
+			}).map(({ uid }) => uid),
 		).toEqual([
 			"forge-image",
 		]);

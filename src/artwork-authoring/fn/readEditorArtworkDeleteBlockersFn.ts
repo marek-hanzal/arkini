@@ -3,12 +3,12 @@ import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameReso
 
 interface ReadEditorArtworkDeleteBlockersProps {
 	readonly config: GameConfigSchema.Type;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 }
 
 /** Finds canonical config references that require one artwork to remain available. */
 export const readEditorArtworkDeleteBlockersFn = ({
 	config,
-	resourceId,
+	resourceUid,
 }: ReadEditorArtworkDeleteBlockersProps) =>
-	readGameResourceUsagesFn(config).filter((usage) => usage.resourceId === resourceId);
+	readGameResourceUsagesFn(config).filter((usage) => usage.resourceUid === resourceUid);

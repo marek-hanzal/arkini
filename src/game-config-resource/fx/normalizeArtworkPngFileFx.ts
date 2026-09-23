@@ -11,7 +11,7 @@ const maxArtworkDimension = 512;
 
 /** Streams one square Artwork PNG into a bounded normalized RGBA file. */
 export const normalizeArtworkPngFileFx = Effect.fn("normalizeArtworkPngFileFx")(
-	(source: string, target: string, resourceId: string) =>
+	(source: string, target: string, resourceUid: string) =>
 		Effect.gen(function* () {
 			const sourceInfo = yield* Effect.tryPromise({
 				try: () => stat(source),
@@ -19,7 +19,7 @@ export const normalizeArtworkPngFileFx = Effect.fn("normalizeArtworkPngFileFx")(
 			});
 			if (sourceInfo.size > PngResourceLimits.maxBytes)
 				return yield* Effect.fail(
-					new Error(`Artwork ${resourceId} exceeds the PNG byte limit.`),
+					new Error(`Artwork ${resourceUid} exceeds the PNG byte limit.`),
 				);
 			yield* Effect.tryPromise({
 				try: async () => {
@@ -37,7 +37,9 @@ export const normalizeArtworkPngFileFx = Effect.fn("normalizeArtworkPngFileFx")(
 						metadata.height > PngResourceLimits.maxDimension ||
 						metadata.width * metadata.height > PngResourceLimits.maxPixels
 					)
-						throw new Error(`Artwork ${resourceId} must decode as a square PNG image.`);
+						throw new Error(
+							`Artwork ${resourceUid} must decode as a square PNG image.`,
+						);
 					await pipeline(
 						sharp(source, {
 							limitInputPixels: PngResourceLimits.maxPixels,
@@ -69,14 +71,14 @@ export const normalizeArtworkPngFileFx = Effect.fn("normalizeArtworkPngFileFx")(
 						output.channels !== 4
 					)
 						throw new Error(
-							`Artwork ${resourceId} could not be normalized as bounded square RGBA.`,
+							`Artwork ${resourceUid} could not be normalized as bounded square RGBA.`,
 						);
 				},
 				catch: (cause) =>
-					new Error(`Artwork ${resourceId} could not be normalized for the Serapack.`, {
+					new Error(`Artwork ${resourceUid} could not be normalized for the Serapack.`, {
 						cause,
 					}),
 			});
-			return yield* validatePngResourceFileFx(target, resourceId);
+			return yield* validatePngResourceFileFx(target, resourceUid);
 		}),
 );

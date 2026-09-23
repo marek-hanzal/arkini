@@ -55,13 +55,13 @@ const installEditorApi = () => {
 		})),
 		awaitIdleFn: vi.fn(async () => success(undefined)),
 		createProjectFn: vi.fn(async () => success(project)),
-		createNoteFn: vi.fn(async ({ projectId, content, itemUids, resourceIds }) =>
+		createNoteFn: vi.fn(async ({ projectId, content, itemUids, resourceUids }) =>
 			success({
 				noteId: "note-one",
 				projectId,
 				content,
 				itemUids,
-				resourceIds,
+				resourceUids,
 				createdAtMs: 12,
 				updatedAtMs: 12,
 			}),
@@ -87,7 +87,7 @@ const installEditorApi = () => {
 		importResourcesFn: vi.fn(async () =>
 			success({
 				project,
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		),
 		listProjectsFn: vi.fn(async () =>
@@ -109,13 +109,13 @@ const installEditorApi = () => {
 		replaceConfigFn: vi.fn(async () => success(commit)),
 		replaceResourceFn: vi.fn(async () => success(project)),
 		upsertItemFn: vi.fn(async () => success(commit)),
-		updateNoteFn: vi.fn(async ({ projectId, noteId, content, itemUids, resourceIds }) =>
+		updateNoteFn: vi.fn(async ({ projectId, noteId, content, itemUids, resourceUids }) =>
 			success({
 				noteId,
 				projectId,
 				content,
 				itemUids,
-				resourceIds,
+				resourceUids,
 				createdAtMs: 12,
 				updatedAtMs: 13,
 			}),
@@ -165,17 +165,17 @@ describe("createElectronProjectRepositoryFx", () => {
 		const request = {
 			projectId: project.projectId,
 			expectedRevision: project.revision,
-			resourceId: "track",
-			name: "Dusty Plains",
+			resourceUid: "track",
+			title: "Dusty Plains",
 		};
 		vi.mocked(editor.saveResourceMetadataFn).mockResolvedValue(
 			success({
 				...project,
 				resources: [
 					{
-						id: "track",
+						uid: "track",
 						type: "music",
-						name: "Dusty Plains",
+						title: "Dusty Plains",
 						size: 10,
 						version: "audio-version",
 					},
@@ -192,8 +192,8 @@ describe("createElectronProjectRepositoryFx", () => {
 		const saved = await Effect.runPromise(repository.saveResourceMetadataFx(request));
 		expect(editor.saveResourceMetadataFn).toHaveBeenCalledExactlyOnceWith(request);
 		expect(saved.resources[0]).toMatchObject({
-			id: "track",
-			name: "Dusty Plains",
+			uid: "track",
+			title: "Dusty Plains",
 			version: "audio-version",
 		});
 	});
@@ -293,7 +293,7 @@ describe("createElectronProjectRepositoryFx", () => {
 					projectId: "another-project",
 					content: "Foreign",
 					itemUids: [],
-					resourceIds: [],
+					resourceUids: [],
 					createdAtMs: 1,
 					updatedAtMs: 1,
 				},
@@ -305,7 +305,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				projectId: "project-one",
 				content: "Wrong identity",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 				createdAtMs: 1,
 				updatedAtMs: 2,
 			}),
@@ -316,7 +316,7 @@ describe("createElectronProjectRepositoryFx", () => {
 		const updateFailure = await readTypedFailure(
 			repository.updateNoteFx({
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 				projectId: "project-one",
 				noteId: "note-one",
 				expectedUpdatedAtMs: 1,
@@ -375,7 +375,7 @@ describe("createElectronProjectRepositoryFx", () => {
 				expectedRevision: project.revision,
 				onProgressFn,
 				projectId: project.projectId,
-				resourceIds: [
+				resourceUids: [
 					"hero",
 					"item-water",
 				],

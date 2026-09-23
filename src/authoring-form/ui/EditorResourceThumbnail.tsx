@@ -12,16 +12,16 @@ const thumbnailSizeClassName = {
 
 /** Audio references remain metadata-only until explicit preview; images request their own URL. */
 export const EditorResourceThumbnail = ({
-	resourceId,
+	resourceUid,
 	size = "md",
 }: {
-	readonly resourceId: string | undefined;
+	readonly resourceUid: string | undefined;
 	readonly size?: keyof typeof thumbnailSizeClassName;
 }) => {
 	const project = useEditorProject();
-	const resource = project.resources.find(({ id }) => id === resourceId);
+	const resource = project.resources.find(({ uid }) => uid === resourceUid);
 	const audio = resource?.type === "music" || resource?.type === "sfx";
-	const url = useResourceUrl(audio ? undefined : resourceId);
+	const url = useResourceUrl(audio ? undefined : resourceUid);
 	return (
 		<span
 			data-ui="EditorResourceThumbnail"
@@ -30,7 +30,7 @@ export const EditorResourceThumbnail = ({
 			{audio ? (
 				<AudioLines className="size-5 text-muted" />
 			) : url === undefined ? (
-				resourceId ? (
+				resourceUid ? (
 					<span className="text-sm font-semibold text-subtle">?</span>
 				) : null
 			) : (

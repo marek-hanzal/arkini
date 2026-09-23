@@ -94,7 +94,8 @@ beforeEach(() => {
 		resources: [
 			...editorTestResources,
 			{
-				id: "unused",
+				uid: "unused",
+				title: "unused",
 				type: "artwork",
 				size: 1,
 				version: "1",
@@ -110,7 +111,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (resourceId: string) => {
+const render = async (resourceUid: string) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -121,7 +122,7 @@ const render = async (resourceId: string) => {
 				<EditorArtworkDeleteSection
 					filter="unused"
 					query="spare"
-					resourceId={resourceId}
+					resourceUid={resourceUid}
 				/>
 			</TranslationTestProvider>,
 		);
@@ -137,7 +138,7 @@ describe("EditorArtworkDeleteSection", () => {
 			...project,
 			projectId: "project/one",
 			resources: project.resources.map((resource) =>
-				resource.id === "unused"
+				resource.uid === "unused"
 					? {
 							...resource,
 							id: "unused/artwork",
@@ -159,7 +160,7 @@ describe("EditorArtworkDeleteSection", () => {
 
 		expect(state.remove).toHaveBeenCalledWith({
 			expectedRevision: 0,
-			resourceId: "unused/artwork",
+			resourceUid: "unused/artwork",
 			onDeletedFn: expect.any(Function),
 		});
 		expect(state.navigate).toHaveBeenCalledWith({

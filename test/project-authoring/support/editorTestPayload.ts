@@ -68,12 +68,12 @@ export const editorTestPayload: TestSerapackPayload = {
 	config: editorTestConfig,
 	resources: [
 		{
-			id: "hero",
+			uid: "hero",
 			type: "image",
 			bytes: createTestPngBytes(),
 		},
 		{
-			id: "item-water",
+			uid: "item-water",
 			type: "artwork",
 			bytes: createAlternateTestPngBytes(),
 		},
@@ -81,8 +81,9 @@ export const editorTestPayload: TestSerapackPayload = {
 };
 
 /** Renderer/repository projection of the same fixture's disk-backed PNG files. */
-export const editorTestResources = editorTestPayload.resources.map(({ id, type, bytes }) => ({
-	id,
+export const editorTestResources = editorTestPayload.resources.map(({ uid, type, bytes }) => ({
+	uid,
+	title: uid,
 	type,
 	size: bytes.byteLength,
 	version: "1",

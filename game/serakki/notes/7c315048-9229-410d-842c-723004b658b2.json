@@ -18,21 +18,21 @@
 		"hhq1jyc6purkrnzfh6bqsk51",
 		"mroh4s4rsygi6qlncjqbqu2k"
 	],
-	"resourceIds": [
-		"empty-cauldron",
-		"cauldron-with-water",
-		"cauldron-with-boiling-water",
-		"cauldron-with-lye",
-		"animal-fat",
-		"cutting-board-with-animal-fat",
-		"cauldron-with-soap",
-		"bucket-with-soapy-water",
-		"scrubbing-brush",
-		"soapy-scrubbing-brush",
-		"dirty-scrubbing-brush",
-		"loose-ash",
-		"ash",
-		"empty-sack"
+	"resourceUids": [
+		"pis3cyap54i5hc2w6qruiwei",
+		"l4mgk58zjh9mtegirlriarhh",
+		"ja9udt8o5dm6agg0lkiiu4im",
+		"e3gohmyayw4bt9cpu3jnnkaz",
+		"a2o7me2pzkte93mq5a4y7ks7",
+		"ju3xcg0nfzenmccc728bnp04",
+		"zdadp7u0hzeihjp08vqjovhm",
+		"maa0k805ba6p9hx2u9azhhyk",
+		"taxw7u1lko0lx1z4ym93fcoy",
+		"fwar0hkl561wgi0m5iseg2em",
+		"bgp83j4c4vj3na05jvnrrigw",
+		"k5puv6a7v6vl08u25wzplx6w",
+		"dgw79us8fvtnx6h1pdu5umn9",
+		"as98dbdjvhj8p6iaqnpvgfsx"
 	],
 	"createdAtMs": 1789830259371,
 	"updatedAtMs": 1789830542398

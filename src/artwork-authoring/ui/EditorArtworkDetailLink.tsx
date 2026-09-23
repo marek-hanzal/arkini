@@ -9,22 +9,22 @@ import { ButtonLink } from "~/ui/ui/Button";
 export const EditorArtworkDetailLink = ({
 	children,
 	className,
-	resourceId,
+	resourceUid,
 	filter = "all",
-	query = resourceId,
+	query = resourceUid,
 }: PropsWithChildren<{
 	readonly className?: string;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly filter?: ArtworkCatalogFilterSchema.Type;
 	readonly query?: string;
 }>) => {
 	const project = useEditorProject();
 	return (
 		<ButtonLink
-			to="/editor/$projectId/artwork/$resourceId/detail/overview"
+			to="/editor/$projectId/artwork/$resourceUid/detail/overview"
 			params={{
 				projectId: project.projectId,
-				resourceId,
+				resourceUid,
 			}}
 			search={{
 				filter,
@@ -34,7 +34,7 @@ export const EditorArtworkDetailLink = ({
 				"min-h-0 border-0 bg-transparent p-0 text-left font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover",
 				className,
 			)}
-			title={`Open artwork ${resourceId}`}
+			title={`Open artwork ${resourceUid}`}
 		>
 			{children}
 		</ButtonLink>

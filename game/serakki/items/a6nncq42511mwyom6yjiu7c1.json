@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"sheep-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"mrnd35l8q8ynnve32m7znypb"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "sheep-farm",
 				"title": "Build Sheep Farm",
-				"artwork": "sheep-farm",
+				"artwork": "mrnd35l8q8ynnve32m7znypb",
 				"description": "Build Sheep Farm.",
 				"clockWeight": 1,
 				"default": true,

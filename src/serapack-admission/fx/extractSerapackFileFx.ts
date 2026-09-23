@@ -76,12 +76,12 @@ export const extractSerapackFileFx = Effect.fn("extractSerapackFileFx")(function
 		const path = join(resourcesRoot, String(index).padStart(6, "0"));
 		yield* copyRangeFx(serapackPath, resource.offset, resource.length, path);
 		yield* resource.type === "artwork"
-			? validateArtworkPngFileFx(path, resource.id)
+			? validateArtworkPngFileFx(path, resource.uid)
 			: resource.type === "image"
-				? validatePngResourceFileFx(path, resource.id)
-				: validateOggOpusFileFx(path, resource.id);
+				? validatePngResourceFileFx(path, resource.uid)
+				: validateOggOpusFileFx(path, resource.uid);
 		resources.push({
-			id: resource.id,
+			uid: resource.uid,
 			type: resource.type,
 			path,
 			size: resource.length,

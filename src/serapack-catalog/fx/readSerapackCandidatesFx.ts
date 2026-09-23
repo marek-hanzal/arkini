@@ -9,7 +9,7 @@ import { VersionSchema as GameVersionSchema } from "~/game-version/schema/Versio
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface LoadedSerapackResource {
-	readonly id: string;
+	readonly uid: string;
 	readonly type: ResourceTypeSchema.Type;
 	readonly url: string;
 }

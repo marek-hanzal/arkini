@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"rapeseed-farm"
+				"w9p7m4v0s8q3pjmbvpc7xda4"
 			]
 		},
 		"maxQueueSize": 4,
@@ -94,7 +94,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Rapeseed Field",
-				"artwork": "empty-rapeseed-field",
+				"artwork": "j32cdouc0x1c1ngan5lsz8ma",
 				"description": "Prepare a new rapeseed field for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -136,7 +136,7 @@
 			{
 				"id": "blueprint",
 				"title": "Rapeseed Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Rapeseed Farm.",
 				"clockWeight": 1,
 				"default": false,

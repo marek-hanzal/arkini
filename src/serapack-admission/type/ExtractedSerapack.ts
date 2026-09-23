@@ -5,7 +5,7 @@ import type { VersionSchema as GameVersionSchema } from "~/game-version/schema/V
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface ExtractedSerapackResource {
-	readonly id: string;
+	readonly uid: string;
 	readonly type: ResourceTypeSchema.Type;
 	readonly path: string;
 	readonly size: number;

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"carpenter"
+				"so7r094glj6wfe6yoveiclrg",
+				"xu2pifv4mgpkrm75kej8c6sb"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "carpenter",
 				"title": "Build Carpenter",
-				"artwork": "carpenter",
+				"artwork": "xu2pifv4mgpkrm75kej8c6sb",
 				"description": "Build a carpenter's workshop from planks and stone blocks.",
 				"default": true,
 				"clockWeight": 1,

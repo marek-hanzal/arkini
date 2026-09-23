@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"hunter"
+				"rev9r1cphdn05gqh3wj4w7pj"
 			]
 		},
 		"maxQueueSize": 3,
@@ -16,7 +16,7 @@
 			{
 				"id": "hunt-steak",
 				"title": "Hunt For Steak",
-				"artwork": "raw-steak",
+				"artwork": "ygces9f1ynk9qr5yrs3fl8q7",
 				"description": "Work a nearby Forest for a clean cut of meat. Slow, deliberate, and intentionally boring enough to bootstrap food without vomiting half a carcass onto the board.",
 				"clock": false,
 				"clockWeight": 1,
@@ -103,7 +103,7 @@
 			{
 				"id": "hunt-raw-meat",
 				"title": "Hunt For Raw Meat",
-				"artwork": "raw-game-meat",
+				"artwork": "e3credp19j7on2s4n2y7d4f8",
 				"description": "Work a nearby Forest for generic raw game meat. Uses the same hunting gear but returns only the meat instead of the whole unpleasant accounting exercise.",
 				"clock": false,
 				"clockWeight": 1,
@@ -190,7 +190,7 @@
 			{
 				"id": "hunt-fawn",
 				"title": "Hunt Fawn",
-				"artwork": "fawn",
+				"artwork": "mq003g3xomvl71vvq6648gt4",
 				"description": "Hunt a specific fawn with a reserved Bow and one consumed Arrow.",
 				"clock": false,
 				"clockWeight": 1,
@@ -275,7 +275,7 @@
 			{
 				"id": "hunt-wild-boar",
 				"title": "Hunt Wild Boar",
-				"artwork": "wild-boar",
+				"artwork": "rseqyidiainkls2qbo0hp78q",
 				"description": "Hunt a specific wild boar with a reserved Bow and one consumed Arrow.",
 				"clock": false,
 				"clockWeight": 1,
@@ -360,7 +360,7 @@
 			{
 				"id": "hunt-shorn-wild-boar",
 				"title": "Hunt Shorn Wild Boar",
-				"artwork": "shorn-wild-boar",
+				"artwork": "nim1xmgkvpq5nfufzrbukgpp",
 				"description": "Hunt a specific shorn wild boar with a reserved Bow and one consumed Arrow.",
 				"clock": false,
 				"clockWeight": 1,
@@ -445,7 +445,7 @@
 			{
 				"id": "hunt-wolf",
 				"title": "Hunt Wolf",
-				"artwork": "wolf",
+				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "Hunt a specific wolf with a reserved Bow and one consumed Arrow.",
 				"clock": false,
 				"clockWeight": 1,
@@ -530,7 +530,7 @@
 			{
 				"id": "hunt-bear",
 				"title": "Hunt Bear",
-				"artwork": "bear",
+				"artwork": "qi3z0prh4ozd1ofelnucin2s",
 				"description": "Hunt a specific bear with a reserved Bow and two consumed Arrows. Large target, large disagreement.",
 				"clock": false,
 				"clockWeight": 1,

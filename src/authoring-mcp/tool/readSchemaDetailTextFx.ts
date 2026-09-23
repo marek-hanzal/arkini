@@ -35,12 +35,12 @@ const resolveSchemaFn = (
 	schemas: Readonly<Record<string, unknown>>,
 	depth: number,
 	path: ReadonlySet<string>,
-	resourceId: string,
+	resourceUid: string,
 	inline: boolean,
 ): unknown => {
 	if (Array.isArray(value))
 		return value.map((child) =>
-			resolveSchemaFn(child, schemas, depth, path, resourceId, inline),
+			resolveSchemaFn(child, schemas, depth, path, resourceUid, inline),
 		);
 	if (!isObjectFn(value)) return value;
 	const ref = value.$ref;
@@ -55,7 +55,7 @@ const resolveSchemaFn = (
 				return [
 					[
 						key,
-						`${resourceId}${child}`,
+						`${resourceUid}${child}`,
 					],
 				];
 			if (schemaMaps.has(key) && isObjectFn(child))
@@ -65,7 +65,7 @@ const resolveSchemaFn = (
 						Object.fromEntries(
 							Object.entries(child).map(([name, schema]) => [
 								name,
-								resolveSchemaFn(schema, schemas, depth, path, resourceId, inline),
+								resolveSchemaFn(schema, schemas, depth, path, resourceUid, inline),
 							]),
 						),
 					],
@@ -74,7 +74,7 @@ const resolveSchemaFn = (
 				return [
 					[
 						key,
-						resolveSchemaFn(child, schemas, depth, path, resourceId, inline),
+						resolveSchemaFn(child, schemas, depth, path, resourceUid, inline),
 					],
 				];
 			// Defaults, examples, enums and extension values are data, even when they contain a literal $ref.

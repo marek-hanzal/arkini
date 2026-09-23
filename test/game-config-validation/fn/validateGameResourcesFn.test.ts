@@ -58,13 +58,14 @@ describe("validateGameResourcesFn", () => {
 						? []
 						: [
 								{
-									id: "line-art",
+									uid: "line-art",
 									path: `${type}/line-art.png`,
 									type,
 								},
 							],
 			}).filter(
-				(diagnostic) => "resourceId" in diagnostic && diagnostic.resourceId === "line-art",
+				(diagnostic) =>
+					"resourceUid" in diagnostic && diagnostic.resourceUid === "line-art",
 			);
 			if (type === "artwork") expect(diagnostics).toEqual([]);
 			else
@@ -103,7 +104,7 @@ describe("validateGameResourcesFn", () => {
 			[],
 			[
 				{
-					id: "detail-track",
+					uid: "detail-track",
 					path: "sfx/detail-track.ogg",
 					type: "sfx" as const,
 				},
@@ -120,7 +121,7 @@ describe("validateGameResourcesFn", () => {
 						resources.length === 0
 							? DiagnosticCodeEnumSchema.enum.ResourceMissing
 							: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
-					resourceId: "detail-track",
+					resourceUid: "detail-track",
 					path: [
 						"items",
 						itemUid,
@@ -136,19 +137,19 @@ describe("validateGameResourcesFn", () => {
 				provenance,
 				resources: [
 					{
-						id: "detail-track",
+						uid: "detail-track",
 						path: "music/detail-track.ogg",
 						type: "music",
 					},
 				],
 			}).filter(
 				(diagnostic) =>
-					"resourceId" in diagnostic && diagnostic.resourceId === "detail-track",
+					"resourceUid" in diagnostic && diagnostic.resourceUid === "detail-track",
 			),
 		).toEqual([]);
 	});
 
-	it("accepts exact filename resource IDs", () => {
+	it("accepts exact resource UIDs", () => {
 		const ids = new Set<string>([
 			startTestConfig.resources.hero,
 		]);
@@ -161,7 +162,7 @@ describe("validateGameResourcesFn", () => {
 			resources: [
 				...ids,
 			].map((id) => ({
-				id,
+				uid: id,
 				path: `${id}.png`,
 				type: readResourceTypeFn(id),
 			})),
@@ -183,7 +184,7 @@ describe("validateGameResourcesFn", () => {
 			provenance,
 			resources: [
 				{
-					id: "hero",
+					uid: "hero",
 					path: "hero.png",
 					type: "image",
 				},
@@ -193,7 +194,7 @@ describe("validateGameResourcesFn", () => {
 		expect(diagnostics).toContainEqual(
 			expect.objectContaining({
 				code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
-				resourceId: "avatar-02",
+				resourceUid: "avatar-02",
 				path: [
 					"resources",
 					"avatar-02",
@@ -211,7 +212,7 @@ describe("validateGameResourcesFn", () => {
 						"avatar-05",
 						"avatar-06",
 						"avatar-07",
-					].includes(diagnostic.resourceId),
+					].includes(diagnostic.resourceUid),
 			),
 		).toBe(false);
 	});
@@ -234,7 +235,7 @@ describe("validateGameResourcesFn", () => {
 			},
 			resources: [
 				{
-					id: "wrong-theme",
+					uid: "wrong-theme",
 					path: "image/wrong-theme.png",
 					type: "image",
 				},
@@ -250,14 +251,14 @@ describe("validateGameResourcesFn", () => {
 						"playlist",
 						0,
 					],
-					resourceId: "missing-theme",
+					resourceUid: "missing-theme",
 					source: "game.json",
 				}),
 				expect.objectContaining({
 					actualType: "image",
 					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
 					expectedType: "music",
-					resourceId: "wrong-theme",
+					resourceUid: "wrong-theme",
 					source: "game.json",
 				}),
 			]),
@@ -282,7 +283,7 @@ describe("validateGameResourcesFn", () => {
 			},
 			resources: [
 				{
-					id: "wrong-spawn",
+					uid: "wrong-spawn",
 					path: "image/wrong-spawn.png",
 					type: "image",
 				},
@@ -298,14 +299,14 @@ describe("validateGameResourcesFn", () => {
 						"events",
 						"job:started",
 					],
-					resourceId: "missing-job-start",
+					resourceUid: "missing-job-start",
 					source: "game.json",
 				}),
 				expect.objectContaining({
 					actualType: "image",
 					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
 					expectedType: "sfx",
-					resourceId: "wrong-spawn",
+					resourceUid: "wrong-spawn",
 					source: "game.json",
 				}),
 			]),
@@ -330,7 +331,7 @@ describe("validateGameResourcesFn", () => {
 			},
 			resources: [
 				{
-					id: "wrong-detail-close",
+					uid: "wrong-detail-close",
 					path: "image/wrong-detail-close.png",
 					type: "image",
 				},
@@ -346,32 +347,32 @@ describe("validateGameResourcesFn", () => {
 						"events",
 						"item-detail:opened",
 					],
-					resourceId: "missing-detail-open",
+					resourceUid: "missing-detail-open",
 					source: "game.json",
 				}),
 				expect.objectContaining({
 					actualType: "image",
 					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
 					expectedType: "sfx",
-					resourceId: "wrong-detail-close",
+					resourceUid: "wrong-detail-close",
 					source: "game.json",
 				}),
 			]),
 		);
 	});
 
-	it("reports duplicate and missing exact resource IDs", () => {
+	it("reports duplicate and missing exact resource UIDs", () => {
 		const diagnostics = validateGameResourcesFn({
 			config: startTestConfig,
 			provenance,
 			resources: [
 				{
-					id: "hero",
+					uid: "hero",
 					path: "a/hero.png",
 					type: "image",
 				},
 				{
-					id: "hero",
+					uid: "hero",
 					path: "b/hero.png",
 					type: "image",
 				},
@@ -382,7 +383,7 @@ describe("validateGameResourcesFn", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					code: DiagnosticCodeEnumSchema.enum.ResourceDuplicate,
-					resourceId: "hero",
+					resourceUid: "hero",
 				}),
 				expect.objectContaining({
 					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
@@ -419,7 +420,7 @@ describe("validateGameResourcesFn", () => {
 		expect(diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					resourceId: "missing:base",
+					resourceUid: "missing:base",
 					path: [
 						"items",
 						itemUid,
@@ -429,7 +430,7 @@ describe("validateGameResourcesFn", () => {
 					],
 				}),
 				expect.objectContaining({
-					resourceId: "missing:overlay",
+					resourceUid: "missing:overlay",
 					path: [
 						"items",
 						itemUid,
@@ -540,7 +541,7 @@ describe("validateGameResourcesFn", () => {
 				"artwork:lens",
 				"blueprint",
 			].map((id) => ({
-				id,
+				uid: id,
 				path: `${id}.png`,
 				type: readResourceTypeFn(id),
 			})),

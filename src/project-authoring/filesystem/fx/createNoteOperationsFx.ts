@@ -38,7 +38,7 @@ const errorFn = (
 const assertLinksFx = (
 	state: ProjectState,
 	itemUids: ReadonlyArray<string>,
-	resourceIds: ReadonlyArray<string>,
+	resourceUids: ReadonlyArray<string>,
 	operation: "create-note" | "update-note",
 ) => {
 	const existingItemUids = new Set(
@@ -52,14 +52,14 @@ const assertLinksFx = (
 				`Linked item UIDs do not exist in the open project: ${missingItemUids.join(", ")}.`,
 			),
 		);
-	const existingResourceIds = new Set(state.project.resources.map((resource) => resource.id));
-	const missingResourceIds = resourceIds.filter((id) => !existingResourceIds.has(id));
-	return missingResourceIds.length === 0
+	const existingResourceUids = new Set(state.project.resources.map((resource) => resource.uid));
+	const missingResourceUids = resourceUids.filter((id) => !existingResourceUids.has(id));
+	return missingResourceUids.length === 0
 		? Effect.void
 		: Effect.fail(
 				errorFn(
 					operation,
-					`Linked resource IDs do not exist in the open project: ${missingResourceIds.join(", ")}.`,
+					`Linked resource IDs do not exist in the open project: ${missingResourceUids.join(", ")}.`,
 				),
 			);
 };
@@ -92,8 +92,8 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 					itemUids: [
 						...note.itemUids,
 					],
-					resourceIds: [
-						...note.resourceIds,
+					resourceUids: [
+						...note.resourceUids,
 					],
 				})),
 			]),
@@ -107,8 +107,8 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 					itemUids: [
 						...note.itemUids,
 					],
-					resourceIds: [
-						...note.resourceIds,
+					resourceUids: [
+						...note.resourceUids,
 					],
 				})),
 			].sort(
@@ -141,14 +141,14 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 		projectId,
 		content: candidate,
 		itemUids: candidateItemUids,
-		resourceIds: candidateResourceIds,
+		resourceUids: candidateResourceUids,
 	}) =>
 		Effect.gen(function* () {
-			const { content, itemUids, resourceIds } = yield* Effect.try({
+			const { content, itemUids, resourceUids } = yield* Effect.try({
 				try: () => ({
 					content: NoteContentSchema.parse(candidate),
 					itemUids: NoteSchema.shape.itemUids.parse(candidateItemUids),
-					resourceIds: NoteSchema.shape.resourceIds.parse(candidateResourceIds),
+					resourceUids: NoteSchema.shape.resourceUids.parse(candidateResourceUids),
 				}),
 				catch: (cause) =>
 					errorFn("create-note", "The Editor project note is invalid.", cause),
@@ -158,7 +158,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 				Effect.gen(function* () {
 					const state = yield* readStateFx(projectId);
 					const notes = yield* readNotesFx(projectId);
-					yield* assertLinksFx(state, itemUids, resourceIds, "create-note");
+					yield* assertLinksFx(state, itemUids, resourceUids, "create-note");
 					const latest = notes[0]?.updatedAtMs;
 					const createdAtMs =
 						latest === undefined ? clockMs : Math.max(clockMs, latest + 1);
@@ -167,7 +167,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 						projectId,
 						content,
 						itemUids,
-						resourceIds,
+						resourceUids,
 						createdAtMs,
 						updatedAtMs: createdAtMs,
 					});
@@ -182,7 +182,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 								NoteFileSchema.parse({
 									content: note.content,
 									itemUids: note.itemUids,
-									resourceIds: note.resourceIds,
+									resourceUids: note.resourceUids,
 									createdAtMs: note.createdAtMs,
 									updatedAtMs: note.updatedAtMs,
 								}),
@@ -211,17 +211,17 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 		noteId: candidateId,
 		content: candidate,
 		itemUids: candidateItemUids,
-		resourceIds: candidateResourceIds,
+		resourceUids: candidateResourceUids,
 		expectedUpdatedAtMs: candidateExpectedUpdatedAtMs,
 	}) =>
 		Effect.gen(function* () {
-			const { noteId, content, itemUids, resourceIds, expectedUpdatedAtMs } =
+			const { noteId, content, itemUids, resourceUids, expectedUpdatedAtMs } =
 				yield* Effect.try({
 					try: () => ({
 						noteId: IdSchema.parse(candidateId),
 						content: NoteContentSchema.parse(candidate),
 						itemUids: NoteSchema.shape.itemUids.parse(candidateItemUids),
-						resourceIds: NoteSchema.shape.resourceIds.parse(candidateResourceIds),
+						resourceUids: NoteSchema.shape.resourceUids.parse(candidateResourceUids),
 						expectedUpdatedAtMs: NonNegativeIntegerSchema.parse(
 							candidateExpectedUpdatedAtMs,
 						),
@@ -249,13 +249,13 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 								`Editor note ${noteId} changed after it was read.`,
 							),
 						);
-					yield* assertLinksFx(state, itemUids, resourceIds, "update-note");
+					yield* assertLinksFx(state, itemUids, resourceUids, "update-note");
 					const latest = notes[0]?.updatedAtMs ?? previous.updatedAtMs;
 					const note = NoteSchema.parse({
 						...previous,
 						content,
 						itemUids,
-						resourceIds,
+						resourceUids,
 						updatedAtMs: Math.max(clockMs, latest + 1),
 					});
 					const target = yield* state.paths.noteFileFx(noteId);
@@ -268,7 +268,7 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 							bytes: encodeJsonFn({
 								content: note.content,
 								itemUids: note.itemUids,
-								resourceIds: note.resourceIds,
+								resourceUids: note.resourceUids,
 								createdAtMs: note.createdAtMs,
 								updatedAtMs: note.updatedAtMs,
 							}),

@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"house-t2"
+				"f0vnkcqwb0i3r7l5dqs3852l"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "labor-t2",
 				"title": "Labor - Tier 2",
-				"artwork": "labor-t2",
+				"artwork": "slsv3zrpag2yi4uqa82usr0c",
 				"description": "Coordinate several units of basic labor into a smaller amount of more capable Tier 2 labor.",
 				"clockWeight": 1,
 				"default": true,

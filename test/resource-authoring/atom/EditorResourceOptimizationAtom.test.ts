@@ -24,7 +24,7 @@ const state = vi.hoisted(() => ({
 					readonly totalResourceCount: number;
 				}) => void;
 				readonly projectId: string;
-				readonly resourceIds: ReadonlyArray<string>;
+				readonly resourceUids: ReadonlyArray<string>;
 				readonly type: "artwork" | "sfx";
 		  }
 		| undefined,
@@ -112,7 +112,7 @@ describe("EditorResourceOptimizationAtom", () => {
 		registry.set(optimizationAtom, {
 			expectedRevision: project.revision,
 			kind: "optimize",
-			resourceIds: [
+			resourceUids: [
 				"one",
 				"two",
 				"three",
@@ -124,7 +124,7 @@ describe("EditorResourceOptimizationAtom", () => {
 		expect(state.request).toMatchObject({
 			expectedRevision: project.revision,
 			projectId: project.projectId,
-			resourceIds: [
+			resourceUids: [
 				"one",
 				"two",
 				"three",
@@ -187,7 +187,7 @@ describe("EditorResourceOptimizationAtom", () => {
 		registry.set(optimizationAtom, {
 			expectedRevision: project.revision,
 			kind: "optimize",
-			resourceIds: [
+			resourceUids: [
 				"one",
 			],
 			type: "artwork",
@@ -222,7 +222,7 @@ describe("EditorResourceOptimizationAtom", () => {
 		registry.set(atom, {
 			kind: "optimize",
 			expectedRevision: 4,
-			resourceIds: [
+			resourceUids: [
 				"one",
 			],
 			type: "artwork",
@@ -272,7 +272,7 @@ describe("EditorResourceOptimizationAtom", () => {
 			registry.set(atom, {
 				kind: "optimize",
 				expectedRevision: 4,
-				resourceIds: [
+				resourceUids: [
 					"one",
 				],
 				type: "artwork",

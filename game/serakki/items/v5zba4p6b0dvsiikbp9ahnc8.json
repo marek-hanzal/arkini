@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"gardener"
+				"so7r094glj6wfe6yoveiclrg",
+				"e66c5l38fesf2qr41s7335ux"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "gardener",
 				"title": "Build Gardener",
-				"artwork": "gardener",
+				"artwork": "e66c5l38fesf2qr41s7335ux",
 				"description": "Build Gardener.",
 				"clockWeight": 1,
 				"default": true,

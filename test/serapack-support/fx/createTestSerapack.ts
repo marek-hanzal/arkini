@@ -83,12 +83,12 @@ export const createTestSerapack = (
 			config: identifiedConfig,
 			resources: [
 				{
-					id: "hero",
+					uid: "hero",
 					type: "image",
 					bytes: createTestPngBytes(),
 				},
 				{
-					id: "asset-water",
+					uid: "asset-water",
 					type: "artwork",
 					bytes: createTestPngBytes(),
 				},

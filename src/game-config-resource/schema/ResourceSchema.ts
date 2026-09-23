@@ -5,7 +5,7 @@ import { ResourceTypeSchema } from "./ResourceTypeSchema";
 
 export const ResourceSchema = z
 	.object({
-		id: IdSchema.describe("The stable resource identifier."),
+		uid: IdSchema.describe("The stable resource identifier."),
 		type: ResourceTypeSchema.describe("The semantic resource kind."),
 		bytes: z
 			.custom<Uint8Array>((value) => value instanceof Uint8Array)

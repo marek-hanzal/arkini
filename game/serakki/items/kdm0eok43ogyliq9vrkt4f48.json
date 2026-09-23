@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"hop-farm"
+				"fs5g5vup2as9dpzqlmghj1os"
 			]
 		},
 		"maxQueueSize": 4,
@@ -94,7 +94,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Hop Field",
-				"artwork": "empty-hop-field",
+				"artwork": "l30oo2nvumphxsc0frobu1di",
 				"description": "Prepare a new hop field for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -136,7 +136,7 @@
 			{
 				"id": "blueprint",
 				"title": "Hop Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Hop Farm.",
 				"clockWeight": 1,
 				"default": false,

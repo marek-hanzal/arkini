@@ -36,10 +36,10 @@ describe("filesystem Editor project current tree", () => {
 		await writeFile(
 			join(harness.root, "music", "orphan.json"),
 			JSON.stringify({
-				name: "Dusty Plains",
+				title: "Dusty Plains",
 			}),
 		);
-		await expect(harness.read()).rejects.toThrow("requires its paired file");
+		await expect(harness.read()).rejects.toThrow("has no paired resource");
 	});
 
 	it("round-trips and republishes the complete authoritative current tree", async () => {
@@ -64,8 +64,9 @@ describe("filesystem Editor project current tree", () => {
 		const expectCurrentTreeFn = async (expected: ProjectFiles) => {
 			expect(await harness.read()).toEqual({
 				...expected,
-				resources: expected.resources.map(({ id, type, bytes }) => ({
-					id,
+				resources: expected.resources.map(({ uid, type, bytes }) => ({
+					uid,
+					title: uid,
 					type,
 					size: bytes.byteLength,
 					version: expect.any(String),
@@ -75,7 +76,7 @@ describe("filesystem Editor project current tree", () => {
 				const directory = resource.type;
 				expect(
 					new Uint8Array(
-						await readFile(join(harness.root, directory, `${resource.id}.png`)),
+						await readFile(join(harness.root, directory, `${resource.uid}.png`)),
 					),
 				).toEqual(resource.bytes);
 			}
@@ -104,7 +105,7 @@ describe("filesystem Editor project current tree", () => {
 					$ref: "urn:serakki:schema:project#/$defs/ItemFileSchema",
 				},
 				{
-					$ref: "urn:serakki:schema:project#/$defs/AudioResourceMetadataSchema",
+					$ref: "urn:serakki:schema:project#/$defs/ResourceMetadataSchema",
 				},
 			],
 			$defs: {
@@ -176,7 +177,7 @@ describe("filesystem Editor project current tree", () => {
 				},
 			}),
 			resources: repaired.resources.map((resource) =>
-				resource.id === "item-water"
+				resource.uid === "item-water"
 					? {
 							...resource,
 							bytes: new Uint8Array([

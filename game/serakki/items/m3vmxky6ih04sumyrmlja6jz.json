@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"herbalist"
+				"t8fcvhnkshehi1vumbhhxdu7"
 			]
 		},
 		"maxQueueSize": 4,
@@ -229,7 +229,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Herb Garden",
-				"artwork": "empty-herb-garden",
+				"artwork": "n5vp6l4aeq5yzor4v8qzzvbs",
 				"description": "Prepare a new herb garden for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -271,7 +271,7 @@
 			{
 				"id": "blueprint",
 				"title": "Herbalist Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Herbalist.",
 				"clockWeight": 1,
 				"default": false,

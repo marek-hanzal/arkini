@@ -5,27 +5,27 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
-	artworkIdError: undefined as string | undefined,
+	titleError: undefined as string | undefined,
 	file: undefined as File | undefined,
 	fileError: undefined as string | undefined,
 }));
 
 vi.mock("~/artwork-authoring/ui/useEditorArtworkEditController", () => ({
 	useEditorArtworkEditController: () => ({
-		artworkIdError: state.artworkIdError,
+		titleError: state.titleError,
 		currentUrl: "blob:canonical",
 		dirty: true,
 		error: undefined,
 		file: state.file,
 		fileError: state.fileError,
-		nextId: "hero",
+		title: "hero",
 		projectId: "project",
 		resourceFound: true,
 		saveFn: vi.fn().mockResolvedValue(true),
 		discardFn: vi.fn().mockResolvedValue(undefined),
 		saving: false,
 		setFileFn: vi.fn(),
-		setNextIdFn: vi.fn(),
+		setTitleFn: vi.fn(),
 	}),
 }));
 
@@ -68,7 +68,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	state.file = undefined;
-	state.artworkIdError = undefined;
+	state.titleError = undefined;
 	state.fileError = undefined;
 	document.body.replaceChildren();
 	vi.restoreAllMocks();
@@ -76,7 +76,7 @@ afterEach(async () => {
 
 describe("EditorArtworkEdit", () => {
 	it("targets draft validation at the exact artwork control", async () => {
-		state.artworkIdError = "Enter a value.";
+		state.titleError = "Enter a value.";
 		state.fileError = "Choose a valid PNG.";
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -91,7 +91,7 @@ describe("EditorArtworkEdit", () => {
 					createElement(EditorArtworkEdit, {
 						filter: "all",
 						query: "",
-						resourceId: "hero",
+						resourceUid: "hero",
 					}),
 				),
 			),
@@ -130,7 +130,7 @@ describe("EditorArtworkEdit", () => {
 					createElement(EditorArtworkEdit, {
 						filter: "all",
 						query: "",
-						resourceId: "hero",
+						resourceUid: "hero",
 					}),
 				),
 			),

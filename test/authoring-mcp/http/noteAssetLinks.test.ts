@@ -36,7 +36,7 @@ describe("editor MCP note asset links", () => {
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 
-		for (const resourceIds of [
+		for (const resourceUids of [
 			[
 				"missing",
 			],
@@ -52,7 +52,7 @@ describe("editor MCP note asset links", () => {
 					itemUids: [
 						"water",
 					],
-					resourceIds,
+					resourceUids,
 				},
 			});
 			expect(result.isError).toBe(true);
@@ -67,7 +67,7 @@ describe("editor MCP note asset links", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [
+				resourceUids: [
 					"hero",
 					"item-water",
 				],
@@ -81,13 +81,13 @@ describe("editor MCP note asset links", () => {
 				projectId: project.projectId,
 				content: "Newer palette note without item context",
 				itemUids: [],
-				resourceIds: [
+				resourceUids: [
 					"hero",
 				],
 			}),
 		);
 
-		for (const resourceId of [
+		for (const resourceUid of [
 			"hero",
 			"item-water",
 		]) {
@@ -96,7 +96,7 @@ describe("editor MCP note asset links", () => {
 					name: "note_collection",
 					arguments: {
 						itemUid: "water",
-						resourceId,
+						resourceUid,
 						query: "PALETTE",
 						limit: 1,
 					},
@@ -104,14 +104,14 @@ describe("editor MCP note asset links", () => {
 			);
 			expect(collection).toContain("Matched notes: 1");
 			expect(collection).toContain(`- ${note.noteId}`);
-			expect(collection).toContain('"id":"hero","type":"image"');
+			expect(collection).toContain('"uid":"hero","type":"image"');
 		}
 		const unmatched = readTextFn(
 			await client.callTool({
 				name: "note_collection",
 				arguments: {
 					itemUid: "water",
-					resourceId: "hero",
+					resourceUid: "hero",
 					query: "Newer",
 				},
 			}),
@@ -144,11 +144,13 @@ describe("editor MCP note asset links", () => {
 			],
 			linkedResources: [
 				{
-					id: "hero",
+					uid: "hero",
+					title: "hero",
 					type: "image",
 				},
 				{
-					id: "item-water",
+					uid: "item-water",
+					title: "item-water",
 					type: "artwork",
 				},
 			],
@@ -164,7 +166,7 @@ describe("editor MCP note asset links", () => {
 			name: "edit_note",
 			arguments: {
 				...editInput,
-				resourceIds: [
+				resourceUids: [
 					"missing",
 				],
 			},
@@ -174,7 +176,7 @@ describe("editor MCP note asset links", () => {
 			name: "edit_note",
 			arguments: {
 				...editInput,
-				resourceIds: [
+				resourceUids: [
 					"item-water",
 				],
 			},
@@ -185,7 +187,7 @@ describe("editor MCP note asset links", () => {
 		);
 		expect(updated).toEqual({
 			...note,
-			resourceIds: [
+			resourceUids: [
 				"item-water",
 			],
 			updatedAtMs: expect.any(Number),
@@ -195,7 +197,7 @@ describe("editor MCP note asset links", () => {
 			name: "edit_note",
 			arguments: {
 				...editInput,
-				resourceIds: [],
+				resourceUids: [],
 			},
 		});
 		expect(stale.isError).toBe(true);
@@ -206,7 +208,7 @@ describe("editor MCP note asset links", () => {
 				name: "note_collection",
 				arguments: {
 					itemUid: "water",
-					resourceId: "hero",
+					resourceUid: "hero",
 				},
 			}),
 		);

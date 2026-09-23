@@ -60,7 +60,7 @@ export const NoteItemLinks = ({
 									}}
 								>
 									<EditorItemThumbnail
-										resourceIds={item.artwork.default}
+										resourceUids={item.artwork.default}
 										size="sm"
 									/>
 									<span className="truncate">{item.title || item.uid}</span>

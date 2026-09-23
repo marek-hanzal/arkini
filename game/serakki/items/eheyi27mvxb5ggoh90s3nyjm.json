@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"townhall-t1"
+				"so7r094glj6wfe6yoveiclrg",
+				"c7uw765u5c2hqnjvv3zmwkgn"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "townhall-t1",
 				"title": "Townhall I",
-				"artwork": "townhall-t1",
+				"artwork": "c7uw765u5c2hqnjvv3zmwkgn",
 				"description": "Turn the Base Camp into the first proper Townhall and unpack a small supply chest from the next stage of civilization.",
 				"clockWeight": 1,
 				"default": true,

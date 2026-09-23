@@ -8,8 +8,7 @@ import {
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
-import { readInitialAudioResourceNameFn } from "~/audio-authoring/fn/readInitialAudioResourceNameFn";
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameProjectJsonSchema } from "~/game-config-source/schema/GameProjectJsonSchema";
 import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
@@ -144,20 +143,20 @@ const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(funct
 	const resourceWrites = new Map<string, Write>();
 	for (const resource of [
 		...resources,
-	].sort((left, right) => left.id.localeCompare(right.id))) {
+	].sort((left, right) => left.uid.localeCompare(right.uid))) {
 		const target = yield* paths.resourceFileFx(resource);
 		const collision = addUniqueTargetFn(resourceWrites, {
 			target,
 			bytes: resource.bytes,
 		});
 		if (collision !== undefined) return yield* Effect.fail(collision);
-		if (resource.type === "music" || resource.type === "sfx") {
-			const metadataTarget = yield* paths.audioMetadataFileFx({
-				id: resource.id,
+		{
+			const metadataTarget = yield* paths.resourceMetadataFileFx({
+				uid: resource.uid,
 				type: resource.type,
 			});
-			const metadata = AudioResourceMetadataSchema.parse({
-				name: readInitialAudioResourceNameFn(resource.id),
+			const metadata = ResourceMetadataSchema.parse({
+				title: resource.uid,
 			});
 			const metadataCollision = addUniqueTargetFn(resourceWrites, {
 				target: metadataTarget,
@@ -260,7 +259,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 					NoteFileSchema.parse({
 						content: note.content,
 						itemUids: note.itemUids,
-						resourceIds: note.resourceIds,
+						resourceUids: note.resourceUids,
 						createdAtMs: note.createdAtMs,
 						updatedAtMs: note.updatedAtMs,
 					}),

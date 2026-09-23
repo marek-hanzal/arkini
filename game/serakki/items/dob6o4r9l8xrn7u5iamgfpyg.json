@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"school-t1"
+				"e8h5l2j4tq4tu8uskz5aqd8e"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "knowledge-t1",
 				"title": "Basic Education",
-				"artwork": "knowledge-t1",
+				"artwork": "cfj7eir2owkscyllcaxh7lk3",
 				"description": "Spend time, labor, and paper teaching the settlement something worth remembering.",
 				"clockWeight": 1,
 				"default": true,

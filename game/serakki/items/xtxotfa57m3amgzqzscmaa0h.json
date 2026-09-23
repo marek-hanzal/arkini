@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"explorer"
+				"so7r094glj6wfe6yoveiclrg",
+				"u79x20w1h96ptfjkdcyv8ojp"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "explorer",
 				"title": "Build Explorer",
-				"artwork": "explorer",
+				"artwork": "u79x20w1h96ptfjkdcyv8ojp",
 				"description": "Build an explorer's camp from wood and stone.",
 				"clockWeight": 1,
 				"default": true,

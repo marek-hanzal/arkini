@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"flower-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"l90rt6qrg0fvv2g7qak9uamt"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "flower-farm",
 				"title": "Build Flower Farm",
-				"artwork": "flower-farm",
+				"artwork": "l90rt6qrg0fvv2g7qak9uamt",
 				"description": "Build Flower Farm.",
 				"clockWeight": 1,
 				"default": true,

@@ -14,18 +14,18 @@ const thumbnailSizeClassName = {
 interface EditorItemThumbnailProps {
 	readonly className?: string;
 	readonly imageClassName?: string;
-	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
+	readonly resourceUids: ItemSchema.Type["artwork"]["default"];
 	readonly size?: keyof typeof thumbnailSizeClassName;
 }
 
 /** Renders the compact item preview placed beside editor search controls. */
 const EditorItemSelectedThumbnail = ({
 	className,
-	resourceIds,
-}: Pick<EditorItemThumbnailProps, "className" | "resourceIds">) => (
+	resourceUids,
+}: Pick<EditorItemThumbnailProps, "className" | "resourceUids">) => (
 	<EditorItemThumbnail
 		className={twMerge("rounded-lg", className)}
-		resourceIds={resourceIds}
+		resourceUids={resourceUids}
 		size="input"
 	/>
 );
@@ -43,7 +43,7 @@ export const EditorItemSearchThumbnail = ({
 	selected ? (
 		<EditorItemSelectedThumbnail
 			className={className}
-			resourceIds={
+			resourceUids={
 				item?.artwork.default ?? [
 					"",
 				]
@@ -52,7 +52,7 @@ export const EditorItemSearchThumbnail = ({
 	) : item === undefined ? null : (
 		<EditorItemThumbnail
 			className={className}
-			resourceIds={item.artwork.default}
+			resourceUids={item.artwork.default}
 			size="lg"
 		/>
 	);
@@ -61,14 +61,14 @@ export const EditorItemSearchThumbnail = ({
 export const EditorItemThumbnail = ({
 	className,
 	imageClassName,
-	resourceIds,
+	resourceUids,
 	size = "lg",
 }: EditorItemThumbnailProps) => {
-	const backgroundUrl = useResourceUrl(resourceIds[0]);
-	const foregroundUrl = useResourceUrl(resourceIds[1]);
+	const backgroundUrl = useResourceUrl(resourceUids[0]);
+	const foregroundUrl = useResourceUrl(resourceUids[1]);
 	const ready =
 		backgroundUrl !== undefined &&
-		(resourceIds[1] === undefined || foregroundUrl !== undefined);
+		(resourceUids[1] === undefined || foregroundUrl !== undefined);
 	if (ready) {
 		return (
 			<ItemArtwork
@@ -92,7 +92,7 @@ export const EditorItemThumbnail = ({
 			)}
 			data-ui="EditorItemThumbnail"
 		>
-			{resourceIds[0] === "" ? null : (
+			{resourceUids[0] === "" ? null : (
 				<span className="text-xl font-semibold text-subtle">?</span>
 			)}
 		</div>

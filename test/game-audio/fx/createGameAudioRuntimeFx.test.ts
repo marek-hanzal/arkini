@@ -118,11 +118,11 @@ describe("createGameAudioRuntimeFx", () => {
 					},
 					resources: [
 						{
-							id: "theme",
+							uid: "theme",
 							type: "music",
 						},
 						{
-							id: "item-theme",
+							uid: "item-theme",
 							type: "music",
 						},
 					],
@@ -202,11 +202,11 @@ describe("createGameAudioRuntimeFx", () => {
 						},
 						resources: [
 							{
-								id: "theme",
+								uid: "theme",
 								type: "music",
 							},
 							{
-								id: "cue",
+								uid: "cue",
 								type: "sfx",
 							},
 						],
@@ -272,7 +272,7 @@ describe("createGameAudioRuntimeFx", () => {
 					},
 					resources: [
 						{
-							id: "custom-job-start",
+							uid: "custom-job-start",
 							type: "sfx",
 						},
 					],
@@ -340,7 +340,7 @@ describe("createGameAudioRuntimeFx", () => {
 					},
 					resources: [
 						{
-							id: "unused-sfx",
+							uid: "unused-sfx",
 							type: "sfx",
 						},
 					],
@@ -384,11 +384,11 @@ describe("createGameAudioRuntimeFx", () => {
 					},
 					resources: [
 						{
-							id: "theme-a",
+							uid: "theme-a",
 							type: "music",
 						},
 						{
-							id: "theme-b",
+							uid: "theme-b",
 							type: "music",
 						},
 					],
@@ -439,8 +439,8 @@ describe("item detail music", () => {
 						"global",
 						"detail-b",
 						"detail-c",
-					].map((id) => ({
-						id,
+					].map((uid) => ({
+						uid,
 						type: "music" as const,
 					})),
 					getResourceUrlFn: (id) => `serakki://resource/${id}`,

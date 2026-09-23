@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"herders-guild"
+				"so7r094glj6wfe6yoveiclrg",
+				"sfiecse95ohoctxsonulfpfa"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "herders-guild",
 				"title": "Build Herders Guild",
-				"artwork": "herders-guild",
+				"artwork": "sfiecse95ohoctxsonulfpfa",
 				"description": "Build Herders Guild.",
 				"clockWeight": 1,
 				"default": true,

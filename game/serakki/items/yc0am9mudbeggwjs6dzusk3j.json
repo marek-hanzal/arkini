@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"carpenter"
+				"xu2pifv4mgpkrm75kej8c6sb"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "empty-bucket",
 				"title": "Empty Bucket",
-				"artwork": "empty-bucket",
+				"artwork": "jjjclycevj28udhuw8z2dj0h",
 				"description": "Make a wooden bucket for carrying water and other liquids.",
 				"clockWeight": 1,
 				"default": false,
@@ -71,7 +71,7 @@
 			{
 				"id": "empty-crate",
 				"title": "Empty Crate",
-				"artwork": "empty-crate",
+				"artwork": "ds3rbh45niqolr0afwqwz4r9",
 				"description": "Build a wooden crate for packing goods.",
 				"clockWeight": 1,
 				"default": false,
@@ -125,7 +125,7 @@
 			{
 				"id": "empty-basket",
 				"title": "Empty Basket",
-				"artwork": "empty-basket",
+				"artwork": "xg7vezdfetjkmpfjhfigjqhq",
 				"description": "Weave a simple basket from processed wood fibers for eggs, bread, and other loose goods.",
 				"clockWeight": 1,
 				"default": false,
@@ -179,7 +179,7 @@
 			{
 				"id": "empty-paper-drying-rack",
 				"title": "Paper Drying Rack",
-				"artwork": "empty-paper-drying-rack",
+				"artwork": "yzibccv5myux6gvh7c9rbjch",
 				"description": "Build a reusable wooden rack for forming and drying sheets of paper.",
 				"clockWeight": 1,
 				"default": false,
@@ -233,7 +233,7 @@
 			{
 				"id": "scrubbing-brush",
 				"title": "Scrubbing Brush",
-				"artwork": "scrubbing-brush",
+				"artwork": "taxw7u1lko0lx1z4ym93fcoy",
 				"description": "Build a sturdy wooden scrubbing brush using boar bristles.",
 				"clockWeight": 1,
 				"default": false,
@@ -302,7 +302,7 @@
 			{
 				"id": "cutting-board",
 				"title": "Cutting Board",
-				"artwork": "cutting-board",
+				"artwork": "xbl6vn5ornfwxztuw4x58vjs",
 				"description": "Make a simple wooden cutting board for food preparation and other increasingly questionable kitchen chemistry.",
 				"clockWeight": 1,
 				"default": false,
@@ -356,7 +356,7 @@
 			{
 				"id": "shepherds-crook",
 				"title": "Shepherd's Crook",
-				"artwork": "shepherds-crook",
+				"artwork": "bfhaec6ttp7jufstqez635sg",
 				"description": "Carve a reusable crook for manually releasing animals from populated enclosures.",
 				"clockWeight": 1,
 				"default": false,
@@ -410,7 +410,7 @@
 			{
 				"id": "wooden-sticks",
 				"title": "Wooden Sticks",
-				"artwork": "wooden-sticks",
+				"artwork": "sph5etm2s4wtaq97o9zpzcvr",
 				"description": "Cut processed planks into a larger batch of straight wooden sticks with less waste.",
 				"clock": false,
 				"clockWeight": 1,

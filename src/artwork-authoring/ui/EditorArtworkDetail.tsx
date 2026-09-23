@@ -13,8 +13,7 @@ import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
-import { useEditorArtworkById } from "~/artwork-authoring/ui/useEditorArtworkById";
-import { readResourceNameFn } from "~/game-config-resource/fn/readResourceNameFn";
+import { useEditorArtworkByUid } from "~/artwork-authoring/ui/useEditorArtworkByUid";
 import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
@@ -33,13 +32,13 @@ const EditorArtworkDetailTab = ({
 	filter,
 	projectId,
 	query,
-	resourceId,
+	resourceUid,
 	section,
 }: {
 	readonly filter: ArtworkCatalogFilterSchema.Type;
 	readonly projectId: string;
 	readonly query: string;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly section: EditorArtworkDetailSection;
 }) => {
 	const translator = useTranslator();
@@ -55,7 +54,7 @@ const EditorArtworkDetailTab = ({
 				to={section.to}
 				params={{
 					projectId,
-					resourceId,
+					resourceUid,
 				}}
 				search={{
 					filter,
@@ -87,24 +86,24 @@ export const EditorArtworkDetail = ({
 	filter,
 	help,
 	query,
-	resourceId,
+	resourceUid,
 }: PropsWithChildren<{
 	readonly help: EditorPageHelpContent;
 	readonly contentMode?: "scroll" | "viewport";
 	readonly filter: ArtworkCatalogFilterSchema.Type;
 	readonly query: string;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 }>) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const editActionRef = useEditorEditShortcut();
-	const resource = useEditorArtworkById(resourceId);
+	const resource = useEditorArtworkByUid(resourceUid);
 	useEditorArtworkDetailSectionShortcuts({
 		enabled: resource !== undefined,
 		filter,
 		projectId: project.projectId,
 		query,
-		resourceId,
+		resourceUid,
 	});
 	if (resource === undefined) {
 		return (
@@ -123,7 +122,7 @@ export const EditorArtworkDetail = ({
 								}}
 							/>
 						}
-						title={<h1 className="truncate text-xl font-semibold">{resourceId}</h1>}
+						title={<h1 className="truncate text-xl font-semibold">{resourceUid}</h1>}
 					/>
 				}
 			>
@@ -155,19 +154,19 @@ export const EditorArtworkDetail = ({
 					}
 					title={
 						<ItemHeaderTitle
-							resourceIds={[
-								resource.id,
+							resourceUids={[
+								resource.uid,
 							]}
-							title={resource.id}
+							title={resource.title}
 						/>
 					}
 					action={
 						<PrimaryButtonLink
 							ref={editActionRef}
-							to="/editor/$projectId/artwork/$resourceId/edit"
+							to="/editor/$projectId/artwork/$resourceUid/edit"
 							params={{
 								projectId: project.projectId,
-								resourceId,
+								resourceUid,
 							}}
 							search={{
 								filter,
@@ -187,9 +186,9 @@ export const EditorArtworkDetail = ({
 						<CreateItemLink
 							dataUi="EditorArtworkCreateItem"
 							defaultDraft
-							defaultTitle={readResourceNameFn(resource.id)}
+							defaultTitle={resource.title}
 							projectId={project.projectId}
-							resourceId={resource.id}
+							resourceUid={resource.uid}
 							variant="link"
 							className="inline-flex items-center gap-1.5 text-sm"
 						>
@@ -204,7 +203,7 @@ export const EditorArtworkDetail = ({
 							key={section.id}
 							projectId={project.projectId}
 							query={query}
-							resourceId={resourceId}
+							resourceUid={resourceUid}
 							section={section}
 						/>
 					))}

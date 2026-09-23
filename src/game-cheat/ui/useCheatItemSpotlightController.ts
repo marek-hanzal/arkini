@@ -55,14 +55,14 @@ export const useCheatItemSpotlightController = ({
 	const items = useMemo(() => {
 		const exit = game.readFn(readCheatItemCatalogFx());
 		if (Exit.isFailure(exit)) throw exit.cause;
-		return exit.value.map(({ itemUid, sourceResourceIds, title }) => ({
-			...(sourceResourceIds[1] === undefined
+		return exit.value.map(({ itemUid, sourceResourceUids, title }) => ({
+			...(sourceResourceUids[1] === undefined
 				? {}
 				: {
-						compositeUrl: game.getResourceUrlFn(sourceResourceIds[1]),
+						compositeUrl: game.getResourceUrlFn(sourceResourceUids[1]),
 					}),
 			itemUid,
-			sourceUrl: game.getResourceUrlFn(sourceResourceIds[0]),
+			sourceUrl: game.getResourceUrlFn(sourceResourceUids[0]),
 			title,
 		}));
 	}, [

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"cow-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"idjjruev1o20fc0k5r90nppr"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "cow-farm",
 				"title": "Build Cow Farm",
-				"artwork": "cow-farm",
+				"artwork": "idjjruev1o20fc0k5r90nppr",
 				"description": "Build Cow Farm.",
 				"clockWeight": 1,
 				"default": true,

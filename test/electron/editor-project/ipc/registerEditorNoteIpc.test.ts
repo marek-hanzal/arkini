@@ -99,7 +99,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		).resolves.toMatchObject({
 			type: "success",
@@ -108,7 +108,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			},
 		});
 		await expect(
@@ -118,7 +118,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		).resolves.toMatchObject({
 			type: "success",
@@ -129,7 +129,7 @@ describe("editor project-note IPC", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			},
 		});
 		await expect(invoke(SerakkiElectronApi.channels.editorNoteDelete, key)).resolves.toEqual({
@@ -144,7 +144,7 @@ describe("editor project-note IPC", () => {
 			itemUids: [
 				"water",
 			],
-			resourceIds: [],
+			resourceUids: [],
 		});
 		expect(repository.updateNoteFx).toHaveBeenCalledWith({
 			...key,
@@ -152,7 +152,7 @@ describe("editor project-note IPC", () => {
 			itemUids: [
 				"water",
 			],
-			resourceIds: [],
+			resourceUids: [],
 		});
 		expect(repository.deleteNoteFx).toHaveBeenCalledWith(key);
 	});

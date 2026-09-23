@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"crop-market"
+				"so7r094glj6wfe6yoveiclrg",
+				"ffbzxdufwade6ssq81so5b9z"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "farmers-market",
 				"title": "Build Farmers Market",
-				"artwork": "crop-market",
+				"artwork": "ffbzxdufwade6ssq81so5b9z",
 				"description": "Build a Farmers Market.",
 				"clockWeight": 1,
 				"default": true,

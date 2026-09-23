@@ -16,7 +16,7 @@ export const readArtworkCollectionTextFn = (project: Project, input: ArtworkColl
 	const hasPreviousPage = input.page > 1;
 	const hasNextPage = input.page * input.limit < matches.length;
 	const renderedArtwork = pageArtwork
-		.map((artwork) => `- Type: artwork\n  ID: ${artwork.id}`)
+		.map((artwork) => `- Type: artwork\n  UID: ${artwork.uid}\n  Title: ${artwork.title}`)
 		.join("\n\n");
 	return [
 		"Artwork collection",

@@ -30,13 +30,15 @@ vi.mock("~/artwork-authoring/ui/useEditorArtworkLibrary", () => ({
 			{
 				size: 0,
 				version: "1",
-				id: "visible-one",
+				uid: "visible-one",
+				title: "visible-one",
 				type: "artwork",
 			},
 			{
 				size: 0,
 				version: "1",
-				id: "visible-two",
+				uid: "visible-two",
+				title: "visible-two",
 				type: "artwork",
 			},
 		],
@@ -139,7 +141,7 @@ describe("useEditorArtworkManagerController", () => {
 		expect(state.optimizeResources).toHaveBeenCalledWith({
 			expectedRevision: 42,
 			kind: "optimize",
-			resourceIds: [
+			resourceUids: [
 				"visible-one",
 				"visible-two",
 			],

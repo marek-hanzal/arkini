@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"apiary"
+				"wvvpfewnw4oxnti4ljsn4w9o"
 			]
 		},
 		"maxQueueSize": 4,
@@ -198,7 +198,7 @@
 			{
 				"id": "restore-beehive",
 				"title": "Restore Beehive",
-				"artwork": "beehive",
+				"artwork": "lf8latln6upg44g47cjl34op",
 				"description": "Use a fresh bunch of flowers to repopulate a nearby empty hive.",
 				"clockWeight": 1,
 				"default": false,

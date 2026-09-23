@@ -12,18 +12,18 @@
 		"h1fch6nyd1nyzp03ffkjmtlh",
 		"wxg5ic5fq27jq6hhu1953ruq"
 	],
-	"resourceIds": [
-		"waste",
-		"bio-waste",
-		"waste-incinerator",
-		"air-pollution",
-		"faith-waste-incinerator",
-		"magic-waste-incinerator",
-		"steam-waste-incinerator",
-		"charcoal",
-		"charcoal-kiln",
-		"compost",
-		"composting-workshop"
+	"resourceUids": [
+		"iq38xai1uzr31nff9p5z0w7z",
+		"cepf602vecdhm30jmqhqe2am",
+		"mo6y7oa1ipuwt7pycm9s521t",
+		"fp7k69wp5fyf55nz796git6e",
+		"zqknl6roer5vankm1yply7s9",
+		"r5t4syuutcmvhghwdz8xxvtk",
+		"v19bd8p9ytb3zrn2msnrry7g",
+		"gg7suufmbre08vtoy15kv6u8",
+		"f5k76d90k3ibro2tzlio4znd",
+		"iaobxjxmpcgboqir2vir5feh",
+		"d1nx3rme3j7j161hpd2cu7jv"
 	],
 	"createdAtMs": 1789822885418,
 	"updatedAtMs": 1789830237818

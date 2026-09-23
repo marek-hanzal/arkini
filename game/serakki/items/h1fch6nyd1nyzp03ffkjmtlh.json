@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"charcoal-kiln"
+				"so7r094glj6wfe6yoveiclrg",
+				"f5k76d90k3ibro2tzlio4znd"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "charcoal-kiln",
 				"title": "Build Charcoal Kiln",
-				"artwork": "charcoal-kiln",
+				"artwork": "f5k76d90k3ibro2tzlio4znd",
 				"description": "Build a compact kiln from processed wood and stone.",
 				"clockWeight": 1,
 				"default": true,

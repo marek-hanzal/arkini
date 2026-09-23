@@ -88,7 +88,7 @@ const readRevisionContextFn = (value: unknown) => {
 		"previousRevision",
 		"revision",
 		"uid",
-		"resourceId",
+		"resourceUid",
 	] as const) {
 		if (!(key in value)) continue;
 		const field = Reflect.get(value, key);

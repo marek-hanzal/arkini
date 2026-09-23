@@ -8,7 +8,6 @@ import {
 	type EditorSearchOption,
 } from "~/editor-control/ui/EditorSearchCombobox";
 import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
-import { readResourceNameFn } from "~/game-config-resource/fn/readResourceNameFn";
 
 import type { Project } from "~/project-authoring/type/Project";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
@@ -52,7 +51,7 @@ interface ResourceReferenceControlProps extends ResourceAutocompleteFieldProps {
 	readonly error?: string;
 	readonly includeResourceFn?: (resource: Project.Resource) => boolean;
 	readonly onBlurFn?: () => void;
-	readonly onChangeFn: (resourceId: string) => void;
+	readonly onChangeFn: (resourceUid: string) => void;
 }
 
 /** Reuses the canonical typed Resource autocomplete outside direct form field bindings. */
@@ -79,13 +78,13 @@ export const ResourceReferenceControl = ({
 						(includeResourceFn?.(resource) ?? true),
 				)
 				.map((resource) => {
-					const label = resource.name ?? readResourceNameFn(resource.id);
+					const label = resource.title;
 					return {
-						id: resource.id,
+						id: resource.uid,
 						label,
-						meta: resource.id,
+						meta: resource.uid,
 						terms: [
-							resource.id,
+							resource.uid,
 							label,
 						],
 					} satisfies EditorSearchOption;
@@ -99,7 +98,7 @@ export const ResourceReferenceControl = ({
 	return (
 		<EditorSearchCombobox
 			displaySelectedLabel={project.resources.some(
-				(resource) => resource.id === value && resource.name !== undefined,
+				(resource) => resource.uid === value && resource.title !== undefined,
 			)}
 			label={label}
 			description={description}
@@ -112,7 +111,7 @@ export const ResourceReferenceControl = ({
 			onChangeFn={onChangeFn}
 			renderPreviewFn={(option) => (
 				<EditorResourceThumbnail
-					resourceId={option.id}
+					resourceUid={option.id}
 					size="xl"
 				/>
 			)}
@@ -120,7 +119,7 @@ export const ResourceReferenceControl = ({
 				showSelectedPreview
 					? (option) => (
 							<EditorResourceThumbnail
-								resourceId={option?.id}
+								resourceUid={option?.id}
 								size="input"
 							/>
 						)

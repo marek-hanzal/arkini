@@ -31,7 +31,7 @@ describe("filesystem Editor project writes", () => {
 		await Effect.runPromise(
 			repository.createNoteFx({
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 				projectId: created.projectId,
 				content: "Keep this note",
 			}),
@@ -277,8 +277,9 @@ describe("filesystem Editor project writes", () => {
 		const resourcePath = join(harness.temporaryDirectory, "new-artwork.png");
 		await writeFile(resourcePath, resourceBytes);
 		const resource = {
-			id: "new-asset",
+			uid: "new-asset",
 			type: "artwork" as const,
+			title: "new-asset",
 			path: resourcePath,
 			size: resourceBytes.byteLength,
 		};
@@ -290,8 +291,9 @@ describe("filesystem Editor project writes", () => {
 				],
 			}),
 		);
-		expect(resourceCommit.resources.find(({ id }) => id === resource.id)).toEqual({
-			id: resource.id,
+		expect(resourceCommit.resources.find(({ uid }) => uid === resource.uid)).toEqual({
+			uid: resource.uid,
+			title: resource.title,
 			type: resource.type,
 			size: resourceBytes.byteLength,
 			version: expect.any(String),
@@ -305,10 +307,10 @@ describe("filesystem Editor project writes", () => {
 				repository.replaceResourceFx({
 					projectId: created.projectId,
 					expectedRevision: itemCommit.revision,
-					currentId: resource.id,
-					config: resourceCommit.config,
+					resourceUid: resource.uid,
 					resource: {
-						id: resource.id,
+						uid: resource.uid,
+						title: resource.title,
 						type: resource.type,
 					},
 				}),
@@ -322,23 +324,23 @@ describe("filesystem Editor project writes", () => {
 				repository.replaceResourceFx({
 					projectId: created.projectId,
 					expectedRevision: resourceCommit.revision,
-					currentId: resource.id,
-					config: resourceCommit.config,
+					resourceUid: resource.uid,
 					resource: {
-						id: "hero",
+						uid: "hero",
+						title: "Hero",
 						type: resource.type,
 					},
 				}),
 			),
-		).rejects.toThrow("Resource ID hero already exists.");
+		).rejects.toThrow("Replacement must preserve its resource UID and type.");
 
 		const canonical = await Effect.runPromise(repository.readProjectFx(created.projectId));
 		expect(canonical?.config.items.water?.title).toBe("Fresh Water");
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		if (root === null) throw new Error("Managed project root missing.");
-		expect(new Uint8Array(await readFile(join(root, "artwork", `${resource.id}.png`)))).toEqual(
-			resourceBytes,
-		);
+		expect(
+			new Uint8Array(await readFile(join(root, "artwork", `${resource.uid}.png`))),
+		).toEqual(resourceBytes);
 		expect(canonical?.resources).toEqual(resourceCommit.resources);
 	});
 
@@ -356,11 +358,11 @@ describe("filesystem Editor project writes", () => {
 				repository.replaceResourceFx({
 					projectId: project.projectId,
 					expectedRevision: project.revision,
-					currentId: "hero",
-					config: project.config,
+					resourceUid: "hero",
 					resource: {
-						id: "hero",
+						uid: "hero",
 						type: "image",
+						title: "hero",
 						path: source,
 						size: 9,
 					},
@@ -384,10 +386,10 @@ describe("filesystem Editor project writes", () => {
 				projectId: project.projectId,
 				resources: [
 					{
-						id: "theme",
+						uid: "theme",
 						path: source,
 						size: bytes.byteLength,
-						name: "Test audio",
+						title: "Test audio",
 						type: "music",
 					},
 				],
@@ -402,9 +404,9 @@ describe("filesystem Editor project writes", () => {
 		expect(await Effect.runPromise(reopened.readProjectFx(project.projectId))).toMatchObject({
 			resources: expect.arrayContaining([
 				expect.objectContaining({
-					id: "theme",
+					uid: "theme",
 					size: bytes.byteLength,
-					name: "Test audio",
+					title: "Test audio",
 					type: "music",
 				}),
 			]),
@@ -423,10 +425,10 @@ describe("filesystem Editor project writes", () => {
 				projectId: project.projectId,
 				resources: [
 					{
-						id: "playlist-theme",
+						uid: "playlist-theme",
 						path: source,
 						size: bytes.byteLength,
-						name: "Test audio",
+						title: "Test audio",
 						type: "music",
 					},
 				],
@@ -450,7 +452,7 @@ describe("filesystem Editor project writes", () => {
 			repository.deleteResourceFx({
 				projectId: project.projectId,
 				expectedRevision: marked.revision,
-				resourceId: "playlist-theme",
+				resourceUid: "playlist-theme",
 			}),
 		);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -473,10 +475,10 @@ describe("filesystem Editor project writes", () => {
 				projectId: project.projectId,
 				resources: [
 					{
-						id: "shared-sfx",
+						uid: "shared-sfx",
 						path: source,
 						size: bytes.byteLength,
-						name: "Test audio",
+						title: "Test audio",
 						type: "sfx",
 					},
 				],
@@ -501,7 +503,7 @@ describe("filesystem Editor project writes", () => {
 			repository.deleteResourceFx({
 				projectId: project.projectId,
 				expectedRevision: marked.revision,
-				resourceId: "shared-sfx",
+				resourceUid: "shared-sfx",
 			}),
 		);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -542,11 +544,11 @@ describe("filesystem Editor project writes", () => {
 				repository.replaceResourceFx({
 					projectId: project.projectId,
 					expectedRevision: project.revision,
-					currentId: "item-water",
-					config: project.config,
+					resourceUid: "item-water",
 					resource: {
-						id: "item-water",
+						uid: "item-water",
 						type: "artwork",
+						title: "item-water",
 						path: source,
 						size: 1,
 					},

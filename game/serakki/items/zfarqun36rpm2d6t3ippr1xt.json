@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"corn-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"owlqcko1fyi8058syhln3d4h"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "corn-farm",
 				"title": "Build Corn Farm",
-				"artwork": "corn-farm",
+				"artwork": "owlqcko1fyi8058syhln3d4h",
 				"description": "Build Corn Farm.",
 				"clockWeight": 1,
 				"default": true,

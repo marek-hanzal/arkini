@@ -170,11 +170,11 @@ describe("filesystem Editor project build", () => {
 			repository.replaceResourceFx({
 				projectId: project.projectId,
 				expectedRevision: project.revision,
-				currentId: "hero",
-				config: project.config,
+				resourceUid: "hero",
 				resource: {
-					id: "hero",
+					uid: "hero",
 					type: "image",
+					title: "hero",
 					path: alternateHeroPath,
 					size: alternateHero.byteLength,
 				},
@@ -185,8 +185,9 @@ describe("filesystem Editor project build", () => {
 				projectId: project.projectId,
 				resources: [
 					{
-						id: "aa",
+						uid: "aa",
 						type: "artwork",
+						title: "aa",
 						path: artworkPath,
 						size: artwork.byteLength,
 					},
@@ -203,7 +204,7 @@ describe("filesystem Editor project build", () => {
 			revision: updated.revision,
 			version: "1.0",
 		});
-		expect(updated.resources.map(({ id }) => id)).toEqual([
+		expect(updated.resources.map(({ uid }) => uid)).toEqual([
 			"aa",
 			"hero",
 			"item-water",
@@ -252,7 +253,7 @@ describe("filesystem Editor project build", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		const rebuilt = await Effect.runPromise(
@@ -320,6 +321,7 @@ describe("filesystem Editor project build", () => {
 	it("preserves blocking diagnostics with project-relative provenance", async () => {
 		const root = await harness.createExternalProject("project-invalid-resource");
 		await unlink(join(root, "artwork", "item-water.png"));
+		await unlink(join(root, "artwork", "item-water.json"));
 		const repository = await harness.openRepository();
 		const project = await Effect.runPromise(
 			repository.openProjectFx({
@@ -347,6 +349,12 @@ describe("filesystem Editor project build", () => {
 	it("keeps successful Build warnings project-relative", async () => {
 		const root = await harness.createExternalProject("project-warning");
 		await writeFile(join(root, "artwork", "unused.png"), createTestPngBytes());
+		await writeFile(
+			join(root, "artwork", "unused.json"),
+			JSON.stringify({
+				title: "Unused",
+			}),
+		);
 		const repository = await harness.openRepository();
 		const project = await Effect.runPromise(
 			repository.openProjectFx({

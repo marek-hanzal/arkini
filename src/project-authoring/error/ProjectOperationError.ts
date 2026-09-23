@@ -6,7 +6,7 @@ export class ProjectOperationError extends Data.TaggedError("EditorProjectError"
 		| "invalid-artwork"
 		| "invalid-config"
 		| "invalid-item"
-		| "invalid-resource-id"
+		| "invalid-resource-title"
 		| "project-not-found";
 	readonly message: string;
 	readonly cause?: unknown;

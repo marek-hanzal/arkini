@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"flax-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"hp4vey6cbxfktd47m1seu0k4"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "flax-farm",
 				"title": "Build Flax Farm",
-				"artwork": "flax-farm",
+				"artwork": "hp4vey6cbxfktd47m1seu0k4",
 				"description": "Build Flax Farm.",
 				"clockWeight": 1,
 				"default": true,

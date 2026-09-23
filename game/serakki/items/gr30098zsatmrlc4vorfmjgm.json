@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"grain-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"s1txn4siry26ofn0zzn82hkm"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "grain-farm",
 				"title": "Grain Farm",
-				"artwork": "grain-farm",
+				"artwork": "s1txn4siry26ofn0zzn82hkm",
 				"description": "Soon there will be some farming simulator available...",
 				"clockWeight": 1,
 				"default": true,

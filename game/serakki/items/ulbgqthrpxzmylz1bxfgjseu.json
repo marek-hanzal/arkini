@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"dye-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"wd9pts2jmrb76pkx47xjq499"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "dye-farm",
 				"title": "Build Dye Farm",
-				"artwork": "dye-farm",
+				"artwork": "wd9pts2jmrb76pkx47xjq499",
 				"description": "Build Dye Farm.",
 				"clockWeight": 1,
 				"default": true,

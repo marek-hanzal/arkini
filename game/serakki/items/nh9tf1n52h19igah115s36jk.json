@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"air-pollution"
+				"fp7k69wp5fyf55nz796git6e"
 			]
 		},
 		"units": {
@@ -24,7 +24,7 @@
 			{
 				"id": "drift",
 				"title": "Drift",
-				"artwork": "air-pollution",
+				"artwork": "fp7k69wp5fyf55nz796git6e",
 				"description": "The pollution cloud drifts elsewhere.",
 				"clock": true,
 				"clockWeight": 4,

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"grape-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"oj4vj063lzhz7k878dy7w0wk"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "grape-farm",
 				"title": "Build Grape Farm",
-				"artwork": "grape-farm",
+				"artwork": "oj4vj063lzhz7k878dy7w0wk",
 				"description": "Build Grape Farm.",
 				"clockWeight": 1,
 				"default": true,

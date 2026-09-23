@@ -22,7 +22,7 @@ export const readResourceDescriptorsFx = Effect.fn("readResourceDescriptorsFx")(
 	return files.resources.map((resource) => {
 		const resourcePath = resource.path;
 		return {
-			id: path.basename(resourcePath, path.extname(resourcePath)),
+			uid: path.basename(resourcePath, path.extname(resourcePath)),
 			type: resource.type,
 			path: resourcePath,
 		} satisfies ResourceDescriptorSchema.Type;

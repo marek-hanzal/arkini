@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"brewery"
+				"so7r094glj6wfe6yoveiclrg",
+				"sv5zgqpnuzhei2h2zf98dynr"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "brewery",
 				"title": "Brewery",
-				"artwork": "brewery",
+				"artwork": "sv5zgqpnuzhei2h2zf98dynr",
 				"description": "So, it's time to brew a beer",
 				"default": true,
 				"clockWeight": 1,

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"forester"
+				"so7r094glj6wfe6yoveiclrg",
+				"fg49qoxb45alma2nc715rspz"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "forester",
 				"title": "Build Forester",
-				"artwork": "forester",
+				"artwork": "fg49qoxb45alma2nc715rspz",
 				"description": "Build a small forestry post from basic timber and stone.",
 				"clockWeight": 1,
 				"default": true,

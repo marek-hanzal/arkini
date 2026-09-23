@@ -37,7 +37,7 @@ vi.mock("~/ui/ui/Button", async (importOriginalFn) => ({
 				...props,
 				href: String(to)
 					.replace("$projectId", (params as Record<string, string>).projectId)
-					.replace("$resourceId", (params as Record<string, string>).resourceId),
+					.replace("$resourceUid", (params as Record<string, string>).resourceUid),
 				"data-search": JSON.stringify(search),
 			},
 			children as ReactNode,
@@ -52,7 +52,7 @@ vi.mock("~/ui/ui/Tooltip", () => ({
 }));
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
-import { Route as ArtworkNotesRoute } from "~/@routes/editor/$projectId/artwork/$resourceId/detail/notes";
+import { Route as ArtworkNotesRoute } from "~/@routes/editor/$projectId/artwork/$resourceUid/detail/notes";
 import { Route as GlobalNotesRoute } from "~/@routes/editor/$projectId/notes";
 import { editorNotesTestState as state } from "~test/project-note/support/EditorNotesFixture";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
@@ -68,7 +68,7 @@ const registries: Array<AtomRegistry.AtomRegistry> = [];
 beforeEach(() => {
 	vi.spyOn(ArtworkNotesRoute, "useParams").mockReturnValue({
 		projectId: "project-one",
-		resourceId: "asset-water",
+		resourceUid: "asset-water",
 	});
 	vi.spyOn(ArtworkNotesRoute, "useSearch").mockReturnValue({
 		filter: "unused",
@@ -192,7 +192,7 @@ describe("resource Notes", () => {
 			itemUids: [
 				"water",
 			],
-			resourceIds: [
+			resourceUids: [
 				"asset-water",
 				"asset-wood",
 			],
@@ -220,7 +220,7 @@ describe("resource Notes", () => {
 			itemUids: [
 				"water",
 			],
-			resourceIds: [
+			resourceUids: [
 				"asset-wood",
 			],
 		});
@@ -236,7 +236,7 @@ describe("resource Notes", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [
+				resourceUids: [
 					"asset-water",
 					"asset-wood",
 				],
@@ -263,7 +263,7 @@ describe("resource Notes", () => {
 		);
 		expect(state.notes[0]).toMatchObject({
 			itemUids: [],
-			resourceIds: [
+			resourceUids: [
 				"asset-water",
 				"asset-wood",
 			],
@@ -277,7 +277,7 @@ describe("resource Notes", () => {
 				projectId: "project-one",
 				content: "Retained idea",
 				itemUids: [],
-				resourceIds: [
+				resourceUids: [
 					"missing-asset",
 				],
 				createdAtMs: 1,
@@ -296,7 +296,7 @@ describe("resource Notes", () => {
 		);
 		expect(state.notes[0]).toMatchObject({
 			noteId: "missing",
-			resourceIds: [],
+			resourceUids: [],
 			content: "Retained idea",
 		});
 	});

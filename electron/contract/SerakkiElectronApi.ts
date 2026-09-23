@@ -128,7 +128,7 @@ export namespace SerakkiElectronApi {
 	export interface SerapackLoadedFile extends SerapackFile {
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<{
-			readonly id: string;
+			readonly uid: string;
 			readonly type: "artwork" | "image" | "music" | "sfx";
 			readonly url: string;
 		}>;

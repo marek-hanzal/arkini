@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"hunter"
+				"so7r094glj6wfe6yoveiclrg",
+				"rev9r1cphdn05gqh3wj4w7pj"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "hunter",
 				"title": "Build Hunter",
-				"artwork": "hunter",
+				"artwork": "rev9r1cphdn05gqh3wj4w7pj",
 				"description": "Build a hunter's camp from wood and stone.",
 				"clockWeight": 1,
 				"default": true,

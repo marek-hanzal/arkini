@@ -23,7 +23,7 @@ describe("filesystem Editor project sidecars", () => {
 		const created = await Effect.runPromise(
 			repository.createNoteFx({
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 				projectId: project.projectId,
 				content: "Original note",
 			}),
@@ -31,7 +31,7 @@ describe("filesystem Editor project sidecars", () => {
 		const updated = await Effect.runPromise(
 			repository.updateNoteFx({
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 				projectId: project.projectId,
 				noteId: created.noteId,
 				content: "Current note",
@@ -43,7 +43,7 @@ describe("filesystem Editor project sidecars", () => {
 			Effect.runPromise(
 				repository.updateNoteFx({
 					itemUids: [],
-					resourceIds: [],
+					resourceUids: [],
 					projectId: project.projectId,
 					noteId: created.noteId,
 					content: "Stale overwrite",
@@ -100,12 +100,12 @@ describe("filesystem Editor project sidecars", () => {
 			expect.objectContaining({
 				noteId: "\udc00",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 			expect.objectContaining({
 				noteId: "\ud800",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		]);
 
@@ -115,12 +115,12 @@ describe("filesystem Editor project sidecars", () => {
 			expect.objectContaining({
 				noteId: "\udc00",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 			expect.objectContaining({
 				noteId: "\ud800",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		]);
 	});
@@ -133,7 +133,7 @@ describe("filesystem Editor project sidecars", () => {
 		const note = await Effect.runPromise(
 			repository.createNoteFx({
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 				projectId: project.projectId,
 				content: "Editor-owned note",
 			}),

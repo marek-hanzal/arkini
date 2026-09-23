@@ -3,10 +3,10 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 /** Keeps the item identity and its complete artwork together in detail and form headers. */
 export const ItemHeaderTitle = ({
-	resourceIds,
+	resourceUids,
 	title,
 }: {
-	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
+	readonly resourceUids: ItemSchema.Type["artwork"]["default"];
 	readonly title: string;
 }) => (
 	<h1
@@ -15,7 +15,7 @@ export const ItemHeaderTitle = ({
 	>
 		<EditorItemThumbnail
 			className="size-10 rounded-none border-0 bg-transparent"
-			resourceIds={resourceIds}
+			resourceUids={resourceUids}
 		/>
 		<span className="shrink-0 text-subtle">·</span>
 		<span className="truncate">{title}</span>

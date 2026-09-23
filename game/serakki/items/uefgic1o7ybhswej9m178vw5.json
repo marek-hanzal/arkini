@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"sunflower-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"wxqantahcsz9emd1y1g3tmu6"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "sunflower-farm",
 				"title": "Build Sunflower Farm",
-				"artwork": "sunflower-farm",
+				"artwork": "wxqantahcsz9emd1y1g3tmu6",
 				"description": "Build Sunflower Farm.",
 				"clockWeight": 1,
 				"default": true,

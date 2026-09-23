@@ -54,7 +54,7 @@ describe("printGameDiagnosticsForCliFx", () => {
 						],
 						source: "artwork/unused.png",
 						message: "This asset is not referenced.",
-						resourceId: "unused",
+						resourceUid: "unused",
 					},
 					{
 						code: "input:units-invalid",

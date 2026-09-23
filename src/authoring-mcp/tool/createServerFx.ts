@@ -230,9 +230,9 @@ const SchemaDetailInputSchema = z
 const errorTextFn = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
 const readProjectTextFn = (project: Project) => {
-	const avatarResourceIds = Object.entries(project.config.resources)
+	const avatarResourceUids = Object.entries(project.config.resources)
 		.filter(([role]) => role.startsWith("avatar-"))
-		.map(([, resourceId]) => resourceId);
+		.map(([, resourceUid]) => resourceUid);
 	return [
 		`Title: ${project.title}`,
 		`Project ID: ${project.projectId}`,
@@ -241,10 +241,10 @@ const readProjectTextFn = (project: Project) => {
 		`Revision: ${project.revision}`,
 		`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
 		`Hero artwork: ${project.config.resources.hero}`,
-		...(avatarResourceIds.length === 0
+		...(avatarResourceUids.length === 0
 			? []
 			: [
-					`About avatars: ${avatarResourceIds.join(", ")}`,
+					`About avatars: ${avatarResourceUids.join(", ")}`,
 				]),
 		`Items: ${Object.keys(project.config.items).length}`,
 		`Resources: ${project.resources.length}`,

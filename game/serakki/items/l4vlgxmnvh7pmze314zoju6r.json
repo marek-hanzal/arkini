@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"growers-guild"
+				"g12ykuh5vwadvkoy3cs9r6zd"
 			]
 		},
 		"maxQueueSize": 6,
@@ -17,7 +17,7 @@
 			{
 				"id": "gardener-blueprint",
 				"title": "Gardener Blueprint",
-				"artwork": "gardener",
+				"artwork": "e66c5l38fesf2qr41s7335ux",
 				"description": "Draw plans for Gardener.",
 				"clockWeight": 1,
 				"default": false,
@@ -132,7 +132,7 @@
 			{
 				"id": "grain-farm-blueprint",
 				"title": "Grain Farm Blueprint",
-				"artwork": "grain-farm",
+				"artwork": "s1txn4siry26ofn0zzn82hkm",
 				"description": "Draw plans for Grain Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -247,7 +247,7 @@
 			{
 				"id": "grass-farm-blueprint",
 				"title": "Grass Farm Blueprint",
-				"artwork": "grass-farm",
+				"artwork": "wrmhxvug81bpye6nu2z29v92",
 				"description": "Draw plans for Grass Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -362,7 +362,7 @@
 			{
 				"id": "corn-farm-blueprint",
 				"title": "Corn Farm Blueprint",
-				"artwork": "corn-farm",
+				"artwork": "owlqcko1fyi8058syhln3d4h",
 				"description": "Draw plans for Corn Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -477,7 +477,7 @@
 			{
 				"id": "vegetable-farm-blueprint",
 				"title": "Vegetable Farm Blueprint",
-				"artwork": "vegetable-farm",
+				"artwork": "fabzgtg8buny4mcp46jrvdli",
 				"description": "Draw plans for Vegetable Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -592,7 +592,7 @@
 			{
 				"id": "fruit-farm-blueprint",
 				"title": "Fruit Farm Blueprint",
-				"artwork": "fruit-farm",
+				"artwork": "pwz8m2ffgyrsrfopn2bmm8w1",
 				"description": "Draw plans for Fruit Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -707,7 +707,7 @@
 			{
 				"id": "farmers-market-blueprint",
 				"title": "Farmers Market Blueprint",
-				"artwork": "crop-market",
+				"artwork": "ffbzxdufwade6ssq81so5b9z",
 				"description": "Draw plans for a Farmers Market once basic grain farming is established.",
 				"clockWeight": 1,
 				"default": false,
@@ -837,7 +837,7 @@
 			{
 				"id": "herbalist-blueprint",
 				"title": "Herbalist Blueprint",
-				"artwork": "herbalist",
+				"artwork": "t8fcvhnkshehi1vumbhhxdu7",
 				"description": "Draw plans for Herbalist.",
 				"clockWeight": 1,
 				"default": false,
@@ -967,7 +967,7 @@
 			{
 				"id": "flower-farm-blueprint",
 				"title": "Flower Farm Blueprint",
-				"artwork": "flower-farm",
+				"artwork": "l90rt6qrg0fvv2g7qak9uamt",
 				"description": "Draw plans for Flower Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1097,7 +1097,7 @@
 			{
 				"id": "pumpkin-farm-blueprint",
 				"title": "Pumpkin Farm Blueprint",
-				"artwork": "pumpkin-farm",
+				"artwork": "dvv4barhd6clyqk27xta73dv",
 				"description": "Draw plans for Pumpkin Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1227,7 +1227,7 @@
 			{
 				"id": "flax-farm-blueprint",
 				"title": "Flax Farm Blueprint",
-				"artwork": "flax-farm",
+				"artwork": "hp4vey6cbxfktd47m1seu0k4",
 				"description": "Draw plans for Flax Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1357,7 +1357,7 @@
 			{
 				"id": "cotton-farm-blueprint",
 				"title": "Cotton Farm Blueprint",
-				"artwork": "cotton-farm",
+				"artwork": "g68kq5f65zhx8bdaj9ln5dti",
 				"description": "Draw plans for Cotton Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1487,7 +1487,7 @@
 			{
 				"id": "rapeseed-farm-blueprint",
 				"title": "Rapeseed Farm Blueprint",
-				"artwork": "rapeseed-farm",
+				"artwork": "w9p7m4v0s8q3pjmbvpc7xda4",
 				"description": "Draw plans for Rapeseed Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1617,7 +1617,7 @@
 			{
 				"id": "sunflower-farm-blueprint",
 				"title": "Sunflower Farm Blueprint",
-				"artwork": "sunflower-farm",
+				"artwork": "wxqantahcsz9emd1y1g3tmu6",
 				"description": "Draw plans for Sunflower Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1747,7 +1747,7 @@
 			{
 				"id": "grape-farm-blueprint",
 				"title": "Grape Farm Blueprint",
-				"artwork": "grape-farm",
+				"artwork": "oj4vj063lzhz7k878dy7w0wk",
 				"description": "Draw plans for Grape Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -1922,7 +1922,7 @@
 			{
 				"id": "hop-farm-blueprint",
 				"title": "Hop Farm Blueprint",
-				"artwork": "hop-farm",
+				"artwork": "fs5g5vup2as9dpzqlmghj1os",
 				"description": "Draw plans for Hop Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -2097,7 +2097,7 @@
 			{
 				"id": "sugar-beet-farm-blueprint",
 				"title": "Sugar Beet Farm Blueprint",
-				"artwork": "sugar-beet-farm",
+				"artwork": "hckjdd3x6d7e8j879cgupn5l",
 				"description": "Draw plans for Sugar Beet Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -2272,7 +2272,7 @@
 			{
 				"id": "sugar-cane-farm-blueprint",
 				"title": "Sugar Cane Farm Blueprint",
-				"artwork": "sugar-cane-farm",
+				"artwork": "qpfdqjecb4rrkyaxjxcdo3hc",
 				"description": "Draw plans for Sugar Cane Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -2447,7 +2447,7 @@
 			{
 				"id": "coffee-farm-blueprint",
 				"title": "Coffee Farm Blueprint",
-				"artwork": "coffee-farm",
+				"artwork": "susgla9mmb7vqgeq375aa6r2",
 				"description": "Draw plans for Coffee Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -2622,7 +2622,7 @@
 			{
 				"id": "cacao-farm-blueprint",
 				"title": "Cacao Farm Blueprint",
-				"artwork": "cacao-farm",
+				"artwork": "bi1znl2l2getwrkalhxji2ao",
 				"description": "Draw plans for Cacao Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -2797,7 +2797,7 @@
 			{
 				"id": "dye-farm-blueprint",
 				"title": "Dye Farm Blueprint",
-				"artwork": "dye-farm",
+				"artwork": "wd9pts2jmrb76pkx47xjq499",
 				"description": "Draw plans for Dye Farm.",
 				"clockWeight": 1,
 				"default": false,

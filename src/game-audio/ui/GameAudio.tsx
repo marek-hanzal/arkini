@@ -134,9 +134,9 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 				concurrent: true,
 			},
 		).pipe(Atom.setIdleTTL(0));
-		const requestDetailMusicAtom = Atom.fn((resourceId: string | undefined, get) =>
+		const requestDetailMusicAtom = Atom.fn((resourceUid: string | undefined, get) =>
 			get.result(audioAtom).pipe(
-				Effect.flatMap((audio) => audio.requestDetailMusicFx(resourceId)),
+				Effect.flatMap((audio) => audio.requestDetailMusicFx(resourceUid)),
 				Effect.catchCause((cause) =>
 					Cause.hasInterruptsOnly(cause)
 						? Effect.void
@@ -238,8 +238,8 @@ export const GameAudio = ({ children }: PropsWithChildren) => {
 		],
 	);
 	const requestDetailMusicFn = useCallback(
-		(resourceId: string | undefined) => {
-			if (activeAudioAtomsRef.current === audioAtoms) requestDetailMusicAtomFn(resourceId);
+		(resourceUid: string | undefined) => {
+			if (activeAudioAtomsRef.current === audioAtoms) requestDetailMusicAtomFn(resourceUid);
 		},
 		[
 			audioAtoms,

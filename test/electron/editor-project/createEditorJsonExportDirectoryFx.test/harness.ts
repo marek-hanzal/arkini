@@ -32,12 +32,12 @@ export const writeReimportableProjectFx = (root: string, revision: number, withA
 				? [
 						...editorTestPayload.resources,
 						{
-							id: "unresolved-waltz",
+							uid: "unresolved-waltz",
 							type: "music" as const,
 							bytes: createTestOggOpusBytesFn(),
 						},
 						{
-							id: "job-start",
+							uid: "job-start",
 							type: "sfx" as const,
 							bytes: createTestOggOpusBytesFn(),
 						},

@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"empty-well"
+				"w9akcrs9hu9tduag70j7el8v"
 			]
 		},
 		"units": {
@@ -19,7 +19,7 @@
 			{
 				"id": "well",
 				"title": "Well",
-				"artwork": "well",
+				"artwork": "hki2ifgb69fb84zyd2ct3ied",
 				"description": "Find a new well",
 				"clockWeight": 1,
 				"default": true,

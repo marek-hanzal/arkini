@@ -27,8 +27,8 @@ export const useEditorArtworkLibrary = ({
 }: UseEditorArtworkLibraryProps): UseEditorArtworkLibraryOutput => {
 	const project = useEditorProject();
 	const notes = useProjectNotes(project.projectId);
-	const notedResourceIds = useMemo(
-		() => new Set(notes.notes.flatMap((note) => note.resourceIds)),
+	const notedResourceUids = useMemo(
+		() => new Set(notes.notes.flatMap((note) => note.resourceUids)),
 		[
 			notes.notes,
 		],
@@ -41,11 +41,13 @@ export const useEditorArtworkLibrary = ({
 				query,
 				resources:
 					filter === "with-note"
-						? project.resources.filter((resource) => notedResourceIds.has(resource.id))
+						? project.resources.filter((resource) =>
+								notedResourceUids.has(resource.uid),
+							)
 						: project.resources,
 			}),
 		[
-			notedResourceIds,
+			notedResourceUids,
 			filter,
 			project.config,
 			project.resources,

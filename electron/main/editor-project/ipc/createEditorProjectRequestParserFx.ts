@@ -1,5 +1,5 @@
 import { ProjectResourceReplacementSchema } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { Effect } from "effect";
 import { z } from "zod";
 
@@ -50,17 +50,17 @@ const deleteResourceSchema = z
 	.object({
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		resourceId: IdSchema,
+		resourceUid: IdSchema,
 	})
 	.strict();
 const saveResourceMetadataSchema = deleteResourceSchema.extend({
-	name: AudioResourceMetadataSchema.shape.name,
+	title: ResourceMetadataSchema.shape.title,
 });
 const optimizeResourcesSchema = z
 	.object({
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		resourceIds: IdSchema.array()
+		resourceUids: IdSchema.array()
 			.min(1)
 			.refine((ids) => new Set(ids).size === ids.length, {
 				message: "Resource IDs must be unique.",
@@ -80,8 +80,7 @@ const replaceConfigSchema = z
 	.strict();
 const replaceResourceSchema = z
 	.object({
-		config: GameConfigSchema,
-		currentId: IdSchema,
+		resourceUid: IdSchema,
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
 		resource: ProjectResourceReplacementSchema,

@@ -73,11 +73,11 @@ export const useEditorAudioResourceManagerController = ({
 	);
 	const candidates = useMemo(
 		() =>
-			allResources.map(({ id, name }) => ({
-				identity: id,
+			allResources.map(({ uid, title }) => ({
+				identity: uid,
 				terms: [
-					id,
-					name ?? "",
+					uid,
+					title,
 				],
 			})),
 		[
@@ -89,7 +89,7 @@ export const useEditorAudioResourceManagerController = ({
 		() =>
 			new Map(
 				allResources.map((resource) => [
-					resource.id,
+					resource.uid,
 					resource,
 				]),
 			),
@@ -104,8 +104,8 @@ export const useEditorAudioResourceManagerController = ({
 			resourcesById,
 		],
 	);
-	const resourceIds = useMemo(
-		() => allResources.map(({ id }) => id),
+	const resourceUids = useMemo(
+		() => allResources.map(({ uid }) => uid),
 		[
 			allResources,
 		],
@@ -114,7 +114,7 @@ export const useEditorAudioResourceManagerController = ({
 	const importError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(importResult));
 
 	const preview = useEditorAudioPreview({
-		resourceIds,
+		resourceUids,
 		type,
 	});
 	const onFilesChangeFn: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -129,7 +129,7 @@ export const useEditorAudioResourceManagerController = ({
 	};
 
 	return {
-		activeResourceId: preview.activeResourceId,
+		activeResourceUid: preview.activeResourceUid,
 		filesInputRef,
 		importError,
 		importPending,

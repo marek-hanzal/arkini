@@ -88,5 +88,17 @@ export const writeSigningGame = async (root: string) => {
 	);
 	await writeFile(join(gameDirectory, "artwork", "item.png"), createTestPngBytes());
 	await writeFile(join(gameDirectory, "image", "hero.png"), createTestPngBytes());
+	await writeFile(
+		join(gameDirectory, "artwork", "item.json"),
+		JSON.stringify({
+			title: "Item",
+		}),
+	);
+	await writeFile(
+		join(gameDirectory, "image", "hero.json"),
+		JSON.stringify({
+			title: "Hero",
+		}),
+	);
 	return gameDirectory;
 };

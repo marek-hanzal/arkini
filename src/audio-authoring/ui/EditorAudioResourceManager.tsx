@@ -25,7 +25,7 @@ interface EditorAudioResourceManagerProps {
 	readonly revealedResource?: {
 		readonly id: string;
 	};
-	readonly onResourceDragStartFn?: (event: DragEvent<HTMLLIElement>, resourceId: string) => void;
+	readonly onResourceDragStartFn?: (event: DragEvent<HTMLLIElement>, resourceUid: string) => void;
 	readonly onResourceDragEndFn?: () => void;
 	readonly renderResourceActionFn?: (resource: Project.Resource) => ReactNode;
 	readonly resourceMutationBlocked?: boolean;
@@ -194,15 +194,15 @@ export const EditorAudioResourceManager = ({
 							data-ui={`${dataUiPrefix}List`}
 						>
 							{resources.map((resource) => {
-								const active = controller.activeResourceId === resource.id;
+								const active = controller.activeResourceUid === resource.uid;
 								const playing = active && controller.playing;
 
 								return (
 									<li
 										className="ak-list-row ak-list-row-interactive grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden px-4 py-3 data-[ui-selected=true]:outline-2 data-[ui-selected=true]:-outline-offset-2 data-[ui-selected=true]:outline-accent data-[ui-seekable=true]:cursor-pointer [&[draggable=true]]:cursor-grab"
-										key={resource.id}
+										key={resource.uid}
 										ref={
-											revealedResource?.id === resource.id
+											revealedResource?.id === resource.uid
 												? selectedRowRef
 												: undefined
 										}
@@ -222,7 +222,7 @@ export const EditorAudioResourceManager = ({
 													String(value),
 												),
 											);
-											onResourceDragStartFn?.(event, resource.id);
+											onResourceDragStartFn?.(event, resource.uid);
 										}}
 										onDragEnd={(event) => {
 											event.currentTarget.removeAttribute("data-ui-dragging");
@@ -233,7 +233,7 @@ export const EditorAudioResourceManager = ({
 											const bounds =
 												event.currentTarget.getBoundingClientRect();
 											controller.seekPlaybackFn(
-												resource.id,
+												resource.uid,
 												(event.clientX - bounds.left) / bounds.width,
 											);
 										}}
@@ -241,7 +241,7 @@ export const EditorAudioResourceManager = ({
 											dataUi: `${dataUiPrefix}Row`,
 											state: {
 												playing,
-												selected: revealedResource?.id === resource.id,
+												selected: revealedResource?.id === resource.uid,
 												seekable: music,
 												state: active ? "active" : undefined,
 											},
@@ -266,20 +266,20 @@ export const EditorAudioResourceManager = ({
 												draggable={false}
 												to={
 													music
-														? "/editor/$projectId/music/$resourceId/$sectionId"
-														: "/editor/$projectId/sfx/$resourceId/$sectionId"
+														? "/editor/$projectId/music/$resourceUid/$sectionId"
+														: "/editor/$projectId/sfx/$resourceUid/$sectionId"
 												}
 												params={{
 													projectId: project.projectId,
-													resourceId: resource.id,
+													resourceUid: resource.uid,
 													sectionId: "view",
 												}}
 												onClick={(event) => event.stopPropagation()}
 											>
-												{resource.name}
+												{resource.title}
 											</Link>
 											<p className="truncate text-xs text-muted">
-												{resource.id} · {formatByteSizeFn(resource.size)}
+												{resource.uid} · {formatByteSizeFn(resource.size)}
 											</p>
 										</div>
 										<div className="relative z-10 flex items-center gap-3">
@@ -289,7 +289,7 @@ export const EditorAudioResourceManager = ({
 												data-ui={`${dataUiPrefix}Playback`}
 												onClick={(event) => {
 													event.stopPropagation();
-													controller.togglePlaybackFn(resource.id);
+													controller.togglePlaybackFn(resource.uid);
 												}}
 											>
 												{playing ? (
@@ -304,10 +304,10 @@ export const EditorAudioResourceManager = ({
 													data-ui="EditorSfxDeleteLink"
 													title={translator.textFn("Delete")}
 													draggable={false}
-													to="/editor/$projectId/sfx/$resourceId/$sectionId"
+													to="/editor/$projectId/sfx/$resourceUid/$sectionId"
 													params={{
 														projectId: project.projectId,
-														resourceId: resource.id,
+														resourceUid: resource.uid,
 														sectionId: "delete",
 													}}
 													onClick={(event) => event.stopPropagation()}

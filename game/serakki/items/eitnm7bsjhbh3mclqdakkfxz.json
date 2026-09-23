@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"recovering-goose"
+				"kvwd67etely2ki0n5hgd1xnh"
 			]
 		},
 		"units": {
@@ -41,7 +41,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "recovering-goose",
+				"artwork": "kvwd67etely2ki0n5hgd1xnh",
 				"description": "Wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 5,
@@ -201,7 +201,7 @@
 			{
 				"id": "disease-relapse",
 				"title": "Disease Relapse",
-				"artwork": "disease",
+				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 6,
@@ -271,7 +271,7 @@
 			{
 				"id": "plague-relapse",
 				"title": "Plague Relapse",
-				"artwork": "plague",
+				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 12,

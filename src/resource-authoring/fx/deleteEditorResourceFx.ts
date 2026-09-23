@@ -8,7 +8,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 export const deleteEditorResourceFx = Effect.fn("deleteEditorResourceFx")(function* (props: {
 	readonly expectedRevision: number;
 	readonly projectId: string;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly onDeletedFn?: () => Promise<void>;
 }) {
 	const repository = yield* ProjectRepository;

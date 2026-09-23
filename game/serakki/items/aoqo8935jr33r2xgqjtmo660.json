@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"vegetable-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"fabzgtg8buny4mcp46jrvdli"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "vegetable-farm",
 				"title": "Build Vegetable Farm",
-				"artwork": "vegetable-farm",
+				"artwork": "fabzgtg8buny4mcp46jrvdli",
 				"description": "Build Vegetable Farm.",
 				"clockWeight": 1,
 				"default": true,

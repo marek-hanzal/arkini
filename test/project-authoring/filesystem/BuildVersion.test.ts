@@ -34,7 +34,7 @@ describe("filesystem build version metadata", () => {
 				projectId: project.projectId,
 				content: "Keep",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));

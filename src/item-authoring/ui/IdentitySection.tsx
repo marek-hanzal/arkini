@@ -36,7 +36,7 @@ export const IdentitySection = () => {
 					<form.AppField name="music">
 						{(field) => (
 							<EditorMusicSelection
-								resourceId={field.state.value}
+								resourceUid={field.state.value}
 								onChangeFn={field.handleChange}
 								error={readEditorFieldErrorFn(field.state.meta.errors)}
 							/>

@@ -36,7 +36,7 @@ export const encodeTestSerapackPayloadFx = Effect.fn("encodeTestSerapackPayloadF
 					projectRevision: 1,
 					length: configBytes.byteLength,
 					resources: resources.map((resource) => ({
-						id: resource.id,
+						uid: resource.uid,
 						type: resource.type,
 						length: resource.bytes.byteLength,
 					})),
@@ -91,7 +91,7 @@ export const decodeTestSerapackPayloadFx = Effect.fn("decodeTestSerapackPayloadF
 				const resourceBytes = Uint8Array.from(bytes.slice(offset, end));
 				offset = end;
 				return {
-					id: resource.id,
+					uid: resource.uid,
 					type: resource.type,
 					bytes: resourceBytes,
 				};

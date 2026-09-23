@@ -11,7 +11,7 @@ export namespace useItemSectionShortcuts {
 			readonly defaultDraft?: boolean;
 			readonly defaultTitle?: string;
 			readonly create?: boolean;
-			readonly resourceId?: string;
+			readonly resourceUid?: string;
 		};
 		readonly itemUid: string;
 		readonly projectId: string;

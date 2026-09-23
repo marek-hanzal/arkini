@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sugar-cane-farm"
+				"qpfdqjecb4rrkyaxjxcdo3hc"
 			]
 		},
 		"maxQueueSize": 4,
@@ -94,7 +94,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Sugar Cane Field",
-				"artwork": "empty-sugar-cane-field",
+				"artwork": "zx0tptnskxjl62ubeg7hmvim",
 				"description": "Prepare a new sugar cane field for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -136,7 +136,7 @@
 			{
 				"id": "blueprint",
 				"title": "Sugar Cane Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Sugar Cane Farm.",
 				"clockWeight": 1,
 				"default": false,

@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"well-fed-chicken"
+				"zn0j4b8l3mv4x0pc7sn3aqmb"
 			]
 		},
 		"units": {
@@ -42,7 +42,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "well-fed-chicken",
+				"artwork": "zn0j4b8l3mv4x0pc7sn3aqmb",
 				"description": "Wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 9,
@@ -212,7 +212,7 @@
 			{
 				"id": "disease-exposure",
 				"title": "Disease Exposure",
-				"artwork": "disease",
+				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 8,
@@ -282,7 +282,7 @@
 			{
 				"id": "plague-exposure",
 				"title": "Plague Exposure",
-				"artwork": "plague",
+				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 16,

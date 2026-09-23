@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"composting-workshop"
+				"so7r094glj6wfe6yoveiclrg",
+				"d1nx3rme3j7j161hpd2cu7jv"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "composting-workshop",
 				"title": "Build Composting Workshop",
-				"artwork": "composting-workshop",
+				"artwork": "d1nx3rme3j7j161hpd2cu7jv",
 				"description": "Build a Composting Workshop.",
 				"clockWeight": 1,
 				"default": true,

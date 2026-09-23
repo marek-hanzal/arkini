@@ -10,58 +10,43 @@ import { editEditorArtworkFx } from "~/artwork-authoring/fx/editEditorArtworkFx"
 import { validateEditorArtworkFileFx } from "~/artwork-authoring/fx/validateEditorArtworkFileFx";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { IdSchema } from "~/game-value/schema/IdSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
-import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
-import { useEditorArtworkById } from "~/artwork-authoring/ui/useEditorArtworkById";
+import { useEditorArtworkByUid } from "~/artwork-authoring/ui/useEditorArtworkByUid";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
 interface EditEditorArtworkCommandProps {
-	readonly currentId: string;
+	readonly title: string;
 	readonly file?: File;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 }
 
 const validateEditorArtworkDraftFx = Effect.fn("validateEditorArtworkDraftFx")(function* ({
-	currentId,
 	file,
-	resources,
-	resourceId: candidateId,
+	resourceUid,
+	title,
 }: {
-	readonly currentId: string;
 	readonly file?: File;
-	readonly resources: ReadonlyArray<{
-		readonly id: string;
-	}>;
-	readonly resourceId: string;
+	readonly resourceUid: string;
+	readonly title: string;
 }) {
-	const resourceId = yield* Effect.try({
-		try: () => IdSchema.parse(candidateId.trim()),
+	yield* Effect.try({
+		try: () =>
+			ResourceMetadataSchema.parse({
+				title,
+			}),
 		catch: (cause) =>
 			new ProjectOperationError({
-				reason: "invalid-resource-id",
-				message: "Artwork ID must not be empty.",
+				reason: "invalid-resource-title",
+				message: "Artwork title must not be empty.",
 				cause,
 			}),
 	});
-	if (resourceId !== currentId && resources.some(({ id }) => id === resourceId)) {
-		return yield* Effect.fail(
-			new ProjectOperationError({
-				reason: "invalid-resource-id",
-				message: `Artwork ID ${resourceId} is already used by another artwork.`,
-			}),
-		);
-	}
-	if (file !== undefined) yield* validateEditorArtworkFileFx(file, resourceId);
+	if (file !== undefined) yield* validateEditorArtworkFileFx(file, resourceUid);
 });
-
-const isArtworkIdCollisionFn = (error: unknown, resourceId: string) =>
-	error instanceof ProjectRepositoryError &&
-	error.operation === "replace-resource" &&
-	error.message === `Resource ID ${resourceId} already exists.`;
 
 const editEditorArtworkCommandAtom = RendererRuntime.runSync(
 	Effect.map(
@@ -88,49 +73,61 @@ export namespace useEditorArtworkEditController {
 	export interface Props {
 		readonly filter: ArtworkCatalogFilterSchema.Type;
 		readonly query: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 	}
 
 	export interface Output {
-		readonly artworkIdError?: string;
+		readonly titleError?: string;
 		readonly currentUrl?: string;
 		readonly dirty: boolean;
 		readonly discardFn: () => Promise<void>;
 		readonly error: unknown;
 		readonly file?: File;
 		readonly fileError?: string;
-		readonly nextId: string;
+		readonly title: string;
 		readonly projectId: string;
 		readonly resourceFound: boolean;
 		readonly saveFn: () => Promise<boolean>;
 		readonly saving: boolean;
 		readonly setFileFn: (file: File | undefined) => void;
-		readonly setNextIdFn: (resourceId: string) => void;
+		readonly setTitleFn: (resourceUid: string) => void;
 	}
 }
 
 export const useEditorArtworkEditController = ({
 	filter,
 	query,
-	resourceId,
+	resourceUid,
 }: useEditorArtworkEditController.Props): useEditorArtworkEditController.Output => {
 	const project = useEditorProject();
 	const admission = RendererRuntime.runSync(ProjectWriteAdmission);
-	const resource = useEditorArtworkById(resourceId);
-	const currentUrl = useResourceUrl(resourceId);
+	const resource = useEditorArtworkByUid(resourceUid);
+	const currentUrl = useResourceUrl(resourceUid);
 	const navigateFn = useNavigate();
 	const commandAtom = editEditorArtworkCommandAtom(project.projectId);
 	const result = useAtomValue(commandAtom);
 	const mutateFn = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
-	const [nextId, setNextIdStateFn] = useState(resourceId);
+	const [title, setTitleStateFn] = useState(resource?.title ?? "");
 	const [file, setFileStateFn] = useState<File>();
 	const [saving, setSavingFn] = useState(false);
 	const mountedRef = useRef(false);
 	const draftEpochRef = useRef(0);
 	const pendingSaveRef = useRef<number | undefined>(undefined);
 	const commandEpochRef = useRef<number | undefined>(undefined);
+	const canonicalTitleRef = useRef(resource?.title ?? "");
+	useLayoutEffect(() => {
+		const previousTitle = canonicalTitleRef.current;
+		canonicalTitleRef.current = resource?.title ?? "";
+		if (pendingSaveRef.current === undefined && file === undefined && title === previousTitle) {
+			setTitleStateFn(canonicalTitleRef.current);
+		}
+	}, [
+		resource?.title,
+		title,
+		file,
+	]);
 	useLayoutEffect(() => {
 		mountedRef.current = true;
 		return () => {
@@ -140,7 +137,7 @@ export const useEditorArtworkEditController = ({
 		};
 	}, [
 		project.projectId,
-		resourceId,
+		resourceUid,
 	]);
 	const invalidateSaveFn = useCallback(() => {
 		draftEpochRef.current += 1;
@@ -148,17 +145,15 @@ export const useEditorArtworkEditController = ({
 		setSavingFn(false);
 	}, []);
 	const [validationIssue, setValidationIssueFn] = useState<{
-		readonly field: "artworkId" | "file";
+		readonly field: "title" | "file";
 		readonly message: string;
 	}>();
-	const setNextIdFn = useCallback(
+	const setTitleFn = useCallback(
 		(value: string) => {
 			if (pendingSaveRef.current !== undefined || result.waiting) return;
 			invalidateSaveFn();
-			setNextIdStateFn(value);
-			setValidationIssueFn((current) =>
-				current?.field === "artworkId" ? undefined : current,
-			);
+			setTitleStateFn(value);
+			setValidationIssueFn((current) => (current?.field === "title" ? undefined : current));
 		},
 		[
 			invalidateSaveFn,
@@ -178,7 +173,7 @@ export const useEditorArtworkEditController = ({
 		],
 	);
 	const showValidationIssueFn = useCallback(
-		(issue: { readonly field: "artworkId" | "file"; readonly message: string }) => {
+		(issue: { readonly field: "title" | "file"; readonly message: string }) => {
 			setValidationIssueFn(issue);
 			const focusInvalidFieldFn = () =>
 				document
@@ -194,7 +189,7 @@ export const useEditorArtworkEditController = ({
 		},
 		[],
 	);
-	const dirty = nextId.trim() !== resourceId || file !== undefined;
+	const dirty = title.trim() !== resource?.title || file !== undefined;
 	const dirtyRef = useRef(dirty);
 	dirtyRef.current = dirty;
 	const persistFn = useCallback(async () => {
@@ -212,10 +207,9 @@ export const useEditorArtworkEditController = ({
 		try {
 			const validation = await RendererRuntime.runPromise(
 				validateEditorArtworkDraftFx({
-					currentId: resourceId,
 					file,
-					resources: project.resources,
-					resourceId: nextId,
+					resourceUid,
+					title,
 				}).pipe(
 					Effect.match({
 						onFailure: (issue) => ({
@@ -229,33 +223,28 @@ export const useEditorArtworkEditController = ({
 			if (!isCurrentFn()) return false;
 			if ("issue" in validation) {
 				showValidationIssueFn({
-					field: validation.issue.reason === "invalid-artwork" ? "file" : "artworkId",
+					field: validation.issue.reason === "invalid-artwork" ? "file" : "title",
 					message: validation.issue.message,
 				});
 				return false;
 			}
 			setValidationIssueFn(undefined);
-			const id = nextId.trim();
+			const nextTitle = title.trim();
 			try {
 				commandEpochRef.current = epoch;
 				await mutateFn({
-					currentId: resourceId,
 					file,
-					resourceId: id,
+					resourceUid,
+					title: nextTitle,
 				});
 			} catch (error) {
 				if (!isCurrentFn()) return false;
-				if (isArtworkIdCollisionFn(error, id)) {
-					showValidationIssueFn({
-						field: "artworkId",
-						message: `Artwork ID ${id} is already used by another artwork.`,
-					});
-				}
+
 				return false;
 			}
 			if (!isCurrentFn()) return false;
 			dirtyRef.current = false;
-			setNextIdStateFn(id);
+			setTitleStateFn(nextTitle);
 			setFileStateFn(undefined);
 			return true;
 		} finally {
@@ -267,9 +256,9 @@ export const useEditorArtworkEditController = ({
 	}, [
 		file,
 		mutateFn,
-		nextId,
-		project.resources,
-		resourceId,
+		title,
+		resource?.title,
+		resourceUid,
 		result.waiting,
 		showValidationIssueFn,
 	]);
@@ -282,12 +271,11 @@ export const useEditorArtworkEditController = ({
 			admission.isNavigationBlockedFn()
 		)
 			return false;
-		const id = nextId.trim();
 		await navigateFn({
-			to: "/editor/$projectId/artwork/$resourceId/detail/overview",
+			to: "/editor/$projectId/artwork/$resourceUid/detail/overview",
 			params: {
 				projectId: project.projectId,
-				resourceId: id,
+				resourceUid,
 			},
 			search: {
 				filter,
@@ -300,7 +288,7 @@ export const useEditorArtworkEditController = ({
 		admission,
 		filter,
 		navigateFn,
-		nextId,
+		resourceUid,
 		persistFn,
 		project.projectId,
 		query,
@@ -308,21 +296,21 @@ export const useEditorArtworkEditController = ({
 	const resetDraftFn = useCallback(() => {
 		invalidateSaveFn();
 		dirtyRef.current = false;
-		setNextIdStateFn(resourceId);
+		setTitleStateFn(resource?.title ?? "");
 		setFileStateFn(undefined);
 		setValidationIssueFn(undefined);
 	}, [
 		invalidateSaveFn,
-		resourceId,
+		resource?.title,
 	]);
 	const discardFn = useCallback(async () => {
 		if (pendingSaveRef.current !== undefined || result.waiting) return;
 		resetDraftFn();
 		await navigateFn({
-			to: "/editor/$projectId/artwork/$resourceId/detail/overview",
+			to: "/editor/$projectId/artwork/$resourceUid/detail/overview",
 			params: {
 				projectId: project.projectId,
-				resourceId,
+				resourceUid,
 			},
 			search: {
 				filter,
@@ -336,26 +324,25 @@ export const useEditorArtworkEditController = ({
 		project.projectId,
 		query,
 		resetDraftFn,
-		resourceId,
+		resourceUid,
 		result.waiting,
 	]);
 	useEditorUnsavedChangesRegistration({
 		discardFn: resetDraftFn,
-		id: `artwork:${project.projectId}:${resourceId}`,
+		id: `artwork:${project.projectId}:${resourceUid}`,
 		isDirtyFn: () => dirtyRef.current,
 		isValidFn: async () =>
 			Exit.isSuccess(
 				await RendererRuntime.runPromiseExit(
 					validateEditorArtworkDraftFx({
-						currentId: resourceId,
 						file,
-						resources: project.resources,
-						resourceId: nextId,
+						resourceUid,
+						title,
 					}),
 				),
 			),
 		ownsPathnameFn: (pathname) =>
-			pathname.startsWith(`/editor/${project.projectId}/artwork/${resourceId}/edit`),
+			pathname.startsWith(`/editor/${project.projectId}/artwork/${resourceUid}/edit`),
 		saveFn: persistFn,
 	});
 	const settledError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
@@ -364,24 +351,23 @@ export const useEditorArtworkEditController = ({
 	const error =
 		validationIssue === undefined
 			? persistenceError
-			: `${validationIssue.field === "artworkId" ? "Artwork ID" : "Image"}: ${validationIssue.message}`;
+			: `${validationIssue.field === "title" ? "Title" : "Image"}: ${validationIssue.message}`;
 	const resourceFound = resource !== undefined;
 
 	return {
-		artworkIdError:
-			validationIssue?.field === "artworkId" ? validationIssue.message : undefined,
+		titleError: validationIssue?.field === "title" ? validationIssue.message : undefined,
 		currentUrl,
 		dirty,
 		discardFn,
 		error,
 		file,
 		fileError: validationIssue?.field === "file" ? validationIssue.message : undefined,
-		nextId,
+		title,
 		projectId: project.projectId,
 		resourceFound,
 		saveFn,
 		saving: saving || result.waiting,
 		setFileFn,
-		setNextIdFn,
+		setTitleFn,
 	};
 };

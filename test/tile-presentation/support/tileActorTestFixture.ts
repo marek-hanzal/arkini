@@ -227,5 +227,5 @@ export const createTemporaryTileActorRuntime = ({
 	});
 
 export const tileActorGame = {
-	getResourceUrlFn: (resourceId: string) => `resource:${resourceId}`,
+	getResourceUrlFn: (resourceUid: string) => `resource:${resourceUid}`,
 };

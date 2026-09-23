@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"herbalist"
+				"so7r094glj6wfe6yoveiclrg",
+				"t8fcvhnkshehi1vumbhhxdu7"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "herbalist",
 				"title": "Build Herbalist",
-				"artwork": "herbalist",
+				"artwork": "t8fcvhnkshehi1vumbhhxdu7",
 				"description": "Build Herbalist.",
 				"clockWeight": 1,
 				"default": true,

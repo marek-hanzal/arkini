@@ -7,10 +7,10 @@ import { Mx } from "~/translation/ui/Mx";
 import { Status } from "~/ui/ui/Status";
 import { EditorArtworkUsageRow } from "~/artwork-authoring/ui/EditorArtworkUsageRow";
 
-export const EditorArtworkUsage = ({ resourceId }: { readonly resourceId: string }) => {
+export const EditorArtworkUsage = ({ resourceUid }: { readonly resourceUid: string }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const usages = useEditorResourceUsages().filter((usage) => usage.resourceId === resourceId);
+	const usages = useEditorResourceUsages().filter((usage) => usage.resourceUid === resourceUid);
 	if (usages.length === 0) {
 		return (
 			<Status

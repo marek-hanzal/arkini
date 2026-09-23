@@ -66,7 +66,7 @@ describe("editor MCP note item links", () => {
 				name: "create_note",
 				arguments: {
 					content: "Rejected links",
-					resourceIds: [],
+					resourceUids: [],
 					itemUids,
 				},
 			});
@@ -79,7 +79,7 @@ describe("editor MCP note item links", () => {
 			name: "create_note",
 			arguments: {
 				content: "Shared recipe",
-				resourceIds: [],
+				resourceUids: [],
 				itemUids: [
 					"water",
 					"clay",
@@ -93,7 +93,7 @@ describe("editor MCP note item links", () => {
 			repository.createNoteFx({
 				projectId: project.projectId,
 				content: "Shared unlinked recipe",
-				resourceIds: [],
+				resourceUids: [],
 				itemUids: [],
 			}),
 		);
@@ -173,7 +173,7 @@ describe("editor MCP note item links", () => {
 				noteId: note.noteId,
 				content: note.content,
 				expectedUpdatedAtMs: note.updatedAtMs,
-				resourceIds: [],
+				resourceUids: [],
 				itemUids: [
 					"missing",
 				],
@@ -186,7 +186,7 @@ describe("editor MCP note item links", () => {
 				noteId: note.noteId,
 				content: note.content,
 				expectedUpdatedAtMs: note.updatedAtMs,
-				resourceIds: [],
+				resourceUids: [],
 				itemUids: [
 					"clay",
 				],
@@ -198,7 +198,7 @@ describe("editor MCP note item links", () => {
 		);
 		expect(updated).toEqual({
 			...note,
-			resourceIds: [],
+			resourceUids: [],
 			itemUids: [
 				"clay",
 			],
@@ -211,7 +211,7 @@ describe("editor MCP note item links", () => {
 				noteId: note.noteId,
 				content: note.content,
 				expectedUpdatedAtMs: note.updatedAtMs,
-				resourceIds: [],
+				resourceUids: [],
 				itemUids: [],
 			},
 		});
@@ -251,7 +251,7 @@ describe("editor MCP note item links", () => {
 		);
 		expect(afterDelete).toEqual({
 			...note,
-			resourceIds: [],
+			resourceUids: [],
 			itemUids: [],
 			linkedResources: [],
 			linkedItems: [],

@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"empty-sheep-pen"
+				"tmn25bjuu0boas6t86ag239h"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "stock",
 				"title": "Stock Sheep Pen",
-				"artwork": "sheep-pen",
+				"artwork": "gzmgh8zm5rqimmud53xfuiyh",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
 				"clockWeight": 1,
 				"default": true,

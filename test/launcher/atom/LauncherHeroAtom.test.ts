@@ -62,7 +62,7 @@ vi.mock("~/serapack-catalog/fx/loadSerapackFx", () => ({
 					config: testSerapackConfig,
 					resources: [
 						{
-							id: "hero",
+							uid: "hero",
 							type: "image",
 							url: "serakki://test/hero",
 						},

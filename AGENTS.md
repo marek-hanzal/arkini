@@ -23,7 +23,7 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 
 ### Visual canon
 
-- Inspect [`game/serakki/resources/hero.png`](game/serakki/resources/hero.png) before generating. It is the default canon for palette, contrast, lighting, material rendering, sharpness, and degree of stylization, not a subject or composition template.
+- Inspect [`game/serakki/image/t7gotajnzi1aokgvtn405yng.png`](game/serakki/image/t7gotajnzi1aokgvtn405yng.png) before generating. It is the default canon for palette, contrast, lighting, material rendering, sharpness, and degree of stylization, not a subject or composition template.
 - Inspect only one or two relevant approved assets in addition to `hero.png`; do not preload the whole asset directory. A directly edited image outranks every other reference. Otherwise the latest user-approved asset from the same series is the structural reference, with `hero.png` continuing to govern the general color and rendering profile.
 - Do not copy unicorns, pink hair, gears, pipes, lettering, or other concrete motifs from `hero.png` unless the request calls for them.
 - Render premium stylized fantasy art for a casual/merge game: strong 2.5D volume, rounded and slightly exaggerated proportions, a clean silhouette, saturated colors, clearly separated materials, broad gradients, soft hand-painted shading, contact shadows, ambient occlusion, and controlled edge highlights.
@@ -31,12 +31,12 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 
 ### Reference routing
 
-- For a simple or early-game building, inspect [`house-t1.png`](game/serakki/assets/house-t1.png) or [`base-camp.png`](game/serakki/assets/base-camp.png). They define the restrained amount of structure and detail, not a house or tent motif to copy.
-- For a production building or workshop, inspect [`pottery-workshop.png`](game/serakki/assets/pottery-workshop.png), [`roof-tile-workshop.png`](game/serakki/assets/roof-tile-workshop.png), or [`foundry.png`](game/serakki/assets/foundry.png). They define a readable functional centerpiece, colorful rounded construction, and a lively compact base.
-- For a field or farm plot, inspect [`empty-field.png`](game/serakki/assets/empty-field.png) and the closest crop variant such as [`hop-field.png`](game/serakki/assets/hop-field.png). Preserve the shared footprint and three-row language when the series calls for it; vary plants naturally rather than cloning one specimen.
-- For a natural source or world deposit, inspect [`coal-source.png`](game/serakki/assets/coal-source.png) or [`forest.png`](game/serakki/assets/forest.png). The terrain silhouette and material color should carry the identity without turning into a miniature building.
-- For a standalone item, tool, or processed material, inspect [`hammer.png`](game/serakki/assets/hammer.png), [`cheese.png`](game/serakki/assets/cheese.png), or [`coin.png`](game/serakki/assets/coin.png). Use one dominant object, no terrain base, and only a few supporting details.
-- For an animal or animal enclosure, inspect [`cow.png`](game/serakki/assets/cow.png) or [`cow-pen.png`](game/serakki/assets/cow-pen.png). Animals stay anatomically coherent and expressive; pens use lush grass and an irregular hand-built fence.
+- For a simple or early-game building, inspect [`house-t1.png`](game/serakki/artwork/ucep41zyvgbrif6rlcqdabk1.png) or [`base-camp.png`](game/serakki/artwork/qtxp6ohylrzr12j45nvjl8fu.png). They define the restrained amount of structure and detail, not a house or tent motif to copy.
+- For a production building or workshop, inspect [`pottery-workshop.png`](game/serakki/artwork/uqs6kzzv2zqgktzibbkidud0.png), [`roof-tile-workshop.png`](game/serakki/artwork/izh2wdwcws2mhi0k8085c0jj.png), or [`foundry.png`](game/serakki/artwork/cgzrahlcwpe0ik1nkl7akim8.png). They define a readable functional centerpiece, colorful rounded construction, and a lively compact base.
+- For a field or farm plot, inspect [`empty-field.png`](game/serakki/artwork/empty-field.png) and the closest crop variant such as [`hop-field.png`](game/serakki/artwork/seg6c66labeex3dyktffd5m6.png). Preserve the shared footprint and three-row language when the series calls for it; vary plants naturally rather than cloning one specimen.
+- For a natural source or world deposit, inspect [`coal-source.png`](game/serakki/artwork/ahiuwcwxg8tubpkb733p40tf.png) or [`forest.png`](game/serakki/artwork/vh26v4kb2y915z79r4x5rlqs.png). The terrain silhouette and material color should carry the identity without turning into a miniature building.
+- For a standalone item, tool, or processed material, inspect [`hammer.png`](game/serakki/artwork/x9qn18vfs7ni6nl59zm968qp.png), [`cheese.png`](game/serakki/artwork/teumhc9uh2f0a8sfquyeenj0.png), or [`coin.png`](game/serakki/artwork/xmgk72sh5hvs43028cmy3rmx.png). Use one dominant object, no terrain base, and only a few supporting details.
+- For an animal or animal enclosure, inspect [`cow.png`](game/serakki/artwork/cu5g8wg1z1z5egmgcf3x02jb.png) or [`cow-pen.png`](game/serakki/artwork/kvwdw73ifpkni8gmwozgsf78.png). Animals stay anatomically coherent and expressive; pens use lush grass and an irregular hand-built fence.
 - For a tiered series, the approved previous tier is the mandatory structural reference. For an alternate, filled, depleted, lit, or recolored state, the corresponding approved base asset is mandatory and all unrelated properties remain locked.
 
 ### Shape and mood
@@ -73,11 +73,11 @@ Apply these defaults automatically whenever the user asks for a game image; the 
 
 ### Approval and alpha workflow
 
-- Generate and show the native-alpha candidate first. If native alpha failed, show the fallback keyed candidate instead. Do not write either candidate into [`game/serakki/assets`](game/serakki/assets) until the user explicitly approves it with an instruction such as `ulozit`, `prepsat`, or equivalent.
+- Generate and show the native-alpha candidate first. If native alpha failed, show the fallback keyed candidate instead. Do not write either candidate into [`game/serakki/artwork`](game/serakki/artwork) until the user explicitly approves it with an instruction such as `ulozit`, `prepsat`, or equivalent.
 - On approval, preserve a clean native-alpha source and limit processing to demonstrated defects such as negligible alpha noise; do not re-key or re-extract its background. For a fallback keyed source, remove the key into a true alpha channel. Protect legitimate foreground greens; remove the edge-connected key field plus keyed regions visible through real openings such as handles, arches, windows, and gaps. Preserve smooth antialiased edges and eliminate green fringe instead of merely making the exact center color transparent.
 - Translucent subjects such as glass need explicit inspection: preserve their rim, highlights, body, and foot while clearing the key visible through them. Never leave the key as an opaque fill inside a transparent object.
 - Inspect the finished PNG over both a dark-plum background and a warm light background. Check the complete silhouette, thin projections, holes, terrain fringe, and absence of detached shadows or key-colored pixels.
-- Save the approved PNG under a semantic kebab-case name in [`game/serakki/assets`](game/serakki/assets). Before reporting success, reopen the saved file and verify the requested subject, exact path, dimensions, sRGBA/alpha presence, transparent corners, and Git status. When replacing an asset, verify that the intended existing path was actually overwritten.
+- Save a new approved PNG under a fresh immutable UID filename with an adjacent `{ "title": "Readable title" }` JSON sidecar in [`game/serakki/artwork`](game/serakki/artwork). Before reporting success, reopen the saved file and verify the requested subject, exact path, dimensions, sRGBA/alpha presence, transparent corners, and Git status. When replacing an asset, verify that the intended existing path was actually overwritten.
 
 ### Iteration and tiers
 

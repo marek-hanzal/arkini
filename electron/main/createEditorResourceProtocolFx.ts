@@ -50,7 +50,7 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					}
 					const url = new URL(request.url);
 					const projectId = url.searchParams.get("projectId");
-					const resourceId = url.searchParams.get("resourceId");
+					const resourceUid = url.searchParams.get("resourceUid");
 					const version = url.searchParams.get("version");
 					if (
 						url.protocol !== "serakki:" ||
@@ -59,7 +59,7 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 						url.username !== "" ||
 						url.password !== "" ||
 						!projectId ||
-						!resourceId ||
+						!resourceUid ||
 						!version ||
 						Array.from(url.searchParams.keys()).length !== 3
 					) {
@@ -67,7 +67,7 @@ export const createEditorResourceProtocolFx = Effect.fn("createEditorResourcePro
 					}
 					const location = yield* readResourceLocationFx({
 						projectId,
-						resourceId,
+						resourceUid,
 					});
 					if (location === null) return yield* Effect.fail(unavailableFn());
 					if (location.version !== version) {

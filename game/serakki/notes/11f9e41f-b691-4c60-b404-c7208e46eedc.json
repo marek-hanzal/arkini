@@ -23,15 +23,15 @@
 		"uiqz45kgrs6rsjzliqp0k6i2",
 		"spkn18pn248fe91tsk0xlvkc"
 	],
-	"resourceIds": [
-		"school-t1",
-		"school-t2",
-		"school-t3",
-		"university",
-		"faith-paper-scriptorium",
-		"magic-scriptorium",
-		"steam-paper-scriptorium",
-		"townhall-t2"
+	"resourceUids": [
+		"e8h5l2j4tq4tu8uskz5aqd8e",
+		"sj22vclculpow2m4a5d58b8t",
+		"y6yz7da8tt7btt1epvchudiz",
+		"jhpnrti5gr87gwnrg4did61n",
+		"i1ssujzv9drb1c7o1tyejbb2",
+		"lrtg2p0lyfsnvx82qci6qok6",
+		"btp3fv22yojwkzjvf9u9wxl7",
+		"dtuzdkf4lo7h6azmdgpv059f"
 	],
 	"createdAtMs": 1789822498317,
 	"updatedAtMs": 1789831165379

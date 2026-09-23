@@ -6,8 +6,9 @@ import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSc
 
 const identitySchema = z
 	.object({
-		id: IdSchema,
+		uid: IdSchema,
 		type: ResourceTypeSchema,
+		title: z.string().trim().min(1),
 	})
 	.strict();
 
@@ -16,7 +17,7 @@ export const ProjectResourceFileReplacementSchema = identitySchema.extend({
 	size: NonNegativeIntegerSchema,
 });
 
-/** A rename or native file-backed replacement. */
+/** Metadata or native file-backed content replacement. */
 export const ProjectResourceReplacementSchema = z
 	.union([
 		ProjectResourceFileReplacementSchema,
@@ -24,7 +25,7 @@ export const ProjectResourceReplacementSchema = z
 	])
 	.meta({
 		id: "ProjectResourceReplacementSchema",
-		description: "A resource rename with optional replacement content.",
+		description: "Resource metadata with optional replacement content.",
 	});
 export type ProjectResourceReplacementSchema = typeof ProjectResourceReplacementSchema;
 export namespace ProjectResourceReplacementSchema {

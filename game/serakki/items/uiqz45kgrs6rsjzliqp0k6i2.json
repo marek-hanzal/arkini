@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"townhall-t2"
+				"dtuzdkf4lo7h6azmdgpv059f"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "house-t2-blueprint",
 				"title": "House - Tier 2 Blueprint",
-				"artwork": "house-t2",
+				"artwork": "f0vnkcqwb0i3r7l5dqs3852l",
 				"description": "Discover plans for a larger household that can organize Tier 2 labor.",
 				"clockWeight": 1,
 				"default": false,
@@ -132,7 +132,7 @@
 			{
 				"id": "school-t2-blueprint",
 				"title": "School - Tier 2 Blueprint",
-				"artwork": "school-t2",
+				"artwork": "sj22vclculpow2m4a5d58b8t",
 				"description": "Discover plans for an advanced school once a Tier 2 household can supply the labor needed to build it.",
 				"clockWeight": 1,
 				"default": false,
@@ -262,7 +262,7 @@
 			{
 				"id": "composting-workshop-blueprint",
 				"title": "Composting Workshop Blueprint",
-				"artwork": "composting-workshop",
+				"artwork": "d1nx3rme3j7j161hpd2cu7jv",
 				"description": "Discover plans for a Composting Workshop. Agriculture starts with having somewhere useful to put the mess.",
 				"clockWeight": 1,
 				"default": false,
@@ -377,7 +377,7 @@
 			{
 				"id": "growers-guild-blueprint",
 				"title": "Growers Guild Blueprint",
-				"artwork": "growers-guild",
+				"artwork": "g12ykuh5vwadvkoy3cs9r6zd",
 				"description": "Discover plans for Growers Guild.",
 				"clockWeight": 1,
 				"default": false,
@@ -507,7 +507,7 @@
 			{
 				"id": "animal-feed-workshop-blueprint",
 				"title": "Animal Feed Workshop Blueprint",
-				"artwork": "animal-feed-workshop",
+				"artwork": "qgam58n66dfu2yc9s2cdtoug",
 				"description": "Discover plans for an Animal Feed Workshop after establishing the Growers Guild.",
 				"clockWeight": 1,
 				"default": false,
@@ -637,7 +637,7 @@
 			{
 				"id": "herders-guild-blueprint",
 				"title": "Herders Guild Blueprint",
-				"artwork": "herders-guild",
+				"artwork": "sfiecse95ohoctxsonulfpfa",
 				"description": "Discover plans for Herders Guild after establishing animal-feed production.",
 				"clockWeight": 1,
 				"default": false,

@@ -82,16 +82,16 @@ it.each([
 			},
 			resources: [
 				{
-					id: "first",
+					uid: "first",
 					type,
-					name: "First recording",
+					title: "First recording",
 					size: 10,
 					version: "bytes-first",
 				},
 				{
-					id: "second",
+					uid: "second",
 					type,
-					name: "Second recording",
+					title: "Second recording",
 					size: 20,
 					version: "bytes-second",
 				},
@@ -108,16 +108,16 @@ it.each([
 			completeFirstFn = resolveFn;
 		});
 		const saveResourceMetadataFn = vi.fn(
-			async (request: { resourceId: string; name: string }) => {
-				if (request.resourceId === "first") await firstReply;
+			async (request: { resourceUid: string; title: string }) => {
+				if (request.resourceUid === "first") await firstReply;
 				project = {
 					...project,
 					revision: project.revision + 1,
 					resources: project.resources.map((resource) =>
-						resource.id === request.resourceId
+						resource.uid === request.resourceUid
 							? {
 									...resource,
-									name: request.name,
+									title: request.title,
 								}
 							: resource,
 					),
@@ -128,11 +128,11 @@ it.each([
 				};
 			},
 		);
-		const deleteResourceFn = vi.fn(async (request: { resourceId: string }) => {
+		const deleteResourceFn = vi.fn(async (request: { resourceUid: string }) => {
 			project = {
 				...project,
 				revision: project.revision + 1,
-				resources: project.resources.filter(({ id }) => id !== request.resourceId),
+				resources: project.resources.filter(({ uid }) => uid !== request.resourceUid),
 				config: {
 					...project.config,
 					...(type === "music"
@@ -176,13 +176,13 @@ it.each([
 		});
 		const detail = createRoute({
 			getParentRoute: () => editor,
-			path: `${type}/$resourceId/$sectionId`,
+			path: `${type}/$resourceUid/$sectionId`,
 			component: () => {
-				const { resourceId, sectionId } = detail.useParams();
+				const { resourceUid, sectionId } = detail.useParams();
 				// Keep the same route component mounted: the production detail must own its draft identity.
 				return (
 					<EditorAudioResourceDetail
-						resourceId={resourceId}
+						resourceUid={resourceUid}
 						type={type}
 						section={
 							sectionId === "edit"
@@ -293,8 +293,8 @@ it.each([
 			expect(saveResourceMetadataFn).toHaveBeenLastCalledWith({
 				projectId: state.projectId,
 				expectedRevision: 0,
-				resourceId: "first",
-				name: "Draft for first",
+				resourceUid: "first",
+				title: "Draft for first",
 			});
 			await act(async () => {
 				navigation = router.navigate({
@@ -326,17 +326,17 @@ it.each([
 			expect(saveResourceMetadataFn).toHaveBeenLastCalledWith({
 				projectId: state.projectId,
 				expectedRevision: 1,
-				resourceId: "second",
-				name: "Second renamed",
+				resourceUid: "second",
+				title: "Second renamed",
 			});
 			expect(RendererAtomRegistry.get(atom)?.resources).toEqual([
 				{
 					...project.resources[0],
-					name: "Draft for first",
+					title: "Draft for first",
 				},
 				{
 					...project.resources[1],
-					name: "Second renamed",
+					title: "Second renamed",
 				},
 			]);
 			expect(RendererAtomRegistry.get(atom)?.config).toEqual(originalConfig);
@@ -386,13 +386,13 @@ it.each([
 			);
 			await vi.waitFor(() =>
 				expect(
-					RendererAtomRegistry.get(atom)?.resources.some(({ id }) => id === "second"),
+					RendererAtomRegistry.get(atom)?.resources.some(({ uid }) => uid === "second"),
 				).toBe(false),
 			);
 			expect(deleteResourceFn).toHaveBeenCalledWith({
 				projectId: state.projectId,
 				expectedRevision: 2,
-				resourceId: "second",
+				resourceUid: "second",
 			});
 		} finally {
 			completeFirstFn();

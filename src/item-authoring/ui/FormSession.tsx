@@ -38,7 +38,7 @@ export const FormSession = ({
 	outcomeRollIndex,
 	outcomeIndex,
 	productionLineId,
-	resourceId,
+	resourceUid,
 	sectionId,
 }: PropsWithChildren<{
 	readonly defaultDraft?: boolean;
@@ -55,7 +55,7 @@ export const FormSession = ({
 	readonly outcomeRollIndex?: number;
 	readonly outcomeIndex?: number;
 	readonly productionLineId?: string;
-	readonly resourceId?: string;
+	readonly resourceUid?: string;
 	readonly sectionId: SectionId;
 }>) => {
 	const navigateFn = useNavigate();
@@ -71,7 +71,7 @@ export const FormSession = ({
 			defaultDraft,
 			defaultTitle,
 			create,
-			resourceId,
+			resourceUid,
 		},
 	});
 	const unsavedChanges = useEditorUnsavedChangesOwner();
@@ -100,10 +100,10 @@ export const FormSession = ({
 						: {
 								create,
 							}),
-					...(resourceId === undefined
+					...(resourceUid === undefined
 						? {}
 						: {
-								resourceId,
+								resourceUid,
 							}),
 					...(nextSectionId === "merges" && typeof path[1] === "number"
 						? {
@@ -119,7 +119,7 @@ export const FormSession = ({
 			create,
 			navigateFn,
 			project.projectId,
-			resourceId,
+			resourceUid,
 		],
 	);
 	const controller = useFormController({
@@ -254,7 +254,7 @@ export const FormSession = ({
 						>
 							{([title, artwork]) => (
 								<ItemHeaderTitle
-									resourceIds={readCanonicalItemArtworkFn(artwork).default}
+									resourceUids={readCanonicalItemArtworkFn(artwork).default}
 									title={
 										title.trim() ||
 										(isNew ? translator.textFn("New item") : initialItem.uid)
@@ -284,7 +284,7 @@ export const FormSession = ({
 									create={create}
 									itemUid={params.itemUid}
 									projectId={params.projectId}
-									resourceId={resourceId}
+									resourceUid={resourceUid}
 									section={candidate}
 								/>
 							))}

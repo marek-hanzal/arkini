@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"vegetable-farm"
+				"fabzgtg8buny4mcp46jrvdli"
 			]
 		},
 		"maxQueueSize": 4,
@@ -109,7 +109,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Vegetable Garden",
-				"artwork": "empty-vegetable-garden",
+				"artwork": "qs340jz8b5p9q1xpe0svwzdh",
 				"description": "Prepare a new empty growing plot.",
 				"clockWeight": 1,
 				"default": false,
@@ -151,7 +151,7 @@
 			{
 				"id": "blueprint",
 				"title": "Vegetable Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Vegetable Farm.",
 				"clockWeight": 1,
 				"default": false,

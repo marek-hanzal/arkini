@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"pumpkin-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"dvv4barhd6clyqk27xta73dv"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "pumpkin-farm",
 				"title": "Build Pumpkin Farm",
-				"artwork": "pumpkin-farm",
+				"artwork": "dvv4barhd6clyqk27xta73dv",
 				"description": "Build Pumpkin Farm.",
 				"clockWeight": 1,
 				"default": true,

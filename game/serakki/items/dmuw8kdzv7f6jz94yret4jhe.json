@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"stonemason-camp"
+				"so7r094glj6wfe6yoveiclrg",
+				"u0ugyubcxh6gng4hljmts53j"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "stonemason-camp",
 				"title": "Stonemason Camp",
-				"artwork": "stonemason-camp",
+				"artwork": "u0ugyubcxh6gng4hljmts53j",
 				"description": "After this, you'll be master of Stones!",
 				"clockWeight": 1,
 				"default": true,

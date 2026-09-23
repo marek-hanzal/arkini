@@ -33,9 +33,9 @@ describe("filesystem audio metadata", () => {
 					projectId: project.projectId,
 					resources: [
 						{
-							id: "stable-audio",
+							uid: "stable-audio",
 							type,
-							name: "Recording 17",
+							title: "Recording 17",
 							path: source,
 							size: bytes.byteLength,
 						},
@@ -80,7 +80,7 @@ describe("filesystem audio metadata", () => {
 					projectId: project.projectId,
 					content: "Audio note",
 					itemUids: [],
-					resourceIds: [
+					resourceUids: [
 						"stable-audio",
 					],
 				}),
@@ -116,22 +116,22 @@ describe("filesystem audio metadata", () => {
 				},
 			});
 			const opened = await Effect.runPromise(repository.readProjectFx(project.projectId));
-			const original = opened?.resources.find(({ id }) => id === "stable-audio");
+			const original = opened?.resources.find(({ uid }) => uid === "stable-audio");
 			expect(original).toMatchObject({
-				name: "Recording 17",
+				title: "Recording 17",
 			});
 			writes.length = 0;
 			const saved = await Effect.runPromise(
 				repository.saveResourceMetadataFx({
 					projectId: project.projectId,
 					expectedRevision: marked.revision,
-					resourceId: "stable-audio",
-					name: "  Dusty Plains  ",
+					resourceUid: "stable-audio",
+					title: "  Dusty Plains  ",
 				}),
 			);
-			expect(saved.resources.find(({ id }) => id === "stable-audio")).toEqual({
+			expect(saved.resources.find(({ uid }) => uid === "stable-audio")).toEqual({
 				...original,
-				name: "Dusty Plains",
+				title: "Dusty Plains",
 			});
 			expect(saved.config).toEqual(marked.config);
 			expect(saved.revision).toBeGreaterThan(marked.revision);
@@ -144,15 +144,15 @@ describe("filesystem audio metadata", () => {
 			expect(
 				JSON.parse(await readFile(join(root, type, "stable-audio.json"), "utf8")),
 			).toEqual({
-				name: "Dusty Plains",
+				title: "Dusty Plains",
 			});
 			await expect(
 				Effect.runPromise(
 					repository.saveResourceMetadataFx({
 						projectId: project.projectId,
 						expectedRevision: marked.revision,
-						resourceId: "stable-audio",
-						name: "Stale",
+						resourceUid: "stable-audio",
+						title: "Stale",
 					}),
 				),
 			).rejects.toThrow("changed from revision");
@@ -161,20 +161,20 @@ describe("filesystem audio metadata", () => {
 					repository.saveResourceMetadataFx({
 						projectId: project.projectId,
 						expectedRevision: saved.revision,
-						resourceId: "stable-audio",
-						name: " ",
+						resourceUid: "stable-audio",
+						title: " ",
 					}),
 				),
-			).rejects.toThrow("name is invalid");
+			).rejects.toThrow("title is invalid");
 			await expect(
 				Effect.runPromise(
 					repository.upsertResourceFilesFx({
 						projectId: project.projectId,
 						resources: [
 							{
-								id: "stable-audio",
+								uid: "stable-audio",
 								type,
-								name: "Collision",
+								title: "Collision",
 								path: source,
 								size: bytes.byteLength,
 							},
@@ -187,26 +187,26 @@ describe("filesystem audio metadata", () => {
 					repository.replaceResourceFx({
 						projectId: project.projectId,
 						expectedRevision: saved.revision,
-						currentId: "stable-audio",
-						config: saved.config,
+						resourceUid: "stable-audio",
 						resource: {
-							id: "new-id",
+							uid: "new-id",
+							title: "Renamed",
 							type,
 						},
 					}),
 				),
-			).rejects.toThrow("preserve its resource ID and type");
+			).rejects.toThrow("preserve its resource UID and type");
 			const reopened = await Effect.runPromise(
 				repository.refreshProjectFx(project.projectId),
 			);
-			expect(reopened.resources.find(({ id }) => id === "stable-audio")).toEqual({
+			expect(reopened.resources.find(({ uid }) => uid === "stable-audio")).toEqual({
 				...original,
-				name: "Dusty Plains",
+				title: "Dusty Plains",
 			});
 			expect(
 				(await Effect.runPromise(repository.listNotesFx(project.projectId))).find(
 					({ noteId }) => noteId === note.noteId,
-				)?.resourceIds,
+				)?.resourceUids,
 			).toEqual([
 				"stable-audio",
 			]);
@@ -218,13 +218,13 @@ describe("filesystem audio metadata", () => {
 				repository.deleteResourceFx({
 					projectId: project.projectId,
 					expectedRevision: reopened.revision,
-					resourceId: "stable-audio",
+					resourceUid: "stable-audio",
 				}),
 			);
 			expect(
 				Object.values(deleted.config.items).every((item) => item.music === undefined),
 			).toBe(true);
-			expect(deleted.resources.some(({ id }) => id === "stable-audio")).toBe(false);
+			expect(deleted.resources.some(({ uid }) => uid === "stable-audio")).toBe(false);
 			for (const extension of [
 				"ogg",
 				"json",
@@ -240,7 +240,7 @@ describe("filesystem audio metadata", () => {
 			expect(
 				(await Effect.runPromise(repository.listNotesFx(project.projectId))).find(
 					({ noteId }) => noteId === note.noteId,
-				)?.resourceIds,
+				)?.resourceUids,
 			).toEqual([]);
 		},
 	);

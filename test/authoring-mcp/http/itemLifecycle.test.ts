@@ -54,7 +54,7 @@ describe("editor MCP item lifecycle", () => {
 			repository.createNoteFx({
 				projectId: "item-lifecycle",
 				content: "Keep the design after deletion",
-				resourceIds: [
+				resourceUids: [
 					"item-water",
 				],
 				itemUids: [
@@ -98,7 +98,7 @@ describe("editor MCP item lifecycle", () => {
 		expect(project.revision).toBeGreaterThan(created.revision);
 		expect(await readFile(join(root, "artwork/item-water.png"))).toEqual(originalBytes);
 		expect(
-			(await Effect.runPromise(repository.listNotesFx("item-lifecycle")))[0]?.resourceIds,
+			(await Effect.runPromise(repository.listNotesFx("item-lifecycle")))[0]?.resourceUids,
 		).toEqual([
 			"item-water",
 		]);
@@ -152,7 +152,7 @@ describe("editor MCP item lifecycle", () => {
 		expect(notes).toEqual([
 			{
 				...note,
-				resourceIds: [
+				resourceUids: [
 					"item-water",
 				],
 				itemUids: [],

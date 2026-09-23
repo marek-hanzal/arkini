@@ -1,4 +1,4 @@
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { isDeepStrictEqual } from "node:util";
 import { Effect, FileSystem } from "effect";
 
@@ -23,20 +23,15 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 	previous,
 	next,
 	resourceFileWrites = [],
-	resourceRename,
 	noteUpdates,
 }: {
 	readonly root: string;
 	readonly previous: Project;
 	readonly next: Project;
 	readonly resourceFileWrites?: ReadonlyArray<{
-		readonly id: string;
+		readonly uid: string;
 		readonly path: string;
 	}>;
-	readonly resourceRename?: {
-		readonly from: string;
-		readonly to: string;
-	};
 	readonly noteUpdates: ReadonlyArray<NoteSchema.Type>;
 }) {
 	const fileSystem = yield* FileSystem.FileSystem;
@@ -124,55 +119,43 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 				);
 			const previousResources = new Map(
 				previous.resources.map((resource) => [
-					resource.id,
+					resource.uid,
 					resource,
 				]),
 			);
 			const resourceFiles = new Map(
 				resourceFileWrites.map((resource) => [
-					resource.id,
+					resource.uid,
 					resource.path,
 				]),
 			);
 			for (const resource of next.resources) {
-				const oldId =
-					resourceRename?.to === resource.id ? resourceRename.from : resource.id;
-				const old = previousResources.get(oldId);
+				const oldUid = resource.uid;
+				const old = previousResources.get(oldUid);
 				const target = yield* paths.resourceFileFx(resource);
 				yield* admitTargetFx(target);
 				const oldTarget = old === undefined ? undefined : yield* paths.resourceFileFx(old);
-				const metadataTarget =
-					resource.type === "music" || resource.type === "sfx"
-						? yield* paths.audioMetadataFileFx({
-								id: resource.id,
-								type: resource.type,
-							})
-						: undefined;
+				const metadataTarget = yield* paths.resourceMetadataFileFx(resource);
 				const oldMetadataTarget =
-					old?.type === "music" || old?.type === "sfx"
-						? yield* paths.audioMetadataFileFx({
-								id: old.id,
-								type: old.type,
-							})
-						: undefined;
+					old === undefined ? undefined : yield* paths.resourceMetadataFileFx(old);
 				if (oldMetadataTarget !== undefined && oldMetadataTarget !== metadataTarget)
 					deletes.add(oldMetadataTarget);
 				if (metadataTarget !== undefined) {
 					yield* admitTargetFx(metadataTarget);
 					const metadata = yield* Effect.try(() =>
-						AudioResourceMetadataSchema.parse({
-							name: resource.name,
+						ResourceMetadataSchema.parse({
+							title: resource.title,
 						}),
 					);
-					if (oldMetadataTarget !== metadataTarget || old?.name !== metadata.name) {
+					if (oldMetadataTarget !== metadataTarget || old?.title !== metadata.title) {
 						writes.push({
 							target: metadataTarget,
 							bytes: encodeJsonFn(metadata),
 						});
-						changedResources.add(resource.id);
+						changedResources.add(resource.uid);
 					}
 				}
-				let source = resourceFiles.get(resource.id);
+				let source = resourceFiles.get(resource.uid);
 				if (oldTarget !== undefined && oldTarget !== target) {
 					deletes.add(oldTarget);
 					source ??= oldTarget;
@@ -182,23 +165,22 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 						target,
 						source,
 					});
-					changedResources.add(resource.id);
+					changedResources.add(resource.uid);
 				} else if (old === undefined) {
 					return yield* Effect.fail(
-						new Error(`New Editor resource ${resource.id} has no content.`),
+						new Error(`New Editor resource ${resource.uid} has no content.`),
 					);
 				}
-				previousResources.delete(oldId);
+				previousResources.delete(oldUid);
 			}
 			for (const resource of previousResources.values()) {
 				deletes.add(yield* paths.resourceFileFx(resource));
-				if (resource.type === "music" || resource.type === "sfx")
-					deletes.add(
-						yield* paths.audioMetadataFileFx({
-							id: resource.id,
-							type: resource.type,
-						}),
-					);
+				deletes.add(
+					yield* paths.resourceMetadataFileFx({
+						uid: resource.uid,
+						type: resource.type,
+					}),
+				);
 			}
 			for (const note of noteUpdates) {
 				writes.push({
@@ -206,7 +188,7 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 					bytes: encodeJsonFn({
 						content: note.content,
 						itemUids: note.itemUids,
-						resourceIds: note.resourceIds,
+						resourceUids: note.resourceUids,
 						createdAtMs: note.createdAtMs,
 						updatedAtMs: note.updatedAtMs,
 					}),
@@ -222,11 +204,11 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 			return {
 				writes,
 				verifyFx: Effect.forEach(next.resources, (resource) =>
-					changedResources.has(resource.id)
+					changedResources.has(resource.uid)
 						? Effect.gen(function* () {
 								const target = yield* paths.resourceFileFx(resource);
 								return yield* readProjectResourceMetadataFx(
-									resource.id,
+									resource.uid,
 									resource.type,
 									target,
 								);

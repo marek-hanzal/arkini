@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"house-t2"
+				"so7r094glj6wfe6yoveiclrg",
+				"f0vnkcqwb0i3r7l5dqs3852l"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "house-t2",
 				"title": "Build House - Tier 2",
-				"artwork": "house-t2",
+				"artwork": "f0vnkcqwb0i3r7l5dqs3852l",
 				"description": "Build a Tier 2 house using processed materials and several units of basic labor.",
 				"clockWeight": 1,
 				"default": true,

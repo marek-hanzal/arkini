@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"cotton-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"g68kq5f65zhx8bdaj9ln5dti"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "cotton-farm",
 				"title": "Build Cotton Farm",
-				"artwork": "cotton-farm",
+				"artwork": "g68kq5f65zhx8bdaj9ln5dti",
 				"description": "Build Cotton Farm.",
 				"clockWeight": 1,
 				"default": true,

@@ -69,7 +69,7 @@ describe("handleSerakkiProtocolRequestFx", () => {
 	});
 	it("routes Editor resource requests to the registered resource owner instead of the renderer tree", async () => {
 		const request = new Request(
-			"serakki://app/editor/resource?projectId=p&resourceId=r&version=v",
+			"serakki://app/editor/resource?projectId=p&resourceUid=r&version=v",
 		);
 		const handleEditorResourceRequestFx = vi.fn(() => Effect.succeed(new Response("png")));
 		const response = await Effect.runPromise(
@@ -86,7 +86,7 @@ describe("handleSerakkiProtocolRequestFx", () => {
 
 	it("routes same-origin Game resource requests before the renderer tree", async () => {
 		const request = new Request(
-			"serakki://app/game/resource?packageId=p&contentHash=h&resourceId=r",
+			"serakki://app/game/resource?packageId=p&contentHash=h&resourceUid=r",
 		);
 		const handleGameResourceRequestFx = vi.fn(() => Effect.succeed(new Response("png")));
 		const response = await Effect.runPromise(

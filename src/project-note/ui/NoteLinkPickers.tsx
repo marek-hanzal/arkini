@@ -10,16 +10,16 @@ import type { Project } from "~/project-authoring/type/Project";
 /** Adds note relationships immediately; selected links are rendered below both pickers. */
 export const NoteLinkPickers = ({
 	itemUids,
-	resourceIds,
+	resourceUids,
 	disabled,
 	onItemUidsChangeFn,
-	onResourceIdsChangeFn,
+	onResourceUidsChangeFn,
 }: {
 	readonly itemUids: ReadonlyArray<string>;
-	readonly resourceIds: ReadonlyArray<string>;
+	readonly resourceUids: ReadonlyArray<string>;
 	readonly disabled: boolean;
 	readonly onItemUidsChangeFn: (itemUids: ReadonlyArray<string>) => void;
-	readonly onResourceIdsChangeFn: (resourceIds: ReadonlyArray<string>) => void;
+	readonly onResourceUidsChangeFn: (resourceUids: ReadonlyArray<string>) => void;
 }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
@@ -30,9 +30,9 @@ export const NoteLinkPickers = ({
 		],
 	);
 	const includeResourceFn = useCallback(
-		(resource: Project.Resource) => !resourceIds.includes(resource.id),
+		(resource: Project.Resource) => !resourceUids.includes(resource.uid),
 		[
-			resourceIds,
+			resourceUids,
 		],
 	);
 	return (
@@ -60,20 +60,20 @@ export const NoteLinkPickers = ({
 			<ResourceReferenceControl
 				showSelectedPreview={false}
 				emptyLabel={translator.textFn("No resources match this search.")}
-				key={`resources:${resourceIds.length}`}
+				key={`resources:${resourceUids.length}`}
 				label={translator.textFn("Link resource")}
 				value=""
 				includeResourceFn={includeResourceFn}
-				onChangeFn={(resourceId) => {
+				onChangeFn={(resourceUid) => {
 					if (
 						disabled ||
-						resourceIds.includes(resourceId) ||
-						!project.resources.some((resource) => resource.id === resourceId)
+						resourceUids.includes(resourceUid) ||
+						!project.resources.some((resource) => resource.uid === resourceUid)
 					)
 						return;
-					onResourceIdsChangeFn([
-						...resourceIds,
-						resourceId,
+					onResourceUidsChangeFn([
+						...resourceUids,
+						resourceUid,
 					]);
 				}}
 			/>

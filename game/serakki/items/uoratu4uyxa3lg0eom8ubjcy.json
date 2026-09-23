@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"sawmill"
+				"so7r094glj6wfe6yoveiclrg",
+				"oo4txpzczam6kt5jue7vhf1a"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "sawmill",
 				"title": "Build Sawmill",
-				"artwork": "sawmill",
+				"artwork": "oo4txpzczam6kt5jue7vhf1a",
 				"description": "Let's build sawmill",
 				"clockWeight": 1,
 				"default": true,

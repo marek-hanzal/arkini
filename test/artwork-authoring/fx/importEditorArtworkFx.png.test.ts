@@ -37,7 +37,7 @@ describe("Artwork Authoring importEditorArtworkFx from PNG files", () => {
 				type: "success",
 				value: {
 					project,
-					resourceIds: [
+					resourceUids: [
 						"new-artwork",
 						"other-artwork",
 					],
@@ -93,7 +93,7 @@ describe("Artwork Authoring importEditorArtworkFx from PNG files", () => {
 			source: "files",
 			type: "artwork",
 		});
-		expect(imported.resourceIds).toEqual([
+		expect(imported.resourceUids).toEqual([
 			"new-artwork",
 			"other-artwork",
 		]);

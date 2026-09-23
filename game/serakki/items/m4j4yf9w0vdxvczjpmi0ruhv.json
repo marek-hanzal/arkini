@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"copper-mine"
+				"y1ibu0fwsvyeghbbtafs22rs"
 			]
 		},
 		"units": {
@@ -45,7 +45,7 @@
 			{
 				"id": "copper-ore---candle",
 				"title": "Copper Ore - Candle",
-				"artwork": "candle",
+				"artwork": "rxpbi0mu35ylblwwky8w04bm",
 				"description": "Copper ore",
 				"default": false,
 				"clockWeight": 1,
@@ -113,7 +113,7 @@
 			{
 				"id": "copper-ore---lantern",
 				"title": "Copper Ore - Lantern",
-				"artwork": "lantern",
+				"artwork": "d849jmpyesvhw3kxx0in38ni",
 				"description": "Copper ore",
 				"clock": false,
 				"clockWeight": 1,

@@ -37,7 +37,7 @@ describe("Game resource protocol", () => {
 	])(
 		"serves exact package %j and resource identities with media byte ranges",
 		async (packageId) => {
-			const resourceId = "image:\udc00";
+			const resourceUid = "image:\udc00";
 			const contentHash = "a".repeat(64);
 			const installationRoot = join(
 				root,
@@ -55,7 +55,7 @@ describe("Game resource protocol", () => {
 					contentHash,
 					resources: [
 						{
-							id: resourceId,
+							uid: resourceUid,
 							type: "image",
 							path: "resources/000000",
 							size: 6,
@@ -74,7 +74,7 @@ describe("Game resource protocol", () => {
 					isTrustedUrlFn: () => true,
 				}),
 			);
-			const url = `serakki://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${contentHash}&resourceId=${encodeURIComponent(JSON.stringify(resourceId))}`;
+			const url = `serakki://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${contentHash}&resourceUid=${encodeURIComponent(JSON.stringify(resourceUid))}`;
 
 			const response = await Effect.runPromise(
 				protocol.handleRequestFx(

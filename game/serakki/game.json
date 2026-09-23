@@ -14,14 +14,14 @@
 		}
 	},
 	"resources": {
-		"hero": "hero",
-		"avatar-01": "avatar-01",
-		"avatar-02": "avatar-02",
-		"avatar-03": "avatar-03",
-		"avatar-04": "avatar-04",
-		"avatar-05": "avatar-05",
-		"avatar-06": "avatar-06",
-		"avatar-07": "avatar-07"
+		"hero": "t7gotajnzi1aokgvtn405yng",
+		"avatar-01": "mcwybx65ocgxs5dzeidpcrfd",
+		"avatar-02": "e8nhqxqjnnvdwpeelhvgf8q0",
+		"avatar-03": "a8lb774csgqtki0f4qzq6lsi",
+		"avatar-04": "blbisuy3bd9zxu3683wp9oag",
+		"avatar-05": "oaghoh9c1m9ijhi35p2sqjsy",
+		"avatar-06": "bb6zaxexna6p283x8zcph6go",
+		"avatar-07": "dz4fvff6k9a1pehwry3dhsbo"
 	},
 	"music": {
 		"playlist": [
@@ -118,6 +118,16 @@
 					"x": 8,
 					"y": 3,
 					"itemUid": "nw61q7vfe9qpdh58ocjp0gpx"
+				},
+				{
+					"x": 3,
+					"y": 3,
+					"itemUid": "kfex38vvnfqn5iavk06en63s"
+				},
+				{
+					"x": 4,
+					"y": 3,
+					"itemUid": "u3rae7whzo3to29mylyewg8v"
 				}
 			]
 		},

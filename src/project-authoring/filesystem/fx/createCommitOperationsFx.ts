@@ -2,7 +2,7 @@ import {
 	ProjectResourceFileReplacementSchema,
 	ProjectResourceReplacementSchema,
 } from "~/project-authoring/schema/ProjectResourceReplacementSchema";
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
@@ -110,7 +110,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		resources,
 		resourceFileWrites,
 		resourceDelete,
-		resourceRename,
 		nowMs,
 	}: {
 		readonly allowProjectIdChange?: boolean;
@@ -118,14 +117,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ProjectResourceSchema.Type>;
 		readonly resourceFileWrites?: ReadonlyArray<{
-			readonly id: string;
+			readonly uid: string;
 			readonly path: string;
 		}>;
 		readonly resourceDelete?: string;
-		readonly resourceRename?: {
-			readonly from: string;
-			readonly to: string;
-		};
 		readonly nowMs: number;
 	}) {
 		const canonicalConfig = GameConfigSchema.parse({
@@ -155,7 +150,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			config: canonicalConfig,
 			resources: [
 				...resources,
-			].sort((left, right) => left.id.localeCompare(right.id)),
+			].sort((left, right) => left.uid.localeCompare(right.uid)),
 		};
 		// Reconcile against the completed config: force cleanup may remove additional owners.
 		// Notes and the item tree are published from the same completed project projection.
@@ -168,26 +163,22 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		);
 		const notes = state.notes.map((note) => {
 			const itemUids = note.itemUids.filter((uid) => remainingItemUids.has(uid));
-			const reconciledResourceIds =
-				resourceRename === undefined
-					? resourceDelete === undefined
-						? note.resourceIds
-						: note.resourceIds.filter((id) => id !== resourceDelete)
-					: note.resourceIds.map((id) =>
-							id === resourceRename.from ? resourceRename.to : id,
-						);
-			const resourceIds = [
-				...new Set(reconciledResourceIds),
+			const reconciledResourceUids =
+				resourceDelete === undefined
+					? note.resourceUids
+					: note.resourceUids.filter((uid) => uid !== resourceDelete);
+			const resourceUids = [
+				...new Set(reconciledResourceUids),
 			];
-			const resourceIdsChanged =
-				resourceIds.length !== note.resourceIds.length ||
-				resourceIds.some((id, index) => id !== note.resourceIds[index]);
-			return itemUids.length === note.itemUids.length && !resourceIdsChanged
+			const resourceUidsChanged =
+				resourceUids.length !== note.resourceUids.length ||
+				resourceUids.some((uid, index) => uid !== note.resourceUids[index]);
+			return itemUids.length === note.itemUids.length && !resourceUidsChanged
 				? note
 				: {
 						...note,
 						itemUids,
-						resourceIds,
+						resourceUids,
 						updatedAtMs: noteUpdatedAtMs,
 					};
 		});
@@ -197,7 +188,6 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			previous: state.project,
 			next: nextProject,
 			resourceFileWrites,
-			resourceRename,
 			noteUpdates,
 		});
 
@@ -210,8 +200,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					itemUids: [
 						...note.itemUids,
 					],
-					resourceIds: [
-						...note.resourceIds,
+					resourceUids: [
+						...note.resourceUids,
 					],
 				}))
 				.sort(
@@ -312,7 +302,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 								...state.project.config,
 								items: Object.fromEntries(
 									Object.entries(state.project.config.items).filter(
-										([id]) => id !== itemUid,
+										([uid]) => uid !== itemUid,
 									),
 								),
 							});
@@ -384,14 +374,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ProjectResourceSchema.Type>;
 				readonly resourceFileWrites?: ReadonlyArray<{
-					readonly id: string;
+					readonly uid: string;
 					readonly path: string;
 				}>;
 				readonly resourceDelete?: string;
-				readonly resourceRename?: {
-					readonly from: string;
-					readonly to: string;
-				};
 			},
 			ProjectRepositoryError,
 			never
@@ -416,27 +402,22 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 								: {
 										resourceDelete: next.resourceDelete,
 									}),
-							...(next.resourceRename === undefined
-								? {}
-								: {
-										resourceRename: next.resourceRename,
-									}),
 							nowMs,
 						}),
 					);
 				}),
 			);
 		});
-	const assertDistinctResourceIdsFx = Effect.fn("assertDistinctResourceIdsFx")(function* <
+	const assertDistinctResourceUidsFx = Effect.fn("assertDistinctResourceUidsFx")(function* <
 		Resource extends {
-			readonly id: string;
+			readonly uid: string;
 		},
 	>(resources: ReadonlyArray<Resource>) {
 		if (resources.length === 0)
 			return yield* Effect.fail(
 				errorFn("upsert-resource", "Select at least one resource to import."),
 			);
-		if (new Set(resources.map(({ id }) => id)).size !== resources.length)
+		if (new Set(resources.map(({ uid }) => uid)).size !== resources.length)
 			return yield* Effect.fail(
 				errorFn(
 					"upsert-resource",
@@ -451,64 +432,50 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	}: {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<{
-			readonly id: string;
+			readonly uid: string;
 			readonly type: ProjectResourceSchema.Type["type"];
 			readonly path: string;
 			readonly size: number;
-			readonly name?: string;
+			readonly title: string;
 		}>;
 	}) =>
 		Effect.gen(function* () {
-			yield* assertDistinctResourceIdsFx(resources);
+			yield* assertDistinctResourceUidsFx(resources);
 			for (const resource of resources)
-				if (resource.type === "music" || resource.type === "sfx")
-					yield* Effect.try({
-						try: () =>
-							AudioResourceMetadataSchema.parse({
-								name: resource.name,
-							}),
-						catch: (cause) =>
-							errorFn(
-								"upsert-resource",
-								`Audio resource ${resource.id} has invalid metadata.`,
-								cause,
-							),
-					});
+				yield* Effect.try({
+					try: () =>
+						ResourceMetadataSchema.parse({
+							title: resource.title,
+						}),
+					catch: (cause) =>
+						errorFn(
+							"upsert-resource",
+							`Resource ${resource.uid} has invalid metadata.`,
+							cause,
+						),
+				});
 			return yield* commitResourcesFx("upsert-resource", projectId, undefined, (state) => {
 				for (const resource of resources) {
-					const existing = state.project.resources.find(({ id }) => id === resource.id);
-					if (
-						existing !== undefined &&
-						(resource.type === "music" || resource.type === "sfx")
-					)
+					const existing = state.project.resources.find(
+						({ uid }) => uid === resource.uid,
+					);
+					if (existing !== undefined)
 						return Effect.fail(
 							errorFn(
 								"upsert-resource",
-								`Resource ID ${resource.id} already exists.`,
-							),
-						);
-					if (existing !== undefined && existing.type !== resource.type)
-						return Effect.fail(
-							errorFn(
-								"upsert-resource",
-								`Resource ${resource.id} already exists as ${existing.type}; it cannot be imported as ${resource.type}.`,
+								`Resource ID ${resource.uid} already exists.`,
 							),
 						);
 				}
-				const ids = new Set(resources.map(({ id }) => id));
 				return Effect.succeed({
 					config: state.project.config,
 					resources: [
-						...state.project.resources.filter(({ id }) => !ids.has(id)),
-						...resources.map(({ id, type, size, name }) => ({
-							id,
+						...state.project.resources,
+						...resources.map(({ uid, type, size, title }) => ({
+							uid,
 							type,
 							size,
-							...(type === "music" || type === "sfx"
-								? {
-										name,
-									}
-								: {}),
+							title,
 							version: "pending",
 						})),
 					],
@@ -529,7 +496,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 		expectedRevision,
 		onProgressFn,
 		projectId,
-		resourceIds,
+		resourceUids,
 		type,
 	}) =>
 		operations
@@ -542,35 +509,35 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							expectedRevision,
 							"optimize-resources",
 						);
-						if (resourceIds.length === 0)
+						if (resourceUids.length === 0)
 							return yield* Effect.fail(
 								errorFn(
 									"optimize-resources",
 									"At least one resource must be selected for optimization.",
 								),
 							);
-						const selectedResourceIds = new Set(resourceIds);
-						if (selectedResourceIds.size !== resourceIds.length)
+						const selectedResourceUids = new Set(resourceUids);
+						if (selectedResourceUids.size !== resourceUids.length)
 							return yield* Effect.fail(
 								errorFn(
 									"optimize-resources",
 									"Each selected resource may appear only once.",
 								),
 							);
-						const resources = state.project.resources.filter(({ id }) =>
-							selectedResourceIds.has(id),
+						const resources = state.project.resources.filter(({ uid }) =>
+							selectedResourceUids.has(uid),
 						);
-						if (resources.length !== resourceIds.length) {
-							const currentResourceIds = new Set(
-								state.project.resources.map(({ id }) => id),
+						if (resources.length !== resourceUids.length) {
+							const currentResourceUids = new Set(
+								state.project.resources.map(({ uid }) => uid),
 							);
-							const missingResourceIds = resourceIds.filter(
-								(resourceId) => !currentResourceIds.has(resourceId),
+							const missingResourceUids = resourceUids.filter(
+								(resourceUid) => !currentResourceUids.has(resourceUid),
 							);
 							return yield* Effect.fail(
 								errorFn(
 									"optimize-resources",
-									`Selected resources do not exist in project ${projectId}: ${missingResourceIds.join(", ")}.`,
+									`Selected resources do not exist in project ${projectId}: ${missingResourceUids.join(", ")}.`,
 								),
 							);
 						}
@@ -604,16 +571,16 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 										? optimizePngResourceFileFx(
 												source,
 												targetPrefix,
-												resource.id,
+												resource.uid,
 											)
 										: optimizeOggOpusResourceFileFx(
 												source,
 												`${targetPrefix}.ogg`,
-												resource.id,
+												resource.uid,
 											);
 									return {
 										...result,
-										id: resource.id,
+										uid: resource.uid,
 									};
 								}).pipe(
 									Effect.tap(() =>
@@ -645,7 +612,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						);
 						const optimizedResources = new Map(
 							results.map((result) => [
-								result.id,
+								result.uid,
 								result,
 							]),
 						);
@@ -663,10 +630,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 										state,
 										config: state.project.config,
 										resources: state.project.resources.map((resource) =>
-											optimizedResources.has(resource.id)
+											optimizedResources.has(resource.uid)
 												? {
 														...resource,
-														size: optimizedResources.get(resource.id)!
+														size: optimizedResources.get(resource.uid)!
 															.optimizedBytes,
 													}
 												: resource,
@@ -674,7 +641,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 										resourceFileWrites: results
 											.filter((result) => result.changed)
 											.map((result) => ({
-												id: result.id,
+												uid: result.uid,
 												path: result.path,
 											})),
 										nowMs: yield* Clock.currentTimeMillis,
@@ -704,42 +671,34 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	const saveResourceMetadataFx: Operations["saveResourceMetadataFx"] = ({
 		projectId,
 		expectedRevision,
-		resourceId,
-		name,
+		resourceUid,
+		title,
 	}) =>
 		commitResourcesFx("save-resource-metadata", projectId, expectedRevision, (state) =>
 			Effect.gen(function* () {
-				const resource = state.project.resources.find(({ id }) => id === resourceId);
+				const resource = state.project.resources.find(({ uid }) => uid === resourceUid);
 				if (resource === undefined)
-					return yield* Effect.fail(
-						errorFn("save-resource-metadata", `Resource ${resourceId} does not exist.`),
-					);
-				if (resource.type !== "music" && resource.type !== "sfx")
 					return yield* Effect.fail(
 						errorFn(
 							"save-resource-metadata",
-							"Only Music and SFX resources have editable names.",
+							`Resource ${resourceUid} does not exist.`,
 						),
 					);
 				const metadata = yield* Effect.try({
 					try: () =>
-						AudioResourceMetadataSchema.parse({
-							name,
+						ResourceMetadataSchema.parse({
+							title,
 						}),
 					catch: (cause) =>
-						errorFn(
-							"save-resource-metadata",
-							"The audio resource name is invalid.",
-							cause,
-						),
+						errorFn("save-resource-metadata", "The resource title is invalid.", cause),
 				});
 				return {
 					config: state.project.config,
 					resources: state.project.resources.map((entry) =>
-						entry.id === resourceId
+						entry.uid === resourceUid
 							? {
 									...entry,
-									name: metadata.name,
+									title: metadata.title,
 								}
 							: entry,
 					),
@@ -749,7 +708,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			Effect.mapError((cause) =>
 				errorFn(
 					"save-resource-metadata",
-					`Resource ${resourceId} metadata could not be saved in project ${projectId}.`,
+					`Resource ${resourceUid} metadata could not be saved in project ${projectId}.`,
 					cause,
 				),
 			),
@@ -758,32 +717,34 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 	const deleteResourceFx: Operations["deleteResourceFx"] = ({
 		expectedRevision,
 		projectId,
-		resourceId,
+		resourceUid,
 	}) =>
 		commitResourcesFx("delete-resource", projectId, expectedRevision, (state) =>
 			Effect.gen(function* () {
-				const resource = state.project.resources.find(({ id }) => id === resourceId);
+				const resource = state.project.resources.find(({ uid }) => uid === resourceUid);
 				if (resource === undefined)
 					return yield* Effect.fail(
-						errorFn("delete-resource", `Resource ${resourceId} does not exist.`),
+						errorFn("delete-resource", `Resource ${resourceUid} does not exist.`),
 					);
 				const withoutMusicReference =
 					resource.type === "music"
 						? GameConfigSchema.parse({
 								...state.project.config,
 								items: Object.fromEntries(
-									Object.entries(state.project.config.items).map(([id, item]) => {
-										if (item.music !== resourceId)
+									Object.entries(state.project.config.items).map(
+										([uid, item]) => {
+											if (item.music !== resourceUid)
+												return [
+													uid,
+													item,
+												];
+											const { music: _music, ...withoutMusic } = item;
 											return [
-												id,
-												item,
+												uid,
+												withoutMusic,
 											];
-										const { music: _music, ...withoutMusic } = item;
-										return [
-											id,
-											withoutMusic,
-										];
-									}),
+										},
+									),
 								),
 								...(state.project.config.music === undefined
 									? {}
@@ -792,7 +753,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 												...state.project.config.music,
 												playlist:
 													state.project.config.music.playlist.filter(
-														(id) => id !== resourceId,
+														(uid) => uid !== resourceUid,
 													),
 											},
 										}),
@@ -806,7 +767,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 									...withoutMusicReference.sfx,
 									events: Object.fromEntries(
 										Object.entries(withoutMusicReference.sfx.events).filter(
-											([, id]) => id !== resourceId,
+											([, uid]) => uid !== resourceUid,
 										),
 									),
 								},
@@ -814,146 +775,95 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						: withoutMusicReference;
 				const blockers = readEditorArtworkDeleteBlockersFn({
 					config,
-					resourceId,
+					resourceUid,
 				});
 				if (blockers.length > 0)
 					return yield* Effect.fail(
 						errorFn(
 							"delete-resource",
-							`Resource ${resourceId} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
+							`Resource ${resourceUid} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
 						),
 					);
 				return {
 					config,
-					resources: state.project.resources.filter(({ id }) => id !== resourceId),
-					resourceDelete: resourceId,
+					resources: state.project.resources.filter(({ uid }) => uid !== resourceUid),
+					resourceDelete: resourceUid,
 				};
 			}),
 		).pipe(
 			Effect.mapError((cause) =>
 				errorFn(
 					"delete-resource",
-					`Resource ${resourceId} could not be deleted from project ${projectId}.`,
+					`Resource ${resourceUid} could not be deleted from project ${projectId}.`,
 					cause,
 				),
 			),
 		);
 
 	const replaceResourceFx: Operations["replaceResourceFx"] = ({
-		config: candidateConfig,
-		currentId,
+		resourceUid,
 		expectedRevision,
 		projectId,
 		resource: candidateResource,
 	}) =>
 		Effect.gen(function* () {
-			const config = yield* Effect.try({
-				try: () => GameConfigSchema.parse(candidateConfig),
-				catch: (cause) =>
-					errorFn("replace-resource", "The resource references are invalid.", cause),
-			});
-			const parsedResource = yield* Effect.try({
+			const resource = yield* Effect.try({
 				try: () => ProjectResourceReplacementSchema.parse(candidateResource),
 				catch: (cause) =>
 					errorFn("replace-resource", "The replacement resource is invalid.", cause),
 			});
-			const parsedFileResource =
-				ProjectResourceFileReplacementSchema.safeParse(parsedResource);
-			const resource = parsedFileResource.success
-				? ProjectResourceReplacementSchema.parse({
-						...parsedFileResource.data,
-						size: yield* parsedFileResource.data.type === "artwork"
-							? validateArtworkPngFileFx(
-									parsedFileResource.data.path,
-									parsedFileResource.data.id,
-								)
-							: parsedFileResource.data.type === "image"
-								? validatePngResourceFileFx(
-										parsedFileResource.data.path,
-										parsedFileResource.data.id,
-									)
-								: validateOggOpusFileFx(
-										parsedFileResource.data.path,
-										parsedFileResource.data.id,
-									),
-					})
-				: parsedResource;
 			const fileResource = ProjectResourceFileReplacementSchema.safeParse(resource);
+			const size = fileResource.success
+				? yield* resource.type === "artwork"
+						? validateArtworkPngFileFx(fileResource.data.path, resource.uid)
+						: resource.type === "image"
+							? validatePngResourceFileFx(fileResource.data.path, resource.uid)
+							: validateOggOpusFileFx(fileResource.data.path, resource.uid)
+				: undefined;
 			return yield* commitResourcesFx(
 				"replace-resource",
 				projectId,
 				expectedRevision,
 				(state) => {
-					const previousResource = state.project.resources.find(
-						({ id }) => id === currentId,
+					const previous = state.project.resources.find(
+						(entry) => entry.uid === resourceUid,
 					);
-					if (previousResource === undefined)
+					if (previous === undefined)
 						return Effect.fail(
-							errorFn("replace-resource", `Resource ${currentId} does not exist.`),
+							errorFn("replace-resource", `Resource ${resourceUid} does not exist.`),
 						);
-					if (
-						(previousResource.type === "music" ||
-							previousResource.type === "sfx" ||
-							resource.type === "music" ||
-							resource.type === "sfx") &&
-						(resource.id !== currentId || resource.type !== previousResource.type)
-					)
+					if (resource.uid !== resourceUid || resource.type !== previous.type)
 						return Effect.fail(
 							errorFn(
 								"replace-resource",
-								"Audio replacement must preserve its resource ID and type.",
-							),
-						);
-					if (
-						resource.id !== currentId &&
-						state.project.resources.some(({ id }) => id === resource.id)
-					)
-						return Effect.fail(
-							errorFn(
-								"replace-resource",
-								`Resource ID ${resource.id} already exists.`,
+								"Replacement must preserve its resource UID and type.",
 							),
 						);
 					return Effect.succeed({
-						config,
-						resources: [
-							...state.project.resources.filter(({ id }) => id !== currentId),
-							{
-								id: resource.id,
-								type: resource.type,
-								size: fileResource.success
-									? fileResource.data.size
-									: previousResource.size,
-								version: previousResource.version,
-								...(resource.type === "music" || resource.type === "sfx"
-									? {
-											name: previousResource.name,
-										}
-									: {}),
-							},
-						],
-						resourceFileWrites: !fileResource.success
-							? []
-							: [
+						config: state.project.config,
+						resources: state.project.resources.map((entry) =>
+							entry.uid === resourceUid
+								? {
+										...entry,
+										title: resource.title,
+										size: size ?? entry.size,
+									}
+								: entry,
+						),
+						resourceFileWrites: fileResource.success
+							? [
 									{
-										id: resource.id,
+										uid: resourceUid,
 										path: fileResource.data.path,
 									},
-								],
-						...(resource.id === currentId
-							? {}
-							: {
-									resourceRename: {
-										from: currentId,
-										to: resource.id,
-									},
-								}),
+								]
+							: [],
 					});
 				},
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				errorFn("replace-resource", `Resource ${currentId} could not be updated.`, cause),
+				errorFn("replace-resource", `Resource ${resourceUid} could not be updated.`, cause),
 			),
 		);
 

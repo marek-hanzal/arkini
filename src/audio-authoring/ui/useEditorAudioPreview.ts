@@ -7,35 +7,35 @@ import { useResourceUrls } from "~/authoring-session/ui/ResourceUrlSession";
 interface ActiveAudio {
 	readonly audio: HTMLAudioElement;
 	readonly disposeFn: () => void;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 }
 
 export namespace useEditorAudioPreview {
 	export interface Props {
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 		readonly type: "music" | "sfx";
 	}
 	export interface Output {
-		readonly activeResourceId?: string;
+		readonly activeResourceUid?: string;
 		readonly playbackError?: string;
 		readonly playbackProgress: number;
 		readonly playing: boolean;
 		readonly setVolumeFn: (volume: number) => void;
-		readonly seekPlaybackFn: (resourceId: string, progress: number) => void;
-		readonly togglePlaybackFn: (resourceId: string) => void;
+		readonly seekPlaybackFn: (resourceUid: string, progress: number) => void;
+		readonly togglePlaybackFn: (resourceUid: string) => void;
 		readonly volume: number;
 	}
 }
 
 /** Owns one lazy audio preview and disposes its media body when its surface leaves. */
 export const useEditorAudioPreview = ({
-	resourceIds,
+	resourceUids,
 	type,
 }: useEditorAudioPreview.Props): useEditorAudioPreview.Output => {
 	const sound = useAtomValue(SoundSettingsAtom);
-	const urls = useResourceUrls(resourceIds);
+	const urls = useResourceUrls(resourceUids);
 	const activeAudioRef = useRef<ActiveAudio | undefined>(undefined);
-	const [activeResourceId, setActiveResourceIdFn] = useState<string>();
+	const [activeResourceUid, setActiveResourceUidFn] = useState<string>();
 	const [playbackDuration, setPlaybackDurationFn] = useState(0);
 	const [playbackTime, setPlaybackTimeFn] = useState(0);
 	const [playing, setPlayingFn] = useState(false);
@@ -76,10 +76,10 @@ export const useEditorAudioPreview = ({
 		volume,
 	]);
 
-	const startPlaybackFn = (resourceId: string, initialProgress?: number) => {
-		const url = urls.get(resourceId);
+	const startPlaybackFn = (resourceUid: string, initialProgress?: number) => {
+		const url = urls.get(resourceUid);
 		if (url === undefined) {
-			setPlaybackErrorFn(`${resourceLabel} ${resourceId} is unavailable.`);
+			setPlaybackErrorFn(`${resourceLabel} ${resourceUid} is unavailable.`);
 			return;
 		}
 		setPlaybackErrorFn(undefined);
@@ -113,7 +113,7 @@ export const useEditorAudioPreview = ({
 		const onErrorFn = () => {
 			if (activeAudioRef.current?.audio !== audio) return;
 			setPlayingFn(false);
-			setPlaybackErrorFn(`${resourceLabel} ${resourceId} could not be played.`);
+			setPlaybackErrorFn(`${resourceLabel} ${resourceUid} could not be played.`);
 		};
 		audio.addEventListener("play", onPlayFn);
 		audio.addEventListener("pause", onPauseFn);
@@ -124,7 +124,7 @@ export const useEditorAudioPreview = ({
 		audio.addEventListener("timeupdate", updateTimeFn);
 		activeAudioRef.current = {
 			audio,
-			resourceId,
+			resourceUid,
 			disposeFn: () => {
 				audio.removeEventListener("play", onPlayFn);
 				audio.removeEventListener("pause", onPauseFn);
@@ -135,18 +135,18 @@ export const useEditorAudioPreview = ({
 				audio.removeEventListener("timeupdate", updateTimeFn);
 			},
 		};
-		setActiveResourceIdFn(resourceId);
+		setActiveResourceUidFn(resourceUid);
 		setPlayingFn(false);
 		void audio.play().catch((cause) => {
 			if (activeAudioRef.current?.audio !== audio) return;
 			setPlaybackErrorFn(String(cause));
 		});
 	};
-	const togglePlaybackFn = (resourceId: string) => {
+	const togglePlaybackFn = (resourceUid: string) => {
 		setPlaybackErrorFn(undefined);
 		const active = activeAudioRef.current;
-		if (active?.resourceId !== resourceId) {
-			startPlaybackFn(resourceId);
+		if (active?.resourceUid !== resourceUid) {
+			startPlaybackFn(resourceUid);
 			return;
 		}
 		if (active.audio.paused) {
@@ -158,11 +158,11 @@ export const useEditorAudioPreview = ({
 			active.audio.pause();
 		}
 	};
-	const seekPlaybackFn = (resourceId: string, nextProgress: number) => {
+	const seekPlaybackFn = (resourceUid: string, nextProgress: number) => {
 		const progress = Math.min(1, Math.max(0, nextProgress));
 		const active = activeAudioRef.current;
-		if (active?.resourceId !== resourceId) {
-			startPlaybackFn(resourceId, progress);
+		if (active?.resourceUid !== resourceUid) {
+			startPlaybackFn(resourceUid, progress);
 			return;
 		}
 		if (!Number.isFinite(active.audio.duration) || active.audio.duration <= 0) return;
@@ -171,7 +171,7 @@ export const useEditorAudioPreview = ({
 	};
 
 	return {
-		activeResourceId,
+		activeResourceUid,
 		playbackError,
 		playbackProgress: playbackDuration > 0 ? Math.min(1, playbackTime / playbackDuration) : 0,
 		playing,

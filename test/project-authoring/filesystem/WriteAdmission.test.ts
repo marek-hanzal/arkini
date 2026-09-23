@@ -79,8 +79,9 @@ describe("incremental write admission", () => {
 				projectId: initial.projectId,
 				resources: [
 					{
-						id: "Ore",
+						uid: "Ore",
 						type: "artwork",
+						title: "Ore",
 						path: firstPath,
 						size: bytes.byteLength,
 					},
@@ -96,8 +97,9 @@ describe("incremental write admission", () => {
 					projectId: project.projectId,
 					resources: [
 						{
-							id: "ore",
+							uid: "ore",
 							type: "artwork",
+							title: "ore",
 							path: secondPath,
 							size: bytes.byteLength,
 						},

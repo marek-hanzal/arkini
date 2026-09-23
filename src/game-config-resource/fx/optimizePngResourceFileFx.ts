@@ -63,12 +63,12 @@ export namespace optimizePngResourceFileFx {
 
 /** Losslessly optimizes one PNG through temporary files without retaining its body. */
 export const optimizePngResourceFileFx = Effect.fn("optimizePngResourceFileFx")(
-	(source: string, targetPrefix: string, resourceId: string) =>
+	(source: string, targetPrefix: string, resourceUid: string) =>
 		Effect.tryPromise({
 			try: async (): Promise<optimizePngResourceFileFx.Result> => {
 				const sourceInfo = await stat(source);
 				if (sourceInfo.size > PngResourceLimits.maxBytes)
-					throw new Error(`Resource ${resourceId} exceeds the PNG byte limit.`);
+					throw new Error(`Resource ${resourceUid} exceeds the PNG byte limit.`);
 				const metadata = await sharp(source, {
 					limitInputPixels: PngResourceLimits.maxPixels,
 				}).metadata();
@@ -83,7 +83,7 @@ export const optimizePngResourceFileFx = Effect.fn("optimizePngResourceFileFx")(
 					metadata.height > PngResourceLimits.maxDimension ||
 					metadata.width * metadata.height > PngResourceLimits.maxPixels
 				)
-					throw new Error(`Resource ${resourceId} must be a supported 8-bit PNG image.`);
+					throw new Error(`Resource ${resourceUid} must be a supported 8-bit PNG image.`);
 
 				const rawPath = `${targetPrefix}.rgba`;
 				await pipeline(
@@ -130,7 +130,7 @@ export const optimizePngResourceFileFx = Effect.fn("optimizePngResourceFileFx")(
 				const optimized = adaptive.size <= plain.size ? adaptive : plain;
 				if (optimized.size > PngResourceLimits.maxBytes)
 					throw new Error(
-						`Resource ${resourceId} exceeds the PNG byte limit after optimization.`,
+						`Resource ${resourceUid} exceeds the PNG byte limit after optimization.`,
 					);
 				const changed =
 					sourceInfo.size !== optimized.size ||
@@ -143,7 +143,7 @@ export const optimizePngResourceFileFx = Effect.fn("optimizePngResourceFileFx")(
 				};
 			},
 			catch: (cause) =>
-				new Error(`Resource ${resourceId} could not be optimized.`, {
+				new Error(`Resource ${resourceUid} could not be optimized.`, {
 					cause,
 				}),
 		}),

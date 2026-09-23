@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"grass-farm"
+				"wrmhxvug81bpye6nu2z29v92"
 			]
 		},
 		"maxQueueSize": 4,
@@ -94,7 +94,7 @@
 			{
 				"id": "field",
 				"title": "Prepare Grass Field",
-				"artwork": "empty-grass-field",
+				"artwork": "funmgqm1p8wsfuol18cfy3xa",
 				"description": "Prepare a new grass field for planting.",
 				"clockWeight": 1,
 				"default": false,
@@ -136,7 +136,7 @@
 			{
 				"id": "blueprint",
 				"title": "Grass Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Grass Farm.",
 				"clockWeight": 1,
 				"default": false,

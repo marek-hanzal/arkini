@@ -38,14 +38,14 @@ export namespace ProjectRepository {
 	export interface SaveResourceMetadataProps {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly resourceId: string;
-		readonly name: string;
+		readonly resourceUid: string;
+		readonly title: string;
 	}
 
 	export interface DeleteResourceProps {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 	}
 
 	export interface ReplaceConfigProps {
@@ -55,8 +55,7 @@ export namespace ProjectRepository {
 	}
 
 	export interface ReplaceResourceProps {
-		readonly config: GameConfigSchema.Type;
-		readonly currentId: string;
+		readonly resourceUid: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
 		readonly resource: ProjectResourceReplacementSchema.Type;
@@ -66,7 +65,7 @@ export namespace ProjectRepository {
 		readonly expectedRevision: number;
 		readonly onProgressFn?: (progress: OptimizeResourcesProgress) => void;
 		readonly projectId: string;
-		readonly resourceIds: ReadonlyArray<IdSchema.Type>;
+		readonly resourceUids: ReadonlyArray<IdSchema.Type>;
 		readonly type: "artwork" | "sfx";
 	}
 
@@ -93,7 +92,7 @@ export namespace ProjectRepository {
 		readonly projectId: string;
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 	}
 
 	export interface DeleteNoteProps extends NoteKey {
@@ -103,7 +102,7 @@ export namespace ProjectRepository {
 	export interface UpdateNoteProps extends NoteKey {
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 		readonly expectedUpdatedAtMs: number;
 	}
 }

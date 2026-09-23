@@ -127,22 +127,22 @@ describe("installSerapackFileFx", () => {
 				},
 				resources: [
 					{
-						id: "hero",
+						uid: "hero",
 						type: "image",
 						bytes: createTestPngBytes(),
 					},
 					{
-						id: "asset-water",
+						uid: "asset-water",
 						type: "artwork",
 						bytes: createTestPngBytes(),
 					},
 					{
-						id: "theme",
+						uid: "theme",
 						type: "music",
 						bytes: createTestOggOpusBytesFn(),
 					},
 					{
-						id: "job-start",
+						uid: "job-start",
 						type: "sfx",
 						bytes: createTestOggOpusBytesFn(),
 					},
@@ -168,25 +168,25 @@ describe("installSerapackFileFx", () => {
 		);
 
 		expect(
-			installed.resources.map(({ id, type }) => ({
-				id,
+			installed.resources.map(({ uid, type }) => ({
+				uid,
 				type,
 			})),
 		).toEqual([
 			{
-				id: "hero",
+				uid: "hero",
 				type: "image",
 			},
 			{
-				id: "asset-water",
+				uid: "asset-water",
 				type: "artwork",
 			},
 			{
-				id: "theme",
+				uid: "theme",
 				type: "music",
 			},
 			{
-				id: "job-start",
+				uid: "job-start",
 				type: "sfx",
 			},
 		]);

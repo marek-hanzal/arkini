@@ -26,20 +26,20 @@ export const ArtworkDetail = ({
 		>
 			<ArtworkTilePreview
 				className="group-data-[ui-layout=detail]/artwork:aspect-square group-data-[ui-layout=detail]/artwork:size-auto group-data-[ui-layout=detail]/artwork:w-full group-data-[ui-layout=detail]/artwork:max-w-[60dvh] group-data-[ui-layout=detail]/artwork:rounded-2xl group-data-[ui-layout=detail]/artwork:border-2 group-data-[ui-layout=detail]/artwork:border-accent"
-				resourceIds={item.artwork.default}
+				resourceUids={item.artwork.default}
 				scale={item.artwork.scale}
 			/>
 			<dl className="grid min-w-0 gap-4 text-left group-data-[ui-layout=detail]/artwork:order-first">
-				{item.artwork.default.map((resourceId, index) => (
+				{item.artwork.default.map((resourceUid, index) => (
 					<DetailFact
-						key={resourceId}
+						key={resourceUid}
 						label={translator.textFn(index === 0 ? "Base artwork" : "Overlay artwork")}
 						value={
 							<EditorArtworkDetailLink
 								className="font-mono text-sm"
-								resourceId={resourceId}
+								resourceUid={resourceUid}
 							>
-								{resourceId}
+								{resourceUid}
 							</EditorArtworkDetailLink>
 						}
 					/>

@@ -17,7 +17,7 @@ import type { Project } from "~/project-authoring/type/Project";
 
 interface DeleteEditorArtworkCommandProps {
 	readonly expectedRevision: number;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly onDeletedFn: () => Promise<void>;
 }
 
@@ -70,7 +70,7 @@ export namespace useEditorArtworkDeleteController {
 	export interface Props {
 		readonly filter: ArtworkCatalogFilterSchema.Type;
 		readonly query: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 	}
 
 	export interface Output {
@@ -89,7 +89,7 @@ export namespace useEditorArtworkDeleteController {
 export const useEditorArtworkDeleteController = ({
 	filter,
 	query,
-	resourceId,
+	resourceUid,
 }: useEditorArtworkDeleteController.Props): useEditorArtworkDeleteController.Output => {
 	const project = useEditorProject();
 	const navigateFn = useNavigate();
@@ -100,7 +100,7 @@ export const useEditorArtworkDeleteController = ({
 		},
 		[
 			project.projectId,
-			resourceId,
+			resourceUid,
 		],
 	);
 	const commandAtom = deleteEditorArtworkCommandAtom(project.projectId);
@@ -113,11 +113,11 @@ export const useEditorArtworkDeleteController = ({
 		() =>
 			readEditorArtworkDeleteBlockersFn({
 				config: project.config,
-				resourceId,
+				resourceUid,
 			}),
 		[
 			project.config,
-			resourceId,
+			resourceUid,
 		],
 	);
 	const cancelFn = useCallback(() => {
@@ -137,7 +137,7 @@ export const useEditorArtworkDeleteController = ({
 		try {
 			await removeFn({
 				expectedRevision: project.revision,
-				resourceId,
+				resourceUid,
 				onDeletedFn: async () => {
 					// Deletion still publishes after departure; only its original UI may navigate.
 					if (sessionGeneration.current !== submittedSession) return;
@@ -166,7 +166,7 @@ export const useEditorArtworkDeleteController = ({
 		project.revision,
 		query,
 		removeFn,
-		resourceId,
+		resourceUid,
 		result.waiting,
 	]);
 

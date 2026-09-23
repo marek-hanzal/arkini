@@ -18,11 +18,11 @@ const readHeroResourceFx = Effect.fn("prepareLauncherHeroFx.readResourceFx")(fun
 	};
 	readonly resources: ReadonlyArray<LoadedSerapackResource>;
 }) {
-	const resourceId = payload.config.resources.hero;
-	const resource = payload.resources.find((candidate) => candidate.id === resourceId);
+	const resourceUid = payload.config.resources.hero;
+	const resource = payload.resources.find((candidate) => candidate.uid === resourceUid);
 	if (resource === undefined) {
 		return yield* Effect.fail(
-			new Error(`Serapack Hero resource ${resourceId} is unavailable.`),
+			new Error(`Serapack Hero resource ${resourceUid} is unavailable.`),
 		);
 	}
 	return resource;

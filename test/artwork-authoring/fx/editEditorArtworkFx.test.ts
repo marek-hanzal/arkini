@@ -70,18 +70,17 @@ describe("Artwork Authoring editEditorArtworkFx", () => {
 			},
 		});
 		const replaceResourceFx = vi.fn<ProjectRepositoryService["replaceResourceFx"]>(
-			({ config, resource }) =>
+			({ resource }) =>
 				Effect.succeed({
 					...project,
-					title: config.meta.title,
+					title: project.config.meta.title,
 					revision: project.revision + 1,
 					updatedAtMs: project.updatedAtMs + 1,
-					config,
 					resources: project.resources.map((existing) =>
-						existing.id === "item-water"
+						existing.uid === "item-water"
 							? {
 									...existing,
-									id: resource.id,
+									title: resource.title,
 								}
 							: existing,
 					),
@@ -90,9 +89,9 @@ describe("Artwork Authoring editEditorArtworkFx", () => {
 
 		await Effect.runPromise(
 			editEditorArtworkFx({
-				currentId: "item-water",
+				title: "New water",
 				projectId: project.projectId,
-				resourceId: "new-item-water",
+				resourceUid: "item-water",
 			}).pipe(
 				Effect.provideService(ProjectRepository, createRepository(replaceResourceFx)),
 				Effect.provideService(AtomRegistry.AtomRegistry, registry),
@@ -105,18 +104,17 @@ describe("Artwork Authoring editEditorArtworkFx", () => {
 
 		expect(replaceResourceFx).toHaveBeenCalledWith(
 			expect.objectContaining({
-				currentId: "item-water",
+				resourceUid: "item-water",
 				expectedRevision: project.revision,
 				projectId: project.projectId,
 				resource: {
-					id: "new-item-water",
+					uid: "item-water",
+					title: "New water",
 					type: "artwork",
 				},
 			}),
 		);
-		expect(replaceResourceFx.mock.calls[0]?.[0].config.items.water?.artwork.default[0]).toBe(
-			"new-item-water",
-		);
+		expect(registry.get(projectAtom)?.config).toBe(project.config);
 		expect(registry.get(projectAtom)?.revision).toBe(project.revision + 1);
 	});
 
@@ -142,9 +140,9 @@ describe("Artwork Authoring editEditorArtworkFx", () => {
 		await expect(
 			Effect.runPromise(
 				editEditorArtworkFx({
-					currentId: "item-water",
+					title: "New water",
 					projectId: project.projectId,
-					resourceId: "new-item-water",
+					resourceUid: "item-water",
 				}).pipe(
 					Effect.provideService(ProjectRepository, createRepository(replaceResourceFx)),
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),

@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"school-t2"
+				"sj22vclculpow2m4a5d58b8t"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "knowledge-t2",
 				"title": "Advanced Education",
-				"artwork": "knowledge-t2",
+				"artwork": "iemadnvneo3fyth0vg8oszrt",
 				"description": "Build on established knowledge using Tier 2 labor and paper to produce more advanced understanding.",
 				"clockWeight": 1,
 				"default": true,

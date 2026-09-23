@@ -65,7 +65,7 @@ export const OutcomeOption = ({
 					key={id}
 					size="md"
 					className="rounded-md"
-					resourceIds={
+					resourceUids={
 						project.config.items[id]?.artwork.default ?? [
 							"",
 						]

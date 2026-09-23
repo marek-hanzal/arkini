@@ -24,13 +24,13 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 		speedUpMultiplier: GameplaySpeedUpMultiplier,
 		config: project.config,
 	});
-	const resourcesById = new Map(
+	const resourcesByUid = new Map(
 		project.resources.map((resource) => [
-			resource.id,
+			resource.uid,
 			resource,
 		]),
 	);
-	const releaseResourcesFx = Effect.sync(() => resourcesById.clear());
+	const releaseResourcesFx = Effect.sync(() => resourcesByUid.clear());
 	const discardFailedBootstrapFx = discardGameBootstrapFx(session, releaseResourcesFx);
 
 	return yield* Effect.gen(function* () {
@@ -56,8 +56,8 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 		const game: EditorBoardGame = {
 			...session,
 			config: project.config,
-			resources: project.resources.map(({ id, type }) => ({
-				id,
+			resources: project.resources.map(({ uid, type }) => ({
+				uid,
 				type,
 			})),
 			diagnosticSessionId: diagnostics.sessionId,
@@ -65,13 +65,13 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			disposeWithoutSaveFx: disposeFx,
 			projectId: project.projectId,
 			projectRevision: project.revision,
-			getResourceUrlFn: (resourceId) => {
-				const resource = resourcesById.get(resourceId);
+			getResourceUrlFn: (resourceUid) => {
+				const resource = resourcesByUid.get(resourceUid);
 				if (resource === undefined)
-					throw new Error(`Editor game resource ${resourceId} is unavailable.`);
+					throw new Error(`Editor game resource ${resourceUid} is unavailable.`);
 				return readProjectResourceUrlFn({
 					projectId: project.projectId,
-					resourceId,
+					resourceUid,
 					version: resource.version,
 				});
 			},

@@ -56,7 +56,8 @@ it.each([
 		resources: [
 			...editorTestResources,
 			{
-				id: "unused",
+				uid: "unused",
+				title: "unused",
 				type: "artwork",
 				size: 1,
 				version: "1",
@@ -99,13 +100,13 @@ it.each([
 			<EditorArtworkDetail
 				filter="unused"
 				query=""
-				resourceId="unused"
+				resourceUid="unused"
 				help={EditorArtworkSectionHelp.delete}
 			>
 				<EditorArtworkDeleteSection
 					filter="unused"
 					query=""
-					resourceId="unused"
+					resourceUid="unused"
 				/>
 			</EditorArtworkDetail>
 		),

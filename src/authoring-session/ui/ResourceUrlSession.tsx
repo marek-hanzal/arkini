@@ -15,8 +15,8 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 type ResourceUrlListener = () => void;
 
 interface ResourceUrlStore {
-	readonly readFn: (resourceId: string) => string | undefined;
-	readonly subscribeFn: (resourceId: string, listenerFn: ResourceUrlListener) => () => void;
+	readonly readFn: (resourceUid: string) => string | undefined;
+	readonly subscribeFn: (resourceUid: string, listenerFn: ResourceUrlListener) => () => void;
 	readonly syncFn: (resources: Project["resources"]) => void;
 	readonly disposeFn: () => void;
 }
@@ -40,47 +40,47 @@ const ResourceUrlProvider = ({
 		const createUrlFn = (resource: Project.Resource) => {
 			const url = readProjectResourceUrlFn({
 				projectId,
-				resourceId: resource.id,
+				resourceUid: resource.uid,
 				version: resource.version,
 			});
-			urls.set(resource.id, url);
+			urls.set(resource.uid, url);
 			return url;
 		};
 		storeRef.current = {
-			readFn: (resourceId) => urls.get(resourceId),
-			subscribeFn: (resourceId, listenerFn) => {
-				let listeners = listenersById.get(resourceId);
+			readFn: (resourceUid) => urls.get(resourceUid),
+			subscribeFn: (resourceUid, listenerFn) => {
+				let listeners = listenersById.get(resourceUid);
 				if (listeners === undefined) {
 					listeners = new Set();
-					listenersById.set(resourceId, listeners);
+					listenersById.set(resourceUid, listeners);
 				}
 				listeners.add(listenerFn);
-				if (!urls.has(resourceId)) {
-					const resource = resourcesById.get(resourceId);
+				if (!urls.has(resourceUid)) {
+					const resource = resourcesById.get(resourceUid);
 					if (resource !== undefined) createUrlFn(resource);
 				}
 				return () => {
-					const currentListeners = listenersById.get(resourceId);
+					const currentListeners = listenersById.get(resourceUid);
 					currentListeners?.delete(listenerFn);
 					if (currentListeners !== undefined && currentListeners.size > 0) return;
-					listenersById.delete(resourceId);
-					urls.delete(resourceId);
+					listenersById.delete(resourceUid);
+					urls.delete(resourceUid);
 				};
 			},
 			syncFn: (nextResources) => {
 				resourcesById = new Map(
 					nextResources.map((resource) => [
-						resource.id,
+						resource.uid,
 						resource,
 					]),
 				);
 				const changedListeners = new Set<ResourceUrlListener>();
-				for (const [resourceId, listeners] of listenersById) {
-					const resource = resourcesById.get(resourceId);
-					const url = urls.get(resourceId);
+				for (const [resourceUid, listeners] of listenersById) {
+					const resource = resourcesById.get(resourceUid);
+					const url = urls.get(resourceUid);
 					if (resource === undefined) {
 						if (url === undefined) continue;
-						urls.delete(resourceId);
+						urls.delete(resourceUid);
 						for (const listenerFn of listeners) changedListeners.add(listenerFn);
 						continue;
 					}
@@ -93,12 +93,12 @@ const ResourceUrlProvider = ({
 						url ===
 						readProjectResourceUrlFn({
 							projectId,
-							resourceId: resource.id,
+							resourceUid: resource.uid,
 							version: resource.version,
 						})
 					)
 						continue;
-					urls.delete(resourceId);
+					urls.delete(resourceUid);
 					createUrlFn(resource);
 					for (const listenerFn of listeners) changedListeners.add(listenerFn);
 				}
@@ -144,34 +144,34 @@ export const ProjectResourceUrlProvider = ({ children }: PropsWithChildren) => {
 };
 
 /** Resolves one lazily acquired project-scoped resource URL. */
-export const useResourceUrl = (resourceId: string | undefined) => {
+export const useResourceUrl = (resourceUid: string | undefined) => {
 	const store = useContext(ResourceUrlContext);
 	const [url, setUrlFn] = useState<string>();
 	useLayoutEffect(() => {
-		if (store === undefined || resourceId === undefined) {
+		if (store === undefined || resourceUid === undefined) {
 			setUrlFn(undefined);
 			return;
 		}
-		const updateFn = () => setUrlFn(store.readFn(resourceId));
-		const releaseFn = store.subscribeFn(resourceId, updateFn);
+		const updateFn = () => setUrlFn(store.readFn(resourceUid));
+		const releaseFn = store.subscribeFn(resourceUid, updateFn);
 		updateFn();
 		return releaseFn;
 	}, [
-		resourceId,
+		resourceUid,
 		store,
 	]);
 	return url;
 };
 
 /** Resolves only the project-scoped resource URLs requested by one mounted consumer. */
-export const useResourceUrls = (resourceIds: ReadonlyArray<string>) => {
+export const useResourceUrls = (resourceUids: ReadonlyArray<string>) => {
 	const store = useContext(ResourceUrlContext);
 	const requestedIds = useMemo(
 		() => [
-			...new Set(resourceIds),
+			...new Set(resourceUids),
 		],
 		[
-			resourceIds,
+			resourceUids,
 		],
 	);
 	const [snapshot, setSnapshotFn] = useState<{
@@ -193,16 +193,18 @@ export const useResourceUrls = (resourceIds: ReadonlyArray<string>) => {
 		const updateFn = () => {
 			if (!active) return;
 			const urls = new Map<string, string>();
-			for (const resourceId of requestedIds) {
-				const url = store.readFn(resourceId);
-				if (url !== undefined) urls.set(resourceId, url);
+			for (const resourceUid of requestedIds) {
+				const url = store.readFn(resourceUid);
+				if (url !== undefined) urls.set(resourceUid, url);
 			}
 			setSnapshotFn({
 				ids: requestedIds,
 				urls,
 			});
 		};
-		const releases = requestedIds.map((resourceId) => store.subscribeFn(resourceId, updateFn));
+		const releases = requestedIds.map((resourceUid) =>
+			store.subscribeFn(resourceUid, updateFn),
+		);
 		updateFn();
 		return () => {
 			active = false;

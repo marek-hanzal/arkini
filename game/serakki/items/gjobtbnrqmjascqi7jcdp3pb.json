@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"empty-cow-pen"
+				"gb89ubbwj3xq884llit16hyw"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "stock",
 				"title": "Stock Cow Pen",
-				"artwork": "cow-pen",
+				"artwork": "kvwdw73ifpkni8gmwozgsf78",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
 				"clockWeight": 1,
 				"default": true,

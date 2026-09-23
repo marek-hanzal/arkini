@@ -35,9 +35,9 @@ export namespace useEditorSfxManagerController {
 	export type View = "all" | "assigned" | "unused";
 
 	export interface Output extends useEditorAudioResourceManagerController.Output {
-		readonly resourceIdByEvent: SfxSchema.Type["events"];
+		readonly resourceUidByEvent: SfxSchema.Type["events"];
 		readonly assigningEvent?: SfxEventEnumSchema.Type;
-		readonly assigningResourceId?: string;
+		readonly assigningResourceUid?: string;
 		readonly assignmentError?: unknown;
 		readonly assignmentPending: boolean;
 		readonly onOptimizeFn: () => void;
@@ -48,14 +48,14 @@ export namespace useEditorSfxManagerController {
 		readonly sfx: ReadonlyArray<Project.Resource>;
 		readonly assignResourceFn: (
 			event: SfxEventEnumSchema.Type,
-			resourceId: string | undefined,
+			resourceUid: string | undefined,
 		) => void;
 		readonly revealedResource?: {
 			readonly id: string;
 		};
-		readonly revealResourceFn: (resourceId: string) => void;
-		readonly draggedResourceId?: string;
-		readonly setDraggedResourceIdFn: (resourceId: string | undefined) => void;
+		readonly revealResourceFn: (resourceUid: string) => void;
+		readonly draggedResourceUid?: string;
+		readonly setDraggedResourceUidFn: (resourceUid: string | undefined) => void;
 		readonly allSfx: ReadonlyArray<Project.Resource>;
 		readonly view: View;
 	}
@@ -73,35 +73,35 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	const optimizationState = useAtomValue(optimizationAtom);
 	const optimizeResourcesFn = useAtomSet(optimizationAtom);
 	const [assigningEvent, setAssigningEventFn] = useState<SfxEventEnumSchema.Type>();
-	const [assigningResourceId, setAssigningResourceIdFn] = useState<string>();
+	const [assigningResourceUid, setAssigningResourceUidFn] = useState<string>();
 	const [view, setViewFn] = useState<useEditorSfxManagerController.View>("all");
 	const [revealedResource, setRevealedResourceFn] = useState<{
 		readonly id: string;
 	}>();
-	const [draggedResourceId, setDraggedResourceIdFn] = useState<string>();
+	const [draggedResourceUid, setDraggedResourceUidFn] = useState<string>();
 	const allSfx = project.resources.filter(({ type }) => type === "sfx");
-	const revealResourceFn = (resourceId: string) => {
+	const revealResourceFn = (resourceUid: string) => {
 		setViewFn("all");
 		audio.setQueryFn("");
 		setRevealedResourceFn({
-			id: resourceId,
+			id: resourceUid,
 		});
 	};
-	const resourceIdByEvent = project.config.sfx?.events ?? {};
-	const assignedResourceIds = useMemo(
-		() => new Set(Object.values(resourceIdByEvent)),
+	const resourceUidByEvent = project.config.sfx?.events ?? {};
+	const assignedResourceUids = useMemo(
+		() => new Set(Object.values(resourceUidByEvent)),
 		[
-			resourceIdByEvent,
+			resourceUidByEvent,
 		],
 	);
 	const sfx = useMemo(
 		() =>
 			audio.resources.filter((resource) => {
-				const assigned = assignedResourceIds.has(resource.id);
+				const assigned = assignedResourceUids.has(resource.uid);
 				return view === "all" || (view === "assigned" ? assigned : !assigned);
 			}),
 		[
-			assignedResourceIds,
+			assignedResourceUids,
 			audio.resources,
 			view,
 		],
@@ -119,17 +119,17 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		optimizationState.kind === "optimizing" && optimizationState.type === "sfx"
 			? optimizationState.progress
 			: undefined;
-	const assignResourceFn = (event: SfxEventEnumSchema.Type, resourceId: string | undefined) => {
+	const assignResourceFn = (event: SfxEventEnumSchema.Type, resourceUid: string | undefined) => {
 		if (assignmentPending || optimizePending || audio.importPending) return;
-		if (resourceId !== undefined && !allSfx.some(({ id }) => id === resourceId)) return;
-		if (resourceIdByEvent[event] === resourceId) return;
+		if (resourceUid !== undefined && !allSfx.some(({ uid }) => uid === resourceUid)) return;
+		if (resourceUidByEvent[event] === resourceUid) return;
 		setAssigningEventFn(event);
-		setAssigningResourceIdFn(resourceId);
+		setAssigningResourceUidFn(resourceUid);
 		const events = {
-			...resourceIdByEvent,
+			...resourceUidByEvent,
 		};
-		if (resourceId === undefined) delete events[event];
-		else events[event] = resourceId;
+		if (resourceUid === undefined) delete events[event];
+		else events[event] = resourceUid;
 		assignSfxFn({
 			config: {
 				...project.config,
@@ -143,22 +143,22 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 	};
 	const onOptimizeFn = () => {
 		if (optimizePending || audio.importPending || assignmentPending) return;
-		const resourceIds = project.resources
+		const resourceUids = project.resources
 			.filter(({ type }) => type === "sfx")
-			.map(({ id }) => id);
-		if (resourceIds.length === 0) return;
+			.map(({ uid }) => uid);
+		if (resourceUids.length === 0) return;
 		optimizeResourcesFn({
 			expectedRevision: project.revision,
 			kind: "optimize",
-			resourceIds,
+			resourceUids,
 			type: "sfx",
 		});
 	};
 
 	return {
-		activeResourceId: audio.activeResourceId,
+		activeResourceUid: audio.activeResourceUid,
 		assigningEvent,
-		assigningResourceId,
+		assigningResourceUid,
 		assignmentError,
 		assignmentPending,
 		filesInputRef: audio.filesInputRef,
@@ -174,7 +174,7 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		playbackProgress: audio.playbackProgress,
 		playing: audio.playing,
 		query: audio.query,
-		resourceIdByEvent,
+		resourceUidByEvent,
 		resources: audio.resources,
 		seekPlaybackFn: audio.seekPlaybackFn,
 		setQueryFn: audio.setQueryFn,
@@ -185,8 +185,8 @@ export const useEditorSfxManagerController = (): useEditorSfxManagerController.O
 		allSfx,
 		revealedResource,
 		revealResourceFn,
-		draggedResourceId,
-		setDraggedResourceIdFn,
+		draggedResourceUid,
+		setDraggedResourceUidFn,
 		togglePlaybackFn: audio.togglePlaybackFn,
 		totalResourceCount: audio.totalResourceCount,
 		type: audio.type,

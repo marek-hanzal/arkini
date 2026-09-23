@@ -247,13 +247,13 @@ const EditorArtworkCard = ({
 }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
-	const url = useResourceUrl(resource.id);
+	const url = useResourceUrl(resource.uid);
 	return (
 		<ArtworkCardLink
-			to="/editor/$projectId/artwork/$resourceId/detail/overview"
+			to="/editor/$projectId/artwork/$resourceUid/detail/overview"
 			params={{
 				projectId: project.projectId,
-				resourceId: resource.id,
+				resourceUid: resource.uid,
 			}}
 			search={{
 				filter,
@@ -267,7 +267,7 @@ const EditorArtworkCard = ({
 					unused,
 				},
 			})}
-			label={resource.id}
+			label={resource.title}
 			cornerEnd={
 				unused ? (
 					<span
@@ -303,12 +303,13 @@ interface EditorArtworkGridProps {
 	readonly resources: Project["resources"];
 }
 
-const readArtworkKeyFn = (resource: Project["resources"][number]) => resource.id;
+const readArtworkKeyFn = (resource: Project["resources"][number]) => resource.uid;
 
 const EditorArtworkGrid = memo(({ filter, query, resources }: EditorArtworkGridProps) => {
 	const project = useEditorProject();
-	const usedResourceIds = useMemo(
-		() => new Set(readGameResourceUsagesFn(project.config).map(({ resourceId }) => resourceId)),
+	const usedResourceUids = useMemo(
+		() =>
+			new Set(readGameResourceUsagesFn(project.config).map(({ resourceUid }) => resourceUid)),
 		[
 			project.config,
 		],
@@ -319,13 +320,13 @@ const EditorArtworkGrid = memo(({ filter, query, resources }: EditorArtworkGridP
 				filter={filter}
 				query={query}
 				resource={resource}
-				unused={!usedResourceIds.has(resource.id)}
+				unused={!usedResourceUids.has(resource.uid)}
 			/>
 		),
 		[
 			filter,
 			query,
-			usedResourceIds,
+			usedResourceUids,
 		],
 	);
 	return (

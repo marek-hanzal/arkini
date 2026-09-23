@@ -21,14 +21,14 @@ const readAboutPortraitResourcesFn = (payload: {
 }) => {
 	const resourceById = new Map(
 		payload.resources.map((resource) => [
-			resource.id,
+			resource.uid,
 			resource,
 		]),
 	);
 	return avatarRoles.flatMap((role) => {
-		const resourceId = payload.config.resources[role];
-		if (resourceId === undefined) return [];
-		const resource = resourceById.get(resourceId);
+		const resourceUid = payload.config.resources[role];
+		if (resourceUid === undefined) return [];
+		const resource = resourceById.get(resourceUid);
 		return resource === undefined
 			? []
 			: [

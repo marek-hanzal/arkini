@@ -8,7 +8,7 @@ import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 interface MusicSlot {
 	readonly audio: HTMLAudioElement;
 	readonly gain: GainNode;
-	resourceId?: string;
+	resourceUid?: string;
 }
 
 interface SfxSlot extends MusicSlot {
@@ -30,9 +30,9 @@ export namespace createGameAudioRuntimeFx {
 		readonly prepareFx: Effect.Effect<void, unknown, never>;
 		readonly unlockFx: Effect.Effect<void, unknown, never>;
 		readonly playFx: (cues: ReadonlyArray<GameAudioCue>) => Effect.Effect<void, never, never>;
-		readonly playMusicFx: (resourceId: string) => Effect.Effect<void, never, never>;
+		readonly playMusicFx: (resourceUid: string) => Effect.Effect<void, never, never>;
 		readonly requestDetailMusicFx: (
-			resourceId: string | undefined,
+			resourceUid: string | undefined,
 		) => Effect.Effect<void, never, never>;
 		readonly setSoundFx: (sound: SoundSettings) => Effect.Effect<void, never, never>;
 		readonly closeFx: Effect.Effect<void, unknown, never>;
@@ -49,13 +49,13 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 	const random = yield* Random.Random;
 	return yield* Effect.sync(() => {
 		const packagedMusicIds = new Set(
-			game.resources.filter(({ type }) => type === "music").map(({ id }) => id),
+			game.resources.filter(({ type }) => type === "music").map(({ uid }) => uid),
 		);
 		const musicIds = (game.config.music?.playlist ?? []).filter((id) =>
 			packagedMusicIds.has(id),
 		);
 		const sfxIds = new Set(
-			game.resources.filter(({ type }) => type === "sfx").map(({ id }) => id),
+			game.resources.filter(({ type }) => type === "sfx").map(({ uid }) => uid),
 		);
 		let sound = initialSound;
 		let disposed = false;
@@ -112,13 +112,13 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			slot.audio.pause();
 			slot.audio.removeAttribute("src");
 			slot.audio.load();
-			slot.resourceId = undefined;
+			slot.resourceUid = undefined;
 		};
 
-		let startMusicFn: (resourceId: string, explicit: boolean) => void = () => undefined;
+		let startMusicFn: (resourceUid: string, explicit: boolean) => void = () => undefined;
 		const startRandomMusicFn = () => {
-			const resourceId = nextRandomMusicIdFn();
-			if (resourceId !== undefined) startMusicFn(resourceId, false);
+			const resourceUid = nextRandomMusicIdFn();
+			if (resourceUid !== undefined) startMusicFn(resourceUid, false);
 		};
 
 		const createSlotFn = (activeContext: AudioContext, detail = false): MusicSlot => {
@@ -159,7 +159,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 				startRandomMusicFn();
 			});
 			audio.addEventListener("error", () => {
-				if (slot.resourceId !== undefined) failedMusic.add(slot.resourceId);
+				if (slot.resourceUid !== undefined) failedMusic.add(slot.resourceUid);
 				if (disposed || activeMusicSlot !== slot || detailMusicId !== undefined) return;
 				transitioning = false;
 				explicitMusic = false;
@@ -171,7 +171,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 		const releaseSfxSlotFn = (slot: SfxSlot) => {
 			if (!slot.busy) return;
 			slot.busy = false;
-			slot.resourceId = undefined;
+			slot.resourceUid = undefined;
 			slot.audio.pause();
 			slot.audio.removeAttribute("src");
 			slot.audio.load();
@@ -224,14 +224,14 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			applySoundFn();
 		};
 
-		startMusicFn = (resourceId, explicit) => {
+		startMusicFn = (resourceUid, explicit) => {
 			const activeContext = context;
 			if (
 				disposed ||
 				!unlocked ||
 				detailMusicId !== undefined ||
 				activeContext === null ||
-				!musicIds.includes(resourceId)
+				!musicIds.includes(resourceUid)
 			)
 				return;
 			const previous = activeMusicSlot;
@@ -239,8 +239,8 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			if (next === undefined) return;
 			if (transitionTimer !== undefined) window.clearTimeout(transitionTimer);
 			clearSlotFn(next);
-			next.resourceId = resourceId;
-			next.audio.src = game.getResourceUrlFn(resourceId);
+			next.resourceUid = resourceUid;
+			next.audio.src = game.getResourceUrlFn(resourceUid);
 			next.audio.load();
 			next.gain.gain.cancelScheduledValues(activeContext.currentTime);
 			next.gain.gain.setValueAtTime(
@@ -248,7 +248,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 				activeContext.currentTime,
 			);
 			activeMusicSlot = next;
-			lastMusicId = resourceId;
+			lastMusicId = resourceUid;
 			explicitMusic = explicit;
 			if (explicit) pendingExplicitMusicId = undefined;
 			transitioning = previous !== undefined;
@@ -276,7 +276,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 					}, crossfadeSeconds * 1000);
 				},
 				() => {
-					failedMusic.add(resourceId);
+					failedMusic.add(resourceUid);
 					if (activeMusicSlot === next) {
 						transitioning = false;
 						explicitMusic = false;
@@ -295,7 +295,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 
 		// The global voices retain their media and position while the detail owns the mixer.
 		// Two lazy detail voices allow a new excerpt to crossfade without restarting the global pool.
-		const transitionDetailFn = (resourceId: string | undefined) => {
+		const transitionDetailFn = (resourceUid: string | undefined) => {
 			if (disposed || !unlocked || context === null) return;
 			const generation = ++detailGeneration;
 			cancelDetailLoadFn?.();
@@ -303,7 +303,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			if (detailTimer !== undefined) window.clearTimeout(detailTimer);
 			detailTimer = undefined;
 			detailTransitioning = true;
-			if (resourceId === undefined) {
+			if (resourceUid === undefined) {
 				for (const slot of detailSlots) rampSlotFn(slot, 0);
 				if (activeMusicSlot === undefined) startRandomMusicFn();
 				else {
@@ -314,7 +314,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 						},
 						() => {
 							if (generation === detailGeneration && !disposed) {
-								failedMusic.add(global.resourceId!);
+								failedMusic.add(global.resourceUid!);
 								startRandomMusicFn();
 							}
 						},
@@ -363,7 +363,7 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			}
 			const next = detailSlots.find((slot) => slot !== activeDetailSlot)!;
 			clearSlotFn(next);
-			next.resourceId = resourceId;
+			next.resourceUid = resourceUid;
 			activeDetailSlot = next;
 			next.gain.gain.cancelScheduledValues(context.currentTime);
 			next.gain.gain.setValueAtTime(0, context.currentTime);
@@ -411,22 +411,22 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			};
 			next.audio.addEventListener("loadedmetadata", startFn);
 			cancelDetailLoadFn = () => next.audio.removeEventListener("loadedmetadata", startFn);
-			next.audio.src = game.getResourceUrlFn(resourceId);
+			next.audio.src = game.getResourceUrlFn(resourceUid);
 			next.audio.load();
 			if (next.audio.readyState >= 1) startFn();
 		};
 
 		const playCueFn = (cue: GameAudioCue) => {
 			const activeContext = context;
-			const resourceId = game.config.sfx?.events[cue.event];
+			const resourceUid = game.config.sfx?.events[cue.event];
 			if (
 				disposed ||
 				sound.master === 0 ||
 				sound.sfx === 0 ||
 				!unlocked ||
 				activeContext === null ||
-				resourceId === undefined ||
-				!sfxIds.has(resourceId)
+				resourceUid === undefined ||
+				!sfxIds.has(resourceUid)
 			)
 				return;
 			const slot = sfxSlots.find(({ busy }) => !busy);
@@ -434,12 +434,12 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 			slot.busy = true;
 			slot.generation += 1;
 			const generation = slot.generation;
-			slot.resourceId = resourceId;
+			slot.resourceUid = resourceUid;
 			slot.gain.gain.setValueAtTime(
 				Math.min(1, 0.55 + cue.strength * 0.15),
 				activeContext.currentTime,
 			);
-			slot.audio.src = game.getResourceUrlFn(resourceId);
+			slot.audio.src = game.getResourceUrlFn(resourceUid);
 			slot.audio.load();
 			void slot.audio.play().catch(() => {
 				if (slot.generation === generation) releaseSfxSlotFn(slot);
@@ -470,17 +470,17 @@ export const createGameAudioRuntimeFx = Effect.fn("createGameAudioRuntimeFx")(fu
 				Effect.sync(() => {
 					for (const cue of cues) playCueFn(cue);
 				}),
-			playMusicFx: (resourceId) =>
+			playMusicFx: (resourceUid) =>
 				Effect.sync(() => {
-					if (!musicIds.includes(resourceId)) return;
-					pendingExplicitMusicId = resourceId;
-					startMusicFn(resourceId, true);
+					if (!musicIds.includes(resourceUid)) return;
+					pendingExplicitMusicId = resourceUid;
+					startMusicFn(resourceUid, true);
 				}),
-			requestDetailMusicFx: (resourceId) =>
+			requestDetailMusicFx: (resourceUid) =>
 				Effect.sync(() => {
 					const nextId =
-						resourceId !== undefined && packagedMusicIds.has(resourceId)
-							? resourceId
+						resourceUid !== undefined && packagedMusicIds.has(resourceUid)
+							? resourceUid
 							: undefined;
 					if (disposed || nextId === detailMusicId) return;
 					detailMusicId = nextId;

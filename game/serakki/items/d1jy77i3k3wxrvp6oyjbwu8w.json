@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"cacao-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"bi1znl2l2getwrkalhxji2ao"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "cacao-farm",
 				"title": "Build Cacao Farm",
-				"artwork": "cacao-farm",
+				"artwork": "bi1znl2l2getwrkalhxji2ao",
 				"description": "Build Cacao Farm.",
 				"clockWeight": 1,
 				"default": true,

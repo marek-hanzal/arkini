@@ -31,7 +31,7 @@ describe("readGameResourceUsagesFn", () => {
 		});
 		expect(readGameResourceUsagesFn(config)).toContainEqual(
 			expect.objectContaining({
-				resourceId: "line-art",
+				resourceUid: "line-art",
 				resourceType: "artwork",
 				owner: "item",
 				ownerId: "water",
@@ -50,7 +50,7 @@ describe("readGameResourceUsagesFn", () => {
 	it("projects project and item references with stable owner facts", () => {
 		expect(readGameResourceUsagesFn(editorTestConfig)).toEqual([
 			{
-				resourceId: "hero",
+				resourceUid: "hero",
 				resourceType: "image",
 				owner: "project",
 				ownerLabel: "Project",
@@ -61,7 +61,7 @@ describe("readGameResourceUsagesFn", () => {
 				],
 			},
 			{
-				resourceId: "item-water",
+				resourceUid: "item-water",
 				resourceType: "artwork",
 				owner: "item",
 				ownerId: "water",
@@ -97,7 +97,7 @@ describe("readGameResourceUsagesFn", () => {
 				"playlist",
 				0,
 			],
-			resourceId: "theme",
+			resourceUid: "theme",
 			resourceType: "music",
 			roleLabel: "Random playlist track 1",
 		});
@@ -122,7 +122,7 @@ describe("readGameResourceUsagesFn", () => {
 				"events",
 				"job:started",
 			],
-			resourceId: "job-start",
+			resourceUid: "job-start",
 			resourceType: "sfx",
 			roleLabel: "job:started",
 		});
@@ -134,7 +134,7 @@ describe("readGameResourceUsagesFn", () => {
 				"events",
 				"item-detail:opened",
 			],
-			resourceId: "detail-open",
+			resourceUid: "detail-open",
 			resourceType: "sfx",
 			roleLabel: "item-detail:opened",
 		});

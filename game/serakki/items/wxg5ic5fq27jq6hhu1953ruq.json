@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"waste-incinerator"
+				"so7r094glj6wfe6yoveiclrg",
+				"mo6y7oa1ipuwt7pycm9s521t"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "waste-incinerator",
 				"title": "Build Waste Incinerator",
-				"artwork": "waste-incinerator",
+				"artwork": "mo6y7oa1ipuwt7pycm9s521t",
 				"description": "Build a sturdy incinerator for turning accumulated Waste into smoke and ash.",
 				"clockWeight": 1,
 				"default": true,

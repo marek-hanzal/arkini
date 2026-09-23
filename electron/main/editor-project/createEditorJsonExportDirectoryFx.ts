@@ -25,6 +25,14 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 			".png",
 		],
 		[
+			"artwork",
+			".json",
+		],
+		[
+			"image",
+			".json",
+		],
+		[
 			"image",
 			".png",
 		],

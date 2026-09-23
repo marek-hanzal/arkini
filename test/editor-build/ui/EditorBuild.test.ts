@@ -36,7 +36,7 @@ const unusedResourceDiagnostic = {
 		"resources",
 		"unused-asset",
 	],
-	resourceId: "unused-asset",
+	resourceUid: "unused-asset",
 };
 
 const state = vi.hoisted(() => ({
@@ -341,7 +341,7 @@ describe("EditorBuild", () => {
 					"resources",
 					"unused-asset",
 				],
-				resourceId: "unused-asset",
+				resourceUid: "unused-asset",
 			},
 			{
 				code: "config:key-uid-mismatch" as const,
@@ -373,7 +373,7 @@ describe("EditorBuild", () => {
 			},
 			resources: [
 				{
-					id: "unused-asset",
+					uid: "unused-asset",
 					type: "artwork",
 				},
 			],

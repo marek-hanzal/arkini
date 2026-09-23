@@ -58,7 +58,7 @@ export const EditorSfxManager = () => {
 	}>;
 	const renderResourceActionFn = (resource: Project.Resource) => {
 		const assignedEvents = SfxEventPresentation.filter(
-			({ event }) => controller.resourceIdByEvent[event] === resource.id,
+			({ event }) => controller.resourceUidByEvent[event] === resource.uid,
 		);
 		return assignedEvents.length === 0 ? null : (
 			<span
@@ -81,13 +81,13 @@ export const EditorSfxManager = () => {
 				controller.optimizePending ||
 				controller.importPending
 					? undefined
-					: (event, resourceId) => {
+					: (event, resourceUid) => {
 							event.dataTransfer.effectAllowed = "copy";
-							event.dataTransfer.setData("text/plain", resourceId);
-							controller.setDraggedResourceIdFn(resourceId);
+							event.dataTransfer.setData("text/plain", resourceUid);
+							controller.setDraggedResourceUidFn(resourceUid);
 						}
 			}
-			onResourceDragEndFn={() => controller.setDraggedResourceIdFn(undefined)}
+			onResourceDragEndFn={() => controller.setDraggedResourceUidFn(undefined)}
 			sidePanel={<EditorSfxSlots controller={controller} />}
 			extraError={controller.assignmentError ?? controller.optimizeError}
 			renderResourceActionFn={renderResourceActionFn}
@@ -136,9 +136,9 @@ const EditorSfxSlots = ({
 	const [hoveredEvent, setHoveredEventFn] = useState<SfxEventEnumSchema.Type>();
 	const blocked =
 		controller.assignmentPending || controller.optimizePending || controller.importPending;
-	const canDrop = !blocked && controller.draggedResourceId !== undefined;
+	const canDrop = !blocked && controller.draggedResourceUid !== undefined;
 	const visibleSlots = SfxEventPresentation.filter((option) => {
-		const assigned = controller.resourceIdByEvent[option.event] !== undefined;
+		const assigned = controller.resourceUidByEvent[option.event] !== undefined;
 		return controller.view === "all" || (controller.view === "assigned" ? assigned : !assigned);
 	});
 	if (visibleSlots.length === 0)
@@ -181,13 +181,13 @@ const EditorSfxSlots = ({
 							{visibleSlots
 								.filter((option) => option.group === group)
 								.map((option) => {
-									const resourceId = controller.resourceIdByEvent[option.event];
+									const resourceUid = controller.resourceUidByEvent[option.event];
 									const resource = controller.allSfx.find(
-										({ id }) => id === resourceId,
+										({ uid }) => uid === resourceUid,
 									);
 									const playing =
-										resourceId !== undefined &&
-										controller.activeResourceId === resourceId &&
+										resourceUid !== undefined &&
+										controller.activeResourceUid === resourceUid &&
 										controller.playing;
 									const pending =
 										controller.assignmentPending &&
@@ -199,7 +199,7 @@ const EditorSfxSlots = ({
 											{...readDataUiFn({
 												dataUi: "EditorSfxSlot",
 												state: {
-													assigned: resourceId !== undefined,
+													assigned: resourceUid !== undefined,
 													dropTarget:
 														canDrop && hoveredEvent === option.event,
 												},
@@ -226,9 +226,9 @@ const EditorSfxSlots = ({
 												if (canDrop)
 													controller.assignResourceFn(
 														option.event,
-														controller.draggedResourceId,
+														controller.draggedResourceUid,
 													);
-												controller.setDraggedResourceIdFn(undefined);
+												controller.setDraggedResourceUidFn(undefined);
 											}}
 										>
 											<div className="min-w-0">
@@ -238,7 +238,7 @@ const EditorSfxSlots = ({
 												<p className="mt-0.5 text-xs text-muted">
 													{translator.textFn(option.description)}
 												</p>
-												{resourceId === undefined ? (
+												{resourceUid === undefined ? (
 													<p className="mt-2 h-5 text-sm leading-5 text-muted">
 														{translator.textFn("Unassigned")}
 													</p>
@@ -247,11 +247,11 @@ const EditorSfxSlots = ({
 														className="mt-2 flex h-5 w-fit max-w-full items-center gap-1 text-sm leading-5"
 														data-ui="EditorSfxReveal"
 														onClick={() =>
-															controller.revealResourceFn(resourceId)
+															controller.revealResourceFn(resourceUid)
 														}
 													>
 														<span className="truncate">
-															{resource?.name ?? resourceId}
+															{resource?.title ?? resourceUid}
 														</span>
 														<ChevronRight className="size-4 shrink-0" />
 													</LinkButton>
@@ -261,14 +261,14 @@ const EditorSfxSlots = ({
 												{pending ? (
 													<LoaderCircle className="size-4 animate-spin text-accent" />
 												) : null}
-												{resourceId === undefined ? null : (
+												{resourceUid === undefined ? null : (
 													<>
 														<LinkButton
 															className="grid size-9 shrink-0 place-items-center text-foreground"
 															data-ui="EditorSfxSlotPlayback"
 															onClick={() =>
 																controller.togglePlaybackFn(
-																	resourceId,
+																	resourceUid,
 																)
 															}
 														>

@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"townhall-t2"
+				"so7r094glj6wfe6yoveiclrg",
+				"dtuzdkf4lo7h6azmdgpv059f"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "townhall-t2",
 				"title": "Build Townhall II",
-				"artwork": "townhall-t2",
+				"artwork": "dtuzdkf4lo7h6azmdgpv059f",
 				"description": "Upgrade the settlement using processed materials, available labor, and enough knowledge to avoid calling it a bigger shed.",
 				"clockWeight": 1,
 				"default": true,

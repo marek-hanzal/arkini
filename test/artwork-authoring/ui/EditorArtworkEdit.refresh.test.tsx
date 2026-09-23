@@ -82,18 +82,18 @@ it("drains admitted artwork validation, commit and publication before hard Refre
 				}),
 		);
 	vi.stubGlobal("createImageBitmap", decodeFn);
-	const replaceResourceFn = vi.fn(async ({ config, currentId, resource }) => ({
+	const replaceResourceFn = vi.fn(async ({ resourceUid, resource }) => ({
 		type: "success",
 		value: {
 			...project,
 			revision: 1,
 			updatedAtMs: 2,
-			config,
 			resources: project.resources.map((r) =>
-				r.id === currentId
+				r.uid === resourceUid
 					? {
 							...r,
-							id: resource.id,
+							uid: resource.uid,
+							title: resource.title,
 						}
 					: r,
 			),
@@ -126,7 +126,7 @@ it("drains admitted artwork validation, commit and publication before hard Refre
 	let controller!: useEditorArtworkEditController.Output;
 	const Probe = () => {
 		controller = useEditorArtworkEditController({
-			resourceId: "item-water",
+			resourceUid: "item-water",
 			filter: "all",
 			query: "",
 		});
@@ -150,7 +150,7 @@ it("drains admitted artwork validation, commit and publication before hard Refre
 	});
 	const overview = createRoute({
 		getParentRoute: () => editor,
-		path: "artwork/$resourceId/detail/overview",
+		path: "artwork/$resourceUid/detail/overview",
 		component: () => createElement("div", null, "overview"),
 	});
 	const router = createRouter({

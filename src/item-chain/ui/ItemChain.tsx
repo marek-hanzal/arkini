@@ -179,7 +179,7 @@ const ItemReference = ({
 			className="min-h-0 max-w-full justify-start gap-2 border-0 bg-transparent p-0 text-left text-sm shadow-none hover:bg-transparent hover:text-accent"
 		>
 			<EditorItemThumbnail
-				resourceIds={item.artwork.default}
+				resourceUids={item.artwork.default}
 				size="input"
 			/>
 			<span className="flex min-w-0 flex-col gap-1">

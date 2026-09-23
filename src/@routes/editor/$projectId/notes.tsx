@@ -41,7 +41,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 				}
 			>
 				<ProjectNotes
-					defaultResourceIds={[]}
+					defaultResourceUids={[]}
 					collection={collection}
 					notes={collection.notes}
 					defaultItemUids={[]}

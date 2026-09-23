@@ -15,7 +15,7 @@ export const MissingResourceDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		resourceId: IdSchema,
+		resourceUid: IdSchema,
 	})
 	.strict()
 	.meta({

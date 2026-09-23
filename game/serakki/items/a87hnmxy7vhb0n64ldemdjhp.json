@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"goose-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"oxittviuc7021lcpe04kybb9"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "goose-farm",
 				"title": "Build Goose Farm",
-				"artwork": "goose-farm",
+				"artwork": "oxittviuc7021lcpe04kybb9",
 				"description": "Build Goose Farm.",
 				"clockWeight": 1,
 				"default": true,

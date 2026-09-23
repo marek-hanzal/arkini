@@ -6,7 +6,7 @@ import type { ArtworkSchema } from "~/item-definition/schema/ArtworkSchema";
 
 interface CheatItemCatalogEntry {
 	readonly itemUid: IdSchema.Type;
-	readonly sourceResourceIds: ArtworkSchema.Type["default"];
+	readonly sourceResourceUids: ArtworkSchema.Type["default"];
 	readonly title: string;
 }
 
@@ -17,7 +17,7 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 		.map(
 			(item): CheatItemCatalogEntry => ({
 				itemUid: item.uid,
-				sourceResourceIds: item.artwork.default,
+				sourceResourceUids: item.artwork.default,
 				title: item.title,
 			}),
 		)

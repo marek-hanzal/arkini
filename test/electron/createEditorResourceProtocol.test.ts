@@ -52,7 +52,7 @@ const registerFn = async (id: string, content: string, type: "artwork" | "music"
 	});
 	return readProjectResourceUrlFn({
 		projectId: "project",
-		resourceId: id,
+		resourceUid: id,
 		version,
 	});
 };
@@ -88,9 +88,9 @@ beforeEach(async () => {
 	});
 	protocol = await Effect.runPromise(
 		createEditorResourceProtocolFx({
-			readResourceLocationFx: ({ projectId, resourceId }) =>
+			readResourceLocationFx: ({ projectId, resourceUid }) =>
 				Effect.succeed(
-					projectId === "project" ? (locations.get(resourceId) ?? null) : null,
+					projectId === "project" ? (locations.get(resourceUid) ?? null) : null,
 				),
 			isTrustedUrlFn: (url) => url === "serakki://app" || url === "http://127.0.0.1:4040",
 		}).pipe(Effect.provide(NodeServices.layer)),
@@ -151,7 +151,7 @@ describe("Editor resource protocol", () => {
 			404,
 		);
 		expect(
-			(await requestFn(url.replace("resourceId=asset", "resourceId=..%2Fsecret"))).status,
+			(await requestFn(url.replace("resourceUid=asset", "resourceUid=..%2Fsecret"))).status,
 		).toBe(404);
 		const location = locations.get("asset")!;
 		await rm(location.path);

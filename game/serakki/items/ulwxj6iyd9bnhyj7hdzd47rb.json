@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"architect-t1"
+				"so7r094glj6wfe6yoveiclrg",
+				"aj95mj8sdw2q1ciy8ifjzsyq"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "architect-t1",
 				"title": "Build Architect - Tier 1",
-				"artwork": "architect-t1",
+				"artwork": "aj95mj8sdw2q1ciy8ifjzsyq",
 				"description": "Build a small architect's office from processed wood and stone.",
 				"clockWeight": 1,
 				"default": true,

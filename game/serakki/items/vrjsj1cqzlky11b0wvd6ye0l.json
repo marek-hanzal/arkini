@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"lumber-camp"
+				"vmfdb9sa06isuopjs1kqn7n2"
 			]
 		},
 		"maxQueueSize": 8,
@@ -16,7 +16,7 @@
 			{
 				"id": "wood",
 				"title": "Chop the wood from a tree",
-				"artwork": "wood-t1",
+				"artwork": "rxcve60bw1u5hkgyysvq2ryy",
 				"description": "Get the wood from a tree. Find the tree. No tree, no wood. Really.",
 				"clockWeight": 1,
 				"default": true,
@@ -86,7 +86,7 @@
 			{
 				"id": "firewood",
 				"title": "Firewood",
-				"artwork": "firewood",
+				"artwork": "fzrsaj4d5tqdwwv0gg6b02mg",
 				"description": "Split wood into firewood.",
 				"clockWeight": 1,
 				"default": false,
@@ -140,7 +140,7 @@
 			{
 				"id": "wooden-sticks",
 				"title": "Wooden Sticks",
-				"artwork": "wooden-sticks",
+				"artwork": "sph5etm2s4wtaq97o9zpzcvr",
 				"description": "Roughly split fresh wood into simple straight sticks. Cheap, crude, and good enough for arrow shafts.",
 				"clock": false,
 				"clockWeight": 1,

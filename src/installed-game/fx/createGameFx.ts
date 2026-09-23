@@ -23,7 +23,7 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
 
 interface GameResourceUrls {
-	readonly getFn: (resourceId: string) => string;
+	readonly getFn: (resourceUid: string) => string;
 	readonly releaseFx: Effect.Effect<void, never, never>;
 }
 
@@ -128,15 +128,15 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	return yield* Effect.gen(function* () {
 		const urls = new Map(
 			loaded.payload.resources.map((resource) => [
-				resource.id,
+				resource.uid,
 				resource.url,
 			]),
 		);
 		resourceUrls = {
-			getFn: (resourceId) => {
-				const url = urls.get(resourceId);
+			getFn: (resourceUid) => {
+				const url = urls.get(resourceUid);
 				if (url === undefined)
-					throw new Error(`Game resource ${resourceId} is unavailable.`);
+					throw new Error(`Game resource ${resourceUid} is unavailable.`);
 				return url;
 			},
 			releaseFx: Effect.sync(() => urls.clear()),
@@ -160,8 +160,8 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			...session,
 			serapack: loaded.descriptor,
 			config: loaded.payload.config,
-			resources: loaded.payload.resources.map(({ id, type }) => ({
-				id,
+			resources: loaded.payload.resources.map(({ uid, type }) => ({
+				uid,
 				type,
 			})),
 			diagnosticSessionId: diagnostics.sessionId,

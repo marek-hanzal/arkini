@@ -1,7 +1,7 @@
 export namespace readProjectResourceUrlFn {
 	export interface Props {
 		readonly projectId: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 		readonly version: string;
 	}
 }
@@ -9,11 +9,11 @@ export namespace readProjectResourceUrlFn {
 /** The resource version gives every replacement a distinct renderer URL identity. */
 export const readProjectResourceUrlFn = ({
 	projectId,
-	resourceId,
+	resourceUid,
 	version,
 }: readProjectResourceUrlFn.Props): string =>
 	`serakki://app/editor/resource?${new URLSearchParams({
 		projectId,
-		resourceId,
+		resourceUid,
 		version,
 	})}`;

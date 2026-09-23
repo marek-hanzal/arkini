@@ -45,7 +45,7 @@ export const editorProjectIpcNote = {
 	projectId: editorProjectIpcProject.projectId,
 	content: "A project note",
 	itemUids: [],
-	resourceIds: [],
+	resourceUids: [],
 	createdAtMs: 4,
 	updatedAtMs: 4,
 };
@@ -60,7 +60,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	importSerapackFileFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	dismissInvalidProjectFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
-	createNoteFx: vi.fn(({ projectId, content, itemUids, resourceIds }) =>
+	createNoteFx: vi.fn(({ projectId, content, itemUids, resourceUids }) =>
 		Effect.succeed({
 			...editorProjectIpcNote,
 			projectId,
@@ -68,8 +68,8 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 			itemUids: [
 				...itemUids,
 			],
-			resourceIds: [
-				...resourceIds,
+			resourceUids: [
+				...resourceUids,
 			],
 		}),
 	),
@@ -117,7 +117,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourceFilesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids, resourceIds }) =>
+	updateNoteFx: vi.fn(({ projectId, noteId, content, itemUids, resourceUids }) =>
 		Effect.succeed({
 			...editorProjectIpcNote,
 			projectId,
@@ -126,8 +126,8 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 			itemUids: [
 				...itemUids,
 			],
-			resourceIds: [
-				...resourceIds,
+			resourceUids: [
+				...resourceUids,
 			],
 			updatedAtMs: 5,
 		}),

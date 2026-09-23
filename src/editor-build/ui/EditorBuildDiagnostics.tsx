@@ -18,7 +18,7 @@ type EditorDiagnosticTarget =
 	  }
 	| {
 			readonly kind: "resource";
-			readonly resourceId: string;
+			readonly resourceUid: string;
 			readonly resourceType: Project.Resource["type"];
 			readonly label: string;
 	  }
@@ -112,14 +112,14 @@ const readEditorGameDiagnosticTargetsFn = (
 	if (itemTargets.length > 0) return itemTargets;
 	const resource =
 		(diagnostic.code === "resource:duplicate" || diagnostic.code === "resource:unused") &&
-		project.resources.find((candidate) => candidate.id === diagnostic.resourceId);
+		project.resources.find((candidate) => candidate.uid === diagnostic.resourceUid);
 	if (resource)
 		return [
 			{
 				kind: "resource",
-				resourceId: diagnostic.resourceId,
+				resourceUid: diagnostic.resourceUid,
 				resourceType: resource.type,
-				label: diagnostic.resourceId,
+				label: diagnostic.resourceUid,
 			} satisfies EditorDiagnosticTarget,
 		];
 	if (diagnostic.code === "source:json-invalid") return [];
@@ -179,10 +179,10 @@ const EditorDiagnosticLink = ({
 			return target.resourceType === "artwork" ? (
 				<ButtonLink
 					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/artwork/$resourceId/detail/overview"
+					to="/editor/$projectId/artwork/$resourceUid/detail/overview"
 					params={{
 						projectId,
-						resourceId: target.resourceId,
+						resourceUid: target.resourceUid,
 					}}
 				>
 					<Tx label="Open artwork" /> {target.label}

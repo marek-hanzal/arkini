@@ -62,7 +62,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 							/>
 						</FactList>
 						<div className="grid min-w-0 grid-cols-2 items-start gap-x-8">
-							<EditorMusicSelection resourceId={item.music} />
+							<EditorMusicSelection resourceUid={item.music} />
 							<FactList columns={1}>
 								<Fact
 									label={translator.textFn("Item UID")}

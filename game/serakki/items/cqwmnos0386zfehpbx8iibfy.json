@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"house-t1"
+				"so7r094glj6wfe6yoveiclrg",
+				"ucep41zyvgbrif6rlcqdabk1"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "house---tier-1",
 				"title": "House - Tier 1",
-				"artwork": "house-t1",
+				"artwork": "ucep41zyvgbrif6rlcqdabk1",
 				"description": "A beautiful simple house, but you'll like it!",
 				"clockWeight": 1,
 				"default": true,

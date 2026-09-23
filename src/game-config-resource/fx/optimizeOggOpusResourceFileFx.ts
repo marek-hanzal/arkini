@@ -15,11 +15,11 @@ export namespace optimizeOggOpusResourceFileFx {
 
 /** Trims silent edges from one canonical Ogg/Opus file without re-encoding clean audio. */
 export const optimizeOggOpusResourceFileFx = Effect.fn("optimizeOggOpusResourceFileFx")(
-	(source: string, target: string, resourceId: string) =>
+	(source: string, target: string, resourceUid: string) =>
 		Effect.tryPromise({
 			try: () => stat(source),
 			catch: (cause) =>
-				new Error(`Resource ${resourceId} could not be inspected.`, {
+				new Error(`Resource ${resourceUid} could not be inspected.`, {
 					cause,
 				}),
 		}).pipe(
@@ -31,7 +31,7 @@ export const optimizeOggOpusResourceFileFx = Effect.fn("optimizeOggOpusResourceF
 				}).pipe(
 					Effect.flatMap((changed) =>
 						changed
-							? validateOggOpusFileFx(target, resourceId).pipe(
+							? validateOggOpusFileFx(target, resourceUid).pipe(
 									Effect.map(
 										(optimizedBytes): optimizeOggOpusResourceFileFx.Result => ({
 											changed: true,
@@ -52,7 +52,7 @@ export const optimizeOggOpusResourceFileFx = Effect.fn("optimizeOggOpusResourceF
 			),
 			Effect.mapError(
 				(cause) =>
-					new Error(`Resource ${resourceId} could not be optimized.`, {
+					new Error(`Resource ${resourceUid} could not be optimized.`, {
 						cause,
 					}),
 			),

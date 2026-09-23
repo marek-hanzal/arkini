@@ -19,17 +19,19 @@ export const readArtworkCollectionFn = ({
 	query,
 	resources,
 }: readArtworkCollectionFn.Props): ReadonlyArray<Project.Resource> => {
-	const usedResourceIds = new Set(
-		readGameResourceUsagesFn(config).map(({ resourceId }) => resourceId),
+	const usedResourceUids = new Set(
+		readGameResourceUsagesFn(config).map(({ resourceUid }) => resourceUid),
 	);
 	const filteredResources = resources.filter(
 		(resource) =>
-			resource.type === "artwork" && (filter === "all" || !usedResourceIds.has(resource.id)),
+			resource.type === "artwork" &&
+			(filter === "all" || !usedResourceUids.has(resource.uid)),
 	);
 	const fuzzyFn = createFuzzySearchFn({
 		candidates: filteredResources.map((resource) => ({
 			terms: [
-				resource.id,
+				resource.uid,
+				resource.title,
 				resource.type,
 				"PNG",
 				"image",

@@ -77,7 +77,7 @@ const ItemImages = ({
 					key={id}
 					className="rounded-md"
 					size="md"
-					resourceIds={
+					resourceUids={
 						items[id]?.artwork.default ?? [
 							"",
 						]

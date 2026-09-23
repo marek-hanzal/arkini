@@ -15,7 +15,7 @@ interface EditorItemFormSearch {
 	readonly outcomeSet?: number;
 	readonly outcomeRoll?: number;
 	readonly outcomeIndex?: number;
-	readonly resourceId?: string;
+	readonly resourceUid?: string;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form")({
@@ -93,9 +93,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						merge,
 					}
 				: {}),
-			...(typeof search.resourceId === "string" && search.resourceId.length > 0
+			...(typeof search.resourceUid === "string" && search.resourceUid.length > 0
 				? {
-						resourceId: search.resourceId,
+						resourceUid: search.resourceUid,
 					}
 				: {}),
 		};
@@ -115,7 +115,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			outcomeSet,
 			outcomeRoll,
 			outcomeIndex,
-			resourceId,
+			resourceUid,
 		} = Route.useSearch();
 		const params = useParams({
 			strict: false,
@@ -137,7 +137,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				outcomeRollIndex={outcomeRoll}
 				outcomeIndex={outcomeIndex}
 				productionLineId={lineId}
-				resourceId={resourceId}
+				resourceUid={resourceUid}
 				sectionId={sectionId}
 				uid={itemUid}
 			>

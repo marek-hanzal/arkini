@@ -12,7 +12,7 @@ export namespace EditorResourceOptimizationAtom {
 	export interface OptimizeCommand {
 		readonly expectedRevision: number;
 		readonly kind: "optimize";
-		readonly resourceIds: ProjectRepository.OptimizeResourcesProps["resourceIds"];
+		readonly resourceUids: ProjectRepository.OptimizeResourcesProps["resourceUids"];
 		readonly type: ProjectRepository.OptimizeResourcesProps["type"];
 	}
 
@@ -69,7 +69,7 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 										});
 									},
 									projectId,
-									resourceIds: command.resourceIds,
+									resourceUids: command.resourceUids,
 									type: command.type,
 								}).pipe(
 									Effect.provideService(ProjectRepository, repository),
@@ -118,7 +118,7 @@ export const EditorResourceOptimizationAtom = RendererRuntime.runSync(
 							progress: {
 								completedResourceCount: 0,
 								phase: "optimizing",
-								totalResourceCount: command.resourceIds.length,
+								totalResourceCount: command.resourceUids.length,
 							},
 							type: command.type,
 						});

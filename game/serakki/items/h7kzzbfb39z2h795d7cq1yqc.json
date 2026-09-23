@@ -8,8 +8,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"apiary"
+				"so7r094glj6wfe6yoveiclrg",
+				"wvvpfewnw4oxnti4ljsn4w9o"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "apiary",
 				"title": "Apiary",
-				"artwork": "apiary",
+				"artwork": "wvvpfewnw4oxnti4ljsn4w9o",
 				"description": "Bees bees bees",
 				"clockWeight": 1,
 				"default": true,

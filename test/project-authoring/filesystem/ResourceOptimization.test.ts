@@ -61,7 +61,7 @@ describe("filesystem Editor PNG optimization", () => {
 				expectedRevision: created.revision,
 				onProgressFn: (value) => progress.push(value),
 				projectId: created.projectId,
-				resourceIds: [
+				resourceUids: [
 					"item-water",
 				],
 				type: "artwork",
@@ -92,7 +92,7 @@ describe("filesystem Editor PNG optimization", () => {
 		expect(new Uint8Array(await readFile(join(root, "image/hero.png")))).toEqual(
 			new Uint8Array(dirtyPng),
 		);
-		for (const [resourceId, source] of [
+		for (const [resourceUid, source] of [
 			[
 				"item-water",
 				"artwork/item-water.png",
@@ -107,15 +107,16 @@ describe("filesystem Editor PNG optimization", () => {
 				width: 2,
 			});
 			expect(decoded).toEqual(Buffer.from(Uint8Array.of(0, 0, 0, 0, 20, 40, 60, 255)));
-			expect(result.project.resources.find(({ id }) => id === resourceId)).toEqual({
-				id: resourceId,
+			expect(result.project.resources.find(({ uid }) => uid === resourceUid)).toEqual({
+				uid: resourceUid,
 				type: "artwork",
+				title: resourceUid,
 				size: bytes.byteLength,
 				version: expect.any(String),
 			});
-			expect(result.project.resources.find(({ id }) => id === resourceId)?.version).not.toBe(
-				created.resources.find(({ id }) => id === resourceId)?.version,
-			);
+			expect(
+				result.project.resources.find(({ uid }) => uid === resourceUid)?.version,
+			).not.toBe(created.resources.find(({ uid }) => uid === resourceUid)?.version);
 		}
 
 		await expect(
@@ -123,7 +124,7 @@ describe("filesystem Editor PNG optimization", () => {
 				repository.optimizeResourcesFx({
 					expectedRevision: created.revision,
 					projectId: created.projectId,
-					resourceIds: [
+					resourceUids: [
 						"hero",
 						"item-water",
 					],
@@ -155,7 +156,7 @@ describe("filesystem Editor PNG optimization", () => {
 			repository.optimizeResourcesFx({
 				expectedRevision: created.revision,
 				projectId: created.projectId,
-				resourceIds: [
+				resourceUids: [
 					"item-water",
 				],
 				type: "artwork",

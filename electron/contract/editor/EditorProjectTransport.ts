@@ -89,8 +89,8 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface Resource {
-		readonly name?: string;
-		readonly id: string;
+		readonly title: string;
+		readonly uid: string;
 		readonly type: "artwork" | "image" | "music" | "sfx";
 		readonly size: number;
 		readonly version: string;
@@ -140,7 +140,7 @@ export namespace EditorProjectTransport {
 
 	export interface ImportResourcesResult {
 		readonly project: Project;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 	}
 
 	export interface Note {
@@ -148,7 +148,7 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 		readonly createdAtMs: number;
 		readonly updatedAtMs: number;
 	}
@@ -157,7 +157,7 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 	}
 
 	export interface NoteKeyRequest {
@@ -172,7 +172,7 @@ export namespace EditorProjectTransport {
 	export interface UpdateNoteRequest extends DeleteNoteRequest {
 		readonly content: string;
 		readonly itemUids: ReadonlyArray<string>;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 	}
 
 	export interface UpsertItemRequest {
@@ -191,14 +191,14 @@ export namespace EditorProjectTransport {
 	export interface SaveResourceMetadataRequest {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly resourceId: string;
-		readonly name: string;
+		readonly resourceUid: string;
+		readonly title: string;
 	}
 
 	export interface DeleteResourceRequest {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 	}
 
 	export interface ReplaceConfigRequest {
@@ -208,8 +208,7 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface ReplaceResourceRequest {
-		readonly config: unknown;
-		readonly currentId: string;
+		readonly resourceUid: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
 		readonly resource: unknown;
@@ -218,7 +217,7 @@ export namespace EditorProjectTransport {
 	export interface OptimizeResourcesRequest {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly resourceIds: ReadonlyArray<string>;
+		readonly resourceUids: ReadonlyArray<string>;
 		readonly type: "artwork" | "sfx";
 	}
 

@@ -128,7 +128,7 @@ export const InputsControl = ({
 								<EditorItemThumbnail
 									size="md"
 									className="rounded-md"
-									resourceIds={
+									resourceUids={
 										project.config.items[input.query.selector.itemUid]?.artwork
 											.default ?? [
 											"",
@@ -160,7 +160,7 @@ export const InputsControl = ({
 								{itemUid.length === 0 ? null : (
 									<EditorItemThumbnail
 										className="rounded-md"
-										resourceIds={
+										resourceUids={
 											project.config.items[itemUid]?.artwork.default ?? [
 												"",
 											]

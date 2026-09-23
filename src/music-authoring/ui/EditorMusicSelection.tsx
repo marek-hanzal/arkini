@@ -13,12 +13,12 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 /** Selects an item-detail track with one shared preview session for options and the selected track. */
 export const EditorMusicSelection = ({
-	resourceId,
+	resourceUid,
 	onChangeFn,
 	error,
 }: {
-	readonly resourceId?: string;
-	readonly onChangeFn?: (resourceId: string | undefined) => void;
+	readonly resourceUid?: string;
+	readonly onChangeFn?: (resourceUid: string | undefined) => void;
 	readonly error?: string;
 }) => {
 	const project = useEditorProject();
@@ -29,8 +29,8 @@ export const EditorMusicSelection = ({
 			project.resources,
 		],
 	);
-	const resourceIds = useMemo(
-		() => music.map(({ id }) => id),
+	const resourceUids = useMemo(
+		() => music.map(({ uid }) => uid),
 		[
 			music,
 		],
@@ -38,11 +38,11 @@ export const EditorMusicSelection = ({
 	const options = useMemo(
 		() =>
 			music.map((resource) => ({
-				id: resource.id,
-				label: resource.name ?? resource.id,
+				id: resource.uid,
+				label: resource.title ?? resource.uid,
 				terms: [
-					resource.name ?? resource.id,
-					resource.id,
+					resource.title ?? resource.uid,
+					resource.uid,
 				],
 			})),
 		[
@@ -50,11 +50,11 @@ export const EditorMusicSelection = ({
 		],
 	);
 	const preview = useEditorAudioPreview({
-		resourceIds,
+		resourceUids,
 		type: "music",
 	});
-	const selected = music.find(({ id }) => id === resourceId);
-	const selectedActive = preview.activeResourceId === resourceId;
+	const selected = music.find(({ uid }) => uid === resourceUid);
+	const selectedActive = preview.activeResourceUid === resourceUid;
 	return (
 		<div
 			className="grid gap-4 data-[ui-read-only=true]:gap-1"
@@ -77,14 +77,14 @@ export const EditorMusicSelection = ({
 								translator.textFn("Global playlist")
 							) : (
 								<LinkButtonLink
-									to="/editor/$projectId/music/$resourceId/$sectionId"
+									to="/editor/$projectId/music/$resourceUid/$sectionId"
 									params={{
 										projectId: project.projectId,
-										resourceId: selected.id,
+										resourceUid: selected.uid,
 										sectionId: "view",
 									}}
 								>
-									{selected.name ?? selected.id}
+									{selected.title ?? selected.uid}
 								</LinkButtonLink>
 							)
 						}
@@ -99,7 +99,7 @@ export const EditorMusicSelection = ({
 							placeholder={translator.textFn("Global playlist")}
 							emptyLabel={translator.textFn("No matching music")}
 							displaySelectedLabel
-							value={resourceId ?? ""}
+							value={resourceUid ?? ""}
 							options={options}
 							error={error}
 							onChangeFn={(id) => onChangeFn(id || undefined)}
@@ -117,7 +117,7 @@ export const EditorMusicSelection = ({
 											preview.togglePlaybackFn(option.id);
 										}}
 									>
-										{preview.activeResourceId === option.id &&
+										{preview.activeResourceUid === option.id &&
 										preview.playing ? (
 											<Pause className="size-4" />
 										) : (
@@ -128,7 +128,7 @@ export const EditorMusicSelection = ({
 							)}
 						/>
 					</div>
-					{resourceId === undefined ? null : (
+					{resourceUid === undefined ? null : (
 						<LinkButton
 							className="grid size-10 shrink-0 place-items-center"
 							title={translator.textFn("Clear")}
@@ -141,7 +141,7 @@ export const EditorMusicSelection = ({
 			)}
 			<EditorAudioPreviewPlayer
 				fill
-				trackName={selected?.name ?? selected?.id}
+				trackName={selected?.title ?? selected?.uid}
 				disabled={selected === undefined}
 				placeholder={
 					selected === undefined
@@ -152,10 +152,10 @@ export const EditorMusicSelection = ({
 				progress={selected !== undefined && selectedActive ? preview.playbackProgress : 0}
 				playing={selected !== undefined && selectedActive && preview.playing}
 				seekFn={(progress) => {
-					if (selected !== undefined) preview.seekPlaybackFn(selected.id, progress);
+					if (selected !== undefined) preview.seekPlaybackFn(selected.uid, progress);
 				}}
 				toggleFn={() => {
-					if (selected !== undefined) preview.togglePlaybackFn(selected.id);
+					if (selected !== undefined) preview.togglePlaybackFn(selected.uid);
 				}}
 			/>
 		</div>

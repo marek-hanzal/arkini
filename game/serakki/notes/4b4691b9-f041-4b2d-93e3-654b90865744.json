@@ -1,17 +1,17 @@
 {
 	"content": "# TODO — překreslit zvířecí ohrádky\n\nSoučasné enclosure artworky jsou funkční, ale vizuálně slabé a před finálním průchodem potřebují redraw.\n\nTýká se hlavně:\n- `empty-cow-pen` / `cow-pen`\n- `empty-pig-pen` / `pig-pen`\n- `empty-sheep-pen` / `sheep-pen`\n- `empty-chicken-coop` / `chicken-coop`\n- `empty-goose-pen` / `goose-pen`\n\nCíl:\n- sjednotit styl s novějšími farm/building assety;\n- zachovat jasné rozlišení empty vs populated;\n- zlepšit siluetu a čitelnost v herní velikosti;\n- držet stejnou kameru, paletu a materiálový jazyk jako zbytek aktuálního Serakki artu.\n\nMechaniku při redraw neměnit; jde čistě o vizuální refresh.",
 	"itemUids": [],
-	"resourceIds": [
-		"empty-cow-pen",
-		"cow-pen",
-		"empty-pig-pen",
-		"pig-pen",
-		"empty-sheep-pen",
-		"sheep-pen",
-		"empty-chicken-coop",
-		"chicken-coop",
-		"empty-goose-pen",
-		"goose-pen"
+	"resourceUids": [
+		"gb89ubbwj3xq884llit16hyw",
+		"kvwdw73ifpkni8gmwozgsf78",
+		"dmyisodmydlf80356hcvpsra",
+		"f5j5vbmok6nbfnxj8mvf8i3h",
+		"tmn25bjuu0boas6t86ag239h",
+		"gzmgh8zm5rqimmud53xfuiyh",
+		"ipmpr9d6wjg2wa7bppin0340",
+		"aha604t1wuq6u9ntedhp6cw0",
+		"iemj1plgthrak61dsn4yrrxx",
+		"daow1b3ak47qy8z4cjfjcbp6"
 	],
 	"createdAtMs": 1789850491031,
 	"updatedAtMs": 1789850491031

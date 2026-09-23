@@ -15,7 +15,7 @@ export const ResourceTypeMismatchDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		resourceId: IdSchema,
+		resourceUid: IdSchema,
 		expectedType: ResourceTypeSchema,
 		actualType: ResourceTypeSchema,
 	})

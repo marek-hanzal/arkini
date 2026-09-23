@@ -6,11 +6,11 @@ import type { ArtworkSchema } from "~/item-definition/schema/ArtworkSchema";
 /** Compares the authored artwork canvas with its unchanged full tile bounds. */
 export const ArtworkTilePreview = ({
 	className,
-	resourceIds,
+	resourceUids,
 	scale,
 }: {
 	readonly className?: string;
-	readonly resourceIds: ArtworkSchema.Type["default"];
+	readonly resourceUids: ArtworkSchema.Type["default"];
 	readonly scale: number;
 }) => (
 	<div
@@ -28,7 +28,7 @@ export const ArtworkTilePreview = ({
 		>
 			<EditorItemThumbnail
 				className="size-full rounded-none border-0 bg-transparent"
-				resourceIds={resourceIds}
+				resourceUids={resourceUids}
 			/>
 		</div>
 	</div>

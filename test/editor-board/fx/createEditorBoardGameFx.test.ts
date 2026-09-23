@@ -72,7 +72,7 @@ describe("Editor Board createEditorBoardGameFx", () => {
 		expect(game.getResourceUrlFn("item-water")).toBe(
 			readProjectResourceUrlFn({
 				projectId: project.projectId,
-				resourceId: "item-water",
+				resourceUid: "item-water",
 				version: "1",
 			}),
 		);

@@ -384,7 +384,8 @@ describe("project section form session", () => {
 			resources: [
 				...boardSpaceProject.resources,
 				{
-					id: "avatar-three",
+					uid: "avatar-three",
+					title: "avatar-three",
 					type: "image",
 					size: 1,
 					version: "1",

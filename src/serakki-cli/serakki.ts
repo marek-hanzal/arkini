@@ -6,6 +6,7 @@ import { Command } from "effect/unstable/cli";
 import { SerapackCommand } from "~/serakki-cli/command/SerapackCommand";
 import { DiagnosticsCommand } from "~/serakki-cli/command/DiagnosticsCommand";
 import { EditorMcpCommand } from "~/serakki-cli/command/EditorMcpCommand";
+import { EditorImportCommand } from "~/serakki-cli/command/EditorImportCommand";
 import { PackCommand } from "~/serakki-cli/command/PackCommand";
 import { ProjectCommand } from "~/serakki-cli/command/ProjectCommand";
 import { ReplayCommand } from "~/serakki-cli/command/ReplayCommand";
@@ -34,6 +35,7 @@ const EditorCommand = Command.make("editor")
 	.pipe(
 		Command.withSubcommands([
 			EditorMcpCommand,
+			EditorImportCommand,
 		]),
 	)
 	.pipe(Command.withDescription("Editor project commands."));

@@ -11,7 +11,7 @@ export const CreateItemLink = ({
 	dataUi,
 	defaultDraft,
 	defaultTitle,
-	resourceId,
+	resourceUid,
 	variant = "default",
 }: {
 	readonly projectId: string;
@@ -20,7 +20,7 @@ export const CreateItemLink = ({
 	readonly dataUi?: string;
 	readonly defaultDraft?: boolean;
 	readonly defaultTitle?: string;
-	readonly resourceId?: string;
+	readonly resourceUid?: string;
 	readonly variant?: "default" | "primary" | "link";
 }) => {
 	const [uid] = useState(createId);
@@ -41,7 +41,7 @@ export const CreateItemLink = ({
 				create: true,
 				defaultDraft,
 				defaultTitle,
-				resourceId,
+				resourceUid,
 			}}
 			className={className}
 			data-ui={dataUi}

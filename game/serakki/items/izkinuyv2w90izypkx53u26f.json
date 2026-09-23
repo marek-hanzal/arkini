@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"pig-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"mg241ly73avd22s3ncv4e5q9"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "pig-farm",
 				"title": "Build Pig Farm",
-				"artwork": "pig-farm",
+				"artwork": "mg241ly73avd22s3ncv4e5q9",
 				"description": "Build Pig Farm.",
 				"clockWeight": 1,
 				"default": true,

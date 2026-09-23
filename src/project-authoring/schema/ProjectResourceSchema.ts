@@ -2,14 +2,14 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 
 /** A disk-backed typed Resource reference; binary bodies are not part of project state. */
 export const ProjectResourceSchema = z
 	.object({
-		id: IdSchema,
+		uid: IdSchema,
 		type: ResourceTypeSchema,
-		name: AudioResourceMetadataSchema.shape.name.optional(),
+		title: ResourceMetadataSchema.shape.title,
 		size: z.number().int().nonnegative(),
 		version: z.string().min(1),
 	})

@@ -15,7 +15,7 @@ export const DuplicateResourceDiagnosticSchema = z
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
-		resourceId: IdSchema,
+		resourceUid: IdSchema,
 		sources: z.tuple([
 			z.string().min(1),
 			z.string().min(1),

@@ -3,7 +3,7 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface PlayableResource {
-	readonly id: string;
+	readonly uid: string;
 	readonly type: ResourceTypeSchema.Type;
 }
 
@@ -16,5 +16,5 @@ export interface PlayableGame extends GameSession {
 	/** Immutable semantic catalog available to presentation runtimes. */
 	readonly resources: ReadonlyArray<PlayableResource>;
 	/** Resolves one validated session resource to its renderer object URL. */
-	readonly getResourceUrlFn: (resourceId: string) => string;
+	readonly getResourceUrlFn: (resourceUid: string) => string;
 }

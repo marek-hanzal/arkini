@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"quest",
-				"grain"
+				"lr8i4gjiyumr5s2lzvvv13ov",
+				"dymcjezdhim4qja2uftf90l6"
 			]
 		},
 		"units": {
@@ -123,7 +123,7 @@
 			{
 				"id": "complete",
 				"title": "Complete Contract",
-				"artwork": "grain",
+				"artwork": "dymcjezdhim4qja2uftf90l6",
 				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",
 				"clockWeight": 1,
 				"default": true,

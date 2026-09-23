@@ -38,12 +38,12 @@ const createStorages = async (version = "1.0", introduction?: string) => {
 		},
 		resources: [
 			{
-				id: "hero",
+				uid: "hero",
 				type: "image",
 				url: "serakki://test/hero",
 			},
 			{
-				id: "artwork:water",
+				uid: "artwork:water",
 				type: "artwork",
 				url: "serakki://test/asset-water",
 			},

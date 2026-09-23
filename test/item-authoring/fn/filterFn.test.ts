@@ -14,7 +14,7 @@ const itemFn = ({
 }) => ({
 	...createDraftFn({
 		draft,
-		resourceId: `artwork:${id}`,
+		resourceUid: `artwork:${id}`,
 		uid: `uid:${id}`,
 	}),
 	title,

@@ -84,7 +84,7 @@ describe("Form", () => {
 			artwork: {
 				scale: 1,
 				default: [
-					project.resources.find(({ type }) => type === "artwork")?.id,
+					project.resources.find(({ type }) => type === "artwork")?.uid,
 				],
 			},
 			draft: false,
@@ -105,7 +105,7 @@ describe("Form", () => {
 					defaultDraft: true,
 					defaultTitle: "Selected Asset Name",
 					create: true,
-					resourceId: "selected_asset-name",
+					resourceUid: "selected_asset-name",
 					uid: "draft-with-selected-asset",
 				}),
 			);

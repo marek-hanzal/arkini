@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"school-t1"
+				"so7r094glj6wfe6yoveiclrg",
+				"e8h5l2j4tq4tu8uskz5aqd8e"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "school-t1",
 				"title": "Build School - Tier 1",
-				"artwork": "school-t1",
+				"artwork": "e8h5l2j4tq4tu8uskz5aqd8e",
 				"description": "Build a basic school from processed materials and a little actual work.",
 				"clockWeight": 1,
 				"default": true,

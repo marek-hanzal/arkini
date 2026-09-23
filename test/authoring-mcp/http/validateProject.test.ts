@@ -42,7 +42,7 @@ describe("editor MCP project validation", () => {
 				resources: [
 					...editorTestPayload.resources,
 					{
-						id: "unused-artwork",
+						uid: "unused-artwork",
 						type: "artwork",
 						bytes: createTestPngBytes(),
 					},

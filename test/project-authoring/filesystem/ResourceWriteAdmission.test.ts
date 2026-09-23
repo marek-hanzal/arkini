@@ -18,14 +18,14 @@ afterEach(async () => harness.close());
 describe("resource write admission", () => {
 	it.each([
 		[
-			"item-water",
-			"ITEM-WATER",
+			"ore",
+			"ORE",
 		],
 		[
 			"café",
 			"cafe\u0301",
 		],
-	])("rejects an aliased rename %s → %s before changing any files", async (from, to) => {
+	])("rejects identity changes %s → %s before changing any files", async (from, to) => {
 		const repository = await harness.openRepository();
 		const initial = await harness.createProject(repository);
 		const bytes = createTestPngBytes();
@@ -36,8 +36,9 @@ describe("resource write admission", () => {
 				projectId: initial.projectId,
 				resources: [
 					{
-						id: from,
+						uid: from,
 						type: "artwork",
+						title: from,
 						path: source,
 						size: bytes.byteLength,
 					},
@@ -60,11 +61,11 @@ describe("resource write admission", () => {
 				repository.replaceResourceFx({
 					projectId: project.projectId,
 					expectedRevision: project.revision,
-					currentId: from,
-					config: project.config,
+					resourceUid: from,
 					resource: {
-						id: to,
+						uid: to,
 						type: "artwork",
+						title: to,
 					},
 				}),
 			),
@@ -99,14 +100,16 @@ describe("resource write admission", () => {
 					projectId: project.projectId,
 					resources: [
 						{
-							id: "new-image",
+							uid: "new-image",
 							type: "image",
+							title: "new-image",
 							path: source,
 							size: bytes.byteLength,
 						},
 						{
-							id: "item-water",
+							uid: "item-water",
 							type: "image",
+							title: "item-water",
 							path: source,
 							size: bytes.byteLength,
 						},

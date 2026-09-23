@@ -223,7 +223,7 @@ export const List = ({
 				artwork={
 					<EditorItemThumbnail
 						className="aspect-square h-auto w-66 max-w-full rounded-none border-0 bg-transparent"
-						resourceIds={item.artwork.default}
+						resourceUids={item.artwork.default}
 					/>
 				}
 			/>

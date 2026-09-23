@@ -36,10 +36,10 @@ export namespace useEditorMusicManagerController {
 		readonly music: ReadonlyArray<Project.Resource>;
 		readonly playlistError?: unknown;
 		readonly playlistPending: boolean;
-		readonly playlistResourceIds: ReadonlySet<string>;
+		readonly playlistResourceUids: ReadonlySet<string>;
 		readonly setViewFn: (view: View) => void;
-		readonly togglePlaylistFn: (resourceId: string) => void;
-		readonly togglingPlaylistResourceId?: string;
+		readonly togglePlaylistFn: (resourceUid: string) => void;
+		readonly togglingPlaylistResourceUid?: string;
 		readonly view: View;
 	}
 }
@@ -52,20 +52,20 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 	});
 	const playlistResult = useAtomValue(toggleEditorMusicPlaylistAtom);
 	const togglePlaylistCommandFn = useAtomSet(toggleEditorMusicPlaylistAtom);
-	const [togglingPlaylistResourceId, setTogglingPlaylistResourceIdFn] = useState<string>();
+	const [togglingPlaylistResourceUid, setTogglingPlaylistResourceUidFn] = useState<string>();
 	const [view, setViewFn] = useState<useEditorMusicManagerController.View>("all");
-	const playlistResourceIds = useMemo(
+	const playlistResourceUids = useMemo(
 		() => new Set(project.config.music?.playlist ?? []),
 		[
 			project.config.music?.playlist,
 		],
 	);
-	const usedResourceIds = useMemo(
+	const usedResourceUids = useMemo(
 		() =>
 			new Set(
 				readGameResourceUsagesFn(project.config)
 					.filter((usage) => usage.resourceType === "music")
-					.map((usage) => usage.resourceId),
+					.map((usage) => usage.resourceUid),
 			),
 		[
 			project.config,
@@ -74,29 +74,29 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 	const music = useMemo(
 		() =>
 			audio.resources.filter((resource) => {
-				const inPlaylist = playlistResourceIds.has(resource.id);
+				const inPlaylist = playlistResourceUids.has(resource.uid);
 				return (
 					view === "all" ||
-					(view === "playlist" ? inPlaylist : !usedResourceIds.has(resource.id))
+					(view === "playlist" ? inPlaylist : !usedResourceUids.has(resource.uid))
 				);
 			}),
 		[
 			audio.resources,
-			playlistResourceIds,
-			usedResourceIds,
+			playlistResourceUids,
+			usedResourceUids,
 			view,
 		],
 	);
 	const playlistError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(playlistResult));
 	const playlistPending = playlistResult.waiting;
-	const togglePlaylistFn = (resourceId: string) => {
+	const togglePlaylistFn = (resourceUid: string) => {
 		if (playlistPending) return;
-		setTogglingPlaylistResourceIdFn(resourceId);
-		const playlist = playlistResourceIds.has(resourceId)
-			? (project.config.music?.playlist ?? []).filter((id) => id !== resourceId)
+		setTogglingPlaylistResourceUidFn(resourceUid);
+		const playlist = playlistResourceUids.has(resourceUid)
+			? (project.config.music?.playlist ?? []).filter((id) => id !== resourceUid)
 			: [
 					...(project.config.music?.playlist ?? []),
-					resourceId,
+					resourceUid,
 				];
 		togglePlaylistCommandFn({
 			config: {
@@ -111,7 +111,7 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 	};
 
 	return {
-		activeResourceId: audio.activeResourceId,
+		activeResourceUid: audio.activeResourceUid,
 		filesInputRef: audio.filesInputRef,
 		importError: audio.importError,
 		importPending: audio.importPending,
@@ -122,7 +122,7 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 		playbackProgress: audio.playbackProgress,
 		playlistError,
 		playlistPending,
-		playlistResourceIds,
+		playlistResourceUids,
 		playing: audio.playing,
 		query: audio.query,
 		resources: audio.resources,
@@ -132,7 +132,7 @@ export const useEditorMusicManagerController = (): useEditorMusicManagerControll
 		seekPlaybackFn: audio.seekPlaybackFn,
 		togglePlaybackFn: audio.togglePlaybackFn,
 		togglePlaylistFn,
-		togglingPlaylistResourceId,
+		togglingPlaylistResourceUid,
 		totalResourceCount: audio.totalResourceCount,
 		type: audio.type,
 		view,

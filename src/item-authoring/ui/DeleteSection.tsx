@@ -37,7 +37,7 @@ const DeleteBlockerLink = ({
 				className="ak-list-row ak-list-row-interactive grid min-h-0 grid-cols-[auto_1fr_auto] items-center gap-4 p-4 text-left"
 			>
 				<EditorItemThumbnail
-					resourceIds={owner.artwork.default}
+					resourceUids={owner.artwork.default}
 					size="sm"
 				/>
 				<span className="min-w-0">

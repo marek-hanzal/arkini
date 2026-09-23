@@ -41,7 +41,7 @@ const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string 
 		case "resource:missing":
 		case "resource:type-mismatch":
 		case "resource:unused":
-			return diagnostic.resourceId;
+			return diagnostic.resourceUid;
 		case "config:missing-reference":
 			return `${diagnostic.reference} · ${diagnostic.referenceId}`;
 		case "config:key-uid-mismatch":

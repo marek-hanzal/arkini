@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"lumber-camp"
+				"so7r094glj6wfe6yoveiclrg",
+				"vmfdb9sa06isuopjs1kqn7n2"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "lumber-camp",
 				"title": "Lumber Camp",
-				"artwork": "lumber-camp",
+				"artwork": "vmfdb9sa06isuopjs1kqn7n2",
 				"description": "Build a new lumber-camp",
 				"clockWeight": 1,
 				"default": true,

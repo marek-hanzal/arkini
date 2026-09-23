@@ -58,13 +58,15 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		revision: 7,
 		resources: [
 			{
-				id: "opening-theme",
+				uid: "opening-theme",
+				title: "opening-theme",
 				size: 47,
 				type: "music",
 				version: "1",
 			},
 			{
-				id: "battle-march",
+				uid: "battle-march",
+				title: "battle-march",
 				size: 47,
 				type: "music",
 				version: "1",
@@ -78,11 +80,11 @@ vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
 		new Map([
 			[
 				"opening-theme",
-				"serakki://app/editor/resource?resourceId=opening-theme",
+				"serakki://app/editor/resource?resourceUid=opening-theme",
 			],
 			[
 				"battle-march",
-				"serakki://app/editor/resource?resourceId=battle-march",
+				"serakki://app/editor/resource?resourceUid=battle-march",
 			],
 		]),
 }));
@@ -155,13 +157,13 @@ afterEach(async () => {
 describe("useEditorMusicManagerController", () => {
 	it("searches Music and plays one lazy URL at the selected volume", async () => {
 		await act(async () => controller?.setQueryFn("battle"));
-		expect(controller?.music.map(({ id }) => id)).toEqual([
+		expect(controller?.music.map(({ uid }) => uid)).toEqual([
 			"battle-march",
 		]);
 
 		await act(async () => controller?.togglePlaybackFn("battle-march"));
 		const audio = AudioStub.instances[0];
-		expect(audio?.src).toContain("resourceId=battle-march");
+		expect(audio?.src).toContain("resourceUid=battle-march");
 		expect(audio?.play).toHaveBeenCalledOnce();
 		expect(controller?.playing).toBe(true);
 
@@ -175,18 +177,18 @@ describe("useEditorMusicManagerController", () => {
 	});
 
 	it("filters the searched Music collection by playlist membership", async () => {
-		expect(controller?.music.map(({ id }) => id)).toEqual([
+		expect(controller?.music.map(({ uid }) => uid)).toEqual([
 			"opening-theme",
 			"battle-march",
 		]);
 
 		await act(async () => controller?.setViewFn("playlist"));
-		expect(controller?.music.map(({ id }) => id)).toEqual([
+		expect(controller?.music.map(({ uid }) => uid)).toEqual([
 			"opening-theme",
 		]);
 
 		await act(async () => controller?.setViewFn("unused"));
-		expect(controller?.music.map(({ id }) => id)).toEqual([
+		expect(controller?.music.map(({ uid }) => uid)).toEqual([
 			"battle-march",
 		]);
 
@@ -199,7 +201,7 @@ describe("useEditorMusicManagerController", () => {
 		await act(async () => root?.render(<Probe />));
 		await act(async () => controller?.setViewFn("unused"));
 		expect(controller?.music).toEqual([]);
-		expect(controller?.playlistResourceIds.has("battle-march")).toBe(false);
+		expect(controller?.playlistResourceUids.has("battle-march")).toBe(false);
 	});
 	it("tracks playback, seeks through the active row, and disposes on departure", async () => {
 		await act(async () => controller?.togglePlaybackFn("battle-march"));
@@ -222,8 +224,8 @@ describe("useEditorMusicManagerController", () => {
 	});
 
 	it("toggles one Music resource in the authored random playlist", async () => {
-		expect(controller?.playlistResourceIds.has("opening-theme")).toBe(true);
-		expect(controller?.playlistResourceIds.has("battle-march")).toBe(false);
+		expect(controller?.playlistResourceUids.has("opening-theme")).toBe(true);
+		expect(controller?.playlistResourceUids.has("battle-march")).toBe(false);
 
 		await act(async () => controller?.togglePlaylistFn("battle-march"));
 		expect(state.playlistMusicFn).toHaveBeenCalledWith({

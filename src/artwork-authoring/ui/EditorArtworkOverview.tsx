@@ -4,13 +4,13 @@ import { useState } from "react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { Fact, FactList } from "~/ui/ui/FactList";
-import { useEditorArtworkById } from "~/artwork-authoring/ui/useEditorArtworkById";
+import { useEditorArtworkByUid } from "~/artwork-authoring/ui/useEditorArtworkByUid";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 
-export const EditorArtworkOverview = ({ resourceId }: { readonly resourceId: string }) => {
+export const EditorArtworkOverview = ({ resourceUid }: { readonly resourceUid: string }) => {
 	const translator = useTranslator();
-	const resource = useEditorArtworkById(resourceId);
-	const url = useResourceUrl(resourceId);
+	const resource = useEditorArtworkByUid(resourceUid);
+	const url = useResourceUrl(resourceUid);
 	const [dimensions, setDimensionsFn] = useState<{
 		readonly height: number;
 		readonly url: string;
@@ -26,9 +26,9 @@ export const EditorArtworkOverview = ({ resourceId }: { readonly resourceId: str
 			<EditorRootCard dataUi="EditorArtworkDetailsCard">
 				<FactList columns={3}>
 					<Fact
-						label={translator.textFn("Resource ID")}
+						label={translator.textFn("Resource UID")}
 						mono
-						value={resource.id}
+						value={resource.uid}
 					/>
 					<Fact
 						label={translator.textFn("Dimensions")}
@@ -56,7 +56,7 @@ export const EditorArtworkOverview = ({ resourceId }: { readonly resourceId: str
 					<div className="grid size-[min(80cqh,100cqw)] place-items-center overflow-hidden rounded-2xl border-2 border-accent bg-canvas/70">
 						<img
 							src={url}
-							alt={`${resource.id} preview`}
+							alt={`${resource.uid} preview`}
 							className="size-full object-contain"
 							draggable={false}
 							onLoad={(event) =>

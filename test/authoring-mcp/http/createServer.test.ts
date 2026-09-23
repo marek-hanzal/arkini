@@ -208,11 +208,11 @@ describe("editor MCP server", () => {
 					...editorTestPayload.resources,
 					{
 						...editorTestPayload.resources.find(({ type }) => type === "artwork")!,
-						id: "cow",
+						uid: "cow",
 					},
 					{
 						...editorTestPayload.resources.find(({ type }) => type === "artwork")!,
-						id: "cow-farm",
+						uid: "cow-farm",
 					},
 				],
 			}),
@@ -245,7 +245,7 @@ describe("editor MCP server", () => {
 		expect(artwork.content).toMatchObject([
 			{
 				text: expect.stringMatching(
-					/- Type: artwork\n  ID: cow\n\n- Type: artwork\n  ID: cow-farm/,
+					/- Type: artwork\n  UID: cow\n  Title: cow\n\n- Type: artwork\n  UID: cow-farm\n  Title: cow-farm/,
 				),
 			},
 		]);

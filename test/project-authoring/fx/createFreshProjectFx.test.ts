@@ -47,8 +47,9 @@ describe("createFreshProjectFx", () => {
 					updatedAtMs: 100,
 					revision: 0,
 					config,
-					resources: resources.map(({ id, type, bytes }) => ({
-						id,
+					resources: resources.map(({ uid, type, bytes }) => ({
+						uid,
+						title: uid,
 						type,
 						size: bytes.byteLength,
 						version: "1",
@@ -79,7 +80,7 @@ describe("createFreshProjectFx", () => {
 					},
 				},
 				resources: {
-					hero: "hero",
+					hero: expect.any(String),
 				},
 				music: {
 					playlist: [],
@@ -104,7 +105,7 @@ describe("createFreshProjectFx", () => {
 			}),
 		);
 		expect(project.resources[0]).toMatchObject({
-			id: "hero",
+			uid: project.config.resources.hero,
 			type: "image",
 		});
 		expect(createProjectFx.mock.calls[0]?.[0].resources[0]?.bytes.slice(0, 8)).toEqual(

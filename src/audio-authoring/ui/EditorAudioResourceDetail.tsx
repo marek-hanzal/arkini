@@ -9,7 +9,7 @@ import { FileQuestion, Pencil, ShieldAlert, ShieldCheck, Trash2, X } from "lucid
 import { useMemo } from "react";
 
 import { useEditorAudioPreview } from "~/audio-authoring/ui/useEditorAudioPreview";
-import { useEditorAudioResourceEditController } from "~/audio-authoring/ui/useEditorAudioResourceEditController";
+import { useEditorResourceMetadataEditController } from "~/resource-authoring/ui/useEditorResourceMetadataEditController";
 import { useEditorAudioResourceDeleteController } from "~/audio-authoring/ui/useEditorAudioResourceDeleteController";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -34,7 +34,7 @@ import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 
 interface EditorAudioResourceDetailProps {
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly type: "music" | "sfx";
 	readonly section: "view" | "edit" | "delete";
 }
@@ -59,16 +59,16 @@ const EditorAudioPreview = ({
 	readonly resource: Project.Resource;
 	readonly type: "music" | "sfx";
 }) => {
-	const resourceIds = useMemo(
+	const resourceUids = useMemo(
 		() => [
-			resource.id,
+			resource.uid,
 		],
 		[
-			resource.id,
+			resource.uid,
 		],
 	);
 	const preview = useEditorAudioPreview({
-		resourceIds,
+		resourceUids,
 		type,
 	});
 	return (
@@ -76,23 +76,23 @@ const EditorAudioPreview = ({
 			error={preview.playbackError}
 			progress={preview.playbackProgress}
 			playing={preview.playing}
-			seekFn={(progress) => preview.seekPlaybackFn(resource.id, progress)}
-			toggleFn={() => preview.togglePlaybackFn(resource.id)}
+			seekFn={(progress) => preview.seekPlaybackFn(resource.uid, progress)}
+			toggleFn={() => preview.togglePlaybackFn(resource.uid)}
 		/>
 	);
 };
 
 const EditorAudioResourceUsage = ({
-	resourceId,
+	resourceUid,
 	asFact = false,
 }: {
-	readonly resourceId: string;
+	readonly resourceUid: string;
 	readonly asFact?: boolean;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const usages = readGameResourceUsagesFn(project.config).filter(
-		(usage) => usage.resourceId === resourceId,
+		(usage) => usage.resourceUid === resourceUid,
 	);
 	const usageLabels = usages.map((usage) =>
 		usage.owner === "item"
@@ -148,7 +148,7 @@ const EditorAudioResourceEdit = ({
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();
-	const controller = useEditorAudioResourceEditController({
+	const controller = useEditorResourceMetadataEditController({
 		resource,
 		type,
 	});
@@ -159,17 +159,17 @@ const EditorAudioResourceEdit = ({
 			saveEnabled={controller.dirty}
 			saveFn={controller.saveFn}
 			saving={controller.saving}
-			title={<h1 className="truncate text-xl font-semibold">{resource.name}</h1>}
+			title={<h1 className="truncate text-xl font-semibold">{resource.title}</h1>}
 			leading={
 				<EditorHistoryBackButton
 					to={
 						type === "music"
-							? "/editor/$projectId/music/$resourceId/$sectionId"
-							: "/editor/$projectId/sfx/$resourceId/$sectionId"
+							? "/editor/$projectId/music/$resourceUid/$sectionId"
+							: "/editor/$projectId/sfx/$resourceUid/$sectionId"
 					}
 					params={{
 						projectId: project.projectId,
-						resourceId: resource.id,
+						resourceUid: resource.uid,
 						sectionId: "view",
 					}}
 				/>
@@ -181,9 +181,9 @@ const EditorAudioResourceEdit = ({
 			>
 				<EditorTextControl
 					label={translator.textFn("Name")}
-					value={controller.name}
-					onChangeFn={controller.setNameFn}
-					error={controller.nameError}
+					value={controller.title}
+					onChangeFn={controller.setTitleFn}
+					error={controller.titleError}
 				/>
 			</section>
 		</EditorFormSectionPage>
@@ -200,10 +200,10 @@ const EditorAudioResourceDelete = ({
 	const project = useEditorProject();
 	const translator = useTranslator();
 	const assigned = readGameResourceUsagesFn(project.config).some(
-		(usage) => usage.resourceId === resource.id,
+		(usage) => usage.resourceUid === resource.uid,
 	);
 	const controller = useEditorAudioResourceDeleteController({
-		resourceId: resource.id,
+		resourceUid: resource.uid,
 		type,
 	});
 	return (
@@ -234,7 +234,7 @@ const EditorAudioResourceDelete = ({
 					</DangerButton>
 				}
 			/>
-			{assigned ? <EditorAudioResourceUsage resourceId={resource.id} /> : null}
+			{assigned ? <EditorAudioResourceUsage resourceUid={resource.uid} /> : null}
 			{controller.confirming ? (
 				<Overlay onCloseFn={controller.cancelFn}>
 					<div
@@ -246,11 +246,11 @@ const EditorAudioResourceDelete = ({
 						</h2>
 						<p className="text-sm leading-6 text-muted">
 							<Tx label="Delete" />{" "}
-							<strong className="text-foreground">{resource.name}</strong>
+							<strong className="text-foreground">{resource.title}</strong>
 						</p>
 						{assigned ? (
 							<div className="max-h-52 overflow-y-auto overscroll-contain">
-								<EditorAudioResourceUsage resourceId={resource.id} />
+								<EditorAudioResourceUsage resourceUid={resource.uid} />
 							</div>
 						) : null}
 						<p className="rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
@@ -292,20 +292,20 @@ const EditorAudioResourceDelete = ({
 
 /** Shared Music/SFX detail keeps stable identity visible and metadata editing separate from audio playback. */
 export const EditorAudioResourceDetail = ({
-	resourceId,
+	resourceUid,
 	type,
 	section,
 }: EditorAudioResourceDetailProps) => {
 	const project = useEditorProject();
 	const resource = project.resources.find(
-		(candidate) => candidate.id === resourceId && candidate.type === type,
+		(candidate) => candidate.uid === resourceUid && candidate.type === type,
 	);
 	const translator = useTranslator();
 	const editRef = useEditorEditShortcut();
 	const to =
 		type === "music"
-			? "/editor/$projectId/music/$resourceId/$sectionId"
-			: "/editor/$projectId/sfx/$resourceId/$sectionId";
+			? "/editor/$projectId/music/$resourceUid/$sectionId"
+			: "/editor/$projectId/sfx/$resourceUid/$sectionId";
 	const navigateFn = useNavigate();
 	useSectionShortcuts({
 		enabled: resource !== undefined && section !== "edit",
@@ -315,7 +315,7 @@ export const EditorAudioResourceDetail = ({
 				to,
 				params: {
 					projectId: project.projectId,
-					resourceId,
+					resourceUid,
 					sectionId: tab.id,
 				},
 			});
@@ -324,7 +324,7 @@ export const EditorAudioResourceDetail = ({
 	if (resource !== undefined && section === "edit")
 		return (
 			<EditorAudioResourceEdit
-				key={`${project.projectId}:${type}:${resource.id}`}
+				key={`${project.projectId}:${type}:${resource.uid}`}
 				resource={resource}
 				type={type}
 			/>
@@ -349,9 +349,9 @@ export const EditorAudioResourceDetail = ({
 					title={
 						<h1
 							className="truncate text-xl font-semibold"
-							data-ui="EditorAudioResourceIdentity"
+							data-ui="EditorAudioResourceUidentity"
 						>
-							{resource?.name ?? resourceId}
+							{resource?.title ?? resourceUid}
 						</h1>
 					}
 					action={
@@ -361,7 +361,7 @@ export const EditorAudioResourceDetail = ({
 								to={to}
 								params={{
 									projectId: project.projectId,
-									resourceId,
+									resourceUid,
 									sectionId: "edit",
 								}}
 								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
@@ -378,7 +378,7 @@ export const EditorAudioResourceDetail = ({
 					<EditorSectionBar
 						actions={
 							<EditorAudioPreview
-								key={`${project.projectId}:${type}:${resource.id}`}
+								key={`${project.projectId}:${type}:${resource.uid}`}
 								resource={resource}
 								type={type}
 							/>
@@ -396,7 +396,7 @@ export const EditorAudioResourceDetail = ({
 									to={to}
 									params={{
 										projectId: project.projectId,
-										resourceId,
+										resourceUid,
 										sectionId: tab.id,
 									}}
 									className={sectionLinkClassName}
@@ -426,7 +426,7 @@ export const EditorAudioResourceDetail = ({
 				/>
 			) : section === "delete" ? (
 				<EditorAudioResourceDelete
-					key={`${project.projectId}:${type}:${resource.id}`}
+					key={`${project.projectId}:${type}:${resource.uid}`}
 					resource={resource}
 					type={type}
 				/>
@@ -453,7 +453,7 @@ export const EditorAudioResourceDetail = ({
 										to={to}
 										params={{
 											projectId: project.projectId,
-											resourceId,
+											resourceUid,
 											sectionId: "edit",
 										}}
 									>
@@ -466,7 +466,7 @@ export const EditorAudioResourceDetail = ({
 								<FactList>
 									<Fact
 										label={translator.textFn("Name")}
-										value={resource.name}
+										value={resource.title}
 									/>
 									<Fact
 										label={translator.textFn("Size")}
@@ -475,10 +475,10 @@ export const EditorAudioResourceDetail = ({
 									<Fact
 										label="ID"
 										mono
-										value={resource.id}
+										value={resource.uid}
 									/>
 									<EditorAudioResourceUsage
-										resourceId={resourceId}
+										resourceUid={resourceUid}
 										asFact
 									/>
 								</FactList>

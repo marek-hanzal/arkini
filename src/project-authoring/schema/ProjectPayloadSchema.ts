@@ -73,5 +73,5 @@ export const ProjectPayloadSchema = projectTransportSchema
 			.map((resource) => ({
 				...resource,
 			}))
-			.sort((left, right) => left.id.localeCompare(right.id)),
+			.sort((left, right) => left.uid.localeCompare(right.uid)),
 	}));

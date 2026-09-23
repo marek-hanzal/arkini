@@ -81,27 +81,27 @@ const hasCompleteOpusHeadersFn = (source: Buffer) => {
 
 /** Validates bounded Ogg/Opus headers and the presence of one audio packet. */
 export const validateOggOpusFileFx = Effect.fn("validateOggOpusFileFx")(
-	(path: string, resourceId: string) =>
+	(path: string, resourceUid: string) =>
 		Effect.tryPromise({
 			try: async () => {
 				const info = await stat(path);
 				if (!info.isFile() || info.size < 1)
-					throw new Error(`Audio ${resourceId} must be a valid Ogg/Opus file.`);
+					throw new Error(`Audio ${resourceUid} must be a valid Ogg/Opus file.`);
 				const file = await open(path, "r");
 				try {
 					const header = Buffer.alloc(Math.min(HeaderBytes, info.size));
 					const { bytesRead } = await file.read(header, 0, header.length, 0);
 					if (!hasCompleteOpusHeadersFn(header.subarray(0, bytesRead)))
-						throw new Error(`Audio ${resourceId} must be a valid Ogg/Opus file.`);
+						throw new Error(`Audio ${resourceUid} must be a valid Ogg/Opus file.`);
 					return Number(info.size);
 				} finally {
 					await file.close();
 				}
 			},
 			catch: (cause) =>
-				cause instanceof Error && cause.message.startsWith(`Audio ${resourceId}`)
+				cause instanceof Error && cause.message.startsWith(`Audio ${resourceUid}`)
 					? cause
-					: new Error(`Audio ${resourceId} must decode as a valid Ogg/Opus file.`, {
+					: new Error(`Audio ${resourceUid} must decode as a valid Ogg/Opus file.`, {
 							cause,
 						}),
 		}),

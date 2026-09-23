@@ -3,7 +3,7 @@ import { createContext } from "react";
 import type { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
 export interface GameAudioControl {
-	readonly requestDetailMusicFn: (resourceId: string | undefined) => void;
+	readonly requestDetailMusicFn: (resourceUid: string | undefined) => void;
 	readonly playSfxEventFn: (event: PresentationSfxEventEnumSchema.Type) => void;
 }
 

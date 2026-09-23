@@ -61,19 +61,19 @@ let registry: AtomRegistry.AtomRegistry;
 
 export const createGame = (): Game =>
 	({
-		getResourceUrlFn: (resourceId: string) => `blob:${resourceId}`,
+		getResourceUrlFn: (resourceUid: string) => `blob:${resourceUid}`,
 		readFn: () =>
 			Exit.succeed([
 				{
 					itemUid: "item:alpha",
-					sourceResourceIds: [
+					sourceResourceUids: [
 						"alpha",
 					],
 					title: "Alpha",
 				},
 				{
 					itemUid: "item:beta",
-					sourceResourceIds: [
+					sourceResourceUids: [
 						"beta",
 						"beta-overlay",
 					],

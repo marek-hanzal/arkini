@@ -1,13 +1,13 @@
 import { Effect, FileSystem, Option } from "effect";
 
-import { readAudioResourceMetadataFx } from "~/audio-authoring/fx/readAudioResourceMetadataFx";
+import { readResourceMetadataFx } from "~/game-config-resource/fx/readResourceMetadataFx";
 import type { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 import { readProjectResourceVersionFn } from "../fn/readProjectResourceVersionFn";
 
 /** Reads resource presentation and cache identity without opening or decoding media bodies. */
 export const readProjectResourceMetadataFx = Effect.fn("readProjectResourceMetadataFx")(function* (
-	resourceId: string,
+	resourceUid: string,
 	type: ResourceTypeSchema.Type,
 	target: string,
 ) {
@@ -17,11 +17,9 @@ export const readProjectResourceMetadataFx = Effect.fn("readProjectResourceMetad
 		return yield* Effect.fail(new Error(`Editor resource ${target} is not a file.`));
 	const size = Number(stat.size);
 	return {
-		id: resourceId,
+		uid: resourceUid,
 		type,
-		...(type === "music" || type === "sfx"
-			? yield* readAudioResourceMetadataFx(`${target.slice(0, -4)}.json`)
-			: {}),
+		...(yield* readResourceMetadataFx(`${target.slice(0, -4)}.json`)),
 		size,
 		version: readProjectResourceVersionFn({
 			size,

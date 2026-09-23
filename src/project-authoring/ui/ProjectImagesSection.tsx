@@ -66,7 +66,7 @@ export const ProjectImagesSection = ({
 									onRemoveFn={(index) => avatarsField.removeValue(index)}
 									renderItemPreviewFn={(index) => (
 										<EditorResourceThumbnail
-											resourceId={avatars[index]}
+											resourceUid={avatars[index]}
 											size="sm"
 										/>
 									)}

@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sheep-farm"
+				"mrnd35l8q8ynnve32m7znypb"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "sheep",
 				"title": "Sheep",
-				"artwork": "sheep",
+				"artwork": "hhec3mqxrgiw7nznb18dl260",
 				"description": "Feed a sheep before releasing it from a nearby populated pen.",
 				"clockWeight": 1,
 				"default": true,
@@ -85,7 +85,7 @@
 			{
 				"id": "empty-sheep-pen",
 				"title": "Prepare Sheep Pen",
-				"artwork": "empty-sheep-pen",
+				"artwork": "tmn25bjuu0boas6t86ag239h",
 				"description": "Prepare a new empty enclosure using 2 planks.",
 				"clockWeight": 1,
 				"default": false,
@@ -139,7 +139,7 @@
 			{
 				"id": "blueprint",
 				"title": "Sheep Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Sheep Farm.",
 				"clockWeight": 1,
 				"default": false,

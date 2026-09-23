@@ -57,10 +57,6 @@ An unexpected error prevented the build. Try again.:
   value: An unexpected error prevented the build. Try again.
 Artwork:
   value: Artwork
-Artwork ID:
-  value: Artwork ID
-Artwork ID help:
-  value: The stable Resource ID used by Item artwork references.
 Artwork PNG import summary:
   value: Import selected square PNGs. Filenames become Artwork IDs.
 Artwork Serapack import summary:
@@ -1674,8 +1670,8 @@ Reset:
   value: Reset
 Reset password:
   value: Reset password
-Resource ID:
-  value: Resource ID
+Resource UID:
+  value: Resource UID
 Resources:
   value: Resources
 Retry loading notes:

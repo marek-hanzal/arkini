@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"sugar-beet-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"hckjdd3x6d7e8j879cgupn5l"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "sugar-beet-farm",
 				"title": "Build Sugar Beet Farm",
-				"artwork": "sugar-beet-farm",
+				"artwork": "hckjdd3x6d7e8j879cgupn5l",
 				"description": "Build Sugar Beet Farm.",
 				"clockWeight": 1,
 				"default": true,

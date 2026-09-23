@@ -8,19 +8,19 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { Button, ButtonLink } from "~/ui/ui/Button";
 
 interface NoteResourceLinksProps {
-	readonly resourceIds: ReadonlyArray<string>;
-	readonly requiredResourceId?: string;
+	readonly resourceUids: ReadonlyArray<string>;
+	readonly requiredResourceUid?: string;
 	readonly disabled: boolean;
 	readonly filter?: ArtworkCatalogFilterSchema.Type;
 	readonly query?: string;
-	readonly onChangeFn?: (resourceIds: ReadonlyArray<string>) => void;
-	readonly onUnlinkFn?: (resourceId: string) => void;
+	readonly onChangeFn?: (resourceUids: ReadonlyArray<string>) => void;
+	readonly onUnlinkFn?: (resourceUid: string) => void;
 }
 
 /** Resolves each resource relationship without treating Notes as runtime usage. */
 export const NoteResourceLinks = ({
-	resourceIds,
-	requiredResourceId,
+	resourceUids,
+	requiredResourceUid,
 	disabled,
 	filter,
 	query,
@@ -28,7 +28,7 @@ export const NoteResourceLinks = ({
 	onUnlinkFn,
 }: NoteResourceLinksProps) => {
 	const project = useEditorProject();
-	if (resourceIds.length === 0) return null;
+	if (resourceUids.length === 0) return null;
 	return (
 		<div
 			className="grid min-w-0 gap-3"
@@ -38,27 +38,27 @@ export const NoteResourceLinks = ({
 				<Tx label="Resources" />:
 			</span>
 			<div className="flex flex-wrap gap-2">
-				{resourceIds.map((resourceId) => {
+				{resourceUids.map((resourceUid) => {
 					const resource = project.resources.find(
-						(candidate) => candidate.id === resourceId,
+						(candidate) => candidate.uid === resourceUid,
 					);
 					return (
 						<div
-							key={resourceId}
+							key={resourceUid}
 							className="flex min-w-0 items-center gap-1 rounded-xl border border-line bg-canvas/50 p-1"
 						>
 							{resource?.type === "artwork" ? (
 								<EditorArtworkDetailLink
-									resourceId={resourceId}
+									resourceUid={resourceUid}
 									filter={filter}
 									query={query}
 									className="flex min-w-0 items-center gap-2 pr-2 text-sm"
 								>
 									<EditorResourceThumbnail
-										resourceId={resourceId}
+										resourceUid={resourceUid}
 										size="sm"
 									/>
-									<span className="truncate">{resourceId}</span>
+									<span className="truncate">{resource.title}</span>
 								</EditorArtworkDetailLink>
 							) : resource?.type === "image" ? (
 								<ButtonLink
@@ -70,53 +70,55 @@ export const NoteResourceLinks = ({
 									className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
 								>
 									<EditorResourceThumbnail
-										resourceId={resourceId}
+										resourceUid={resourceUid}
 										size="sm"
 									/>
-									<span className="truncate">{resourceId}</span>
+									<span className="truncate">{resource.title}</span>
 								</ButtonLink>
 							) : resource?.type === "music" || resource?.type === "sfx" ? (
 								<ButtonLink
 									to={
 										resource.type === "music"
-											? "/editor/$projectId/music/$resourceId/$sectionId"
-											: "/editor/$projectId/sfx/$resourceId/$sectionId"
+											? "/editor/$projectId/music/$resourceUid/$sectionId"
+											: "/editor/$projectId/sfx/$resourceUid/$sectionId"
 									}
 									params={{
 										projectId: project.projectId,
-										resourceId,
+										resourceUid,
 										sectionId: "view",
 									}}
 									className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
 								>
 									<EditorResourceThumbnail
-										resourceId={resourceId}
+										resourceUid={resourceUid}
 										size="sm"
 									/>
-									<span className="truncate">{resource.name ?? resourceId}</span>
+									<span className="truncate">
+										{resource.title ?? resourceUid}
+									</span>
 								</ButtonLink>
 							) : (
 								<span
 									className="px-2 text-sm text-muted"
 									data-ui="EditorNoteMissingResource"
 								>
-									<Tx label="Unavailable resource" /> · {resourceId}
+									<Tx label="Unavailable resource" /> · {resourceUid}
 								</span>
 							)}
 
 							<Button
 								className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"
 								data-ui="EditorNoteUnlinkResource"
-								disabled={disabled || requiredResourceId === resourceId}
+								disabled={disabled || requiredResourceUid === resourceUid}
 								onClick={() => {
-									if (disabled || requiredResourceId === resourceId) return;
+									if (disabled || requiredResourceUid === resourceUid) return;
 									if (onChangeFn !== undefined)
 										onChangeFn(
-											resourceIds.filter(
-												(linkedId) => linkedId !== resourceId,
+											resourceUids.filter(
+												(linkedId) => linkedId !== resourceUid,
 											),
 										);
-									else onUnlinkFn?.(resourceId);
+									else onUnlinkFn?.(resourceUid);
 								}}
 							>
 								<Trash2 className="size-4" />

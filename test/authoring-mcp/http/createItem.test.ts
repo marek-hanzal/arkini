@@ -64,7 +64,7 @@ describe("editor MCP item creation", () => {
 			artwork: {
 				scale: 1,
 				default: [
-					editorTestPayload.resources.find(({ type }) => type === "artwork")?.id,
+					editorTestPayload.resources.find(({ type }) => type === "artwork")?.uid,
 				],
 			},
 			description: "Created through the editor MCP.",

@@ -2,7 +2,7 @@ import type { ManifestSchema } from "~/serapack-artifact/schema/ManifestSchema";
 import type { ResourceTypeSchema } from "~/game-config-resource/schema/ResourceTypeSchema";
 
 export interface SerapackFileResourceLayout {
-	readonly id: string;
+	readonly uid: string;
 	readonly type: ResourceTypeSchema.Type;
 	readonly length: number;
 	readonly offset: number;

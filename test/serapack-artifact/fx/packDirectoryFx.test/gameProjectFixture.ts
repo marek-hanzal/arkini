@@ -197,7 +197,17 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 	yield* fileSystem.writeFile(path.join(musicDirectory, "theme.ogg"), musicOgg);
 	yield* fileSystem.writeFile(path.join(musicDirectory, "unused-theme.ogg"), musicOgg);
 	yield* fileSystem.writeFile(path.join(sfxDirectory, "job-start.ogg"), sfxOgg);
-	for (const [directory, id, name] of [
+	for (const [directory, uid, title] of [
+		[
+			image,
+			"hero",
+			"Hero",
+		],
+		[
+			artwork,
+			"item-water",
+			"Water",
+		],
 		[
 			musicDirectory,
 			"theme",
@@ -215,9 +225,9 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		],
 	] as const)
 		yield* fileSystem.writeFileString(
-			path.join(directory, `${id}.json`),
+			path.join(directory, `${uid}.json`),
 			JSON.stringify({
-				name,
+				title,
 			}),
 		);
 	const squareArtworkPng = yield* Effect.promise(() =>

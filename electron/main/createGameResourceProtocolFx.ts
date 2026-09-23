@@ -18,7 +18,7 @@ const InstallationResourceSchema = z
 		resources: z.array(
 			z
 				.object({
-					id: z.string(),
+					uid: IdSchema,
 					type: ResourceTypeSchema,
 					path: z.string(),
 					size: z.number().int().nonnegative(),
@@ -62,8 +62,8 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 							JSON.parse(url.searchParams.get("packageId") ?? "null"),
 						);
 						const contentHash = url.searchParams.get("contentHash");
-						const resourceId = IdSchema.parse(
-							JSON.parse(url.searchParams.get("resourceId") ?? "null"),
+						const resourceUid = IdSchema.parse(
+							JSON.parse(url.searchParams.get("resourceUid") ?? "null"),
 						);
 						if (
 							url.protocol !== "serakki:" ||
@@ -71,7 +71,7 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 							url.pathname !== "/game/resource" ||
 							!packageId ||
 							!contentHash ||
-							!resourceId ||
+							!resourceUid ||
 							Array.from(url.searchParams.keys()).length !== 3
 						)
 							return new Response("Game resource was not found.", {
@@ -92,7 +92,9 @@ export const createGameResourceProtocolFx = Effect.fn("createGameResourceProtoco
 							return new Response("Game resource was not found.", {
 								status: 404,
 							});
-						const resource = installation.resources.find(({ id }) => id === resourceId);
+						const resource = installation.resources.find(
+							({ uid }) => uid === resourceUid,
+						);
 						if (resource === undefined)
 							return new Response("Game resource was not found.", {
 								status: 404,

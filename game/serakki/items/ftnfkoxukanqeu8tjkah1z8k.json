@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"treasure-chest-t1"
+				"drlvi3wmv3s1uexv16xuzkd9"
 			]
 		},
 		"units": {
@@ -20,7 +20,7 @@
 			{
 				"id": "open-supplies",
 				"title": "Open the Townhall Supplies",
-				"artwork": "treasure-chest-t1",
+				"artwork": "drlvi3wmv3s1uexv16xuzkd9",
 				"description": "Unpack a few samples of what the settlement will soon learn to produce, understand, employ, and inevitably run out of.",
 				"clockWeight": 1,
 				"default": true,

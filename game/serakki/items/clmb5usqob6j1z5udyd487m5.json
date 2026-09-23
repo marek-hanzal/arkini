@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"stonemason-camp"
+				"u0ugyubcxh6gng4hljmts53j"
 			]
 		},
 		"maxQueueSize": 8,
@@ -16,7 +16,7 @@
 			{
 				"id": "stone",
 				"title": "Stone",
-				"artwork": "stone-t1",
+				"artwork": "rdgbwmk5ornk307ygh9vpjsi",
 				"description": "Get the stone from stone deposit.",
 				"clockWeight": 1,
 				"default": true,

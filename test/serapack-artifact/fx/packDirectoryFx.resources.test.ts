@@ -40,7 +40,7 @@ describe("packDirectoryFx resource isolation", () => {
 				yield* fs.readFile(result.serapack),
 			);
 			const payload = yield* decodeTestSerapackPayloadFx(envelope.payload);
-			expect(payload.resources.find(({ id }) => id === "unused-theme")?.bytes).toEqual(
+			expect(payload.resources.find(({ uid }) => uid === "unused-theme")?.bytes).toEqual(
 				Uint8Array.from(musicOgg),
 			);
 		}).pipe(Effect.provide(NodeServices.layer)),
@@ -86,11 +86,11 @@ describe("packDirectoryFx resource isolation", () => {
 				const bytes = yield* fileSystem.readFile(result.serapack);
 				const envelope = yield* decodeTestSerapackEnvelopeFx(bytes);
 				const payload = yield* decodeTestSerapackPayloadFx(envelope.payload);
-				expect(payload.resources.find(({ id }) => id === "hero")?.bytes).toEqual(png);
-				expect(payload.resources.find(({ id }) => id === "theme")?.bytes).toEqual(
+				expect(payload.resources.find(({ uid }) => uid === "hero")?.bytes).toEqual(png);
+				expect(payload.resources.find(({ uid }) => uid === "theme")?.bytes).toEqual(
 					Uint8Array.from(musicOgg),
 				);
-				expect(payload.resources.find(({ id }) => id === "job-start")?.bytes).toEqual(
+				expect(payload.resources.find(({ uid }) => uid === "job-start")?.bytes).toEqual(
 					Uint8Array.from(sfxOgg),
 				);
 				const layout = yield* readSerapackFileLayoutFx(result.serapack);

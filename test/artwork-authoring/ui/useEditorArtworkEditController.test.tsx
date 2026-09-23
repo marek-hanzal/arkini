@@ -29,9 +29,9 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/artwork-authoring/ui/useEditorArtworkById", () => ({
-	useEditorArtworkById: (resourceId: string) =>
-		state.project.resources.find(({ id }) => id === resourceId),
+vi.mock("~/artwork-authoring/ui/useEditorArtworkByUid", () => ({
+	useEditorArtworkByUid: (resourceUid: string) =>
+		state.project.resources.find(({ uid }) => uid === resourceUid),
 }));
 
 vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
@@ -94,7 +94,7 @@ afterEach(async () => {
 });
 
 describe("useEditorArtworkEditController", () => {
-	it("rejects an existing artwork ID at the exact field before persistence", async () => {
+	it("rejects an empty title before persistence", async () => {
 		state.project = {
 			projectId: "project",
 			title: editorTestPayload.config.meta.title,
@@ -116,16 +116,16 @@ describe("useEditorArtworkEditController", () => {
 			const controller = useEditorArtworkEditController({
 				filter: "all",
 				query: "",
-				resourceId: "hero",
+				resourceUid: "hero",
 			});
 			return createElement(
 				"div",
 				null,
 				createElement(EditorTextControl, {
-					error: controller.artworkIdError,
-					label: "Artwork ID",
-					onChangeFn: controller.setNextIdFn,
-					value: controller.nextId,
+					error: controller.titleError,
+					label: "Title",
+					onChangeFn: controller.setTitleFn,
+					value: controller.title,
 				}),
 				createElement(
 					"button",
@@ -166,7 +166,7 @@ describe("useEditorArtworkEditController", () => {
 		)?.set;
 		if (valueSetter === undefined) throw new Error("Native input setter missing.");
 		await act(async () => {
-			valueSetter.call(input, "item-water");
+			valueSetter.call(input, "   ");
 			input.dispatchEvent(
 				new Event("input", {
 					bubbles: true,
@@ -186,9 +186,7 @@ describe("useEditorArtworkEditController", () => {
 		);
 
 		expect(input.dataset.uiInvalid).toBe("true");
-		expect(container.textContent).toContain(
-			"Artwork ID: Artwork ID item-water is already used by another artwork.",
-		);
+		expect(container.textContent).toContain("Title: Artwork title must not be empty.");
 		expect(document.activeElement).toBe(input);
 		expect(state.replaceResource).not.toHaveBeenCalled();
 		expect(state.navigate).not.toHaveBeenCalled();

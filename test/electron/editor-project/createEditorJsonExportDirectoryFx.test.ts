@@ -25,13 +25,13 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			yield* fileSystem.writeFileString(
 				`${source}/music/unresolved-waltz.json`,
 				JSON.stringify({
-					name: "Dusty Plains",
+					title: "Dusty Plains",
 				}),
 			);
 			yield* fileSystem.writeFileString(
 				`${source}/sfx/job-start.json`,
 				JSON.stringify({
-					name: "Workshop Bell",
+					title: "Workshop Bell",
 				}),
 			);
 			yield* writeExportSourceExtrasFx(source);
@@ -54,17 +54,17 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			expect(firstProject.marker.revision).toBe(2);
 			expect(firstProject.resources).toContainEqual(
 				expect.objectContaining({
-					id: "unresolved-waltz",
+					uid: "unresolved-waltz",
 					type: "music",
-					name: "Dusty Plains",
+					title: "Dusty Plains",
 				}),
 			);
 			expect(yield* fileSystem.exists(`${first.root}/music/unresolved-waltz.ogg`)).toBe(true);
 			expect(firstProject.resources).toContainEqual(
 				expect.objectContaining({
-					id: "job-start",
+					uid: "job-start",
 					type: "sfx",
-					name: "Workshop Bell",
+					title: "Workshop Bell",
 				}),
 			);
 			expect(yield* fileSystem.exists(`${first.root}/sfx/job-start.ogg`)).toBe(true);

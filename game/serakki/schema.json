@@ -8,7 +8,7 @@
 			"$ref": "urn:serakki:schema:project#/$defs/ItemFileSchema"
 		},
 		{
-			"$ref": "urn:serakki:schema:project#/$defs/AudioResourceMetadataSchema"
+			"$ref": "urn:serakki:schema:project#/$defs/ResourceMetadataSchema"
 		}
 	],
 	"$id": "urn:serakki:schema:project",
@@ -1871,19 +1871,19 @@
 			"additionalProperties": false,
 			"description": "An ordinary item with optional production and Clock scheduling."
 		},
-		"AudioResourceMetadataSchema": {
+		"ResourceMetadataSchema": {
 			"type": "object",
 			"properties": {
-				"name": {
+				"title": {
 					"type": "string",
 					"minLength": 1
 				}
 			},
 			"required": [
-				"name"
+				"title"
 			],
 			"additionalProperties": false,
-			"description": "Editor-only display name for one Music or SFX resource."
+			"description": "Editor-only display title for one resource."
 		}
 	}
 }

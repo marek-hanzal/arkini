@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"ghost"
+				"l8fcutyu853b3qmfb8tnig91"
 			]
 		},
 		"units": {
@@ -52,7 +52,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "ghost",
+				"artwork": "l8fcutyu853b3qmfb8tnig91",
 				"description": "The ghost drifts somewhere else on the board.",
 				"clock": true,
 				"clockWeight": 1,

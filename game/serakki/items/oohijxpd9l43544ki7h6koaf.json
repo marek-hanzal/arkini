@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"explorer"
+				"u79x20w1h96ptfjkdcyv8ojp"
 			]
 		},
 		"maxQueueSize": 3,
@@ -16,7 +16,7 @@
 			{
 				"id": "explore-forest",
 				"title": "Explore Forest",
-				"artwork": "forest",
+				"artwork": "vh26v4kb2y915z79r4x5rlqs",
 				"description": "Search the nearby forest for wildlife. You may find something. Or nothing.",
 				"clockWeight": 1,
 				"default": true,

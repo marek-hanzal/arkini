@@ -55,18 +55,18 @@ const moveCellFn = (
 
 const BoardGridCellContent = ({
 	empty,
-	resourceIds,
+	resourceUids,
 }: {
 	readonly empty?: ReactNode;
-	readonly resourceIds: ItemSchema.Type["artwork"]["default"] | undefined;
+	readonly resourceUids: ItemSchema.Type["artwork"]["default"] | undefined;
 }) => (
 	<>
-		{resourceIds === undefined ? (
+		{resourceUids === undefined ? (
 			empty
 		) : (
 			<EditorItemThumbnail
 				className="absolute inset-[11%] size-[78%] border-0 bg-transparent"
-				resourceIds={resourceIds}
+				resourceUids={resourceUids}
 				size="sm"
 			/>
 		)}
@@ -165,7 +165,7 @@ const BoardGridSlot = ({
 	>
 		<BoardGridCellContent
 			empty={<Plus className="size-[15%] opacity-35" />}
-			resourceIds={item?.artwork.default}
+			resourceUids={item?.artwork.default}
 		/>
 	</button>
 );
@@ -238,7 +238,7 @@ const BoardGridSurface = ({
 						const className =
 							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center border-0 bg-transparent p-0 text-subtle shadow-none";
 						const content = (
-							<BoardGridCellContent resourceIds={item?.artwork.default} />
+							<BoardGridCellContent resourceUids={item?.artwork.default} />
 						);
 						return cell !== undefined &&
 							item !== undefined &&
@@ -311,14 +311,14 @@ const BoardGridDragPreview = ({
 	clientX,
 	clientY,
 	cellSize,
-	resourceIds,
+	resourceUids,
 	previewRef,
 }: {
 	readonly clientX: number;
 	readonly clientY: number;
 	readonly cellSize: number;
 	readonly previewRef: RefObject<HTMLDivElement | null>;
-	readonly resourceIds: ItemSchema.Type["artwork"]["default"];
+	readonly resourceUids: ItemSchema.Type["artwork"]["default"];
 }) => (
 	<div
 		className="pointer-events-none fixed top-0 left-0 z-[90] grid [container-type:inline-size] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"
@@ -330,7 +330,7 @@ const BoardGridDragPreview = ({
 			height: cellSize,
 		}}
 	>
-		<BoardGridCellContent resourceIds={resourceIds} />
+		<BoardGridCellContent resourceUids={resourceUids} />
 	</div>
 );
 
@@ -414,7 +414,7 @@ const BoardGridEdit = ({
 					clientY={dragVisual.clientY}
 					cellSize={dragVisual.cellSize}
 					previewRef={dragPreviewRef}
-					resourceIds={items[dragVisual.source.itemUid]?.artwork.default ?? []}
+					resourceUids={items[dragVisual.source.itemUid]?.artwork.default ?? []}
 				/>
 			)}
 		</>

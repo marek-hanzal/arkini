@@ -140,9 +140,9 @@ export const createFilesystemSerapackCatalogFx = Effect.fn("createFilesystemSera
 						provenance: installed.provenance,
 						config: installed.config,
 						resources: installed.resources.map((resource) => ({
-							id: resource.id,
+							uid: resource.uid,
 							type: resource.type,
-							url: `serakki://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${installed.contentHash}&resourceId=${encodeURIComponent(JSON.stringify(resource.id))}`,
+							url: `serakki://app/game/resource?packageId=${encodeURIComponent(JSON.stringify(packageId))}&contentHash=${installed.contentHash}&resourceUid=${encodeURIComponent(JSON.stringify(resource.uid))}`,
 						})),
 					} satisfies SerakkiElectronApi.SerapackLoadedFile;
 				});

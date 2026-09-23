@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"herders-guild"
+				"sfiecse95ohoctxsonulfpfa"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "chicken-farm-blueprint",
 				"title": "Chicken Farm Blueprint",
-				"artwork": "chicken-farm",
+				"artwork": "t00oswv00ifkupq0qr67cb53",
 				"description": "Draw plans for Chicken Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -132,7 +132,7 @@
 			{
 				"id": "pig-farm-blueprint",
 				"title": "Pig Farm Blueprint",
-				"artwork": "pig-farm",
+				"artwork": "mg241ly73avd22s3ncv4e5q9",
 				"description": "Draw plans for Pig Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -247,7 +247,7 @@
 			{
 				"id": "goose-farm-blueprint",
 				"title": "Goose Farm Blueprint",
-				"artwork": "goose-farm",
+				"artwork": "oxittviuc7021lcpe04kybb9",
 				"description": "Draw plans for Goose Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -362,7 +362,7 @@
 			{
 				"id": "sheep-farm-blueprint",
 				"title": "Sheep Farm Blueprint",
-				"artwork": "sheep-farm",
+				"artwork": "mrnd35l8q8ynnve32m7znypb",
 				"description": "Draw plans for Sheep Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -477,7 +477,7 @@
 			{
 				"id": "cow-farm-blueprint",
 				"title": "Cow Farm Blueprint",
-				"artwork": "cow-farm",
+				"artwork": "idjjruev1o20fc0k5r90nppr",
 				"description": "Draw plans for Cow Farm.",
 				"clockWeight": 1,
 				"default": false,
@@ -592,7 +592,7 @@
 			{
 				"id": "apiary-blueprint",
 				"title": "Apiary Blueprint",
-				"artwork": "apiary",
+				"artwork": "wvvpfewnw4oxnti4ljsn4w9o",
 				"description": "Draw plans for an Apiary once flower farming is established.",
 				"clockWeight": 1,
 				"default": false,

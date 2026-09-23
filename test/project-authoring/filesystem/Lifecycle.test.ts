@@ -50,14 +50,14 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(imported.resources).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					id: "theme",
+					uid: "theme",
 					type: "music",
-					name: "Theme",
+					title: "theme",
 				}),
 				expect.objectContaining({
-					id: "job-start",
+					uid: "job-start",
 					type: "sfx",
-					name: "Job Start",
+					title: "job-start",
 				}),
 			]),
 		);
@@ -67,7 +67,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(Object.values(imported.config.sfx?.events ?? {})).toContain("job-start");
 		const root = await Effect.runPromise(repository.readProjectRootFx(imported.projectId));
 		if (root === null) throw new Error("Imported project root missing.");
-		for (const [type, id, name, bytes] of [
+		for (const [type, id, , bytes] of [
 			[
 				"music",
 				"theme",
@@ -82,7 +82,7 @@ describe("filesystem Editor project lifecycle", () => {
 			],
 		] as const) {
 			expect(JSON.parse(await readFile(join(root, type, `${id}.json`), "utf8"))).toEqual({
-				name,
+				title: id,
 			});
 			expect(new Uint8Array(await readFile(join(root, type, `${id}.ogg`)))).toEqual(
 				Uint8Array.from(bytes),
@@ -110,14 +110,14 @@ describe("filesystem Editor project lifecycle", () => {
 				},
 			},
 		});
-		expect(imported.resources.map(({ id }) => id).sort()).toEqual([
+		expect(imported.resources.map(({ uid }) => uid).sort()).toEqual([
 			"asset-water",
 			"hero",
 		]);
 		const hero = await Effect.runPromise(
 			repository.readResourceLocationFx({
 				projectId: imported.projectId,
-				resourceId: "hero",
+				resourceUid: "hero",
 			}),
 		);
 		expect(hero).not.toBeNull();
@@ -154,7 +154,7 @@ describe("filesystem Editor project lifecycle", () => {
 					templates: [],
 					items: {},
 				},
-				resources: editorTestPayload.resources.filter(({ id }) => id === "hero"),
+				resources: editorTestPayload.resources.filter(({ uid }) => uid === "hero"),
 			}),
 		);
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));

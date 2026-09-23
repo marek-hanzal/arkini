@@ -42,14 +42,14 @@ afterEach(async () => {
 	vi.restoreAllMocks();
 });
 
-const UrlProbe = ({ resourceId }: { readonly resourceId: string }) =>
-	createElement("output", null, useResourceUrl(resourceId));
+const UrlProbe = ({ resourceUid }: { readonly resourceUid: string }) =>
+	createElement("output", null, useResourceUrl(resourceUid));
 
-const UrlMapProbe = ({ resourceIds }: { readonly resourceIds: ReadonlyArray<string> }) => {
+const UrlMapProbe = ({ resourceUids }: { readonly resourceUids: ReadonlyArray<string> }) => {
 	const stableIds = useMemo(
-		() => resourceIds,
+		() => resourceUids,
 		[
-			resourceIds,
+			resourceUids,
 		],
 	);
 	return createElement(
@@ -63,16 +63,17 @@ const UrlMapProbe = ({ resourceIds }: { readonly resourceIds: ReadonlyArray<stri
 	);
 };
 
-const resourceFn = (id: string, version = "1"): Project.Resource => ({
-	id,
+const resourceFn = (uid: string, version = "1"): Project.Resource => ({
+	uid,
+	title: uid,
 	version,
 	type: "artwork",
 	size: 1024,
 });
-const urlFn = (resourceId: string, version = "1", projectId = "project-one") =>
+const urlFn = (resourceUid: string, version = "1", projectId = "project-one") =>
 	readProjectResourceUrlFn({
 		projectId,
-		resourceId,
+		resourceUid,
 		version,
 	});
 
@@ -83,15 +84,15 @@ const mountFn = () => {
 	roots.push(root);
 	return {
 		container,
-		renderFn: (resourceIds: ReadonlyArray<string>) =>
+		renderFn: (resourceUids: ReadonlyArray<string>) =>
 			root.render(
 				createElement(
 					ProjectResourceUrlProvider,
 					null,
-					...resourceIds.map((resourceId) =>
+					...resourceUids.map((resourceUid) =>
 						createElement(UrlProbe, {
-							key: resourceId,
-							resourceId,
+							key: resourceUid,
+							resourceUid,
 						}),
 					),
 				),
@@ -167,7 +168,7 @@ describe("ProjectResourceUrlProvider", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		const resourceIds = [
+		const resourceUids = [
 			"hero",
 			"overlay",
 			"missing",
@@ -183,7 +184,7 @@ describe("ProjectResourceUrlProvider", () => {
 					ProjectResourceUrlProvider,
 					null,
 					createElement(UrlMapProbe, {
-						resourceIds,
+						resourceUids,
 					}),
 				),
 			);

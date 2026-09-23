@@ -8,7 +8,7 @@ export const NoteFileSchema = z
 	.object({
 		content: NoteContentSchema,
 		itemUids: NoteSchema.shape.itemUids.optional().default([]),
-		resourceIds: NoteSchema.shape.resourceIds.optional().default([]),
+		resourceUids: NoteSchema.shape.resourceUids.optional().default([]),
 		createdAtMs: NonNegativeIntegerSchema,
 		updatedAtMs: NonNegativeIntegerSchema,
 	})

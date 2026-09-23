@@ -94,7 +94,7 @@ export const Detail = ({
 					}
 					title={
 						<ItemHeaderTitle
-							resourceIds={item.artwork.default}
+							resourceUids={item.artwork.default}
 							title={item.title || item.uid}
 						/>
 					}

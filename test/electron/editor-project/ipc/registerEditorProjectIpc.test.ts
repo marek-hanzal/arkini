@@ -201,10 +201,12 @@ describe("registerEditorProjectIpcFx", () => {
 			config: editorTestPayload.config,
 		};
 		const replaceResourceRequest = {
-			...replaceConfigRequest,
-			currentId: "hero",
+			projectId: "project-one",
+			expectedRevision: 0,
+			resourceUid: "hero",
 			resource: {
-				id: "hero",
+				uid: "hero",
+				title: "Hero",
 				type: "image",
 			},
 		};
@@ -222,12 +224,12 @@ describe("registerEditorProjectIpcFx", () => {
 		const deleteResourceRequest = {
 			expectedRevision: 0,
 			projectId: "project-one",
-			resourceId: "unused",
+			resourceUid: "unused",
 		};
 		const optimizeResourcesRequest = {
 			expectedRevision: 0,
 			projectId: "project-one",
-			resourceIds: [
+			resourceUids: [
 				"hero",
 				"item-water",
 			],
@@ -346,7 +348,7 @@ describe("registerEditorProjectIpcFx", () => {
 		);
 		const metadataRequest = {
 			...deleteResourceRequest,
-			name: "Dusty Plains",
+			title: "Dusty Plains",
 		};
 		await invoke(
 			SerakkiElectronApi.channels.editorProjectSaveResourceMetadata,
@@ -369,7 +371,7 @@ describe("registerEditorProjectIpcFx", () => {
 			}),
 			resources: [
 				expect.objectContaining({
-					id: "hero",
+					uid: expect.any(String),
 					type: "image",
 					bytes: expect.any(Uint8Array),
 				}),
@@ -561,7 +563,7 @@ describe("registerEditorProjectIpcFx", () => {
 					});
 					return {
 						project,
-						resourceIds: [],
+						resourceUids: [],
 					};
 				}),
 			);

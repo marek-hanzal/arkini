@@ -35,9 +35,9 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/artwork-authoring/ui/useEditorArtworkById", () => ({
-	useEditorArtworkById: (resourceId: string) =>
-		state.project.resources.find(({ id }) => id === resourceId),
+vi.mock("~/artwork-authoring/ui/useEditorArtworkByUid", () => ({
+	useEditorArtworkByUid: (resourceUid: string) =>
+		state.project.resources.find(({ uid }) => uid === resourceUid),
 }));
 
 vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
@@ -128,7 +128,7 @@ const mountEditor = async () => {
 		controller = useEditorArtworkEditController({
 			filter: "all",
 			query: "",
-			resourceId: "item-water",
+			resourceUid: "item-water",
 		});
 		return null;
 	};
@@ -149,6 +149,16 @@ const mountEditor = async () => {
 	);
 	return {
 		read: () => controller,
+		rerender: () =>
+			root.render(
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: registry,
+					},
+					createElement(Probe),
+				),
+			),
 		unmount: () => root.render(null),
 	};
 };
@@ -209,20 +219,19 @@ it.each([
 	},
 );
 
-it("keeps an admitted rename fixed until its canonical identity is published", async () => {
+it("keeps an admitted title edit fixed while preserving identity", async () => {
 	const editor = await mountEditor();
 	let finish!: () => void;
-	state.replaceResource.mockImplementation(({ config, currentId, resource }) =>
+	state.replaceResource.mockImplementation(({ resourceUid, resource }) =>
 		EffectModule.promise(
 			() =>
 				new Promise<Project>((resolve) => {
 					finish = () => {
 						state.project = {
 							...state.project,
-							config,
 							revision: 4,
 							resources: state.project.resources.map((candidate) =>
-								candidate.id === currentId ? resource : candidate,
+								candidate.uid === resourceUid ? resource : candidate,
 							),
 						};
 						resolve(state.project);
@@ -230,24 +239,24 @@ it("keeps an admitted rename fixed until its canonical identity is published", a
 				}),
 		),
 	);
-	await act(async () => editor.read().setNextIdFn("new-item-water"));
+	await act(async () => editor.read().setTitleFn("new-item-water"));
 	let saving!: Promise<boolean>;
 	await act(async () => {
 		saving = editor.read().saveFn();
 	});
 	await vi.waitFor(() => expect(state.replaceResource).toHaveBeenCalledOnce());
-	await act(async () => editor.read().setNextIdFn("another-item-water"));
-	expect(editor.read().nextId).toBe("new-item-water");
+	await act(async () => editor.read().setTitleFn("another-item-water"));
+	expect(editor.read().title).toBe("new-item-water");
 	await act(async () => {
 		finish();
 		expect(await saving).toBe(true);
 	});
-	expect(state.project.resources.some(({ id }) => id === "item-water")).toBe(false);
+	expect(state.project.resources.some(({ uid }) => uid === "item-water")).toBe(true);
 	expect(state.navigate).toHaveBeenCalledWith(
 		expect.objectContaining({
 			params: {
 				projectId: "project",
-				resourceId: "new-item-water",
+				resourceUid: "item-water",
 			},
 		}),
 	);
@@ -279,7 +288,7 @@ it.each([
 				})
 			: EffectModule.promise(failWrite),
 	);
-	await act(async () => editor.read().setNextIdFn("new-item-water"));
+	await act(async () => editor.read().setTitleFn("new-item-water"));
 	let saving!: Promise<boolean>;
 	await act(async () => {
 		saving = editor.read().saveFn();
@@ -293,7 +302,7 @@ it.each([
 	if (kind === "typed") {
 		await completion;
 		expect(editor.read().error).toBeUndefined();
-		expect(editor.read().nextId).toBe("item-water");
+		expect(editor.read().title).toBe("item-water");
 		expect(editor.read().dirty).toBe(false);
 	} else {
 		await expect(completion).rejects.toHaveProperty("reasons.0._tag", "Die");
@@ -304,7 +313,7 @@ it.each([
 it("discards the artwork draft before navigating without persisting a rename or image", async () => {
 	const editor = await mountEditor();
 	await act(async () => {
-		editor.read().setNextIdFn("renamed-item-water");
+		editor.read().setTitleFn("renamed-item-water");
 		editor.read().setFileFn(
 			new File([], "replacement.png", {
 				type: "image/png",
@@ -314,15 +323,15 @@ it("discards the artwork draft before navigating without persisting a rename or 
 	expect(editor.read().dirty).toBe(true);
 	await act(async () => editor.read().discardFn());
 	expect(editor.read().dirty).toBe(false);
-	expect(editor.read().nextId).toBe("item-water");
+	expect(editor.read().title).toBe("item-water");
 	expect(editor.read().file).toBeUndefined();
 	expect(state.session.isDirtyFn()).toBe(false);
 	expect(state.replaceResource).not.toHaveBeenCalled();
 	expect(state.navigate).toHaveBeenCalledWith({
-		to: "/editor/$projectId/artwork/$resourceId/detail/overview",
+		to: "/editor/$projectId/artwork/$resourceUid/detail/overview",
 		params: {
 			projectId: "project",
-			resourceId: "item-water",
+			resourceUid: "item-water",
 		},
 		search: {
 			filter: "all",
@@ -330,4 +339,37 @@ it("discards the artwork draft before navigating without persisting a rename or 
 		},
 		replace: true,
 	});
+});
+
+it("follows refreshed titles while pristine and discards a draft to the latest canonical title", async () => {
+	const editor = await mountEditor();
+	const refreshTitle = (title: string) => {
+		state.project = {
+			...state.project,
+			resources: state.project.resources.map((resource) =>
+				resource.uid === "item-water"
+					? {
+							...resource,
+							title,
+						}
+					: resource,
+			),
+		};
+	};
+	await act(async () => {
+		refreshTitle("Fresh water");
+		editor.rerender();
+	});
+	expect(editor.read().title).toBe("Fresh water");
+	expect(editor.read().dirty).toBe(false);
+	await act(async () => editor.read().setTitleFn("Draft"));
+	await act(async () => {
+		refreshTitle("Latest water");
+		editor.rerender();
+	});
+	expect(editor.read().title).toBe("Draft");
+	await act(async () => editor.read().discardFn());
+	expect(editor.read().title).toBe("Latest water");
+	expect(editor.read().dirty).toBe(false);
+	expect(state.replaceResource).not.toHaveBeenCalled();
 });

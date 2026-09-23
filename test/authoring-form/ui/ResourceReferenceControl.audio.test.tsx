@@ -8,7 +8,7 @@ import { ResourceReferenceControl } from "~/authoring-form/ui/ResourceAutocomple
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 const state = vi.hoisted(() => ({
-	useResourceUrlFn: vi.fn((_resourceId?: string) => undefined),
+	useResourceUrlFn: vi.fn((_resourceUid?: string) => undefined),
 }));
 vi.mock("~/authoring-session/ui/ResourceUrlSession", () => ({
 	useResourceUrl: state.useResourceUrlFn,
@@ -17,16 +17,16 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		resources: [
 			{
-				id: "track-one",
+				uid: "track-one",
 				type: "music",
-				name: "Evening",
+				title: "Evening",
 				size: 12,
 				version: "v1",
 			},
 			{
-				id: "track-two",
+				uid: "track-two",
 				type: "music",
-				name: "Evening",
+				title: "Evening",
 				size: 12,
 				version: "v2",
 			},

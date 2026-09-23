@@ -118,7 +118,7 @@ const RuleOption = ({ label, rule }: { readonly label: string; readonly rule: Dr
 				<EditorItemThumbnail
 					key={itemUid}
 					className="rounded-md"
-					resourceIds={
+					resourceUids={
 						project.config.items[itemUid]?.artwork.default ?? [
 							"",
 						]
@@ -153,7 +153,7 @@ const ConditionOption = ({ label, when }: { readonly label: string; readonly whe
 			{itemUid.length === 0 ? null : (
 				<EditorItemThumbnail
 					className="rounded-md"
-					resourceIds={
+					resourceUids={
 						project.config.items[itemUid]?.artwork.default ?? [
 							"",
 						]

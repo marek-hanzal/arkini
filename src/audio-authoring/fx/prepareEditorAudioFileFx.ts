@@ -6,17 +6,17 @@ import { transcodeAudioResourceFileFx } from "~/game-config-resource/fx/transcod
 
 /** Produces canonical Ogg/Opus while trimming only detected silent edges through FFmpeg. */
 export const prepareEditorAudioFileFx = Effect.fn("prepareEditorAudioFileFx")(function* ({
-	id,
+	uid,
 	source,
 	target,
 }: {
-	readonly id: string;
+	readonly uid: string;
 	readonly source: string;
 	readonly target: string;
 }) {
-	const canonical = yield* validateOggOpusFileFx(source, id).pipe(Effect.option);
+	const canonical = yield* validateOggOpusFileFx(source, uid).pipe(Effect.option);
 	if (Option.isSome(canonical)) {
-		const optimized = yield* optimizeOggOpusResourceFileFx(source, target, id);
+		const optimized = yield* optimizeOggOpusResourceFileFx(source, target, uid);
 		return {
 			path: optimized.path,
 			size: optimized.optimizedBytes,
@@ -29,6 +29,6 @@ export const prepareEditorAudioFileFx = Effect.fn("prepareEditorAudioFileFx")(fu
 	});
 	return {
 		path: target,
-		size: yield* validateOggOpusFileFx(target, id),
+		size: yield* validateOggOpusFileFx(target, uid),
 	};
 });

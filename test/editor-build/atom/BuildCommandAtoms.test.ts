@@ -63,7 +63,7 @@ describe("BuildCommandAtoms", () => {
 						"resources",
 						"unused-asset",
 					],
-					resourceId: "unused-asset",
+					resourceUid: "unused-asset",
 				},
 			],
 		});

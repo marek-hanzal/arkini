@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"growers-guild"
+				"so7r094glj6wfe6yoveiclrg",
+				"g12ykuh5vwadvkoy3cs9r6zd"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "growers-guild",
 				"title": "Build Growers Guild",
-				"artwork": "growers-guild",
+				"artwork": "g12ykuh5vwadvkoy3cs9r6zd",
 				"description": "Build Growers Guild.",
 				"clockWeight": 1,
 				"default": true,

@@ -9,7 +9,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"goose-farm"
+				"oxittviuc7021lcpe04kybb9"
 			]
 		},
 		"maxQueueSize": 4,
@@ -17,7 +17,7 @@
 			{
 				"id": "goose",
 				"title": "Goose",
-				"artwork": "goose",
+				"artwork": "c7nyplvmdbrgzcpmv5dx4xgt",
 				"description": "Feed and water a goose before releasing it from a nearby populated pen.",
 				"clockWeight": 1,
 				"default": true,
@@ -110,7 +110,7 @@
 			{
 				"id": "empty-goose-pen",
 				"title": "Prepare Goose Pen",
-				"artwork": "empty-goose-pen",
+				"artwork": "iemj1plgthrak61dsn4yrrxx",
 				"description": "Prepare a new empty enclosure using 2 planks.",
 				"clockWeight": 1,
 				"default": false,
@@ -164,7 +164,7 @@
 			{
 				"id": "blueprint",
 				"title": "Goose Farm Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Goose Farm.",
 				"clockWeight": 1,
 				"default": false,

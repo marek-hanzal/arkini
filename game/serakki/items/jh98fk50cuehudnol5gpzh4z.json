@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"grass-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"wrmhxvug81bpye6nu2z29v92"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "grass-farm",
 				"title": "Build Grass Farm",
-				"artwork": "grass-farm",
+				"artwork": "wrmhxvug81bpye6nu2z29v92",
 				"description": "Build Grass Farm.",
 				"clockWeight": 1,
 				"default": true,

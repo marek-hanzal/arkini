@@ -81,7 +81,7 @@ const writeJsonFileFx = Effect.fn("packDirectoryFx.writeJsonFileFx")(
 );
 
 interface PackedResourceFile {
-	readonly id: string;
+	readonly uid: string;
 	readonly type: ResourceTypeSchema.Type;
 	readonly path: string;
 	readonly length: number;
@@ -174,13 +174,13 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		const resourcesRoot = path.join(temporary, "resources");
 		yield* fileSystem.makeDirectory(resourcesRoot);
 		const resources: PackedResourceFile[] = [];
-		const musicIds = new Set(
+		const musicUids = new Set(
 			readGameResourceUsagesFn(config)
 				.filter((usage) => usage.resourceType === "music")
-				.map((usage) => usage.resourceId),
+				.map((usage) => usage.resourceUid),
 		);
 		const packedResources = compilation.resources.filter(
-			(resource) => resource.type !== "music" || musicIds.has(resource.id),
+			(resource) => resource.type !== "music" || musicUids.has(resource.uid),
 		);
 		for (let index = 0; index < packedResources.length; index += 1) {
 			const resource = packedResources[index];
@@ -189,12 +189,12 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 			if (resource.type !== "artwork") yield* fileSystem.copyFile(resource.path, target);
 			const length =
 				resource.type === "artwork"
-					? yield* normalizeArtworkPngFileFx(resource.path, target, resource.id)
+					? yield* normalizeArtworkPngFileFx(resource.path, target, resource.uid)
 					: resource.type === "image"
-						? yield* validatePngResourceFileFx(target, resource.id)
-						: yield* validateOggOpusFileFx(target, resource.id);
+						? yield* validatePngResourceFileFx(target, resource.uid)
+						: yield* validateOggOpusFileFx(target, resource.uid);
 			resources.push({
-				id: resource.id,
+				uid: resource.uid,
 				type: resource.type,
 				path: target,
 				length,
@@ -214,8 +214,8 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 			serakki: SerakkiVersionSchema.parse(SerakkiAppVersion),
 			projectRevision: projectManifest.revision,
 			length: configLength,
-			resources: resources.map(({ id, type, length }) => ({
-				id,
+			resources: resources.map(({ uid, type, length }) => ({
+				uid,
 				type,
 				length,
 			})),

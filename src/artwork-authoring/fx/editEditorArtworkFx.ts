@@ -4,30 +4,32 @@ import { Effect } from "effect";
 import { ProjectRepository } from "~/project-authoring/service/ProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { validateEditorArtworkFileFx } from "~/artwork-authoring/fx/validateEditorArtworkFileFx";
-import { IdSchema } from "~/game-value/schema/IdSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
-import { renameGameResourceFx } from "~/game-config-resource/fx/renameGameResourceFx";
 
 interface EditEditorArtworkProps {
-	readonly currentId: string;
+	readonly title: string;
 	readonly file?: File;
 	readonly projectId: string;
-	readonly resourceId: string;
+	readonly resourceUid: string;
 }
 
-/** Atomically renames one resource, its references, and optionally its PNG bytes. */
+/** Updates artwork title and optional PNG bytes while preserving its UID. */
 export const editEditorArtworkFx = Effect.fn("editEditorArtworkFx")(function* ({
-	currentId,
+	title: candidateTitle,
 	file,
 	projectId,
-	resourceId: candidateId,
+	resourceUid,
 }: EditEditorArtworkProps) {
-	const resourceId = yield* Effect.try({
-		try: () => IdSchema.parse(candidateId.trim()),
+	const { title } = yield* Effect.try({
+		try: () =>
+			ResourceMetadataSchema.parse({
+				title: candidateTitle,
+			}),
 		catch: (cause) =>
 			new ProjectOperationError({
-				reason: "invalid-resource-id",
-				message: "Artwork ID must not be empty.",
+				reason: "invalid-resource-title",
+				message: "Artwork title must not be empty.",
 				cause,
 			}),
 	});
@@ -39,12 +41,12 @@ export const editEditorArtworkFx = Effect.fn("editEditorArtworkFx")(function* ({
 		Effect.uninterruptible(
 			Effect.gen(function* () {
 				const project = yield* repository.readProjectFx(projectId);
-				const existing = project?.resources.find(({ id }) => id === currentId);
+				const existing = project?.resources.find(({ uid }) => uid === resourceUid);
 				if (project === null || existing?.type !== "artwork") {
 					return yield* Effect.fail(
 						new ProjectOperationError({
 							reason: "invalid-artwork",
-							message: `Artwork ${currentId} no longer exists.`,
+							message: `Artwork ${resourceUid} no longer exists.`,
 						}),
 					);
 				}
@@ -52,20 +54,16 @@ export const editEditorArtworkFx = Effect.fn("editEditorArtworkFx")(function* ({
 					file === undefined
 						? {
 								type: existing.type,
-								id: resourceId,
+								uid: resourceUid,
+								title,
 							}
 						: {
-								...(yield* validateEditorArtworkFileFx(file, resourceId)),
+								...(yield* validateEditorArtworkFileFx(file, resourceUid)),
 								path: window.serakki.file.readPathFn(file),
+								title,
 							};
-				const config = yield* renameGameResourceFx({
-					config: project.config,
-					from: currentId,
-					to: resourceId,
-				});
 				const saved = yield* repository.replaceResourceFx({
-					config,
-					currentId,
+					resourceUid,
 					expectedRevision: project.revision,
 					projectId,
 					resource,

@@ -2,14 +2,14 @@ import { z } from "zod";
 
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { ItemFileSchema } from "~/game-config-source/schema/ItemFileSchema";
-import { AudioResourceMetadataSchema } from "~/audio-authoring/schema/AudioResourceMetadataSchema";
+import { ResourceMetadataSchema } from "~/game-config-resource/schema/ResourceMetadataSchema";
 
 /** One fragment accepted by the portable game-project JSON Schema. */
 export const ProjectSchema = z
 	.union([
 		GameFileSchema,
 		ItemFileSchema,
-		AudioResourceMetadataSchema,
+		ResourceMetadataSchema,
 	])
 	.meta({
 		$id: "urn:serakki:schema:project",

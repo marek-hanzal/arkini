@@ -30,22 +30,22 @@ it("creates nonempty metadata for separator-only IDs through project creation an
 				resources: [
 					...editorTestPayload.resources,
 					{
-						id: "---",
+						uid: "---",
 						type: "sfx",
 						bytes: createTestOggOpusBytesFn(),
 					},
 				],
 			}),
 		);
-		expect(sourceProject.resources.find(({ id }) => id === "---")).toMatchObject({
-			name: "---",
+		expect(sourceProject.resources.find(({ uid }) => uid === "---")).toMatchObject({
+			title: "---",
 		});
 		const named = await Effect.runPromise(
 			sourceRepository.saveResourceMetadataFx({
 				projectId: sourceProject.projectId,
 				expectedRevision: sourceProject.revision,
-				resourceId: "---",
-				name: "Authored source name",
+				resourceUid: "---",
+				title: "Authored source name",
 			}),
 		);
 		const sourceRoot = await Effect.runPromise(
@@ -61,8 +61,8 @@ it("creates nonempty metadata for separator-only IDs through project creation an
 		const importedProject = await Effect.runPromise(
 			targetRepository.importSerapackFileFx(packed.serapack),
 		);
-		expect(importedProject.resources.find(({ id }) => id === "---")).toMatchObject({
-			name: "---",
+		expect(importedProject.resources.find(({ uid }) => uid === "---")).toMatchObject({
+			title: "---",
 			type: "sfx",
 		});
 		expect(importedProject.config.sfx?.events["job:started"]).toBe("---");
@@ -87,11 +87,11 @@ it("creates nonempty metadata for separator-only IDs through project creation an
 				},
 			}),
 		);
-		expect(importedResource.resourceIds).toEqual([
+		expect(importedResource.resourceUids).toEqual([
 			"---",
 		]);
-		expect(importedResource.project.resources.find(({ id }) => id === "---")).toMatchObject({
-			name: "---",
+		expect(importedResource.project.resources.find(({ uid }) => uid === "---")).toMatchObject({
+			title: "---",
 			type: "sfx",
 		});
 		expect(

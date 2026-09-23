@@ -90,7 +90,7 @@ describe("EditorArtworkUsageRow", () => {
 				"resources",
 				"hero",
 			],
-			resourceId: "hero",
+			resourceUid: "hero",
 			resourceType: "image",
 			roleLabel: "Hero",
 		});
@@ -107,7 +107,7 @@ describe("EditorArtworkUsageRow", () => {
 				"resources",
 				"avatar-03",
 			],
-			resourceId: "avatar-three",
+			resourceUid: "avatar-three",
 			resourceType: "image",
 			roleLabel: "Avatar 3",
 		});

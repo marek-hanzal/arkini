@@ -27,7 +27,7 @@ export namespace importEditorResourcesFx {
 const resultSchema = z
 	.object({
 		project: ProjectPayloadSchema,
-		resourceIds: IdSchema.array(),
+		resourceUids: IdSchema.array(),
 	})
 	.strict();
 

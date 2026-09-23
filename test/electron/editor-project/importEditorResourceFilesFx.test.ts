@@ -69,7 +69,7 @@ describe("importEditorResourceFilesFx", () => {
 				}),
 			),
 		).resolves.toMatchObject({
-			resourceIds: [
+			resourceUids: [
 				expect.any(String),
 			],
 		});
@@ -77,8 +77,8 @@ describe("importEditorResourceFilesFx", () => {
 			projectId: "project-one",
 			resources: [
 				expect.objectContaining({
-					id: expect.any(String),
-					name: "Opening Theme",
+					uid: expect.any(String),
+					title: "Opening Theme",
 					path: musicPath,
 					size: musicBytes.byteLength,
 					type: "music",
@@ -106,7 +106,7 @@ describe("importEditorResourceFilesFx", () => {
 				}),
 			),
 		).resolves.toMatchObject({
-			resourceIds: [
+			resourceUids: [
 				expect.any(String),
 			],
 		});
@@ -114,8 +114,8 @@ describe("importEditorResourceFilesFx", () => {
 			projectId: "project-one",
 			resources: [
 				expect.objectContaining({
-					id: expect.any(String),
-					name: "Job Start",
+					uid: expect.any(String),
+					title: "Job Start",
 					path: sfxPath,
 					size: musicBytes.byteLength,
 					type: "sfx",
@@ -141,7 +141,7 @@ describe("importEditorResourceFilesFx", () => {
 		expect(optimizeOggOpusResourceFileFxMock).toHaveBeenCalledTimes(3);
 		const importedIds = vi
 			.mocked(repository.upsertResourceFilesFx)
-			.mock.calls.map(([request]) => request.resources[0]?.id);
+			.mock.calls.map(([request]) => request.resources[0]?.uid);
 		expect(new Set(importedIds).size).toBe(3);
 		expect(importedIds).not.toContain("opening-theme");
 		expect(importedIds).not.toContain("job-start");
@@ -184,20 +184,45 @@ describe("importEditorResourceFilesFx", () => {
 				}),
 			),
 		).resolves.toMatchObject({
-			resourceIds: [
-				"hero",
+			resourceUids: [
+				expect.any(String),
 			],
 		});
 		expect(repository.upsertResourceFilesFx).toHaveBeenCalledWith({
 			projectId: "project-one",
 			resources: [
 				expect.objectContaining({
-					id: "hero",
+					uid: expect.any(String),
 					path: imagePath,
 					type: "image",
 				}),
 			],
 		});
+
+		await Effect.runPromise(
+			importEditorResourceFilesFx({
+				repository,
+				request: {
+					projectId: "project-one",
+					source: "files",
+					type: "image",
+					files: [
+						{
+							name: "Hero.png",
+							path: imagePath,
+						},
+					],
+				},
+			}),
+		);
+		const imported = vi
+			.mocked(repository.upsertResourceFilesFx)
+			.mock.calls.map(([request]) => request.resources[0]!);
+		expect(new Set(imported.map(({ uid }) => uid)).size).toBe(2);
+		expect(imported.map(({ title }) => title)).toEqual([
+			"Hero",
+			"Hero",
+		]);
 
 		await expect(
 			Effect.runPromise(
@@ -256,7 +281,7 @@ describe("importEditorResourceFilesFx", () => {
 			}),
 		);
 
-		expect(result.resourceIds).toEqual([
+		expect(result.resourceUids).toEqual([
 			"asset-water",
 		]);
 		expect(upsertResourceFilesFx).toHaveBeenCalledOnce();

@@ -9,8 +9,8 @@ export namespace useNotesController {
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly requiredCurrentItemUid?: string;
 		readonly defaultItemUids: ReadonlyArray<string>;
-		readonly requiredCurrentResourceId?: string;
-		readonly defaultResourceIds: ReadonlyArray<string>;
+		readonly requiredCurrentResourceUid?: string;
+		readonly defaultResourceUids: ReadonlyArray<string>;
 	}
 	export interface Output {
 		readonly cancelEditFn: () => void;
@@ -19,22 +19,22 @@ export namespace useNotesController {
 		readonly createFn: () => void;
 		readonly editContent: string;
 		readonly editItemUids: ReadonlyArray<string>;
-		readonly editResourceIds: ReadonlyArray<string>;
+		readonly editResourceUids: ReadonlyArray<string>;
 		readonly editingNoteId?: string;
 		readonly error?: unknown;
 		readonly loaded: boolean;
 		readonly loading: boolean;
 		readonly newContent: string;
 		readonly newItemUids: ReadonlyArray<string>;
-		readonly newResourceIds: ReadonlyArray<string>;
+		readonly newResourceUids: ReadonlyArray<string>;
 		readonly notes: ReadonlyArray<NoteSchema.Type>;
 		readonly pending: boolean;
 		readonly removeFn: (note: NoteSchema.Type) => void;
 		readonly retryFn: () => void;
 		readonly saveEditFn: () => void;
-		readonly setEditResourceIdsFn: (resourceIds: ReadonlyArray<string>) => void;
-		readonly setNewResourceIdsFn: (resourceIds: ReadonlyArray<string>) => void;
-		readonly unlinkResourceFn: (note: NoteSchema.Type, resourceId: string) => void;
+		readonly setEditResourceUidsFn: (resourceUids: ReadonlyArray<string>) => void;
+		readonly setNewResourceUidsFn: (resourceUids: ReadonlyArray<string>) => void;
+		readonly unlinkResourceFn: (note: NoteSchema.Type, resourceUid: string) => void;
 		readonly setEditItemUidsFn: (itemUids: ReadonlyArray<string>) => void;
 		readonly setNewItemUidsFn: (itemUids: ReadonlyArray<string>) => void;
 		readonly unlinkFn: (note: NoteSchema.Type, itemUid: string) => void;
@@ -49,12 +49,12 @@ export const useNotesController = ({
 	notes,
 	requiredCurrentItemUid,
 	defaultItemUids,
-	requiredCurrentResourceId,
-	defaultResourceIds,
+	requiredCurrentResourceUid,
+	defaultResourceUids,
 }: useNotesController.Props): useNotesController.Output => {
 	const { error, loaded, loading, pending, runFn } = collection;
-	const [newResourceIds, setNewResourceIdsFn] = useState(defaultResourceIds);
-	const [editResourceIds, setEditResourceIdsFn] = useState<ReadonlyArray<string>>([]);
+	const [newResourceUids, setNewResourceUidsFn] = useState(defaultResourceUids);
+	const [editResourceUids, setEditResourceUidsFn] = useState<ReadonlyArray<string>>([]);
 	const [newItemUids, setNewItemUidsFn] = useState(defaultItemUids);
 	const [editItemUids, setEditItemUidsFn] = useState<ReadonlyArray<string>>([]);
 	const [editContent, setEditContentFn] = useState("");
@@ -85,13 +85,13 @@ export const useNotesController = ({
 		void runFn({
 			action: "create",
 			content: newContent,
-			resourceIds: [
+			resourceUids: [
 				...new Set(
-					requiredCurrentResourceId === undefined
-						? newResourceIds
+					requiredCurrentResourceUid === undefined
+						? newResourceUids
 						: [
-								...newResourceIds,
-								requiredCurrentResourceId,
+								...newResourceUids,
+								requiredCurrentResourceUid,
 							],
 				),
 			],
@@ -109,7 +109,7 @@ export const useNotesController = ({
 			.then(() => {
 				setNewContentFn("");
 				setNewItemUidsFn(defaultItemUids);
-				setNewResourceIdsFn(defaultResourceIds);
+				setNewResourceUidsFn(defaultResourceUids);
 			})
 			.catch(() => undefined);
 	};
@@ -120,7 +120,7 @@ export const useNotesController = ({
 		});
 		setEditContentFn(note.content);
 		setEditItemUidsFn(note.itemUids);
-		setEditResourceIdsFn(note.resourceIds);
+		setEditResourceUidsFn(note.resourceUids);
 	};
 	const cancelEditFn = () => {
 		if (pending) return;
@@ -133,8 +133,8 @@ export const useNotesController = ({
 			action: "update",
 			noteId: editingNote.noteId,
 			content: editContent,
-			resourceIds: [
-				...editResourceIds,
+			resourceUids: [
+				...editResourceUids,
 			],
 			itemUids: [
 				...editItemUids,
@@ -161,19 +161,19 @@ export const useNotesController = ({
 			action: "update",
 			noteId: note.noteId,
 			content: note.content,
-			resourceIds: note.resourceIds,
+			resourceUids: note.resourceUids,
 			itemUids: note.itemUids.filter((linkedUid) => linkedUid !== itemUid),
 			expectedUpdatedAtMs: note.updatedAtMs,
 		}).catch(() => undefined);
 	};
-	const unlinkResourceFn = (note: NoteSchema.Type, resourceId: string) => {
+	const unlinkResourceFn = (note: NoteSchema.Type, resourceUid: string) => {
 		if (pending || editingNote !== undefined) return;
 		void runFn({
 			action: "update",
 			noteId: note.noteId,
 			content: note.content,
 			itemUids: note.itemUids,
-			resourceIds: note.resourceIds.filter((linkedId) => linkedId !== resourceId),
+			resourceUids: note.resourceUids.filter((linkedId) => linkedId !== resourceUid),
 			expectedUpdatedAtMs: note.updatedAtMs,
 		}).catch(() => undefined);
 	};
@@ -191,7 +191,7 @@ export const useNotesController = ({
 		createFn,
 		editContent,
 		editItemUids,
-		editResourceIds,
+		editResourceUids,
 		...(editingNoteId === undefined
 			? {}
 			: {
@@ -206,7 +206,7 @@ export const useNotesController = ({
 		loaded,
 		newContent,
 		newItemUids,
-		newResourceIds,
+		newResourceUids,
 		notes,
 		pending,
 		removeFn,
@@ -214,8 +214,8 @@ export const useNotesController = ({
 		saveEditFn,
 		setEditContentFn,
 		setEditItemUidsFn,
-		setEditResourceIdsFn,
-		setNewResourceIdsFn,
+		setEditResourceUidsFn,
+		setNewResourceUidsFn,
 		unlinkResourceFn,
 		setNewItemUidsFn,
 		unlinkFn,

@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"british-shorthair"
+				"nk2pbyuux3vzrmimvcwy92wk"
 			]
 		},
 		"units": {
@@ -197,7 +197,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "british-shorthair",
+				"artwork": "nk2pbyuux3vzrmimvcwy92wk",
 				"description": "Wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 8,
@@ -367,7 +367,7 @@
 			{
 				"id": "disease-exposure",
 				"title": "Disease Exposure",
-				"artwork": "disease",
+				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 8,
@@ -437,7 +437,7 @@
 			{
 				"id": "plague-exposure",
 				"title": "Plague Exposure",
-				"artwork": "plague",
+				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 16,
@@ -507,7 +507,7 @@
 			{
 				"id": "cuddle-kitten",
 				"title": "Cuddle Kitten",
-				"artwork": "british-shorthair-cuddling-kitten",
+				"artwork": "ecd9h52614atfopdxdtmtfvo",
 				"description": "The cat decides to cuddle with a kitten.",
 				"clock": true,
 				"clockWeight": 3,
@@ -591,7 +591,7 @@
 			{
 				"id": "fight-cat",
 				"title": "Territorial Fight",
-				"artwork": "fighting-british-shorthairs",
+				"artwork": "qoy3shsr31m9pndqfcvkejs8",
 				"description": "Two adult cats decide that peaceful coexistence was overrated.",
 				"clock": true,
 				"clockWeight": 2,

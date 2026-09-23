@@ -24,7 +24,7 @@ describe("repository note item relationships", () => {
 				itemUids: [
 					"water",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		expect(
@@ -90,7 +90,7 @@ describe("repository note item relationships", () => {
 				projectId: project.projectId,
 				content: "Preserve",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		for (const itemUids of [
@@ -108,7 +108,7 @@ describe("repository note item relationships", () => {
 						projectId: project.projectId,
 						content: "Rejected",
 						itemUids,
-						resourceIds: [],
+						resourceUids: [],
 					}),
 				),
 			).rejects.toBeDefined();
@@ -160,7 +160,7 @@ describe("repository note item relationships", () => {
 					"water",
 					"oil",
 				],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		const global = await Effect.runPromise(
@@ -168,7 +168,7 @@ describe("repository note item relationships", () => {
 				projectId: project.projectId,
 				content: "Global",
 				itemUids: [],
-				resourceIds: [],
+				resourceUids: [],
 			}),
 		);
 		await Effect.runPromise(

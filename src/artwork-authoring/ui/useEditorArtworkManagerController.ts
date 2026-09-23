@@ -88,7 +88,7 @@ export const useEditorArtworkManagerController = ({
 	const importError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const importedCount =
 		AsyncResult.isSuccess(result) && !importPending
-			? result.value.resourceIds.length
+			? result.value.resourceUids.length
 			: undefined;
 	const optimizeError =
 		optimizationState.kind === "failure" && optimizationState.type === "artwork"
@@ -140,7 +140,7 @@ export const useEditorArtworkManagerController = ({
 		optimizeResourcesFn({
 			expectedRevision: library.projectRevision,
 			kind: "optimize",
-			resourceIds: library.resources.map(({ id }) => id),
+			resourceUids: library.resources.map(({ uid }) => uid),
 			type: "artwork",
 		});
 	};

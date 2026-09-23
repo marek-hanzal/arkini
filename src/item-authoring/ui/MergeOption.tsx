@@ -53,7 +53,7 @@ export const MergeOption = ({
 				<EditorItemThumbnail
 					size="md"
 					className="rounded-md"
-					resourceIds={
+					resourceUids={
 						target?.artwork.default ?? [
 							"",
 						]

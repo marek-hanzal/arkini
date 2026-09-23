@@ -97,7 +97,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 									description={
 										<Mx
 											label={
-												props.requiredCurrentResourceId !== undefined
+												props.requiredCurrentResourceUid !== undefined
 													? "Artwork notes empty description"
 													: props.requiredCurrentItemUid === undefined
 														? "Notes empty description"
@@ -107,7 +107,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 									}
 									icon={NotebookPen}
 									title={translator.textFn(
-										props.requiredCurrentResourceId !== undefined
+										props.requiredCurrentResourceUid !== undefined
 											? "Artwork notes empty title"
 											: props.requiredCurrentItemUid === undefined
 												? "Notes empty title"
@@ -162,7 +162,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 											<NoteForm
 												content={controller.editContent}
 												itemUids={controller.editItemUids}
-												resourceIds={controller.editResourceIds}
+												resourceUids={controller.editResourceUids}
 												artworkFilter={props.artworkFilter}
 												artworkQuery={props.artworkQuery}
 												pending={controller.pending}
@@ -170,8 +170,8 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 												saveLabel="Save"
 												onContentChangeFn={controller.setEditContentFn}
 												onItemUidsChangeFn={controller.setEditItemUidsFn}
-												onResourceIdsChangeFn={
-													controller.setEditResourceIdsFn
+												onResourceUidsChangeFn={
+													controller.setEditResourceUidsFn
 												}
 												onSaveFn={controller.saveEditFn}
 												onCancelFn={controller.cancelEditFn}
@@ -192,15 +192,15 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 													}
 												/>
 												<NoteResourceLinks
-													resourceIds={note.resourceIds}
+													resourceUids={note.resourceUids}
 													disabled={
 														controller.pending ||
 														controller.editingNoteId !== undefined
 													}
-													onUnlinkFn={(resourceId) =>
+													onUnlinkFn={(resourceUid) =>
 														controller.unlinkResourceFn(
 															note,
-															resourceId,
+															resourceUid,
 														)
 													}
 													filter={props.artworkFilter}
@@ -230,9 +230,9 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 					<NoteForm
 						content={controller.newContent}
 						itemUids={controller.newItemUids}
-						resourceIds={controller.newResourceIds}
+						resourceUids={controller.newResourceUids}
 						requiredItemUid={props.requiredCurrentItemUid}
-						requiredResourceId={props.requiredCurrentResourceId}
+						requiredResourceUid={props.requiredCurrentResourceUid}
 						artworkFilter={props.artworkFilter}
 						artworkQuery={props.artworkQuery}
 						pending={controller.pending}
@@ -240,7 +240,7 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 						saveLabel="Create note"
 						onContentChangeFn={controller.setNewContentFn}
 						onItemUidsChangeFn={controller.setNewItemUidsFn}
-						onResourceIdsChangeFn={controller.setNewResourceIdsFn}
+						onResourceUidsChangeFn={controller.setNewResourceUidsFn}
 						onSaveFn={controller.createFn}
 					/>
 				</EditorRootCard>

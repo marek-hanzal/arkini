@@ -19,19 +19,22 @@ describe("readArtworkCollectionTextFn", () => {
 				{
 					size: 0,
 					version: "1",
-					id: "hero",
+					uid: "hero",
+					title: "hero",
 					type: "image" as const,
 				},
 				{
 					size: 0,
 					version: "1",
-					id: "forge-image",
+					uid: "forge-image",
+					title: "forge-image",
 					type: "artwork" as const,
 				},
 				{
 					size: 0,
 					version: "1",
-					id: "water-image",
+					uid: "water-image",
+					title: "water-image",
 					type: "artwork" as const,
 				},
 			],
@@ -54,14 +57,14 @@ describe("readArtworkCollectionTextFn", () => {
 		});
 
 		expect(fuzzyMatch).toContain("Matched artwork: 1");
-		expect(fuzzyMatch).toContain("- Type: artwork\n  ID: forge-image");
+		expect(fuzzyMatch).toContain("- Type: artwork\n  UID: forge-image");
 		expect(lastPage).toContain("Page: 2\nTotal pages: 2");
 		expect(lastPage).toContain("Previous page: 1");
-		expect(lastPage).toContain("- Type: artwork\n  ID: water-image");
+		expect(lastPage).toContain("- Type: artwork\n  UID: water-image");
 		expect(lastPage).not.toContain("bytes");
 		expect(lastPage).not.toContain("image/png");
 		expect(unused).toContain("Usage filter: unused");
-		expect(unused).toContain("- Type: artwork\n  ID: forge-image");
-		expect(unused).not.toContain("ID: hero");
+		expect(unused).toContain("- Type: artwork\n  UID: forge-image");
+		expect(unused).not.toContain("UID: hero");
 	});
 });

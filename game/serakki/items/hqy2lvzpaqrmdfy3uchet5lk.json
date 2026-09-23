@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"quest",
-				"vegetable-crate"
+				"lr8i4gjiyumr5s2lzvvv13ov",
+				"np1dwla0c2u3ym90ufqmfnzu"
 			]
 		},
 		"units": {
@@ -123,7 +123,7 @@
 			{
 				"id": "complete",
 				"title": "Complete Contract",
-				"artwork": "vegetable-crate",
+				"artwork": "np1dwla0c2u3ym90ufqmfnzu",
 				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",
 				"clockWeight": 1,
 				"default": true,

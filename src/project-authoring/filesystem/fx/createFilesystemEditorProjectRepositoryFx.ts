@@ -73,17 +73,17 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		awaitIdleFx: operations.withPermits(1)(Effect.void),
 		readResourceLocationFx: ({
 			projectId,
-			resourceId,
+			resourceUid,
 		}: {
 			readonly projectId: string;
-			readonly resourceId: string;
+			readonly resourceUid: string;
 		}) =>
 			operations
 				.withPermits(1)(
 					Effect.gen(function* () {
 						const state = states.get(projectId);
 						const resource = state?.project.resources.find(
-							(resource) => resource.id === resourceId,
+							(resource) => resource.uid === resourceUid,
 						);
 						if (state === undefined || resource === undefined) return null;
 						const target = yield* state.paths.resourceFileFx(resource);

@@ -10,7 +10,7 @@ export namespace useEditorArtworkDetailSectionShortcuts {
 		readonly filter: ArtworkCatalogFilterSchema.Type;
 		readonly projectId: string;
 		readonly query: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 	}
 }
 
@@ -20,7 +20,7 @@ export const useEditorArtworkDetailSectionShortcuts = ({
 	filter,
 	projectId,
 	query,
-	resourceId,
+	resourceUid,
 }: useEditorArtworkDetailSectionShortcuts.Props) => {
 	const router = useRouter();
 	useSectionShortcuts({
@@ -31,7 +31,7 @@ export const useEditorArtworkDetailSectionShortcuts = ({
 				to: section.to,
 				params: {
 					projectId,
-					resourceId,
+					resourceUid,
 				},
 				search: {
 					filter,

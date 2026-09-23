@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"gardener"
+				"e66c5l38fesf2qr41s7335ux"
 			]
 		},
 		"maxQueueSize": 8,
@@ -16,7 +16,7 @@
 			{
 				"id": "grain-seed",
 				"title": "Grain Seed",
-				"artwork": "grain-seed",
+				"artwork": "d1ayn11ywpibe3taadsm2o1w",
 				"description": "Buy loose grain planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -86,7 +86,7 @@
 			{
 				"id": "corn-seed",
 				"title": "Corn Kernels",
-				"artwork": "corn-kernels",
+				"artwork": "l0e5uz9pxz3hcwkpvwsimnr8",
 				"description": "Buy loose corn planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -156,7 +156,7 @@
 			{
 				"id": "vegetable-seed",
 				"title": "Vegetable Seed",
-				"artwork": "vegetable-seed",
+				"artwork": "ieee04h4dknay2rzmaxauq36",
 				"description": "Buy loose vegetable planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -226,7 +226,7 @@
 			{
 				"id": "fruit-seed",
 				"title": "Fruit Seed",
-				"artwork": "fruit-seed",
+				"artwork": "ipf75brkivgc4iuzcxe2cp3j",
 				"description": "Buy loose fruit planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -296,7 +296,7 @@
 			{
 				"id": "cotton-seed",
 				"title": "Cotton Seed",
-				"artwork": "cotton-seed",
+				"artwork": "fq3wkjg0iop3t862f63rctgw",
 				"description": "Buy loose cotton planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -366,7 +366,7 @@
 			{
 				"id": "flax-seed",
 				"title": "Flax Seed",
-				"artwork": "flax-seed",
+				"artwork": "pvnig6yhiafdqvz5wzetyu90",
 				"description": "Buy loose flax planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -436,7 +436,7 @@
 			{
 				"id": "grass-seed",
 				"title": "Grass Seed",
-				"artwork": "grass-seed",
+				"artwork": "cicup6s227nl6jn9tfbbi646",
 				"description": "Buy loose grass planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -506,7 +506,7 @@
 			{
 				"id": "herb-seed",
 				"title": "Herb Seed",
-				"artwork": "herb-seed",
+				"artwork": "q6qyc5ap9tfcluhe71xv35k0",
 				"description": "Buy loose herb planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -576,7 +576,7 @@
 			{
 				"id": "flower-seed",
 				"title": "Flower Seed",
-				"artwork": "flower-seed",
+				"artwork": "wt86q7jnjcydsa6g2m5hjkyz",
 				"description": "Buy loose flower planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -646,7 +646,7 @@
 			{
 				"id": "pumpkin-seed",
 				"title": "Pumpkin Seed",
-				"artwork": "pumpkin-seed",
+				"artwork": "qf9z8jyll2gr7i9rycs20vu2",
 				"description": "Buy loose pumpkin planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -716,7 +716,7 @@
 			{
 				"id": "grape-seed",
 				"title": "Grape Seed",
-				"artwork": "grape-seed",
+				"artwork": "nubw6c3qa38035b8frx5d6tz",
 				"description": "Buy loose grape planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -786,7 +786,7 @@
 			{
 				"id": "hop-seed",
 				"title": "Hop Seed",
-				"artwork": "hop-seed",
+				"artwork": "n40ohyaajnc7wz9vqm844jmj",
 				"description": "Buy loose hop planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -856,7 +856,7 @@
 			{
 				"id": "rapeseed-seed",
 				"title": "Rapeseed Seed",
-				"artwork": "rapeseed-seed",
+				"artwork": "sy8j1ma0406rcd4jcsfq5fi6",
 				"description": "Buy loose rapeseed planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -926,7 +926,7 @@
 			{
 				"id": "sunflower-seed",
 				"title": "Sunflower Seed",
-				"artwork": "sunflower-seed",
+				"artwork": "qalzit0de3z3qrn3oilifzvn",
 				"description": "Buy loose sunflower planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -996,7 +996,7 @@
 			{
 				"id": "sugar-beet-seed",
 				"title": "Sugar Beet Seed",
-				"artwork": "sugar-beet-seed",
+				"artwork": "skvrd04nekh91j5w9s1poksv",
 				"description": "Buy loose sugar beet planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -1066,7 +1066,7 @@
 			{
 				"id": "sugar-cane-seed",
 				"title": "Sugar Cane Seed",
-				"artwork": "sugar-cane-seed",
+				"artwork": "s25xwr30i2cssto6upbr3j2u",
 				"description": "Buy loose sugar cane planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -1136,7 +1136,7 @@
 			{
 				"id": "coffee-seed",
 				"title": "Coffee Seed",
-				"artwork": "coffee-seed",
+				"artwork": "dbb4lzwit1iojmegwsj95vf8",
 				"description": "Buy loose coffee planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -1206,7 +1206,7 @@
 			{
 				"id": "cacao-seed",
 				"title": "Cacao Seed",
-				"artwork": "cacao-seed",
+				"artwork": "fhk5h5usbsy71iejhlrzkicb",
 				"description": "Buy loose cacao planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -1276,7 +1276,7 @@
 			{
 				"id": "dye-seed",
 				"title": "Dye Plant Seed",
-				"artwork": "dye-seed",
+				"artwork": "mqv8mdh47m0cztboppkud762",
 				"description": "Buy loose dye plant planting seed.",
 				"clockWeight": 1,
 				"default": false,
@@ -1346,7 +1346,7 @@
 			{
 				"id": "blueprint",
 				"title": "Gardener Blueprint",
-				"artwork": "blueprint",
+				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Gardener.",
 				"clockWeight": 1,
 				"default": false,

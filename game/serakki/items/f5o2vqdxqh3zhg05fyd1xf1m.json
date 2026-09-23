@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"cow"
+				"cu5g8wg1z1z5egmgcf3x02jb"
 			]
 		},
 		"units": {
@@ -41,7 +41,7 @@
 			{
 				"id": "wander",
 				"title": "Wander",
-				"artwork": "cow",
+				"artwork": "cu5g8wg1z1z5egmgcf3x02jb",
 				"description": "Wanders somewhere else.",
 				"clock": true,
 				"clockWeight": 1,
@@ -201,7 +201,7 @@
 			{
 				"id": "disease-exposure",
 				"title": "Disease Exposure",
-				"artwork": "disease",
+				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 8,
@@ -271,7 +271,7 @@
 			{
 				"id": "plague-exposure",
 				"title": "Plague Exposure",
-				"artwork": "plague",
+				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
 				"clock": true,
 				"clockWeight": 16,
@@ -341,7 +341,7 @@
 			{
 				"id": "wolf-attack-near",
 				"title": "Wolf Attack",
-				"artwork": "wolf",
+				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "A wolf two tiles away may attack.",
 				"clock": true,
 				"clockWeight": 1,
@@ -445,7 +445,7 @@
 			{
 				"id": "wolf-attack-close",
 				"title": "Wolf Attack",
-				"artwork": "wolf",
+				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "A wolf right next to the cow may attack.",
 				"clock": true,
 				"clockWeight": 4,

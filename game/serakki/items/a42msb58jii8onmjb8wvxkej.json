@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"animal-feed-workshop"
+				"so7r094glj6wfe6yoveiclrg",
+				"qgam58n66dfu2yc9s2cdtoug"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "animal-feed-workshop",
 				"title": "Build Animal Feed Workshop",
-				"artwork": "animal-feed-workshop",
+				"artwork": "qgam58n66dfu2yc9s2cdtoug",
 				"description": "Build Animal Feed Workshop.",
 				"clockWeight": 1,
 				"default": true,

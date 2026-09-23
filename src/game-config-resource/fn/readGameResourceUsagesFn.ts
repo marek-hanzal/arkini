@@ -7,7 +7,7 @@ import { SfxEventEnumSchema } from "~/sfx-event/schema/SfxEventEnumSchema";
 export namespace readGameResourceUsagesFn {
 	export type Usage =
 		| {
-				readonly resourceId: string;
+				readonly resourceUid: string;
 				readonly resourceType: "image" | "music" | "sfx";
 				readonly owner: "project";
 				readonly ownerLabel: "Project";
@@ -15,7 +15,7 @@ export namespace readGameResourceUsagesFn {
 				readonly path: DiagnosticPathSchema.Type;
 		  }
 		| {
-				readonly resourceId: string;
+				readonly resourceUid: string;
 				readonly resourceType: "artwork" | "music";
 				readonly owner: "item";
 				readonly ownerId: string;
@@ -67,10 +67,10 @@ export const readGameResourceUsagesFn = (
 ): readGameResourceUsagesFn.Usage[] => {
 	const usages: readGameResourceUsagesFn.Usage[] = [];
 	for (const role of projectRoles) {
-		const resourceId = config.resources[role.id];
-		if (resourceId === undefined) continue;
+		const resourceUid = config.resources[role.id];
+		if (resourceUid === undefined) continue;
 		usages.push({
-			resourceId,
+			resourceUid,
 			resourceType: "image",
 			owner: "project",
 			ownerLabel: "Project",
@@ -81,9 +81,9 @@ export const readGameResourceUsagesFn = (
 			],
 		});
 	}
-	config.music?.playlist.forEach((resourceId, index) => {
+	config.music?.playlist.forEach((resourceUid, index) => {
 		usages.push({
-			resourceId,
+			resourceUid,
 			resourceType: "music",
 			owner: "project",
 			ownerLabel: "Project",
@@ -96,10 +96,10 @@ export const readGameResourceUsagesFn = (
 		});
 	});
 	for (const event of SfxEventEnumSchema.options) {
-		const resourceId = config.sfx?.events[event];
-		if (resourceId === undefined) continue;
+		const resourceUid = config.sfx?.events[event];
+		if (resourceUid === undefined) continue;
 		usages.push({
-			resourceId,
+			resourceUid,
 			resourceType: "sfx",
 			owner: "project",
 			ownerLabel: "Project",
@@ -116,7 +116,7 @@ export const readGameResourceUsagesFn = (
 	)) {
 		if (item.music !== undefined) {
 			usages.push({
-				resourceId: item.music,
+				resourceUid: item.music,
 				resourceType: "music",
 				owner: "item",
 				ownerId: itemUid,
@@ -130,9 +130,9 @@ export const readGameResourceUsagesFn = (
 				],
 			});
 		}
-		item.artwork.default.forEach((resourceId, index) => {
+		item.artwork.default.forEach((resourceUid, index) => {
 			usages.push({
-				resourceId,
+				resourceUid,
 				resourceType: "artwork",
 				owner: "item",
 				ownerId: itemUid,
@@ -151,7 +151,7 @@ export const readGameResourceUsagesFn = (
 		item.lines.forEach((line, index) => {
 			if (line.artwork === undefined) return;
 			usages.push({
-				resourceId: line.artwork,
+				resourceUid: line.artwork,
 				resourceType: "artwork",
 				owner: "item",
 				ownerId: itemUid,

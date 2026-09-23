@@ -8,7 +8,7 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"sawmill"
+				"oo4txpzczam6kt5jue7vhf1a"
 			]
 		},
 		"maxQueueSize": 6,
@@ -69,7 +69,7 @@
 			{
 				"id": "wood-fibers",
 				"title": "Wood Fibers",
-				"artwork": "wood-fibers",
+				"artwork": "kw3efx1p35vtxbs675l229h4",
 				"description": "Process wood into fibers suitable for making paper pulp.",
 				"clockWeight": 1,
 				"default": false,

@@ -61,7 +61,7 @@ describe("Editor Build createElectronEditorBuildRepositoryFx", () => {
 					0,
 				],
 				source: "items/water.json",
-				resourceId: "item-water",
+				resourceUid: "item-water",
 			},
 		];
 		editor.buildProject.mockResolvedValueOnce({

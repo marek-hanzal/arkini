@@ -22,16 +22,16 @@ export interface OwnedEditorProjectRepository
 	readonly upsertResourceFilesFx: (props: {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<{
-			readonly id: string;
+			readonly uid: string;
 			readonly type: ResourceTypeSchema.Type;
 			readonly path: string;
 			readonly size: number;
-			readonly name?: string;
+			readonly title: string;
 		}>;
 	}) => Effect.Effect<Project, ProjectRepositoryError, never>;
 	readonly readResourceLocationFx: (props: {
 		readonly projectId: string;
-		readonly resourceId: string;
+		readonly resourceUid: string;
 	}) => Effect.Effect<
 		{
 			readonly root: string;

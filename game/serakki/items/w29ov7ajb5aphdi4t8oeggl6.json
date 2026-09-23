@@ -9,8 +9,8 @@
 		"artwork": {
 			"scale": 1,
 			"default": [
-				"blueprint",
-				"coffee-farm"
+				"so7r094glj6wfe6yoveiclrg",
+				"susgla9mmb7vqgeq375aa6r2"
 			]
 		},
 		"units": {
@@ -21,7 +21,7 @@
 			{
 				"id": "coffee-farm",
 				"title": "Build Coffee Farm",
-				"artwork": "coffee-farm",
+				"artwork": "susgla9mmb7vqgeq375aa6r2",
 				"description": "Build Coffee Farm.",
 				"clockWeight": 1,
 				"default": true,

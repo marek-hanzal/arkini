@@ -6,7 +6,7 @@ import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeInteger
 
 export const ManifestResourceSchema = z
 	.object({
-		id: IdSchema.describe("The stable resource identifier."),
+		uid: IdSchema.describe("The stable resource identifier."),
 		type: ResourceTypeSchema.describe("The semantic resource kind."),
 		length: NonNegativeIntegerSchema.describe("The resource payload size in bytes."),
 	})

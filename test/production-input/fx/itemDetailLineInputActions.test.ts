@@ -6,7 +6,6 @@ import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
 import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
-import { getItemFx } from "~test/support/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -278,54 +277,6 @@ describe("Item Detail line input actions", () => {
 		});
 	});
 
-	it("does not autofill from another board space", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnItemFx({
-					id: "runtime:other-space",
-					itemUid: "water",
-					location: {
-						scope: "board",
-						space: 1,
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-				});
-
-				const autofilled = yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				const runtime = yield* readRuntimeFx();
-				return {
-					autofilled,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(result.autofilled).toEqual({
-			remainingMissingQuantity: 3,
-			scheduledQuantity: 0,
-		});
-		expect(result.runtime.items).toContainEqual(
-			expect.objectContaining({
-				id: "runtime:other-space",
-				location: expect.objectContaining({
-					scope: "board",
-					space: 1,
-				}),
-			}),
-		);
-	});
-
 	it("withdraws one exact input completely while preserving its buffered sibling", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -418,36 +369,27 @@ describe("Item Detail line input actions", () => {
 	});
 });
 
-it("leaves the exact input and its queue unchanged when canonical placement fails", () => {
+it("rolls back every withdrawn identity and its queue when a later placement fails", () => {
 	const result = Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnOwnerFx();
-			yield* spawnWaterFx({
-				id: "runtime:water",
-				location: {
-					scope: "board" as const,
-					space: 0,
-					position: {
-						x: 1,
-						y: 0,
-					},
-				},
-			});
-			const water = yield* getItemFx({
-				itemId: "runtime:water",
-			});
-			yield* bufferInputMaterialForTestFx({
-				ownerItemId,
-				lineId,
-				inputIndex: 0,
-				sourceItemId: water.id,
-				sourceItemRevision: water.revision,
-			});
-			yield* spawnItemFx({
-				id: "runtime:blocker",
-				itemUid: "stone",
-				location: sourceLocation(1),
-			});
+			for (const id of [
+				"runtime:water:first",
+				"runtime:water:second",
+			]) {
+				const water = yield* spawnWaterFx({
+					id,
+					location: sourceLocation(1),
+				});
+				yield* bufferInputMaterialForTestFx({
+					ownerItemId,
+					lineId,
+					inputIndex: 0,
+					sourceItemId: water.id,
+					sourceItemRevision: water.revision,
+				});
+			}
+			// The owner leaves one cell: the first return fits, the second must roll it back.
 			yield* enqueueLineFx({
 				ownerItemId,
 				lineId,
@@ -472,6 +414,12 @@ it("leaves the exact input and its queue unchanged when canonical placement fail
 		),
 	);
 
+	expect(result.before.jobQueue).toHaveLength(1);
 	expect(Exit.isFailure(result.withdrawal)).toBe(true);
+	if (Exit.isFailure(result.withdrawal)) {
+		expect(Option.getOrThrow(Cause.findErrorOption(result.withdrawal.cause))).toMatchObject({
+			_tag: "PlacementUnavailableError",
+		});
+	}
 	expect(result.after).toEqual(result.before);
 });

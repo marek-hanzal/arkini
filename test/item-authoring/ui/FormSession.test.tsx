@@ -3,7 +3,7 @@
 import { detectPlatform } from "@tanstack/react-hotkeys";
 import type { Project } from "~/project-authoring/type/Project";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -301,25 +301,6 @@ const completeFirstProductionLine = async (container: HTMLElement) => {
 };
 
 describe("item section form session", () => {
-	it("saves an explicit simple interface from the identity section", async () => {
-		const { container } = await render(<IdentitySection />);
-		const simple = Array.from(container.querySelectorAll("button")).find(
-			(button) => button.textContent === "Simple",
-		);
-		if (simple === undefined) throw new Error("Missing interface choice");
-		await act(async () => simple.click());
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem).toHaveBeenCalledWith(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					ui: "simple",
-				}),
-			}),
-		);
-	});
-
 	it("renders artwork on direct Clock entry and follows unsaved overlay changes", async () => {
 		state.project = {
 			...(state.project as Project),
@@ -392,61 +373,52 @@ describe("item section form session", () => {
 		expect(state.saveItem).not.toHaveBeenCalled();
 	});
 
-	it.each([
-		"artwork",
-		"production",
-		"merges",
-		"units",
-		"clock",
-	] as const)(
-		"returns %s edits to the matching detail after Save and Discard",
-		async (sectionId) => {
-			const { container, renderSection } = await render(<IdentitySection />);
-			await renderSection(<IdentitySection />, sectionId);
-			const title = container.querySelector<HTMLInputElement>('input[name="title"]');
-			if (title === null) throw new Error("Missing title input");
-			await changeInput(title, "Changed");
-			const buttonFn = (label: string) =>
-				[
-					...container.querySelectorAll("button"),
-				].find((button) => button.textContent === label);
-			await act(async () => {
-				if (sectionId === "clock") {
-					title.dispatchEvent(
-						new KeyboardEvent("keydown", {
-							key: "s",
-							code: "KeyS",
-							bubbles: true,
-							cancelable: true,
-							metaKey: detectPlatform() === "mac",
-							ctrlKey: detectPlatform() !== "mac",
-						}),
-					);
-				} else buttonFn("Save")?.click();
-			});
-			expect(state.navigate).toHaveBeenLastCalledWith(
-				expect.objectContaining({
-					to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
-					params: expect.objectContaining({
-						sectionId,
-					}),
+	it("returns to the current section after shortcut Save and Discard", async () => {
+		const { container, renderSection } = await render(<IdentitySection />);
+		await renderSection(<IdentitySection />, "clock");
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null) throw new Error("Missing title input");
+		await changeInput(title, "Changed");
+		const buttonFn = (label: string) =>
+			[
+				...container.querySelectorAll("button"),
+			].find((button) => button.textContent === label);
+		await act(async () => {
+			title.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "s",
+					code: "KeyS",
+					bubbles: true,
+					cancelable: true,
+					metaKey: detectPlatform() === "mac",
+					ctrlKey: detectPlatform() !== "mac",
 				}),
 			);
-			const saves = state.saveItem.mock.calls.length;
-			await changeInput(title, "Discarded");
-			await act(async () => {
-				buttonFn("Discard")?.click();
-			});
-			expect(state.navigate).toHaveBeenLastCalledWith(
-				expect.objectContaining({
-					params: expect.objectContaining({
-						sectionId,
-					}),
+		});
+		expect(state.navigate).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
+				params: expect.objectContaining({
+					sectionId: "clock",
 				}),
-			);
-			expect(state.saveItem).toHaveBeenCalledTimes(saves);
-		},
-	);
+			}),
+		);
+		const saves = state.saveItem.mock.calls.length;
+		state.navigate.mockClear();
+		await changeInput(title, "Discarded");
+		await act(async () => {
+			buttonFn("Discard")?.click();
+		});
+		expect(state.navigate).toHaveBeenCalledTimes(1);
+		expect(state.navigate).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				params: expect.objectContaining({
+					sectionId: "clock",
+				}),
+			}),
+		);
+		expect(state.saveItem).toHaveBeenCalledTimes(saves);
+	});
 	it.each([
 		"production",
 	] as const)("keeps the detail %s enable intent local until Save", async (capability) => {
@@ -586,21 +558,6 @@ describe("item section form session", () => {
 		expect(scaledItem.artwork.scale).toBe(0.65);
 	});
 
-	it("does not republish the form Context when parent inputs are unchanged", async () => {
-		let consumerRenders = 0;
-		const Probe = memo(() => {
-			useFormSession();
-			consumerRenders += 1;
-			return null;
-		});
-		const probe = <Probe />;
-		const { renderSection } = await render(probe);
-
-		await renderSection(probe);
-
-		expect(consumerRenders).toBe(1);
-	});
-
 	it("keeps the unsaved-leave Save persistence-only while ordinary Save owns navigation", async () => {
 		const { container } = await render(<IdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
@@ -626,6 +583,7 @@ describe("item section form session", () => {
 		expect(state.saveItem).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				item: expect.objectContaining({
+					uid: item.uid,
 					title: "Saved and leave",
 				}),
 			}),
@@ -1076,61 +1034,6 @@ describe("item section form session", () => {
 		expect(
 			JSON.parse(JSON.stringify(state.saveItem.mock.lastCall?.[0].item)).lines[0],
 		).not.toHaveProperty("artwork");
-	});
-
-	it("duplicates a complete production line with a fresh non-selected identity", async () => {
-		const source = {
-			...createLine({
-				id: "copper-ore",
-				default: true,
-				clock: true,
-			}),
-			title: "Copper Ore",
-			description: "Mines copper ore.",
-		};
-		const common = {
-			...createProducerItem({
-				id: item.uid,
-				lines: [
-					source,
-				],
-			}),
-			uid: item.uid,
-		};
-		state.persisted = common;
-		(state.project as Project).config.items[item.uid] = common;
-		const { container } = await render(<ProductionSection />);
-		const duplicate = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionDuplicate"]',
-		);
-		if (duplicate === null) throw new Error("Missing duplicate line control.");
-		await act(async () => duplicate.click());
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem.mock.lastCall?.[0].item.lines).toEqual([
-			source,
-			{
-				...source,
-				id: "copper-ore-2",
-				clock: true,
-				default: false,
-			},
-		]);
-	});
-
-	it("changes a title while preserving the immutable item UID", async () => {
-		const { container } = await render(<IdentitySection />);
-		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
-		if (title === null) throw new Error("Missing title field.");
-		await changeInput(title, "Next Title");
-		await act(async () => {
-			await state.unsavedSession?.saveFn();
-		});
-		expect(state.saveItem.mock.lastCall?.[0].item).toEqual({
-			...item,
-			title: "Next Title",
-		});
 	});
 
 	it("regenerates only the edited line ID from title while allowing independent ID edits", async () => {

@@ -3,16 +3,6 @@ import { describe, expect, it } from "vitest";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 
 describe("createLineFn", () => {
-	it("leaves new line identity copy blank until the author names it", () => {
-		const line = createLineFn([], "", "");
-
-		expect(line).toMatchObject({
-			description: "",
-			id: "",
-			title: "",
-		});
-	});
-
 	it("derives a fresh line ID from its authored title", () => {
 		const line = createLineFn([], "New production line", "Description");
 

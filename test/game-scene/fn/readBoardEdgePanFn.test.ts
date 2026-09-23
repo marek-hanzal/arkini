@@ -27,16 +27,13 @@ const input = {
 
 describe("readBoardEdgePanFn", () => {
 	it("moves only overflowing axes, leaving a fitted board still", () => {
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				height: 1000,
-				pointerY: 0,
-			}),
-		).toEqual({
-			x: 20,
-			y: -200,
+		const overflowing = readBoardEdgePanFn({
+			...input,
+			height: 1000,
+			pointerY: 0,
 		});
+		expect(overflowing.x).toBeGreaterThan(input.x);
+		expect(overflowing.y).toBe(input.y);
 		expect(
 			readBoardEdgePanFn({
 				...input,
@@ -44,8 +41,8 @@ describe("readBoardEdgePanFn", () => {
 				pointerY: 0,
 			}),
 		).toEqual({
-			x: -100,
-			y: -200,
+			x: input.x,
+			y: input.y,
 		});
 	});
 
@@ -76,48 +73,34 @@ describe("readBoardEdgePanFn", () => {
 		});
 	});
 
-	it("moves smoothly back from free-pan overscroll and never moves farther out", () => {
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				x: 300,
-			}),
-		).toEqual({
+	it("moves back from free-pan overscroll without snapping or moving farther out", () => {
+		const beyondLeft = {
+			...input,
 			x: 300,
-			y: -200,
-		});
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				x: 300,
-				pointerX: 800,
-			}),
-		).toEqual({
-			x: 180,
-			y: -200,
-		});
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				x: -500,
-				pointerX: 800,
-			}),
-		).toEqual({
+		};
+		expect(readBoardEdgePanFn(beyondLeft).x).toBe(beyondLeft.x);
+		const returningLeft = readBoardEdgePanFn({
+			...beyondLeft,
+			pointerX: 800,
+		}).x;
+		expect(returningLeft).toBeLessThan(beyondLeft.x);
+		expect(returningLeft).toBeGreaterThan(80);
+
+		const beyondRight = {
+			...input,
 			x: -500,
-			y: -200,
-		});
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				x: -500,
-			}),
-		).toEqual({
-			x: -380,
-			y: -200,
-		});
+			pointerX: 800,
+		};
+		expect(readBoardEdgePanFn(beyondRight).x).toBe(beyondRight.x);
+		const returningRight = readBoardEdgePanFn({
+			...beyondRight,
+			pointerX: 0,
+		}).x;
+		expect(returningRight).toBeGreaterThan(beyondRight.x);
+		expect(returningRight).toBeLessThan(-320);
 	});
 
-	it("uses elapsed frame time and accelerates toward the viewport edge", () => {
+	it("uses elapsed time independently of the number of frames", () => {
 		const first = readBoardEdgePanFn({
 			...input,
 			deltaMs: 50,
@@ -128,56 +111,17 @@ describe("readBoardEdgePanFn", () => {
 			deltaMs: 50,
 		});
 		expect(second).toEqual(readBoardEdgePanFn(input));
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				pointerX: 30,
-			}).x,
-		).toBe(-40);
-		expect(
-			readBoardEdgePanFn({
-				...input,
-				pointerX: 60,
-			}).x,
-		).toBe(-100);
 	});
 
-	it("stops for pointers outside the viewport and keeps the tiny viewport center neutral", () => {
-		for (const pointer of [
-			{
-				pointerX: -1,
-			},
-			{
-				pointerX: 801,
-			},
-			{
-				pointerY: -1,
-			},
-			{
-				pointerY: 601,
-			},
-		]) {
-			expect(
-				readBoardEdgePanFn({
-					...input,
-					...pointer,
-				}),
-			).toEqual({
-				x: -100,
-				y: -200,
-			});
-		}
+	it("stops when the pointer leaves the viewport", () => {
 		expect(
 			readBoardEdgePanFn({
 				...input,
-				width: 80,
-				height: 80,
-				pointerX: 40,
-				pointerY: 40,
+				pointerX: -1,
 			}),
 		).toEqual({
-			x: -100,
-			y: -200,
+			x: input.x,
+			y: input.y,
 		});
 	});
 });

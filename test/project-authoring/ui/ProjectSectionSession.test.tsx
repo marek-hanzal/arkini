@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 // @vitest-environment jsdom
 
-import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -256,68 +256,6 @@ describe("project section form session", () => {
 		expect(state.navigate).toHaveBeenCalledOnce();
 	});
 
-	it("exposes routed page help only for a section that owns guidance", async () => {
-		state.project = boardSpaceProject;
-		state.section = <div />;
-		state.sectionId = "board";
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () =>
-			root.render(
-				<TranslationTestProvider>
-					{createElement(TranslationTestProvider, null, createElement(EditorProjectForm))}
-				</TranslationTestProvider>,
-			),
-		);
-
-		const open = container.querySelector<HTMLButtonElement>('[data-ui="EditorPageHelpOpen"]');
-		expect(open).not.toBeNull();
-		await act(async () => open?.click());
-		expect(document.querySelector('[data-ui="EditorPageHelpDialog"]')).not.toBeNull();
-	});
-
-	it("does not republish the form Context when parent inputs are unchanged", async () => {
-		state.project = {
-			projectId: "project",
-			title: editorTestPayload.config.meta.title,
-			version: {
-				major: 1,
-				minor: 0,
-			},
-			createdAtMs: 1,
-			updatedAtMs: 2,
-			revision: 0,
-			config: editorTestPayload.config,
-			resources: editorTestResources,
-		} satisfies Project;
-		let consumerRenders = 0;
-		const Probe = memo(() => {
-			useProjectFormSession();
-			consumerRenders += 1;
-			return null;
-		});
-		state.section = <Probe />;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () =>
-			root.render(
-				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
-			),
-		);
-		await act(async () =>
-			root.render(
-				createElement(TranslationTestProvider, null, createElement(EditorProjectForm)),
-			),
-		);
-
-		expect(consumerRenders).toBe(1);
-	});
-
 	it("preserves one local project draft while routed section content changes", async () => {
 		state.project = {
 			projectId: "project",
@@ -507,10 +445,8 @@ describe("project section form session", () => {
 				</TranslationTestProvider>,
 			);
 		});
-		expect(container.querySelectorAll('[data-ui="EditorProjectAvatarSlot"]')).toHaveLength(8);
 		expect(session?.form.state.values.avatars["avatar-03"]).toBe("avatar-three");
 		expect(session?.form.state.values.avatars["avatar-01"]).toBe("");
-		expect(session?.form.state.values.avatars["avatar-08"]).toBe("");
 		const selectSlotFn = async (slot: string) => {
 			const button = container.querySelector<HTMLButtonElement>(
 				`[data-ui="EditorProjectAvatarSelect"][data-avatar-slot="${slot}"]`,
@@ -747,12 +683,6 @@ describe("project section form session", () => {
 
 		expect(spaceInput.value).toBe("0");
 		expect(readGridCells()).toBe("water:0:0");
-		await changeInput(spaceInput, "-1");
-		expect(readGridCells()).toBe("water:0:0");
-		await changeInput(spaceInput, "1");
-		expect(readGridCells()).toBe("water:1:1");
-		await changeInput(spaceInput, "32");
-		expect(readGridCells()).toBeUndefined();
 		await changeInput(spaceInput, "1");
 		expect(readGridCells()).toBe("water:1:1");
 

@@ -56,7 +56,7 @@ afterEach(async () => {
 });
 
 describe("useFuseSearch", () => {
-	it("preserves empty order and rebuilds Fuse only when identities or semantic terms change", async () => {
+	it("reuses an equivalent corpus and invalidates changed identities, direct and related terms", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -75,96 +75,75 @@ describe("useFuseSearch", () => {
 			});
 		};
 
+		const candidate: FuseSearchCandidate<string> = {
+			identity: "item",
+			terms: [
+				"Copper",
+			],
+			relatedTerms: [
+				"Ore",
+			],
+		};
 		await render(
 			[
-				{
-					identity: "first",
-					terms: [
-						"Alpha",
-					],
-				},
-				{
-					identity: "second",
-					terms: [
-						"Beta",
-					],
-				},
+				candidate,
 			],
-			"",
+			"copper",
 		);
-		expect(container.textContent).toBe("first,second");
+		expect(container.textContent).toBe("item");
 		expect(fuseState.constructionCount).toBe(1);
 
 		await render(
 			[
 				{
-					identity: "first",
-					terms: [
-						"Alpha",
-					],
-				},
-				{
-					identity: "second",
-					terms: [
-						"Beta",
-					],
+					...candidate,
 				},
 			],
-			"beta",
+			"ore",
 		);
-		expect(container.textContent).toBe("second");
+		expect(container.textContent).toBe("item");
 		expect(fuseState.constructionCount).toBe(1);
 
+		const renamed = {
+			...candidate,
+			terms: [
+				"Silver",
+			],
+		};
 		await render(
 			[
-				{
-					identity: "first",
-					terms: [
-						"Alpha",
-					],
-				},
-				{
-					identity: "second",
-					terms: [
-						"Gamma",
-					],
-				},
+				renamed,
 			],
-			"gamma",
+			"silver",
 		);
-		expect(container.textContent).toBe("second");
+		expect(container.textContent).toBe("item");
 		expect(fuseState.constructionCount).toBe(2);
+
+		const related = {
+			...renamed,
+			relatedTerms: [
+				"Metal",
+			],
+		};
 		await render(
 			[
-				{
-					identity: "second",
-					terms: [
-						"Gamma",
-					],
-					relatedTerms: [
-						"Copper",
-					],
-				},
+				related,
 			],
-			"copper",
-		);
-		expect(container.textContent).toBe("second");
-		expect(fuseState.constructionCount).toBe(3);
-		await render(
-			[
-				{
-					identity: "second",
-					terms: [
-						"Gamma",
-					],
-					relatedTerms: [
-						"Silver",
-					],
-				},
-			],
-			"copper",
+			"ore",
 		);
 		expect(container.textContent).toBe("");
+		expect(fuseState.constructionCount).toBe(3);
+
+		await render(
+			[
+				{
+					...related,
+					identity: "replacement",
+				},
+			],
+			"metal",
+		);
+		expect(container.textContent).toBe("replacement");
 		expect(fuseState.constructionCount).toBe(4);
 	});
 });

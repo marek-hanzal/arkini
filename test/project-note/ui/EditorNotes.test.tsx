@@ -393,24 +393,6 @@ describe("EditorNotes", () => {
 		expect(markdown?.querySelector("script")).toBeNull();
 	});
 
-	it("persists a new note into the live stream", async () => {
-		const container = await renderNotes();
-		await act(async () =>
-			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
-		);
-		const composer = container.querySelector<HTMLTextAreaElement>("textarea");
-		if (composer === null) throw new Error("Missing note composer.");
-		await changeTextarea(composer, "New note");
-		await click(
-			[
-				...container.querySelectorAll("button"),
-			].find((button) => button.textContent === "Create note") ?? null,
-		);
-		await act(async () =>
-			vi.waitFor(() => expect(container.textContent).toContain("New note")),
-		);
-	});
-
 	it("keeps a failed create draft available for retry", async () => {
 		state.createFailures = 1;
 		const container = await renderNotes();

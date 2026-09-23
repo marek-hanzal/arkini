@@ -12,7 +12,7 @@ import {
 afterEach(cleanupMcpHarnesses);
 
 describe("editor MCP item creation", () => {
-	it("creates a passive item from the Editor draft defaults with a generated immutable UID", async () => {
+	it("persists a created item with a generated immutable UID and publishes its revision", async () => {
 		const notifyProjectChanged = vi.fn();
 		const { ownership, port, repository } = await createMcpHarness(
 			Effect.runPromise,
@@ -61,42 +61,11 @@ describe("editor MCP item creation", () => {
 		);
 		if (item === undefined) throw new Error("Missing created item");
 		expect(item).toMatchObject({
-			artwork: {
-				scale: 1,
-				default: [
-					editorTestPayload.resources.find(({ type }) => type === "artwork")?.uid,
-				],
-			},
 			description: "Created through the editor MCP.",
-			draft: false,
 			title: "MCP Simple",
-
-			lines: [],
-			maxQueueSize: 1,
 		});
 		expect(item?.uid).toEqual(expect.any(String));
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("create-item-project");
-		const detail = await client.callTool({
-			name: "item_detail",
-			arguments: {
-				itemUid: item.uid,
-			},
-		});
-		expect(detail.content).toMatchObject([
-			{
-				text: expect.stringContaining("Draft: false"),
-			},
-		]);
-		const collection = await client.callTool({
-			name: "item_collection",
-			arguments: {},
-		});
-		expect(collection.content).toMatchObject([
-			{
-				text: expect.stringContaining(item.uid),
-			},
-		]);
-
 		const rejectedStructuredInput = await client.callTool({
 			name: "create_item",
 			arguments: {

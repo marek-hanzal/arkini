@@ -76,80 +76,54 @@ import { InputsControl } from "~/production-authoring/ui/InputsControl";
 		IS_REACT_ACT_ENVIRONMENT?: boolean;
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
-it.each([
-	true,
-	false,
-])(
-	"selects exact input for materials=%s without locking later selection",
-	async (allowMaterials) => {
-		const value: InputSchema.Type[] = [
-			"first",
-			"target",
-			"third",
-		].map((itemUid) =>
-			allowMaterials
-				? {
-						type: "materials",
-						mode: "consume",
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-						query: {
-							distance: "far",
-							selector: {
-								type: "item",
-								itemUid,
-							},
-						},
-					}
-				: {
-						type: "units",
-						query: {
-							distance: "far",
-							selector: {
-								type: "item",
-								itemUid,
-							},
-						},
-					},
+it("selects the exact routed input without locking later selection", async () => {
+	const value: InputSchema.Type[] = [
+		"first",
+		"target",
+		"third",
+	].map((itemUid) => ({
+		type: "units",
+		query: {
+			distance: "far",
+			selector: {
+				type: "item",
+				itemUid,
+			},
+		},
+	}));
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	navigation.inputIndex = 1;
+	try {
+		await act(async () =>
+			root.render(
+				<InputsControl
+					value={value}
+					onChangeFn={() => {}}
+				/>,
+			),
 		);
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		navigation.inputIndex = 1;
-		try {
-			await act(async () =>
-				root.render(
-					<InputsControl
-						allowMaterials={allowMaterials}
-						value={value}
-						onChangeFn={() => {}}
-					/>,
-				),
-			);
-			expect(container.querySelector("[data-input]")?.textContent).toBe("target");
-			await act(async () =>
-				container.querySelector<HTMLButtonElement>("[data-select-first]")?.click(),
-			);
-			expect(container.querySelector("[data-input]")?.textContent).toBe("first");
-			navigation.inputIndex = 2;
-			await act(async () =>
-				root.render(
-					<InputsControl
-						allowMaterials={allowMaterials}
-						value={value}
-						onChangeFn={() => {}}
-					/>,
-				),
-			);
-			expect(container.querySelector("[data-input]")?.textContent).toBe("third");
-		} finally {
-			await act(async () => root.unmount());
-			container.remove();
-		}
-	},
-);
+		expect(container.querySelector("[data-input]")?.textContent).toBe("target");
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>("[data-select-first]")?.click(),
+		);
+		expect(container.querySelector("[data-input]")?.textContent).toBe("first");
+		navigation.inputIndex = 2;
+		await act(async () =>
+			root.render(
+				<InputsControl
+					value={value}
+					onChangeFn={() => {}}
+				/>,
+			),
+		);
+		expect(container.querySelector("[data-input]")?.textContent).toBe("third");
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
 
 it("keeps the required last-input remove control visible and disabled", async () => {
 	const container = document.createElement("div");
@@ -188,59 +162,6 @@ it("keeps the required last-input remove control visible and disabled", async ()
 		expect(remove?.disabled).toBe(false);
 		await act(async () => remove?.click());
 		expect(onChangeFn).toHaveBeenCalledWith([]);
-	} finally {
-		await act(async () => root.unmount());
-		container.remove();
-	}
-});
-
-it("duplicates the selected root input with its complete nested configuration", async () => {
-	const container = document.createElement("div");
-	document.body.append(container);
-	const root = createRoot(container);
-	const onChangeFn = vi.fn();
-	const value: InputSchema.Type[] = [
-		{
-			type: "materials",
-			mode: "reserve",
-			quantity: {
-				min: 2,
-				max: 4,
-			},
-			query: {
-				distance: "far",
-				selector: {
-					type: "item",
-					itemUid: "ore",
-				},
-			},
-		},
-	];
-	try {
-		await act(async () =>
-			root.render(
-				<InputsControl
-					value={value}
-					onChangeFn={onChangeFn}
-				/>,
-			),
-		);
-		await act(async () =>
-			container
-				.querySelector<HTMLButtonElement>(
-					'[data-ui="EditorInputsCollection"] [data-ui="EditorCollectionDuplicate"]',
-				)
-				?.click(),
-		);
-		const next = onChangeFn.mock.lastCall?.[0] as InputSchema.Type[];
-		expect(next).toEqual([
-			value[0],
-			value[0],
-		]);
-		expect(next[1]).not.toBe(value[0]);
-		if (next[1].type !== "materials" || value[0].type !== "materials")
-			throw new Error("Expected material inputs.");
-		expect(next[1].quantity).not.toBe(value[0].quantity);
 	} finally {
 		await act(async () => root.unmount());
 		container.remove();

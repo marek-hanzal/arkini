@@ -8,6 +8,20 @@ const candidate = (value: string, ...terms: string[]) => ({
 });
 
 describe("createFuzzySearchFn", () => {
+	it("uses deterministic Unicode casing to rank exact matches first", () => {
+		const fuzzyFn = createFuzzySearchFn({
+			candidates: [
+				candidate("ascii", "ITEM"),
+				candidate("dotted", "İTEM"),
+			],
+		});
+
+		expect(fuzzyFn("i\u0307tem")).toEqual([
+			"dotted",
+			"ascii",
+		]);
+	});
+
 	it("ranks equally matching direct terms above related terms and searches across both", () => {
 		const fuzzyFn = createFuzzySearchFn({
 			candidates: [

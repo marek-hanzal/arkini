@@ -266,60 +266,12 @@ describe("validateGameResourcesFn", () => {
 		);
 	});
 
-	it("requires every gameplay-event assignment to resolve to SFX", () => {
+	it("requires gameplay and presentation event assignments to resolve to SFX", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			sfx: {
 				events: {
 					"job:started": "missing-job-start",
-					"item:spawned": "wrong-spawn",
-				},
-			},
-		});
-		const diagnostics = validateGameResourcesFn({
-			config,
-			provenance: {
-				...provenance,
-				sfx: "game.json",
-			},
-			resources: [
-				{
-					uid: "wrong-spawn",
-					path: "image/wrong-spawn.png",
-					type: "image",
-				},
-			],
-		});
-
-		expect(diagnostics).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
-					path: [
-						"sfx",
-						"events",
-						"job:started",
-					],
-					resourceUid: "missing-job-start",
-					source: "game.json",
-				}),
-				expect.objectContaining({
-					actualType: "image",
-					code: DiagnosticCodeEnumSchema.enum.ResourceTypeMismatch,
-					expectedType: "sfx",
-					resourceUid: "wrong-spawn",
-					source: "game.json",
-				}),
-			]),
-		);
-	});
-
-	it("requires every presentation-event assignment to resolve to SFX", () => {
-		const config = GameConfigSchema.parse({
-			...startTestConfig,
-			sfx: {
-				events: {
-					"item-detail:opened": "missing-detail-open",
 					"item-detail:closed": "wrong-detail-close",
 				},
 			},
@@ -346,9 +298,9 @@ describe("validateGameResourcesFn", () => {
 					path: [
 						"sfx",
 						"events",
-						"item-detail:opened",
+						"job:started",
 					],
-					resourceUid: "missing-detail-open",
+					resourceUid: "missing-job-start",
 					source: "game.json",
 				}),
 				expect.objectContaining({

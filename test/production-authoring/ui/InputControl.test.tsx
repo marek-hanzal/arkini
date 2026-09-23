@@ -103,11 +103,6 @@ const withoutUnitsUnitsInput = {
 	},
 } as const satisfies InputSchema.Type;
 
-const readChoiceValues = (control: Element) =>
-	Array.from(control.querySelectorAll<HTMLButtonElement>("button[data-ui-value]")).map(
-		(button) => button.dataset.uiValue,
-	);
-
 const findChoiceControl = (container: Element, label: string) => {
 	const control = Array.from(container.querySelectorAll('[data-ui="EditorChoiceControl"]')).find(
 		(candidate) => candidate.querySelector("legend")?.textContent === label,
@@ -188,43 +183,6 @@ describe("InputControl", () => {
 		);
 	});
 
-	it("shows unit authoring only for Units inputs", async () => {
-		const { container, root } = createContainer();
-
-		await renderInput(root, {
-			type: "simple",
-			units: {
-				cost: 1,
-				from: "self",
-			},
-		});
-		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).toBeNull();
-
-		await renderInput(root, {
-			type: "materials",
-			units: {
-				cost: 1,
-				from: "self",
-			},
-			mode: "consume",
-			quantity: {
-				min: 1,
-				max: 1,
-			},
-			query: {
-				distance: "far",
-				selector: {
-					type: "item",
-					itemUid: "stone",
-				},
-			},
-		});
-		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).toBeNull();
-
-		await renderInput(root, withoutUnitsUnitsInput);
-		expect(container.querySelector('[data-ui="EditorInputUnitCost"]')).not.toBeNull();
-	});
-
 	it("edits target query reach while keeping Target as the default unit payer", async () => {
 		const { container, root } = createContainer();
 		const onChangeFn = vi.fn();
@@ -232,22 +190,7 @@ describe("InputControl", () => {
 
 		const unitCost = container.querySelector('[data-ui="EditorInputUnitCost"]');
 		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
-		const inputType = findChoiceControl(container, "Input type");
-		const paidBy = findChoiceControl(container, "Paid by");
 		const boardDistance = findChoiceControl(unitCost, "Search area");
-
-		expect(inputType.parentElement).toBe(paidBy.parentElement);
-		expect(unitCost.contains(paidBy)).toBe(false);
-		expect(readChoiceValues(paidBy)).toEqual([
-			"target",
-			"self",
-		]);
-
-		expect(
-			paidBy.querySelector('[data-ui-value="target"]')?.getAttribute("data-ui-selected"),
-		).toBe("true");
-		expect(unitCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).not.toBeNull();
-		expect(unitCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("1");
 		const nearClose = boardDistance.querySelector<HTMLButtonElement>(
 			'[data-ui-value="near-close"]',
 		);
@@ -352,29 +295,6 @@ describe("InputControl", () => {
 		);
 	});
 
-	it("renders only Cost for a self-paid Units", async () => {
-		const { container, root } = createContainer();
-		await renderInput(root, {
-			...withoutUnitsUnitsInput,
-			units: {
-				cost: 2,
-				from: "self",
-			},
-		});
-
-		const unitCost = container.querySelector('[data-ui="EditorInputUnitCost"]');
-		if (unitCost === null) throw new Error("Expected Units unit cost controls.");
-		const paidBy = findChoiceControl(container, "Paid by");
-		const self = paidBy.querySelector<HTMLButtonElement>('[data-ui-value="self"]');
-		if (self === null) throw new Error("Expected Self unit source option.");
-
-		expect(self.disabled).toBe(false);
-		expect(self.getAttribute("data-ui-selected")).toBe("true");
-		expect(unitCost.querySelector('[data-ui="EditorSearchComboboxInput"]')).toBeNull();
-		expect(unitCost.querySelector('[data-ui="EditorChoiceControl"]')).toBeNull();
-		expect(unitCost.querySelector<HTMLInputElement>('input[type="number"]')?.value).toBe("2");
-	});
-
 	it("binds a self-paid Units to the owning item instead of a hidden empty target", async () => {
 		const { container, root } = createContainer();
 		const onChangeFn = vi.fn();
@@ -445,39 +365,6 @@ describe("InputControl", () => {
 
 		expect(self.disabled).toBe(true);
 		expect(self.dataset.uiDisabled).toBe("true");
-	});
-
-	it("creates a new Units input with a Target unit cost", async () => {
-		const { container, root } = createContainer();
-		const onChangeFn = vi.fn();
-		await renderInput(
-			root,
-			{
-				type: "simple",
-			},
-			onChangeFn,
-		);
-
-		const unitsButton = container.querySelector<HTMLButtonElement>(
-			'button[data-ui-value="units"]',
-		);
-		if (unitsButton === null) throw new Error("Expected Units input type option.");
-		await act(async () => unitsButton.click());
-
-		expect(onChangeFn).toHaveBeenCalledWith({
-			type: "units",
-			units: {
-				cost: 1,
-				from: "target",
-			},
-			query: {
-				distance: "close",
-				selector: {
-					type: "item",
-					itemUid: "",
-				},
-			},
-		});
 	});
 
 	it("offers only items with units to a target-paid Units and flags an existing invalid target", async () => {

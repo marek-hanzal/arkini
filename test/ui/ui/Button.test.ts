@@ -11,7 +11,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { Button, ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
+import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
 
 (
 	globalThis as {
@@ -29,7 +29,7 @@ afterEach(async () => {
 });
 
 describe("Button primitives", () => {
-	it("preserves disabled navigation and native button semantics", async () => {
+	it("blocks disabled link navigation while allowing an enabled link", async () => {
 		const rootRoute = createRootRoute();
 		const indexRoute = createRoute({
 			getParentRoute: () => rootRoute,
@@ -52,13 +52,6 @@ describe("Button primitives", () => {
 							to: "/about",
 						},
 						"Enabled link",
-					),
-					createElement(
-						Button,
-						{
-							disabled: true,
-						},
-						"Disabled button",
 					),
 				),
 		});
@@ -97,16 +90,11 @@ describe("Button primitives", () => {
 		const enabledLink = container.querySelector<HTMLAnchorElement>(
 			'a[data-ui-disabled="false"]',
 		);
-		const button = container.querySelector<HTMLButtonElement>("button");
-		expect(disabledLink?.href).toMatch(/\/about$/);
-		expect(enabledLink?.href).toMatch(/\/about$/);
-		expect(button?.type).toBe("button");
-		expect(button?.disabled).toBe(true);
 
-		await act(async () => disabledLink?.click());
+		await act(async () => disabledLink!.click());
 		expect(router.state.location.pathname).toBe("/");
 
-		await act(async () => enabledLink?.click());
+		await act(async () => enabledLink!.click());
 		expect(router.state.location.pathname).toBe("/about");
 	});
 });

@@ -4,7 +4,7 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
 
 export type AnimationChannel =
-	| "crowd-opacity"
+	| "artwork-opacity"
 	| "drop-target"
 	| "grab-offset"
 	| "lifecycle-opacity"
@@ -30,6 +30,9 @@ export interface PresentedPose {
 
 export type ActorAnimation =
 	| (AnimationBase & {
+			readonly channel: "artwork-opacity";
+	  })
+	| (AnimationBase & {
 			readonly channel: "drop-target";
 			readonly toFactor: number;
 	  })
@@ -47,10 +50,6 @@ export type ActorAnimation =
 	| (AnimationBase & {
 			readonly channel: "lifecycle-scale";
 			readonly toScale: number;
-	  })
-	| (AnimationBase & {
-			readonly channel: "crowd-opacity";
-			readonly toCrowdAlpha: number;
 	  });
 
 export type PresentationWrite =
@@ -68,11 +67,6 @@ export type PresentationWrite =
 			readonly actor: PixiTileActor;
 			readonly channel: "lifecycle-scale";
 			readonly scale: number;
-	  }
-	| {
-			readonly actor: PixiTileActor;
-			readonly alpha: number;
-			readonly channel: "crowd-opacity";
 	  }
 	| {
 			readonly actor: PixiTileActor;

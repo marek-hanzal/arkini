@@ -77,27 +77,33 @@ describe("main drag controller: motion", () => {
 		Effect.runSync(mounted.controller.closeFx);
 	});
 
-	it("blocks clicks and drags while a pose settles, then admits a new gesture", async () => {
-		const mounted = mountController();
-		mounted.isPoseActive.mockReturnValue(true);
+	it.each([
+		"isPoseActive",
+		"isTraveling",
+	] as const)(
+		"blocks clicks and drags while %s owns the pose, then admits a new gesture",
+		async (owner) => {
+			const mounted = mountController();
+			mounted[owner].mockReturnValue(true);
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("pointerup", pointer(10, 20));
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.stage.emit("pointerup", pointer(30, 20));
-		await flushMicrotasks();
-		expect(mounted.onActivate).not.toHaveBeenCalled();
-		expect(mounted.onDrop).not.toHaveBeenCalled();
-		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-		expect(mounted.cancelAnimation).not.toHaveBeenCalled();
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+			mounted.stage.emit("pointerup", pointer(10, 20));
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+			mounted.stage.emit("globalpointermove", pointer(30, 20));
+			mounted.stage.emit("pointerup", pointer(30, 20));
+			await flushMicrotasks();
+			expect(mounted.onActivate).not.toHaveBeenCalled();
+			expect(mounted.onDrop).not.toHaveBeenCalled();
+			expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+			expect(mounted.cancelAnimation).not.toHaveBeenCalled();
 
-		mounted.isPoseActive.mockReturnValue(false);
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("pointerup", pointer(10, 20));
-		await flushMicrotasks();
-		expect(mounted.onActivate).toHaveBeenCalledOnce();
-	});
+			mounted[owner].mockReturnValue(false);
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+			mounted.stage.emit("pointerup", pointer(10, 20));
+			await flushMicrotasks();
+			expect(mounted.onActivate).toHaveBeenCalledOnce();
+		},
+	);
 
 	it.each([
 		false,

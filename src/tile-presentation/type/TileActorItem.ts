@@ -1,5 +1,4 @@
 import type { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
-import type { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 
@@ -10,14 +9,13 @@ export interface TileActorItem extends TileActorVisual {
 	readonly id: string;
 	readonly revision: string;
 	readonly location: BoardLocationSchema.Type;
-	readonly jobStatus?: JobStatusEnumSchema.Type;
 	readonly progressRatio?: number;
 	readonly clockPulse?: {
 		readonly intervalMs: number;
 		readonly remainingMs: number;
 		readonly enabled: boolean;
 	};
-	/** Waiting-cursor presentation; instant jobs keep their status without flashing a wait. */
+	/** Waiting-cursor presentation; instant jobs never flash a wait. */
 	readonly running: boolean;
 	readonly primaryAction: readRuntimeItemPrimaryActionFx.Result;
 }

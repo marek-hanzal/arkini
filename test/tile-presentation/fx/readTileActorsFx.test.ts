@@ -90,6 +90,58 @@ describe("readTileActorsFx", () => {
 		});
 	});
 
+	it("keeps lifetime visible across an instant Clock job", () => {
+		const runtime = createTileActorRuntime({
+			active: true,
+		});
+		const scheduled = RuntimeSchema.parse({
+			...runtime,
+			items: runtime.items.map((item) => ({
+				...item,
+				item: {
+					...item.item,
+					clock: {
+						durationMs: 1_000,
+						intervalMs: 100,
+					},
+					lines: item.item.lines.map((line) => ({
+						...line,
+						runtimeMs: 0,
+						clock: true,
+						input: [
+							{
+								type: "simple",
+							},
+						],
+					})),
+				},
+				schedule: {
+					remainingDurationMs: 600,
+					remainingIntervalMs: 100,
+				},
+			})),
+			jobs: runtime.jobs.map((job) => ({
+				...job,
+				durationMs: 0,
+				remainingMs: 0,
+			})),
+		});
+		for (const jobs of [
+			scheduled.jobs,
+			[],
+		]) {
+			const actor = readMainActor({
+				...scheduled,
+				jobs,
+			});
+			expect(actor?.progressRatio).toBe(0.6);
+			expect(actor?.running).toBe(false);
+			expect(actor?.clockPulse).toMatchObject({
+				enabled: true,
+			});
+		}
+	});
+
 	it("projects the saved pulse independently of a running job and full queue, with no Clock line selected", () => {
 		const runtime = createTileActorRuntime({
 			active: true,

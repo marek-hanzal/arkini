@@ -92,9 +92,6 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 			y: 20,
 		},
 		visualLayer: new Container(),
-		crowdLayer: {
-			alpha: 1,
-		},
 		lifecycleLayer: {
 			scale: {
 				set(value: number) {
@@ -148,7 +145,6 @@ describe("actor animator", () => {
 			y: 200,
 		});
 		expect(actor.container.scale.x).toBe(1);
-		expect(actor.crowdLayer.alpha).toBe(1);
 
 		Effect.runSync(
 			animator.animateFx({
@@ -159,19 +155,8 @@ describe("actor animator", () => {
 				toAlpha: 1,
 			}),
 		);
-		Effect.runSync(
-			animator.animateFx({
-				actor,
-				channel: "crowd-opacity",
-				durationMs: 180,
-				ownerKey: "running:actor",
-				toCrowdAlpha: 0.82,
-			}),
-		);
 		tweens[1]?.update(0.5);
-		tweens[2]?.update(0.5);
 		expect(actor.container.alpha).toBeCloseTo(0.91);
-		expect(actor.crowdLayer.alpha).toBeCloseTo(0.91);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
 	});
@@ -196,10 +181,6 @@ describe("actor animator", () => {
 				toAlpha: 0.4,
 			},
 			{
-				channel: "crowd-opacity",
-				toCrowdAlpha: 0.5,
-			},
-			{
 				channel: "drop-target",
 				toFactor: 0.8,
 			},
@@ -221,25 +202,27 @@ describe("actor animator", () => {
 				actor,
 				channel: "drop-target",
 				durationMs: 180,
-				toFactor: 1,
+				toFactor: 1.2,
 			}),
 		);
-		for (const tween of tweens.slice(0, 4)) {
+		for (const tween of tweens.slice(0, 3)) {
 			expect(tween.stop).not.toHaveBeenCalled();
 			tween.update(1);
 		}
-		expect(tweens[4]?.stop).toHaveBeenCalledOnce();
-		tweens[4]?.update(1);
-		tweens[5]?.update(0.5);
-		expect(actor.visualLayer.scale.x).toBeCloseTo(0.95);
+		expect(tweens[3]?.stop).toHaveBeenCalledOnce();
+		tweens[3]?.update(1);
+		tweens[4]?.update(0.5);
+		expect(actor.visualLayer.scale.x).toBeCloseTo(1.05);
 		expect(actor.visualLayer.alpha).toBeCloseTo(0.95);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
 		expect(actor.container.scale.x).toBe(1);
 		expect(actor.container.alpha).toBeCloseTo(0.4);
 		expect(actor.lifecycleLayer.scale.x).toBeCloseTo(0.6);
-		expect(actor.crowdLayer.alpha).toBeCloseTo(0.5);
 
+		tweens[4]?.update(1);
+		expect(actor.visualLayer.scale.x).toBe(1.2);
+		expect(actor.visualLayer.alpha).toBe(1);
 		Effect.runSync(
 			animator.setFx({
 				actor,
@@ -247,7 +230,7 @@ describe("actor animator", () => {
 				factor: 1,
 			}),
 		);
-		expect(tweens[5]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[4]?.stop).toHaveBeenCalledOnce();
 		expect(actor.visualLayer.scale.x).toBe(1);
 		expect(actor.visualLayer.alpha).toBe(1);
 	});
@@ -337,35 +320,6 @@ describe("actor animator", () => {
 		expect(actor.container.alpha).toBeCloseTo(0.455);
 		expect(actor.container.x).toBe(85);
 		expect(actor.container.y).toBe(170);
-	});
-
-	it("reverses one channel from its live value even when the successor has another owner key", () => {
-		const actor = createActor();
-		const { animator, tweens } = createAnimator();
-
-		Effect.runSync(
-			animator.animateFx({
-				actor,
-				channel: "crowd-opacity",
-				durationMs: 180,
-				ownerKey: "running:start",
-				toCrowdAlpha: 0.82,
-			}),
-		);
-		tweens[0]?.update(0.5);
-		Effect.runSync(
-			animator.animateFx({
-				actor,
-				channel: "crowd-opacity",
-				durationMs: 180,
-				ownerKey: "running:stop",
-				toCrowdAlpha: 1,
-			}),
-		);
-		tweens[1]?.update(0.5);
-
-		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
-		expect(actor.crowdLayer.alpha).toBeCloseTo(0.955);
 	});
 
 	it("settles cancellation separately from natural completion", () => {
@@ -585,10 +539,10 @@ describe("actor animator", () => {
 		Effect.runSync(
 			animator.animateFx({
 				actor: secondActor,
-				channel: "crowd-opacity",
+				channel: "lifecycle-opacity",
 				durationMs: 300,
-				ownerKey: "second-actor-crowd",
-				toCrowdAlpha: 0.6,
+				ownerKey: "second-actor-opacity",
+				toAlpha: 0.6,
 			}),
 		);
 		Effect.runSync(

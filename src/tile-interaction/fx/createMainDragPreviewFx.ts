@@ -59,19 +59,26 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 	game,
 	surface,
 }: Props) {
-	let diminishedTarget: PixiTileActor | null = null;
+	let previewTarget: PixiTileActor | null = null;
+	let previewFactor = 1;
 
 	const setTargetFx = Effect.fn("MainDragPreview.setTargetFx")(function* (
 		target: PixiTileActor | null,
+		factor = 1,
 	) {
-		if (diminishedTarget === target) return;
-		const previous = diminishedTarget;
-		diminishedTarget = target;
-		if (previous !== null && !previous.container.destroyed) {
+		if (previewTarget === target && previewFactor === factor) return;
+		const previous = previewTarget;
+		previewTarget = target;
+		previewFactor = factor;
+		if (previous !== target && previous !== null && !previous.container.destroyed) {
 			yield* animator.animateFx({
 				actor: previous,
 				channel: "drop-target",
-				durationMs: 160,
+				curve: {
+					kind: "spring",
+					bounce: 0,
+				},
+				durationMs: 260,
 				toFactor: 1,
 			});
 		}
@@ -79,30 +86,30 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 			yield* animator.animateFx({
 				actor: target,
 				channel: "drop-target",
-				durationMs: 160,
-				toFactor: 0.8,
+				curve: {
+					kind: "spring",
+					bounce: 0,
+				},
+				durationMs: 260,
+				toFactor: factor,
 			});
 		}
 	});
 	const projectTargetFx = Effect.fn("MainDragPreview.projectTargetFx")(function* (
 		drag: createMainDragPreviewFx.State,
 	) {
-		const diminished = match(drag.previewKind)
-			.with(DropItemResultKind.Reject, DropItemResultKind.Swap, () => true)
-			.with(
-				null,
-				DropItemResultKind.Ignored,
-				DropItemResultKind.Move,
-				DropItemResultKind.Merge,
-				() => false,
-			)
+		const factor = match(drag.previewKind)
+			.with(DropItemResultKind.Reject, DropItemResultKind.Swap, () => 0.8)
+			.with(DropItemResultKind.Merge, () => 1.08)
+			.with(null, DropItemResultKind.Ignored, DropItemResultKind.Move, () => 1)
 			.exhaustive();
 		const actor =
-			diminished && drag.targetItem !== null
+			factor !== 1 && drag.targetItem !== null
 				? (actorStore.actors.get(drag.targetItem.id) ?? null)
 				: null;
 		yield* setTargetFx(
 			actor !== null && actor !== drag.actor && !actor.container.destroyed ? actor : null,
+			factor,
 		);
 	});
 
@@ -205,7 +212,7 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 		detachTargetFx: Effect.fn("MainDragPreview.detachTargetFx")(function* (
 			actor: PixiTileActor,
 		) {
-			if (diminishedTarget === actor) diminishedTarget = null;
+			if (previewTarget === actor) previewTarget = null;
 			// A departing actor must not retain a partial hover response when its animations stop.
 			yield* animator.setFx({
 				actor,

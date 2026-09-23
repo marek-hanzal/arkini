@@ -71,6 +71,7 @@ const createHarnessFn = (item: TileActorItem) => {
 	const updateFn = (nextItem: TileActorItem, size: number) =>
 		Effect.runSync(
 			updateTileActorFx({
+				crossfadeArtworkFx: ({ onCompleteFn }) => Effect.sync(onCompleteFn),
 				actor,
 				frames,
 				item: nextItem,

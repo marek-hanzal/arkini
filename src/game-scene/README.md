@@ -23,10 +23,13 @@ defines that direction.
 - An ordinary commit updates canonical actor identities and presentation requests. The reconciler
   requests pop on arrival, fade and shrink on departure, crossfade for different identities in one
   slot, or travel toward a live target. Artwork replacement waits for a complete texture and then
-  publishes atomically. Progress and Clock rings follow the current snapshot.
-- Committed `item:input-stored` and `item:spawned` events request flights only when the final
-  visible actor identity still matches. A consumed input follows its receiver's live pose; a new
-  output starts at its producer's rendered pose. Missing visuals simply use the final snapshot.
+  crossfades through the same presentation owner, including merges that keep their runtime ID.
+  A newer replacement continues from the visible blend. Progress and Clock rings follow the current snapshot.
+- Committed `item:spawned` and `item:placed` facts give new Board items a visible origin. They pop
+  while moving away from that origin, fly to their live destination, then settle. A true same-slot
+  replacement crossfades. Newly admitted outbound deliveries pull their existing Board actor toward
+  the live input owner, using the exact previous and final Runtime identities; missing visuals simply
+  use the final snapshot.
 - Space and Template use the same sequential transition. The visible Board and its items exit
   together. Until it vanishes, later commits may update that visible Space. After a render barrier,
   the latest snapshot replaces its geometry and actors, the camera fits the new Board immediately,
@@ -37,7 +40,8 @@ defines that direction.
 - Interaction is blocked until the Board has settled. Pointer drag, target preview, camera
   gestures and exact drop commands retain their own owners and remain available during ordinary
   item feedback. A pending drop is keyed by its exact generation; late results cannot claim a
-  different actor. Dragged items keep their live pose through canonical updates.
+  different actor. A travel request blocks grabbing its actor even while artwork is loading.
+  Dragged items keep their live pose through canonical updates.
 
 ## Interaction and lifetime
 
@@ -49,7 +53,8 @@ hit geometry or admission.
 
 The scene owns one actor per visible runtime identity. A transported identity receives a fresh
 Pixi actor in its destination Space. Animation requests can be replaced or cancelled without
-changing Engine truth. Async texture generations and scene teardown prevent late callbacks from
+changing Engine truth. A lifecycle replacement continues from the current frame; cancelling an
+arrival restores a complete visible face for the next owner. Async texture generations and scene teardown prevent late callbacks from
 publishing into destroyed actors. The animation driver invalidates demand frames; Pixi has no
 second animation clock.
 

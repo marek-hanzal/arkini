@@ -14,6 +14,10 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 export namespace transitionActorVisualFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
+		readonly crossfadeArtworkFx: (props: {
+			readonly actor: PixiTileActor;
+			readonly onCompleteFn: () => void;
+		}) => Effect.Effect<void>;
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
@@ -25,6 +29,7 @@ export namespace transitionActorVisualFx {
 /** Keeps the old face visible until the complete replacement is ready to publish. */
 export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(function* ({
 	actor,
+	crossfadeArtworkFx,
 	frames,
 	item,
 	palette,
@@ -87,15 +92,23 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 			if (!ownsIncomingFn()) return;
 			actor.currentVisual = incoming;
 			actor.pendingVisual = null;
-			for (const visual of [
+			const outgoing = [
 				...actor.visuals,
-			]) {
-				if (visual === incoming) continue;
-				actor.visuals.delete(visual);
-				RendererRuntime.runSync(destroyActorVisualFx(visual));
-			}
-			incoming.container.alpha = 1;
-			RendererRuntime.runSync(frames.invalidateFx);
+			].filter((visual) => visual !== incoming);
+			RendererRuntime.runSync(
+				crossfadeArtworkFx({
+					actor,
+					onCompleteFn: () => {
+						if (actor.container.destroyed) return;
+						for (const visual of outgoing) {
+							actor.visuals.delete(visual);
+							RendererRuntime.runSync(destroyActorVisualFx(visual));
+						}
+						incoming.container.alpha = 1;
+						RendererRuntime.runSync(frames.invalidateFx);
+					},
+				}),
+			);
 		},
 	});
 });

@@ -133,6 +133,13 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(dropSubmission.closeFx);
+		const presentation = yield* createPresentationRuntimeFx({
+			animator,
+			animationDriver,
+			frames: application.frames,
+			surface,
+		});
+		registerRollbackFn(presentation.closeFx);
 		const drag = yield* createMainDragControllerFx({
 			actorStore,
 			animator,
@@ -142,6 +149,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			dragOriginGhosts,
 			dropSubmission,
 			game,
+			isTravelingFx: presentation.isTravelingFx,
 			onActivateFn,
 			surface,
 		});
@@ -170,13 +178,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			],
 		});
 		registerRollbackFn(camera.closeFx);
-		const presentation = yield* createPresentationRuntimeFx({
-			animator,
-			animationDriver,
-			frames: application.frames,
-			surface,
-		});
-		registerRollbackFn(presentation.closeFx);
 		const reconciler = yield* createMainReconcilerFx({
 			actorStore,
 			animator,

@@ -10,10 +10,16 @@ export interface PresentationTarget {
 
 /** Owns live gameplay feedback requests, never canonical gameplay or pointer gestures. */
 export interface PresentationRuntime {
+	readonly arriveFromFx: (props: {
+		readonly actor: PixiTileActor;
+		readonly origin: PresentationTarget;
+		readonly readTargetFn: () => PresentationTarget | null;
+		readonly target: PresentationTarget;
+		readonly onCompleteFn?: () => void;
+	}) => Effect.Effect<void, never, never>;
 	readonly appearFx: (props: {
 		readonly actor: PixiTileActor;
 		readonly delayMs?: number;
-		readonly initial: boolean;
 		readonly onCompleteFn?: () => void;
 	}) => Effect.Effect<void, never, never>;
 	readonly disappearFx: (props: {
@@ -22,9 +28,12 @@ export interface PresentationRuntime {
 	}) => Effect.Effect<void, never, never>;
 	readonly crossfadeFx: (props: {
 		readonly incoming: PixiTileActor;
-		readonly initialIncoming: boolean;
 		readonly outgoing: PixiTileActor;
 		readonly onCompleteFn?: () => void;
+	}) => Effect.Effect<void, never, never>;
+	readonly crossfadeArtworkFx: (props: {
+		readonly actor: PixiTileActor;
+		readonly onCompleteFn: () => void;
 	}) => Effect.Effect<void, never, never>;
 	readonly travelFx: (props: {
 		readonly actor: PixiTileActor;

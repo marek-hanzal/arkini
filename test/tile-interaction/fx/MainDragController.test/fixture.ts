@@ -216,6 +216,7 @@ export const mountController = ({
 	const onSettledDrop = vi.fn();
 	const reportCriticalFailureFn = vi.fn();
 	const isPoseActive = vi.fn(() => false);
+	const isTraveling = vi.fn(() => false);
 	const releasePointerCapture = vi.fn();
 	const dropPresentation = Effect.runSync(createDropPresentationFx());
 	const onDrop = vi.fn(() =>
@@ -397,6 +398,7 @@ export const mountController = ({
 				dragOriginGhosts,
 				dropSubmission,
 				game,
+				isTravelingFx: () => Effect.sync(isTraveling),
 				onActivateFn: onActivate,
 				surface,
 			}),
@@ -419,6 +421,7 @@ export const mountController = ({
 		animations,
 		animateActor,
 		isPoseActive,
+		isTraveling,
 		beginOriginGhost,
 		canonicalItems,
 		cancelAnimation,

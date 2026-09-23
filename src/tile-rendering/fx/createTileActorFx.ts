@@ -6,7 +6,6 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import { createActorVisualFx } from "~/tile-rendering/fx/createActorVisualFx";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
-import { readCrowdAlphaFn } from "~/tile-rendering/fn/readCrowdAlphaFn";
 import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 
@@ -39,11 +38,6 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				eventMode: "none",
 				label: `TileActorLifecycle:${item.id}:${instanceId}`,
 			});
-			const crowdLayer = new Container({
-				eventMode: "none",
-				label: `TileActorCrowd:${item.id}:${instanceId}`,
-			});
-			crowdLayer.alpha = readCrowdAlphaFn(item);
 			const visualLayer = new Container({
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
@@ -69,15 +63,13 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				currentVisual,
 			]);
 			visualLayer.addChild(currentVisual.container);
-			crowdLayer.addChild(visualLayer);
-			lifecycleLayer.addChild(crowdLayer, progressBar, clockRing);
+			lifecycleLayer.addChild(visualLayer, progressBar, clockRing);
 			container.addChild(lifecycleLayer);
 
 			return {
 				instanceId,
 				container,
 				lifecycleLayer,
-				crowdLayer,
 				visualLayer,
 				progressBar,
 				clockRing,

@@ -165,7 +165,7 @@ Presentation may trail canonical Runtime and may redirect, shorten, collapse, or
 
 Do not add queue reordering, wall-clock job timestamps, reverse reservation history, partial outcome, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.
 
-Production artwork uses the same activity effect for every running job owner. Every owner with an active job uses the same occupied opacity, including jobs waiting for completion placement; passive items retain their normal opacity.
+Production jobs never dim item artwork. Timed jobs project production progress; instant jobs preserve the item’s lifetime indicator without flashing a production state.
 
 
 Installed games keep Current, a separate Manual save, and independent 5-minute, 30-minute and 4-hour checkpoints. Current follows autosave and final save; explicit Game Menu Save writes only Manual. Checkpoint intervals use real elapsed time and persisted snapshot timestamps, unaffected by Speed up. Each missing checkpoint is initialized on the first successful Current save; only due checkpoints are replaced on later saves, including after restart or a long gap. These are refresh intervals, not exact historical ages.

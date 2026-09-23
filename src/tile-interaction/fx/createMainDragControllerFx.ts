@@ -50,6 +50,7 @@ interface Props {
 	readonly dragOriginGhosts: DragOriginGhosts;
 	readonly dropSubmission: DropSubmission;
 	readonly game: GameEngine;
+	readonly isTravelingFx: (actor: PixiTileActor) => Effect.Effect<boolean, never, never>;
 	readonly onActivateFn: (
 		item: TileActorItem,
 		intent: MainActivationIntent,
@@ -116,6 +117,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	dragOriginGhosts,
 	dropSubmission,
 	game,
+	isTravelingFx,
 	onActivateFn,
 	surface,
 }: Props) {
@@ -136,6 +138,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	});
 
 	const isMovingFn = (actor: PixiTileActor) =>
+		RendererRuntime.runSync(isTravelingFx(actor)) ||
 		RendererRuntime.runSync(animator.isChannelActiveFx(actor, "pose"));
 
 	const isTargetMovingFn = (facts: MainInteractionTargetFacts) => {

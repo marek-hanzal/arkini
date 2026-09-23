@@ -13,6 +13,10 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 export namespace updateTileActorFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
+		readonly crossfadeArtworkFx: (props: {
+			readonly actor: PixiTileActor;
+			readonly onCompleteFn: () => void;
+		}) => Effect.Effect<void>;
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
@@ -33,6 +37,7 @@ const sameVisualRevisionFn = (left: TileActorItem, right: TileActorItem) =>
 /** Reconciles metadata and geometry while texture-bearing revisions publish only when ready. */
 export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	actor,
+	crossfadeArtworkFx,
 	frames,
 	item,
 	palette,
@@ -75,6 +80,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 		if (texturesChanged || actor.pendingVisual !== null) {
 			yield* transitionActorVisualFx({
 				actor,
+				crossfadeArtworkFx,
 				frames,
 				item,
 				palette,

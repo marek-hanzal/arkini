@@ -156,19 +156,16 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 	container.alpha = 1;
 	container.position.set(40, 60);
 	const lifecycleLayer = new Container();
-	const crowdLayer = new Container();
 	const visualLayer = new Container();
 	const progressBar = new Graphics();
 	const currentVisual = createVisual(item);
 	visualLayer.addChild(currentVisual.container);
-	crowdLayer.addChild(visualLayer);
-	lifecycleLayer.addChild(crowdLayer);
+	lifecycleLayer.addChild(visualLayer);
 	container.addChild(lifecycleLayer);
 	return {
 		instanceId: `test:${item.id}`,
 		container,
 		lifecycleLayer,
-		crowdLayer,
 		visualLayer,
 		progressBar,
 		clockRing: new Graphics(),
@@ -229,7 +226,10 @@ export const createActorStore = (actor: PixiTileActor) => {
 				Effect.sync(() => {
 					const released = actors.get(actorId) ?? null;
 					actors.delete(actorId);
-					if (released !== null) exitingActors.add(released);
+					if (released !== null) {
+						released.container.eventMode = "none";
+						exitingActors.add(released);
+					}
 					return released;
 				}),
 			setActorFx: (nextActor: PixiTileActor) =>
@@ -316,9 +316,6 @@ export const createAnimator = () => {
 						case "lifecycle-opacity":
 							write.actor.container.alpha = write.alpha;
 							break;
-						case "crowd-opacity":
-							write.actor.crowdLayer.alpha = write.alpha;
-							break;
 					}
 				}),
 		} satisfies ActorAnimator,
@@ -356,14 +353,30 @@ const createPresentation = (animator: ActorAnimator) => {
 	const appears: Parameters<PresentationRuntime["appearFx"]>[0][] = [];
 	const disappears: Parameters<PresentationRuntime["disappearFx"]>[0][] = [];
 	const crossfades: Parameters<PresentationRuntime["crossfadeFx"]>[0][] = [];
+	const arrivals: Parameters<PresentationRuntime["arriveFromFx"]>[0][] = [];
 	const travels: Parameters<PresentationRuntime["travelFx"]>[0][] = [];
 	const traveling = new Set<PixiTileActor>();
+	const activeArrivals = new Set<PixiTileActor>();
 	return {
 		appears,
 		disappears,
 		crossfades,
+		arrivals,
 		travels,
 		presentation: {
+			arriveFromFx: (props) =>
+				Effect.sync(() => {
+					activeArrivals.add(props.actor);
+					props.actor.container.eventMode = "none";
+					arrivals.push({
+						...props,
+						onCompleteFn: () => {
+							activeArrivals.delete(props.actor);
+							props.onCompleteFn?.();
+						},
+					});
+					props.actor.container.position.set(props.origin.x, props.origin.y);
+				}),
 			appearFx: (props) =>
 				Effect.sync(() => {
 					appears.push(props);
@@ -372,6 +385,7 @@ const createPresentation = (animator: ActorAnimator) => {
 				Effect.sync(() => {
 					disappears.push(props);
 				}),
+			crossfadeArtworkFx: ({ onCompleteFn }) => Effect.sync(onCompleteFn),
 			crossfadeFx: (props) =>
 				Effect.sync(() => {
 					crossfades.push(props);
@@ -388,12 +402,14 @@ const createPresentation = (animator: ActorAnimator) => {
 						toY: props.target.y,
 					});
 				}),
-			isTravelingFx: (actor) => Effect.sync(() => traveling.has(actor)),
+			isTravelingFx: (actor) =>
+				Effect.sync(() => traveling.has(actor) || activeArrivals.has(actor)),
 			exitBoardFx: () => Effect.void,
 			enterBoardFx: () => Effect.void,
 			cancelActorFx: (actor) =>
 				Effect.sync(() => {
 					traveling.delete(actor);
+					if (activeArrivals.delete(actor)) actor.container.eventMode = "static";
 				}),
 			cancelAllFx: Effect.void,
 			closeFx: Effect.void,
@@ -483,11 +499,22 @@ export const createReconcilerHarness = ({
 	};
 };
 
-export const transition = (sequence: number, events: GameTransition["events"] = []) =>
+export const transition = (
+	sequence: number,
+	events: GameTransition["events"] = [],
+	runtimes?: {
+		readonly previousItems: GameTransition["runtime"]["items"];
+		readonly items: GameTransition["runtime"]["items"];
+	},
+) =>
 	({
 		events,
-		previousRuntime: {},
-		runtime: {},
+		previousRuntime: {
+			items: runtimes?.previousItems ?? [],
+		},
+		runtime: {
+			items: runtimes?.items ?? [],
+		},
 		sequence,
 	}) as unknown as ReturnType<GameEngine["getTransitionSnapshotFn"]>;
 

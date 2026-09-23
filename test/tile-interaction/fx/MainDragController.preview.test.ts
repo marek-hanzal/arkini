@@ -64,7 +64,7 @@ describe("manual drop target feedback", () => {
 		return mounted;
 	};
 
-	it("restores a nonaccepting target when a stationary drag becomes accepted", () => {
+	it("enlarges the same target when a stationary drag becomes accepted", () => {
 		const mounted = mountTarget();
 		const targetActor = mounted.actors.get(target.id);
 		expect(mounted.animations.filter(({ channel }) => channel === "drop-target")).toMatchObject(
@@ -105,11 +105,22 @@ describe("manual drop target feedback", () => {
 				},
 				{
 					actor: targetActor,
-					toFactor: 1,
+					toFactor: expect.any(Number),
 				},
 			],
 		);
+		const accepted = mounted.animations
+			.filter(({ channel }) => channel === "drop-target")
+			.at(-1);
+		expect(accepted?.channel === "drop-target" ? accepted.toFactor : undefined).toBeGreaterThan(
+			1,
+		);
 		Effect.runSync(mounted.controller.closeFx);
+		expect(mounted.presentationWrites.at(-1)).toMatchObject({
+			actor: targetActor,
+			channel: "drop-target",
+			factor: 1,
+		});
 	});
 
 	it("restores the old target when the pointer leaves and never dims the dragged actor", () => {

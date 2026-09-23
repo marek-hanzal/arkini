@@ -8,7 +8,6 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
-import { readCrowdAlphaFn } from "~/tile-rendering/fn/readCrowdAlphaFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
@@ -110,27 +109,24 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	}) {
 		yield* updateTileActorFx({
 			actor,
+			crossfadeArtworkFx: presentation.crossfadeArtworkFx,
 			frames: application.frames,
 			item,
 			palette: readPaletteFn(),
 			size: pose.size,
 			textures,
 		});
-		const crowdAlpha = readCrowdAlphaFn(item);
-		if (actor.crowdLayer.alpha !== crowdAlpha) {
-			yield* animator.setFx({
-				actor,
-				alpha: crowdAlpha,
-				channel: "crowd-opacity",
-			});
-		}
 	});
 
 	const createActorFx = Effect.fn("MainReconciler.createActorFx")(function* ({
+		hidden,
 		item,
+		origin,
 		pose,
 	}: {
+		readonly hidden: boolean;
 		readonly item: TileActorItem;
+		readonly origin?: PresentationTarget;
 		readonly pose: ActorPose;
 	}) {
 		const actor = yield* createTileActorFx({
@@ -139,14 +135,27 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			palette: readPaletteFn(),
 			textures,
 		});
-		yield* actorStore.setActorFx(actor);
-		pose.layer.addChild(actor.container);
+		for (const exiting of [
+			...actorStore.exitingActors,
+		]) {
+			if (exiting.item.id !== item.id) continue;
+			yield* presentation.cancelActorFx(exiting);
+			yield* animator.cancelActorFx(exiting);
+			yield* actorStore.destroyExitingActorFx(exiting);
+		}
+		// Prepare the first drawable pose before publishing the actor to the scene.
+		const initialPose = origin ?? pose;
+		yield* animator.setFx({
+			actor,
+			channel: "lifecycle-opacity",
+			alpha: hidden ? 0 : 1,
+		});
 		yield* animator.setFx({
 			actor,
 			channel: "pose",
-			scale: 1,
-			x: pose.x,
-			y: pose.y,
+			scale: initialPose.size / Math.max(1, pose.size),
+			x: initialPose.x,
+			y: initialPose.y,
 		});
 		yield* drag.attachActorFx(actor);
 		yield* updateActorFx({
@@ -154,6 +163,8 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			item,
 			pose,
 		});
+		yield* actorStore.setActorFx(actor);
+		(origin === undefined ? pose.layer : surface.transientActorLayer).addChild(actor.container);
 		return actor;
 	});
 
@@ -163,9 +174,9 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		if (actorStore.actors.get(actor.item.id) !== actor) return;
 		pendingTravel.delete(actor);
 		yield* drag.detachActorFx(actor);
-		yield* actorStore.releaseActorFx(actor.item.id);
 		yield* presentation.cancelActorFx(actor);
 		yield* animator.cancelActorFx(actor);
+		yield* actorStore.releaseActorFx(actor.item.id);
 	});
 
 	const destroyReleasedActorFn = (actor: PixiTileActor) => {
@@ -195,9 +206,10 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const moved = !isSameTileActorLocationFn(actor.item.location, item.location);
 		const previousSize = actor.size * actor.container.scale.x;
 		const poseChannelActive = yield* animator.isChannelActiveFx(actor, "pose");
-		const retargetTravel =
-			present && moved && poseChannelActive && (yield* presentation.isTravelingFx(actor));
-		const poseOwned = actor.dragging || (poseChannelActive && !retargetTravel);
+		const traveling = yield* presentation.isTravelingFx(actor);
+		const retargetTravel = present && moved && traveling;
+		// A request owns position while artwork loads and between its animation phases too.
+		const poseOwned = actor.dragging || ((poseChannelActive || traveling) && !retargetTravel);
 		yield* updateActorFx({
 			actor,
 			item,
@@ -299,30 +311,41 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const spawnOriginByItem = new Map<
 			string,
 			{
-				readonly size: number;
-				readonly x: number;
-				readonly y: number;
+				readonly actor: PixiTileActor;
+				readonly pose: PresentationTarget;
 			}
 		>();
 		if (present) {
+			const previousById = new Map(
+				(transition.previousRuntime?.items ?? []).map((item) => [
+					item.id,
+					item,
+				]),
+			);
+			for (const item of transition.runtime.items) {
+				if (item.location.scope !== "delivery" || item.location.phase !== "outbound")
+					continue;
+				const previous = previousById.get(item.id);
+				const actor = actorStore.actors.get(item.id);
+				const owner = nextById.get(item.location.target.ownerItemId);
+				if (
+					previous?.location.scope !== "board" ||
+					actor === undefined ||
+					owner?.location.scope !== "board" ||
+					previous.item.uid !== item.item.uid ||
+					actor.item.itemUid !== item.item.uid ||
+					!isSameTileActorLocationFn(previous.location, item.location.origin) ||
+					!isSameTileActorLocationFn(actor.item.location, previous.location) ||
+					owner.location.space !== previous.location.space
+				)
+					continue;
+				inputTargetBySource.set(item.id, owner.id);
+			}
 			for (const event of transition.events) {
-				if (event.type === GameEventEnumSchema.enum.ItemInputStored) {
-					const source = actorStore.actors.get(event.sourceItemId);
-					const owner = nextById.get(event.ownerItemId);
-					if (
-						source !== undefined &&
-						owner !== undefined &&
-						source.item.itemUid === event.itemUid &&
-						owner.location.scope === "board" &&
-						isSameTileActorLocationFn(
-							source.item.location,
-							event.previousSourceLocation,
-						) &&
-						!nextById.has(event.sourceItemId)
-					) {
-						inputTargetBySource.set(event.sourceItemId, event.ownerItemId);
-					}
-				} else if (event.type === GameEventEnumSchema.enum.ItemSpawned) {
+				if (
+					event.type === GameEventEnumSchema.enum.ItemSpawned ||
+					event.type === GameEventEnumSchema.enum.ItemPlaced
+				) {
 					const item = nextById.get(event.itemId);
 					const origin = actorStore.actors.get(event.originItemId);
 					if (
@@ -333,13 +356,13 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 						actorStore.actors.has(item.id)
 					)
 						continue;
-					spawnOriginByItem.set(
-						item.id,
-						readContactPoseFn({
+					spawnOriginByItem.set(item.id, {
+						actor: origin,
+						pose: readContactPoseFn({
 							moving: null,
 							target: origin,
 						}),
-					);
+					});
 				}
 			}
 		}
@@ -376,8 +399,10 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 						if (actorStore.actors.has(item.id)) return [];
 						const key = readSlotKeyFn(item);
 						const outgoing = key === null ? undefined : departureBySlot.get(key);
+						const origin = spawnOriginByItem.get(item.id);
 						return outgoing === undefined ||
 							outgoing.item.id === item.id ||
+							(origin !== undefined && origin.actor !== outgoing) ||
 							inputTargetBySource.has(outgoing.item.id)
 							? []
 							: [
@@ -420,31 +445,21 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			}
 			const actor = actorStore.actors.get(item.id);
 			if (actor === undefined) {
+				const outgoing = present ? replacementById.get(item.id) : undefined;
+				const origin =
+					present && outgoing === undefined ? spawnOriginByItem.get(item.id) : undefined;
 				const created = yield* createActorFx({
+					hidden: present,
 					item,
+					origin: origin?.pose,
 					pose,
 				});
 				if (present) {
-					const outgoing = replacementById.get(item.id);
 					if (outgoing === undefined) {
-						const origin = spawnOriginByItem.get(item.id);
 						if (origin !== undefined) {
-							surface.transientActorLayer.addChild(created.container);
-							yield* animator.setFx({
+							yield* presentation.arriveFromFx({
 								actor: created,
-								channel: "pose",
-								scale: origin.size / Math.max(1, created.size),
-								x: origin.x,
-								y: origin.y,
-							});
-						}
-						yield* presentation.appearFx({
-							actor: created,
-							initial: true,
-						});
-						if (origin !== undefined) {
-							yield* presentation.travelFx({
-								actor: created,
+								origin: origin.pose,
 								target: pose,
 								readTargetFn: () =>
 									actorStore.actors.get(item.id) === created
@@ -464,11 +479,13 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 									if (latest !== null) latest.layer.addChild(created.container);
 								},
 							});
-						}
+						} else
+							yield* presentation.appearFx({
+								actor: created,
+							});
 					} else {
 						yield* presentation.crossfadeFx({
 							incoming: created,
-							initialIncoming: true,
 							outgoing,
 							onCompleteFn: () => destroyReleasedActorFn(outgoing),
 						});
@@ -552,6 +569,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			const pose = yield* surface.readActorPoseFx(item);
 			if (pose === null) continue;
 			const actor = yield* createActorFx({
+				hidden: true,
 				item,
 				pose,
 			});
@@ -569,7 +587,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		for (const [index, arrival] of arrivals.entries()) {
 			yield* presentation.appearFx({
 				actor: arrival.actor,
-				initial: true,
 				delayMs: 120 + Math.min(index * 12, 150),
 			});
 		}
@@ -591,6 +608,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			if (pose === null) continue;
 			yield* updateTileActorFx({
 				actor,
+				crossfadeArtworkFx: presentation.crossfadeArtworkFx,
 				frames: application.frames,
 				item: actor.item,
 				palette: readPaletteFn(),

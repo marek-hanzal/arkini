@@ -25,12 +25,12 @@ interface ActiveActorRequest {
 	readonly actors: readonly PixiTileActor[];
 	readonly keys: readonly string[];
 	readonly slots: readonly string[];
-	onRetireFn?: () => void;
+	onRetireFn?: (replacementSlots: readonly string[]) => void;
 }
 
 const enterDurationMs = 160;
 const exitDurationMs = 130;
-const crossfadeDurationMs = 170;
+const crossfadeDurationMs = 500;
 const boardDurationMs = 155;
 const boardOffsetPx = 40;
 
@@ -44,7 +44,7 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 			let boardControl: AnimationControl | null = null;
 			let closed = false;
 
-			const slotFn = (actor: PixiTileActor, kind: "lifecycle" | "pose") =>
+			const slotFn = (actor: PixiTileActor, kind: "lifecycle" | "pose" | "artwork") =>
 				`${actor.instanceId}:${kind}`;
 			const ownsFn = (request: ActiveActorRequest) =>
 				!closed && request.slots.every((slot) => activeBySlot.get(slot) === request);
@@ -53,24 +53,46 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 					if (activeBySlot.get(slot) === request) activeBySlot.delete(slot);
 				}
 			};
+			const restoreAppearanceFx = Effect.fn("PresentationRuntime.restoreAppearanceFx")(
+				function* (actor: PixiTileActor, replacementSlots: readonly string[]) {
+					// A replacing lifecycle starts from the current frame; other takeovers need a complete face.
+					if (
+						actor.container.destroyed ||
+						replacementSlots.includes(slotFn(actor, "lifecycle"))
+					)
+						return;
+					yield* animator.setFx({
+						actor,
+						channel: "lifecycle-opacity",
+						alpha: 1,
+					});
+					yield* animator.setFx({
+						actor,
+						channel: "lifecycle-scale",
+						scale: 1,
+					});
+					actor.container.eventMode = "static";
+				},
+			);
 			const retireFx = Effect.fn("PresentationRuntime.retireFx")(function* (
 				request: ActiveActorRequest,
+				replacementSlots: readonly string[] = [],
 			) {
 				releaseFn(request);
 				for (const key of request.keys) yield* animator.cancelFx(key);
-				request.onRetireFn?.();
+				request.onRetireFn?.(replacementSlots);
 			});
 			const beginFx = Effect.fn("PresentationRuntime.beginFx")(function* (
 				claims: readonly {
 					actor: PixiTileActor;
-					kind: "lifecycle" | "pose";
+					kind: "lifecycle" | "pose" | "artwork";
 				}[],
 				channels: number,
 			) {
 				if (closed || claims.some(({ actor }) => actor.container.destroyed)) return null;
 				const slots = claims.map(({ actor, kind }) => slotFn(actor, kind));
 				for (const previous of new Set(slots.map((slot) => activeBySlot.get(slot)))) {
-					if (previous !== undefined) yield* retireFx(previous);
+					if (previous !== undefined) yield* retireFx(previous, slots);
 				}
 				const generation = ++nextGeneration;
 				const request: ActiveActorRequest = {
@@ -163,12 +185,204 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 				});
 				yield* frames.invalidateFx;
 			});
+			const runTravelFx = Effect.fn("PresentationRuntime.runTravelFx")(function* ({
+				actor,
+				onArriveFn,
+				ownerKey,
+				readTargetFn,
+				request,
+				target,
+			}: {
+				readonly actor: PixiTileActor;
+				readonly onArriveFn: () => void;
+				readonly ownerKey: string;
+				readonly readTargetFn: () => PresentationTarget | null;
+				readonly request: ActiveActorRequest;
+				readonly target: PresentationTarget;
+			}) {
+				const readPoseFn = (): PresentationTarget & {
+					readonly scale: number;
+				} => {
+					const latest = readTargetFn() ?? target;
+					return {
+						scale: latest.size / Math.max(1, actor.size),
+						x: latest.x,
+						y: latest.y,
+						size: latest.size,
+					};
+				};
+				const startTravelFx = Effect.fn("PresentationRuntime.startTravelFx")(function* () {
+					if (!ownsFn(request) || actor.container.destroyed) return;
+					const destination = readPoseFn();
+					const from = {
+						scale: actor.container.scale.x,
+						x: actor.container.x,
+						y: actor.container.y,
+					};
+					if (
+						from.x === destination.x &&
+						from.y === destination.y &&
+						from.scale === destination.scale
+					) {
+						onArriveFn();
+						return;
+					}
+					const sampleFn = yield* createRetargetablePoseSamplerFx({
+						from,
+						readTargetFn: readPoseFn,
+					});
+					yield* animator.animateFx({
+						actor,
+						channel: "pose",
+						durationMs: Math.max(
+							180,
+							readTravelDurationMsFn({
+								fromX: from.x,
+								fromY: from.y,
+								tileSize: destination.size,
+								toX: destination.x,
+								toY: destination.y,
+							}),
+						),
+						onCompleteFn: () => {
+							if (!ownsFn(request)) return;
+							const latest = readPoseFn();
+							if (
+								Math.hypot(
+									actor.container.x - latest.x,
+									actor.container.y - latest.y,
+								) < 0.25 &&
+								Math.abs(actor.container.scale.x - latest.scale) < 0.001
+							) {
+								RendererRuntime.runSync(
+									animator.setFx({
+										actor,
+										channel: "pose",
+										scale: latest.scale,
+										x: latest.x,
+										y: latest.y,
+									}),
+								);
+								onArriveFn();
+								return;
+							}
+							RendererRuntime.runSync(startTravelFx());
+						},
+						ownerKey,
+						readPoseFn: sampleFn,
+					});
+				});
+				yield* startWhenReadyFx(request, actor, startTravelFx);
+			});
 
 			return {
+				arriveFromFx: Effect.fn("PresentationRuntime.arriveFromFx")(function* ({
+					actor,
+					onCompleteFn,
+					origin,
+					readTargetFn,
+					target,
+				}) {
+					const request = yield* beginFx(
+						[
+							{
+								actor,
+								kind: "lifecycle",
+							},
+							{
+								actor,
+								kind: "pose",
+							},
+						],
+						3,
+					);
+					if (request === null) return;
+					request.onRetireFn = (replacementSlots) =>
+						RendererRuntime.runSync(restoreAppearanceFx(actor, replacementSlots));
+					actor.container.eventMode = "none";
+					yield* animator.setFx({
+						actor,
+						channel: "pose",
+						scale: origin.size / Math.max(1, actor.size),
+						x: origin.x,
+						y: origin.y,
+					});
+					yield* animator.setFx({
+						actor,
+						channel: "lifecycle-opacity",
+						alpha: 0,
+					});
+					yield* animator.setFx({
+						actor,
+						channel: "lifecycle-scale",
+						scale: 0.8,
+					});
+					const landFn = () => {
+						if (!ownsFn(request)) return;
+						RendererRuntime.runSync(
+							animator.animateFx({
+								actor,
+								channel: "lifecycle-scale",
+								durationMs: 65,
+								onCompleteFn: () => {
+									if (!ownsFn(request)) return;
+									RendererRuntime.runSync(
+										animator.animateFx({
+											actor,
+											channel: "lifecycle-scale",
+											durationMs: 90,
+											onCompleteFn: () => {
+												if (!ownsFn(request)) return;
+												actor.container.eventMode = "static";
+												completeFn(request, onCompleteFn);
+											},
+											ownerKey: request.keys[1],
+											toScale: 1,
+										}),
+									);
+								},
+								ownerKey: request.keys[1],
+								toScale: 1.06,
+							}),
+						);
+					};
+					yield* startWhenReadyFx(request, actor, () =>
+						Effect.gen(function* () {
+							let completed = 0;
+							const finishArrivalFn = () => {
+								if (++completed !== 3 || !ownsFn(request)) return;
+								landFn();
+							};
+							yield* animator.animateFx({
+								actor,
+								channel: "lifecycle-opacity",
+								durationMs: enterDurationMs,
+								onCompleteFn: finishArrivalFn,
+								ownerKey: request.keys[0],
+								toAlpha: 1,
+							});
+							yield* animator.animateFx({
+								actor,
+								channel: "lifecycle-scale",
+								durationMs: enterDurationMs,
+								onCompleteFn: finishArrivalFn,
+								ownerKey: request.keys[1],
+								toScale: 1,
+							});
+							yield* runTravelFx({
+								actor,
+								onArriveFn: finishArrivalFn,
+								ownerKey: request.keys[2],
+								readTargetFn,
+								request,
+								target,
+							});
+						}),
+					);
+				}),
 				appearFx: Effect.fn("PresentationRuntime.appearFx")(function* ({
 					actor,
 					delayMs,
-					initial,
 					onCompleteFn,
 				}) {
 					const request = yield* beginFx(
@@ -181,19 +395,19 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 						2,
 					);
 					if (request === null) return;
+					request.onRetireFn = (replacementSlots) =>
+						RendererRuntime.runSync(restoreAppearanceFx(actor, replacementSlots));
 					actor.container.eventMode = "none";
-					if (initial) {
-						yield* animator.setFx({
-							actor,
-							channel: "lifecycle-opacity",
-							alpha: 0,
-						});
-						yield* animator.setFx({
-							actor,
-							channel: "lifecycle-scale",
-							scale: 0.8,
-						});
-					}
+					yield* animator.setFx({
+						actor,
+						channel: "lifecycle-opacity",
+						alpha: 0,
+					});
+					yield* animator.setFx({
+						actor,
+						channel: "lifecycle-scale",
+						scale: 0.8,
+					});
 					yield* startWhenReadyFx(request, actor, () =>
 						Effect.gen(function* () {
 							let completeChannels = 0;
@@ -261,14 +475,9 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 				}),
 				crossfadeFx: Effect.fn("PresentationRuntime.crossfadeFx")(function* ({
 					incoming,
-					initialIncoming,
 					outgoing,
 					onCompleteFn,
 				}) {
-					if (incoming === outgoing) {
-						onCompleteFn?.();
-						return;
-					}
 					const request = yield* beginFx(
 						[
 							{
@@ -284,15 +493,16 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 					);
 					if (request === null) return;
 					// An interrupted crossfade still has to retire its outgoing actor.
-					request.onRetireFn = onCompleteFn;
+					request.onRetireFn = (replacementSlots) => {
+						RendererRuntime.runSync(restoreAppearanceFx(incoming, replacementSlots));
+						onCompleteFn?.();
+					};
 					incoming.container.eventMode = "none";
-					if (initialIncoming) {
-						yield* animator.setFx({
-							actor: incoming,
-							channel: "lifecycle-opacity",
-							alpha: 0,
-						});
-					}
+					yield* animator.setFx({
+						actor: incoming,
+						channel: "lifecycle-opacity",
+						alpha: 0,
+					});
 					yield* startWhenReadyFx(request, incoming, () =>
 						Effect.gen(function* () {
 							let completeChannels = 0;
@@ -320,6 +530,35 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 						}),
 					);
 				}),
+				crossfadeArtworkFx: Effect.fn("PresentationRuntime.crossfadeArtworkFx")(function* ({
+					actor,
+					onCompleteFn,
+				}) {
+					const request = yield* beginFx(
+						[
+							{
+								actor,
+								kind: "artwork",
+							},
+						],
+						1,
+					);
+					if (request === null) {
+						onCompleteFn();
+						return;
+					}
+					// The successor inherits every visible face at its live opacity. Explicit cancellation settles it.
+					request.onRetireFn = (replacementSlots) => {
+						if (!replacementSlots.includes(slotFn(actor, "artwork"))) onCompleteFn();
+					};
+					yield* animator.animateFx({
+						actor,
+						channel: "artwork-opacity",
+						durationMs: crossfadeDurationMs,
+						ownerKey: request.keys[0],
+						onCompleteFn: () => completeFn(request, onCompleteFn),
+					});
+				}),
 				travelFx: Effect.fn("PresentationRuntime.travelFx")(function* ({
 					actor,
 					onCompleteFn,
@@ -336,81 +575,14 @@ export const createPresentationRuntimeFx = Effect.fn("createPresentationRuntimeF
 						1,
 					);
 					if (request === null) return;
-					const readPoseFn = (): PresentationTarget & {
-						readonly scale: number;
-					} => {
-						const latest = readTargetFn() ?? target;
-						return {
-							scale: latest.size / Math.max(1, actor.size),
-							x: latest.x,
-							y: latest.y,
-							size: latest.size,
-						};
-					};
-					const startTravelFx = Effect.fn("PresentationRuntime.startTravelFx")(
-						function* () {
-							if (!ownsFn(request) || actor.container.destroyed) return;
-							const destination = readPoseFn();
-							const from = {
-								scale: actor.container.scale.x,
-								x: actor.container.x,
-								y: actor.container.y,
-							};
-							if (
-								from.x === destination.x &&
-								from.y === destination.y &&
-								from.scale === destination.scale
-							) {
-								completeFn(request, onCompleteFn);
-								return;
-							}
-							const sampleFn = yield* createRetargetablePoseSamplerFx({
-								from,
-								readTargetFn: readPoseFn,
-							});
-							yield* animator.animateFx({
-								actor,
-								channel: "pose",
-								durationMs: Math.max(
-									180,
-									readTravelDurationMsFn({
-										fromX: from.x,
-										fromY: from.y,
-										tileSize: destination.size,
-										toX: destination.x,
-										toY: destination.y,
-									}),
-								),
-								onCompleteFn: () => {
-									if (!ownsFn(request)) return;
-									const latest = readPoseFn();
-									if (
-										Math.hypot(
-											actor.container.x - latest.x,
-											actor.container.y - latest.y,
-										) < 0.25 &&
-										Math.abs(actor.container.scale.x - latest.scale) < 0.001
-									) {
-										RendererRuntime.runSync(
-											animator.setFx({
-												actor,
-												channel: "pose",
-												scale: latest.scale,
-												x: latest.x,
-												y: latest.y,
-											}),
-										);
-										completeFn(request, onCompleteFn);
-										return;
-									}
-									RendererRuntime.runSync(startTravelFx());
-								},
-								ownerKey: request.keys[0],
-								readPoseFn: sampleFn,
-							});
-						},
-					);
-					yield* startWhenReadyFx(request, actor, startTravelFx);
+					yield* runTravelFx({
+						actor,
+						onArriveFn: () => completeFn(request, onCompleteFn),
+						ownerKey: request.keys[0],
+						readTargetFn,
+						request,
+						target,
+					});
 				}),
 				exitBoardFx: (onCompleteFn) =>
 					animateBoardFx({

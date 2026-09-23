@@ -78,7 +78,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 				switch (write.channel) {
 					case "drop-target":
 						write.actor.visualLayer.scale.set(write.factor);
-						write.actor.visualLayer.alpha = write.factor;
+						write.actor.visualLayer.alpha = Math.min(1, write.factor);
 						break;
 					case "pose":
 						write.actor.container.x = write.x;
@@ -90,9 +90,6 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 						break;
 					case "lifecycle-scale":
 						write.actor.lifecycleLayer.scale.set(write.scale);
-						break;
-					case "crowd-opacity":
-						write.actor.crowdLayer.alpha = write.alpha;
 						break;
 					case "grab-offset":
 						write.actor.container.pivot.set(write.pivotX, write.pivotY);
@@ -119,7 +116,18 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const fromScale = actor.container.scale.x;
 					const fromAlpha = actor.container.alpha;
 					const fromLifecycleScale = actor.lifecycleLayer.scale.x;
-					const fromCrowdAlpha = actor.crowdLayer.alpha;
+					const artworkAlphas =
+						animation.channel === "artwork-opacity"
+							? [
+									...actor.visuals,
+								]
+									.filter((visual) => visual !== actor.pendingVisual)
+									.map((visual) => ({
+										visual,
+										from: visual.container.alpha,
+										to: visual === actor.currentVisual ? 1 : 0,
+									}))
+							: [];
 					const fromDropScale = channel === "drop-target" ? actor.visualLayer.scale.x : 1;
 					const fromDropAlpha = channel === "drop-target" ? actor.visualLayer.alpha : 1;
 					const active: ActiveAnimation = {
@@ -143,6 +151,13 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 								onUpdateFn: (progress) => {
 									if (closed || actor.container.destroyed) return;
 									switch (animation.channel) {
+										case "artwork-opacity":
+											for (const { visual, from, to } of artworkAlphas) {
+												if (!visual.container.destroyed)
+													visual.container.alpha =
+														from + (to - from) * progress;
+											}
+											break;
 										case "drop-target":
 											actor.visualLayer.scale.set(
 												fromDropScale +
@@ -150,7 +165,8 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 											);
 											actor.visualLayer.alpha =
 												fromDropAlpha +
-												(animation.toFactor - fromDropAlpha) * progress;
+												(Math.min(1, animation.toFactor) - fromDropAlpha) *
+													progress;
 											break;
 										case "pose": {
 											const pose = animation.readPoseFn?.(progress);
@@ -181,12 +197,6 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 													(animation.toScale - fromLifecycleScale) *
 														progress,
 											);
-											break;
-										case "crowd-opacity":
-											actor.crowdLayer.alpha =
-												fromCrowdAlpha +
-												(animation.toCrowdAlpha - fromCrowdAlpha) *
-													progress;
 											break;
 									}
 								},

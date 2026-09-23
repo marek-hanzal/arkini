@@ -93,13 +93,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 					yield* destroyTileActorFx(actor);
 					return;
 				}
-				for (const exitingActor of exitingActors) {
-					if (exitingActor === actor || exitingActor.item.id !== actor.item.id) {
-						continue;
-					}
-					exitingActors.delete(exitingActor);
-					yield* destroyTileActorFx(exitingActor);
-				}
+
 				actors.set(actor.item.id, actor);
 			}),
 			closeFx: Effect.gen(function* () {

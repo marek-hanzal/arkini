@@ -172,6 +172,12 @@ describe("texture readiness", () => {
 		const { actor, frames } = createActor({
 			textures,
 		});
+		const crossfades: Array<() => void> = [];
+		const crossfadeArtworkFx = vi.fn(({ onCompleteFn }: { onCompleteFn: () => void }) =>
+			Effect.sync(() => {
+				crossfades.push(onCompleteFn);
+			}),
+		);
 		const oldVisual = actor.currentVisual;
 		const oldTexture = new Texture();
 		const nextTexture = new Texture();
@@ -186,6 +192,7 @@ describe("texture readiness", () => {
 
 		Effect.runSync(
 			updateTileActorFx({
+				crossfadeArtworkFx,
 				actor,
 				frames,
 				item: createItem({
@@ -208,6 +215,7 @@ describe("texture readiness", () => {
 		expect(oldVisual.primary.texture).toBe(oldTexture);
 		expect(actor.pendingVisual?.container.alpha).toBe(0);
 		expect(actor.pendingVisual?.primary.texture).toBe(Texture.EMPTY);
+		expect(crossfadeArtworkFx).not.toHaveBeenCalled();
 		const pendingVisual = actor.pendingVisual;
 		const transitionGeneration = actor.visualTransitionGeneration;
 		const publishedBeforeCancel = vi.fn(() => {
@@ -220,6 +228,7 @@ describe("texture readiness", () => {
 
 		Effect.runSync(
 			updateTileActorFx({
+				crossfadeArtworkFx,
 				actor,
 				frames,
 				item: createItem({
@@ -239,6 +248,10 @@ describe("texture readiness", () => {
 			expect(actor.currentVisual.primary.texture).toBe(nextTexture);
 		});
 		expect(actor.currentVisual.primary.texture).toBe(nextTexture);
+		expect(crossfadeArtworkFx).toHaveBeenCalledOnce();
+		expect(actor.currentVisual.container.alpha).toBe(0);
+		expect(oldVisual.container.destroyed).toBe(false);
+		crossfades[0]?.();
 		expect(actor.currentVisual.container.alpha).toBe(1);
 		expect(actor.pendingVisual).toBeNull();
 		expect(oldVisual.container.destroyed).toBe(true);
@@ -271,6 +284,7 @@ describe("texture readiness", () => {
 		const updateFn = (item: TileActorItem) =>
 			Effect.runSync(
 				updateTileActorFx({
+					crossfadeArtworkFx: ({ onCompleteFn }) => Effect.sync(onCompleteFn),
 					actor,
 					frames,
 					item,

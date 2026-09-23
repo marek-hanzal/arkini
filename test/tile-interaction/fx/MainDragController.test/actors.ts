@@ -64,7 +64,6 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 	} satisfies ActorVisual;
 	return {
 		container,
-		crowdLayer: new Container(),
 		currentVisual: visual,
 		dragging: false,
 		dragOffsetX: 0,

@@ -4,7 +4,6 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
 import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
-import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 
 interface TargetPose {
 	readonly x: number;
@@ -16,10 +15,8 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 	actor,
 	animator,
 	curve,
-	durationMs: requestedDurationMs,
-	onCancelFn,
+	durationMs,
 	onCompleteFn,
-	ownerKey,
 	readSizeFn,
 	readTargetFn,
 	target,
@@ -27,23 +24,12 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 	readonly actor: PixiTileActor;
 	readonly animator: ActorAnimator;
 	readonly curve?: AnimationCurve;
-	readonly durationMs?: number;
-	readonly onCancelFn?: () => void;
+	readonly durationMs: number;
 	readonly onCompleteFn?: () => void;
-	readonly ownerKey?: string;
 	readonly readSizeFn: () => number;
 	readonly readTargetFn: () => TargetPose | null;
 	readonly target: TargetPose;
 }) {
-	const durationMs =
-		requestedDurationMs ??
-		readTravelDurationMsFn({
-			fromX: actor.container.x,
-			fromY: actor.container.y,
-			tileSize: actor.size,
-			toX: target.x,
-			toY: target.y,
-		});
 	const readTargetPoseFn = () => {
 		const latest = readTargetFn() ?? target;
 		return {
@@ -65,9 +51,7 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 		channel: "pose",
 		curve,
 		durationMs,
-		onCancelFn,
 		onCompleteFn,
-		ownerKey,
 		// Layout settling has no follow-up leg: a dropped final frame must still
 		// land on the latest target before releasing the pose channel.
 		readPoseFn: (progress) => (progress === 1 ? readTargetPoseFn() : readPoseFn(progress)),

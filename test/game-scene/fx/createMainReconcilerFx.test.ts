@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameTransition } from "~/game-session/type/GameSession";
 
 import {
 	boardLocation,
@@ -167,66 +168,7 @@ describe("main reconciliation / snapshot ownership", () => {
 			y: 200,
 		});
 	});
-	it("flies a consumed input toward the live dragged owner center", () => {
-		const source = createItem("runtime:input", boardLocation);
-		const owner = createItem("runtime:owner", {
-			...boardLocation,
-			position: {
-				x: 1,
-				y: 0,
-			},
-		});
-		const sourceActor = createActor(source);
-		sourceActor.container.pivot.set(10, 5);
-		const ownerActor = createActor(owner);
-		ownerActor.dragging = true;
-		ownerActor.container.position.set(300, 160);
-		ownerActor.container.pivot.set(20, 10);
-		ownerActor.container.scale.set(1.25);
-		const harness = createReconcilerHarness({
-			actor: sourceActor,
-		});
-		Effect.runSync(harness.store.setActorFx(ownerActor));
-		projectionState.main = [
-			owner,
-		];
 
-		Effect.runSync(
-			harness.reconciler.reconcileFx(
-				transition(2, [
-					{
-						type: GameEventEnumSchema.enum.ItemInputStored,
-						sourceItemId: source.id,
-						itemUid: source.itemUid,
-						previousSourceLocation: boardLocation,
-						ownerItemId: owner.id,
-						lineId: "line:input",
-						inputIndex: 0,
-					},
-				]),
-			),
-		);
-
-		expect(harness.disappears).toEqual([]);
-		expect(harness.travels).toHaveLength(1);
-		expect(harness.travels[0]?.actor).toBe(sourceActor);
-		expect(sourceActor.container.destroyed).toBe(false);
-		expect(harness.travels[0]?.readTargetFn()).toMatchObject({
-			size: 100,
-			x: 287.5,
-			y: 153.75,
-		});
-		ownerActor.container.position.set(320, 180);
-		expect(harness.travels[0]?.readTargetFn()).toMatchObject({
-			x: 307.5,
-			y: 173.75,
-		});
-		harness.travels[0]?.onCompleteFn?.();
-		expect(harness.disappears).toHaveLength(1);
-		expect(sourceActor.container.destroyed).toBe(false);
-		harness.disappears[0]?.onCompleteFn?.();
-		expect(sourceActor.container.destroyed).toBe(true);
-	});
 	it("flies multiple spawned outputs from a producer removed in the same commit", () => {
 		const producer = createItem("runtime:producer", boardLocation);
 		const first = createItem("runtime:first-output", {
@@ -268,12 +210,44 @@ describe("main reconciliation / snapshot ownership", () => {
 			location: item.location,
 		}));
 
+		const firstFrames: Array<{
+			alpha: number;
+			x: number;
+			y: number;
+		}> = [];
+		harness.transientActorLayer.on("childAdded", (child) => {
+			firstFrames.push({
+				alpha: child.alpha,
+				x: child.x,
+				y: child.y,
+			});
+		});
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2, events)));
+		expect(firstFrames).toEqual([
+			{
+				alpha: 0,
+				x: 120,
+				y: 140,
+			},
+			{
+				alpha: 0,
+				x: 120,
+				y: 140,
+			},
+		]);
 
 		expect(producerActor.container.destroyed).toBe(false);
-		expect(harness.travels).toHaveLength(2);
-		for (const flight of harness.travels) {
-			expect(flight.actor.container.position).toMatchObject({
+		expect(harness.arrivals).toHaveLength(2);
+		// No physical pose tween exists while artwork is pending; the request still owns position.
+		for (let sequence = 3; sequence <= 10; sequence++) {
+			Effect.runSync(harness.reconciler.reconcileFx(transition(sequence)));
+			Effect.runSync(harness.reconciler.hydrateFx(transition(sequence)));
+		}
+		for (const flight of harness.arrivals) {
+			expect({
+				x: flight.actor.container.x,
+				y: flight.actor.container.y,
+			}).toEqual({
 				x: 120,
 				y: 140,
 			});
@@ -281,6 +255,272 @@ describe("main reconciliation / snapshot ownership", () => {
 			flight.onCompleteFn?.();
 			expect(flight.actor.container.parent).toBe(harness.layer);
 		}
+	});
+	it("flies an originated output even when another actor leaves its destination", () => {
+		const origin = createItem("runtime:origin", boardLocation);
+		const destination = {
+			...boardLocation,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		};
+		const outgoing = createItem("runtime:outgoing", destination);
+		const output = createItem("runtime:output", destination);
+		const harness = createReconcilerHarness({
+			actor: createActor(origin),
+		});
+		Effect.runSync(harness.store.setActorFx(createActor(outgoing)));
+		projectionState.main = [
+			output,
+		];
+
+		Effect.runSync(
+			harness.reconciler.reconcileFx(
+				transition(2, [
+					{
+						type: GameEventEnumSchema.enum.ItemSpawned,
+						itemId: output.id,
+						itemUid: output.itemUid,
+						originItemId: origin.id,
+						location: destination,
+					},
+				]),
+			),
+		);
+
+		expect(harness.arrivals).toHaveLength(1);
+		expect(harness.arrivals[0]?.origin).toMatchObject({
+			x: 40,
+			y: 60,
+		});
+		expect(harness.crossfades).toEqual([]);
+		expect(harness.disappears).toHaveLength(2);
+	});
+	it("flies an item placed from storage when its origin is visible", () => {
+		const origin = createItem("runtime:origin", boardLocation);
+		const destination = {
+			...boardLocation,
+			position: {
+				x: 2,
+				y: 0,
+			},
+		};
+		const placed = createItem("runtime:placed", destination);
+		const harness = createReconcilerHarness({
+			actor: createActor(origin),
+		});
+		projectionState.main = [
+			origin,
+			placed,
+		];
+
+		Effect.runSync(
+			harness.reconciler.reconcileFx(
+				transition(2, [
+					{
+						type: GameEventEnumSchema.enum.ItemPlaced,
+						itemId: placed.id,
+						itemUid: placed.itemUid,
+						originItemId: origin.id,
+						previousLocation: {
+							scope: "input",
+							ownerItemId: origin.id,
+							lineId: "line:input",
+							inputIndex: 0,
+						},
+						location: destination,
+					},
+				]),
+			),
+		);
+
+		expect(harness.arrivals).toHaveLength(1);
+		expect(harness.arrivals[0]?.actor.item.id).toBe(placed.id);
+		expect(harness.appears).toEqual([]);
+	});
+	it("keeps an originated actor noninteractive when it departs mid-flight", () => {
+		const origin = createItem("runtime:origin", boardLocation);
+		const output = createItem("runtime:output", {
+			...boardLocation,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		});
+		const harness = createReconcilerHarness({
+			actor: createActor(origin),
+		});
+		projectionState.main = [
+			origin,
+			output,
+		];
+		Effect.runSync(
+			harness.reconciler.reconcileFx(
+				transition(2, [
+					{
+						type: GameEventEnumSchema.enum.ItemSpawned,
+						itemId: output.id,
+						itemUid: output.itemUid,
+						originItemId: origin.id,
+						location: output.location,
+					},
+				]),
+			),
+		);
+		const outputActor = harness.actors.get(output.id);
+		expect(outputActor?.container.eventMode).toBe("none");
+		projectionState.main = [
+			origin,
+		];
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+		expect(outputActor?.container.eventMode).toBe("none");
+	});
+	it("pulls an admitted autofill source toward its live owner", () => {
+		const source = createItem("runtime:source", boardLocation);
+		const ownerLocation = {
+			...boardLocation,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		};
+		const owner = createItem("runtime:owner", ownerLocation);
+		const sourceActor = createActor(source);
+		sourceActor.container.pivot.set(10, 5);
+		const ownerActor = createActor(owner);
+		ownerActor.dragging = true;
+		ownerActor.container.position.set(300, 160);
+		ownerActor.container.pivot.set(20, 10);
+		ownerActor.container.scale.set(1.25);
+		const harness = createReconcilerHarness({
+			actor: sourceActor,
+		});
+		Effect.runSync(harness.store.setActorFx(ownerActor));
+		projectionState.main = [
+			owner,
+		];
+		const runtimeItem = (item: typeof source, location: unknown) =>
+			({
+				id: item.id,
+				item: {
+					uid: item.itemUid,
+				},
+				location,
+				revision: item.revision,
+			}) as GameTransition["runtime"]["items"][number];
+		const previousItems = [
+			runtimeItem(source, source.location),
+			runtimeItem(owner, owner.location),
+		];
+		const items = [
+			runtimeItem(source, {
+				scope: "delivery",
+				phase: "outbound",
+				origin: boardLocation,
+				target: {
+					kind: "line-input",
+					ownerItemId: owner.id,
+					lineId: "line:input",
+					inputIndex: 0,
+				},
+			}),
+			runtimeItem(owner, owner.location),
+		];
+
+		Effect.runSync(
+			harness.reconciler.reconcileFx(
+				transition(2, [], {
+					previousItems,
+					items,
+				}),
+			),
+		);
+
+		expect(harness.travels).toHaveLength(1);
+		expect(harness.travels[0]?.actor).toBe(sourceActor);
+		expect(harness.disappears).toEqual([]);
+		expect(harness.travels[0]?.readTargetFn()).toMatchObject({
+			size: 100,
+			x: 287.5,
+			y: 153.75,
+		});
+		ownerActor.container.position.set(320, 180);
+		expect(harness.travels[0]?.readTargetFn()).toMatchObject({
+			x: 307.5,
+			y: 173.75,
+		});
+		harness.travels[0]?.onCompleteFn?.();
+		expect(harness.disappears).toHaveLength(1);
+		expect(sourceActor.container.destroyed).toBe(false);
+		harness.disappears[0]?.onCompleteFn?.();
+		expect(sourceActor.container.destroyed).toBe(true);
+	});
+	it("retires an autofill flight before the same identity returns to the Board", () => {
+		const source = createItem("runtime:quick-return", boardLocation);
+		const owner = createItem("runtime:owner", {
+			...boardLocation,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		});
+		const sourceActor = createActor(source);
+		const harness = createReconcilerHarness({
+			actor: sourceActor,
+		});
+		Effect.runSync(harness.store.setActorFx(createActor(owner)));
+		projectionState.main = [
+			owner,
+		];
+		const runtimeItem = (location: unknown) =>
+			({
+				id: source.id,
+				item: {
+					uid: source.itemUid,
+				},
+				location,
+				revision: source.revision,
+			}) as GameTransition["runtime"]["items"][number];
+		Effect.runSync(
+			harness.reconciler.reconcileFx(
+				transition(2, [], {
+					previousItems: [
+						runtimeItem(boardLocation),
+					],
+					items: [
+						runtimeItem({
+							scope: "delivery",
+							phase: "outbound",
+							origin: boardLocation,
+							target: {
+								kind: "line-input",
+								ownerItemId: owner.id,
+							},
+						}),
+						{
+							id: owner.id,
+							item: {
+								uid: owner.itemUid,
+							},
+							location: owner.location,
+						} as GameTransition["runtime"]["items"][number],
+					],
+				}),
+			),
+		);
+		expect(harness.travels).toHaveLength(1);
+		projectionState.main = [
+			owner,
+			source,
+		];
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+
+		expect(sourceActor.container.destroyed).toBe(true);
+		expect(harness.canceledActors).toContain(sourceActor);
+		expect(harness.actors.get(source.id)).not.toBe(sourceActor);
+		harness.travels[0]?.onCompleteFn?.();
+		expect(harness.disappears).toEqual([]);
 	});
 	it("crossfades a different identity committed into the same slot", () => {
 		const consumed = createItem("runtime:producer", boardLocation);
@@ -293,13 +533,24 @@ describe("main reconciliation / snapshot ownership", () => {
 			output,
 		];
 
-		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		Effect.runSync(
+			harness.reconciler.reconcileFx(
+				transition(2, [
+					{
+						type: GameEventEnumSchema.enum.ItemSpawned,
+						itemId: output.id,
+						itemUid: output.itemUid,
+						originItemId: consumed.id,
+						location: boardLocation,
+					},
+				]),
+			),
+		);
 
 		const incoming = harness.actors.get(output.id);
 		expect(harness.crossfades).toHaveLength(1);
 		expect(harness.crossfades[0]).toMatchObject({
 			incoming,
-			initialIncoming: true,
 			outgoing,
 		});
 		expect(harness.appears).toEqual([]);

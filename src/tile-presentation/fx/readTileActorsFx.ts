@@ -37,10 +37,8 @@ const readProgressRatioFn = ({
 	readonly activeJob?: JobSchema.Type;
 	readonly item: RuntimeItemSchema.Type;
 }) => {
-	if (activeJob !== undefined)
-		return activeJob.durationMs <= 0
-			? undefined
-			: clampRatioFn(1 - activeJob.remainingMs / activeJob.durationMs);
+	if (activeJob !== undefined && activeJob.durationMs > 0)
+		return clampRatioFn(1 - activeJob.remainingMs / activeJob.durationMs);
 	const durationMs = readItemScheduleFn(item.item)?.durationMs;
 	if (durationMs === undefined) return undefined;
 	return durationMs <= 0
@@ -127,11 +125,6 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				id: item.id,
 				revision: item.revision,
 				location: item.location,
-				...(activeJobStatus === undefined
-					? {}
-					: {
-							jobStatus: activeJobStatus,
-						}),
 				running: running && activeJob !== undefined && activeJob.durationMs > 0,
 				...(clockPulse === undefined
 					? {}

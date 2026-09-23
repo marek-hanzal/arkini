@@ -21,7 +21,6 @@ export const createRetargetablePoseSamplerFx = Effect.fn("createRetargetablePose
 			let segmentOrigin = from;
 			let segmentStart = 0;
 			let target = readTargetFn();
-			let lastPose = from;
 
 			return (progress: number): Required<PresentedPose> => {
 				const nextTarget = readTargetFn();
@@ -37,8 +36,7 @@ export const createRetargetablePoseSamplerFx = Effect.fn("createRetargetablePose
 					segmentStart = progress;
 					target = nextTarget;
 				}
-				lastPose = advancedPose;
-				return lastPose;
+				return advancedPose;
 			};
 		}),
 );

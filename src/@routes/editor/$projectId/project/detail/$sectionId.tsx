@@ -8,6 +8,18 @@ import { ProjectGeneralDetail } from "~/project-authoring/ui/ProjectGeneralDetai
 import { type ProjectSectionId, ProjectSectionIds } from "~/project-authoring/type/ProjectSections";
 
 export const Route = createFileRoute("/editor/$projectId/project/detail/$sectionId")({
+	validateSearch: (
+		search,
+	): {
+		readonly space?: number;
+	} => ({
+		space:
+			typeof search.space === "number" &&
+			Number.isSafeInteger(search.space) &&
+			search.space >= 0
+				? search.space
+				: undefined,
+	}),
 	beforeLoad: ({ params }) => {
 		if (ProjectSectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
@@ -21,6 +33,7 @@ export const Route = createFileRoute("/editor/$projectId/project/detail/$section
 	},
 	component: () => {
 		const { sectionId } = Route.useParams();
+		const { space } = Route.useSearch();
 		const project = useEditorProject();
 		switch (sectionId as ProjectSectionId) {
 			case "introduction":
@@ -30,7 +43,13 @@ export const Route = createFileRoute("/editor/$projectId/project/detail/$section
 			case "images":
 				return <ProjectImagesDetail project={project} />;
 			case "board":
-				return <ProjectBoardDetail project={project} />;
+				return (
+					<ProjectBoardDetail
+						key={space}
+						project={project}
+						initialSpace={space}
+					/>
+				);
 		}
 	},
 });

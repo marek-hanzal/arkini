@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { createEditorMcpOwnershipFx } from "~/authoring-mcp/http/createEditorMcpOwnershipFx";
 import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
@@ -55,7 +54,6 @@ describe("editor MCP server", () => {
 			"delete_template",
 			"project",
 			"item_meta",
-			"estimate",
 			"item_collection",
 			"artwork_collection",
 			"note_collection",
@@ -69,9 +67,10 @@ describe("editor MCP server", () => {
 			"item_lines",
 			"item_line_configs",
 			"item_line_config",
+			"graph_schema",
+			"graph_query",
 			"item_input",
 			"item_outcome",
-			"item_estimate",
 			"item_chain",
 		]);
 		const artworkCollectionSchema = tools.tools.find(
@@ -148,22 +147,6 @@ describe("editor MCP server", () => {
 				type: "boolean",
 			},
 		});
-		expect(
-			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
-		).toMatchObject({
-			page: expect.any(Object),
-			limit: expect.any(Object),
-			query: expect.any(Object),
-			view: {
-				default: "fastest",
-				enum: [
-					"fastest",
-					"slowest",
-					"demand",
-					"incomplete",
-				],
-			},
-		});
 		for (const toolName of [
 			"item_input",
 			"item_outcome",
@@ -173,12 +156,6 @@ describe("editor MCP server", () => {
 			expect(properties).toHaveProperty("itemUid");
 			expect(properties).toHaveProperty("level");
 		}
-		expect(
-			tools.tools.find(({ name }) => name === "item_estimate")?.inputSchema.properties,
-		).toMatchObject({
-			itemUid: expect.any(Object),
-			quantity: expect.any(Object),
-		});
 		const missing = await client.callTool({
 			name: "project",
 			arguments: {},
@@ -270,127 +247,5 @@ describe("editor MCP server", () => {
 		expect(runtimeCalls).toBe(2);
 		ownership.clearProjectContextFn("project-context");
 		expect(ownership.readProjectContextFn()).toBeUndefined();
-	});
-
-	it("routes relation and estimate requests through the active project", async () => {
-		const { ownership, port, repository } = await createMcpHarness();
-		await Effect.runPromise(
-			repository.createProjectFx({
-				version: {
-					major: 1,
-					minor: 0,
-				},
-				config: {
-					...createJobTestConfig(),
-					meta: {
-						...createJobTestConfig().meta,
-						id: "tool-project",
-					},
-				},
-				resources: [],
-			}),
-		);
-		ownership.setProjectContextFn("tool-project");
-		await Effect.runPromise(ownership.startLocalFx);
-		const client = await connectMcpClient(port);
-		const relation = await client.callTool({
-			name: "item_input",
-			arguments: {
-				itemUid: "water",
-				level: 2,
-			},
-		});
-		const globalEstimate = await client.callTool({
-			name: "estimate",
-			arguments: {
-				limit: 2,
-				view: "incomplete",
-			},
-		});
-		const estimate = await client.callTool({
-			name: "item_estimate",
-			arguments: {
-				itemUid: "tool",
-			},
-		});
-		for (const name of [
-			"item_input",
-			"item_outcome",
-			"item_estimate",
-		]) {
-			const argumentsBase = {
-				itemUid: "tool",
-			};
-			const defaultResult = await client.callTool({
-				name,
-				arguments: argumentsBase,
-			});
-			const fullResult = await client.callTool({
-				name,
-				arguments: {
-					...argumentsBase,
-					detail: "full",
-				},
-			});
-			const summaryResult = await client.callTool({
-				name,
-				arguments: {
-					...argumentsBase,
-					detail: "summary",
-				},
-			});
-			expect(fullResult).toEqual(defaultResult);
-			expect(summaryResult.isError).not.toBe(true);
-			expect(summaryResult.content).toMatchObject([
-				{
-					text: expect.stringContaining("Detail: summary"),
-				},
-			]);
-			const invalidResult = await client.callTool({
-				name,
-				arguments: {
-					...argumentsBase,
-					detail: "brief",
-				},
-			});
-			expect(invalidResult.isError).toBe(true);
-		}
-		const missingEstimate = await client.callTool({
-			name: "item_estimate",
-			arguments: {
-				itemUid: "missing",
-			},
-		});
-
-		expect(relation.isError).not.toBe(true);
-		expect(relation).not.toHaveProperty("structuredContent");
-		expect(relation.content).toMatchObject([
-			{
-				text: expect.stringContaining("Item input\nItem UID: water"),
-			},
-		]);
-		expect(globalEstimate.isError).not.toBe(true);
-		expect(globalEstimate).not.toHaveProperty("structuredContent");
-		expect(globalEstimate.content).toMatchObject([
-			{
-				text: expect.stringContaining("View: incomplete"),
-			},
-		]);
-		expect(estimate.isError).not.toBe(true);
-		expect(estimate).not.toHaveProperty("structuredContent");
-		expect(estimate.content).toMatchObject([
-			{
-				text: expect.stringContaining("Item estimate\nItem UID: tool"),
-			},
-		]);
-		expect(missingEstimate).toMatchObject({
-			isError: true,
-			content: [
-				{
-					text: "Editor operation failed: Item missing does not exist in the open project.",
-					type: "text",
-				},
-			],
-		});
 	});
 });

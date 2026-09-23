@@ -1,0 +1,15 @@
+DataScript 1.8.1
+Copyright 2014-2021 Nikita Prokopov
+
+This distribution includes the unmodified DataScript JavaScript library,
+bundled into the application, under the Eclipse Public License v1.0.
+The complete license accompanies this notice as DataScript-EPL-1.0.txt.
+
+Source for the exact version is available at:
+https://github.com/tonsky/datascript/tree/1.8.1
+https://github.com/tonsky/datascript/archive/refs/tags/1.8.1.tar.gz
+
+DataScript is provided without warranties or conditions of any kind.
+Its contributors disclaim liability as specified in the accompanying license.
+Any application-specific terms are offered by the application distributor
+alone and not by DataScript's contributors.

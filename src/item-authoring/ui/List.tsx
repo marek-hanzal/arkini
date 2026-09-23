@@ -8,21 +8,8 @@ import {
 	EditorSectionShortcutNavigation,
 } from "~/authoring-shell/ui/EditorSectionBar";
 import { Mx } from "~/translation/ui/Mx";
-import {
-	ArrowDownAZ,
-	CircleOff,
-	FilePenLine,
-	Gauge,
-	Hourglass,
-	NotebookPen,
-	PackageOpen,
-	Plus,
-	RefreshCw,
-	SearchX,
-	TrendingUp,
-	TriangleAlert,
-} from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { ArrowDownAZ, FilePenLine, NotebookPen, PackageOpen, Plus, SearchX } from "lucide-react";
+import { useCallback, useMemo } from "react";
 import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -35,8 +22,6 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { CreateItemLink } from "~/item-authoring/ui/CreateItemLink";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
-import { ItemEstimateMetrics } from "~/estimate/ui/ItemEstimateMetrics";
-import { useItemEstimateIndex } from "~/estimate/ui/useItemEstimateIndex";
 import { ArtworkCardLink } from "~/ui/ui/ArtworkCardLink";
 import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
@@ -88,30 +73,6 @@ export const List = ({
 			shortcut: "n",
 		},
 		{
-			icon: CircleOff,
-			label: translator.textFn("Unreachable"),
-			value: "incomplete",
-			shortcut: "u",
-		},
-		{
-			icon: Gauge,
-			label: translator.textFn("Fastest first"),
-			value: "fastest",
-			shortcut: "f",
-		},
-		{
-			icon: Hourglass,
-			label: translator.textFn("Slowest first"),
-			value: "slowest",
-			shortcut: "s",
-		},
-		{
-			icon: TrendingUp,
-			label: translator.textFn("Highest demand first"),
-			value: "demand",
-			shortcut: "h",
-		},
-		{
 			icon: NotebookPen,
 			label: translator.textFn("With note"),
 			value: "with-note",
@@ -124,34 +85,7 @@ export const List = ({
 		readonly value: selectItemCollectionFn.View;
 	}>;
 
-	const [refreshVersion, setRefreshVersion] = useState(0);
 	const settledQuery = useDebouncedSearchQuery(query);
-	const estimates = useItemEstimateIndex(project, {
-		query: "",
-		refreshVersion,
-		view: view === "name" || view === "with-note" ? "fastest" : view,
-	});
-	const estimatesCurrent = estimates.snapshot.config === project.config;
-	// Item editing stays live; estimates belong to the entry or manually refreshed config.
-	const currentEstimateRows = useMemo(
-		() => (estimatesCurrent ? estimates.rows : []),
-		[
-			estimates.rows,
-			estimatesCurrent,
-		],
-	);
-	const estimatesByUid = useMemo(
-		() =>
-			new Map(
-				currentEstimateRows.map(({ item, estimate }) => [
-					item.uid,
-					estimate,
-				]),
-			),
-		[
-			currentEstimateRows,
-		],
-	);
 	const items = useMemo(
 		() => Object.values(project.config.items),
 		[
@@ -163,7 +97,6 @@ export const List = ({
 		() =>
 			selectItemCollectionFn({
 				items,
-				orderedEstimates: currentEstimateRows,
 				notedItemUids,
 				draft,
 				query: settledQuery,
@@ -173,7 +106,6 @@ export const List = ({
 			draft,
 			items,
 			settledQuery,
-			currentEstimateRows,
 			notedItemUids,
 			view,
 		],
@@ -188,14 +120,11 @@ export const List = ({
 					sectionId: "identity",
 				}}
 				preload="intent"
-				className="data-[ui-highlighted=true]:bg-accent/10 data-[ui-highlighted=true]:hover:bg-accent/15"
+				className="data-[ui-draft=true]:bg-accent/10 data-[ui-draft=true]:hover:bg-accent/15"
 				{...readDataUiFn({
 					dataUi: "EditorItemCard",
 					state: {
 						draft: readDraftFn(item),
-						highlighted:
-							readDraftFn(item) ||
-							estimatesByUid.get(item.uid)?.status === "unreachable",
 					},
 				})}
 				data-item-uid={item.uid}
@@ -214,12 +143,6 @@ export const List = ({
 						</span>
 					) : undefined
 				}
-				details={
-					<ItemEstimateMetrics
-						estimate={estimatesByUid.get(item.uid)}
-						maximumDemand={estimates.maximumDemand}
-					/>
-				}
 				artwork={
 					<EditorItemThumbnail
 						className="aspect-square h-auto w-66 max-w-full rounded-none border-0 bg-transparent"
@@ -230,8 +153,6 @@ export const List = ({
 		),
 		[
 			project.projectId,
-			estimatesByUid,
-			estimates.maximumDemand,
 			notedItemUids,
 			translator,
 		],
@@ -266,23 +187,6 @@ export const List = ({
 			}
 			secondaryNavigation={
 				<EditorSectionBar
-					actions={
-						<LinkButton
-							className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap opacity-60 data-[ui-stale=true]:opacity-100 hover:opacity-100"
-							disabled={estimatesCurrent && estimates.status === "loading"}
-							onClick={() => setRefreshVersion((version) => version + 1)}
-							{...readDataUiFn({
-								dataUi: "EditorItemsRefresh",
-								state: {
-									stale: !estimatesCurrent || estimates.status === "error",
-									loading: estimatesCurrent && estimates.status === "loading",
-								},
-							})}
-						>
-							<RefreshCw className="size-4 in-data-[ui-loading=true]:animate-spin" />
-							{translator.textFn("Refresh")}
-						</LinkButton>
-					}
 					help={
 						<EditorPageHelp
 							title={translator.textFn("Items")}
@@ -343,18 +247,7 @@ export const List = ({
 				{view === "with-note" && notes.loading ? (
 					<p className="text-sm text-muted">{translator.textFn("Loading notes…")}</p>
 				) : null}
-				{!empty && estimatesCurrent && estimates.status === "error" ? (
-					<Status
-						dataUi="EditorItemEstimatesError"
-						description={estimates.message}
-						icon={TriangleAlert}
-						title={translator.textFn("Estimate calculation failed")}
-					/>
-				) : null}
-				{!empty &&
-				filteredItems.length === 0 &&
-				(view !== "with-note" || notes.loaded) &&
-				(view !== "incomplete" || (estimatesCurrent && estimates.status === "ready")) ? (
+				{!empty && filteredItems.length === 0 && (view !== "with-note" || notes.loaded) ? (
 					<Status
 						dataUi="EditorItemSearchEmpty"
 						icon={SearchX}

@@ -57,6 +57,10 @@ files:
     filter:
       - '**/*'
 extraResources:
+  - from: electron/resources/licenses
+    to: licenses
+    filter:
+      - '**/*'
   - from: game/serakki/build
     to: game
     filter:

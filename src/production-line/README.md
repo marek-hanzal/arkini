@@ -104,7 +104,7 @@ Likely affected:
 - Runtime validation and exact Item ownership.
 - Tick queue/start/completion/delivery order.
 - Item Detail Line projections and production commands.
-- Flow acquisition facts and Estimate route/cost semantics when authored inputs or outputs change.
+- Graph relationship facts, operation metadata and query projections when authored inputs or outputs change.
 - Config validation and Production Authoring when a schema changes.
 - Focused tests under the exact `test/production-*` owner plus Game Tick or Runtime when transaction shape changes.
 

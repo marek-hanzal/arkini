@@ -5,20 +5,6 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { ItemEstimateIndexRow } from "~/estimate/type/ItemEstimateIndex";
-
-const state = vi.hoisted(() => ({
-	estimate: {
-		maximumDemand: 0,
-		rows: [] as ItemEstimateIndexRow[],
-		status: "loading" as "loading" | "ready",
-	},
-}));
-
-vi.mock("~/estimate/ui/useItemEstimateIndex", () => ({
-	useItemEstimateIndex: () => state.estimate,
-}));
-
 vi.mock("~/project-note/ui/ProjectNotesOverview", () => ({
 	ProjectNotesOverview: ({ projectId }: { readonly projectId: string }) =>
 		createElement("div", {
@@ -75,15 +61,10 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	document.body.replaceChildren();
-	state.estimate = {
-		maximumDemand: 0,
-		rows: [],
-		status: "loading",
-	};
 });
 
 describe("ProjectOverview", () => {
-	it("routes every project-wide card action and preserves Estimate loading", async () => {
+	it("routes project-wide card actions to the current project", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -112,9 +93,6 @@ describe("ProjectOverview", () => {
 			expect(JSON.parse(link.dataset.params ?? "null")).toEqual({
 				projectId: project.projectId,
 			});
-		expect(container.textContent).toContain("Calculating…");
-		expect(container.querySelector(".animate-spin")).not.toBeNull();
-		expect(container.querySelector('[data-overview-id="unreachable-items"]')).toBeNull();
 		expect(
 			container.querySelector('[data-ui="EditorProjectOverview"]')?.firstElementChild,
 		).toMatchObject({
@@ -122,44 +100,6 @@ describe("ProjectOverview", () => {
 				projectId: project.projectId,
 				ui: "EditorProjectNotesOverview",
 			},
-		});
-	});
-
-	it("links an actual unreachable count to the incomplete Estimate view", async () => {
-		state.estimate = {
-			maximumDemand: 0,
-			rows: [
-				{
-					estimate: {
-						demand: 0,
-						itemUid: editorTestPayload.config.items.water.uid,
-						method: "static",
-						status: "unreachable",
-					},
-					item: editorTestPayload.config.items.water,
-				},
-			],
-			status: "ready",
-		};
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-
-		await act(async () =>
-			root.render(
-				<TranslationTestProvider>
-					<ProjectOverview project={project} />
-				</TranslationTestProvider>,
-			),
-		);
-
-		const link = container.querySelector<HTMLAnchorElement>(
-			'[data-overview-id="unreachable-items"]',
-		);
-		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/list");
-		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
-			view: "incomplete",
 		});
 	});
 });

@@ -73,7 +73,7 @@ Likely affected:
 - Semantic validation and diagnostic variants.
 - CLI validation/packing, Editor Build and Serapack admission.
 - Project Authoring forms and every current-format authored-data writer.
-- Runtime, Flow and Estimate when the completed Game Config shape or semantics change.
+- Runtime and Graph Engine when the completed Game Config shape or semantics change.
 
 Changing a `game-value` scalar has a wider blast radius than changing the completed aggregate. Follow every direct schema consumer, generated JSON Schema, persisted reader and external writer; the defaults below do not apply.
 

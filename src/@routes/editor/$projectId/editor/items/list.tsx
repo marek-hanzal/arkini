@@ -11,14 +11,7 @@ interface EditorItemsRouteSearch {
 export const Route = createFileRoute("/editor/$projectId/editor/items/list")({
 	validateSearch: (search): EditorItemsRouteSearch => ({
 		draft: search.draft === true ? true : undefined,
-		view:
-			search.view === "fastest" ||
-			search.view === "slowest" ||
-			search.view === "demand" ||
-			search.view === "incomplete" ||
-			search.view === "with-note"
-				? search.view
-				: undefined,
+		view: search.view === "with-note" ? search.view : undefined,
 		query:
 			typeof search.query === "string" && search.query.length > 0 ? search.query : undefined,
 	}),

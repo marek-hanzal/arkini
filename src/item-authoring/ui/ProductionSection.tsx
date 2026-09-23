@@ -31,8 +31,9 @@ const ProductionFields = withFieldGroupFn({
 	props: {
 		invalidLineIndex: undefined as number | undefined,
 		selectedLineId: undefined as string | undefined,
+		selectedLineIndex: undefined as number | undefined,
 	},
-	render: ({ group, invalidLineIndex, selectedLineId }) => {
+	render: ({ group, invalidLineIndex, selectedLineId, selectedLineIndex }) => {
 		const translator = useTranslator();
 		const { form, project } = useFormSession();
 		return (
@@ -101,10 +102,17 @@ const ProductionFields = withFieldGroupFn({
 												project.config.items,
 											)
 										}
-										initialSelectedIndex={Math.max(
-											0,
-											lines.findIndex((line) => line.id === selectedLineId),
-										)}
+										initialSelectedIndex={
+											selectedLineIndex !== undefined &&
+											lines[selectedLineIndex]?.id === selectedLineId
+												? selectedLineIndex
+												: Math.max(
+														0,
+														lines.findIndex(
+															(line) => line.id === selectedLineId,
+														),
+													)
+										}
 										selectedIndex={invalidLineIndex}
 										label={translator.textFn("Product lines")}
 										navigationCard
@@ -153,7 +161,7 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const { form, productionLineId } = useFormSession();
+	const { form, productionLineId, productionLineIndex } = useFormSession();
 	const lines = useStore(form.store, (state) => state.values.lines);
 	const invalidLineIndex = useFormValidationFocusIndex(lines);
 	return (
@@ -165,6 +173,7 @@ export const ProductionSection = () => {
 			}}
 			invalidLineIndex={invalidLineIndex}
 			selectedLineId={productionLineId}
+			selectedLineIndex={productionLineIndex}
 		/>
 	);
 };

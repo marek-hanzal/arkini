@@ -26,7 +26,7 @@ The important dense clusters are:
 | Authored schemas | Game Value is foundational; Config, Item, Location and Production compose its scalar contracts | [`src/game-config/README.md`](src/game-config/README.md) |
 | Retained scene | Game Scene owns Board transitions and feedback requests; Tile Rendering draws actors and Tile Interaction owns gestures. Game Shell and Game Scene also share one explicit UI behavior seam. | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Editor persistence | Renderer products, filesystem Project Repository, MCP and Electron IPC cross through exact capability, transport and replacement lifecycles | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
-| Acquisition and Estimate | Estimate and MCP consume the shared authored acquisition graph | [`src/estimate/README.md`](src/estimate/README.md) |
+| Authored relationships | Editor and MCP share one revision-scoped DataScript query backend | [`src/graph/README.md`](src/graph/README.md) |
 
 ## Stable boundaries
 

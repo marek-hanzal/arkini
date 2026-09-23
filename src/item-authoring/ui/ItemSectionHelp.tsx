@@ -68,10 +68,6 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 			</>
 		),
 	},
-	estimate: {
-		title: <Tx label="Estimate" />,
-		content: <Mx label="Item estimate help" />,
-	},
 	chain: {
 		title: <Tx label="Chain" />,
 		content: <Mx label="Chain help" />,

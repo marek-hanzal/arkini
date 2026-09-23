@@ -6,12 +6,15 @@ import { z } from "zod";
 import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
-import { ItemEstimateQuantitySchema } from "~/estimate/schema/ItemEstimateQuantitySchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ArtworkCollectionInputSchema } from "./ArtworkCollectionInputSchema";
 import { GraphDetailSchema } from "./GraphDetailSchema";
-import { EstimateInputSchema } from "./EstimateInputSchema";
+import { createProjectGraphFx } from "~/graph/fx/createProjectGraphFx";
+import { readItemChainQueryFn } from "~/graph/fn/readItemChainQueryFn";
+import type { ProjectGraph } from "~/graph/type/ProjectGraph";
+import { GraphQuerySchema } from "~/graph/schema/GraphQuerySchema";
+import { readGraphSchemaTextFn } from "./fn/readGraphSchemaTextFn";
 import { CreateItemInputSchema } from "./CreateItemInputSchema";
 import { EditItemLinesInputSchema } from "./EditItemLinesInputSchema";
 import { editLinesFx } from "~/item-authoring/fx/editLinesFx";
@@ -28,12 +31,8 @@ import { ItemLineOrderInputSchema } from "./ItemLineOrderInputSchema";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 import { mutateItemLineFx } from "./mutateItemLineFx";
 import { readArtworkCollectionTextFn } from "./fn/readArtworkCollectionTextFn";
-import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
 import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
-import { readItemChainTextFx } from "./readItemChainTextFx";
-import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
-import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { readSchemaDetailTextFx, schemaDetailResolveDepthLimit } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerNoteToolsFn } from "./registerNoteTools";
@@ -149,7 +148,7 @@ const ItemConfigsInputSchema = z
 		description: "Read canonical item configurations from one project snapshot and revision.",
 	});
 
-const itemRelationInputSchema = (role: "input" | "output") =>
+const itemRelationInputSchemaFn = (role: "input" | "output") =>
 	z
 		.object({
 			itemUid: IdSchema.describe("The exact root item UID returned by item_collection."),
@@ -158,6 +157,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 				.number()
 				.int()
 				.positive()
+				.max(12)
 				.default(1)
 				.describe("Relationship-hop depth; defaults to 1."),
 		})
@@ -172,7 +172,7 @@ const ItemChainInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact starting item UID returned by item_collection."),
 		detail: GraphDetailSchema.default("full").describe(
-			"Summary keeps starting operations, their immediate branches and all outcome states; full includes the complete bounded Details tree.",
+			"Summary retains typed edges and operation identities; full includes authored operation configuration and context.",
 		),
 		maxDepth: z
 			.number()
@@ -180,7 +180,7 @@ const ItemChainInputSchema = z
 			.min(1)
 			.max(12)
 			.default(5)
-			.describe("Maximum operation depth; defaults to 5, matching Item → Chain."),
+			.describe("Maximum relationship-hop depth; defaults to 5."),
 	})
 	.strict()
 	.meta({
@@ -188,19 +188,6 @@ const ItemChainInputSchema = z
 		title: "Item Chain tool input",
 		description:
 			"The starting item, detail level and bounded traversal depth for the Chain projection.",
-	});
-
-const ItemEstimateInputSchema = z
-	.object({
-		itemUid: IdSchema.describe("The exact target item UID returned by item_collection."),
-		quantity: ItemEstimateQuantitySchema.default(1),
-		detail: GraphDetailSchema.default("full"),
-	})
-	.strict()
-	.meta({
-		$id: "urn:serakki:schema:mcp:item-estimate-input",
-		title: "Item estimate tool input",
-		description: "The target item and quantity for one authored dependency estimate.",
 	});
 
 const SchemaDetailInputSchema = z
@@ -453,6 +440,7 @@ const readCurrentProjectFx = (
 	});
 
 const createServerFn = (
+	graph: ProjectGraph,
 	notifyProjectChangedFn: (projectId: string) => void,
 	repository: ProjectRepositoryService,
 	readProjectContextFn: () => string | undefined,
@@ -713,18 +701,6 @@ const createServerFn = (
 		async () => runToolFn(readProjectFx().pipe(Effect.map(readItemMetaTextFn))),
 	);
 	server.registerTool(
-		"estimate",
-		{
-			description:
-				"Read one page of the global approximate Estimate view for every item at quantity one. Supports the same mutually exclusive fastest, slowest, aggregate-demand, and incomplete display modes plus fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
-			inputSchema: EstimateInputSchema,
-		},
-		async (input) =>
-			runToolFn(
-				readProjectFx().pipe(Effect.map((project) => readEstimateTextFn(project, input))),
-			),
-	);
-	server.registerTool(
 		"item_collection",
 		{
 			description:
@@ -852,6 +828,40 @@ const createServerFn = (
 				),
 			),
 	);
+	server.registerTool(
+		"graph_schema",
+		{
+			description:
+				"Discover the authored graph vocabulary, stable node identities, edge directions, operation context, result semantics and bounded query JSON Schema. Available without an open project.",
+			inputSchema: z.object({}).strict().meta({
+				$id: "urn:serakki:schema:mcp:graph-schema-input",
+				title: "Graph schema discovery input",
+				description: "Graph schema discovery accepts no arguments.",
+			}),
+			annotations: {
+				readOnlyHint: true,
+			},
+		},
+		async () => runToolFn(Effect.succeed(readGraphSchemaTextFn())),
+	);
+	server.registerTool(
+		"graph_query",
+		{
+			description:
+				"Query the current project's immutable authored graph snapshot. Supports node lookup, direct connections, traversal and from-to paths with typed edge filters and explicit limits. Returns canonical graph JSON with project revision, nodes, edges, operation context and truncation. Read graph_schema first. No executable EDN or arbitrary query code is accepted.",
+			inputSchema: GraphQuerySchema,
+			annotations: {
+				readOnlyHint: true,
+			},
+		},
+		async (input) =>
+			runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.queryFx(project, input)),
+					Effect.map((result) => JSON.stringify(result)),
+				),
+			),
+	);
 	for (const role of [
 		"input",
 		"output",
@@ -862,46 +872,49 @@ const createServerFn = (
 			{
 				description:
 					role === "input"
-						? "Read where one item is used as an input. Level 1 returns every operation that directly uses it; higher levels repeat input lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outcomes. Use detail=summary for compact operations with authored gates and outcome odds; omitted detail or full retains detailed dependency witnesses."
-						: "Read where one item is produced as an Item outcome. Level 1 returns every operation that directly produces it; higher levels repeat outcome lookup from each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outcomes. Use detail=summary for compact operations with authored gates and outcome odds; omitted detail or full retains detailed dependency witnesses.",
-				inputSchema: itemRelationInputSchema(role),
+						? "Find where this item is used as a line material, unit selector or unit cost. Uses outgoing typed input edges in the shared graph; level is relationship-hop depth (1–12). Returns canonical graph JSON. Use graph_query for all other relationships."
+						: "Find operations that produce this item through lines, merge outcomes/replacement, Clock or depletion. Uses incoming typed output edges in the shared graph; level is relationship-hop depth (1–12). Returns canonical graph JSON. Use graph_query for all other relationships.",
+				inputSchema: itemRelationInputSchemaFn(role),
+				annotations: {
+					readOnlyHint: true,
+				},
 			},
 			async ({ itemUid, level, detail }) =>
 				runToolFn(
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
-							readItemRelationTextFx(project, {
-								itemUid,
-								level,
+							graph.queryFx(project, {
+								kind: level === 1 ? "connections" : "traverse",
+								from: `item:${itemUid}`,
+								direction: role === "input" ? "out" : "in",
+								kinds:
+									role === "input"
+										? [
+												"line-material",
+												"line-unit-selector",
+												"line-unit-cost",
+											]
+										: [
+												"line-item-outcome",
+												"merge-item-outcome",
+												"merge-replacement",
+												"clock-item-outcome",
+												"depletion-item-outcome",
+											],
+								maxDepth: level,
 								detail,
-								role,
 							}),
 						),
+						Effect.map((result) => JSON.stringify(result)),
 					),
 				),
 		);
 	}
 	server.registerTool(
-		"item_estimate",
-		{
-			description:
-				"Approximate one item against the authored dependency graph. The estimator uses bounded per-output and correlated joint-output distributions to compute expected first-hitting time, ranks complete quantity-aware routes with stable route-ID ties, and times the selected-fact witness as an optimistic parallel critical path. Demand uses the larger of additive consumption and each selected route's simultaneous consumed-plus-reusable need; finite authored roots and jointly selected co-products are shared. Unsupported bounded state space returns partial. Runtime rule truth, concrete item identity packing, placement, renewable capacity, and engine execution are not simulated. Use detail=summary for totals and every requirement without the selected fact DAG; omitted detail or full retains the full diagnostic presentation.",
-			inputSchema: ItemEstimateInputSchema,
-		},
-		async ({ itemUid, quantity, detail }) =>
-			runToolFn(
-				readProjectFx().pipe(
-					Effect.flatMap((project) =>
-						readItemEstimateTextFx(project, itemUid, quantity, detail),
-					),
-				),
-			),
-	);
-	server.registerTool(
 		"item_chain",
 		{
 			description:
-				"Explore what one item can turn into through its own directional merges and Clock. Returns the same bounded projection as Item → Chain, as readable text. Summary keeps starting operations, their immediate branches and all outcome states; full (default) includes the complete Details tree: intermediate items, operation owners, merge/line identities, per-operation times and quantities, weighted outcome sets, guaranteed and chance groups, conditions and termination states. maxDepth defaults to 5 (the Editor default), with a range of 1–12. Cycle detection and the 400-expansion safety budget apply to both detail levels. Only the root's merges initiate interaction; subsequent steps follow Clock expiry and Clock-selected line outcomes. Reverse/intermediate merges, other production lines and production input acquisition are excluded. No-Clock items terminate branches. This is authored possibility analysis, not runtime simulation or accumulated periodic yield. Use item_input/item_outcome for general relations and item_estimate for acquisition planning.",
+				"Traverse outgoing authored consequences: line outcomes, merge replacement and outcomes, Clock, depletion, space and template outcomes and template placements. Retains every authored branch and source identity in the shared graph. Returns canonical graph JSON. maxDepth counts relationship hops (1–12, default 5). Use graph_query to include other edge kinds or change direction.",
 			inputSchema: ItemChainInputSchema,
 			annotations: {
 				readOnlyHint: true,
@@ -911,8 +924,9 @@ const createServerFn = (
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
-						readItemChainTextFx(project, itemUid, detail, maxDepth),
+						graph.queryFx(project, readItemChainQueryFn(itemUid, maxDepth, detail)),
 					),
+					Effect.map((result) => JSON.stringify(result)),
 				),
 			),
 	);
@@ -935,13 +949,18 @@ export const createServerFx = Effect.fn("createServerFx")(
 			effect: Effect.Effect<Value, Error, never>,
 		) => Promise<Value>;
 	}) =>
-		Effect.succeed({
-			create: () =>
-				createServerFn(
-					notifyProjectChangedFn,
-					repository,
-					readProjectContextFn,
-					runPromiseFn,
-				),
-		} as const),
+		Effect.map(
+			createProjectGraphFx(),
+			(graph) =>
+				({
+					create: () =>
+						createServerFn(
+							graph,
+							notifyProjectChangedFn,
+							repository,
+							readProjectContextFn,
+							runPromiseFn,
+						),
+				}) as const,
+		),
 );

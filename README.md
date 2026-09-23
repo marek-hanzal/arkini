@@ -4,7 +4,7 @@
   <img src="game/serakki/image/t7gotajnzi1aokgvtn405yng.png" alt="Serakki logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Serakki is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Serapacks, runs the real gameplay surface, and exposes authoring and analysis tools including MCP, Estimate, Notes, and Artwork. **Item → Chain** inspects one item’s directional merges and their automatic Clock consequences. MCP exposes the same results through `item_chain({ itemUid, detail, maxDepth })`: `full` (default) includes complete step details, while `summary` retains starting operations, immediate branches and outcome states. Depth defaults to 5 and accepts 1–12; cycle detection and the expansion safety limit apply to both.
+Serakki is an offline Electron economy game built around merge, production, and a deterministic data-driven engine. Its Editor authors portable game projects, validates and packs them into Serapacks, runs the real gameplay surface, and exposes authoring tools including MCP, Connections, Chain, Notes, and Artwork. **Item → Connections** inspects typed direct relationships. **Item → Chain** follows authored consequences across items, spaces, and templates. Both use the revision-scoped [Graph Engine](src/graph/README.md), also exposed through MCP.
 
 The main menu offers **New Game** for the bundled game and **Continue** when its current save exists. Starting over with existing saves requires confirmation and clears that game’s current, manual, and checkpoint saves through the existing reset lifecycle.
 
@@ -31,7 +31,7 @@ Read the smallest entry point needed for the task:
 | Authored source | Foundational values, completed Config, source files, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Artifacts and compatibility | Serapack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |
 | Editor persistence | Portable repository, renderer project session, IPC, Notes and Build | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
-| Acquisition and Estimate | Shared authored acquisition graph and static optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
+| Authored relationships | Shared DataScript graph, bounded queries, Connections and Chain | [`src/graph/README.md`](src/graph/README.md) |
 | Application and platform | Launcher, renderer runtime/shell/settings, routes and Electron | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 
 For an exact domain role and first public entrypoint, search [`DOMAIN_ATLAS.md`](DOMAIN_ATLAS.md). Directory grammar identifies the code layer; source imports and Dependency Cruiser identify the concrete graph; the owning contract identifies meaning.
@@ -79,7 +79,7 @@ Serakki is Electron-only: there is no web target or browser-storage fallback. De
 Settings → Dev includes a two-click **Hard reset**. It permanently deletes the entire `~/.serakki` data root (including managed Editor projects, installed games, saves, preferences, and logs) and restarts the app. Projects stored outside that root are not deleted.
 
 
-MCP `item_input`, `item_output`, and `item_estimate` accept optional `detail: "summary" | "full"`. Omitted detail preserves the full response. Relation summaries retain every discovered operation and traversal level, compact authored inputs, output sets/roll chances, and gates without repeated dependency witnesses. Estimate summaries retain the selected result and all requirement groups without the selected fact DAG. Diagnostic counts describe only the estimator's bounded reported evidence, not a complete count of rejected alternatives. Both modes use the same analysis; summary reduces presentation size without imposing a result limit.
+MCP `graph_schema` describes node IDs, typed edges, limits and examples; `graph_query` performs node lookup, direct connections, bounded traversal or `from` → `to` paths. `item_input`, `item_outcome` and `item_chain` are convenience queries over the same backend. `detail: "full"` includes operations and paths; `summary` omits those records, and a summary path query returns existence only. Every response carries its project revision and truncation status. See the [query and compatibility contract](src/graph/README.md).
 
 MCP Board Templates have focused collection/detail reads, canonical JSON through `template_config`, creation, patching, deletion and ordered cell edits. All mutations use the project revision; descriptions point to exact input schemas. See [Template authoring](CONFIG.md#mcp-board-template-authoring) for the workflow and cell-operation contract.
 

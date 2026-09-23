@@ -154,5 +154,5 @@ Usually not affected:
 
 - Installed-game Runtime saves and recovery; they use separate Game Persistence ownership.
 - Gameplay Runtime, Tick and production behavior.
-- Flow/Estimate algorithms and Pixi presentation.
+- Graph relationship queries and Pixi presentation.
 - Serapack catalog selection unless Build/install or portable source semantics change.

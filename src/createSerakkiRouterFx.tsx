@@ -39,7 +39,6 @@ export const createSerakkiRouterFx = Effect.fn("createSerakkiRouterFx")((context
 			scrollRestoration: true,
 			scrollToTopSelectors: [
 				'[data-scroll-restoration-id="editor-artwork-list"]',
-				'[data-scroll-restoration-id="editor-estimate-list"]',
 				'[data-scroll-restoration-id="editor-item-list"]',
 				'[data-scroll-restoration-id="editor-item-type-picker"]',
 				'[data-scroll-restoration-id="editor-section-page"]',

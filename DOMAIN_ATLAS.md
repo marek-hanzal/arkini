@@ -20,7 +20,7 @@ The densest islands have local maps:
 | Production | Condition, input, line, job, delivery and outcomes | [`src/production-line/README.md`](src/production-line/README.md) |
 | Retained scene | Game Scene, Tile Presentation, Rendering and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
-| Acquisition and Estimate | Shared acquisition graph and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
+| Authored relationships | Typed graph facts and bounded relationship queries | [`src/graph/README.md`](src/graph/README.md) |
 | Editor persistence | Project Authoring filesystem repository, transactions, renderer projection, MCP and Electron IPC | [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md) |
 
 ## Change impact
@@ -144,9 +144,8 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `editor-build` | Build descriptor, command identity, publication and UI | [`src/editor-build/service/EditorBuildRepository.ts`](src/editor-build/service/EditorBuildRepository.ts) |
 | `project-note` | Ordered portable project Notes | [`src/project-note/schema/NoteFileSchema.ts`](src/project-note/schema/NoteFileSchema.ts) |
 | `authoring-mcp` | MCP schemas, storage, HTTP/tools/tunnel lifecycle and Editor presentation | [`src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts`](src/authoring-mcp/fx/createFilesystemEditorMcpOwnershipFx.ts) |
-| `item-chain` | Root-owned merge and Clock consequence exploration in Item detail | [`src/item-chain/fn/readItemChainsFn.ts`](src/item-chain/fn/readItemChainsFn.ts), [`src/item-chain/ui/ItemChain.tsx`](src/item-chain/ui/ItemChain.tsx) |
-| `flow` | Authored acquisition graph and relation semantics | [`src/flow/fn/createAcquisitionGraphFn.ts`](src/flow/fn/createAcquisitionGraphFn.ts) |
-| `estimate` | Optimistic acquisition witnesses, index, cache and worker | [`src/estimate/README.md`](src/estimate/README.md) |
+| `item-chain` | Authored consequence presentation in Item detail | [`src/item-chain/ui/ItemChain.tsx`](src/item-chain/ui/ItemChain.tsx), [`src/graph/fn/readItemChainQueryFn.ts`](src/graph/fn/readItemChainQueryFn.ts) |
+| `graph` | Authored relationships, DataScript snapshots and shared bounded queries | [`src/graph/README.md`](src/graph/README.md) |
 
 The filesystem Project Repository and Electron IPC composition are mapped in [`electron/main/editor-project/README.md`](electron/main/editor-project/README.md).
 

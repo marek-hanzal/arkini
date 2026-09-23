@@ -3,7 +3,7 @@ import { ButtonLink } from "~/ui/ui/Button";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
+import type { ItemConnectionFilterSchema } from "~/graph/schema/ItemConnectionFilterSchema";
 import { Tx } from "~/translation/ui/Tx";
 
 /** Links one known item reference to the requested detail section. */
@@ -19,7 +19,7 @@ export const DetailReference = ({
 	readonly description?: ReactNode;
 	readonly eyebrow?: ReactNode;
 	readonly search?: {
-		readonly filter?: ItemConnectionFilter;
+		readonly filter?: ItemConnectionFilterSchema.Type;
 	};
 	readonly sectionId?: SectionId;
 	readonly stretched?: boolean;

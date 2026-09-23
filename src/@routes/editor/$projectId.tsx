@@ -1,3 +1,4 @@
+import { EditorGraphProvider } from "~/graph/ui/EditorGraphProvider";
 import { Tx } from "~/translation/ui/Tx";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
@@ -13,7 +14,6 @@ import { ButtonLink } from "~/ui/ui/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/ui/EditorShell";
 import { ProjectResourceUrlProvider } from "~/authoring-session/ui/ResourceUrlSession";
-import { ItemEstimateWarmup } from "~/estimate/ui/ItemEstimateWarmup";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
 	(project: Project | undefined) =>
@@ -81,13 +81,14 @@ export const Route = createFileRoute("/editor/$projectId")({
 		const project = Route.useLoaderData();
 		return (
 			<EditorProjectProvider loaded={project}>
-				<ItemEstimateWarmup project={project} />
 				<EditorProjectReplacementBoundary>
-					<ProjectResourceUrlProvider>
-						<EditorShell>
-							<Outlet />
-						</EditorShell>
-					</ProjectResourceUrlProvider>
+					<EditorGraphProvider>
+						<ProjectResourceUrlProvider>
+							<EditorShell>
+								<Outlet />
+							</EditorShell>
+						</ProjectResourceUrlProvider>
+					</EditorGraphProvider>
 				</EditorProjectReplacementBoundary>
 			</EditorProjectProvider>
 		);

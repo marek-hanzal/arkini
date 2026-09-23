@@ -1,5 +1,4 @@
 import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection";
-import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { CopyButton } from "~/ui/ui/CopyButton";
@@ -139,20 +138,6 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				<ClockDetail
 					item={item}
 					preview
-				/>
-			</section>
-			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
-				data-ui="EditorItemEstimateDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="estimate"
-					title={translator.textFn("Estimate")}
-				/>
-				<ItemEstimateSection
-					itemUid={item.uid}
-					previewItemUid={item.uid}
 				/>
 			</section>
 			<ConnectionsSummaryDetail item={item} />

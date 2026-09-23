@@ -65,5 +65,5 @@ visuals/animation channels, Tile Interaction gestures, and focused `test/game-sc
 `test/tile-*` behavior.
 
 Usually not affected: Engine Tick, production outcomes, project persistence, Editor authoring,
-Flow, Estimate, and Electron IPC. Follow an Engine owner only if canonical Runtime or command
+Graph queries and Electron IPC. Follow an Engine owner only if canonical Runtime or command
 semantics change.

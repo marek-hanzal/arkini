@@ -228,6 +228,10 @@ const render = async (
 	newItem = false,
 	defaultDraft?: boolean,
 	enableCapability?: OptionalCapability,
+	productionLine?: {
+		readonly id: string;
+		readonly index: number;
+	},
 ) => {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -246,6 +250,8 @@ const render = async (
 						: {})}
 					sectionId={sectionId}
 					enableCapability={enableCapability}
+					productionLineId={productionLine?.id}
+					productionLineIndex={productionLine?.index}
 					uid={item.uid}
 				>
 					{section}
@@ -1034,6 +1040,39 @@ describe("item section form session", () => {
 		expect(
 			JSON.parse(JSON.stringify(state.saveItem.mock.lastCall?.[0].item)).lines[0],
 		).not.toHaveProperty("artwork");
+	});
+
+	it("opens the exact graph line occurrence when two authored lines share an ID", async () => {
+		const common = {
+			...createProducerItem({
+				id: item.uid,
+				lines: [
+					{
+						...createLine({
+							id: "shared",
+						}),
+						title: "First",
+					},
+					{
+						...createLine({
+							id: "shared",
+						}),
+						title: "Second",
+					},
+				],
+			}),
+			uid: item.uid,
+		};
+		state.persisted = common;
+		(state.project as Project).config.items[item.uid] = common;
+		const { container } = await render(<ProductionSection />, false, undefined, undefined, {
+			id: "shared",
+			index: 1,
+		});
+		expect(
+			container.querySelector<HTMLInputElement>('input[name="lines[1].title"]')?.value,
+		).toBe("Second");
+		expect(container.querySelector('input[name="lines[0].title"]')).toBeNull();
 	});
 
 	it("regenerates only the edited line ID from title while allowing independent ID edits", async () => {

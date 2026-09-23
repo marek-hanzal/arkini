@@ -1,5 +1,8 @@
 About avatars:
   value: About avatars
+Accepts merge from:
+  value: Accepts merge from
+  dynamic: true
 Action disable rule help:
   value: |
     **Disable** blocks the action whenever all its conditions match.
@@ -43,16 +46,19 @@ Add at least {minimum} items.:
   dynamic: true
 Add to playlist:
   value: Add to playlist
-After:
-  value: After
 All:
   value: All
+All relationships:
+  value: All relationships
+  dynamic: true
 Already optimized:
   value: Already optimized
 Alternative set:
   value: Alternative set
 An unexpected error prevented the build. Try again.:
   value: An unexpected error prevented the build. Try again.
+Any transported incoming item:
+  value: Any transported incoming item
 Artwork:
   value: Artwork
 Artwork PNG import summary:
@@ -218,6 +224,8 @@ Authtoken:
 Autofill started:
   value: Autofill started
   dynamic: true
+Availability:
+  value: Availability
 Available:
   value: Available
 Available for this job.:
@@ -272,12 +280,6 @@ Build validation blocked description:
   value: Fix the **errors below**, then try Build again.
 Byte size:
   value: Size
-Calculating all item estimates:
-  value: Calculating all item estimates
-Calculating estimate:
-  value: Calculating estimate
-Calculating…:
-  value: Calculating…
 Cancel:
   value: Cancel
 Cancel edit:
@@ -288,23 +290,16 @@ Capacity:
   value: Capacity
 Chain:
   value: Chain
-Chain empty description:
-  value: This item starts no Merge and has no Clock. A Merge started by another item appears on that item's Chain.
 Chain help:
   value: |
-    Chain previews what can follow from this item's merges and Clock.
+    Chain follows authored consequences through production, merges, Clock expiry, unit depletion, spaces and templates.
 
-    - **Merge direction matters.** A onto B is different from B onto A.
-    - After the first step, Chain follows Clock production and expiry. It stops following new Merges and input items.
-    - Periodic production is shown once for one attempt, not as an endless pile of rewards.
-    - **Details** explains each step. Set weights, chances, conditions and quantities stay visible.
-    - Chain follows up to **five steps**. Reaching a loop or step five means more may follow.
+    - **Direction matters.** Every arrow keeps the original relationship and its exact source.
+    - **Paths** show the sequence of nodes. The rows below explain each relationship, including alternative sets, chances, quantities and conditions.
+    - Depth counts relationships. The default is **five steps**; you can select one to twelve.
+    - A visible limit means additional relationships may remain outside the result.
 
-    This is a map of possible results, not a playthrough. Rules, missing inputs, full queues or blocked placement may still prevent them.
-Chain pulse explanation:
-  value: Shows one possible production run. The item stays until Lifetime ends. Missing inputs, rules, a full queue or blocked output can still stop it.
-Chain safety limit:
-  value: Chain stopped after five steps. Later results may exist, but they are not shown here.
+    Conditions and alternatives remain authored facts. This view does not calculate a production plan or evaluate the current game state.
 Chance:
   value: Chance
 Chance (%):
@@ -319,6 +314,8 @@ Chance roll type help:
     Makes one probability check.
 
     On success, every drop in this roll continues. On failure, this roll creates nothing; the other rolls still run.
+Choose a counterpart to inspect its relationships…:
+  value: Choose a counterpart to inspect its relationships…
 Choose a different Project ID.:
   value: Choose a different Project ID.
 Choose a track to listen to it here.:
@@ -334,10 +331,11 @@ Clear lifetime:
   value: Clear lifetime
 Clock:
   value: Clock
-Clock expiry:
-  value: Clock expiry
 Clock expiry outcome help:
   value: Clock expiry outcome help
+Clock expiry output:
+  value: Clock expiry output
+  dynamic: true
 Clock interval:
   value: Clock interval
 Clock interval help:
@@ -355,8 +353,6 @@ Clock lifetime help:
     How long this item remains alive before expiring.
 
     Time advances in every location while Clock rules allow it, including inputs and production. Leave empty for unlimited Lifetime.
-Clock line:
-  value: Clock line
 Clock loop:
   value: Clock repeats
   dynamic: true
@@ -393,16 +389,10 @@ Condition:
   dynamic: true
 Condition type:
   value: Condition type
-Conditional or alternative:
-  value: Conditional or alternative
 Configure the remote domain in the ngrok tab.:
   value: Configure the remote domain in the ngrok tab.
 Configured — paste to replace:
   value: Configured — paste to replace
-Connection search empty:
-  value: No connection matches this search.
-Connection search placeholder:
-  value: Search connections…
 Connection type:
   value: Connection type
 Connections:
@@ -455,6 +445,8 @@ Count range condition help:
     Passes when the total is between **Minimum** and **Maximum**, including both ends.
 
     Example: `2–4` accepts 2, 3 or 4 items.
+Counterpart:
+  value: Counterpart
 Create a template to prepare a reusable board.:
   value: Create a template to prepare a reusable board.
 Create item:
@@ -470,11 +462,10 @@ Create project help:
     Example: `my-fantasy-game`. Renaming it later creates a different game for existing saves.
 Create the first item to start authoring this game.:
   value: Create the first item to start authoring this game.
+Current space:
+  value: Current space
 Custom:
   value: Custom
-"Cycle on route {routeId}: {factIds}.":
-  value: "{routeId} loops through these items: {factIds}."
-  dynamic: true
 Default:
   value: Default
 Default board height:
@@ -505,19 +496,21 @@ Deleting this audio also removes the assignments listed below.:
   value: Deleting this audio also removes the assignments listed below.
 Deleting this template removes its saved board layout from the project.:
   value: Deleting this template removes its saved board layout from the project.
-Depends on conditions:
-  value: Depends on conditions
 Depleted:
   value: Depleted
 Depletion outcome:
   value: Depletion outcome
 Depletion outcome help:
   value: Depletion outcome help
+Depth:
+  value: Depth
 Depth limit:
   value: More steps follow
   dynamic: true
 Description:
   value: Description
+Destination:
+  value: Destination
 Details:
   value: Details
 Development domain:
@@ -563,8 +556,6 @@ Disable removes timing, rules and expiry output from this item.:
   dynamic: true
 Disabled:
   value: Disabled
-Disabled by default:
-  value: Disabled by default
 Discard:
   value: Discard
 Dismiss:
@@ -643,16 +634,6 @@ Enter the assigned ngrok domain first.:
   value: Enter the assigned ngrok domain first.
 Enter the ngrok hostname without https:// or a path.:
   value: Enter the ngrok hostname without https:// or a path.
-Estimate:
-  value: Estimate
-Estimate calculation failed:
-  value: Estimate calculation failed
-Estimate incomplete description:
-  value: Estimate stopped before the totals were reliable. The details below explain where.
-Estimate loading description:
-  value: Finding a route from the starting items and calculating what it needs.
-Estimate unreachable description:
-  value: No complete path leads from the project’s **starting items** to this item with the current configuration.
 Every slot has a sound assigned. Switch to All to see them.:
   value: Every slot has a sound assigned. Switch to All to see them.
 Exact count:
@@ -675,6 +656,9 @@ Expiry mode:
   value: When time runs out
 Expiry outcome:
   value: Expiry outcome
+Exploration limit:
+  value: Exploration limit
+  dynamic: true
 Export:
   value: Export
 Extra outcome:
@@ -682,8 +666,6 @@ Extra outcome:
 Far:
   value: Far
   dynamic: true
-Fastest first:
-  value: Fastest first
 Final item:
   value: Final item
   dynamic: true
@@ -723,10 +705,10 @@ Height:
   value: Height
 Hero image:
   value: Hero image
+Hidden:
+  value: Hidden
 Hide:
   value: Hide
-Highest demand first:
-  value: Highest demand first
 Hint:
   value: Hint
 Image:
@@ -755,8 +737,8 @@ Importing music…:
   value: Importing music…
 In use for this job.:
   value: In use for this job.
-Indeterminate:
-  value: Indeterminate
+Incoming item:
+  value: Incoming item
 Initial board → item {index}:
   value: Initial board → item {index}
   dynamic: true
@@ -819,14 +801,15 @@ Item clock help:
     Time advances in every location while Clock rules allow it; production pulses require a Board. Enabling Clock removes Action.
 Item connections help:
   value: |
-    Connections answers four quick questions:
+    Connections searches the project's authored graph. Choose a relationship type and optionally a counterpart.
 
-    - **Required by:** which items need this one?
-    - **Inputs:** what does this item need?
-    - **Produces:** what can this item create?
-    - **Produced by:** what can create this item?
+    - **All relationships** includes incoming and outgoing links, including rules, merges, spaces and templates.
+    - **Merges into** shows the targets of this item's merges. **Accepts merge from** finds items with a merge targeting this item.
+    - **Inputs** and **Required by** follow line materials, selectors and unit costs.
+    - **Produces** and **Produced by** follow authored outputs and replacements.
+    - **Rule references** and **Referenced by rules** keep condition mentions separate from consumed inputs.
 
-    Rows show the exact production line, action, merge, depletion or Clock behind the link. Search filters the current list; opening a result keeps the selected relationship.
+    Every arrow keeps its authored direction. Repeated links remain separate occurrences. **Details** preserves exact source paths, alternative groups, chance and guards; the operation link opens its owner for editing.
 Item consumed:
   value: Item consumed
   dynamic: true
@@ -865,18 +848,6 @@ Item draft status help:
 Item drop rejected:
   value: Item drop rejected
   dynamic: true
-Item estimate help:
-  value: |
-    Estimate answers: **roughly what does the game need to obtain this item?**
-
-    ### Reading it
-
-    - **Quantity** is the approximate amount needed along one complete route.
-    - **Time** is that step's contribution to the optimistic total.
-    - Random rewards use their average number of attempts.
-    - Work that can happen together is counted in parallel.
-
-    This is a planning shortcut, not a playthrough. Full queues, placement, player choices and unlucky rolls can make real play slower. **Incomplete** means the calculation hit a limit; **Unreachable** means no complete route starts from the project's starting items.
 Item expired:
   value: Item expired
   dynamic: true
@@ -901,15 +872,9 @@ Item interface help:
     Clock, Actions, movement and merges keep their own rules.
 Item list help:
   value: |
-    Browse saved items by title or ID. Cards show artwork, Estimate, Demand, Draft status and linked Notes.
+    Browse saved items by title or ID. Cards show artwork, Draft status and linked Notes.
 
-    ### Filters and sorting
-
-    - Sort by **Name**, estimated time or highest Demand.
-    - **Unreachable** includes incomplete routes.
-    - **With note** and **Draft** combine with search and sorting.
-
-    **Estimate** is the optimistic time to obtain one item. **Demand** approximates how much of it is needed across reachable item routes. Both are planning hints, not balance verdicts.
+    Items are ordered by **Name**. **With note** and **Draft** combine with search.
 
     **New item** opens an unsaved draft. Creating from Artwork fills its first title and artwork for you.
 Item merges empty title:
@@ -1023,8 +988,20 @@ Line duration:
   value: Line duration
 Line inputs:
   value: Line inputs
+Line material:
+  value: Line material
+  dynamic: true
+Line output:
+  value: Line output
+  dynamic: true
 Line title:
   value: Line title
+Line unit cost:
+  value: Line unit cost
+  dynamic: true
+Line unit selector:
+  value: Line unit selector
+  dynamic: true
 Link item:
   value: Link item
 Link resource:
@@ -1033,6 +1010,8 @@ Loading MCP settings…:
   value: Loading MCP settings…
 Loading notes…:
   value: Loading notes…
+Loading relationships…:
+  value: Loading relationships…
 Local MCP:
   value: Local MCP
 Local drop:
@@ -1101,6 +1080,9 @@ Maximum count:
   value: Maximum count
 Merge:
   value: Merge
+Merge extra output:
+  value: Merge extra output
+  dynamic: true
 Merge outcome:
   value: Merge outcome
 Merge outcome help:
@@ -1108,6 +1090,9 @@ Merge outcome help:
     Choose what else happens after the dragged item and receiver are handled. For example, using a key on a chest can remove the chest and drop treasure. Leave this empty if changing the two items is the whole result.
 
     Add outcome sets for different possible results. Rules decide which sets are available; if several qualify, their weights choose one. Every roll in the chosen set is then checked; chance and individual rules can still prevent some results. If there is no eligible set, the merge creates nothing extra.
+Merge replacement:
+  value: Merge replacement
+  dynamic: true
 Merge source consume help:
   value: |
     **Consume** removes one dragged item, not one Unit.
@@ -1125,11 +1110,17 @@ Merge source spend help:
     **Spend** removes one Unit from the dragged item and keeps it in place.
 
     At zero Units, that item depletes and may create its depletion output.
+Merge source unit cost:
+  value: Merge source unit cost
+  dynamic: true
 Merge source use help:
   value: |
     **Use** keeps the dragged item and drops it into the nearest free cell around the target after the interaction.
 
     Items with Units, Clock state, stored inputs or production work cannot be reused this way. A plain reusable tool works well.
+Merge target:
+  value: Merge target
+  dynamic: true
 Merge target keep help:
   value: |
     **Keep** leaves the target item unchanged.
@@ -1143,11 +1134,20 @@ Merge target replace help:
     **Replace** swaps one target item for **Replace by** in the same cell.
 
     Units transfer only to a compatible replacement.
+Merge target replacement:
+  value: Merge target replacement
+  dynamic: true
 Merge target spend help:
   value: |
     **Spend** removes one Unit from the target and leaves it in place.
 
     At zero Units, that item depletes and may create its depletion output.
+Merge target unit cost:
+  value: Merge target unit cost
+  dynamic: true
+Merge transport:
+  value: Merge transport
+  dynamic: true
 Merge with:
   value: Merge with
 Merge with help:
@@ -1161,6 +1161,9 @@ Merge with help:
     Dragging the chosen item back onto this one does not trigger the same rule. That direction needs its own merge rule on the other item.
 Merges:
   value: Merges
+Merges into:
+  value: Merges into
+  dynamic: true
 Minimum:
   value: Minimum
 Minimum count:
@@ -1169,6 +1172,8 @@ Minor:
   value: Minor
 Missing item marker:
   value: Missing item marker
+Missing reference:
+  value: Missing reference
 Music:
   value: Music
 Music details:
@@ -1203,6 +1208,8 @@ New template:
   value: New template
 New version:
   value: New version
+No:
+  value: No
 No Clock configured:
   value: No Clock configured
 No Units configured:
@@ -1222,8 +1229,6 @@ No authored operation owned by this item directly inputs or positively requires 
 No authored operation owned by this item outputs another item.:
   value: This item does not create another item.
   dynamic: true
-No chains for this item:
-  value: No chains for this item
 No configured Space matches this search.:
   value: No configured Space matches this search.
 No depletion outcome configured.:
@@ -1232,8 +1237,6 @@ No expiry outcome configured.:
   value: No expiry outcome configured.
 No extra outcome configured.:
   value: No extra outcome configured.
-No finite lifetime:
-  value: No time limit
 No image selected:
   value: No image selected
 No images match this search.:
@@ -1248,8 +1251,6 @@ No item with Units enabled matches this search.:
   value: No item with Units enabled matches this search.
 No items can be placed here.:
   value: No items can be placed here.
-No items emitted:
-  value: No items created
 No items match this search.:
   value: No items match this search.
 No items yet:
@@ -1260,6 +1261,8 @@ No matching items:
   value: No matching items
 No matching music:
   value: No matching music
+No matching relationships:
+  value: No matching relationships
 No matching sound effects:
   value: No matching sound effects
 No matching templates:
@@ -1279,6 +1282,8 @@ No outcome configured.:
   value: No outcome configured.
 No outcomes:
   value: No outcomes
+No relationship found within these limits:
+  value: No relationship found within these limits
 No resources match this search.:
   value: No resources match this search.
 No rules:
@@ -1324,6 +1329,8 @@ Nothing to make right now.:
   value: Nothing to make right now.
 One batch is in progress. This is how long it has left.:
   value: One batch is in progress. This is how long it has left.
+Only part of the graph is shown.:
+  value: Only part of the graph is shown.
 Open:
   value: Open
 Open artwork:
@@ -1387,8 +1394,6 @@ Page help:
   value: Page help
 Paid by:
   value: Paid by
-Partial:
-  value: Incomplete
 Partly ready. More is available.:
   value: Partly ready. More is available.
 Partly ready. You'll need to find more.:
@@ -1397,6 +1402,8 @@ Paste an ngrok authtoken first.:
   value: Paste an ngrok authtoken first.
 Paste ngrok authtoken:
   value: Paste ngrok authtoken
+Paths:
+  value: Paths
 Pick random space:
   value: Pick random space
 Player hint:
@@ -1543,12 +1550,6 @@ Project item count:
   value: "{count} item"
 Project items count:
   value: "{count} items"
-Project unreachable item count:
-  value: "{count} unreachable item"
-Project unreachable items count:
-  value: "{count} unreachable items"
-Quantity:
-  value: Quantity
 Queue capacity:
   value: Queue capacity
 Random:
@@ -1562,12 +1563,19 @@ Reading image…:
   value: Reading image…
 Ready for this job.:
   value: Ready for this job.
-Refresh:
-  value: Refresh
+Receiver:
+  value: Receiver
+Receiver effect:
+  value: Receiver effect
+Referenced by rules:
+  value: Referenced by rules
+  dynamic: true
 Refresh failed:
   value: Refresh failed
 Refresh from disk:
   value: Refresh from disk
+Relationships could not be loaded:
+  value: Relationships could not be loaded
 Relative set weight:
   value: Set weight
 Remains:
@@ -1616,8 +1624,6 @@ Rename project ID help:
     Changes the name used by saved games.
 
     Existing saves will see this as a different game. Project content and build settings stay unchanged.
-Repeated output:
-  value: Repeated output
 Replace:
   value: Replace
 Replace by:
@@ -1662,6 +1668,9 @@ Resource UID:
   value: Resource UID
 Resources:
   value: Resources
+Result limit:
+  value: Result limit
+  dynamic: true
 Retry loading notes:
   value: Retry loading notes
 Right click to take one back.:
@@ -1685,6 +1694,12 @@ Route {routeId} can never yield {factId}.:
   dynamic: true
 Rule:
   value: Rule
+Rule reference:
+  value: Rule reference
+  dynamic: true
+Rule references:
+  value: Rule references
+  dynamic: true
 Rule type:
   value: Rule type
 Rules:
@@ -1784,8 +1799,6 @@ Simple input type help:
     Other inputs on the same line or action must still be ready.
 Size:
   value: Size
-Slowest first:
-  value: Slowest first
 Source:
   value: Source
 Source action:
@@ -1795,10 +1808,17 @@ Space:
 Space changed:
   value: Space changed
   dynamic: true
+Space output:
+  value: Space output
+  dynamic: true
+Spaces:
+  value: Spaces
 Speed up:
   value: Speed up
 Spend:
   value: Spend
+Spend one unit:
+  value: Spend one unit
 Spends one unit:
   value: Spends one unit
   dynamic: true
@@ -1808,6 +1828,8 @@ Start Remote MCP:
   value: Start Remote MCP
 Start from scratch and make it yours:
   value: Start from scratch and make it yours
+Starting configuration:
+  value: Starting configuration
 Starting layout controls help:
   value: |
     ### Editing the starting layout
@@ -1816,6 +1838,12 @@ Starting layout controls help:
     - **Right-click** removes one item.
     - Hold **Alt/Cmd** and drag, or use **Alt/Cmd + Arrow**, to move an item and replace the destination.
     - **Minus** or **Delete** removes the item.
+Starting space:
+  value: Starting space
+  dynamic: true
+Starting template:
+  value: Starting template
+  dynamic: true
 Status:
   value: Status
 Still missing a few ingredients. Bring them over to get things moving.:
@@ -1854,6 +1882,12 @@ Template:
   value: Template
 Template not found.:
   value: Template not found.
+Template output:
+  value: Template output
+  dynamic: true
+Template placement:
+  value: Template placement
+  dynamic: true
 Templates:
   value: Templates
 Templates help:
@@ -1893,8 +1927,6 @@ This item doesn't use units.:
 This item has no inputs:
   value: This item has no inputs
   dynamic: true
-This item is unreachable.:
-  value: This item is unreachable.
 This item produces nothing:
   value: This item produces nothing
   dynamic: true
@@ -1904,12 +1936,15 @@ This template cannot be deleted yet:
   value: This template cannot be deleted yet
 "This will also:":
   value: "This will also:"
-Time:
-  value: Time
+Time limit:
+  value: Time limit
+  dynamic: true
 Timer:
   value: Timer
 Title:
   value: Title
+Transport incoming item:
+  value: Transport incoming item
 Try a different search or change the active filters.:
   value: Try another search or change the **active filters**.
 Try a different search.:
@@ -1924,8 +1959,11 @@ Unavailable resource:
   value: Unavailable resource
 Unit cost:
   value: Unit cost
-Unit depletion:
-  value: Unit depletion
+Unit depletion output:
+  value: Unit depletion output
+  dynamic: true
+Unit payer:
+  value: Unit payer
 Unit spent:
   value: Unit spent
   dynamic: true
@@ -1958,8 +1996,6 @@ Units remaining:
   value: Units remaining
 Unlimited:
   value: Unlimited
-Unreachable:
-  value: Unreachable
 Unsaved changes:
   value: Unsaved changes
 Unused:
@@ -1980,6 +2016,8 @@ Validation findings:
   value: Validation findings
 Version:
   value: Version
+Visibility:
+  value: Visibility
 Visible:
   value: Visible
 Volume:
@@ -2050,6 +2088,8 @@ Write a note…:
   value: Write a note…
 Write a welcome in Markdown…:
   value: Write a welcome in Markdown…
+Yes:
+  value: Yes
 added by invisible color cleanup:
   value: added by invisible color cleanup
 assigned:
@@ -2060,18 +2100,20 @@ blocking errors:
   value: errors
 chance:
   value: chance
+clock:
+  value: clock
 conditions:
   value: conditions
 consume:
   value: consume
 count:
   value: count
+currentSpace:
+  value: currentSpace
 entries:
   value: entries
 from:
   value: from
-from authored start:
-  value: from starting items
 from the game.:
   value: from the game.
 keep:
@@ -2082,14 +2124,8 @@ managed:
   value: managed
 music:
   value: music
-negligible:
-  value: negligible
 ngrok tunnel:
   value: ngrok tunnel
-partial:
-  value: partial
-pulse:
-  value: pulse
 random:
   value: random
 range:
@@ -2128,21 +2164,3 @@ warning:
   value: warning
 warnings:
   value: warnings
-"{factId} × {quantity} exceeds the static estimate limit of {maximumQuantity} ({source}).":
-  value: "Estimate stopped: {factId} needs {quantity}, above the limit of {maximumQuantity} ({source})."
-  dynamic: true
-"{factId} × {quantity} has no complete acquisition route through {routeId}.":
-  value: No complete route through {routeId} can create {quantity} × {factId}.
-  dynamic: true
-"{factId} × {quantity} has no complete acquisition route.":
-  value: No complete route can create {quantity} × {factId}.
-  dynamic: true
-"{routeId} depends on finite owner lifetime and production settlement, which static Estimate cannot resolve.":
-  value: "{routeId} depends on an expiring item with unfinished production, so Estimate cannot calculate it safely."
-  dynamic: true
-"{routeId} exceeds the bounded complete-witness search of {maximumStates} states.":
-  value: Estimate tried {maximumStates} route combinations for {routeId} and stopped before finding a complete one.
-  dynamic: true
-"{routeId} exceeds the bounded joint-output accounting state space.":
-  value: Estimate found too many combined output possibilities in {routeId} to calculate them safely.
-  dynamic: true

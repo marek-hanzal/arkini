@@ -8,11 +8,10 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 import { ConnectionsSection } from "~/item-authoring/ui/ConnectionsSection";
 import { DeleteSection } from "~/item-authoring/ui/DeleteSection";
-import { ItemEstimateSection } from "~/estimate/ui/ItemEstimateSection";
 import { IdentityDetail } from "~/item-authoring/ui/IdentityDetail";
 import { NotFound } from "~/item-authoring/ui/NotFound";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
-import { type ItemConnectionFilter, ItemConnectionFilters } from "~/flow/type/ItemConnectionFilter";
+import { ItemConnectionFilterSchema } from "~/graph/schema/ItemConnectionFilterSchema";
 import { type SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
@@ -38,12 +37,12 @@ const ItemNotes = ({ itemUid }: { readonly itemUid: string }) => {
 };
 
 interface EditorItemDetailRouteSearch {
-	readonly filter?: ItemConnectionFilter;
+	readonly filter?: ItemConnectionFilterSchema.Type;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({
 	validateSearch: (search): EditorItemDetailRouteSearch => ({
-		filter: ItemConnectionFilters.find((filter) => filter === search.filter),
+		filter: ItemConnectionFilterSchema.options.find((filter) => filter === search.filter),
 	}),
 	beforeLoad: ({ params }) => {
 		if (readSectionsFn().some((section) => section.id === params.sectionId)) return;
@@ -87,10 +86,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <MergesCollectionDetail item={item} />;
 			case "chain":
 				return <ItemChain itemUid={item.uid} />;
-			case "estimate":
-				return <ItemEstimateSection itemUid={item.uid} />;
 			case "connections": {
-				const filter = search.filter ?? "required-by";
+				const filter = search.filter ?? "all";
 				return (
 					<ConnectionsSection
 						filter={filter}

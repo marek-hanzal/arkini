@@ -7,7 +7,13 @@ import { BoardGrid } from "~/board-authoring/ui/BoardGrid";
 import { LinkButtonLink } from "~/ui/ui/LinkButton";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 
-export const ProjectBoardDetail = ({ project }: { readonly project: Project }) => {
+export const ProjectBoardDetail = ({
+	project,
+	initialSpace,
+}: {
+	readonly project: Project;
+	readonly initialSpace?: number;
+}) => {
 	const translator = useTranslator();
 	const spaces = [
 		...new Set([
@@ -15,7 +21,9 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 			...project.config.start.spaces.map((entry) => entry.space),
 		]),
 	].sort((a, b) => a - b);
-	const [requestedSpace, setRequestedSpaceFn] = useState(project.config.start.currentSpace);
+	const [requestedSpace, setRequestedSpaceFn] = useState(
+		initialSpace ?? project.config.start.currentSpace,
+	);
 	const selectedSpace = spaces.includes(requestedSpace) ? requestedSpace : spaces[0]!;
 	const uid = project.config.start.spaces.find(
 		(entry) => entry.space === selectedSpace,

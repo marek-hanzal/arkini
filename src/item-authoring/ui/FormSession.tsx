@@ -38,6 +38,7 @@ export const FormSession = ({
 	outcomeRollIndex,
 	outcomeIndex,
 	productionLineId,
+	productionLineIndex,
 	resourceUid,
 	sectionId,
 }: PropsWithChildren<{
@@ -55,6 +56,7 @@ export const FormSession = ({
 	readonly outcomeRollIndex?: number;
 	readonly outcomeIndex?: number;
 	readonly productionLineId?: string;
+	readonly productionLineIndex?: number;
 	readonly resourceUid?: string;
 	readonly sectionId: SectionId;
 }>) => {
@@ -184,6 +186,7 @@ export const FormSession = ({
 			outcomeRollIndex,
 			outcomeIndex,
 			productionLineId,
+			productionLineIndex,
 		}),
 		[
 			controller,
@@ -197,6 +200,7 @@ export const FormSession = ({
 			outcomeRollIndex,
 			outcomeIndex,
 			productionLineId,
+			productionLineIndex,
 		],
 	);
 	const sections = readSectionsFn("form");

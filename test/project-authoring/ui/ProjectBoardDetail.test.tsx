@@ -77,51 +77,62 @@ afterEach(async () => {
 });
 
 describe("project Board detail", () => {
-	it("selects only configured non-linear Spaces and renders one preview", async () => {
-		const project = {
-			...boardSpaceProject,
-			config: {
-				...boardSpaceProject.config,
-				start: {
-					...boardSpaceProject.config.start,
-					spaces: boardSpaceProject.config.start.spaces.map((entry) => ({
-						...entry,
-						space: entry.space === 1 ? 4 : entry.space,
-					})),
+	it.each([
+		undefined,
+		4,
+	])(
+		"selects the requested Space %s and renders one configured Board preview",
+		async (initialSpace) => {
+			const project = {
+				...boardSpaceProject,
+				config: {
+					...boardSpaceProject.config,
+					start: {
+						...boardSpaceProject.config.start,
+						spaces: boardSpaceProject.config.start.spaces.map((entry) => ({
+							...entry,
+							space: entry.space === 1 ? 4 : entry.space,
+						})),
+					},
 				},
-			},
-		} satisfies Project;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				<TranslationTestProvider>
-					<ProjectBoardDetail project={project} />
-				</TranslationTestProvider>,
-			);
-		});
+			} satisfies Project;
+			const container = document.createElement("div");
+			document.body.append(container);
+			const root = createRoot(container);
+			roots.push(root);
+			await act(async () => {
+				root.render(
+					<TranslationTestProvider>
+						<ProjectBoardDetail
+							project={project}
+							initialSpace={initialSpace}
+						/>
+					</TranslationTestProvider>,
+				);
+			});
 
-		const select = container.querySelector("select");
-		const preview = () => container.querySelector<HTMLElement>('[data-ui="EditorBoardGrid"]');
-		if (select === null) throw new Error("Missing Space selector.");
-		expect(Array.from(select.options, (option) => option.value)).toEqual([
-			"0",
-			"4",
-		]);
-		expect(preview()?.dataset.items).toBe("water");
+			const select = container.querySelector("select");
+			const preview = () =>
+				container.querySelector<HTMLElement>('[data-ui="EditorBoardGrid"]');
+			if (select === null) throw new Error("Missing Space selector.");
+			expect(Array.from(select.options, (option) => option.value)).toEqual([
+				"0",
+				"4",
+			]);
+			expect(select.value).toBe(String(initialSpace ?? 0));
+			expect(preview()?.dataset.items).toBe("water");
 
-		await act(async () => {
-			select.value = "4";
-			select.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
-		});
+			await act(async () => {
+				select.value = "4";
+				select.dispatchEvent(
+					new Event("change", {
+						bubbles: true,
+					}),
+				);
+			});
 
-		expect(preview()?.dataset.items).toBe("water");
-		expect(container.querySelectorAll('[data-ui="EditorBoardGrid"]')).toHaveLength(1);
-	});
+			expect(preview()?.dataset.items).toBe("water");
+			expect(container.querySelectorAll('[data-ui="EditorBoardGrid"]')).toHaveLength(1);
+		},
+	);
 });

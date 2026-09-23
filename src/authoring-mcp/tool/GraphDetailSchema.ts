@@ -8,7 +8,7 @@ export const GraphDetailSchema = z
 	.meta({
 		id: "mcp.GraphDetailSchema",
 		description:
-			"Summary retains every discovered operation or requirement; full includes dependency witnesses and diagnostics. Defaults to full.",
+			"Summary retains typed relationships and operation identities; full includes authored operation configuration and context. Defaults to full.",
 	});
 export type GraphDetailSchema = typeof GraphDetailSchema;
 export namespace GraphDetailSchema {

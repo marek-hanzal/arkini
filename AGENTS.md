@@ -151,4 +151,4 @@ Validate focused → affected → broad as risk requires, using `argc`; report h
 
 ## Product boundaries
 
-The Game loads an Serapack and runs the canonical gameplay engine. The Editor authors portable projects and provides Item editing, Assets, a live Board, Estimate, Notes, Build, and a project-scoped MCP server. The shared `flow` domain owns the authored acquisition graph used by Estimate, Connections, and MCP. Estimate is optimistic static authored-dependency analysis using bounded output distributions, expected first-hitting time, deterministic complete-route choice, shared finite roots and co-products, and parallel critical-path timing, not runtime simulation.
+The Game loads a Serapack and runs the canonical gameplay engine. The Editor authors portable projects and provides Item editing, Assets, a live Board, Connections, Chain, Notes, Build, and a project-scoped MCP server. The shared `graph` domain owns typed authored relationships and revision-scoped DataScript queries consumed by Editor and MCP. It preserves exact operation, participant, alternative and source identities without evaluating runtime state or calculating acquisition estimates.

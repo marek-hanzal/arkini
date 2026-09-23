@@ -1,4 +1,4 @@
-import type { ItemConnectionFilter } from "~/flow/type/ItemConnectionFilter";
+import type { ItemConnectionFilterSchema } from "~/graph/schema/ItemConnectionFilterSchema";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
@@ -20,7 +20,7 @@ export const ItemDetailSectionHeader = ({
 	readonly sectionId?: SectionId;
 	readonly title: string;
 	readonly description?: ReactNode;
-	readonly filter?: ItemConnectionFilter;
+	readonly filter?: ItemConnectionFilterSchema.Type;
 }) => {
 	const project = useEditorProject();
 	const translator = useTranslator();

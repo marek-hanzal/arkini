@@ -1,10 +1,9 @@
 import { useMemo } from "react";
-import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { readItemConnectionsFn } from "~/item-authoring/fn/readItemConnectionsFn";
-import { ItemConnectionRow } from "~/item-authoring/ui/ItemConnectionRow";
-import { ItemConnectionsEmpty } from "~/item-authoring/ui/ItemConnectionsEmpty";
+import type { ItemConnectionFilterSchema } from "~/graph/schema/ItemConnectionFilterSchema";
+import { readItemConnectionQueryFn } from "~/graph/fn/readItemConnectionQueryFn";
+import { useEditorGraphQuery } from "~/graph/ui/useEditorGraphQuery";
+import { GraphQueryResult } from "~/graph/ui/GraphQueryResult";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -27,59 +26,52 @@ const Views = [
 	},
 ] as const;
 
-/** Appends the four authored connection previews, each capped at two items. */
-export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
-	const project = useEditorProject();
+/** Four compact previews borrow the same session; each link opens its complete query. */
+export const ConnectionsSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
+	<>
+		{Views.map((view) => (
+			<ConnectionPreview
+				key={view.filter}
+				itemUid={item.uid}
+				{...view}
+			/>
+		))}
+	</>
+);
+
+const ConnectionPreview = ({
+	itemUid,
+	filter,
+	title,
+}: {
+	readonly itemUid: string;
+	readonly filter: ItemConnectionFilterSchema.Type;
+	readonly title: string;
+}) => {
 	const translator = useTranslator();
-	const views = useMemo(
-		() =>
-			Views.map((view) => ({
-				...view,
-				connections: readItemConnectionsFn(project.config, item.uid, view.filter),
-			})),
+	const query = useMemo(
+		() => ({
+			...readItemConnectionQueryFn(itemUid, filter),
+			limit: 2,
+		}),
 		[
-			project.config,
-			item.uid,
+			itemUid,
+			filter,
 		],
 	);
+	const state = useEditorGraphQuery(query);
 	return (
-		<>
-			{views.map(({ filter, title, connections }) => (
-				<section
-					className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
-					data-ui="EditorItemConnectionsSummary"
-					key={filter}
-				>
-					<ItemDetailSectionHeader
-						itemUid={item.uid}
-						sectionId="connections"
-						filter={filter}
-						title={translator.textFn(title)}
-					/>
-					<div className="grid">
-						{connections.length === 0 ? (
-							<EditorRootCard dataUi="EditorItemConnectionsEmptyCard">
-								<ItemConnectionsEmpty filter={filter} />
-							</EditorRootCard>
-						) : (
-							<div className="ak-list grid content-start gap-2">
-								{connections.slice(0, 2).map(({ item: connectedItem, origins }) => (
-									<ItemConnectionRow
-										key={connectedItem.uid}
-										item={connectedItem}
-										origins={origins}
-										owner={
-											filter === "required-by" || filter === "produced-by"
-												? connectedItem
-												: item
-										}
-									/>
-								))}
-							</div>
-						)}
-					</div>
-				</section>
-			))}
-		</>
+		<section
+			className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
+			data-ui="EditorItemConnectionsSummary"
+		>
+			<ItemDetailSectionHeader
+				itemUid={itemUid}
+				sectionId="connections"
+				filter={filter}
+				title={translator.textFn(title)}
+			/>
+			<GraphQueryResult state={state} />
+		</section>
 	);
 };

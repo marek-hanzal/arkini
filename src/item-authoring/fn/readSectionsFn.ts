@@ -36,11 +36,6 @@ const FormSections = [
 const DetailSections = [
 	...FormSections,
 	{
-		id: "estimate",
-		label: "Estimate",
-		shortcut: "s",
-	},
-	{
 		id: "chain",
 		label: "Chain",
 		shortcut: "h",

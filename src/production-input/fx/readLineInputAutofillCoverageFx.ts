@@ -13,7 +13,6 @@ export namespace readLineInputAutofillCoverageFx {
 
 	interface Coverage {
 		readonly plan: planLineInputAutofillFx.Result;
-		readonly selectedQuantity: number;
 	}
 
 	export type Result =
@@ -22,7 +21,6 @@ export namespace readLineInputAutofillCoverageFx {
 		  })
 		| (Coverage & {
 				readonly type: "incomplete";
-				readonly missingQuantity: number;
 		  });
 }
 
@@ -40,19 +38,15 @@ export const readLineInputAutofillCoverageFx = Effect.fn("readLineInputAutofillC
 			ownerItemId,
 			runtime,
 		});
-		const selectedQuantity = plan.entry.length;
 		if (plan.remainingMissingQuantity > 0) {
 			return {
 				type: "incomplete",
-				missingQuantity: plan.remainingMissingQuantity,
 				plan,
-				selectedQuantity,
 			} satisfies readLineInputAutofillCoverageFx.Result;
 		}
 		return {
 			type: "complete",
 			plan,
-			selectedQuantity,
 		} satisfies readLineInputAutofillCoverageFx.Result;
 	},
 );

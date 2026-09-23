@@ -22,7 +22,6 @@ export namespace applyInputRunPlanFx {
 	}
 
 	export interface Result {
-		readonly consumption: readonly applyInputMaterialConsumeRunPlanFx.Consumption[];
 		readonly events: readonly GameEventSchema.Type[];
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -44,7 +43,6 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 			},
 			() =>
 				Effect.succeed({
-					consumption: [],
 					events: [],
 					runtime,
 				} satisfies applyInputRunPlanFx.Result),
@@ -81,7 +79,6 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 					Effect.map(
 						(nextRuntime) =>
 							({
-								consumption: [],
 								events: [],
 								runtime: nextRuntime,
 							}) satisfies applyInputRunPlanFx.Result,
@@ -94,7 +91,6 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 			},
 			() =>
 				Effect.succeed({
-					consumption: [],
 					events: [],
 					runtime,
 				} satisfies applyInputRunPlanFx.Result),

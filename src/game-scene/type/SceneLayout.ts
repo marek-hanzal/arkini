@@ -8,8 +8,3 @@ export interface SurfaceLayout {
 	readonly x: number;
 	readonly y: number;
 }
-
-export interface MainLayout {
-	readonly board: SurfaceLayout;
-	readonly viewportPadding: number;
-}

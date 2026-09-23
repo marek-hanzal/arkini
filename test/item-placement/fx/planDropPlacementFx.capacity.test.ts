@@ -10,7 +10,7 @@ import {
 	placementTestConfig,
 } from "~test/item-placement/support/placementTestConfig";
 
-it("rejects insufficient board capacity before allocating identities, including return leases and exclusions", () => {
+it("rejects insufficient board capacity before allocating identities, including return leases", () => {
 	let identities = 0;
 	const item = {
 		id: "origin",
@@ -71,11 +71,10 @@ it("rejects insufficient board capacity before allocating identities, including 
 			const rejected = yield* Effect.result(
 				planDropPlacementFx({
 					...props,
-					excludedLocations: [
-						boardLocation(0),
-						boardLocation(2),
-						boardLocation(2),
-					],
+					drop: {
+						...props.drop,
+						quantity: 3,
+					},
 				}),
 			);
 			expect(Result.isFailure(rejected)).toBe(true);

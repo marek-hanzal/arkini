@@ -91,9 +91,9 @@ describe("Space Action presenter", () => {
 		};
 
 		Effect.runSync(presenter.setInteractionBlockedFx(true));
-		presenter.presentFn(spaceTransition(1, 0, 1), "present");
-		presenter.presentFn(ordinaryTransition(2, 1), "present");
-		presenter.presentFn(spaceTransition(3, 1, 2), "present");
+		presenter.presentFn(spaceTransition(1, 0, 1));
+		presenter.presentFn(ordinaryTransition(2, 1));
+		presenter.presentFn(spaceTransition(3, 1, 2));
 
 		expect(applied).toEqual([
 			"1:0:item:unit-spent",
@@ -114,7 +114,7 @@ describe("Space Action presenter", () => {
 		expect(interactionBlocks.at(-1)).toBe(false);
 		expect(applied.at(-1)).toBe("3:2:current-space:changed");
 
-		presenter.presentFn(spaceTransition(4, 2, 3), "present");
+		presenter.presentFn(spaceTransition(4, 2, 3));
 		const appliedBeforeClose = [
 			...applied,
 		];
@@ -142,7 +142,7 @@ describe("Space Action presenter", () => {
 		const overtakingSpace = spaceTransition(1, 0, 1);
 
 		presenter.refreshFn(overtakingSpace);
-		presenter.presentFn(overtakingSpace, "present");
+		presenter.presentFn(overtakingSpace);
 		expect(applied.map((transition) => transition.events.map((event) => event.type))).toEqual([
 			[
 				"item:unit-spent",
@@ -184,8 +184,8 @@ describe("Space Action presenter", () => {
 		);
 
 		presenter.refreshFn(ordinaryTransition(2, 1));
-		presenter.presentFn(spaceTransition(1, 0, 1), "present");
-		presenter.presentFn(ordinaryTransition(2, 1), "present");
+		presenter.presentFn(spaceTransition(1, 0, 1));
+		presenter.presentFn(ordinaryTransition(2, 1));
 
 		expect(applied).toEqual([
 			"1:0:item:unit-spent",

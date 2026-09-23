@@ -107,32 +107,11 @@ const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			const boardFirst = Option.getOrUndefined(narrowBoardRuntimeItemFn(first));
-			const boardSecond = Option.getOrUndefined(narrowBoardRuntimeItemFn(second));
-			if (
-				boardFirst !== undefined &&
-				boardSecond !== undefined &&
-				boardFirst.location.space !== boardSecond.location.space
-			) {
+			if (first.location.space !== second.location.space) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
-						fromSpace: boardFirst.location.space,
-						toSpace: boardSecond.location.space,
-					}),
-				);
-			}
-			const firstOnBoard = boardFirst !== undefined;
-			const secondOnBoard = boardSecond !== undefined;
-			const boardItem = boardFirst ?? boardSecond;
-			if (
-				firstOnBoard !== secondOnBoard &&
-				boardItem !== undefined &&
-				boardItem.location.space !== runtime.currentSpace
-			) {
-				return yield* Effect.fail(
-					new CrossSpaceBoardOperationError({
-						fromSpace: runtime.currentSpace,
-						toSpace: boardItem.location.space,
+						fromSpace: first.location.space,
+						toSpace: second.location.space,
 					}),
 				);
 			}

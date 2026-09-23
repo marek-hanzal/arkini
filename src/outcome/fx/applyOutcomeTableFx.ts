@@ -2,7 +2,6 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
 import type { resolveOutcomeTableFx } from "./resolveOutcomeTableFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
 import type { applyItemOutcomeFx } from "./applyItemOutcomeFx";
 import { applyOutcomeRollFx } from "./applyOutcomeRollFx";
@@ -12,7 +11,6 @@ export namespace applyOutcomeTableFx {
 		readonly outcome: resolveOutcomeTableFx.Result;
 		readonly runtime: RuntimeSchema.Type;
 		readonly overflow?: "discard";
-		readonly excludedLocations?: readonly BoardLocationSchema.Type[];
 	}
 	export interface Result {
 		readonly events?: readonly GameEventSchema.Type[];
@@ -26,7 +24,6 @@ export const applyOutcomeTableFx = Effect.fn("applyOutcomeTableFx")(function* ({
 	outcome,
 	runtime,
 	overflow,
-	excludedLocations,
 }: applyOutcomeTableFx.Props) {
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
@@ -37,7 +34,6 @@ export const applyOutcomeTableFx = Effect.fn("applyOutcomeTableFx")(function* ({
 			roll,
 			runtime: draft,
 			overflow,
-			excludedLocations,
 		});
 		draft = result.runtime;
 		events.push(...result.events);

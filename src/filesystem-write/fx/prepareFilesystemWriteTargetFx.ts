@@ -10,7 +10,7 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 		requestedRoot,
 		target: requestedTarget,
 	}: {
-		readonly operation: "remove-file" | "replace-file" | "write-files";
+		readonly operation: "remove-file" | "replace-file";
 		readonly root: string;
 		readonly requestedRoot: string;
 		readonly target: string;

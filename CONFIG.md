@@ -26,6 +26,10 @@ notes/<noteId>.json
 
 Only `game.json`, `items/<uid>.json`, `artwork/*.png`, `image/*.png`, `music/*.ogg`, and `sfx/*.ogg` are game sources. Every binary resource has a paired `<uid>.json` file containing validated Editor metadata, not gameplay config or packed resources. Project metadata, resource titles, Notes, locks, temporary files, and ignored `build/` artifacts never enter Serapacks. Editor Build and `serakki-cli game pack` validate and build the current saved sources directly.
 
+Portable projects support ordinary files and directories only. Symlinks anywhere in a project, including a linked project root, are unsupported.
+
+An open Editor project has one writer. Changing its files outside the Editor while it remains open is unsupported; close it before editing files externally and reopen it afterward. Refresh does not provide external-write synchronization or conflict recovery.
+
 - `project.json` is the root marker and contains Serakki writer provenance plus current project revision.
 - `schema.json` is generated from the current source schema and must expose stable root/definition identity.
 - `game.json` is the strict complete non-item root and owns `$schema`, package metadata/ID, structured output version, resources, and start state.
@@ -35,7 +39,7 @@ Only `game.json`, `items/<uid>.json`, `artwork/*.png`, `image/*.png`, `music/*.o
 - `sfx/` contains canonical Ogg/Opus sound effects. SFX share the global resource-UID namespace; filenames hold assigned immutable UIDs. `game.json.sfx.events` maps exact SFX event IDs to resources; the vocabulary includes committed gameplay events, including accepted queue intents, Autofill delivery admission, explicit queue clearing, and an item disappearing without an actually placed lifecycle replacement, plus explicit presentation interactions such as Item Detail opening and closing. Each event has at most one assigned sound, and an event without an assignment remains silent. Presentation interactions trigger audio directly without manufacturing a committed gameplay event. SFX **Optimize** explicitly trims detected silence from existing files one at a time through the same PATH-visible `ffmpeg` pipeline used by conversion; an already clean effect is not re-encoded. Game playback loads and decodes a short effect only when its assigned event occurs; build validates and streams every SFX source unchanged.
 
 - Every Artwork, Image, Music and SFX body has an adjacent strict `{ "title": "Display title" }` JSON file. The title is non-empty, editable, and need not be unique. Import assigns a fresh UID and initializes a readable title from the source filename. Importing the same file again creates a separate resource; there is no content deduplication. Renaming edits metadata only. Replacing content and Optimize preserve UID, references and title. Libraries and selectors display/search titles while references retain UIDs. Missing bodies, missing metadata, or invalid pairs are errors; there is no legacy reader or automatic migration.
-- Portable project export retains both files and their UIDs. Serapacks contain neither metadata files nor display titles; importing a Serapack creates Editor metadata with UID-derived initial titles. Selected-Music packaging, all-SFX packaging, and lazy native streaming remain unchanged. Deletion shows usage and removes the pair through existing project write serialization and reference cleanup.
+- Portable project export retains both files and their UIDs. Serapacks contain neither metadata files nor display titles; importing a Serapack creates Editor metadata with UID-derived initial titles. Selected-Music packaging, all-SFX packaging, and lazy native streaming remain unchanged. Artwork and audio deletion surfaces show usage and remove the pair through existing project write serialization and reference cleanup. The general Image library currently exposes import and title editing.
 
 There is no free-form recursive JSON-fragment grammar. JSON outside the exact root and item paths is excluded from gameplay assembly; resource sidecars have their own strict metadata validation, and a missing/invalid marker, schema, root, path identity, or reference is a diagnostic.
 
@@ -98,7 +102,7 @@ MCP `item_detail` includes the project revision for lightweight authoring reads.
 
 Item `uid` is the sole immutable definition identity, generated at creation and preserved through import/export and Serapack rebuilds. Config maps are keyed by UID; canonical references use `itemUid`. The Editor does not expose identity editing. Validation rejects duplicate source providers and disagreement between a definition UID, config key, or file path. Runtime `itemId` identifies a live instance, distinct from its definition UID.
 
-MCP `rename_item` selects an exact `itemUid` and changes only `title`. Resource identities are immutable and independent; resource authoring changes titles or replaces content without changing references. Writes retain the revision-guarded project lock and atomic individual replacement contract, without aggregate rollback.
+MCP `rename_item` selects an exact `itemUid` and changes only `title`. Resource identities are immutable and independent; resource authoring changes titles or replaces content without changing references. Writes retain the revision-guarded project lock and ordered best-effort file plan, without per-file atomic replacement or aggregate rollback. An interrupted write can leave an incomplete file.
 
 The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests, and artifacts derive or verify it rather than copying a competing identity.
 

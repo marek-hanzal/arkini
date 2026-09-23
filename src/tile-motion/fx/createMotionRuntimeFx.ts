@@ -38,8 +38,6 @@ const emptyMotionLanes = {
 	pending: [],
 } satisfies updateTileMotionLanesFn.State;
 
-const maximumRememberedCueKeys = 256;
-
 /** Moving actors remain unavailable until their cue settles. */
 const readInteractionClaimsFn = (cues: ReadonlyArray<TileMotionCue>) => {
 	const claims = new Map<string, InteractionClaim>();
@@ -173,7 +171,9 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 }: createMotionRuntimeFx.Props) {
 	let closed = false;
 	let motionLanes: updateTileMotionLanesFn.State = emptyMotionLanes;
+	// A same-sequence refresh can resubmit cues even after their lifecycle settles.
 	const knownCueKeys = new Set<string>();
+	let newestCueSequence: number | null = null;
 	const cueLifecycleByKey = new Map<string, CueLifecycle>();
 
 	const readCueKeyFn = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
@@ -181,14 +181,6 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 		...motionLanes.active,
 		...motionLanes.pending,
 	];
-
-	const retainNewestCueKeysFn = () => {
-		while (knownCueKeys.size > maximumRememberedCueKeys) {
-			const oldest = knownCueKeys.values().next().value;
-			if (oldest === undefined) return;
-			knownCueKeys.delete(oldest);
-		}
-	};
 
 	const readCurrentInteractionClaimsFn = () => readInteractionClaimsFn(readCuesFn());
 
@@ -402,13 +394,18 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			Effect.sync(() => {
 				if (closed || cues.length === 0) return;
 				const uniqueCues = cues.filter((cue) => {
+					if (newestCueSequence !== null && cue.sequence < newestCueSequence)
+						return false;
+					if (newestCueSequence !== cue.sequence) {
+						newestCueSequence = cue.sequence;
+						knownCueKeys.clear();
+					}
 					const cueKey = readCueKeyFn(cue);
 					if (knownCueKeys.has(cueKey)) return false;
 					knownCueKeys.add(cueKey);
 					cueLifecycleByKey.set(cueKey, createCueLifecycleFn());
 					return true;
 				});
-				retainNewestCueKeysFn();
 				if (uniqueCues.length === 0) return;
 				motionLanes = updateTileMotionLanesFn({
 					action: {

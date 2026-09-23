@@ -144,11 +144,10 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 					}),
 				);
 			}
-			const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));
-			if (boardSource !== undefined && boardSource.location.space !== target.location.space) {
+			if (source.location.space !== target.location.space) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
-						fromSpace: boardSource.location.space,
+						fromSpace: source.location.space,
 						toSpace: target.location.space,
 					}),
 				);

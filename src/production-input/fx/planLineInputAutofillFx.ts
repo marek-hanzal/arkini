@@ -29,7 +29,6 @@ export namespace planLineInputAutofillFx {
 
 	export interface Result {
 		readonly entry: readonly Entry[];
-		readonly storedQuantity: number;
 		readonly remainingMissingQuantity: number;
 	}
 }
@@ -169,7 +168,6 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 
 	return {
 		entry: entries,
-		storedQuantity: entries.length,
 		remainingMissingQuantity,
 	} satisfies planLineInputAutofillFx.Result;
 });

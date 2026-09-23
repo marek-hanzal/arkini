@@ -2,7 +2,6 @@ import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect, Option } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
@@ -76,6 +75,9 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return rejectedFn(DropItemRejectedReason.StaleSource);
 	}
 	if (target.occupant === null) {
+		if (source.location.space !== target.location.space) {
+			return rejectedFn(DropItemRejectedReason.InvalidTarget);
+		}
 		const claim = readGridLocationClaimAtFn({
 			claims: readGridLocationClaimsFn({
 				runtime,
@@ -119,34 +121,17 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejectedFn(DropItemRejectedReason.StaleTarget);
 	}
-	const boardSource = Option.getOrUndefined(narrowBoardRuntimeItemFn(source));
-	const boardTarget = Option.getOrUndefined(narrowBoardRuntimeItemFn(targetItem));
-	if (
-		boardSource !== undefined &&
-		boardTarget !== undefined &&
-		boardSource.location.space !== boardTarget.location.space
-	) {
+	if (source.location.space !== targetItem.location.space) {
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
-	const oneBoardItem = (boardSource === undefined) !== (boardTarget === undefined);
-	const boardItem = boardSource ?? boardTarget;
-	if (
-		oneBoardItem &&
-		boardItem !== undefined &&
-		boardItem.location.space !== runtime.currentSpace
-	) {
-		return rejectedFn(DropItemRejectedReason.InvalidTarget);
-	}
-	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
-		const mergeRule = yield* resolveMergeRuleFx({
-			source,
-			target: targetItem,
-		}).pipe(Effect.option);
-		if (Option.isSome(mergeRule)) {
-			return {
-				kind: DropItemResultKind.Merge,
-			} satisfies readDropItemPreviewFx.Result;
-		}
+	const mergeRule = yield* resolveMergeRuleFx({
+		source,
+		target: targetItem,
+	}).pipe(Effect.option);
+	if (Option.isSome(mergeRule)) {
+		return {
+			kind: DropItemResultKind.Merge,
+		} satisfies readDropItemPreviewFx.Result;
 	}
 	return {
 		kind: DropItemResultKind.Swap,

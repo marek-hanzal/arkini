@@ -10,7 +10,6 @@ import { NoteContentSchema, NoteSchema } from "~/project-note/schema/NoteSchema"
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
@@ -31,7 +30,7 @@ const errorFn = (
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecoveryFn(message, cause),
+				message,
 				cause,
 			});
 

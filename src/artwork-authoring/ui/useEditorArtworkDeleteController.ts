@@ -10,8 +10,7 @@ import { ProjectRepository } from "~/project-authoring/service/ProjectRepository
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { readEditorArtworkDeleteBlockersFn } from "~/artwork-authoring/fn/readEditorArtworkDeleteBlockersFn";
-import type { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
+import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import type { Project } from "~/project-authoring/type/Project";
 
@@ -111,10 +110,9 @@ export const useEditorArtworkDeleteController = ({
 	const [confirming, setConfirmingFn] = useState(false);
 	const blockers = useMemo(
 		() =>
-			readEditorArtworkDeleteBlockersFn({
-				config: project.config,
-				resourceUid,
-			}),
+			readGameResourceUsagesFn(project.config).filter(
+				(usage) => usage.resourceUid === resourceUid,
+			),
 		[
 			project.config,
 			resourceUid,

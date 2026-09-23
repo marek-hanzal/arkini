@@ -159,9 +159,6 @@ const mountFn = (
 const mainLayout = readMainLayoutFn({
 	boardHeight: 3,
 	boardWidth: 4,
-	fixedCellSize: 512,
-	width: 1000,
-	height: 800,
 });
 const cases: Array<{
 	name: string;
@@ -173,7 +170,7 @@ const cases: Array<{
 	{
 		name: "Board",
 		surfaces: [
-			mainLayout.board,
+			mainLayout,
 		],
 	},
 ];
@@ -325,7 +322,7 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 describe("Board edge navigation", () => {
 	it("continues without pointer movement and stops on overlays, pointer exit, blur and teardown", () => {
 		const mounted = mountFn([
-			mainLayout.board,
+			mainLayout,
 		]);
 		mounted.stage.scale.set(1);
 		mounted.stage.position.set(0, 0);
@@ -352,7 +349,7 @@ describe("Board edge navigation", () => {
 
 	it("keeps edge navigation active with a held item and refreshes its stationary pointer", () => {
 		const mounted = mountFn([
-			mainLayout.board,
+			mainLayout,
 		]);
 		mounted.stage.scale.set(1);
 		mounted.stage.position.set(0, 0);
@@ -374,7 +371,7 @@ describe("Board edge navigation", () => {
 
 	it("does not run in fitted view and cancels before an item or camera drag", () => {
 		const mounted = mountFn([
-			mainLayout.board,
+			mainLayout,
 		]);
 		mounted.pointerFn("pointermove", 1010, 440, 0);
 		expect(mounted.edgeFrames.size).toBe(0);
@@ -389,18 +386,15 @@ describe("Board edge navigation", () => {
 
 it("refits the camera and reset bounds when the current board dimensions change", () => {
 	const mounted = mountFn([
-		mainLayout.board,
+		mainLayout,
 	]);
 	const next = readMainLayoutFn({
 		boardWidth: 2,
 		boardHeight: 1,
-		fixedCellSize: 512,
-		width: 1000,
-		height: 800,
 	});
 	Effect.runSync(
 		mounted.camera.setSurfacesFx([
-			next.board,
+			next,
 		]),
 	);
 	expect(mounted.tweens).toHaveLength(1);
@@ -428,15 +422,12 @@ it("refits the camera and reset bounds when the current board dimensions change"
 
 it("retargets size fitting from the live camera and retires callbacks on close", () => {
 	const mounted = mountFn([
-		mainLayout.board,
+		mainLayout,
 	]);
 	const small = readMainLayoutFn({
 		boardWidth: 2,
 		boardHeight: 1,
-		fixedCellSize: 512,
-		width: 1000,
-		height: 800,
-	}).board;
+	});
 	Effect.runSync(
 		mounted.camera.setSurfacesFx([
 			small,
@@ -447,7 +438,7 @@ it("retargets size fitting from the live camera and retires callbacks on close",
 	const liveScale = mounted.stage.scale.x;
 	Effect.runSync(
 		mounted.camera.setSurfacesFx([
-			mainLayout.board,
+			mainLayout,
 		]),
 	);
 	const second = mounted.tweens[1]!;

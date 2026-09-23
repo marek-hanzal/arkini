@@ -23,12 +23,10 @@ export namespace planBestEffortDropPlacementFx {
  * No candidate is published here. The caller commits placement and loss facts together. */
 export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacementFx")(function* ({
 	drop,
-	excludedLocations,
 	origin,
 	runtime,
 }: {
 	readonly drop: ResolvedOutcome.Item;
-	readonly excludedLocations?: readonly BoardLocationSchema.Type[];
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
@@ -40,7 +38,6 @@ export const planBestEffortDropPlacementFx = Effect.fn("planBestEffortDropPlacem
 				...drop,
 				quantity,
 			},
-			excludedLocations,
 			origin,
 			runtime,
 		}).pipe(

@@ -30,18 +30,25 @@ interface RuntimeModification<Value> {
 	readonly transition: CommittedTransitionSchema.Type | null;
 }
 
-/** Temporary detach/reinsert operations are not committed removals; the last capture wins. */
+/** Only identities present before the write can have a committed removal; the last capture wins. */
 const readCommittedEventsFn = (
-	runtime: RuntimeSchema.Type,
+	previousRuntime: RuntimeSchema.Type,
+	nextRuntime: RuntimeSchema.Type,
 	events: readonly GameEventSchema.Type[],
 ): GameEventSchema.Type[] => {
-	const survivingIds = new Set(runtime.items.map((item) => item.id));
+	const previousIds = new Set(previousRuntime.items.map((item) => item.id));
+	const survivingIds = new Set(nextRuntime.items.map((item) => item.id));
 	const capturedIds = new Set<string>();
 	const result: GameEventSchema.Type[] = [];
 	for (let index = events.length - 1; index >= 0; index--) {
 		const event = events[index];
 		if (event.type === "item:removed") {
-			if (survivingIds.has(event.snapshot.id) || capturedIds.has(event.snapshot.id)) continue;
+			if (
+				!previousIds.has(event.snapshot.id) ||
+				survivingIds.has(event.snapshot.id) ||
+				capturedIds.has(event.snapshot.id)
+			)
+				continue;
 			capturedIds.add(event.snapshot.id);
 		}
 		result.push(event);
@@ -70,6 +77,7 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 			}),
 			Effect.map(([result, nextRuntime, emittedEvents = []]) => {
 				const events: GameEventSchema.Type[] = readCommittedEventsFn(
+					transition.runtime,
 					nextRuntime,
 					emittedEvents,
 				).filter((event) => event.type !== "current-space:changed");

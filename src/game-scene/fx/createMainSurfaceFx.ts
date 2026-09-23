@@ -15,7 +15,7 @@ import { drawMaskFx } from "~/game-scene/fx/drawMaskFx";
 import { drawSurfaceFx } from "~/game-scene/fx/drawSurfaceFx";
 import { readSlotFn } from "~/game-scene/fn/readSlotFn";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
-import type { MainLayout, SurfaceLayout } from "~/game-scene/type/SceneLayout";
+import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainSurface } from "~/game-scene/service/MainSurface";
 
@@ -52,12 +52,9 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				runtime: latestTransition.runtime,
 				space: latestTransition.runtime.currentSpace,
 			});
-			let layout: MainLayout = readMainLayoutFn({
-				fixedCellSize: 512,
+			let layout: SurfaceLayout = readMainLayoutFn({
 				boardHeight: initialSize.height,
 				boardWidth: initialSize.width,
-				height: application.app.screen.height,
-				width: application.app.screen.width,
 			});
 
 			const gridLayer = new Container({
@@ -101,9 +98,9 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				) {
 					return {
 						layer: boardActorLayer,
-						size: layout.board.cellSize,
-						x: layout.board.x + location.position.x * layout.board.cellSize,
-						y: layout.board.y + location.position.y * layout.board.cellSize,
+						size: layout.cellSize,
+						x: layout.x + location.position.x * layout.cellSize,
+						y: layout.y + location.position.y * layout.cellSize,
 					};
 				}
 				return null;
@@ -169,7 +166,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 
 			const readDropTargetFn = (x: number, y: number): PixiSceneDropTarget | null => {
 				const boardSlot = readSlotFn({
-					surface: layout.board,
+					surface: layout,
 					x,
 					y,
 				});
@@ -177,7 +174,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					? null
 					: {
 							kind: "slot" as const,
-							layout: layout.board,
+							layout,
 							...boardSlot,
 						};
 			};
@@ -216,11 +213,8 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						space: latestTransition.runtime.currentSpace,
 					});
 					layout = readMainLayoutFn({
-						fixedCellSize: 512,
 						boardHeight: size.height,
 						boardWidth: size.width,
-						height: application.app.screen.height,
-						width: application.app.screen.width,
 					});
 
 					yield* drawSurfaceFx({
@@ -230,12 +224,12 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 							palette.gridA,
 							palette.gridB,
 						],
-						surface: layout.board,
+						surface: layout,
 						surfaceColor: palette.surface,
 					});
 					yield* drawMaskFx({
 						graphics: boardMask,
-						surface: layout.board,
+						surface: layout,
 					});
 					yield* application.frames.invalidateFx;
 				}),

@@ -16,7 +16,6 @@ import { readSerapackArtifactNameFn } from "~/serapack-artifact/fn/readSerapackA
 import { withProjectLockFx } from "./withProjectLockFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
 import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import { GameFileSchema } from "~/game-config-source/schema/GameFileSchema";
 import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
@@ -53,16 +52,6 @@ const relativeDiagnosticProvenanceFn = (
 	);
 };
 
-const filesystemFailureMessageFn = (
-	operation: "build-project" | "read-project-build" | "save-build-version",
-	cause: FilesystemWriteError,
-) => {
-	const action = operation === "build-project" ? "published" : "read";
-	return cause.recovery === undefined
-		? `The Editor build could not be ${action} safely. Retry the operation.`
-		: `The Editor build could not be ${action} safely. Recovery data was preserved; restart the Editor before retrying.`;
-};
-
 const createBuildErrorFn = (
 	operation: "build-project" | "read-project-build" | "save-build-version",
 	message: string,
@@ -73,11 +62,7 @@ const createBuildErrorFn = (
 		: new ProjectRepositoryError({
 				operation,
 				message:
-					cause instanceof EditorProjectBuildOperationError
-						? cause.message
-						: cause instanceof FilesystemWriteError
-							? filesystemFailureMessageFn(operation, cause)
-							: message,
+					cause instanceof EditorProjectBuildOperationError ? cause.message : message,
 				...(cause instanceof GameValidationError
 					? {
 							diagnostics: cause.diagnostics,

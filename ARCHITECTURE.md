@@ -41,7 +41,7 @@ The stable graph-wide constraints are:
 - Renderer code may consume only the pure `electron/contract` seam, never Electron main/preload or the Electron package.
 - Electron main may consume product contracts and platform-neutral behavior, never renderer presentation.
 - `src/game-value` owns only immutable scalar schemas and imports no aggregate, runtime, authoring or platform owner.
-- `src/filesystem-write` owns only mechanical lock/path/durable-write capability and imports no product consumer.
+- `src/filesystem-write` owns only mechanical lock, path and file-write capability and imports no product consumer.
 - `src/item-revision` stays upstream of Runtime and command owners except for its exact type-only Game Value ID contract.
 - Game Tick may orchestrate Job, Delivery and item-schedule lifecycle; those owners never import Tick clock, replay or loop.
 - Game Session stays package-independent; `installed-game → playable-game → game-session` is the live capability direction.

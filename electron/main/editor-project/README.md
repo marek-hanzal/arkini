@@ -54,18 +54,18 @@ Managed roots may be deleted only by explicit managed-project deletion. External
 
 ## Current-tree writes
 
-Writers share `editor.lock` and apply their already validated file plan in order.
+Writers share `editor.lock` and apply their already validated file plan in order on a best-effort basis.
 
 ```text
 validate the authored result
 → compute exact changed writes and removals
-→ replace each owned file
+→ write each owned file
 → apply exact removals
 → verify the resulting metadata
 → publish the fresh Project projection
 ```
 
-Path containment and owned-file validation remain immediate write contracts. There is no aggregate journal, rollback or crash recovery: a failed multi-file write may leave a partial tree, and reopening or repeating the operation is the repair path. Item/config commits reconcile Note links against the final item UIDs; resource deletion removes Note resource UIDs in the same ordered plan. Single-file mechanics belong to `src/filesystem-write`.
+Path containment and owned-file validation apply to supported regular project entries; symlinks are unsupported. There is no per-file atomic replacement, aggregate journal, rollback or crash recovery: an interrupted write can leave an incomplete file, which may require manual repair before reopening. Item/config commits reconcile Note links against the final item UIDs; resource deletion removes Note resource UIDs in the same ordered plan. Single-file mechanics belong to `src/filesystem-write`.
 
 ## Resource bodies and incremental saves
 
@@ -119,7 +119,7 @@ Project and Item save command state belongs to the mounted form, so explicit Ref
 
 Application diagnostics record successful IPC revision transitions (operation, project, expected/previous/result revision), MCP invalidation reads, and renderer Refresh start/completion/failure with its last stage. These records contain identities and revision tokens, never authored config or resource bodies.
 
-External authored JSON and resource catalog changes do not refresh mounted Editor projections. Build reads the saved source tree independently. Requested image and audio bodies come directly from their registered disk paths; already mounted resource/Board projections are not watched and Refresh rebuilds them. Refresh is explicit; there is no watcher, merge, repair mode, partial load or second renderer store.
+The Editor does not watch project files. External changes while a project is open are unsupported; close the project before editing files outside the Editor and reopen it afterward. Hard Refresh rebuilds mounted projections from repository state for supported Editor operations, not concurrent external writes. Build reads the saved source tree independently, and requested image and audio bodies come directly from their registered disk paths. There is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Output version and Build admission
 

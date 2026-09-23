@@ -61,7 +61,7 @@ Item Chain is a separate authored consequence projection in [`readItemChainsFn`]
 
 ## Revision and UI boundaries
 
-Editor entry may warm one immutable Estimate revision. An Estimate surface captures the current revision when entered and never combines a result with a later project config. Saving the project alone does not mutate an already captured result. The Items toolbar always offers Refresh to capture the latest published config explicitly; stale results only highlight that control, without inserting a notice above the grid.
+Editor entry may warm one immutable Estimate revision. An Estimate surface captures the current revision when entered and never combines a result with a later project config. Saving the project alone does not mutate an already captured result. The Items toolbar always offers Refresh to capture the latest Editor-published config explicitly; stale results only highlight that control, without inserting a notice above the grid. External file changes while the project is open are unsupported by the project contract.
 
 Query, filtering, sorting and selection belong to [`fn/createItemEstimateIndexFn.ts`](fn/createItemEstimateIndexFn.ts) and [`fn/selectItemEstimateIndexFn.ts`](fn/selectItemEstimateIndexFn.ts). React binds controls and renders selected rows; it does not filter the raw catalog or recompute estimates per page.
 

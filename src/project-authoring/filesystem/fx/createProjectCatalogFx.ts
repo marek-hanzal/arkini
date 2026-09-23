@@ -5,7 +5,6 @@ import { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCat
 import { ProjectCatalogSchema } from "~/project-authoring/schema/ProjectCatalogSchema";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
-import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 
 const encoder = new TextEncoder();
 
@@ -21,7 +20,7 @@ export interface ProjectCatalog {
 const createErrorFn = (message: string, cause?: unknown) =>
 	new ProjectRepositoryError({
 		operation: "list-projects",
-		message: withFilesystemWriteRecoveryFn(message, cause),
+		message,
 		cause,
 	});
 

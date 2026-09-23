@@ -14,7 +14,7 @@ import {
 	type ProjectRepositoryOperation,
 } from "~/project-authoring/error/ProjectRepositoryError";
 import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
-import { readEditorArtworkDeleteBlockersFn } from "~/artwork-authoring/fn/readEditorArtworkDeleteBlockersFn";
+import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 import { GameProjectGameSchemaReference } from "~/game-config-source/constant/GameProjectReference";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -24,7 +24,6 @@ import { validatePngResourceFileFx } from "~/game-config-resource/fx/validatePng
 import { validateArtworkPngFileFx } from "~/game-config-resource/fx/validateArtworkPngFileFx";
 import { validateOggOpusFileFx } from "~/game-config-resource/fx/validateOggOpusFileFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
 import { writeProjectChangesFx } from "./writeProjectChangesFx";
 import type { ProjectResourceSchema } from "~/project-authoring/schema/ProjectResourceSchema";
@@ -47,7 +46,7 @@ const errorFn = (operation: ProjectRepositoryOperation, message: string, cause?:
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecoveryFn(message, cause),
+				message,
 				cause,
 			});
 
@@ -773,10 +772,9 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 								},
 							})
 						: withoutMusicReference;
-				const blockers = readEditorArtworkDeleteBlockersFn({
-					config,
-					resourceUid,
-				});
+				const blockers = readGameResourceUsagesFn(config).filter(
+					(usage) => usage.resourceUid === resourceUid,
+				);
 				if (blockers.length > 0)
 					return yield* Effect.fail(
 						errorFn(

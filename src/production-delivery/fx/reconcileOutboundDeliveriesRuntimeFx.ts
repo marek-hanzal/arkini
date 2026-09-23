@@ -66,24 +66,20 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 			owner?.location.scope === LocationScopeEnumSchema.enum.Board &&
 			line !== undefined
 		) {
-			do {
-				const input = line.input[target.inputIndex];
-				if (
-					input === undefined ||
-					input.type !== TypeSchema.enum.Materials ||
-					!matchesItemSelectorFn({
-						item: current.item,
-						selector: input.query.selector,
-					}) ||
-					isLineInputClosedFn({
-						ownerItemId: owner.id,
-						lineId: line.id,
-						runtime: nextRuntime,
-					})
-				) {
-					continue;
-				}
-
+			const input = line.input[target.inputIndex];
+			if (
+				input !== undefined &&
+				input.type === TypeSchema.enum.Materials &&
+				matchesItemSelectorFn({
+					item: current.item,
+					selector: input.query.selector,
+				}) &&
+				!isLineInputClosedFn({
+					ownerItemId: owner.id,
+					lineId: line.id,
+					runtime: nextRuntime,
+				})
+			) {
 				const key = JSON.stringify([
 					owner.id,
 					line.id,
@@ -109,7 +105,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 					remainingTargetBySlot.set(key, remainingTarget - 1);
 					retained = true;
 				}
-			} while (false);
+			}
 		}
 		if (retained) continue;
 

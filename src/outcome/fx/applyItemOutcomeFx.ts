@@ -12,7 +12,6 @@ export namespace applyItemOutcomeFx {
 	export interface Props {
 		readonly drop: ResolvedOutcome.Item;
 		readonly overflow?: "discard";
-		readonly excludedLocations?: readonly BoardLocationSchema.Type[];
 		readonly origin: BoardLocationSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -26,7 +25,6 @@ export namespace applyItemOutcomeFx {
 export const applyItemOutcomeFx = Effect.fn("applyItemOutcomeFx")(function* ({
 	drop,
 	overflow,
-	excludedLocations,
 	origin,
 	runtime,
 }: applyItemOutcomeFx.Props) {
@@ -56,7 +54,6 @@ export const applyItemOutcomeFx = Effect.fn("applyItemOutcomeFx")(function* ({
 			Effect.gen(function* () {
 				const props = {
 					drop: resolvedDrop,
-					excludedLocations,
 					origin,
 					runtime: state.draft,
 				};

@@ -191,10 +191,8 @@ export const createMainDragPreviewFx = Effect.fn("createMainDragPreviewFx")(func
 			revision: sourceItem.revision,
 		};
 		drag.actor.container.cursor = readActorCursorFn({
-			dragPolicy: "main-target-presence",
 			hasDropTarget: targetFacts.target !== null,
 			phase: "dragging",
-			previewKind: kind,
 			running: sourceItem.running,
 		});
 		yield* projectTargetFx(drag);

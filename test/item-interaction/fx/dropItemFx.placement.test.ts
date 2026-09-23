@@ -1,4 +1,5 @@
 import { commitMoveDropFx } from "~/item-interaction/fx/commitMoveDropFx";
+import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
@@ -241,6 +242,55 @@ it("rejects a new move outside configured bounds at commit without rejecting exi
 		}),
 	);
 	expect(result.outcome).toMatchObject({
+		kind: DropItemResultKind.Reject,
+		reason: DropItemRejectedReason.InvalidTarget,
+	});
+	expect(result.after).toBe(result.before);
+});
+
+it("rejects an empty target in another space in both preview and commit", () => {
+	const targetLocation = {
+		...emptyLocation,
+		space: 1,
+	};
+	const result = run(
+		Effect.gen(function* () {
+			const source = yield* spawnItemFx({
+				id: "runtime:water",
+				itemUid: "water",
+				location: sourceLocation,
+			});
+			const before = yield* readRuntimeFx();
+			const preview = yield* readDropItemPreviewFx({
+				sourceItemId: source.id,
+				sourceRevision: source.revision,
+				sourceLocation,
+				target: {
+					kind: "slot",
+					location: targetLocation,
+					occupant: null,
+				},
+			});
+			const commit = yield* commitMoveDropFx({
+				sourceItemId: source.id,
+				sourceRevision: source.revision,
+				sourceLocation,
+				targetLocation,
+			});
+			return {
+				before,
+				after: yield* readRuntimeFx(),
+				preview,
+				commit,
+			};
+		}),
+	);
+
+	expect(result.preview).toEqual({
+		kind: DropItemResultKind.Reject,
+		reason: DropItemRejectedReason.InvalidTarget,
+	});
+	expect(result.commit).toMatchObject({
 		kind: DropItemResultKind.Reject,
 		reason: DropItemRejectedReason.InvalidTarget,
 	});

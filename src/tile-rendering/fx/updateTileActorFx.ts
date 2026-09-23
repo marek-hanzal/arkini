@@ -70,7 +70,6 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	if (!actor.dragging) {
 		actor.container.cursor = readActorCursorFn({
 			phase: "idle",
-			previewKind: null,
 			running: item.running,
 		});
 	}

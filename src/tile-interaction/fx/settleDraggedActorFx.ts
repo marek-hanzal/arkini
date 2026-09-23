@@ -32,7 +32,6 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 	actor.container.zIndex = 0;
 	actor.container.cursor = readActorCursorFn({
 		phase: "idle",
-		previewKind: null,
 		running: actor.item.running,
 	});
 	const durationMs = readSettleDurationMsFn({

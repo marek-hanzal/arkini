@@ -41,8 +41,6 @@ Add at least one roll.:
 Add at least {minimum} items.:
   value: Add at least {minimum} items.
   dynamic: true
-Add avatars:
-  value: Add avatars
 Add to playlist:
   value: Add to playlist
 After:
@@ -1205,8 +1203,6 @@ New template:
   value: New template
 New version:
   value: New version
-No About avatars configured.:
-  value: No About avatars configured.
 No Clock configured:
   value: No Clock configured
 No Units configured:
@@ -1530,9 +1526,6 @@ Project ID is required.:
   value: Project ID is required.
 Project artwork count:
   value: "{count} artwork"
-Project avatars empty help:
-  value: |
-    Choose portrait Images for any of the **eight** named slots. Empty slots stay unused on the **About** page.
 Project general help:
   value: |
     Review the project's title, ID and storage sizes.

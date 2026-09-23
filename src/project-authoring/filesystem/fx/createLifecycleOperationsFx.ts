@@ -15,10 +15,10 @@ import { encodeGameProjectFileStemFn } from "~/game-config-source/fn/encodeGameP
 import { GameProjectManifestSchema } from "~/game-config-source/schema/GameProjectManifestSchema";
 import { ProjectCatalogEntrySchema } from "~/project-authoring/schema/ProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { cloneProjectFn } from "~/project-authoring/fn/cloneProjectFn";
 import { ResourceSchema } from "~/game-config-resource/schema/ResourceSchema";
 import { VersionPartsSchema } from "~/game-version/schema/VersionPartsSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
-import { withFilesystemWriteRecoveryFn } from "~/filesystem-write/fn/withFilesystemWriteRecoveryFn";
 import { readProjectFilesFx } from "./readProjectFilesFx";
 import { readProjectNotesFx } from "./readProjectNotesFx";
 import { withProjectLockFx } from "./withProjectLockFx";
@@ -60,17 +60,6 @@ interface LifecycleOperations {
 	) => Effect.Effect<Project, ProjectRepositoryError, never>;
 }
 
-const cloneProjectFn = (project: Project): Project => ({
-	...project,
-	version: {
-		...project.version,
-	},
-	config: GameConfigSchema.parse(project.config),
-	resources: project.resources.map((resource) => ({
-		...resource,
-	})),
-});
-
 const materializeDescriptorFn = ({
 	projectId,
 	title,
@@ -109,7 +98,7 @@ const errorFn = (
 		? cause
 		: new ProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecoveryFn(message, cause),
+				message,
 				cause,
 			});
 

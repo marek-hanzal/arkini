@@ -34,6 +34,7 @@ export namespace attemptQueuedLineStartFx {
 		  }
 		| {
 				type: "delivery-scheduled";
+				deliveryItemIds: readonly IdSchema.Type[];
 				events: readonly GameEventSchema.Type[];
 				runtime: RuntimeSchema.Type;
 		  }
@@ -93,6 +94,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 			if (autofill.result.scheduledQuantity > 0) {
 				return {
 					type: "delivery-scheduled",
+					deliveryItemIds: autofill.result.deliveryItemIds,
 					events: autofill.events,
 					runtime: autofill.runtime,
 				} satisfies attemptQueuedLineStartFx.Result;

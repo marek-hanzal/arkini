@@ -11,13 +11,11 @@ import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
 
 interface PlanBoardPlacementProps {
-	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly item: ItemSchema.Type;
 	readonly origin: BoardLocationSchema.Type;
 	readonly placement: PlacementSchema.Type;
@@ -54,7 +52,6 @@ const resolveBoardPlacementOriginFx = Effect.fn("resolveBoardPlacementOriginFx")
 
 /** Plans single-item placement in one Board space around its physical or randomized origin. */
 export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* ({
-	excludedLocations = [],
 	item,
 	origin,
 	placement,
@@ -81,24 +78,8 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 		origin: placementOrigin,
 	});
 
-	const eligibleLocations: BoardLocationSchema.Type[] = [];
-	for (const location of locations) {
-		let excluded = false;
-		for (const excludedLocation of excludedLocations) {
-			if (
-				isSameGridLocationFn({
-					left: location,
-					right: excludedLocation,
-				})
-			) {
-				excluded = true;
-				break;
-			}
-		}
-		if (!excluded) eligibleLocations.push(location);
-	}
 	const emptyLocations = readEmptyLocationsFn({
-		locations: eligibleLocations,
+		locations,
 		runtime,
 	});
 	const spawn = yield* planSpawnPlacementFx({

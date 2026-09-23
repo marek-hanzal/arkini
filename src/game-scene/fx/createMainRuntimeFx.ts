@@ -23,7 +23,6 @@ import { createApplicationOwnerFx } from "~/tile-rendering/fx/createApplicationO
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
-import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscriptionReplayGateFx";
 import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
@@ -172,9 +171,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		const layout = readMainLayoutFn({
 			boardHeight: initialSize.height,
 			boardWidth: initialSize.width,
-			fixedCellSize: 512,
-			height: application.app.screen.height,
-			width: application.app.screen.width,
 		});
 		const camera = yield* createBoardCameraFx({
 			animationDriver,
@@ -186,7 +182,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			drag,
 			dragThreshold,
 			surfaces: [
-				layout.board,
+				layout,
 			],
 		});
 		registerRollbackFn(camera.closeFx);
@@ -219,7 +215,10 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		let closed = false;
 		let latestTransition = game.getTransitionSnapshotFn();
 
-		const applyTransitionFn = (transition: GameTransition, delivery: "hydrate" | "present") => {
+		const applyTransitionFn = (
+			transition: GameTransition,
+			delivery: "hydrate" | "present" = "present",
+		) => {
 			if (closed) return;
 			const previousSize = readBoardSizeFn({
 				runtime: latestTransition.runtime,
@@ -239,13 +238,10 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 				const nextLayout = readMainLayoutFn({
 					boardHeight: nextSize.height,
 					boardWidth: nextSize.width,
-					fixedCellSize: 512,
-					height: application.app.screen.height,
-					width: application.app.screen.width,
 				});
 				RendererRuntime.runSync(
 					camera.setSurfacesFx([
-						nextLayout.board,
+						nextLayout,
 					]),
 				);
 			}
@@ -275,9 +271,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 
 		RendererRuntime.runSync(surface.redrawFx);
 		applyTransitionFn(latestTransition, "hydrate");
-		const subscriptionReplayGate = yield* createSubscriptionReplayGateFx(
-			latestTransition.sequence,
-		);
 		const removeResizeListenerFn = yield* application.addResizeListenerFx(redrawFn);
 		registerRollbackFn(Effect.sync(() => removeResizeListenerFn()));
 		const appearanceObserver = new MutationObserver(() => {
@@ -296,10 +289,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		registerRollbackFn(Effect.sync(() => appearanceObserver.disconnect()));
 		const unsubscribeTransitionsFn = game.subscribeTransitionsFn((transition) => {
 			try {
-				const delivery = RendererRuntime.runSync(
-					subscriptionReplayGate.classifyFx(transition.sequence),
-				);
-				transitionPresenter.presentFn(transition, delivery);
+				transitionPresenter.presentFn(transition);
 			} catch (cause) {
 				reportCriticalFailureFn(cause);
 			}

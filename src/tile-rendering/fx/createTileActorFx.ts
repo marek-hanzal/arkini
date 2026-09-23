@@ -117,7 +117,6 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 			});
 			container.cursor = readActorCursorFn({
 				phase: "idle",
-				previewKind: null,
 				running: item.running,
 			});
 			const lifecycleLayer = new Container({

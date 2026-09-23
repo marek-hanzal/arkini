@@ -7,7 +7,6 @@ import type { TimeSchema } from "~/game-value/schema/TimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { settleActionUnitsFx } from "~/production-action/fx/settleActionUnitsFx";
-import type { applyInputMaterialConsumeRunPlanFx } from "~/production-input/fx/applyInputMaterialConsumeRunPlanFx";
 import { applyInputRunPlanFx } from "~/production-input/fx/applyInputRunPlanFx";
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
@@ -82,7 +81,6 @@ const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 	return yield* Effect.reduce(
 		plan.input,
 		() => ({
-			consumption: [] as applyInputMaterialConsumeRunPlanFx.Consumption[],
 			events: [] as GameEventSchema.Type[],
 			runtime,
 		}),
@@ -96,10 +94,6 @@ const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 				runtime: state.runtime,
 			}).pipe(
 				Effect.map((result) => ({
-					consumption: [
-						...state.consumption,
-						...result.consumption,
-					],
 					events: [
 						...state.events,
 						...result.events,

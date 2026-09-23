@@ -56,7 +56,7 @@ Tick: persisted global queue order, earliest actionable request per idle owner
 → resolveLineRunFx from one pinned snapshot
 → commit inputs + spend units
 → start one Job atomically
-→ only start or scheduled delivery handles this owner for the queue pass
+→ a successful start settlement, including a terminal depletion reset, or scheduled delivery handles this owner for the queue pass
 
 Tick: ready Job in stable ID order
 → remove Job and consumed roots from one candidate
@@ -87,7 +87,7 @@ Scheduled owners filter their selected Clock pool by line rules, draw by `clockW
 
 ## Important invariants
 
-- Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can start or schedule useful delivery. Blocked probes leave Runtime, events and gameplay randomness unchanged.
+- Queue intent order stays persisted; each pass chooses the earliest request per idle Board owner that can settle a start or schedule useful delivery. A depletion Template may remove the admitted Job in that same settlement. Blocked probes leave Runtime, events and gameplay randomness unchanged.
 - A skipped request keeps its identity, line and valid stored inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs. Explicit forced owner removal can abort active Jobs.
 - The engine can cancel an exact active job through [`cancelItemJobFx`](../production-job/fx/cancelItemJobFx.ts). Shared [`abortJobRuntimeFx`](../production-job/fx/abortJobRuntimeFx.ts) consumes committed material, returns reservations, and settles owner depletion atomically. Stale job IDs never cancel a replacement.

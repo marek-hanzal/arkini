@@ -5,7 +5,6 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { ResolvedOutcomeRoll } from "~/outcome/type/ResolvedOutcomeRoll";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { applyItemOutcomeFx } from "./applyItemOutcomeFx";
 import { applySpaceOutcomeFn } from "~/outcome/fn/applySpaceOutcomeFn";
 import type { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
@@ -15,7 +14,6 @@ export namespace applyOutcomeRollFx {
 		readonly roll: ResolvedOutcomeRoll;
 		readonly runtime: RuntimeSchema.Type;
 		readonly overflow?: "discard";
-		readonly excludedLocations?: readonly BoardLocationSchema.Type[];
 	}
 	export interface Result {
 		readonly runtime: RuntimeSchema.Type;
@@ -30,7 +28,6 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 	roll,
 	runtime,
 	overflow,
-	excludedLocations,
 }: applyOutcomeRollFx.Props) {
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
@@ -49,7 +46,6 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 							origin: roll.origin,
 							runtime: draft,
 							overflow,
-							excludedLocations,
 						});
 						draft = next;
 						item.push(placement);

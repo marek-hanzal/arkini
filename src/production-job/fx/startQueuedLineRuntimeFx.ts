@@ -23,9 +23,7 @@ export namespace startQueuedLineRuntimeFx {
 	export type Result =
 		| {
 				readonly type: "incomplete";
-				readonly missingQuantity: number;
 				readonly runtime: RuntimeSchema.Type;
-				readonly selectedQuantity: number;
 		  }
 		| {
 				readonly type: "queue-request-unavailable";
@@ -112,9 +110,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 			});
 			return {
 				type: "incomplete",
-				missingQuantity: coverage.type === "incomplete" ? coverage.missingQuantity : 0,
 				runtime,
-				selectedQuantity: coverage.selectedQuantity,
 			} satisfies startQueuedLineRuntimeFx.Result;
 		}
 	}

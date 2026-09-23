@@ -16,20 +16,17 @@ import { planBoardPlacementFx } from "./planBoardPlacementFx";
 
 interface PlanDropPlacementProps {
 	readonly drop: ResolvedOutcome.Item;
-	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }
 
 const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(function* ({
 	drop,
-	excludedLocations,
 	item,
 	origin,
 	runtime,
 }: {
 	readonly drop: ResolvedOutcome.Item;
-	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly item: ItemSchema.Type;
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
@@ -42,12 +39,9 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 	});
 	const boardSpace = origin.space;
 	const occupied = new Set<string>();
-	for (const location of [
-		...readGridLocationClaimsFn({
-			runtime,
-		}).map((claim) => claim.location),
-		...(excludedLocations ?? []),
-	]) {
+	for (const { location } of readGridLocationClaimsFn({
+		runtime,
+	})) {
 		if (
 			location.scope === "board" &&
 			location.space === boardSpace &&
@@ -76,7 +70,6 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 /** Plans one complete all-or-nothing board drop. */
 export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	drop,
-	excludedLocations,
 	origin,
 	runtime,
 }: PlanDropPlacementProps) {
@@ -85,13 +78,11 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	});
 	yield* assertBoardOnlyCapacityFx({
 		drop,
-		excludedLocations,
 		item,
 		origin,
 		runtime,
 	});
 	const plan = yield* planBoardPlacementFx({
-		excludedLocations,
 		item,
 		origin,
 		placement: drop.placement,

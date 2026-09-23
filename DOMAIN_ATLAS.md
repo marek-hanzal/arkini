@@ -114,7 +114,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-config-compiler` | Deterministic source assembly and blocking gate | [`src/game-config-compiler/fx/compileGameDirectoryFx.ts`](src/game-config-compiler/fx/compileGameDirectoryFx.ts) |
 | `application-version` | Serakki writer provenance and major-only admission | [`src/application-version/fn/readSerakkiVersionIncompatibilityFn.ts`](src/application-version/fn/readSerakkiVersionIncompatibilityFn.ts) |
 | `game-version` | Project-owned gameplay compatibility | [`src/game-version/schema/VersionSchema.ts`](src/game-version/schema/VersionSchema.ts) |
-| `filesystem-write` | Shared Node-only lock and durable write mechanics | [`src/filesystem-write/fx/createFilesystemWriteFx.ts`](src/filesystem-write/fx/createFilesystemWriteFx.ts) |
+| `filesystem-write` | Shared Node-only lock, path validation and file writes | [`src/filesystem-write/fx/createFilesystemWriteFx.ts`](src/filesystem-write/fx/createFilesystemWriteFx.ts) |
 | `serapack-artifact` | Package bytes, envelope, compression, signing and provenance | [`src/serapack-artifact/fx/packDirectoryFx.ts`](src/serapack-artifact/fx/packDirectoryFx.ts) |
 | `serapack-admission` | Bounded decode and semantic package admission | [`src/serapack-admission/fx/readSerapackFx.ts`](src/serapack-admission/fx/readSerapackFx.ts) |
 | `serapack-catalog` | Renderer catalog state, storage and mutation lifecycle | [`src/serapack-catalog/service/SerapackCatalog.ts`](src/serapack-catalog/service/SerapackCatalog.ts) |

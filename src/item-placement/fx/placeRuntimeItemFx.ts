@@ -9,7 +9,6 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { ItemJobScopedError } from "~/game-runtime/error/ItemJobScopedError";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
@@ -22,7 +21,6 @@ import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 
 interface PlaceRuntimeItemProps {
-	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly itemId: IdSchema.Type;
 	readonly origin: BoardLocationSchema.Type;
 	readonly originItemId: IdSchema.Type;
@@ -34,48 +32,24 @@ interface PlaceRuntimeItemResult {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-const excludeGridLocationsFn = <Location extends BoardLocationSchema.Type>({
-	excludedLocations,
-	locations,
-}: {
-	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
-	readonly locations: ReadonlyArray<Location>;
-}) =>
-	excludedLocations === undefined
-		? locations
-		: locations.filter(
-				(location) =>
-					!excludedLocations.some((excludedLocation) =>
-						isSameGridLocationFn({
-							left: location,
-							right: excludedLocation,
-						}),
-					),
-			);
-
 const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")(function* ({
 	item,
-	excludedLocations,
 	origin,
 	runtime,
 }: {
 	readonly item: RuntimeItemSchema.Type;
-	readonly excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 	readonly origin: BoardLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const config = yield* GameConfigFx;
 	const emptyBoard = readEmptyLocationsFn({
-		locations: excludeGridLocationsFn({
-			excludedLocations,
-			locations: readBoardLocationsFn({
-				size: readBoardSizeFn({
-					runtime,
-					config,
-					space: origin.space,
-				}),
+		locations: readBoardLocationsFn({
+			size: readBoardSizeFn({
+				runtime,
+				config,
 				space: origin.space,
 			}),
+			space: origin.space,
 		}),
 		runtime,
 	});
@@ -102,7 +76,6 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
  * canonical drop policy and reports the exact visible placement facts.
  */
 export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
-	excludedLocations,
 	itemId,
 	origin,
 	originItemId,
@@ -142,7 +115,6 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	} satisfies RuntimeSchema.Type;
 
 	const location = yield* readRuntimeItemDropLocationFx({
-		excludedLocations,
 		item,
 		origin,
 		runtime: detachedRuntime,

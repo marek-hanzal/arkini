@@ -9,9 +9,64 @@ import {
 	readPoseAnimation,
 	samplePoseAnimation,
 	createSwapHarness,
+	type TileMotionCue,
 } from "./createMotionRuntimeFx.test/fixture";
 
+const readOverflowingCuesFn = (cue: TileMotionCue) =>
+	Array.from(
+		{
+			length: 256,
+		},
+		(_, index) => ({
+			...cue,
+			eventIndex: index + 1,
+		}),
+	);
+
 describe("motion runtime lifecycle", () => {
+	it("does not restart an active cue after more than 256 same-sequence cues", () => {
+		const { animations, cue, runtime } = createSwapHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		expect(animations).toHaveLength(2);
+
+		Effect.runSync(runtime.enqueueFx(readOverflowingCuesFn(cue)));
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		expect(animations).toHaveLength(2);
+	});
+
+	it("does not replay a completed cue after a larger same-sequence batch", () => {
+		const { animations, cue, runtime } = createSwapHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		Effect.runSync(runtime.enqueueFx(readOverflowingCuesFn(cue)));
+		animations[0]?.onCompleteFn?.();
+		animations[1]?.onCompleteFn?.();
+		Effect.runSync(runtime.cancelSpaceFx(firstBoardLocation.space));
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(0);
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(0);
+	});
+
 	it("deduplicates completed cues and ignores duplicate leg completion", () => {
 		const { animations, cue, runtime, source, target } = createSwapHarness();
 		Effect.runSync(

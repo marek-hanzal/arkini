@@ -10,7 +10,6 @@ import type { InputRun } from "~/production-input/type/InputRun";
 import type { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
 import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntimeItemOwnedStateFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
-import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -24,14 +23,9 @@ export namespace applyInputMaterialConsumeRunPlanFx {
 		plan: InputRun.MaterialPlan;
 		runtime: RuntimeSchema.Type;
 	}
-
-	export interface Consumption {
-		readonly sourceItem: InputRuntimeItemSchema.Type;
-		readonly consumedItem: JobRuntimeItemSchema.Type;
-	}
 }
 
-/** Commits exact consume allocations to one job and returns their source-to-job identities. */
+/** Commits exact consume allocations to one job. */
 export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialConsumeRunPlanFx")(
 	function* ({
 		jobId,
@@ -44,7 +38,6 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 		return yield* Effect.reduce(
 			plan.item,
 			() => ({
-				consumption: [] as applyInputMaterialConsumeRunPlanFx.Consumption[],
 				events: [] as GameEventSchema.Type[],
 				runtime,
 			}),
@@ -74,13 +67,6 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 						} satisfies JobRuntimeItemSchema.Type,
 					});
 					return {
-						consumption: [
-							...state.consumption,
-							{
-								sourceItem: item,
-								consumedItem,
-							},
-						],
 						events: [
 							...state.events,
 							...discardedRuntime.events,

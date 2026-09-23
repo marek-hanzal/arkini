@@ -20,7 +20,6 @@ import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceB
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
@@ -107,11 +106,7 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					runtime,
 				] as const;
 			}
-			if (
-				item.location.scope === LocationScopeEnumSchema.enum.Board &&
-				location.scope === LocationScopeEnumSchema.enum.Board &&
-				item.location.space !== location.space
-			) {
+			if (item.location.space !== location.space) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
 						fromSpace: item.location.space,

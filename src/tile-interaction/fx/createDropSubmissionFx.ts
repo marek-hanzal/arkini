@@ -133,7 +133,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 					RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 					actor.container.cursor = readActorCursorFn({
 						phase: "pending",
-						previewKind,
 						running: sourceItem.running,
 					});
 					const drop = RendererRuntime.runSync(
@@ -170,7 +169,6 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								retainedSource.container.zIndex = 0;
 								retainedSource.container.cursor = readActorCursorFn({
 									phase: "idle",
-									previewKind: null,
 									running: retainedSource.item.running,
 								});
 							}

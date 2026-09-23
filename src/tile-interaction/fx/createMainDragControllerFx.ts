@@ -485,7 +485,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				actor.container.eventMode = "static";
 				actor.container.cursor = readActorCursorFn({
 					phase: "idle",
-					previewKind: null,
 					running: actor.item.running,
 				});
 				const onPointerDownFn = (event: FederatedPointerEvent) => {

@@ -15,7 +15,7 @@ export namespace writeElectronPreferenceFx {
 	}
 }
 
-/** Validates, serializes and atomically replaces one Electron preference file. */
+/** Validates, serializes and writes one Electron preference file under its lock. */
 export const writeElectronPreferenceFx = Effect.fn("writeElectronPreferenceFx")(
 	<Value>({
 		filesystemWrite,

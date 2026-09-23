@@ -132,34 +132,27 @@ export const writeProjectChangesFx = Effect.fn("writeProjectChangesFx")(function
 			for (const resource of next.resources) {
 				const oldUid = resource.uid;
 				const old = previousResources.get(oldUid);
+				if (old !== undefined && old.type !== resource.type)
+					return yield* Effect.fail(
+						new Error(`Editor resource ${resource.uid} cannot change type.`),
+					);
 				const target = yield* paths.resourceFileFx(resource);
 				yield* admitTargetFx(target);
-				const oldTarget = old === undefined ? undefined : yield* paths.resourceFileFx(old);
 				const metadataTarget = yield* paths.resourceMetadataFileFx(resource);
-				const oldMetadataTarget =
-					old === undefined ? undefined : yield* paths.resourceMetadataFileFx(old);
-				if (oldMetadataTarget !== undefined && oldMetadataTarget !== metadataTarget)
-					deletes.add(oldMetadataTarget);
-				if (metadataTarget !== undefined) {
-					yield* admitTargetFx(metadataTarget);
-					const metadata = yield* Effect.try(() =>
-						ResourceMetadataSchema.parse({
-							title: resource.title,
-						}),
-					);
-					if (oldMetadataTarget !== metadataTarget || old?.title !== metadata.title) {
-						writes.push({
-							target: metadataTarget,
-							bytes: encodeJsonFn(metadata),
-						});
-						changedResources.add(resource.uid);
-					}
+				yield* admitTargetFx(metadataTarget);
+				const metadata = yield* Effect.try(() =>
+					ResourceMetadataSchema.parse({
+						title: resource.title,
+					}),
+				);
+				if (old?.title !== metadata.title) {
+					writes.push({
+						target: metadataTarget,
+						bytes: encodeJsonFn(metadata),
+					});
+					changedResources.add(resource.uid);
 				}
-				let source = resourceFiles.get(resource.uid);
-				if (oldTarget !== undefined && oldTarget !== target) {
-					deletes.add(oldTarget);
-					source ??= oldTarget;
-				}
+				const source = resourceFiles.get(resource.uid);
 				if (source !== undefined) {
 					writes.push({
 						target,

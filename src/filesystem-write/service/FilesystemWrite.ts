@@ -26,7 +26,7 @@ export interface FilesystemWrite {
 			  }
 		),
 	) => Effect.Effect<void, FilesystemWriteError, never>;
-	/** Replaces independently publishable files under one lock without aggregate rollback. */
+	/** Writes independent files under one lock without aggregate rollback. */
 	readonly replaceIndependentFilesFx: (props: {
 		readonly lock: string;
 		readonly files: ReadonlyArray<{

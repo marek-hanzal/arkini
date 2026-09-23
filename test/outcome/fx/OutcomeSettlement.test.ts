@@ -371,6 +371,11 @@ describe("Outcome settlement", () => {
 		expect(result.events.map((event) => event.type)).toContain("board:template-applied");
 		expect(result.events.map((event) => event.type)).toContain("item:disappeared");
 		expect(result.events.map((event) => event.type)).not.toContain("item:spawned");
+		expect(
+			result.events.some(
+				(event) => event.type === "item:removed" && event.snapshot.item.uid === "reward",
+			),
+		).toBe(false);
 	});
 
 	it("does not publish a round-trip Space event or apply rejected Space outcomes", () => {

@@ -21,7 +21,6 @@ const mountFn = (
 		SurfaceLayout,
 		...SurfaceLayout[],
 	],
-	canStartLeftPanFn?: (x: number, y: number) => boolean,
 ) => {
 	const canvas = document.createElement("canvas");
 	document.body.append(canvas);
@@ -62,10 +61,6 @@ const mountFn = (
 						};
 					}),
 			} as AnimationDriver,
-			canStartLeftPanFx:
-				canStartLeftPanFn === undefined
-					? undefined
-					: (x, y) => Effect.sync(() => canStartLeftPanFn(x, y)),
 			dragThreshold: 5,
 			application: {
 				app: {
@@ -219,24 +214,21 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 		expect(mounted.stage.scale.x).toBe(zoom);
 	});
 
-	it("admits left camera drag only from an empty cell using world coordinates", () => {
-		const admitFn = vi.fn().mockReturnValue(false);
-		const mounted = mountFn(surfaces, admitFn);
-		mounted.stage.scale.set(0.5);
-		mounted.stage.position.set(100, 200);
-		mounted.pointerFn("pointerdown", 320, 340, 0, 1);
-		expect(admitFn).toHaveBeenLastCalledWith(400, 200);
-		mounted.pointerFn("pointermove", 350, 340, 0, 1);
-		expect(mounted.stage.x).toBe(100);
-		mounted.pointerFn("pointerup", 350, 340, 0);
-		admitFn.mockReturnValue(true);
-		mounted.pointerFn("pointerdown", 320, 340, 0, 1);
-		mounted.pointerFn("pointermove", 350, 340, 0, 1);
-		expect(mounted.stage.x).toBe(130);
-		expect(mounted.blockFn).toHaveBeenLastCalledWith(true);
-		mounted.pointerFn("pointerup", 360, 340, 0);
-		expect(mounted.stage.x).toBe(140);
-		expect(mounted.blockFn).toHaveBeenLastCalledWith(false);
+	it("leaves left-button gestures to item interaction without moving the camera", () => {
+		const mounted = mountFn(surfaces);
+		const before = {
+			x: mounted.stage.x,
+			y: mounted.stage.y,
+		};
+		mounted.blockFn.mockClear();
+		mounted.pointerFn("pointerdown", 100, 100, 0, 1);
+		mounted.pointerFn("pointermove", 150, 120, 0, 1);
+		mounted.pointerFn("pointerup", 170, 120, 0);
+		expect({
+			x: mounted.stage.x,
+			y: mounted.stage.y,
+		}).toEqual(before);
+		expect(mounted.blockFn).not.toHaveBeenCalled();
 	});
 
 	it("lets short right clicks reach tiles but claims a right drag before tile activation", () => {

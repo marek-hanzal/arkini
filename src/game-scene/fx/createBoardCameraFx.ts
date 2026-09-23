@@ -11,7 +11,6 @@ import type { AnimationControl, AnimationDriver } from "~/tile-rendering/service
 
 interface Props {
 	readonly animationDriver: AnimationDriver;
-	readonly canStartLeftPanFx?: (x: number, y: number) => Effect.Effect<boolean>;
 	readonly application: PixiApplicationOwner;
 	readonly drag: {
 		readonly cancelInteractionFx: Effect.Effect<void>;
@@ -45,7 +44,6 @@ export namespace createBoardCameraFx {
 
 /** One camera transforms every canvas layer; actor and drop coordinates remain world-local. */
 export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
-	canStartLeftPanFx,
 	animationDriver,
 	application,
 	drag,
@@ -259,20 +257,10 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			blocked ||
 			pan !== null ||
 			event.target !== canvas ||
-			(event.button !== 2 && event.button !== 0) ||
+			event.button !== 2 ||
 			!event.isPrimary
 		)
 			return;
-		if (event.button === 0) {
-			if (canStartLeftPanFx === undefined) return;
-			const bounds = canvas.getBoundingClientRect();
-			if (bounds.width <= 0 || bounds.height <= 0) return;
-			const point = stage.toLocal({
-				x: ((event.clientX - bounds.left) * width) / bounds.width,
-				y: ((event.clientY - bounds.top) * height) / bounds.height,
-			});
-			if (!RendererRuntime.runSync(canStartLeftPanFx(point.x, point.y))) return;
-		}
 		stopFitFn();
 		pan = {
 			phase: "pressed",

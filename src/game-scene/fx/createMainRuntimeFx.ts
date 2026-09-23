@@ -166,10 +166,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		});
 		const camera = yield* createBoardCameraFx({
 			animationDriver,
-			canStartLeftPanFx: (x, y) =>
-				surface
-					.readTargetFactsFx(x, y)
-					.pipe(Effect.map((facts) => facts.target !== null && facts.occupant === null)),
 			application,
 			drag,
 			dragThreshold,

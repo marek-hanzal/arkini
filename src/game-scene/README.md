@@ -46,7 +46,7 @@ defines that direction.
 ## Interaction and lifetime
 
 The Board uses fixed 512 px world cells. The camera supports wheel and pinch zoom anchored at the
-pointer, right drag pan, left drag pan starting on an empty canonical cell, edge pan while dragging,
+pointer, right drag pan, edge pan while dragging,
 `0` to fit, and resize that preserves the viewed center. Engine preview owns drop validity;
 Pixi hit testing supplies coordinates and the exact canonical target. Hover feedback never changes
 hit geometry or admission.

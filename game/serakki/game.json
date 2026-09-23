@@ -259,75 +259,63 @@
 			},
 			{
 				"x": 8,
-				"y": 4,
-				"space": 0,
-				"itemId": "foundation-chest"
-			},
-			{
-				"x": 8,
-				"y": 5,
-				"space": 0,
-				"itemId": "base-camp"
-			},
-			{
-				"x": 6,
-				"y": 5,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 7,
-				"y": 3,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 9,
-				"y": 3,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 5,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
 				"y": 7,
 				"space": 0,
-				"itemId": "tree"
+				"itemId": "forest"
 			},
 			{
 				"x": 8,
 				"y": 6,
 				"space": 0,
-				"itemId": "forest"
+				"itemId": "base-camp"
 			},
 			{
-				"x": 9,
-				"y": 4,
+				"x": 6,
+				"y": 6,
 				"space": 0,
-				"itemId": "stone-deposit"
+				"itemId": "tree"
+			},
+			{
+				"x": 10,
+				"y": 6,
+				"space": 0,
+				"itemId": "tree"
 			},
 			{
 				"x": 7,
-				"y": 4,
+				"y": 5,
 				"space": 0,
 				"itemId": "stone-deposit"
 			},
 			{
 				"x": 8,
-				"y": 8,
+				"y": 5,
 				"space": 0,
-				"itemId": "forest-portal"
+				"itemId": "tree"
+			},
+			{
+				"x": 9,
+				"y": 5,
+				"space": 0,
+				"itemId": "stone-deposit"
+			},
+			{
+				"x": 9,
+				"y": 4,
+				"space": 0,
+				"itemId": "tree"
 			},
 			{
 				"x": 7,
-				"y": 5,
-				"space": 2,
-				"itemId": "homeland-portal"
+				"y": 4,
+				"space": 0,
+				"itemId": "tree"
+			},
+			{
+				"x": 8,
+				"y": 3,
+				"space": 0,
+				"itemId": "foundation-chest"
 			}
 		]
 	}

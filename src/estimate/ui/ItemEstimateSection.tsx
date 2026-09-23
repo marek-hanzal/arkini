@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
@@ -183,6 +184,12 @@ export const ItemEstimateSection = ({
 						optionDataUi="EditorItemEstimateRouteSort"
 						options={sortOptions.map((option) => ({
 							...option,
+							label: (
+								<ShortcutLabel
+									label={option.label}
+									shortcut={option.shortcut}
+								/>
+							),
 							description: `${option.label} · ${formatForDisplay({
 								key: option.shortcut,
 								shift: option.shift,

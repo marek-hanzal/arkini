@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { Mx } from "~/translation/ui/Mx";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
@@ -71,7 +72,10 @@ const EditorArtworkDetailTab = ({
 				}}
 				className={sectionLinkClassName}
 			>
-				{label}
+				<ShortcutLabel
+					label={label}
+					shortcut={section.shortcut}
+				/>
 			</LinkButtonLink>
 		</Tooltip>
 	);

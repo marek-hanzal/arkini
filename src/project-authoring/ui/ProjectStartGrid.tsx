@@ -1,3 +1,4 @@
+import "./ProjectStartGrid.css";
 import { Plus } from "lucide-react";
 import {
 	type PointerEvent as ReactPointerEvent,
@@ -104,7 +105,7 @@ const ProjectStartGridSlot = ({
 	readonly suppressClickRef: RefObject<boolean>;
 }) => (
 	<button
-		className="relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:border-line-strong enabled:hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
+		className="relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center border-0 bg-transparent p-0 text-subtle inset-ring-0 transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:shadow-[inset_0_0_0_1px_var(--ak-accent)] data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:inset-ring-2 data-[ui-drag-target=true]:inset-ring-accent/60 data-[ui-invalid=true]:inset-ring-2 data-[ui-invalid=true]:inset-ring-danger/35"
 		data-start-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
@@ -116,6 +117,7 @@ const ProjectStartGridSlot = ({
 				dragSource: isDragSource,
 				dragTarget: isDragTarget,
 				invalid,
+				alternate: (position.x + position.y) % 2 === 1,
 			},
 		})}
 		onClick={(event) => {
@@ -220,12 +222,15 @@ const ProjectStartGridSurface = ({
 			data-mode={edit === undefined ? "detail" : "edit"}
 		>
 			<div
-				className="mx-auto grid gap-1.5"
+				className="mx-auto grid overflow-hidden border border-line bg-surface/78"
+				data-ui="EditorProjectStartGridSurface"
 				ref={edit?.gridRef}
 				style={{
 					gridTemplateColumns: `repeat(${Math.max(1, width)}, minmax(0, 1fr))`,
 					// Fit square cells to the panel width and a viewport-bounded preview height.
-					width: `min(100%, calc((70dvh - ${Math.max(0, height - 1)} * 0.375rem) / ${Math.max(1, height)} * ${Math.max(1, width)} + ${Math.max(0, width - 1)} * 0.375rem))`,
+					width: `min(100%, calc(70dvh / ${Math.max(1, height)} * ${Math.max(1, width)}))`,
+					// Gameplay rounds the outer board by 16 px per 512 px world cell.
+					borderRadius: `${100 / (32 * Math.max(1, width))}% / ${100 / (32 * Math.max(1, height))}%`,
 				}}
 			>
 				{positions.map((position) => {
@@ -234,7 +239,7 @@ const ProjectStartGridSurface = ({
 					const item = cell === undefined ? undefined : items[cell.itemId];
 					if (edit === undefined) {
 						const className =
-							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 p-0 text-subtle shadow-none";
+							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center border-0 bg-transparent p-0 text-subtle shadow-none";
 						const content = (
 							<ProjectStartGridCellContent resourceIds={item?.artwork.default} />
 						);
@@ -242,9 +247,14 @@ const ProjectStartGridSurface = ({
 							item !== undefined &&
 							projectId !== undefined ? (
 							<ButtonLink
-								className={`${className} hover:border-accent`}
+								className={`${className} hover:shadow-[inset_0_0_0_1px_var(--ak-accent)]`}
 								data-item-id={item.id}
-								data-ui="EditorProjectStartGridSlot"
+								{...readDataUiFn({
+									dataUi: "EditorProjectStartGridSlot",
+									state: {
+										alternate: (position.x + position.y) % 2 === 1,
+									},
+								})}
 								key={key}
 								params={{
 									itemUid: item.uid,
@@ -259,7 +269,12 @@ const ProjectStartGridSurface = ({
 						) : (
 							<div
 								className={className}
-								data-ui="EditorProjectStartGridSlot"
+								{...readDataUiFn({
+									dataUi: "EditorProjectStartGridSlot",
+									state: {
+										alternate: (position.x + position.y) % 2 === 1,
+									},
+								})}
 								key={key}
 								title={item?.title || item?.id}
 							>

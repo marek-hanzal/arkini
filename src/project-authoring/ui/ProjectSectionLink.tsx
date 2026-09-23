@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -36,7 +37,10 @@ export const ProjectSectionLink = ({
 			}}
 			className={sectionLinkClassName}
 		>
-			{label}
+			<ShortcutLabel
+				label={label}
+				shortcut={section.shortcut}
+			/>
 		</LinkButtonLink>
 	);
 	return (

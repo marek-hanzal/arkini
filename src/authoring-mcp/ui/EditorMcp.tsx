@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useNavigate } from "@tanstack/react-router";
 import { Tooltip } from "~/ui/ui/Tooltip";
@@ -135,7 +136,10 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 									}}
 									className={sectionLinkClassName}
 								>
-									{translator.textFn(candidate.label)}
+									<ShortcutLabel
+										label={translator.textFn(candidate.label)}
+										shortcut={candidate.shortcut}
+									/>
 								</LinkButtonLink>
 							</Tooltip>
 						))}

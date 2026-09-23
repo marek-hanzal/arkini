@@ -1,3 +1,4 @@
+import { CircleCheck, Dice5, Package, DoorOpen, MapPin, Shuffle } from "lucide-react";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { match } from "ts-pattern";
 
@@ -66,10 +67,12 @@ const OutcomeFields = ({
 				options={[
 					{
 						value: "item",
+						icon: <Package className="size-4 shrink-0" />,
 						label: translator.textFn("Item"),
 					},
 					{
 						value: "space",
+						icon: <DoorOpen className="size-4 shrink-0" />,
 						label: translator.textFn("Space"),
 					},
 				]}
@@ -132,11 +135,13 @@ const OutcomeFields = ({
 								{
 									description: <Mx label="Local drop placement help" />,
 									label: translator.textFn("Local drop"),
+									icon: <MapPin className="size-4" />,
 									value: "drop",
 								},
 								{
 									description: <Mx label="Random drop placement help" />,
 									label: translator.textFn("Random"),
+									icon: <Shuffle className="size-4" />,
 									value: "random",
 								},
 							]}
@@ -339,11 +344,13 @@ const RollControl = ({
 						{
 							description: <Mx label="Guaranteed roll type help" />,
 							label: translator.textFn("Guaranteed"),
+							icon: <CircleCheck className="size-4" />,
 							value: "guaranteed",
 						},
 						{
 							description: <Mx label="Chance roll type help" />,
 							label: translator.textFn("Chance"),
+							icon: <Dice5 className="size-4" />,
 							value: "chance",
 						},
 					]}

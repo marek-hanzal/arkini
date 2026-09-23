@@ -1,3 +1,4 @@
+import { Star, Eye, Power, Clock } from "lucide-react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
@@ -111,6 +112,7 @@ export const LineFields = withFieldGroupFn({
 														description: (
 															<Mx label="Production line default help" />
 														),
+														icon: <Star className="size-4 shrink-0" />,
 														label: translator.textFn("Default"),
 														onChangeFn: (value) =>
 															onMarkerChangeFn("default", value),
@@ -121,6 +123,7 @@ export const LineFields = withFieldGroupFn({
 														description: (
 															<Mx label="Production line visibility help" />
 														),
+														icon: <Eye className="size-4 shrink-0" />,
 														label: translator.textFn("Visible"),
 														onChangeFn: (value) =>
 															group.setFieldValue("show", value),
@@ -131,6 +134,7 @@ export const LineFields = withFieldGroupFn({
 														description: (
 															<Mx label="Production line enabled help" />
 														),
+														icon: <Power className="size-4 shrink-0" />,
 														label: translator.textFn("Enabled"),
 														onChangeFn: (value) =>
 															group.setFieldValue("enable", value),
@@ -141,6 +145,7 @@ export const LineFields = withFieldGroupFn({
 														description: (
 															<Mx label="Production line Clock help" />
 														),
+														icon: <Clock className="size-4 shrink-0" />,
 														label: translator.textFn("Clock"),
 														onChangeFn: (value) =>
 															onMarkerChangeFn("clock", value),

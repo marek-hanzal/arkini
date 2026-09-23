@@ -25,17 +25,17 @@
 				"id": "travel",
 				"title": "Travel",
 				"description": "Travel to the destination space.",
+				"clock": false,
+				"clockWeight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,
-				"clock": false,
 				"runtimeMs": 0,
 				"input": [
 					{
 						"type": "simple"
 					}
 				],
-				"rules": [],
 				"outcome": {
 					"set": [
 						{
@@ -55,7 +55,8 @@
 							]
 						}
 					]
-				}
+				},
+				"rules": []
 			}
 		]
 	}

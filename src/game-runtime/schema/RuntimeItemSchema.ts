@@ -37,7 +37,7 @@ export const RuntimeItemSchema = z
 		schedule: ScheduleStateSchema.optional(),
 		/** Persisted merge random-stream cursor; bookkeeping does not make an item impure. */
 		mergeSequence: NonNegativeIntegerSchema.optional().describe(
-			"Successful source merges on this surviving identity; omitted means zero.",
+			"Successful merges owned by this surviving identity; omitted means zero.",
 		),
 		/**
 		 * Opaque optimistic-concurrency token replaced after command-relevant mutations.

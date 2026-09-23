@@ -12,6 +12,13 @@
 				"workshop-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 696,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

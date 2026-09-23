@@ -25,7 +25,7 @@ export const readCapabilityRelatedTermsFn = (
 		for (const rule of capability.rules)
 			for (const when of rule.when) ids.add(when.query.selector.itemId);
 	} else {
-		ids.add(capability.target.itemId);
+		if (capability.action !== "space") ids.add(capability.target.itemId);
 		if (capability.effect === "replace") ids.add(capability.result);
 	}
 	for (const set of capability.outcome?.set ?? []) {

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
@@ -11,9 +12,9 @@ const BaseSchema = z
 		target: SelectorSchema.describe(
 			"The selector that must match the receiving item for this merge to apply.",
 		),
-		action: SourceActionSchema.describe(
-			"The action applied to the source item after this merge resolves.",
-		),
+		action: SourceActionSchema.exclude([
+			"Space",
+		]).describe("The action applied to the source item after this merge resolves."),
 		outcome: OutcomeTableSchema.optional().describe(
 			"The optional extra outcome evaluated after this merge resolves.",
 		),
@@ -78,27 +79,57 @@ const ReplaceSchema = z
 		description: "A merge that replaces its selected receiving item with an explicit result.",
 	});
 
-/**
- * A target-specific directional interaction initiated by dropping its owning
- * item onto another item.
- *
- * Source handling and target effects are separate: `action` describes the
- * source item, while this union's `effect` describes the matched target.
- */
+const SpaceBaseSchema = z
+	.object({
+		action: SourceActionSchema.extract([
+			"Space",
+		]),
+		space: NonNegativeIntegerSchema.describe(
+			"The destination Board space for the incoming item.",
+		),
+		outcome: OutcomeTableSchema.optional(),
+	})
+	.strict();
+
+/** Source-owned directional merges and receiver-owned transport share target effects and outcomes. */
 export const MergeSchema = z
-	.discriminatedUnion("effect", [
-		SpendSchema,
-		KeepSchema,
-		RemoveSchema,
-		ReplaceSchema,
+	.discriminatedUnion("action", [
+		z.discriminatedUnion("effect", [
+			SpendSchema,
+			KeepSchema,
+			RemoveSchema,
+			ReplaceSchema,
+		]),
+		z.discriminatedUnion("effect", [
+			SpaceBaseSchema.extend({
+				effect: TargetEffectSchema.extract([
+					"Keep",
+				]),
+			}),
+			SpaceBaseSchema.extend({
+				effect: TargetEffectSchema.extract([
+					"Remove",
+				]),
+			}),
+			SpaceBaseSchema.extend({
+				effect: TargetEffectSchema.extract([
+					"Spend",
+				]),
+			}),
+			SpaceBaseSchema.extend({
+				effect: TargetEffectSchema.extract([
+					"Replace",
+				]),
+				result: IdSchema,
+			}),
+		]),
 	])
 	.meta({
 		id: "MergeSchema",
-		description: "A discriminated target-specific directional item merge.",
+		description: "A source-owned directional merge or receiver-owned Space transport.",
 	});
 
 export type MergeSchema = typeof MergeSchema;
-
 export namespace MergeSchema {
 	export type Type = z.infer<MergeSchema>;
 }

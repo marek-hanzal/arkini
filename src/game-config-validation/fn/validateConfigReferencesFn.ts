@@ -347,20 +347,21 @@ export const validateConfigReferencesFn = ({
 			);
 		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
-			diagnostics.push(
-				...validateSelectorReferenceFn({
-					config,
-					selector: merge.target,
-					path: [
-						"items",
-						itemId,
-						"merge",
-						mergeIndex,
-						"target",
-					],
-					source,
-				}),
-			);
+			if (merge.action !== "space")
+				diagnostics.push(
+					...validateSelectorReferenceFn({
+						config,
+						selector: merge.target,
+						path: [
+							"items",
+							itemId,
+							"merge",
+							mergeIndex,
+							"target",
+						],
+						source,
+					}),
+				);
 
 			match(merge)
 				.with(

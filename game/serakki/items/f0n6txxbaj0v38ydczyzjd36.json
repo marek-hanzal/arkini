@@ -12,6 +12,13 @@
 				"food-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 753,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

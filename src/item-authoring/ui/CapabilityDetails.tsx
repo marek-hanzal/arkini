@@ -99,17 +99,25 @@ export const MergeDetail = ({
 				<DetailFact
 					label={translator.textFn("Target")}
 					description={<Mx label="Authored merge target summary help" />}
-					value={<SelectorDetail selector={merge.target} />}
+					value={
+						merge.action === "space" ? (
+							`${translator.textFn("Space")} ${merge.space}`
+						) : (
+							<SelectorDetail selector={merge.target} />
+						)
+					}
 				/>
 				<DetailFact
 					label={translator.textFn("Source action")}
 					description={<Mx label="Authored merge source action summary help" />}
 					value={translator.textFn(
-						merge.action === "spend"
-							? "Spend"
-							: merge.action === "use"
-								? "Use"
-								: "Consume",
+						merge.action === "space"
+							? "Space"
+							: merge.action === "spend"
+								? "Spend"
+								: merge.action === "use"
+									? "Use"
+									: "Consume",
 					)}
 				/>
 				{"result" in merge ? (

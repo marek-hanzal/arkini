@@ -102,7 +102,7 @@ const targetSpendRule = {
 } satisfies MergeSchema.Type;
 
 const combinations: ReadonlyArray<{
-	action: SourceActionSchema.Type;
+	action: Exclude<SourceActionSchema.Type, "space">;
 	effect: TargetEffectSchema.Type;
 }> = [
 	{

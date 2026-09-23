@@ -879,19 +879,151 @@
 		"MergeSchema": {
 			"oneOf": [
 				{
-					"$ref": "urn:serakki:schema:project#/$defs/merge.SpendSchema"
+					"oneOf": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.SpendSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.KeepSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.RemoveSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.ReplaceSchema"
+						}
+					]
 				},
 				{
-					"$ref": "urn:serakki:schema:project#/$defs/merge.KeepSchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/merge.RemoveSchema"
-				},
-				{
-					"$ref": "urn:serakki:schema:project#/$defs/merge.ReplaceSchema"
+					"oneOf": [
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"keep"
+									]
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect"
+							],
+							"additionalProperties": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"remove"
+									]
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect"
+							],
+							"additionalProperties": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"spend"
+									]
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect"
+							],
+							"additionalProperties": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"replace"
+									]
+								},
+								"result": {
+									"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect",
+								"result"
+							],
+							"additionalProperties": false
+						}
+					]
 				}
 			],
-			"description": "A discriminated target-specific directional item merge."
+			"description": "A source-owned directional merge or receiver-owned Space transport."
 		},
 		"merge.SpendSchema": {
 			"type": "object",
@@ -901,8 +1033,13 @@
 					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
 				},
 				"action": {
-					"description": "The action applied to the source item after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+					"type": "string",
+					"enum": [
+						"use",
+						"consume",
+						"spend"
+					],
+					"description": "The action applied to the source item after this merge resolves."
 				},
 				"outcome": {
 					"description": "The optional extra outcome evaluated after this merge resolves.",
@@ -924,15 +1061,6 @@
 			"additionalProperties": false,
 			"description": "A merge that spends one unit from its selected receiving item."
 		},
-		"merge.SourceActionSchema": {
-			"type": "string",
-			"enum": [
-				"use",
-				"consume",
-				"spend"
-			],
-			"description": "The action applied to a source item after it initiates a merge."
-		},
 		"merge.KeepSchema": {
 			"type": "object",
 			"properties": {
@@ -941,8 +1069,13 @@
 					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
 				},
 				"action": {
-					"description": "The action applied to the source item after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+					"type": "string",
+					"enum": [
+						"use",
+						"consume",
+						"spend"
+					],
+					"description": "The action applied to the source item after this merge resolves."
 				},
 				"outcome": {
 					"description": "The optional extra outcome evaluated after this merge resolves.",
@@ -972,8 +1105,13 @@
 					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
 				},
 				"action": {
-					"description": "The action applied to the source item after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+					"type": "string",
+					"enum": [
+						"use",
+						"consume",
+						"spend"
+					],
+					"description": "The action applied to the source item after this merge resolves."
 				},
 				"outcome": {
 					"description": "The optional extra outcome evaluated after this merge resolves.",
@@ -1003,8 +1141,13 @@
 					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
 				},
 				"action": {
-					"description": "The action applied to the source item after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/merge.SourceActionSchema"
+					"type": "string",
+					"enum": [
+						"use",
+						"consume",
+						"spend"
+					],
+					"description": "The action applied to the source item after this merge resolves."
 				},
 				"outcome": {
 					"description": "The optional extra outcome evaluated after this merge resolves.",
@@ -1619,7 +1762,7 @@
 					"$ref": "urn:serakki:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
-					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"description": "Optional directional merges and at most one receiver-owned Space interaction.",
 					"type": "array",
 					"prefixItems": [
 						{

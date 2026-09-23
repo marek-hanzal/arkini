@@ -12,6 +12,13 @@
 				"farmland-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 994,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

@@ -1,3 +1,4 @@
+import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -61,7 +62,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	runtime,
 	source,
 }: {
-	readonly action: SourceActionSchema.Type;
+	readonly action: Exclude<SourceActionSchema.Type, "space">;
 	readonly actionId: string;
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: BoardRuntimeItemSchema.Type;
@@ -305,20 +306,31 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	source,
 	target,
 }: ApplyMergeRuntimeProps) {
-	const sourceAction = yield* applyMergeSourceActionFx({
-		action: rule.action,
-		actionId: `merge:${ruleIndex}:${source.mergeSequence ?? 0}`,
-		runtime,
-		source,
-	});
+	const owner = rule.action === "space" ? target : source;
+	const sourceAction = yield* rule.action === "space"
+		? relocateBoardItemFx({
+				itemId: source.id,
+				originItemId: owner.id,
+				runtime,
+				origin: {
+					...owner.location,
+					space: rule.space,
+				},
+			})
+		: applyMergeSourceActionFx({
+				action: rule.action,
+				actionId: `merge:${ruleIndex}:${owner.mergeSequence ?? 0}`,
+				runtime,
+				source,
+			});
 	// Resolve the target against the draft after source side effects.
 	const currentTarget = yield* readBoardRuntimeItemByIdFx({
 		itemId: target.id,
 		runtime: sourceAction.runtime,
 	});
 	const targetEffect = yield* applyMergeTargetEffectFx({
-		actionId: `merge:${ruleIndex}:target:${source.mergeSequence ?? 0}`,
-		ownerItemId: source.id,
+		actionId: `merge:${ruleIndex}:target:${owner.mergeSequence ?? 0}`,
+		ownerItemId: owner.id,
 		rule,
 		runtime: sourceAction.runtime,
 		target: currentTarget,
@@ -345,8 +357,8 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		} satisfies ApplyMergeRuntimeResult;
 	}
 	const outcome = yield* resolveOutcomeTableFx({
-		ownerItemId: source.id,
-		origin: source.location,
+		ownerItemId: owner.id,
+		origin: owner.location,
 		outcome: rule.outcome,
 	});
 	const [placement, withOutcome] = yield* applyOutcomeTableFx({
@@ -354,7 +366,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		runtime: draft,
 	});
 	const placementEvents = yield* readOutcomePlacementItemEventsFx({
-		originItemId: source.id,
+		originItemId: owner.id,
 		placement,
 	});
 	events.push(...placementEvents);

@@ -10,6 +10,35 @@ import {
 	outputFn,
 } from "./readItemChainsFn.test/fixtures";
 describe("root-owned interaction chains", () => {
+	it("projects receiver replacement and outcomes without inventing the anonymous transported source", () => {
+		const items = catalogFn(
+			itemFn("portal", {
+				merge: [
+					{
+						action: "space",
+						space: 7,
+						effect: "replace",
+						result: "spent-portal",
+						outcome: outputFn("rubble"),
+					},
+				],
+			}),
+			itemFn("spent-portal"),
+			itemFn("rubble"),
+		);
+		const result = readItemChainsFn(items, "portal");
+		expect(finalIdsFn(result)).toEqual([
+			"spent-portal",
+			"rubble",
+		]);
+		expect(result.chains[0].steps[0]).toMatchObject({
+			ownerId: "portal",
+			targetId: "portal",
+			sourceAction: "space",
+			targetEffect: "replace",
+		});
+	});
+
 	it("keeps opposite merge directions distinct and never follows intermediate merges", () => {
 		const items = catalogFn(
 			itemFn("fawn", {

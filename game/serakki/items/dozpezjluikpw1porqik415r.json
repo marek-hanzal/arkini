@@ -12,6 +12,13 @@
 				"forest-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 833,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

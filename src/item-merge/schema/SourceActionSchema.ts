@@ -1,17 +1,18 @@
 import { z } from "zod";
 
 /**
- * Discriminates what happens to a source item after it initiates a merge.
+ * Discriminates handling of the dragged item; Space is authored by the receiving item.
  */
 export const SourceActionSchema = z
 	.enum({
 		Use: "use",
 		Consume: "consume",
 		Spend: "spend",
+		Space: "space",
 	})
 	.meta({
 		id: "merge.SourceActionSchema",
-		description: "The action applied to a source item after it initiates a merge.",
+		description: "The action applied to the dragged item during an authored merge.",
 	});
 
 export type SourceActionSchema = typeof SourceActionSchema;

@@ -12,6 +12,13 @@
 				"mining-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 2,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

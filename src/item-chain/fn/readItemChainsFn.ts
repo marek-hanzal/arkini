@@ -53,6 +53,7 @@ export namespace readItemChainsFn {
 	export interface Chain {
 		readonly id: string;
 		readonly kind: "merge" | "clock";
+		readonly space?: number;
 		readonly ownerId: string;
 		readonly targetId?: string;
 		readonly steps: readonly Step[];
@@ -288,9 +289,12 @@ export const readItemChainsFn = (
 			break;
 		}
 		remaining--;
-		// Canonical merge admission uses the first exact target rule, never reverse matching.
-		if (seenTargets.has(merge.target.itemId)) continue;
-		seenTargets.add(merge.target.itemId);
+		const targetId = merge.action === "space" ? root.id : merge.target.itemId;
+		// Receiver-owned transport retains an anonymous source; only its concrete target consequences are projected.
+		if (merge.action !== "space") {
+			if (seenTargets.has(targetId)) continue;
+			seenTargets.add(targetId);
+		}
 		const path = `merge/${mergeIndex}`;
 		const before = omitted;
 		const branches: readItemChainsFn.Node[] = [];
@@ -299,7 +303,7 @@ export const readItemChainsFn = (
 		else if (merge.effect === "keep" || merge.effect === "spend")
 			branches.push(
 				nodeFn(
-					merge.target.itemId,
+					targetId,
 					`${path}/target`,
 					1,
 					[],
@@ -308,7 +312,7 @@ export const readItemChainsFn = (
 					merge.effect === "keep" ? "retained" : "spent",
 				),
 			);
-		if (merge.action !== "consume")
+		if (merge.action !== "consume" && merge.action !== "space")
 			branches.push(
 				nodeFn(
 					root.id,
@@ -330,7 +334,7 @@ export const readItemChainsFn = (
 			],
 			[
 				"target",
-				merge.effect === "spend" ? items[merge.target.itemId] : undefined,
+				merge.effect === "spend" ? items[targetId] : undefined,
 			],
 		] as const) {
 			if (participant?.units?.outcome === undefined) continue;
@@ -354,7 +358,7 @@ export const readItemChainsFn = (
 				path,
 				kind: "merge",
 				ownerId: root.id,
-				targetId: merge.target.itemId,
+				targetId: targetId,
 				mergeIndex,
 				sourceAction: merge.action,
 				targetEffect: merge.effect,
@@ -368,8 +372,13 @@ export const readItemChainsFn = (
 		chains.push({
 			id: path,
 			kind: "merge",
+			...(merge.action === "space"
+				? {
+						space: merge.space,
+					}
+				: {}),
 			ownerId: root.id,
-			targetId: merge.target.itemId,
+			targetId: targetId,
 			steps,
 		});
 	}

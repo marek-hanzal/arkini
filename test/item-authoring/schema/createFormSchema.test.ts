@@ -37,6 +37,44 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 });
 
 describe("createFormSchema", () => {
+	it("rejects ambiguous receiver transport definitions at the second action", () => {
+		const source = createSimpleItem("portal");
+		const project = {
+			config: {
+				items: {
+					[source.id]: source,
+				},
+			} as GameConfigSchema.Type,
+		};
+		const form = readFormValues(source);
+		const result = createFormSchema(project, source.uid).safeParse({
+			...form,
+			merge: [
+				{
+					action: "space",
+					space: 1,
+					effect: "keep",
+				},
+				{
+					action: "space",
+					space: 2,
+					effect: "keep",
+				},
+			],
+		});
+		expect(result.success).toBe(false);
+		if (!result.success)
+			expect(result.error.issues).toContainEqual(
+				expect.objectContaining({
+					path: [
+						"merge",
+						1,
+						"action",
+					],
+				}),
+			);
+	});
+
 	it("rejects a Spend merge action after Units are disabled on its source", () => {
 		const target = createSimpleItem("target");
 		const source = {

@@ -57,7 +57,12 @@ export const ItemChain = ({ itemId }: { readonly itemId: string }) => {
 				>
 					<div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-4">
 						<div className="flex min-w-0 flex-col gap-2">
-							{chain.targetId === undefined ? (
+							{chain.space !== undefined ? (
+								<ItemReference
+									itemId={chain.ownerId}
+									description={`${translator.textFn("Space")} ${chain.space}`}
+								/>
+							) : chain.targetId === undefined ? (
 								<ItemReference
 									description={
 										<span className="inline-flex items-center gap-2 text-sm text-muted">

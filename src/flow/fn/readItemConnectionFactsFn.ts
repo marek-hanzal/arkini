@@ -151,13 +151,14 @@ const readOwnerFactsFn = (item: ItemSchema.Type): ItemConnectionFact[] => {
 			type: "merge",
 			mergeIndex,
 		} as const;
-		facts.push({
-			factId: merge.target.itemId,
-			origin: {
-				source,
-				role: "input",
-			},
-		});
+		if (merge.action !== "space")
+			facts.push({
+				factId: merge.target.itemId,
+				origin: {
+					source,
+					role: "input",
+				},
+			});
 		if (merge.effect === "replace")
 			facts.push({
 				factId: merge.result,

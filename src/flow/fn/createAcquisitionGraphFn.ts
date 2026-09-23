@@ -339,6 +339,8 @@ const readMergeRoutesFn = (config: GameConfigSchema.Type, source: ItemSchema.Typ
 	const routes: AcquisitionRoute[] = [];
 	const matchedTargetItemIds = new Set<string>();
 	for (const [mergeIndex, merge] of (source.merge ?? []).entries()) {
+		// Anonymous transported sources have no exact acquisition requirement in this graph.
+		if (merge.action === "space") continue;
 		if (matchedTargetItemIds.has(merge.target.itemId)) continue;
 		matchedTargetItemIds.add(merge.target.itemId);
 		const requirements: AcquisitionRoute["requirements"] = {

@@ -43,6 +43,7 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 	readonly target: RuntimeItemSchema.Type;
 }) {
 	// Seed tags are stable gameplay identity; renaming an operation must not reroll outcome.
+	const owner = rule.action === "space" ? target : source;
 	const actionSeed = rule.action === SourceActionSchema.enum.Spend ? "deposit" : rule.action;
 	const effectSeed = rule.effect === TargetEffectSchema.enum.Spend ? "deposit" : rule.effect;
 	const result = rule.effect === TargetEffectSchema.enum.Replace ? rule.result : "none";
@@ -53,7 +54,7 @@ const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <Result, Erro
 				"serakki:merge",
 				`v${MergeRandomVersion}`,
 				source.id,
-				source.mergeSequence ?? 0,
+				owner.mergeSequence ?? 0,
 				source.item.id,
 				readRemainingUnitsSeedFn(source),
 				target.id,
@@ -157,6 +158,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				source,
 				target,
 			});
+			const owner = resolved.rule.action === "space" ? target : source;
 			const mergeTransition = yield* makeMergeRandomFx({
 				program: applyMergeRuntimeFx({
 					rule: resolved.rule,
@@ -170,16 +172,16 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				source,
 				target,
 			});
-			// Advance the surviving source stream only in this committed candidate;
+			// Advance the surviving definition owner stream only in this committed candidate;
 			// revisions cannot seed it because hydration replaces those tokens.
 			const nextRuntime = {
 				...mergeTransition.runtime,
 				items: yield* Effect.forEach(mergeTransition.runtime.items, (item) =>
-					item.id === source.id
+					item.id === owner.id
 						? reviseRuntimeItemFx({
 								item: {
 									...item,
-									mergeSequence: (source.mergeSequence ?? 0) + 1,
+									mergeSequence: (owner.mergeSequence ?? 0) + 1,
 								},
 							})
 						: Effect.succeed(item),

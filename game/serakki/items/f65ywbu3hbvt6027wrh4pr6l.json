@@ -12,6 +12,13 @@
 				"industrial-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 4,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

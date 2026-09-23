@@ -144,10 +144,7 @@ Authored artwork summary help:
 
     Artwork changes only appearance, never placement or gameplay.
 Authored merge outcome summary help:
-  value: |
-    Extra results this merge can create after it changes the dragged and target items.
-
-    For example, opening a chest can remove the chest and drop treasure. If there is no extra outcome, the changes to the two items are the whole result.
+  value: Authored merge outcome summary help
 Authored merge source action summary help:
   value: |
     What happens to the item you drag:
@@ -155,6 +152,7 @@ Authored merge source action summary help:
     - **Use:** keep it.
     - **Consume:** remove one item.
     - **Spend:** remove one Unit.
+    - **Space:** receive any dragged item and send that same instance to the configured space.
 Authored merge target effect summary help:
   value: |
     What happens to the item receiving the drop:
@@ -170,9 +168,9 @@ Authored merge target summary help:
     Direction matters: A onto B is different from B onto A.
 Authored merges summary help:
   value: |
-    Starts when you drop this item onto its selected target.
+    Use, Consume and Spend start when you drop this item onto its selected target. Space starts when another item is dropped onto this one, unless that item owns an explicit merge for this target.
 
-    It updates the dragged item, updates the target, then creates any extra output.
+    It updates or transports the dragged item, updates the receiving item, then applies any extra outcome.
 Authored outcome summary help:
   value: Authored outcome summary help
 Authored production Clock marker help:
@@ -1113,15 +1111,19 @@ Merge:
 Merge outcome:
   value: Merge outcome
 Merge outcome help:
-  value: |
-    Choose what else happens after the dragged item and receiver are handled. For example, using a key on a chest can remove the chest and drop treasure. Leave this empty if changing the two items is the whole result.
-
-    Add outcome sets for different possible results. Rules decide which sets are available; if several qualify, their weights choose one. Every roll in the chosen set is then checked; chance and individual rules can still prevent some results. If there is no eligible set, the merge creates nothing extra.
+  value: Merge outcome help
 Merge source consume help:
   value: |
     **Consume** removes one dragged item, not one Unit.
 
     Example: **Match + Unlit Candle → Candle** consumes one Match.
+Merge source space help:
+  value: |
+    **Space** sends any item dropped onto this item to the target space, preserving its identity and state. An explicit merge on the dragged item takes priority.
+
+    **Target item** controls this receiving item. Extra outcomes use this receiver's original Board position. Transport does not switch the player's space; a Space outcome can do that separately.
+
+    A full destination or failed effect cancels the whole interaction. Each item can define one Space merge.
 Merge source spend help:
   value: |
     **Spend** removes one Unit from the dragged item and keeps it in place.
@@ -1154,13 +1156,9 @@ Merge with:
   value: Merge with
 Merge with help:
   value: |
-    Choose which item this one can be dropped **onto**. This merge rule belongs to the item you are editing: dragging it onto the chosen item triggers the rule.
+    Choose the item you will drop this item **onto**.
 
-    This item is the dragged item. **Source action** decides whether it stays, disappears, or spends a Unit. **Target effect** decides what happens to the item receiving it.
-
-    Extra **Merge outcome** rules use the dragged item's Board position, and local results appear near it. If the target runs out of Units, its separate depletion outcome uses the target's own position.
-
-    Dragging the chosen item back onto this one does not trigger the same rule. That direction needs its own merge rule on the other item.
+    This item is always the source. Direction matters.
 Merges:
   value: Merges
 Minimum:
@@ -2088,6 +2086,8 @@ self:
   value: self
 simple:
   value: simple
+space:
+  value: space
 spend:
   value: spend
 starting:

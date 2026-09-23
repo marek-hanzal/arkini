@@ -109,7 +109,9 @@ const mergeLinesFn = (
 		? []
 		: [
 				`  Merge: ${includeOwner ? `${itemFn(project, sourceId)} / ` : ""}rule ${mergeIndex + 1}; Runtime: instant`,
-				`  Inputs: source x1 ${merge.action}; target ${itemFn(project, merge.target.itemId)} x1 ${merge.effect}${sourceId === merge.target.itemId ? "; distinct source/target instances" : ""}`,
+				merge.action === "space"
+					? `  Inputs: any dragged item transported to space ${merge.space}; receiver ${itemFn(project, sourceId)} x1 ${merge.effect}`
+					: `  Inputs: source x1 ${merge.action}; target ${itemFn(project, merge.target.itemId)} x1 ${merge.effect}${sourceId === merge.target.itemId ? "; distinct source/target instances" : ""}`,
 			];
 };
 

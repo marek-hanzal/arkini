@@ -41,7 +41,8 @@ export const validateMergeViabilityFn = ({
 					reason: InvalidMergeReasonEnumSchema.enum.SourceUnitsDisabled,
 				});
 			}
-			const exactTarget = config.items[merge.target.itemId];
+			const targetId = merge.action === "space" ? ownerItemId : merge.target.itemId;
+			const exactTarget = config.items[targetId];
 			if (
 				merge.effect === TargetEffectSchema.enum.Spend &&
 				exactTarget !== undefined &&
@@ -58,7 +59,7 @@ export const validateMergeViabilityFn = ({
 						"effect",
 					],
 					source: provenance.items[ownerItemId],
-					message: `Merge ${mergeIndex} of item ${ownerItemId} spends a target unit, but selected target ${merge.target.itemId} has no units.`,
+					message: `Merge ${mergeIndex} of item ${ownerItemId} spends a target unit, but selected target ${targetId} has no units.`,
 					ownerItemId,
 					mergeIndex,
 					reason: InvalidMergeReasonEnumSchema.enum.TargetUnitsDisabled,

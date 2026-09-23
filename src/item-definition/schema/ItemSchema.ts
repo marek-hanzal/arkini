@@ -81,9 +81,25 @@ export const ItemSchema = z
 				],
 				MergeSchema,
 			)
+			.superRefine((merges, context) => {
+				let hasSpace = false;
+				for (const [index, merge] of merges.entries()) {
+					if (merge.action !== "space") continue;
+					if (hasSpace)
+						context.addIssue({
+							code: "custom",
+							path: [
+								index,
+								"action",
+							],
+							message: "Only one Space interaction is allowed per item.",
+						});
+					hasSpace = true;
+				}
+			})
 			.optional()
 			.describe(
-				"The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+				"Optional directional merges and at most one receiver-owned Space interaction.",
 			),
 		clock: ItemScheduleSchema.optional(),
 		/**

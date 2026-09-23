@@ -12,6 +12,13 @@
 				"homeland-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 0,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

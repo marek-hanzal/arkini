@@ -12,6 +12,13 @@
 				"trade-portal"
 			]
 		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 338,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
 		"lines": [
 			{

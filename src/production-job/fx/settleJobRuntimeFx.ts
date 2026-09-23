@@ -96,7 +96,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 				runtime: draft,
 			});
 			depletionEffects = placement.effects;
-			depletionDiscarded = placement.discarded ?? [];
+			depletionDiscarded = placement.discarded;
 			draft = withDepletionOutcome;
 		}
 	}

@@ -1,9 +1,8 @@
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { EngineFact } from "~/game-event/type/EngineFact";
-import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 
@@ -54,17 +53,12 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 					continue;
 				}
 				for (const spawned of effect.placement.spawn) {
-					const item = Option.getOrUndefined(narrowBoardRuntimeItemFn(spawned));
-					if (item === undefined)
-						return yield* Effect.die(
-							new Error(`Outcome spawned ${spawned.id} outside Board.`),
-						);
 					candidates.push({
 						type: GameEventEnumSchema.enum.ItemSpawned,
-						itemId: item.id,
-						itemUid: item.item.uid,
+						itemId: spawned.id,
+						itemUid: spawned.item.uid,
 						originItemId: fact.originItemId,
-						location: item.location,
+						location: spawned.location,
 					});
 				}
 			}

@@ -13,7 +13,7 @@ export namespace applyOutcomeTableFx {
 	}
 	export interface Result {
 		readonly effects: readonly AppliedOutcome[];
-		readonly discarded?: readonly planBestEffortDropPlacementFx.Discarded[];
+		readonly discarded: readonly planBestEffortDropPlacementFx.Discarded[];
 	}
 }
 
@@ -39,11 +39,7 @@ export const applyOutcomeTableFx = Effect.fn("applyOutcomeTableFx")(function* ({
 	return [
 		{
 			effects,
-			...(overflow === "discard"
-				? {
-						discarded,
-					}
-				: {}),
+			discarded,
 		} satisfies applyOutcomeTableFx.Result,
 		draft,
 	] as const;

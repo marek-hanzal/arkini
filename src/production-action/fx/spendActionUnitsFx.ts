@@ -116,6 +116,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 
 	let placement: applyOutcomeTableFx.Result = {
 		effects: [],
+		discarded: [],
 	};
 	const depletionOutcome = item.item.units?.outcome;
 	if (depletionOutcome !== undefined) {

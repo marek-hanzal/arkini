@@ -83,7 +83,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			return {
 				runtime: withOutcome,
 				effects: placement.effects,
-				discarded: (placement.discarded ?? []).map(
+				discarded: placement.discarded.map(
 					(loss): GameEventSchema.Type => ({
 						type: GameEventEnumSchema.enum.ItemDiscarded,
 						ownerItemId: item.id,

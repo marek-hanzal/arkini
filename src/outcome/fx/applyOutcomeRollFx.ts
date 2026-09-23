@@ -5,7 +5,6 @@ import { match } from "ts-pattern";
 import type { ResolvedOutcomeRoll } from "~/outcome/type/ResolvedOutcomeRoll";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { applyItemOutcomeFx } from "./applyItemOutcomeFx";
-import { applySpaceOutcomeFn } from "~/outcome/fn/applySpaceOutcomeFn";
 import type { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
 import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 
@@ -59,10 +58,12 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 				},
 				(outcome) =>
 					Effect.gen(function* () {
-						draft = applySpaceOutcomeFn({
-							outcome,
-							runtime: draft,
-						});
+						// Navigation stays in the draft; publication reads only the final space.
+						if (draft.currentSpace !== outcome.space)
+							draft = {
+								...draft,
+								currentSpace: outcome.space,
+							};
 					}),
 			)
 			.with(
